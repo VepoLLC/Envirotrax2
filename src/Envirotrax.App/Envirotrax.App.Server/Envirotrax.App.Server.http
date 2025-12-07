@@ -1,0 +1,6 @@
+@Envirotrax.App.Server_HostAddress = http://localhost:5242
+
+GET {{Envirotrax.App.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

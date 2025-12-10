@@ -13,12 +13,15 @@ namespace Envirotrax.Common.Data.Services.Definitions
 
         int UserId { get; }
 
+        int ContractorId { get; }
+
+        int ParentContractorId { get; }
+
         void SetWaterSupplierId(int supplierId);
         void SetWaterSupplier(ClaimsPrincipal principal, int supplierId);
 
         void SetParentWaterSupplier(ClaimsPrincipal principal, int supplierId);
 
         void SetDomain(ClaimsPrincipal principal, string domain);
-
     }
 }

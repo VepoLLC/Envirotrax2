@@ -20,6 +20,7 @@
     <ProjectReference Include="..\envirotrax.app.client\envirotrax.app.client.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="../../Envirotrax.Common/Envirotrax.Common.csproj" />
   </ItemGroup>
 
 </Project>

@@ -14,14 +14,7 @@ namespace Envirotrax.Common.Data.Services.Implementations
         {
             get
             {
-                var tenantIdClaim = _contextAccessor.HttpContext?.User.FindFirstValue("wsId");
-
-                if (int.TryParse(tenantIdClaim, out var tenantId))
-                {
-                    return tenantId;
-                }
-
-                return default;
+                return TryGetInteger("wsId");
             }
         }
 
@@ -29,14 +22,7 @@ namespace Envirotrax.Common.Data.Services.Implementations
         {
             get
             {
-                var tenantIdClaim = _contextAccessor.HttpContext?.User.FindFirstValue("pWsId");
-
-                if (int.TryParse(tenantIdClaim, out var tenantId))
-                {
-                    return tenantId;
-                }
-
-                return default;
+                return TryGetInteger("pWsId");
             }
         }
 
@@ -53,20 +39,41 @@ namespace Envirotrax.Common.Data.Services.Implementations
         {
             get
             {
-                var userIdClaim = _contextAccessor.HttpContext?.User.FindFirstValue(OpenIddictConstants.Claims.Subject);
+                return TryGetInteger(OpenIddictConstants.Claims.Subject);
+            }
+        }
 
-                if (int.TryParse(userIdClaim, out var userId))
-                {
-                    return userId;
-                }
+        public int ContractorId
+        {
+            get
+            {
+                return TryGetInteger("ctrId");
+            }
+        }
 
-                return default;
+        public int ParentContractorId
+        {
+            get
+            {
+                return TryGetInteger("pCtrId");
             }
         }
 
         public TenantProviderService(IHttpContextAccessor contextAccessor)
         {
             _contextAccessor = contextAccessor;
+        }
+
+        private int TryGetInteger(string claimType)
+        {
+            var claim = _contextAccessor.HttpContext?.User.FindFirstValue(claimType);
+
+            if (int.TryParse(claim, out var integer))
+            {
+                return integer;
+            }
+
+            return default;
         }
 
         private ClaimsIdentity GetClaimsIdentity()

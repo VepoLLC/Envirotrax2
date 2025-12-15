@@ -1,0 +1,57 @@
+﻿/*Style from old project header_back.css file */
+#header {
+    transition: all 0.5s;
+    z-index: 997;
+    transition: all 0.5s;
+}
+
+    #header .logo img {
+        padding: 0;
+        margin: 0;
+        max-height: 40px;
+        transition: 0.75s ease-in-out;
+        opacity: 0;
+    }
+
+.login {
+    margin-top: 0px;
+}
+
+#header .main-panel {
+    padding: 5px 10px;
+    background: #008fd4;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.8);
+}
+
+#header .login-panel {
+    margin-top: 5px;
+}
+
+.login-box {
+    border: 1px solid var(--bs-body-color);
+    border-radius: 4px;
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    padding: 3px 10px;
+    margin-left: 2px;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+}
+
+    .login-box i {
+        color: #008fd4;
+    }
+
+    .login-box a {
+        color: var(--bs-body-color);
+    }
+
+    .login-box.left {
+        border-radius: 0px 4px 4px 15px;
+        padding-left: 15px;
+    }
+
+    .login-box.right {
+        border-radius: 4px 0px 15px 4px;
+        padding-right: 15px;
+    }

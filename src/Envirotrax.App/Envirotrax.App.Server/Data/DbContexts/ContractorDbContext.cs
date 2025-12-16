@@ -33,5 +33,34 @@ namespace Envirotrax.App.Server.Data.DbContexts
                 }
             }
         }
+
+        protected override void SetSecurityProperties()
+        {
+            base.SetSecurityProperties();
+
+            if (!SkipSaveSecurityProperties)
+            {
+                var contractorId = _tenantProvider.ContractorId;
+
+                foreach (var entry in ChangeTracker.Entries<IContractorModel>())
+                {
+                    var contractorProperty = entry.Property(e => e.ContractorId);
+                    contractorProperty.CurrentValue = contractorId;
+                }
+            }
+        }
+
+        protected override void SetSecurityProperties(object entity)
+        {
+            base.SetSecurityProperties(entity);
+
+            if (!SkipSaveSecurityProperties)
+            {
+                if (entity is IContractorModel contractorModel)
+                {
+                    contractorModel.ContractorId = _tenantProvider.ContractorId;
+                }
+            }
+        }
     }
 }

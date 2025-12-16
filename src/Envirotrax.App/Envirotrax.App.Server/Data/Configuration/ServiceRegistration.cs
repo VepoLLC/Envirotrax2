@@ -1,5 +1,7 @@
 
 using Envirotrax.App.Server.Data.DbContexts;
+using Envirotrax.App.Server.Data.Services.Definitions;
+using Envirotrax.App.Server.Data.Services.Implementations;
 using Envirotrax.Common.Configuration;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,6 +29,7 @@ public static class ServiceRegistration
     {
         AddDbContext<TenantDbContext>(services, configuration, environment);
         AddDbContext<ContractorDbContext>(services, configuration, environment);
+        services.AddScoped<IDbContextSelector, DbContextSelector>();
 
         services.AddTenantProvider();
 

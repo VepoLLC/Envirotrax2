@@ -3,8 +3,8 @@ using Envirotrax.App.Server.Data.DbContexts;
 
 namespace Envirotrax.App.Server.Data.Services.Definitions
 {
-    public interface IDbContextFactory
+    public interface IDbContextSelector
     {
-        TenantDbContext CreateContext();
+        TenantDbContext Current { get; }
     }
 }

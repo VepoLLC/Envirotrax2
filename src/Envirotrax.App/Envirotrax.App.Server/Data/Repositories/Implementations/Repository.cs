@@ -3,12 +3,23 @@
 using System.Reflection;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
+using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Repositories.Definitions;
+using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations;
+
+public abstract class Repository<TModel> : Repository<TModel, TenantDbContext>, IRepository<TModel>
+        where TModel : class
+{
+    public Repository(IDbContextSelector dbContextSelector)
+        : base(dbContextSelector.Current)
+    {
+    }
+}
 
 public abstract class Repository<TModel, TDbContext> : Repository<TModel, int, TDbContext>, IRepository<TModel>
         where TModel : class

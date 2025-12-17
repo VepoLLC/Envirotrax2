@@ -10,6 +10,21 @@ public class WaterSupplierProfile : Profile
     public WaterSupplierProfile()
     {
         CreateMap<WaterSupplier, WaterSupplierDto>()
+            .AfterMap((model, dto) =>
+            {
+                if (model.ParentId.HasValue)
+                {
+                    dto.Parent ??= new ReferencedWaterSupplierDto
+                    {
+                        Id = model.ParentId.Value
+                    };
+                }
+            })
+            .ReverseMap()
+            .ForMember(supplier => supplier.Parent, opt => opt.Ignore())
+            .ForMember(supplier => supplier.ParentId, opt => opt.MapFrom(supplier => supplier.Parent!.Id));
+
+        CreateMap<WaterSupplier, ReferencedWaterSupplierDto>()
             .ReverseMap();
     }
 }

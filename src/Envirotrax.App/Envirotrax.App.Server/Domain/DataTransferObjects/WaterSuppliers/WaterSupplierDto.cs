@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers
 {
-    public class WaterSupplierDto
+    public class WaterSupplierDto : IDto
     {
         public int Id { get; set; }
 
@@ -13,5 +13,17 @@ namespace Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers
 
         [StringLength(50)]
         public string Domain { get; set; } = null!;
+
+        public ReferencedWaterSupplierDto? Parent { get; set; }
+    }
+
+    public class ReferencedWaterSupplierDto
+    {
+        [Required]
+        public int? Id { get; set; }
+
+        public string? Name { get; set; }
+
+        public string? Domain { get; set; }
     }
 }

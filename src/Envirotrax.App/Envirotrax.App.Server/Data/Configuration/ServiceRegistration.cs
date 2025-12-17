@@ -1,5 +1,7 @@
 
 using Envirotrax.App.Server.Data.DbContexts;
+using Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
+using Envirotrax.App.Server.Data.Repositories.Implementations.WaterSuppliers;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Data.Services.Implementations;
 using Envirotrax.Common.Configuration;
@@ -32,6 +34,8 @@ public static class ServiceRegistration
         services.AddScoped<IDbContextSelector, DbContextSelector>();
 
         services.AddTenantProvider();
+
+        services.AddTransient<IWaterSupplierRepository, WaterSupplierRepository>();
 
         return services;
     }

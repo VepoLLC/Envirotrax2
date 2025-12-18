@@ -1,0 +1,14 @@
+<ng-container *ngIf="!componentType">
+    <div *ngIf="column.type == 'date'">
+        {{cellData | date: 'mediumDate'}}
+    </div>
+
+    <div *ngIf="column.type != 'date'">
+        {{cellData}}
+    </div>
+</ng-container>
+
+<ng-container *ngIf="componentType">
+    <ng-container *ngComponentOutlet="column.cellComponent!; injector: cellInjector">
+    </ng-container>
+</ng-container>

@@ -4,6 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
+import { SharedComponentsModule } from './shared/components/shared.components.module';
 
 @NgModule({
   declarations: [
@@ -11,7 +12,8 @@ import { App } from './app';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    SharedComponentsModule
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),

@@ -1,0 +1,18 @@
+<a *ngIf="routerLink"
+   class="dropdown-item"
+   href="javascript:void(0)"
+   [routerLink]="routerLink"
+   [queryParams]="queryParams"
+   [state]="state">
+    <ng-container *ngTemplateOutlet="tempOutlet"></ng-container>
+</a>
+
+<button *ngIf="!routerLink"
+        type="button"
+        class="dropdown-item">
+    <ng-container *ngTemplateOutlet="tempOutlet"></ng-container>
+</button>
+
+<ng-template #tempOutlet>
+    <ng-content></ng-content>
+</ng-template>

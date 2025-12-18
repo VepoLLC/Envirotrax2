@@ -1,0 +1,11 @@
+<div class="text-danger" *ngIf="(form.invalid && form.submitted) || validationErrors.length > 0">
+    <p>
+        There are validation errors. Please correct the validation errors, then try again.
+    </p>
+
+    <ul>
+        <li *ngFor="let error of validationErrors">
+            {{error}}
+        </li>
+    </ul>
+</div>

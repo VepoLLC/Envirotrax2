@@ -1,0 +1,6 @@
+<div class="text-danger"
+     *ngIf="(form?.controls![fieldName]?.touched || form?.submitted) && form?.controls![fieldName]?.invalid">
+    <div *ngIf="form?.controls![fieldName]?.errors!['required']">
+        The {{fieldLabel}} field is required.
+    </div>
+</div>

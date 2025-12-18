@@ -34,7 +34,7 @@ namespace Envirotrax.Common.Data.DbContexts
         private readonly ILogger<TenantDbContextBase<TTenant, TUser>> _logger;
         private readonly ITenantProvidersService _tenantProvider;
 
-        public bool SkipSaveTenant { get; set; }
+        public bool SkipSaveSecurityProperties { get; set; }
 
         public DbSet<TTenant> WaterSuppliers { get; set; }
         public DbSet<TUser> AspNetUsers { get; set; }
@@ -239,11 +239,11 @@ namespace Envirotrax.Common.Data.DbContexts
 
         public void SetTenantId(object entity)
         {
-            if (!SkipSaveTenant)
+            if (!SkipSaveSecurityProperties)
             {
-                if (entity is ITenantModel userModel)
+                if (entity is ITenantModel tenantModel)
                 {
-                    userModel.WaterSupplierId = VerifySaveTenantId(_tenantProvider.WaterSupplierId);
+                    tenantModel.WaterSupplierId = VerifySaveTenantId(_tenantProvider.WaterSupplierId);
                 }
             }
         }
@@ -253,7 +253,7 @@ namespace Envirotrax.Common.Data.DbContexts
         /// </summary>
         public void SetTenantId()
         {
-            if (!SkipSaveTenant)
+            if (!SkipSaveSecurityProperties)
             {
                 var tenantId = _tenantProvider.WaterSupplierId;
 
@@ -263,6 +263,16 @@ namespace Envirotrax.Common.Data.DbContexts
                     tenantIdProperty.CurrentValue = VerifySaveTenantId(tenantIdProperty.CurrentValue);
                 }
             }
+        }
+
+        protected virtual void SetSecurityProperties(object entity)
+        {
+            SetTenantId(entity);
+        }
+
+        protected virtual void SetSecurityProperties()
+        {
+            SetTenantId();
         }
 
         private bool HasGenericInterface(Type type, Type genericInterfaceType)
@@ -334,7 +344,7 @@ namespace Envirotrax.Common.Data.DbContexts
         public override int SaveChanges()
         {
             EnforceReadOnlyTables();
-            SetTenantId();
+            SetSecurityProperties();
             AuditEntities();
 
             try
@@ -351,7 +361,7 @@ namespace Envirotrax.Common.Data.DbContexts
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             EnforceReadOnlyTables();
-            SetTenantId();
+            SetSecurityProperties();
             AuditEntities();
 
             try
@@ -367,13 +377,13 @@ namespace Envirotrax.Common.Data.DbContexts
 
         public override EntityEntry Attach(object entity)
         {
-            SetTenantId(entity);
+            SetSecurityProperties(entity);
             return base.Attach(entity);
         }
 
         public override EntityEntry<TEntity> Attach<TEntity>(TEntity entity)
         {
-            SetTenantId(entity);
+            SetSecurityProperties(entity);
             return base.Attach(entity);
         }
 
@@ -381,7 +391,7 @@ namespace Envirotrax.Common.Data.DbContexts
         {
             foreach (var entity in entities)
             {
-                SetTenantId(entity);
+                SetSecurityProperties(entity);
             }
 
             base.AttachRange(entities);
@@ -391,7 +401,7 @@ namespace Envirotrax.Common.Data.DbContexts
         {
             foreach (var entity in entities)
             {
-                SetTenantId(entity);
+                SetSecurityProperties(entity);
             }
 
             base.AttachRange(entities);
@@ -399,13 +409,13 @@ namespace Envirotrax.Common.Data.DbContexts
 
         public override EntityEntry Entry(object entity)
         {
-            SetTenantId(entity);
+            SetSecurityProperties(entity);
             return base.Entry(entity);
         }
 
         public override EntityEntry<TEntity> Entry<TEntity>(TEntity entity)
         {
-            SetTenantId(entity);
+            SetSecurityProperties(entity);
             return base.Entry(entity);
         }
     }

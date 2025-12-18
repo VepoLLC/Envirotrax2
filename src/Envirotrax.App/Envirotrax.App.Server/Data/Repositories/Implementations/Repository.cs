@@ -3,12 +3,23 @@
 using System.Reflection;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
+using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Repositories.Definitions;
+using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations;
+
+public abstract class Repository<TModel> : Repository<TModel, TenantDbContext>, IRepository<TModel>
+        where TModel : class
+{
+    public Repository(IDbContextSelector dbContextSelector)
+        : base(dbContextSelector.Current)
+    {
+    }
+}
 
 public abstract class Repository<TModel, TDbContext> : Repository<TModel, int, TDbContext>, IRepository<TModel>
         where TModel : class
@@ -27,13 +38,13 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
 {
     private readonly string _primaryKeyName;
 
-    protected TDbContext Context { get; private set; }
+    protected TDbContext DbContext { get; private set; }
 
     protected DbSet<TModel> Entity { get; private set; }
 
     public Repository(TDbContext dbContext)
     {
-        Context = dbContext;
+        DbContext = dbContext;
         Entity = dbContext.Set<TModel>();
 
         // Since our db primary key names can be different for each table, we get the primary key name from the model metadata.
@@ -49,7 +60,7 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
 
     protected virtual string GetPrimaryColumnName()
     {
-        return Context
+        return DbContext
             .Model
             .FindEntityType(typeof(TModel))!
             .FindPrimaryKey()!
@@ -114,14 +125,14 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
     public virtual async Task<TModel> AddAsync(TModel model)
     {
         Entity.Add(model);
-        await Context.SaveChangesAsync();
+        await DbContext.SaveChangesAsync();
 
         return model;
     }
 
     protected virtual void UpdateEntity(TModel model)
     {
-        Context.Attach(model);
+        DbContext.Attach(model);
         Entity.Entry(model).State = EntityState.Modified;
     }
 
@@ -129,7 +140,7 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
     {
         UpdateEntity(model);
 
-        await Context.SaveChangesAsync();
+        await DbContext.SaveChangesAsync();
 
         return model;
     }
@@ -140,9 +151,9 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
 
         if (model != null)
         {
-            Context.Entry(model).State = EntityState.Deleted;
+            DbContext.Entry(model).State = EntityState.Deleted;
 
-            if (await Context.SaveChangesAsync() > 0)
+            if (await DbContext.SaveChangesAsync() > 0)
             {
                 return model;
             }
@@ -155,18 +166,18 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
     {
         if (model != null)
         {
-            Context.Entry(model).State = EntityState.Detached;
-            Context.Attach(model);
+            DbContext.Entry(model).State = EntityState.Detached;
+            DbContext.Attach(model);
 
-            var deletedTime = Context.Entry(model).Property(nameof(IAuditableModel<AspNetUserBase>.DeletedTime));
+            var deletedTime = DbContext.Entry(model).Property(nameof(IAuditableModel<AspNetUserBase>.DeletedTime));
             deletedTime.CurrentValue = null;
             deletedTime.IsModified = true;
 
-            var deletedById = Context.Entry(model).Property(nameof(IAuditableModel<AspNetUserBase>.DeletedById));
+            var deletedById = DbContext.Entry(model).Property(nameof(IAuditableModel<AspNetUserBase>.DeletedById));
             deletedById.CurrentValue = null;
             deletedById.IsModified = true;
 
-            await Context.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
 
             return model;
         }

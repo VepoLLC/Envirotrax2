@@ -1,0 +1,110 @@
+<div *ngIf="model && columns && queryForm && index >= 0" class="border p-1 mb-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div *ngIf="index > 0" class="mb-3">
+                    <label for="filter-lop-{{index}}" class="form-label">
+                        Operator
+                    </label>
+                    <select id="filter-lop-{{index}}" name="filterLop{{index}}" class="form-control"
+                            [(ngModel)]="model.logicalOperator" required="required">
+                        <option *ngFor="let item of options.logicalOperators" [value]="item.id">
+                            {{item.value}}
+                        </option>
+                    </select>
+                    <vp-validation-field [form]="queryForm" fieldName="filterLop{{index}}" fieldLabel="Operator">
+                    </vp-validation-field>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="filter-column-{{index}}" class="form-label">
+                        Column
+                    </label>
+                    <select id="filter-column-{{index}}" name="filterColumn{{index}}" class="form-control"
+                            [(ngModel)]="model.columnName" (ngModelChange)="columnSelected()" required="required">
+                        <option *ngFor="let item of columns" [value]="item.id">
+                            {{item.value}}
+                        </option>
+                    </select>
+                    <vp-validation-field [form]="queryForm" fieldName="filterColumn{{index}}" fieldLabel="Column">
+                    </vp-validation-field>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="filter-operator-{{index}}" class="form-label">
+                        Search Type
+                    </label>
+                    <select id="filter-operator-{{index}}" name="filterOperator{{index}}" class="form-control"
+                            [(ngModel)]="model.comparisonOperator" required="required">
+                        <ng-container *ngIf="selectedColumn?.searchTypes">
+                            <option *ngFor="let item of selectedColumn!.searchTypes" [value]="item.id">
+                                {{item.value}}
+                            </option>
+                        </ng-container>
+                        <ng-container *ngIf="!selectedColumn?.searchTypes">
+                            <option *ngFor="let item of options.otherOptions" [value]="item.id">
+                                {{item.value}}
+                            </option>
+                        </ng-container>
+                    </select>
+                    <vp-validation-field [form]="queryForm" fieldName="filterOperator{{index}}"
+                                         fieldLabel="Search Type">
+                    </vp-validation-field>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="filter-value-{{index}}" class="form-label">
+                        Search Term
+                    </label>
+                    <div class="input-group">
+                        <ng-container *ngIf="selectedColumn?.inputType == 'select'">
+                            <select id="filter-value-{{index}}" name="filterValue{{index}}" class="form-control"
+                                    [(ngModel)]="model.value" required="required"
+                                    [disabled]="model.isValueNull || false">
+                                <option *ngFor="let item of selectedColumn?.columnValues" [value]="item.id">
+                                    {{item.value}}
+                                </option>
+                            </select>
+                        </ng-container>
+
+                        <ng-container *ngIf="selectedColumn?.inputType != 'select'">
+                            <input id="filter-value-{{index}}" name="filterValue{{index}}" class="form-control"
+                                   [attr.type]="selectedColumn?.inputType || 'text'" [(ngModel)]="model.value"
+                                   required="required" [disabled]="model.isValueNull || false" />
+                        </ng-container>
+
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <div class="form-check">
+                                    <input id="filter-null-{{index}}" name="filterNull{{index}}"
+                                           class="form-check-input" type="checkbox" [(ngModel)]="model.isValueNull"
+                                           (ngModelChange)="valueNullChange()" />
+                                    <label for="filter-null-{{index}}" class="form-check-label">
+                                        Empty
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <vp-validation-field [form]="queryForm" fieldName="filterValue{{index}}" fieldLabel="Search Term">
+                    </vp-validation-field>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mb-2">
+            <button type="button" class="btn btn-danger w-50" (click)="onDelete.emit()">
+                Delete
+            </button>
+        </div>
+    </div>
+</div>

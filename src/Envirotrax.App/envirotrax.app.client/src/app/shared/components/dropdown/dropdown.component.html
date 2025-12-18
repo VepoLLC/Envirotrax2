@@ -1,0 +1,17 @@
+<div class="btn-group">
+    <div *ngIf="isExpanded" class="vp-backdrop position-fixed w-100 h-100 vp-backdrop" (click)="isExpanded = false">
+    </div>
+
+    <button type="button" class="btn" [class]="buttonClass" [class.dropdown-toggle]="showCaret" aria-haspopup="true"
+            [attr.aria-expanded]="isExpanded" (click)="toggleExpanded($event)" [class.show]="isExpanded"
+            [attr.title]="title" #dropdownButton>
+        <i *ngIf="iconCss" class="{{iconCss}}"></i>
+        {{label}}
+    </button>
+
+    <div #dropdownContent class="dropdown-menu" [class.show]="isExpanded" (click)="isExpanded = !isExpanded">
+        <ng-content *ngIf="isExpanded">
+
+        </ng-content>
+    </div>
+</div>

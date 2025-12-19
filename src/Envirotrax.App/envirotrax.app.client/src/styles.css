@@ -1,1 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+.bg-primary {
+    background-color: #008fd4 !important;
+}

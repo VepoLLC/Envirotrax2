@@ -1,0 +1,196 @@
+﻿/*Style from old project footer.css*/
+
+
+.footer {
+    position: relative; /* instead of absolute */
+    width: 100%;
+}
+
+#footer {
+    background: #304050;
+    padding: 0 0 30px 0;
+    color: #fff;
+    font-size: 14px;
+}
+
+    #footer .footer-top {
+        padding: 25px 0 10px 0;
+    }
+
+        #footer .footer-top .footer-info {
+            /*margin-top: -90px;*/
+            /*margin-bottom: 15px;*/
+            background: white;
+            color: #2f4d5a;
+            border: 1px solid #004fa4;
+            /*border-top: 10px solid #304050;*/
+            border-radius: 20px;
+            text-align: center;
+            padding: 30px 20px;
+            box-shadow: #00000040 5px 5px 5px;
+        }
+
+    #footer .footer-info:hover {
+        box-shadow: #fff 0px 0px 15px;
+    }
+
+    #footer .footer-top .footer-info a {
+        text-decoration: none !important;
+        color: #008fd4 !important;
+    }
+
+    #footer .footer-top .footer-info h3 {
+        font-size: 24px;
+        margin: 0 0 20px 0;
+        padding: 2px 0 2px 0;
+        line-height: 1;
+        font-weight: 700;
+    }
+
+    #footer .footer-top .footer-info p {
+        font-size: 14px;
+        line-height: 24px;
+        margin-bottom: 0;
+        font-family: "Raleway", sans-serif;
+    }
+
+    #footer .footer-top .social-links a {
+        font-size: 18px;
+        display: inline-block;
+        background: #008fd4;
+        color: #fff;
+        line-height: 1;
+        padding: 8px 0;
+        margin-right: 4px;
+        border-radius: 50%;
+        text-align: center;
+        width: 36px;
+        height: 36px;
+        transition: 0.3s;
+    }
+
+        #footer .footer-top .social-links a:hover {
+            background: #67b0d1;
+            color: #fff;
+            text-decoration: none;
+        }
+
+    #footer .footer-top h4 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #fff;
+        position: relative;
+        padding-bottom: 12px;
+    }
+
+    #footer .footer-top .footer-links {
+        margin-bottom: 30px;
+    }
+
+    #footer .footer-top .footer-links ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    #footer .footer-top .footer-links ul i {
+        padding-right: 2px;
+        color: white;
+        font-size: 18px;
+        line-height: 1;
+    }
+
+    #footer .footer-top .footer-links ul li {
+        padding: 10px 0;
+        display: flex;
+        align-items: center;
+    }
+
+    #footer .footer-top .footer-links ul li:first-child {
+        padding-top: 0;
+    }
+
+    #footer .footer-top .footer-links ul a {
+        color: #fff;
+        transition: 0.3s;
+        display: inline-block;
+        line-height: 1;
+    }
+
+        #footer .footer-top .footer-links ul a:hover {
+        color: #d0d0d0;
+        }
+
+    #footer .footer-top .footer-newsletter form {
+        margin-top: 30px;
+        background: #fff;
+        padding: 6px 10px;
+        position: relative;
+        border-radius: 4;
+    }
+
+    #footer .footer-top .footer-newsletter form input[type=email] {
+        border: 0;
+        padding: 4px;
+        width: calc(100% - 110px);
+    }
+
+    #footer .footer-top .footer-newsletter form input[type=submit] {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        border: 0;
+        background: none;
+        font-size: 16px;
+        padding: 0 20px;
+        background: #67b0d1;
+        color: #fff;
+        transition: 0.3s;
+        border-radius: 4;
+    }
+
+        #footer .footer-top .footer-newsletter form input[type=submit]:hover {
+            background: #409cc5;
+        }
+
+    #footer .copyright {
+        border-top: 1px solid #385b6b;
+        text-align: center;
+        padding-top: 30px;
+    }
+
+    #footer .credits {
+        padding-top: 10px;
+        text-align: center;
+        font-size: 13px;
+        color: #fff;
+    }
+
+#envirotrax_cookie_banner {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+}
+
+    #envirotrax_cookie_banner .body {
+        margin-left: 10px;
+        margin-right: 20px;
+        border: 2px solid #008fd4;
+        border-radius: 8px;
+        background: #f0f0f0;
+        padding: 15px 15px;
+        font-size: .85rem;
+        color: #222;
+    }
+
+    #envirotrax_cookie_banner h4 {
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+@media (max-width: 575px) {
+    #footer .footer-top .footer-info {
+        margin: -20px 0 30px 0;
+    }
+}

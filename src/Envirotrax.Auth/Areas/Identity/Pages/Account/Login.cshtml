@@ -5,7 +5,77 @@
     ViewData["Title"] = "Log in";
 }
 
-<h1>@ViewData["Title"]</h1>
+
+<section id="sectionLogin" runat="server" class="border-box">
+    <div class="row header">
+        <div class="col title">
+            <h3>Existing CSI Inspector Account Login</h3>
+        </div>
+        <div class="col-auto title-right">
+        </div>
+    </div>
+    <div class="content">
+        <div id="divLoginInfo" runat="server" style="width: 100%">
+            If you have an existing CSI inspector account, please login with the User ID and Password you specified when creating the account.  If you do not know
+            your User ID or Password, use the <b>Retrieve Lost Login</b> link to have your login information sent to the email address you specified when you created
+            the account.
+        </div>
+        <form id="account" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <div class="row justify-content-center mt-4">
+                <div class="col-sm-12 col-md-6 col-lg-5 col-xl-4">
+                    <div>
+                        <label asp-for="Input.Email" class="form-label">User ID/Email Address</label>
+                        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+                    <div class="row g-0 align-items-center">
+                        <label asp-for="Input.Password" class="form-label">Password</label>
+                        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                        <div class="col-auto pl-2">
+                            <a href="javascript:void(0);"><i id="eyePassword" class="fa fa-eye password-eye" aria-hidden="true" onclick="showHidePassword();"></i></a>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button type="submit" id="btnLogin" style="width: 200px;" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i>&nbsp;&nbsp;LOGIN
+                        </button>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <a href="lost_login.aspx?e=<%=loginEmailAddress %>" class="a-blue"><b>I forgot my password</b></a>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</section>
+
+<section id="sectionCreateAccount" runat="server" class="border-box mt-3">
+    <div class="row header">
+        <div class="col title">
+            <h3>Create a New CSI Inspector Account</h3>
+        </div>
+        <div class="col-auto title-right">
+        </div>
+    </div>
+    <div class="content">
+        <p style="text-align: center;">
+            <button type="button" class="link-button" ID="btnCreateAccount" Width="200" >
+                <i class="fas fa-user-circle"></i>&nbsp;&nbsp;Create Account
+            </button>
+        </p>
+        <p style="text-align: center;">
+            <a class="a-blue" href="Quick Start Guide.pdf" target="_blank">Click here to download a Quick Start Guide.</a>
+        </p>
+    </div>
+</section>
+
+
+
+
+@* <h1>@ViewData["Title"]</h1>
 <div class="row">
     <div class="col-md-4">
         <section>
@@ -76,7 +146,7 @@
             }
         </section>
     </div>
-</div>
+</div> *@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

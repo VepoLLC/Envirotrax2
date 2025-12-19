@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     public class ProtectedController : ControllerBase
     {

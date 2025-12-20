@@ -5,6 +5,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 import { SharedComponentsModule } from './shared/components/shared.components.module';
+import { TitleStrategy } from '@angular/router';
+import { AppTitleStrategy } from './shared/services/helpers/title/app-title-strategy.service';
 
 @NgModule({
   declarations: [
@@ -17,7 +19,11 @@ import { SharedComponentsModule } from './shared/components/shared.components.mo
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideHttpClient(withInterceptorsFromDi())
+    provideHttpClient(withInterceptorsFromDi()),
+    {
+      provide: TitleStrategy,
+      useClass: AppTitleStrategy
+    }
   ],
   bootstrap: [App]
 })

@@ -1,4 +1,9 @@
-<div class="form-floating">
+<div>
+    <label *ngIf="label" [attr.for]="id" class="form-label">
+        {{label}}
+        <span *ngIf="required" class="text-danger">*</span>
+    </label>
+
     <input *ngIf="type != 'textarea' && type != 'select' && type != 'date' && type != 'datetime'"
            [attr.id]="id"
            [attr.name]="name"
@@ -13,7 +18,7 @@
            [(ngModel)]="value"
            (change)="onChanged()"
            (blur)="onTouched($event)"
-           [placeholder]="placeholder || label"
+           [placeholder]="placeholder"
            (input)="onInput($event)" />
 
     <textarea *ngIf="type == 'textarea'"
@@ -26,7 +31,7 @@
               [disabled]="disabled"
               [attr.maxlength]="maxLength"
               [rows]="rows"
-              [placeholder]="placeholder || label"
+              [placeholder]="placeholder"
               [(ngModel)]="value"
               (change)="onChanged()"
               (blur)="onTouched($event)"
@@ -42,7 +47,7 @@
            [attr.min]="min"
            [attr.max]="max"
            [ngModel]="value | date:'yyyy-MM-dd'"
-           [placeholder]="placeholder || label"
+           [placeholder]="placeholder"
            (ngModelChange)="value = $event"
            (change)="onChanged()"
            (blur)="onTouched($event)" />
@@ -56,7 +61,7 @@
            [disabled]="disabled"
            [attr.min]="min"
            [attr.max]="max"
-           [placeholder]="placeholder || label"
+           [placeholder]="placeholder"
            (blur)="onTouched($event)" />
     <select *ngIf="type == 'select'"
             [attr.id]="id"
@@ -73,10 +78,6 @@
             <ng-content select="option"></ng-content>
         </ng-container>
     </select>
-    <label *ngIf="label" [attr.for]="id" class="form-label">
-        {{label}}
-        <span *ngIf="required" class="text-danger">*</span>
-    </label>
 
     <div>
         <vp-validation-field *ngIf="form" [form]="form" [fieldName]="name" [fieldLabel]="label" />

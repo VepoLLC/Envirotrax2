@@ -1,0 +1,22 @@
+<section class="border rounded shadow-sm">
+    <div class="bg-info px-3 py-2 rounded-top">
+        <div role="button" class="d-flex justify-content-between text-white">
+            <div class="d-flex align-items-center">
+                <h2 *ngIf="header" class="h4">
+                    {{header}}
+                </h2>
+            </div>
+
+            <div>
+                <button type="button" class="border btn text-white px-2 py-1" (click)="isExpanded = !isExpanded">
+                    <i *ngIf="!isExpanded" class="fa-solid fa-chevron-down"></i>
+                    <i *ngIf="isExpanded" class="fa-solid fa-chevron-up"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="isExpanded" class="p-3 bg-white rounded-bottom">
+        <ng-content></ng-content>
+    </div>
+</section>

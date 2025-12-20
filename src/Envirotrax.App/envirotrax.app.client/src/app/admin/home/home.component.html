@@ -3,36 +3,35 @@
         <h1 class="h3">
             Settings
         </h1>
-
-        <p>
-            Type in the text field below to search menu items
-        </p>
-
-        <vp-input [(ngModel)]="searchText"
-                  (ngModelChange)="onSearch($event)"
-                  label="Search" />
     </header>
 
-    <div class="row">
-        <ng-container *ngFor="let menuItem of menuItems">
-            <div *ngIf="menuItem.hasPermission && !menuItem.isHidden" class="col-md-4 mb-3">
-                <a class="border d-block p-3 rounded-2 shadow-sm text-body text-decoration-none h-100"
-                   [routerLink]="menuItem.routerLink">
-                    <div>
-                        <div class="align-items-center d-flex mb-3">
-                            <i [class]="menuItem.iconCss" class="vp-box-icon me-2 text-primary"></i>
+    <vp-section header="Menu">
+        <vp-input [(ngModel)]="searchText"
+                  (ngModelChange)="onSearch($event)"
+                  label="Search"
+                  placeholder="Type in the text field below to search menu items" />
 
-                            <h2 class="h4 mb-0">
-                                {{menuItem.title}}
-                            </h2>
-                        </div>
-
+        <div class="row mt-3">
+            <ng-container *ngFor="let menuItem of menuItems">
+                <div *ngIf="menuItem.hasPermission && !menuItem.isHidden" class="col-md-4 mb-3">
+                    <a class="border d-block p-3 rounded-2 shadow-sm text-body text-decoration-none h-100"
+                       [routerLink]="menuItem.routerLink">
                         <div>
-                            {{menuItem.description}}
+                            <div class="align-items-center d-flex mb-3">
+                                <i [class]="menuItem.iconCss" class="vp-box-icon me-2 text-primary"></i>
+
+                                <h2 class="h4 mb-0">
+                                    {{menuItem.title}}
+                                </h2>
+                            </div>
+
+                            <div>
+                                {{menuItem.description}}
+                            </div>
                         </div>
-                    </div>
-                </a>
-            </div>
-        </ng-container>
-    </div>
+                    </a>
+                </div>
+            </ng-container>
+        </div>
+    </vp-section>
 </div>

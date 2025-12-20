@@ -7,3 +7,32 @@ html {
 .bg-primary {
     background-color: #008fd4 !important;
 }
+
+.bg-info {
+    background-color: #008fd4a0 !important;
+}
+
+.text-primary {
+    color: #008fd4 !important;
+}
+
+.btn-primary {
+    background-color: #008fd4 !important;
+    border-color: #ccc;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: #3282b8 !important;
+    border-color: #dde3eb !important;
+}
+
+.dp-modal-header:not(.dp-error):not(.dp-success):not(.dp-warning) {
+    background-color: #008fd4a0 !important;
+    color: #ffffff;
+}
+
+.dp-modal-header button {
+    color: #ffffff !important;
+}

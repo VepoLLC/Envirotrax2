@@ -49,7 +49,7 @@ export class InputComponent implements ControlValueAccessor, OnInit, AfterViewIn
     public disabled: boolean = false;
 
     @Input()
-    public placeholder: string = null!;
+    public placeholder: string = '';
 
     @Input()
     public maxLength: number = null!;

@@ -1,0 +1,39 @@
+<div>
+    <vp-section header="General">
+        <div dp-spinner-parent>
+            <form #supplierForm="ngForm" (ngSubmit)="save(supplierForm)">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <vp-input [(ngModel)]="supplier.name"
+                                      [required]="true"
+                                      name="name"
+                                      label="Name"
+                                      [form]="supplierForm" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <vp-input [(ngModel)]="supplier.domain"
+                                      [required]="true"
+                                      name="domain"
+                                      label="Domain"
+                                      [form]="supplierForm" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <vp-validation-summary [form]="supplierForm" [validationErrors]="validationErrors" />
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary vp-section-button">
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </vp-section>
+</div>

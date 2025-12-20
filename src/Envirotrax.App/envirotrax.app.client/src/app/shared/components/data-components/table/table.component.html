@@ -59,10 +59,10 @@
                            [attr.placeholder]="freeTextSearch.placeholder"
                            [attr.aria-label]="freeTextSearch.placeholder"
                            [attr.aria-describedby]="searchId">
-                    <button class="btn btn-secondary" type="submit" [attr.id]="searchId" title="Click to Search">
+                    <button class="btn btn-primary" type="submit" [attr.id]="searchId" title="Click to Search">
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </button>
-                    <button *ngIf="freeTextSearch.text" class="btn btn-secondary" type="button"
+                    <button *ngIf="freeTextSearch.text" class="btn btn-primary" type="button"
                             [attr.id]="resetSearchId" title="Click to Reset Search" (click)="resetFreeTextSearch()">
                         <i class="fa-solid fa-xmark"></i>
                     </button>

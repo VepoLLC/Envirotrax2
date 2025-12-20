@@ -5,6 +5,7 @@ import { SupplierListComponent } from "./list/supplier-list.component";
 const routes: Routes = [
     {
         path: '',
+        title: 'Water Suppliers',
         component: SupplierListComponent
     }
 ];

@@ -19,6 +19,7 @@ import { ConfirmModalComponent } from "./modals/confirm-modal.component";
 import { MessageModalComponent } from "./modals/message-modal.component";
 import { ValidationFieldComponent } from "./validation/validation-field/validation-field.component";
 import { ValidationSummaryComponent } from "./validation/validation-summary/validation-summary.component";
+import { SectionComponent } from "./section/section.component";
 
 @NgModule({
     declarations: [
@@ -36,7 +37,8 @@ import { ValidationSummaryComponent } from "./validation/validation-summary/vali
         ConfirmModalComponent,
         MessageModalComponent,
         ValidationFieldComponent,
-        ValidationSummaryComponent
+        ValidationSummaryComponent,
+        SectionComponent
     ],
     imports: [
         CommonModule,
@@ -54,6 +56,7 @@ import { ValidationSummaryComponent } from "./validation/validation-summary/vali
         ValidationSummaryComponent,
         TableComponent,
         CheckboxCellComponent,
+        SectionComponent,
         LoadingSpinnerModule,
         ModalModule
     ]

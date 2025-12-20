@@ -9,7 +9,7 @@ html {
 }
 
 .bg-info {
-    background-color: #008fd4a0 !important;
+    background-color: #05bfdf !important;
 }
 
 .text-primary {
@@ -29,10 +29,26 @@ html {
 }
 
 .dp-modal-header:not(.dp-error):not(.dp-success):not(.dp-warning) {
-    background-color: #008fd4a0 !important;
+    background-color: #05bfdf !important;
     color: #ffffff;
 }
 
 .dp-modal-header button {
     color: #ffffff !important;
+}
+
+.vp-section-button {
+    min-width: 100%;
+}
+
+@media screen and (min-width: 768px) {
+    .vp-section-button {
+        min-width: 50%;
+    }
+}
+
+@media screen and (min-width: 992px) {
+    .vp-section-button {
+        min-width: 25%;
+    }
 }

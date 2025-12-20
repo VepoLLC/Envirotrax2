@@ -6,6 +6,7 @@ import { TableColumn } from "../../../shared/components/data-components/table/ta
 import { ActivatedRoute, Router } from "@angular/router";
 import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
 import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
+import { CreateSupplierComponent } from "../create/create-supplier.component";
 
 @Component({
     templateUrl: './supplier-list.component.html',
@@ -64,7 +65,10 @@ export class SupplierListComponent {
     }
 
     public add(): void {
-
+        this._modalHelper.show<WaterSupplier>(CreateSupplierComponent, {
+            title: 'Create Water Supplier',
+        }).result()
+            .subscribe(supplier => this.edit(supplier));
     }
 
     public edit(supplier: WaterSupplier): void {

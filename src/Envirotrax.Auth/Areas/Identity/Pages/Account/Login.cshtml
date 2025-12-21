@@ -25,12 +25,12 @@
             <div class="row justify-content-center mt-4">
                 <div class="col-sm-12 col-md-6 col-lg-5 col-xl-4">
                     <div>
-                        <label asp-for="Input.Email" class="form-label">User ID/Email Address</label>
+                        <label asp-for="Input.Email" class="form-label fw-bold">User ID/Email Address</label>
                         <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
                         <span asp-validation-for="Input.Email" class="text-danger"></span>
                     </div>
                     <div class="row g-0 align-items-center">
-                        <label asp-for="Input.Password" class="form-label">Password</label>
+                        <label asp-for="Input.Password" class="form-label fw-bold">Password</label>
                         <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
                         <span asp-validation-for="Input.Password" class="text-danger"></span>
                         <div class="col-auto pl-2">
@@ -39,8 +39,9 @@
                     </div>
                     <div class="mt-4 text-center">
                         <button type="submit" id="btnLogin" style="width: 200px;" class="btn btn-primary">
-                            <i class="fas fa-sign-in-alt"></i>&nbsp;&nbsp;LOGIN
-                        </button>
+                            <i class="fa-solid fa-right-to-bracket"></i> LOGIN
+@*                             <i class="fas fa-sign-in-alt"></i>&nbsp;&nbsp;LOGIN
+ *@                        </button>
                     </div>
                     <div class="mt-4 text-center">
                         <a href="lost_login.aspx?e=<%=loginEmailAddress %>" class="a-blue"><b>I forgot my password</b></a>

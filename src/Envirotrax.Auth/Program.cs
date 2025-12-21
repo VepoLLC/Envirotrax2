@@ -1,3 +1,4 @@
+using Envirotrax.Auth.Areas.OpenIdConnect.Configuration;
 using Envirotrax.Auth.Data;
 using Envirotrax.Auth.Data.Models;
 using Microsoft.AspNetCore.Identity;
@@ -15,6 +16,9 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.AddCustomAuth(builder.Configuration, builder.Environment);
+
 builder.Services.AddRazorPages();
 
 var app = builder.Build();

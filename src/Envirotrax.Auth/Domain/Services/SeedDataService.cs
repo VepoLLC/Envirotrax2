@@ -1,7 +1,5 @@
-
-
-using Envirotrax.Auth.Areas.OpenIdConnect.Configuration;
 using Envirotrax.Auth.Data;
+using Envirotrax.Auth.Domain.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;

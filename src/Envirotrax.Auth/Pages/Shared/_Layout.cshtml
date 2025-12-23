@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Envirotrax.Auth</title>
+    <title>@ViewData["Title"]</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 @*     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="~/css/header.css" />
     <link rel="stylesheet" href="~/css/footer.css"/>
     <link rel="stylesheet" href="~/font-awesome/css/all.min.css" />
-
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body class="bg-light">
     <header id="header" class="fixed-top">
@@ -36,48 +36,12 @@
         </div>
     </header>
 
-
-@*     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 ">
-            <div class="container main-panel">
-                <div class="logo">
-                    <a href="/">
-                        <img src="@Url.Content("~/images/header/envirotrax_logo_navbar.svg")"
-                             alt="Vepo LLC" class="" style="opacity: 1;" />
-                    </a>
-                </div>
-            <a class="navbar-brand" asp-area="" asp-page="/Index">Envirotrax.Auth</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button> 
-           <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                    <partial name="_LoginPartial" />
-                </div> 
-            </div>
-        </nav>
-    </header> *@
-
+           
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
-@* 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - Envirotrax.Auth - <a asp-area="" asp-page="/Privacy">Privacy</a>
-        </div>
-    </footer> *@
-
 
     <footer id="footer" class="footer"> 
         <div class="footer-top">
@@ -105,32 +69,23 @@
                     <div class="col-lg-4 footer-links">
                         <h4>Site Links</h4>
                         <ul>
-                            <li><i class="bx bx-chevrons-right"></i> <a href="/">Home</a></li>
-                            <li><i class="bx bx-chevrons-right"></i> <a href="/#programs">Management Programs</a></li>
-                            <li><i class="bx bx-chevrons-right"></i> <a href="/#services">Services</a></li>
-                            <li><i class="bx bx-chevrons-right"></i> <a href="/about_us.aspx">About us</a></li>
-                            <li><i class="bx bx-chevrons-right"></i> <a href="/privacy_policy.aspx">Privacy policy</a></li>
+                            <li><i class="fas fa-angle-double-right fa-xs"></i> <a href="/">Home</a></li>
+                            <li><i class="fas fa-angle-double-right fa-xs"></i> <a href="/#programs">Management Programs</a></li>
+                            <li><i class="fas fa-angle-double-right fa-xs"></i> <a href="/#services">Services</a></li>
+                            <li><i class="fas fa-angle-double-right fa-xs"></i> <a href="/about_us.aspx">About us</a></li>
+                            <li><i class="fas fa-angle-double-right fa-xs"></i> <a href="/privacy_policy.aspx">Privacy policy</a></li>
                         </ul>
                     </div>
 
                     <div class="col-lg-4 footer-links">
                         <h4>Our Management Programs</h4>
                         <ul>
-                            <li><i class="bx bx-chevrons-right"></i> <a href="/program_backflow.aspx">Backflow - Cross Connection Management</a></li>
-                            <li><i class="bx bx-chevrons-right"></i> <a href="/program_csi.aspx">CSI Site Inspections</a></li>
-                            <li><i class="bx bx-chevrons-right"></i> <a href="/program_fog.aspx">FOG Inspection &amp; Waste Disosal</a></li>
-                            <li><i class="bx bx-chevrons-right"></i> <a href="/program_wise.aspx">W.I.S.E. Guys Irrigation Evaluations</a></li>
+                            <li><i class="fas fa-angle-double-right fa-xs"></i> <a href="/program_backflow.aspx">Backflow - Cross Connection Management</a></li>
+                            <li><i class="fas fa-angle-double-right fa-xs"></i> <a href="/program_csi.aspx">CSI Site Inspections</a></li>
+                            <li><i class="fas fa-angle-double-right fa-xs"></i> <a href="/program_fog.aspx">FOG Inspection &amp; Waste Disosal</a></li>
+                            <li><i class="fas fa-angle-double-right fa-xs"></i> <a href="/program_wise.aspx">W.I.S.E. Guys Irrigation Evaluations</a></li>
                         </ul>
                     </div>
-
-                    <!--<div class="col-lg-4 col-md-6 footer-newsletter">
-                    <h4>Our Newsletter</h4>
-                    <p>Tamen quem nulla quae legam multos aute sint culpa legam noster magna</p>
-                    <form action="" method="post">
-                        <input type="email" name="email"><input type="submit" value="Subscribe">
-                    </form>
-
-                    </div>-->
 
                 </div>
             </div>
@@ -142,7 +97,7 @@
                 <p>&copy; Copyright <strong><span>Vepo LLC</span></strong>. All Rights Reserved</p>
             </div>
         </div>
-    </footer><!-- End Footer -->
+    </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

@@ -1,5 +1,16 @@
 /*Style from old project main_back.css*/
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+    -webkit-text-fill-color: inherit !important;
+    box-shadow: 0 0 0 1000px transparent inset !important;
+    transition: background-color 9999s ease-out 0s;
+}
+
+
 :root {
     --font-size: .8rem;
     --bs-body-bg: #fff;

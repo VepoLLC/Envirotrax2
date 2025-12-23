@@ -2,16 +2,15 @@
 using System.Security.Cryptography.X509Certificates;
 using Envirotrax.Auth.Areas.OpenIdConnect.Services;
 using Envirotrax.Auth.Areas.OpenIdConnect.Services.Definitions;
-using Envirotrax.Auth.Areas.OpenIdConnect.Services.Implementations;
 using Envirotrax.Auth.Data;
-using Microsoft.EntityFrameworkCore;
+using Envirotrax.Auth.Domain.Services.Implementations;
 using Quartz;
 
-namespace Envirotrax.Auth.Areas.OpenIdConnect.Configuration
+namespace Envirotrax.Auth.Domain.Configuration
 {
     public static class ServiceRegistration
     {
-        public static IServiceCollection AddCustomAuth(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
+        private static IServiceCollection AddOpenIdConnect(IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
         {
             services.Configure<OpenIddictOptions>(configuration.GetSection("OpenIddict"));
 
@@ -109,6 +108,14 @@ namespace Envirotrax.Auth.Areas.OpenIdConnect.Configuration
                 });
 
             services.AddHostedService<SeedDataService>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddDomainServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
+        {
+            AddOpenIdConnect(services, configuration, environment);
+
             services.AddTransient<IAuthService, AuthService>();
 
             return services;

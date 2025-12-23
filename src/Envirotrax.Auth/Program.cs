@@ -1,23 +1,18 @@
-using Envirotrax.Auth.Areas.OpenIdConnect.Configuration;
 using Envirotrax.Auth.Data;
+using Envirotrax.Auth.Data.Configuration;
 using Envirotrax.Auth.Data.Models;
+using Envirotrax.Auth.Domain.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
-builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
-
-builder.Services.AddCustomAuth(builder.Configuration, builder.Environment);
+builder
+    .Services
+    .AddDataServices(builder.Configuration, builder.Environment)
+    .AddDomainServices(builder.Configuration, builder.Environment);
 
 builder.Services.AddRazorPages();
 

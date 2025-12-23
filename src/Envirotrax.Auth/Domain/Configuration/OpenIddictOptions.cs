@@ -1,5 +1,5 @@
 
-namespace Envirotrax.Auth.Areas.OpenIdConnect.Configuration;
+namespace Envirotrax.Auth.Domain.Configuration;
 
 public class OpenIddictOptions
 {

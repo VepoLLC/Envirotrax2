@@ -114,6 +114,14 @@ namespace Envirotrax.Common.Data.Services.Implementations
             }
         }
 
+        public void SetContractor(ClaimsPrincipal principal, int contractorId)
+        {
+            if (principal.Identities is ClaimsIdentity claimsIdentity)
+            {
+                claimsIdentity.AddClaim(new Claim("ctrId", contractorId.ToString()).SetDestinations(OpenIddictConstants.Destinations.AccessToken));
+            }
+        }
+
         public void SetDomain(ClaimsPrincipal principal, string domain)
         {
             if (principal.Identity is ClaimsIdentity claimsIdentity)

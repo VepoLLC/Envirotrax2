@@ -1,5 +1,6 @@
 
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using Envirotrax.Auth.Areas.OpenIdConnect.Services.Definitions;
 using Envirotrax.Auth.Data.Repositories.Defintions;
 using Envirotrax.Auth.Domain.DataTransferObjects;
@@ -23,7 +24,22 @@ public class AuthService : TenantProviderService, IAuthService
         _contractorUserRepository = contractorUserRepository;
     }
 
-    public async Task<UserAccessDto> GetAccessSettingsAsync(int userId, int? waterSupplierId, int? contractorId)
+    public async Task SetSecurityPropertiesAsync(ClaimsPrincipal principal, int userId, int? waterSupplierId, int? contractorId)
+    {
+        var userAccess = await GetAccessSettingsAsync(userId, waterSupplierId, contractorId);
+
+        if (userAccess.WaterSupplierId.HasValue)
+        {
+            SetWaterSupplier(principal, userAccess.WaterSupplierId.Value);
+        }
+
+        if (userAccess.ContractorId.HasValue)
+        {
+            SetContractor(principal, userAccess.ContractorId.Value);
+        }
+    }
+
+    private async Task<UserAccessDto> GetAccessSettingsAsync(int userId, int? waterSupplierId, int? contractorId)
     {
         var accessDto = new UserAccessDto();
 

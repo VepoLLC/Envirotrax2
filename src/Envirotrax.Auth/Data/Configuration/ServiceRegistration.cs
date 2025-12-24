@@ -15,6 +15,9 @@ public static class ServiceRegistration
         {
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException());
 
+            // Register the entity sets needed by OpenIddict
+            options.UseOpenIddict();
+
             if (environment.IsDevelopment())
             {
                 options.EnableDetailedErrors();

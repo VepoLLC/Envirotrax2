@@ -22,6 +22,8 @@ namespace Envirotrax.Common.Data.Services.Definitions
 
         void SetParentWaterSupplier(ClaimsPrincipal principal, int supplierId);
 
+        void SetContractor(ClaimsPrincipal principal, int contractorId);
+
         void SetDomain(ClaimsPrincipal principal, string domain);
     }
 }

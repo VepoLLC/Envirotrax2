@@ -55,12 +55,6 @@ namespace Envirotrax.Common.Data.DbContexts
 
             foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {
-                if (entity.ClrType.GetCustomAttribute<ExcludedModelAttribute>() != null)
-                {
-                    modelBuilder.Entity(entity.ClrType).Metadata.SetIsTableExcludedFromMigrations(true);
-                    continue;
-                }
-
                 SetPrimaryKeys(modelBuilder, entity);
                 SetForeignKeys(modelBuilder, entity);
                 SetIndexes(modelBuilder, entity);

@@ -57,7 +57,7 @@ namespace Envirotrax.Auth.Domain.Configuration
                         .AddEphemeralSigningKey();
 
                     // Register scopes (permissions)
-                    options.RegisterScopes("mobile_app", "client_portal", "internal_api");
+                    options.RegisterScopes("envirotrax_app");
 
                     // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
                     var aspNetOptions = options.UseAspNetCore();

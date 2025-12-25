@@ -87,39 +87,39 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
         return Entity.AsNoTracking();
     }
 
-    public virtual async Task<IEnumerable<TModel>> GetAllAsync()
+    public virtual async Task<IEnumerable<TModel>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await GetListQuery().ToListAsync();
+        return await GetListQuery().ToListAsync(cancellationToken);
     }
 
-    public virtual async Task<IEnumerable<TModel>> GetAllAsync(PageInfo pageInfo, Query query)
+    public virtual async Task<IEnumerable<TModel>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         var paginated = await GetListQuery()
             .Where(query.Filter)
             .OrderBy(query.Sort)
-            .PaginateAsync(pageInfo);
+            .PaginateAsync(pageInfo, cancellationToken);
 
-        return await paginated.ToListAsync();
+        return await paginated.ToListAsync(cancellationToken);
     }
 
-    public virtual async Task<IEnumerable<TModel>> GetAllAsync(PageInfo pageInfo, Query query, int maxPageSize)
+    public virtual async Task<IEnumerable<TModel>> GetAllAsync(PageInfo pageInfo, Query query, int maxPageSize, CancellationToken cancellationToken)
     {
         var paginated = await GetListQuery()
             .Where(query.Filter)
             .OrderBy(query.Sort)
-            .PaginateAsync(pageInfo, maxPageSize);
+            .PaginateAsync(pageInfo, maxPageSize, cancellationToken);
 
-        return await paginated.ToListAsync();
+        return await paginated.ToListAsync(cancellationToken);
     }
 
-    public virtual async Task<TModel?> GetNoIncludesAsync(TKey id)
+    public virtual async Task<TModel?> GetNoIncludesAsync(TKey id, CancellationToken cancellationToken)
     {
-        return await Entity.SingleOrDefaultAsync(m => EF.Property<TKey>(m, _primaryKeyName)!.Equals(id));
+        return await Entity.SingleOrDefaultAsync(m => EF.Property<TKey>(m, _primaryKeyName)!.Equals(id), cancellationToken);
     }
 
-    public virtual async Task<TModel?> GetAsync(TKey id)
+    public virtual async Task<TModel?> GetAsync(TKey id, CancellationToken cancellationToken)
     {
-        return await GetDetailsQuery().SingleOrDefaultAsync(m => EF.Property<TKey>(m, _primaryKeyName)!.Equals(id));
+        return await GetDetailsQuery().SingleOrDefaultAsync(m => EF.Property<TKey>(m, _primaryKeyName)!.Equals(id), cancellationToken);
     }
 
     public virtual async Task<TModel> AddAsync(TModel model)
@@ -147,7 +147,7 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
 
     public virtual async Task<TModel?> DeleteAsync(TKey id)
     {
-        var model = await GetAsync(id);
+        var model = await GetAsync(id, default);
 
         if (model != null)
         {
@@ -192,7 +192,7 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
             throw new InvalidOperationException($"An entity must implement {nameof(IDeleteAutitableModel<AspNetUserBase>)} interface for reactivating.");
         }
 
-        var model = await GetAsync(id);
+        var model = await GetAsync(id, default);
 
         return await ReactivateAsync(model);
     }

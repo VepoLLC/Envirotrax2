@@ -37,6 +37,7 @@
     "bootstrap": "^5.3.8",
     "flatpickr": "^4.6.13",
     "jest-editor-support": "*",
+    "oidc-client-ts": "^3.4.1",
     "run-script-os": "*",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

@@ -24,11 +24,11 @@ public interface IService<TModel, TDto, TKey> : IServiceBase<TDto, TKey>
 public interface IServiceBase<TDto, TKey>
     where TDto : class, IDto<TKey>
 {
-    Task<IEnumerable<TDto>> GetAllAsync();
-    Task<IPagedData<TDto>> GetAllAsync(PageInfo pageInfo, Query query);
-    Task<IPagedData<TDto>> GetAllAsync(PageInfo pageInfo, Query query, int maxPageSize);
+    Task<IEnumerable<TDto>> GetAllAsync(CancellationToken cancellationToken);
+    Task<IPagedData<TDto>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<IPagedData<TDto>> GetAllAsync(PageInfo pageInfo, Query query, int maxPageSize, CancellationToken cancellationToken);
 
-    Task<TDto?> GetAsync(TKey id);
+    Task<TDto?> GetAsync(TKey id, CancellationToken cancellationToken);
     Task<TDto> AddAsync(TDto dto);
     Task<TDto> UpdateAsync(TDto dto);
     Task<TDto?> DeleteAsync(TKey id);

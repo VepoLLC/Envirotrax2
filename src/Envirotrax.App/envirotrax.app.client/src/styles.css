@@ -1,1 +1,54 @@
 /* You can add global styles to this file, and also import other style files */
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+.bg-primary {
+    background-color: #008fd4 !important;
+}
+
+.bg-info {
+    background-color: #05bfdf !important;
+}
+
+.text-primary {
+    color: #008fd4 !important;
+}
+
+.btn-primary {
+    background-color: #008fd4 !important;
+    border-color: #ccc;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: #3282b8 !important;
+    border-color: #dde3eb !important;
+}
+
+.dp-modal-header:not(.dp-error):not(.dp-success):not(.dp-warning) {
+    background-color: #05bfdf !important;
+    color: #ffffff;
+}
+
+.dp-modal-header button {
+    color: #ffffff !important;
+}
+
+.vp-section-button {
+    min-width: 100%;
+}
+
+@media screen and (min-width: 768px) {
+    .vp-section-button {
+        min-width: 50%;
+    }
+}
+
+@media screen and (min-width: 992px) {
+    .vp-section-button {
+        min-width: 25%;
+    }
+}

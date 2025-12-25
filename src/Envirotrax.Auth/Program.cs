@@ -1,20 +1,19 @@
 using Envirotrax.Auth.Data;
+using Envirotrax.Auth.Data.Configuration;
 using Envirotrax.Auth.Data.Models;
+using Envirotrax.Auth.Domain.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+builder
+    .Services
+    .AddDataServices(builder.Configuration, builder.Environment)
+    .AddDomainServices(builder.Configuration, builder.Environment);
 
-builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
@@ -41,10 +40,12 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();
+app.MapControllers();
 
 app.Run();

@@ -1,0 +1,89 @@
+<div>
+    <label *ngIf="label" [attr.for]="id" class="form-label">
+        {{label}}
+        <span *ngIf="required" class="text-danger">*</span>
+    </label>
+
+    <input *ngIf="type != 'textarea' && type != 'select' && type != 'date' && type != 'datetime'"
+           [attr.id]="id"
+           [attr.name]="name"
+           [attr.type]="type"
+           class="form-control"
+           [required]="required"
+           [readonly]="readonly"
+           [disabled]="disabled"
+           [attr.maxlength]="maxLength"
+           [attr.min]="min"
+           [attr.max]="max"
+           [(ngModel)]="value"
+           (change)="onChanged()"
+           (blur)="onTouched($event)"
+           [placeholder]="placeholder"
+           (input)="onInput($event)" />
+
+    <textarea *ngIf="type == 'textarea'"
+              [attr.id]="id"
+              [attr.name]="name"
+              [attr.type]="type"
+              class="form-control"
+              [required]="required"
+              [readonly]="readonly"
+              [disabled]="disabled"
+              [attr.maxlength]="maxLength"
+              [rows]="rows"
+              [placeholder]="placeholder"
+              [(ngModel)]="value"
+              (change)="onChanged()"
+              (blur)="onTouched($event)"
+              (input)="onInput($event)">
+    </textarea>
+    <input *ngIf="type == 'date'"
+           type="date" [attr.id]="id"
+           [attr.name]="name"
+           class="form-control"
+           [required]="required"
+           [readonly]="readonly"
+           [disabled]="disabled"
+           [attr.min]="min"
+           [attr.max]="max"
+           [ngModel]="value | date:'yyyy-MM-dd'"
+           [placeholder]="placeholder"
+           (ngModelChange)="value = $event"
+           (change)="onChanged()"
+           (blur)="onTouched($event)" />
+    <input *ngIf="type == 'datetime'"
+           #flatpickr
+           [attr.id]="id"
+           [attr.name]="name"
+           class="form-control"
+           [required]="required"
+           [readonly]="readonly"
+           [disabled]="disabled"
+           [attr.min]="min"
+           [attr.max]="max"
+           [placeholder]="placeholder"
+           (blur)="onTouched($event)" />
+    <select *ngIf="type == 'select'"
+            [attr.id]="id"
+            [attr.name]="name"
+            [attr.type]="type"
+            class="form-control"
+            [required]="required"
+            [disabled]="disabled || readonly"
+            [(ngModel)]="value"
+            (change)="onChanged()"
+            (blur)="onTouched($event)"
+            [attr.value]="value">
+        <ng-container ngProjectAs="'option'">
+            <ng-content select="option"></ng-content>
+        </ng-container>
+    </select>
+
+    <div>
+        <vp-validation-field *ngIf="form" [form]="form" [fieldName]="name" [fieldLabel]="label" />
+
+        <div *ngIf="(type == 'text' || type == 'textarea') && maxLength" class="lh-sm me-1 text-end text-muted">
+            <small>{{value?.length || 0}} of {{maxLength}}</small>
+        </div>
+    </div>
+</div>

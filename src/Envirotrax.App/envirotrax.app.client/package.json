@@ -23,17 +23,24 @@
   },
   "private": true,
   "dependencies": {
+    "@angular/animations": "^21.0.6",
     "@angular/common": "^20.1.0",
     "@angular/compiler": "^20.1.0",
     "@angular/core": "^20.1.0",
     "@angular/forms": "^20.1.0",
     "@angular/platform-browser": "^20.1.0",
     "@angular/router": "^20.1.0",
+    "@developer-partners/ngx-loading-spinner": "^1.0.8",
+    "@developer-partners/ngx-modal-dialog": "^1.0.6",
+    "@fortawesome/fontawesome-free": "^7.1.0",
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.8",
+    "flatpickr": "^4.6.13",
+    "jest-editor-support": "*",
+    "run-script-os": "*",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.15.0",
-    "jest-editor-support": "*",
-    "run-script-os": "*"
+    "zone.js": "~0.15.0"
   },
   "devDependencies": {
     "@angular/build": "^20.1.3",

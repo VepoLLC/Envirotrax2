@@ -57,4 +57,14 @@ export class WaterSupplierService {
 
         return lastValueFrom(observable);
     }
+
+    public getAllMySuppliers(pageInfo: PageInfo, query: Query): Promise<PagedData<WaterSupplier>> {
+        const url = this._urlResolver.resolveUrl('/api/water-suppliers/my');
+
+        const observable = this._http.get<PagedData<WaterSupplier>>(url, {
+            params: this._queryHelper.buildQuery(pageInfo, query)
+        });
+
+        return lastValueFrom(observable);
+    }
 }

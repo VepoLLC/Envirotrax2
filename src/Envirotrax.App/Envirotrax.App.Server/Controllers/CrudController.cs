@@ -25,27 +25,27 @@ namespace Envirotrax.App.Server.Controllers
             _service = service;
         }
 
-        protected virtual async Task<IPagedData<TDto>> ProcessGetAllAsync(PageInfo pageInfo, Query query)
+        protected virtual async Task<IPagedData<TDto>> ProcessGetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
         {
-            return await _service.GetAllAsync(pageInfo, query);
+            return await _service.GetAllAsync(pageInfo, query, cancellationToken);
         }
 
         [HttpGet]
-        public virtual async Task<IActionResult> GetAllAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query)
+        public virtual async Task<IActionResult> GetAllAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
         {
-            var dtoList = await ProcessGetAllAsync(pageInfo, query);
+            var dtoList = await ProcessGetAllAsync(pageInfo, query, cancellationToken);
             return Ok(dtoList);
         }
 
-        protected virtual async Task<TDto?> ProcessGetAsync(TKey id)
+        protected virtual async Task<TDto?> ProcessGetAsync(TKey id, CancellationToken cancellationToken)
         {
-            return await _service.GetAsync(id);
+            return await _service.GetAsync(id, cancellationToken);
         }
 
         [HttpGet("{id}")]
-        public virtual async Task<IActionResult> GetAsync(TKey id)
+        public virtual async Task<IActionResult> GetAsync(TKey id, CancellationToken cancellationToken)
         {
-            var dto = await ProcessGetAsync(id);
+            var dto = await ProcessGetAsync(id, cancellationToken);
 
             if (dto != null)
             {

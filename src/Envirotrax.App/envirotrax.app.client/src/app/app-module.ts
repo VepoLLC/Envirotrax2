@@ -1,4 +1,4 @@
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
@@ -7,6 +7,7 @@ import { App } from './app';
 import { SharedComponentsModule } from './shared/components/shared.components.module';
 import { TitleStrategy } from '@angular/router';
 import { AppTitleStrategy } from './shared/services/helpers/title/app-title-strategy.service';
+import { AuthInterceptor } from './shared/services/auth/auth.iterceptor';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,12 @@ import { AppTitleStrategy } from './shared/services/helpers/title/app-title-stra
     {
       provide: TitleStrategy,
       useClass: AppTitleStrategy
-    }
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    },
   ],
   bootstrap: [App]
 })

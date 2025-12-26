@@ -14,8 +14,7 @@ namespace Envirotrax.Common.Data.Services.Implementations
         {
             get
             {
-                return 1;
-                //return TryGetInteger("wsId");
+                return TryGetInteger("wsId");
             }
         }
 

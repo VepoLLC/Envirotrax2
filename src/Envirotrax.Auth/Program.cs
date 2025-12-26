@@ -16,13 +16,22 @@ builder
 
 builder.Services.AddRazorPages();
 
-var app = builder.Build();
+var allowedCorsOrigins = "_alowedCorsOrigins";
 
-using (var scope = app.Services.CreateScope())
+builder.Services.AddCors(options =>
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    dbContext.Database.Migrate();
-}
+    options.AddPolicy(name: allowedCorsOrigins, policy =>
+    {
+        var origins = builder.Configuration["Cors:AllowedOrigins"] ?? throw new InvalidOperationException("No CORS configuration was provided");
+
+        policy.WithOrigins(origins.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
+
+
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -35,6 +44,8 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.UseCors(allowedCorsOrigins);
 
 app.UseHttpsRedirection();
 

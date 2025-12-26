@@ -14,7 +14,17 @@ export class AuthService {
         this._userManager = this.createUserManager();
     }
 
-    private createUserManager(waterSupplierId?: number): UserManager {
+    private createUserManager(waterSupplierId?: number, contractorId?: number): UserManager {
+        let acrValues = '';
+
+        if (waterSupplierId) {
+            acrValues += `waterSupplierId:${waterSupplierId} `;
+        }
+
+        if (contractorId) {
+            acrValues + `contractorId:${contractorId} `;
+        }
+
         return new UserManager({
             authority: environment.authUrl,
             loadUserInfo: true,
@@ -24,9 +34,7 @@ export class AuthService {
             post_logout_redirect_uri: window.location.origin + '/auth/sign-out',
             response_type: 'code',
             extraTokenParams: {
-                'acr_values': waterSupplierId
-                    ? `waterSupplierId:${waterSupplierId}`
-                    : ''
+                'acr_values': acrValues
             }
         });
     }
@@ -58,7 +66,7 @@ export class AuthService {
         if (user) {
             const profile = user.profile as any;
 
-            if (profile.tenId) {
+            if (profile.wsId) {
                 return parseInt(profile.wsId);
             }
         }

@@ -1,5 +1,9 @@
+using System.Text;
 using Envirotrax.Auth.Data;
+using Envirotrax.Auth.Data.Models;
 using Envirotrax.Auth.Domain.Configuration;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
@@ -10,11 +14,16 @@ public class SeedDataService : IHostedService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly OpenIddictOptions _openIddictOptions;
+    private readonly AdminUserOptions _adminUserOptions;
 
-    public SeedDataService(IServiceProvider serviceProvider, IOptions<OpenIddictOptions> openIddictOptions)
+    public SeedDataService(
+        IServiceProvider serviceProvider,
+        IOptions<OpenIddictOptions> openIddictOptions,
+        IOptions<AdminUserOptions> adminUserOptions)
     {
         _serviceProvider = serviceProvider;
         _openIddictOptions = openIddictOptions.Value;
+        _adminUserOptions = adminUserOptions.Value;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -26,12 +35,39 @@ public class SeedDataService : IHostedService
 
             await AddApiClientsAsync(scope.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>());
             await AddApiResources(scope.ServiceProvider.GetRequiredService<IOpenIddictScopeManager>());
+
+            await AddUsersAsync(userManager: scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>());
         }
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
+    }
+
+    private async Task AddUsersAsync(UserManager<AppUser> userManager)
+    {
+        if (await userManager.FindByEmailAsync(_adminUserOptions.EmailAddress) == null)
+        {
+            var result = await userManager.CreateAsync(
+                user: new() { UserName = _adminUserOptions.EmailAddress, Email = _adminUserOptions.EmailAddress, EmailConfirmed = true },
+                password: _adminUserOptions.Password
+            );
+
+            if (!result.Succeeded)
+            {
+                var errorBuilder = new StringBuilder("Failed creating admin user.");
+
+                foreach (var error in result.Errors)
+                {
+                    errorBuilder
+                        .AppendLine()
+                        .AppendFormat("Code: {0}, Description: {1}", error.Code, error.Description);
+                }
+
+                throw new InvalidOperationException(errorBuilder.ToString());
+            }
+        }
     }
 
     private async Task AddApiResources(IOpenIddictScopeManager scopeManager)

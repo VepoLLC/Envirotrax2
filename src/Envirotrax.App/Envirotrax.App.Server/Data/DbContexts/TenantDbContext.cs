@@ -1,5 +1,6 @@
 
 using Envirotrax.App.Server.Data.Models.Contractors;
+using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.Common.Data.DbContexts;
 using Envirotrax.Common.Data.Models;
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.DbContexts;
 
-public class TenantDbContext : TenantDbContextBase<WaterSupplier>
+public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
 {
     public DbSet<WaterSupplierContractor> WaterSupplierContractors { get; set; }
     public DbSet<WaterSupplierUser> WaterSupplierUsers { get; set; }
@@ -18,7 +19,7 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier>
 
     protected TenantDbContext(
         DbContextOptions options,
-        ILogger<TenantDbContextBase<WaterSupplier, AspNetUserBase>> logger,
+        ILogger<TenantDbContext> logger,
         ITenantProvidersService tenantProvider)
         : base(options, logger, tenantProvider)
     {
@@ -26,7 +27,7 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier>
 
     public TenantDbContext(
         DbContextOptions<TenantDbContext> options,
-        ILogger<TenantDbContextBase<WaterSupplier, AspNetUserBase>> logger,
+        ILogger<TenantDbContext> logger,
         ITenantProvidersService tenantProvider)
         : base(options, logger, tenantProvider)
     {

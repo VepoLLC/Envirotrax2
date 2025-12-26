@@ -107,14 +107,15 @@ namespace Envirotrax.Auth.Domain.Configuration
                     options.UseAspNetCore();
                 });
 
-            services.AddHostedService<SeedDataService>();
-
             return services;
         }
 
         public static IServiceCollection AddDomainServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
         {
             AddOpenIdConnect(services, configuration, environment);
+
+            services.Configure<AdminUserOptions>(configuration.GetSection("AdminUser"));
+            services.AddHostedService<SeedDataService>();
 
             services.AddTransient<IAuthService, AuthService>();
 

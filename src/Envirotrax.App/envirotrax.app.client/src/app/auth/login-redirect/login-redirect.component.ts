@@ -6,7 +6,8 @@ import { WaterSupplier } from "../../shared/models/water-suppliers/water-supplie
 import { WaterSupplierService } from "../../shared/services/water-suppliers/water-supplier.service";
 
 @Component({
-    templateUrl: './login-redirect.component.html'
+    templateUrl: './login-redirect.component.html',
+    standalone: false
 })
 export class LoginRedirectComponent {
     public isLoading: boolean = false;

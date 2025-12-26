@@ -287,7 +287,7 @@ namespace Envirotrax.Auth.Areas.OpenIdConnect.Controllers
             if (!string.IsNullOrWhiteSpace(acrValues))
             {
                 return acrValues
-                    .Split(' ')
+                    .Split(' ', StringSplitOptions.RemoveEmptyEntries)
                     .Select(values =>
                     {
                         var keyPairs = values.Split(':');

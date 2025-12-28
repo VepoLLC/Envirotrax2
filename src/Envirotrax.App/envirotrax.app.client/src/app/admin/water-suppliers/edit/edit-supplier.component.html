@@ -1,39 +1,301 @@
 <div>
     <vp-section header="General">
         <div dp-spinner-parent>
-            <form #supplierForm="ngForm" (ngSubmit)="save(supplierForm)">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <vp-input [(ngModel)]="supplier.name"
-                                      [required]="true"
-                                      name="name"
-                                      label="Name"
-                                      [form]="supplierForm" />
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <vp-input [(ngModel)]="supplier.domain"
-                                      [required]="true"
-                                      name="domain"
-                                      label="Domain"
-                                      [form]="supplierForm" />
-                        </div>
-                    </div>
+          <form #supplierForm="ngForm" (ngSubmit)="save(supplierForm)">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <vp-input [(ngModel)]="supplier.name"
+                            name="name"
+                            label="Water Supplier Name"
+                            [required]="true"
+                            [form]="supplierForm" />
                 </div>
 
-                <div class="mt-3">
-                    <vp-validation-summary [form]="supplierForm" [validationErrors]="validationErrors" />
-
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-primary vp-section-button">
-                            Save
-                        </button>
-                    </div>
+                <div class="mb-3">
+                  <vp-input [(ngModel)]="supplier.contactName"
+                            name="contactName"
+                            label="Contact Name"
+                            [form]="supplierForm" />
                 </div>
-            </form>
+
+                <div class="mb-3">
+                  <vp-input [(ngModel)]="supplier.address"
+                            name="address"
+                            label="Address"
+                            [form]="supplierForm" />
+                </div>
+
+                <div class="mb-3">
+                  <vp-input [(ngModel)]="supplier.city"
+                            name="city"
+                            label="City"
+                            [form]="supplierForm" />
+                </div>
+
+                <div class="mb-3">
+                  <vp-input [(ngModel)]="supplier.state"
+                            name="state"
+                            label="State"
+                            [form]="supplierForm" />
+                </div>
+
+                <div class="mb-3">
+                  <vp-input [(ngModel)]="supplier.zipCode"
+                            name="zipCode"
+                            label="Zip Code"
+                            [form]="supplierForm" />
+                </div>
+              </div>
+
+              <div class="col-md-6">
+
+                <div class="mb-3">
+                  <vp-input [(ngModel)]="supplier.domain"
+                            [required]="true"
+                            name="domain"
+                            label="Domain"
+                            [form]="supplierForm" />
+                </div>
+
+                <div class="mb-3">
+                  <vp-input [(ngModel)]="supplier.pwsId"
+                            name="pwsId"
+                            label="PWS ID"
+                            [form]="supplierForm" />
+                </div>
+
+                <div class="mb-3">
+                  <vp-input [(ngModel)]="supplier.phone"
+                            name="phone"
+                            label="Phone Number"
+                            [form]="supplierForm" />
+                </div>
+
+                <div class="mb-3">
+                  <vp-input [(ngModel)]="supplier.fax"
+                            name="fax"
+                            label="Fax Number"
+                            [form]="supplierForm" />
+                </div>
+
+                <div class="mb-3">
+                  <vp-input [(ngModel)]="supplier.email"
+                            name="email"
+                            label="Email Address"
+                            type="email"
+                            [form]="supplierForm" />
+                </div>
+              </div>
+            </div>
+
+            <!--<div class="row">
+    <div class="col-md-6">
+      <div class="mb-3">
+        <vp-input [(ngModel)]="supplier.name"
+                  [required]="true"
+                  name="name"
+                  label="Name"
+                  [form]="supplierForm" />
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="mb-3">
+        <vp-input [(ngModel)]="supplier.domain"
+                  [required]="true"
+                  name="domain"
+                  label="Domain"
+                  [form]="supplierForm" />
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <vp-input [(ngModel)]="supplier.contactName"
+                name="contactName"
+                label="Contact Name"
+                [form]="supplierForm" />
+    </div>
+
+
+    <div class="col-md-6 mb-3">
+      <vp-input [(ngModel)]="supplier.address"
+                name="address"
+                label="Address"
+                [form]="supplierForm" />
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <vp-input [(ngModel)]="supplier.city"
+                name="city"
+                label="City"
+                [form]="supplierForm" />
+    </div>
+
+
+    <div class="col-md-6 mb-3">
+      <vp-input [(ngModel)]="supplier.state"
+                name="state"
+                label="State"
+                [form]="supplierForm" />
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <vp-input [(ngModel)]="supplier.zipCode"
+                name="zipCode"
+                label="Zip Code"
+                [form]="supplierForm" />
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <vp-input [(ngModel)]="supplier.pwsId"
+                name="pwsId"
+                label="PWS ID"
+                [form]="supplierForm" />
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <vp-input [(ngModel)]="supplier.phone"
+                name="phone"
+                label="Phone Number"
+                [form]="supplierForm" />
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <vp-input [(ngModel)]="supplier.fax"
+                name="fax"
+                label="Fax Number"
+                [form]="supplierForm" />
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <vp-input [(ngModel)]="supplier.email"
+                name="email"
+                label="Email Address"
+                type="email"
+                [form]="supplierForm" />
+    </div>
+  </div>-->
+            <!-- Letter Return Address -->
+            <vp-section header="Letter Return Address Information">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <vp-input [(ngModel)]="supplier.letterReturn.companyName"
+                            name="lrCompanyName"
+                            label="Company Name"
+                            [form]="supplierForm" />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <vp-input [(ngModel)]="supplier.letterReturn.contactName"
+                            name="lrContactName"
+                            label="Contact Name"
+                            [form]="supplierForm" />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <vp-input [(ngModel)]="supplier.letterReturn.address"
+                            name="lrAddress"
+                            label="Address"
+                            [form]="supplierForm" />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <vp-input [(ngModel)]="supplier.letterReturn.city"
+                            name="lrCity"
+                            label="City"
+                            [form]="supplierForm" />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <vp-input [(ngModel)]="supplier.letterReturn.state"
+                            name="lrState"
+                            label="State"
+                            [form]="supplierForm" />
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  <vp-input [(ngModel)]="supplier.letterReturn.zipCode"
+                            name="lrZipCode"
+                            label="Zip Code"
+                            [form]="supplierForm" />
+                </div>
+              </div>
+            </vp-section>
+
+            <!-- Letter Contact Information -->
+            <vp-section header="Letter Contact Information">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <vp-input [(ngModel)]="supplier.letterContact.companyName"
+                            name="lcCompanyName"
+                            label="Company Name"
+                            [form]="supplierForm" />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <vp-input [(ngModel)]="supplier.letterContact.contactName"
+                            name="lcContactName"
+                            label="Contact Name"
+                            [form]="supplierForm" />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <vp-input [(ngModel)]="supplier.letterContact.address"
+                            name="lcAddress"
+                            label="Address"
+                            [form]="supplierForm" />
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  <vp-input [(ngModel)]="supplier.letterContact.city"
+                            name="lcCity"
+                            label="City"
+                            [form]="supplierForm" />
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  <vp-input [(ngModel)]="supplier.letterContact.state"
+                            name="lcState"
+                            label="State"
+                            [form]="supplierForm" />
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  <vp-input [(ngModel)]="supplier.letterContact.zipCode"
+                            name="lcZipCode"
+                            label="Zip Code"
+                            [form]="supplierForm" />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <vp-input [(ngModel)]="supplier.letterContact.phone"
+                            name="lcPhone"
+                            label="Phone Number"
+                            [form]="supplierForm" />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <vp-input [(ngModel)]="supplier.letterContact.email"
+                            name="lcEmail"
+                            label="Email Address"
+                            type="email"
+                            [form]="supplierForm" />
+                </div>
+              </div>
+            </vp-section>
+
+
+            <div class="mt-3">
+              <vp-validation-summary [form]="supplierForm" [validationErrors]="validationErrors" />
+
+              <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                  Save
+                </button>
+              </div>
+            </div>
+          </form>
         </div>
     </vp-section>
 </div>

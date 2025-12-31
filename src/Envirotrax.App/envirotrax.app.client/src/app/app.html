@@ -28,12 +28,17 @@
                         </div>
 
                         <ul class="dropdown-menu shadow" [class.show]="item.isExpanded" #dropdownContent>
-                            <li *ngFor="let child of item.children" class="m-2">
-                                <a class="dropdown-item rounded" [routerLink]="child.routerLink">
-                                    <i [class]="child.iconCss" class="me-1"></i>
-                                    {{child.title}}
-                                </a>
-                            </li>
+                            <ng-container *ngFor="let child of item.children">
+                                <li *ngIf="child.type === 'separator'" class="m-2">
+                                    <hr class="dropdown-divider my-2">
+                                </li>
+                                <li *ngIf="child.type !== 'separator'" class="m-2">
+                                    <a class="dropdown-item rounded" [routerLink]="child.routerLink">
+                                        <i [class]="child.iconCss" class="me-1"></i>
+                                        {{child.title}}
+                                    </a>
+                                </li>
+                            </ng-container>
                         </ul>
                     </a>
                 </li>

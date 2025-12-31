@@ -70,12 +70,19 @@ body {
     border-radius: 5px;
 }
 
+.navbar .dropdown-menu {
+    font-size: 0.9rem;
+}
+
 .navbar .dropdown-menu i {
     color: #008fd4;
+    width: 20px;
+    text-align: center;
 }
 
 .dropdown-item {
     border: 1px solid transparent;
+    padding: 0.5rem 1rem;
 }
 
 .dropdown-item:hover,
@@ -83,6 +90,11 @@ body {
     background: rgba(0, 143, 212, 0.1);
     border-color: rgba(0, 143, 212, 0.5);
     color: black;
+}
+
+.dropdown-divider {
+    margin: 0.5rem 0;
+    border-top: 1px solid #dee2e6;
 }
 
 .navbar .small {

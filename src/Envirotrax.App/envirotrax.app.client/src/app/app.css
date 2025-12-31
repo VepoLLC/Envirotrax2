@@ -1,3 +1,21 @@
 ﻿.vp-logo {
     max-width: 200px;
 }
+
+.vp-navbar {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+}
+
+.vp-navbar.show {
+    position: fixed;
+}
+
+@media (min-width: 992px) {
+    .vp-navbar {
+        position: relative;
+    }
+}

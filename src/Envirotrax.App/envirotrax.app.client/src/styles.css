@@ -72,6 +72,18 @@ body {
 
 .navbar .dropdown-menu {
     font-size: 0.9rem;
+    transition: opacity 0.3s;
+    display: block;
+    visibility: hidden;
+    opacity: 0;
+    overflow: hidden;
+    transform: scale(0);
+}
+
+.navbar .dropdown-menu.show {
+    visibility: visible;
+    opacity: 1;
+    transform: scale(1);
 }
 
 .navbar .dropdown-menu i {
@@ -99,4 +111,12 @@ body {
 
 .navbar .small {
     font-size: 0.75rem;
+}
+
+.border-primary {
+    border-color: #008fd4 !important;
+}
+
+.navbar-nav .dropdown-menu {
+    position: fixed;
 }

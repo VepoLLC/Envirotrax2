@@ -53,7 +53,7 @@ public class SeedDataService : IHostedService
 
     private async Task AddUsersAsync(TenantDbContext dbContext)
     {
-        if (await dbContext.WaterSupplierUsers.AnyAsync())
+        if (!await dbContext.WaterSupplierUsers.IgnoreQueryFilters().AnyAsync())
         {
             var normalizedEmail = _adminUserOptions.EmailAddress.ToUpperInvariant();
 

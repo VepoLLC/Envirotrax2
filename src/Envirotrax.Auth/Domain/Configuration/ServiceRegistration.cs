@@ -88,8 +88,7 @@ namespace Envirotrax.Auth.Domain.Configuration
                             throw new Exception($"Certificate with thumbprint {certThumbprint} was not found");
                         }
 
-                        var bytes = File.ReadAllBytes(filePath);
-                        var cert = X509CertificateLoader.LoadCertificate(bytes);
+                        var cert = X509CertificateLoader.LoadPkcs12FromFile(filePath, password: null);
 
                         options
                             .AddEncryptionCertificate(cert)

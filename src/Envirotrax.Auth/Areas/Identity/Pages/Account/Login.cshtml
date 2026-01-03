@@ -34,7 +34,7 @@
                  role="alert"></div>
 
             <div class="row justify-content-center mt-4">
-                <div class="col-sm-12 col-md-6 col-lg-5 col-xl-4">
+                <div class="col-sm-12 col-md-6 col-lg-5 col-xl-4">    
 
                     <div class="mb-3">
                         <label asp-for="Input.Email" class="form-label fw-bold">
@@ -83,8 +83,8 @@
                     </div>
 
                     <div class="mt-4 text-center">
-                        <a href="lost_login.aspx?e=<%=loginEmailAddress %>"
-                           class="a-blue fw-bold">
+                        <a asp-area="Identity"
+                           asp-page="/Account/ForgotPassword">
                             I forgot my password
                         </a>
                     </div>
@@ -104,10 +104,10 @@
         </div>
     </div>
     <div class="content">
-        <p style="text-align: center;">
-            <button type="button" class="link-button" ID="btnCreateAccount" Width="200" >
+        <p class="text-center">
+            <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-link link-button text-decoration-none" style="width:200px;">
                 <i class="fas fa-user-circle"></i>&nbsp;&nbsp;Create Account
-            </button>
+            </a>
         </p>
         <p style="text-align: center;">
             <a class="a-blue" href="Quick Start Guide.pdf" target="_blank">Click here to download a Quick Start Guide.</a>

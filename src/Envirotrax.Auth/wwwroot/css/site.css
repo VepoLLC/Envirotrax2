@@ -1,4 +1,4 @@
-/*Style from old project main_back.css*/
+﻿/*Style from old project main_back.css*/
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -191,15 +191,16 @@ html, body {
 }
 
 body {
+    margin: 0;
     /*font-family: sans-serif, "Raleway";*/
-    font-family: "Montserrat", sans-serif;
+    /*    font-family: "Montserrat", sans-serif;
     font-weight: 400;
     font-size: var(--font-size);
     color: var(--bs-body-color);
     background: var(--body-bg);
     min-height: 100vh;
-    overflow-x: hidden;
-    padding-top: 60px;
+    overflow-x: hidden;*/
+    /*    padding-top: 60px;*/
 }
 
 
@@ -1783,6 +1784,17 @@ span.evalzone {
 }
 
 
+.bg-primary {
+    background-color: #008fd4 !important;
+}
+
+.bg-gradient {
+    background-image: var(--bs-gradient) !important;
+}
+
+.vp-logo{
+    max-width: 200px;
+}
 
 /*html {
   font-size: 14px;

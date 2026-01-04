@@ -1,3 +1,4 @@
+using Azure.Identity;
 using Envirotrax.Auth.Data;
 using Envirotrax.Auth.Data.Configuration;
 using Envirotrax.Auth.Data.Models;
@@ -9,6 +10,10 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Configuration.AddAzureKeyVault(
+    vaultUri: new Uri(builder.Configuration["KeyVault:Url"] ?? throw new InvalidOperationException()),
+    credential: new DefaultAzureCredential());
+
 builder
     .Services
     .AddDataServices(builder.Configuration, builder.Environment)

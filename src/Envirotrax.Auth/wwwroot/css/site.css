@@ -1,6 +1,4 @@
-﻿/*Style from old project main_back.css*/
-
-input:-webkit-autofill,
+﻿input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 textarea:-webkit-autofill,
@@ -192,26 +190,15 @@ html, body {
 
 body {
     margin: 0;
-    /*font-family: sans-serif, "Raleway";*/
-    /*    font-family: "Montserrat", sans-serif;
-    font-weight: 400;
-    font-size: var(--font-size);
-    color: var(--bs-body-color);
-    background: var(--body-bg);
-    min-height: 100vh;
-    overflow-x: hidden;*/
-    /*    padding-top: 60px;*/
 }
 
 
 a {
     text-decoration: none;
-/*    font-weight: 500;
-*/    color: var(--a-color);
+    color: var(--a-color);
 }
 
     a:hover {
-        /*color: #8ec4dd;*/
         color: var(--a-hover-color);
         text-decoration: underline;
     }
@@ -1801,49 +1788,16 @@ span.evalzone {
     color: #008fd4 !important;
 }
 
-
 .bg-primary-gradient {
     background: linear-gradient(180deg, #0d8ed3 0%, #1aa0d8 100%);
 }
 
-/*.bg-footer {
-    background-color: #2f3e4e;
-}
-
-.footer-card {
-    border: 1px solid #004fa4;
-}
-
-    .footer-links a:hover {
-        color: #d0d0d0;
-    }
-
-
-.footer-links li {
-    padding: .4rem 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;*/ /* space between icon and text */
-/*}
-
-.footer-links a {
-    color: #ffffff;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    white-space: nowrap;*/ /* keep on one line */
-/*}*/
-
-
-/* FOOTER BASE */
 .footer {
     background-color: #2f3e4e;
     color: #ffffff;
-    /*  padding: 3rem 0 2rem;*/
     font-size: 0.95rem;
 }
 
-/* THEME TOGGLE */
 .theme-toggle {
     display: flex;
     align-items: center;
@@ -1852,7 +1806,6 @@ span.evalzone {
     margin-bottom: 1.25rem;
 }
 
-/* CONTACT CARD */
 .footer-card {
     background: #ffffff;
     color: #1f2d3d;
@@ -1879,13 +1832,11 @@ span.evalzone {
         font-weight: 500;
     }
 
-/* HEADINGS */
 .footer h5 {
     font-weight: 700;
     margin-bottom: 1rem;
 }
 
-/* FOOTER LINKS */
 .footer-links {
     list-style: none;
     padding: 0;
@@ -1914,13 +1865,11 @@ span.evalzone {
             color: #d0d0d0;
         }
 
-/* DIVIDER */
 .footer hr {
     border-color: rgba(255, 255, 255, 0.2);
     margin: 2rem 0 1.25rem;
 }
 
-/* FOOTER BOTTOM */
 .footer-bottom {
     text-align: center;
     font-size: 0.8rem;
@@ -1958,4 +1907,14 @@ span.evalzone {
 .page-content {
     padding-top: 1.5rem;
     padding-bottom: 1.5rem;
+}
+
+.a-blue {
+    font-size: 0.9rem;
+}
+
+.section-card {
+    max-width: 680px;
+    width: 100%;
+    border-radius: 12px;
 }

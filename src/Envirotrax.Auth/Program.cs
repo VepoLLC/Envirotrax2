@@ -14,7 +14,12 @@ builder
     .AddDataServices(builder.Configuration, builder.Environment)
     .AddDomainServices(builder.Configuration, builder.Environment);
 
-builder.Services.AddRazorPages();
+var razor = builder.Services.AddRazorPages();
+
+if (builder.Environment.IsDevelopment())
+{
+    razor.AddRazorRuntimeCompilation();
+}
 
 var allowedCorsOrigins = "_alowedCorsOrigins";
 
@@ -29,7 +34,6 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader();
     });
 });
-
 
 var app = builder.Build();
 

@@ -32,6 +32,11 @@
 
   <ItemGroup>
     <Folder Include="Data\Migrations\" />
+    <Folder Include="wwwroot\images\footer\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Envirotrax.Common/Envirotrax.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

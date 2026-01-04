@@ -7,25 +7,21 @@
 
 
 <section id="divPageTitle" class="container-lg page-title">
-    <div class="row no-gutters text-center">
-        <div class="col-12">
-            <h2>CSI Inspector Login</h2>
-        </div>
+    <div class="text-center">
+        <h2>Account Login</h2>
     </div>
 </section>
 
-<section id="sectionLogin" runat="server" class="border-box">
-    <div class="row header">
-        <div class="col title">
-            <h3>Existing CSI Inspector Account Login</h3>
-        </div>
-        <div class="col-auto title-right">
-        </div>
+<section id="sectionLogin" runat="server" class="card shadow-sm">
+    <div class="card-header border-bottom-0 text-center text-white bg-info fw-semibold fs-5 rounded-top">
+        <h3 class="h4 mb-0">Existing Account Login</h3>
     </div>
-    <div class="content">
+    <div class="card-body border border-info rounded-bottom">
         <div id="divLoginInfo" runat="server" style="width: 100%">
-            If you have an existing CSI inspector account, please login with the User ID and Password you specified when creating the account.  If you do not know
-            your User ID or Password, use the <b>Retrieve Lost Login</b> link to have your login information sent to the email address you specified when you created
+            If you have an existing account, please login with the User ID and Password you specified when creating the
+            account. If you do not know
+            your User ID or Password, use the <b>Retrieve Lost Login</b> link to have your login information sent to the
+            email address you specified when you created
             the account.
         </div>
         <form id="account" method="post">
@@ -34,7 +30,7 @@
                  role="alert"></div>
 
             <div class="row justify-content-center mt-4">
-                <div class="col-sm-12 col-md-6 col-lg-5 col-xl-4">    
+                <div class="col-sm-12 col-md-6 col-lg-5 col-xl-4">
 
                     <div class="mb-3">
                         <label asp-for="Input.Email" class="form-label fw-bold">
@@ -60,14 +56,13 @@
                                    aria-required="true"
                                    placeholder="Enter you password" />
 
-                            <span class="input-group-text">
-                                <a href="javascript:void(0);" class="text-decoration-none text-dark">
-                                    <i id="eyePassword"
-                                       class="fa fa-eye"
-                                       aria-hidden="true"
-                                       onclick="showHidePassword();"></i>
-                                </a>
-                            </span>
+                            <button type="button"
+                                    onclick="showHidePassword(this, '@Html.IdFor(model => model.Input.Password)');"
+                                    class="btn p-2">
+                                <i id="eyePassword"
+                                   class="fa fa-eye"
+                                   aria-hidden="true"></i>
+                            </button>
                         </div>
 
                         <span asp-validation-for="Input.Password" class="text-danger"></span>
@@ -95,22 +90,20 @@
     </div>
 </section>
 
-<section id="sectionCreateAccount" runat="server" class="border-box mt-3">
-    <div class="row header">
-        <div class="col title">
-            <h3>Create a New CSI Inspector Account</h3>
-        </div>
-        <div class="col-auto title-right">
-        </div>
+<section id="sectionCreateAccount" runat="server" class="card mt-3">
+    <div class="card-header border-bottom-0 text-center text-white bg-info fw-semibold fs-5 rounded-top">
+        <h3 class="h4 mb-0">Create a New Account</h3>
     </div>
-    <div class="content">
+    <div class="card-body border border-info rounded-bottom">
         <p class="text-center">
-            <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-link link-button text-decoration-none" style="width:200px;">
+            <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-link link-button text-decoration-none"
+               style="width:200px;">
                 <i class="fas fa-user-circle"></i>&nbsp;&nbsp;Create Account
             </a>
         </p>
         <p style="text-align: center;">
-            <a class="a-blue" href="Quick Start Guide.pdf" target="_blank">Click here to download a Quick Start Guide.</a>
+            <a class="a-blue" href="Quick Start Guide.pdf" target="_blank">Click here to download a Quick Start
+                Guide.</a>
         </p>
     </div>
 </section>

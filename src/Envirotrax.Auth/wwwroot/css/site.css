@@ -1953,3 +1953,9 @@ span.evalzone {
     .theme-toggle .form-switch .form-check-input {
         margin-left: 0;
     }
+
+
+.page-content {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+}

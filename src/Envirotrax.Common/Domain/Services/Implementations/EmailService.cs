@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 
 namespace Envirotrax.Common.Domain.Services.Implementations;
 
-public class EmailService
+public class EmailService : IEmailService
 {
     private readonly EmailOptions _emailOptions;
     private readonly ILogger<EmailService> _logger;
@@ -30,11 +30,11 @@ public class EmailService
         switch (addressType)
         {
             case FromAddressType.Team:
-                return new("Envirotrax.com<team@envirotrax.com>");
+                return new(_emailOptions.TeamAddress);
             case FromAddressType.Info:
-                return new("Envirotrax.com<info@envirotrax.com>");
+                return new(_emailOptions.InfoAddress);
             default:
-                return new("Envirotrax.com<noreply@envirotrax.com>");
+                return new(_emailOptions.NoreplyAddress);
         }
     }
 
@@ -48,7 +48,12 @@ public class EmailService
         return recipients;
     }
 
-    public async Task SendAsync<TTemplate>(EmailDto email)
+    public Task SendAsync(EmailDto email)
+    {
+        return SendAsync(email);
+    }
+
+    public async Task SendAsync<TTemplate>(EmailDto<TTemplate> email)
     {
         try
         {

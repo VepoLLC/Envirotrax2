@@ -9,9 +9,9 @@ public class EmailOptions
     public string Host { get; set; } = null!;
     public int Port { get; set; } = 587;
 
-    public string NoreplyAddress { get; set; } = null!;
-    public string TeamAddress { get; set; } = null!;
-    public string InfoAddress { get; set; } = null!;
+    public string NoreplyAddress { get; set; } = "Envirotrax.com<noreply@envirotrax.com>";
+    public string TeamAddress { get; set; } = "Envirotrax.com<team@envirotrax.com>";
+    public string InfoAddress { get; set; } = "Envirotrax.com<info@envirotrax.com>";
 
     public string? OverrideRecipients { get; set; }
 }

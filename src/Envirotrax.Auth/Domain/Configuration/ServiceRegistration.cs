@@ -1,9 +1,11 @@
 
+using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using Envirotrax.Auth.Areas.OpenIdConnect.Services;
 using Envirotrax.Auth.Areas.OpenIdConnect.Services.Definitions;
 using Envirotrax.Auth.Data;
 using Envirotrax.Auth.Domain.Services.Implementations;
+using Envirotrax.Common.Configuration;
 using Quartz;
 
 namespace Envirotrax.Auth.Domain.Configuration
@@ -113,6 +115,12 @@ namespace Envirotrax.Auth.Domain.Configuration
         public static IServiceCollection AddDomainServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
         {
             AddOpenIdConnect(services, configuration, environment);
+
+            services.AddEmailService(configuration.GetSection("Email"), options =>
+            {
+                options.Assembly = Assembly.GetExecutingAssembly();
+                options.Namespace = "Envirotrax.Auth";
+            });
 
             services.Configure<AdminUserOptions>(configuration.GetSection("AdminUser"));
             services.AddHostedService<SeedDataService>();

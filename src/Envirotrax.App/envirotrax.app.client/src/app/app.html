@@ -1,43 +1,60 @@
-﻿<nav class="navbar navbar-expand-lg bg-primary bg-gradient">
+<nav class="vp-navbar align-items-start bg-gradient bg-primary d-flex navbar navbar-expand-lg"
+     [class.show]="isNavbarVisible">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">
             <img src="/images/logo-navbar.svg" alt="Envirotrax Logo" class="vp-logo">
         </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+        <button class="border-0 navbar-toggler text-white"
+                type="button" d
+                ata-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+                (click)="isNavbarVisible = !isNavbarVisible">
+            <i class="fa-solid fa-bars"></i>
         </button>
-        <div *ngIf="isAuthenticated" class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
-            <ul class="navbar-nav mb-2 mb-lg-0">
-                <li class="nav-item" *ngFor="let item of menuItems">
-                    <a [routerLink]="item.routerLink"
-                       [attr.role]="!item.routerLink ? 'button' : null"
-                       class="fw-bold nav-link p1 rounded-3"
-                       #dropdownButton
-                       (click)="toggleExpanded($event, dropdownButton, dropdownContent, item)">
-                        <i [class]="item.iconCss"></i>
-                        {{item.title}}
+        <div *ngIf="isAuthenticated"
+             class="collapse justify-content-end navbar-collapse"
+             id="navbarSupportedContent"
+             [class.show]="isNavbarVisible">
+            <div class="d-flex justify-content-center justify-content-lg-end">
+                <ul class="navbar-nav mb-2 mb-lg-0">
+                    <li class="nav-item pb-3 pb-lg-0" *ngFor="let item of menuItems">
+                        <a [routerLink]="item.routerLink"
+                           [attr.role]="!item.routerLink ? 'button' : null"
+                           class="fw-bold nav-link p1 rounded-3"
+                           #dropdownButton
+                           (click)="toggleExpanded($event, dropdownButton, dropdownContent, item)">
+                            <i [class]="item.iconCss"></i>
+                            {{item.title}}
 
-                        <i *ngIf="item.children && item.children.length" class="fa-solid fa-angles-down small"></i>
+                            <i *ngIf="item.children && item.children.length" class="fa-solid fa-angles-down small"></i>
 
-                        <div *ngIf="item.isExpanded"
-                             class="vp-backdrop position-fixed w-100 h-100 vp-backdrop z-1"
-                             style="left: 0">
-                        </div>
+                            <div *ngIf="item.isExpanded"
+                                 class="vp-backdrop position-fixed w-100 h-100 vp-backdrop z-1"
+                                 style="left: 0">
+                            </div>
 
-                        <ul class="dropdown-menu shadow" [class.show]="item.isExpanded" #dropdownContent>
-                            <li *ngFor="let child of item.children" class="m-2">
-                                <a class="dropdown-item rounded" [routerLink]="child.routerLink">
-                                    <i [class]="child.iconCss" class="me-1"></i>
-                                    {{child.title}}
-                                </a>
-                            </li>
-                        </ul>
-                    </a>
-                </li>
-            </ul>
+                            <ul class="dropdown-menu shadow-lg border border-primary" [class.show]="item.isExpanded"
+                                #dropdownContent>
+                                <ng-container *ngFor="let child of item.children">
+                                    <li *ngIf="child.type === 'separator'" class="m-2">
+                                        <hr class="dropdown-divider my-2">
+                                    </li>
+                                    <li *ngIf="child.type !== 'separator'" class="m-2">
+                                        <a class="dropdown-item rounded" [routerLink]="child.routerLink">
+                                            <i [class]="child.iconCss" class="me-1"></i>
+                                            {{child.title}}
+                                        </a>
+                                    </li>
+                                </ng-container>
+                            </ul>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </nav>

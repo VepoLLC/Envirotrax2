@@ -1,5 +1,5 @@
 export const environment = {
-    authUrl: '',
+    authUrl: 'https://test.auth.envirotrax.com',
     apiUrl: '',
-    production: false,
+    production: true,
 };

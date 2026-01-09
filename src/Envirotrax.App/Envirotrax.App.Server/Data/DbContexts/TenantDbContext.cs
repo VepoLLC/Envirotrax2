@@ -1,5 +1,5 @@
-
 using Envirotrax.App.Server.Data.Models.Contractors;
+using Envirotrax.App.Server.Data.Models.States;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.Common.Data.DbContexts;
 using Envirotrax.Common.Data.Models;
@@ -15,18 +15,19 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier>
 
     public DbSet<Contractor> Contractors { get; set; }
     public DbSet<ContractorUser> ContractorUsers { get; set; }
+    public DbSet<State> States { get; set; }
 
     protected TenantDbContext(
         DbContextOptions options,
-        ILogger<TenantDbContextBase<WaterSupplier, AspNetUserBase>> logger,
+        ILogger<TenantDbContextBase<WaterSupplier, AspNetUserBase>> logger,  
         ITenantProvidersService tenantProvider)
-        : base(options, logger, tenantProvider)
+        : base(options, logger, tenantProvider) 
     {
     }
 
     public TenantDbContext(
         DbContextOptions<TenantDbContext> options,
-        ILogger<TenantDbContextBase<WaterSupplier, AspNetUserBase>> logger,
+        ILogger<TenantDbContextBase<WaterSupplier, AspNetUserBase>> logger, 
         ITenantProvidersService tenantProvider)
         : base(options, logger, tenantProvider)
     {

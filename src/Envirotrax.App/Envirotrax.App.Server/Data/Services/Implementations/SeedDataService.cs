@@ -1,6 +1,7 @@
 
 using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
+using Envirotrax.App.Server.Data.SeedData;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Services.Implementations;
@@ -26,6 +27,7 @@ public class SeedDataService : IHostedService
             dbContext.SkipSaveSecurityProperties = true;
 
             await AddTenantsAsync(dbContext);
+            await AddStatesAsync(dbContext);
         }
     }
 
@@ -42,6 +44,15 @@ public class SeedDataService : IHostedService
             };
 
             dbContext.WaterSuppliers.Add(_defaultTenant);
+            await dbContext.SaveChangesAsync();
+        }
+    }
+
+    private async Task AddStatesAsync(TenantDbContext dbContext)
+    {
+        if (!await dbContext.States.AnyAsync())
+        {
+            dbContext.States.AddRange(StateSeedData.States);
             await dbContext.SaveChangesAsync();
         }
     }

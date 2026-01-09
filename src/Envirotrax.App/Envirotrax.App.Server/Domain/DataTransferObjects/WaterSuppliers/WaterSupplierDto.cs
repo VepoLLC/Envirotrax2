@@ -14,6 +14,20 @@ namespace Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers
         [StringLength(50)]
         public string Domain { get; set; } = null!;
 
+        public string ContactName { get; set; } = null!;
+        public string PwsId { get; set; } = null!;
+
+        public string Address { get; set; } = null!;
+        public string City { get; set; } = null!;
+        public string ZipCode { get; set; } = null!;
+
+        public string PhoneNumber { get; set; } = null!;
+        public string FaxNumber { get; set; } = null!;
+        public string EmailAddress { get; set; } = null!;
+        public int? StateId { get; set; }
+        public LetterAddressDto? LetterAddress { get; set; }
+        public LetterContactDto? LetterContact { get; set; }
+
         public ReferencedWaterSupplierDto? Parent { get; set; }
     }
 

@@ -42,6 +42,17 @@ namespace Envirotrax.App.Server.Controllers
             return await _service.GetAsync(id);
         }
 
+        [HttpGet("all-no-paging")]
+        public virtual async Task<IActionResult> GetAllNoPagingAsync([FromQuery] Query query)
+        {
+            var list = await ProcessGetAllNoPagingAsync(query);
+            return Ok(list);
+        }
+        protected virtual async Task<IEnumerable<TDto>> ProcessGetAllNoPagingAsync(Query query)
+        {
+            return await _service.GetAllAsync();
+        }
+
         [HttpGet("{id}")]
         public virtual async Task<IActionResult> GetAsync(TKey id)
         {

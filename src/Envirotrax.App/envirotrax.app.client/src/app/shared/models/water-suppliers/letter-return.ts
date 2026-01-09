@@ -1,8 +1,9 @@
-export interface LetterReturn {
-  companyName: string;
-  contactName: string;
-  address: string;
-  city: string;
-  state: string;
-  zipCode: string;
+export interface LetterAddress {
+    id: number;
+    companyName: string;
+    contactName: string;
+    address: string;
+    city: string;
+    stateId: number;
+    zipCode: string;
 }

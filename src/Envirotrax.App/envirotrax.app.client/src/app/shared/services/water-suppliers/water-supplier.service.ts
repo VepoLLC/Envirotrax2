@@ -31,65 +31,35 @@ export class WaterSupplierService {
     }
 
     public get(id: number): Promise<WaterSupplier> {
-      const url = this._urlResolver.resolveUrl(`/api/water-suppliers/${id}`);
+        const url = this._urlResolver.resolveUrl(`/api/water-suppliers/${id}`);
 
-      return lastValueFrom(
-        this._http.get<WaterSupplier>(url)
-      );
+        return lastValueFrom(
+            this._http.get<WaterSupplier>(url)
+        );
     }
 
-  public add(supplier: WaterSupplier): Promise<WaterSupplier> {
-    const url = this._urlResolver.resolveUrl('/api/water-suppliers');
+    public add(supplier: WaterSupplier): Promise<WaterSupplier> {
+        const url = this._urlResolver.resolveUrl('/api/water-suppliers');
 
-    return lastValueFrom(
-      this._http.post<WaterSupplier>(url, supplier)
-    );
-  }
-
-
-  public update(supplier: WaterSupplier): Promise<WaterSupplier> {
-    const url = this._urlResolver.resolveUrl(`/api/water-suppliers/${supplier.id}`);
-
-    return lastValueFrom(
-      this._http.put<WaterSupplier>(url, supplier)
-    );
-  }
-
-  public delete(id: number): Promise<WaterSupplier> {
-    const url = this._urlResolver.resolveUrl(`/api/water-suppliers/${id}`);
-
-    return lastValueFrom(
-      this._http.delete<WaterSupplier>(url)
-    );
-  }
+        return lastValueFrom(
+            this._http.post<WaterSupplier>(url, supplier)
+        );
+    }
 
 
+    public update(supplier: WaterSupplier): Promise<WaterSupplier> {
+        const url = this._urlResolver.resolveUrl(`/api/water-suppliers/${supplier.id}`);
 
-    //public get(id: number): Promise<WaterSupplier> {
-    //    const url = this._urlResolver.resolveUrl(`/api/water-suppliers/${id}`);
-    //    const observable = this._http.get(url);
+        return lastValueFrom(
+            this._http.put<WaterSupplier>(url, supplier)
+        );
+    }
 
-    //    return lastValueFrom(observable);
-    //}
+    public delete(id: number): Promise<WaterSupplier> {
+        const url = this._urlResolver.resolveUrl(`/api/water-suppliers/${id}`);
 
-    //public add(supplier: WaterSupplier): Promise<WaterSupplier> {
-    //    const url = this._urlResolver.resolveUrl('/api/water-suppliers');
-    //    const observable = this._http.post(url, supplier);
-
-    //    return lastValueFrom(observable);
-    //}
-
-    //public update(supplier: WaterSupplier): Promise<WaterSupplier | undefined> {
-    //    const url = this._urlResolver.resolveUrl(`/api/water-suppliers/${supplier.id}`);
-    //    const observable = this._http.put(url, supplier);
-
-    //    return lastValueFrom(observable);
-    //}
-
-    //public delete(id: number): Promise<WaterSupplier | undefined> {
-    //    const url = this._urlResolver.resolveUrl(`/api/water-suppliers/${id}`);
-    //    const observable = this._http.delete(url);
-
-    //    return lastValueFrom(observable);
-    //}
+        return lastValueFrom(
+            this._http.delete<WaterSupplier>(url)
+        );
+    }
 }

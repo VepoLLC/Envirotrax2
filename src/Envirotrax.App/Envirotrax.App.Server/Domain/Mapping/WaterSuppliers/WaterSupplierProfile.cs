@@ -26,5 +26,11 @@ public class WaterSupplierProfile : Profile
 
         CreateMap<WaterSupplier, ReferencedWaterSupplierDto>()
             .ReverseMap();
+
+        CreateMap<LetterAddress, LetterAddressDto>()
+          .ReverseMap();
+
+        CreateMap<LetterContact, LetterContactDto>()
+              .ReverseMap();
     }
 }

@@ -29,6 +29,8 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
     {
         return base.GetDetailsQuery()
             .Include(supplier => supplier.Parent)
+            .Include(supplier => supplier.LetterAddress)
+            .Include(supplier => supplier.LetterContact)
             .Where(supplier => supplier.ParentId == _tenantProvider.WaterSupplierId);
     }
 
@@ -40,17 +42,78 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
 
     public override async Task<WaterSupplier?> UpdateAsync(WaterSupplier supplier)
     {
-        var dbSupplier = await DbContext.WaterSuppliers.SingleOrDefaultAsync(t => t.ParentId == _tenantProvider.WaterSupplierId && t.Id == supplier.Id);
+        var dbSupplier = await DbContext.WaterSuppliers
+            .Include(x => x.LetterAddress)
+            .Include(x => x.LetterContact)
+            .SingleOrDefaultAsync(x =>
+                x.ParentId == _tenantProvider.WaterSupplierId &&
+                x.Id == supplier.Id);
 
-        if (dbSupplier != null)
+        if (dbSupplier == null)
+            return null;
+
+        UpdateSupplier(dbSupplier, supplier);
+        UpdateLetterAddress(dbSupplier, supplier.LetterAddress);
+        UpdateLetterContact(dbSupplier, supplier.LetterContact);
+
+        await DbContext.SaveChangesAsync();
+        return dbSupplier;
+    }
+
+    private void UpdateSupplier(WaterSupplier dbSupplier, WaterSupplier supplier)
+    {
+        dbSupplier.ParentId = _tenantProvider.WaterSupplierId;
+        dbSupplier.Name = supplier.Name;
+        dbSupplier.Domain = supplier.Domain;
+        dbSupplier.UpdatedTime = DateTime.UtcNow;
+        dbSupplier.ContactName = supplier.ContactName;
+        dbSupplier.PwsId = supplier.PwsId;
+        dbSupplier.Address = supplier.Address;
+        dbSupplier.City = supplier.City;
+        dbSupplier.StateId = supplier.StateId;
+        dbSupplier.ZipCode = supplier.ZipCode;
+        dbSupplier.PhoneNumber = supplier.PhoneNumber;
+        dbSupplier.FaxNumber = supplier.FaxNumber;
+        dbSupplier.EmailAddress = supplier.EmailAddress;
+        // dbSupplier.UpdatedById = _tenantProvider.UserId;
+    }
+
+    private void UpdateLetterAddress(WaterSupplier dbSupplier, LetterAddress? source)
+    {
+        if (source == null)
+            return;
+
+        if (dbSupplier.LetterAddress == null)
         {
-            dbSupplier.ParentId = _tenantProvider.WaterSupplierId;
-            dbSupplier.Name = supplier.Name;
-            dbSupplier.Domain = supplier.Domain;
-
-            await DbContext.SaveChangesAsync();
+            dbSupplier.LetterAddress = new LetterAddress();
         }
 
-        return dbSupplier;
+        dbSupplier.LetterAddress.CompanyName = source.CompanyName;
+        dbSupplier.LetterAddress.ContactName = source.ContactName;
+        dbSupplier.LetterAddress.Address = source.Address;
+        dbSupplier.LetterAddress.City = source.City;
+        dbSupplier.LetterAddress.StateId = source.StateId;
+        dbSupplier.LetterAddress.ZipCode = source.ZipCode;
+    }
+
+    private void UpdateLetterContact(WaterSupplier dbSupplier, LetterContact? source)
+    {
+        if (source == null)
+            return;
+
+        if (dbSupplier.LetterContact == null)
+        {
+            dbSupplier.LetterContact = new LetterContact();
+        }
+
+        dbSupplier.LetterContact.CompanyName = source.CompanyName;
+        dbSupplier.LetterContact.ContactName = source.ContactName;
+        dbSupplier.LetterContact.Address = source.Address;
+        dbSupplier.LetterContact.City = source.City;
+        dbSupplier.LetterContact.StateId = source.StateId;
+        dbSupplier.LetterContact.ZipCode = source.ZipCode;
+        dbSupplier.LetterContact.PhoneNumber = source.PhoneNumber;
+        dbSupplier.LetterContact.FaxNumber = source.FaxNumber;
+        dbSupplier.LetterContact.EmailAddress = source.EmailAddress;
     }
 }

@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260109144508_AddLetterAddressAndContact")]
+    partial class AddLetterAddressAndContact
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -84,23 +87,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.ToTable("ContractorUsers");
                 });
 
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.States.State", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("States");
-                });
-
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.LetterAddress", b =>
                 {
                     b.Property<int>("Id")
@@ -125,16 +111,15 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("StateId")
-                        .HasColumnType("int");
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ZipCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("StateId");
 
                     b.ToTable("LetterAddress");
                 });
@@ -175,16 +160,15 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("StateId")
-                        .HasColumnType("int");
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ZipCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("StateId");
 
                     b.ToTable("LetterContact");
                 });
@@ -256,8 +240,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("StateId")
-                        .HasColumnType("int");
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("UpdatedById")
                         .HasColumnType("int");
@@ -280,8 +265,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("LetterContactId");
 
                     b.HasIndex("ParentId");
-
-                    b.HasIndex("StateId");
 
                     b.HasIndex("UpdatedById");
 
@@ -403,26 +386,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.LetterAddress", b =>
-                {
-                    b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "State")
-                        .WithMany()
-                        .HasForeignKey("StateId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("State");
-                });
-
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.LetterContact", b =>
-                {
-                    b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "State")
-                        .WithMany()
-                        .HasForeignKey("StateId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("State");
-                });
-
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", b =>
                 {
                     b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "CreatedBy")
@@ -450,11 +413,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "State")
-                        .WithMany()
-                        .HasForeignKey("StateId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById")
@@ -469,8 +427,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("LetterContact");
 
                     b.Navigation("Parent");
-
-                    b.Navigation("State");
 
                     b.Navigation("UpdatedBy");
                 });

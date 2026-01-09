@@ -18,7 +18,7 @@ export class CreateSupplierComponent {
     constructor(
         private readonly _supplierService: WaterSupplierService,
         private readonly _modalReference: ModalReference<WaterSupplier>,
-        private readonly _helper: HelperService
+        private readonly _helper: HelperService,
     ) {
 
     }

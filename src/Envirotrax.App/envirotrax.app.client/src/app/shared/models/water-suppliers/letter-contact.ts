@@ -1,11 +1,12 @@
 export interface LetterContact {
+    id?: number;
     companyName?: string;
     contactName?: string;
     address?: string;
     city?: string;
-    state?: string;
+    stateId?: number;
     zipCode?: string;
-    phone?: string;
-    fax?: string;
-    email?: string;
+    phoneNumber?: string;
+    faxNumber?: string;
+    emailAddress?: string;
 }

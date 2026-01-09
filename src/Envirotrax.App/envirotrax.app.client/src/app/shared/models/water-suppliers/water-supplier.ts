@@ -1,5 +1,5 @@
 import { LetterContact } from './letter-contact';
-import { LetterReturn } from './letter-return';
+import { LetterAddress } from './letter-return';
 
 export interface WaterSupplier {
   id?: number;
@@ -11,13 +11,13 @@ export interface WaterSupplier {
   pwsId?: string;
   address?: string;
   city?: string;
-  state?: string;
+  stateId?: number | null;
   zipCode?: string;
-  phone?: string;
-  fax?: string;
-  email?: string;
+  phoneNumber?: string;
+  faxNumber?: string;
+  emailAddress?: string;
 
-  letterReturn: LetterReturn;
+  letterAddress: LetterAddress;  
 
   letterContact: LetterContact;
 }

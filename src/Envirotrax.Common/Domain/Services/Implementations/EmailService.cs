@@ -1,9 +1,11 @@
 
+using System.Dynamic;
 using System.Net;
 using System.Net.Mail;
 using Envirotrax.Common.Configuration;
 using Envirotrax.Common.Domain.DataTransferObjects;
 using Envirotrax.Common.Domain.Services.Defintions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -14,15 +16,18 @@ public class EmailService : IEmailService
     private readonly EmailOptions _emailOptions;
     private readonly ILogger<EmailService> _logger;
     private readonly IHtmlTemplateService _templateService;
+    private readonly IHttpContextAccessor _contextAccessor;
 
     public EmailService(
         IOptions<EmailOptions> emailOptions,
         ILogger<EmailService> logger,
-        IHtmlTemplateService templateService)
+        IHtmlTemplateService templateService,
+        IHttpContextAccessor contextAccessor)
     {
         _emailOptions = emailOptions.Value;
         _logger = logger;
         _templateService = templateService;
+        _contextAccessor = contextAccessor;
     }
 
     private MailAddress GetFromAddress(FromAddressType addressType)
@@ -66,7 +71,12 @@ public class EmailService : IEmailService
 
             if (!string.IsNullOrWhiteSpace(email.TemplateId))
             {
-                mail.Body = await _templateService.ParseEmailAsync(email.TemplateId, email.TemplateData);
+                dynamic viewBag = new ExpandoObject();
+                var request = _contextAccessor.HttpContext!.Request;
+
+                viewBag.BaseUrl = $"https://{request.Host}";
+
+                mail.Body = await _templateService.ParseEmailAsync(email.TemplateId, email.TemplateData, viewBag);
             }
 
             foreach (var address in GetToAddresses(email.Recipients))

@@ -20,8 +20,10 @@ public static class ServiceRegistrations
 
     public static IServiceCollection AddHtmlTemplateService(this IServiceCollection services, Action<HtmlTemplateOptions> templateConfigAction)
     {
-        services.Configure(templateConfigAction);
-        services.AddSingleton<IHtmlTemplateService, HtmlTemplateService>();
+        services
+            .AddHttpContextAccessor()
+            .Configure(templateConfigAction)
+            .AddSingleton<IHtmlTemplateService, HtmlTemplateService>();
 
         return services;
     }

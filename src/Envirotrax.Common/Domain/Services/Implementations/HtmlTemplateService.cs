@@ -1,4 +1,5 @@
 
+using System.Dynamic;
 using System.Reflection;
 using Envirotrax.Common.Configuration;
 using Envirotrax.Common.Domain.Services.Defintions;
@@ -21,12 +22,17 @@ namespace Envirotrax.Common.Domain.Services.Implementations
 
         public async Task<string> ParseEmailAsync<T>(string pageName, T model)
         {
-            return await ParseStringAsync($"Emails.{pageName}", model);
+            return await ParseStringAsync($"Emails.{pageName}", model, null);
         }
 
-        private async Task<string> ParseStringAsync<T>(string pageName, T model)
+        public async Task<string> ParseEmailAsync<T>(string pageName, T model, ExpandoObject viewBag)
         {
-            return await _engine.CompileRenderAsync($"Templates.{pageName}", model);
+            return await ParseStringAsync($"Emails.{pageName}", model, viewBag);
+        }
+
+        private async Task<string> ParseStringAsync<T>(string pageName, T model, ExpandoObject? viewBag)
+        {
+            return await _engine.CompileRenderAsync($"Templates.{pageName}", model, viewBag: viewBag);
         }
     }
 }

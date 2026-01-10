@@ -78,10 +78,16 @@
                     </div>
 
                     <div class="mt-4 text-center">
-                        <a asp-area="Identity"
-                           asp-page="/Account/ForgotPassword">
-                            I forgot my password
-                        </a>
+                        <div>
+                            <a asp-page="./ForgotPassword">
+                                I forgot my password
+                            </a>
+                        </div>
+                        <div class="mt-3">
+                            <a asp-page="./ResendEmailConfirmation">
+                                Resend email confirmation
+                            </a>
+                        </div>
                     </div>
 
                 </div>

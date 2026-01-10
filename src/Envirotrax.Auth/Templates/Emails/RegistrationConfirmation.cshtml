@@ -1,0 +1,20 @@
+@using RazorLight
+@using Envirotrax.Auth.Templates.Emails
+@inherits TemplatePage<RegistrationConfirmationVm>
+
+@{
+    Layout = "Templates.Emails._EmailLayout";
+}
+
+<div>
+    <p style="margin-top: 0;">
+        To use the full set of features of our app, you must confirm your registration. Please click the link below
+        confirm your registration.
+    </p>
+
+    <a style="word-wrap: break-word;" href="@Model.CallbackUrl">@Model.CallbackUrl</a>
+
+    <p>
+        If you haven't registered in our website, please ignore this email.
+    </p>
+</div>

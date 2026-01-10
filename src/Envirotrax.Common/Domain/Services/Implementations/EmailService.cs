@@ -6,6 +6,7 @@ using Envirotrax.Common.Configuration;
 using Envirotrax.Common.Domain.DataTransferObjects;
 using Envirotrax.Common.Domain.Services.Defintions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -17,17 +18,20 @@ public class EmailService : IEmailService
     private readonly ILogger<EmailService> _logger;
     private readonly IHtmlTemplateService _templateService;
     private readonly IHttpContextAccessor _contextAccessor;
+    private readonly IHostEnvironment _environment;
 
     public EmailService(
         IOptions<EmailOptions> emailOptions,
         ILogger<EmailService> logger,
         IHtmlTemplateService templateService,
-        IHttpContextAccessor contextAccessor)
+        IHttpContextAccessor contextAccessor,
+        IHostEnvironment environment)
     {
         _emailOptions = emailOptions.Value;
         _logger = logger;
         _templateService = templateService;
         _contextAccessor = contextAccessor;
+        _environment = environment;
     }
 
     private MailAddress GetFromAddress(FromAddressType addressType)
@@ -92,7 +96,14 @@ public class EmailService : IEmailService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error sending email.");
+            if (_environment.IsDevelopment())
+            {
+                throw;
+            }
+            else
+            {
+                _logger.LogError(ex, "Error sending email.");
+            }
         }
     }
 }

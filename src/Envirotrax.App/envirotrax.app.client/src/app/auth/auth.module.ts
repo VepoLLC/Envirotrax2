@@ -1,10 +1,10 @@
 import { NgModule } from "@angular/core";
 import { RouterModule } from "@angular/router";
-import { LoadingSpinnerModule } from "@developer-partners/ngx-loading-spinner";
 import { CommonModule } from "@angular/common";
 import { LoginRedirectComponent } from "./login-redirect/login-redirect.component";
 import { SignOutComponent } from "./sign-out/sign-out.component";
 import { UnauthorizedComponent } from "./unauthorized/unauthorized.component";
+import { AppLoadingSpinnerModule } from "../shared/components/loading-spinner/app-loading-spinner.module";
 
 @NgModule({
     declarations: [
@@ -13,7 +13,7 @@ import { UnauthorizedComponent } from "./unauthorized/unauthorized.component";
     ],
     imports: [
         CommonModule,
-        LoadingSpinnerModule,
+        AppLoadingSpinnerModule,
         RouterModule.forChild([
             {
                 path: 'login-redirect',

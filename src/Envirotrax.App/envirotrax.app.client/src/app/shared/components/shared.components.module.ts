@@ -2,7 +2,6 @@ import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { RouterModule } from "@angular/router";
-import { LoadingSpinnerModule } from "@developer-partners/ngx-loading-spinner";
 import { ModalModule } from "@developer-partners/ngx-modal-dialog";
 import { PaginationComponent } from "./data-components/pagination/pagination.component";
 import { FilterInputComponent } from "./data-components/sorting-filtering/filter-input.component";
@@ -20,6 +19,7 @@ import { MessageModalComponent } from "./modals/message-modal.component";
 import { ValidationFieldComponent } from "./validation/validation-field/validation-field.component";
 import { ValidationSummaryComponent } from "./validation/validation-summary/validation-summary.component";
 import { SectionComponent } from "./section/section.component";
+import { AppLoadingSpinnerModule } from "./loading-spinner/app-loading-spinner.module";
 
 @NgModule({
     declarations: [
@@ -45,7 +45,7 @@ import { SectionComponent } from "./section/section.component";
         FormsModule,
         RouterModule,
         ModalModule,
-        LoadingSpinnerModule
+        AppLoadingSpinnerModule
     ],
     exports: [
         PaginationComponent,
@@ -57,7 +57,7 @@ import { SectionComponent } from "./section/section.component";
         TableComponent,
         CheckboxCellComponent,
         SectionComponent,
-        LoadingSpinnerModule,
+        AppLoadingSpinnerModule,
         ModalModule
     ]
 })

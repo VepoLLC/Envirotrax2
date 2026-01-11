@@ -17,7 +17,8 @@ import { LoadingSpinnerComponent } from "./loading-spinner.component";
             provide: LoadingSpinnerConfig,
             useFactory: () => {
                 return {
-                    component: LoadingSpinnerComponent
+                    component: LoadingSpinnerComponent,
+                    defaultMessage: 'Loading Data...'
                 }
             }
         }

@@ -1,9 +1,10 @@
-import { Component } from "@angular/core";
+import { Component, ViewEncapsulation } from "@angular/core";
 
 @Component({
     standalone: false,
     templateUrl: './loading-spinner.component.html',
-    styleUrl: './loading-spinner.component.css'
+    styleUrl: './loading-spinner.component.css',
+    encapsulation: ViewEncapsulation.None
 })
 export class LoadingSpinnerComponent {
 

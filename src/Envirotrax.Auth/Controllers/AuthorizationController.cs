@@ -1,7 +1,7 @@
 
 using System.Security.Claims;
-using Envirotrax.Auth.Areas.OpenIdConnect.Services.Definitions;
 using Envirotrax.Auth.Data.Models;
+using Envirotrax.Auth.Domain.Services.Definitions;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;

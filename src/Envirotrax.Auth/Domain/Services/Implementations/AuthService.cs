@@ -1,11 +1,10 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
-using Envirotrax.Auth.Areas.OpenIdConnect.Services.Definitions;
 using Envirotrax.Auth.Data.Repositories.Defintions;
 using Envirotrax.Auth.Domain.DataTransferObjects;
+using Envirotrax.Auth.Domain.Services.Definitions;
 using Envirotrax.Common.Data.Services.Implementations;
-using Microsoft.CodeAnalysis.Elfie.Serialization;
 
 namespace Envirotrax.Auth.Domain.Services.Implementations;
 

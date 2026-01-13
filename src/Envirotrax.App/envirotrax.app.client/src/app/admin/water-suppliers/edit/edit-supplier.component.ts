@@ -35,7 +35,6 @@ export class EditSupplierComponent {
         await this.loadStates();
         this._acitvatedRoute.paramMap.subscribe(async params => {
           const supplierId = params.get('id');
-          console.log(supplierId);
             if (supplierId) {
                 await this.getSupplier(+supplierId);
             }
@@ -72,7 +71,6 @@ export class EditSupplierComponent {
             console.log(form.valid);
             try {
                 this.isLoading = true;
-                console.log(this.supplier);
                 await this._supplierService.update(this.supplier);
 
                 await this._router.navigate(['/admin/water-suppliers']);

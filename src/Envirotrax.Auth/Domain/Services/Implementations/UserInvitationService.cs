@@ -5,6 +5,7 @@ using Envirotrax.Auth.Data.Models;
 using Envirotrax.Auth.Data.Repositories.Defintions;
 using Envirotrax.Auth.Domain.DataTransferObjects;
 using Envirotrax.Auth.Domain.Services.Definitions;
+using Envirotrax.Auth.Pages;
 using Envirotrax.Auth.Templates.Emails;
 using Envirotrax.Common.Domain.Services.Defintions;
 using Microsoft.AspNetCore.Identity;
@@ -17,17 +18,23 @@ public class UserInvitationService : IUserInvitationService
     private readonly UserManager<AppUser> _userManager;
     private readonly IPasswordHasher<AppUser> _passwordHasher;
     private readonly IUserInvitationReppsitory _invitationRepository;
+    private readonly LinkGenerator _linkGenerator;
+    private readonly IHttpContextAccessor _contextAccessor;
     private readonly IEmailService _emailService;
 
     public UserInvitationService(
         UserManager<AppUser> userManager,
         IPasswordHasher<AppUser> passwordHasher,
         IUserInvitationReppsitory invitationReppsitory,
+        LinkGenerator linkGenerator,
+        IHttpContextAccessor contextAccessor,
         IEmailService emailService)
     {
         _userManager = userManager;
         _passwordHasher = passwordHasher;
         _invitationRepository = invitationReppsitory;
+        _linkGenerator = linkGenerator;
+        _contextAccessor = contextAccessor;
         _emailService = emailService;
     }
 
@@ -51,10 +58,9 @@ public class UserInvitationService : IUserInvitationService
         }
 
         throw new ValidationException(string.Join(Environment.NewLine, identityResult.Errors));
-
     }
 
-    public async Task<UserInvitationDto> AddAsync(UserInvitationDto invitation, int creatorId, IUrlHelper urlHelper)
+    public async Task<UserInvitationDto> AddAsync(UserInvitationDto invitation)
     {
         var user = await _userManager.FindByEmailAsync(invitation.EmailAddress);
 
@@ -67,17 +73,19 @@ public class UserInvitationService : IUserInvitationService
             var addedInvitation = await _invitationRepository.AddAsync(new()
             {
                 UserId = user.Id,
-                CreatedById = creatorId,
+                CreatedById = invitation.CreatorId!.Value,
                 CreatedTime = DateTime.UtcNow,
                 TokenHash = _passwordHasher.HashPassword(user, token)
             });
             invitation.Id = addedInvitation.Id;
 
-            var callbackUrl = urlHelper.Page(
-                 "/Account/AcceptInvitation",
-                 pageHandler: null,
-                 values: new { area = "Identity", tokenId = addedInvitation.Id, token },
-                 protocol: "https");
+            var callbackUrl = _linkGenerator.GetUriByPage(
+                httpContext: _contextAccessor.HttpContext!,
+                page: "/Account/AcceptInvitation",
+                handler: null,
+                values: new { area = "Identity", tokenId = addedInvitation.Id, token },
+                scheme: "https"
+            );
 
             await _emailService.SendAsync<RegistrationInvitationVm>(new()
             {
@@ -86,7 +94,8 @@ public class UserInvitationService : IUserInvitationService
                 Recipients = [user.Email!],
                 TemplateData = new()
                 {
-                    CallbackUrl = callbackUrl!
+                    CallbackUrl = callbackUrl!,
+                    InvitedByCompany = invitation.InvitedByCompany
                 }
             });
 
@@ -95,8 +104,9 @@ public class UserInvitationService : IUserInvitationService
         }
     }
 
-    public async Task<bool> IsValidAsync(int invitationId, string token)
+    public async Task<InvitationValidationResultDto> ValidateAsync(int invitationId, string token)
     {
+        var result = new InvitationValidationResultDto();
         var invitation = await _invitationRepository.GetAsync(invitationId);
 
         if (invitation != null)
@@ -105,11 +115,12 @@ public class UserInvitationService : IUserInvitationService
             {
                 if (_passwordHasher.VerifyHashedPassword(invitation.User!, invitation.TokenHash, token) == PasswordVerificationResult.Success)
                 {
-                    return true;
+                    result.IsValid = true;
+                    result.User = invitation.User;
                 }
             }
         }
 
-        return false;
+        return result;
     }
 }

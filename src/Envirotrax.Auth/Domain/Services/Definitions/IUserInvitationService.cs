@@ -6,7 +6,7 @@ namespace Envirotrax.Auth.Domain.Services.Definitions;
 
 public interface IUserInvitationService
 {
-    Task<UserInvitationDto> AddAsync(UserInvitationDto invitation, int creatorId, IUrlHelper urlHelper);
+    Task<UserInvitationDto> AddAsync(UserInvitationDto invitation);
 
-    Task<bool> IsValidAsync(int invitationId, string token);
+    Task<InvitationValidationResultDto> ValidateAsync(int invitationId, string token);
 }

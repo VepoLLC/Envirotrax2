@@ -125,6 +125,7 @@ namespace Envirotrax.Auth.Domain.Configuration
             services.AddHostedService<SeedDataService>();
 
             services.AddTransient<IAuthService, AuthService>();
+            services.AddHttpContextAccessor();
             services.AddTransient<IUserInvitationService, UserInvitationService>();
 
             return services;

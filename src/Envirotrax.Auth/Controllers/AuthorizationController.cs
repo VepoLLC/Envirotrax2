@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 
-namespace Envirotrax.Auth.Areas.OpenIdConnect.Controllers
+namespace Envirotrax.Auth.Controllers
 {
     [ApiController]
     [Route("oauth/connect")]

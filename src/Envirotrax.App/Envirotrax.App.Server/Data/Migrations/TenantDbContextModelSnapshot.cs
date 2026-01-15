@@ -66,7 +66,7 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Contractors");
+                    b.ToTable("Contractors", (string)null);
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Contractors.ContractorUser", b =>
@@ -81,112 +81,7 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ContractorUsers");
-                });
-
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.States.State", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("States");
-                });
-
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.LetterAddress", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CompanyName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContactName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("StateId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ZipCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StateId");
-
-                    b.ToTable("LetterAddress");
-                });
-
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.LetterContact", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CompanyName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContactName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("EmailAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FaxNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("StateId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ZipCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StateId");
-
-                    b.ToTable("LetterContact");
+                    b.ToTable("ContractorUsers", (string)null);
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", b =>
@@ -196,18 +91,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContactName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
@@ -226,20 +109,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("EmailAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FaxNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("LetterAddressId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("LetterContactId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -248,26 +117,11 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<int?>("ParentId")
                         .HasColumnType("int");
 
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PwsId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("StateId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("UpdatedById")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("ZipCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -275,17 +129,11 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.HasIndex("DeletedById");
 
-                    b.HasIndex("LetterAddressId");
-
-                    b.HasIndex("LetterContactId");
-
                     b.HasIndex("ParentId");
-
-                    b.HasIndex("StateId");
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("WaterSuppliers");
+                    b.ToTable("WaterSuppliers", (string)null);
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplierContractor", b =>
@@ -300,7 +148,7 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.HasIndex("ContractorId");
 
-                    b.ToTable("WaterSupplierContractors");
+                    b.ToTable("WaterSupplierContractors", (string)null);
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplierUser", b =>
@@ -315,7 +163,7 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("WaterSupplierUsers");
+                    b.ToTable("WaterSupplierUsers", (string)null);
                 });
 
             modelBuilder.Entity("Envirotrax.Common.Data.Models.AspNetUserBase", b =>
@@ -336,7 +184,7 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AspNetUsers", t =>
+                    b.ToTable("AspNetUsers", null, t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -403,26 +251,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.LetterAddress", b =>
-                {
-                    b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "State")
-                        .WithMany()
-                        .HasForeignKey("StateId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("State");
-                });
-
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.LetterContact", b =>
-                {
-                    b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "State")
-                        .WithMany()
-                        .HasForeignKey("StateId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("State");
-                });
-
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", b =>
                 {
                     b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "CreatedBy")
@@ -435,24 +263,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasForeignKey("DeletedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.LetterAddress", "LetterAddress")
-                        .WithMany()
-                        .HasForeignKey("LetterAddressId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.LetterContact", "LetterContact")
-                        .WithMany()
-                        .HasForeignKey("LetterContactId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "Parent")
                         .WithMany()
                         .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "State")
-                        .WithMany()
-                        .HasForeignKey("StateId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "UpdatedBy")
@@ -464,13 +277,7 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.Navigation("DeletedBy");
 
-                    b.Navigation("LetterAddress");
-
-                    b.Navigation("LetterContact");
-
                     b.Navigation("Parent");
-
-                    b.Navigation("State");
 
                     b.Navigation("UpdatedBy");
                 });

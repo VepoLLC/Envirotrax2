@@ -1,23 +1,36 @@
-import { LetterContact } from './letter-contact';
-import { LetterAddress } from './letter-return';
 
-export interface WaterSupplier {
-  id?: number;
-  name?: string;
-  domain?: string;
-  parent?: WaterSupplier;
+export class WaterSupplier {
+    id?: number;
+    name?: string;
+    domain?: string;
+    parent?: WaterSupplier;
 
-  contactName?: string;
-  pwsId?: string;
-  address?: string;
-  city?: string;
-  stateId?: number | null;
-  zipCode?: string;
-  phoneNumber?: string;
-  faxNumber?: string;
-  emailAddress?: string;
+    contactName?: string;
+    pwsId?: string;
+    address?: string;
+    city?: string;
+    stateId?: number | null;
+    zipCode?: string;
+    phoneNumber?: string;
+    faxNumber?: string;
+    emailAddress?: string;
 
-  letterAddress: LetterAddress;  
+    // Letter
+    letterCompanyName?: string;
+    letterContactName?: string;
+    letterAddress?: string;
+    letterCity?: string;
+    letterStateId?: number | null;
+    letterZipCode?: string;
 
-  letterContact: LetterContact;
+    // Letter Contact
+    letterContactCompanyName?: string;
+    letterContactContactName?: string;
+    letterContactAddress?: string;
+    letterContactCity?: string;
+    letterContactStateId?: number | null;
+    letterContactZipCode?: string;
+    letterContactPhoneNumber?: string;
+    letterContactFaxNumber?: string;
+    letterContactEmailAddress?: string;
 }

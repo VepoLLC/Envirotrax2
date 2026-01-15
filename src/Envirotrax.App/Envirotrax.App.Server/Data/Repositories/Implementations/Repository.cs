@@ -69,15 +69,6 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
 
         return property?.Name
                ?? primaryKey.Properties.First().Name;
-
-
-        //return DbContext
-        //    .Model
-        //    .FindEntityType(typeof(TModel))!
-        //    .FindPrimaryKey()!
-        //    .Properties
-        //    .First(p => p.PropertyInfo!.GetCustomAttribute<AppPrimaryKeyAttribute>()?.IsShadowKey == false)
-        //    .Name;
     }
 
     /// <summary>

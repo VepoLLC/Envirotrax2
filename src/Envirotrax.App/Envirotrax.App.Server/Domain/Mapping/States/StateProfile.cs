@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
 
 namespace Envirotrax.App.Server.Domain.Mapping.States
 {
@@ -6,7 +7,7 @@ namespace Envirotrax.App.Server.Domain.Mapping.States
     {
         public StateProfile()
         {
-            CreateMap<Data.Models.States.State, DataTransferObjects.States.StateDto>()
+            CreateMap<Data.Models.States.State, StateDto>()
                 .ReverseMap();
         }
     }

@@ -1,11 +1,10 @@
 import { Component } from "@angular/core";
 import { WaterSupplier } from "../../../shared/models/water-suppliers/water-supplier";
-import { createEmptyWaterSupplier } from "../../../shared/factories/water-supplier/water-supplier.factory";
 import { WaterSupplierService } from "../../../shared/services/water-suppliers/water-supplier.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { NgForm } from "@angular/forms";
-import { StateService } from "../../../shared/services/states/state.service";
+import { LookupService } from "../../../shared/services/lookup/lookup.service";
 import { State } from "../../../shared/models/states/state";
 
 
@@ -14,7 +13,7 @@ import { State } from "../../../shared/models/states/state";
     standalone: false
 })
 export class EditSupplierComponent {
-    public supplier: WaterSupplier = createEmptyWaterSupplier();
+    public supplier: WaterSupplier = new WaterSupplier();
     public states: State[] = [];
 
     public isLoading: boolean = false;
@@ -25,7 +24,7 @@ export class EditSupplierComponent {
         private readonly _acitvatedRoute: ActivatedRoute,
         private readonly _helper: HelperService,
         private readonly _router: Router,
-        private readonly _stateService: StateService,
+        private readonly _stateService: LookupService,
         //private readonly _toastService: ToastService
     ) {
 
@@ -47,19 +46,9 @@ export class EditSupplierComponent {
 
             const apiSupplier = await this._supplierService.get(id);
 
-            const emptySupplier = createEmptyWaterSupplier();
 
             this.supplier = {
-                ...emptySupplier,
                 ...apiSupplier,
-                letterAddress: {
-                    ...emptySupplier.letterAddress,
-                    ...apiSupplier.letterAddress
-                },
-                letterContact: {
-                    ...emptySupplier.letterContact,
-                    ...apiSupplier.letterContact
-                }
             };
         } finally {
             this.isLoading = false;

@@ -29,16 +29,27 @@ public class WaterSupplier : TenantBase, IAuditableModel<AppUser>
     public int? StateId { get; set; }
     public State? State { get; set; }
 
+    public string LetterCompanyName { get; set; } = null!;
+    public string LetterContactName { get; set; } = null!;
+    public string LetterAddress { get; set; } = null!;
+    public string LetterCity { get; set; } = null!;
+    public string LetterZipCode { get; set; } = null!;
+    public int? LetterStateId { get; set; }
+    public State? LetterState { get; set; }
+
+    public string LetterContactCompanyName { get; set; } = null!;
+    public string LetterContactContactName { get; set; } = null!;
+    public string LetterContactAddress { get; set; } = null!;
+    public string LetterContactCity { get; set; } = null!;
+    public string LetterContactZipCode { get; set; } = null!;
+    public string LetterContactPhoneNumber { get; set; } = null!;
+    public string LetterContactFaxNumber { get; set; } = null!;
+    public string LetterContactEmailAddress { get; set; } = null!;
+    public int? LetterContactStateId { get; set; }
+    public State? LetterContactState { get; set; }
+
     [ForeignKey(nameof(ParentId))]
     public WaterSupplier? Parent { get; set; }
-
-    [ForeignKey(nameof(LetterAddressId))]
-    public int? LetterAddressId { get; set; }
-    public LetterAddress? LetterAddress { get; set; } = null!;
-
-    [ForeignKey(nameof(LetterContactId))]
-    public int? LetterContactId { get; set; }
-    public LetterContact? LetterContact { get; set; } = null!;
 
     public int? CreatedById { get; set; }
     public AppUser? CreatedBy { get; set; }

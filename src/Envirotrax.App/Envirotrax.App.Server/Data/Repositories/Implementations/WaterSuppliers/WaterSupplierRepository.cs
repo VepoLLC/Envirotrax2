@@ -29,8 +29,6 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
     {
         return base.GetDetailsQuery()
             .Include(supplier => supplier.Parent)
-            .Include(supplier => supplier.LetterAddress)
-            .Include(supplier => supplier.LetterContact)
             .Where(supplier => supplier.ParentId == _tenantProvider.WaterSupplierId);
     }
 
@@ -43,8 +41,6 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
     public override async Task<WaterSupplier?> UpdateAsync(WaterSupplier supplier)
     {
         var dbSupplier = await DbContext.WaterSuppliers
-            .Include(x => x.LetterAddress)
-            .Include(x => x.LetterContact)
             .SingleOrDefaultAsync(x =>
                 x.ParentId == _tenantProvider.WaterSupplierId &&
                 x.Id == supplier.Id);
@@ -52,16 +48,6 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
         if (dbSupplier == null)
             return null;
 
-        UpdateSupplier(dbSupplier, supplier);
-        UpdateLetterAddress(dbSupplier, supplier.LetterAddress);
-        UpdateLetterContact(dbSupplier, supplier.LetterContact);
-
-        await DbContext.SaveChangesAsync();
-        return dbSupplier;
-    }
-
-    private void UpdateSupplier(WaterSupplier dbSupplier, WaterSupplier supplier)
-    {
         dbSupplier.ParentId = _tenantProvider.WaterSupplierId;
         dbSupplier.Name = supplier.Name;
         dbSupplier.Domain = supplier.Domain;
@@ -75,45 +61,27 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
         dbSupplier.PhoneNumber = supplier.PhoneNumber;
         dbSupplier.FaxNumber = supplier.FaxNumber;
         dbSupplier.EmailAddress = supplier.EmailAddress;
+
+        dbSupplier.LetterCompanyName = supplier.LetterCompanyName;
+        dbSupplier.LetterContactName = supplier.LetterContactContactName;
+        dbSupplier.LetterAddress = supplier.LetterAddress;
+        dbSupplier.LetterCity = supplier.LetterCity;
+        dbSupplier.LetterStateId = supplier.LetterStateId;
+        dbSupplier.LetterZipCode = supplier.LetterZipCode;
+
+        dbSupplier.LetterContactCompanyName = supplier.LetterContactCompanyName;
+        dbSupplier.LetterContactContactName = supplier.LetterContactContactName;
+        dbSupplier.LetterContactAddress = supplier.LetterContactAddress;
+        dbSupplier.LetterContactCity = supplier.LetterContactCity;
+        dbSupplier.LetterContactStateId = supplier.LetterContactStateId;
+        dbSupplier.LetterContactZipCode = supplier.LetterContactZipCode;
+        dbSupplier.LetterContactPhoneNumber = supplier.LetterContactPhoneNumber;
+        dbSupplier.LetterContactFaxNumber = supplier.LetterContactFaxNumber;
+        dbSupplier.LetterContactEmailAddress = supplier.LetterContactEmailAddress;
+
         // dbSupplier.UpdatedById = _tenantProvider.UserId;
-    }
 
-    private void UpdateLetterAddress(WaterSupplier dbSupplier, LetterAddress? source)
-    {
-        if (source == null)
-            return;
-
-        if (dbSupplier.LetterAddress == null)
-        {
-            dbSupplier.LetterAddress = new LetterAddress();
-        }
-
-        dbSupplier.LetterAddress.CompanyName = source.CompanyName;
-        dbSupplier.LetterAddress.ContactName = source.ContactName;
-        dbSupplier.LetterAddress.Address = source.Address;
-        dbSupplier.LetterAddress.City = source.City;
-        dbSupplier.LetterAddress.StateId = source.StateId;
-        dbSupplier.LetterAddress.ZipCode = source.ZipCode;
-    }
-
-    private void UpdateLetterContact(WaterSupplier dbSupplier, LetterContact? source)
-    {
-        if (source == null)
-            return;
-
-        if (dbSupplier.LetterContact == null)
-        {
-            dbSupplier.LetterContact = new LetterContact();
-        }
-
-        dbSupplier.LetterContact.CompanyName = source.CompanyName;
-        dbSupplier.LetterContact.ContactName = source.ContactName;
-        dbSupplier.LetterContact.Address = source.Address;
-        dbSupplier.LetterContact.City = source.City;
-        dbSupplier.LetterContact.StateId = source.StateId;
-        dbSupplier.LetterContact.ZipCode = source.ZipCode;
-        dbSupplier.LetterContact.PhoneNumber = source.PhoneNumber;
-        dbSupplier.LetterContact.FaxNumber = source.FaxNumber;
-        dbSupplier.LetterContact.EmailAddress = source.EmailAddress;
+        await DbContext.SaveChangesAsync();
+        return dbSupplier;
     }
 }

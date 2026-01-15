@@ -7,7 +7,7 @@ import { lastValueFrom } from "rxjs";
 @Injectable({
     providedIn: 'root'
 })
-export class StateService {
+export class LookupService {
 
     constructor(
         private readonly _urlResolver: UrlResolverService,
@@ -16,7 +16,7 @@ export class StateService {
     }
 
     public async getAllStates(): Promise<State[]> {
-        const url = this._urlResolver.resolveUrl('/api/states/all-no-paging');
+        const url = this._urlResolver.resolveUrl('/api/lookup/states');
 
         return await lastValueFrom(
             this._http.get<State[]>(url)

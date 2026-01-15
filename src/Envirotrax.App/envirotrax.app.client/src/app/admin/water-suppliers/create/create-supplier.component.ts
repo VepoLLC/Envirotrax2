@@ -4,7 +4,6 @@ import { WaterSupplierService } from "../../../shared/services/water-suppliers/w
 import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { NgForm } from "@angular/forms";
-import { createEmptyWaterSupplier } from "../../../shared/factories/water-supplier/water-supplier.factory";
 
 @Component({
     templateUrl: './create-supplier.component.html',
@@ -13,7 +12,7 @@ import { createEmptyWaterSupplier } from "../../../shared/factories/water-suppli
 export class CreateSupplierComponent {
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
-    public supplier: WaterSupplier = createEmptyWaterSupplier();
+    public supplier: WaterSupplier = new WaterSupplier();
 
     constructor(
         private readonly _supplierService: WaterSupplierService,

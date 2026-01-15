@@ -1,7 +1,5 @@
-
-using Envirotrax.App.Server.Domain.Services.Definitions.States;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
-using Envirotrax.App.Server.Domain.Services.Implementations.States;
+using Envirotrax.App.Server.Domain.Services.Implementations.Lookup;
 using Envirotrax.App.Server.Domain.Services.Implementations.WaterSuppliers;
 
 namespace Envirotrax.App.Server.Domain.Configuration;
@@ -17,7 +15,7 @@ public static class ServiceRegistration
         });
 
         services.AddTransient<IWaterSupplierService, WaterSupplierService>();
-        services.AddTransient<IStateService, StateService>();
+        services.AddTransient<LookupService>();
 
         return services;
     }

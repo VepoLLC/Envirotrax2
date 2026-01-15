@@ -13,8 +13,6 @@ public class AcceptInvitationModel : PageModel
     private readonly IUserInvitationService _invitationService;
     private readonly UserManager<AppUser> _userManager;
 
-    public bool IsSucceeded { get; set; }
-
     [BindProperty]
     public int TokenId { get; set; }
 
@@ -58,7 +56,7 @@ public class AcceptInvitationModel : PageModel
         {
             if (!string.IsNullOrWhiteSpace(result.User.PasswordHash))
             {
-                IsSucceeded = true;
+                return RedirectToPage("./InvitationConfirmation");
             }
         }
 
@@ -86,8 +84,10 @@ public class AcceptInvitationModel : PageModel
 
             if (passwordResult.Succeeded)
             {
-                IsSucceeded = true;
-                return Page();
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(result.User);
+                await _userManager.ConfirmEmailAsync(result.User, code);
+
+                return RedirectToPage("./InvitationConfirmation");
             }
 
             foreach (var error in passwordResult.Errors)

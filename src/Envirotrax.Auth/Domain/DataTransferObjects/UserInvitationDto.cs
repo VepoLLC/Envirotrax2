@@ -8,6 +8,8 @@ public class UserInvitationDto
 {
     public int Id { get; set; }
 
+    public int UserId { get; set; }
+
     [Required]
     public int? CreatorId { get; set; }
 

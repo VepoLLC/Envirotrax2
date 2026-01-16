@@ -17,7 +17,7 @@ public class ServiceMessageDto<T>
     {
         if (waterSupplierId <= 0)
         {
-            throw new ArgumentException("TenantId must be greater than 0", nameof(waterSupplierId));
+            throw new ArgumentException("WaterSupplierId must be greater than 0", nameof(waterSupplierId));
         }
 
         if (loggedInUserId.HasValue && loggedInUserId <= 0)

@@ -14,6 +14,16 @@ namespace Envirotrax.Common.Data.Services.Implementations
         {
             get
             {
+                if (HasScopes("envirotrax_app_internal"))
+                {
+                    var supplierIdHeader = _contextAccessor.HttpContext?.Request?.Headers["Vp-Water-Supplier-Id"];
+
+                    if (int.TryParse(supplierIdHeader, out var headerSupplierId))
+                    {
+                        return headerSupplierId;
+                    }
+                }
+
                 return TryGetInteger("wsId");
             }
         }
@@ -39,6 +49,16 @@ namespace Envirotrax.Common.Data.Services.Implementations
         {
             get
             {
+                if (HasScopes("envirotrax_app_internal"))
+                {
+                    var userIdHeader = _contextAccessor.HttpContext?.Request?.Headers["Vp-User-Id"];
+
+                    if (int.TryParse(userIdHeader, out var headerUserId))
+                    {
+                        return headerUserId;
+                    }
+                }
+
                 return TryGetInteger(OpenIddictConstants.Claims.Subject);
             }
         }
@@ -138,6 +158,20 @@ namespace Envirotrax.Common.Data.Services.Implementations
                 return scope
                     .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                     .Any(s => s == scopeToCheck);
+            }
+
+            return false;
+        }
+
+        public bool HasScopes(params string[] scopesToCheck)
+        {
+            var scope = _contextAccessor.HttpContext?.User?.FindFirstValue("scope");
+
+            if (!string.IsNullOrWhiteSpace(scope))
+            {
+                return scope
+                    .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .Any(s => scopesToCheck.Contains(s));
             }
 
             return false;

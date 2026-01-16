@@ -3,6 +3,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Implementations.Users;
 using Envirotrax.App.Server.Domain.Services.Implementations.WaterSuppliers;
+using Envirotrax.Common.Configuration;
 
 namespace Envirotrax.App.Server.Domain.Configuration;
 
@@ -15,6 +16,8 @@ public static class ServiceRegistration
             config.AddMaps(typeof(ServiceRegistration).Assembly);
             config.LicenseKey = configuration["AutoMapper:LicenseKey"];
         });
+
+        services.AddInternalApi<AuthApiOptions>(configuration.GetSection("AuthApi"));
 
         services.AddTransient<IWaterSupplierService, WaterSupplierService>();
         services.AddTransient<IUserService, UserService>();

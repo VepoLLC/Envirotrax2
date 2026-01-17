@@ -8,4 +8,6 @@ public interface IUserInvitationReppsitory
     Task<UserInvitation?> GetAsync(int id);
 
     Task<UserInvitation> AddAsync(UserInvitation invitation);
+
+    Task DeleteAllAsync(int userId);
 }

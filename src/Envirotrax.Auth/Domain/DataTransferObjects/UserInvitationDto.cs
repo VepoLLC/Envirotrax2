@@ -11,9 +11,6 @@ public class UserInvitationDto
     public int UserId { get; set; }
 
     [Required]
-    public int? CreatorId { get; set; }
-
-    [Required]
     [EmailAddress]
     [StringLength(100)]
     public string EmailAddress { get; set; } = null!;

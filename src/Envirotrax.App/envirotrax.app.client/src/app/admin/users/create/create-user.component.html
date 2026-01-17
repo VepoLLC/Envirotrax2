@@ -4,22 +4,22 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="mb-3">
-                    <vp-input [(ngModel)]="supplier.name"
+                    <vp-input [(ngModel)]="user.contactName"
                               [required]="true"
-                              name="name"
-                              label="Name"
-                              [maxLength]="255"
+                              name="contactName"
+                              label="Contact Name"
+                              [maxLength]="100"
                               [form]="form" />
                 </div>
             </div>
 
             <div class="col-md-6">
                 <div class="mb-3">
-                    <vp-input [(ngModel)]="supplier.domain"
+                    <vp-input [(ngModel)]="user.emailAddress"
                               [required]="true"
-                              name="domain"
-                              label="Domain"
-                              [maxLength]="50"
+                              name="emailAddress"
+                              label="Email"
+                              [maxLength]="100"
                               [form]="form" />
                 </div>
             </div>

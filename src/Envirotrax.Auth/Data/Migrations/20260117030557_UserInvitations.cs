@@ -20,9 +20,7 @@ namespace Envirotrax.Auth.Data.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     TokenHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedById = table.Column<int>(type: "int", nullable: true),
-                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DeletedById = table.Column<int>(type: "int", nullable: true),
-                    DeletedTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -30,11 +28,6 @@ namespace Envirotrax.Auth.Data.Migrations
                     table.ForeignKey(
                         name: "FK_UserInvitations_AspNetUsers_CreatedById",
                         column: x => x.CreatedById,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_UserInvitations_AspNetUsers_DeletedById",
-                        column: x => x.DeletedById,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
@@ -49,11 +42,6 @@ namespace Envirotrax.Auth.Data.Migrations
                 name: "IX_UserInvitations_CreatedById",
                 table: "UserInvitations",
                 column: "CreatedById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserInvitations_DeletedById",
-                table: "UserInvitations",
-                column: "DeletedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserInvitations_UserId",

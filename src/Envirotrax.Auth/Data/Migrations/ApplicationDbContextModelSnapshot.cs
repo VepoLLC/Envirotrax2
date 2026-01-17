@@ -148,12 +148,6 @@ namespace Envirotrax.Auth.Data.Migrations
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("DeletedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeletedTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("TokenHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -164,8 +158,6 @@ namespace Envirotrax.Auth.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
 
                     b.HasIndex("UserId");
 
@@ -603,10 +595,6 @@ namespace Envirotrax.Auth.Data.Migrations
                         .WithMany()
                         .HasForeignKey("CreatedById");
 
-                    b.HasOne("Envirotrax.Auth.Data.Models.AppUser", "DeletedBy")
-                        .WithMany()
-                        .HasForeignKey("DeletedById");
-
                     b.HasOne("Envirotrax.Auth.Data.Models.AppUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -614,8 +602,6 @@ namespace Envirotrax.Auth.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
-
-                    b.Navigation("DeletedBy");
 
                     b.Navigation("User");
                 });

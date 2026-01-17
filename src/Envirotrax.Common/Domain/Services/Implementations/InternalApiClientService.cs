@@ -95,13 +95,19 @@ public class InternalApiClientService<TOptions> : IInternalApiClientService<TOpt
             response = await requestCallback();
         }
 
+        var content = await response.Content.ReadAsStringAsync();
+
         if (!response.IsSuccessStatusCode)
         {
-            var content = await response.Content.ReadAsStringAsync();
             throw new InvalidOperationException(content);
         }
 
-        return await response.Content.ReadFromJsonAsync<T>(_jsonOptions);
+        if (!string.IsNullOrWhiteSpace(content))
+        {
+            return JsonSerializer.Deserialize<T>(content, _jsonOptions);
+        }
+
+        return default;
     }
 
     public Task<T?> GetAsync<T>(int waterSupplierId, int? loggedInUserId, string url)
@@ -149,7 +155,7 @@ public class InternalApiClientService<TOptions> : IInternalApiClientService<TOpt
     {
         return ProcessRequestAsync<T>(() =>
         {
-            var request = CreateRequestMessage(HttpMethod.Post, waterSupplierId, loggedInUserId, url);
+            var request = CreateRequestMessage(HttpMethod.Delete, waterSupplierId, loggedInUserId, url);
 
             return _httpClient.SendAsync(request);
         });

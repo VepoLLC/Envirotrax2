@@ -35,7 +35,6 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
 
         var invitation = new UserInvitationDto
         {
-            CreatorId = _authService.UserId,
             EmailAddress = dto.EmailAddress,
             InvitedByCompany = supplier.Name
         };
@@ -54,12 +53,16 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
 
         return await base.AddAsync(dto);
     }
+
+    public override async Task<WaterSupplierUserDto?> DeleteAsync(int id)
+    {
+        await _authApiClient.DeleteAsync<object>(_authService.WaterSupplierId, _authService.UserId, $"/api/users/{id}/invitations");
+        return await base.DeleteAsync(id);
+    }
 }
 class UserInvitationDto
 {
     public int Id { get; set; }
-
-    public int CreatorId { get; set; }
 
     public int UserId { get; set; }
 

@@ -5,11 +5,9 @@ using Envirotrax.Auth.Data.Models;
 using Envirotrax.Auth.Data.Repositories.Defintions;
 using Envirotrax.Auth.Domain.DataTransferObjects;
 using Envirotrax.Auth.Domain.Services.Definitions;
-using Envirotrax.Auth.Pages;
 using Envirotrax.Auth.Templates.Emails;
 using Envirotrax.Common.Domain.Services.Defintions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.Auth.Domain.Services.Implementations;
 
@@ -21,6 +19,7 @@ public class UserInvitationService : IUserInvitationService
     private readonly LinkGenerator _linkGenerator;
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IEmailService _emailService;
+    private readonly Definitions.IAuthService _authService;
 
     public UserInvitationService(
         UserManager<AppUser> userManager,
@@ -28,7 +27,8 @@ public class UserInvitationService : IUserInvitationService
         IUserInvitationReppsitory invitationReppsitory,
         LinkGenerator linkGenerator,
         IHttpContextAccessor contextAccessor,
-        IEmailService emailService)
+        IEmailService emailService,
+        Definitions.IAuthService authService)
     {
         _userManager = userManager;
         _passwordHasher = passwordHasher;
@@ -36,6 +36,7 @@ public class UserInvitationService : IUserInvitationService
         _linkGenerator = linkGenerator;
         _contextAccessor = contextAccessor;
         _emailService = emailService;
+        _authService = authService;
     }
 
     private async Task<AppUser> GetOrCreateUserIdAsync(AppUser? user, UserInvitationDto invitation)
@@ -73,11 +74,13 @@ public class UserInvitationService : IUserInvitationService
             var addedInvitation = await _invitationRepository.AddAsync(new()
             {
                 UserId = user.Id,
-                CreatedById = invitation.CreatorId!.Value,
+                CreatedById = _authService.UserId,
                 CreatedTime = DateTime.UtcNow,
                 TokenHash = _passwordHasher.HashPassword(user, token)
             });
+
             invitation.Id = addedInvitation.Id;
+            invitation.UserId = addedInvitation.UserId;
 
             var callbackUrl = _linkGenerator.GetUriByPage(
                 httpContext: _contextAccessor.HttpContext!,
@@ -122,5 +125,10 @@ public class UserInvitationService : IUserInvitationService
         }
 
         return result;
+    }
+
+    public async Task DeleteAllAsync(int userId)
+    {
+        await _invitationRepository.DeleteAllAsync(userId);
     }
 }

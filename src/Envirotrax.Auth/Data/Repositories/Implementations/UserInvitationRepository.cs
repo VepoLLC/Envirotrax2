@@ -29,4 +29,12 @@ public class UserInvitationReppsitory : IUserInvitationReppsitory
 
         return invitation;
     }
+
+    public async Task DeleteAllAsync(int userId)
+    {
+        await _dbContext
+            .UserInvitations
+            .Where(userInvitation => userInvitation.UserId == userId)
+            .ExecuteDeleteAsync();
+    }
 }

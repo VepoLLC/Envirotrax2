@@ -4,7 +4,7 @@ using Envirotrax.Common.Data.Models;
 
 namespace Envirotrax.Auth.Data.Models;
 
-public class UserInvitation : ICreateAuditableModel<AppUser>, IDeleteAutitableModel<AppUser>
+public class UserInvitation : ICreateAuditableModel<AppUser>
 {
     [Key]
     public int Id { get; set; }
@@ -18,7 +18,4 @@ public class UserInvitation : ICreateAuditableModel<AppUser>, IDeleteAutitableMo
     public int? CreatedById { get; set; }
     public AppUser? CreatedBy { get; set; }
     public DateTime CreatedTime { get; set; }
-    public int? DeletedById { get; set; }
-    public AppUser? DeletedBy { get; set; }
-    public DateTime? DeletedTime { get; set; }
 }

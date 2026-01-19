@@ -40,6 +40,7 @@ public static class ServiceRegistration
         services.AddHostedService<SeedDataService>();
 
         services.AddTransient<IWaterSupplierRepository, WaterSupplierRepository>();
+        services.AddTransient<IGeneralSettingsRepository, GeneralSettingsRepository>();
         services.AddTransient<IUserRepository, UserRepository>();
 
         return services;

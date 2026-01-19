@@ -20,6 +20,7 @@ public static class ServiceRegistration
         services.AddInternalApi<AuthApiOptions>(configuration.GetSection("AuthApi"));
 
         services.AddTransient<IWaterSupplierService, WaterSupplierService>();
+        services.AddTransient<IGeneralSettingsService, GeneralSettingsService>();
         services.AddTransient<IUserService, UserService>();
 
         return services;

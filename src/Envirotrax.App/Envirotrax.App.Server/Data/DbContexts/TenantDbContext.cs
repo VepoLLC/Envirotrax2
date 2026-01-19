@@ -13,6 +13,7 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
 {
     public DbSet<WaterSupplierContractor> WaterSupplierContractors { get; set; }
     public DbSet<WaterSupplierUser> WaterSupplierUsers { get; set; }
+    public DbSet<GeneralSettings> GeneralSettings { get; set; }
 
     public DbSet<Contractor> Contractors { get; set; }
     public DbSet<ContractorUser> ContractorUsers { get; set; }

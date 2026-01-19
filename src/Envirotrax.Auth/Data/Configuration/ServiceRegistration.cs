@@ -2,6 +2,7 @@
 using Envirotrax.Auth.Data.Models;
 using Envirotrax.Auth.Data.Repositories.Defintions;
 using Envirotrax.Auth.Data.Repositories.Implementations;
+using Envirotrax.Common.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,6 +35,7 @@ public static class ServiceRegistration
 
         services.AddTransient<IWaterSupplierUserRepository, WaterSupplierUserRepository>();
         services.AddTransient<IContractorUserRepository, ContractorUserRepository>();
+        services.AddTransient<IUserInvitationReppsitory, UserInvitationReppsitory>();
 
         return services;
     }

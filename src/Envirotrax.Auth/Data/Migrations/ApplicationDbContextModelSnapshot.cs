@@ -134,6 +134,36 @@ namespace Envirotrax.Auth.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Envirotrax.Auth.Data.Models.UserInvitation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserInvitations");
+                });
+
             modelBuilder.Entity("Envirotrax.Auth.Data.Models.WaterSupplier", b =>
                 {
                     b.Property<int>("Id")
@@ -555,6 +585,23 @@ namespace Envirotrax.Auth.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Contractor");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Envirotrax.Auth.Data.Models.UserInvitation", b =>
+                {
+                    b.HasOne("Envirotrax.Auth.Data.Models.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Envirotrax.Auth.Data.Models.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
 
                     b.Navigation("User");
                 });

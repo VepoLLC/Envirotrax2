@@ -950,7 +950,8 @@ button[type=submit],
 button[type=reset],
 input[type=button],
 input[type=submit],
-input[type=reset] {
+input[type=reset],
+.btn-primary {
     color: #fff;
     background-color: var(--steelblue);
     border: 1px solid #ccc;
@@ -1020,7 +1021,8 @@ button[type=submit]:hover,
 button[type=reset]:hover,
 input[type=button]:hover,
 input[type=submit]:hover,
-input[type=reset]:hover {
+input[type=reset]:hover,
+.btn-primary:hover {
     color: #fff;
     background-color: #3282b8;
     border-color: #dde3eb;

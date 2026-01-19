@@ -1,7 +1,7 @@
 
 using System.Security.Claims;
-using Envirotrax.Auth.Areas.OpenIdConnect.Services.Definitions;
 using Envirotrax.Auth.Data.Models;
+using Envirotrax.Auth.Domain.Services.Definitions;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 
-namespace Envirotrax.Auth.Areas.OpenIdConnect.Controllers
+namespace Envirotrax.Auth.Controllers
 {
     [ApiController]
     [Route("oauth/connect")]

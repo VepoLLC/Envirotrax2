@@ -1,0 +1,19 @@
+<div>
+    <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+    <vp-table *ngIf="table.items"
+              [columns]="table.columns!"
+              [data]="table.items.data"
+              [canAdd]="true"
+              (add)="add()"
+              [canEdit]="true"
+              (edit)="edit($event)"
+              [canDelete]="true"
+              (delete)="delete($event)"
+              [(pageInfo)]="table.items.pageInfo"
+              (pageInfoChange)="getUsers()"
+              [(query)]="table.query"
+              (queryChange)="getUsers()"
+              (queryReset)="getUsers()"
+              [freeTextSearch]="table.freeTextSearch" />
+</div>

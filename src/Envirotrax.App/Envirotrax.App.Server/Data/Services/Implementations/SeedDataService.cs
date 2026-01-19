@@ -63,7 +63,8 @@ public class SeedDataService : IHostedService
             dbContext.WaterSupplierUsers.Add(new()
             {
                 WaterSupplierId = _defaultTenant!.Id,
-                UserId = user.Id
+                UserId = user.Id,
+                EmailAddress = _adminUserOptions.EmailAddress
             });
 
             await dbContext.SaveChangesAsync();

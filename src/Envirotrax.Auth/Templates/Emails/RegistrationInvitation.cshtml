@@ -1,0 +1,16 @@
+@using RazorLight
+@using Envirotrax.Auth.Templates.Emails
+@inherits TemplatePage<RegistrationInvitationVm>
+
+@{
+    Layout = "Templates.Emails._EmailLayout";
+}
+
+<div>
+    <p style="margin-top: 0;">
+        @Model.InvitedByCompany invited you to register in their system. Please click the link below to accept their
+        invitation.
+    </p>
+
+    <a style="word-wrap: break-word;" href="@Model.CallbackUrl">@Model.CallbackUrl</a>
+</div>

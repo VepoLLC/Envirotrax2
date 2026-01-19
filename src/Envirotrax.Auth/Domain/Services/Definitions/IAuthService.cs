@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using Envirotrax.Common.Data.Services.Definitions;
 
-namespace Envirotrax.Auth.Areas.OpenIdConnect.Services.Definitions;
+namespace Envirotrax.Auth.Domain.Services.Definitions;
 
 public interface IAuthService : ITenantProvidersService
 {

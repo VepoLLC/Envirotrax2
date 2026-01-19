@@ -34,6 +34,7 @@ public static class ServiceRegistration
         services.AddScoped<IDbContextSelector, DbContextSelector>();
 
         services.AddTenantProvider();
+        services.Configure<AdminUserOptions>(configuration.GetSection("AdminUser"));
         services.AddHostedService<SeedDataService>();
 
         services.AddTransient<IWaterSupplierRepository, WaterSupplierRepository>();

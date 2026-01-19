@@ -14,8 +14,7 @@ namespace Envirotrax.Common.Data.Services.Implementations
         {
             get
             {
-                return 1;
-                //return TryGetInteger("wsId");
+                return TryGetInteger("wsId");
             }
         }
 
@@ -111,6 +110,14 @@ namespace Envirotrax.Common.Data.Services.Implementations
             if (principal.Identity is ClaimsIdentity claimsIdentity)
             {
                 claimsIdentity.AddClaim(new Claim("pWsId", supplierId.ToString()).SetDestinations(OpenIddictConstants.Destinations.AccessToken));
+            }
+        }
+
+        public void SetContractor(ClaimsPrincipal principal, int contractorId)
+        {
+            if (principal.Identities is ClaimsIdentity claimsIdentity)
+            {
+                claimsIdentity.AddClaim(new Claim("ctrId", contractorId.ToString()).SetDestinations(OpenIddictConstants.Destinations.AccessToken));
             }
         }
 

@@ -5,78 +5,117 @@
     ViewData["Title"] = "Log in";
 }
 
-<h1>@ViewData["Title"]</h1>
-<div class="row">
-    <div class="col-md-4">
-        <section>
-            <form id="account" method="post">
-                <h2>Use a local account to log in.</h2>
-                <hr />
-                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                    <label asp-for="Input.Email" class="form-label">Email</label>
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
-                </div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label asp-for="Input.Password" class="form-label">Password</label>
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-                <div class="checkbox mb-3">
-                    <label asp-for="Input.RememberMe" class="form-label">
-                        <input class="form-check-input" asp-for="Input.RememberMe" />
-                        @Html.DisplayNameFor(m => m.Input.RememberMe)
-                    </label>
-                </div>
-                <div>
-                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-                </div>
-                <div>
-                    <p>
-                        <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p>
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
-                    </p>
-                    <p>
-                        <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
-                    </p>
-                </div>
-            </form>
-        </section>
+
+<section id="divPageTitle" class="container-lg page-title">
+    <div class="text-center">
+        <h2>Account Login</h2>
     </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to log in.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
+</section>
+
+<section id="sectionLogin" runat="server" class="card shadow-sm">
+    <div class="card-header border-bottom-0 text-center text-white bg-info fw-semibold fs-5 rounded-top">
+        <h3 class="h4 mb-0">Existing Account Login</h3>
+    </div>
+    <div class="card-body border border-info rounded-bottom">
+        <div id="divLoginInfo" runat="server" style="width: 100%">
+            If you have an existing account, please login with the User ID and Password you specified when creating the
+            account. If you do not know
+            your User ID or Password, use the <b>Retrieve Lost Login</b> link to have your login information sent to the
+            email address you specified when you created
+            the account.
+        </div>
+        <form id="account" method="post">
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger text-center mb-3"
+                 role="alert"></div>
+
+            <div class="row justify-content-center mt-4">
+                <div class="col-sm-12 col-md-6 col-lg-5 col-xl-4">
+
+                    <div class="mb-3">
+                        <label asp-for="Input.Email" class="form-label fw-bold">
+                            User ID / Email Address
+                        </label>
+                        <input asp-for="Input.Email"
+                               class="form-control"
+                               autocomplete="username"
+                               aria-required="true"
+                               placeholder="name@example.com" />
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
                     </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
+
+                    <div class="mb-3">
+                        <label asp-for="Input.Password" class="form-label fw-bold">
+                            Password
+                        </label>
+
+                        <div class="input-group">
+                            <input asp-for="Input.Password"
+                                   class="form-control"
+                                   autocomplete="current-password"
+                                   aria-required="true"
+                                   placeholder="Enter you password" />
+
+                            <button type="button"
+                                    onclick="showHidePassword(this, '@Html.IdFor(model => model.Input.Password)');"
+                                    class="btn p-2">
+                                <i id="eyePassword"
+                                   class="fa fa-eye"
+                                   aria-hidden="true"></i>
+                            </button>
                         </div>
-                    </form>
-                }
-            }
-        </section>
+
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <button type="submit"
+                                id="btnLogin"
+                                class="btn btn-primary px-5">
+                            <i class="fa-solid fa-right-to-bracket me-2"></i>
+                            LOGIN
+                        </button>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <div>
+                            <a asp-page="./ForgotPassword">
+                                I forgot my password
+                            </a>
+                        </div>
+                        <div class="mt-3">
+                            <a asp-page="./ResendEmailConfirmation">
+                                Resend email confirmation
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
     </div>
-</div>
+</section>
+
+<section id="sectionCreateAccount" runat="server" class="card mt-3">
+    <div class="card-header border-bottom-0 text-center text-white bg-info fw-semibold fs-5 rounded-top">
+        <h3 class="h4 mb-0">Create a New Account</h3>
+    </div>
+    <div class="card-body border border-info rounded-bottom">
+        <p class="text-center">
+            <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-link link-button text-decoration-none"
+               style="width:200px;">
+                <i class="fas fa-user-circle"></i>&nbsp;&nbsp;Create Account
+            </a>
+        </p>
+        <p style="text-align: center;">
+            <a class="a-blue" href="Quick Start Guide.pdf" target="_blank">Click here to download a Quick Start
+                Guide.</a>
+        </p>
+    </div>
+</section>
+
+
+
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

@@ -4,6 +4,10 @@ html {
     min-height: 100%;
 }
 
+body {
+    font-family: "Montserrat", sans-serif;
+}
+
 .bg-primary {
     background-color: #008fd4 !important;
 }
@@ -51,4 +55,68 @@ html {
     .vp-section-button {
         min-width: 25%;
     }
+}
+
+.nav-link {
+    color: #fff;
+    padding: 0.2rem;
+    border: 1px solid transparent;
+}
+
+.nav-link:hover,
+.nav-link:focus {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.5);
+    border-radius: 5px;
+}
+
+.navbar .dropdown-menu {
+    font-size: 0.9rem;
+    transition: opacity 0.3s;
+    display: block;
+    visibility: hidden;
+    opacity: 0;
+    overflow: hidden;
+    transform: scale(0);
+}
+
+.navbar .dropdown-menu.show {
+    visibility: visible;
+    opacity: 1;
+    transform: scale(1);
+}
+
+.navbar .dropdown-menu i {
+    color: #008fd4;
+    width: 20px;
+    text-align: center;
+}
+
+.dropdown-item {
+    border: 1px solid transparent;
+    padding: 0.5rem 1rem;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background: rgba(0, 143, 212, 0.1);
+    border-color: rgba(0, 143, 212, 0.5);
+    color: black;
+}
+
+.dropdown-divider {
+    margin: 0.5rem 0;
+    border-top: 1px solid #dee2e6;
+}
+
+.navbar .small {
+    font-size: 0.75rem;
+}
+
+.border-primary {
+    border-color: #008fd4 !important;
+}
+
+.navbar-nav .dropdown-menu {
+    position: fixed;
 }

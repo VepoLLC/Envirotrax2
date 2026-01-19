@@ -1,21 +1,44 @@
+using Azure.Identity;
 using Envirotrax.Auth.Data;
+using Envirotrax.Auth.Data.Configuration;
 using Envirotrax.Auth.Data.Models;
+using Envirotrax.Auth.Domain.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+builder.Configuration.AddAzureKeyVault(
+    vaultUri: new Uri(builder.Configuration["KeyVault:Url"] ?? throw new InvalidOperationException()),
+    credential: new DefaultAzureCredential());
 
-builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
-builder.Services.AddRazorPages();
+builder
+    .Services
+    .AddDataServices(builder.Configuration, builder.Environment)
+    .AddDomainServices(builder.Configuration, builder.Environment);
+
+var razor = builder.Services.AddRazorPages();
+
+if (builder.Environment.IsDevelopment())
+{
+    razor.AddRazorRuntimeCompilation();
+}
+
+var allowedCorsOrigins = "_alowedCorsOrigins";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: allowedCorsOrigins, policy =>
+    {
+        var origins = builder.Configuration["Cors:AllowedOrigins"] ?? throw new InvalidOperationException("No CORS configuration was provided");
+
+        policy.WithOrigins(origins.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
 
 var app = builder.Build();
 
@@ -31,14 +54,18 @@ else
     app.UseHsts();
 }
 
+app.UseCors(allowedCorsOrigins);
+
 app.UseHttpsRedirection();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();
+app.MapControllers();
 
 app.Run();

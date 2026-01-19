@@ -50,45 +50,45 @@ public class Service<TModel, TDto, TKey> : IService<TModel, TDto, TKey>
         return Mapper.Map<TDto, TModel>(dto);
     }
 
-    public virtual async Task<IEnumerable<TDto>> GetAllAsync()
+    public virtual async Task<IEnumerable<TDto>> GetAllAsync(CancellationToken cancellationToken)
     {
-        var model = await Repository.GetAllAsync();
+        var model = await Repository.GetAllAsync(cancellationToken);
         return model.Select(m => MapToDto(m)!);
     }
 
-    public virtual async Task<IPagedData<TDto>> GetAllAsync(PageInfo pageInfo, Query query)
+    public virtual async Task<IPagedData<TDto>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         query.Sort = query.ConvertSortProperties<TModel, TDto>(Mapper);
         query.Filter = query.ConvertFilterProperties<TModel, TDto>(Mapper);
 
-        var model = await Repository.GetAllAsync(pageInfo, query);
+        var model = await Repository.GetAllAsync(pageInfo, query, cancellationToken);
 
         return model
             .Select(m => MapToDto(m)!)
             .ToPagedData(pageInfo);
     }
 
-    public virtual async Task<IPagedData<TDto>> GetAllAsync(PageInfo pageInfo, Query query, int maxPageSize)
+    public virtual async Task<IPagedData<TDto>> GetAllAsync(PageInfo pageInfo, Query query, int maxPageSize, CancellationToken cancellationToken)
     {
         query.Sort = query.ConvertSortProperties<TModel, TDto>(Mapper);
         query.Filter = query.ConvertFilterProperties<TModel, TDto>(Mapper);
 
-        var model = await Repository.GetAllAsync(pageInfo, query, maxPageSize);
+        var model = await Repository.GetAllAsync(pageInfo, query, maxPageSize, cancellationToken);
 
         return model
             .Select(m => MapToDto(m)!)
             .ToPagedData(pageInfo);
     }
 
-    public virtual async Task<TDto?> GetNoIncludesAsync(TKey id)
+    public virtual async Task<TDto?> GetNoIncludesAsync(TKey id, CancellationToken cancellationToken)
     {
-        var model = await Repository.GetNoIncludesAsync(id);
+        var model = await Repository.GetNoIncludesAsync(id, cancellationToken);
         return MapToDto(model);
     }
 
-    public virtual async Task<TDto?> GetAsync(TKey id)
+    public virtual async Task<TDto?> GetAsync(TKey id, CancellationToken cancellationToken)
     {
-        var model = await Repository.GetAsync(id);
+        var model = await Repository.GetAsync(id, cancellationToken);
         return MapToDto(model);
     }
 

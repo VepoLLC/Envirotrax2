@@ -1,0 +1,17 @@
+<div>
+    <dp-loading-spinner *ngIf="isLoading" message="Logging you in..."></dp-loading-spinner>
+
+    <ng-container *ngIf="suppliers && suppliers.data && suppliers.data.length > 1">
+        <p>
+            It seems like you have access to multiple systems. Please select the system you want to login.
+        </p>
+
+        <div>
+            <ul class="list-group">
+                <li *ngFor="let supplier of suppliers.data" class="list-group-item list-group-item-action">
+                    {{supplier.name}}
+                </li>
+            </ul>
+        </div>
+    </ng-container>
+</div>

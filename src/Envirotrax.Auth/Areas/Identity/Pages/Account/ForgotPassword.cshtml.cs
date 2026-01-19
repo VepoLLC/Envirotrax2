@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Envirotrax.Common.Domain.Services.Defintions;
+using Envirotrax.Auth.Templates.Emails;
 
 namespace Envirotrax.Auth.Areas.Identity.Pages.Account
 {
@@ -21,11 +23,16 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IEmailSender _emailSender;
+        private readonly IEmailService _emailService;
 
-        public ForgotPasswordModel(UserManager<AppUser> userManager, IEmailSender emailSender)
+        public ForgotPasswordModel(
+            UserManager<AppUser> userManager,
+            IEmailSender emailSender,
+            IEmailService emailService)
         {
             _userManager = userManager;
             _emailSender = emailSender;
+            _emailService = emailService;
         }
 
         /// <summary>
@@ -71,10 +78,16 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
                     values: new { area = "Identity", code },
                     protocol: Request.Scheme);
 
-                await _emailSender.SendEmailAsync(
-                    Input.Email,
-                    "Reset Password",
-                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                await _emailService.SendAsync<ForgotPasswordVm>(new()
+                {
+                    TemplateId = "ForgotPassword",
+                    Subject = "Forgot Password",
+                    Recipients = [user.Email],
+                    TemplateData = new()
+                    {
+                        CallbackUrl = callbackUrl
+                    }
+                });
 
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }

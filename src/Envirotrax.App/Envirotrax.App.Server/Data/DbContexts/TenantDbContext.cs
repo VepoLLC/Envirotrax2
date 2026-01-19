@@ -1,4 +1,5 @@
 using Envirotrax.App.Server.Data.Models.Contractors;
+using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.States;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.Common.Data.DbContexts;
@@ -8,28 +9,28 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.DbContexts;
 
-public class TenantDbContext : TenantDbContextBase<WaterSupplier>
+public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
 {
-    public DbSet<WaterSupplierContractor> WaterSupplierContractors { get; set; }
-    public DbSet<WaterSupplierUser> WaterSupplierUsers { get; set; }
+        public DbSet<WaterSupplierContractor> WaterSupplierContractors { get; set; }
+        public DbSet<WaterSupplierUser> WaterSupplierUsers { get; set; }
 
-    public DbSet<Contractor> Contractors { get; set; }
-    public DbSet<ContractorUser> ContractorUsers { get; set; }
-    public DbSet<State> States { get; set; }
+        public DbSet<Contractor> Contractors { get; set; }
+        public DbSet<ContractorUser> ContractorUsers { get; set; }
+        public DbSet<State> States { get; set; }
 
-    protected TenantDbContext(
-        DbContextOptions options,
-        ILogger<TenantDbContextBase<WaterSupplier, AspNetUserBase>> logger,  
-        ITenantProvidersService tenantProvider)
-        : base(options, logger, tenantProvider) 
-    {
-    }
+        protected TenantDbContext(
+            DbContextOptions options,
+            ILogger<TenantDbContext> logger,
+            ITenantProvidersService tenantProvider)
+            : base(options, logger, tenantProvider)
+        {
+        }
 
-    public TenantDbContext(
-        DbContextOptions<TenantDbContext> options,
-        ILogger<TenantDbContextBase<WaterSupplier, AspNetUserBase>> logger, 
-        ITenantProvidersService tenantProvider)
-        : base(options, logger, tenantProvider)
-    {
-    }
+        public TenantDbContext(
+            DbContextOptions<TenantDbContext> options,
+            ILogger<TenantDbContext> logger,
+            ITenantProvidersService tenantProvider)
+            : base(options, logger, tenantProvider)
+        {
+        }
 }

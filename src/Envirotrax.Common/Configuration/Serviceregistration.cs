@@ -15,7 +15,8 @@ public static class ServiceRegistrations
     {
         return services
             .AddHttpContextAccessor()
-            .AddTransient<ITenantProvidersService, TenantProviderService>();
+            .AddTransient<ITenantProvidersService, TenantProviderService>()
+            .AddTransient<IAuthService, AuthService>();
     }
 
     public static IServiceCollection AddHtmlTemplateService(this IServiceCollection services, Action<HtmlTemplateOptions> templateConfigAction)
@@ -36,5 +37,20 @@ public static class ServiceRegistrations
         services.AddTransient<IEmailService, EmailService>();
 
         return services;
+    }
+
+    public static IServiceCollection AddInternalApi<TOptions>(this IServiceCollection services, IConfigurationSection configuration)
+        where TOptions : InternalApiOptions
+    {
+        return services
+            .Configure<TOptions>(configuration)
+            .AddTransient<IInternalApiClientService<TOptions>, InternalApiClientService<TOptions>>();
+    }
+
+    public static IServiceCollection AddInternalApi(this IServiceCollection services, IConfigurationSection configuration)
+    {
+        return services
+            .Configure<InternalApiOptions>(configuration)
+            .AddTransient<IInternalApiClientService, InternalApiClientService>();
     }
 }

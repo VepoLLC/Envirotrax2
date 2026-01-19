@@ -16,6 +16,8 @@ public class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRole<int>
     public DbSet<Contractor> Contractors { get; set; }
     public DbSet<ContractorUser> ContractorUsers { get; set; }
 
+    public DbSet<UserInvitation> UserInvitations { get; set; }
+
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
           : base(options)
     {

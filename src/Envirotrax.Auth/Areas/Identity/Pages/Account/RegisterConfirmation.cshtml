@@ -9,7 +9,7 @@
         <div class="card-header text-center text-white bg-info fw-semibold fs-5 rounded-top">
             <h1 class="h4 mb-0">@ViewData["Title"]</h1>
         </div>
-        <div class="card-body">
+        <div class="card-body border border-info rounded-bottom">
             @if (@Model.DisplayConfirmAccountLink)
             {
                 <p>
@@ -24,7 +24,7 @@
             else
             {
                 <p>
-                    Please check your email to confirm your account.
+                    Thank you for registering. Please check your email to confirm your account.
                 </p>
             }
         </div>

@@ -2,8 +2,8 @@
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using Envirotrax.Auth.Areas.OpenIdConnect.Services;
-using Envirotrax.Auth.Areas.OpenIdConnect.Services.Definitions;
 using Envirotrax.Auth.Data;
+using Envirotrax.Auth.Domain.Services.Definitions;
 using Envirotrax.Auth.Domain.Services.Implementations;
 using Envirotrax.Common.Configuration;
 using Quartz;
@@ -59,7 +59,7 @@ namespace Envirotrax.Auth.Domain.Configuration
                         .AddEphemeralSigningKey();
 
                     // Register scopes (permissions)
-                    options.RegisterScopes("envirotrax_app");
+                    options.RegisterScopes("envirotrax_app", "envirotrax_app_internal");
 
                     // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
                     var aspNetOptions = options.UseAspNetCore();
@@ -125,6 +125,8 @@ namespace Envirotrax.Auth.Domain.Configuration
             services.AddHostedService<SeedDataService>();
 
             services.AddTransient<IAuthService, AuthService>();
+            services.AddHttpContextAccessor();
+            services.AddTransient<IUserInvitationService, UserInvitationService>();
 
             return services;
         }

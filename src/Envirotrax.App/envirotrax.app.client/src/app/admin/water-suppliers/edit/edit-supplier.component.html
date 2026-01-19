@@ -16,6 +16,7 @@
                                       name="name"
                                       label="Water Supplier Name"
                                       [required]="true"
+                                      [maxLength]="255"
                                       [form]="supplierForm" />
                         </div>
 
@@ -73,6 +74,7 @@
                                       [required]="true"
                                       name="domain"
                                       label="Domain"
+                                      [maxLength]="50"
                                       [form]="supplierForm" />
                         </div>
 

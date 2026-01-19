@@ -1,5 +1,7 @@
 using Envirotrax.App.Server.Data.DbContexts;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Users;
 using Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Users;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Lookup;
 using Envirotrax.App.Server.Data.Repositories.Implementations.WaterSuppliers;
 using Envirotrax.App.Server.Data.Services.Definitions;
@@ -38,7 +40,9 @@ public static class ServiceRegistration
         services.AddHostedService<SeedDataService>();
 
         services.AddTransient<IWaterSupplierRepository, WaterSupplierRepository>();
+        services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<LookupRepository>();
+
         return services;
     }
 }

@@ -27,6 +27,13 @@ export class HomeComponent implements OnInit {
                 hasPermission: true,
                 description: 'Manage all water suppliers, their details, and configurations.'
             },
+            {
+                title: 'Users',
+                iconCss: 'fa-solid fa-users',
+                routerLink: ['users'],
+                hasPermission: true,
+                description: 'Manage users of your system.'
+            },
         ];
     }
 

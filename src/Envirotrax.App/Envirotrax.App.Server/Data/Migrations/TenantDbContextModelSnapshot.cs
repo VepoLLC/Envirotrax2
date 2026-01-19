@@ -84,6 +84,47 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.ToTable("ContractorUsers");
                 });
 
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Users.AppUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AspNetUsers");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Users.WaterSupplierUser", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ContactName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("EmailAddress")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("WaterSupplierId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("WaterSupplierUsers");
+                });
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.States.State", b =>
                 {
                     b.Property<int>("Id")
@@ -273,56 +314,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.ToTable("WaterSupplierContractors");
                 });
 
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplierUser", b =>
-                {
-                    b.Property<int>("WaterSupplierId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("WaterSupplierId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("WaterSupplierUsers");
-                });
-
-            modelBuilder.Entity("Envirotrax.Common.Data.Models.AspNetUserBase", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(21)
-                        .HasColumnType("nvarchar(21)");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AspNetUsers", t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
-
-                    b.HasDiscriminator().HasValue("AspNetUserBase");
-
-                    b.UseTphMappingStrategy();
-                });
-
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Users.AppUser", b =>
-                {
-                    b.HasBaseType("Envirotrax.Common.Data.Models.AspNetUserBase");
-
-                    b.HasDiscriminator().HasValue("AppUser");
-                });
-
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Contractors.Contractor", b =>
                 {
                     b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "CreatedBy")
@@ -371,6 +362,25 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("Contractor");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Users.WaterSupplierUser", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("WaterSupplier");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", b =>
@@ -440,25 +450,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Contractor");
-
-                    b.Navigation("WaterSupplier");
-                });
-
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplierUser", b =>
-                {
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
-                        .WithMany()
-                        .HasForeignKey("WaterSupplierId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("User");
 
                     b.Navigation("WaterSupplier");
                 });

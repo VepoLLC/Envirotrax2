@@ -60,13 +60,15 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
 
     protected virtual string GetPrimaryColumnName()
     {
-        return DbContext
-            .Model
-            .FindEntityType(typeof(TModel))!
-            .FindPrimaryKey()!
-            .Properties
-            .First(p => p.PropertyInfo!.GetCustomAttribute<AppPrimaryKeyAttribute>()?.IsShadowKey == false)
-            .Name;
+        var entityType = DbContext.Model.FindEntityType(typeof(TModel))!;
+        var primaryKey = entityType.FindPrimaryKey()!;
+
+        var property = primaryKey.Properties
+            .FirstOrDefault(p =>
+                p.PropertyInfo?.GetCustomAttribute<AppPrimaryKeyAttribute>()?.IsShadowKey == false);
+
+        return property?.Name
+               ?? primaryKey.Properties.First().Name;
     }
 
     /// <summary>

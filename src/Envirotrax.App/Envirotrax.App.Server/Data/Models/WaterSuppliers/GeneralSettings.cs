@@ -1,14 +1,10 @@
 using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Models.WaterSuppliers;
 
 public class GeneralSettings : TenantModel<WaterSupplier>
 {
-    [AppPrimaryKey(false)]
-    public new int WaterSupplierId { get; set; }
-
     // Program Settings - Checkboxes
     public bool PrivacyRequired { get; set; }
     public bool NewSitesLocked { get; set; }

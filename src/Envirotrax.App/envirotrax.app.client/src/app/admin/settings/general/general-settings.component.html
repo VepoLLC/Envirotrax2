@@ -1,11 +1,12 @@
 <div>
+    <dp-loading-spinner *ngIf="isLoading" />
+
     <div dp-spinner-parent>
         <form #settingsForm="ngForm" (ngSubmit)="save(settingsForm)">
             <div class="row">
                 <!-- Program Settings Section -->
-                <div class="col-md-6">
+                <div class="col-md-6 mb-3">
                     <vp-section header="Program Settings">
-                        <!-- Top row: Privacy Required / New Sites Locked | Administrative Only -->
                         <div class="row mb-2">
                             <div class="col-6">
                                 <div class="form-check">
@@ -67,9 +68,9 @@
                             </div>
                             <div class="input-group input-group-sm" style="width: 140px;">
                                 <span class="input-group-text">$</span>
-                                <input type="number" class="form-control"
-                                       [(ngModel)]="settings.bpatsRequireInsuranceAmount"
-                                       name="bpatsRequireInsuranceAmount">
+                                <vp-input type="number" [decimals]="2"
+                                          [(ngModel)]="settings.bpatsRequireInsuranceAmount"
+                                          name="bpatsRequireInsuranceAmount" />
                             </div>
                         </div>
 
@@ -89,9 +90,9 @@
                             </div>
                             <div class="input-group input-group-sm" style="width: 140px;">
                                 <span class="input-group-text">$</span>
-                                <input type="number" class="form-control"
-                                       [(ngModel)]="settings.csiInspectorsRequireInsuranceAmount"
-                                       name="csiInspectorsRequireInsuranceAmount">
+                                <vp-input type="number" [decimals]="2"
+                                          [(ngModel)]="settings.csiInspectorsRequireInsuranceAmount"
+                                          name="csiInspectorsRequireInsuranceAmount" />
                             </div>
                         </div>
 
@@ -104,9 +105,9 @@
                             </div>
                             <div class="input-group input-group-sm" style="width: 140px;">
                                 <span class="input-group-text">$</span>
-                                <input type="number" class="form-control"
-                                       [(ngModel)]="settings.fogTransportersRequireInsuranceAmount"
-                                       name="fogTransportersRequireInsuranceAmount">
+                                <vp-input type="number" [decimals]="2"
+                                          [(ngModel)]="settings.fogTransportersRequireInsuranceAmount"
+                                          name="fogTransportersRequireInsuranceAmount" />
                             </div>
                         </div>
 
@@ -153,7 +154,7 @@
                 </div>
 
                 <!-- Submission Fees Section -->
-                <div class="col-md-6">
+                <div class="col-md-6 mb-3">
                     <vp-section header="Submission Fees">
                         <table class="table table-sm table-borderless">
                             <thead>
@@ -166,28 +167,28 @@
                             <tbody>
                                 <tr>
                                     <td class="text-end pe-2"><strong>Backflow Commercial Test Fees:</strong></td>
-                                    <td><input type="number" class="form-control form-control-sm" [(ngModel)]="settings.backflowCommercialTestFee" name="backflowCommercialTestFee"></td>
-                                    <td><input type="number" class="form-control form-control-sm" [(ngModel)]="settings.backflowCommercialTestFeeWsShare" name="backflowCommercialTestFeeWsShare"></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.backflowCommercialTestFee" name="backflowCommercialTestFee" /></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.backflowCommercialTestFeeWsShare" name="backflowCommercialTestFeeWsShare" /></td>
                                 </tr>
                                 <tr>
                                     <td class="text-end pe-2"><strong>Backflow Residential Test Fees:</strong></td>
-                                    <td><input type="number" class="form-control form-control-sm" [(ngModel)]="settings.backflowResidentialTestFee" name="backflowResidentialTestFee"></td>
-                                    <td><input type="number" class="form-control form-control-sm" [(ngModel)]="settings.backflowResidentialTestFeeWsShare" name="backflowResidentialTestFeeWsShare"></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.backflowResidentialTestFee" name="backflowResidentialTestFee" /></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.backflowResidentialTestFeeWsShare" name="backflowResidentialTestFeeWsShare" /></td>
                                 </tr>
                                 <tr>
                                     <td class="text-end pe-2"><strong>CSI Commercial Inspection Fees:</strong></td>
-                                    <td><input type="number" class="form-control form-control-sm" [(ngModel)]="settings.csiCommercialInspectionFee" name="csiCommercialInspectionFee"></td>
-                                    <td><input type="number" class="form-control form-control-sm" [(ngModel)]="settings.csiCommercialInspectionFeeWsShare" name="csiCommercialInspectionFeeWsShare"></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.csiCommercialInspectionFee" name="csiCommercialInspectionFee" /></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.csiCommercialInspectionFeeWsShare" name="csiCommercialInspectionFeeWsShare" /></td>
                                 </tr>
                                 <tr>
                                     <td class="text-end pe-2"><strong>CSI Residential Inspection Fees:</strong></td>
-                                    <td><input type="number" class="form-control form-control-sm" [(ngModel)]="settings.csiResidentialInspectionFee" name="csiResidentialInspectionFee"></td>
-                                    <td><input type="number" class="form-control form-control-sm" [(ngModel)]="settings.csiResidentialInspectionFeeWsShare" name="csiResidentialInspectionFeeWsShare"></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.csiResidentialInspectionFee" name="csiResidentialInspectionFee" /></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.csiResidentialInspectionFeeWsShare" name="csiResidentialInspectionFeeWsShare" /></td>
                                 </tr>
                                 <tr>
                                     <td class="text-end pe-2"><strong>FOG Transport Fee:</strong></td>
-                                    <td><input type="number" class="form-control form-control-sm" [(ngModel)]="settings.fogTransportFee" name="fogTransportFee"></td>
-                                    <td><input type="number" class="form-control form-control-sm" [(ngModel)]="settings.fogTransportFeeWsShare" name="fogTransportFeeWsShare"></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.fogTransportFee" name="fogTransportFee" /></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.fogTransportFeeWsShare" name="fogTransportFeeWsShare" /></td>
                                 </tr>
                             </tbody>
                         </table>

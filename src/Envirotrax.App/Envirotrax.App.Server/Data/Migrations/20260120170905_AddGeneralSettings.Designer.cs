@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    [Migration("20260119150642_AddGeneralSettings")]
+    [Migration("20260120170905_AddGeneralSettings")]
     partial class AddGeneralSettings
     {
         /// <inheritdoc />

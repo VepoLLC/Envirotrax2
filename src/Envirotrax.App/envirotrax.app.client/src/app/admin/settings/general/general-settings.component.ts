@@ -6,7 +6,17 @@ import { NgForm } from "@angular/forms";
 
 @Component({
     templateUrl: './general-settings.component.html',
-    standalone: false
+    standalone: false,
+    styles: [`
+        :host ::ng-deep .input-group vp-input {
+            flex: 1 1 auto;
+            width: 1%;
+            min-width: 0;
+        }
+        :host ::ng-deep .input-group vp-input > div {
+            display: contents;
+        }
+    `]
 })
 export class GeneralSettingsComponent implements OnInit {
     public settings: GeneralSettings = {};
@@ -25,16 +35,10 @@ export class GeneralSettingsComponent implements OnInit {
     }
 
     private async getSettings(): Promise<void> {
-        try {
-            this.isLoading = true;
-            const response = await this._generalSettingsService.getAll({ pageNumber: 1, pageSize: 1 }, { sort: {}, filter: [] });
+        this.isLoading = true;
 
-            if (response.data && response.data.length > 0) {
-                this.settings = response.data[0];
-            }
-        } catch (error) {
-            // If no settings exist yet, keep the empty object
-            console.log('No settings found, will create new on save', error);
+        try {
+            this.settings = await this._generalSettingsService.get();
         } finally {
             this.isLoading = false;
         }
@@ -46,7 +50,7 @@ export class GeneralSettingsComponent implements OnInit {
                 this.isLoading = true;
 
                 let result;
-                if (this.settings.waterSupplierId) {
+                if (this.settings.id) {
                     result = await this._generalSettingsService.update(this.settings);
                 } else {
                     result = await this._generalSettingsService.add(this.settings);
@@ -56,13 +60,11 @@ export class GeneralSettingsComponent implements OnInit {
                     this.settings = result;
                 }
 
-                //this._toastService.successfullySaved();
             } catch (error) {
                 if (!this._helper.parseValidationErrors(error, this.validationErrors)) {
                     throw error;
                 }
 
-                //this._toastService.failedToSave();
             } finally {
                 this.isLoading = false;
             }

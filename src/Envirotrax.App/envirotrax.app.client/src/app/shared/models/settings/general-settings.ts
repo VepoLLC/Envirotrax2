@@ -1,6 +1,5 @@
 export interface GeneralSettings {
     id?: number;
-    waterSupplierId?: number;
 
     // Program Settings - Checkboxes
     privacyRequired?: boolean;

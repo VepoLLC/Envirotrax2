@@ -4,7 +4,6 @@ namespace Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers
     public class GeneralSettingsDto : IDto
     {
         public int Id { get; set; }
-        public int WaterSupplierId { get; set; }
 
         // Program Settings - Checkboxes
         public bool PrivacyRequired { get; set; }

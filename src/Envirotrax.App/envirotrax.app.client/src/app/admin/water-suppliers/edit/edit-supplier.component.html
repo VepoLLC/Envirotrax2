@@ -24,6 +24,8 @@
                             <vp-input [(ngModel)]="supplier.contactName"
                                       name="contactName"
                                       label="Contact Name"
+                                      [required]="true"
+                                      [maxLength]="100"
                                       [form]="supplierForm" />
                         </div>
 
@@ -31,6 +33,7 @@
                             <vp-input [(ngModel)]="supplier.address"
                                       name="address"
                                       label="Address"
+                                      [maxLength]="100"
                                       [form]="supplierForm" />
                         </div>
 
@@ -38,6 +41,7 @@
                             <vp-input [(ngModel)]="supplier.city"
                                       name="city"
                                       label="City"
+                                      [maxLength]="50"
                                       [form]="supplierForm" />
                         </div>
 
@@ -62,6 +66,7 @@
                             <vp-input [(ngModel)]="supplier.zipCode"
                                       name="zipCode"
                                       label="Zip Code"
+                                      [maxLength]="50"
                                       [form]="supplierForm" />
                         </div>
 
@@ -82,6 +87,7 @@
                             <vp-input [(ngModel)]="supplier.pwsId"
                                       name="pwsId"
                                       label="PWS ID"
+                                      [maxLength]="25"
                                       [form]="supplierForm" />
                         </div>
 
@@ -89,6 +95,7 @@
                             <vp-input [(ngModel)]="supplier.phoneNumber"
                                       name="phoneNumber"
                                       label="Phone Number"
+                                      [maxLength]="25"
                                       [form]="supplierForm" />
                         </div>
 
@@ -96,6 +103,7 @@
                             <vp-input [(ngModel)]="supplier.faxNumber"
                                       name="faxNumber"
                                       label="Fax Number"
+                                      [maxLength]="25"
                                       [form]="supplierForm" />
                         </div>
 
@@ -104,6 +112,7 @@
                                       name="emailAddress"
                                       label="Email Address"
                                       type="email"
+                                      [maxLength]="100"
                                       [form]="supplierForm" />
                         </div>
 
@@ -121,6 +130,7 @@
                                 <vp-input [(ngModel)]="supplier.letterCompanyName"
                                           name="lrCompanyName"
                                           label="Company Name"
+                                          [maxLength]="255"
                                           [form]="supplierForm" />
                             </div>
 
@@ -128,6 +138,7 @@
                                 <vp-input [(ngModel)]="supplier.letterContactName"
                                           name="lrContactName"
                                           label="Contact Name"
+                                          [maxLength]="100"
                                           [form]="supplierForm" />
                             </div>
 
@@ -135,6 +146,7 @@
                                 <vp-input [(ngModel)]="supplier.letterAddress"
                                           name="lrAddress"
                                           label="Address"
+                                          [maxLength]="100"
                                           [form]="supplierForm" />
                             </div>
 
@@ -142,6 +154,7 @@
                                 <vp-input [(ngModel)]="supplier.letterCity"
                                           name="lrCity"
                                           label="City"
+                                          [maxLength]="50"
                                           [form]="supplierForm" />
                             </div>
 
@@ -166,6 +179,7 @@
                                 <vp-input [(ngModel)]="supplier.letterZipCode"
                                           name="lrZipCode"
                                           label="Zip Code"
+                                          [maxLength]="50"
                                           [form]="supplierForm" />
                             </div>
 
@@ -182,6 +196,7 @@
                                 <vp-input [(ngModel)]="supplier.letterContactCompanyName"
                                           name="lcCompanyName"
                                           label="Company Name"
+                                          [maxLength]="100"
                                           [form]="supplierForm" />
                             </div>
 
@@ -189,6 +204,7 @@
                                 <vp-input [(ngModel)]="supplier.letterContactContactName"
                                           name="lcContactName"
                                           label="Contact Name"
+                                          [maxLength]="100"
                                           [form]="supplierForm" />
                             </div>
 
@@ -196,6 +212,7 @@
                                 <vp-input [(ngModel)]="supplier.letterContactAddress"
                                           name="lcAddress"
                                           label="Address"
+                                          [maxLength]="100"
                                           [form]="supplierForm" />
                             </div>
 
@@ -203,6 +220,7 @@
                                 <vp-input [(ngModel)]="supplier.letterContactCity"
                                           name="lcCity"
                                           label="City"
+                                          [maxLength]="50"
                                           [form]="supplierForm" />
                             </div>
 
@@ -227,6 +245,7 @@
                                 <vp-input [(ngModel)]="supplier.letterContactZipCode"
                                           name="lcZipCode"
                                           label="Zip Code"
+                                          [maxLength]="50"
                                           [form]="supplierForm" />
                             </div>
 
@@ -234,6 +253,7 @@
                                 <vp-input [(ngModel)]="supplier.letterContactPhoneNumber"
                                           name="lcPhone"
                                           label="Phone Number"
+                                          [maxLength]="25"
                                           [form]="supplierForm" />
                             </div>
 
@@ -241,6 +261,7 @@
                                 <vp-input [(ngModel)]="supplier.letterContactFaxNumber"
                                           name="lcFax"
                                           label="Fax Number"
+                                          [maxLength]="25"
                                           [form]="supplierForm" />
                             </div>
 
@@ -249,6 +270,7 @@
                                           name="lcEmail"
                                           label="Email Address"
                                           type="email"
+                                          [maxLength]="100"
                                           [form]="supplierForm" />
                             </div>
 

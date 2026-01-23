@@ -13,9 +13,9 @@ public class WaterSupplierUser : TenantModel<WaterSupplier>
     public int UserId { get; set; }
     public AppUser? User { get; set; }
 
-    [Required]
-    [StringLength(100)]
-    public string ContactName { get; set; } = null!;
+    //[Required]
+    //[StringLength(100)]
+    //public string ContactName { get; set; } = null!;
 
     [Required]
     [StringLength(100)]

@@ -43,7 +43,7 @@ export class UserListComponent implements OnInit {
     private getColumns(): TableColumn<WaterSupplierUser>[] {
         return [
             {
-                field: 'cotnactName',
+                field: 'contactName',
                 caption: 'Contact Name',
                 type: ColumnType.text
             },
@@ -72,7 +72,9 @@ export class UserListComponent implements OnInit {
     }
 
     public edit(user: WaterSupplierUser): void {
-
+        this._router.navigate([user.id, 'edit'], {
+            relativeTo: this._activatedRoute
+        });
     }
 
     private async processDelete(user: WaterSupplierUser): Promise<void> {

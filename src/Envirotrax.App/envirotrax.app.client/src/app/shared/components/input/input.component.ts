@@ -64,6 +64,12 @@ export class InputComponent implements ControlValueAccessor, OnInit, AfterViewIn
     public max?: number | Date;
 
     @Input()
+    public step?: number | string;
+
+    @Input()
+    public decimals?: number;
+
+    @Input()
     public label: string = null!;
 
     @Input()
@@ -102,6 +108,14 @@ export class InputComponent implements ControlValueAccessor, OnInit, AfterViewIn
         if (this._flatpickerInstance) {
             this._flatpickerInstance.setDate(this.value, false);
         }
+
+        // Format decimals on initial load
+        if (this.type === 'number' && this.decimals != null && this.value != null && this.value !== '') {
+            const num = parseFloat(this.value);
+            if (!isNaN(num)) {
+                this.value = num.toFixed(this.decimals);
+            }
+        }
     }
 
     public registerOnChange(fn: any): void {
@@ -134,6 +148,17 @@ export class InputComponent implements ControlValueAccessor, OnInit, AfterViewIn
 
     public onTouched(event: FocusEvent): void {
         this._onTouched(event);
+        this.formatDecimals();
+    }
+
+    private formatDecimals(): void {
+        if (this.type === 'number' && this.decimals != null && this.value != null && this.value !== '') {
+            const num = parseFloat(this.value);
+            if (!isNaN(num)) {
+                this.value = num.toFixed(this.decimals);
+                this._onChanged(this.value);
+            }
+        }
     }
 
     public onInput(e: Event) {

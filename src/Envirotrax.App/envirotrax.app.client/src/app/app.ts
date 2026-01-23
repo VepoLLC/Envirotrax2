@@ -49,7 +49,7 @@ export class App implements OnInit {
           {
             title: 'User Accounts',
             iconCss: 'fa-solid fa-users',
-            routerLink: ['/users'],
+            routerLink: ['admin/users'],
             hasPermission: true
           },
           {

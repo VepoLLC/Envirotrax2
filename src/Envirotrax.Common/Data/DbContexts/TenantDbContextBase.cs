@@ -95,6 +95,15 @@ namespace Envirotrax.Common.Data.DbContexts
                 LambdaExpression lambdaExpression = ConvertFilterExpression(expression, entity.ClrType);
 
                 builder.Entity(entity.ClrType).HasQueryFilter("TenantFilter", lambdaExpression);
+
+                var waterSupplierProperty = entity.ClrType.GetProperty(nameof(TenantModel<TenantBase>.WaterSupplier));
+                if (waterSupplierProperty != null && typeof(TenantBase).IsAssignableFrom(waterSupplierProperty.PropertyType))
+                {
+                    builder.Entity(entity.ClrType)
+                        .HasOne(waterSupplierProperty.PropertyType, nameof(TenantModel<TenantBase>.WaterSupplier))
+                        .WithMany()
+                        .HasForeignKey(nameof(ITenantModel.WaterSupplierId));
+                }
             }
         }
 

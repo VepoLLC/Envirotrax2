@@ -1,0 +1,210 @@
+<div>
+    <dp-loading-spinner *ngIf="isLoading" />
+
+    <div dp-spinner-parent>
+        <form #settingsForm="ngForm" (ngSubmit)="save(settingsForm)">
+            <div class="row">
+                <!-- Program Settings Section -->
+                <div class="col-md-6 mb-3">
+                    <vp-section header="Program Settings">
+                        <div class="row mb-2">
+                            <div class="col-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           [(ngModel)]="settings.privacyRequired"
+                                           name="privacyRequired" id="privacyRequired">
+                                    <label class="form-check-label" for="privacyRequired">Privacy Required</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           [(ngModel)]="settings.newSitesLocked"
+                                           name="newSitesLocked" id="newSitesLocked">
+                                    <label class="form-check-label" for="newSitesLocked">New Sites Locked</label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           [(ngModel)]="settings.administrativeOnly"
+                                           name="administrativeOnly" id="administrativeOnly">
+                                    <label class="form-check-label" for="administrativeOnly">Administrative Only</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Program checkboxes -->
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   [(ngModel)]="settings.wiseGuys"
+                                   name="wiseGuys" id="wiseGuys">
+                            <label class="form-check-label" for="wiseGuys">WISE Guys</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   [(ngModel)]="settings.backflowTesting"
+                                   name="backflowTesting" id="backflowTesting">
+                            <label class="form-check-label" for="backflowTesting">Backflow Testing</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   [(ngModel)]="settings.csiInspections"
+                                   name="csiInspections" id="csiInspections">
+                            <label class="form-check-label" for="csiInspections">CSI Inspections</label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox"
+                                   [(ngModel)]="settings.fogProgram"
+                                   name="fogProgram" id="fogProgram">
+                            <label class="form-check-label" for="fogProgram">FOG Program</label>
+                        </div>
+
+                        <!-- Insurance Requirements with inline amount fields -->
+                        <div class="d-flex align-items-center mb-1">
+                            <div class="form-check" style="width: 260px;">
+                                <input class="form-check-input" type="checkbox"
+                                       [(ngModel)]="settings.bpatsRequireInsurance"
+                                       name="bpatsRequireInsurance" id="bpatsRequireInsurance">
+                                <label class="form-check-label" for="bpatsRequireInsurance">BPATs require insurance</label>
+                            </div>
+                            <div class="input-group input-group-sm" style="width: 140px;">
+                                <span class="input-group-text">$</span>
+                                <vp-input type="number" [decimals]="2"
+                                          [(ngModel)]="settings.bpatsRequireInsuranceAmount"
+                                          name="bpatsRequireInsuranceAmount" />
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-1">
+                            <input class="form-check-input" type="checkbox"
+                                   [(ngModel)]="settings.bpatsRequireIrrigationLicense"
+                                   name="bpatsRequireIrrigationLicense" id="bpatsRequireIrrigationLicense">
+                            <label class="form-check-label" for="bpatsRequireIrrigationLicense">BPATs require irrigation license</label>
+                        </div>
+
+                        <div class="d-flex align-items-center mb-1">
+                            <div class="form-check" style="width: 260px;">
+                                <input class="form-check-input" type="checkbox"
+                                       [(ngModel)]="settings.csiInspectorsRequireInsurance"
+                                       name="csiInspectorsRequireInsurance" id="csiInspectorsRequireInsurance">
+                                <label class="form-check-label" for="csiInspectorsRequireInsurance">CSI inspectors require insurance</label>
+                            </div>
+                            <div class="input-group input-group-sm" style="width: 140px;">
+                                <span class="input-group-text">$</span>
+                                <vp-input type="number" [decimals]="2"
+                                          [(ngModel)]="settings.csiInspectorsRequireInsuranceAmount"
+                                          name="csiInspectorsRequireInsuranceAmount" />
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center mb-1">
+                            <div class="form-check" style="width: 260px;">
+                                <input class="form-check-input" type="checkbox"
+                                       [(ngModel)]="settings.fogTransportersRequireInsurance"
+                                       name="fogTransportersRequireInsurance" id="fogTransportersRequireInsurance">
+                                <label class="form-check-label" for="fogTransportersRequireInsurance">FOG transporters require insurance</label>
+                            </div>
+                            <div class="input-group input-group-sm" style="width: 140px;">
+                                <span class="input-group-text">$</span>
+                                <vp-input type="number" [decimals]="2"
+                                          [(ngModel)]="settings.fogTransportersRequireInsuranceAmount"
+                                          name="fogTransportersRequireInsuranceAmount" />
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-1">
+                            <input class="form-check-input" type="checkbox"
+                                   [(ngModel)]="settings.fogVehiclesRequirePermit"
+                                   name="fogVehiclesRequirePermit" id="fogVehiclesRequirePermit">
+                            <label class="form-check-label" for="fogVehiclesRequirePermit">FOG vehicles require permit</label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox"
+                                   [(ngModel)]="settings.fogVehiclesRequireInspection"
+                                   name="fogVehiclesRequireInspection" id="fogVehiclesRequireInspection">
+                            <label class="form-check-label" for="fogVehiclesRequireInspection">FOG vehicles require inspection</label>
+                        </div>
+
+                        <!-- Lock Registration Options -->
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   [(ngModel)]="settings.lockBpatRegistrations"
+                                   name="lockBpatRegistrations" id="lockBpatRegistrations">
+                            <label class="form-check-label" for="lockBpatRegistrations">Lock BPAT Registrations</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   [(ngModel)]="settings.lockCsiRegistrations"
+                                   name="lockCsiRegistrations" id="lockCsiRegistrations">
+                            <label class="form-check-label" for="lockCsiRegistrations">Lock CSI Registrations</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   [(ngModel)]="settings.lockFogInspectorRegistrations"
+                                   name="lockFogInspectorRegistrations" id="lockFogInspectorRegistrations">
+                            <label class="form-check-label" for="lockFogInspectorRegistrations">Lock FOG Inspector Registrations</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   [(ngModel)]="settings.lockFogTransporterRegistrations"
+                                   name="lockFogTransporterRegistrations" id="lockFogTransporterRegistrations">
+                            <label class="form-check-label" for="lockFogTransporterRegistrations">Lock FOG Transporter Registrations</label>
+                        </div>
+                    </vp-section>
+                </div>
+
+                <!-- Submission Fees Section -->
+                <div class="col-md-6 mb-3">
+                    <vp-section header="Submission Fees">
+                        <table class="table table-sm table-borderless">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th class="text-center">Total Fee:</th>
+                                    <th class="text-center">WS Share:</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-end pe-2"><strong>Backflow Commercial Test Fees:</strong></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.backflowCommercialTestFee" name="backflowCommercialTestFee" /></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.backflowCommercialTestFeeWsShare" name="backflowCommercialTestFeeWsShare" /></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end pe-2"><strong>Backflow Residential Test Fees:</strong></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.backflowResidentialTestFee" name="backflowResidentialTestFee" /></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.backflowResidentialTestFeeWsShare" name="backflowResidentialTestFeeWsShare" /></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end pe-2"><strong>CSI Commercial Inspection Fees:</strong></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.csiCommercialInspectionFee" name="csiCommercialInspectionFee" /></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.csiCommercialInspectionFeeWsShare" name="csiCommercialInspectionFeeWsShare" /></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end pe-2"><strong>CSI Residential Inspection Fees:</strong></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.csiResidentialInspectionFee" name="csiResidentialInspectionFee" /></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.csiResidentialInspectionFeeWsShare" name="csiResidentialInspectionFeeWsShare" /></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end pe-2"><strong>FOG Transport Fee:</strong></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.fogTransportFee" name="fogTransportFee" /></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.fogTransportFeeWsShare" name="fogTransportFeeWsShare" /></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </vp-section>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <vp-validation-summary [form]="settingsForm" [validationErrors]="validationErrors" />
+
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary vp-section-button">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

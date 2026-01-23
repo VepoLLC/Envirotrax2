@@ -28,6 +28,13 @@ export class HomeComponent implements OnInit {
                 description: 'Manage all water suppliers, their details, and configurations.'
             },
             {
+                title: 'General Settings & Fees',
+                iconCss: 'fa-solid fa-gear',
+                routerLink: ['settings'],
+                hasPermission: true,
+                description: 'Manage program settings and submissions fees.'
+            },
+            {
                 title: 'Users',
                 iconCss: 'fa-solid fa-users',
                 routerLink: ['users'],

@@ -1,0 +1,43 @@
+<div>
+    <vp-section header="Main Information">
+        <dp-loading-spinner *ngIf="isLoading" />
+
+        <div dp-spinner-parent>
+            <form #userForm="ngForm" (ngSubmit)="save(userForm)">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <vp-input [(ngModel)]="user.contactName"
+                                      [required]="true"
+                                      [maxLength]="100"
+                                      name="contactName"
+                                      label="Contact Name"
+                                      [form]="userForm" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <vp-input [(ngModel)]="user.emailAddress"
+                                      [required]="true"
+                                      [maxLength]="100"
+                                      name="emailAddress"
+                                      label="Email Address"
+                                      [form]="userForm" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <vp-validation-summary [form]="userForm" [validationErrors]="validationErrors" />
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary vp-section-button">
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </vp-section>
+</div>

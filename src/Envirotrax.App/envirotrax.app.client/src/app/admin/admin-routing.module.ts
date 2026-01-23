@@ -13,6 +13,10 @@ const routes: Routes = [
         loadChildren: () => import('./water-suppliers/water-supplier.module').then(m => m.WaterSupplierModule)
     },
     {
+        path: 'settings',
+        loadChildren: () => import('./settings/settings.module').then(m => m.SettingsModule)
+    },
+    {
         path: 'users',
         loadChildren: () => import('./users/user.module').then(m => m.UserModule)
     }

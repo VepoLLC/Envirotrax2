@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    [Migration("20260123111842_ChangeWaterSupplierEntity")]
+    [Migration("20260124010441_ChangeWaterSupplierEntity")]
     partial class ChangeWaterSupplierEntity
     {
         /// <inheritdoc />
@@ -134,6 +134,11 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
+                    b.Property<string>("ContactName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("EmailAddress")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -144,6 +149,106 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("WaterSupplierUsers");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.GeneralSettings", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("AdministrativeOnly")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("BackflowCommercialTestFee")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("BackflowCommercialTestFeeWsShare")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("BackflowResidentialTestFee")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("BackflowResidentialTestFeeWsShare")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("BackflowTesting")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("BpatsRequireInsurance")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("BpatsRequireInsuranceAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("BpatsRequireIrrigationLicense")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("CsiCommercialInspectionFee")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("CsiCommercialInspectionFeeWsShare")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("CsiInspections")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CsiInspectorsRequireInsurance")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("CsiInspectorsRequireInsuranceAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("CsiResidentialInspectionFee")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("CsiResidentialInspectionFeeWsShare")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("FogProgram")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("FogTransportFee")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("FogTransportFeeWsShare")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("FogTransportersRequireInsurance")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("FogTransportersRequireInsuranceAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("FogVehiclesRequireInspection")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("FogVehiclesRequirePermit")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LockBpatRegistrations")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LockCsiRegistrations")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LockFogInspectorRegistrations")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LockFogTransporterRegistrations")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("NewSitesLocked")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("PrivacyRequired")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("WiseGuys")
+                        .HasColumnType("bit");
+
+                    b.HasKey("WaterSupplierId");
+
+                    b.ToTable("GeneralSettings");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", b =>
@@ -378,6 +483,17 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+
+                    b.Navigation("WaterSupplier");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.GeneralSettings", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("WaterSupplier");
                 });

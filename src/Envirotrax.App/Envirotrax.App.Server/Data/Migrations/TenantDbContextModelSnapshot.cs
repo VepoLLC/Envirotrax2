@@ -131,6 +131,11 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
+                    b.Property<string>("ContactName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("EmailAddress")
                         .IsRequired()
                         .HasMaxLength(100)

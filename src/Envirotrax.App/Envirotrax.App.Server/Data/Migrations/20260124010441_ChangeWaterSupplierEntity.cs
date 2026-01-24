@@ -10,10 +10,6 @@ namespace Envirotrax.App.Server.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "ContactName",
-                table: "WaterSupplierUsers");
-
             migrationBuilder.AlterColumn<string>(
                 name: "ZipCode",
                 table: "WaterSuppliers",
@@ -207,14 +203,6 @@ namespace Envirotrax.App.Server.Data.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "ContactName",
-                table: "WaterSupplierUsers",
-                type: "nvarchar(100)",
-                maxLength: 100,
-                nullable: false,
-                defaultValue: "");
-
             migrationBuilder.AlterColumn<string>(
                 name: "ZipCode",
                 table: "WaterSuppliers",

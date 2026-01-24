@@ -27,6 +27,9 @@ env:
 on:
   push:
     branches: [ "test" ]
+    paths:
+      - "src/Envirotrax.Auth/**"
+      - "src/Envirotrax.Common/**"
   workflow_dispatch:
 
 permissions:
@@ -78,6 +81,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: .net-app
+          path: ./artifacts/Envirotrax.Auth
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -92,4 +96,4 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: 'Production'
-          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          package: ./artifacts/Envirotrax.Auth

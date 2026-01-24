@@ -33,7 +33,7 @@ export class EditSupplierComponent {
     public async ngOnInit(): Promise<void> {
         await this.loadStates();
         this._acitvatedRoute.paramMap.subscribe(async params => {
-          const supplierId = params.get('id');
+            const supplierId = params.get('id');
             if (supplierId) {
                 await this.getSupplier(+supplierId);
             }
@@ -57,12 +57,10 @@ export class EditSupplierComponent {
 
     public async save(form: NgForm): Promise<void> {
         if (form.valid) {
-            console.log(form.valid);
             try {
                 this.isLoading = true;
                 await this._supplierService.update(this.supplier);
 
-                await this._router.navigate(['/admin/water-suppliers']);
                 // this._toastService.successfullySaved();
             } catch (error) {
                 if (!this._helper.parseValidationErrors(error, this.validationErrors)) {
@@ -70,6 +68,8 @@ export class EditSupplierComponent {
                 }
 
                 //this._toastService.failedToSave();
+            } finally {
+                this.isLoading = false;
             }
         }
     }

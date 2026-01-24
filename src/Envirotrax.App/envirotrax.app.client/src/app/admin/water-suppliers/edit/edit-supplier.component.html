@@ -1,9 +1,11 @@
+<dp-loading-spinner *ngIf="isLoading" />
+
 <div class="d-flex justify-content-center align-items-center mb-3">
     <h2>Edit Water Supplier Account Information</h2>
 </div>
 
 <div>
-    <div dp-spinner-parent>
+    <div>
         <form #supplierForm="ngForm" (ngSubmit)="save(supplierForm)">
 
             <!-- Main account information -->

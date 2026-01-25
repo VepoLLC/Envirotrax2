@@ -120,3 +120,8 @@ body {
 .navbar-nav .dropdown-menu {
     position: fixed;
 }
+
+.form-label,
+.form-check-label {
+    font-weight: 600;
+}

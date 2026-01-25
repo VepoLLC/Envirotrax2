@@ -5,8 +5,22 @@ namespace Envirotrax.Auth.Pages;
 
 public class IndexModel : PageModel
 {
-    public void OnGet()
-    {
+    private readonly IConfiguration _configuration;
 
+    public IndexModel(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+
+    public IActionResult OnGet()
+    {
+        var url = _configuration["Sites:Envirotrax.App:Url"];
+
+        if (!string.IsNullOrEmpty(url))
+        {
+            return Redirect(url);
+        }
+
+        return Page();
     }
 }

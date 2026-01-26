@@ -1,5 +1,5 @@
-using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Models.WaterSuppliers;
 
@@ -29,22 +29,43 @@ public class GeneralSettings : TenantModel<WaterSupplier>
     public bool LockFogTransporterRegistrations { get; set; }
 
     // Insurance Amount Fields
-    
+    [Precision(19, 4)]
     public decimal BpatsRequireInsuranceAmount { get; set; }
-    public decimal CsiInspectorsRequireInsuranceAmount { get; set; }    
+
+    [Precision(19, 4)]
+    public decimal CsiInspectorsRequireInsuranceAmount { get; set; }
+
+    [Precision(19, 4)]
     public decimal FogTransportersRequireInsuranceAmount { get; set; }
 
-    
     // Submission Fees - Total Fee and WS Share
-    
+    [Precision(19, 4)]
     public decimal BackflowCommercialTestFee { get; set; }
+
+    [Precision(19, 4)]
     public decimal BackflowCommercialTestFeeWsShare { get; set; }
-    public decimal BackflowResidentialTestFee { get; set; } 
+
+    [Precision(19, 4)]
+    public decimal BackflowResidentialTestFee { get; set; }
+
+    [Precision(19, 4)]
     public decimal BackflowResidentialTestFeeWsShare { get; set; }
+
+    [Precision(19, 4)]
     public decimal CsiCommercialInspectionFee { get; set; }
+
+    [Precision(19, 4)]
     public decimal CsiCommercialInspectionFeeWsShare { get; set; }
+
+    [Precision(19, 4)]
     public decimal CsiResidentialInspectionFee { get; set; }
+
+    [Precision(19, 4)]
     public decimal CsiResidentialInspectionFeeWsShare { get; set; }
+
+    [Precision(19, 4)]
     public decimal FogTransportFee { get; set; }
+
+    [Precision(19, 4)]
     public decimal FogTransportFeeWsShare { get; set; }
 }

@@ -14,7 +14,7 @@ public class IndexModel : PageModel
 
     public IActionResult OnGet()
     {
-        var url = _configuration["Sites:Envirotrax.App:Url"];
+        var url = _configuration["Sites:EnvirotraxApp:Url"];
 
         if (!string.IsNullOrEmpty(url))
         {

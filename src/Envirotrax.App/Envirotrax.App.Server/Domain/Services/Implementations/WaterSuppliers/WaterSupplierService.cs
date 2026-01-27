@@ -38,7 +38,7 @@ public class WaterSupplierService : Service<WaterSupplier, WaterSupplierDto>, IW
 
     public async Task<IPagedData<WaterSupplierDto>> GetAllMySuppliersAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        query.Sort = query.ConvertSortProperties<WaterSupplier, WaterSupplierContractor>(Mapper);
+        query.Sort = query.ConvertSortProperties<WaterSupplier, WaterSupplierProfessional>(Mapper);
         query.Filter = query.ConvertFilterProperties<WaterSupplier, WaterSupplierDto>(Mapper);
 
         var supplierModels = await _repository.GetAllMySuppliersAsync(pageInfo, query, cancellationToken);

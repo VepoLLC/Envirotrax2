@@ -89,13 +89,13 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
 
     private IQueryable<WaterSupplier> GetMySuppliersQuery()
     {
-        if (_tenantProvider.ContractorId > 0)
+        if (_tenantProvider.ProfessionalId > 0)
         {
             return DbContext
-                .WaterSupplierContractors
+                .WaterSupplierProfessionals
                 .IgnoreQueryFilters()
-                .Where(contractorSupplier => contractorSupplier.ContractorId == _tenantProvider.ContractorId)
-                .Select(contractorSupplier => contractorSupplier.WaterSupplier!);
+                .Where(professionalSupplier => professionalSupplier.ProfessionalId == _tenantProvider.ProfessionalId)
+                .Select(professionalSupplier => professionalSupplier.WaterSupplier!);
         }
 
         return DbContext

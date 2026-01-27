@@ -11,34 +11,34 @@ namespace Envirotrax.Auth.Domain.Services.Implementations;
 public class AuthService : TenantProviderService, IAuthService
 {
     private readonly IWaterSupplierUserRepository _supplierUserRepository;
-    private readonly IContractorUserRepository _contractorUserRepository;
+    private readonly IProfessionalUserRepository _professionalUserRepository;
 
     public AuthService(
         IHttpContextAccessor contextAccessor,
         IWaterSupplierUserRepository supplierUserRepository,
-        IContractorUserRepository contractorUserRepository)
+        IProfessionalUserRepository professionalUserRepository)
         : base(contextAccessor)
     {
         _supplierUserRepository = supplierUserRepository;
-        _contractorUserRepository = contractorUserRepository;
+        _professionalUserRepository = professionalUserRepository;
     }
 
-    public async Task SetSecurityPropertiesAsync(ClaimsPrincipal principal, int userId, int? waterSupplierId, int? contractorId)
+    public async Task SetSecurityPropertiesAsync(ClaimsPrincipal principal, int userId, int? waterSupplierId, int? professionalId)
     {
-        var userAccess = await GetAccessSettingsAsync(userId, waterSupplierId, contractorId);
+        var userAccess = await GetAccessSettingsAsync(userId, waterSupplierId, professionalId);
 
         if (userAccess.WaterSupplierId.HasValue)
         {
             SetWaterSupplier(principal, userAccess.WaterSupplierId.Value);
         }
 
-        if (userAccess.ContractorId.HasValue)
+        if (userAccess.ProfessionalId.HasValue)
         {
-            SetContractor(principal, userAccess.ContractorId.Value);
+            SetProfessional(principal, userAccess.ProfessionalId.Value);
         }
     }
 
-    private async Task<UserAccessDto> GetAccessSettingsAsync(int userId, int? waterSupplierId, int? contractorId)
+    private async Task<UserAccessDto> GetAccessSettingsAsync(int userId, int? waterSupplierId, int? professionalid)
     {
         var accessDto = new UserAccessDto();
 
@@ -48,10 +48,10 @@ public class AuthService : TenantProviderService, IAuthService
             accessDto.WaterSupplierId = supplierUser.WaterSupplierId;
         }
 
-        if (contractorId.HasValue)
+        if (professionalid.HasValue)
         {
-            var contractorUser = await _contractorUserRepository.GetAsync(contractorId.Value, userId) ?? throw new ValidationException("User doesn't have access to this contractor.");
-            accessDto.ContractorId = contractorUser.ContractorId;
+            var professionalUser = await _professionalUserRepository.GetAsync(professionalid.Value, userId) ?? throw new ValidationException("User doesn't have access to this registered professional.");
+            accessDto.ProfessionalId = professionalUser.ProfessionalId;
         }
 
         return accessDto;

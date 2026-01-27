@@ -1,4 +1,4 @@
-using Envirotrax.App.Server.Data.Models.Contractors;
+using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.States;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
@@ -11,12 +11,12 @@ namespace Envirotrax.App.Server.Data.DbContexts;
 
 public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
 {
-    public DbSet<WaterSupplierContractor> WaterSupplierContractors { get; set; }
+    public DbSet<WaterSupplierProfessional> WaterSupplierProfessionals { get; set; }
     public DbSet<WaterSupplierUser> WaterSupplierUsers { get; set; }
     public DbSet<GeneralSettings> GeneralSettings { get; set; }
 
-    public DbSet<Contractor> Contractors { get; set; }
-    public DbSet<ContractorUser> ContractorUsers { get; set; }
+    public DbSet<Professional> Professionals { get; set; }
+    public DbSet<ProfessionalUser> ProfessionalUsers { get; set; }
     public DbSet<State> States { get; set; }
 
     protected TenantDbContext(

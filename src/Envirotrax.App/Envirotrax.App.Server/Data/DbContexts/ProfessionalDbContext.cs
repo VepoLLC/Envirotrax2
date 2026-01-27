@@ -1,17 +1,17 @@
 using System.Linq.Expressions;
-using Envirotrax.App.Server.Data.Models.Contractors;
+using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.DbContexts
 {
-    public class ContractorDbContext : TenantDbContext
+    public class ProfessionalDbContext : TenantDbContext
     {
         private readonly ITenantProvidersService _tenantProvider;
 
-        public ContractorDbContext(
-            DbContextOptions<ContractorDbContext> options,
-            ILogger<ContractorDbContext> logger,
+        public ProfessionalDbContext(
+            DbContextOptions<ProfessionalDbContext> options,
+            ILogger<ProfessionalDbContext> logger,
             ITenantProvidersService tenantProvider)
             : base(options, logger, tenantProvider)
         {
@@ -24,12 +24,12 @@ namespace Envirotrax.App.Server.Data.DbContexts
 
             foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {
-                if (typeof(IContractorModel).IsAssignableFrom(entity.ClrType))
+                if (typeof(IProfessionalModel).IsAssignableFrom(entity.ClrType))
                 {
-                    Expression<Func<IContractorModel, bool>> expression = model => model.ContractorId == _tenantProvider.ContractorId;
+                    Expression<Func<IProfessionalModel, bool>> expression = model => model.ProfessionalId == _tenantProvider.ProfessionalId;
                     var lambdaExpression = ConvertFilterExpression(expression, entity.ClrType);
 
-                    modelBuilder.Entity(entity.ClrType).HasQueryFilter("ContractorFilter", lambdaExpression);
+                    modelBuilder.Entity(entity.ClrType).HasQueryFilter("ProfessionalFilter", lambdaExpression);
                 }
             }
         }
@@ -40,12 +40,12 @@ namespace Envirotrax.App.Server.Data.DbContexts
 
             if (!SkipSaveSecurityProperties)
             {
-                var contractorId = _tenantProvider.ContractorId;
+                var professionalId = _tenantProvider.ProfessionalId;
 
-                foreach (var entry in ChangeTracker.Entries<IContractorModel>())
+                foreach (var entry in ChangeTracker.Entries<IProfessionalModel>())
                 {
-                    var contractorProperty = entry.Property(e => e.ContractorId);
-                    contractorProperty.CurrentValue = contractorId;
+                    var professionalProperty = entry.Property(e => e.ProfessionalId);
+                    professionalProperty.CurrentValue = professionalId;
                 }
             }
         }
@@ -56,9 +56,9 @@ namespace Envirotrax.App.Server.Data.DbContexts
 
             if (!SkipSaveSecurityProperties)
             {
-                if (entity is IContractorModel contractorModel)
+                if (entity is IProfessionalModel professionalModel)
                 {
-                    contractorModel.ContractorId = _tenantProvider.ContractorId;
+                    professionalModel.ProfessionalId = _tenantProvider.ProfessionalId;
                 }
             }
         }

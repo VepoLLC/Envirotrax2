@@ -6,7 +6,7 @@ namespace Envirotrax.Auth.Data.Models;
 
 [ExcludedModel]
 [ReadOnlyModel]
-public class Contractor
+public class Professional
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }
@@ -16,5 +16,5 @@ public class Contractor
     public string Name { get; set; } = null!;
 
     public int? ParentId { get; set; }
-    public Contractor? Parent { get; set; }
+    public Professional? Parent { get; set; }
 }

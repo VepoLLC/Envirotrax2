@@ -22,11 +22,11 @@ public class DbContextSelector : IDbContextSelector
 
     private TenantDbContext GetCurrentContext()
     {
-        if (_tenantProvider.ContractorId > 0 || _tenantProvider.ParentContractorId > 0)
+        if (_tenantProvider.ProfessionalId > 0 || _tenantProvider.ParentProfessionalId > 0)
         {
-            return _serviceProvider.GetRequiredService<ContractorDbContext>();
+            return _serviceProvider.GetRequiredService<ProfessionalDbContext>();
         }
 
         return _serviceProvider.GetRequiredService<TenantDbContext>();
     }
-}     
+}

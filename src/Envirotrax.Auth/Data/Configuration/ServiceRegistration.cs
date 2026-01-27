@@ -34,7 +34,7 @@ public static class ServiceRegistration
             .AddDefaultTokenProviders();
 
         services.AddTransient<IWaterSupplierUserRepository, WaterSupplierUserRepository>();
-        services.AddTransient<IContractorUserRepository, ContractorUserRepository>();
+        services.AddTransient<IProfessionalUserRepository, ProfessionalUserRepository>();
         services.AddTransient<IUserInvitationReppsitory, UserInvitationReppsitory>();
 
         return services;

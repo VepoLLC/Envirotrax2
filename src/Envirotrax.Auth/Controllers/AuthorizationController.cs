@@ -48,9 +48,9 @@ namespace Envirotrax.Auth.Controllers
             return GetIntegerFromAcr(acrValues, "waterSupplierId");
         }
 
-        private int? GetContractorId(string? acrValues)
+        private int? GetProfessionalId(string? acrValues)
         {
-            return GetIntegerFromAcr(acrValues, "contractorId");
+            return GetIntegerFromAcr(acrValues, "professionalId");
         }
 
         private int GetUserId(ClaimsPrincipal claimsPrincipal)
@@ -76,7 +76,7 @@ namespace Envirotrax.Auth.Controllers
                 principal: claimsPrincipal,
                 userId: GetUserId(claimsPrincipal),
                 waterSupplierId: GetWaterSupplierId(request.AcrValues),
-                contractorId: GetContractorId(request.AcrValues)
+                professionalId: GetProfessionalId(request.AcrValues)
             );
 
             // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
@@ -94,7 +94,7 @@ namespace Envirotrax.Auth.Controllers
                 principal: claimsPrincipal,
                 userId: GetUserId(claimsPrincipal),
                 waterSupplierId: GetWaterSupplierId(request.AcrValues),
-                contractorId: GetContractorId(request.AcrValues)
+                professionalId: GetProfessionalId(request.AcrValues)
             );
 
             // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.

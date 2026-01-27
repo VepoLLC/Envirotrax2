@@ -32,7 +32,7 @@ public static class ServiceRegistration
     public static IServiceCollection AddDataServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
         AddDbContext<TenantDbContext>(services, configuration, environment);
-        AddDbContext<ContractorDbContext>(services, configuration, environment);
+        AddDbContext<ProfessionalDbContext>(services, configuration, environment);
         services.AddScoped<IDbContextSelector, DbContextSelector>();
 
         services.AddTenantProvider();

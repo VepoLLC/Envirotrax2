@@ -1,13 +1,13 @@
 
-using Envirotrax.App.Server.Data.Models.Contractors;
+using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
 
 namespace Envirotrax.App.Server.Data.Models.WaterSuppliers;
 
-public class WaterSupplierContractor : TenantModel<WaterSupplier>
+public class WaterSupplierProfessional : TenantModel<WaterSupplier>
 {
     [AppPrimaryKey(false)]
-    public int ContractorId { get; set; }
-    public Contractor? Contractor { get; set; }
+    public int ProfessionalId { get; set; }
+    public Professional? Professional { get; set; }
 }

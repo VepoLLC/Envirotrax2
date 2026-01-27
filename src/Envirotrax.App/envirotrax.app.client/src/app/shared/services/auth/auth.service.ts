@@ -14,15 +14,15 @@ export class AuthService {
         this._userManager = this.createUserManager();
     }
 
-    private createUserManager(waterSupplierId?: number, contractorId?: number): UserManager {
+    private createUserManager(waterSupplierId?: number, professionalId?: number): UserManager {
         let acrValues = '';
 
         if (waterSupplierId) {
             acrValues += `waterSupplierId:${waterSupplierId} `;
         }
 
-        if (contractorId) {
-            acrValues + `contractorId:${contractorId} `;
+        if (professionalId) {
+            acrValues + `professional:${professionalId} `;
         }
 
         return new UserManager({

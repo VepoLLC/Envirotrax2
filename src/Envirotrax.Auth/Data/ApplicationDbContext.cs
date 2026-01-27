@@ -13,8 +13,8 @@ public class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRole<int>
     public DbSet<WaterSupplier> WaterSuppliers { get; set; }
     public DbSet<WaterSupplierUser> WaterSupplierUsers { get; set; }
 
-    public DbSet<Contractor> Contractors { get; set; }
-    public DbSet<ContractorUser> ContractorUsers { get; set; }
+    public DbSet<Professional> Professionals { get; set; }
+    public DbSet<ProfessionalUser> ProfessionalUsers { get; set; }
 
     public DbSet<UserInvitation> UserInvitations { get; set; }
 

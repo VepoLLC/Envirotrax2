@@ -5,35 +5,35 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.Auth.Data.Repositories.Implementations;
 
-public class ContractorUserRepository : IContractorUserRepository
+public class ProfessionalUserRepository : IProfessionalUserRepository
 {
     private readonly ApplicationDbContext _dbContext;
 
-    public ContractorUserRepository(ApplicationDbContext dbContext)
+    public ProfessionalUserRepository(ApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
-    public async Task<ContractorUser?> GetAsync(int contractorId, int userId)
+    public async Task<ProfessionalUser?> GetAsync(int professionalId, int userId)
     {
-        var contractorUser = await _dbContext
-            .ContractorUsers
-            .SingleOrDefaultAsync(s => s.ContractorId == contractorId && s.UserId == userId);
+        var professionalUser = await _dbContext
+            .ProfessionalUsers
+            .SingleOrDefaultAsync(s => s.ProfessionalId == professionalId && s.UserId == userId);
 
-        if (contractorUser == null)
+        if (professionalUser == null)
         {
             var parentId = await _dbContext
-                    .Contractors
-                    .Where(t => t.Id == contractorId)
+                    .Professionals
+                    .Where(t => t.Id == professionalId)
                     .Select(t => t.ParentId)
                     .SingleOrDefaultAsync();
 
             if (parentId.HasValue)
             {
-                contractorUser = await GetAsync(parentId.Value, userId);
+                professionalUser = await GetAsync(parentId.Value, userId);
             }
         }
 
-        return contractorUser;
+        return professionalUser;
     }
 }

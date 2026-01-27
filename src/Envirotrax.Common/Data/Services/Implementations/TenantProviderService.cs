@@ -63,19 +63,19 @@ namespace Envirotrax.Common.Data.Services.Implementations
             }
         }
 
-        public int ContractorId
+        public int ProfessionalId
         {
             get
             {
-                return TryGetInteger("ctrId");
+                return TryGetInteger("prfId");
             }
         }
 
-        public int ParentContractorId
+        public int ParentProfessionalId
         {
             get
             {
-                return TryGetInteger("pCtrId");
+                return TryGetInteger("pPrfId");
             }
         }
 
@@ -133,11 +133,11 @@ namespace Envirotrax.Common.Data.Services.Implementations
             }
         }
 
-        public void SetContractor(ClaimsPrincipal principal, int contractorId)
+        public void SetProfessional(ClaimsPrincipal principal, int professionalId)
         {
             if (principal.Identities is ClaimsIdentity claimsIdentity)
             {
-                claimsIdentity.AddClaim(new Claim("ctrId", contractorId.ToString()).SetDestinations(OpenIddictConstants.Destinations.AccessToken));
+                claimsIdentity.AddClaim(new Claim("prfId", professionalId.ToString()).SetDestinations(OpenIddictConstants.Destinations.AccessToken));
             }
         }
 

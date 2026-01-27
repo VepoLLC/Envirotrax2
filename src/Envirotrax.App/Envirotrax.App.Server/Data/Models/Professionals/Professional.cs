@@ -4,9 +4,9 @@ using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
 
-namespace Envirotrax.App.Server.Data.Models.Contractors;
+namespace Envirotrax.App.Server.Data.Models.Professionals;
 
-public class Contractor : IAuditableModel<AppUser>
+public class Professional : IAuditableModel<AppUser>
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }
@@ -16,7 +16,7 @@ public class Contractor : IAuditableModel<AppUser>
     public string Name { get; set; } = null!;
 
     public int? ParentId { get; set; }
-    public Contractor? Parent { get; set; }
+    public Professional? Parent { get; set; }
 
     public int? CreatedById { get; set; }
     public AppUser? CreatedBy { get; set; }

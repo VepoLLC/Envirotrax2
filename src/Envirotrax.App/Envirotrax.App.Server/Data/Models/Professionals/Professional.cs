@@ -18,6 +18,26 @@ public class Professional : IAuditableModel<AppUser>
     public int? ParentId { get; set; }
     public Professional? Parent { get; set; }
 
+    [StringLength(255)]
+    public string? Address { get; set; }
+
+    [StringLength(255)]
+    public string? City { get; set; }
+
+    [StringLength(25)]
+    public string? ZipCode { get; set; }
+
+    [StringLength(50)]
+    public string? PhoneNumber { get; set; }
+
+    [StringLength(50)]
+    public string? FaxNumber { get; set; }
+
+    [StringLength(255)]
+    public string? WebSiteUrl { get; set; }
+
+    public bool HidePublicListing { get; set; }
+
     public int? CreatedById { get; set; }
     public AppUser? CreatedBy { get; set; }
     public DateTime CreatedTime { get; set; }

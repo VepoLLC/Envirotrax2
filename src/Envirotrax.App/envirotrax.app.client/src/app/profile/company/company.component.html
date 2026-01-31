@@ -1,0 +1,53 @@
+<dp-loading-spinner *ngIf="isLoading" />
+
+<h1 class="text-center h2">
+    Tell Us About Your Business
+</h1>
+
+<vp-section header="Company Information">
+    <form #form="ngForm">
+        <div class="mb-3">
+            <vp-input name="name"
+                      label="Company Name"
+                      [required]="true"
+                      [maxLength]="255"
+                      [form]="form"
+                      [(ngModel)]="professional.name" />
+        </div>
+
+        <div class="row">
+            <div class="mb-3 col-md-6">
+                <vp-input name="phoneNumber"
+                          label="Phone Number"
+                          [maxLength]="50"
+                          [form]="form"
+                          [(ngModel)]="professional.phoneNumber" />
+            </div>
+
+            <div class="mb-3 col-md-6">
+                <vp-input nam="faxNumber"
+                          label="Fax Number"
+                          [maxLength]="50"
+                          [form]="form"
+                          [(ngModel)]="professional.faxNumber" />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <vp-input name="websiteUrl"
+                      label="Website"
+                      [maxLength]="255"
+                      [form]="form"
+                      [(ngModel)]="professional.websiteUrl" />
+        </div>
+
+        <div class="mb-3">
+            <vp-input name="address"
+                      label="Address"
+                      [maxLength]="255"
+                      [form]="form"
+                      [ngModel]="professional.state?.id"
+                      (ngModelChange)="stateChanged($event)" />
+        </div>
+    </form>
+</vp-section>

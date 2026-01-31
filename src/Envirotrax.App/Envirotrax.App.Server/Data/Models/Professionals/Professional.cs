@@ -1,5 +1,6 @@
 
 using System.ComponentModel.DataAnnotations;
+using Envirotrax.App.Server.Data.Models.States;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
@@ -20,6 +21,9 @@ public class Professional : IAuditableModel<AppUser>
 
     [StringLength(255)]
     public string? Address { get; set; }
+
+    public int? StateId { get; set; }
+    public State? State { get; set; }
 
     [StringLength(255)]
     public string? City { get; set; }

@@ -18,6 +18,11 @@ const routes: Routes = [
     path: 'auth',
     title: '',
     loadChildren: () => import('./auth/auth.module').then(m => m.AppAuthModule)
+  },
+  {
+    path: 'profile',
+    title: '',
+    loadChildren: () => import('./profile/profile.module').then(m => m.ProfileModule)
   }
 ];
 

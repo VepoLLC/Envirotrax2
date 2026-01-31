@@ -1,5 +1,6 @@
 
 using System.ComponentModel.DataAnnotations;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 
@@ -16,6 +17,8 @@ public class ProfessionalDto : IDto
 
     [StringLength(255)]
     public string? City { get; set; }
+
+    public ReferencedStateDto? State { get; set; }
 
     [StringLength(25)]
     public string? ZipCode { get; set; }

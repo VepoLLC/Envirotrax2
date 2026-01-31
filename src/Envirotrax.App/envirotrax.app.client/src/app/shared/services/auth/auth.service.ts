@@ -44,9 +44,9 @@ export class AuthService {
         this.setLoggedIn(false);
     }
 
-    public signIn(waterSupplierId?: number): Promise<void> {
+    public signIn(waterSupplierId?: number, professionalId?: number): Promise<void> {
         if (waterSupplierId) {
-            this._userManager = this.createUserManager(waterSupplierId);
+            this._userManager = this.createUserManager(waterSupplierId, professionalId);
         }
 
         return this._userManager.signinRedirect();
@@ -60,29 +60,53 @@ export class AuthService {
         window.open(`${environment.authUrl}/Identity/Account/Manage`, '_blank');
     }
 
-    public async getWaterSupplierId(): Promise<number | null> {
+    private async getProfileField(fieldName: string): Promise<any> {
         const user = await this._userManager.getUser();
 
         if (user) {
             const profile = user.profile as any;
 
-            if (profile.wsId) {
-                return parseInt(profile.wsId);
+            if (profile) {
+                return profile[fieldName];
             }
         }
 
         return null;
     }
 
-    public async isAuthenticated(): Promise<boolean> {
-        const supplierId = await this.getWaterSupplierId();
-        return !!supplierId;
+    private async getProfileInteger(fieldName: string): Promise<number | null> {
+        const id = await this.getProfileField(fieldName);
+
+        return id
+            ? parseInt(id)
+            : null;
+    }
+
+    public async getWaterSupplierId(): Promise<number | null> {
+        return this.getProfileInteger("wsId");
+    }
+
+    public getProfessionalId(): Promise<number | null> {
+        return this.getProfileInteger("prfId");
+    }
+
+    public async isAuthenticated(checkTenantOrProfessional: boolean): Promise<boolean> {
+        if (checkTenantOrProfessional) {
+            const supplierId = await this.getWaterSupplierId();
+            const professionalId = await this.getProfessionalId();
+
+            return !!supplierId || !!professionalId;
+        }
+
+        const user = await this._userManager.getUser();
+
+        return !!user;
     }
 
     public onLoggedIn(): Observable<boolean> {
         return merge(
             this._isLoggedIn$.asObservable(),
-            from(this.isAuthenticated())
+            from(this.isAuthenticated(true))
         );
     }
 

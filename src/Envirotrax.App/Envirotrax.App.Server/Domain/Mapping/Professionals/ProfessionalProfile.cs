@@ -10,7 +10,19 @@ public class ProfessionalProfile : Profile
     public ProfessionalProfile()
     {
         CreateMap<Professional, ProfessionalDto>()
-            .ReverseMap();
+            .AfterMap((model, dto) =>
+            {
+                if (model.StateId.HasValue)
+                {
+                    dto.State ??= new()
+                    {
+                        Id = model.StateId.Value
+                    };
+                }
+            })
+            .ReverseMap()
+            .ForMember(pro => pro.State, opt => opt.Ignore())
+            .ForMember(pro => pro.StateId, opt => opt.MapFrom(pro => pro.State!.Id));
 
         CreateMap<Professional, ReferencedProfessionalDto>();
     }

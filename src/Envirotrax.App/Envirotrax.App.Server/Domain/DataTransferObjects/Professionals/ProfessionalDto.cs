@@ -23,12 +23,15 @@ public class ProfessionalDto : IDto
     [StringLength(25)]
     public string? ZipCode { get; set; }
 
+    [Phone]
     [StringLength(50)]
     public string? PhoneNumber { get; set; }
 
+    [Phone]
     [StringLength(50)]
     public string? FaxNumber { get; set; }
 
+    [Url]
     [StringLength(255)]
     public string? WebSiteUrl { get; set; }
 

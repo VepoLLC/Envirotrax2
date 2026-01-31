@@ -1,5 +1,6 @@
 
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,5 +21,25 @@ public class ProfessionalControler : ProtectedController
     {
         var professionals = await _professionalService.GetAllMyAsync(pageInfo, query, cancellationToken);
         return Ok(professionals);
+    }
+
+    [HttpGet("my/current")]
+    public async Task<IActionResult> GetLoggedInProfessionalAsync(CancellationToken cancellationToken)
+    {
+        var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
+
+        if (professional != null)
+        {
+            return Ok(professional);
+        }
+
+        return NotFound();
+    }
+
+    [HttpPost("my")]
+    public async Task<IActionResult> AddMyAsync(ProfessionalDto professional)
+    {
+        var added = await _professionalService.AddAsync(professional);
+        return Ok(added);
     }
 }

@@ -7,6 +7,7 @@ public class ProfessionalUserDto : IDto
 {
     public int Id { get; set; }
 
+    [Required]
     [StringLength(255)]
     public string? ContactName { get; set; }
 

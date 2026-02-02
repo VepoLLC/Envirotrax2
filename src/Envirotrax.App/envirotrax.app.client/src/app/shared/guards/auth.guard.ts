@@ -1,8 +1,6 @@
 import { Injectable } from "@angular/core";
 import { CanActivate, Router, UrlTree } from "@angular/router";
 import { AuthService } from "../services/auth/auth.service";
-import { ProfesisonalService } from "../services/professionals/professional.service";
-import { ProfesionalUserService } from "../services/professionals/professional-user.service";
 
 @Injectable({
     providedIn: 'root'
@@ -10,9 +8,7 @@ import { ProfesionalUserService } from "../services/professionals/professional-u
 export class AuthGuard implements CanActivate {
     constructor(
         private readonly _authService: AuthService,
-        private readonly _router: Router,
-        private readonly _professionalService: ProfesisonalService,
-        private readonly _professionalUserService: ProfesionalUserService
+        private readonly _router: Router
     ) {
 
     }
@@ -29,21 +25,9 @@ export class AuthGuard implements CanActivate {
             }
 
             // If user is logged in, but they don't have a supplierId, they are a professional
-            // Let's check if their profile is filled
+            // Let's navigate to profile page to collect the missing information
             if (!professionalId) {
-                return this._router.createUrlTree(['/profile/company']);
-            }
-
-            const professional = await this._professionalService.getLoggedInProfessional();
-
-            if (!professional) {
-                return this._router.createUrlTree(['/profile/company']);
-            }
-
-            const professionalUser = await this._professionalUserService.getMyData();
-
-            if (!professionalUser || !professionalUser.contactName) {
-                return this._router.createUrlTree(['/profile/user']);
+                return this._router.createUrlTree(['/profile']);
             }
 
             return true;

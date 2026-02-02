@@ -4,13 +4,10 @@ import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { SharedComponentsModule } from "../shared/components/shared.components.module";
 import { CompanyComponent } from "./company/company.component";
-import { UserComponent } from "./user/user.component";
-
 
 @NgModule({
     declarations: [
         CompanyComponent,
-        UserComponent
     ],
     imports: [
         ProfileRoutingModule,

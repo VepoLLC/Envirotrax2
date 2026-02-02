@@ -46,16 +46,18 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
         return await GetAsync(_authService.ProfessionalId, cancellationToken);
     }
 
-    public async Task<ProfessionalDto> AddMyAsync(ProfessionalDto professional)
+    public async Task<ProfessionalDto> AddMyAsync(CreateProfessionalDto createProfessional)
     {
         using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            var added = await AddAsync(professional);
+            var added = await AddAsync(createProfessional.Professional);
 
             await _professionalUserRepository.AddAsync(new()
             {
                 ProfessionalId = added.Id,
-                UserId = _authService.UserId
+                UserId = _authService.UserId,
+                ContactName = createProfessional.User.ContactName,
+                JobTitle = createProfessional.User.JobTitle
             });
 
             scope.Complete();

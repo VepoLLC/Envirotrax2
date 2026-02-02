@@ -16,7 +16,6 @@ export class AuthService {
 
     private createUserManager(waterSupplierId?: number, professionalId?: number): UserManager {
         let acrValues = '';
-        debugger;
 
         if (waterSupplierId) {
             acrValues += `waterSupplierId:${waterSupplierId} `;

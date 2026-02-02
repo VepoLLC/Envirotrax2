@@ -1,4 +1,5 @@
 import { State } from "../states/state";
+import { ProfessionalUser } from "./professional-user";
 
 export interface Professional {
     id?: number;
@@ -11,4 +12,9 @@ export interface Professional {
     faxNumber?: string;
     websiteUrl?: string;
     hidePublicListing?: boolean;
+}
+
+export interface CreateProfessional {
+    professional: Professional;
+    user: ProfessionalUser
 }

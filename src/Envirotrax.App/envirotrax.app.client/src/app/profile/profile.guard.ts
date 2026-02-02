@@ -1,7 +1,6 @@
 import { Injectable } from "@angular/core";
 import { CanActivate, Router, UrlTree } from "@angular/router";
 import { AuthService } from "../shared/services/auth/auth.service";
-import { ProfesionalUserService } from "../shared/services/professionals/professional-user.service";
 
 @Injectable({
     providedIn: 'root'
@@ -9,8 +8,7 @@ import { ProfesionalUserService } from "../shared/services/professionals/profess
 export class ProfileGuard implements CanActivate {
     constructor(
         private readonly _authService: AuthService,
-        private readonly _router: Router,
-        private readonly _professionalUserService: ProfesionalUserService
+        private readonly _router: Router
     ) {
 
     }
@@ -23,11 +21,7 @@ export class ProfileGuard implements CanActivate {
             ]);
 
             if (supplierId || professionalId) {
-                const professionalUser = await this._professionalUserService.getMyData();
-
-                if (professionalUser && professionalUser.contactName) {
-                    return this._router.createUrlTree(['/']);
-                }
+                return this._router.createUrlTree(['/']);
             }
 
             return true;

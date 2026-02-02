@@ -1,12 +1,12 @@
 import { Component, OnInit } from "@angular/core";
 import { Professional } from "../../shared/models/professionals/professional";
-import { ActivatedRoute, Router } from "@angular/router";
+import { Router } from "@angular/router";
 import { HelperService } from "../../shared/services/helpers/helper.service";
 import { State } from "../../shared/models/states/state";
 import { LookupService } from "../../shared/services/lookup/lookup.service";
 import { ProfesisonalService } from "../../shared/services/professionals/professional.service";
-import { HttpErrorResponse } from "@angular/common/http";
 import { NgForm } from "@angular/forms";
+import { ProfessionalUser } from "../../shared/models/professionals/professional-user";
 import { AuthService } from "../../shared/services/auth/auth.service";
 
 @Component({
@@ -17,11 +17,12 @@ export class CompanyComponent implements OnInit {
     public isLoading: boolean = false;
     public loadingMessage: string = '';
     public validationErrors: string[] = [];
+
     public professional: Professional = {};
+    public user: ProfessionalUser = {};
     public states: State[] = [];
 
     constructor(
-        private readonly _acitvatedRoute: ActivatedRoute,
         private readonly _helper: HelperService,
         private readonly _lookupService: LookupService,
         private readonly _professionalService: ProfesisonalService,
@@ -31,49 +32,15 @@ export class CompanyComponent implements OnInit {
 
     }
 
-    private async getLoggedInProfessional(): Promise<Professional> {
-        try {
-            return await this._professionalService.getLoggedInProfessional();
-        } catch (e) {
-            // If profile is not filled out, getting logged in professional will return Not Found.
-            if (e instanceof HttpErrorResponse) {
-                if (e.status != 404) {
-                    throw e;
-                }
-            }
-        }
-
-        return {};
-    }
-
     public async ngOnInit(): Promise<void> {
         try {
             this.isLoading = true;
-            this.loadingMessage = 'Loading Company Information';
+            this.loadingMessage = 'Loading Profile';
 
-            [this.states, this.professional] = await Promise.all([
-                this._lookupService.getAllStates(),
-                this.getLoggedInProfessional()
-            ]);
-
-            this.professional = this.professional || {};
+            this.states = await this._lookupService.getAllStates();
         } finally {
             this.isLoading = false;
             this.loadingMessage = '';
-        }
-    }
-
-    private async navigateToUserInfo(): Promise<void> {
-        const professionalIdInToken = await this._authService.getProfessionalId();
-
-        if (professionalIdInToken) {
-            this._router.navigate(['../user'], {
-                relativeTo: this._acitvatedRoute
-            });
-        } else {
-            // Getting another token will trigger navigation to user profile if user information is not set.
-            const supplierId = await this._authService.getWaterSupplierId();
-            this._authService.signIn(supplierId, this.professional.id)
         }
     }
 
@@ -90,11 +57,15 @@ export class CompanyComponent implements OnInit {
         if (form.valid) {
             try {
                 this.isLoading = true;
-                this.loadingMessage = 'Saving Company Information';
+                this.loadingMessage = 'Saving Profile';
                 this.validationErrors = [];
 
-                this.professional = await this._professionalService.addMyData(this.professional);
-                this.navigateToUserInfo();
+                const addedProfessional = await this._professionalService.addMyData({
+                    professional: this.professional,
+                    user: this.user
+                });
+
+                await this._authService.signIn(undefined, addedProfessional.id)
             } catch (e) {
                 if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
                     throw e;

@@ -5,8 +5,9 @@ import { HttpClient } from "@angular/common/http";
 import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
-import { Professional } from "../../models/professionals/professional";
+import { CreateProfessional, Professional } from "../../models/professionals/professional";
 import { BehaviorSubject, lastValueFrom, Observable, of, shareReplay } from "rxjs";
+import { ProfessionalUser } from "../../models/professionals/professional-user";
 
 @Injectable({
     providedIn: 'root'
@@ -43,16 +44,16 @@ export class ProfesisonalService {
         return lastValueFrom(this._currentProfessional$);
     }
 
-    public async addMyData(professional: Professional): Promise<Professional> {
+    public async addMyData(createProfessional: CreateProfessional): Promise<Professional> {
         const url = this._urlResolver.resolveUrl('/api/professionals/my');
 
-        const observable = this._http.post<Professional>(url, professional);
+        const observable = this._http.post<CreateProfessional>(url, createProfessional);
         const addedProfessional = await lastValueFrom(observable);
 
-        this._currentProfessional$ = of(addedProfessional);
+        this._currentProfessional$ = of(addedProfessional.professional);
         this._professionalUpdated$.next();
 
-        return addedProfessional;
+        return addedProfessional.professional;
     }
 
     public setLoggedInProfessional(professional: Professional): void {

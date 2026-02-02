@@ -9,4 +9,6 @@ public interface IProfessionalService : IService<Professional, ProfessionalDto>
 {
     Task<IPagedData<ProfessionalDto>> GetAllMyAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<ProfessionalDto?> GetLoggedInProfessionalAsync(CancellationToken cancellationToken);
+
+    Task<ProfessionalDto> AddMyAsync(ProfessionalDto professional);
 }

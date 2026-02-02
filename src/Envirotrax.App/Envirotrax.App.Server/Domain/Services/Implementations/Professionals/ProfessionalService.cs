@@ -1,4 +1,5 @@
 
+using System.Transactions;
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
@@ -14,15 +15,18 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Professionals;
 public class ProfessionalService : Service<Professional, ProfessionalDto>, IProfessionalService
 {
     private readonly IProfessionalRepository _professionalRepository;
+    private readonly IProfessionalUserRepository _professionalUserRepository;
     private readonly IAuthService _authService;
 
     public ProfessionalService(
         IMapper mapper,
         IProfessionalRepository repository,
+        IProfessionalUserRepository professionalUserRepository,
         IAuthService authService)
         : base(mapper, repository)
     {
         _professionalRepository = repository;
+        _professionalUserRepository = professionalUserRepository;
         _authService = authService;
     }
 
@@ -40,5 +44,22 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
     public async Task<ProfessionalDto?> GetLoggedInProfessionalAsync(CancellationToken cancellationToken)
     {
         return await GetAsync(_authService.ProfessionalId, cancellationToken);
+    }
+
+    public async Task<ProfessionalDto> AddMyAsync(ProfessionalDto professional)
+    {
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            var added = await AddAsync(professional);
+
+            await _professionalUserRepository.AddAsync(new()
+            {
+                ProfessionalId = added.Id,
+                UserId = _authService.UserId
+            });
+
+            scope.Complete();
+            return added;
+        }
     }
 }

@@ -2,6 +2,7 @@ import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
 import { CompanyComponent } from "./company/company.component";
 import { ProfileGuard } from "./profile.guard";
+import { UserComponent } from "./user/user.component";
 
 const routes: Routes = [
     {
@@ -13,6 +14,16 @@ const routes: Routes = [
                 path: '',
                 component: CompanyComponent,
                 title: 'Company Information'
+            },
+            {
+                path: 'company',
+                component: CompanyComponent,
+                title: 'Company Information'
+            },
+            {
+                path: 'user',
+                component: UserComponent,
+                title: 'User Information'
             }
         ]
     }

@@ -7,6 +7,7 @@ import { LookupService } from "../../shared/services/lookup/lookup.service";
 import { ProfesisonalService } from "../../shared/services/professionals/professional.service";
 import { HttpErrorResponse } from "@angular/common/http";
 import { NgForm } from "@angular/forms";
+import { AuthService } from "../../shared/services/auth/auth.service";
 
 @Component({
     standalone: false,
@@ -24,7 +25,8 @@ export class CompanyComponent implements OnInit {
         private readonly _helper: HelperService,
         private readonly _lookupService: LookupService,
         private readonly _professionalService: ProfesisonalService,
-        private readonly _router: Router
+        private readonly _router: Router,
+        private readonly _authService: AuthService
     ) {
 
     }
@@ -54,11 +56,7 @@ export class CompanyComponent implements OnInit {
                 this.getLoggedInProfessional()
             ]);
 
-            if (this.professional) {
-                await this.navigateToUserInfo();
-            }
-
-            this.professional = {};
+            this.professional = this.professional || {};
         } finally {
             this.isLoading = false;
             this.loadingMessage = '';
@@ -66,9 +64,17 @@ export class CompanyComponent implements OnInit {
     }
 
     private async navigateToUserInfo(): Promise<void> {
-        await this._router.navigate(['user'], {
-            relativeTo: this._acitvatedRoute
-        });
+        const professionalIdInToken = await this._authService.getProfessionalId();
+
+        if (professionalIdInToken) {
+            this._router.navigate(['../user'], {
+                relativeTo: this._acitvatedRoute
+            });
+        } else {
+            // Getting another token will trigger navigation to user profile if user information is not set.
+            const supplierId = await this._authService.getWaterSupplierId();
+            this._authService.signIn(supplierId, this.professional.id)
+        }
     }
 
     public stateChanged(stateId: number): void {
@@ -85,7 +91,9 @@ export class CompanyComponent implements OnInit {
             try {
                 this.isLoading = true;
                 this.loadingMessage = 'Saving Company Information';
+                this.validationErrors = [];
 
+                this.professional = await this._professionalService.addMyData(this.professional);
                 this.navigateToUserInfo();
             } catch (e) {
                 if (!this._helper.parseValidationErrors(e, this.validationErrors)) {

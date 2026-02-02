@@ -1,8 +1,13 @@
 <div>
-    <label *ngIf="label" [attr.for]="id" class="form-label">
-        {{label}}
-        <span *ngIf="required" class="text-danger">*</span>
-    </label>
+    <div class="d-flex justify-content-between">
+        <label *ngIf="label" [attr.for]="id" class="form-label">
+            {{label}}
+            <span *ngIf="required" class="text-danger">*</span>
+        </label>
+        <div *ngIf="(type == 'text' || type == 'textarea') && maxLength" class="lh-sm me-1 text-end text-muted">
+            <small>{{value?.length || 0}} of {{maxLength}}</small>
+        </div>
+    </div>
 
     <input *ngIf="type != 'textarea' && type != 'select' && type != 'date' && type != 'datetime'"
            [attr.id]="id"
@@ -83,9 +88,5 @@
 
     <div>
         <vp-validation-field *ngIf="form" [form]="form" [fieldName]="name" [fieldLabel]="label" />
-
-        <div *ngIf="(type == 'text' || type == 'textarea') && maxLength" class="lh-sm me-1 text-end text-muted">
-            <small>{{value?.length || 0}} of {{maxLength}}</small>
-        </div>
     </div>
 </div>

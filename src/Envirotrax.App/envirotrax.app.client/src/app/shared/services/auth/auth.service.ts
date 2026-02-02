@@ -16,13 +16,14 @@ export class AuthService {
 
     private createUserManager(waterSupplierId?: number, professionalId?: number): UserManager {
         let acrValues = '';
+        debugger;
 
         if (waterSupplierId) {
             acrValues += `waterSupplierId:${waterSupplierId} `;
         }
 
         if (professionalId) {
-            acrValues + `professional:${professionalId} `;
+            acrValues += `professionalId:${professionalId} `;
         }
 
         return new UserManager({
@@ -45,7 +46,7 @@ export class AuthService {
     }
 
     public signIn(waterSupplierId?: number, professionalId?: number): Promise<void> {
-        if (waterSupplierId) {
+        if (waterSupplierId || professionalId) {
             this._userManager = this.createUserManager(waterSupplierId, professionalId);
         }
 
@@ -71,22 +72,22 @@ export class AuthService {
             }
         }
 
-        return null;
+        return undefined;
     }
 
-    private async getProfileInteger(fieldName: string): Promise<number | null> {
+    private async getProfileInteger(fieldName: string): Promise<number | undefined> {
         const id = await this.getProfileField(fieldName);
 
         return id
             ? parseInt(id)
-            : null;
+            : undefined;
     }
 
-    public async getWaterSupplierId(): Promise<number | null> {
+    public async getWaterSupplierId(): Promise<number | undefined> {
         return this.getProfileInteger("wsId");
     }
 
-    public getProfessionalId(): Promise<number | null> {
+    public getProfessionalId(): Promise<number | undefined> {
         return this.getProfileInteger("prfId");
     }
 

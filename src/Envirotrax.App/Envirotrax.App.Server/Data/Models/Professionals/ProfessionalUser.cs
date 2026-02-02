@@ -6,21 +6,19 @@ using Envirotrax.Common.Data.Attributes;
 
 namespace Envirotrax.App.Server.Data.Models.Professionals;
 
-public class ProfessionalUser
+public class ProfessionalUser : IProfessionalModel
 {
-    [AppPrimaryKey(false)]
+    [AppPrimaryKey(false, IsShadowKey = true)]
     public int ProfessionalId { get; set; }
     public Professional? Professional { get; set; }
-
-    [Required]
-    [StringLength(255)]
-    public string ContactName { get; set; } = null!;
-
-    [Required]
-    [StringLength(150)]
-    public string JobTitle { get; set; } = null!;
 
     [AppPrimaryKey(false)]
     public int UserId { get; set; }
     public AppUser? User { get; set; }
+
+    [StringLength(255)]
+    public string? ContactName { get; set; }
+
+    [StringLength(150)]
+    public string? JobTitle { get; set; }
 }

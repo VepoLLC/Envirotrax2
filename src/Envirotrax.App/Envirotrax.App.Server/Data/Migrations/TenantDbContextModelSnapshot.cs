@@ -110,12 +110,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ContactName")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("JobTitle")
-                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 

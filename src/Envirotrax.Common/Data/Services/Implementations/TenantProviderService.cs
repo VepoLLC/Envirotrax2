@@ -135,7 +135,7 @@ namespace Envirotrax.Common.Data.Services.Implementations
 
         public void SetProfessional(ClaimsPrincipal principal, int professionalId)
         {
-            if (principal.Identities is ClaimsIdentity claimsIdentity)
+            if (principal.Identity is ClaimsIdentity claimsIdentity)
             {
                 claimsIdentity.AddClaim(new Claim("prfId", professionalId.ToString()).SetDestinations(OpenIddictConstants.Destinations.AccessToken));
             }

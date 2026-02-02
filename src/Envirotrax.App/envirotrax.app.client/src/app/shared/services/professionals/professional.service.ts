@@ -6,13 +6,14 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { Professional } from "../../models/professionals/professional";
-import { lastValueFrom, Observable, shareReplay } from "rxjs";
+import { BehaviorSubject, lastValueFrom, Observable, of, shareReplay } from "rxjs";
 
 @Injectable({
     providedIn: 'root'
 })
 export class ProfesisonalService {
     private _currentProfessional$?: Observable<Professional>;
+    private _professionalUpdated$: BehaviorSubject<void> = new BehaviorSubject<void>(undefined);
 
     constructor(
         private readonly _urlResolver: UrlResolverService,
@@ -42,12 +43,23 @@ export class ProfesisonalService {
         return lastValueFrom(this._currentProfessional$);
     }
 
-    public addMy(professional: Professional): Promise<Professional> {
+    public async addMyData(professional: Professional): Promise<Professional> {
         const url = this._urlResolver.resolveUrl('/api/professionals/my');
 
         const observable = this._http.post<Professional>(url, professional);
-        this._currentProfessional$ = undefined;
+        const addedProfessional = await lastValueFrom(observable);
 
-        return lastValueFrom(observable);
+        this._currentProfessional$ = of(addedProfessional);
+        this._professionalUpdated$.next();
+
+        return addedProfessional;
+    }
+
+    public setLoggedInProfessional(professional: Professional): void {
+        this._currentProfessional$ = of(professional);
+    }
+
+    public onLoggedInPofessionalUpdated(): Observable<void> {
+        return this._professionalUpdated$.asObservable();
     }
 }

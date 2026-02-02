@@ -27,6 +27,7 @@ public static class ServiceRegistration
         services.AddTransient<LookupService>();
 
         services.AddTransient<IProfessionalService, ProfessionalService>();
+        services.AddTransient<IProfessionalUserService, ProfessionalUserService>();
 
         return services;
     }

@@ -47,6 +47,7 @@ public static class ServiceRegistration
         services.AddTransient<LookupRepository>();
 
         services.AddTransient<IProfessionalRepository, ProfessionalRepository>();
+        services.AddTransient<IProfessionalUserRepository, ProfessionalUserRepository>();
 
         return services;
     }

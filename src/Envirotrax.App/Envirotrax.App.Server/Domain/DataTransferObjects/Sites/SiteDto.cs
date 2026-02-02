@@ -17,7 +17,7 @@ public class SiteDto : IDto
     [StringLength(100)]
     public string? BusinessName { get; set; }
 
-    public PropertyType? PropertyType { get; set; }
+    public PropertyType PropertyType { get; set; }
 
     [StringLength(50)]
     public string? StreetNumber { get; set; }

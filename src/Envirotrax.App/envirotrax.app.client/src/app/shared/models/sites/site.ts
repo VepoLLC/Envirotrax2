@@ -3,7 +3,7 @@ export interface Site {
     subArea?: string;
     accountNumber?: string;
     businessName?: string;
-    propertyType?: number;
+    propertyType: number;
     streetNumber?: string;
     streetName?: string;
     propertyNumber?: string;

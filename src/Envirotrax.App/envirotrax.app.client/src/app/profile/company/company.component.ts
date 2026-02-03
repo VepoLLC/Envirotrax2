@@ -54,10 +54,10 @@ export class CompanyComponent implements OnInit {
     }
 
     private validateServices(): boolean {
-        if (!this.professional.hasWiseGuys ||
-            !this.professional.hasBackflowTesting ||
-            !this.professional.hasCsiInspection ||
-            !this.professional.hasFogInspection ||
+        if (!this.professional.hasWiseGuys &&
+            !this.professional.hasBackflowTesting &&
+            !this.professional.hasCsiInspection &&
+            !this.professional.hasFogInspection &&
             !this.professional.hasFogTransportation) {
 
             this.validationErrors.push('Please select at least one service.');

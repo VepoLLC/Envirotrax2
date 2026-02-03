@@ -4,6 +4,8 @@ using Envirotrax.App.Server.Domain.Services.Implementations.Users;
 using Envirotrax.App.Server.Domain.Services.Implementations.Lookup;
 using Envirotrax.App.Server.Domain.Services.Implementations.WaterSuppliers;
 using Envirotrax.Common.Configuration;
+using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
+using Envirotrax.App.Server.Domain.Services.Implementations.Professionals;
 
 namespace Envirotrax.App.Server.Domain.Configuration;
 
@@ -23,6 +25,9 @@ public static class ServiceRegistration
         services.AddTransient<IGeneralSettingsService, GeneralSettingsService>();
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<LookupService>();
+
+        services.AddTransient<IProfessionalService, ProfessionalService>();
+        services.AddTransient<IProfessionalUserService, ProfessionalUserService>();
 
         return services;
     }

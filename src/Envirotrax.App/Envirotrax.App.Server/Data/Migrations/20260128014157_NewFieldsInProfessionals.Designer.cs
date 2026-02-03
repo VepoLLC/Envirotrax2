@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260128014157_NewFieldsInProfessionals")]
+    partial class NewFieldsInProfessionals
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,21 +57,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<bool>("HasBackflowTesting")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("HasCsiInspection")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("HasFogInspection")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("HasFogTransportation")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("HasWiseGuys")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("HidePublicListing")
                         .HasColumnType("bit");
 
@@ -83,9 +71,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<int?>("StateId")
-                        .HasColumnType("int");
 
                     b.Property<int?>("UpdatedById")
                         .HasColumnType("int");
@@ -109,8 +94,6 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.HasIndex("StateId");
-
                     b.HasIndex("UpdatedById");
 
                     b.ToTable("Professionals");
@@ -125,10 +108,12 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ContactName")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("JobTitle")
+                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
@@ -212,20 +197,16 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal>("BackflowCommercialTestFee")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("BackflowCommercialTestFeeWsShare")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("BackflowResidentialTestFee")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("BackflowResidentialTestFeeWsShare")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("BackflowTesting")
                         .HasColumnType("bit");
@@ -234,19 +215,16 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal>("BpatsRequireInsuranceAmount")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("BpatsRequireIrrigationLicense")
                         .HasColumnType("bit");
 
                     b.Property<decimal>("CsiCommercialInspectionFee")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("CsiCommercialInspectionFeeWsShare")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("CsiInspections")
                         .HasColumnType("bit");
@@ -255,34 +233,28 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal>("CsiInspectorsRequireInsuranceAmount")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("CsiResidentialInspectionFee")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("CsiResidentialInspectionFeeWsShare")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("FogProgram")
                         .HasColumnType("bit");
 
                     b.Property<decimal>("FogTransportFee")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("FogTransportFeeWsShare")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("FogTransportersRequireInsurance")
                         .HasColumnType("bit");
 
                     b.Property<decimal>("FogTransportersRequireInsuranceAmount")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("FogVehiclesRequireInspection")
                         .HasColumnType("bit");
@@ -500,11 +472,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "State")
-                        .WithMany()
-                        .HasForeignKey("StateId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById")
@@ -515,8 +482,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("DeletedBy");
 
                     b.Navigation("Parent");
-
-                    b.Navigation("State");
 
                     b.Navigation("UpdatedBy");
                 });

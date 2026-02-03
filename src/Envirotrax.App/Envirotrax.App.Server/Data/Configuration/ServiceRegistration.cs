@@ -8,6 +8,8 @@ using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Data.Services.Implementations;
 using Envirotrax.Common.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 
 namespace Envirotrax.App.Server.Data.Configuration;
 
@@ -43,6 +45,9 @@ public static class ServiceRegistration
         services.AddTransient<IGeneralSettingsRepository, GeneralSettingsRepository>();
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<LookupRepository>();
+
+        services.AddTransient<IProfessionalRepository, ProfessionalRepository>();
+        services.AddTransient<IProfessionalUserRepository, ProfessionalUserRepository>();
 
         return services;
     }

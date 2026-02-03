@@ -42,13 +42,7 @@ body {
 }
 
 .vp-section-button {
-    min-width: 100%;
-}
-
-@media screen and (min-width: 768px) {
-    .vp-section-button {
-        min-width: 50%;
-    }
+    min-width: 50%;
 }
 
 @media screen and (min-width: 992px) {

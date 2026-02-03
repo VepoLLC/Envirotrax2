@@ -1,11 +1,11 @@
 import { Injectable } from "@angular/core";
 import { CanActivate, Router, UrlTree } from "@angular/router";
-import { AuthService } from "../services/auth/auth.service";
+import { AuthService } from "../shared/services/auth/auth.service";
 
 @Injectable({
     providedIn: 'root'
 })
-export class AuthGuard implements CanActivate {
+export class ProfileGuard implements CanActivate {
     constructor(
         private readonly _authService: AuthService,
         private readonly _router: Router
@@ -20,14 +20,8 @@ export class AuthGuard implements CanActivate {
                 this._authService.getProfessionalId()
             ]);
 
-            if (supplierId) {
-                return true;
-            }
-
-            // If user is logged in, but they don't have a supplierId, they are a professional
-            // Let's navigate to profile page to collect the missing information
-            if (!professionalId) {
-                return this._router.createUrlTree(['/profile']);
+            if (supplierId || professionalId) {
+                return this._router.createUrlTree(['/']);
             }
 
             return true;

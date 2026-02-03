@@ -1,0 +1,216 @@
+<dp-loading-spinner *ngIf="isLoading" [message]="loadingMessage" />
+
+<h1 class="text-center h2">
+    Tell Us About You
+</h1>
+
+<form #form="ngForm" (ngSubmit)="save(form)">
+    <div class="mb-3">
+        <vp-section header="User Information">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <vp-input name="contactName"
+                              label="Your Name"
+                              [maxLength]="255"
+                              [required]="true"
+                              [form]="form"
+                              [(ngModel)]="user.contactName" />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <vp-input name="jobTitle"
+                              label="Job Title"
+                              [maxLength]="150"
+                              [form]="form"
+                              [(ngModel)]="user.jobTitle" />
+                </div>
+            </div>
+        </vp-section>
+    </div>
+
+    <div class="mb-3">
+        <vp-section header="Company Information">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <vp-input name="name"
+                              label="Company Name"
+                              [required]="true"
+                              [maxLength]="255"
+                              [form]="form"
+                              [(ngModel)]="professional.name" />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <vp-input name="websiteUrl"
+                              label="Website"
+                              [maxLength]="255"
+                              [form]="form"
+                              [(ngModel)]="professional.websiteUrl" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="mb-3 col-md-6">
+                    <vp-input name="phoneNumber"
+                              label="Phone Number"
+                              [maxLength]="50"
+                              [form]="form"
+                              [(ngModel)]="professional.phoneNumber" />
+                </div>
+
+                <div class="mb-3 col-md-6">
+                    <vp-input name="faxNumber"
+                              label="Fax Number"
+                              [maxLength]="50"
+                              [form]="form"
+                              [(ngModel)]="professional.faxNumber" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <vp-input name="address"
+                              label="Address"
+                              [maxLength]="255"
+                              [form]="form"
+                              [(ngModel)]="professional.address" />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <vp-input name="city"
+                              label="City"
+                              [maxLength]="255"
+                              [form]="form"
+                              [(ngModel)]="professional.city" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <vp-input name="stateId"
+                              label="State"
+                              type="select"
+                              [form]="form"
+                              [ngModel]="professional.state?.id"
+                              (ngModelChange)="stateChanged($event)">
+                        <option value=""></option>
+                        <option *ngFor="let state of states" [value]="state.id">
+                            {{state.name}}
+                        </option>
+                    </vp-input>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <vp-input name="zipCode"
+                              label="Zip Code"
+                              [maxLength]="10"
+                              [form]="form"
+                              [(ngModel)]="professional.zipCode" />
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center mt-3 my-2">
+                <div class="form-check">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           name="hidePublicListing"
+                           id="hide-public-listing"
+                           [(ngModel)]="professional.hidePublicListing">
+                    <label class="form-check-label" for="hide-public-listing">
+                        Do not show this account in registered professionals listing
+                    </label>
+                </div>
+            </div>
+        </vp-section>
+    </div>
+
+    <vp-section header="Services Provided">
+        <p class="text-danger">
+            Please note that you must select at least one service.
+        </p>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="hasCsiInspection"
+                               id="has-csi-inspection"
+                               [(ngModel)]="professional.hasCsiInspection">
+                        <label class="form-check-label" for="has-csi-inspection">
+                            CSI Inspection
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="hasFogInspection"
+                               id="has-fog-inspection"
+                               [(ngModel)]="professional.hasFogInspection">
+                        <label class="form-check-label" for="has-fog-inspection">
+                            FOG Inspection
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="hasFogTransportation"
+                               id="has-fog-transportation"
+                               [(ngModel)]="professional.hasFogTransportation">
+                        <label class="form-check-label" for="has-fog-transportation">
+                            FOG Transportation
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="hasBackflowTesting"
+                               id="has-backflow-testing"
+                               [(ngModel)]="professional.hasBackflowTesting">
+                        <label class="form-check-label" for="has-backflow-testing">
+                            Backflow Testing
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="hasWiseGuys"
+                               id="has-wise-guys"
+                               [(ngModel)]="professional.hasWiseGuys">
+                        <label class="form-check-label" for="has-wise-guys">
+                            WISE Guys
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </vp-section>
+
+    <div class="mt-3">
+        <vp-validation-summary [form]="form"
+                               [validationErrors]="validationErrors" />
+
+        <div class="d-flex justify-content-center">
+            <button type="submit"
+                    class="btn btn-primary vp-section-button">
+                Save Profile
+            </button>
+        </div>
+    </div>
+</form>

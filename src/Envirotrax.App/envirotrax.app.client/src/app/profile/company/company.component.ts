@@ -53,6 +53,20 @@ export class CompanyComponent implements OnInit {
         }
     }
 
+    private validateServices(): boolean {
+        if (!this.professional.hasWiseGuys ||
+            !this.professional.hasBackflowTesting ||
+            !this.professional.hasCsiInspection ||
+            !this.professional.hasFogInspection ||
+            !this.professional.hasFogTransportation) {
+
+            this.validationErrors.push('Please select at least one service.');
+            return false;
+        }
+
+        return true;
+    }
+
     public async save(form: NgForm): Promise<void> {
         if (form.valid) {
             try {
@@ -60,12 +74,14 @@ export class CompanyComponent implements OnInit {
                 this.loadingMessage = 'Saving Profile';
                 this.validationErrors = [];
 
-                const addedProfessional = await this._professionalService.addMyData({
-                    professional: this.professional,
-                    user: this.user
-                });
+                if (this.validateServices()) {
+                    const addedProfessional = await this._professionalService.addMyData({
+                        professional: this.professional,
+                        user: this.user
+                    });
 
-                await this._authService.signIn(undefined, addedProfessional.id)
+                    await this._authService.signIn(undefined, addedProfessional.id)
+                }
             } catch (e) {
                 if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
                     throw e;

@@ -36,6 +36,12 @@ public class ProfessionalDto : IDto
     public string? WebSiteUrl { get; set; }
 
     public bool HidePublicListing { get; set; }
+
+    public bool HasWiseGuys { get; set; }
+    public bool HasBackflowTesting { get; set; }
+    public bool HasCsiInspection { get; set; }
+    public bool HasFogInspection { get; set; }
+    public bool HasFogTransportation { get; set; }
 }
 
 public class ReferencedProfessionalDto

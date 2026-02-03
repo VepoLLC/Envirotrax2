@@ -42,6 +42,12 @@ public class Professional : IAuditableModel<AppUser>
 
     public bool HidePublicListing { get; set; }
 
+    public bool HasWiseGuys { get; set; }
+    public bool HasBackflowTesting { get; set; }
+    public bool HasCsiInspection { get; set; }
+    public bool HasFogInspection { get; set; }
+    public bool HasFogTransportation { get; set; }
+
     public int? CreatedById { get; set; }
     public AppUser? CreatedBy { get; set; }
     public DateTime CreatedTime { get; set; }

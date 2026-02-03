@@ -7,7 +7,6 @@ import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { CreateProfessional, Professional } from "../../models/professionals/professional";
 import { BehaviorSubject, lastValueFrom, Observable, of, shareReplay } from "rxjs";
-import { ProfessionalUser } from "../../models/professionals/professional-user";
 
 @Injectable({
     providedIn: 'root'
@@ -47,13 +46,13 @@ export class ProfesisonalService {
     public async addMyData(createProfessional: CreateProfessional): Promise<Professional> {
         const url = this._urlResolver.resolveUrl('/api/professionals/my');
 
-        const observable = this._http.post<CreateProfessional>(url, createProfessional);
+        const observable = this._http.post<Professional>(url, createProfessional);
         const addedProfessional = await lastValueFrom(observable);
 
-        this._currentProfessional$ = of(addedProfessional.professional);
+        this._currentProfessional$ = of(addedProfessional);
         this._professionalUpdated$.next();
 
-        return addedProfessional.professional;
+        return addedProfessional;
     }
 
     public setLoggedInProfessional(professional: Professional): void {

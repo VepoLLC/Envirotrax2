@@ -12,6 +12,12 @@ export interface Professional {
     faxNumber?: string;
     websiteUrl?: string;
     hidePublicListing?: boolean;
+
+    hasWiseGuys?: boolean;
+    hasBackflowTesting?: boolean;
+    hasCsiInspection?: boolean;
+    hasFogInspection?: boolean;
+    hasFogTransportation?: boolean;
 }
 
 export interface CreateProfessional {

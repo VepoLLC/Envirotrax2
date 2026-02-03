@@ -1,6 +1,8 @@
 using Envirotrax.App.Server.Data.DbContexts;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Users;
 using Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Sites;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Users;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Lookup;
 using Envirotrax.App.Server.Data.Repositories.Implementations.WaterSuppliers;
@@ -44,6 +46,7 @@ public static class ServiceRegistration
         services.AddTransient<IWaterSupplierRepository, WaterSupplierRepository>();
         services.AddTransient<IGeneralSettingsRepository, GeneralSettingsRepository>();
         services.AddTransient<IUserRepository, UserRepository>();
+        services.AddTransient<ISiteRepository, SiteRepository>();
         services.AddTransient<LookupRepository>();
 
         services.AddTransient<IProfessionalRepository, ProfessionalRepository>();

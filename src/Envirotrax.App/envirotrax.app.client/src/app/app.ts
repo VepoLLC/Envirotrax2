@@ -80,7 +80,7 @@ export class App implements OnInit {
           {
             title: 'Property Record Search',
             iconCss: 'fa-regular fa-building-magnifying-glass',
-            routerLink: ['/'],
+            routerLink: ['sites'],
             hasPermission: true
           },
           {
@@ -142,7 +142,7 @@ export class App implements OnInit {
           {
             title: 'Property Record Search',
             iconCss: 'fa-regular fa-building-magnifying-glass',
-            routerLink: ['/'],
+            routerLink: ['sites'],
             hasPermission: true
           },
           {
@@ -227,7 +227,7 @@ export class App implements OnInit {
           {
             title: 'Property Record Search',
             iconCss: 'fa-regular fa-building-magnifying-glass',
-            routerLink: ['/'],
+            routerLink: ['sites'],
             hasPermission: true
           },
           {

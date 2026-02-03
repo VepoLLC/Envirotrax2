@@ -1,0 +1,13 @@
+<div>
+    <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+    <vp-table *ngIf="table.items"
+              [columns]="table.columns!"
+              [data]="table.items.data"
+              [(pageInfo)]="table.items.pageInfo"
+              (pageInfoChange)="getSites()"
+              [(query)]="table.query"
+              (queryChange)="getSites()"
+              (queryReset)="getSites()"
+              [freeTextSearch]="table.freeTextSearch" />
+</div>

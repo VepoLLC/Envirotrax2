@@ -1,4 +1,5 @@
 using Envirotrax.App.Server.Data.Models.Professionals;
+using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.States;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
@@ -18,6 +19,7 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
     public DbSet<Professional> Professionals { get; set; }
     public DbSet<ProfessionalUser> ProfessionalUsers { get; set; }
     public DbSet<State> States { get; set; }
+    public DbSet<Site> Sites { get; set; }
 
     protected TenantDbContext(
         DbContextOptions options,

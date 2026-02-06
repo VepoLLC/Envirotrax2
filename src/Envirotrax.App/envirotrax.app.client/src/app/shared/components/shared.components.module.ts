@@ -20,6 +20,8 @@ import { ValidationFieldComponent } from "./validation/validation-field/validati
 import { ValidationSummaryComponent } from "./validation/validation-summary/validation-summary.component";
 import { SectionComponent } from "./section/section.component";
 import { AppLoadingSpinnerModule } from "./loading-spinner/app-loading-spinner.module";
+import { FilterPanelFieldComponent } from "./data-components/sorting-filtering/filter-panel/filter-panel-field.component";
+import { FilterPanelComponent } from "./data-components/sorting-filtering/filter-panel/filter-panel.component";
 
 @NgModule({
     declarations: [
@@ -38,7 +40,9 @@ import { AppLoadingSpinnerModule } from "./loading-spinner/app-loading-spinner.m
         MessageModalComponent,
         ValidationFieldComponent,
         ValidationSummaryComponent,
-        SectionComponent
+        SectionComponent,
+        FilterPanelComponent,
+        FilterPanelFieldComponent
     ],
     imports: [
         CommonModule,
@@ -58,7 +62,9 @@ import { AppLoadingSpinnerModule } from "./loading-spinner/app-loading-spinner.m
         CheckboxCellComponent,
         SectionComponent,
         AppLoadingSpinnerModule,
-        ModalModule
+        ModalModule,
+        FilterPanelComponent,
+        FilterPanelFieldComponent
     ]
 })
 export class SharedComponentsModule {

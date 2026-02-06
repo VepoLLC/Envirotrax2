@@ -5,12 +5,16 @@ import { SiteService } from "../../shared/services/sites/site.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import { TableColumn } from "../../shared/components/data-components/table/table.component";
 import { ColumnType } from "../../shared/components/data-components/sorting-filtering/query-view-model";
+import { QueryProperty } from "../../shared/models/query";
+import { NgForm } from "@angular/forms";
 
 @Component({
     standalone: false,
     templateUrl: './site-list.component.html'
 })
 export class SiteListComponent implements OnInit {
+    public showResults: boolean = false;
+
     public table: TableViewModel<Site> = {
         columns: this.getColumns(),
         query: {
@@ -79,6 +83,17 @@ export class SiteListComponent implements OnInit {
             this.table.items = await this._siteService.getAll(this.table.items?.pageInfo || {}, this.table.query);
         } finally {
             this.table.isLoading = false;
+        }
+    }
+
+    public onFilterChange(queryProperties: QueryProperty[]): void {
+        this.table.query.filter = queryProperties
+    }
+
+    public async search(searchForm: NgForm): Promise<void> {
+        if (searchForm.valid) {
+            await this.getSites();
+            this.showResults = true;
         }
     }
 }

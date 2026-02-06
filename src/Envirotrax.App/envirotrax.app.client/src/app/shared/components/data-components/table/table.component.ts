@@ -79,6 +79,9 @@ export class TableComponent implements OnChanges {
     public canHaveSoftDelete: boolean = false;
 
     @Input()
+    public canFilterAdvanced: boolean = false;
+
+    @Input()
     public layoutName?: string;
 
     public queryColumns?: TableColumn<any>[];

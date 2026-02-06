@@ -1,0 +1,9 @@
+<vp-input [label]="label"
+          [type]="type"
+          [(ngModel)]="value"
+          [form]="form"
+          (ngModelChange)="onChange()">
+    <ng-container ngProjectAs="'option'">
+        <ng-content select="option"></ng-content>
+    </ng-container>
+</vp-input>

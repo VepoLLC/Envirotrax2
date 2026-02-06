@@ -9,7 +9,7 @@
         </div>
     </div>
 
-    <input *ngIf="type != 'textarea' && type != 'select' && type != 'date' && type != 'datetime'"
+    <input *ngIf="type != 'textarea' && type != 'select' && type != 'date' && type != 'datetime' && type != 'daterange'"
            [attr.id]="id"
            [attr.name]="name"
            [attr.type]="decimals != null ? 'text' : type"
@@ -58,7 +58,7 @@
            (ngModelChange)="value = $event"
            (change)="onChanged()"
            (blur)="onTouched($event)" />
-    <input *ngIf="type == 'datetime'"
+    <input *ngIf="type == 'datetime' || type == 'daterange'"
            #flatpickr
            [attr.id]="id"
            [attr.name]="name"

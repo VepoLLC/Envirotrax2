@@ -1,13 +1,79 @@
-<div>
-    <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+<h1 class="text-center h2">
+    Property Record Search
+</h1>
 
-    <vp-table *ngIf="table.items"
-              [columns]="table.columns!"
-              [data]="table.items.data"
-              [(pageInfo)]="table.items.pageInfo"
-              (pageInfoChange)="getSites()"
-              [(query)]="table.query"
-              (queryChange)="getSites()"
-              (queryReset)="getSites()"
-              [freeTextSearch]="table.freeTextSearch" />
+<div [hidden]="showResults">
+    <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+        <vp-filter-panel (filterChange)="onFilterChange($event)">
+            <vp-section header="General Search Criteria">
+                <div class="row">
+                    <div class="col-md-6">
+                        <vp-filter-panel-field fieldName="accountNumber"
+                                               label="Account Number"
+                                               [form]="searchForm" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <vp-filter-panel-field fieldName="facilityType"
+                                               label="Facility Type"
+                                               type="select"
+                                               [form]="searchForm">
+                            <option value="">Any Value</option>
+                            <option Value="Restaurant">Restaurant</option>
+                            <option Value="Fast Food Establishment">Fast Food Establishment</option>
+                            <option Value="Hotel/Motel">Hotel/Motel</option>
+                            <option Value="Car Wash">Car Wash</option>
+                            <option Value="School/University">School/University</option>
+                            <option Value="Grocery Store">Grocery Store</option>
+                            <option Value="Convenience Store">Convenience Store</option>
+                            <option Value="Assisted Living Facility">Assisted Living Facility</option>
+                            <option Value="Medical Facility">Medical Facility</option>
+                            <option Value="Industrial">Industrial</option>
+                            <option Value="City Owned Facility">City Owned Facility</option>
+                            <option Value="Other">Other</option>
+                        </vp-filter-panel-field>
+                    </div>
+
+                    <div class="col-md-6">
+                        <vp-filter-panel-field fieldName="createdTime"
+                                               label="Creation Date"
+                                               type="daterange"
+                                               [form]="searchForm" />
+                    </div>
+                </div>
+            </vp-section>
+        </vp-filter-panel>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="searchForm" />
+
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    Search
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+<div *ngIf="showResults">
+    <div class="mb-3 d-flex justify-content-end">
+        <button type="button" class="btn btn-primary vp-section-button" (click)="showResults = false;">
+            Search Again
+        </button>
+    </div>
+
+    <vp-section header="Property Record Search">
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getSites()"
+                  [(query)]="table.query"
+                  (queryChange)="getSites()"
+                  (queryReset)="getSites()"
+                  [freeTextSearch]="table.freeTextSearch" />
+    </vp-section>
 </div>

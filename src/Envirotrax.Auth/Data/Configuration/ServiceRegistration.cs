@@ -36,6 +36,7 @@ public static class ServiceRegistration
         services.AddTransient<IWaterSupplierUserRepository, WaterSupplierUserRepository>();
         services.AddTransient<IProfessionalUserRepository, ProfessionalUserRepository>();
         services.AddTransient<IUserInvitationReppsitory, UserInvitationReppsitory>();
+        services.AddTransient<IFeatureRepository, FeatureRepository>();
 
         return services;
     }

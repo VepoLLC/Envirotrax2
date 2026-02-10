@@ -1,7 +1,10 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, from, merge, Observable } from "rxjs";
+import { BehaviorSubject, from, lastValueFrom, merge, Observable, shareReplay } from "rxjs";
 import { UserManager } from "oidc-client-ts";
 import { environment } from "../../../../environments/environment";
+import { FeatureType } from "../../models/feature-tyype";
+import { UrlResolverService } from "../helpers/url-resolver.service";
+import { HttpClient } from "@angular/common/http";
 
 @Injectable({
     providedIn: 'root'
@@ -9,8 +12,12 @@ import { environment } from "../../../../environments/environment";
 export class AuthService {
     private _isLoggedIn$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     private _userManager: UserManager;
+    private _userAcces$?: Observable<UserAccess>;
 
-    constructor() {
+    constructor(
+        private readonly _http: HttpClient,
+        private readonly _urlResolver: UrlResolverService
+    ) {
         this._userManager = this.createUserManager();
     }
 
@@ -118,4 +125,30 @@ export class AuthService {
         const user = await this._userManager.getUser();
         return user?.access_token;
     }
+
+    private getMyAccess(): Promise<UserAccess> {
+        const url = this._urlResolver.resolveUrl('/api/users/access/my');
+
+        if (!this._userAcces$) {
+            this._userAcces$ = this._http.get<UserAccess>(url).pipe(shareReplay(1));
+        }
+
+        return lastValueFrom(this._userAcces$);
+    }
+
+    public async hasAnyFeatures(...featuresToCheck: FeatureType[]): Promise<boolean> {
+        const myAccess = await this.getMyAccess();
+
+        for (let featureToCheck of featuresToCheck) {
+            if (myAccess.features.indexOf(featureToCheck) >= 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
+interface UserAccess {
+    features: FeatureType[];
 }

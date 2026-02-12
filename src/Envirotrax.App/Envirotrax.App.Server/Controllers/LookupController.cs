@@ -1,4 +1,4 @@
-﻿using Envirotrax.App.Server.Domain.Services.Implementations.Lookup;
+﻿using Envirotrax.App.Server.Domain.Services.Definitions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,9 +8,9 @@ namespace Envirotrax.App.Server.Controllers
     [ApiController]
     public class LookupController : ControllerBase
     {
-        private readonly LookupService _lookupService;
+        private readonly ILookupService _lookupService;
 
-        public LookupController(LookupService lookupService)
+        public LookupController(ILookupService lookupService)
         {
             _lookupService = lookupService;
         }
@@ -18,7 +18,7 @@ namespace Envirotrax.App.Server.Controllers
         [HttpGet("states")]
         public async Task<IActionResult> GetStates()
         {
-            var states =  await _lookupService.GetStatesAsync();
+            var states = await _lookupService.GetStatesAsync();
             return Ok(states);
         }
     }

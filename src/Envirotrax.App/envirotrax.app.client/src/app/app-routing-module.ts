@@ -15,6 +15,10 @@ const routes: Routes = [
       {
         path: 'sites',
         loadChildren: () => import('./sites/site.module').then(m => m.SiteModule)
+      },
+      {
+        path: 'professionals',
+        loadChildren: () => import('./professionals/professional-routing.module').then(m => m.ProfessionalRoutingModule)
       }
     ]
   },

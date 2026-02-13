@@ -23,4 +23,11 @@ public class WaterSupplierController : CrudController<WaterSupplierDto>
         var tenants = await _supplierService.GetAllMySuppliersAsync(pageInfo, query, cancellationToken);
         return Ok(tenants);
     }
+
+    [HttpGet("my/current")]
+    public async Task<IActionResult> GetLoggedInSupplierAsync(CancellationToken cancellationToken)
+    {
+        var supplier = await _supplierService.GetLoggedInSupplierAsync(cancellationToken);
+        return Ok(supplier);
+    }
 }

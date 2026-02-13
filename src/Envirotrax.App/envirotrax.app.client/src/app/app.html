@@ -1,63 +1,81 @@
-<nav class="vp-navbar align-items-start bg-gradient bg-primary d-flex navbar navbar-expand-lg"
-     [class.show]="isNavbarVisible">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-            <img src="/images/logo-navbar.svg" alt="Envirotrax Logo" class="vp-logo">
-        </a>
+<header class="vp-header">
+    <nav class="vp-navbar align-items-start bg-gradient bg-primary d-flex navbar navbar-expand-lg"
+         [class.show]="isNavbarVisible">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <img src="/images/logo-navbar.svg" alt="Envirotrax Logo" class="vp-logo">
+            </a>
 
-        <button class="border-0 navbar-toggler text-white"
-                type="button" d
-                ata-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent"
-                aria-expanded="false"
-                aria-label="Toggle navigation"
-                (click)="isNavbarVisible = !isNavbarVisible">
-            <i class="fa-solid fa-bars"></i>
-        </button>
-        <div *ngIf="isAuthenticated"
-             class="collapse justify-content-end navbar-collapse"
-             id="navbarSupportedContent"
-             [class.show]="isNavbarVisible">
-            <div class="d-flex justify-content-center justify-content-lg-end">
-                <ul class="navbar-nav mb-2 mb-lg-0">
-                    <li class="nav-item pb-3 pb-lg-0" *ngFor="let item of menuItems">
-                        <a [routerLink]="item.routerLink"
-                           [attr.role]="!item.routerLink ? 'button' : null"
-                           class="fw-bold nav-link p1 rounded-3"
-                           #dropdownButton
-                           (click)="toggleExpanded($event, dropdownButton, dropdownContent, item)">
-                            <i [class]="item.iconCss"></i>
-                            {{item.title}}
+            <button class="border-0 navbar-toggler text-white"
+                    type="button" d
+                    ata-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation"
+                    (click)="isNavbarVisible = !isNavbarVisible">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <div *ngIf="isAuthenticated"
+                 class="collapse justify-content-end navbar-collapse"
+                 id="navbarSupportedContent"
+                 [class.show]="isNavbarVisible">
+                <div class="d-flex justify-content-center justify-content-lg-end">
+                    <ul class="navbar-nav mb-2 mb-lg-0">
+                        <li class="nav-item pb-3 pb-lg-0" *ngFor="let item of menuItems">
+                            <a [routerLink]="item.routerLink"
+                               [attr.role]="!item.routerLink ? 'button' : null"
+                               class="fw-bold nav-link p1 rounded-3"
+                               #dropdownButton
+                               (click)="toggleExpanded($event, dropdownButton, dropdownContent, item)">
+                                <i [class]="item.iconCss"></i>
+                                {{item.title}}
 
-                            <i *ngIf="item.children && item.children.length" class="fa-solid fa-angles-down small"></i>
+                                <i *ngIf="item.children && item.children.length" class="fa-solid fa-angles-down small"></i>
 
-                            <div *ngIf="item.isExpanded"
-                                 class="vp-backdrop position-fixed w-100 h-100 vp-backdrop z-1"
-                                 style="left: 0">
-                            </div>
+                                <div *ngIf="item.isExpanded"
+                                     class="vp-backdrop position-fixed w-100 h-100 vp-backdrop z-1"
+                                     style="left: 0">
+                                </div>
 
-                            <ul class="dropdown-menu shadow-lg border border-primary" [class.show]="item.isExpanded"
-                                #dropdownContent>
-                                <ng-container *ngFor="let child of item.children">
-                                    <li *ngIf="child.type === 'separator'" class="m-2">
-                                        <hr class="dropdown-divider my-2">
-                                    </li>
-                                    <li *ngIf="child.type !== 'separator'" class="m-2">
-                                        <a class="dropdown-item rounded" [routerLink]="child.routerLink">
-                                            <i [class]="child.iconCss" class="me-1"></i>
-                                            {{child.title}}
-                                        </a>
-                                    </li>
-                                </ng-container>
-                            </ul>
-                        </a>
-                    </li>
-                </ul>
+                                <ul class="dropdown-menu shadow-lg border border-primary" [class.show]="item.isExpanded"
+                                    #dropdownContent>
+                                    <ng-container *ngFor="let child of item.children">
+                                        <li *ngIf="child.type === 'separator'" class="m-2">
+                                            <hr class="dropdown-divider my-2">
+                                        </li>
+                                        <li *ngIf="child.type !== 'separator'" class="m-2">
+                                            <a class="dropdown-item rounded" [routerLink]="child.routerLink">
+                                                <i [class]="child.iconCss" class="me-1"></i>
+                                                {{child.title}}
+                                            </a>
+                                        </li>
+                                    </ng-container>
+                                </ul>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div *ngIf="isAuthenticated" class="container-fluid">
+        <div class="row">
+            <div class="col"></div>
+            <div class="col-auto text-nowrap login-panel">
+                <span *ngIf="waterSupplierName" class="login-box left">
+                    <i class="fa-solid fa-building me-1"></i>{{waterSupplierName}}
+                </span>
+                <span *ngIf="userEmail" class="login-box">
+                    <i class="fa-solid fa-user me-1"></i>{{userEmail}}
+                </span>
+                <span class="login-box right" (click)="signOut()">
+                    <i class="fa-solid fa-right-from-bracket me-1"></i>Logout
+                </span>
             </div>
         </div>
     </div>
-</nav>
+</header>
 
 <div class="d-flex w-100 h-100 flex-fill position-relative">
     <main id="main-content" class="overflow-auto d-flex w-100 bg-light">

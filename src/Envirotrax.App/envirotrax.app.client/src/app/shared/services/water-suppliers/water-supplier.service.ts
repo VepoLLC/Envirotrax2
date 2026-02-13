@@ -6,12 +6,14 @@ import { QueryHelperService } from "../helpers/query-helper.service";
 import { HttpClient } from "@angular/common/http";
 import { PagedData } from "../../models/paged-data";
 import { WaterSupplier } from "../../models/water-suppliers/water-supplier";
-import { lastValueFrom } from "rxjs";
+import { lastValueFrom, Observable, shareReplay } from "rxjs";
 
 @Injectable({
     providedIn: 'root'
 })
 export class WaterSupplierService {
+    private _currentSupplier$: Observable<WaterSupplier> | null = null;
+
     constructor(
         private readonly _urlResolver: UrlResolverService,
         private readonly _queryHelper: QueryHelperService,
@@ -71,5 +73,16 @@ export class WaterSupplierService {
         });
 
         return lastValueFrom(observable);
+    }
+
+    public getCurrentSupplier(): Observable<WaterSupplier> {
+        if (!this._currentSupplier$) {
+            const url = this._urlResolver.resolveUrl('/api/water-suppliers/my/current');
+            this._currentSupplier$ = this._http.get<WaterSupplier>(url).pipe(
+                shareReplay(1)
+            );
+        }
+
+        return this._currentSupplier$;
     }
 }

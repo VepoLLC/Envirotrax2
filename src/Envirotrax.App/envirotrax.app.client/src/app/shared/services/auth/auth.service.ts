@@ -118,4 +118,9 @@ export class AuthService {
         const user = await this._userManager.getUser();
         return user?.access_token;
     }
+
+    public async getUserEmail(): Promise<string | undefined> {
+        const user = await this._userManager.getUser();
+        return user?.profile?.email;
+    }
 }

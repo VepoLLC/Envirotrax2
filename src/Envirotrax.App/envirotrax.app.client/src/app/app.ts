@@ -1,5 +1,6 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { AuthService } from './shared/services/auth/auth.service';
+import { WaterSupplierService } from './shared/services/water-suppliers/water-supplier.service';
 import { createPopper, flip, preventOverflow } from '@popperjs/core';
 
 @Component({
@@ -12,8 +13,13 @@ export class App implements OnInit {
   public isAuthenticated: boolean = false;
   public menuItems: MenuItem[] = [];
   public isNavbarVisible: boolean = false;
+  public waterSupplierName: string = '';
+  public userEmail: string = '';
 
-  constructor(private readonly _authService: AuthService) {
+  constructor(
+    private readonly _authService: AuthService,
+    private readonly _waterSupplierService: WaterSupplierService
+  ) {
 
   }
 
@@ -23,8 +29,21 @@ export class App implements OnInit {
 
       if (this.isAuthenticated) {
         this.menuItems = this.createMenuItems();
+        this.loadUserInfo();
       }
     });
+  }
+
+  private async loadUserInfo(): Promise<void> {
+    this.userEmail = await this._authService.getUserEmail() ?? '';
+
+    this._waterSupplierService.getCurrentSupplier().subscribe(supplier => {
+      this.waterSupplierName = supplier.name ?? '';
+    });
+  }
+
+  public signOut(): void {
+    this._authService.signOut();
   }
 
   private createMenuItems(): MenuItem[] {

@@ -19,3 +19,48 @@
         position: relative;
     }
 }
+
+/* Header */
+.vp-header {
+    width: 100%;
+}
+
+/* Login panel boxes */
+.login-panel {
+    padding: 5px 10px;
+}
+
+.login-box {
+    border: 1px solid var(--bs-body-color);
+    border-radius: 4px;
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    padding: 3px 10px;
+    margin-left: 2px;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.login-box i {
+    color: #008fd4;
+}
+
+.login-box a {
+    color: var(--bs-body-color);
+    text-decoration: none;
+}
+
+.login-box.left {
+    border-radius: 0px 4px 4px 15px;
+    padding-left: 15px;
+}
+
+.login-box.right {
+    border-radius: 4px 0px 15px 4px;
+    padding-right: 15px;
+}
+
+.login-box.right:hover {
+    cursor: pointer;
+}

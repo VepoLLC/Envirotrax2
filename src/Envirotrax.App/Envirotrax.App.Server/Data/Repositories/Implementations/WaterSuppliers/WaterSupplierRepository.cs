@@ -92,7 +92,7 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
         if (_tenantProvider.ProfessionalId > 0)
         {
             return DbContext
-                .WaterSupplierProfessionals
+                .ProfessionalWaterSuppliers
                 .IgnoreQueryFilters()
                 .Where(professionalSupplier => professionalSupplier.ProfessionalId == _tenantProvider.ProfessionalId)
                 .Select(professionalSupplier => professionalSupplier.WaterSupplier!);

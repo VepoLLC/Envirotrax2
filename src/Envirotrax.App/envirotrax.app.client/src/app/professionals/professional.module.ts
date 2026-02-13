@@ -3,7 +3,7 @@ import { ProfessionalRoutingModule } from "./professional-routing.module";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { SharedComponentsModule } from "../shared/components/shared.components.module";
-import { WaterSuppliersComponent } from "./water-supppliers/water-supliers.component";
+import { WaterSuppliersComponent } from "./water-supppliers/water-suppliers.component";
 
 @NgModule({
     declarations: [
@@ -16,6 +16,6 @@ import { WaterSuppliersComponent } from "./water-supppliers/water-supliers.compo
         SharedComponentsModule,
     ]
 })
-export class ProfileModule {
+export class ProfessionalModule {
 
 }

@@ -42,4 +42,11 @@ public class ProfessionalControler : ProtectedController
         var added = await _professionalService.AddMyAsync(createProfessional);
         return Ok(added);
     }
+
+    [HttpPut("my")]
+    public async Task<IActionResult> UpdateMyAsync(ProfessionalDto professional)
+    {
+        var updated = await _professionalService.UpdateAsync(professional);
+        return Ok(updated);
+    }
 }

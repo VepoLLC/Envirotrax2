@@ -29,6 +29,9 @@ export class App implements OnInit {
   }
 
   private async createMenuItems(): Promise<MenuItem[]> {
+    const professionalId = await this._authService.getProfessionalId();
+    const supplierId = await this._authService.getWaterSupplierId();
+
     return [
       {
         title: 'Account Overview',
@@ -46,7 +49,7 @@ export class App implements OnInit {
           {
             title: 'Account Contact Information',
             iconCss: 'fa-regular fa-user',
-            routerLink: ['/'],
+            routerLink: professionalId ? ['/profile'] : ['/'],
             hasPermission: true,
             hasFeature: true
           },
@@ -62,7 +65,14 @@ export class App implements OnInit {
             iconCss: 'fa-solid fa-gear',
             routerLink: ['admin'],
             hasPermission: true,
-            hasFeature: true
+            hasFeature: !!supplierId
+          },
+          {
+            title: 'Water Supplier Management',
+            iconCss: 'fa-solid fa-droplet',
+            routerLink: ['professionals/water-suppliers'],
+            hasPermission: true,
+            hasFeature: !!professionalId
           },
           {
             title: 'Notification Management',

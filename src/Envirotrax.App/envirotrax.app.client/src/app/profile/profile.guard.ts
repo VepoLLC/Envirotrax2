@@ -15,12 +15,9 @@ export class ProfileGuard implements CanActivate {
 
     public async canActivate(): Promise<boolean | UrlTree> {
         if (await this._authService.isAuthenticated(false)) {
-            const [supplierId, professionalId] = await Promise.all([
-                this._authService.getWaterSupplierId(),
-                this._authService.getProfessionalId()
-            ]);
+            const supplierId = await this._authService.getWaterSupplierId();
 
-            if (supplierId || professionalId) {
+            if (supplierId) {
                 return this._router.createUrlTree(['/']);
             }
 

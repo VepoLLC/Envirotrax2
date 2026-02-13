@@ -8,6 +8,7 @@ import { ProfesisonalService } from "../../shared/services/professionals/profess
 import { NgForm } from "@angular/forms";
 import { ProfessionalUser } from "../../shared/models/professionals/professional-user";
 import { AuthService } from "../../shared/services/auth/auth.service";
+import { ProfesionalUserService } from "../../shared/services/professionals/professional-user.service";
 
 @Component({
     standalone: false,
@@ -26,7 +27,7 @@ export class CompanyComponent implements OnInit {
         private readonly _helper: HelperService,
         private readonly _lookupService: LookupService,
         private readonly _professionalService: ProfesisonalService,
-        private readonly _router: Router,
+        private readonly _professionalUserService: ProfesionalUserService,
         private readonly _authService: AuthService
     ) {
 
@@ -37,7 +38,15 @@ export class CompanyComponent implements OnInit {
             this.isLoading = true;
             this.loadingMessage = 'Loading Profile';
 
-            this.states = await this._lookupService.getAllStates();
+            const [states, professional, user] = await Promise.all([
+                this._lookupService.getAllStates(),
+                this._professionalService.getLoggedInProfessional(),
+                this._professionalUserService.getMyData()
+            ]);
+
+            this.states = states;
+            this.professional = professional || {};
+            this.user = user || {};
         } finally {
             this.isLoading = false;
             this.loadingMessage = '';
@@ -75,12 +84,18 @@ export class CompanyComponent implements OnInit {
                 this.validationErrors = [];
 
                 if (this.validateServices()) {
-                    const addedProfessional = await this._professionalService.addMyData({
-                        professional: this.professional,
-                        user: this.user
-                    });
+                    const updatedProfessional = this.professional.id
+                        ? await this._professionalService.updateMyData(this.professional)
+                        : await this._professionalService.addMyData({
+                            professional: this.professional,
+                            user: this.user
+                        });
 
-                    await this._authService.signIn(undefined, addedProfessional.id)
+                    if (this.professional.id) {
+                        await this._professionalUserService.updateMyData(this.user);
+                    }
+
+                    await this._authService.signIn(undefined, updatedProfessional.id)
                 }
             } catch (e) {
                 if (!this._helper.parseValidationErrors(e, this.validationErrors)) {

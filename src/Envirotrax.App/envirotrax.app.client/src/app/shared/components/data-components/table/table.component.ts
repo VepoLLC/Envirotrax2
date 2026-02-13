@@ -184,7 +184,7 @@ export class TableComponent implements OnChanges {
             if (!this.freeTextSearch.placeholder) {
                 const columnCaptions = this.freeTextSearch
                     .searchQuery
-                    .map(property => this.columns?.find(c => c.field == property.field)?.caption)
+                    .map(property => property.placeholder || this.columns?.find(c => c.field == property.field)?.caption)
                     .filter(property => !!property);
 
                 this.freeTextSearch.placeholder = 'Enter text to search by ' + columnCaptions.join(', ');
@@ -370,4 +370,5 @@ export interface FreeTextQuery {
     operator?: ComparisonOperator;
     logicalOperator?: 'And' | 'Or';
     multiWordSearch?: boolean
+    placeholder?: string;
 }

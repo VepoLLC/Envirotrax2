@@ -11,7 +11,26 @@ export interface ProfessionalWaterSupplier {
 
     isBanned?: boolean;
 
-    residentialFee?: number;
-    commercialFee?: number;
-    fogFee?: boolean;
+    backflowResidentialTestFee?: number;
+    backflowCommercialTestFee?: number;
+    csiCommercialInspectionFee?: number;
+    csiResidentialInspectionFee?: number;
+    fogTransportFee?: number;
+}
+
+export interface AvailableWaterSupplier {
+    id?: number;
+    name?: string;
+
+    hasWiseGuys?: boolean;
+    hasBackflowTesting?: boolean;
+    hasCsiInspection?: boolean;
+    hasFogInspection?: boolean;
+    hasFogTransportation?: boolean;
+
+    backflowResidentialTestFee?: number;
+    backflowCommercialTestFee?: number;
+    csiCommercialInspectionFee?: number;
+    csiResidentialInspectionFee?: number;
+    fogTransportFee?: number;
 }

@@ -26,5 +26,7 @@ public class ProfessionalSupplierProfile : Profile
             .ForMember(model => model.Professional, opt => opt.Ignore())
             .ForMember(model => model.WaterSupplier, opt => opt.Ignore())
             .ForMember(model => model.WaterSupplierId, opt => opt.MapFrom(dto => dto.WaterSupplier.Id));
+
+        CreateMap<AvailableWaterSupplier, AvailableWaterSupplierDto>();
     }
 }

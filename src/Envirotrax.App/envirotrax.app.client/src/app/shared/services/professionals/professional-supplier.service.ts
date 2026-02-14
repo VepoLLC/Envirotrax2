@@ -7,7 +7,7 @@ import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { WaterSupplier } from "../../models/water-suppliers/water-supplier";
 import { lastValueFrom } from "rxjs";
-import { ProfessionalWaterSupplier } from "../../models/professionals/professional-water-supplier";
+import { AvailableWaterSupplier, ProfessionalWaterSupplier } from "../../models/professionals/professional-water-supplier";
 
 @Injectable({
     providedIn: 'root'
@@ -21,10 +21,10 @@ export class ProfessionalSupplierService {
 
     }
 
-    public getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<WaterSupplier>> {
-        const url = this._urlResolver.resolveUrl('/api/professionals/water-suppliers');
+    public getAllAvailableSuppliers(pageInfo: PageInfo, query: Query): Promise<PagedData<AvailableWaterSupplier>> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/water-suppliers/available');
 
-        const obsertvable = this._http.get<PagedData<WaterSupplier>>(url, {
+        const obsertvable = this._http.get<PagedData<AvailableWaterSupplier>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)
         });
 

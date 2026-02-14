@@ -10,18 +10,16 @@ using Microsoft.AspNetCore.Mvc;
 public class ProfessionalSupplierContoller : ProtectedController
 {
     private readonly IProfessionalSupplierService _proSupplierService;
-    private readonly IWaterSupplierService _waterSupplierService;
 
-    public ProfessionalSupplierContoller(IProfessionalSupplierService proSupplierService, IWaterSupplierService waterSupplierService)
+    public ProfessionalSupplierContoller(IProfessionalSupplierService proSupplierService)
     {
         _proSupplierService = proSupplierService;
-        _waterSupplierService = waterSupplierService;
     }
 
-    [HttpGet]
+    [HttpGet("available")]
     public async Task<IActionResult> GetAllAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
     {
-        var suppliers = await _waterSupplierService.GetAllAsync(pageInfo, query, cancellationToken);
+        var suppliers = await _proSupplierService.GetAllAvailableSuppliersAsync(pageInfo, query, cancellationToken);
         return Ok(suppliers);
     }
 

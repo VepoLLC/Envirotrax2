@@ -19,11 +19,43 @@ public class ProfessionalWaterSupplier : TenantModel<WaterSupplier>, IProfession
     public bool IsBanned { get; set; }
 
     [Precision(19, 4)]
-    public decimal? ResidentialFee { get; set; }
+    public decimal? BackflowResidentialTestFee { get; set; }
 
     [Precision(19, 4)]
-    public decimal? CommercialFee { get; set; }
+    public decimal? BackflowCommercialTestFee { get; set; }
 
     [Precision(19, 4)]
-    public decimal? FogFee { get; set; }
+    public decimal? CsiCommercialInspectionFee { get; set; }
+
+    [Precision(19, 4)]
+    public decimal? CsiResidentialInspectionFee { get; set; }
+
+    [Precision(19, 4)]
+    public decimal? FogTransportFee { get; set; }
+}
+
+public class AvailableWaterSupplier
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = null!;
+    public bool HasWiseGuys { get; set; }
+    public bool HasBackflowTesting { get; set; }
+    public bool HasCsiInpection { get; set; }
+    public bool HasFogInspection { get; set; }
+    public bool HasFogTransportation { get; set; }
+
+    [Precision(19, 4)]
+    public decimal? BackflowResidentialTestFee { get; set; }
+
+    [Precision(19, 4)]
+    public decimal? BackflowCommercialTestFee { get; set; }
+
+    [Precision(19, 4)]
+    public decimal? CsiCommercialInspectionFee { get; set; }
+
+    [Precision(19, 4)]
+    public decimal? CsiResidentialInspectionFee { get; set; }
+
+    [Precision(19, 4)]
+    public decimal? FogTransportFee { get; set; }
 }

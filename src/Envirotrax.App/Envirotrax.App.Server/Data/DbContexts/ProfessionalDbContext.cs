@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Envirotrax.App.Server.Data.DbContexts
 {
@@ -21,16 +22,16 @@ namespace Envirotrax.App.Server.Data.DbContexts
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+        }
 
-            foreach (var entity in modelBuilder.Model.GetEntityTypes())
+        protected override void SetupGlobalFiltering(ModelBuilder builder, IMutableEntityType entity)
+        {
+            if (typeof(IProfessionalModel).IsAssignableFrom(entity.ClrType))
             {
-                if (typeof(IProfessionalModel).IsAssignableFrom(entity.ClrType))
-                {
-                    Expression<Func<IProfessionalModel, bool>> expression = model => model.ProfessionalId == _tenantProvider.ProfessionalId;
-                    var lambdaExpression = ConvertFilterExpression(expression, entity.ClrType);
+                Expression<Func<IProfessionalModel, bool>> expression = model => model.ProfessionalId == _tenantProvider.ProfessionalId;
+                var lambdaExpression = ConvertFilterExpression(expression, entity.ClrType);
 
-                    modelBuilder.Entity(entity.ClrType).HasQueryFilter("ProfessionalFilter", lambdaExpression);
-                }
+                builder.Entity(entity.ClrType).HasQueryFilter(lambdaExpression);
             }
         }
 

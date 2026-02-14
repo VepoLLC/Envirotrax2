@@ -18,41 +18,39 @@ namespace Envirotrax.App.Server.Data.Migrations
             migrationBuilder.RenameColumn(
                 name: "FogFee",
                 table: "ProfessionalWaterSuppliers",
-                newName: "BackflowResidentialTestFee");
+                newName: "CsiResidentialInspectionFee");
 
             migrationBuilder.RenameColumn(
                 name: "CommercialFee",
                 table: "ProfessionalWaterSuppliers",
-                newName: "BackflowCommercialTestFee");
+                newName: "CsiCommercialInspectionFee");
 
             migrationBuilder.AddColumn<decimal>(
-                name: "CsiCommercialInspectionFee",
+                name: "BackflowCommercialTestFee",
                 table: "ProfessionalWaterSuppliers",
                 type: "decimal(19,4)",
                 precision: 19,
                 scale: 4,
-                nullable: false,
-                defaultValue: 0m);
+                nullable: true);
 
             migrationBuilder.AddColumn<decimal>(
-                name: "CsiResidentialInspectionFee",
+                name: "BackflowResidentialTestFee",
                 table: "ProfessionalWaterSuppliers",
                 type: "decimal(19,4)",
                 precision: 19,
                 scale: 4,
-                nullable: false,
-                defaultValue: 0m);
+                nullable: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "CsiCommercialInspectionFee",
+                name: "BackflowCommercialTestFee",
                 table: "ProfessionalWaterSuppliers");
 
             migrationBuilder.DropColumn(
-                name: "CsiResidentialInspectionFee",
+                name: "BackflowResidentialTestFee",
                 table: "ProfessionalWaterSuppliers");
 
             migrationBuilder.RenameColumn(
@@ -61,12 +59,12 @@ namespace Envirotrax.App.Server.Data.Migrations
                 newName: "ResidentialFee");
 
             migrationBuilder.RenameColumn(
-                name: "BackflowResidentialTestFee",
+                name: "CsiResidentialInspectionFee",
                 table: "ProfessionalWaterSuppliers",
                 newName: "FogFee");
 
             migrationBuilder.RenameColumn(
-                name: "BackflowCommercialTestFee",
+                name: "CsiCommercialInspectionFee",
                 table: "ProfessionalWaterSuppliers",
                 newName: "CommercialFee");
         }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Query } from "@angular/core";
 import { WaterSupplier } from "../../shared/models/water-suppliers/water-supplier";
 import { TableViewModel } from "../../shared/models/table-view-model";
 import { ProfessionalSupplierService } from "../../shared/services/professionals/professional-supplier.service";
@@ -7,6 +7,8 @@ import { ColumnType } from "../../shared/components/data-components/sorting-filt
 import { AvailableWaterSupplier, ProfessionalWaterSupplier } from "../../shared/models/professionals/professional-water-supplier";
 import { ProfesisonalService } from "../../shared/services/professionals/professional.service";
 import { QueryProperty } from "../../shared/models/query";
+import { State } from "../../shared/models/states/state";
+import { LookupService } from "../../shared/services/lookup/lookup.service";
 
 @Component({
     standalone: false,
@@ -18,6 +20,10 @@ import { QueryProperty } from "../../shared/models/query";
     `
 })
 export class WaterSuppliersComponent implements OnInit {
+    private readonly _stateQuuery: QueryProperty = {
+        columnName: 'stateId'
+    };
+
     public suppliers: TableViewModel<ProfessionalSupplierVm> = {
         query: {
             sort: {},
@@ -30,14 +36,19 @@ export class WaterSuppliersComponent implements OnInit {
         }
     };
 
+    public states: State[] = [];
+    public stateId?: number;
+
     constructor(
         private readonly _professionalSupplierService: ProfessionalSupplierService,
-        private readonly _professionalService: ProfesisonalService
+        private readonly _professionalService: ProfesisonalService,
+        private readonly _lookupService: LookupService
     ) {
 
     }
 
     public async ngOnInit(): Promise<void> {
+        this.suppliers.query.filter?.push(this._stateQuuery);
         this.suppliers.columns = this.getColumns();
 
         await this.setSupplierFilters();
@@ -47,10 +58,17 @@ export class WaterSuppliersComponent implements OnInit {
     private async setSupplierFilters(): Promise<void> {
         try {
             this.suppliers.isLoading = true;
-            const currentProfessional = await this._professionalService.getLoggedInProfessional();
+
+            const [currentProfessional, states] = await Promise.all([
+                this._professionalService.getLoggedInProfessional(),
+                this._lookupService.getAllStates()
+            ]);
+
+            this.states = states;
 
             const queryProperty: QueryProperty = {
-                children: []
+                children: [],
+                columnName: 'id'
             };
 
             if (currentProfessional.hasBackflowTesting) {
@@ -111,7 +129,7 @@ export class WaterSuppliersComponent implements OnInit {
                 data: allSuppliers
                     .data
                     .map(supplier => ({
-                        supplier: supplier,
+                        ...supplier,
                         selected: mySuppliers.find(s => s.waterSupplier?.id == supplier.id)
                     }))
             };
@@ -134,9 +152,13 @@ export class WaterSuppliersComponent implements OnInit {
             }
         ]
     }
+
+    public stateChanged(): void {
+        this._stateQuuery.value = this.stateId?.toString();
+        this.getSuppliers();
+    }
 }
 
-interface ProfessionalSupplierVm {
-    supplier: AvailableWaterSupplier;
+interface ProfessionalSupplierVm extends AvailableWaterSupplier {
     selected?: ProfessionalWaterSupplier
 }

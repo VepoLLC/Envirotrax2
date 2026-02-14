@@ -29,6 +29,7 @@ public class ProfessionalSupplierRepository : IProfessionalSupplierRepository
                              {
                                  Id = supplier.Id,
                                  Name = supplier.Name,
+                                 StateId = supplier.StateId,
                                  HasBackflowTesting = (bool?)settings.BackflowTesting ?? false,
                                  HasCsiInpection = (bool?)settings.CsiInspections ?? false,
                                  HasWiseGuys = (bool?)settings.WiseGuys ?? false,

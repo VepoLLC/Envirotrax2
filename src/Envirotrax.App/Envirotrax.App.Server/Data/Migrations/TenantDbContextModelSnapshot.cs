@@ -152,11 +152,11 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasPrecision(19, 4)
                         .HasColumnType("decimal(19,4)");
 
-                    b.Property<decimal>("CsiCommercialInspectionFee")
+                    b.Property<decimal?>("CsiCommercialInspectionFee")
                         .HasPrecision(19, 4)
                         .HasColumnType("decimal(19,4)");
 
-                    b.Property<decimal>("CsiResidentialInspectionFee")
+                    b.Property<decimal?>("CsiResidentialInspectionFee")
                         .HasPrecision(19, 4)
                         .HasColumnType("decimal(19,4)");
 

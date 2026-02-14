@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    [Migration("20260213234701_ProfessionalSupplierFees")]
+    [Migration("20260214001206_ProfessionalSupplierFees")]
     partial class ProfessionalSupplierFees
     {
         /// <inheritdoc />
@@ -155,11 +155,11 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasPrecision(19, 4)
                         .HasColumnType("decimal(19,4)");
 
-                    b.Property<decimal>("CsiCommercialInspectionFee")
+                    b.Property<decimal?>("CsiCommercialInspectionFee")
                         .HasPrecision(19, 4)
                         .HasColumnType("decimal(19,4)");
 
-                    b.Property<decimal>("CsiResidentialInspectionFee")
+                    b.Property<decimal?>("CsiResidentialInspectionFee")
                         .HasPrecision(19, 4)
                         .HasColumnType("decimal(19,4)");
 

@@ -30,6 +30,7 @@ public class AvailableWaterSupplierDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = null!;
+    public int? StateId { get; set; }
     public bool HasWiseGuys { get; set; }
     public bool HasBackflowTesting { get; set; }
     public bool HasCsiInpection { get; set; }

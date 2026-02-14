@@ -1,9 +1,11 @@
+import { PropertyType } from "../../enums/property-type.enum";
+
 export interface Site {
     id?: number;
     subArea?: string;
     accountNumber?: string;
     businessName?: string;
-    propertyType: number;
+    propertyType?: PropertyType;
     streetNumber?: string;
     streetName?: string;
     propertyNumber?: string;

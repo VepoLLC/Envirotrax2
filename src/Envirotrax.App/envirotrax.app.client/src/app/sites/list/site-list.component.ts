@@ -7,6 +7,8 @@ import { TableColumn } from "../../shared/components/data-components/table/table
 import { ColumnType } from "../../shared/components/data-components/sorting-filtering/query-view-model";
 import { QueryProperty } from "../../shared/models/query";
 import { NgForm } from "@angular/forms";
+import { ModalHelperService } from "../../shared/services/helpers/modal-helper.service";
+import { CreateSiteComponent } from "../create/create-site-component";
 
 @Component({
     standalone: false,
@@ -34,12 +36,14 @@ export class SiteListComponent implements OnInit {
     constructor(
         private readonly _siteService: SiteService,
         private readonly _router: Router,
-        private readonly _activatedRoute: ActivatedRoute
+        private readonly _activatedRoute: ActivatedRoute,
+        private readonly _modalHelper: ModalHelperService
     ) {
     }
 
     public async ngOnInit(): Promise<void> {
-        await this.getSites();
+        var sites = await this.getSites();
+        console.log(sites);
     }
 
     private getColumns(): TableColumn<Site>[] {
@@ -81,6 +85,8 @@ export class SiteListComponent implements OnInit {
         try {
             this.table.isLoading = true;
             this.table.items = await this._siteService.getAll(this.table.items?.pageInfo || {}, this.table.query);
+            this.showResults = (this.table?.items?.data?.length ?? 0) > 0;
+            console.log(this.table.items);
         } finally {
             this.table.isLoading = false;
         }
@@ -95,5 +101,12 @@ export class SiteListComponent implements OnInit {
             await this.getSites();
             this.showResults = true;
         }
+    }
+
+    public add(): void {
+        this._modalHelper.show<Site>(CreateSiteComponent, {
+            title: 'Create Site',
+        }).result()
+            .subscribe(_ => this.getSites());
     }
 }

@@ -58,6 +58,12 @@
 
 <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
 
+<button type="button" class="btn btn-primary" title="Add New Record"
+        aria-label="Add New Record" (click)="add()">
+    <i class="fa-solid fa-circle-plus"></i>
+    Add New
+</button>
+
 <div *ngIf="showResults">
     <div class="mb-3 d-flex justify-content-end">
         <button type="button" class="btn btn-primary vp-section-button" (click)="showResults = false;">
@@ -74,6 +80,7 @@
                   [(query)]="table.query"
                   (queryChange)="getSites()"
                   (queryReset)="getSites()"
+                  [canEdit] ="true"
                   [freeTextSearch]="table.freeTextSearch" />
     </vp-section>
 </div>

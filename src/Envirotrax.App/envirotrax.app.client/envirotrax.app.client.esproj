@@ -3,12 +3,10 @@
     <!-- Default Angular environment -->
     <BuildCommand>development</BuildCommand>
   </PropertyGroup>
-
   <PropertyGroup>
     <BuildCommand>npm run start</BuildCommand>
     <BuildCommand Condition="'$(AngularEnvironment)' == 'test'">npm run build-test</BuildCommand>
   </PropertyGroup>
-
   <PropertyGroup>
     <StartupCommand>npm start</StartupCommand>
     <JavaScriptTestFramework>Jasmine</JavaScriptTestFramework>

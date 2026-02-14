@@ -5,10 +5,12 @@ import { RouterModule } from "@angular/router";
 import { SharedComponentsModule } from "../shared/components/shared.components.module";
 import { SiteListComponent } from "./list/site-list.component";
 import { SiteRoutingModule } from "./site-routing.module";
+import { CreateSiteComponent } from './create/create-site-component';
 
 @NgModule({
     declarations: [
-        SiteListComponent
+        SiteListComponent,
+        CreateSiteComponent
     ],
     imports: [
         CommonModule,

@@ -6,11 +6,13 @@ import { SharedComponentsModule } from "../shared/components/shared.components.m
 import { SiteListComponent } from "./list/site-list.component";
 import { SiteRoutingModule } from "./site-routing.module";
 import { CreateSiteComponent } from './create/create-site-component';
+import { EditSiteComponent } from './edit/edit-site-component';
 
 @NgModule({
     declarations: [
         SiteListComponent,
-        CreateSiteComponent
+        CreateSiteComponent,
+        EditSiteComponent
     ],
     imports: [
         CommonModule,

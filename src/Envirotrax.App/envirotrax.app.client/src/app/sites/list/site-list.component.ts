@@ -9,6 +9,7 @@ import { QueryProperty } from "../../shared/models/query";
 import { NgForm } from "@angular/forms";
 import { ModalHelperService } from "../../shared/services/helpers/modal-helper.service";
 import { CreateSiteComponent } from "../create/create-site-component";
+import { EditSiteComponent } from "../edit/edit-site-component";
 
 @Component({
     standalone: false,
@@ -86,7 +87,6 @@ export class SiteListComponent implements OnInit {
             this.table.isLoading = true;
             this.table.items = await this._siteService.getAll(this.table.items?.pageInfo || {}, this.table.query);
             this.showResults = (this.table?.items?.data?.length ?? 0) > 0;
-            console.log(this.table.items);
         } finally {
             this.table.isLoading = false;
         }
@@ -105,8 +105,16 @@ export class SiteListComponent implements OnInit {
 
     public add(): void {
         this._modalHelper.show<Site>(CreateSiteComponent, {
-            title: 'Create Site',
+            title: 'Location / Property information',
         }).result()
             .subscribe(_ => this.getSites());
     }
+
+    public edit(site: Site): void {
+        console.log('event');
+        this._router.navigate([site.id, 'edit'], {
+            relativeTo: this._activatedRoute
+        });
+    }
+
 }

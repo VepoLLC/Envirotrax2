@@ -1,0 +1,154 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+    <form #form="ngForm" (ngSubmit)="save(form)">
+        <div class="row">
+            <!--Account Number-->
+            <div class="mb-3">
+                <vp-input [(ngModel)]="site.accountNumber"
+                          name="accountNumber"
+                          label="Account Number"
+                          [required]="true"
+                          [maxLength]="50"
+                          [form]="form">
+                </vp-input>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Property Type</label>
+
+                <select class="form-select"
+                        [(ngModel)]="site.propertyType"
+                        name="propertyType"
+                        #propertyType="ngModel">
+
+                    <option *ngFor="let type of propertyTypes"
+                            [ngValue]="type">
+                        {{ PropertyType[type] }}
+                    </option>
+                </select>
+            </div>
+
+
+            <!--Business Name-->
+            <div class="mb-3">
+                <vp-input [(ngModel)]="site.businessName"
+                          name="businessName"
+                          label="Business Name"
+                          [maxLength]="255"
+                          [form]="form">
+                </vp-input>
+            </div>
+
+            <p class="fw-bold">Property Address</p>
+
+            <!--Street #-->
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <vp-input [(ngModel)]="site.streetNumber"
+                              name="streetNumber"
+                              label="Street #"
+                              [form]="form">
+                    </vp-input>
+                </div>
+            </div>
+
+            <!--Street Name-->
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <vp-input [(ngModel)]="site.streetName"
+                              name="streetName"
+                              label="Street Name"
+                              [form]="form">
+                    </vp-input>
+                </div>
+            </div>
+
+            <!--Suite / Apt-->
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <vp-input [(ngModel)]="site.propertyNumber"
+                              name="propertyNumber"
+                              label="Suite / Apt #"
+                              [form]="form">
+                    </vp-input>
+                </div>
+            </div>
+
+            <!--City-->
+            <div class="mb-3">
+                <vp-input [(ngModel)]="site.city"
+                          name="city"
+                          label="City"
+                          [form]="form">
+                </vp-input>
+            </div>
+
+            <!--State-->
+            <div class="mb-3">
+                <label class="form-label">State</label>
+
+                <select class="form-select"
+                        [(ngModel)]="site.stateId"
+                        name="state">
+
+                    <option [ngValue]="null">Select state</option>
+
+                    <option *ngFor="let state of states"
+                            [ngValue]="state.id">
+                        {{ state.name }}
+                    </option>
+
+                </select>
+            </div>
+
+
+            <!--ZIP-->
+            <div class="mb-3">
+                <vp-input [(ngModel)]="site.zipCode"
+                          name="zip"
+                          label="ZIP"
+                          [maxLength]="10"
+                          [form]="form">
+                </vp-input>
+            </div>
+
+            <!--Phone-->
+            <div class="mb-3">
+                <vp-input [(ngModel)]="site.fogGeneratorPhoneNumber"
+                          name="phone"
+                          label="Phone Number"
+                          [form]="form">
+                </vp-input>
+            </div>
+
+            <!--Email-->
+            <div class="mb-3">
+                <vp-input [(ngModel)]="site.fogGeneratorEmailAddress"
+                          name="email"
+                          label="Email Address"
+                          [form]="form">
+                </vp-input>
+            </div>
+        </div>
+
+
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="form"
+                                   [validationErrors]="validationErrors">
+            </vp-validation-summary>
+
+            <div class="d-flex justify-content-center">
+                <button type="button" class="btn btn-primary me-2 w-100" (click)="cancel()">
+                    Cancel
+                </button>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    Save
+                </button>
+            </div>
+        </div>
+
+    </form>
+</div>

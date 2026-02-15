@@ -81,6 +81,7 @@
                   (queryChange)="getSites()"
                   (queryReset)="getSites()"
                   [canEdit] ="true"
+                  (edit)="edit($event)"
                   [freeTextSearch]="table.freeTextSearch" />
     </vp-section>
 </div>

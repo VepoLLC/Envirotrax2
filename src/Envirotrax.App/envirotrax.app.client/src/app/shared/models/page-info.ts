@@ -5,3 +5,5 @@ export interface PageInfo {
     totalItems?: number;
     totalPages?: number;
 }
+
+export const MAX_PAGE_SIZE = 2000;

@@ -243,9 +243,17 @@ export class TableComponent implements OnChanges {
             this.query.filter = this.query.filter!.filter(p => p.tag?.location != QueryPropertyLocation.SearchBar);
 
             if (this.freeTextSearch.text) {
+                const freeTextQueryProperty: QueryProperty = {
+                    columnName: this.freeTextSearch.searchQuery.find(Boolean)?.field,
+                    children: [],
+                    tag: {
+                        location: QueryPropertyLocation.SearchBar
+                    }
+                };
+
                 for (let property of this.freeTextSearch.searchQuery) {
                     let queryItem = this.createFreeTextProperty(property, this.freeTextSearch.text);
-                    this.query.filter.push(queryItem);
+                    freeTextQueryProperty.children!.push(queryItem);
 
                     if (property.multiWordSearch) {
                         let multipleWords = this.freeTextSearch
@@ -255,11 +263,13 @@ export class TableComponent implements OnChanges {
 
                         for (let word of multipleWords) {
                             if (queryItem.value != word) {
-                                this.query.filter.push(this.createFreeTextProperty(property, word));
+                                freeTextQueryProperty.children!.push(this.createFreeTextProperty(property, word));
                             }
                         }
                     }
                 }
+
+                this.query.filter.push(freeTextQueryProperty);
             }
 
             this.onQueryChange(this.query);

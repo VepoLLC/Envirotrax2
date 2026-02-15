@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Envirotrax.App.Server.Controllers
 {
     public abstract class CrudController<TDto> : CrudController<TDto, int>
-        where TDto : class, IDto<int>
+        where TDto : class
     {
         protected CrudController(IServiceBase<TDto, int> service)
             : base(service)
@@ -16,7 +16,7 @@ namespace Envirotrax.App.Server.Controllers
     }
 
     public abstract class CrudController<TDto, TKey> : ProtectedController
-        where TDto : class, IDto<TKey>
+        where TDto : class
     {
         private readonly IServiceBase<TDto, TKey> _service;
 
@@ -81,11 +81,6 @@ namespace Envirotrax.App.Server.Controllers
         [HttpPut("{id}")]
         public virtual async Task<IActionResult> UpdateAsync(TKey id, TDto dto)
         {
-            if (dto?.Id?.Equals(id) == false)
-            {
-                return BadRequest();
-            }
-
             var updated = await ProcessUpdateAsync(dto!);
 
             if (updated != null)

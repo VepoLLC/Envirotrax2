@@ -2,10 +2,9 @@ import { Injectable } from "@angular/core";
 import { UrlResolverService } from "../helpers/url-resolver.service";
 import { QueryHelperService } from "../helpers/query-helper.service";
 import { HttpClient } from "@angular/common/http";
-import { PageInfo } from "../../models/page-info";
+import { MAX_PAGE_SIZE, PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
-import { WaterSupplier } from "../../models/water-suppliers/water-supplier";
 import { lastValueFrom } from "rxjs";
 import { AvailableWaterSupplier, ProfessionalWaterSupplier } from "../../models/professionals/professional-water-supplier";
 
@@ -31,15 +30,34 @@ export class ProfessionalSupplierService {
         return lastValueFrom(obsertvable);
     }
 
-    public getAllMy(): Promise<ProfessionalWaterSupplier[]> {
-        const url = this._urlResolver.resolveUrl('/api/professionals/water-suppliers/my');
-        const observable = this._http.get<ProfessionalWaterSupplier[]>(url);
+    public getAllMy(): Promise<PagedData<ProfessionalWaterSupplier>> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/water-suppliers');
+
+        const observable = this._http.get<PagedData<ProfessionalWaterSupplier>>(url, {
+            params: {
+                pageSize: MAX_PAGE_SIZE
+            }
+        });
 
         return lastValueFrom(observable);
     }
 
-    public addOrUpdate(proSupplier: ProfessionalWaterSupplier): Promise<ProfessionalWaterSupplier> {
-        const url = this._urlResolver.resolveUrl('/api/professionals/water-suppliers/my/add-or-update');
+    public get(supplierId: number): Promise<ProfessionalWaterSupplier> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/water-suppliers/${supplierId}`);
+        const observable = this._http.get<ProfessionalWaterSupplier>(url);
+
+        return lastValueFrom(observable);
+    }
+
+    public add(proSupplier: ProfessionalWaterSupplier): Promise<ProfessionalWaterSupplier> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/water-suppliers');
+        const observable = this._http.post<ProfessionalWaterSupplier>(url, proSupplier);
+
+        return lastValueFrom(observable);
+    }
+
+    public update(proSupplier: ProfessionalWaterSupplier): Promise<ProfessionalWaterSupplier> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/water-suppliers/${proSupplier.waterSupplier?.id}`);
         const observable = this._http.put<ProfessionalWaterSupplier>(url, proSupplier);
 
         return lastValueFrom(observable);

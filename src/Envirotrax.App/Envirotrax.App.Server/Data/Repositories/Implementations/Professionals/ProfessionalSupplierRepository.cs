@@ -10,19 +10,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 
-public class ProfessionalSupplierRepository : IProfessionalSupplierRepository
+public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSupplier>, IProfessionalSupplierRepository
 {
-    private readonly TenantDbContext _dbContext;
 
     public ProfessionalSupplierRepository(IDbContextSelector dbContextSelector)
+        : base(dbContextSelector)
     {
-        _dbContext = dbContextSelector.Current;
+    }
+
+    protected override string GetPrimaryColumnName()
+    {
+        return nameof(ProfessionalWaterSupplier.WaterSupplierId);
     }
 
     public async Task<IEnumerable<AvailableWaterSupplier>> GetAllAvailableSuppliersAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        var suppliersQuery = from supplier in _dbContext.WaterSuppliers
-                             join settings in _dbContext.GeneralSettings
+        var suppliersQuery = from supplier in DbContext.WaterSuppliers
+                             join settings in DbContext.GeneralSettings
                              on supplier.Id equals settings.WaterSupplierId into settingsJoin
                              from settings in settingsJoin.DefaultIfEmpty()
                              select new AvailableWaterSupplier
@@ -30,11 +34,23 @@ public class ProfessionalSupplierRepository : IProfessionalSupplierRepository
                                  Id = supplier.Id,
                                  Name = supplier.Name,
                                  StateId = supplier.StateId,
+
                                  HasBackflowTesting = (bool?)settings.BackflowTesting ?? false,
                                  HasCsiInpection = (bool?)settings.CsiInspections ?? false,
                                  HasWiseGuys = (bool?)settings.WiseGuys ?? false,
                                  HasFogInspection = (bool?)settings.FogProgram ?? false,
                                  HasFogTransportation = (bool?)settings.FogProgram ?? false,
+
+                                 BpatsRequireInsurance = (bool?)settings.BpatsRequireInsurance ?? false,
+                                 CsiInspectorsRequireInsurance = (bool?)settings.CsiInspectorsRequireInsurance ?? false,
+                                 FogTransportersRequireInsurance = (bool?)settings.FogTransportersRequireInsurance ?? false,
+                                 FogVehiclesRequireInspection = (bool?)settings.FogVehiclesRequireInspection ?? false,
+                                 FogVehiclesRequirePermit = (bool?)settings.FogVehiclesRequirePermit ?? false,
+
+                                 BpatsRequireInsuranceAmount = (decimal?)settings.BpatsRequireInsuranceAmount,
+                                 CsiInspectorsRequireInsuranceAmount = (decimal?)settings.CsiInspectorsRequireInsuranceAmount,
+                                 FogTransportersRequireInsuranceAmount = (decimal?)settings.FogTransportersRequireInsuranceAmount,
+
                                  BackflowCommercialTestFee = (decimal?)settings.BackflowCommercialTestFee,
                                  BackflowResidentialTestFee = (decimal?)settings.BackflowResidentialTestFee,
                                  CsiCommercialInspectionFee = (decimal?)settings.CsiCommercialInspectionFee,
@@ -48,38 +64,5 @@ public class ProfessionalSupplierRepository : IProfessionalSupplierRepository
             .PaginateAsync(pageInfo, cancellationToken);
 
         return await paginated.ToListAsync(cancellationToken);
-    }
-
-    public async Task<IEnumerable<ProfessionalWaterSupplier>> GetAllAsync(CancellationToken cancellationToken)
-    {
-        return await _dbContext.ProfessionalWaterSuppliers.ToListAsync(cancellationToken);
-    }
-
-    public async Task<ProfessionalWaterSupplier> AddOrUpdateAsync(ProfessionalWaterSupplier profesisonalSupplier)
-    {
-        var dbRecord = await _dbContext
-            .ProfessionalWaterSuppliers
-            .SingleOrDefaultAsync(x => x.WaterSupplierId == profesisonalSupplier.WaterSupplierId);
-
-        if (dbRecord == null)
-        {
-            dbRecord = new()
-            {
-                WaterSupplierId = profesisonalSupplier.WaterSupplierId
-            };
-        }
-
-        dbRecord.BackflowCommercialTestFee = profesisonalSupplier.BackflowCommercialTestFee;
-        dbRecord.BackflowResidentialTestFee = profesisonalSupplier.BackflowResidentialTestFee;
-        dbRecord.FogTransportFee = profesisonalSupplier.FogTransportFee;
-        dbRecord.CsiCommercialInspectionFee = profesisonalSupplier.CsiCommercialInspectionFee;
-        dbRecord.CsiResidentialInspectionFee = profesisonalSupplier.CsiResidentialInspectionFee;
-
-        dbRecord.HasBackflowTesting = profesisonalSupplier.HasBackflowTesting;
-        dbRecord.HasCsiInpection = profesisonalSupplier.HasCsiInpection;
-        dbRecord.HasFogInspection = profesisonalSupplier.HasFogInspection;
-        dbRecord.HasFogTransportation = profesisonalSupplier.HasFogTransportation;
-
-        return dbRecord;
     }
 }

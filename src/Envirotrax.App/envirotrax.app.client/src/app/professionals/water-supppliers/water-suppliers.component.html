@@ -1,4 +1,10 @@
 <div>
+    <header class="text-center">
+        <h1 class="h2">
+            Water Supplier Management
+        </h1>
+    </header>
+
     <vp-section header="Water Suppliers">
         <dp-loading-spinner *ngIf="suppliers.isLoading"></dp-loading-spinner>
 
@@ -27,12 +33,29 @@
                     Insurance Required
                 </div>
 
-                <div class="mx-2 d-flex align-items-center">
+                <div *ngIf="professional.hasBackflowTesting || professional.hasCsiInspection"
+                     class="mx-2 d-flex align-items-center">
                     <img src="/images/camera-icon.png"
                          alt="Water supplier requires assembly photos"
                          class="vp-requirement-icon me-2" />
                     Requires Assembly Photos
                 </div>
+
+                <ng-container *ngIf="professional.hasFogTransportation">
+                    <div class="mx-2 d-flex align-items-center">
+                        <img src="/images/vehicle-permit-icon.png"
+                             alt="Water supplier requires assembly photos"
+                             class="vp-requirement-icon me-2" />
+                        Vehicle Permit Required
+                    </div>
+
+                    <div class="mx-2 d-flex align-items-center">
+                        <img src="/images/vehicle-inspection-icon.png"
+                             alt="Water supplier requires assembly photos"
+                             class="vp-requirement-icon me-2" />
+                        Vehicle Inspection Required
+                    </div>
+                </ng-container>
             </div>
 
             <vp-input *ngIf="states"

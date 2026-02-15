@@ -9,7 +9,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions;
 
 public class Service<TModel, TDto> : Service<TModel, TDto, int>
         where TModel : class
-        where TDto : class, IDto
+        where TDto : class
 {
     public Service(IMapper mapper, IRepository<TModel> repository)
         : base(mapper, repository)
@@ -19,7 +19,7 @@ public class Service<TModel, TDto> : Service<TModel, TDto, int>
 
 public class Service<TModel, TDto, TKey> : IService<TModel, TDto, TKey>
     where TModel : class
-    where TDto : class, IDto<TKey>
+    where TDto : class
 {
     protected IMapper Mapper { get; private set; }
     protected IRepository<TModel, TKey> Repository { get; private set; }

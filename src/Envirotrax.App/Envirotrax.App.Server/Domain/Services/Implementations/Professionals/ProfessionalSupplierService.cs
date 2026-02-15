@@ -3,21 +3,22 @@ using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Professionals;
+using Envirotrax.App.Server.Data.Repositories.Definitions;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Professionals;
 
-public class ProfessionalSupplierService : IProfessionalSupplierService
+public class ProfessionalSupplierService : Service<ProfessionalWaterSupplier, ProfessionalWaterSupplierDto>, IProfessionalSupplierService
 {
     private readonly IMapper _mapper;
     private readonly IProfessionalSupplierRepository _proSupplierRepository;
 
-    public ProfessionalSupplierService(IMapper mapper, IProfessionalSupplierRepository proSupplierRepository)
+    public ProfessionalSupplierService(IMapper mapper, IProfessionalSupplierRepository repository) : base(mapper, repository)
     {
         _mapper = mapper;
-        _proSupplierRepository = proSupplierRepository;
+        _proSupplierRepository = repository;
     }
 
     public async Task<IPagedData<AvailableWaterSupplierDto>> GetAllAvailableSuppliersAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
@@ -30,20 +31,5 @@ public class ProfessionalSupplierService : IProfessionalSupplierService
         return _mapper
             .Map<IEnumerable<AvailableWaterSupplier>, IEnumerable<AvailableWaterSupplierDto>>(suppliers)
             .ToPagedData(pageInfo);
-    }
-
-    public async Task<IEnumerable<ProfessionalWaterSupplierDto>> GetAllAsync(CancellationToken cancellationToken)
-    {
-        var proSuppliers = await _proSupplierRepository.GetAllAsync(cancellationToken);
-        return _mapper.Map<IEnumerable<ProfessionalWaterSupplier>, IEnumerable<ProfessionalWaterSupplierDto>>(proSuppliers);
-    }
-
-    public async Task<ProfessionalWaterSupplierDto> AddOrUpdateAsync(ProfessionalWaterSupplierDto proSupplier)
-    {
-        var model = _mapper.Map<ProfessionalWaterSupplierDto, ProfessionalWaterSupplier>(proSupplier);
-
-        var added = await _proSupplierRepository.AddOrUpdateAsync(model);
-
-        return _mapper.Map<ProfessionalWaterSupplier, ProfessionalWaterSupplierDto>(added);
     }
 }

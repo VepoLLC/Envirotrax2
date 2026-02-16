@@ -1,6 +1,7 @@
 import { Component, Input, Optional, Output } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { FilterPanelComponent } from "./filter-panel.component";
+import { InputOption } from "../../../input/input.component";
 
 @Component({
     selector: 'vp-filter-panel-field',
@@ -22,6 +23,9 @@ export class FilterPanelFieldComponent {
 
     @Input()
     public form?: NgForm;
+
+    @Input()
+    public options: InputOption[] = [];
 
     constructor(@Optional() private readonly _parent: FilterPanelComponent) {
 

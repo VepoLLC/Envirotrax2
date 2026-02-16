@@ -22,6 +22,8 @@ import { SectionComponent } from "./section/section.component";
 import { AppLoadingSpinnerModule } from "./loading-spinner/app-loading-spinner.module";
 import { FilterPanelFieldComponent } from "./data-components/sorting-filtering/filter-panel/filter-panel-field.component";
 import { FilterPanelComponent } from "./data-components/sorting-filtering/filter-panel/filter-panel.component";
+import { NgSelectModule } from "@ng-select/ng-select";
+import { InputOptionComponent } from "./input/input-option.component";
 
 @NgModule({
     declarations: [
@@ -36,6 +38,7 @@ import { FilterPanelComponent } from "./data-components/sorting-filtering/filter
         DropdownComponent,
         InputComponent,
         OptionDirective,
+        InputOptionComponent,
         ConfirmModalComponent,
         MessageModalComponent,
         ValidationFieldComponent,
@@ -49,13 +52,15 @@ import { FilterPanelComponent } from "./data-components/sorting-filtering/filter
         FormsModule,
         RouterModule,
         ModalModule,
-        AppLoadingSpinnerModule
+        AppLoadingSpinnerModule,
+        NgSelectModule
     ],
     exports: [
         PaginationComponent,
         DropdownComponent,
         DropdownOptionComponent,
         InputComponent,
+        InputOptionComponent,
         ValidationFieldComponent,
         ValidationSummaryComponent,
         TableComponent,

@@ -9,6 +9,7 @@ import { NgForm } from "@angular/forms";
 import { ProfessionalUser } from "../../shared/models/professionals/professional-user";
 import { AuthService } from "../../shared/services/auth/auth.service";
 import { ProfesionalUserService } from "../../shared/services/professionals/professional-user.service";
+import { InputOption } from "../../shared/components/input/input.component";
 
 @Component({
     standalone: false,
@@ -21,7 +22,7 @@ export class CompanyComponent implements OnInit {
 
     public professional: Professional = {};
     public user: ProfessionalUser = {};
-    public states: State[] = [];
+    public states: InputOption<State>[] = [];
 
     constructor(
         private readonly _helper: HelperService,
@@ -39,7 +40,7 @@ export class CompanyComponent implements OnInit {
             this.loadingMessage = 'Loading Profile';
 
             const [states, professional, user] = await Promise.all([
-                this._lookupService.getAllStates(),
+                this._lookupService.getAllStatesAsOptions(true),
                 this._professionalService.getLoggedInProfessional(),
                 this._professionalUserService.getMyData()
             ]);

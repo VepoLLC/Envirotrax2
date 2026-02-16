@@ -10,6 +10,7 @@ import { QueryProperty } from "../../shared/models/query";
 import { State } from "../../shared/models/states/state";
 import { LookupService } from "../../shared/services/lookup/lookup.service";
 import { Professional } from "../../shared/models/professionals/professional";
+import { InputOption } from "../../shared/components/input/input.component";
 
 @Component({
     standalone: false,
@@ -37,7 +38,7 @@ export class WaterSuppliersComponent implements OnInit {
         }
     };
 
-    public states: State[] = [];
+    public states: InputOption<State>[] = [];
     public stateId?: number;
     public professional: Professional = {};
 
@@ -63,7 +64,7 @@ export class WaterSuppliersComponent implements OnInit {
 
             const [currentProfessional, states] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
-                this._lookupService.getAllStates()
+                this._lookupService.getAllStatesAsOptions(true)
             ]);
 
             this.states = states;

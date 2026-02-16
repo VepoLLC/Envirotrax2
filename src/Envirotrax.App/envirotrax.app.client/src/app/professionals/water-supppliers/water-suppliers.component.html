@@ -64,12 +64,8 @@
                       type="select"
                       class="mt-4"
                       [(ngModel)]="stateId"
-                      (ngModelChange)="stateChanged()">
-                <option value=""></option>
-                <option *ngFor="let state of states" [value]="state.id">
-                    {{state.name}}
-                </option>
-            </vp-input>
+                      [options]="states"
+                      (ngModelChange)="stateChanged()" />
         </div>
 
         <vp-table *ngIf="suppliers.items"

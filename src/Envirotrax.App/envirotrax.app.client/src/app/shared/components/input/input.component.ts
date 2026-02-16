@@ -1,5 +1,5 @@
 import { DatePipe } from "@angular/common";
-import { AfterViewInit, Component, ElementRef, forwardRef, Input, OnInit, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, forwardRef, input, Input, OnInit, ViewChild } from "@angular/core";
 import { ControlValueAccessor, NgForm, NG_VALUE_ACCESSOR } from "@angular/forms";
 import flatpickr from "flatpickr";
 import { Instance } from "flatpickr/dist/types/instance";
@@ -74,6 +74,9 @@ export class InputComponent implements ControlValueAccessor, OnInit, AfterViewIn
 
     @Input()
     public form?: NgForm;
+
+    @Input()
+    public options: InputOption[] = [];
 
     public value: any | DateRange;
 
@@ -185,4 +188,10 @@ export class InputComponent implements ControlValueAccessor, OnInit, AfterViewIn
 export interface DateRange {
     startDate?: string;
     endDate?: string;
+}
+
+export interface InputOption<T = any> {
+    id?: any;
+    text?: string;
+    data?: T;
 }

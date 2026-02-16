@@ -7,6 +7,7 @@ import { TableColumn } from "../../shared/components/data-components/table/table
 import { ColumnType } from "../../shared/components/data-components/sorting-filtering/query-view-model";
 import { QueryProperty } from "../../shared/models/query";
 import { NgForm } from "@angular/forms";
+import { InputOption } from "../../shared/components/input/input.component";
 
 @Component({
     standalone: false,
@@ -30,6 +31,22 @@ export class SiteListComponent implements OnInit {
             ]
         }
     };
+
+    public facilityTypes: InputOption[] = [
+        { id: "", text: "Any Value" },
+        { id: "Restaurant", text: "Restaurant" },
+        { id: "Fast Food Establishment", text: "Fast Food Establishment" },
+        { id: "Hotel/Motel", text: "Hotel/Motel" },
+        { id: "Car Wash", text: "Car Wash" },
+        { id: "School/University", text: "School/University" },
+        { id: "Grocery Store", text: "Grocery Store" },
+        { id: "Convenience Store", text: "Convenience Store" },
+        { id: "Assisted Living Facility", text: "Assisted Living Facility" },
+        { id: "Medical Facility", text: "Medical Facility" },
+        { id: "Industrial", text: "Industrial" },
+        { id: "City Owned Facility", text: "City Owned Facility" },
+        { id: "Other", text: "Other" }
+    ];
 
     constructor(
         private readonly _siteService: SiteService,

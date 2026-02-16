@@ -3,6 +3,7 @@ import { HttpClient } from "@angular/common/http";
 import { State } from "../../models/states/state";
 import { UrlResolverService } from "../helpers/url-resolver.service";
 import { lastValueFrom, Observable } from "rxjs";
+import { InputOption } from "../../components/input/input.component";
 
 @Injectable({
     providedIn: 'root'
@@ -24,5 +25,21 @@ export class LookupService {
         }
 
         return await lastValueFrom(this._states$);
+    }
+
+    public async getAllStatesAsOptions(includeEmpty: boolean): Promise<InputOption<State>[]> {
+        const states = await this.getAllStates();
+
+        const options: InputOption<State>[] = states.map(s => ({
+            id: s.id,
+            text: s.name,
+            data: s
+        }));
+
+        if (includeEmpty) {
+            options.splice(0, 0, { id: '', text: '' });
+        }
+
+        return options;
     }
 }

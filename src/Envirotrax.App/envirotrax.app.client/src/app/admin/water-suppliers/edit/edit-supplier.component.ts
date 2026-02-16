@@ -6,6 +6,7 @@ import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { NgForm } from "@angular/forms";
 import { LookupService } from "../../../shared/services/lookup/lookup.service";
 import { State } from "../../../shared/models/states/state";
+import { InputOption } from "../../../shared/components/input/input.component";
 
 
 @Component({
@@ -14,7 +15,7 @@ import { State } from "../../../shared/models/states/state";
 })
 export class EditSupplierComponent {
     public supplier: WaterSupplier = new WaterSupplier();
-    public states: State[] = [];
+    public states: InputOption<State>[] = [];
 
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
@@ -75,7 +76,7 @@ export class EditSupplierComponent {
     }
 
     private async loadStates(): Promise<void> {
-        this.states = await this._stateService.getAllStates();
+        this.states = await this._stateService.getAllStatesAsOptions(true);
     }
 
 }

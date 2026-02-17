@@ -85,22 +85,20 @@
             </div>
 
             <!--State-->
-                <div class="mb-3">
-                    <label class="form-label">State</label>
+            <div class="mb-3">
 
-                    <select class="form-select"
-                            [(ngModel)]="site.stateId"
-                            name="state">
-
-                        <option [ngValue]="null">Select state</option>
-
-                        <option *ngFor="let state of states"
-                                [ngValue]="state.id">
-                            {{ state.name }}
-                        </option>
-
-                    </select>
-                </div>
+                <vp-input name="stateId"
+                          label="State"
+                          type="select"
+                          [form]="form"
+                          [ngModel]="site.stateId"
+                          (ngModelChange)="stateChanged($event)">
+                    <option value=""></option>
+                    <option *ngFor="let state of states" [value]="state.id">
+                        {{state.name}}
+                    </option>
+                </vp-input>
+            </div>
 
 
             <!--ZIP-->

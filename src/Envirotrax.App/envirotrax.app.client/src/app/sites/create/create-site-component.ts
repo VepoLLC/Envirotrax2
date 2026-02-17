@@ -68,6 +68,15 @@ export class CreateSiteComponent {
         this._modalReference.cancel();
     }
 
+    public stateChanged(stateId: number): void {
+        if (stateId) {
+            //  this.professional.state = this.professional.state || {};
+            this.site.stateId = stateId;
+        } else {
+            this.site.stateId  = undefined;
+        }
+    }
+
     private async loadStates(): Promise<void> {
         this.states = await this._stateService.getAllStates();
     }

@@ -207,6 +207,8 @@ public class Site : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 
     public DateTime? FogAccountAssignmentDate { get; set; }
 
+    public bool Active { get;set; }
+
     // Audit properties
     public int? CreatedById { get; set; }
     public AppUser? CreatedBy { get; set; }

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Envirotrax.App.Server.Data.Models.Sites;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 
@@ -150,4 +151,7 @@ public class SiteDto : IDto
     public DateTime? CsiAccountAssignmentDate { get; set; }
     public DateTime? BackflowAccountAssignmentDate { get; set; }
     public DateTime? FogAccountAssignmentDate { get; set; }
+    public DateTime CreatedTime { get; set; }
+    public DateTime? UpdatedTime { get; set; }
+    public AppUserDto? UpdatedBy { get; set; }
 }

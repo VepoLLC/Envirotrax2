@@ -82,4 +82,7 @@ export interface Site {
     csiAccountAssignmentDate?: string;
     backflowAccountAssignmentDate?: string;
     fogAccountAssignmentDate?: string;
+    active?: boolean;
+    createdTime?: Date;
+    updatedTime?: Date;
 }

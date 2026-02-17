@@ -1,6 +1,7 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { AuthService } from './shared/services/auth/auth.service';
 import { WaterSupplierService } from './shared/services/water-suppliers/water-supplier.service';
+import { ProfesisonalService } from './shared/services/professionals/professional.service';
 import { createPopper, flip, preventOverflow } from '@popperjs/core';
 
 @Component({
@@ -13,12 +14,13 @@ export class App implements OnInit {
   public isAuthenticated: boolean = false;
   public menuItems: MenuItem[] = [];
   public isNavbarVisible: boolean = false;
-  public waterSupplierName: string = '';
+  public companyName: string = '';
   public userEmail: string = '';
 
   constructor(
     private readonly _authService: AuthService,
-    private readonly _waterSupplierService: WaterSupplierService
+    private readonly _waterSupplierService: WaterSupplierService,
+    private readonly _professionalService: ProfesisonalService
   ) {
 
   }
@@ -29,7 +31,7 @@ export class App implements OnInit {
 
       if (this.isAuthenticated) {
         this.menuItems = this.createMenuItems();
-        this.loadUserInfo();
+        await this.loadUserInfo();
       }
     });
   }
@@ -37,9 +39,15 @@ export class App implements OnInit {
   private async loadUserInfo(): Promise<void> {
     this.userEmail = await this._authService.getUserEmail() ?? '';
 
-    this._waterSupplierService.getCurrentSupplier().subscribe(supplier => {
-      this.waterSupplierName = supplier.name ?? '';
-    });
+    const professionalId = await this._authService.getProfessionalId();
+
+    if (professionalId) {
+      const professional = await this._professionalService.getLoggedInProfessional();
+      this.companyName = professional.name ?? '';
+    } else {
+      const supplier = await this._waterSupplierService.getLoggedInSupplier();
+      this.companyName = supplier.name ?? '';
+    }
   }
 
   public signOut(): void {

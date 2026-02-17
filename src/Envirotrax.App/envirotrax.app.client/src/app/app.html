@@ -63,22 +63,22 @@
         <div class="row">
             <div class="col"></div>
             <div class="col-auto text-nowrap login-panel">
-                <span *ngIf="waterSupplierName" class="login-box left">
-                    <i class="fa-solid fa-building me-1"></i>{{waterSupplierName}}
-                </span>
-                <span *ngIf="userEmail" class="login-box">
+                <button *ngIf="companyName" type="button" class="login-box left border shadow-sm bg-body text-body py-1 px-2 ms-1">
+                    <i class="fa-solid fa-building me-1"></i>{{companyName}}
+                </button>
+                <button *ngIf="userEmail" type="button" class="login-box border shadow-sm bg-body text-body py-1 px-2 ms-1 rounded">
                     <i class="fa-solid fa-user me-1"></i>{{userEmail}}
-                </span>
-                <span class="login-box right" (click)="signOut()">
+                </button>
+                <button type="button" class="login-box right border shadow-sm bg-body text-body py-1 px-2 ms-1" (click)="signOut()">
                     <i class="fa-solid fa-right-from-bracket me-1"></i>Logout
-                </span>
+                </button>
             </div>
         </div>
     </div>
 </header>
 
 <div class="d-flex w-100 h-100 flex-fill position-relative">
-    <main id="main-content" class="overflow-auto d-flex w-100 bg-light">
+    <main id="main-content" class="overflow-auto d-flex w-100">
         <div class="p-3 flex-fill d-flex flex-column">
             <router-outlet></router-outlet>
         </div>

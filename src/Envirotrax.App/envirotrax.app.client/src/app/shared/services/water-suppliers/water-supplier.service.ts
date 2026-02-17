@@ -75,14 +75,15 @@ export class WaterSupplierService {
         return lastValueFrom(observable);
     }
 
-    public getCurrentSupplier(): Observable<WaterSupplier> {
+    public getLoggedInSupplier(): Promise<WaterSupplier> {
+        const url = this._urlResolver.resolveUrl('/api/water-suppliers/my/current');
+
         if (!this._currentSupplier$) {
-            const url = this._urlResolver.resolveUrl('/api/water-suppliers/my/current');
             this._currentSupplier$ = this._http.get<WaterSupplier>(url).pipe(
                 shareReplay(1)
             );
         }
 
-        return this._currentSupplier$;
+        return lastValueFrom(this._currentSupplier$);
     }
 }

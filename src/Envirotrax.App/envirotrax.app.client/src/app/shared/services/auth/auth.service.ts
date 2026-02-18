@@ -126,6 +126,11 @@ export class AuthService {
         return user?.access_token;
     }
 
+    public async getUserEmail(): Promise<string | undefined> {
+        const user = await this._userManager.getUser();
+        return user?.profile?.email;
+    }
+
     private getMyAccess(): Promise<UserAccess> {
         const url = this._urlResolver.resolveUrl('/api/users/access/my');
 

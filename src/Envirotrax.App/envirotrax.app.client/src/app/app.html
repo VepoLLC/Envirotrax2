@@ -7,7 +7,7 @@
             </a>
 
             <button class="border-0 navbar-toggler text-white"
-                    type="button" d
+                    type="button"
                     ata-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent"
                     aria-controls="navbarSupportedContent"
@@ -67,20 +67,19 @@
 </header>
 
 <div *ngIf="isAuthenticated" class="container-fluid">
-    <div class="row">
-        <div class="col"></div>
-        <div class="col-auto text-nowrap login-panel">
+    <div class="d-flex justify-content-end">
+        <div class="col-auto text-nowrap mt-1">
             <button *ngIf="companyName" type="button"
                     class="login-box left border shadow-sm bg-body text-body py-1 px-2 ms-1">
-                <i class="fa-solid fa-building me-1"></i>{{companyName}}
+                <i class="text-primary fa-solid fa-building me-1"></i>{{companyName}}
             </button>
             <button *ngIf="userEmail" type="button"
                     class="login-box border shadow-sm bg-body text-body py-1 px-2 ms-1 rounded">
-                <i class="fa-solid fa-user me-1"></i>{{userEmail}}
+                <i class="text-primary fa-solid fa-user me-1"></i>{{userEmail}}
             </button>
             <button type="button" class="login-box right border shadow-sm bg-body text-body py-1 px-2 ms-1"
                     (click)="signOut()">
-                <i class="fa-solid fa-right-from-bracket me-1"></i>Logout
+                <i class="text-primary fa-solid fa-right-from-bracket me-1"></i>Logout
             </button>
         </div>
     </div>

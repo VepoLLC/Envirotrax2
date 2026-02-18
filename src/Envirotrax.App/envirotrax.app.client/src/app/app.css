@@ -26,14 +26,6 @@
 }
 
 /* Login panel boxes */
-.login-panel {
-    padding: 5px 10px;
-}
-
-.login-box i {
-    color: #008fd4;
-}
-
 .login-box.left {
     border-radius: 0px 4px 4px 15px;
     padding-left: 15px;

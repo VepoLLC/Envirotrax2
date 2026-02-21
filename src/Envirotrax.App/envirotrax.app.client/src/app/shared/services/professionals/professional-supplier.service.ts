@@ -62,4 +62,11 @@ export class ProfessionalSupplierService {
 
         return lastValueFrom(observable);
     }
+
+    public delete(supplierId: number): Promise<ProfessionalWaterSupplier> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/water-suppliers/${supplierId}`);
+        const observable = this._http.delete<ProfessionalWaterSupplier>(url);
+
+        return lastValueFrom(observable);
+    }
 }

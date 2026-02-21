@@ -18,7 +18,7 @@ const routes: Routes = [
       },
       {
         path: 'professionals',
-        loadChildren: () => import('./professionals/professional-routing.module').then(m => m.ProfessionalRoutingModule)
+        loadChildren: () => import('./professionals/professional.module').then(m => m.ProfessionalModule)
       }
     ]
   },

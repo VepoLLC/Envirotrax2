@@ -28,6 +28,18 @@ export interface AvailableWaterSupplier {
     hasFogInspection?: boolean;
     hasFogTransportation?: boolean;
 
+    bpatsRequireInsurance?: boolean;
+    csiInspectorsRequireInsurance?: boolean;
+    fogTransportersRequireInsurance?: boolean;
+    fogVehiclesRequirePermit?: boolean;
+    fogVehiclesRequireInspection?: boolean;
+    requireBackflowTestImages?: boolean;
+    requireCsiInspectionImages?: boolean;
+
+    bpatsRequireInsuranceAmount?: number;
+    csiInspectorsRequireInsuranceAmount?: number;
+    fogTransportersRequireInsuranceAmount?: number;
+
     backflowResidentialTestFee?: number;
     backflowCommercialTestFee?: number;
     csiCommercialInspectionFee?: number;

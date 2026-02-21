@@ -36,7 +36,7 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
                                  StateId = supplier.StateId,
 
                                  HasBackflowTesting = (bool?)settings.BackflowTesting ?? false,
-                                 HasCsiInpection = (bool?)settings.CsiInspections ?? false,
+                                 HasCsiInspection = (bool?)settings.CsiInspections ?? false,
                                  HasWiseGuys = (bool?)settings.WiseGuys ?? false,
                                  HasFogInspection = (bool?)settings.FogProgram ?? false,
                                  HasFogTransportation = (bool?)settings.FogProgram ?? false,
@@ -46,6 +46,8 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
                                  FogTransportersRequireInsurance = (bool?)settings.FogTransportersRequireInsurance ?? false,
                                  FogVehiclesRequireInspection = (bool?)settings.FogVehiclesRequireInspection ?? false,
                                  FogVehiclesRequirePermit = (bool?)settings.FogVehiclesRequirePermit ?? false,
+                                 RequireBackflowTestImages = (bool?)settings.RequireBackflowTestImages ?? false,
+                                 RequireCsiInspectionImages = (bool?)settings.RequireCsiInspectionImages ?? false,
 
                                  BpatsRequireInsuranceAmount = (decimal?)settings.BpatsRequireInsuranceAmount,
                                  CsiInspectorsRequireInsuranceAmount = (decimal?)settings.CsiInspectorsRequireInsuranceAmount,

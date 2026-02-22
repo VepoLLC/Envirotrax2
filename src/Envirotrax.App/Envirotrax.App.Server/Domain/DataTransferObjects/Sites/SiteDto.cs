@@ -148,6 +148,7 @@ public class SiteDto : IDto
     public string? FogAccountAssignment { get; set; }
 
     public bool NeedsRenewalCheck { get; set; }
+    public bool Active { get; set; }
     public DateTime? CsiAccountAssignmentDate { get; set; }
     public DateTime? BackflowAccountAssignmentDate { get; set; }
     public DateTime? FogAccountAssignmentDate { get; set; }

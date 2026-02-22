@@ -9,7 +9,6 @@ import { QueryProperty } from "../../shared/models/query";
 import { NgForm } from "@angular/forms";
 import { ModalHelperService } from "../../shared/services/helpers/modal-helper.service";
 import { CreateSiteComponent } from "../create/create-site-component";
-import { EditSiteComponent } from "../edit/edit-site-component";
 
 @Component({
     standalone: false,
@@ -43,8 +42,6 @@ export class SiteListComponent implements OnInit {
     }
 
     public async ngOnInit(): Promise<void> {
-        var sites = await this.getSites();
-        console.log(sites);
     }
 
     private getColumns(): TableColumn<Site>[] {
@@ -86,7 +83,6 @@ export class SiteListComponent implements OnInit {
         try {
             this.table.isLoading = true;
             this.table.items = await this._siteService.getAll(this.table.items?.pageInfo || {}, this.table.query);
-            this.showResults = (this.table?.items?.data?.length ?? 0) > 0;
         } finally {
             this.table.isLoading = false;
         }

@@ -10,6 +10,7 @@ import { SortingFilteringComponent } from "./data-components/sorting-filtering/s
 import { TableComponent } from "./data-components/table/table.component";
 import { TableCellComponent } from "./data-components/table/table-cells/table-cell.component";
 import { CheckboxCellComponent } from "./data-components/table/table-cells/checkbox-cell.component";
+import { CurrencyCellComponent } from "./data-components/table/table-cells/currency-cell.component";
 import { DropdownOptionComponent } from "./dropdown/dropdown-option.component";
 import { DropdownComponent } from "./dropdown/dropdown.component";
 import { InputComponent } from "./input/input.component";
@@ -34,6 +35,7 @@ import { InputOptionComponent } from "./input/input-option.component";
         TableComponent,
         TableCellComponent,
         CheckboxCellComponent,
+        CurrencyCellComponent,
         DropdownOptionComponent,
         DropdownComponent,
         InputComponent,
@@ -65,6 +67,7 @@ import { InputOptionComponent } from "./input/input-option.component";
         ValidationSummaryComponent,
         TableComponent,
         CheckboxCellComponent,
+        CurrencyCellComponent,
         SectionComponent,
         AppLoadingSpinnerModule,
         ModalModule,

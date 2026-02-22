@@ -7,7 +7,7 @@ import { ComparisonOperator, Query, QueryProperty } from "../../../models/query"
 @Component({
     selector: 'vp-table',
     templateUrl: './table.component.html',
-    standalone: false,
+    standalone: false
 })
 export class TableComponent implements OnChanges {
     private static _counter: number = 0;
@@ -80,6 +80,12 @@ export class TableComponent implements OnChanges {
 
     @Input()
     public canFilterAdvanced: boolean = false;
+
+    @Input()
+    public centerHeaders: boolean = false;
+
+    @Input()
+    public centerRows: boolean = false;
 
     @Input()
     public layoutName?: string;
@@ -330,9 +336,14 @@ export interface TableColumn<T> extends QueryColumn {
     cellComponent?: Type<any>
 
     /**
-    * Custom table column size match with Bootstrap's col classe
+    * CSS class to be added to the header row columns
     */
-    size?: ColumnSize;
+    headerCssClass?: string;
+
+    /**
+    * CSS class to be added to the body row cells
+    */
+    rowCssClass?: string;
 
     /**
      * Tells whether the column should be exluded from the downloaded CSV file.

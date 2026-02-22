@@ -72,12 +72,16 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table" [class.table-hover]="canSelect || canEdit">
+        <table class="table align-middle" [class.table-hover]="canSelect || canEdit">
             <thead>
                 <tr>
                     <ng-container *ngFor="let column of columns">
-                        <th *ngIf="!column.isTableColumnExcluded" [hidden]="column.isInvisible" [class]="column.size"
-                            class="text-nowrap text-secondary" role="button" (click)="sortColumn(column)">
+                        <th *ngIf="!column.isTableColumnExcluded"
+                            [hidden]="column.isInvisible"
+                            [class]="column.headerCssClass"
+                            class="text-nowrap text-secondary"
+                            role="button"
+                            (click)="sortColumn(column)">
                             {{column.caption}}
 
                             <span *ngIf="query?.sort && query?.sort![column.field]">
@@ -93,7 +97,9 @@
                 <tr *ngFor="let row of data" [attr.role]="canSelect || canEdit ? 'button' : null"
                     (click)="onSelect(row)">
                     <ng-container *ngFor="let column of columns">
-                        <td *ngIf="!column.isTableColumnExcluded" [hidden]="column.isInvisible">
+                        <td *ngIf="!column.isTableColumnExcluded"
+                            [hidden]="column.isInvisible"
+                            [class]="column.rowCssClass">
                             <vp-table-cell *ngIf="!column.cellTemplate" [column]="column" [rowData]="row"
                                            [componentType]="column.cellComponent!">
                             </vp-table-cell>

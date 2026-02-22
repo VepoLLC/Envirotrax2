@@ -41,7 +41,7 @@ public class AvailableWaterSupplier
     public int? StateId { get; set; }
     public bool HasWiseGuys { get; set; }
     public bool HasBackflowTesting { get; set; }
-    public bool HasCsiInpection { get; set; }
+    public bool HasCsiInspection { get; set; }
     public bool HasFogInspection { get; set; }
     public bool HasFogTransportation { get; set; }
 
@@ -50,6 +50,8 @@ public class AvailableWaterSupplier
     public bool FogTransportersRequireInsurance { get; set; }
     public bool FogVehiclesRequirePermit { get; set; }
     public bool FogVehiclesRequireInspection { get; set; }
+    public bool RequireBackflowTestImages { get; set; }
+    public bool RequireCsiInspectionImages { get; set; }
 
     public decimal? BpatsRequireInsuranceAmount { get; set; }
     public decimal? CsiInspectorsRequireInsuranceAmount { get; set; }
@@ -57,15 +59,12 @@ public class AvailableWaterSupplier
 
     public decimal? BackflowResidentialTestFee { get; set; }
 
-    [Precision(19, 4)]
     public decimal? BackflowCommercialTestFee { get; set; }
 
-    [Precision(19, 4)]
     public decimal? CsiCommercialInspectionFee { get; set; }
 
-    [Precision(19, 4)]
     public decimal? CsiResidentialInspectionFee { get; set; }
 
-    [Precision(19, 4)]
     public decimal? FogTransportFee { get; set; }
+    public decimal? FogInspectorFee { get; set; }
 }

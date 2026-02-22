@@ -37,8 +37,6 @@ namespace Envirotrax.App.Server.Data.DbContexts
 
         protected override void SetSecurityProperties()
         {
-            base.SetSecurityProperties();
-
             if (!SkipSaveSecurityProperties)
             {
                 var professionalId = _tenantProvider.ProfessionalId;
@@ -53,8 +51,6 @@ namespace Envirotrax.App.Server.Data.DbContexts
 
         protected override void SetSecurityProperties(object entity)
         {
-            base.SetSecurityProperties(entity);
-
             if (!SkipSaveSecurityProperties)
             {
                 if (entity is IProfessionalModel professionalModel)

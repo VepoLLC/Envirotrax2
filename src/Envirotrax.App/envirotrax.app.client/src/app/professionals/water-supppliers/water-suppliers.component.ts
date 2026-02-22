@@ -1,8 +1,8 @@
-import { Component, OnInit, Query } from "@angular/core";
-import { WaterSupplier } from "../../shared/models/water-suppliers/water-supplier";
+import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { TableViewModel } from "../../shared/models/table-view-model";
 import { ProfessionalSupplierService } from "../../shared/services/professionals/professional-supplier.service";
-import { TableColumn } from "../../shared/components/data-components/table/table.component";
+import { CellTemplateData, TableColumn, TableCustomAction } from "../../shared/components/data-components/table/table.component";
+import { CurrencyCellComponent } from "../../shared/components/data-components/table/table-cells/currency-cell.component";
 import { ColumnType } from "../../shared/components/data-components/sorting-filtering/query-view-model";
 import { AvailableWaterSupplier, ProfessionalWaterSupplier } from "../../shared/models/professionals/professional-water-supplier";
 import { ProfesisonalService } from "../../shared/services/professionals/professional.service";
@@ -11,6 +11,8 @@ import { State } from "../../shared/models/states/state";
 import { LookupService } from "../../shared/services/lookup/lookup.service";
 import { Professional } from "../../shared/models/professionals/professional";
 import { InputOption } from "../../shared/components/input/input.component";
+import { ModalHelperService } from "../../shared/services/helpers/modal-helper.service";
+import { WaterSupplierRegistrationComponent, WaterSupplierRegistrationVm } from "./registration/water-supplier-registration.component";
 
 @Component({
     standalone: false,
@@ -18,6 +20,18 @@ import { InputOption } from "../../shared/components/input/input.component";
     styles: `
         .vp-requirement-icon {
             max-width: 25px;
+        }
+
+        .vp-filter {
+            min-width: 270px;
+        }
+
+        :host ::ng-deep .vp-registration-table-column {
+            min-width: 300px;
+        }
+
+        :host ::ng-deep .vp-registration-actions-column {
+            min-width: 150px;
         }
     `
 })
@@ -42,10 +56,26 @@ export class WaterSuppliersComponent implements OnInit {
     public stateId?: number;
     public professional: Professional = {};
 
+    @ViewChild('supportedPrograms', { static: true })
+    public supportedPrograms?: TemplateRef<CellTemplateData<AvailableWaterSupplier>>;
+
+    @ViewChild('selectedPrograms', { static: true })
+    public selectedPrograms?: TemplateRef<CellTemplateData<ProfessionalSupplierVm>>;
+
+    @ViewChild('bpatRequirements', { static: true })
+    public bpatRequirements?: TemplateRef<CellTemplateData<AvailableWaterSupplier>>;
+
+    @ViewChild('csiRequirements', { static: true })
+    public csiRequirements?: TemplateRef<CellTemplateData<AvailableWaterSupplier>>;
+
+    @ViewChild('fogRequirements', { static: true })
+    public fogRequirements?: TemplateRef<CellTemplateData<AvailableWaterSupplier>>;
+
     constructor(
         private readonly _professionalSupplierService: ProfessionalSupplierService,
         private readonly _professionalService: ProfesisonalService,
-        private readonly _lookupService: LookupService
+        private readonly _lookupService: LookupService,
+        private readonly _modalHelper: ModalHelperService
     ) {
 
     }
@@ -69,6 +99,9 @@ export class WaterSuppliersComponent implements OnInit {
 
             this.states = states;
             this.professional = currentProfessional;
+
+            this.stateId = states.find(s => s.data?.code == 'TX')?.id;
+            this._stateQuuery.value = this.stateId?.toString();
 
             const queryProperty: QueryProperty = {
                 children: [],
@@ -134,17 +167,137 @@ export class WaterSuppliersComponent implements OnInit {
         }
     }
 
+    public openRegistration(supplier: ProfessionalSupplierVm): void {
+        const model: WaterSupplierRegistrationVm = {
+            availableSupplier: supplier,
+            selected: supplier.selected
+        };
+
+        this._modalHelper.show<WaterSupplierRegistrationVm, ProfessionalWaterSupplier>(WaterSupplierRegistrationComponent, {
+            title: `Register with ${supplier.name}`,
+            model
+        }).result()
+            .subscribe(() => this.getSuppliers());
+    }
+
+    public deleteRegistration(supplier: ProfessionalWaterSupplier): void {
+        this._modalHelper.showDeleteConfirmation()
+            .result()
+            .subscribe(() => this.processDelete(supplier));
+    }
+
+    private async processDelete(supplier: ProfessionalSupplierVm): Promise<void> {
+        try {
+            this.suppliers.isLoading = true;
+            await this._professionalSupplierService.delete(supplier.selected!.waterSupplier!.id!);
+        } finally {
+            this.suppliers.isLoading = false;
+        }
+
+        await this.getSuppliers();
+    }
+
     private getColumns(): TableColumn<ProfessionalSupplierVm>[] {
         return [
             {
-                field: 'name',
-                caption: 'Water Supplier',
-                type: ColumnType.text
+                field: 'Actions',
+                caption: 'Actions',
+                type: ColumnType.other,
+                cellTemplate: this.selectedPrograms,
+                queryColumnExcluded: true,
+                headerCssClass: 'vp-registration-actions-column text-center',
+                rowCssClass: 'vp-registration-actions-column'
             },
             {
-                field: 'requirements',
-                caption: 'Requirements',
-                type: ColumnType.other
+                field: 'name',
+                caption: 'Water Supplier',
+                type: ColumnType.text,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
+            },
+            {
+                field: 'Supported Programs',
+                caption: 'Supported Programs',
+                type: ColumnType.other,
+                cellTemplate: this.supportedPrograms,
+                queryColumnExcluded: true,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
+            },
+            {
+                field: 'BPAT Requirements',
+                caption: 'BPAT Requirements',
+                type: ColumnType.other,
+                cellTemplate: this.bpatRequirements,
+                queryColumnExcluded: true,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
+            },
+            {
+                field: 'backflowResidentialTestFee',
+                caption: 'BPAT Residential Fee',
+                type: ColumnType.number,
+                cellComponent: CurrencyCellComponent,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
+            },
+            {
+                field: 'backflowCommercialTestFee',
+                caption: 'BPAT Commercial Fee',
+                type: ColumnType.number,
+                cellComponent: CurrencyCellComponent,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
+            },
+            {
+                field: 'CSI Requirements',
+                caption: 'CSI Requirements',
+                type: ColumnType.other,
+                cellTemplate: this.csiRequirements,
+                queryColumnExcluded: true,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
+            },
+            {
+                field: 'csiResidentialInspectionFee',
+                caption: 'CSI Residential Fee',
+                type: ColumnType.number,
+                cellComponent: CurrencyCellComponent,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
+            },
+            {
+                field: 'csiCommercialInspectionFee',
+                caption: 'CSI Commercial Fee',
+                type: ColumnType.number,
+                cellComponent: CurrencyCellComponent,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
+            },
+            {
+                field: 'FOG Requirements',
+                caption: 'FOG Requirements',
+                type: ColumnType.other,
+                cellTemplate: this.fogRequirements,
+                queryColumnExcluded: true,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
+            },
+            {
+                field: 'fogInspectorFee',
+                caption: 'FOG Inspection Fee',
+                type: ColumnType.number,
+                cellComponent: CurrencyCellComponent,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
+            },
+            {
+                field: 'fogTransportFee',
+                caption: 'FOG Transport Fee',
+                type: ColumnType.number,
+                cellComponent: CurrencyCellComponent,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
             }
         ]
     }

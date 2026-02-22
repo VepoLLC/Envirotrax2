@@ -2,6 +2,7 @@ import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { TableViewModel } from "../../shared/models/table-view-model";
 import { ProfessionalSupplierService } from "../../shared/services/professionals/professional-supplier.service";
 import { CellTemplateData, TableColumn, TableCustomAction } from "../../shared/components/data-components/table/table.component";
+import { CurrencyCellComponent } from "../../shared/components/data-components/table/table-cells/currency-cell.component";
 import { ColumnType } from "../../shared/components/data-components/sorting-filtering/query-view-model";
 import { AvailableWaterSupplier, ProfessionalWaterSupplier } from "../../shared/models/professionals/professional-water-supplier";
 import { ProfesisonalService } from "../../shared/services/professionals/professional.service";
@@ -23,6 +24,14 @@ import { WaterSupplierRegistrationComponent, WaterSupplierRegistrationVm } from 
 
         .vp-filter {
             min-width: 270px;
+        }
+
+        :host ::ng-deep .vp-registration-table-column {
+            min-width: 300px;
+        }
+
+        :host ::ng-deep .vp-registration-actions-column {
+            min-width: 150px;
         }
     `
 })
@@ -46,14 +55,6 @@ export class WaterSuppliersComponent implements OnInit {
     public states: InputOption<State>[] = [];
     public stateId?: number;
     public professional: Professional = {};
-
-    public readonly supplierActions: TableCustomAction<ProfessionalSupplierVm>[] = [
-        {
-            text: 'Register',
-            iconClass: 'fa-solid fa-pen-to-square',
-            action: (supplier) => this.openRegistration(supplier)
-        }
-    ];
 
     @ViewChild('supportedPrograms', { static: true })
     public supportedPrograms?: TemplateRef<CellTemplateData<AvailableWaterSupplier>>;
@@ -199,45 +200,105 @@ export class WaterSuppliersComponent implements OnInit {
     private getColumns(): TableColumn<ProfessionalSupplierVm>[] {
         return [
             {
+                field: 'Actions',
+                caption: 'Actions',
+                type: ColumnType.other,
+                cellTemplate: this.selectedPrograms,
+                queryColumnExcluded: true,
+                headerCssClass: 'vp-registration-actions-column text-center',
+                rowCssClass: 'vp-registration-actions-column'
+            },
+            {
                 field: 'name',
                 caption: 'Water Supplier',
-                type: ColumnType.text
+                type: ColumnType.text,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
             },
             {
                 field: 'Supported Programs',
                 caption: 'Supported Programs',
                 type: ColumnType.other,
                 cellTemplate: this.supportedPrograms,
-                queryColumnExcluded: true
+                queryColumnExcluded: true,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
             },
             {
                 field: 'BPAT Requirements',
                 caption: 'BPAT Requirements',
                 type: ColumnType.other,
                 cellTemplate: this.bpatRequirements,
-                queryColumnExcluded: true
+                queryColumnExcluded: true,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
+            },
+            {
+                field: 'backflowResidentialTestFee',
+                caption: 'BPAT Residential Fee',
+                type: ColumnType.number,
+                cellComponent: CurrencyCellComponent,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
+            },
+            {
+                field: 'backflowCommercialTestFee',
+                caption: 'BPAT Commercial Fee',
+                type: ColumnType.number,
+                cellComponent: CurrencyCellComponent,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
             },
             {
                 field: 'CSI Requirements',
                 caption: 'CSI Requirements',
                 type: ColumnType.other,
                 cellTemplate: this.csiRequirements,
-                queryColumnExcluded: true
+                queryColumnExcluded: true,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
+            },
+            {
+                field: 'csiResidentialInspectionFee',
+                caption: 'CSI Residential Fee',
+                type: ColumnType.number,
+                cellComponent: CurrencyCellComponent,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
+            },
+            {
+                field: 'csiCommercialInspectionFee',
+                caption: 'CSI Commercial Fee',
+                type: ColumnType.number,
+                cellComponent: CurrencyCellComponent,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
             },
             {
                 field: 'FOG Requirements',
                 caption: 'FOG Requirements',
                 type: ColumnType.other,
                 cellTemplate: this.fogRequirements,
-                queryColumnExcluded: true
+                queryColumnExcluded: true,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
             },
             {
-                field: 'Selected Programs',
-                caption: 'Selected Programs',
-                type: ColumnType.other,
-                cellTemplate: this.selectedPrograms,
-                queryColumnExcluded: true
+                field: 'fogInspectorFee',
+                caption: 'FOG Inspection Fee',
+                type: ColumnType.number,
+                cellComponent: CurrencyCellComponent,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
             },
+            {
+                field: 'fogTransportFee',
+                caption: 'FOG Transport Fee',
+                type: ColumnType.number,
+                cellComponent: CurrencyCellComponent,
+                headerCssClass: 'vp-registration-table-column text-center',
+                rowCssClass: 'vp-registration-table-column text-center'
+            }
         ]
     }
 

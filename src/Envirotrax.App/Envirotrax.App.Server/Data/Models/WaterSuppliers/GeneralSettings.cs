@@ -67,6 +67,9 @@ public class GeneralSettings : TenantModel<WaterSupplier>
     public decimal FogTransportFee { get; set; }
 
     [Precision(19, 4)]
+    public decimal FogInspectorFee { get; set; }
+
+    [Precision(19, 4)]
     public decimal FogTransportFeeWsShare { get; set; }
 
     public bool RequireBackflowTestImages { get; set; }

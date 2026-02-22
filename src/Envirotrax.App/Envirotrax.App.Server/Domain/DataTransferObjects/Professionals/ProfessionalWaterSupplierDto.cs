@@ -55,4 +55,5 @@ public class AvailableWaterSupplierDto
     public decimal CsiCommercialInspectionFee { get; set; }
     public decimal CsiResidentialInspectionFee { get; set; }
     public decimal? FogTransportFee { get; set; }
+    public decimal? FogInspectorFee { get; set; }
 }

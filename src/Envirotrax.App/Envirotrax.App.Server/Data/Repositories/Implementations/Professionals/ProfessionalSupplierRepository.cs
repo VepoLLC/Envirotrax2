@@ -57,7 +57,8 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
                                  BackflowResidentialTestFee = (decimal?)settings.BackflowResidentialTestFee,
                                  CsiCommercialInspectionFee = (decimal?)settings.CsiCommercialInspectionFee,
                                  CsiResidentialInspectionFee = (decimal?)settings.CsiResidentialInspectionFee,
-                                 FogTransportFee = (decimal?)settings.FogTransportFee
+                                 FogTransportFee = (decimal?)settings.FogTransportFee,
+                                 FogInspectorFee = (decimal?)settings.FogInspectorFee
                              };
 
         var paginated = await suppliersQuery

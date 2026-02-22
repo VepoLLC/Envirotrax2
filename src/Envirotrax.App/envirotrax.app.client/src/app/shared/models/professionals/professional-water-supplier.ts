@@ -45,4 +45,5 @@ export interface AvailableWaterSupplier {
     csiCommercialInspectionFee?: number;
     csiResidentialInspectionFee?: number;
     fogTransportFee?: number;
+    FogInspectorFee?: number;
 }

@@ -70,85 +70,113 @@
             </div>
         </div>
 
+        <ng-template #selectedPrograms let-supplier="rowData">
+            <button type="button"
+                    class="btn btn-primary w-100 mb-2"
+                    (click)="openRegistration(supplier)">
+                {{supplier.selected ? 'Modify' : 'Select'}}
+            </button>
+            <button *ngIf="supplier.selected"
+                    type="button"
+                    class="btn btn-danger w-100 mb-2"
+                    (click)="deleteRegistration(supplier)">
+                Unselect
+            </button>
+        </ng-template>
 
         <ng-template #supportedPrograms let-supplier="rowData">
-            <span *ngIf="supplier.hasBackflowTesting" class="badge bg-primary me-1">BPAT</span>
-            <span *ngIf="supplier.hasCsiInspection" class="badge bg-success me-1">CSI</span>
-            <span *ngIf="supplier.hasFogInspection || supplier.hasFogTransportation"
-                  class="badge bg-warning text-dark me-1">FOG Inspection</span>
-            <span *ngIf="supplier.hasFogTransportation" class="badge bg-warning text-dark me-1">FOG
-                Transportation</span>
+            <div class="text-center">
+                <div>
+                    <span *ngIf="supplier.hasBackflowTesting" class="badge bg-primary me-1">BPAT</span>
+                </div>
+                <div>
+                    <span *ngIf="supplier.hasCsiInspection" class="badge bg-success me-1">CSI</span>
+                </div>
+                <div>
+                    <span *ngIf="supplier.hasFogInspection || supplier.hasFogTransportation"
+                          class="badge bg-warning text-dark me-1">FOG Inspection</span>
+                </div>
+                <div>
+                    <span *ngIf="supplier.hasFogTransportation" class="badge bg-warning text-dark me-1">FOG
+                        Transportation</span>
+                </div>
+            </div>
         </ng-template>
 
         <ng-template #bpatRequirements let-supplier="rowData">
-            <div *ngIf="supplier.bpatsRequireInsurance"
-                 class="mx-2 d-flex align-items-center mb-2">
-                <img src="/images/insurance-icon.png"
-                     alt="Water supplier requires insurance"
-                     class="vp-requirement-icon me-2" />
-                Insurance Required
-                <span *ngIf="supplier.bpatsRequireInsuranceAmount" class="ms-1">
-                    ({{ supplier.bpatsRequireInsuranceAmount | currency }})
-                </span>
-            </div>
+            <div class="d-flex flex-column justify-content-center align-items-center">
+                <div *ngIf="supplier.bpatsRequireInsurance"
+                     class="mx-2 d-flex align-items-center mb-2">
+                    <img src="/images/insurance-icon.png"
+                         alt="Water supplier requires insurance"
+                         class="vp-requirement-icon me-2" />
+                    Insurance Required
+                    <span *ngIf="supplier.bpatsRequireInsuranceAmount" class="ms-1">
+                        ({{ supplier.bpatsRequireInsuranceAmount | currency }})
+                    </span>
+                </div>
 
-            <div *ngIf="supplier.requireBackflowTestImages"
-                 class="mx-2 d-flex align-items-center mb-2">
-                <img src="/images/camera-icon.png"
-                     alt="Water supplier requires assembly photos"
-                     class="vp-requirement-icon me-2" />
-                Requires Assembly Photos
+                <div *ngIf="supplier.requireBackflowTestImages"
+                     class="mx-2 d-flex align-items-center mb-2">
+                    <img src="/images/camera-icon.png"
+                         alt="Water supplier requires assembly photos"
+                         class="vp-requirement-icon me-2" />
+                    Requires Assembly Photos
+                </div>
             </div>
         </ng-template>
 
         <ng-template #csiRequirements let-supplier="rowData">
-            <div *ngIf="supplier.csiInspectorsRequireInsurance"
-                 class="mx-2 d-flex align-items-center mb-2">
-                <img src="/images/insurance-icon.png"
-                     alt="Water supplier requires insurance"
-                     class="vp-requirement-icon me-2" />
-                Insurance Required
-                <span *ngIf="supplier.csiInspectorsRequireInsuranceAmount" class="ms-1">
-                    ({{ supplier.csiInspectorsRequireInsuranceAmount | currency }})
-                </span>
-            </div>
+            <div class="d-flex flex-column justify-content-center align-items-center">
+                <div *ngIf="supplier.csiInspectorsRequireInsurance"
+                     class="mx-2 d-flex align-items-center mb-2">
+                    <img src="/images/insurance-icon.png"
+                         alt="Water supplier requires insurance"
+                         class="vp-requirement-icon me-2" />
+                    Insurance Required
+                    <span *ngIf="supplier.csiInspectorsRequireInsuranceAmount" class="ms-1">
+                        ({{ supplier.csiInspectorsRequireInsuranceAmount | currency }})
+                    </span>
+                </div>
 
-            <div *ngIf="supplier.requireCsiInspectionImages"
-                 class="mx-2 d-flex align-items-center mb-2">
-                <img src="/images/camera-icon.png"
-                     alt="Water supplier requires inspection photos"
-                     class="vp-requirement-icon me-2" />
-                Requires Inspection Photos
+                <div *ngIf="supplier.requireCsiInspectionImages"
+                     class="mx-2 d-flex align-items-center mb-2">
+                    <img src="/images/camera-icon.png"
+                         alt="Water supplier requires inspection photos"
+                         class="vp-requirement-icon me-2" />
+                    Requires Inspection Photos
+                </div>
             </div>
         </ng-template>
 
         <ng-template #fogRequirements let-supplier="rowData">
-            <span *ngIf="!supplier.hasFogInspection && !supplier.hasFogTransportation">—</span>
-            <div *ngIf="supplier.fogTransportersRequireInsurance"
-                 class="mx-2 d-flex align-items-center mb-2">
-                <img src="/images/insurance-icon.png"
-                     alt="Water supplier requires insurance"
-                     class="vp-requirement-icon me-2" />
-                Insurance Required
-                <span *ngIf="supplier.fogTransportersRequireInsuranceAmount" class="ms-1">
-                    ({{ supplier.fogTransportersRequireInsuranceAmount | currency }})
-                </span>
-            </div>
+            <div class="d-flex flex-column justify-content-center align-items-center">
+                <div *ngIf="supplier.fogTransportersRequireInsurance"
+                     class="mx-2 d-flex align-items-center mb-2">
+                    <img src="/images/insurance-icon.png"
+                         alt="Water supplier requires insurance"
+                         class="vp-requirement-icon me-2" />
+                    Insurance Required
+                    <span *ngIf="supplier.fogTransportersRequireInsuranceAmount" class="ms-1">
+                        ({{ supplier.fogTransportersRequireInsuranceAmount | currency }})
+                    </span>
+                </div>
 
-            <div *ngIf="supplier.fogVehiclesRequirePermit"
-                 class="mx-2 d-flex align-items-center mb-2">
-                <img src="/images/vehicle-permit-icon.png"
-                     alt="Water supplier requires vehicle permit"
-                     class="vp-requirement-icon me-2" />
-                Vehicle Permit Required
-            </div>
+                <div *ngIf="supplier.fogVehiclesRequirePermit"
+                     class="mx-2 d-flex align-items-center mb-2">
+                    <img src="/images/vehicle-permit-icon.png"
+                         alt="Water supplier requires vehicle permit"
+                         class="vp-requirement-icon me-2" />
+                    Vehicle Permit Required
+                </div>
 
-            <div *ngIf="supplier.fogVehiclesRequireInspection"
-                 class="mx-2 d-flex align-items-center mb-2">
-                <img src="/images/vehicle-inspection-icon.png"
-                     alt="Water supplier requires vehicle inspection"
-                     class="vp-requirement-icon me-2" />
-                Vehicle Inspection Required
+                <div *ngIf="supplier.fogVehiclesRequireInspection"
+                     class="mx-2 d-flex align-items-center mb-2">
+                    <img src="/images/vehicle-inspection-icon.png"
+                         alt="Water supplier requires vehicle inspection"
+                         class="vp-requirement-icon me-2" />
+                    Vehicle Inspection Required
+                </div>
             </div>
         </ng-template>
 
@@ -174,7 +202,6 @@
                   [(query)]="suppliers.query"
                   (queryChange)="getSuppliers()"
                   (queryReset)="getSuppliers()"
-                  [freeTextSearch]="suppliers.freeTextSearch"
-                  [customActions]="supplierActions" />
+                  [freeTextSearch]="suppliers.freeTextSearch" />
     </vp-section>
 </div>

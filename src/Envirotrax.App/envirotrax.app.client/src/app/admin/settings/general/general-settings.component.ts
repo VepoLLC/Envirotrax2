@@ -23,6 +23,8 @@ export class GeneralSettingsComponent implements OnInit {
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
 
+    public showProgramUpdateWarning: boolean = false;
+
     constructor(
         private readonly _generalSettingsService: GeneralSettingsService,
         private readonly _helper: HelperService,

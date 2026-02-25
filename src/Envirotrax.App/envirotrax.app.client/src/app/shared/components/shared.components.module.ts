@@ -10,6 +10,7 @@ import { SortingFilteringComponent } from "./data-components/sorting-filtering/s
 import { TableComponent } from "./data-components/table/table.component";
 import { TableCellComponent } from "./data-components/table/table-cells/table-cell.component";
 import { CheckboxCellComponent } from "./data-components/table/table-cells/checkbox-cell.component";
+import { CurrencyCellComponent } from "./data-components/table/table-cells/currency-cell.component";
 import { DropdownOptionComponent } from "./dropdown/dropdown-option.component";
 import { DropdownComponent } from "./dropdown/dropdown.component";
 import { InputComponent } from "./input/input.component";
@@ -22,6 +23,8 @@ import { SectionComponent } from "./section/section.component";
 import { AppLoadingSpinnerModule } from "./loading-spinner/app-loading-spinner.module";
 import { FilterPanelFieldComponent } from "./data-components/sorting-filtering/filter-panel/filter-panel-field.component";
 import { FilterPanelComponent } from "./data-components/sorting-filtering/filter-panel/filter-panel.component";
+import { NgSelectModule } from "@ng-select/ng-select";
+import { InputOptionComponent } from "./input/input-option.component";
 
 @NgModule({
     declarations: [
@@ -32,10 +35,12 @@ import { FilterPanelComponent } from "./data-components/sorting-filtering/filter
         TableComponent,
         TableCellComponent,
         CheckboxCellComponent,
+        CurrencyCellComponent,
         DropdownOptionComponent,
         DropdownComponent,
         InputComponent,
         OptionDirective,
+        InputOptionComponent,
         ConfirmModalComponent,
         MessageModalComponent,
         ValidationFieldComponent,
@@ -49,17 +54,20 @@ import { FilterPanelComponent } from "./data-components/sorting-filtering/filter
         FormsModule,
         RouterModule,
         ModalModule,
-        AppLoadingSpinnerModule
+        AppLoadingSpinnerModule,
+        NgSelectModule
     ],
     exports: [
         PaginationComponent,
         DropdownComponent,
         DropdownOptionComponent,
         InputComponent,
+        InputOptionComponent,
         ValidationFieldComponent,
         ValidationSummaryComponent,
         TableComponent,
         CheckboxCellComponent,
+        CurrencyCellComponent,
         SectionComponent,
         AppLoadingSpinnerModule,
         ModalModule,

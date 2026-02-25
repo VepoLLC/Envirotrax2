@@ -29,21 +29,8 @@
                         <vp-filter-panel-field fieldName="facilityType"
                                                label="Facility Type"
                                                type="select"
-                                               [form]="searchForm">
-                            <option value="">Any Value</option>
-                            <option Value="Restaurant">Restaurant</option>
-                            <option Value="Fast Food Establishment">Fast Food Establishment</option>
-                            <option Value="Hotel/Motel">Hotel/Motel</option>
-                            <option Value="Car Wash">Car Wash</option>
-                            <option Value="School/University">School/University</option>
-                            <option Value="Grocery Store">Grocery Store</option>
-                            <option Value="Convenience Store">Convenience Store</option>
-                            <option Value="Assisted Living Facility">Assisted Living Facility</option>
-                            <option Value="Medical Facility">Medical Facility</option>
-                            <option Value="Industrial">Industrial</option>
-                            <option Value="City Owned Facility">City Owned Facility</option>
-                            <option Value="Other">Other</option>
-                        </vp-filter-panel-field>
+                                               [form]="searchForm"
+                                               [options]="facilityTypes" />
                     </div>
 
                     <div class="col-md-6">

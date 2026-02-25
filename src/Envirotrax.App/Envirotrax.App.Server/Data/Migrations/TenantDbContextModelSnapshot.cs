@@ -139,6 +139,59 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.ToTable("ProfessionalUsers");
                 });
 
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalWaterSupplier", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("BackflowCommercialTestFee")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("decimal(19,4)");
+
+                    b.Property<decimal?>("BackflowResidentialTestFee")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("decimal(19,4)");
+
+                    b.Property<decimal?>("CsiCommercialInspectionFee")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("decimal(19,4)");
+
+                    b.Property<decimal?>("CsiResidentialInspectionFee")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("decimal(19,4)");
+
+                    b.Property<decimal?>("FogTransportFee")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("decimal(19,4)");
+
+                    b.Property<bool>("HasBackflowTesting")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasCsiInpection")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasFogInspection")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasFogTransportation")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasWiseGuys")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsBanned")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ProfessionalId")
+                        .HasColumnType("int");
+
+                    b.HasKey("WaterSupplierId");
+
+                    b.HasIndex("ProfessionalId");
+
+                    b.ToTable("ProfessionalWaterSuppliers");
+                });
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Sites.Site", b =>
                 {
                     b.Property<int>("WaterSupplierId")
@@ -584,6 +637,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasPrecision(19, 4)
                         .HasColumnType("decimal(19,4)");
 
+                    b.Property<decimal>("FogInspectorFee")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("decimal(19,4)");
+
                     b.Property<bool>("FogProgram")
                         .HasColumnType("bit");
 
@@ -624,6 +681,12 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("PrivacyRequired")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("RequireBackflowTestImages")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("RequireCsiInspectionImages")
                         .HasColumnType("bit");
 
                     b.Property<bool>("WiseGuys")
@@ -786,21 +849,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.ToTable("WaterSuppliers");
                 });
 
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplierProfessional", b =>
-                {
-                    b.Property<int>("WaterSupplierId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProfessionalId")
-                        .HasColumnType("int");
-
-                    b.HasKey("WaterSupplierId", "ProfessionalId");
-
-                    b.HasIndex("ProfessionalId");
-
-                    b.ToTable("WaterSupplierProfessionals");
-                });
-
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.Professional", b =>
                 {
                     b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "CreatedBy")
@@ -856,6 +904,25 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("Professional");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalWaterSupplier", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
+                        .WithMany()
+                        .HasForeignKey("ProfessionalId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Professional");
+
+                    b.Navigation("WaterSupplier");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Sites.Site", b =>
@@ -984,25 +1051,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("State");
 
                     b.Navigation("UpdatedBy");
-                });
-
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplierProfessional", b =>
-                {
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
-                        .WithMany()
-                        .HasForeignKey("ProfessionalId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
-                        .WithMany()
-                        .HasForeignKey("WaterSupplierId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Professional");
-
-                    b.Navigation("WaterSupplier");
                 });
 #pragma warning restore 612, 618
         }

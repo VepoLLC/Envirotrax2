@@ -70,21 +70,20 @@
            [attr.max]="max"
            [placeholder]="placeholder"
            (blur)="onTouched($event)" />
-    <select *ngIf="type == 'select'"
-            [attr.id]="id"
-            [attr.name]="name"
-            [attr.type]="type"
-            class="form-control"
-            [required]="required"
-            [disabled]="disabled || readonly"
-            [(ngModel)]="value"
-            (change)="onChanged()"
-            (blur)="onTouched($event)"
-            [attr.value]="value">
-        <ng-container ngProjectAs="'option'">
-            <ng-content select="option"></ng-content>
-        </ng-container>
-    </select>
+    <ng-select *ngIf="type == 'select'"
+               [attr.id]="id"
+               [attr.name]="name"
+               class="form-control"
+               [required]="required"
+               [disabled]="disabled || readonly"
+               [(ngModel)]="value"
+               [items]="options"
+               (change)="onChanged()"
+               (blur)="onTouched($event)"
+               [attr.value]="value"
+               bindLabel="text"
+               bindValue="id">
+    </ng-select>
 
     <div>
         <vp-validation-field *ngIf="form" [form]="form" [fieldName]="name" [fieldLabel]="label" />

@@ -7,7 +7,7 @@ import { ComparisonOperator, Query, QueryProperty } from "../../../models/query"
 @Component({
     selector: 'vp-table',
     templateUrl: './table.component.html',
-    standalone: false,
+    standalone: false
 })
 export class TableComponent implements OnChanges {
     private static _counter: number = 0;
@@ -80,6 +80,12 @@ export class TableComponent implements OnChanges {
 
     @Input()
     public canFilterAdvanced: boolean = false;
+
+    @Input()
+    public centerHeaders: boolean = false;
+
+    @Input()
+    public centerRows: boolean = false;
 
     @Input()
     public layoutName?: string;
@@ -184,7 +190,7 @@ export class TableComponent implements OnChanges {
             if (!this.freeTextSearch.placeholder) {
                 const columnCaptions = this.freeTextSearch
                     .searchQuery
-                    .map(property => this.columns?.find(c => c.field == property.field)?.caption)
+                    .map(property => property.placeholder || this.columns?.find(c => c.field == property.field)?.caption)
                     .filter(property => !!property);
 
                 this.freeTextSearch.placeholder = 'Enter text to search by ' + columnCaptions.join(', ');
@@ -243,9 +249,17 @@ export class TableComponent implements OnChanges {
             this.query.filter = this.query.filter!.filter(p => p.tag?.location != QueryPropertyLocation.SearchBar);
 
             if (this.freeTextSearch.text) {
+                const freeTextQueryProperty: QueryProperty = {
+                    columnName: this.freeTextSearch.searchQuery.find(Boolean)?.field,
+                    children: [],
+                    tag: {
+                        location: QueryPropertyLocation.SearchBar
+                    }
+                };
+
                 for (let property of this.freeTextSearch.searchQuery) {
                     let queryItem = this.createFreeTextProperty(property, this.freeTextSearch.text);
-                    this.query.filter.push(queryItem);
+                    freeTextQueryProperty.children!.push(queryItem);
 
                     if (property.multiWordSearch) {
                         let multipleWords = this.freeTextSearch
@@ -255,11 +269,13 @@ export class TableComponent implements OnChanges {
 
                         for (let word of multipleWords) {
                             if (queryItem.value != word) {
-                                this.query.filter.push(this.createFreeTextProperty(property, word));
+                                freeTextQueryProperty.children!.push(this.createFreeTextProperty(property, word));
                             }
                         }
                     }
                 }
+
+                this.query.filter.push(freeTextQueryProperty);
             }
 
             this.onQueryChange(this.query);
@@ -320,9 +336,14 @@ export interface TableColumn<T> extends QueryColumn {
     cellComponent?: Type<any>
 
     /**
-    * Custom table column size match with Bootstrap's col classe
+    * CSS class to be added to the header row columns
     */
-    size?: ColumnSize;
+    headerCssClass?: string;
+
+    /**
+    * CSS class to be added to the body row cells
+    */
+    rowCssClass?: string;
 
     /**
      * Tells whether the column should be exluded from the downloaded CSV file.
@@ -370,4 +391,5 @@ export interface FreeTextQuery {
     operator?: ComparisonOperator;
     logicalOperator?: 'And' | 'Or';
     multiWordSearch?: boolean
+    placeholder?: string;
 }

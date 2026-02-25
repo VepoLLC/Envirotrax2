@@ -58,7 +58,7 @@ namespace Envirotrax.Common.Data.DbContexts
                 SetPrimaryKeys(modelBuilder, entity);
                 SetForeignKeys(modelBuilder, entity);
                 SetIndexes(modelBuilder, entity);
-                SetupTenantModels(modelBuilder, entity);
+                SetupGlobalFiltering(modelBuilder, entity);
 
                 foreach (var relationship in entity.GetForeignKeys())
                 {
@@ -68,6 +68,15 @@ namespace Envirotrax.Common.Data.DbContexts
                 if (entity.ClrType.GetCustomAttribute<ExcludedModelAttribute>() != null)
                 {
                     modelBuilder.Entity(entity.ClrType).Metadata.SetIsTableExcludedFromMigrations(true);
+                }
+
+                var waterSupplierProperty = entity.ClrType.GetProperty(nameof(TenantModel<>.WaterSupplier));
+                if (waterSupplierProperty != null && typeof(TenantBase).IsAssignableFrom(waterSupplierProperty.PropertyType))
+                {
+                    modelBuilder.Entity(entity.ClrType)
+                        .HasOne(waterSupplierProperty.PropertyType, nameof(TenantModel<>.WaterSupplier))
+                        .WithMany()
+                        .HasForeignKey(nameof(ITenantModel.WaterSupplierId));
                 }
             }
         }
@@ -87,23 +96,14 @@ namespace Envirotrax.Common.Data.DbContexts
             return t => t.WaterSupplierId == _tenantProvider.WaterSupplierId;
         }
 
-        private void SetupTenantModels(ModelBuilder builder, IMutableEntityType entity)
+        protected virtual void SetupGlobalFiltering(ModelBuilder builder, IMutableEntityType entity)
         {
             if (typeof(ITenantModel).IsAssignableFrom(entity.ClrType))
             {
                 Expression<Func<ITenantModel, bool>> expression = GetTenantFilterExpression();
                 LambdaExpression lambdaExpression = ConvertFilterExpression(expression, entity.ClrType);
 
-                builder.Entity(entity.ClrType).HasQueryFilter("TenantFilter", lambdaExpression);
-
-                var waterSupplierProperty = entity.ClrType.GetProperty(nameof(TenantModel<TenantBase>.WaterSupplier));
-                if (waterSupplierProperty != null && typeof(TenantBase).IsAssignableFrom(waterSupplierProperty.PropertyType))
-                {
-                    builder.Entity(entity.ClrType)
-                        .HasOne(waterSupplierProperty.PropertyType, nameof(TenantModel<TenantBase>.WaterSupplier))
-                        .WithMany()
-                        .HasForeignKey(nameof(ITenantModel.WaterSupplierId));
-                }
+                builder.Entity(entity.ClrType).HasQueryFilter(lambdaExpression);
             }
         }
 

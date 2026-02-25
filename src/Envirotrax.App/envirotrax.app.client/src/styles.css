@@ -119,3 +119,32 @@ body {
 .form-check-label {
     font-weight: 600;
 }
+
+/* Make ng-select look like Bootstrap form-control */
+.ng-select.form-control {
+    padding: 0;
+    border: none;
+    height: auto;
+}
+
+.ng-select .ng-select-container {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    /* Bootstrap 5 */
+    min-height: 38px;
+    padding: 0.375rem 0.75rem;
+    box-shadow: none;
+}
+
+.ng-select.ng-select-focused .ng-select-container {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.ng-select.ng-select-disabled .ng-select-container {
+    background-color: #e9ecef;
+}
+
+.ng-select .ng-select-container:hover {
+    border-color: #86b7fe;
+}

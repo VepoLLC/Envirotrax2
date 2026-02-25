@@ -55,6 +55,18 @@ export class ProfesisonalService {
         return addedProfessional;
     }
 
+    public async updateMyData(professional: Professional): Promise<Professional> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/my');
+
+        const observable = this._http.put<Professional>(url, professional);
+        const updatedProfessiona = await lastValueFrom(observable);
+
+        this._currentProfessional$ = of(updatedProfessiona);
+        this._professionalUpdated$.next();
+
+        return updatedProfessiona;
+    }
+
     public setLoggedInProfessional(professional: Professional): void {
         this._currentProfessional$ = of(professional);
     }

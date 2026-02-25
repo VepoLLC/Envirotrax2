@@ -48,20 +48,12 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">State</label>
-
-                            <select class="form-select"
-                                    [(ngModel)]="supplier.stateId"
-                                    name="state">
-
-                                <option [ngValue]="null">Select state</option>
-
-                                <option *ngFor="let state of states"
-                                        [ngValue]="state.id">
-                                    {{ state.name }}
-                                </option>
-
-                            </select>
+                            <vp-input [ngModel]="supplier.stateId"
+                                      [options]="states"
+                                      [form]="supplierForm"
+                                      type="select"
+                                      name="stateId"
+                                      label="State" />
                         </div>
 
                         <div class="mb-3">
@@ -161,20 +153,12 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">State</label>
-
-                                <select class="form-select"
-                                        [(ngModel)]="supplier.letterStateId"
-                                        name="lrState">
-
-                                    <option [ngValue]="null">Select state</option>
-
-                                    <option *ngFor="let state of states"
-                                            [ngValue]="state.id">
-                                        {{ state.name }}
-                                    </option>
-
-                                </select>
+                                <vp-input [ngModel]="supplier.letterStateId"
+                                          [options]="states"
+                                          [form]="supplierForm"
+                                          type="select"
+                                          name="stateId"
+                                          label="State" />
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -227,20 +211,12 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">State</label>
-
-                                <select class="form-select"
-                                        [(ngModel)]="supplier.letterContactStateId"
-                                        name="lcState">
-
-                                    <option [ngValue]="null">Select state</option>
-
-                                    <option *ngFor="let state of states"
-                                            [ngValue]="state.id">
-                                        {{ state.name }}
-                                    </option>
-
-                                </select>
+                                <vp-input [ngModel]="supplier.letterContactStateId"
+                                          [options]="states"
+                                          [form]="supplierForm"
+                                          type="select"
+                                          name="stateId"
+                                          label="State" />
                             </div>
 
                             <div class="col-md-6 mb-3">

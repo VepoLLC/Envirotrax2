@@ -1,0 +1,74 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="isLoading" />
+
+    <p class="mb-4">
+        Select the programs you provide for <strong>{{ availableSupplier.name }}</strong>.
+    </p>
+
+    <form #form="ngForm">
+        <div class="row mb-3">
+            <div *ngIf="availableSupplier.hasBackflowTesting" class="col-md-6 mb-3">
+                <div class="form-check">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="chk-bpat"
+                           name="hasBackflowTesting"
+                           [(ngModel)]="registration.hasBackflowTesting" />
+                    <label class="form-check-label" for="chk-bpat">
+                        BPAT (Backflow Prevention Assembly Testing)
+                    </label>
+                </div>
+            </div>
+
+            <div *ngIf="availableSupplier.hasFogInspection" class="col-md-6 mb-3">
+                <div class="form-check">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="chk-fog-inspection"
+                           name="hasFogInspection"
+                           [(ngModel)]="registration.hasFogInspection" />
+                    <label class="form-check-label" for="chk-fog-inspection">
+                        FOG Inspection
+                    </label>
+                </div>
+            </div>
+
+            <div *ngIf="availableSupplier.hasFogTransportation" class="col-md-6 mb-3">
+                <div class="form-check">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="chk-fog-transport"
+                           name="hasFogTransportation"
+                           [(ngModel)]="registration.hasFogTransportation" />
+                    <label class="form-check-label" for="chk-fog-transport">
+                        FOG Transportation
+                    </label>
+                </div>
+            </div>
+
+            <div *ngIf="availableSupplier.hasCsiInspection" class="col-md-6 mb-3">
+                <div class="form-check">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="chk-csi"
+                           name="hasCsiInspection"
+                           [(ngModel)]="registration.hasCsiInspection" />
+                    <label class="form-check-label" for="chk-csi">
+                        CSI (Cross-Connection Survey Inspection)
+                    </label>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <vp-validation-summary [form]="form" [validationErrors]="validationErrors" />
+
+    <div class="d-flex justify-content-center">
+        <button type="button" class="btn btn-primary me-2 w-100" (click)="cancel()">
+            Cancel
+        </button>
+        <button type="button" class="btn btn-primary w-100" (click)="save()">
+            Save
+        </button>
+    </div>
+</div>

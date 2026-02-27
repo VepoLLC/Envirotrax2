@@ -9,6 +9,7 @@ using Envirotrax.Common.Configuration;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Implementations.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 
 namespace Envirotrax.App.Server.Domain.Configuration;
 
@@ -26,9 +27,13 @@ public static class ServiceRegistration
 
         services.AddTransient<IWaterSupplierService, WaterSupplierService>();
         services.AddTransient<IGeneralSettingsService, GeneralSettingsService>();
-        services.AddTransient<IUserService, UserService>();
         services.AddTransient<ISiteService, SiteService>();
         services.AddTransient<ILookupService, LookupService>();
+
+        services.AddTransient<IUserService, UserService>();
+        services.AddTransient<IUserRoleService, UserRoleService>();
+        services.AddTransient<IRolePermissionService, RolePermissionService>();
+        services.AddTransient<IRoleService, RoleService>();
 
         services.AddTransient<IProfessionalService, ProfessionalService>();
         services.AddTransient<IProfessionalUserService, ProfessionalUserService>();

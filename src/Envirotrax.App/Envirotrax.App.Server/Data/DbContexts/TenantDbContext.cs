@@ -12,8 +12,13 @@ namespace Envirotrax.App.Server.Data.DbContexts;
 
 public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
 {
-    public DbSet<WaterSupplierUser> WaterSupplierUsers { get; set; }
     public DbSet<GeneralSettings> GeneralSettings { get; set; }
+
+    public DbSet<WaterSupplierUser> WaterSupplierUsers { get; set; }
+    public DbSet<Permission> Permissions { get; set; }
+    public DbSet<Role> Roles { get; set; }
+    public DbSet<RolePermission> RolePermissions { get; set; }
+    public DbSet<UserRole> UserRoles { get; set; }
 
     public DbSet<Professional> Professionals { get; set; }
     public DbSet<ProfessionalUser> ProfessionalUsers { get; set; }

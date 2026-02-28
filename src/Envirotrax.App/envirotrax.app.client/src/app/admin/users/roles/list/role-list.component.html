@@ -1,0 +1,25 @@
+<div class="text-center">
+    <h1 class="h2">
+        Roles
+    </h1>
+</div>
+
+<vp-section header="Role List">
+    <dp-loading-spinner *ngIf="table.isLoading" />
+
+    <vp-table *ngIf="table.items"
+              [columns]="table.columns!"
+              [data]="table.items.data"
+              [canAdd]="canAdd"
+              (add)="add()"
+              [canEdit]="canEdit"
+              (edit)="edit($event)"
+              [canDelete]="canDelete"
+              (delete)="delete($event)"
+              [(pageInfo)]="table.items.pageInfo"
+              (pageInfoChange)="getRoles()"
+              [(query)]="table.query"
+              (queryChange)="getRoles()"
+              (queryReset)="getRoles()"
+              [freeTextSearch]="table.freeTextSearch" />
+</vp-section>

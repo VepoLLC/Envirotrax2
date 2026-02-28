@@ -5,12 +5,15 @@ import { environment } from "../../../../environments/environment";
 import { FeatureType } from "../../models/feature-tyype";
 import { UrlResolverService } from "../helpers/url-resolver.service";
 import { HttpClient } from "@angular/common/http";
+import { RolePermission } from "../../models/users/role-permission";
+import { PermissionAction, PermissionType } from "../../models/permission-type";
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
     private _isLoggedIn$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    private _myPermissions$?: Observable<RolePermission[]>;
     private _userManager: UserManager;
     private _userAcces$?: Observable<UserAccess>;
 
@@ -146,6 +149,47 @@ export class AuthService {
 
         for (let featureToCheck of featuresToCheck) {
             if (myAccess.features.indexOf(featureToCheck) >= 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private getAllMyPermissions(): Promise<RolePermission[]> {
+        if (!this._myPermissions$) {
+            this._myPermissions$ = this._http
+                .get<RolePermission[]>(`api/users/roles/permissions/my`)
+                .pipe(shareReplay(1));
+        }
+
+        return lastValueFrom(this._myPermissions$);
+    }
+
+    private hasPermission(myPermissions: RolePermission[], action: PermissionAction, type: PermissionType): boolean {
+        let matchingPermission = myPermissions.find(p => p.permission!.id == type);
+
+        if (matchingPermission) {
+            switch (action) {
+                case PermissionAction.CanCreate:
+                    return matchingPermission.canCreate!;
+                case PermissionAction.CanDelete:
+                    return matchingPermission.canDelete!;
+                case PermissionAction.CanEdit:
+                    return matchingPermission.canEdit!;
+                case PermissionAction.CamView:
+                    return matchingPermission.canEdit! || matchingPermission.canView!;
+            }
+        }
+
+        return false;
+    }
+
+    public async hasAnyPermisison(action: PermissionAction, ...types: PermissionType[]): Promise<boolean> {
+        let myPermissions = await this.getAllMyPermissions();
+
+        for (let type of types) {
+            if (this.hasPermission(myPermissions, action, type)) {
                 return true;
             }
         }

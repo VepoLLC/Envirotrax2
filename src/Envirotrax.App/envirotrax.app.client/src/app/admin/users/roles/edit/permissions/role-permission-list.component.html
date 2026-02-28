@@ -1,0 +1,55 @@
+<vp-section header="Permissions">
+    <div class="dp-spinner-parent">
+        <dp-loading-spinner *ngIf="isLoading" />
+
+        <div class="overflow-x">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>Permission</td>
+                        <td>List</td>
+                        <td>Create</td>
+                        <td>Edit</td>
+                        <td>Delete</td>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr *ngFor="let rolePermission of rolePermissions; let i = index">
+                        <td>
+                            {{rolePermission.permission?.name}}
+                        </td>
+                        <td>
+                            <input type="checkbox"
+                                   name="canList{{i}}"
+                                   class="form-check-input"
+                                   [(ngModel)]="rolePermission.canView"
+                                   (ngModelChange)="update(rolePermission)" />
+                        </td>
+                        <td>
+                            <input type="checkbox"
+                                   name="canCreate{{i}}"
+                                   class="form-check-input"
+                                   [(ngModel)]="rolePermission.canCreate"
+                                   (ngModelChange)="update(rolePermission)" />
+                        </td>
+                        <td>
+                            <input type="checkbox"
+                                   name="canEdit{{i}}"
+                                   class="form-check-input"
+                                   [(ngModel)]="rolePermission.canEdit"
+                                   (ngModelChange)="update(rolePermission)" />
+                        </td>
+                        <td>
+                            <input type="checkbox"
+                                   name="canDelete{{i}}"
+                                   class="form-check-input"
+                                   [(ngModel)]="rolePermission.canDelete"
+                                   (ngModelChange)="update(rolePermission)" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</vp-section>

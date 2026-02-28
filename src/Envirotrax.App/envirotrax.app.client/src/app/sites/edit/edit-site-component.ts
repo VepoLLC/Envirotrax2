@@ -9,6 +9,9 @@ import { SiteService } from "../../shared/services/sites/site.service";
 import { HelperService } from "../../shared/services/helpers/helper.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import { UserService } from "../../shared/services/water-suppliers/user.service";
+import { FacilityType } from '../../shared/enums/facility-type.enum';
+import { InputOption } from "../../shared/components/input/input.component";
+import { GreaseTrapType } from '../../shared/enums/grease-trap-type.enum';
 
 @Component({
     selector: 'app-edit-site-component',
@@ -21,38 +24,22 @@ export class EditSiteComponent implements OnInit {
     public validationErrors: string[] = [];
     public site: Site = {
         backflowScheduleMonth: 0,
-        hasGreaseTrap: 0,
+        greaseTrapType: 0,
+        facilityType: FacilityType.Other
     };
 
     public currentSite?: Site = {};
 
     public states: State[] = [];
 
-    public selectedPropertyType = {
-        propertyType: PropertyType.Residential
-    };
 
-    public propertyTypes = [
-        PropertyType.Residential,
-        PropertyType.Commercial
-    ];
-    public PropertyType = PropertyType;
+    public users: any[] = [];
+    public greaseTrapOptions: any[] = [];
 
-
-    monthsnumbers = Array.from({ length: 12 }, (_, i) => i + 1);
-
-    days = Array.from({ length: 31 }, (_, i) => i + 1);
-
-    years = Array.from(
-        { length: 50 },
-        (_, i) => new Date().getFullYear() - i
-    );
-
-
-    months: any[] = [];
-    users: any[] = [];
-    facilityTypes: any[] = [];
-    greaseTrapOptions: any[] = [];
+    public csiUsers: InputOption[] = [];
+    public backflowUsers: InputOption[] = [];
+    public fogUsers: InputOption[] = [];
+    public stateOptions: InputOption[] = [];
 
     constructor(
         private readonly _siteService: SiteService,
@@ -67,7 +54,6 @@ export class EditSiteComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         await this.loadStates();
         await this.getUsers();
-        this.loadDropdowns();
         this._acitvatedRoute.paramMap.subscribe(async params => {
             const siteId = params.get('id');
             if (siteId) {
@@ -77,111 +63,100 @@ export class EditSiteComponent implements OnInit {
         });
     }
 
+    public propertyTypeOptions: InputOption[] = [
+        { id: PropertyType.Residential, text: 'Residential' },
+        { id: PropertyType.Commercial, text: 'Commercial' }
+    ];
 
-    public async save(form: NgForm): Promise<void> {
-        if (form.valid) {
-            try {
-                this.isLoading = true;
-                this.validationErrors = [];
 
-                const result = await this._siteService.update(this.site);
+    public facilityTypes: InputOption[] = [
+        { id: FacilityType.Restaurant, text: "Restaurant" },
+        { id: FacilityType.FastFoodEstablishment, text: "Fast Food Establishment" },
+        { id: FacilityType.HotelMotel, text: "Hotel/Motel" },
+        { id: FacilityType.CarWash, text: "Car Wash" },
+        { id: FacilityType.SchoolUniversity, text: "School/University" },
+        { id: FacilityType.GroceryStore, text: "Grocery Store" },
+        { id: FacilityType.ConvenienceStore, text: "Convenience Store" },
+        { id: FacilityType.AssistedLivingFacility, text: "Assisted Living Facility" },
+        { id: FacilityType.MedicalFacility, text: "Medical Facility" },
+        { id: FacilityType.Industrial, text: "Industrial" },
+        { id: FacilityType.CityOwnedFacility, text: "City Owned Facility" },
+        { id: FacilityType.Other, text: "Other" },
+    ];
 
-                this._router.navigateByUrl('sites');
 
-            } catch (e) {
-                if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
-                    throw e;
-                }
-            } finally {
-                this.isLoading = false;
-            }
-        }
 
+
+   
+
+    public mailingStateChanged(stateId: number): void {
+        this.site.mailingStateId = stateId;
+    }
+
+    public copyFromPropertyAddress(): void {
+        this.site.mailingStreetNumber = this.site.streetNumber;
+        this.site.mailingStreetName = this.site.streetName;
+        this.site.propertyNumber = this.site.propertyNumber;
+        this.site.mailingCity = this.site.city;
+        this.site.mailingStateId = this.site.stateId;
+        this.site.mailingZipCode = this.site.zipCode;
+        this.site.mailingPhoneNumber = this.site.fogGeneratorPhoneNumber;
+        this.site.mailingEmailAddress = this.site.fogGeneratorEmailAddress;
+        this.site.mailingNumber = this.site.propertyNumber;
     }
 
 
-    public cancel(): void {
-        this._router.navigateByUrl('sites');
-    }
-
-    public stateChanged(stateId: number): void {
-        if (stateId) {
-            this.site.stateId = stateId;
-        } else {
-            this.site.stateId = undefined;
-        }
-    }
+    public greaseTrapTypes: InputOption[] = [
+        { id: GreaseTrapType.TrapNotRequired, text: "Trap Not Required" },
+        { id: GreaseTrapType.HasGreaseTrap, text: "Has Grease Trap" },
+        { id: GreaseTrapType.ShouldHaveGreaseTrap, text: "Should Have Grease Trap" },
+        { id: GreaseTrapType.MightHaveGreaseTrap, text: "Might Have Grease Trap" },
+    ];
 
 
-    private async getSite(id: number): Promise<void> {
-        try {
-            this.isLoading = true;
-            const apiSite = await this._siteService.get(id);
-
-            this.site = {
-                ...apiSite,
-            };
-
-        } finally {
-            this.isLoading = false;
-        }
-    }
-
-    private async loadStates(): Promise<void> {
-        this.states = await this._stateService.getAllStates();
-    }
-
-
-    loadDropdowns(): void {
-
-        this.months = [
-            { value: 1, text: 'January' },
-            { value: 2, text: 'February' },
-            { value: 3, text: 'March' },
-            { value: 4, text: 'April' },
-            { value: 5, text: 'May' },
-            { value: 6, text: 'June' },
-            { value: 7, text: 'July' },
-            { value: 8, text: 'August' },
-            { value: 9, text: 'September' },
-            { value: 10, text: 'October' },
-            { value: 11, text: 'November' },
-            { value: 12, text: 'December' }
-        ];
-
-        this.facilityTypes = [
-            { id: 'Restaurant', name: 'Restaurant' },
-            { id: 'Fast Food Establishment', name: 'Fast Food Establishment' },
-            { id: 'Hotel/Motel', name: 'Hotel/Motel' },
-            { id: 'Car Wash', name: 'Car Wash' },
-            { id: 'School/University', name: 'School/University' },
-            { id: 'Grocery Store', name: 'Grocery Store' },
-            { id: 'Convenience Store', name: 'Convenience Store' },
-            { id: 'Assisted Living Facility', name: 'Assisted Living Facility' },
-            { id: 'Medical Facility', name: 'Medical Facility' },
-            { id: 'Industrial', name: 'Industrial' },
-            { id: 'City Owned Facility', name: 'City Owned Facility' }
-        ];
-
-        this.greaseTrapOptions = [
-            { id: 0, name: 'Trap Not Required' },
-            { id: 1, name: 'Has Grease Trap' },
-            { id: 2, name: 'Should Have Grease Trap' },
-            { id: 3, name: 'Might Have Grease Trap' }
-        ];
-
-    }
+    public backflowScheduleMonths: InputOption[] = [
+        { id: 1, text: 'January' },
+        { id: 2, text: 'February' },
+        { id: 3, text: 'March' },
+        { id: 4, text: 'April' },
+        { id: 5, text: 'May' },
+        { id: 6, text: 'June' },
+        { id: 7, text: 'July' },
+        { id: 8, text: 'August' },
+        { id: 9, text: 'September' },
+        { id: 10, text: 'October' },
+        { id: 11, text: 'November' },
+        { id: 12, text: 'December' }
+    ];
 
     async getUsers() {
         const pageInfo: PageInfo = {
             pageNumber: 1,
             pageSize: 999999
         };
-
         const query: any = {};
         const result = await this._userService.getAll(pageInfo, query);
         this.users = result.data;
+
+        this.csiUsers = [
+            { id: null, text: 'Unassigned' },
+            ...this.users.map(user => ({ id: user.id, text: user.emailAddress }))
+        ];
+
+
+        this.backflowUsers = [
+            { id: null, text: 'Unassigned' },
+            ...this.users.map(user => ({ id: user.id, text: user.emailAddress }))
+        ];
+
+
+        this.fogUsers = [
+            { id: null, text: 'Unassigned' },
+            ...this.users.map(user => ({ id: user.id, text: user.emailAddress }))
+        ];
     }
+
+
 
 
     public async updateFacilityType(form: NgForm) {
@@ -190,9 +165,11 @@ export class EditSiteComponent implements OnInit {
                 this.isLoading = true;
                 this.validationErrors = [];
 
+                console.log(this.site.facilityType);
+
                 if (this.currentSite) {
                     this.currentSite.facilityType = this.site.facilityType;
-                    this.currentSite.hasGreaseTrap = this.site.hasGreaseTrap;
+                    this.currentSite.greaseTrapType = this.site.greaseTrapType;
                     this.currentSite.hasKnownBackflowAssemblies = this.site.hasKnownBackflowAssemblies;
                     this.currentSite.hasOnSiteSewageFacility = this.site.hasOnSiteSewageFacility;
                     this.currentSite.hasAuxWaterSupply = this.site.hasAuxWaterSupply;
@@ -205,8 +182,6 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.requiresDomesticPremisesIsolation = this.site.requiresDomesticPremisesIsolation;
 
                     const result = await this._siteService.update(this.currentSite);
-
-                    this._router.navigateByUrl('sites');
                 }
 
             } catch (e) {
@@ -220,7 +195,7 @@ export class EditSiteComponent implements OnInit {
     }
 
 
-    async updateSiteSettings(form: NgForm): Promise<void> {
+    public async updateSiteSettings(form: NgForm): Promise<void> {
         if (form.valid) {
             try {
                 this.isLoading = true;
@@ -238,14 +213,13 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.needsCsiInspection = this.site.needsCsiInspection;
                     this.currentSite.needsFogInspection = this.site.needsFogInspection;
                     this.currentSite.needsFogPermit = this.site.needsFogPermit;
-                    this.currentSite.csiAccountAssignment = this.site.csiAccountAssignment;
-                    this.currentSite.backflowAccountAssignment = this.site.backflowAccountAssignment;
-                    this.currentSite.fogAccountAssignment = this.site.fogAccountAssignment;
+                    this.currentSite.csiAccountAssignmentId = this.site.csiAccountAssignmentId;
+                    this.currentSite.backflowAccountAssignmentId = this.site.backflowAccountAssignmentId;
+                    this.currentSite.fogAccountAssignmentId = this.site.fogAccountAssignmentId;
 
 
                     const result = await this._siteService.update(this.currentSite);
 
-                    this._router.navigateByUrl('sites');
                 }
 
 
@@ -258,4 +232,91 @@ export class EditSiteComponent implements OnInit {
             }
         }
     }
+
+    public async updateLocation(form: NgForm): Promise<void> {
+        if (form.valid) {
+            try {
+                this.isLoading = true;
+                this.validationErrors = [];
+                if (this.currentSite) {
+                    this.currentSite.id = this.site.id;
+                    this.currentSite.accountNumber = this.site.accountNumber;
+                    this.currentSite.propertyType = this.site.propertyType;
+                    this.currentSite.businessName = this.site.businessName;
+                    this.currentSite.streetNumber = this.site.streetNumber;
+                    this.currentSite.streetName = this.site.streetName;
+                    this.currentSite.propertyNumber = this.site.propertyNumber;
+                    this.currentSite.city = this.site.city;
+                    this.currentSite.stateId = this.site.stateId;
+                    this.currentSite.zipCode = this.site.zipCode;
+                    this.currentSite.fogGeneratorPhoneNumber = this.site.fogGeneratorPhoneNumber;
+                    this.currentSite.fogGeneratorEmailAddress = this.site.fogGeneratorEmailAddress;
+                    const result = await this._siteService.update(this.currentSite);
+                }
+            } catch (e) {
+                if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
+                    throw e;
+                }
+            } finally {
+                this.isLoading = false;
+            }
+        }
+    }
+
+
+    public async updateMailingInformation(form: NgForm): Promise<void> {
+        if (form.valid) {
+            try {
+                this.isLoading = true;
+                this.validationErrors = [];
+                if (this.currentSite) {
+                    this.currentSite.id = this.site.id;
+                    this.currentSite.mailingCompanyName = this.site.mailingCompanyName;
+                    this.currentSite.mailingContactName = this.site.mailingContactName;
+                    this.currentSite.mailingStreetNumber = this.site.mailingStreetNumber;
+                    this.currentSite.mailingStreetName = this.site.mailingStreetName;
+                    this.currentSite.propertyNumber = this.site.propertyNumber;
+                    this.currentSite.mailingCity = this.site.mailingCity;
+                    this.currentSite.mailingStateId = this.site.mailingStateId;
+                    this.currentSite.mailingZipCode = this.site.mailingZipCode;
+                    this.currentSite.mailingPhoneNumber = this.site.mailingPhoneNumber;
+                    this.currentSite.mailingEmailAddress = this.site.mailingEmailAddress;
+                    const result = await this._siteService.update(this.currentSite);
+                }
+            } catch (e) {
+                if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
+                    throw e;
+                }
+            } finally {
+                this.isLoading = false;
+            }
+        }
+    }
+
+    private async getSite(id: number): Promise<void> {
+        try {
+            this.isLoading = true;
+            const apiSite = await this._siteService.get(id);
+
+            this.site = {
+                ...apiSite,
+            };
+
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+
+
+    private async loadStates(): Promise<void> {
+        this.states = await this._stateService.getAllStates();
+        this.stateOptions = [
+            { id: '', text: '' },
+            ...this.states.map(state => ({ id: state.id, text: state.name }))
+        ];
+    }
+
 }
+
+

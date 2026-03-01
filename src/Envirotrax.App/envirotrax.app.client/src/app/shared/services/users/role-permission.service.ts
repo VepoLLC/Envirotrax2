@@ -36,4 +36,11 @@ export class RolePermissionService {
 
         return lastValueFrom(observable);
     }
+
+    public bulkUpdate(roleId: number, rolePermissions: RolePermission[]): Promise<RolePermission[]> {
+        const url = this._urlResolver.resolveUrl(`/api/users/roles/${roleId}/permissions/bulk-update`);
+        const observable = this._httpClient.put<RolePermission[]>(url, rolePermissions);
+
+        return lastValueFrom(observable);
+    }
 }

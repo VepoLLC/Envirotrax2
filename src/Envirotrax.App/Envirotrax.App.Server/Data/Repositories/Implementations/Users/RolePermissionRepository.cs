@@ -60,6 +60,36 @@ public class RolePermissionRepository : IRolePermissionRepository
         return dbRecord;
     }
 
+    public async Task<IEnumerable<RolePermission>> BulkUpdateAsync(IEnumerable<RolePermission> rolePermissions)
+    {
+        foreach (var rolePermission in rolePermissions)
+        {
+            var dbRecord = await _dbContext
+                .RolePermissions
+                .SingleOrDefaultAsync(p => p.RoleId == rolePermission.RoleId && p.PermissionId == rolePermission.PermissionId);
+
+            if (dbRecord == null)
+            {
+                dbRecord = new()
+                {
+                    RoleId = rolePermission.RoleId,
+                    PermissionId = rolePermission.PermissionId
+                };
+
+                _dbContext.RolePermissions.Add(dbRecord);
+            }
+
+            dbRecord.CanView = rolePermission.CanView;
+            dbRecord.CanCreate = rolePermission.CanCreate;
+            dbRecord.CanEdit = rolePermission.CanEdit;
+            dbRecord.CanDelete = rolePermission.CanDelete;
+        }
+
+        await _dbContext.SaveChangesAsync();
+
+        return rolePermissions;
+    }
+
     public async Task<IEnumerable<RolePermission>> GetAllByUserAsync(int supplierId, int userId)
     {
         var rolePermissionQuery = from rolePermission in _dbContext.RolePermissions.IgnoreQueryFilters()

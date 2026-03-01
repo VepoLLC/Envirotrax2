@@ -9,7 +9,7 @@
         </div>
     </div>
 
-    <input *ngIf="type != 'textarea' && type != 'select' && type != 'date' && type != 'datetime' && type != 'daterange'"
+    <input *ngIf="type != 'textarea' && type != 'select' && type != 'multi-select' && type != 'date' && type != 'datetime' && type != 'daterange'"
            [attr.id]="id"
            [attr.name]="name"
            [attr.type]="decimals != null ? 'text' : type"
@@ -70,7 +70,7 @@
            [attr.max]="max"
            [placeholder]="placeholder"
            (blur)="onTouched($event)" />
-    <ng-select *ngIf="type == 'select'"
+    <ng-select *ngIf="type == 'select' || type == 'multi-select'"
                [attr.id]="id"
                [attr.name]="name"
                class="form-control"
@@ -78,6 +78,7 @@
                [disabled]="disabled || readonly"
                [(ngModel)]="value"
                [items]="options"
+               [multiple]="type == 'multi-select'"
                (change)="onChanged()"
                (blur)="onTouched($event)"
                [attr.value]="value"

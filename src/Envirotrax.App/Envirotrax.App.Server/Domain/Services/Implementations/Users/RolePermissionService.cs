@@ -54,5 +54,14 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Users
 
             return _mapper.Map<RolePermission, RolePermissionDto>(result);
         }
+
+        public async Task<IEnumerable<RolePermissionDto>> BulkUpdateAsync(IEnumerable<RolePermissionDto> rolePermissions)
+        {
+            var modelList = _mapper.Map<IEnumerable<RolePermissionDto>, IEnumerable<RolePermission>>(rolePermissions);
+
+            var updatedList = await _rolePermissionRepository.BulkUpdateAsync(modelList);
+
+            return _mapper.Map<IEnumerable<RolePermission>, IEnumerable<RolePermissionDto>>(updatedList);
+        }
     }
 }

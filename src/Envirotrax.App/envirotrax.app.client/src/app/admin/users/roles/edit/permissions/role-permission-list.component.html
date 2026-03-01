@@ -2,15 +2,67 @@
     <div class="dp-spinner-parent">
         <dp-loading-spinner *ngIf="isLoading" />
 
+        <p>
+            To toggle all permissions for a given column, please turn the switch below the column header on or off.
+        </p>
+
         <div class="overflow-x">
             <table class="table">
                 <thead>
                     <tr>
                         <td>Permission</td>
-                        <td>View</td>
-                        <td>Create</td>
-                        <td>Edit</td>
-                        <td>Delete</td>
+                        <td>
+                            View
+
+                            <div class="form-switch">
+                                <input id="select-all-view"
+                                       type="checkbox"
+                                       name="selectAllView"
+                                       class="form-check-input"
+                                       switch
+                                       [(ngModel)]="allView"
+                                       (ngModelChange)="toggleAllView($event)" />
+                            </div>
+                        </td>
+                        <td>
+                            Create
+
+                            <div class="form-switch">
+                                <input id="select-all-create"
+                                       type="checkbox"
+                                       name="selectAllCreate"
+                                       class="form-check-input"
+                                       switch
+                                       [(ngModel)]="allCreate"
+                                       (ngModelChange)="toggleAllCreate($event)" />
+                            </div>
+                        </td>
+                        <td>
+                            Edit
+
+                            <div class="form-switch">
+                                <input id="select-all-edit"
+                                       type="checkbox"
+                                       name="selectAllEdit"
+                                       class="form-check-input"
+                                       switch
+                                       [(ngModel)]="allEdit"
+                                       (ngModelChange)="toggleAllEdit($event)" />
+                            </div>
+                        </td>
+                        <td>
+                            Delete
+
+                            <div class="form-switch">
+                                <input id="select-all-delete"
+                                       type="checkbox"
+                                       name="selectAllDelete"
+                                       class="form-check-input"
+                                       switch
+                                       [(ngModel)]="allDelete"
+                                       (ngModelChange)="toggleAllDelete($event)" />
+                            </div>
+                        </td>
                     </tr>
                 </thead>
 

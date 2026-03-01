@@ -48,5 +48,18 @@ namespace Envirotrax.App.Server.Controllers.Users
 
             return Ok(updated);
         }
+
+        [HttpPut("{roleId}/permissions/bulk-update")]
+        public async Task<IActionResult> BulkUpdateAsync(int roleId, IEnumerable<RolePermissionDto> rolePermissions)
+        {
+            if (!rolePermissions.All(r => r.Role?.Id == roleId))
+            {
+                return BadRequest();
+            }
+
+            var updated = await _rolePermissionService.BulkUpdateAsync(rolePermissions);
+
+            return Ok(updated);
+        }
     }
 }

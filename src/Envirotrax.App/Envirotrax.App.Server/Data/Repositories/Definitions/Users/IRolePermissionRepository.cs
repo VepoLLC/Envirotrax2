@@ -11,5 +11,7 @@ public interface IRolePermissionRepository
 
     Task<RolePermission> AddOrUpdateAsync(RolePermission rolePermission);
 
+    Task<IEnumerable<RolePermission>> BulkUpdateAsync(IEnumerable<RolePermission> rolePermissions);
+
     Task<IEnumerable<RolePermission>> GetAllByUserAsync(int supplierId, int userId);
 }

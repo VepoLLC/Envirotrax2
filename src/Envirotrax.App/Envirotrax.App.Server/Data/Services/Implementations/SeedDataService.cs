@@ -31,8 +31,10 @@ public class SeedDataService : IHostedService
             dbContext.SkipSaveSecurityProperties = true;
 
             await AddTenantsAsync(dbContext);
-            await AddUsersAsync(dbContext);
             await AddStatesAsync(dbContext);
+
+            await AddUsersAsync(dbContext);
+            await AddPermissionsAsync(dbContext);
         }
     }
 
@@ -78,6 +80,15 @@ public class SeedDataService : IHostedService
         if (!await dbContext.States.AnyAsync())
         {
             dbContext.States.AddRange(StateSeedData.States);
+            await dbContext.SaveChangesAsync();
+        }
+    }
+
+    private async Task AddPermissionsAsync(TenantDbContext dbContext)
+    {
+        if (!await dbContext.Permissions.AnyAsync())
+        {
+            dbContext.Permissions.AddRange(PermissionSeedData.Permissions);
             await dbContext.SaveChangesAsync();
         }
     }

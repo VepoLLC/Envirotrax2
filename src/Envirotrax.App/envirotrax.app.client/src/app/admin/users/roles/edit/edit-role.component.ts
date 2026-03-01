@@ -54,6 +54,8 @@ export class EditRoleComponent implements OnInit {
                 if (!this._helper.parseValidationErrors(error, this.validationErrors)) {
                     throw error;
                 }
+            } finally {
+                this.isLoading = false;
             }
         }
     }

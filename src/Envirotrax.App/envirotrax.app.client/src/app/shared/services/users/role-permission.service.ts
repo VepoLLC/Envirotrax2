@@ -5,7 +5,9 @@ import { UrlResolverService } from "../helpers/url-resolver.service";
 import { Permission } from "../../models/users/permission";
 import { RolePermission } from "../../models/users/role-permission";
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class RolePermissionService {
     constructor(
         private readonly _urlResolver: UrlResolverService,

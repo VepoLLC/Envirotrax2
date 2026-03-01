@@ -7,7 +7,7 @@
                 <thead>
                     <tr>
                         <td>Permission</td>
-                        <td>List</td>
+                        <td>View</td>
                         <td>Create</td>
                         <td>Edit</td>
                         <td>Delete</td>
@@ -15,39 +15,60 @@
                 </thead>
 
                 <tbody>
-                    <tr *ngFor="let rolePermission of rolePermissions; let i = index">
-                        <td>
-                            {{rolePermission.permission?.name}}
-                        </td>
-                        <td>
-                            <input type="checkbox"
-                                   name="canList{{i}}"
-                                   class="form-check-input"
-                                   [(ngModel)]="rolePermission.canView"
-                                   (ngModelChange)="update(rolePermission)" />
-                        </td>
-                        <td>
-                            <input type="checkbox"
-                                   name="canCreate{{i}}"
-                                   class="form-check-input"
-                                   [(ngModel)]="rolePermission.canCreate"
-                                   (ngModelChange)="update(rolePermission)" />
-                        </td>
-                        <td>
-                            <input type="checkbox"
-                                   name="canEdit{{i}}"
-                                   class="form-check-input"
-                                   [(ngModel)]="rolePermission.canEdit"
-                                   (ngModelChange)="update(rolePermission)" />
-                        </td>
-                        <td>
-                            <input type="checkbox"
-                                   name="canDelete{{i}}"
-                                   class="form-check-input"
-                                   [(ngModel)]="rolePermission.canDelete"
-                                   (ngModelChange)="update(rolePermission)" />
-                        </td>
-                    </tr>
+                    <ng-container *ngFor="let group of rolePermissions; let gi = index">
+                        <tr class="table-info">
+                            <td colspan="5"><strong>{{group.category}}</strong></td>
+                        </tr>
+                        <tr *ngFor="let rolePermission of group.permissions; let i = index">
+                            <td>
+                                {{rolePermission.permission?.name}}
+                            </td>
+                            <td>
+                                <div class="form-switch">
+                                    <input *ngIf="rolePermission.permission?.canView"
+                                           type="checkbox"
+                                           name="canView{{gi}}_{{i}}"
+                                           class="form-check-input"
+                                           [(ngModel)]="rolePermission.canView"
+                                           (ngModelChange)="update(rolePermission)"
+                                           switch />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-switch">
+                                    <input *ngIf="rolePermission.permission?.canCreate"
+                                           type="checkbox"
+                                           name="canCreate{{gi}}_{{i}}"
+                                           class="form-check-input"
+                                           [(ngModel)]="rolePermission.canCreate"
+                                           (ngModelChange)="update(rolePermission)"
+                                           switch />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-switch">
+                                    <input *ngIf="rolePermission.permission?.canEdit"
+                                           type="checkbox"
+                                           name="canEdit{{gi}}_{{i}}"
+                                           class="form-check-input"
+                                           [(ngModel)]="rolePermission.canEdit"
+                                           (ngModelChange)="update(rolePermission)"
+                                           switch />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-switch">
+                                    <input *ngIf="rolePermission.permission?.canDelete"
+                                           type="checkbox"
+                                           name="canDelete{{gi}}_{{i}}"
+                                           class="form-check-input"
+                                           [(ngModel)]="rolePermission.canDelete"
+                                           (ngModelChange)="update(rolePermission)"
+                                           switch />
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-container>
                 </tbody>
             </table>
         </div>

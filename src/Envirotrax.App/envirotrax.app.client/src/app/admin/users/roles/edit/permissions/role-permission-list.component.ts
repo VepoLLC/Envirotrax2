@@ -3,13 +3,13 @@ import { RolePermission } from "../../../../../shared/models/users/role-permissi
 import { RolePermissionService } from "../../../../../shared/services/users/role-permission.service";
 
 @Component({
-    selector: 'dp-role-permission-list',
+    selector: 'vp-role-permission-list',
     templateUrl: './role-permission-list.component.html',
     standalone: false
 })
 export class RolePermissionListComponent implements OnInit {
     public isLoading: boolean = false;
-    public rolePermissions: RolePermission[] = [];
+    public rolePermissions: RolePermissionVm[] = [];
 
     @Input()
     public roleId!: number;
@@ -31,14 +31,24 @@ export class RolePermissionListComponent implements OnInit {
             const permissions = await this._permissionService.getAllPermissions();
             const rolePermissions = await this._permissionService.getAll(this.roleId);
 
-            for (let permission of permissions) {
+            const groups = new Map<string, RolePermissionVm>();
+
+            for (const permission of permissions) {
                 const rolePermission = rolePermissions.find(p => p.permission?.id == permission.id) ?? {
                     role: { id: this.roleId },
                     permission: permission
                 };
 
-                this.rolePermissions.push(rolePermission)
+                const category = permission.category ?? 'Other';
+
+                if (!groups.has(category)) {
+                    groups.set(category, { category, permissions: [] });
+                }
+
+                groups.get(category)!.permissions.push(rolePermission);
             }
+
+            this.rolePermissions = Array.from(groups.values());
         } finally {
             this.isLoading = false;
         }
@@ -53,4 +63,9 @@ export class RolePermissionListComponent implements OnInit {
             this.isLoading = false;
         }
     }
+}
+
+interface RolePermissionVm {
+    category: string;
+    permissions: RolePermission[];
 }

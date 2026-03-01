@@ -8,7 +8,9 @@ import { Role } from "../../models/users/role";
 import { lastValueFrom } from "rxjs";
 import { Query } from "../../models/query";
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class RoleService {
     constructor(
         private readonly _urlResolver: UrlResolverService,

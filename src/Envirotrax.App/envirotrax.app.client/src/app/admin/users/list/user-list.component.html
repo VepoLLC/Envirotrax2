@@ -1,4 +1,10 @@
-<div>
+<div class="text-center mb-3">
+    <h1 class="h2">
+        User Management
+    </h1>
+</div>
+
+<vp-section header="User Accounts">
     <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
 
     <vp-table *ngIf="table.items"
@@ -16,4 +22,4 @@
               (queryChange)="getUsers()"
               (queryReset)="getUsers()"
               [freeTextSearch]="table.freeTextSearch" />
-</div>
+</vp-section>

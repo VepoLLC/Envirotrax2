@@ -148,3 +148,7 @@ body {
 .ng-select .ng-select-container:hover {
     border-color: #86b7fe;
 }
+
+.form-check-input {
+    border-color: #b9b9b9;
+}

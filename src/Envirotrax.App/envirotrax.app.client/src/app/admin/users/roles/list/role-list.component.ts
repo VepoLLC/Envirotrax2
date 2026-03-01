@@ -28,9 +28,9 @@ export class RoleListComponent implements OnInit {
         }
     };
 
-    public canAdd: boolean = false;
-    public canEdit: boolean = false;
-    public canDelete: boolean = false;
+    public canAdd: boolean = true;
+    public canEdit: boolean = true;
+    public canDelete: boolean = true;
 
     constructor(
         private readonly _roleService: RoleService,

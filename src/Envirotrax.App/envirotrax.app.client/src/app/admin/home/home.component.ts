@@ -41,6 +41,13 @@ export class HomeComponent implements OnInit {
                 hasPermission: true,
                 description: 'Manage users of your system.'
             },
+            {
+                title: 'Roles',
+                iconCss: 'fa-solid fa-sitemap',
+                routerLink: ['users/roles'],
+                hasPermission: true,
+                description: 'Create and assign roles to control permissions and access.'
+            }
         ];
     }
 

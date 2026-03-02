@@ -1,4 +1,4 @@
-import { Component, Input, Optional, Output } from "@angular/core";
+import { Component, Input, OnInit, Optional } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { FilterPanelComponent } from "./filter-panel.component";
 import { InputOption } from "../../../input/input.component";
@@ -8,7 +8,7 @@ import { InputOption } from "../../../input/input.component";
     templateUrl: './filter-panel-field.component.html',
     standalone: false
 })
-export class FilterPanelFieldComponent {
+export class FilterPanelFieldComponent implements OnInit {
     @Input()
     public fieldName: string = null!;
 
@@ -29,6 +29,12 @@ export class FilterPanelFieldComponent {
 
     constructor(@Optional() private readonly _parent: FilterPanelComponent) {
 
+    }
+
+    public ngOnInit(): void {
+        if (this.type === 'select' && this.value === undefined) {
+            this.value = '';
+        }
     }
 
     public onChange() {

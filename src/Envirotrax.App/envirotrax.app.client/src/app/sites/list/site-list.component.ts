@@ -48,6 +48,26 @@ export class SiteListComponent implements OnInit {
         { id: "Other", text: "Other" }
     ];
 
+    public yesNoOptions: InputOption[] = [
+        { id: "", text: "Any Value" },
+        { id: "true", text: "Yes" },
+        { id: "false", text: "No" }
+    ];
+
+    public greaseTrapoptions: InputOption[] = [
+        { id: "", text: "Any Value" },
+        { id: "0", text: "Trap Not Required" },
+        { id: "1", text: "Has Grease Trap" },
+        { id: "2", text: "Should Have Grease Trap" },
+        { id: "3", text: "Might Have Grease Trap" }
+    ];
+
+    public propertyTypes: InputOption[] = [
+        { id: "", text: "Any Value" },
+        { id: "0", text: "Residential" },
+        { id: "1", text: "Commercial" }
+    ];
+
     constructor(
         private readonly _siteService: SiteService,
         private readonly _router: Router,

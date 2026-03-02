@@ -82,7 +82,9 @@
                (blur)="onTouched($event)"
                [attr.value]="value"
                bindLabel="text"
-               bindValue="id">
+               bindValue="id"
+               [clearable]="false"
+               [searchable]="false">
     </ng-select>
 
     <div>

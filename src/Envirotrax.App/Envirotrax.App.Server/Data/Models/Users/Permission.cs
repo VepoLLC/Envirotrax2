@@ -1,5 +1,6 @@
 
 using System.ComponentModel.DataAnnotations;
+using Envirotrax.Common;
 using Envirotrax.Common.Data.Attributes;
 
 namespace Envirotrax.App.Server.Data.Models.Users;

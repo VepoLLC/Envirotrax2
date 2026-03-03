@@ -1,4 +1,5 @@
 using Envirotrax.App.Server.Data.Models.Users;
+using Envirotrax.Common;
 
 namespace Envirotrax.App.Server.Data.SeedData;
 

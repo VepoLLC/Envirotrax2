@@ -1,5 +1,5 @@
 
-namespace Envirotrax.App.Server;
+namespace Envirotrax.Common;
 
 public enum PermissionType
 {

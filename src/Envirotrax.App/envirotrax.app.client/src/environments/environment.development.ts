@@ -1,5 +1,5 @@
 export const environment = {
-    authUrl: 'https://envirotrax2-auth-dev-hehbcjhvbvfvg2dy.centralus-01.azurewebsites.net',
+    authUrl: 'https://localhost:7098',
     apiUrl: '',
     production: false,
 };

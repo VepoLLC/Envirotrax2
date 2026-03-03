@@ -1,10 +1,13 @@
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions.Users;
+using Envirotrax.App.Server.Filters;
+using Envirotrax.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers.Users
 {
     [Route("api/users/{userId}/roles")]
+    [PermissionResource(PermissionType.Users)]
     public class UserRoleController : ProtectedController
     {
         private readonly IUserRoleService _userRoleService;

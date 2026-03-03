@@ -177,7 +177,7 @@ export class AuthService {
                     return matchingPermission.canDelete!;
                 case PermissionAction.CanEdit:
                     return matchingPermission.canEdit!;
-                case PermissionAction.CamView:
+                case PermissionAction.CanView:
                     return matchingPermission.canEdit! || matchingPermission.canView!;
             }
         }

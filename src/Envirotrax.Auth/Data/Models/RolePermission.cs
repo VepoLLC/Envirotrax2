@@ -1,20 +1,18 @@
 
-using Envirotrax.App.Server.Data.Models.WaterSuppliers;
-using Envirotrax.Common;
 using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
 
-namespace Envirotrax.App.Server.Data.Models.Users;
+namespace Envirotrax.Auth.Data.Models;
 
+[ReadOnlyModel]
+[ExcludedModel]
 public class RolePermission : TenantModel<WaterSupplier>
 {
     [AppPrimaryKey(false)]
     public int RoleId { get; set; }
-    public Role? Role { get; set; }
 
     [AppPrimaryKey(false)]
-    public PermissionType PermissionId { get; set; }
-    public Permission? Permission { get; set; }
+    public int PermissionId { get; set; }
 
     public bool CanView { get; set; }
     public bool CanCreate { get; set; }

@@ -1,5 +1,6 @@
 
 using System.ComponentModel.DataAnnotations;
+using Envirotrax.Common;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 

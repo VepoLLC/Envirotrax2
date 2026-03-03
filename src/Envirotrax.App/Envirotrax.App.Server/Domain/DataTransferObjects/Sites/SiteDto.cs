@@ -92,7 +92,7 @@ public class SiteDto : IDto
     public bool HasAuxWaterSupply { get; set; }
     public bool HasFireSystem { get; set; }
     public bool FireSeparateWater { get; set; }
-    public int HasGreaseTrap { get; set; }
+    public GreaseTrapType GreaseTrapType { get; set; }
     public bool HasGritTrap { get; set; }
     public bool HasReclaimed { get; set; }
     public bool HasIrrigation { get; set; }
@@ -102,8 +102,7 @@ public class SiteDto : IDto
     public bool InvalidMailingAddress { get; set; }
     public bool OutOfArea { get; set; }
 
-    [StringLength(50)]
-    public string? FacilityType { get; set; }
+    public FacilityType FacilityType { get; set; }
 
     public int BackflowScheduleMonth { get; set; }
     public double? GisLatitude { get; set; }
@@ -135,17 +134,10 @@ public class SiteDto : IDto
 
     public bool CustomBooleanData1 { get; set; }
 
-    [StringLength(50)]
-    public string? UserAccountAssignment { get; set; }
-
-    [StringLength(50)]
-    public string? CsiAccountAssignment { get; set; }
-
-    [StringLength(50)]
-    public string? BackflowAccountAssignment { get; set; }
-
-    [StringLength(50)]
-    public string? FogAccountAssignment { get; set; }
+    public int? UserAccountAssignmentId { get; set; }
+    public int? CsiAccountAssignmentId { get; set; }
+    public int? BackflowAccountAssignmentId { get; set; }
+    public int? FogAccountAssignmentId { get; set; }
 
     public bool NeedsRenewalCheck { get; set; }
     public bool Active { get; set; }

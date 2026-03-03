@@ -1,4 +1,5 @@
 import { FacilityType } from "../../enums/facility-type.enum";
+import { GreaseTrapType } from "../../enums/grease-trap-type.enum";
 import { PropertyType } from "../../enums/property-type.enum";
 
 export interface Site {

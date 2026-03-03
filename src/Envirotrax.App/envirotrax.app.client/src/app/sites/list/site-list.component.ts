@@ -36,18 +36,18 @@ export class SiteListComponent implements OnInit {
 
     public facilityTypes: InputOption[] = [
         { id: "", text: "Any Value" },
-        { id: "Restaurant", text: "Restaurant" },
-        { id: "Fast Food Establishment", text: "Fast Food Establishment" },
-        { id: "Hotel/Motel", text: "Hotel/Motel" },
-        { id: "Car Wash", text: "Car Wash" },
-        { id: "School/University", text: "School/University" },
-        { id: "Grocery Store", text: "Grocery Store" },
-        { id: "Convenience Store", text: "Convenience Store" },
-        { id: "Assisted Living Facility", text: "Assisted Living Facility" },
-        { id: "Medical Facility", text: "Medical Facility" },
-        { id: "Industrial", text: "Industrial" },
-        { id: "City Owned Facility", text: "City Owned Facility" },
-        { id: "Other", text: "Other" }
+        { id: "0", text: "Other" },
+        { id: "1", text: "Restaurant" },
+        { id: "2", text: "Fast Food Establishment" },
+        { id: "3", text: "Hotel/Motel" },
+        { id: "4", text: "Car Wash" },
+        { id: "5", text: "School/University" },
+        { id: "6", text: "Grocery Store" },
+        { id: "7", text: "Convenience Store" },
+        { id: "8", text: "Assisted Living Facility" },
+        { id: "9", text: "Medical Facility" },
+        { id: "10", text: "Industrial" },
+        { id: "11", text: "City Owned Facility" }
     ];
 
     public yesNoOptions: InputOption[] = [

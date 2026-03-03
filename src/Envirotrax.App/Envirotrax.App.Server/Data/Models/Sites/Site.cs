@@ -118,7 +118,7 @@ public class Site : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 
     public bool FireSeparateWater { get; set; }
 
-    public int HasGreaseTrap { get; set; }
+    public GreaseTrapType GreaseTrapType { get; set; }    
 
     public bool HasGritTrap { get; set; }
 
@@ -136,8 +136,7 @@ public class Site : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 
     public bool OutOfArea { get; set; }
 
-    [StringLength(50)]
-    public string? FacilityType { get; set; }
+    public FacilityType FacilityType { get; set; }
 
     public byte[]? FacilityMap { get; set; }
 
@@ -187,17 +186,25 @@ public class Site : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 
     public bool CustomBooleanData1 { get; set; }
 
-    [StringLength(50)]
-    public string? UserAccountAssignment { get; set; }
+    /// <summary>
+    /// Water supplier user id.
+    /// </summary>
+    public int? UserAccountAssignmentId { get; set; }
 
-    [StringLength(50)]
-    public string? CsiAccountAssignment { get; set; }
+    /// <summary>
+    /// Water supplier user id.
+    /// </summary>
+    public int? CsiAccountAssignmentId { get; set; }
 
-    [StringLength(50)]
-    public string? BackflowAccountAssignment { get; set; }
+    /// <summary>
+    /// Water supplier user id.
+    /// </summary>
+    public int? BackflowAccountAssignmentId { get; set; }
 
-    [StringLength(50)]
-    public string? FogAccountAssignment { get; set; }
+    /// <summary>
+    /// Water supplier user id.
+    /// </summary>
+    public int? FogAccountAssignmentId { get; set; }
 
     public bool NeedsRenewalCheck { get; set; }
 
@@ -206,6 +213,8 @@ public class Site : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public DateTime? BackflowAccountAssignmentDate { get; set; }
 
     public DateTime? FogAccountAssignmentDate { get; set; }
+
+    public bool Active { get;set; }
 
     // Audit properties
     public int? CreatedById { get; set; }

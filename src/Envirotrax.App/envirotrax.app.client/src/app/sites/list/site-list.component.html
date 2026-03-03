@@ -3,6 +3,18 @@
 </h1>
 
 <div [hidden]="showResults">
+
+    <div class="d-flex justify-content-center  mb-3">
+        <button type="button"
+                class="btn btn-primary"
+                title="Create New Property Record"
+                aria-label="Create New Property Record"
+                (click)="add()">
+            <i class="fa-solid fa-circle-plus me-1"></i>
+            Create New Property Record
+        </button>
+    </div>
+
     <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
         <vp-filter-panel (filterChange)="onFilterChange($event)">
             <vp-section header="General Search Criteria">
@@ -45,12 +57,41 @@
 
 <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
 
+
+
 <div *ngIf="showResults">
+
+    <div class="d-flex justify-content-between mb-3">
+
+        <button type="button"
+                class="btn btn-primary"
+                title="Create New Property Record"
+                aria-label="Create New Property Record"
+                (click)="add()">
+            <i class="fa-solid fa-circle-plus me-1"></i>
+            Create New Property Record
+        </button>
+
+        <button type="button"
+                class="btn btn-primary vp-section-button"
+                (click)="showResults = false;">
+            Search Again
+        </button>
+
+    </div>
+
+
+    <!--<button type="button" class="btn btn-primary" title="Create New Property Record"
+            aria-label="Create New Property Record" (click)="add()">
+        <i class="fa-solid fa-circle-plus"></i>
+        Create New Property Record
+    </button>
+
     <div class="mb-3 d-flex justify-content-end">
         <button type="button" class="btn btn-primary vp-section-button" (click)="showResults = false;">
             Search Again
         </button>
-    </div>
+    </div>-->
 
     <vp-section header="Property Record Search">
         <vp-table *ngIf="table.items"
@@ -61,6 +102,8 @@
                   [(query)]="table.query"
                   (queryChange)="getSites()"
                   (queryReset)="getSites()"
+                  [canEdit]="true"
+                  (edit)="edit($event)"
                   [freeTextSearch]="table.freeTextSearch" />
     </vp-section>
 </div>

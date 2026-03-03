@@ -7,6 +7,8 @@ import { TableColumn } from "../../shared/components/data-components/table/table
 import { ColumnType } from "../../shared/components/data-components/sorting-filtering/query-view-model";
 import { QueryProperty } from "../../shared/models/query";
 import { NgForm } from "@angular/forms";
+import { ModalHelperService } from "../../shared/services/helpers/modal-helper.service";
+import { CreateSiteComponent } from "../create/create-site-component";
 import { InputOption } from "../../shared/components/input/input.component";
 
 @Component({
@@ -51,12 +53,12 @@ export class SiteListComponent implements OnInit {
     constructor(
         private readonly _siteService: SiteService,
         private readonly _router: Router,
-        private readonly _activatedRoute: ActivatedRoute
+        private readonly _activatedRoute: ActivatedRoute,
+        private readonly _modalHelper: ModalHelperService
     ) {
     }
 
     public async ngOnInit(): Promise<void> {
-        await this.getSites();
     }
 
     private getColumns(): TableColumn<Site>[] {
@@ -113,4 +115,19 @@ export class SiteListComponent implements OnInit {
             this.showResults = true;
         }
     }
+
+    public add(): void {
+        this._modalHelper.show<Site>(CreateSiteComponent, {
+            title: 'Location / Property information',
+        }).result()
+            .subscribe(_ => this.getSites());
+    }
+
+    public edit(site: Site): void {
+        console.log('event');
+        this._router.navigate([site.id, 'edit'], {
+            relativeTo: this._activatedRoute
+        });
+    }
+
 }

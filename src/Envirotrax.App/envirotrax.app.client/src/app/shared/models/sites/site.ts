@@ -1,9 +1,12 @@
+import { FacilityType } from "../../enums/facility-type.enum";
+import { PropertyType } from "../../enums/property-type.enum";
+
 export interface Site {
     id?: number;
     subArea?: string;
     accountNumber?: string;
     businessName?: string;
-    propertyType: number;
+    propertyType?: PropertyType;
     streetNumber?: string;
     streetName?: string;
     propertyNumber?: string;
@@ -41,7 +44,7 @@ export interface Site {
     hasAuxWaterSupply?: boolean;
     hasFireSystem?: boolean;
     fireSeparateWater?: boolean;
-    hasGreaseTrap?: number;
+    greaseTrapType?: GreaseTrapType;
     hasGritTrap?: boolean;
     hasReclaimed?: boolean;
     hasIrrigation?: boolean;
@@ -50,7 +53,7 @@ export interface Site {
     requiresDomesticPremisesIsolation?: boolean;
     invalidMailingAddress?: boolean;
     outOfArea?: boolean;
-    facilityType?: string;
+    facilityType?: FacilityType;
     backflowScheduleMonth?: number;
     gisLatitude?: number;
     gisLongitude?: number;
@@ -72,12 +75,15 @@ export interface Site {
     unknownAssembliesLetterStartDate?: string;
     customData1?: string;
     customBooleanData1?: boolean;
-    userAccountAssignment?: string;
-    csiAccountAssignment?: string;
-    backflowAccountAssignment?: string;
-    fogAccountAssignment?: string;
+    userAccountAssignmentId?: number;
+    csiAccountAssignmentId?: number;
+    backflowAccountAssignmentId?: number;
+    fogAccountAssignmentId?: number;
     needsRenewalCheck?: boolean;
     csiAccountAssignmentDate?: string;
     backflowAccountAssignmentDate?: string;
     fogAccountAssignmentDate?: string;
+    active?: boolean;
+    createdTime?: Date;
+    updatedTime?: Date;
 }

@@ -38,7 +38,7 @@ export class AuthService {
         return new UserManager({
             authority: environment.authUrl,
             loadUserInfo: true,
-            scope: 'envirotrax_app',
+            scope: 'openid profile offline_access envirotrax_app',
             client_id: 'envirotrax-app',
             redirect_uri: window.location.origin + '/auth/login-redirect',
             post_logout_redirect_uri: window.location.origin + '/auth/sign-out',

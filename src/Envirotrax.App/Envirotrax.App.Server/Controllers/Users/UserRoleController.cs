@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace Envirotrax.App.Server.Controllers.Users
 {
     [Route("api/users/{userId}/roles")]
-    [PermissionResource(PermissionType.Users)]
     public class UserRoleController : ProtectedController
     {
         private readonly IUserRoleService _userRoleService;
@@ -18,6 +17,7 @@ namespace Envirotrax.App.Server.Controllers.Users
         }
 
         [HttpGet]
+        [HasPermission(PermissionAction.CanView, PermissionType.Users)]
         public async Task<IActionResult> GetAllAsync(int userId)
         {
             var userRoles = await _userRoleService.GetAllAsync(userId);
@@ -25,6 +25,7 @@ namespace Envirotrax.App.Server.Controllers.Users
         }
 
         [HttpPost]
+        [HasPermission(PermissionAction.CanCreate, PermissionType.Users)]
         public async Task<IActionResult> AddAsync(int userId, UserRoleDto userRole)
         {
             if (userId != userRole?.User?.Id)
@@ -37,6 +38,7 @@ namespace Envirotrax.App.Server.Controllers.Users
         }
 
         [HttpDelete("{roleId}")]
+        [HasPermission(PermissionAction.CanDelete, PermissionType.Users)]
         public async Task<IActionResult> DeleteAsync(int userId, int roleId)
         {
             var deleted = await _userRoleService.DeleteAsync(userId, roleId);

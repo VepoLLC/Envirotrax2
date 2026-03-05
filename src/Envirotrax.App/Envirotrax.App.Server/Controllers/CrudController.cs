@@ -33,7 +33,7 @@ namespace Envirotrax.App.Server.Controllers
         }
 
         [HttpGet]
-        [HasPermission(PermissionAction.CamView)]
+        [HasPermission(PermissionAction.CanView)]
         public virtual async Task<IActionResult> GetAllAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
         {
             var dtoList = await ProcessGetAllAsync(pageInfo, query, cancellationToken);
@@ -46,7 +46,7 @@ namespace Envirotrax.App.Server.Controllers
         }
 
         [HttpGet("{id}")]
-        [HasPermission(PermissionAction.CamView)]
+        [HasPermission(PermissionAction.CanView | PermissionAction.CanEdit)]
         public virtual async Task<IActionResult> GetAsync(TKey id, CancellationToken cancellationToken)
         {
             var dto = await ProcessGetAsync(id, cancellationToken);

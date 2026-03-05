@@ -45,7 +45,7 @@ public class AuthService : TenantProviderService, IAuthService
 
         var permissionAction = (PermissionAction)Enum.ToObject(typeof(PermissionAction), int.Parse(parts[1]));
 
-        if (permissionAction.HasFlag(PermissionAction.CamView))
+        if (permissionAction.HasFlag(PermissionAction.CanView))
         {
             permission.CanView = true;
         }
@@ -104,7 +104,7 @@ public class AuthService : TenantProviderService, IAuthService
                 {
                     switch (value)
                     {
-                        case PermissionAction.CamView:
+                        case PermissionAction.CanView:
                             return permissionToCheck.CanView;
                         case PermissionAction.CanCreate:
                             return permissionToCheck.CanCreate;

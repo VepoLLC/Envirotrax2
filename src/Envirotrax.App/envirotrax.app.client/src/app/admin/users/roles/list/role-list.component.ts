@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewContainerRef } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { TableViewModel } from "../../../../shared/models/table-view-model";
 import { TableColumn } from "../../../../shared/components/data-components/table/table.component";
 import { ColumnType } from "../../../../shared/components/data-components/sorting-filtering/query-view-model";
@@ -8,6 +8,8 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { Role } from "../../../../shared/models/users/role";
 import { RoleService } from "../../../../shared/services/users/role.service";
+import { AuthService } from "../../../../shared/services/auth/auth.service";
+import { PermissionAction, PermissionType } from "../../../../shared/models/permission-type";
 
 @Component({
     templateUrl: './role-list.component.html',
@@ -37,7 +39,7 @@ export class RoleListComponent implements OnInit {
         private readonly _modalHelper: ModalHelperService,
         private readonly _router: Router,
         private readonly _activeRoute: ActivatedRoute,
-        private readonly _viewContainerRef: ViewContainerRef
+        private readonly _authService: AuthService
     ) {
 
     }
@@ -58,6 +60,10 @@ export class RoleListComponent implements OnInit {
     }
 
     public async ngOnInit(): Promise<void> {
+        this.canAdd = await this._authService.hasAnyPermisison(PermissionAction.CanCreate, PermissionType.Roles);
+        this.canEdit = await this._authService.hasAnyPermisison(PermissionAction.CanEdit, PermissionType.Roles);
+        this.canDelete = await this._authService.hasAnyPermisison(PermissionAction.CanDelete, PermissionType.Roles);
+
         this.getRoles();
     }
 
@@ -73,7 +79,6 @@ export class RoleListComponent implements OnInit {
     public add(): void {
         this._modalHelper.show<Role>(CreateRoleComponent, {
             title: 'Add Role',
-            viewContainerRef: this._viewContainerRef,
             size: ModalSize.large
         }).result()
             .subscribe(role => this.edit(role));

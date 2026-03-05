@@ -44,7 +44,8 @@
                                         [class.show]="item.isExpanded"
                                         #dropdownContent>
                                         <ng-container *ngFor="let child of item.children">
-                                            <li *ngIf="child.type === 'separator'" class="m-2">
+                                            <li *ngIf="child.type === 'separator' && child.hasFeature && child.hasPermission"
+                                                class="m-2">
                                                 <hr class="dropdown-divider my-2">
                                             </li>
                                             <li *ngIf="child.type !== 'separator' && child.hasFeature && child.hasPermission"

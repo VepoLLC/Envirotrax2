@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace Envirotrax.App.Server.Controllers.Users
 {
     [Route("api/users/roles")]
-    [PermissionResource(PermissionType.Roles)]
     public class RolePermissionController : ProtectedController
     {
         private readonly IRolePermissionService _rolePermissionService;
@@ -33,6 +32,7 @@ namespace Envirotrax.App.Server.Controllers.Users
         }
 
         [HttpGet("{roleId}/permissions")]
+        [HasPermission(PermissionAction.CanView, PermissionType.Roles)]
         public async Task<IActionResult> GetAllAsync(int roleId)
         {
             var rolePermissions = await _rolePermissionService.GetAllAsync(roleId);
@@ -40,6 +40,7 @@ namespace Envirotrax.App.Server.Controllers.Users
         }
 
         [HttpPut("{roleId}/permissions/add-or-update")]
+        [HasPermission(PermissionAction.CanCreate | PermissionAction.CanEdit, PermissionType.Roles)]
         public async Task<IActionResult> AddOrUpdateAsync(int roleId, RolePermissionDto rolePermission)
         {
             if (roleId != rolePermission?.Role?.Id)
@@ -53,6 +54,7 @@ namespace Envirotrax.App.Server.Controllers.Users
         }
 
         [HttpPut("{roleId}/permissions/bulk-update")]
+        [HasPermission(PermissionAction.CanCreate | PermissionAction.CanEdit, PermissionType.Roles)]
         public async Task<IActionResult> BulkUpdateAsync(int roleId, IEnumerable<RolePermissionDto> rolePermissions)
         {
             if (!rolePermissions.All(r => r.Role?.Id == roleId))

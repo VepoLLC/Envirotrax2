@@ -4,6 +4,7 @@ import { WaterSupplierService } from './shared/services/water-suppliers/water-su
 import { ProfesisonalService } from './shared/services/professionals/professional.service';
 import { createPopper, flip, preventOverflow } from '@popperjs/core';
 import { FeatureType } from './shared/models/feature-tyype';
+import { PermissionAction, PermissionType } from './shared/models/permission-type';
 
 @Component({
   selector: 'app-root',
@@ -84,14 +85,14 @@ export class App implements OnInit {
             title: 'User Accounts',
             iconCss: 'fa-solid fa-users',
             routerLink: ['admin/users'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Users),
             hasFeature: true
           },
           {
             title: 'System Settings',
             iconCss: 'fa-solid fa-gear',
             routerLink: ['admin'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Settings),
             hasFeature: !!supplierId
           },
           {
@@ -105,7 +106,7 @@ export class App implements OnInit {
             title: 'Notification Management',
             iconCss: 'fa-regular fa-bell',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Notifications),
             hasFeature: true
           },
           {
@@ -127,26 +128,26 @@ export class App implements OnInit {
             title: 'Property Record Search',
             iconCss: 'fa-regular fa-building-magnifying-glass',
             routerLink: ['sites'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Sites),
             hasFeature: true
           },
           {
             title: 'Inspection Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiInspections),
             hasFeature: true
           },
           {
             type: 'separator',
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Sites, PermissionType.CsiInspections),
             hasFeature: true
           },
           {
             title: 'Inspector Management',
             iconCss: 'fa-regular fa-user',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiInspectors),
             hasFeature: true
           },
           {
@@ -165,13 +166,13 @@ export class App implements OnInit {
             title: 'System Reports',
             iconCss: 'fa-regular fa-chart-simple-horizontal',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports),
             hasFeature: true
           },
           {
             type: 'separator',
-            hasPermission: true,
-            hasFeature: true
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports),
+            hasFeature: false
           },
           {
             title: 'Compliance Management',
@@ -199,33 +200,33 @@ export class App implements OnInit {
             title: 'Property Record Search',
             iconCss: 'fa-regular fa-building-magnifying-glass',
             routerLink: ['sites'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Sites),
             hasFeature: true
           },
           {
             title: 'Backflow Test Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowTests),
             hasFeature: true
           },
           {
             title: 'Out of Service Requests',
             iconCss: 'fa-regular fa-file-minus',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowOutOfService),
             hasFeature: true
           },
           {
             type: 'separator',
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Sites, PermissionType.BackflowTests, PermissionType.BackflowOutOfService),
             hasFeature: true
           },
           {
             title: 'BPAT Management',
             iconCss: 'fa-regular fa-user',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowTesters),
             hasFeature: true
           },
           {
@@ -237,35 +238,35 @@ export class App implements OnInit {
           },
           {
             type: 'separator',
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowTesters),
             hasFeature: true
           },
           {
             title: 'Backflow Report',
             iconCss: 'fa-regular fa-chart-simple-horizontal',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
             hasFeature: true
           },
           {
             title: 'Current Compliance Report',
             iconCss: 'fa-regular fa-chart-pie-simple',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
             hasFeature: true
           },
           {
             title: 'Compliance History Report',
             iconCss: 'fa-solid fa-chart-line-up',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
             hasFeature: true
           },
           {
             title: 'New/Removed Assemblies Report',
             iconCss: 'fa-solid fa-chart-column',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
             hasFeature: true
           },
           {
@@ -299,47 +300,47 @@ export class App implements OnInit {
             title: 'Property Record Search',
             iconCss: 'fa-regular fa-building-magnifying-glass',
             routerLink: ['sites'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Sites),
             hasFeature: true
           },
           {
             title: 'Inspection Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogInspections),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
           },
           {
             title: 'Trip Ticket Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogTripTickets),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
           },
           {
             type: 'separator',
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Sites, PermissionType.FogInspections, PermissionType.FogTripTickets),
             hasFeature: true
           },
           {
             title: 'Inspector Management',
             iconCss: 'fa-regular fa-user',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogInspectors),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
           },
           {
             title: 'Transporter Management',
             iconCss: 'fa-regular fa-user',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogTransporters),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
           },
           {
             title: 'Vehicle Management',
             iconCss: 'fa-solid fa-truck',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogVehicles),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
           },
           {
@@ -358,12 +359,12 @@ export class App implements OnInit {
             title: 'System Reports',
             iconCss: 'fa-regular fa-chart-simple-horizontal',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogReports),
             hasFeature: true
           },
           {
             type: 'separator',
-            hasPermission: true,
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogReports),
             hasFeature: true
           },
           {
@@ -396,7 +397,6 @@ export class App implements OnInit {
           }
         ]
       }
-
     ]
   }
 

@@ -104,7 +104,7 @@ public class AuthService : TenantProviderService, IAuthService
 
             if (rolePermission.CanView)
             {
-                action = action | PermissionAction.CamView;
+                action = action | PermissionAction.CanView;
             }
 
             if (rolePermission.CanCreate)

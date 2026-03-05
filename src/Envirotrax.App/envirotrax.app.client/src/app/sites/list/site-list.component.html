@@ -20,51 +20,67 @@
             <vp-section header="General Search Criteria">
                 <div class="row">
                     <div class="col-md-6">
-                        <vp-filter-panel-field fieldName="accountNumber"
-                                               label="Account Number"
-                                               [form]="searchForm" />
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="accountNumber"
+                                                   label="Account Number"
+                                                   [form]="searchForm" />
+                        </div>
 
-                        <vp-filter-panel-field fieldName="invalidMailingAddress"
-                                               label="Invalid Mailing Address"
-                                               type="select"
-                                               [form]="searchForm"
-                                               [options]="yesNoOptions" />
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="invalidMailingAddress"
+                                                   label="Invalid Mailing Address"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
 
-                        <vp-filter-panel-field fieldName="outOfArea"
-                                               label="Out of Area"
-                                               type="select"
-                                               [form]="searchForm"
-                                               [options]="yesNoOptions" />
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="outOfArea"
+                                                   label="Out of Area"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
 
-                        <vp-filter-panel-field fieldName="isFeeExempt"
-                                               label="Is Fee Exempt"
-                                               type="select"
-                                               [form]="searchForm"
-                                               [options]="yesNoOptions" />
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="isFeeExempt"
+                                                   label="Is Fee Exempt"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
 
-                        <vp-filter-panel-field fieldName="needsCsiInspection"
-                                               label="Needs CSI Inspection"
-                                               type="select"
-                                               [form]="searchForm"
-                                               [options]="yesNoOptions" />
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="needsCsiInspection"
+                                                   label="Needs CSI Inspection"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
 
-                        <vp-filter-panel-field fieldName="needsBackflowLetter"
-                                               label="Needs Unknown Assemblies Letter"
-                                               type="select"
-                                               [form]="searchForm"
-                                               [options]="yesNoOptions" />
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="needsBackflowLetter"
+                                                   label="Needs Unknown Assemblies Letter"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
 
-                        <vp-filter-panel-field fieldName="needsFogInspection"
-                                               label="Needs FOG Inspection"
-                                               type="select"
-                                               [form]="searchForm"
-                                               [options]="yesNoOptions" />
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="needsFogInspection"
+                                                   label="Needs FOG Inspection"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
 
-                        <vp-filter-panel-field fieldName="needsFogPermit"
-                                               label="Needs FOG Permit"
-                                               type="select"
-                                               [form]="searchForm"
-                                               [options]="yesNoOptions" />
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="needsFogPermit"
+                                                   label="Needs FOG Permit"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
 
                         <vp-filter-panel-field fieldName="createdTime"
                                                label="Creation Date"
@@ -73,71 +89,93 @@
                     </div>
 
                     <div class="col-md-6">
-                        <vp-filter-panel-field fieldName="facilityType"
-                                               label="Facility Type"
-                                               type="select"
-                                               [form]="searchForm"
-                                               [options]="facilityTypes" />
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="facilityType"
+                                                   label="Facility Type"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="facilityTypes" />
+                        </div>
 
-                        <vp-filter-panel-field fieldName="greaseTrapType"
-                                               label="Grease Trap"
-                                               type="select"
-                                               [form]="searchForm"
-                                               [options]="greaseTrapoptions" />
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="greaseTrapType"
+                                                   label="Grease Trap"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="greaseTrapoptions" />
+                        </div>
 
-                        <vp-filter-panel-field fieldName="hasKnownBackflowAssemblies"
-                                               label="Has Known Backflow Assemblies"
-                                               type="select"
-                                               [form]="searchForm"
-                                               [options]="yesNoOptions" />
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="hasKnownBackflowAssemblies"
+                                                   label="Has Known Backflow Assemblies"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
 
-                        <vp-filter-panel-field fieldName="hasOnSiteSewageFacility"
-                                               label="Has On-Site Sewage Facility"
-                                               type="select"
-                                               [form]="searchForm"
-                                               [options]="yesNoOptions" />
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="hasOnSiteSewageFacility"
+                                                   label="Has On-Site Sewage Facility"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
 
-                        <vp-filter-panel-field fieldName="hasAuxWaterSupply"
-                                               label="Has Auxiliary Water Supply"
-                                               type="select"
-                                               [form]="searchForm"
-                                               [options]="yesNoOptions" />
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="hasAuxWaterSupply"
+                                                   label="Has Auxiliary Water Supply"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
 
-                        <vp-filter-panel-field fieldName="hasFireSystem"
-                                               label="Has Fire System"
-                                               type="select"
-                                               [form]="searchForm"
-                                               [options]="yesNoOptions" />
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="hasFireSystem"
+                                                   label="Has Fire System"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
 
-                        <vp-filter-panel-field fieldName="fireSeparateWater"
-                                               label="Fire System on Separate Water Supply"
-                                               type="select"
-                                               [form]="searchForm"
-                                               [options]="yesNoOptions" />
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="fireSeparateWater"
+                                                   label="Fire System on Separate Water Supply"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
 
-                        <vp-filter-panel-field fieldName="hasGritTrap"
-                                               label="Has Sand & Grit Trap"
-                                               type="select"
-                                               [form]="searchForm"
-                                               [options]="yesNoOptions" />
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="hasGritTrap"
+                                                   label="Has Sand & Grit Trap"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
 
-                        <vp-filter-panel-field fieldName="hasIrrigation"
-                                               label="Has Irrigation System"
-                                               type="select"
-                                               [form]="searchForm"
-                                               [options]="yesNoOptions" />
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="hasIrrigation"
+                                                   label="Has Irrigation System"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
 
-                        <vp-filter-panel-field fieldName="irrigationSeparateWater"
-                                               label="Irrigation on Separate Water Supply"
-                                               type="select"
-                                               [form]="searchForm"
-                                               [options]="yesNoOptions" />
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="irrigationSeparateWater"
+                                                   label="Irrigation on Separate Water Supply"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
 
-                        <vp-filter-panel-field fieldName="hasDomesticPremisesIsolation"
-                                               label="Has Domestic/Premises Isolation"
-                                               type="select"
-                                               [form]="searchForm"
-                                               [options]="yesNoOptions" />
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="hasDomesticPremisesIsolation"
+                                                   label="Has Domestic/Premises Isolation"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
 
                         <vp-filter-panel-field fieldName="requiresDomesticPremisesIsolation"
                                                label="Requires Domestic/Premises Isolation"
@@ -152,7 +190,7 @@
                 <div class="col-md-6">
                     <vp-section header="Location / Property Criteria">
                         <div class="row">
-                            <div class="col-12">
+                            <div class="col-12 mb-3">
                                 <vp-filter-panel-field fieldName="propertyType"
                                                        label="Property Type"
                                                        type="select"
@@ -160,19 +198,19 @@
                                                        [options]="propertyTypes" />
                             </div>
 
-                            <div class="col-12">
+                            <div class="col-12 mb-3">
                                 <vp-filter-panel-field fieldName="businessName"
                                                        label="Business Name"
                                                        [form]="searchForm" />
                             </div>
 
-                            <div class="col-4">
+                            <div class="col-4 mb-3">
                                 <vp-filter-panel-field fieldName="streetNumber"
                                                        label="Street #"
                                                        [form]="searchForm" />
                             </div>
 
-                            <div class="col-8">
+                            <div class="col-8 mb-3">
                                 <vp-filter-panel-field fieldName="streetName"
                                                        label="Street Name"
                                                        [form]="searchForm" />
@@ -187,28 +225,28 @@
                     </vp-section>
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-6 mt-3 mt-md-0">
                     <vp-section header="Contact / Mailing Criteria">
                         <div class="row">
-                            <div class="col-12">
+                            <div class="col-12 mb-3">
                                 <vp-filter-panel-field fieldName="mailingCompanyName"
                                                        label="Company Name"
                                                        [form]="searchForm" />
                             </div>
 
-                            <div class="col-12">
+                            <div class="col-12 mb-3">
                                 <vp-filter-panel-field fieldName="mailingContactName"
                                                        label="Contact Name"
                                                        [form]="searchForm" />
                             </div>
 
-                            <div class="col-4">
+                            <div class="col-4 mb-3">
                                 <vp-filter-panel-field fieldName="mailingStreetNumber"
                                                        label="Street #"
                                                        [form]="searchForm" />
                             </div>
 
-                            <div class="col-8">
+                            <div class="col-8 mb-3">
                                 <vp-filter-panel-field fieldName="mailingStreetName"
                                                        label="Street Name"
                                                        [form]="searchForm" />

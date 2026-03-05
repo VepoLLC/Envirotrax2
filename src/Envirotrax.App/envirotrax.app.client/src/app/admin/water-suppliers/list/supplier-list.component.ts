@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { WaterSupplier } from "../../../shared/models/water-suppliers/water-supplier";
 import { WaterSupplierService } from "../../../shared/services/water-suppliers/water-supplier.service";
@@ -7,12 +7,14 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
 import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { CreateSupplierComponent } from "../create/create-supplier.component";
+import { AuthService } from "../../../shared/services/auth/auth.service";
+import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
 
 @Component({
     templateUrl: './supplier-list.component.html',
     standalone: false
 })
-export class SupplierListComponent {
+export class SupplierListComponent implements OnInit {
     public table: TableViewModel<WaterSupplier> = {
         columns: this.getColumns(),
         query: {
@@ -27,11 +29,16 @@ export class SupplierListComponent {
         }
     };
 
+    public canAdd: boolean = false;
+    public canEdit: boolean = false;
+    public canDelete: boolean = false;
+
     constructor(
         private readonly _waterSupplierService: WaterSupplierService,
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
-        private readonly _modalHelper: ModalHelperService
+        private readonly _modalHelper: ModalHelperService,
+        private readonly _authService: AuthService
     ) {
 
     }
@@ -52,6 +59,10 @@ export class SupplierListComponent {
     }
 
     public async ngOnInit(): Promise<void> {
+        this.canAdd = await this._authService.hasAnyPermisison(PermissionAction.CanCreate, PermissionType.WaterSuppliers);
+        this.canEdit = await this._authService.hasAnyPermisison(PermissionAction.CanEdit, PermissionType.WaterSuppliers);
+        this.canDelete = await this._authService.hasAnyPermisison(PermissionAction.CanDelete, PermissionType.WaterSuppliers);
+
         await this.getSuppliers();
     }
 

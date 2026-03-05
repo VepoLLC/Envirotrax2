@@ -35,4 +35,113 @@ public class AuthService : TenantProviderService, IAuthService
         var features = GetAllMyFeatures();
         return features.Any(f => featuresToCheck.Contains(f));
     }
+
+    private RolePermissionDto ParseOnePermission(string permissionString)
+    {
+        var permission = new RolePermissionDto();
+        var parts = permissionString.Split('=');
+
+        permission.Permission = Enum.Parse<PermissionType>(parts[0]);
+
+        var permissionAction = (PermissionAction)Enum.ToObject(typeof(PermissionAction), int.Parse(parts[1]));
+
+        if (permissionAction.HasFlag(PermissionAction.CanView))
+        {
+            permission.CanView = true;
+        }
+
+        if (permissionAction.HasFlag(PermissionAction.CanCreate))
+        {
+            permission.CanCreate = true;
+        }
+
+        if (permissionAction.HasFlag(PermissionAction.CanEdit))
+        {
+            permission.CanEdit = true;
+        }
+
+        if (permissionAction.HasFlag(PermissionAction.CanDelete))
+        {
+            permission.CanDelete = true;
+        }
+
+        return permission;
+    }
+
+    private IEnumerable<RolePermissionDto> ParsePermissions(string? permissionsString)
+    {
+        if (!string.IsNullOrWhiteSpace(permissionsString))
+        {
+            return permissionsString.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(p => ParseOnePermission(p));
+        }
+
+        return [];
+    }
+
+    private IEnumerable<RolePermissionDto> GetSignedInUserPermissions()
+    {
+        if (_contextAccessor.HttpContext!.Items.TryGetValue("prms", out var permissions))
+        {
+            return (IEnumerable<RolePermissionDto>)permissions!;
+        }
+
+        var parsedPermissions = ParsePermissions(_contextAccessor.HttpContext?.User.FindFirstValue("prms"));
+        _contextAccessor.HttpContext!.Items["prms"] = parsedPermissions;
+
+        return parsedPermissions;
+    }
+
+    private bool HasPermission(IEnumerable<RolePermissionDto> permissions, PermissionType type, PermissionAction action)
+    {
+        var permissionToCheck = permissions.SingleOrDefault(p => p.Permission == type);
+
+        if (permissionToCheck != null)
+        {
+            foreach (var value in Enum.GetValues<PermissionAction>())
+            {
+                if (action.HasFlag(value))
+                {
+                    switch (value)
+                    {
+                        case PermissionAction.CanView:
+                            return permissionToCheck.CanView;
+                        case PermissionAction.CanCreate:
+                            return permissionToCheck.CanCreate;
+                        case PermissionAction.CanEdit:
+                            return permissionToCheck.CanEdit;
+                        case PermissionAction.CanDelete:
+                            return permissionToCheck.CanDelete;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public bool HasAnyPermission(PermissionAction action, params PermissionType[] permissionTypes)
+    {
+        var permissions = GetSignedInUserPermissions();
+
+        foreach (var type in permissionTypes)
+        {
+            if (HasPermission(permissions, type, action))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
+class RolePermissionDto
+{
+    public PermissionType Permission { get; set; }
+
+    public bool CanView { get; set; }
+    public bool CanCreate { get; set; }
+    public bool CanEdit { get; set; }
+    public bool CanDelete { get; set; }
 }

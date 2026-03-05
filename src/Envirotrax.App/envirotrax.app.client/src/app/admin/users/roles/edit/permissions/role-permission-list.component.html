@@ -1,0 +1,128 @@
+<vp-section header="Permissions">
+    <div class="dp-spinner-parent">
+        <dp-loading-spinner *ngIf="isLoading" />
+
+        <p>
+            To toggle all permissions for a given column, please turn the switch below the column header on or off.
+        </p>
+
+        <div class="overflow-x">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>Permission</td>
+                        <td>
+                            View
+
+                            <div class="form-switch">
+                                <input id="select-all-view"
+                                       type="checkbox"
+                                       name="selectAllView"
+                                       class="form-check-input"
+                                       switch
+                                       [(ngModel)]="allView"
+                                       (ngModelChange)="toggleAllView($event)" />
+                            </div>
+                        </td>
+                        <td>
+                            Create
+
+                            <div class="form-switch">
+                                <input id="select-all-create"
+                                       type="checkbox"
+                                       name="selectAllCreate"
+                                       class="form-check-input"
+                                       switch
+                                       [(ngModel)]="allCreate"
+                                       (ngModelChange)="toggleAllCreate($event)" />
+                            </div>
+                        </td>
+                        <td>
+                            Edit
+
+                            <div class="form-switch">
+                                <input id="select-all-edit"
+                                       type="checkbox"
+                                       name="selectAllEdit"
+                                       class="form-check-input"
+                                       switch
+                                       [(ngModel)]="allEdit"
+                                       (ngModelChange)="toggleAllEdit($event)" />
+                            </div>
+                        </td>
+                        <td>
+                            Delete
+
+                            <div class="form-switch">
+                                <input id="select-all-delete"
+                                       type="checkbox"
+                                       name="selectAllDelete"
+                                       class="form-check-input"
+                                       switch
+                                       [(ngModel)]="allDelete"
+                                       (ngModelChange)="toggleAllDelete($event)" />
+                            </div>
+                        </td>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <ng-container *ngFor="let group of rolePermissions; let gi = index">
+                        <tr class="table-info">
+                            <td colspan="5"><strong>{{group.category}}</strong></td>
+                        </tr>
+                        <tr *ngFor="let rolePermission of group.permissions; let i = index">
+                            <td>
+                                {{rolePermission.permission?.name}}
+                            </td>
+                            <td>
+                                <div class="form-switch">
+                                    <input *ngIf="rolePermission.permission?.canView"
+                                           type="checkbox"
+                                           name="canView{{gi}}_{{i}}"
+                                           class="form-check-input"
+                                           [(ngModel)]="rolePermission.canView"
+                                           (ngModelChange)="update(rolePermission)"
+                                           switch />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-switch">
+                                    <input *ngIf="rolePermission.permission?.canCreate"
+                                           type="checkbox"
+                                           name="canCreate{{gi}}_{{i}}"
+                                           class="form-check-input"
+                                           [(ngModel)]="rolePermission.canCreate"
+                                           (ngModelChange)="update(rolePermission)"
+                                           switch />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-switch">
+                                    <input *ngIf="rolePermission.permission?.canEdit"
+                                           type="checkbox"
+                                           name="canEdit{{gi}}_{{i}}"
+                                           class="form-check-input"
+                                           [(ngModel)]="rolePermission.canEdit"
+                                           (ngModelChange)="update(rolePermission)"
+                                           switch />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-switch">
+                                    <input *ngIf="rolePermission.permission?.canDelete"
+                                           type="checkbox"
+                                           name="canDelete{{gi}}_{{i}}"
+                                           class="form-check-input"
+                                           [(ngModel)]="rolePermission.canDelete"
+                                           (ngModelChange)="update(rolePermission)"
+                                           switch />
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-container>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</vp-section>

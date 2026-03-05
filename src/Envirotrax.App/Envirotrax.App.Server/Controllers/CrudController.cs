@@ -2,6 +2,8 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects;
 using Envirotrax.App.Server.Domain.Services.Definitions;
+using Envirotrax.App.Server.Filters;
+using Envirotrax.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers
@@ -31,6 +33,7 @@ namespace Envirotrax.App.Server.Controllers
         }
 
         [HttpGet]
+        [HasPermission(PermissionAction.CanView)]
         public virtual async Task<IActionResult> GetAllAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
         {
             var dtoList = await ProcessGetAllAsync(pageInfo, query, cancellationToken);
@@ -43,6 +46,7 @@ namespace Envirotrax.App.Server.Controllers
         }
 
         [HttpGet("{id}")]
+        [HasPermission(PermissionAction.CanView | PermissionAction.CanEdit)]
         public virtual async Task<IActionResult> GetAsync(TKey id, CancellationToken cancellationToken)
         {
             var dto = await ProcessGetAsync(id, cancellationToken);
@@ -61,6 +65,7 @@ namespace Envirotrax.App.Server.Controllers
         }
 
         [HttpPost]
+        [HasPermission(PermissionAction.CanCreate)]
         public virtual async Task<IActionResult> AddAsync(TDto dto)
         {
             var added = await ProcessAddAsync(dto);
@@ -79,6 +84,7 @@ namespace Envirotrax.App.Server.Controllers
         }
 
         [HttpPut("{id}")]
+        [HasPermission(PermissionAction.CanEdit)]
         public virtual async Task<IActionResult> UpdateAsync(TKey id, TDto dto)
         {
             var updated = await ProcessUpdateAsync(dto!);
@@ -97,6 +103,7 @@ namespace Envirotrax.App.Server.Controllers
         }
 
         [HttpDelete("{id}")]
+        [HasPermission(PermissionAction.CanDelete)]
         public virtual async Task<IActionResult> DeleteAsync(TKey id)
         {
             var deleted = await ProcessDeleteAsync(id);
@@ -115,6 +122,7 @@ namespace Envirotrax.App.Server.Controllers
         }
 
         [HttpDelete("{id}/reactivate")]
+        [HasPermission(PermissionAction.CanDelete)]
         public virtual async Task<IActionResult> ReactivateAsync(TKey id)
         {
             var reactivated = await ProcessReactivateAsync(id);

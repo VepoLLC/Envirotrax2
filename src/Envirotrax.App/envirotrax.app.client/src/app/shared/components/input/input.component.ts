@@ -37,7 +37,7 @@ export class InputComponent implements ControlValueAccessor, OnInit, AfterViewIn
     public name: string = null!;
 
     @Input()
-    public type: 'text' | 'number' | 'date' | 'datetime' | 'daterange' | 'textarea' | 'select' | 'email' = 'text';
+    public type: 'text' | 'number' | 'date' | 'datetime' | 'daterange' | 'textarea' | 'select' | 'email' | 'multi-select' = 'text';
 
     @Input()
     public required: boolean = false;

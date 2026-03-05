@@ -45,9 +45,13 @@ public static class ServiceRegistration
 
         services.AddTransient<IWaterSupplierRepository, WaterSupplierRepository>();
         services.AddTransient<IGeneralSettingsRepository, GeneralSettingsRepository>();
-        services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<ISiteRepository, SiteRepository>();
         services.AddTransient<LookupRepository>();
+
+        services.AddTransient<IUserRepository, UserRepository>();
+        services.AddTransient<IRoleRepository, RoleRepository>();
+        services.AddTransient<IRolePermissionRepository, RolePermissionRepository>();
+        services.AddTransient<IUserRoleRepository, UserReoleRepository>();
 
         services.AddTransient<IProfessionalRepository, ProfessionalRepository>();
         services.AddTransient<IProfessionalUserRepository, ProfessionalUserRepository>();

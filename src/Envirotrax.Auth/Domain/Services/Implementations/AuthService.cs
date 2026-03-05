@@ -1,9 +1,12 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+using System.Text;
+using Envirotrax.Auth.Data.Models;
 using Envirotrax.Auth.Data.Repositories.Defintions;
 using Envirotrax.Auth.Domain.DataTransferObjects;
 using Envirotrax.Auth.Domain.Services.Definitions;
+using Envirotrax.Common;
 using Envirotrax.Common.Data.Services.Implementations;
 using OpenIddict.Abstractions;
 
@@ -34,6 +37,9 @@ public class AuthService : TenantProviderService, IAuthService
         if (userAccess.WaterSupplierId.HasValue)
         {
             SetWaterSupplier(principal, userAccess.WaterSupplierId.Value);
+
+            var permissions = await _supplierUserRepository.GetAllPermissionsAsync(userAccess.WaterSupplierId.Value, userId);
+            SetPermissions(principal, permissions);
         }
 
         if (userAccess.ProfessionalId.HasValue)
@@ -71,5 +77,72 @@ public class AuthService : TenantProviderService, IAuthService
         }
 
         return accessDto;
+    }
+
+    private string GetPermissionString(IEnumerable<RolePermission> rolePermissions)
+    {
+        var sb = new StringBuilder();
+
+        var list = rolePermissions
+            .GroupBy(p => p.PermissionId)
+            .Select(group => new RolePermission
+            {
+                PermissionId = group.Key,
+                CanView = group.Any(p => p.CanView),
+                CanCreate = group.Any(p => p.CanCreate),
+                CanEdit = group.Any(p => p.CanEdit),
+                CanDelete = group.Any(p => p.CanDelete)
+            }).ToList();
+
+
+        for (int i = 0; i < list.Count; i++)
+        {
+            var rolePermission = list[i];
+            var action = PermissionAction.None;
+
+            sb.AppendFormat("{0}=", rolePermission.PermissionId!);
+
+            if (rolePermission.CanView)
+            {
+                action = action | PermissionAction.CanView;
+            }
+
+            if (rolePermission.CanCreate)
+            {
+                action = action | PermissionAction.CanCreate;
+            }
+
+            if (rolePermission.CanEdit)
+            {
+                action = action | PermissionAction.CanEdit;
+            }
+
+            if (rolePermission.CanDelete)
+            {
+                action = action | PermissionAction.CanDelete;
+            }
+
+            sb.Append((int)action);
+
+            // If it is not the last item
+            if (i < list.Count - 1)
+            {
+                sb.Append(',');
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    public void SetPermissions(ClaimsPrincipal principal, IEnumerable<RolePermission> permissions)
+    {
+        if (permissions != null && permissions.Any())
+        {
+            if (principal.Identity is ClaimsIdentity identity)
+            {
+                var permissionString = GetPermissionString(permissions);
+                identity.AddClaim(new Claim("prms", permissionString).SetDestinations(OpenIddictConstants.Destinations.AccessToken));
+            }
+        }
     }
 }

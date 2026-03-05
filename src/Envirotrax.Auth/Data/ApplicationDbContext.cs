@@ -19,6 +19,10 @@ public class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRole<int>
 
     public DbSet<UserInvitation> UserInvitations { get; set; }
 
+    public DbSet<UserRole> AppUserRoles { get; set; }
+    public DbSet<RolePermission> RolePermissions { get; set; }
+
+
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
           : base(options)
     {
@@ -66,6 +70,8 @@ public class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRole<int>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        builder.Entity<UserRole>().ToTable("UserRoles");
 
         foreach (var entity in builder.Model.GetEntityTypes())
         {

@@ -26,6 +26,16 @@
                                       [form]="userForm" />
                         </div>
                     </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <vp-input type="multi-select"
+                                      [(ngModel)]="selectedRoleIds"
+                                      name="roles"
+                                      label="Roles"
+                                      [options]="roleOptions" />
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mt-3">

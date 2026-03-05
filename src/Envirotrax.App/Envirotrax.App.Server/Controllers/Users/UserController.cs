@@ -2,12 +2,15 @@
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Users;
+using Envirotrax.App.Server.Filters;
+using Envirotrax.Common;
 using Envirotrax.Common.Domain.Services.Defintions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers.Users;
 
 [Route("api/users")]
+[PermissionResource(PermissionType.Users)]
 public class UserController : CrudController<WaterSupplierUserDto>
 {
     private readonly IAuthService _authService;

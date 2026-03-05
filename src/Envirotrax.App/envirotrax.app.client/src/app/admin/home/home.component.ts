@@ -1,4 +1,6 @@
 import { Component, OnInit } from "@angular/core";
+import { AuthService } from "../../shared/services/auth/auth.service";
+import { PermissionAction, PermissionType } from "../../shared/models/permission-type";
 
 
 @Component({
@@ -14,6 +16,8 @@ export class HomeComponent implements OnInit {
     public menuItems: MenuItem[] = [];
     public searchText: string = '';
 
+    constructor(private readonly _authService: AuthService) { }
+
     public async ngOnInit(): Promise<void> {
         this.menuItems = await this.createMenuItems();
     }
@@ -24,23 +28,30 @@ export class HomeComponent implements OnInit {
                 title: 'Water Suppliers',
                 iconCss: 'fa-solid fa-building',
                 routerLink: ['water-suppliers'],
-                hasPermission: true,
+                hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.WaterSuppliers),
                 description: 'Manage all water suppliers, their details, and configurations.'
             },
             {
                 title: 'General Settings & Fees',
                 iconCss: 'fa-solid fa-gear',
                 routerLink: ['settings'],
-                hasPermission: true,
+                hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Settings),
                 description: 'Manage program settings and submissions fees.'
             },
             {
                 title: 'Users',
                 iconCss: 'fa-solid fa-users',
                 routerLink: ['users'],
-                hasPermission: true,
+                hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Users),
                 description: 'Manage users of your system.'
             },
+            {
+                title: 'Roles',
+                iconCss: 'fa-solid fa-sitemap',
+                routerLink: ['users/roles'],
+                hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Roles),
+                description: 'Create and assign roles to control permissions and access.'
+            }
         ];
     }
 

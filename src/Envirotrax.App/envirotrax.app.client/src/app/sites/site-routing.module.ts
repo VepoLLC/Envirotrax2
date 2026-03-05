@@ -23,7 +23,16 @@ const routes: Routes = [
     {
         path: ':id/edit',
         title: 'Edit site',
-        component: EditSiteComponent
+        component: EditSiteComponent,
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.Sites,
+                    action: PermissionAction.CanEdit
+                }
+            ]
+        }
     }
 ];
 

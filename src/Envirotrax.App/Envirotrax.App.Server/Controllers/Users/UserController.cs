@@ -14,10 +14,12 @@ namespace Envirotrax.App.Server.Controllers.Users;
 public class UserController : CrudController<WaterSupplierUserDto>
 {
     private readonly IAuthService _authService;
+    private readonly IUserService _userService;
 
-    public UserController(IUserService service, IAuthService authService)
-        : base(service)
+    public UserController(IUserService userService, IAuthService authService)
+        : base(userService)
     {
+        _userService = userService;
         _authService = authService;
     }
 
@@ -30,5 +32,13 @@ public class UserController : CrudController<WaterSupplierUserDto>
         };
 
         return Ok(accessDto);
+    }
+
+    [HttpPost("{id}/invitations")]
+    [HasPermission(PermissionAction.CanEdit, PermissionType.Users)]
+    public async Task<IActionResult> ResendInvitationAsync(int id)
+    {
+        var result = await _userService.ResendInvitationAsync(id);
+        return Ok(result);
     }
 }

@@ -89,7 +89,7 @@ export class LoginRedirectComponent {
     public async selectProfessional(professional: Professional): Promise<void> {
         try {
             this.isLoading = true;
-            await this._authService.signIn(professional.id);
+            await this._authService.signIn(undefined, professional.id);
         } finally {
             this.isLoading = false;
         }

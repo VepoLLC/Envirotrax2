@@ -8,6 +8,7 @@ import { InputOption } from "../../../shared/components/input/input.component";
 import { RoleService } from "../../../shared/services/users/role.service";
 import { UserRoleService } from "../../../shared/services/users/user-role.service";
 import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
+import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
 
 
 @Component({
@@ -29,6 +30,7 @@ export class EditUserComponent implements OnInit {
         private readonly _userRoleService: UserRoleService,
         private readonly _acitvatedRoute: ActivatedRoute,
         private readonly _helper: HelperService,
+        private readonly _modalHelper: ModalHelperService,
         //private readonly _toastService: ToastService
     ) {
 
@@ -69,6 +71,19 @@ export class EditUserComponent implements OnInit {
         const userRoles = await this._userRoleService.getAll(userId);
         this._originalRoleIds = userRoles.map(ur => ur.role!.id!);
         this.selectedRoleIds = [...this._originalRoleIds];
+    }
+
+    public resendInvitation(): void {
+        this._modalHelper.confirm({
+            messages: ['Are you sure you want to resend the invitation to this user?']
+        }).result().subscribe(async () => {
+            try {
+                this.isLoading = true;
+                await this._userService.resendInvitation(this.user.id!);
+            } finally {
+                this.isLoading = false;
+            }
+        });
     }
 
     public async save(form: NgForm): Promise<void> {

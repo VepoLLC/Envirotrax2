@@ -12,6 +12,7 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Users;
 
 public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUserService
 {
+    private readonly IUserRepository _userRepository;
     private readonly IAuthService _authService;
     private readonly IInternalApiClientService<AuthApiOptions> _authApiClient;
     private readonly IWaterSupplierService _waterSupplierService;
@@ -24,6 +25,7 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
         IWaterSupplierService waterSupplierService)
         : base(mapper, repository)
     {
+        _userRepository = repository;
         _authService = authService;
         _authApiClient = authApiClient;
         _waterSupplierService = waterSupplierService;
@@ -58,6 +60,30 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
     {
         await _authApiClient.DeleteAsync<object>(_authService.WaterSupplierId, _authService.UserId, $"/api/users/{id}/invitations");
         return await base.DeleteAsync(id);
+    }
+
+    public async Task<WaterSupplierUserDto?> ResendInvitationAsync(int id)
+    {
+        var user = await _userRepository.GetAsync(id, CancellationToken.None) ?? throw new InvalidOperationException();
+        var supplier = await _waterSupplierService.GetLoggedInSupplierAsync();
+
+        var invitation = new UserInvitationDto
+        {
+            EmailAddress = user.EmailAddress!,
+            InvitedByCompany = supplier.Name
+        };
+
+        var addedInvitation = await _authApiClient.PostAsync<UserInvitationDto, UserInvitationDto>("/api/users/invitations", new(_authService.WaterSupplierId, _authService.UserId)
+        {
+            Data = invitation
+        });
+
+        if (addedInvitation == null)
+        {
+            throw new InvalidOperationException("Adding user failed.");
+        }
+
+        return MapToDto(user);
     }
 }
 class UserInvitationDto

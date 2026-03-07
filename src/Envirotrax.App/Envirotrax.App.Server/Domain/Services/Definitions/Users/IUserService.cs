@@ -6,5 +6,5 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Users;
 
 public interface IUserService : IService<WaterSupplierUser, WaterSupplierUserDto>
 {
-
+    Task<WaterSupplierUserDto?> ResendInvitationAsync(int id);
 }

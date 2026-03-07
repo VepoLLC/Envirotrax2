@@ -57,4 +57,11 @@ export class UserService {
 
         return lastValueFrom(observable);
     }
+
+    public resendInvitation(id: number): Promise<WaterSupplierUser | undefined> {
+        const url = this._urlResolver.resolveUrl(`/api/users/${id}/invitations`);
+        const observable = this._http.post(url, null);
+
+        return lastValueFrom(observable);
+    }
 }

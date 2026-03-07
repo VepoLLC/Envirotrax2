@@ -186,25 +186,17 @@ public class Site : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 
     public bool CustomBooleanData1 { get; set; }
 
-    /// <summary>
-    /// Water supplier user id.
-    /// </summary>
     public int? UserAccountAssignmentId { get; set; }
+    public WaterSupplierUser? UserAccountAssignment { get; set; }
 
-    /// <summary>
-    /// Water supplier user id.
-    /// </summary>
     public int? CsiAccountAssignmentId { get; set; }
+    public WaterSupplierUser? CsiAccountAssignment { get; set; }
 
-    /// <summary>
-    /// Water supplier user id.
-    /// </summary>
     public int? BackflowAccountAssignmentId { get; set; }
+    public WaterSupplierUser? BackflowAccountAssignment { get; set; }
 
-    /// <summary>
-    /// Water supplier user id.
-    /// </summary>
     public int? FogAccountAssignmentId { get; set; }
+    public WaterSupplierUser? FogAccountAssignment { get; set; }
 
     public bool NeedsRenewalCheck { get; set; }
 

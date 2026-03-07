@@ -1,14 +1,12 @@
 <div>
-    <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+    <form #form="ngForm">
 
-    <div dp-spinner-parent>
-        <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+        <div class="row">
+            <div class="col-md-6">
+                <vp-section header="Site Settings">
+                    <div dp-spinner-parent>
+                        <dp-loading-spinner *ngIf="sectionLoading.siteSettings"></dp-loading-spinner>
 
-        <form #form="ngForm">
-
-            <div class="row">
-                <div class="col-md-6">
-                    <vp-section header="Site Settings">
                         <div class="mb-4">
                             <div class="mb-2">
                                 <strong>Creation Date: </strong>
@@ -51,17 +49,17 @@
                                 </div>
                                 <div class="form-check mb-2">
                                     <input type="checkbox" class="form-check-input"
-                                           [(ngModel)]="site.isFeeExempt" name="isFeeExempt">                       
+                                           [(ngModel)]="site.isFeeExempt" name="isFeeExempt">
                                     <label class="form-check-label">Is Fee Exempt</label>
                                 </div>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <div class="form-check mb-2">   
+                                <div class="form-check mb-2">
                                     <input type="checkbox" class="form-check-input"
                                            [(ngModel)]="site.needsCsiInspection" name="needsCsiInspection">
                                     <label class="form-check-label">Needs CSI Inspection</label>
-                                </div>                               
+                                </div>
                                 <div class="form-check mb-2">
                                     <input type="checkbox" class="form-check-input"
                                            [(ngModel)]="site.needsFogInspection" name="needsFogInspection">
@@ -133,16 +131,19 @@
 
                         <div class="d-flex justify-content-end">
                             <button type="button"
-                                    class="btn btn-primary vp-section-button"   
+                                    class="btn btn-primary vp-section-button"
                                     (click)="updateSiteSettings(form)">
                                 Update
                             </button>
                         </div>
-                    </vp-section>                
-                </div>
-                <div class="col-md-6">
+                    </div>
+                </vp-section>
+            </div>
+            <div class="col-md-6">
 
-                    <vp-section header="Facility Type">
+                <vp-section header="Facility Type">
+                    <div dp-spinner-parent>
+                        <dp-loading-spinner *ngIf="sectionLoading.facilityType"></dp-loading-spinner>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -233,8 +234,6 @@
                             </div>
                         </div>
 
-
-
                         <vp-validation-summary [form]="form"
                                                [validationErrors]="validationErrors">
                         </vp-validation-summary>
@@ -246,15 +245,17 @@
                                 Update
                             </button>
                         </div>
-
-                    </vp-section>
-                </div>
+                    </div>
+                </vp-section>
             </div>
+        </div>
 
 
-            <div class="row mt-3">
-                <div class="col-md-6">
-                    <vp-section header="Location / Property Information">
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <vp-section header="Location / Property Information">
+                    <div dp-spinner-parent>
+                        <dp-loading-spinner *ngIf="sectionLoading.location"></dp-loading-spinner>
 
                         <div class="mb-3">
                             <vp-input [(ngModel)]="site.accountNumber"
@@ -333,7 +334,6 @@
                                       [options]="stateOptions"
                                       [form]="form">
                             </vp-input>
-
                         </div>
 
                         <div class="mb-3">
@@ -372,12 +372,14 @@
                                 Update
                             </button>
                         </div>
+                    </div>
+                </vp-section>
+            </div>
 
-                    </vp-section>
-                </div>
-
-                <div class="col-md-6">
-                    <vp-section header="Contact / Mailing Information">
+            <div class="col-md-6">
+                <vp-section header="Contact / Mailing Information">
+                    <div dp-spinner-parent>
+                        <dp-loading-spinner *ngIf="sectionLoading.mailing"></dp-loading-spinner>
 
                         <div class="mb-3">
                             <vp-input [(ngModel)]="site.mailingCompanyName"
@@ -487,11 +489,9 @@
                                 Update
                             </button>
                         </div>
-
-                    </vp-section>
-                </div>
+                    </div>
+                </vp-section>
             </div>
-        </form>
-    </div>
+        </div>
+    </form>
 </div>
-

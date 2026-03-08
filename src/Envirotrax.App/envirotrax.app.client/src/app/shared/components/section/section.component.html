@@ -1,4 +1,4 @@
-<section class="border rounded shadow-sm">
+<section class="border rounded shadow-sm d-flex flex-column h-100">
     <div class="bg-info px-3 py-2 rounded-top">
         <div role="button" class="d-flex justify-content-between text-white">
             <div class="d-flex align-items-center">
@@ -16,7 +16,7 @@
         </div>
     </div>
 
-    <div *ngIf="isExpanded" class="p-3 bg-white rounded-bottom border border-info border-top-0">
+    <div *ngIf="isExpanded" class="p-3 bg-white rounded-bottom border border-info border-top-0 flex-fill">
         <ng-content></ng-content>
     </div>
 </section>

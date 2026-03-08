@@ -19,8 +19,8 @@ import { GreaseTrapType } from '../../shared/enums/grease-trap-type.enum';
     templateUrl: './edit-site-component.html'
 })
 export class EditSiteComponent implements OnInit {
-
     public validationErrors: string[] = [];
+
     public site: Site = {
         backflowScheduleMonth: 0,
         greaseTrapType: 0,
@@ -28,9 +28,6 @@ export class EditSiteComponent implements OnInit {
     };
 
     public currentSite?: Site = {};
-
-    public states: State[] = [];
-
 
     public users: any[] = [];
     public greaseTrapOptions: any[] = [];
@@ -90,11 +87,6 @@ export class EditSiteComponent implements OnInit {
         { id: FacilityType.Other, text: "Other" },
     ];
 
-
-
-
-   
-
     public mailingStateChanged(stateId: number): void {
         this.site.mailingStateId = stateId;
     }
@@ -111,14 +103,12 @@ export class EditSiteComponent implements OnInit {
         this.site.mailingNumber = this.site.propertyNumber;
     }
 
-
     public greaseTrapTypes: InputOption[] = [
         { id: GreaseTrapType.TrapNotRequired, text: "Trap Not Required" },
         { id: GreaseTrapType.HasGreaseTrap, text: "Has Grease Trap" },
         { id: GreaseTrapType.ShouldHaveGreaseTrap, text: "Should Have Grease Trap" },
         { id: GreaseTrapType.MightHaveGreaseTrap, text: "Might Have Grease Trap" },
     ];
-
 
     public backflowScheduleMonths: InputOption[] = [
         { id: 1, text: 'January' },
@@ -149,21 +139,16 @@ export class EditSiteComponent implements OnInit {
             ...this.users.map(user => ({ id: user.id, text: user.emailAddress }))
         ];
 
-
         this.backflowUsers = [
             { id: null, text: 'Unassigned' },
             ...this.users.map(user => ({ id: user.id, text: user.emailAddress }))
         ];
-
 
         this.fogUsers = [
             { id: null, text: 'Unassigned' },
             ...this.users.map(user => ({ id: user.id, text: user.emailAddress }))
         ];
     }
-
-
-
 
     public async updateFacilityType(form: NgForm) {
         if (form.valid) {
@@ -195,11 +180,10 @@ export class EditSiteComponent implements OnInit {
                     throw e;
                 }
             } finally {
-                this.sectionLoading.facilityType = true;
+                this.sectionLoading.facilityType = false;
             }
         }
     }
-
 
     public async updateSiteSettings(form: NgForm): Promise<void> {
         if (form.valid) {
@@ -223,18 +207,14 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.backflowAccountAssignmentId = this.site.backflowAccountAssignmentId;
                     this.currentSite.fogAccountAssignmentId = this.site.fogAccountAssignmentId;
 
-
                     const result = await this._siteService.update(this.currentSite);
-
                 }
-
-
             } catch (e) {
                 if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
                     throw e;
                 }
             } finally {
-                this.sectionLoading.siteSettings = true;
+                this.sectionLoading.siteSettings = false;
             }
         }
     }
@@ -323,13 +303,6 @@ export class EditSiteComponent implements OnInit {
     }
 
     private async loadStates(): Promise<void> {
-        this.states = await this._stateService.getAllStates();
-        this.stateOptions = [
-            { id: '', text: '' },
-            ...this.states.map(state => ({ id: state.id, text: state.name }))
-        ];
+        this.stateOptions = await this._stateService.getAllStatesAsOptions(true);
     }
-
 }
-
-

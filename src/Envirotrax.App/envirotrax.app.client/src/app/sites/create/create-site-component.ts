@@ -7,6 +7,7 @@ import { PropertyType } from "../../shared/enums/property-type.enum";
 import { SiteService } from "../../shared/services/sites/site.service";
 import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { HelperService } from "../../shared/services/helpers/helper.service";
+import { Router } from "@angular/router";
 
 @Component({
   selector: 'app-create-site-component',
@@ -36,7 +37,8 @@ export class CreateSiteComponent {
         private readonly _siteService: SiteService,
         private readonly _stateService: LookupService,
         private readonly _modalReference: ModalReference<Site>,
-        private readonly _helper: HelperService
+        private readonly _helper: HelperService,
+        private readonly _router: Router
     ) {
     }
 
@@ -53,6 +55,7 @@ export class CreateSiteComponent {
 
                 const result = await this._siteService.add(this.site);
                 this._modalReference.closeSuccess(result);
+                this._router.navigate(['/sites', result.id, 'edit']);
             } catch (e) {
                 if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
                     throw e;

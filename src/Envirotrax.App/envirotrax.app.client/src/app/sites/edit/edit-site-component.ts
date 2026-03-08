@@ -19,9 +19,8 @@ import { GreaseTrapType } from '../../shared/enums/grease-trap-type.enum';
     templateUrl: './edit-site-component.html'
 })
 export class EditSiteComponent implements OnInit {
-
-    public isLoading: boolean = false;
     public validationErrors: string[] = [];
+
     public site: Site = {
         backflowScheduleMonth: 0,
         greaseTrapType: 0,
@@ -30,9 +29,6 @@ export class EditSiteComponent implements OnInit {
 
     public currentSite?: Site = {};
 
-    public states: State[] = [];
-
-
     public users: any[] = [];
     public greaseTrapOptions: any[] = [];
 
@@ -40,6 +36,13 @@ export class EditSiteComponent implements OnInit {
     public backflowUsers: InputOption[] = [];
     public fogUsers: InputOption[] = [];
     public stateOptions: InputOption[] = [];
+
+    public sectionLoading = {
+        siteSettings: false,
+        facilityType: false,
+        location: false,
+        mailing: false,
+    };
 
     constructor(
         private readonly _siteService: SiteService,
@@ -84,11 +87,6 @@ export class EditSiteComponent implements OnInit {
         { id: FacilityType.Other, text: "Other" },
     ];
 
-
-
-
-   
-
     public mailingStateChanged(stateId: number): void {
         this.site.mailingStateId = stateId;
     }
@@ -105,14 +103,12 @@ export class EditSiteComponent implements OnInit {
         this.site.mailingNumber = this.site.propertyNumber;
     }
 
-
     public greaseTrapTypes: InputOption[] = [
         { id: GreaseTrapType.TrapNotRequired, text: "Trap Not Required" },
         { id: GreaseTrapType.HasGreaseTrap, text: "Has Grease Trap" },
         { id: GreaseTrapType.ShouldHaveGreaseTrap, text: "Should Have Grease Trap" },
         { id: GreaseTrapType.MightHaveGreaseTrap, text: "Might Have Grease Trap" },
     ];
-
 
     public backflowScheduleMonths: InputOption[] = [
         { id: 1, text: 'January' },
@@ -143,12 +139,10 @@ export class EditSiteComponent implements OnInit {
             ...this.users.map(user => ({ id: user.id, text: user.emailAddress }))
         ];
 
-
         this.backflowUsers = [
             { id: null, text: 'Unassigned' },
             ...this.users.map(user => ({ id: user.id, text: user.emailAddress }))
         ];
-
 
         this.fogUsers = [
             { id: null, text: 'Unassigned' },
@@ -156,13 +150,10 @@ export class EditSiteComponent implements OnInit {
         ];
     }
 
-
-
-
     public async updateFacilityType(form: NgForm) {
         if (form.valid) {
             try {
-                this.isLoading = true;
+                this.sectionLoading.facilityType = true;
                 this.validationErrors = [];
 
                 console.log(this.site.facilityType);
@@ -189,16 +180,15 @@ export class EditSiteComponent implements OnInit {
                     throw e;
                 }
             } finally {
-                this.isLoading = false;
+                this.sectionLoading.facilityType = false;
             }
         }
     }
 
-
     public async updateSiteSettings(form: NgForm): Promise<void> {
         if (form.valid) {
             try {
-                this.isLoading = true;
+                this.sectionLoading.siteSettings = true;
                 this.validationErrors = [];
 
                 if (this.currentSite) {
@@ -217,18 +207,14 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.backflowAccountAssignmentId = this.site.backflowAccountAssignmentId;
                     this.currentSite.fogAccountAssignmentId = this.site.fogAccountAssignmentId;
 
-
                     const result = await this._siteService.update(this.currentSite);
-
                 }
-
-
             } catch (e) {
                 if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
                     throw e;
                 }
             } finally {
-                this.isLoading = false;
+                this.sectionLoading.siteSettings = false;
             }
         }
     }
@@ -236,7 +222,7 @@ export class EditSiteComponent implements OnInit {
     public async updateLocation(form: NgForm): Promise<void> {
         if (form.valid) {
             try {
-                this.isLoading = true;
+                this.sectionLoading.location = true;
                 this.validationErrors = [];
                 if (this.currentSite) {
                     this.currentSite.id = this.site.id;
@@ -258,7 +244,7 @@ export class EditSiteComponent implements OnInit {
                     throw e;
                 }
             } finally {
-                this.isLoading = false;
+                this.sectionLoading.location = false;
             }
         }
     }
@@ -267,7 +253,8 @@ export class EditSiteComponent implements OnInit {
     public async updateMailingInformation(form: NgForm): Promise<void> {
         if (form.valid) {
             try {
-                this.isLoading = true;
+                this.sectionLoading.mailing = true;
+
                 this.validationErrors = [];
                 if (this.currentSite) {
                     this.currentSite.id = this.site.id;
@@ -288,14 +275,19 @@ export class EditSiteComponent implements OnInit {
                     throw e;
                 }
             } finally {
-                this.isLoading = false;
+                this.sectionLoading.mailing = false;
             }
         }
     }
 
     private async getSite(id: number): Promise<void> {
         try {
-            this.isLoading = true;
+
+            this.sectionLoading.facilityType = true;
+            this.sectionLoading.location = true;
+            this.sectionLoading.mailing = true;
+            this.sectionLoading.siteSettings = true;
+
             const apiSite = await this._siteService.get(id);
 
             this.site = {
@@ -303,20 +295,14 @@ export class EditSiteComponent implements OnInit {
             };
 
         } finally {
-            this.isLoading = false;
+            this.sectionLoading.facilityType = false;
+            this.sectionLoading.location = false;
+            this.sectionLoading.mailing = false;
+            this.sectionLoading.siteSettings = false;
         }
     }
 
-
-
     private async loadStates(): Promise<void> {
-        this.states = await this._stateService.getAllStates();
-        this.stateOptions = [
-            { id: '', text: '' },
-            ...this.states.map(state => ({ id: state.id, text: state.name }))
-        ];
+        this.stateOptions = await this._stateService.getAllStatesAsOptions(true);
     }
-
 }
-
-

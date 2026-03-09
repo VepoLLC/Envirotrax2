@@ -5,137 +5,142 @@
             <div class="col-md-6">
                 <div class="h-100">
                     <vp-section header="Site Settings">
-                        <div dp-spinner-parent>
+                        <div class="d-flex flex-column justify-content-between h-100" dp-spinner-parent>
                             <dp-loading-spinner *ngIf="sectionLoading.siteSettings"></dp-loading-spinner>
 
-                            <div class="mb-4">
-                                <div class="mb-2">
-                                    <strong>Creation Date: </strong>
-                                    <span>{{ site.createdTime | date:'M/d/yyyy h:mm a' }}</span>
-                                </div>
-                                <div class="mb-3">
-                                    <strong>Last Modified: </strong>
-                                    <span>{{ site.updatedTime | date:'M/d/yyyy h:mm a' }}</span>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <vp-input name="backflowScheduleMonth"
-                                              label="Test Renewal Month"
-                                              type="select"
-                                              [(ngModel)]="site.backflowScheduleMonth"
-                                              [options]="backflowScheduleMonths"
-                                              [form]="form">
-                                    </vp-input>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <div class="form-check mb-2">
-                                        <input type="checkbox" class="form-check-input"
-                                               [(ngModel)]="site.active" name="active">
-                                        <label class="form-check-label">Active</label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input type="checkbox" class="form-check-input"
-                                               [(ngModel)]="site.invalidMailingAddress" name="invalidMailingAddress">
-                                        <label class="form-check-label">Invalid Mailing Address</label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input type="checkbox" class="form-check-input"
-                                               [(ngModel)]="site.outOfArea" name="outOfArea">
-                                        <label class="form-check-label">Out of Area</label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input type="checkbox" class="form-check-input"
-                                               [(ngModel)]="site.isFeeExempt" name="isFeeExempt">
-                                        <label class="form-check-label">Is Fee Exempt</label>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <div class="form-check mb-2">
-                                        <input type="checkbox" class="form-check-input"
-                                               [(ngModel)]="site.needsCsiInspection" name="needsCsiInspection">
-                                        <label class="form-check-label">Needs CSI Inspection</label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input type="checkbox" class="form-check-input"
-                                               [(ngModel)]="site.needsFogInspection" name="needsFogInspection">
-                                        <label class="form-check-label">Needs FOG Inspection</label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input type="checkbox" class="form-check-input"
-                                               [(ngModel)]="site.needsFogPermit" name="needsFogPermit">
-                                        <label class="form-check-label">Has FOG Permit</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3" style="margin-top: 40px;">
+                            <div>
+                                <div class="mb-4">
                                     <div class="mb-2">
-                                        <vp-input name="lastTripTicketDate"
-                                                  label="Last Trip Ticket Date"
-                                                  type="date"
-                                                  [(ngModel)]="site.lastTripTicketDate"
-                                                  [form]="form">
-                                        </vp-input>
+                                        <strong>Creation Date: </strong>
+                                        <span>{{ site.createdTime | date:'M/d/yyyy h:mm a' }}</span>
                                     </div>
-                                    <div class="mb-2">
-                                        <vp-input [(ngModel)]="site.tripTicketInterval"
-                                                  name="tripTicketInterval"
-                                                  label="Trip Ticket Interval"
-                                                  type="number"
-                                                  [form]="form">
-                                        </vp-input>
+                                    <div class="mb-3">
+                                        <strong>Last Modified: </strong>
+                                        <span>{{ site.updatedTime | date:'M/d/yyyy h:mm a' }}</span>
                                     </div>
                                 </div>
 
-                                <div class="col-md-6 mb-3">
-                                    <p>Program User Account Assignments:</p>
-                                    <div class="mb-2">
-                                        <vp-input name="CsiAccountAssignment"
-                                                  label="CSI"
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <vp-input name="backflowScheduleMonth"
+                                                  label="Test Renewal Month"
                                                   type="select"
-                                                  [(ngModel)]="site.csiAccountAssignmentId"
-                                                  [options]="csiUsers"
-                                                  [form]="form">
-                                        </vp-input>
-                                    </div>
-                                    <div class="mb-2">
-                                        <vp-input name="backflowAccountAssignment"
-                                                  label="Backflow"
-                                                  type="select"
-                                                  [(ngModel)]="site.backflowAccountAssignmentId"
-                                                  [options]="backflowUsers"
-                                                  [form]="form">
-                                        </vp-input>
-                                    </div>
-                                    <div class="mb-2">
-                                        <vp-input name="fogAccountAssignment"
-                                                  label="FOG"
-                                                  type="select"
-                                                  [(ngModel)]="site.fogAccountAssignmentId"
-                                                  [options]="fogUsers"
+                                                  [(ngModel)]="site.backflowScheduleMonth"
+                                                  [options]="backflowScheduleMonths"
                                                   [form]="form">
                                         </vp-input>
                                     </div>
                                 </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [(ngModel)]="site.active" name="active">
+                                            <label class="form-check-label">Active</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [(ngModel)]="site.invalidMailingAddress"
+                                                   name="invalidMailingAddress">
+                                            <label class="form-check-label">Invalid Mailing Address</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [(ngModel)]="site.outOfArea" name="outOfArea">
+                                            <label class="form-check-label">Out of Area</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [(ngModel)]="site.isFeeExempt" name="isFeeExempt">
+                                            <label class="form-check-label">Is Fee Exempt</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [(ngModel)]="site.needsCsiInspection" name="needsCsiInspection">
+                                            <label class="form-check-label">Needs CSI Inspection</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [(ngModel)]="site.needsFogInspection" name="needsFogInspection">
+                                            <label class="form-check-label">Needs FOG Inspection</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [(ngModel)]="site.needsFogPermit" name="needsFogPermit">
+                                            <label class="form-check-label">Has FOG Permit</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3" style="margin-top: 40px;">
+                                        <div class="mb-2">
+                                            <vp-input name="lastTripTicketDate"
+                                                      label="Last Trip Ticket Date"
+                                                      type="date"
+                                                      [(ngModel)]="site.lastTripTicketDate"
+                                                      [form]="form">
+                                            </vp-input>
+                                        </div>
+                                        <div class="mb-2">
+                                            <vp-input [(ngModel)]="site.tripTicketInterval"
+                                                      name="tripTicketInterval"
+                                                      label="Trip Ticket Interval"
+                                                      type="number"
+                                                      [form]="form">
+                                            </vp-input>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <p>Program User Account Assignments:</p>
+                                        <div class="mb-2">
+                                            <vp-input name="CsiAccountAssignment"
+                                                      label="CSI"
+                                                      type="select"
+                                                      [(ngModel)]="site.csiAccountAssignmentId"
+                                                      [options]="csiUsers"
+                                                      [form]="form">
+                                            </vp-input>
+                                        </div>
+                                        <div class="mb-2">
+                                            <vp-input name="backflowAccountAssignment"
+                                                      label="Backflow"
+                                                      type="select"
+                                                      [(ngModel)]="site.backflowAccountAssignmentId"
+                                                      [options]="backflowUsers"
+                                                      [form]="form">
+                                            </vp-input>
+                                        </div>
+                                        <div class="mb-2">
+                                            <vp-input name="fogAccountAssignment"
+                                                      label="FOG"
+                                                      type="select"
+                                                      [(ngModel)]="site.fogAccountAssignmentId"
+                                                      [options]="fogUsers"
+                                                      [form]="form">
+                                            </vp-input>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <vp-validation-summary [form]="form"
-                                                   [validationErrors]="validationErrors">
-                            </vp-validation-summary>
+                            <div>
+                                <vp-validation-summary [form]="form"
+                                                       [validationErrors]="validationErrors">
+                                </vp-validation-summary>
 
-                            <div class="d-flex justify-content-end">
-                                <button type="button"
-                                        class="btn btn-primary vp-section-button"
-                                        (click)="updateSiteSettings(form)">
-                                    Update
-                                </button>
+                                <div class="d-flex justify-content-end">
+                                    <button type="button"
+                                            class="btn btn-primary vp-section-button"
+                                            (click)="updateSiteSettings(form)">
+                                        Update
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </vp-section>
@@ -144,108 +149,112 @@
             <div class="col-md-6">
                 <div class="h-100">
                     <vp-section header="Facility Type">
-                        <div dp-spinner-parent>
+                        <div class="d-flex flex-column h-100 justify-content-between" dp-spinner-parent>
                             <dp-loading-spinner *ngIf="sectionLoading.facilityType"></dp-loading-spinner>
 
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <vp-input name="facilityType"
-                                              label="Facility Type"
-                                              type="select"
-                                              [(ngModel)]="site.facilityType"
-                                              [options]="facilityTypes"
-                                              [form]="form">
-                                    </vp-input>
+                            <div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <vp-input name="facilityType"
+                                                  label="Facility Type"
+                                                  type="select"
+                                                  [(ngModel)]="site.facilityType"
+                                                  [options]="facilityTypes"
+                                                  [form]="form">
+                                        </vp-input>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <vp-input name="greaseTrapType"
+                                                  label="Grease Trap Type"
+                                                  type="select"
+                                                  [(ngModel)]="site.greaseTrapType"
+                                                  [options]="greaseTrapTypes"
+                                                  [form]="form">
+                                        </vp-input>
+                                    </div>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <vp-input name="greaseTrapType"
-                                              label="Grease Trap Type"
-                                              type="select"
-                                              [(ngModel)]="site.greaseTrapType"
-                                              [options]="greaseTrapTypes"
-                                              [form]="form">
-                                    </vp-input>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [(ngModel)]="site.hasKnownBackflowAssemblies"
+                                                   name="hasKnownBackflowAssemblies">
+                                            <label class="form-check-label">Has Known Backflow Assemblies</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [(ngModel)]="site.hasOnSiteSewageFacility"
+                                                   name="hasOnSiteSewageFacility">
+                                            <label class="form-check-label">Has On Site Sewage Facility</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [(ngModel)]="site.hasAuxWaterSupply"
+                                                   name="hasAuxWaterSupply">
+                                            <label class="form-check-label">Has Auxiliary Water Supply</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [(ngModel)]="site.hasFireSystem"
+                                                   name="hasFireSystem">
+                                            <label class="form-check-label">Has Fire System</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [(ngModel)]="site.fireSeparateWater"
+                                                   name="fireSeparateWater">
+                                            <label class="form-check-label">Fire System on Separate Water Supply</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [(ngModel)]="site.hasGritTrap"
+                                                   name="hasGritTrap">
+                                            <label class="form-check-label">Has Sand &amp; Grit Trap</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [(ngModel)]="site.hasIrrigation"
+                                                   name="hasIrrigation">
+                                            <label class="form-check-label">Has Irrigation System</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [(ngModel)]="site.irrigationSeparateWater"
+                                                   name="irrigationSeparateWater">
+                                            <label class="form-check-label">Irrigation on Separate Water Supply</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [(ngModel)]="site.hasDomesticPremisesIsolation"
+                                                   name="hasDomesticPremisesIsolation">
+                                            <label class="form-check-label">Has Domestic/Premises Isolation</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [(ngModel)]="site.requiresDomesticPremisesIsolation"
+                                                   name="requiresDomesticPremisesIsolation">
+                                            <label class="form-check-label">Requires Domestic/Premises Isolation</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-check mb-2">
-                                        <input type="checkbox" class="form-check-input"
-                                               [(ngModel)]="site.hasKnownBackflowAssemblies"
-                                               name="hasKnownBackflowAssemblies">
-                                        <label class="form-check-label">Has Known Backflow Assemblies</label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input type="checkbox" class="form-check-input"
-                                               [(ngModel)]="site.hasOnSiteSewageFacility"
-                                               name="hasOnSiteSewageFacility">
-                                        <label class="form-check-label">Has On Site Sewage Facility</label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input type="checkbox" class="form-check-input"
-                                               [(ngModel)]="site.hasAuxWaterSupply"
-                                               name="hasAuxWaterSupply">
-                                        <label class="form-check-label">Has Auxiliary Water Supply</label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input type="checkbox" class="form-check-input"
-                                               [(ngModel)]="site.hasFireSystem"
-                                               name="hasFireSystem">
-                                        <label class="form-check-label">Has Fire System</label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input type="checkbox" class="form-check-input"
-                                               [(ngModel)]="site.fireSeparateWater"
-                                               name="fireSeparateWater">
-                                        <label class="form-check-label">Fire System on Separate Water Supply</label>
-                                    </div>
+                            <div>
+                                <vp-validation-summary [form]="form"
+                                                       [validationErrors]="validationErrors">
+                                </vp-validation-summary>
+
+                                <div class="d-flex justify-content-end">
+                                    <button type="button"
+                                            class="btn btn-primary vp-section-button"
+                                            (click)="updateFacilityType(form)">
+                                        Update
+                                    </button>
                                 </div>
-
-                                <div class="col-md-6">
-                                    <div class="form-check mb-2">
-                                        <input type="checkbox" class="form-check-input"
-                                               [(ngModel)]="site.hasGritTrap"
-                                               name="hasGritTrap">
-                                        <label class="form-check-label">Has Sand &amp; Grit Trap</label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input type="checkbox" class="form-check-input"
-                                               [(ngModel)]="site.hasIrrigation"
-                                               name="hasIrrigation">
-                                        <label class="form-check-label">Has Irrigation System</label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input type="checkbox" class="form-check-input"
-                                               [(ngModel)]="site.irrigationSeparateWater"
-                                               name="irrigationSeparateWater">
-                                        <label class="form-check-label">Irrigation on Separate Water Supply</label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input type="checkbox" class="form-check-input"
-                                               [(ngModel)]="site.hasDomesticPremisesIsolation"
-                                               name="hasDomesticPremisesIsolation">
-                                        <label class="form-check-label">Has Domestic/Premises Isolation</label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input type="checkbox" class="form-check-input"
-                                               [(ngModel)]="site.requiresDomesticPremisesIsolation"
-                                               name="requiresDomesticPremisesIsolation">
-                                        <label class="form-check-label">Requires Domestic/Premises Isolation</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <vp-validation-summary [form]="form"
-                                                   [validationErrors]="validationErrors">
-                            </vp-validation-summary>
-
-                            <div class="d-flex justify-content-end">
-                                <button type="button"
-                                        class="btn btn-primary vp-section-button"
-                                        (click)="updateFacilityType(form)">
-                                    Update
-                                </button>
                             </div>
                         </div>
                     </vp-section>
@@ -257,123 +266,127 @@
             <div class="col-md-6">
                 <div class="h-100">
                     <vp-section header="Location / Property Information">
-                        <div dp-spinner-parent>
+                        <div class="d-flex flex-column justify-content-between h-100" dp-spinner-parent>
                             <dp-loading-spinner *ngIf="sectionLoading.location"></dp-loading-spinner>
 
-                            <div class="mb-3">
-                                <vp-input [(ngModel)]="site.accountNumber"
-                                          name="accountNumber"
-                                          label="Account Number"
-                                          [required]="true"
-                                          [maxLength]="50"
-                                          [form]="form">
-                                </vp-input>
-                            </div>
+                            <div>
+                                <div class="mb-3">
+                                    <vp-input [(ngModel)]="site.accountNumber"
+                                              name="accountNumber"
+                                              label="Account Number"
+                                              [required]="true"
+                                              [maxLength]="50"
+                                              [form]="form">
+                                    </vp-input>
+                                </div>
 
-                            <div class="mb-3">
-                                <vp-input name="propertyType"
-                                          label="Property Type"
-                                          type="select"
-                                          [(ngModel)]="site.propertyType"
-                                          [options]="propertyTypeOptions"
-                                          [form]="form">
-                                </vp-input>
-                            </div>
+                                <div class="mb-3">
+                                    <vp-input name="propertyType"
+                                              label="Property Type"
+                                              type="select"
+                                              [(ngModel)]="site.propertyType"
+                                              [options]="propertyTypeOptions"
+                                              [form]="form">
+                                    </vp-input>
+                                </div>
 
-                            <div class="mb-3">
-                                <vp-input [(ngModel)]="site.businessName"
-                                          name="businessName"
-                                          label="Business Name"
-                                          [maxLength]="255"
-                                          [form]="form">
-                                </vp-input>
-                            </div>
+                                <div class="mb-3">
+                                    <vp-input [(ngModel)]="site.businessName"
+                                              name="businessName"
+                                              label="Business Name"
+                                              [maxLength]="255"
+                                              [form]="form">
+                                    </vp-input>
+                                </div>
 
-                            <p class="fw-bold">Property Address</p>
+                                <p class="fw-bold">Property Address</p>
 
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <vp-input [(ngModel)]="site.streetNumber"
-                                                  name="streetNumber"
-                                                  label="Street #"
-                                                  [form]="form">
-                                        </vp-input>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <vp-input [(ngModel)]="site.streetNumber"
+                                                      name="streetNumber"
+                                                      label="Street #"
+                                                      [form]="form">
+                                            </vp-input>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <vp-input [(ngModel)]="site.streetName"
+                                                      name="streetName"
+                                                      label="Street Name"
+                                                      [form]="form">
+                                            </vp-input>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <vp-input [(ngModel)]="site.propertyNumber"
+                                                      name="propertyNumber"
+                                                      label="Suite / Apt #"
+                                                      [form]="form">
+                                            </vp-input>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <vp-input [(ngModel)]="site.streetName"
-                                                  name="streetName"
-                                                  label="Street Name"
-                                                  [form]="form">
-                                        </vp-input>
-                                    </div>
+
+                                <div class="mb-3">
+                                    <vp-input [(ngModel)]="site.city"
+                                              name="city"
+                                              label="City"
+                                              [form]="form">
+                                    </vp-input>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <vp-input [(ngModel)]="site.propertyNumber"
-                                                  name="propertyNumber"
-                                                  label="Suite / Apt #"
-                                                  [form]="form">
-                                        </vp-input>
-                                    </div>
+
+                                <div class="mb-3">
+                                    <vp-input name="stateId"
+                                              label="State"
+                                              type="select"
+                                              [(ngModel)]="site.stateId"
+                                              [options]="stateOptions"
+                                              [form]="form">
+                                    </vp-input>
+                                </div>
+
+                                <div class="mb-3">
+                                    <vp-input [(ngModel)]="site.zipCode"
+                                              name="zip"
+                                              label="ZIP"
+                                              [maxLength]="10"
+                                              [form]="form">
+                                    </vp-input>
+                                </div>
+
+                                <div class="mb-3">
+                                    <vp-input [(ngModel)]="site.fogGeneratorPhoneNumber"
+                                              name="phone"
+                                              label="Phone Number"
+                                              [form]="form">
+                                    </vp-input>
+                                </div>
+
+                                <div class="mb-3">
+                                    <vp-input [(ngModel)]="site.fogGeneratorEmailAddress"
+                                              name="email"
+                                              label="Email Address"
+                                              [form]="form">
+                                    </vp-input>
                                 </div>
                             </div>
 
-                            <div class="mb-3">
-                                <vp-input [(ngModel)]="site.city"
-                                          name="city"
-                                          label="City"
-                                          [form]="form">
-                                </vp-input>
-                            </div>
+                            <div>
+                                <vp-validation-summary [form]="form"
+                                                       [validationErrors]="validationErrors">
+                                </vp-validation-summary>
 
-                            <div class="mb-3">
-                                <vp-input name="stateId"
-                                          label="State"
-                                          type="select"
-                                          [(ngModel)]="site.stateId"
-                                          [options]="stateOptions"
-                                          [form]="form">
-                                </vp-input>
-                            </div>
-
-                            <div class="mb-3">
-                                <vp-input [(ngModel)]="site.zipCode"
-                                          name="zip"
-                                          label="ZIP"
-                                          [maxLength]="10"
-                                          [form]="form">
-                                </vp-input>
-                            </div>
-
-                            <div class="mb-3">
-                                <vp-input [(ngModel)]="site.fogGeneratorPhoneNumber"
-                                          name="phone"
-                                          label="Phone Number"
-                                          [form]="form">
-                                </vp-input>
-                            </div>
-
-                            <div class="mb-3">
-                                <vp-input [(ngModel)]="site.fogGeneratorEmailAddress"
-                                          name="email"
-                                          label="Email Address"
-                                          [form]="form">
-                                </vp-input>
-                            </div>
-
-                            <vp-validation-summary [form]="form"
-                                                   [validationErrors]="validationErrors">
-                            </vp-validation-summary>
-
-                            <div class="d-flex justify-content-end">
-                                <button type="button"
-                                        class="btn btn-primary vp-section-button"
-                                        (click)="updateLocation(form)">
-                                    Update
-                                </button>
+                                <div class="d-flex justify-content-end">
+                                    <button type="button"
+                                            class="btn btn-primary vp-section-button"
+                                            (click)="updateLocation(form)">
+                                        Update
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </vp-section>
@@ -383,116 +396,120 @@
             <div class="col-md-6">
                 <div class="h-100">
                     <vp-section header="Contact / Mailing Information">
-                        <div dp-spinner-parent>
+                        <div class="d-flex flex-column justify-content-between h-100" dp-spinner-parent>
                             <dp-loading-spinner *ngIf="sectionLoading.mailing"></dp-loading-spinner>
 
-                            <div class="mb-3">
-                                <vp-input [(ngModel)]="site.mailingCompanyName"
-                                          name="companyName"
-                                          label="Company Name"
-                                          [form]="form">
-                                </vp-input>
-                            </div>
+                            <div>
+                                <div class="mb-3">
+                                    <vp-input [(ngModel)]="site.mailingCompanyName"
+                                              name="companyName"
+                                              label="Company Name"
+                                              [form]="form">
+                                    </vp-input>
+                                </div>
 
-                            <div class="mb-3">
-                                <vp-input [(ngModel)]="site.mailingContactName"
-                                          name="contactName"
-                                          label="Contact Name"
-                                          [form]="form">
-                                </vp-input>
-                            </div>
+                                <div class="mb-3">
+                                    <vp-input [(ngModel)]="site.mailingContactName"
+                                              name="contactName"
+                                              label="Contact Name"
+                                              [form]="form">
+                                    </vp-input>
+                                </div>
 
-                            <div class="mb-3">
-                                <button type="button"
-                                        class="btn btn-info text-white"
-                                        (click)="copyFromPropertyAddress()">
-                                    Copy from Property Address
-                                </button>
-                            </div>
+                                <div class="mb-3">
+                                    <button type="button"
+                                            class="btn btn-info text-white"
+                                            (click)="copyFromPropertyAddress()">
+                                        Copy from Property Address
+                                    </button>
+                                </div>
 
-                            <p class="fw-bold">Mailing Address</p>
+                                <p class="fw-bold">Mailing Address</p>
 
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <vp-input [(ngModel)]="site.mailingStreetNumber"
-                                                  name="mailingStreetNumber"
-                                                  label="Street #"
-                                                  [form]="form">
-                                        </vp-input>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <vp-input [(ngModel)]="site.mailingStreetNumber"
+                                                      name="mailingStreetNumber"
+                                                      label="Street #"
+                                                      [form]="form">
+                                            </vp-input>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <vp-input [(ngModel)]="site.mailingStreetName"
+                                                      name="mailingStreetName"
+                                                      label="Street Name"
+                                                      [form]="form">
+                                            </vp-input>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <vp-input [(ngModel)]="site.mailingNumber"
+                                                      name="mailingNumber"
+                                                      label="Suite/Apt #"
+                                                      [form]="form">
+                                            </vp-input>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <vp-input [(ngModel)]="site.mailingStreetName"
-                                                  name="mailingStreetName"
-                                                  label="Street Name"
-                                                  [form]="form">
-                                        </vp-input>
-                                    </div>
+
+                                <div class="mb-3">
+                                    <vp-input [(ngModel)]="site.mailingCity"
+                                              name="mailingCity"
+                                              label="City"
+                                              [form]="form">
+                                    </vp-input>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <vp-input [(ngModel)]="site.mailingNumber"
-                                                  name="mailingNumber"
-                                                  label="Suite/Apt #"
-                                                  [form]="form">
-                                        </vp-input>
-                                    </div>
+
+                                <vp-input name="mailingStateId"
+                                          label="State"
+                                          type="select"
+                                          [(ngModel)]="site.mailingStateId"
+                                          [options]="stateOptions"
+                                          [form]="form">
+                                </vp-input>
+
+                                <div class="mb-3">
+                                    <vp-input [(ngModel)]="site.mailingZipCode"
+                                              name="mailingZip"
+                                              label="ZIP"
+                                              [maxLength]="10"
+                                              [form]="form">
+                                    </vp-input>
+                                </div>
+
+                                <div class="mb-3">
+                                    <vp-input [(ngModel)]="site.mailingPhoneNumber"
+                                              name="mailingPhone"
+                                              label="Phone Number"
+                                              [form]="form">
+                                    </vp-input>
+                                </div>
+
+                                <div class="mb-3">
+                                    <vp-input [(ngModel)]="site.mailingEmailAddress"
+                                              name="mailingEmail"
+                                              label="Email Address"
+                                              [form]="form">
+                                    </vp-input>
                                 </div>
                             </div>
 
-                            <div class="mb-3">
-                                <vp-input [(ngModel)]="site.mailingCity"
-                                          name="mailingCity"
-                                          label="City"
-                                          [form]="form">
-                                </vp-input>
-                            </div>
+                            <div>
+                                <vp-validation-summary [form]="form"
+                                                       [validationErrors]="validationErrors">
+                                </vp-validation-summary>
 
-                            <vp-input name="mailingStateId"
-                                      label="State"
-                                      type="select"
-                                      [(ngModel)]="site.mailingStateId"
-                                      [options]="stateOptions"
-                                      [form]="form">
-                            </vp-input>
-
-                            <div class="mb-3">
-                                <vp-input [(ngModel)]="site.mailingZipCode"
-                                          name="mailingZip"
-                                          label="ZIP"
-                                          [maxLength]="10"
-                                          [form]="form">
-                                </vp-input>
-                            </div>
-
-                            <div class="mb-3">
-                                <vp-input [(ngModel)]="site.mailingPhoneNumber"
-                                          name="mailingPhone"
-                                          label="Phone Number"
-                                          [form]="form">
-                                </vp-input>
-                            </div>
-
-                            <div class="mb-3">
-                                <vp-input [(ngModel)]="site.mailingEmailAddress"
-                                          name="mailingEmail"
-                                          label="Email Address"
-                                          [form]="form">
-                                </vp-input>
-                            </div>
-
-                            <vp-validation-summary [form]="form"
-                                                   [validationErrors]="validationErrors">
-                            </vp-validation-summary>
-
-                            <div class="d-flex justify-content-end">
-                                <button type="button"
-                                        class="btn btn-primary vp-section-button"
-                                        (click)="updateMailingInformation(form)">
-                                    Update
-                                </button>
+                                <div class="d-flex justify-content-end">
+                                    <button type="button"
+                                            class="btn btn-primary vp-section-button"
+                                            (click)="updateMailingInformation(form)">
+                                        Update
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </vp-section>

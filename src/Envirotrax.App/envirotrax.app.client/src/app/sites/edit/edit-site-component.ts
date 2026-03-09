@@ -12,6 +12,7 @@ import { UserService } from "../../shared/services/water-suppliers/user.service"
 import { FacilityType } from '../../shared/enums/facility-type.enum';
 import { InputOption } from "../../shared/components/input/input.component";
 import { GreaseTrapType } from '../../shared/enums/grease-trap-type.enum';
+import { ToastService, ToastType } from '../../shared/services/toast.service';
 
 @Component({
     selector: 'app-edit-site-component',
@@ -50,7 +51,8 @@ export class EditSiteComponent implements OnInit {
         private readonly _acitvatedRoute: ActivatedRoute,
         private readonly _router: Router,
         private readonly _helper: HelperService,
-        private readonly _userService: UserService
+        private readonly _userService: UserService,
+        private readonly _toastService: ToastService
     ) {
     }
 
@@ -173,12 +175,15 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.requiresDomesticPremisesIsolation = this.site.requiresDomesticPremisesIsolation;
 
                     const result = await this._siteService.update(this.currentSite);
-                }
 
+                    this._toastService.successfullySaved('Facility Type');
+                }
             } catch (e) {
                 if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
                     throw e;
                 }
+
+                this._toastService.failedToSave('Facility Type');
             } finally {
                 this.sectionLoading.facilityType = false;
             }
@@ -208,11 +213,15 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.fogAccountAssignmentId = this.site.fogAccountAssignmentId;
 
                     const result = await this._siteService.update(this.currentSite);
+
+                    this._toastService.successfullySaved('Site Settings');
                 }
             } catch (e) {
                 if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
                     throw e;
                 }
+
+                this._toastService.failedToSave('Site Settings');
             } finally {
                 this.sectionLoading.siteSettings = false;
             }
@@ -238,11 +247,15 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.fogGeneratorPhoneNumber = this.site.fogGeneratorPhoneNumber;
                     this.currentSite.fogGeneratorEmailAddress = this.site.fogGeneratorEmailAddress;
                     const result = await this._siteService.update(this.currentSite);
+
+                    this._toastService.successfullySaved('Location');
                 }
             } catch (e) {
                 if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
                     throw e;
                 }
+
+                this._toastService.failedToSave('Location');
             } finally {
                 this.sectionLoading.location = false;
             }
@@ -269,11 +282,15 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.mailingPhoneNumber = this.site.mailingPhoneNumber;
                     this.currentSite.mailingEmailAddress = this.site.mailingEmailAddress;
                     const result = await this._siteService.update(this.currentSite);
+
+                    this._toastService.successfullySaved('Mailing Information');
                 }
             } catch (e) {
                 if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
                     throw e;
                 }
+
+                this._toastService.failedToSave('Mailing Information');
             } finally {
                 this.sectionLoading.mailing = false;
             }

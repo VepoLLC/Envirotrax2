@@ -8,10 +8,12 @@ import { SharedComponentsModule } from './shared/components/shared.components.mo
 import { TitleStrategy } from '@angular/router';
 import { AppTitleStrategy } from './shared/services/helpers/title/app-title-strategy.service';
 import { AuthInterceptor } from './shared/services/auth/auth.iterceptor';
+import { ToastContainerComponent } from './toast-container/toast-container.component';
 
 @NgModule({
   declarations: [
-    App
+    App,
+    ToastContainerComponent
   ],
   imports: [
     BrowserModule,

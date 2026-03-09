@@ -7,6 +7,7 @@ import { NgForm } from "@angular/forms";
 import { LookupService } from "../../../shared/services/lookup/lookup.service";
 import { State } from "../../../shared/models/states/state";
 import { InputOption } from "../../../shared/components/input/input.component";
+import { ToastService } from "../../../shared/services/toast.service";
 
 
 @Component({
@@ -26,7 +27,7 @@ export class EditSupplierComponent {
         private readonly _helper: HelperService,
         private readonly _router: Router,
         private readonly _stateService: LookupService,
-        //private readonly _toastService: ToastService
+        private readonly _toastService: ToastService
     ) {
 
     }
@@ -62,13 +63,13 @@ export class EditSupplierComponent {
                 this.isLoading = true;
                 await this._supplierService.update(this.supplier);
 
-                // this._toastService.successfullySaved();
+                this._toastService.successfullySaved('Water Supplier');
             } catch (error) {
                 if (!this._helper.parseValidationErrors(error, this.validationErrors)) {
                     throw error;
                 }
 
-                //this._toastService.failedToSave();
+                this._toastService.failedToSave('Water Supplier');
             } finally {
                 this.isLoading = false;
             }

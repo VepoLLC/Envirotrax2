@@ -3,6 +3,7 @@ import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { AvailableWaterSupplier, ProfessionalWaterSupplier } from "../../../shared/models/professionals/professional-water-supplier";
 import { ProfessionalSupplierService } from "../../../shared/services/professionals/professional-supplier.service";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
+import { ToastService } from "../../../shared/services/toast.service";
 
 export interface WaterSupplierRegistrationVm {
     availableSupplier: AvailableWaterSupplier;
@@ -22,7 +23,8 @@ export class WaterSupplierRegistrationComponent {
     constructor(
         private readonly _modalReference: ModalReference<WaterSupplierRegistrationVm, ProfessionalWaterSupplier>,
         private readonly _supplierService: ProfessionalSupplierService,
-        private readonly _helper: HelperService
+        private readonly _helper: HelperService,
+        private readonly _toastService: ToastService
     ) {
         const model = _modalReference.config.model!;
         this.availableSupplier = model.availableSupplier;
@@ -50,10 +52,13 @@ export class WaterSupplierRegistrationComponent {
             }
 
             this._modalReference.closeSuccess(result);
+            this._toastService.successfullySaved('Registration');
         } catch (e) {
             if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
                 throw e;
             }
+
+            this._toastService.failedToSave('Registration');
         } finally {
             this.isLoading = false;
         }

@@ -5,6 +5,7 @@ import { NgForm } from "@angular/forms";
 import { ModalHelperService } from "../../../../shared/services/helpers/modal-helper.service";
 import { Role } from "../../../../shared/models/users/role";
 import { RoleService } from "../../../../shared/services/users/role.service";
+import { ToastService } from "../../../../shared/services/toast.service";
 
 @Component({
     templateUrl: './edit-role.component.html',
@@ -19,7 +20,8 @@ export class EditRoleComponent implements OnInit {
         private readonly _roleService: RoleService,
         private readonly _helper: HelperService,
         private readonly _activeRoute: ActivatedRoute,
-        private readonly _modalHelper: ModalHelperService
+        private readonly _modalHelper: ModalHelperService,
+        private readonly _toastService: ToastService
     ) {
 
     }
@@ -50,10 +52,13 @@ export class EditRoleComponent implements OnInit {
 
                 await this._roleService.update(this.role);
 
+                this._toastService.successfullySaved('Role');
             } catch (error) {
                 if (!this._helper.parseValidationErrors(error, this.validationErrors)) {
                     throw error;
                 }
+
+                this._toastService.failedToSave('Role');
             } finally {
                 this.isLoading = false;
             }
@@ -65,6 +70,7 @@ export class EditRoleComponent implements OnInit {
             this.isLoading = true;
 
             this.role = await this._roleService.reactivate(this.role.id!);
+            this._toastService.successfullyReactivated('Role');
         } finally {
             this.isLoading = false;
         }

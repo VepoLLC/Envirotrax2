@@ -19,6 +19,10 @@ const routes: Routes = [
       {
         path: 'professionals',
         loadChildren: () => import('./professionals/professional.module').then(m => m.ProfessionalModule)
+      },
+      {
+        path: 'csi',
+        loadChildren: () => import('./csi/csi.module').then(m => m.CsiModule)
       }
     ]
   },

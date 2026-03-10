@@ -2,7 +2,7 @@ import { Component } from "@angular/core";
 import { Router } from "@angular/router";
 import { PagedData } from "../../shared/models/paged-data";
 import { AuthService } from "../../shared/services/auth/auth.service";
-import { WaterSupplier } from "../../shared/models/water-suppliers/water-supplier";
+import { WaterSupplier, WaterSupplierHierarchy } from "../../shared/models/water-suppliers/water-supplier";
 import { WaterSupplierService } from "../../shared/services/water-suppliers/water-supplier.service";
 import { ProfesisonalService } from "../../shared/services/professionals/professional.service";
 import { Professional } from "../../shared/models/professionals/professional";
@@ -13,7 +13,7 @@ import { Professional } from "../../shared/models/professionals/professional";
 })
 export class LoginRedirectComponent {
     public isLoading: boolean = false;
-    public suppliers?: PagedData<WaterSupplier>;
+    public suppliers?: WaterSupplierHierarchy[] = [];
     public professionals?: PagedData<Professional>;
 
     constructor(
@@ -62,15 +62,15 @@ export class LoginRedirectComponent {
             return;
         }
 
-        this.suppliers = await this._supplierService.getAllMySuppliers(this.suppliers?.pageInfo || {}, {});
+        this.suppliers = await this._supplierService.getAllMySuppliers();
 
-        if (this.suppliers.data.length == 1) {
-            await this._authService.signIn(this.suppliers.data[0].id);
+        if (this.suppliers.length == 1 && this.suppliers[0].children.length == 0) {
+            await this._authService.signIn(this.suppliers[0].waterSupplier.id);
             return
         }
 
         // User must be a registered professional who self-registered, but hasn't fileld out their company information yet.
-        if (this.professionals.data.length == 0 && this.suppliers.data.length == 0) {
+        if (this.professionals.data.length == 0 && this.suppliers.length == 1 && this.suppliers[0].children.length == 0) {
             this._router.navigate(['/profile'], {
                 replaceUrl: true
             });

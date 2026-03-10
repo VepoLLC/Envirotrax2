@@ -34,3 +34,9 @@ export class WaterSupplier {
     letterContactFaxNumber?: string;
     letterContactEmailAddress?: string;
 }
+
+export interface WaterSupplierHierarchy {
+    groupLetter: string;
+    waterSupplier: WaterSupplier;
+    children: WaterSupplier[];
+}

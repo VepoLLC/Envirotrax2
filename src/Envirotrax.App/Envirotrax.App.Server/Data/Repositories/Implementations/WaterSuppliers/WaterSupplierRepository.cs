@@ -1,6 +1,7 @@
 
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
+using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
 using Envirotrax.App.Server.Data.Services.Definitions;
@@ -98,20 +99,41 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
                 .Select(professionalSupplier => professionalSupplier.WaterSupplier!);
         }
 
-        return DbContext
+        var suppliersQuery = DbContext
             .WaterSupplierUsers
             .IgnoreQueryFilters()
             .Where(supplierUser => supplierUser.UserId == _tenantProvider.UserId)
             .Select(supplierUser => supplierUser.WaterSupplier!);
+
+        var childSupplierQuery = from supplier in DbContext.WaterSuppliers.IgnoreQueryFilters()
+                                 join childSupplier in DbContext.WaterSuppliers.IgnoreQueryFilters()
+                                 on supplier.Id equals childSupplier.ParentId
+                                 join supplierUser in DbContext.WaterSupplierUsers.IgnoreQueryFilters()
+                                 on supplier.Id equals supplierUser.WaterSupplierId
+                                 where supplierUser.UserId == _tenantProvider.UserId
+                                 select childSupplier;
+
+        return suppliersQuery.Union(childSupplierQuery);
     }
 
-    public async Task<IEnumerable<WaterSupplier>> GetAllMySuppliersAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public async Task<IEnumerable<WaterSupplier>> GetAllMySuppliersAsync(CancellationToken cancellationToken)
     {
-        var paginated = await GetMySuppliersQuery()
-            .Where(query.Filter)
-            .OrderBy(query.Sort)
-            .PaginateAsync(pageInfo, cancellationToken);
+        var suppliersQuery = DbContext
+            .WaterSupplierUsers
+            .IgnoreQueryFilters()
+            .Where(supplierUser => supplierUser.UserId == _tenantProvider.UserId)
+            .Select(supplierUser => supplierUser.WaterSupplier!);
 
-        return await paginated.ToListAsync(cancellationToken);
+        var childSupplierQuery = from supplier in DbContext.WaterSuppliers.IgnoreQueryFilters()
+                                 join childSupplier in DbContext.WaterSuppliers.IgnoreQueryFilters()
+                                 on supplier.Id equals childSupplier.ParentId
+                                 join supplierUser in DbContext.WaterSupplierUsers.IgnoreQueryFilters()
+                                 on supplier.Id equals supplierUser.WaterSupplierId
+                                 where supplierUser.UserId == _tenantProvider.UserId
+                                 select childSupplier;
+
+        return await suppliersQuery
+            .Union(childSupplierQuery)
+            .ToListAsync(cancellationToken);
     }
 }

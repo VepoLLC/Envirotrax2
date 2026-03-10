@@ -17,17 +17,17 @@
         </div>
     </ng-container>
 
-    <ng-container *ngIf="suppliers && suppliers.data && suppliers.data.length > 1">
+    <ng-container *ngIf="suppliers && suppliers.length > 0">
         <p>
             It seems like you have access to multiple systems. Please select the system you want to login.
         </p>
 
         <div>
             <ul class="list-group">
-                <li *ngFor="let supplier of suppliers.data"
+                <li *ngFor="let supplier of suppliers"
                     class="list-group-item list-group-item-action"
-                    (click)="selectSupplier(supplier)">
-                    {{supplier.name}}
+                    (click)="selectSupplier(supplier.waterSupplier)">
+                    {{supplier.waterSupplier.name}}
                 </li>
             </ul>
         </div>

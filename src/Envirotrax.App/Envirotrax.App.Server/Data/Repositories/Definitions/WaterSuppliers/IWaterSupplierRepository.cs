@@ -6,5 +6,5 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
 
 public interface IWaterSupplierRepository : IRepository<WaterSupplier>
 {
-    Task<IEnumerable<WaterSupplier>> GetAllMySuppliersAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<IEnumerable<WaterSupplier>> GetAllMySuppliersAsync(CancellationToken cancellationToken);
 }

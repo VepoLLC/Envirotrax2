@@ -70,7 +70,9 @@
 <div *ngIf="isAuthenticated" class="container-fluid">
     <div class="d-flex justify-content-end">
         <div class="col-auto text-nowrap mt-1">
-            <button *ngIf="companyName" type="button"
+            <button *ngIf="companyName"
+                    type="button"
+                    [routerLink]="['auth/water-suppliers']"
                     class="login-box left border shadow-sm bg-body text-body py-1 px-2 ms-1">
                 <i class="text-primary fa-solid fa-building me-1"></i>{{companyName}}
             </button>

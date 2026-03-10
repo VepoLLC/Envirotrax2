@@ -80,7 +80,7 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
 
         if (addedInvitation == null)
         {
-            throw new InvalidOperationException("Adding user failed.");
+            throw new InvalidOperationException("Resending invitation failed.");
         }
 
         return MapToDto(user);

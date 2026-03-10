@@ -25,6 +25,7 @@ import { FilterPanelFieldComponent } from "./data-components/sorting-filtering/f
 import { FilterPanelComponent } from "./data-components/sorting-filtering/filter-panel/filter-panel.component";
 import { NgSelectModule } from "@ng-select/ng-select";
 import { InputOptionComponent } from "./input/input-option.component";
+import { WaterSupplierHierarchyComponent } from "./water-supplier-hierarchy/water-supplier-hierarchy.component";
 
 @NgModule({
     declarations: [
@@ -47,7 +48,8 @@ import { InputOptionComponent } from "./input/input-option.component";
         ValidationSummaryComponent,
         SectionComponent,
         FilterPanelComponent,
-        FilterPanelFieldComponent
+        FilterPanelFieldComponent,
+        WaterSupplierHierarchyComponent
     ],
     imports: [
         CommonModule,
@@ -72,7 +74,8 @@ import { InputOptionComponent } from "./input/input-option.component";
         AppLoadingSpinnerModule,
         ModalModule,
         FilterPanelComponent,
-        FilterPanelFieldComponent
+        FilterPanelFieldComponent,
+        WaterSupplierHierarchyComponent
     ]
 })
 export class SharedComponentsModule {

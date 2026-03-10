@@ -36,14 +36,35 @@ public class WaterSupplierService : Service<WaterSupplier, WaterSupplierDto>, IW
         return MapToDto(supplier) ?? throw new InvalidOperationException("User is not logged in to specific water supplier.");
     }
 
-    public async Task<IPagedData<WaterSupplierDto>> GetAllMySuppliersAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    private IEnumerable<WaterSupplierHierarchyDto> BuildHierarchy(IEnumerable<WaterSupplier> waterSuppliers)
     {
-        query.Sort = query.ConvertSortProperties<WaterSupplier, WaterSupplierDto>(Mapper);
-        query.Filter = query.ConvertFilterProperties<WaterSupplier, WaterSupplierDto>(Mapper);
+        var supplierList = waterSuppliers.ToList();
+        var idSet = supplierList.Select(s => (int?)s.Id).ToHashSet();
 
-        var supplierModels = await _repository.GetAllMySuppliersAsync(pageInfo, query, cancellationToken);
-        var supplierDtos = Mapper.Map<IEnumerable<WaterSupplier>, IEnumerable<WaterSupplierDto>>(supplierModels);
+        var childrenByParentId = supplierList
+            .Where(s => s.ParentId != null && idSet.Contains(s.ParentId))
+            .GroupBy(s => s.ParentId!.Value)
+            .ToDictionary(g => g.Key, g => g.ToList());
 
-        return supplierDtos.ToPagedData(pageInfo);
+        var roots = supplierList
+            .Where(s => s.ParentId == null || !idSet.Contains(s.ParentId));
+
+        return roots
+            .Select(root => new WaterSupplierHierarchyDto
+            {
+                GroupLetter = root.Name?[..1].ToUpper(),
+                WaterSupplier = Mapper.Map<ReferencedWaterSupplierDto>(root),
+                Children = childrenByParentId.TryGetValue(root.Id, out var children)
+                    ? Mapper.Map<IEnumerable<ReferencedWaterSupplierDto>>(children)
+                    : []
+            })
+            .OrderBy(h => h.GroupLetter)
+            .ThenBy(h => h.WaterSupplier.Name);
+    }
+
+    public async Task<IEnumerable<WaterSupplierHierarchyDto>> GetAllMySuppliersAsync(CancellationToken cancellationToken)
+    {
+        var waterSuppliers = await _repository.GetAllMySuppliersAsync(cancellationToken);
+        return BuildHierarchy(waterSuppliers);
     }
 }

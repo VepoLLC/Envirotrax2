@@ -1,0 +1,19 @@
+<vp-section header="Water Supplier Login">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="isLoading" />
+
+        <p class="text-center">
+            Your account may access the following Water Supplier accounts. Select a Water Supplier below to access.
+        </p>
+
+        <div *ngFor="let item of suppliers">
+            <div class="fw-bold text-info border-bottom mb-2 mt-3">{{ item.groupLetter }}</div>
+            <div class="mb-1">
+                <a (click)="selectSupplier(item.waterSupplier)">{{ item.waterSupplier.name }}</a>
+            </div>
+            <div *ngFor="let child of item.children" class="ms-3 mb-1">
+                <a (click)="selectSupplier(child)">{{ child.name }}</a>
+            </div>
+        </div>
+    </div>
+</vp-section>

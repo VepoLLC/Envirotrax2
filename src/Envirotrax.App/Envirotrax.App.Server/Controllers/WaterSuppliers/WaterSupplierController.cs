@@ -21,9 +21,9 @@ public class WaterSupplierController : CrudController<WaterSupplierDto>
     }
 
     [HttpGet("my")]
-    public async Task<IActionResult> GetAllMyTenantsAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllMyTenantsAsync(CancellationToken cancellationToken)
     {
-        var tenants = await _supplierService.GetAllMySuppliersAsync(pageInfo, query, cancellationToken);
+        var tenants = await _supplierService.GetAllMySuppliersAsync(cancellationToken);
         return Ok(tenants);
     }
 

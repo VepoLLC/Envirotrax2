@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260310065515_AddCsiInspections")]
+    partial class AddCsiInspections
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -116,8 +119,11 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("EmailPdf")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IncludeWsAccountNumbers")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime?>("InspectionDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<string>("InspectorAddress")
                         .HasMaxLength(200)
@@ -195,8 +201,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("MailingStateId")
-                        .HasColumnType("int");
+                    b.Property<string>("MailingState")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("MailingStreetName")
                         .HasMaxLength(100)
@@ -261,8 +268,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("PropertyStateId")
-                        .HasColumnType("int");
+                    b.Property<string>("PropertyState")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("PropertyStreetName")
                         .HasMaxLength(100)
@@ -282,7 +290,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<int>("ReasonForInspection")
                         .HasColumnType("int");
 
-                    b.Property<int>("SiteId")
+                    b.Property<int?>("SiteId")
                         .HasColumnType("int");
 
                     b.Property<string>("SubmissionId")
@@ -313,10 +321,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("DeletedById");
-
-                    b.HasIndex("MailingStateId");
-
-                    b.HasIndex("PropertyStateId");
 
                     b.HasIndex("UpdatedById");
 
@@ -805,14 +809,6 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.HasIndex("WaterSupplierId", "BackflowAccountAssignmentId");
-
-                    b.HasIndex("WaterSupplierId", "CsiAccountAssignmentId");
-
-                    b.HasIndex("WaterSupplierId", "FogAccountAssignmentId");
-
-                    b.HasIndex("WaterSupplierId", "UserAccountAssignmentId");
-
                     b.ToTable("Sites");
                 });
 
@@ -1283,16 +1279,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasForeignKey("DeletedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "MailingState")
-                        .WithMany()
-                        .HasForeignKey("MailingStateId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "PropertyState")
-                        .WithMany()
-                        .HasForeignKey("PropertyStateId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById")
@@ -1307,16 +1293,11 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasOne("Envirotrax.App.Server.Data.Models.Sites.Site", "Site")
                         .WithMany()
                         .HasForeignKey("WaterSupplierId", "SiteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreatedBy");
 
                     b.Navigation("DeletedBy");
-
-                    b.Navigation("MailingState");
-
-                    b.Navigation("PropertyState");
 
                     b.Navigation("Site");
 
@@ -1434,43 +1415,15 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.WaterSupplierUser", "BackflowAccountAssignment")
-                        .WithMany()
-                        .HasForeignKey("WaterSupplierId", "BackflowAccountAssignmentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.WaterSupplierUser", "CsiAccountAssignment")
-                        .WithMany()
-                        .HasForeignKey("WaterSupplierId", "CsiAccountAssignmentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.WaterSupplierUser", "FogAccountAssignment")
-                        .WithMany()
-                        .HasForeignKey("WaterSupplierId", "FogAccountAssignmentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.WaterSupplierUser", "UserAccountAssignment")
-                        .WithMany()
-                        .HasForeignKey("WaterSupplierId", "UserAccountAssignmentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("BackflowAccountAssignment");
-
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("CsiAccountAssignment");
-
                     b.Navigation("DeletedBy");
-
-                    b.Navigation("FogAccountAssignment");
 
                     b.Navigation("MailingState");
 
                     b.Navigation("State");
 
                     b.Navigation("UpdatedBy");
-
-                    b.Navigation("UserAccountAssignment");
 
                     b.Navigation("WaterSupplier");
                 });

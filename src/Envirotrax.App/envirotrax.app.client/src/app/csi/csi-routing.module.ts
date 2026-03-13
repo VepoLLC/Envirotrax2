@@ -1,0 +1,34 @@
+import { NgModule } from "@angular/core";
+import { RouterModule, Routes } from "@angular/router";
+import { CsiSearchComponent } from "./search/csi-search.component";
+import { PermissionGuard } from "../shared/guards/permission.guard";
+import { PermissionAction, PermissionType } from "../shared/models/permission-type";
+
+const routes: Routes = [
+    {
+        path: '',
+        title: 'CSI Search',
+        component: CsiSearchComponent,
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.CsiInspections,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
+    }
+];
+
+@NgModule({
+    imports: [
+        RouterModule.forChild(routes)
+    ],
+    exports: [
+        RouterModule
+    ]
+})
+export class CsiRoutingModule {
+
+}

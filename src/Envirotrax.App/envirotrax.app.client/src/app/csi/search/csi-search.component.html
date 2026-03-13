@@ -1,0 +1,227 @@
+<h1 class="text-center h2">CSI Search</h1>
+
+<div [hidden]="showResults">
+    <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+        <vp-filter-panel (filterChange)="onFilterChange($event)">
+
+            <vp-section header="General Search Criteria">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="site.accountNumber"
+                                                   label="Account Number"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="inspectionDate"
+                                                   label="Inspection Date"
+                                                   type="daterange"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="disapproved"
+                                                   label="Approval Status"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="approvalStatusOptions" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="needsValidation"
+                                                   label="Needs Validation"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="compliance1"
+                                                   label="Inspection Pass/Fail"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="passFailOptions" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="transactionId"
+                                                   label="Has Payment"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="aiOssf"
+                                                   label="Has On-Site Sewage Facility"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="aiWaterWell"
+                                                   label="Has Water Well"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+                    </div>
+                </div>
+            </vp-section>
+
+            <div class="mt-3">
+            <vp-section header="Inspector Criteria">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <vp-filter-panel-field fieldName="inspectorLicenseNumber"
+                                               label="Inspector License Number"
+                                               [form]="searchForm" />
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <vp-filter-panel-field fieldName="inspectorCompanyName"
+                                               label="Inspector Company Name"
+                                               [form]="searchForm" />
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <vp-filter-panel-field fieldName="inspectorContactName"
+                                               label="Inspector Contact Name"
+                                               [form]="searchForm" />
+                    </div>
+                </div>
+            </vp-section>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <vp-section header="Location / Property Criteria">
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <vp-filter-panel-field fieldName="propertyType"
+                                                       label="Property Type"
+                                                       type="select"
+                                                       [form]="searchForm"
+                                                       [options]="propertyTypes" />
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <vp-filter-panel-field fieldName="propertyBusinessName"
+                                                       label="Business Name"
+                                                       [form]="searchForm" />
+                            </div>
+
+                            <div class="col-4 mb-3">
+                                <vp-filter-panel-field fieldName="propertyStreetNumber"
+                                                       label="Street #"
+                                                       [form]="searchForm" />
+                            </div>
+
+                            <div class="col-5 mb-3">
+                                <vp-filter-panel-field fieldName="propertyStreetName"
+                                                       label="Street Name"
+                                                       [form]="searchForm" />
+                            </div>
+
+                            <div class="col-3 mb-3">
+                                <vp-filter-panel-field fieldName="propertyNumber"
+                                                       label="Suite/Apt #"
+                                                       [form]="searchForm" />
+                            </div>
+
+                            <div class="col-12">
+                                <vp-filter-panel-field fieldName="propertyZip"
+                                                       label="ZIP"
+                                                       [form]="searchForm" />
+                            </div>
+                        </div>
+                    </vp-section>
+                </div>
+
+                <div class="col-md-6 mt-3 mt-md-0">
+                    <vp-section header="Contact / Mailing Criteria">
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <vp-filter-panel-field fieldName="mailingCompanyName"
+                                                       label="Company Name"
+                                                       [form]="searchForm" />
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <vp-filter-panel-field fieldName="mailingContactName"
+                                                       label="Contact Name"
+                                                       [form]="searchForm" />
+                            </div>
+
+                            <div class="col-4 mb-3">
+                                <vp-filter-panel-field fieldName="mailingStreetNumber"
+                                                       label="Street #"
+                                                       [form]="searchForm" />
+                            </div>
+
+                            <div class="col-5 mb-3">
+                                <vp-filter-panel-field fieldName="mailingStreetName"
+                                                       label="Street Name"
+                                                       [form]="searchForm" />
+                            </div>
+
+                            <div class="col-3 mb-3">
+                                <vp-filter-panel-field fieldName="mailingNumber"
+                                                       label="Suite/Apt #"
+                                                       [form]="searchForm" />
+                            </div>
+
+                            <div class="col-12">
+                                <vp-filter-panel-field fieldName="mailingZip"
+                                                       label="ZIP"
+                                                       [form]="searchForm" />
+                            </div>
+                        </div>
+                    </vp-section>
+                </div>
+            </div>
+
+        </vp-filter-panel>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="searchForm" />
+
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>
+                    Search
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+<div *ngIf="showResults">
+    <div class="d-flex justify-content-end mb-3">
+        <button type="button"
+                class="btn btn-primary vp-section-button"
+                (click)="showResults = false;">
+            Search Again
+        </button>
+    </div>
+
+    <vp-section header="CSI Search Results">
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getInspections()"
+                  [(query)]="table.query"
+                  (queryChange)="getInspections()"
+                  (queryReset)="getInspections()"
+                  [canEdit]="true"
+                  (edit)="edit($event)"
+                  [freeTextSearch]="table.freeTextSearch" />
+    </vp-section>
+</div>

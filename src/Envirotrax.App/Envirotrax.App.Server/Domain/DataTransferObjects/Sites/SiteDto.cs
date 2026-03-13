@@ -148,3 +148,13 @@ public class SiteDto : IDto
     public DateTime? UpdatedTime { get; set; }
     public AppUserDto? UpdatedBy { get; set; }
 }
+
+public class ReferencedSiteDto
+{
+    [Required]
+    public int? Id { get; set; }
+
+    public string? AccountNumber { get; set; }
+
+    public string? BusinessName { get; set; }
+}

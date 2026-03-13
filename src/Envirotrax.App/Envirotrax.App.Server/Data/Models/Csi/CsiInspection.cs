@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Sites;
+using Envirotrax.App.Server.Data.Models.States;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.Common.Data.Attributes;
@@ -15,10 +16,9 @@ public class CsiInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser
     [AppPrimaryKey(true)]
     public int Id { get; set; }
 
-    public int? SiteId { get; set; }
+    public int SiteId { get; set; }
     public Site? Site { get; set; }
 
-    [Column(TypeName = "date")]
     public DateTime? InspectionDate { get; set; }
 
     [StringLength(50)]
@@ -42,8 +42,8 @@ public class CsiInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser
     [StringLength(50)]
     public string? PropertyCity { get; set; }
 
-    [StringLength(50)]
-    public string? PropertyState { get; set; }
+    public int? PropertyStateId { get; set; }
+    public State? PropertyState { get; set; }
 
     [StringLength(20)]
     public string? PropertyZip { get; set; }
@@ -67,8 +67,8 @@ public class CsiInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser
     [StringLength(50)]
     public string? MailingCity { get; set; }
 
-    [StringLength(50)]
-    public string? MailingState { get; set; }
+    public int? MailingStateId { get; set; }
+    public State? MailingState { get; set; }
 
     [StringLength(20)]
     public string? MailingZip { get; set; }
@@ -123,7 +123,7 @@ public class CsiInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser
     public string? InspectorFaxNumber { get; set; }
 
     // Inspection criteria
-    public int ReasonForInspection { get; set; }
+    public CsiInspectionReason ReasonForInspection { get; set; }
 
     public bool Compliance1 { get; set; }
     public bool Compliance2 { get; set; }
@@ -187,7 +187,6 @@ public class CsiInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser
     public decimal AmountShare { get; set; }
 
     public bool EmailPdf { get; set; }
-    public bool IncludeWsAccountNumbers { get; set; }
 
     // Audit properties
     public int? CreatedById { get; set; }

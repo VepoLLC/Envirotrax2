@@ -1,5 +1,8 @@
 using System.ComponentModel.DataAnnotations;
+using Envirotrax.App.Server.Data.Models.Csi;
 using Envirotrax.App.Server.Data.Models.Sites;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
@@ -8,7 +11,7 @@ public class CsiInspectionDto : IDto
 {
     public int Id { get; set; }
 
-    public int? SiteId { get; set; }
+    public ReferencedSiteDto? Site { get; set; }
 
     public DateTime? InspectionDate { get; set; }
 
@@ -33,8 +36,7 @@ public class CsiInspectionDto : IDto
     [StringLength(50)]
     public string? PropertyCity { get; set; }
 
-    [StringLength(50)]
-    public string? PropertyState { get; set; }
+    public ReferencedStateDto? PropertyState { get; set; }
 
     [StringLength(20)]
     public string? PropertyZip { get; set; }
@@ -58,8 +60,7 @@ public class CsiInspectionDto : IDto
     [StringLength(50)]
     public string? MailingCity { get; set; }
 
-    [StringLength(50)]
-    public string? MailingState { get; set; }
+    public ReferencedStateDto? MailingState { get; set; }
 
     [StringLength(20)]
     public string? MailingZip { get; set; }
@@ -114,7 +115,7 @@ public class CsiInspectionDto : IDto
     public string? InspectorFaxNumber { get; set; }
 
     // Inspection criteria
-    public int ReasonForInspection { get; set; }
+    public CsiInspectionReason ReasonForInspection { get; set; }
 
     public bool Compliance1 { get; set; }
     public bool Compliance2 { get; set; }
@@ -175,7 +176,6 @@ public class CsiInspectionDto : IDto
     public decimal AmountShare { get; set; }
 
     public bool EmailPdf { get; set; }
-    public bool IncludeWsAccountNumbers { get; set; }
 
     // Audit
     public DateTime CreatedTime { get; set; }

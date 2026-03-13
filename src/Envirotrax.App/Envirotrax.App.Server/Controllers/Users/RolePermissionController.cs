@@ -24,13 +24,6 @@ namespace Envirotrax.App.Server.Controllers.Users
             return Ok(permissions);
         }
 
-        [HttpGet("permissions/my")]
-        public async Task<IActionResult> GetAllMyPermissionsAsync()
-        {
-            var rolePermissions = await _rolePermissionService.GetAllMyPermissionsAsync();
-            return Ok(rolePermissions);
-        }
-
         [HttpGet("{roleId}/permissions")]
         [HasPermission(PermissionAction.CanView, PermissionType.Roles)]
         public async Task<IActionResult> GetAllAsync(int roleId)

@@ -18,18 +18,12 @@
     </ng-container>
 
     <ng-container *ngIf="suppliers && suppliers.length > 0">
-        <p>
-            It seems like you have access to multiple systems. Please select the system you want to login.
-        </p>
-
         <div>
-            <ul class="list-group">
-                <li *ngFor="let supplier of suppliers"
-                    class="list-group-item list-group-item-action"
-                    (click)="selectSupplier(supplier.waterSupplier)">
-                    {{supplier.waterSupplier.name}}
-                </li>
-            </ul>
+            <h1 class="h2 text-center mb-4">
+                Water Supplier Login
+            </h1>
         </div>
+
+        <vp-water-supplier-hierarchy [suppliers]="suppliers" />
     </ng-container>
 </div>

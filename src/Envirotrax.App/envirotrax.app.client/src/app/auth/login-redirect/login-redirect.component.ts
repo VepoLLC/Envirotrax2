@@ -27,7 +27,6 @@ export class LoginRedirectComponent {
     public async ngOnInit(): Promise<void> {
         try {
             this.isLoading = true;
-            debugger;
 
             await this._authService.signInCallback();
 

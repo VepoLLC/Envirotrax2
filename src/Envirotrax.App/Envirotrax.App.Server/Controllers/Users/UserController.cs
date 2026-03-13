@@ -28,7 +28,8 @@ public class UserController : CrudController<WaterSupplierUserDto>
     {
         var accessDto = new UserAccessDto
         {
-            Features = _authService.GetAllMyFeatures()
+            Features = _authService.GetAllMyFeatures(),
+            Permissions = _authService.GetAllMyPermissions()
         };
 
         return Ok(accessDto);

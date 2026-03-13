@@ -89,42 +89,4 @@ public class RolePermissionRepository : IRolePermissionRepository
 
         return rolePermissions;
     }
-
-    public async Task<IEnumerable<RolePermission>> GetAllByUserAsync(int supplierId, int userId)
-    {
-        var rolePermissionQuery = from rolePermission in _dbContext.RolePermissions.IgnoreQueryFilters()
-
-                                  join userRole in _dbContext.UserRoles.IgnoreQueryFilters()
-                                  on new { rolePermission.WaterSupplierId, rolePermission.RoleId } equals new { userRole.WaterSupplierId, userRole.RoleId }
-
-                                  where rolePermission.WaterSupplierId == supplierId &&
-                                    rolePermission.RoleId == userRole.RoleId &&
-                                    userRole.WaterSupplierId == supplierId &&
-                                    userRole.UserId == userId
-
-                                  select new RolePermission
-                                  {
-                                      WaterSupplierId = rolePermission.WaterSupplierId,
-                                      RoleId = rolePermission.RoleId,
-                                      PermissionId = rolePermission.PermissionId,
-                                      CanView = rolePermission.CanView,
-                                      CanCreate = rolePermission.CanCreate,
-                                      CanEdit = rolePermission.CanEdit,
-                                      CanDelete = rolePermission.CanDelete
-                                  };
-
-        var rolePermissions = await rolePermissionQuery.AsNoTracking().ToListAsync();
-
-        return rolePermissions
-            .GroupBy(r => new { r.WaterSupplierId, r.PermissionId })
-            .Select(group => new RolePermission
-            {
-                WaterSupplierId = group.Key.WaterSupplierId,
-                PermissionId = group.Key.PermissionId,
-                CanView = group.Any(r => r.CanView),
-                CanCreate = group.Any(r => r.CanCreate),
-                CanEdit = group.Any(r => r.CanEdit),
-                CanDelete = group.Any(r => r.CanDelete)
-            }).ToList();
-    }
 }

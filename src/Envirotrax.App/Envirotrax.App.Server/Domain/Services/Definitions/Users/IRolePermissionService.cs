@@ -9,8 +9,6 @@ public interface IRolePermissionService
 
     Task<IEnumerable<RolePermissionDto>> GetAllAsync(int roleId);
 
-    Task<IEnumerable<RolePermissionDto>> GetAllMyPermissionsAsync();
-
     Task<RolePermissionDto> AddOrUpdateAsync(RolePermissionDto rolePermission);
 
     Task<IEnumerable<RolePermissionDto>> BulkUpdateAsync(IEnumerable<RolePermissionDto> rolePermissions);

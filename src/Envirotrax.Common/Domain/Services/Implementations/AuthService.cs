@@ -1,6 +1,7 @@
 
 using System.Security.Claims;
 using Envirotrax.Common.Data.Services.Implementations;
+using Envirotrax.Common.Domain.DataTransferObjects;
 using Envirotrax.Common.Domain.Services.Defintions;
 using Microsoft.AspNetCore.Http;
 
@@ -79,7 +80,7 @@ public class AuthService : TenantProviderService, IAuthService
         return [];
     }
 
-    private IEnumerable<RolePermissionDto> GetSignedInUserPermissions()
+    public IEnumerable<RolePermissionDto> GetAllMyPermissions()
     {
         if (_contextAccessor.HttpContext!.Items.TryGetValue("prms", out var permissions))
         {
@@ -122,7 +123,7 @@ public class AuthService : TenantProviderService, IAuthService
 
     public bool HasAnyPermission(PermissionAction action, params PermissionType[] permissionTypes)
     {
-        var permissions = GetSignedInUserPermissions();
+        var permissions = GetAllMyPermissions();
 
         foreach (var type in permissionTypes)
         {
@@ -134,14 +135,4 @@ public class AuthService : TenantProviderService, IAuthService
 
         return false;
     }
-}
-
-class RolePermissionDto
-{
-    public PermissionType Permission { get; set; }
-
-    public bool CanView { get; set; }
-    public bool CanCreate { get; set; }
-    public bool CanEdit { get; set; }
-    public bool CanDelete { get; set; }
 }

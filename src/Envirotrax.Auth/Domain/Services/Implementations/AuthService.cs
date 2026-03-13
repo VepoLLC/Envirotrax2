@@ -34,20 +34,20 @@ public class AuthService : TenantProviderService, IAuthService
     {
         var userAccess = await GetAccessSettingsAsync(userId, waterSupplierId, professionalId);
 
-        if (userAccess.WaterSupplierId.HasValue)
+        if (userAccess.WaterSupplierId.HasValue && userAccess.WaterSupplierIdRequested.HasValue)
         {
-            SetWaterSupplier(principal, userAccess.WaterSupplierId.Value);
+            SetWaterSupplier(principal, userAccess.WaterSupplierIdRequested.Value);
 
             var permissions = await _supplierUserRepository.GetAllPermissionsAsync(userAccess.WaterSupplierId.Value, userId);
             SetPermissions(principal, permissions);
         }
 
-        if (userAccess.ProfessionalId.HasValue)
+        if (userAccess.ProfessionalId.HasValue && userAccess.ProfessionalIdRequested.HasValue)
         {
-            SetProfessional(principal, userAccess.ProfessionalId.Value);
+            SetProfessional(principal, userAccess.ProfessionalIdRequested.Value);
         }
 
-        var features = await _featureRepository.GetAllAsync(userAccess.WaterSupplierId, userAccess.ProfessionalId);
+        var features = await _featureRepository.GetAllAsync(userAccess.WaterSupplierIdRequested, userAccess.ProfessionalIdRequested);
 
         AddClaim(principal, "fts", string.Join(',', features.Select(f => (int)f)));
     }
@@ -67,13 +67,17 @@ public class AuthService : TenantProviderService, IAuthService
         if (waterSupplierId.HasValue)
         {
             var supplierUser = await _supplierUserRepository.GetAsync(waterSupplierId.Value, userId) ?? throw new ValidationException("User doesn't have access to this water supplier.");
+
             accessDto.WaterSupplierId = supplierUser.WaterSupplierId;
+            accessDto.WaterSupplierIdRequested = waterSupplierId;
         }
 
         if (professionalid.HasValue)
         {
             var professionalUser = await _professionalUserRepository.GetAsync(professionalid.Value, userId) ?? throw new ValidationException("User doesn't have access to this registered professional.");
+
             accessDto.ProfessionalId = professionalUser.ProfessionalId;
+            accessDto.ProfessionalIdRequested = professionalid;
         }
 
         return accessDto;

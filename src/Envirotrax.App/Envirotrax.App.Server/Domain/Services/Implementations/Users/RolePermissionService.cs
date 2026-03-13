@@ -36,16 +36,6 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Users
             return _mapper.Map<IEnumerable<RolePermission>, IEnumerable<RolePermissionDto>>(rolePermissions);
         }
 
-        public async Task<IEnumerable<RolePermissionDto>> GetAllMyPermissionsAsync()
-        {
-            var supplierId = _authService.ParentWaterSupplierId > 0
-                ? _authService.ParentWaterSupplierId
-                : _authService.WaterSupplierId;
-
-            var rolePermissions = await _rolePermissionRepository.GetAllByUserAsync(supplierId, _authService.UserId);
-            return _mapper.Map<IEnumerable<RolePermission>, IEnumerable<RolePermissionDto>>(rolePermissions);
-        }
-
         public async Task<RolePermissionDto> AddOrUpdateAsync(RolePermissionDto rolePermission)
         {
             var model = _mapper.Map<RolePermissionDto, RolePermission>(rolePermission);

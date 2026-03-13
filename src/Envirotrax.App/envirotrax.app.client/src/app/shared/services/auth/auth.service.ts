@@ -5,7 +5,6 @@ import { environment } from "../../../../environments/environment";
 import { FeatureType } from "../../models/feature-tyype";
 import { UrlResolverService } from "../helpers/url-resolver.service";
 import { HttpClient } from "@angular/common/http";
-import { RolePermission } from "../../models/users/role-permission";
 import { PermissionAction, PermissionType } from "../../models/permission-type";
 
 @Injectable({
@@ -13,7 +12,6 @@ import { PermissionAction, PermissionType } from "../../models/permission-type";
 })
 export class AuthService {
     private _isLoggedIn$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-    private _myPermissions$?: Observable<RolePermission[]>;
     private _userManager: UserManager;
     private _userAcces$?: Observable<UserAccess>;
 
@@ -54,7 +52,9 @@ export class AuthService {
         this.setLoggedIn(false);
     }
 
-    public signIn(waterSupplierId?: number, professionalId?: number): Promise<void> {
+    public async signIn(waterSupplierId?: number, professionalId?: number): Promise<void> {
+        await this._userManager.removeUser();
+
         if (waterSupplierId || professionalId) {
             this._userManager = this.createUserManager(waterSupplierId, professionalId);
         }
@@ -156,18 +156,8 @@ export class AuthService {
         return false;
     }
 
-    private getAllMyPermissions(): Promise<RolePermission[]> {
-        if (!this._myPermissions$) {
-            this._myPermissions$ = this._http
-                .get<RolePermission[]>(`api/users/roles/permissions/my`)
-                .pipe(shareReplay(1));
-        }
-
-        return lastValueFrom(this._myPermissions$);
-    }
-
     private hasPermission(myPermissions: RolePermission[], action: PermissionAction, type: PermissionType): boolean {
-        let matchingPermission = myPermissions.find(p => p.permission!.id == type);
+        let matchingPermission = myPermissions.find(p => p.permission == type);
 
         if (matchingPermission) {
             switch (action) {
@@ -186,10 +176,10 @@ export class AuthService {
     }
 
     public async hasAnyPermisison(action: PermissionAction, ...types: PermissionType[]): Promise<boolean> {
-        let myPermissions = await this.getAllMyPermissions();
+        const access = await this.getMyAccess();
 
         for (let type of types) {
-            if (this.hasPermission(myPermissions, action, type)) {
+            if (this.hasPermission(access.permissions, action, type)) {
                 return true;
             }
         }
@@ -200,4 +190,14 @@ export class AuthService {
 
 interface UserAccess {
     features: FeatureType[];
+    permissions: RolePermission[];
+}
+
+interface RolePermission {
+    permission: PermissionType;
+
+    canView?: boolean;
+    canCreate?: boolean;
+    canEdit?: boolean;
+    canDelete?: boolean;
 }

@@ -58,6 +58,12 @@ namespace Envirotrax.App.Server.Filters
 
             foreach (var permissionAttribute in hasPermissionAttributes)
             {
+                // If it doesn't require protecting any resources, skip.
+                if (permissionAttribute.AllowedPermissions.IsNullOrEmpty())
+                {
+                    return true;
+                }
+
                 if (authService.HasAnyPermission(permissionAttribute.AllowedAction, permissionAttribute.AllowedPermissions))
                 {
                     return true;

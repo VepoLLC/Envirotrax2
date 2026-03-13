@@ -12,6 +12,7 @@ import { UserService } from "../../shared/services/water-suppliers/user.service"
 import { FacilityType } from '../../shared/enums/facility-type.enum';
 import { InputOption } from "../../shared/components/input/input.component";
 import { GreaseTrapType } from '../../shared/enums/grease-trap-type.enum';
+import { ToastService, ToastType } from '../../shared/services/toast.service';
 
 @Component({
     selector: 'app-edit-site-component',
@@ -19,9 +20,8 @@ import { GreaseTrapType } from '../../shared/enums/grease-trap-type.enum';
     templateUrl: './edit-site-component.html'
 })
 export class EditSiteComponent implements OnInit {
-
-    public isLoading: boolean = false;
     public validationErrors: string[] = [];
+
     public site: Site = {
         backflowScheduleMonth: 0,
         greaseTrapType: 0,
@@ -29,9 +29,6 @@ export class EditSiteComponent implements OnInit {
     };
 
     public currentSite?: Site = {};
-
-    public states: State[] = [];
-
 
     public users: any[] = [];
     public greaseTrapOptions: any[] = [];
@@ -41,13 +38,21 @@ export class EditSiteComponent implements OnInit {
     public fogUsers: InputOption[] = [];
     public stateOptions: InputOption[] = [];
 
+    public sectionLoading = {
+        siteSettings: false,
+        facilityType: false,
+        location: false,
+        mailing: false,
+    };
+
     constructor(
         private readonly _siteService: SiteService,
         private readonly _stateService: LookupService,
         private readonly _acitvatedRoute: ActivatedRoute,
         private readonly _router: Router,
         private readonly _helper: HelperService,
-        private readonly _userService: UserService
+        private readonly _userService: UserService,
+        private readonly _toastService: ToastService
     ) {
     }
 
@@ -84,11 +89,6 @@ export class EditSiteComponent implements OnInit {
         { id: FacilityType.Other, text: "Other" },
     ];
 
-
-
-
-   
-
     public mailingStateChanged(stateId: number): void {
         this.site.mailingStateId = stateId;
     }
@@ -105,14 +105,12 @@ export class EditSiteComponent implements OnInit {
         this.site.mailingNumber = this.site.propertyNumber;
     }
 
-
     public greaseTrapTypes: InputOption[] = [
         { id: GreaseTrapType.TrapNotRequired, text: "Trap Not Required" },
         { id: GreaseTrapType.HasGreaseTrap, text: "Has Grease Trap" },
         { id: GreaseTrapType.ShouldHaveGreaseTrap, text: "Should Have Grease Trap" },
         { id: GreaseTrapType.MightHaveGreaseTrap, text: "Might Have Grease Trap" },
     ];
-
 
     public backflowScheduleMonths: InputOption[] = [
         { id: 1, text: 'January' },
@@ -143,12 +141,10 @@ export class EditSiteComponent implements OnInit {
             ...this.users.map(user => ({ id: user.id, text: user.emailAddress }))
         ];
 
-
         this.backflowUsers = [
             { id: null, text: 'Unassigned' },
             ...this.users.map(user => ({ id: user.id, text: user.emailAddress }))
         ];
-
 
         this.fogUsers = [
             { id: null, text: 'Unassigned' },
@@ -156,13 +152,10 @@ export class EditSiteComponent implements OnInit {
         ];
     }
 
-
-
-
     public async updateFacilityType(form: NgForm) {
         if (form.valid) {
             try {
-                this.isLoading = true;
+                this.sectionLoading.facilityType = true;
                 this.validationErrors = [];
 
                 console.log(this.site.facilityType);
@@ -182,23 +175,25 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.requiresDomesticPremisesIsolation = this.site.requiresDomesticPremisesIsolation;
 
                     const result = await this._siteService.update(this.currentSite);
-                }
 
+                    this._toastService.successfullySaved('Facility Type');
+                }
             } catch (e) {
                 if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
                     throw e;
                 }
+
+                this._toastService.failedToSave('Facility Type');
             } finally {
-                this.isLoading = false;
+                this.sectionLoading.facilityType = false;
             }
         }
     }
 
-
     public async updateSiteSettings(form: NgForm): Promise<void> {
         if (form.valid) {
             try {
-                this.isLoading = true;
+                this.sectionLoading.siteSettings = true;
                 this.validationErrors = [];
 
                 if (this.currentSite) {
@@ -217,18 +212,18 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.backflowAccountAssignmentId = this.site.backflowAccountAssignmentId;
                     this.currentSite.fogAccountAssignmentId = this.site.fogAccountAssignmentId;
 
-
                     const result = await this._siteService.update(this.currentSite);
 
+                    this._toastService.successfullySaved('Site Settings');
                 }
-
-
             } catch (e) {
                 if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
                     throw e;
                 }
+
+                this._toastService.failedToSave('Site Settings');
             } finally {
-                this.isLoading = false;
+                this.sectionLoading.siteSettings = false;
             }
         }
     }
@@ -236,7 +231,7 @@ export class EditSiteComponent implements OnInit {
     public async updateLocation(form: NgForm): Promise<void> {
         if (form.valid) {
             try {
-                this.isLoading = true;
+                this.sectionLoading.location = true;
                 this.validationErrors = [];
                 if (this.currentSite) {
                     this.currentSite.id = this.site.id;
@@ -252,13 +247,17 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.fogGeneratorPhoneNumber = this.site.fogGeneratorPhoneNumber;
                     this.currentSite.fogGeneratorEmailAddress = this.site.fogGeneratorEmailAddress;
                     const result = await this._siteService.update(this.currentSite);
+
+                    this._toastService.successfullySaved('Location');
                 }
             } catch (e) {
                 if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
                     throw e;
                 }
+
+                this._toastService.failedToSave('Location');
             } finally {
-                this.isLoading = false;
+                this.sectionLoading.location = false;
             }
         }
     }
@@ -267,7 +266,8 @@ export class EditSiteComponent implements OnInit {
     public async updateMailingInformation(form: NgForm): Promise<void> {
         if (form.valid) {
             try {
-                this.isLoading = true;
+                this.sectionLoading.mailing = true;
+
                 this.validationErrors = [];
                 if (this.currentSite) {
                     this.currentSite.id = this.site.id;
@@ -282,20 +282,29 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.mailingPhoneNumber = this.site.mailingPhoneNumber;
                     this.currentSite.mailingEmailAddress = this.site.mailingEmailAddress;
                     const result = await this._siteService.update(this.currentSite);
+
+                    this._toastService.successfullySaved('Mailing Information');
                 }
             } catch (e) {
                 if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
                     throw e;
                 }
+
+                this._toastService.failedToSave('Mailing Information');
             } finally {
-                this.isLoading = false;
+                this.sectionLoading.mailing = false;
             }
         }
     }
 
     private async getSite(id: number): Promise<void> {
         try {
-            this.isLoading = true;
+
+            this.sectionLoading.facilityType = true;
+            this.sectionLoading.location = true;
+            this.sectionLoading.mailing = true;
+            this.sectionLoading.siteSettings = true;
+
             const apiSite = await this._siteService.get(id);
 
             this.site = {
@@ -303,20 +312,14 @@ export class EditSiteComponent implements OnInit {
             };
 
         } finally {
-            this.isLoading = false;
+            this.sectionLoading.facilityType = false;
+            this.sectionLoading.location = false;
+            this.sectionLoading.mailing = false;
+            this.sectionLoading.siteSettings = false;
         }
     }
 
-
-
     private async loadStates(): Promise<void> {
-        this.states = await this._stateService.getAllStates();
-        this.stateOptions = [
-            { id: '', text: '' },
-            ...this.states.map(state => ({ id: state.id, text: state.name }))
-        ];
+        this.stateOptions = await this._stateService.getAllStatesAsOptions(true);
     }
-
 }
-
-

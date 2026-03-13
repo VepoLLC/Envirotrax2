@@ -152,3 +152,11 @@ body {
 .form-check-input {
     border-color: #b9b9b9;
 }
+
+.text-bg-success {
+    background-color: rgb(41 163 106) !important;
+}
+
+.border-success {
+    border-color: rgb(41 163 106) !important;
+}

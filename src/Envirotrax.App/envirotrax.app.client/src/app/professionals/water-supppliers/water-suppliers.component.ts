@@ -13,6 +13,7 @@ import { Professional } from "../../shared/models/professionals/professional";
 import { InputOption } from "../../shared/components/input/input.component";
 import { ModalHelperService } from "../../shared/services/helpers/modal-helper.service";
 import { WaterSupplierRegistrationComponent, WaterSupplierRegistrationVm } from "./registration/water-supplier-registration.component";
+import { ToastService } from "../../shared/services/toast.service";
 
 @Component({
     standalone: false,
@@ -75,7 +76,8 @@ export class WaterSuppliersComponent implements OnInit {
         private readonly _professionalSupplierService: ProfessionalSupplierService,
         private readonly _professionalService: ProfesisonalService,
         private readonly _lookupService: LookupService,
-        private readonly _modalHelper: ModalHelperService
+        private readonly _modalHelper: ModalHelperService,
+        private readonly _toastService: ToastService
     ) {
 
     }
@@ -190,6 +192,8 @@ export class WaterSuppliersComponent implements OnInit {
         try {
             this.suppliers.isLoading = true;
             await this._professionalSupplierService.delete(supplier.selected!.waterSupplier!.id!);
+
+            this._toastService.successFullyDeleted('Registration');
         } finally {
             this.suppliers.isLoading = false;
         }

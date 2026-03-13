@@ -9,6 +9,7 @@ import { RoleService } from "../../../shared/services/users/role.service";
 import { UserRoleService } from "../../../shared/services/users/user-role.service";
 import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
 import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
+import { ToastService } from "../../../shared/services/toast.service";
 
 
 @Component({
@@ -31,7 +32,7 @@ export class EditUserComponent implements OnInit {
         private readonly _acitvatedRoute: ActivatedRoute,
         private readonly _helper: HelperService,
         private readonly _modalHelper: ModalHelperService,
-        //private readonly _toastService: ToastService
+        private readonly _toastService: ToastService
     ) {
 
     }
@@ -104,13 +105,13 @@ export class EditUserComponent implements OnInit {
 
                 this._originalRoleIds = [...this.selectedRoleIds];
 
-                //this._toastService.successfullySaved();
+                this._toastService.successfullySaved('User');
             } catch (error) {
                 if (!this._helper.parseValidationErrors(error, this.validationErrors)) {
                     throw error;
                 }
 
-                //this._toastService.failedToSave();
+                this._toastService.failedToSave('User');
             } finally {
                 this.isLoading = false;
             }

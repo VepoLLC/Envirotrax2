@@ -134,7 +134,7 @@ export class App implements OnInit {
           {
             title: 'Inspection Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['/'],
+            routerLink: ['csi'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiInspections),
             hasFeature: true
           },

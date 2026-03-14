@@ -45,14 +45,14 @@ public class SeedDataService : IHostedService
 
     private async Task AddTenantsAsync(TenantDbContext dbContext)
     {
-        _defaultTenant = await dbContext.WaterSuppliers.SingleOrDefaultAsync(tenant => tenant.Domain == "vepollc");
+        _defaultTenant = await dbContext.WaterSuppliers.SingleOrDefaultAsync(tenant => tenant.Domain == WaterSupplier.EnvirotraxAdminDomain);
 
         if (_defaultTenant == null)
         {
             _defaultTenant = new WaterSupplier
             {
                 Name = "Vepo LLC",
-                Domain = "vepollc"
+                Domain = WaterSupplier.EnvirotraxAdminDomain
             };
 
             dbContext.WaterSuppliers.Add(_defaultTenant);

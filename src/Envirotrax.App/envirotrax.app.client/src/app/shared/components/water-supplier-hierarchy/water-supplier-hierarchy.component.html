@@ -2,18 +2,57 @@
     <div dp-spinner-parent>
         <dp-loading-spinner *ngIf="isLoading" />
 
-        <p class="text-center">
-            Your account may access the following Water Supplier accounts. Select a Water Supplier below to access.
-        </p>
+        <ng-container *ngIf="mySuppliers">
+            <p class="text-center">
+                Your account may access the following Water Supplier accounts. Select a Water Supplier below to access.
+            </p>
 
-        <div *ngFor="let item of suppliers">
-            <div class="fw-bold text-info border-bottom mb-2 mt-3">{{ item.groupLetter }}</div>
-            <div class="mb-1">
-                <a (click)="selectSupplier(item.waterSupplier)">{{ item.waterSupplier.name }}</a>
+            <div class="row">
+                <div *ngIf="mySuppliers.adminAccount" class="col-md-12 mb-3 text-center">
+                    <p>
+                        You are an Envirotrax admin account user. Please click the Envirotrax Admin button below to
+                        login to your admin account where you can manage system wide customers.
+                    </p>
+                    <div class="mb-1">
+                        <button (click)="selectSupplier(mySuppliers.adminAccount)" class="btn btn-primary">
+                            Envirotrax Admin
+                        </button>
+                    </div>
+                </div>
+
+                <div *ngFor="let item of mySuppliers.hierarchy" class="col-md-3">
+                    <div class="fw-bold mb-2 mt-3">
+                        {{item.groupLetter}}
+                    </div>
+                    <div *ngFor="let supplier of item.waterSuppliers" class="mb-1">
+                        <div class="d-flex gap-2 align-items-center">
+                            <button (click)="selectSupplier(supplier.waterSupplier)"
+                                    class="btn btn-link text-decoration-none p-0">
+                                {{supplier.waterSupplier.name}}
+                            </button>
+                            <button *ngIf="supplier.children && supplier.children.length > 0"
+                                    class="btn btn-outline-secondary py-0 px-1"
+                                    [attr.aria-label]="supplier.isExpanded ? 'Click to collapse children' : 'Click to expand children'"
+                                    [attr.title]="supplier.isExpanded ? 'Click to collapse children' : 'Click to expand children'"
+                                    (click)="supplier.isExpanded = !supplier.isExpanded">
+
+                                <i *ngIf="!supplier.isExpanded" class="fa-solid fa-chevron-down"></i>
+                                <i *ngIf="supplier.isExpanded" class="fa-solid fa-chevron-up"></i>
+                            </button>
+                        </div>
+
+                        <ng-container *ngIf="supplier.isExpanded">
+                            <ng-container *ngFor="let child of supplier.children">
+                                <button *ngFor="let childSupplier of child.waterSuppliers"
+                                        class="btn btn-link text-decoration-none p-0 ms-2 my-2"
+                                        (click)="selectSupplier(childSupplier.waterSupplier)">
+                                    {{childSupplier.waterSupplier.name}}
+                                </button>
+                            </ng-container>
+                        </ng-container>
+                    </div>
+                </div>
             </div>
-            <div *ngFor="let child of item.children" class="ms-3 mb-1">
-                <a (click)="selectSupplier(child)">{{ child.name }}</a>
-            </div>
-        </div>
+        </ng-container>
     </div>
 </vp-section>

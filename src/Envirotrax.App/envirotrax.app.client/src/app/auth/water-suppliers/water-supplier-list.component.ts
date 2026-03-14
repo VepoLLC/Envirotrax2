@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { WaterSupplier, WaterSupplierHierarchy } from "../../shared/models/water-suppliers/water-supplier";
+import { MySupplierHierarchyDto } from "../../shared/models/water-suppliers/water-supplier";
 import { WaterSupplierService } from "../../shared/services/water-suppliers/water-supplier.service";
 
 @Component({
@@ -7,7 +7,7 @@ import { WaterSupplierService } from "../../shared/services/water-suppliers/wate
     standalone: false
 })
 export class WaterSupplierListComponent implements OnInit {
-    public suppliers: WaterSupplierHierarchy[] = [];
+    public suppliers?: MySupplierHierarchyDto;
     public isLoading: boolean = false;
 
     constructor(

@@ -17,13 +17,13 @@
         </div>
     </ng-container>
 
-    <ng-container *ngIf="suppliers && suppliers.length > 0">
+    <ng-container *ngIf="suppliers && (suppliers.adminAccount || suppliers.hierarchy.length > 0)">
         <div>
             <h1 class="h2 text-center mb-4">
                 Water Supplier Login
             </h1>
         </div>
 
-        <vp-water-supplier-hierarchy [suppliers]="suppliers" />
+        <vp-water-supplier-hierarchy [mySuppliers]="suppliers" />
     </ng-container>
 </div>

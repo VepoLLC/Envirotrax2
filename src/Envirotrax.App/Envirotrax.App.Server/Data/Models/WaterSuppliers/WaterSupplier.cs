@@ -97,4 +97,7 @@ public class WaterSupplier : TenantBase, IAuditableModel<AppUser>
     public int? DeletedById { get; set; }
     public AppUser? DeletedBy { get; set; }
     public DateTime? DeletedTime { get; set; }
+
+    [NotMapped]
+    public const string EnvirotraxAdminDomain = "vepollc";
 }

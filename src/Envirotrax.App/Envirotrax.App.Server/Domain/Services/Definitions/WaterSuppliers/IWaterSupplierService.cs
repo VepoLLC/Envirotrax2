@@ -10,5 +10,5 @@ public interface IWaterSupplierService : IService<WaterSupplier, WaterSupplierDt
     Task<WaterSupplierDto> GetLoggedInSupplierAsync();
     Task<WaterSupplierDto> GetLoggedInSupplierAsync(CancellationToken cancellationToken);
 
-    Task<IEnumerable<WaterSupplierHierarchyDto>> GetAllMySuppliersAsync(CancellationToken cancellationToken);
+    Task<MySupplierHierarchyDto> GetAllMySuppliersAsync(CancellationToken cancellationToken);
 }

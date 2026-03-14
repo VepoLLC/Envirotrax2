@@ -36,9 +36,17 @@ public class WaterSupplierService : Service<WaterSupplier, WaterSupplierDto>, IW
         return MapToDto(supplier) ?? throw new InvalidOperationException("User is not logged in to specific water supplier.");
     }
 
-    private IEnumerable<WaterSupplierHierarchyDto> BuildHierarchy(IEnumerable<WaterSupplier> waterSuppliers)
+    private MySupplierHierarchyDto BuildHierarchy(IEnumerable<WaterSupplier> waterSuppliers)
     {
-        var supplierList = waterSuppliers.ToList();
+        var adminAccount = waterSuppliers
+            .Where(s => s.ParentId == null)
+            .Select(s => Mapper.Map<ReferencedWaterSupplierDto>(s))
+            .FirstOrDefault();
+
+        var supplierList = waterSuppliers
+            .Where(s => s.ParentId.HasValue)
+            .ToList();
+
         var idSet = supplierList.Select(s => (int?)s.Id).ToHashSet();
 
         var childrenByParentId = supplierList
@@ -47,22 +55,38 @@ public class WaterSupplierService : Service<WaterSupplier, WaterSupplierDto>, IW
             .ToDictionary(g => g.Key, g => g.ToList());
 
         var roots = supplierList
-            .Where(s => s.ParentId == null || !idSet.Contains(s.ParentId));
+            .Where(s => adminAccount == null || s.ParentId == adminAccount?.Id)
+            .Where(s => !idSet.Contains(s.ParentId));
 
-        return roots
-            .Select(root => new WaterSupplierHierarchyDto
-            {
-                GroupLetter = root.Name?[..1].ToUpper(),
-                WaterSupplier = Mapper.Map<ReferencedWaterSupplierDto>(root),
-                Children = childrenByParentId.TryGetValue(root.Id, out var children)
-                    ? Mapper.Map<IEnumerable<ReferencedWaterSupplierDto>>(children)
-                    : []
-            })
-            .OrderBy(h => h.GroupLetter)
-            .ThenBy(h => h.WaterSupplier.Name);
+        return new MySupplierHierarchyDto
+        {
+            AdminAccount = adminAccount,
+            Hierarchy = GroupByLetter(roots, childrenByParentId)
+        };
     }
 
-    public async Task<IEnumerable<WaterSupplierHierarchyDto>> GetAllMySuppliersAsync(CancellationToken cancellationToken)
+    private IEnumerable<WaterSupplierHierarchyDto> GroupByLetter(IEnumerable<WaterSupplier> suppliers, Dictionary<int, List<WaterSupplier>> childrenByParentId)
+    {
+        return suppliers
+            .Where(s => s.Domain != WaterSupplier.EnvirotraxAdminDomain)
+            .GroupBy(s => s.Name?[..1].ToUpper() ?? "")
+            .OrderBy(g => g.Key)
+            .Select(g => new WaterSupplierHierarchyDto
+            {
+                GroupLetter = g.Key,
+                WaterSuppliers = g
+                    .OrderBy(s => s.Name)
+                    .Select(s => new WaterSupplierHierarchyChildDto
+                    {
+                        WaterSupplier = Mapper.Map<ReferencedWaterSupplierDto>(s),
+                        Children = childrenByParentId.TryGetValue(s.Id, out var children)
+                            ? GroupByLetter(children, childrenByParentId)
+                            : []
+                    })
+            });
+    }
+
+    public async Task<MySupplierHierarchyDto> GetAllMySuppliersAsync(CancellationToken cancellationToken)
     {
         var waterSuppliers = await _repository.GetAllMySuppliersAsync(cancellationToken);
         return BuildHierarchy(waterSuppliers);

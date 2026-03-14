@@ -1,5 +1,5 @@
 import { Component, Input } from "@angular/core";
-import { WaterSupplier, WaterSupplierHierarchy } from "../../models/water-suppliers/water-supplier";
+import { MySupplierHierarchyDto, WaterSupplier } from "../../models/water-suppliers/water-supplier";
 import { AuthService } from "../../services/auth/auth.service";
 
 @Component({
@@ -11,7 +11,7 @@ export class WaterSupplierHierarchyComponent {
     public isLoading: boolean = false;
 
     @Input()
-    public suppliers: WaterSupplierHierarchy[] = [];
+    public mySuppliers?: MySupplierHierarchyDto;
 
     constructor(private readonly _authService: AuthService) {
 

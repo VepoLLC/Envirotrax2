@@ -35,8 +35,18 @@ export class WaterSupplier {
     letterContactEmailAddress?: string;
 }
 
+export interface MySupplierHierarchyDto {
+    adminAccount?: WaterSupplier;
+    hierarchy: WaterSupplierHierarchy[];
+}
+
+export interface WaterSupplierHierarchyChild {
+    waterSupplier: WaterSupplier;
+    children: WaterSupplierHierarchy[];
+    isExpanded?: boolean
+}
+
 export interface WaterSupplierHierarchy {
     groupLetter: string;
-    waterSupplier: WaterSupplier;
-    children: WaterSupplier[];
+    waterSuppliers: WaterSupplierHierarchyChild[];
 }

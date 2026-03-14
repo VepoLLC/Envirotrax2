@@ -2,7 +2,7 @@ import { Component } from "@angular/core";
 import { Router } from "@angular/router";
 import { PagedData } from "../../shared/models/paged-data";
 import { AuthService } from "../../shared/services/auth/auth.service";
-import { WaterSupplier, WaterSupplierHierarchy } from "../../shared/models/water-suppliers/water-supplier";
+import { MySupplierHierarchyDto, WaterSupplier, WaterSupplierHierarchy } from "../../shared/models/water-suppliers/water-supplier";
 import { WaterSupplierService } from "../../shared/services/water-suppliers/water-supplier.service";
 import { ProfesisonalService } from "../../shared/services/professionals/professional.service";
 import { Professional } from "../../shared/models/professionals/professional";
@@ -13,7 +13,7 @@ import { Professional } from "../../shared/models/professionals/professional";
 })
 export class LoginRedirectComponent {
     public isLoading: boolean = false;
-    public suppliers?: WaterSupplierHierarchy[] = [];
+    public suppliers?: MySupplierHierarchyDto;
     public professionals?: PagedData<Professional>;
 
     constructor(
@@ -53,6 +53,18 @@ export class LoginRedirectComponent {
         });
     }
 
+    private checkIfOneSupplier(myHierarchy: MySupplierHierarchyDto): WaterSupplier | null {
+        if (myHierarchy.hierarchy.length == 1) {
+            if (myHierarchy.hierarchy[0].waterSuppliers.length == 1) {
+                if (myHierarchy.hierarchy[0].waterSuppliers[0].children.length == 0) {
+                    return myHierarchy.hierarchy[0].waterSuppliers[0].waterSupplier;
+                }
+            }
+        }
+
+        return null;
+    }
+
     private async loadSystems(): Promise<void> {
         this.professionals = await this._professionalService.getAllMy(this.professionals?.pageInfo || {}, {});
 
@@ -63,13 +75,15 @@ export class LoginRedirectComponent {
 
         this.suppliers = await this._supplierService.getAllMySuppliers();
 
-        if (this.suppliers.length == 1 && this.suppliers[0].children.length == 0) {
-            await this._authService.signIn(this.suppliers[0].waterSupplier.id);
+        const onlySupplier = this.checkIfOneSupplier(this.suppliers);
+
+        if (onlySupplier) {
+            await this._authService.signIn(onlySupplier.id);
             return
         }
 
         // User must be a registered professional who self-registered, but hasn't fileld out their company information yet.
-        if (this.professionals.data.length == 0 && this.suppliers.length == 1 && this.suppliers[0].children.length == 0) {
+        if (this.professionals.data.length == 0 && !this.suppliers.adminAccount && this.suppliers.hierarchy.length == 0) {
             this._router.navigate(['/profile'], {
                 replaceUrl: true
             });

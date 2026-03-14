@@ -127,13 +127,32 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
         var childSupplierQuery = from supplier in DbContext.WaterSuppliers.IgnoreQueryFilters()
                                  join childSupplier in DbContext.WaterSuppliers.IgnoreQueryFilters()
                                  on supplier.Id equals childSupplier.ParentId
+
                                  join supplierUser in DbContext.WaterSupplierUsers.IgnoreQueryFilters()
                                  on supplier.Id equals supplierUser.WaterSupplierId
+
                                  where supplierUser.UserId == _tenantProvider.UserId
+
                                  select childSupplier;
+
+        var grandChildrenQuery = from supplier in DbContext.WaterSuppliers.IgnoreQueryFilters()
+
+                                 join childSupplier in DbContext.WaterSuppliers.IgnoreQueryFilters()
+                                 on supplier.Id equals childSupplier.ParentId
+
+                                 join grandChild in DbContext.WaterSuppliers.IgnoreQueryFilters()
+                                 on childSupplier.Id equals grandChild.ParentId
+
+                                 join supplierUser in DbContext.WaterSupplierUsers.IgnoreQueryFilters()
+                                 on supplier.Id equals supplierUser.WaterSupplierId
+
+                                 where supplierUser.UserId == _tenantProvider.UserId
+
+                                 select grandChild;
 
         return await suppliersQuery
             .Union(childSupplierQuery)
+            .Union(grandChildrenQuery)
             .ToListAsync(cancellationToken);
     }
 }

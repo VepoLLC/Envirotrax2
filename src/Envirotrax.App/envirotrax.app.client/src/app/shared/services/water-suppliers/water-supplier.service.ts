@@ -5,7 +5,7 @@ import { Query } from "../../models/query";
 import { QueryHelperService } from "../helpers/query-helper.service";
 import { HttpClient } from "@angular/common/http";
 import { PagedData } from "../../models/paged-data";
-import { WaterSupplier, WaterSupplierHierarchy } from "../../models/water-suppliers/water-supplier";
+import { MySupplierHierarchyDto, WaterSupplier } from "../../models/water-suppliers/water-supplier";
 import { lastValueFrom, Observable, shareReplay } from "rxjs";
 
 @Injectable({
@@ -65,10 +65,10 @@ export class WaterSupplierService {
         );
     }
 
-    public getAllMySuppliers(): Promise<WaterSupplierHierarchy[]> {
+    public getAllMySuppliers(): Promise<MySupplierHierarchyDto> {
         const url = this._urlResolver.resolveUrl('/api/water-suppliers/my');
 
-        const observable = this._http.get<WaterSupplierHierarchy[]>(url);
+        const observable = this._http.get<MySupplierHierarchyDto>(url);
 
         return lastValueFrom(observable);
     }

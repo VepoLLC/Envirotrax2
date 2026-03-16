@@ -74,6 +74,8 @@
                [attr.id]="id"
                [attr.name]="name"
                class="form-control"
+               [class.has-custom-border]="!!borderColor"
+               [style.--vp-select-border-color]="borderColor"
                [required]="required"
                [disabled]="disabled || readonly"
                [(ngModel)]="value"

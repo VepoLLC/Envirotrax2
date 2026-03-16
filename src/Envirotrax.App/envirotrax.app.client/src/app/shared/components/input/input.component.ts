@@ -20,6 +20,10 @@ import { Instance } from "flatpickr/dist/types/instance";
         .form-floating > textarea.form-control {
             height: auto;
         }
+        ::ng-deep ng-select.has-custom-border .ng-select-container {
+            border-color: var(--vp-select-border-color) !important;
+            border-width: 2px !important;
+        }
     `
 })
 export class InputComponent implements ControlValueAccessor, OnInit, AfterViewInit {
@@ -77,6 +81,9 @@ export class InputComponent implements ControlValueAccessor, OnInit, AfterViewIn
 
     @Input()
     public options: InputOption[] = [];
+
+    @Input()
+    public borderColor?: string;
 
     public value: any | DateRange;
 

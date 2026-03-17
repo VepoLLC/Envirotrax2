@@ -1,0 +1,59 @@
+<div class="text-center mb-3">
+    <h1 class="h2">
+        User Management
+    </h1>
+</div>
+
+<vp-section header="User Accounts">
+    <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+    <div>
+        <h3 class="h4 text-center text-decoration-underline mb-4">
+            If this is a company account employing more than one inspector, you will need to create a sub-account for
+            each inspector.
+        </h3>
+
+        <p>
+            This account will then be considered the "Master" (owner/manager) account. Each employed inspector can then
+            login to their sub-account with the User ID (email address) and Password that they create when they acceopt
+            the invitation to register. Below are the advantages of creating sub-accounts for all
+            inspectors employed by the Master account holder:
+        </p>
+
+        <ul>
+            <li>
+                Sub-accounts will automatically be registered with any water supplier in which the Master account is
+                registered.
+            </li>
+            <li>
+                If an inspector with a sub-account employment is terminated, you can remove the sub-account from the
+                Master account at any time. All inspections submitted under the removed sub-account will be moved to the
+                Master account and will no longer be available to the sub-account. The removed sub-account will be
+                considered independent of the Master account and will no longer share the Master account's water
+                supplier registrations, licenses, or insurance.
+            </li>
+        </ul>
+    </div>
+
+    <vp-table *ngIf="table.items"
+              [columns]="table.columns!"
+              [data]="table.items.data"
+              [canAdd]="true"
+              (add)="add()"
+              [canEdit]="true"
+              (edit)="edit($event)"
+              [canDelete]="true"
+              (delete)="delete($event)"
+              [(pageInfo)]="table.items.pageInfo"
+              (pageInfoChange)="getUsers()"
+              [(query)]="table.query"
+              (queryChange)="getUsers()"
+              (queryReset)="getUsers()"
+              [freeTextSearch]="table.freeTextSearch" />
+
+    <div class="mt-3 d-flex justify-content-center">
+        <button class="btn btn-primary" (click)="add()">
+            Add New Sub Account
+        </button>
+    </div>
+</vp-section>

@@ -10,6 +10,7 @@ import { ProfessionalUser } from "../../shared/models/professionals/professional
 import { AuthService } from "../../shared/services/auth/auth.service";
 import { ProfesionalUserService } from "../../shared/services/professionals/professional-user.service";
 import { InputOption } from "../../shared/components/input/input.component";
+import { HttpErrorResponse } from "@angular/common/http";
 
 @Component({
     standalone: false,
@@ -41,16 +42,42 @@ export class CompanyComponent implements OnInit {
 
             const [states, professional, user] = await Promise.all([
                 this._lookupService.getAllStatesAsOptions(true),
-                this._professionalService.getLoggedInProfessional(),
-                this._professionalUserService.getMyData()
+                this.getLoggedInProfessional(),
+                this.getMyData()
             ]);
 
             this.states = states;
-            this.professional = professional || {};
-            this.user = user || {};
+            this.professional = professional;
+            this.user = user;
         } finally {
             this.isLoading = false;
             this.loadingMessage = '';
+        }
+    }
+
+    private async getLoggedInProfessional(): Promise<Professional> {
+        try {
+            return await this._professionalService.getLoggedInProfessional();
+        } catch (e) {
+            if (this._helper.isNotFoundError(e)) {
+                return {};
+            }
+
+            throw e;
+        }
+    }
+
+    private async getMyData(): Promise<ProfessionalUser> {
+        try {
+            return await this._professionalUserService.getMyData();
+        } catch (e) {
+            if (this._helper.isNotFoundError(e)) {
+                return {
+                    emailAddress: await this._authService.getUserEmail()
+                };
+            }
+
+            throw e;
         }
     }
 

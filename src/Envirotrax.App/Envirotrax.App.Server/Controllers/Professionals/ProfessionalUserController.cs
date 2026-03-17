@@ -7,11 +7,12 @@ namespace Envirotrax.App.Server.Controllers.Professionals;
 
 
 [Route("api/professionals/users")]
-public class ProfessionalUserContoller : ProtectedController
+public class ProfessionalUserContoller : CrudController<ProfessionalUserDto>
 {
     private readonly IProfessionalUserService _userService;
 
     public ProfessionalUserContoller(IProfessionalUserService userService)
+        : base(userService)
     {
         _userService = userService;
     }
@@ -34,5 +35,12 @@ public class ProfessionalUserContoller : ProtectedController
     {
         var updated = await _userService.UpdateMyDataAsync(user);
         return Ok(updated);
+    }
+
+    [HttpPost("{id}/invitations")]
+    public async Task<IActionResult> ResendInvitationAsync(int id)
+    {
+        var result = await _userService.ResendInvitationAsync(id);
+        return Ok(result);
     }
 }

@@ -8,4 +8,6 @@ public interface IProfessionalUserService : IService<ProfessionalUser, Professio
 {
     Task<ProfessionalUserDto?> GetMyDataAsync(CancellationToken cancellationToken);
     Task<ProfessionalUserDto> UpdateMyDataAsync(ProfessionalUserDto user);
+
+    Task<ProfessionalUserDto?> ResendInvitationAsync(int id);
 }

@@ -12,12 +12,15 @@ public interface IInternalApiClientService : IInternalApiClientService<InternalA
 public interface IInternalApiClientService<TOptions>
     where TOptions : InternalApiOptions
 {
+    Task<T?> GetAsync<T>(int? loggedInUserId, string url);
+
     Task<T?> GetAsync<T>(int waterSupplierId, int? loggedInUserId, string url);
 
     Task<TResponse?> PostAsync<TRequest, TResponse>(string url, ServiceMessageDto<TRequest> requestData);
 
     Task<TResponse?> PutAsync<TRequest, TResponse>(string url, ServiceMessageDto<TRequest> requestData);
 
+    Task<T?> DeleteAsync<T>(int? loggedInUserId, string url);
     Task<T?> DeleteAsync<T>(int waterSupplierId, int? loggedInUserId, string url);
 }
 

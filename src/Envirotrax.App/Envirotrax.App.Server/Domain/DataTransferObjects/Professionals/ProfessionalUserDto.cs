@@ -8,6 +8,10 @@ public class ProfessionalUserDto : IDto
     public int Id { get; set; }
 
     [Required]
+    [StringLength(100)]
+    public string EmailAddress { get; set; } = null!;
+
+    [Required]
     [StringLength(255)]
     public string? ContactName { get; set; }
 

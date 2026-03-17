@@ -69,11 +69,14 @@ public class InternalApiClientService<TOptions> : IInternalApiClientService<TOpt
         _httpClient.DefaultRequestHeaders.Authorization = new("Bearer", _tokenResponse.AccessToken);
     }
 
-    private HttpRequestMessage CreateRequestMessage(HttpMethod method, int waterSupplierId, int? loggedInUserId, string url)
+    private HttpRequestMessage CreateRequestMessage(HttpMethod method, int? waterSupplierId, int? loggedInUserId, string url)
     {
         var request = new HttpRequestMessage(method, url);
 
-        request.Headers.Add("Vp-Water-Supplier-Id", waterSupplierId.ToString());
+        if (waterSupplierId.HasValue)
+        {
+            request.Headers.Add("Vp-Water-Supplier-Id", waterSupplierId.ToString());
+        }
 
         if (loggedInUserId.HasValue)
         {
@@ -110,7 +113,17 @@ public class InternalApiClientService<TOptions> : IInternalApiClientService<TOpt
         return default;
     }
 
+    public Task<T?> GetAsync<T>(int? loggedInUserId, string url)
+    {
+        return GetAsync<T>(waterSupplierId: null, loggedInUserId: loggedInUserId, url: url);
+    }
+
     public Task<T?> GetAsync<T>(int waterSupplierId, int? loggedInUserId, string url)
+    {
+        return GetAsync<T>(waterSupplierId: waterSupplierId, loggedInUserId: loggedInUserId, url: url);
+    }
+
+    private Task<T?> GetAsync<T>(int? waterSupplierId, int? loggedInUserId, string url)
     {
         return ProcessRequestAsync<T>(() =>
         {
@@ -151,7 +164,17 @@ public class InternalApiClientService<TOptions> : IInternalApiClientService<TOpt
         });
     }
 
+    public Task<T?> DeleteAsync<T>(int? loggedInUserId, string url)
+    {
+        return DeleteAsync<T>(waterSupplierId: null, loggedInUserId: loggedInUserId, url: url);
+    }
+
     public Task<T?> DeleteAsync<T>(int waterSupplierId, int? loggedInUserId, string url)
+    {
+        return DeleteAsync<T>(waterSupplierId: waterSupplierId, loggedInUserId: loggedInUserId, url: url);
+    }
+
+    private Task<T?> DeleteAsync<T>(int? waterSupplierId, int? loggedInUserId, string url)
     {
         return ProcessRequestAsync<T>(() =>
         {

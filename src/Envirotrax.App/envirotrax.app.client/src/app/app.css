@@ -19,3 +19,19 @@
         position: relative;
     }
 }
+
+/* Header */
+.vp-header {
+    width: 100%;
+}
+
+/* Login panel boxes */
+.login-box.left {
+    border-radius: 0px 4px 4px 15px;
+    padding-left: 15px;
+}
+
+.login-box.right {
+    border-radius: 4px 0px 15px 4px;
+    padding-right: 15px;
+}

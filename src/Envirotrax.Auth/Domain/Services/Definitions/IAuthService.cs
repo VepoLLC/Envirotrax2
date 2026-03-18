@@ -6,5 +6,5 @@ namespace Envirotrax.Auth.Domain.Services.Definitions;
 
 public interface IAuthService : ITenantProvidersService
 {
-    Task SetSecurityPropertiesAsync(ClaimsPrincipal principal, int userId, int? waterSupplierId, int? contractorId);
+    Task SetSecurityPropertiesAsync(ClaimsPrincipal principal, int userId, int? waterSupplierId, int? professionalId);
 }

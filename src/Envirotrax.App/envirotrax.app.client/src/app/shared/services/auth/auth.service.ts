@@ -1,7 +1,11 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, from, merge, Observable } from "rxjs";
+import { BehaviorSubject, from, lastValueFrom, merge, Observable, shareReplay } from "rxjs";
 import { UserManager } from "oidc-client-ts";
 import { environment } from "../../../../environments/environment";
+import { FeatureType } from "../../models/feature-tyype";
+import { UrlResolverService } from "../helpers/url-resolver.service";
+import { HttpClient } from "@angular/common/http";
+import { PermissionAction, PermissionType } from "../../models/permission-type";
 
 @Injectable({
     providedIn: 'root'
@@ -9,26 +13,30 @@ import { environment } from "../../../../environments/environment";
 export class AuthService {
     private _isLoggedIn$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     private _userManager: UserManager;
+    private _userAcces$?: Observable<UserAccess>;
 
-    constructor() {
+    constructor(
+        private readonly _http: HttpClient,
+        private readonly _urlResolver: UrlResolverService
+    ) {
         this._userManager = this.createUserManager();
     }
 
-    private createUserManager(waterSupplierId?: number, contractorId?: number): UserManager {
+    private createUserManager(waterSupplierId?: number, professionalId?: number): UserManager {
         let acrValues = '';
 
         if (waterSupplierId) {
             acrValues += `waterSupplierId:${waterSupplierId} `;
         }
 
-        if (contractorId) {
-            acrValues + `contractorId:${contractorId} `;
+        if (professionalId) {
+            acrValues += `professionalId:${professionalId} `;
         }
 
         return new UserManager({
             authority: environment.authUrl,
             loadUserInfo: true,
-            scope: 'envirotrax_app',
+            scope: 'openid profile offline_access envirotrax_app',
             client_id: 'envirotrax-app',
             redirect_uri: window.location.origin + '/auth/login-redirect',
             post_logout_redirect_uri: window.location.origin + '/auth/sign-out',
@@ -44,9 +52,11 @@ export class AuthService {
         this.setLoggedIn(false);
     }
 
-    public signIn(waterSupplierId?: number): Promise<void> {
-        if (waterSupplierId) {
-            this._userManager = this.createUserManager(waterSupplierId);
+    public async signIn(waterSupplierId?: number, professionalId?: number): Promise<void> {
+        await this._userManager.removeUser();
+
+        if (waterSupplierId || professionalId) {
+            this._userManager = this.createUserManager(waterSupplierId, professionalId);
         }
 
         return this._userManager.signinRedirect();
@@ -60,29 +70,53 @@ export class AuthService {
         window.open(`${environment.authUrl}/Identity/Account/Manage`, '_blank');
     }
 
-    public async getWaterSupplierId(): Promise<number | null> {
+    private async getProfileField(fieldName: string): Promise<any> {
         const user = await this._userManager.getUser();
 
         if (user) {
             const profile = user.profile as any;
 
-            if (profile.wsId) {
-                return parseInt(profile.wsId);
+            if (profile) {
+                return profile[fieldName];
             }
         }
 
-        return null;
+        return undefined;
     }
 
-    public async isAuthenticated(): Promise<boolean> {
-        const supplierId = await this.getWaterSupplierId();
-        return !!supplierId;
+    private async getProfileInteger(fieldName: string): Promise<number | undefined> {
+        const id = await this.getProfileField(fieldName);
+
+        return id
+            ? parseInt(id)
+            : undefined;
+    }
+
+    public async getWaterSupplierId(): Promise<number | undefined> {
+        return this.getProfileInteger("wsId");
+    }
+
+    public getProfessionalId(): Promise<number | undefined> {
+        return this.getProfileInteger("prfId");
+    }
+
+    public async isAuthenticated(checkTenantOrProfessional: boolean): Promise<boolean> {
+        if (checkTenantOrProfessional) {
+            const supplierId = await this.getWaterSupplierId();
+            const professionalId = await this.getProfessionalId();
+
+            return !!supplierId || !!professionalId;
+        }
+
+        const user = await this._userManager.getUser();
+
+        return !!user;
     }
 
     public onLoggedIn(): Observable<boolean> {
         return merge(
             this._isLoggedIn$.asObservable(),
-            from(this.isAuthenticated())
+            from(this.isAuthenticated(true))
         );
     }
 
@@ -94,4 +128,76 @@ export class AuthService {
         const user = await this._userManager.getUser();
         return user?.access_token;
     }
+
+    public async getUserEmail(): Promise<string | undefined> {
+        const user = await this._userManager.getUser();
+        return user?.profile?.email;
+    }
+
+    private getMyAccess(): Promise<UserAccess> {
+        const url = this._urlResolver.resolveUrl('/api/users/access/my');
+
+        if (!this._userAcces$) {
+            this._userAcces$ = this._http.get<UserAccess>(url).pipe(shareReplay(1));
+        }
+
+        return lastValueFrom(this._userAcces$);
+    }
+
+    public async hasAnyFeatures(...featuresToCheck: FeatureType[]): Promise<boolean> {
+        const myAccess = await this.getMyAccess();
+
+        for (let featureToCheck of featuresToCheck) {
+            if (myAccess.features.indexOf(featureToCheck) >= 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private hasPermission(myPermissions: RolePermission[], action: PermissionAction, type: PermissionType): boolean {
+        let matchingPermission = myPermissions.find(p => p.permission == type);
+
+        if (matchingPermission) {
+            switch (action) {
+                case PermissionAction.CanCreate:
+                    return matchingPermission.canCreate!;
+                case PermissionAction.CanDelete:
+                    return matchingPermission.canDelete!;
+                case PermissionAction.CanEdit:
+                    return matchingPermission.canEdit!;
+                case PermissionAction.CanView:
+                    return matchingPermission.canEdit! || matchingPermission.canView!;
+            }
+        }
+
+        return false;
+    }
+
+    public async hasAnyPermisison(action: PermissionAction, ...types: PermissionType[]): Promise<boolean> {
+        const access = await this.getMyAccess();
+
+        for (let type of types) {
+            if (this.hasPermission(access.permissions, action, type)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
+interface UserAccess {
+    features: FeatureType[];
+    permissions: RolePermission[];
+}
+
+interface RolePermission {
+    permission: PermissionType;
+
+    canView?: boolean;
+    canCreate?: boolean;
+    canEdit?: boolean;
+    canDelete?: boolean;
 }

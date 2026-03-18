@@ -12,12 +12,12 @@ import { NgForm } from "@angular/forms";
 export class CreateSupplierComponent {
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
-    public supplier: WaterSupplier = {};
+    public supplier: WaterSupplier = new WaterSupplier();
 
     constructor(
         private readonly _supplierService: WaterSupplierService,
         private readonly _modalReference: ModalReference<WaterSupplier>,
-        private readonly _helper: HelperService
+        private readonly _helper: HelperService,
     ) {
 
     }

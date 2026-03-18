@@ -189,7 +189,7 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
 
     public virtual async Task<TModel?> ReactivateAsync(TKey id)
     {
-        if (ImplementsInterface(typeof(TModel), typeof(IDeleteAutitableModel<>)))
+        if (!ImplementsInterface(typeof(TModel), typeof(IDeleteAutitableModel<>)))
         {
             throw new InvalidOperationException($"An entity must implement {nameof(IDeleteAutitableModel<AspNetUserBase>)} interface for reactivating.");
         }

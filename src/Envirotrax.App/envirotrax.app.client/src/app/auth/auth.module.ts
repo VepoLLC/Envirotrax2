@@ -4,16 +4,19 @@ import { CommonModule } from "@angular/common";
 import { LoginRedirectComponent } from "./login-redirect/login-redirect.component";
 import { SignOutComponent } from "./sign-out/sign-out.component";
 import { UnauthorizedComponent } from "./unauthorized/unauthorized.component";
-import { AppLoadingSpinnerModule } from "../shared/components/loading-spinner/app-loading-spinner.module";
+import { WaterSupplierListComponent } from "./water-suppliers/water-supplier-list.component";
+import { SharedComponentsModule } from "../shared/components/shared.components.module";
 
 @NgModule({
     declarations: [
         LoginRedirectComponent,
-        SignOutComponent
+        SignOutComponent,
+        UnauthorizedComponent,
+        WaterSupplierListComponent,
     ],
     imports: [
         CommonModule,
-        AppLoadingSpinnerModule,
+        SharedComponentsModule,
         RouterModule.forChild([
             {
                 path: 'login-redirect',
@@ -29,6 +32,11 @@ import { AppLoadingSpinnerModule } from "../shared/components/loading-spinner/ap
                 path: 'unauthorized',
                 title: 'Unauthorized',
                 component: UnauthorizedComponent
+            },
+            {
+                path: 'water-suppliers',
+                title: 'Select Water Supplier',
+                component: WaterSupplierListComponent
             }
         ])
     ],

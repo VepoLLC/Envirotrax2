@@ -90,7 +90,7 @@ namespace Envirotrax.Auth.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Envirotrax.Auth.Data.Models.Contractor", b =>
+            modelBuilder.Entity("Envirotrax.Auth.Data.Models.Professional", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -110,25 +110,25 @@ namespace Envirotrax.Auth.Data.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("Contractors", t =>
+                    b.ToTable("Professionals", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
                 });
 
-            modelBuilder.Entity("Envirotrax.Auth.Data.Models.ContractorUser", b =>
+            modelBuilder.Entity("Envirotrax.Auth.Data.Models.ProfessionalUser", b =>
                 {
-                    b.Property<int>("ContractorId")
+                    b.Property<int>("ProfessionalId")
                         .HasColumnType("int");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("ContractorId", "UserId");
+                    b.HasKey("ProfessionalId", "UserId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ContractorUsers", t =>
+                    b.ToTable("ProfessionalUsers", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -561,20 +561,20 @@ namespace Envirotrax.Auth.Data.Migrations
                     b.ToTable("OpenIddictTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Envirotrax.Auth.Data.Models.Contractor", b =>
+            modelBuilder.Entity("Envirotrax.Auth.Data.Models.Professional", b =>
                 {
-                    b.HasOne("Envirotrax.Auth.Data.Models.Contractor", "Parent")
+                    b.HasOne("Envirotrax.Auth.Data.Models.Professional", "Parent")
                         .WithMany()
                         .HasForeignKey("ParentId");
 
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("Envirotrax.Auth.Data.Models.ContractorUser", b =>
+            modelBuilder.Entity("Envirotrax.Auth.Data.Models.ProfessionalUser", b =>
                 {
-                    b.HasOne("Envirotrax.Auth.Data.Models.Contractor", "Contractor")
+                    b.HasOne("Envirotrax.Auth.Data.Models.Professional", "Professional")
                         .WithMany()
-                        .HasForeignKey("ContractorId")
+                        .HasForeignKey("ProfessionalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -584,7 +584,7 @@ namespace Envirotrax.Auth.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Contractor");
+                    b.Navigation("Professional");
 
                     b.Navigation("User");
                 });

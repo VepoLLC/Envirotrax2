@@ -1,5 +1,5 @@
 import { DatePipe } from "@angular/common";
-import { AfterViewInit, Component, ElementRef, forwardRef, Input, OnInit, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, forwardRef, input, Input, OnInit, ViewChild } from "@angular/core";
 import { ControlValueAccessor, NgForm, NG_VALUE_ACCESSOR } from "@angular/forms";
 import flatpickr from "flatpickr";
 import { Instance } from "flatpickr/dist/types/instance";
@@ -20,6 +20,10 @@ import { Instance } from "flatpickr/dist/types/instance";
         .form-floating > textarea.form-control {
             height: auto;
         }
+        ::ng-deep ng-select.has-custom-border .ng-select-container {
+            border-color: var(--vp-select-border-color) !important;
+            border-width: 2px !important;
+        }
     `
 })
 export class InputComponent implements ControlValueAccessor, OnInit, AfterViewInit {
@@ -37,7 +41,7 @@ export class InputComponent implements ControlValueAccessor, OnInit, AfterViewIn
     public name: string = null!;
 
     @Input()
-    public type: 'text' | 'number' | 'date' | 'datetime' | 'textarea' | 'select' | 'email' = 'text';
+    public type: 'text' | 'number' | 'date' | 'datetime' | 'daterange' | 'textarea' | 'select' | 'email' | 'multi-select' = 'text';
 
     @Input()
     public required: boolean = false;
@@ -73,9 +77,15 @@ export class InputComponent implements ControlValueAccessor, OnInit, AfterViewIn
     public label: string = null!;
 
     @Input()
-    public form: NgForm = null!;
+    public form?: NgForm;
 
-    public value: any;
+    @Input()
+    public options: InputOption[] = [];
+
+    @Input()
+    public borderColor?: string;
+
+    public value: any | DateRange;
 
     @ViewChild('flatpickr')
     public flatpickr?: ElementRef<HTMLElement>;
@@ -87,11 +97,25 @@ export class InputComponent implements ControlValueAccessor, OnInit, AfterViewIn
     public ngAfterViewInit(): void {
         if (this.flatpickr?.nativeElement) {
             this._flatpickerInstance = flatpickr(this.flatpickr.nativeElement, {
-                enableTime: true,
-                onChange: (selectedDates: any[]) => {
-                    const dateTime = selectedDates.find(_ => true);
+                enableTime: this.type == 'datetime',
+                mode: this.type == 'daterange'
+                    ? 'range'
+                    : 'single',
 
-                    this.value = this._datePipe.transform(dateTime, 'yyyy-MM-ddTHH:mm');
+                onChange: (selectedDates: any[]) => {
+                    if (this.type == 'datetime') {
+                        const dateTime = selectedDates.find(_ => true);
+                        this.value = this._datePipe.transform(dateTime, 'yyyy-MM-ddTHH:mm');
+                    } else if (this.type == 'daterange') {
+                        const start = selectedDates[0];
+                        const end = selectedDates[selectedDates.length - 1];
+
+                        this.value = {
+                            startDate: this._datePipe.transform(start, 'yyyy-MM-dd'),
+                            endDate: this._datePipe.transform(end, 'yyyy-MM-dd')
+                        };
+                    }
+
                     this.onChanged();
                 }
             });
@@ -166,4 +190,15 @@ export class InputComponent implements ControlValueAccessor, OnInit, AfterViewIn
         this.value = v;
         this._onChanged(v);
     }
+}
+
+export interface DateRange {
+    startDate?: string;
+    endDate?: string;
+}
+
+export interface InputOption<T = any> {
+    id?: any;
+    text?: string;
+    data?: T;
 }

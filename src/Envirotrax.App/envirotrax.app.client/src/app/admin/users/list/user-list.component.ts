@@ -7,6 +7,8 @@ import { ModalHelperService } from "../../../shared/services/helpers/modal-helpe
 import { TableColumn } from "../../../shared/components/data-components/table/table.component";
 import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { CreateUserComponent } from "../create/create-user.component";
+import { AuthService } from "../../../shared/services/auth/auth.service";
+import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
 
 @Component({
     standalone: false,
@@ -27,16 +29,25 @@ export class UserListComponent implements OnInit {
         }
     };
 
+    public canAdd: boolean = false;
+    public canEdit: boolean = false;
+    public canDelete: boolean = false;
+
     constructor(
         private readonly _userService: UserService,
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
-        private readonly _modalHelper: ModalHelperService
+        private readonly _modalHelper: ModalHelperService,
+        private readonly _authService: AuthService
     ) {
 
     }
 
     public async ngOnInit(): Promise<void> {
+        this.canAdd = await this._authService.hasAnyPermisison(PermissionAction.CanCreate, PermissionType.Users);
+        this.canEdit = await this._authService.hasAnyPermisison(PermissionAction.CanEdit, PermissionType.Users);
+        this.canDelete = await this._authService.hasAnyPermisison(PermissionAction.CanDelete, PermissionType.Users);
+
         await this.getUsers();
     }
 

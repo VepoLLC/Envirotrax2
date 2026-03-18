@@ -1,7 +1,10 @@
 
 using Envirotrax.App.Server.Data.Configuration;
 using Envirotrax.App.Server.Data.DbContexts;
+using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
+using Envirotrax.App.Server.Data.SeedData;
+using Envirotrax.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -11,6 +14,8 @@ public class SeedDataService : IHostedService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly AdminUserOptions _adminUserOptions;
+
+    private const string AdminRoleName = "Admin";
 
     private WaterSupplier? _defaultTenant;
 
@@ -30,20 +35,24 @@ public class SeedDataService : IHostedService
             dbContext.SkipSaveSecurityProperties = true;
 
             await AddTenantsAsync(dbContext);
+            await AddStatesAsync(dbContext);
+
+            await AddPermissionsAsync(dbContext);
+            await AddRolesAsync(dbContext);
             await AddUsersAsync(dbContext);
         }
     }
 
     private async Task AddTenantsAsync(TenantDbContext dbContext)
     {
-        _defaultTenant = await dbContext.WaterSuppliers.SingleOrDefaultAsync(tenant => tenant.Domain == "vepollc");
+        _defaultTenant = await dbContext.WaterSuppliers.SingleOrDefaultAsync(tenant => tenant.Domain == WaterSupplier.EnvirotraxAdminDomain);
 
         if (_defaultTenant == null)
         {
             _defaultTenant = new WaterSupplier
             {
                 Name = "Vepo LLC",
-                Domain = "vepollc"
+                Domain = WaterSupplier.EnvirotraxAdminDomain
             };
 
             dbContext.WaterSuppliers.Add(_defaultTenant);
@@ -67,6 +76,69 @@ public class SeedDataService : IHostedService
                 EmailAddress = _adminUserOptions.EmailAddress
             });
 
+            await dbContext.SaveChangesAsync();
+
+            var adminRoleId = await dbContext
+                .Roles
+                .IgnoreQueryFilters()
+                .Where(r => r.Name == AdminRoleName)
+                .Select(r => r.Id)
+                .SingleAsync();
+
+            dbContext.UserRoles.Add(new()
+            {
+                WaterSupplierId = _defaultTenant.Id,
+                RoleId = adminRoleId,
+                UserId = user.Id
+            });
+
+            await dbContext.SaveChangesAsync();
+        }
+    }
+
+    private async Task AddStatesAsync(TenantDbContext dbContext)
+    {
+        if (!await dbContext.States.AnyAsync())
+        {
+            dbContext.States.AddRange(StateSeedData.States);
+            await dbContext.SaveChangesAsync();
+        }
+    }
+
+    private async Task AddPermissionsAsync(TenantDbContext dbContext)
+    {
+        if (!await dbContext.Permissions.AnyAsync())
+        {
+            dbContext.Permissions.AddRange(PermissionSeedData.Permissions);
+            await dbContext.SaveChangesAsync();
+        }
+    }
+
+    private async Task AddRolesAsync(TenantDbContext dbContext)
+    {
+        if (!await dbContext.Roles.IgnoreQueryFilters().AnyAsync())
+        {
+            var adminRole = new Role
+            {
+                WaterSupplierId = _defaultTenant!.Id,
+                Name = AdminRoleName
+            };
+
+            dbContext.Roles.Add(adminRole);
+            await dbContext.SaveChangesAsync();
+
+            var rolePermissions = Enum.GetValues<PermissionType>().Select(permissionId => new RolePermission
+            {
+                WaterSupplierId = _defaultTenant!.Id,
+                RoleId = adminRole.Id,
+                PermissionId = permissionId,
+                CanView = true,
+                CanCreate = true,
+                CanEdit = true,
+                CanDelete = true
+            });
+
+            dbContext.RolePermissions.AddRange(rolePermissions);
             await dbContext.SaveChangesAsync();
         }
     }

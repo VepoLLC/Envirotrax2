@@ -1,10 +1,15 @@
 <div>
-    <label *ngIf="label" [attr.for]="id" class="form-label">
-        {{label}}
-        <span *ngIf="required" class="text-danger">*</span>
-    </label>
+    <div class="d-flex justify-content-between">
+        <label *ngIf="label" [attr.for]="id" class="form-label">
+            {{label}}
+            <span *ngIf="required" class="text-danger">*</span>
+        </label>
+        <div *ngIf="(type == 'text' || type == 'textarea') && maxLength" class="lh-sm me-1 text-end text-muted">
+            <small>{{value?.length || 0}} of {{maxLength}}</small>
+        </div>
+    </div>
 
-    <input *ngIf="type != 'textarea' && type != 'select' && type != 'date' && type != 'datetime'"
+    <input *ngIf="type != 'textarea' && type != 'select' && type != 'multi-select' && type != 'date' && type != 'datetime' && type != 'daterange'"
            [attr.id]="id"
            [attr.name]="name"
            [attr.type]="decimals != null ? 'text' : type"
@@ -53,7 +58,7 @@
            (ngModelChange)="value = $event"
            (change)="onChanged()"
            (blur)="onTouched($event)" />
-    <input *ngIf="type == 'datetime'"
+    <input *ngIf="type == 'datetime' || type == 'daterange'"
            #flatpickr
            [attr.id]="id"
            [attr.name]="name"
@@ -65,27 +70,27 @@
            [attr.max]="max"
            [placeholder]="placeholder"
            (blur)="onTouched($event)" />
-    <select *ngIf="type == 'select'"
-            [attr.id]="id"
-            [attr.name]="name"
-            [attr.type]="type"
-            class="form-control"
-            [required]="required"
-            [disabled]="disabled || readonly"
-            [(ngModel)]="value"
-            (change)="onChanged()"
-            (blur)="onTouched($event)"
-            [attr.value]="value">
-        <ng-container ngProjectAs="'option'">
-            <ng-content select="option"></ng-content>
-        </ng-container>
-    </select>
+    <ng-select *ngIf="type == 'select' || type == 'multi-select'"
+               [attr.id]="id"
+               [attr.name]="name"
+               class="form-control"
+               [class.has-custom-border]="!!borderColor"
+               [style.--vp-select-border-color]="borderColor"
+               [required]="required"
+               [disabled]="disabled || readonly"
+               [(ngModel)]="value"
+               [items]="options"
+               [multiple]="type == 'multi-select'"
+               (change)="onChanged()"
+               (blur)="onTouched($event)"
+               [attr.value]="value"
+               bindLabel="text"
+               bindValue="id"
+               [clearable]="false"
+               [searchable]="false">
+    </ng-select>
 
     <div>
         <vp-validation-field *ngIf="form" [form]="form" [fieldName]="name" [fieldLabel]="label" />
-
-        <div *ngIf="(type == 'text' || type == 'textarea') && maxLength" class="lh-sm me-1 text-end text-muted">
-            <small>{{value?.length || 0}} of {{maxLength}}</small>
-        </div>
     </div>
 </div>

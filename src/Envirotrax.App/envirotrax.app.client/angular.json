@@ -36,6 +36,8 @@
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
+              "node_modules/flatpickr/dist/flatpickr.css",
+              "@ng-select/ng-select/themes/default.theme.css",
               "src/styles.css"
             ]
           },
@@ -134,5 +136,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }

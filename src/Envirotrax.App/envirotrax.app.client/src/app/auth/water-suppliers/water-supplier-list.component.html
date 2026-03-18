@@ -1,0 +1,11 @@
+<div>
+    <h1 class="h2 text-center mb-4">
+        Water Supplier Login
+    </h1>
+</div>
+
+<div>
+    <dp-loading-spinner *ngIf="isLoading" />
+
+    <vp-water-supplier-hierarchy [mySuppliers]="suppliers" />
+</div>

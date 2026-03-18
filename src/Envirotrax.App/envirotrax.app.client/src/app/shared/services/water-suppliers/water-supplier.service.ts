@@ -5,13 +5,15 @@ import { Query } from "../../models/query";
 import { QueryHelperService } from "../helpers/query-helper.service";
 import { HttpClient } from "@angular/common/http";
 import { PagedData } from "../../models/paged-data";
-import { WaterSupplier } from "../../models/water-suppliers/water-supplier";
-import { lastValueFrom } from "rxjs";
+import { MySupplierHierarchyDto, WaterSupplier } from "../../models/water-suppliers/water-supplier";
+import { lastValueFrom, Observable, shareReplay } from "rxjs";
 
 @Injectable({
     providedIn: 'root'
 })
 export class WaterSupplierService {
+    private _currentSupplier$: Observable<WaterSupplier> | null = null;
+
     constructor(
         private readonly _urlResolver: UrlResolverService,
         private readonly _queryHelper: QueryHelperService,
@@ -32,39 +34,54 @@ export class WaterSupplierService {
 
     public get(id: number): Promise<WaterSupplier> {
         const url = this._urlResolver.resolveUrl(`/api/water-suppliers/${id}`);
-        const observable = this._http.get(url);
 
-        return lastValueFrom(observable);
+        return lastValueFrom(
+            this._http.get<WaterSupplier>(url)
+        );
     }
 
     public add(supplier: WaterSupplier): Promise<WaterSupplier> {
         const url = this._urlResolver.resolveUrl('/api/water-suppliers');
-        const observable = this._http.post(url, supplier);
 
-        return lastValueFrom(observable);
+        return lastValueFrom(
+            this._http.post<WaterSupplier>(url, supplier)
+        );
     }
 
-    public update(supplier: WaterSupplier): Promise<WaterSupplier | undefined> {
+
+    public update(supplier: WaterSupplier): Promise<WaterSupplier> {
         const url = this._urlResolver.resolveUrl(`/api/water-suppliers/${supplier.id}`);
-        const observable = this._http.put(url, supplier);
 
-        return lastValueFrom(observable);
+        return lastValueFrom(
+            this._http.put<WaterSupplier>(url, supplier)
+        );
     }
 
-    public delete(id: number): Promise<WaterSupplier | undefined> {
+    public delete(id: number): Promise<WaterSupplier> {
         const url = this._urlResolver.resolveUrl(`/api/water-suppliers/${id}`);
-        const observable = this._http.delete(url);
 
-        return lastValueFrom(observable);
+        return lastValueFrom(
+            this._http.delete<WaterSupplier>(url)
+        );
     }
 
-    public getAllMySuppliers(pageInfo: PageInfo, query: Query): Promise<PagedData<WaterSupplier>> {
+    public getAllMySuppliers(): Promise<MySupplierHierarchyDto> {
         const url = this._urlResolver.resolveUrl('/api/water-suppliers/my');
 
-        const observable = this._http.get<PagedData<WaterSupplier>>(url, {
-            params: this._queryHelper.buildQuery(pageInfo, query)
-        });
+        const observable = this._http.get<MySupplierHierarchyDto>(url);
 
         return lastValueFrom(observable);
+    }
+
+    public getLoggedInSupplier(): Promise<WaterSupplier> {
+        const url = this._urlResolver.resolveUrl('/api/water-suppliers/my/current');
+
+        if (!this._currentSupplier$) {
+            this._currentSupplier$ = this._http.get<WaterSupplier>(url).pipe(
+                shareReplay(1)
+            );
+        }
+
+        return lastValueFrom(this._currentSupplier$);
     }
 }

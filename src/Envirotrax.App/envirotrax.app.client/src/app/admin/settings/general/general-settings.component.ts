@@ -3,6 +3,7 @@ import { GeneralSettings } from "../../../shared/models/settings/general-setting
 import { GeneralSettingsService } from "../../../shared/services/settings/general-settings.service";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { NgForm } from "@angular/forms";
+import { ToastService } from "../../../shared/services/toast.service";
 
 @Component({
     templateUrl: './general-settings.component.html',
@@ -23,9 +24,12 @@ export class GeneralSettingsComponent implements OnInit {
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
 
+    public showProgramUpdateWarning: boolean = false;
+
     constructor(
         private readonly _generalSettingsService: GeneralSettingsService,
         private readonly _helper: HelperService,
+        private readonly _toastService: ToastService
     ) {
 
     }
@@ -60,11 +64,13 @@ export class GeneralSettingsComponent implements OnInit {
                     this.settings = result;
                 }
 
+                this._toastService.successfullySaved('General Settings');
             } catch (error) {
                 if (!this._helper.parseValidationErrors(error, this.validationErrors)) {
                     throw error;
                 }
 
+                this._toastService.failedToSave('General Settings');
             } finally {
                 this.isLoading = false;
             }

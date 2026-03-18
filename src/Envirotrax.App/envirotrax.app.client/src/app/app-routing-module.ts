@@ -11,6 +11,18 @@ const routes: Routes = [
       {
         path: 'admin',
         loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule)
+      },
+      {
+        path: 'sites',
+        loadChildren: () => import('./sites/site.module').then(m => m.SiteModule)
+      },
+      {
+        path: 'professionals',
+        loadChildren: () => import('./professionals/professional.module').then(m => m.ProfessionalModule)
+      },
+      {
+        path: 'csi',
+        loadChildren: () => import('./csi/csi.module').then(m => m.CsiModule)
       }
     ]
   },
@@ -18,6 +30,11 @@ const routes: Routes = [
     path: 'auth',
     title: '',
     loadChildren: () => import('./auth/auth.module').then(m => m.AppAuthModule)
+  },
+  {
+    path: 'profile',
+    title: '',
+    loadChildren: () => import('./profile/profile.module').then(m => m.ProfileModule)
   }
 ];
 

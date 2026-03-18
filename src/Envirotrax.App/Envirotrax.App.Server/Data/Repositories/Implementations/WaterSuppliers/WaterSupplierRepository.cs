@@ -1,6 +1,7 @@
 
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
+using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
 using Envirotrax.App.Server.Data.Services.Definitions;
@@ -42,45 +43,116 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
 
     public override async Task<WaterSupplier?> UpdateAsync(WaterSupplier supplier)
     {
-        var dbSupplier = await DbContext.WaterSuppliers.SingleOrDefaultAsync(t => t.ParentId == _tenantProvider.WaterSupplierId && t.Id == supplier.Id);
+        var dbSupplier = await DbContext.WaterSuppliers
+            .SingleOrDefaultAsync(x =>
+                x.ParentId == _tenantProvider.WaterSupplierId &&
+                x.Id == supplier.Id);
 
-        if (dbSupplier != null)
-        {
-            dbSupplier.ParentId = _tenantProvider.WaterSupplierId;
-            dbSupplier.Name = supplier.Name;
-            dbSupplier.Domain = supplier.Domain;
+        if (dbSupplier == null)
+            return null;
 
-            await DbContext.SaveChangesAsync();
-        }
+        dbSupplier.ParentId = _tenantProvider.WaterSupplierId;
+        dbSupplier.Name = supplier.Name;
+        dbSupplier.Domain = supplier.Domain;
+        dbSupplier.UpdatedTime = DateTime.UtcNow;
+        dbSupplier.ContactName = supplier.ContactName;
+        dbSupplier.PwsId = supplier.PwsId;
+        dbSupplier.Address = supplier.Address;
+        dbSupplier.City = supplier.City;
+        dbSupplier.StateId = supplier.StateId;
+        dbSupplier.ZipCode = supplier.ZipCode;
+        dbSupplier.PhoneNumber = supplier.PhoneNumber;
+        dbSupplier.FaxNumber = supplier.FaxNumber;
+        dbSupplier.EmailAddress = supplier.EmailAddress;
 
+        dbSupplier.LetterCompanyName = supplier.LetterCompanyName;
+        dbSupplier.LetterContactName = supplier.LetterContactContactName;
+        dbSupplier.LetterAddress = supplier.LetterAddress;
+        dbSupplier.LetterCity = supplier.LetterCity;
+        dbSupplier.LetterStateId = supplier.LetterStateId;
+        dbSupplier.LetterZipCode = supplier.LetterZipCode;
+
+        dbSupplier.LetterContactCompanyName = supplier.LetterContactCompanyName;
+        dbSupplier.LetterContactContactName = supplier.LetterContactContactName;
+        dbSupplier.LetterContactAddress = supplier.LetterContactAddress;
+        dbSupplier.LetterContactCity = supplier.LetterContactCity;
+        dbSupplier.LetterContactStateId = supplier.LetterContactStateId;
+        dbSupplier.LetterContactZipCode = supplier.LetterContactZipCode;
+        dbSupplier.LetterContactPhoneNumber = supplier.LetterContactPhoneNumber;
+        dbSupplier.LetterContactFaxNumber = supplier.LetterContactFaxNumber;
+        dbSupplier.LetterContactEmailAddress = supplier.LetterContactEmailAddress;
+
+        // dbSupplier.UpdatedById = _tenantProvider.UserId;
+
+        await DbContext.SaveChangesAsync();
         return dbSupplier;
     }
 
     private IQueryable<WaterSupplier> GetMySuppliersQuery()
     {
-        if (_tenantProvider.ContractorId > 0)
+        if (_tenantProvider.ProfessionalId > 0)
         {
             return DbContext
-                .WaterSupplierContractors
+                .ProfessionalWaterSuppliers
                 .IgnoreQueryFilters()
-                .Where(contractorSupplier => contractorSupplier.ContractorId == _tenantProvider.ContractorId)
-                .Select(contractorSupplier => contractorSupplier.WaterSupplier!);
+                .Where(professionalSupplier => professionalSupplier.ProfessionalId == _tenantProvider.ProfessionalId)
+                .Select(professionalSupplier => professionalSupplier.WaterSupplier!);
         }
 
-        return DbContext
+        var suppliersQuery = DbContext
             .WaterSupplierUsers
             .IgnoreQueryFilters()
             .Where(supplierUser => supplierUser.UserId == _tenantProvider.UserId)
             .Select(supplierUser => supplierUser.WaterSupplier!);
+
+        var childSupplierQuery = from supplier in DbContext.WaterSuppliers.IgnoreQueryFilters()
+                                 join childSupplier in DbContext.WaterSuppliers.IgnoreQueryFilters()
+                                 on supplier.Id equals childSupplier.ParentId
+                                 join supplierUser in DbContext.WaterSupplierUsers.IgnoreQueryFilters()
+                                 on supplier.Id equals supplierUser.WaterSupplierId
+                                 where supplierUser.UserId == _tenantProvider.UserId
+                                 select childSupplier;
+
+        return suppliersQuery.Union(childSupplierQuery);
     }
 
-    public async Task<IEnumerable<WaterSupplier>> GetAllMySuppliersAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public async Task<IEnumerable<WaterSupplier>> GetAllMySuppliersAsync(CancellationToken cancellationToken)
     {
-        var paginated = await GetMySuppliersQuery()
-            .Where(query.Filter)
-            .OrderBy(query.Sort)
-            .PaginateAsync(pageInfo, cancellationToken);
+        var suppliersQuery = DbContext
+            .WaterSupplierUsers
+            .IgnoreQueryFilters()
+            .Where(supplierUser => supplierUser.UserId == _tenantProvider.UserId)
+            .Select(supplierUser => supplierUser.WaterSupplier!);
 
-        return await paginated.ToListAsync(cancellationToken);
+        var childSupplierQuery = from supplier in DbContext.WaterSuppliers.IgnoreQueryFilters()
+                                 join childSupplier in DbContext.WaterSuppliers.IgnoreQueryFilters()
+                                 on supplier.Id equals childSupplier.ParentId
+
+                                 join supplierUser in DbContext.WaterSupplierUsers.IgnoreQueryFilters()
+                                 on supplier.Id equals supplierUser.WaterSupplierId
+
+                                 where supplierUser.UserId == _tenantProvider.UserId
+
+                                 select childSupplier;
+
+        var grandChildrenQuery = from supplier in DbContext.WaterSuppliers.IgnoreQueryFilters()
+
+                                 join childSupplier in DbContext.WaterSuppliers.IgnoreQueryFilters()
+                                 on supplier.Id equals childSupplier.ParentId
+
+                                 join grandChild in DbContext.WaterSuppliers.IgnoreQueryFilters()
+                                 on childSupplier.Id equals grandChild.ParentId
+
+                                 join supplierUser in DbContext.WaterSupplierUsers.IgnoreQueryFilters()
+                                 on supplier.Id equals supplierUser.WaterSupplierId
+
+                                 where supplierUser.UserId == _tenantProvider.UserId
+
+                                 select grandChild;
+
+        return await suppliersQuery
+            .Union(childSupplierQuery)
+            .Union(grandChildrenQuery)
+            .ToListAsync(cancellationToken);
     }
 }

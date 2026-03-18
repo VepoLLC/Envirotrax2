@@ -41,6 +41,13 @@ export class HomeComponent implements OnInit {
                 hasPermission: true,
                 description: 'Manage users of your system.'
             },
+            {
+                title: 'CSI Settings',
+                iconCss: 'fa-solid fa-magnifying-glass-chart',
+                routerLink: ['csi-settings'],
+                hasPermission: true,
+                description: 'Configure CSI inspection program settings, automated letter notification schedules, and letter header appearance.'
+            },
         ];
     }
 

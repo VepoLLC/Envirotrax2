@@ -21,6 +21,7 @@ public static class ServiceRegistration
 
         services.AddTransient<IWaterSupplierService, WaterSupplierService>();
         services.AddTransient<IGeneralSettingsService, GeneralSettingsService>();
+        services.AddTransient<ICsiSettingsService, CsiSettingsService>();
         services.AddTransient<IUserService, UserService>();
 
         return services;

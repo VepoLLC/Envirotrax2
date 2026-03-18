@@ -19,6 +19,10 @@ const routes: Routes = [
     {
         path: 'users',
         loadChildren: () => import('./users/user.module').then(m => m.UserModule)
+    },
+    {
+        path: 'csi-settings',
+        loadChildren: () => import('./csi-settings/csi-settings.module').then(m => m.CsiSettingsModule)
     }
 ];
 

@@ -160,3 +160,124 @@ body {
 .border-success {
     border-color: rgb(41 163 106) !important;
 }
+
+
+.footer {
+    background-color: #2f3e4e;
+    color: #ffffff;
+    font-size: 0.95rem;
+}
+
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+    margin-bottom: 1.25rem;
+}
+
+.footer-card {
+    background: #ffffff;
+    color: #1f2d3d;
+    border-radius: 18px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid #0d6efd;
+    text-align: center;
+}
+
+.footer-card img {
+    max-height: 60px;
+    margin-bottom: 1rem;
+}
+
+.footer-card p {
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+.footer-card a {
+    color: #0d8ed3;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.footer h5 {
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0;
+}
+
+.footer-links i {
+    color: #cfd8df;
+    font-size: 0.7rem;
+}
+
+.footer-links a {
+    color: #ffffff;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.footer-links a:hover {
+    color: #d0d0d0;
+}
+
+.footer hr {
+    border-color: rgba(255, 255, 255, 0.2);
+    margin: 2rem 0 1.25rem;
+}
+
+.footer-bottom {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #d3dbe3;
+}
+
+.footer-bottom p {
+    margin: 0.25rem 0;
+}
+
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.theme-toggle .form-check {
+    display: flex;
+    align-items: center;
+}
+
+.theme-toggle .form-check-input {
+    transform: scale(1.6);
+}
+
+.theme-toggle .form-switch {
+    padding-left: 0.5rem;
+}
+
+.theme-toggle .form-switch .form-check-input {
+    margin-left: 0;
+}
+
+/* Override webkit autofill yellow/white background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #f5f5f5 inset !important;
+    background-clip: content-box !important;
+}

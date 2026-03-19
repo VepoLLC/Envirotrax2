@@ -6,6 +6,11 @@ html {
 
 body {
     font-family: "Montserrat", sans-serif;
+    background-color: #ccc !important;
+}
+
+body.bg-light {
+    background-color: #cccccc !important;
 }
 
 .bg-primary {

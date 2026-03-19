@@ -36,6 +36,30 @@
                                       [form]="userForm" />
                         </div>
                     </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <vp-input type="multi-select"
+                                      [(ngModel)]="selectedJobFunctions"
+                                      name="jobFunctions"
+                                      label="Job Functions"
+                                      [options]="jobFunctionOptions" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input"
+                                       [(ngModel)]="user.isAdmin" name="isAdmin">
+                                <label class="form-check-label">
+                                    Is this user and Administrator?
+                                    <vp-info-icon
+                                                  text="Administrators can manage sub accounts, licenses, insurances, etc." />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mt-3">

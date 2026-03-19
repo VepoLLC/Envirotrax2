@@ -16,6 +16,10 @@ body {
     background-color: #05bfdf !important;
 }
 
+.text-info {
+    color: #05bfdf !important;
+}
+
 .text-primary {
     color: #008fd4 !important;
 }
@@ -132,7 +136,6 @@ body {
     border-radius: 0.375rem;
     /* Bootstrap 5 */
     min-height: 38px;
-    padding: 0.375rem 0.75rem;
     box-shadow: none;
 }
 

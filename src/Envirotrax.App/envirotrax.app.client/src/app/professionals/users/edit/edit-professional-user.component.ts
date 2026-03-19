@@ -6,6 +6,7 @@ import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { NgForm } from "@angular/forms";
 import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
 import { ToastService } from "../../../shared/services/toast.service";
+import { InputOption } from "../../../shared/components/input/input.component";
 
 @Component({
     standalone: false,
@@ -15,6 +16,15 @@ export class EditProfessionalUserComponent implements OnInit {
     public user: ProfessionalUser = {};
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
+    public selectedJobFunctions: string[] = [];
+
+    public readonly jobFunctionOptions: InputOption[] = [
+        { id: 'isWiseGuy', text: 'Wise Guy' },
+        { id: 'isCsiInspector', text: 'CSI Inspector' },
+        { id: 'isBackflowTester', text: 'Backflow Tester' },
+        { id: 'isFogInspector', text: 'FOG Inspector' },
+        { id: 'isFogTransporter', text: 'FOG Transporter' }
+    ];
 
     constructor(
         private readonly _userService: ProfesionalUserService,
@@ -40,6 +50,7 @@ export class EditProfessionalUserComponent implements OnInit {
         try {
             this.isLoading = true;
             this.user = await this._userService.get(id);
+            this.selectedJobFunctions = this.getJobFunctionsFromUser(this.user);
         } finally {
             this.isLoading = false;
         }
@@ -65,6 +76,7 @@ export class EditProfessionalUserComponent implements OnInit {
                 this.isLoading = true;
                 this.validationErrors = [];
 
+                this.applyJobFunctions();
                 await this._userService.update(this.user);
                 this._toastService.successfullySaved('User');
             } catch (error) {
@@ -77,5 +89,23 @@ export class EditProfessionalUserComponent implements OnInit {
                 this.isLoading = false;
             }
         }
+    }
+
+    private getJobFunctionsFromUser(user: ProfessionalUser): string[] {
+        const selected: string[] = [];
+        if (user.isWiseGuy) selected.push('isWiseGuy');
+        if (user.isCsiInspector) selected.push('isCsiInspector');
+        if (user.isBackflowTester) selected.push('isBackflowTester');
+        if (user.isFogInspector) selected.push('isFogInspector');
+        if (user.isFogTransporter) selected.push('isFogTransporter');
+        return selected;
+    }
+
+    private applyJobFunctions(): void {
+        this.user.isWiseGuy = this.selectedJobFunctions.includes('isWiseGuy');
+        this.user.isCsiInspector = this.selectedJobFunctions.includes('isCsiInspector');
+        this.user.isBackflowTester = this.selectedJobFunctions.includes('isBackflowTester');
+        this.user.isFogInspector = this.selectedJobFunctions.includes('isFogInspector');
+        this.user.isFogTransporter = this.selectedJobFunctions.includes('isFogTransporter');
     }
 }

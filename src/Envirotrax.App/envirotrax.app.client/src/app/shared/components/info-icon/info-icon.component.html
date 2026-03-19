@@ -1,0 +1,10 @@
+<span #iconRef
+      class="vp-info-icon-trigger text-info"
+      (mouseenter)="show()"
+      (mouseleave)="hide()">
+    <i class="fa-solid fa-circle-info"></i>
+</span>
+
+<div #tooltipRef class="vp-info-icon-tooltip bg-dark text-white" data-hidden role="tooltip">
+    {{ text }}
+</div>

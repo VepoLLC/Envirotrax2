@@ -4,4 +4,10 @@ export interface ProfessionalUser {
     emailAddress?: string;
     contactName?: string;
     jobTitle?: string;
+    isAdmin?: boolean;
+    isWiseGuy?: boolean;
+    isCsiInspector?: boolean;
+    isBackflowTester?: boolean;
+    isFogInspector?: boolean;
+    isFogTransporter?: boolean;
 }

@@ -39,6 +39,13 @@ export class HomeComponent implements OnInit {
                 description: 'Manage program settings and submissions fees.'
             },
             {
+                title: 'CSI Settings',
+                iconCss: 'fa-solid fa-magnifying-glass-chart',
+                routerLink: ['settings', 'csi-settings'],
+                hasPermission: true,
+                description: 'Configure CSI inspection program settings, automated letter notification schedules, and letter header appearance.'
+            },
+            {
                 title: 'Users',
                 iconCss: 'fa-solid fa-users',
                 routerLink: ['users'],
@@ -51,13 +58,6 @@ export class HomeComponent implements OnInit {
                 routerLink: ['users/roles'],
                 hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Roles),
                 description: 'Create and assign roles to control permissions and access.'
-            },
-            {
-                title: 'CSI Settings',
-                iconCss: 'fa-solid fa-magnifying-glass-chart',
-                routerLink: ['csi-settings'],
-                hasPermission: true,
-                description: 'Configure CSI inspection program settings, automated letter notification schedules, and letter header appearance.'
             },
         ];
     }

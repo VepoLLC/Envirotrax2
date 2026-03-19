@@ -5,10 +5,12 @@ import { RouterModule } from "@angular/router";
 import { SharedComponentsModule } from "../../shared/components/shared.components.module";
 import { SettingsRoutingModule } from "./settings-routing.module";
 import { GeneralSettingsComponent } from "./general/general-settings.component";
+import { CsiSettingsComponent } from "./csi-settings/csi-settings.component";
 
 @NgModule({
     declarations: [
-        GeneralSettingsComponent
+        GeneralSettingsComponent,
+        CsiSettingsComponent
     ],
     imports: [
         CommonModule,

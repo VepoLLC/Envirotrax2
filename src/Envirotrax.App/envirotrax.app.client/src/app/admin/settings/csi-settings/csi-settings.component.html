@@ -1,4 +1,13 @@
 <div>
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/admin/settings/general']">General Settings & Fees</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" [routerLink]="['/admin/settings/csi-settings']">CSI Settings</a>
+        </li>
+    </ul>
+
     <dp-loading-spinner *ngIf="isLoading" />
 
     <div dp-spinner-parent>
@@ -8,27 +17,21 @@
             <div class="mb-3">
                 <vp-section header="CSI Settings">
                     <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <vp-input type="select"
+                                      label="Modification (Grace Period) Days"
+                                      [(ngModel)]="settings.modificationGracePeriodDays"
+                                      name="modificationGracePeriodDays"
+                                      [options]="gracePeriodOptions" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <vp-input type="select"
+                                      label="Newly Created Backflow Test Expiration Days"
+                                      [(ngModel)]="settings.newlyCreatedBackflowTestExpirationDays"
+                                      name="newlyCreatedBackflowTestExpirationDays"
+                                      [options]="expirationDaysOptions" />
+                        </div>
                         <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Modification (Grace Period) Days:</label>
-                                <select class="form-select"
-                                        [(ngModel)]="settings.modificationGracePeriodDays"
-                                        name="modificationGracePeriodDays">
-                                    <option *ngFor="let opt of gracePeriodOptions" [ngValue]="opt.value">
-                                        {{opt.label}}
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Newly Created Backflow Test Expiration Days:</label>
-                                <select class="form-select"
-                                        [(ngModel)]="settings.newlyCreatedBackflowTestExpirationDays"
-                                        name="newlyCreatedBackflowTestExpirationDays">
-                                    <option *ngFor="let opt of expirationDaysOptions" [ngValue]="opt.value">
-                                        {{opt.label}}
-                                    </option>
-                                </select>
-                            </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox"
                                        [(ngModel)]="settings.requireInspectionImages"
@@ -44,73 +47,47 @@
             <div class="mb-3">
                 <vp-section header="CSI Letter Settings">
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Impending Notice 1:</label>
-                                <select class="form-select"
-                                        [(ngModel)]="settings.impendingNotice1"
-                                        name="impendingNotice1">
-                                    <option *ngFor="let opt of impendingNoticeOptions" [ngValue]="opt.value">
-                                        {{opt.label}}
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Impending Notice 2:</label>
-                                <select class="form-select"
-                                        [(ngModel)]="settings.impendingNotice2"
-                                        name="impendingNotice2">
-                                    <option *ngFor="let opt of impendingNoticeOptions" [ngValue]="opt.value">
-                                        {{opt.label}}
-                                    </option>
-                                </select>
-                            </div>
+                        <div class="col-md-6 mb-3">
+                            <vp-input type="select"
+                                      label="Impending Notice 1"
+                                      [(ngModel)]="settings.impendingNotice1"
+                                      name="impendingNotice1"
+                                      [options]="impendingNoticeOptions" />
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Past Due Notice 1:</label>
-                                <select class="form-select"
-                                        [(ngModel)]="settings.pastDueNotice1"
-                                        name="pastDueNotice1">
-                                    <option *ngFor="let opt of pastDueNoticeOptions" [ngValue]="opt.value">
-                                        {{opt.label}}
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Past Due Notice 2:</label>
-                                <select class="form-select"
-                                        [(ngModel)]="settings.pastDueNotice2"
-                                        name="pastDueNotice2">
-                                    <option *ngFor="let opt of pastDueNoticeOptions" [ngValue]="opt.value">
-                                        {{opt.label}}
-                                    </option>
-                                </select>
-                            </div>
+                        <div class="col-md-6 mb-3">
+                            <vp-input type="select"
+                                      label="Impending Notice 2"
+                                      [(ngModel)]="settings.impendingNotice2"
+                                      name="impendingNotice2"
+                                      [options]="impendingNoticeOptions" />
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Non-Compliant Days 1:</label>
-                                <select class="form-select"
-                                        [(ngModel)]="settings.nonCompliant1"
-                                        name="nonCompliant1">
-                                    <option *ngFor="let opt of nonCompliantOptions" [ngValue]="opt.value">
-                                        {{opt.label}}
-                                    </option>
-                                </select>
-                            </div>
+                        <div class="col-md-6 mb-3">
+                            <vp-input type="select"
+                                      label="Past Due Notice 1"
+                                      [(ngModel)]="settings.pastDueNotice1"
+                                      name="pastDueNotice1"
+                                      [options]="pastDueNoticeOptions" />
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Non-Compliant Days 2:</label>
-                                <select class="form-select"
-                                        [(ngModel)]="settings.nonCompliant2"
-                                        name="nonCompliant2">
-                                    <option *ngFor="let opt of nonCompliantOptions" [ngValue]="opt.value">
-                                        {{opt.label}}
-                                    </option>
-                                </select>
-                            </div>
+                        <div class="col-md-6 mb-3">
+                            <vp-input type="select"
+                                      label="Past Due Notice 2"
+                                      [(ngModel)]="settings.pastDueNotice2"
+                                      name="pastDueNotice2"
+                                      [options]="pastDueNoticeOptions" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <vp-input type="select"
+                                      label="Non-Compliant Days 1"
+                                      [(ngModel)]="settings.nonCompliant1"
+                                      name="nonCompliant1"
+                                      [options]="nonCompliantOptions" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <vp-input type="select"
+                                      label="Non-Compliant Days 2"
+                                      [(ngModel)]="settings.nonCompliant2"
+                                      name="nonCompliant2"
+                                      [options]="nonCompliantOptions" />
                         </div>
                     </div>
                 </vp-section>

@@ -17,6 +17,8 @@ import { ToastService } from "../../../shared/services/toast.service";
         :host ::ng-deep .input-group vp-input > div {
             display: contents;
         }
+        .nav-tabs .nav-link { color: var(--bs-body-color) !important; }
+        .nav-tabs .nav-link.active { color: var(--bs-body-color) !important; }
     `]
 })
 export class GeneralSettingsComponent implements OnInit {

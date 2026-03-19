@@ -1,19 +1,21 @@
+import { CsiImpendingType, CsiNonCompliantType, CsiPastDueType } from './csi-settings-enums';
+
 export interface CsiSettings {
     id?: number;
 
-  modificationGracePeriodDays?: number | null;
+    modificationGracePeriodDays?: number | null;
 
     newlyCreatedBackflowTestExpirationDays?: number;
     requireInspectionImages?: boolean;
 
-    impendingNotice1?: number;
-    impendingNotice2?: number;
+    impendingNotice1?: CsiImpendingType;
+    impendingNotice2?: CsiImpendingType;
 
-    pastDueNotice1?: number;
-    pastDueNotice2?: number;
+    pastDueNotice1?: CsiPastDueType;
+    pastDueNotice2?: CsiPastDueType;
 
-    nonCompliant1?: number;
-    nonCompliant2?: number;
+    nonCompliant1?: CsiNonCompliantType;
+    nonCompliant2?: CsiNonCompliantType;
 
     impendingLettersBackgroundColor?: string;
     impendingLettersForegroundColor?: string;

@@ -1,3 +1,4 @@
+using Envirotrax.App.Server.Data.Models.Csi;
 using Envirotrax.Common.Data.Models;
 using System.ComponentModel.DataAnnotations;
 
@@ -10,12 +11,12 @@ public class CsiSettings : TenantModel<WaterSupplier>
     public int NewlyCreatedBackflowTestExpirationDays { get; set; }
     public bool RequireInspectionImages { get; set; }
 
-    public int ImpendingNotice1 { get; set; }
-    public int ImpendingNotice2 { get; set; }
-    public int PastDueNotice1 { get; set; }
-    public int PastDueNotice2 { get; set; }
-    public int NonCompliant1 { get; set; }
-    public int NonCompliant2 { get; set; }
+    public CsiImpendingType ImpendingNotice1 { get; set; }
+    public CsiImpendingType ImpendingNotice2 { get; set; }
+    public CsiPastDueType PastDueNotice1 { get; set; }
+    public CsiPastDueType PastDueNotice2 { get; set; }
+    public CsiNonCompliantType NonCompliant1 { get; set; }
+    public CsiNonCompliantType NonCompliant2 { get; set; }
 
 
     [MaxLength(7)]

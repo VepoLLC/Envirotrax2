@@ -5,6 +5,9 @@ import { HttpClient } from "@angular/common/http";
 import { ProfessionalUser } from "../../models/professionals/professional-user";
 import { lastValueFrom, Observable } from "rxjs";
 import { ProfesisonalService } from "./professional.service";
+import { PageInfo } from "../../models/page-info";
+import { Query } from "../../models/query";
+import { PagedData } from "../../models/paged-data";
 
 @Injectable({
     providedIn: 'root'
@@ -40,5 +43,40 @@ export class ProfesionalUserService {
         this._currentUser$ = undefined;
 
         return lastValueFrom(observable);
+    }
+
+    public getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<ProfessionalUser>> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/users');
+
+        return lastValueFrom(
+            this._http.get<PagedData<ProfessionalUser>>(url, {
+                params: this._queryHelper.buildQuery(pageInfo, query)
+            })
+        );
+    }
+
+    public get(id: number): Promise<ProfessionalUser> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/users/${id}`);
+        return lastValueFrom(this._http.get<ProfessionalUser>(url));
+    }
+
+    public add(user: ProfessionalUser): Promise<ProfessionalUser> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/users');
+        return lastValueFrom(this._http.post<ProfessionalUser>(url, user));
+    }
+
+    public update(user: ProfessionalUser): Promise<ProfessionalUser> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/users/${user.id}`);
+        return lastValueFrom(this._http.put<ProfessionalUser>(url, user));
+    }
+
+    public delete(id: number): Promise<ProfessionalUser> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/users/${id}`);
+        return lastValueFrom(this._http.delete<ProfessionalUser>(url));
+    }
+
+    public resendInvitation(id: number): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/users/${id}/invitations`);
+        return lastValueFrom(this._http.post<void>(url, null));
     }
 }

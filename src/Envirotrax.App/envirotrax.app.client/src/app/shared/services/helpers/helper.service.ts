@@ -33,4 +33,14 @@ export class HelperService {
 
         return false;
     }
+
+    public isNotFoundError(error: any): boolean {
+        if (error instanceof HttpErrorResponse) {
+            if (error.status == 404) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

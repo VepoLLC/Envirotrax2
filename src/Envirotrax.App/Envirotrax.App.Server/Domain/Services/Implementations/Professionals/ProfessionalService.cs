@@ -41,6 +41,11 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
         return professionalsDto.ToPagedData(pageInfo);
     }
 
+    public async Task<ProfessionalDto?> GetLoggedInProfessionalAsync()
+    {
+        return await GetLoggedInProfessionalAsync(CancellationToken.None);
+    }
+
     public async Task<ProfessionalDto?> GetLoggedInProfessionalAsync(CancellationToken cancellationToken)
     {
         return await GetAsync(_authService.ProfessionalId, cancellationToken);

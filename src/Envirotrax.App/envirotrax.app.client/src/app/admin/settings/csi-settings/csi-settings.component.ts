@@ -10,8 +10,18 @@ import { ToastService } from "../../../shared/services/toast.service";
     templateUrl: './csi-settings.component.html',
     standalone: false,
     styles: [`
-        .nav-tabs .nav-link { color: var(--bs-body-color) !important; }
-        .nav-tabs .nav-link.active { color: var(--bs-body-color) !important; }
+        .settings-tabs .nav-link {
+            color: var(--bs-body-color) !important;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin: 0 2px;
+            background-color: #fff;
+        }
+        .settings-tabs .nav-link.active {
+            background-color: #337ab7 !important;
+            border-color: #2e6da4 !important;
+            color: #fff !important;
+        }
     `]
 })
 export class CsiSettingsComponent implements OnInit {

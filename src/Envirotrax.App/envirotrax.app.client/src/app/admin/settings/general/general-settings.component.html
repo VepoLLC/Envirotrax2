@@ -1,12 +1,14 @@
 <div>
-    <ul class="nav nav-tabs mb-3">
-        <li class="nav-item">
-            <a class="nav-link active" [routerLink]="['/admin/settings/general']">General Settings & Fees</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" [routerLink]="['/admin/settings/csi-settings']">CSI Settings</a>
-        </li>
-    </ul>
+    <div class="text-center mb-3">
+        <ul class="nav nav-pills settings-tabs d-inline-flex">
+            <li class="nav-item">
+                <a class="nav-link active" [routerLink]="['/admin/settings/general']">General Settings & Fees</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" [routerLink]="['/admin/settings/csi-settings']">CSI Settings</a>
+            </li>
+        </ul>
+    </div>
 
     <dp-loading-spinner *ngIf="isLoading" />
 

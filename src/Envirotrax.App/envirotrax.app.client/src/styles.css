@@ -8,6 +8,21 @@ body {
     font-family: "Montserrat", sans-serif;
 }
 
+h6,
+.h6,
+h5,
+.h5,
+h4,
+.h4,
+h3,
+.h3,
+h2,
+.h2,
+h1,
+.h1 {
+    font-weight: 700;
+}
+
 .bg-primary {
     background-color: #008fd4 !important;
 }
@@ -294,4 +309,20 @@ input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 1000px #f5f5f5 inset !important;
     background-clip: content-box !important;
+}
+
+.vp-tabs .nav-link {
+    border: 1px solid var(--bs-border-color);
+    margin: 0 6px;
+    background-color: rgba(0, 143, 212, 0.63);
+    border-radius: 13px 13px 4px 4px;
+    min-width: 175px;
+    padding: 3px 25px;
+    font-weight: 600;
+}
+
+.vp-tabs .nav-link.active {
+    background-color: #337ab7 !important;
+    border-color: #2e6da4 !important;
+    color: #fff !important;
 }

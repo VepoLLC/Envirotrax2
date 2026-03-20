@@ -1,12 +1,20 @@
 <div>
-    <ul class="nav nav-tabs mb-3">
-        <li class="nav-item">
-            <a class="nav-link" [routerLink]="['/admin/settings/general']">General Settings & Fees</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link active" [routerLink]="['/admin/settings/csi-settings']">CSI Settings</a>
-        </li>
-    </ul>
+    <div class="text-center">
+        <h1 class="h2 mb-3">
+            System Settings
+        </h1>
+    </div>
+
+    <div class="text-center mb-3">
+        <ul class="vp-tabs nav nav-pills settings-tabs d-inline-flex">
+            <li class="nav-item">
+                <a class="nav-link" [routerLink]="['/admin/settings/general']">General Settings & Fees</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" [routerLink]="['/admin/settings/csi-settings']">CSI Settings</a>
+            </li>
+        </ul>
+    </div>
 
     <dp-loading-spinner *ngIf="isLoading" />
 
@@ -36,7 +44,8 @@
                                 <input class="form-check-input" type="checkbox"
                                        [(ngModel)]="settings.requireInspectionImages"
                                        name="requireInspectionImages" id="requireInspectionImages">
-                                <label class="form-check-label" for="requireInspectionImages">Require Inspection Images</label>
+                                <label class="form-check-label" for="requireInspectionImages">Require Inspection
+                                    Images</label>
                             </div>
                         </div>
                     </div>

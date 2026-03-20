@@ -8,11 +8,7 @@ import { ToastService } from "../../../shared/services/toast.service";
 
 @Component({
     templateUrl: './csi-settings.component.html',
-    standalone: false,
-    styles: [`
-        .nav-tabs .nav-link { color: var(--bs-body-color) !important; }
-        .nav-tabs .nav-link.active { color: var(--bs-body-color) !important; }
-    `]
+    standalone: false
 })
 export class CsiSettingsComponent implements OnInit {
     public settings: CsiSettings = {

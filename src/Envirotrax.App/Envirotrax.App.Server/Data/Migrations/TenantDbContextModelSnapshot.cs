@@ -1020,6 +1020,88 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.ToTable("WaterSupplierUsers");
                 });
 
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.CsiSettings", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImpendingLettersBackgroundColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<string>("ImpendingLettersBorderColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<string>("ImpendingLettersForegroundColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<int>("ImpendingNotice1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ImpendingNotice2")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ModificationGracePeriodDays")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NewlyCreatedBackflowTestExpirationDays")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NonCompliant1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NonCompliant2")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NonCompliantLettersBackgroundColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<string>("NonCompliantLettersBorderColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<string>("NonCompliantLettersForegroundColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<string>("PastDueLettersBackgroundColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<string>("PastDueLettersBorderColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<string>("PastDueLettersForegroundColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<int>("PastDueNotice1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PastDueNotice2")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("RequireInspectionImages")
+                        .HasColumnType("bit");
+
+                    b.HasKey("WaterSupplierId");
+
+                    b.ToTable("CsiSettings");
+                });
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.GeneralSettings", b =>
                 {
                     b.Property<int>("WaterSupplierId")
@@ -1586,6 +1668,17 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+
+                    b.Navigation("WaterSupplier");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.CsiSettings", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("WaterSupplier");
                 });

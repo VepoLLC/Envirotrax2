@@ -1,6 +1,7 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
 import { GeneralSettingsComponent } from "./general/general-settings.component";
+import { CsiSettingsComponent } from "./csi-settings/csi-settings.component";
 import { PermissionGuard } from "../../shared/guards/permission.guard";
 import { PermissionAction, PermissionType } from "../../shared/models/permission-type";
 
@@ -23,6 +24,11 @@ const routes: Routes = [
                 }
             ]
         }
+    },
+    {
+        path: 'csi-settings',
+        title: 'CSI Settings',
+        component: CsiSettingsComponent
     }
 ];
 

@@ -7,7 +7,7 @@
                     <vp-input [(ngModel)]="user.contactName"
                               [required]="true"
                               name="contactName"
-                              label="Contact Name"
+                              label="Contact name"
                               [maxLength]="255"
                               [form]="form" />
                 </div>
@@ -28,7 +28,7 @@
                 <div class="mb-3">
                     <vp-input [(ngModel)]="user.jobTitle"
                               name="jobTitle"
-                              label="Job Title"
+                              label="Job title"
                               [maxLength]="150"
                               [form]="form" />
                 </div>
@@ -39,7 +39,7 @@
                     <vp-input type="multi-select"
                               [(ngModel)]="selectedJobFunctions"
                               name="jobFunctions"
-                              label="Job Functions"
+                              label="Job functions"
                               [options]="jobFunctionOptions" />
                 </div>
             </div>

@@ -121,7 +121,7 @@ body {
 
 .form-label,
 .form-check-label {
-    font-weight: 600;
+    font-weight: normal;
 }
 
 /* Make ng-select look like Bootstrap form-control */

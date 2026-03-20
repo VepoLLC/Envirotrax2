@@ -13,13 +13,13 @@
                                     <input class="form-check-input" type="checkbox"
                                            [(ngModel)]="settings.privacyRequired"
                                            name="privacyRequired" id="privacyRequired">
-                                    <label class="form-check-label" for="privacyRequired">Privacy Required</label>
+                                    <label class="form-check-label" for="privacyRequired">Privacy required</label>
                                 </div>
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox"
                                            [(ngModel)]="settings.newSitesLocked"
                                            name="newSitesLocked" id="newSitesLocked">
-                                    <label class="form-check-label" for="newSitesLocked">New Sites Locked</label>
+                                    <label class="form-check-label" for="newSitesLocked">New sites locked</label>
                                 </div>
                             </div>
                             <div class="col-6">
@@ -27,7 +27,7 @@
                                     <input class="form-check-input" type="checkbox"
                                            [(ngModel)]="settings.administrativeOnly"
                                            name="administrativeOnly" id="administrativeOnly">
-                                    <label class="form-check-label" for="administrativeOnly">Administrative Only</label>
+                                    <label class="form-check-label" for="administrativeOnly">Administrative only</label>
                                 </div>
                             </div>
                         </div>
@@ -45,21 +45,21 @@
                                    [(ngModel)]="settings.backflowTesting"
                                    (ngModelChange)="showProgramUpdateWarning = true"
                                    name="backflowTesting" id="backflowTesting">
-                            <label class="form-check-label" for="backflowTesting">Backflow Testing</label>
+                            <label class="form-check-label" for="backflowTesting">Backflow testing</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox"
                                    [(ngModel)]="settings.csiInspections"
                                    (ngModelChange)="showProgramUpdateWarning = true"
                                    name="csiInspections" id="csiInspections">
-                            <label class="form-check-label" for="csiInspections">CSI Inspections</label>
+                            <label class="form-check-label" for="csiInspections">CSI inspections</label>
                         </div>
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox"
                                    [(ngModel)]="settings.fogProgram"
                                    (ngModelChange)="showProgramUpdateWarning = true"
                                    name="fogProgram" id="fogProgram">
-                            <label class="form-check-label" for="fogProgram">FOG Program</label>
+                            <label class="form-check-label" for="fogProgram">FOG program</label>
                         </div>
 
                         <div *ngIf="showProgramUpdateWarning"
@@ -153,27 +153,27 @@
                             <input class="form-check-input" type="checkbox"
                                    [(ngModel)]="settings.lockBpatRegistrations"
                                    name="lockBpatRegistrations" id="lockBpatRegistrations">
-                            <label class="form-check-label" for="lockBpatRegistrations">Lock BPAT Registrations</label>
+                            <label class="form-check-label" for="lockBpatRegistrations">Lock BPAT registrations</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox"
                                    [(ngModel)]="settings.lockCsiRegistrations"
                                    name="lockCsiRegistrations" id="lockCsiRegistrations">
-                            <label class="form-check-label" for="lockCsiRegistrations">Lock CSI Registrations</label>
+                            <label class="form-check-label" for="lockCsiRegistrations">Lock CSI registrations</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox"
                                    [(ngModel)]="settings.lockFogInspectorRegistrations"
                                    name="lockFogInspectorRegistrations" id="lockFogInspectorRegistrations">
-                            <label class="form-check-label" for="lockFogInspectorRegistrations">Lock FOG Inspector
-                                Registrations</label>
+                            <label class="form-check-label" for="lockFogInspectorRegistrations">Lock FOG inspector
+                                registrations</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox"
                                    [(ngModel)]="settings.lockFogTransporterRegistrations"
                                    name="lockFogTransporterRegistrations" id="lockFogTransporterRegistrations">
-                            <label class="form-check-label" for="lockFogTransporterRegistrations">Lock FOG Transporter
-                                Registrations</label>
+                            <label class="form-check-label" for="lockFogTransporterRegistrations">Lock FOG transporter
+                                registrations</label>
                         </div>
                     </vp-section>
                 </div>

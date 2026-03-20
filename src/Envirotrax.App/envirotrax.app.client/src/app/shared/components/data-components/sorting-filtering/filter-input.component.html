@@ -38,7 +38,7 @@
             <div class="col-md-6">
                 <div class="mb-3">
                     <label for="filter-operator-{{index}}" class="form-label">
-                        Search Type
+                        Search type
                     </label>
                     <select id="filter-operator-{{index}}" name="filterOperator{{index}}" class="form-control"
                             [(ngModel)]="model.comparisonOperator" required="required">
@@ -54,7 +54,7 @@
                         </ng-container>
                     </select>
                     <vp-validation-field [form]="queryForm" fieldName="filterOperator{{index}}"
-                                         fieldLabel="Search Type">
+                                         fieldLabel="Search type">
                     </vp-validation-field>
                 </div>
             </div>
@@ -62,7 +62,7 @@
             <div class="col-md-6">
                 <div class="mb-3">
                     <label for="filter-value-{{index}}" class="form-label">
-                        Search Term
+                        Search term
                     </label>
                     <div class="input-group">
                         <ng-container *ngIf="selectedColumn?.inputType == 'select'">
@@ -95,7 +95,7 @@
                         </div>
                     </div>
 
-                    <vp-validation-field [form]="queryForm" fieldName="filterValue{{index}}" fieldLabel="Search Term">
+                    <vp-validation-field [form]="queryForm" fieldName="filterValue{{index}}" fieldLabel="Search term">
                     </vp-validation-field>
                 </div>
             </div>

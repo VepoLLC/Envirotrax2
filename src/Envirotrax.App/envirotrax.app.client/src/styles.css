@@ -134,14 +134,25 @@ h1,
     position: fixed;
 }
 
-.form-label,
-.form-check-label {
-    font-weight: normal;
+.form-control,
+.form-control:focus,
+.ng-select .ng-select-container,
+.ng-select.ng-select-opened>.ng-select-container,
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+    background-color: #f5f5f5;
 }
 
-.form-control,
-.form-control:focus {
-    background-color: #f5f5f5;
+.ng-select .ng-arrow-wrapper .ng-arrow {
+    border-color: none !important;
+    border-style: none !important;
+    border-width: 0 !important;
+}
+
+.ng-select .ng-arrow-wrapper {
+    background-image: url("/images/icons/down-arrow-light.svg");
+    background-repeat: no-repeat;
+    background-size: 14px 14px;
+    margin-top: 9px;
 }
 
 .input-group .vp-input-container .form-control {

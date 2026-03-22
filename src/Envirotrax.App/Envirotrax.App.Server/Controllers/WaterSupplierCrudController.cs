@@ -8,21 +8,21 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers
 {
-    public abstract class CrudController<TDto> : CrudController<TDto, int>
+    public abstract class WaterSupplierCrudController<TDto> : WaterSupplierCrudController<TDto, int>
         where TDto : class
     {
-        protected CrudController(IServiceBase<TDto, int> service)
+        protected WaterSupplierCrudController(IServiceBase<TDto, int> service)
             : base(service)
         {
         }
     }
 
-    public abstract class CrudController<TDto, TKey> : ProtectedController
+    public abstract class WaterSupplierCrudController<TDto, TKey> : WaterSupplierProtectedController
         where TDto : class
     {
         private readonly IServiceBase<TDto, TKey> _service;
 
-        public CrudController(IServiceBase<TDto, TKey> service)
+        public WaterSupplierCrudController(IServiceBase<TDto, TKey> service)
         {
             _service = service;
         }

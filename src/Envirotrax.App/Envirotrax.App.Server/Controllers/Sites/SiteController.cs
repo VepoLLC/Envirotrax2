@@ -8,7 +8,7 @@ namespace Envirotrax.App.Server.Controllers.Sites;
 
 [Route("api/sites")]
 [PermissionResource(PermissionType.Sites)]
-public class SiteController : CrudController<SiteDto>
+public class SiteController : WaterSupplierCrudController<SiteDto>
 {
     public SiteController(ISiteService service)
         : base(service)

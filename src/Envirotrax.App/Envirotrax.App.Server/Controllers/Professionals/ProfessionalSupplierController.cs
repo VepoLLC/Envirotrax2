@@ -6,7 +6,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("api/professionals/water-suppliers")]
-public class ProfessionalSupplierContoller : CrudController<ProfessionalWaterSupplierDto, int>
+public class ProfessionalSupplierContoller : ProfessionalCrudController<ProfessionalWaterSupplierDto, int>
 {
     private readonly IProfessionalSupplierService _proSupplierService;
 

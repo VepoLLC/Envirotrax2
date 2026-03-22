@@ -15,4 +15,12 @@ public class ProfessionalUser
     [AppPrimaryKey(false)]
     public int UserId { get; set; }
     public AppUser? User { get; set; }
+
+    public bool IsAdmin { get; set; }
+
+    public bool IsWiseGuy { get; set; }
+    public bool IsCsiInspector { get; set; }
+    public bool IsBackflowTester { get; set; }
+    public bool IsFogInspector { get; set; }
+    public bool IsFogTransporter { get; set; }
 }

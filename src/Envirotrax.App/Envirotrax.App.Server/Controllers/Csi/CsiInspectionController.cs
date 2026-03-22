@@ -8,7 +8,7 @@ namespace Envirotrax.App.Server.Controllers.Csi;
 
 [Route("api/csi/inspections")]
 [PermissionResource(PermissionType.CsiInspections)]
-public class CsiInspectionController : CrudController<CsiInspectionDto>
+public class CsiInspectionController : WaterSupplierCrudController<CsiInspectionDto>
 {
     public CsiInspectionController(ICsiInspectionService service)
         : base(service)

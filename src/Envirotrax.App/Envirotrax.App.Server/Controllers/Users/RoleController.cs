@@ -8,7 +8,7 @@ namespace Envirotrax.App.Server.Controllers.Users
 {
     [Route("api/users/roles")]
     [PermissionResource(PermissionType.Roles)]
-    public class RoleContoller : CrudController<RoleDto>
+    public class RoleContoller : WaterSupplierCrudController<RoleDto>
     {
         public RoleContoller(IRoleService service)
             : base(service)

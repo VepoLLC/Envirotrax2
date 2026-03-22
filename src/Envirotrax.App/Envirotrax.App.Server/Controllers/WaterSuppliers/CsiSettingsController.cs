@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Envirotrax.App.Server.Controllers.WaterSuppliers;
 
 [Route("api/csi-settings")]
-public class CsiSettingsController : CrudController<CsiSettingsDto>
+public class CsiSettingsController : WaterSupplierCrudController<CsiSettingsDto>
 {
     public CsiSettingsController(ICsiSettingsService service)
         : base(service)

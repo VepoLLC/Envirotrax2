@@ -16,4 +16,6 @@ public class UserAccessDto
     /// User may belong to a parent professional and request access to a child professional. in that case, this property value will be the child's ID
     /// </summary>
     public int? ProfessionalIdRequested { get; set; }
+
+    public List<string> ProfessionalRoles { get; set; } = [];
 }

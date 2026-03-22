@@ -36,20 +36,38 @@ public class AuthService : TenantProviderService, IAuthService
 
         if (userAccess.WaterSupplierId.HasValue && userAccess.WaterSupplierIdRequested.HasValue)
         {
-            SetWaterSupplier(principal, userAccess.WaterSupplierIdRequested.Value);
-
-            var permissions = await _supplierUserRepository.GetAllPermissionsAsync(userAccess.WaterSupplierId.Value, userId);
-            SetPermissions(principal, permissions);
+            await SetWaterSupplierClaimsAsync(principal, userId, userAccess);
         }
 
         if (userAccess.ProfessionalId.HasValue && userAccess.ProfessionalIdRequested.HasValue)
         {
-            SetProfessional(principal, userAccess.ProfessionalIdRequested.Value);
+            SetProfessionalClaims(principal, userAccess);
         }
 
         var features = await _featureRepository.GetAllAsync(userAccess.WaterSupplierIdRequested, userAccess.ProfessionalIdRequested);
 
         AddClaim(principal, "fts", string.Join(',', features.Select(f => (int)f)));
+    }
+
+    private async Task SetWaterSupplierClaimsAsync(ClaimsPrincipal principal, int userId, UserAccessDto userAccess)
+    {
+        SetWaterSupplier(principal, userAccess.WaterSupplierIdRequested!.Value);
+
+        var permissions = await _supplierUserRepository.GetAllPermissionsAsync(userAccess.WaterSupplierId!.Value, userId);
+
+        SetPermissions(principal, permissions);
+        AddClaim(principal, OpenIddictConstants.Claims.Role, RoleDefinitions.WaterSupplier);
+    }
+
+    private void SetProfessionalClaims(ClaimsPrincipal principal, UserAccessDto userAccess)
+    {
+        SetProfessional(principal, userAccess.ProfessionalIdRequested!.Value);
+        AddClaim(principal, OpenIddictConstants.Claims.Role, RoleDefinitions.Professional);
+
+        foreach (var role in userAccess.ProfessionalRoles)
+        {
+            AddClaim(principal, OpenIddictConstants.Claims.Role, role);
+        }
     }
 
     private void AddClaim(ClaimsPrincipal principal, string claimType, string value)
@@ -78,6 +96,36 @@ public class AuthService : TenantProviderService, IAuthService
 
             accessDto.ProfessionalId = professionalUser.ProfessionalId;
             accessDto.ProfessionalIdRequested = professionalid;
+
+            if (professionalUser.IsAdmin)
+            {
+                accessDto.ProfessionalRoles.Add(RoleDefinitions.Professionals.Admin);
+            }
+
+            if (professionalUser.IsWiseGuy)
+            {
+                accessDto.ProfessionalRoles.Add(RoleDefinitions.Professionals.WiseGuy);
+            }
+
+            if (professionalUser.IsCsiInspector)
+            {
+                accessDto.ProfessionalRoles.Add(RoleDefinitions.Professionals.CsiInspector);
+            }
+
+            if (professionalUser.IsBackflowTester)
+            {
+                accessDto.ProfessionalRoles.Add(RoleDefinitions.Professionals.BackflowTester);
+            }
+
+            if (professionalUser.IsFogInspector)
+            {
+                accessDto.ProfessionalRoles.Add(RoleDefinitions.Professionals.FogInspector);
+            }
+
+            if (professionalUser.IsFogTransporter)
+            {
+                accessDto.ProfessionalRoles.Add(RoleDefinitions.Professionals.FogTransporter);
+            }
         }
 
         return accessDto;
@@ -138,7 +186,7 @@ public class AuthService : TenantProviderService, IAuthService
         return sb.ToString();
     }
 
-    public void SetPermissions(ClaimsPrincipal principal, IEnumerable<RolePermission> permissions)
+    private void SetPermissions(ClaimsPrincipal principal, IEnumerable<RolePermission> permissions)
     {
         if (permissions != null && permissions.Any())
         {

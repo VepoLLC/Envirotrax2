@@ -7,7 +7,7 @@ namespace Envirotrax.App.Server.Controllers.Professionals;
 
 
 [Route("api/professionals/users")]
-public class ProfessionalUserContoller : CrudController<ProfessionalUserDto>
+public class ProfessionalUserContoller : ProfessionalCrudController<ProfessionalUserDto>
 {
     private readonly IProfessionalUserService _userService;
 

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Envirotrax.App.Server.Controllers.Users
 {
     [Route("api/users/roles")]
-    public class RolePermissionController : ProtectedController
+    public class RolePermissionController : WaterSupplierProtectedController
     {
         private readonly IRolePermissionService _rolePermissionService;
 

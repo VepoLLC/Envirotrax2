@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/lookup")]
     [ApiController]
     public class LookupController : ControllerBase
     {

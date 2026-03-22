@@ -9,7 +9,7 @@ namespace Envirotrax.App.Server.Controllers.WaterSuppliers;
 
 [Route("api/general-settings")]
 [PermissionResource(PermissionType.WaterSuppliers)]
-public class GeneralSettingsController : CrudController<GeneralSettingsDto>
+public class GeneralSettingsController : WaterSupplierCrudController<GeneralSettingsDto>
 {
     public GeneralSettingsController(IGeneralSettingsService service)
         : base(service)

@@ -11,6 +11,7 @@ import { AuthService } from "../../shared/services/auth/auth.service";
 import { ProfesionalUserService } from "../../shared/services/professionals/professional-user.service";
 import { InputOption } from "../../shared/components/input/input.component";
 import { HttpErrorResponse } from "@angular/common/http";
+import { ROLE_DEFINITIONS } from "../../shared/models/role-definitions";
 
 @Component({
     standalone: false,
@@ -20,6 +21,7 @@ export class CompanyComponent implements OnInit {
     public isLoading: boolean = false;
     public loadingMessage: string = '';
     public validationErrors: string[] = [];
+    public isAdmin: boolean = false;
 
     public professional: Professional = {};
     public user: ProfessionalUser = {};
@@ -40,15 +42,17 @@ export class CompanyComponent implements OnInit {
             this.isLoading = true;
             this.loadingMessage = 'Loading Profile';
 
-            const [states, professional, user] = await Promise.all([
+            const [states, professional, user, isAdmin] = await Promise.all([
                 this._lookupService.getAllStatesAsOptions(true),
                 this.getLoggedInProfessional(),
-                this.getMyData()
+                this.getMyData(),
+                this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.ADMIN)
             ]);
 
             this.states = states;
             this.professional = professional;
             this.user = user;
+            this.isAdmin = isAdmin;
         } finally {
             this.isLoading = false;
             this.loadingMessage = '';
@@ -111,19 +115,23 @@ export class CompanyComponent implements OnInit {
                 this.loadingMessage = 'Saving Profile';
                 this.validationErrors = [];
 
-                if (this.validateServices()) {
-                    const updatedProfessional = this.professional.id
-                        ? await this._professionalService.updateMyData(this.professional)
-                        : await this._professionalService.addMyData({
-                            professional: this.professional,
-                            user: this.user
-                        });
+                if (this.isAdmin) {
+                    if (this.validateServices()) {
+                        const updatedProfessional = this.professional.id
+                            ? await this._professionalService.updateMyData(this.professional)
+                            : await this._professionalService.addMyData({
+                                professional: this.professional,
+                                user: this.user
+                            });
 
-                    if (this.professional.id) {
-                        await this._professionalUserService.updateMyData(this.user);
+                        if (this.professional.id) {
+                            await this._professionalUserService.updateMyData(this.user);
+                        }
+
+                        await this._authService.signIn(undefined, updatedProfessional.id);
                     }
-
-                    await this._authService.signIn(undefined, updatedProfessional.id)
+                } else {
+                    await this._professionalUserService.updateMyData(this.user);
                 }
             } catch (e) {
                 if (!this._helper.parseValidationErrors(e, this.validationErrors)) {

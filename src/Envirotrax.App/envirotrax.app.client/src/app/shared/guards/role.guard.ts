@@ -1,12 +1,12 @@
 import { Injectable } from "@angular/core";
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from "@angular/router";
 import { AuthService } from "../services/auth/auth.service";
-import { FeatureType } from "../models/feature-tyype";
+
 
 @Injectable({
     providedIn: 'root'
 })
-export class FeatureGuard implements CanActivate {
+export class RoleGuard implements CanActivate {
     constructor(
         private readonly _authService: AuthService,
         private readonly _router: Router
@@ -15,10 +15,10 @@ export class FeatureGuard implements CanActivate {
     }
 
     public async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean | UrlTree> {
-        const features = route.data['features'] as FeatureType[];
+        const roles = route.data['roles'] as string[];
 
-        if (features) {
-            if (await this._authService.hasAnyFeatures(...features)) {
+        if (roles) {
+            if (await this._authService.hasAnyRoles(...roles)) {
                 return true;
             }
         }

@@ -186,11 +186,24 @@ export class AuthService {
 
         return false;
     }
+
+    public async hasAnyRoles(...roles: string[]): Promise<boolean> {
+        const access = await this.getMyAccess();
+
+        for (let roleToCheck of roles) {
+            if (access.roles.indexOf(roleToCheck) >= 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
 
 interface UserAccess {
     features: FeatureType[];
     permissions: RolePermission[];
+    roles: string[];
 }
 
 interface RolePermission {

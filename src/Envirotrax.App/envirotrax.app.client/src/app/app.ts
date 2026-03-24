@@ -5,6 +5,7 @@ import { ProfesisonalService } from './shared/services/professionals/professiona
 import { createPopper, flip, preventOverflow } from '@popperjs/core';
 import { FeatureType } from './shared/models/feature-tyype';
 import { PermissionAction, PermissionType } from './shared/models/permission-type';
+import { ROLE_DEFINITIONS } from './shared/models/role-definitions';
 
 @Component({
   selector: 'app-root',
@@ -398,6 +399,14 @@ export class App implements OnInit {
   }
 
   private async createProfessionalMenuItems(): Promise<MenuItem[]> {
+    const isAdmin = await this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.ADMIN);
+    const isCsiInspector = await this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.CSI_INSPECTOR);
+    const isBackflowTester = await this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.BACKFLOW_TESTER);
+    const isFogInspector = await this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.FOG_INSPECTOR);
+    const isFogTransporter = await this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.FOG_TRANSPORTER);
+
+    const hasFogAccess = isFogInspector || isFogTransporter;
+
     return [
       {
         title: 'Account Overview',
@@ -423,28 +432,28 @@ export class App implements OnInit {
             title: 'User Accounts',
             iconCss: 'fa-solid fa-users',
             routerLink: ['professionals/users'],
-            hasPermission: true,
+            hasPermission: isAdmin,
             hasFeature: true
           },
           {
             title: 'Water Supplier Management',
             iconCss: 'fa-solid fa-droplet',
             routerLink: ['professionals/water-suppliers'],
-            hasPermission: true,
+            hasPermission: isAdmin,
             hasFeature: true
           },
           {
             title: 'Notification Management',
             iconCss: 'fa-regular fa-bell',
             routerLink: ['/'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Notifications),
+            hasPermission: isAdmin,
             hasFeature: true
           },
           {
             title: 'GIS Area Management',
             iconCss: 'fa-solid fa-globe',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: isAdmin,
             hasFeature: true
           }
         ]
@@ -452,71 +461,71 @@ export class App implements OnInit {
       {
         title: 'CSI Management',
         iconCss: 'fa-solid fa-building-magnifying-glass',
-        hasPermission: true,
+        hasPermission: isCsiInspector,
         hasFeature: await this._authService.hasAnyFeatures(FeatureType.CsiInspection),
         children: [
           {
             title: 'Property Record Search',
             iconCss: 'fa-regular fa-building-magnifying-glass',
             routerLink: ['sites'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Sites),
+            hasPermission: isCsiInspector,
             hasFeature: true
           },
           {
             title: 'Inspection Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
             routerLink: ['csi'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiInspections),
+            hasPermission: isCsiInspector,
             hasFeature: true
           },
           {
             type: 'separator',
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Sites, PermissionType.CsiInspections),
+            hasPermission: isCsiInspector,
             hasFeature: true
           },
           {
             title: 'Inspector Management',
             iconCss: 'fa-regular fa-user',
             routerLink: ['/'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiInspectors),
+            hasPermission: isAdmin && isCsiInspector,
             hasFeature: true
           },
           {
             title: 'Letter History',
             iconCss: 'fa-regular fa-envelope',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: isCsiInspector,
             hasFeature: true
           },
           {
             type: 'separator',
-            hasPermission: true,
+            hasPermission: isCsiInspector,
             hasFeature: true
           },
           {
             title: 'System Reports',
             iconCss: 'fa-regular fa-chart-simple-horizontal',
             routerLink: ['/'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports),
+            hasPermission: isCsiInspector,
             hasFeature: true
           },
           {
             type: 'separator',
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports),
+            hasPermission: isCsiInspector,
             hasFeature: false
           },
           {
             title: 'Compliance Management',
             iconCss: 'fa-solid fa-list-check',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: isCsiInspector,
             hasFeature: true
           },
           {
             title: 'Property Log Management',
             iconCss: 'fa-light fa-building-memo',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: isCsiInspector,
             hasFeature: true
           }
         ]
@@ -524,99 +533,99 @@ export class App implements OnInit {
       {
         title: 'Backflow Management',
         iconCss: 'fa-regular fa-gauge',
-        hasPermission: true,
+        hasPermission: isBackflowTester,
         hasFeature: await this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
         children: [
           {
             title: 'Property Record Search',
             iconCss: 'fa-regular fa-building-magnifying-glass',
             routerLink: ['sites'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Sites),
+            hasPermission: isBackflowTester,
             hasFeature: true
           },
           {
             title: 'Backflow Test Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
             routerLink: ['/'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowTests),
+            hasPermission: isBackflowTester,
             hasFeature: true
           },
           {
             title: 'Out of Service Requests',
             iconCss: 'fa-regular fa-file-minus',
             routerLink: ['/'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowOutOfService),
+            hasPermission: isBackflowTester,
             hasFeature: true
           },
           {
             type: 'separator',
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Sites, PermissionType.BackflowTests, PermissionType.BackflowOutOfService),
+            hasPermission: isBackflowTester,
             hasFeature: true
           },
           {
             title: 'BPAT Management',
             iconCss: 'fa-regular fa-user',
             routerLink: ['/'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowTesters),
+            hasPermission: isAdmin && isBackflowTester,
             hasFeature: true
           },
           {
             title: 'Letter History',
             iconCss: 'fa-regular fa-envelope',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: isBackflowTester,
             hasFeature: true
           },
           {
             type: 'separator',
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowTesters),
+            hasPermission: isBackflowTester,
             hasFeature: true
           },
           {
             title: 'Backflow Report',
             iconCss: 'fa-regular fa-chart-simple-horizontal',
             routerLink: ['/'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
+            hasPermission: isBackflowTester,
             hasFeature: true
           },
           {
             title: 'Current Compliance Report',
             iconCss: 'fa-regular fa-chart-pie-simple',
             routerLink: ['/'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
+            hasPermission: isBackflowTester,
             hasFeature: true
           },
           {
             title: 'Compliance History Report',
             iconCss: 'fa-solid fa-chart-line-up',
             routerLink: ['/'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
+            hasPermission: isBackflowTester,
             hasFeature: true
           },
           {
             title: 'New/Removed Assemblies Report',
             iconCss: 'fa-solid fa-chart-column',
             routerLink: ['/'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
+            hasPermission: isBackflowTester,
             hasFeature: true
           },
           {
             type: 'separator',
-            hasPermission: true,
+            hasPermission: isBackflowTester,
             hasFeature: true
           },
           {
             title: 'Compliance Management',
             iconCss: 'fa-solid fa-list-check',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: isBackflowTester,
             hasFeature: true
           },
           {
             title: 'Property Log Management',
             iconCss: 'fa-light fa-building-memo',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: isBackflowTester,
             hasFeature: true
           }
         ]
@@ -624,106 +633,106 @@ export class App implements OnInit {
       {
         title: 'FOG Management',
         iconCss: 'fa-regular fa-tank-water',
-        hasPermission: true,
+        hasPermission: hasFogAccess,
         hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection, FeatureType.FogTransportation),
         children: [
           {
             title: 'Property Record Search',
             iconCss: 'fa-regular fa-building-magnifying-glass',
             routerLink: ['sites'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Sites),
+            hasPermission: hasFogAccess,
             hasFeature: true
           },
           {
             title: 'Inspection Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
             routerLink: ['/'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogInspections),
+            hasPermission: isFogInspector,
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
           },
           {
             title: 'Trip Ticket Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
             routerLink: ['/'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogTripTickets),
+            hasPermission: isFogTransporter,
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
           },
           {
             type: 'separator',
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Sites, PermissionType.FogInspections, PermissionType.FogTripTickets),
+            hasPermission: hasFogAccess,
             hasFeature: true
           },
           {
             title: 'Inspector Management',
             iconCss: 'fa-regular fa-user',
             routerLink: ['/'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogInspectors),
+            hasPermission: isAdmin && isFogInspector,
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
           },
           {
             title: 'Transporter Management',
             iconCss: 'fa-regular fa-user',
             routerLink: ['/'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogTransporters),
+            hasPermission: isAdmin && isFogTransporter,
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
           },
           {
             title: 'Vehicle Management',
             iconCss: 'fa-solid fa-truck',
             routerLink: ['/'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogVehicles),
+            hasPermission: isAdmin && isFogTransporter,
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
           },
           {
             title: 'License Management',
             iconCss: 'fa-regular fa-id-card',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: hasFogAccess,
             hasFeature: true
           },
           {
             type: 'separator',
-            hasPermission: true,
+            hasPermission: hasFogAccess,
             hasFeature: true
           },
           {
             title: 'System Reports',
             iconCss: 'fa-regular fa-chart-simple-horizontal',
             routerLink: ['/'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogReports),
+            hasPermission: hasFogAccess,
             hasFeature: true
           },
           {
             type: 'separator',
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogReports),
+            hasPermission: hasFogAccess,
             hasFeature: true
           },
           {
             title: 'Inspection Compliance Management',
             iconCss: 'fa-solid fa-list-check',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: isFogInspector,
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
           },
           {
             title: 'Permit Compliance Management',
             iconCss: 'fa-solid fa-list-check',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: hasFogAccess,
             hasFeature: true
           },
           {
             title: 'Trip Ticket Compliance Management',
             iconCss: 'fa-solid fa-list-check',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: isFogTransporter,
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
           },
           {
             title: 'Property Log Management',
             iconCss: 'fa-light fa-building-memo',
             routerLink: ['/'],
-            hasPermission: true,
+            hasPermission: hasFogAccess,
             hasFeature: true
           }
         ]

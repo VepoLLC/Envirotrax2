@@ -32,6 +32,7 @@ public class ProfessionalControler : ProfessionalProtectedController
     }
 
     [HttpPost("my")]
+    [Authorize(Roles = RoleDefinitions.Professionals.Admin)]
     public async Task<IActionResult> AddMyAsync(CreateProfessionalDto createProfessional)
     {
         var added = await _professionalService.AddMyAsync(createProfessional);
@@ -39,6 +40,7 @@ public class ProfessionalControler : ProfessionalProtectedController
     }
 
     [HttpPut("my")]
+    [Authorize(Roles = RoleDefinitions.Professionals.Admin)]
     public async Task<IActionResult> UpdateMyAsync(ProfessionalDto professional)
     {
         var updated = await _professionalService.UpdateAsync(professional);

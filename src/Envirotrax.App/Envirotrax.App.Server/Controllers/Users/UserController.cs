@@ -51,7 +51,8 @@ public class MyAccessController : ControllerBase
         var accessDto = new UserAccessDto
         {
             Features = _authService.GetAllMyFeatures(),
-            Permissions = _authService.GetAllMyPermissions()
+            Permissions = _authService.GetAllMyPermissions(),
+            Roles = _authService.GetAllMyRoles()
         };
 
         return Ok(accessDto);

@@ -28,7 +28,7 @@
         </vp-section>
     </div>
 
-    <div class="mb-3">
+    <div class="mb-3" *ngIf="isAdmin">
         <vp-section header="Company Information">
             <div class="row">
                 <div class="col-md-6 mb-3">
@@ -121,7 +121,7 @@
         </vp-section>
     </div>
 
-    <vp-section header="Services Provided">
+    <vp-section *ngIf="isAdmin" header="Services Provided">
         <p class="text-danger">
             Please note that you must select at least one service.
         </p>

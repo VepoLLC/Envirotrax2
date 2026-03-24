@@ -4,6 +4,7 @@ using Envirotrax.Common.Data.Services.Implementations;
 using Envirotrax.Common.Domain.DataTransferObjects;
 using Envirotrax.Common.Domain.Services.Defintions;
 using Microsoft.AspNetCore.Http;
+using OpenIddict.Abstractions;
 
 namespace Envirotrax.Common.Domain.Services.Implementations;
 
@@ -134,5 +135,13 @@ public class AuthService : TenantProviderService, IAuthService
         }
 
         return false;
+    }
+
+    public IEnumerable<string> GetAllMyRoles()
+    {
+        return _contextAccessor.HttpContext?.User
+            .FindAll(OpenIddictConstants.Claims.Role)
+            .Select(c => c.Value)
+            ?? [];
     }
 }

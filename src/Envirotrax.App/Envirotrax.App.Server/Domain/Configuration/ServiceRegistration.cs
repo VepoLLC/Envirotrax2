@@ -9,7 +9,9 @@ using Envirotrax.App.Server.Domain.Services.Implementations;
 using Envirotrax.App.Server.Domain.Services.Implementations.WaterSuppliers;
 using Envirotrax.Common.Configuration;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
+using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Implementations.Professionals;
+using Envirotrax.App.Server.Domain.Services.Implementations.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 
@@ -42,6 +44,7 @@ public static class ServiceRegistration
         services.AddTransient<IProfessionalService, ProfessionalService>();
         services.AddTransient<IProfessionalUserService, ProfessionalUserService>();
         services.AddTransient<IProfessionalSupplierService, ProfessionalSupplierService>();
+        services.AddTransient<IProfessionalUserLicenseService, ProfessionalUserLicenseService>();
 
         return services;
     }

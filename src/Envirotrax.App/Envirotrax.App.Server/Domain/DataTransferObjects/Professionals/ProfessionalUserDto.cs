@@ -26,3 +26,13 @@ public class ProfessionalUserDto : IDto
     public bool IsFogInspector { get; set; }
     public bool IsFogTransporter { get; set; }
 }
+
+public class ReferencedProfessionalUserDto
+{
+    [Required]
+    public int? Id { get; set; }
+
+    public string? EmailAddress { get; set; }
+
+    public string? ContactName { get; set; }
+}

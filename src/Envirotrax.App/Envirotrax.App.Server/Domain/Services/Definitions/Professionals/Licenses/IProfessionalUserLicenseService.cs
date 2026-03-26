@@ -1,0 +1,11 @@
+
+using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Licenses;
+
+namespace Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
+
+public interface IProfessionalUserLicenseService : IService<ProfessionalUserLicense, ProfessionalUserLicenseDto>
+{
+    Task<IPagedData<ProfessionalUserLicenseDto>> GetAllAsync(int userId, PageInfo pageInfo, Query query);
+}

@@ -1,6 +1,7 @@
 
 using Envirotrax.App.Server.Data.Configuration;
 using Envirotrax.App.Server.Data.DbContexts;
+using Envirotrax.App.Server.Data.Models.States;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.SeedData;
@@ -18,6 +19,7 @@ public class SeedDataService : IHostedService
     private const string AdminRoleName = "Admin";
 
     private WaterSupplier? _defaultTenant;
+    private IDictionary<string, State>? _states;
 
     public SeedDataService(IServiceProvider serviceProvider, IOptions<AdminUserOptions> adminUserOptions)
     {
@@ -40,6 +42,8 @@ public class SeedDataService : IHostedService
             await AddPermissionsAsync(dbContext);
             await AddRolesAsync(dbContext);
             await AddUsersAsync(dbContext);
+
+            await AddLicenseTypesAsync(dbContext);
         }
     }
 
@@ -103,6 +107,9 @@ public class SeedDataService : IHostedService
             dbContext.States.AddRange(StateSeedData.States);
             await dbContext.SaveChangesAsync();
         }
+
+        var states = await dbContext.States.ToListAsync();
+        _states = states.ToDictionary(s => s.Code);
     }
 
     private async Task AddPermissionsAsync(TenantDbContext dbContext)
@@ -139,6 +146,15 @@ public class SeedDataService : IHostedService
             });
 
             dbContext.RolePermissions.AddRange(rolePermissions);
+            await dbContext.SaveChangesAsync();
+        }
+    }
+
+    private async Task AddLicenseTypesAsync(TenantDbContext dbContext)
+    {
+        if (!await dbContext.ProfessionalLicenseTypes.AnyAsync())
+        {
+            dbContext.ProfessionalLicenseTypes.AddRange(ProfessionalLicenseTypeSeedData.GetTypes(_states!));
             await dbContext.SaveChangesAsync();
         }
     }

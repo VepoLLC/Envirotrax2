@@ -8,6 +8,7 @@ import { WaterSupplierRegistrationComponent } from "./water-supppliers/registrat
 import { ProfessionalUserListComponent } from "./users/list/professional-user-list.component";
 import { CreateProfessionalUserComponent } from "./users/create/create-professional-user.component";
 import { EditProfessionalUserComponent } from "./users/edit/edit-professional-user.component";
+import { SiteListComponent } from "./sites/site-list.component";
 
 @NgModule({
     declarations: [
@@ -15,7 +16,8 @@ import { EditProfessionalUserComponent } from "./users/edit/edit-professional-us
         WaterSupplierRegistrationComponent,
         ProfessionalUserListComponent,
         CreateProfessionalUserComponent,
-        EditProfessionalUserComponent
+        EditProfessionalUserComponent,
+        SiteListComponent
     ],
     imports: [
         ProfessionalRoutingModule,

@@ -1,0 +1,43 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="isLoading" />
+
+    <form #form="ngForm" (ngSubmit)="save(form)">
+        <div class="row">
+            <div class="col-12">
+                <div class="mb-3">
+                    <vp-input type="select"
+                              [(ngModel)]="license.professionalType"
+                              [required]="true"
+                              name="professionalType"
+                              label="License Type"
+                              [options]="professionalTypeOptions"
+                              [form]="form" />
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="mb-3">
+                    <vp-input [(ngModel)]="license.licenseNumber"
+                              [required]="true"
+                              [maxLength]="50"
+                              name="licenseNumber"
+                              label="License Number"
+                              [form]="form" />
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="form" [validationErrors]="validationErrors" />
+
+            <div class="d-flex justify-content-center">
+                <button type="button" class="btn btn-primary me-2 w-100" (click)="cancel()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn btn-primary w-100">
+                    Save
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

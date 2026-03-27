@@ -5,16 +5,13 @@
         <div class="row">
             <div class="col-12">
                 <div class="mb-3">
-                    <label class="form-label">License Type <span class="text-danger">*</span></label>
-                    <select class="form-select"
-                            name="professionalType"
-                            [(ngModel)]="license.professionalType"
-                            required>
-                        <option [ngValue]="undefined" disabled>Select a type...</option>
-                        <option *ngFor="let option of professionalTypeOptions" [ngValue]="option.value">
-                            {{ option.label }}
-                        </option>
-                    </select>
+                    <vp-input type="select"
+                              [(ngModel)]="license.professionalType"
+                              [required]="true"
+                              name="professionalType"
+                              label="License Type"
+                              [options]="professionalTypeOptions"
+                              [form]="form" />
                 </div>
             </div>
 

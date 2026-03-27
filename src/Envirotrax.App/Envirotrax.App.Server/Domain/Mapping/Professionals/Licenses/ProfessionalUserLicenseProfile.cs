@@ -10,6 +10,13 @@ public class ProfessionalUserLicenseProfile : Profile
     public ProfessionalUserLicenseProfile()
     {
         CreateMap<ProfessionalUserLicense, ProfessionalUserLicenseDto>()
+            .AfterMap((model, dto) =>
+            {
+                dto.User ??= new()
+                {
+                    Id = model.UserId
+                };
+            })
             .ReverseMap()
             .ForMember(l => l.Professional, opt => opt.Ignore())
             .ForMember(l => l.User, opt => opt.Ignore())

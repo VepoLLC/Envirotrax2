@@ -1,15 +1,12 @@
 import { Component, OnInit } from "@angular/core";
 import { ProfessionalUser } from "../../../shared/models/professionals/professional-user";
-import { ProfessionalUserLicense, professionalTypeLabels } from "../../../shared/models/professionals/professional-user-license";
 import { ProfesionalUserService } from "../../../shared/services/professionals/professional-user.service";
-import { ProfessionalUserLicenseService } from "../../../shared/services/professionals/professional-user-license.service";
 import { ActivatedRoute } from "@angular/router";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { NgForm } from "@angular/forms";
 import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
 import { ToastService } from "../../../shared/services/toast.service";
 import { InputOption } from "../../../shared/components/input/input.component";
-import { AddProfessionalUserLicenseComponent } from "./add-professional-user-license.component";
 
 @Component({
     standalone: false,
@@ -21,9 +18,6 @@ export class EditProfessionalUserComponent implements OnInit {
     public validationErrors: string[] = [];
     public selectedJobFunctions: string[] = [];
 
-    public licenses: ProfessionalUserLicense[] = [];
-    public isLicensesLoading: boolean = false;
-
     public readonly jobFunctionOptions: InputOption[] = [
         { id: 'isWiseGuy', text: 'Wise Guy' },
         { id: 'isCsiInspector', text: 'CSI Inspector' },
@@ -34,7 +28,6 @@ export class EditProfessionalUserComponent implements OnInit {
 
     constructor(
         private readonly _userService: ProfesionalUserService,
-        private readonly _licenseService: ProfessionalUserLicenseService,
         private readonly _activatedRoute: ActivatedRoute,
         private readonly _helper: HelperService,
         private readonly _modalHelper: ModalHelperService,
@@ -48,10 +41,7 @@ export class EditProfessionalUserComponent implements OnInit {
             const userId = params.get('id');
 
             if (userId) {
-                await Promise.all([
-                    this.getUser(+userId),
-                    this.getLicenses(+userId)
-                ]);
+                await this.getUser(+userId);
             }
         });
     }
@@ -64,44 +54,6 @@ export class EditProfessionalUserComponent implements OnInit {
         } finally {
             this.isLoading = false;
         }
-    }
-
-    private async getLicenses(userId: number): Promise<void> {
-        try {
-            this.isLicensesLoading = true;
-            this.licenses = await this._licenseService.getForUser(userId);
-        } finally {
-            this.isLicensesLoading = false;
-        }
-    }
-
-    public getLicenseTypeLabel(type?: number): string {
-        if (type === undefined || type === null) return '';
-        return professionalTypeLabels[type as keyof typeof professionalTypeLabels] ?? '';
-    }
-
-    public addLicense(): void {
-        this._modalHelper.show<number, ProfessionalUserLicense>(AddProfessionalUserLicenseComponent, {
-            title: 'Add License',
-            model: this.user.id!
-        }).result().subscribe(license => {
-            this.licenses.push(license);
-        });
-    }
-
-    public deleteLicense(license: ProfessionalUserLicense): void {
-        this._modalHelper.showDeleteConfirmation()
-            .result()
-            .subscribe(async () => {
-                try {
-                    this.isLicensesLoading = true;
-                    await this._licenseService.delete(license.id!);
-                    this.licenses = this.licenses.filter(l => l.id !== license.id);
-                    this._toastService.successFullyDeleted('License');
-                } finally {
-                    this.isLicensesLoading = false;
-                }
-            });
     }
 
     public resendInvitation(): void {

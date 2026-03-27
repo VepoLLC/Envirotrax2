@@ -79,42 +79,6 @@
     </vp-section>
 </div>
 
-<vp-section header="Licenses" class="mt-3">
-    <dp-loading-spinner *ngIf="isLicensesLoading" />
-
-    <div dp-spinner-parent>
-        <div class="d-flex justify-content-end mb-2">
-            <button type="button" class="btn btn-primary" (click)="addLicense()">
-                <i class="fa-solid fa-circle-plus"></i>
-                Add New
-            </button>
-        </div>
-
-        <table class="table" *ngIf="licenses.length > 0">
-            <thead>
-                <tr>
-                    <th>Type</th>
-                    <th>License Number</th>
-                    <th>Expiration Date</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let license of licenses">
-                    <td>{{ getLicenseTypeLabel(license.professionalType) }}</td>
-                    <td>{{ license.licenseNumber }}</td>
-                    <td>{{ license.expirationDate ? (license.expirationDate | date) : 'Pending verification' }}</td>
-                    <td class="text-end">
-                        <button type="button" class="btn btn-sm btn-danger" (click)="deleteLicense(license)">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        <p *ngIf="!isLicensesLoading && licenses.length === 0" class="text-center text-muted">
-            No licenses added yet.
-        </p>
-    </div>
-</vp-section>
+<div *ngIf="user.id" class="mt-3">
+    <vp-professional-user-license-list [userId]="user.id" />
+</div>

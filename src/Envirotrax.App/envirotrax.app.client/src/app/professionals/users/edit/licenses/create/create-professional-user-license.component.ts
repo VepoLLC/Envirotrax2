@@ -1,22 +1,23 @@
 import { Component } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { ModalReference } from "@developer-partners/ngx-modal-dialog";
-import { ProfessionalUserLicense, ProfessionalType, professionalTypeLabels } from "../../../shared/models/professionals/professional-user-license";
-import { ProfessionalUserLicenseService } from "../../../shared/services/professionals/professional-user-license.service";
-import { HelperService } from "../../../shared/services/helpers/helper.service";
+import { ProfessionalUserLicense, ProfessionalType, professionalTypeLabels } from "../../../../../shared/models/professionals/professional-user-license";
+import { ProfessionalUserLicenseService } from "../../../../../shared/services/professionals/professional-user-license.service";
+import { HelperService } from "../../../../../shared/services/helpers/helper.service";
+import { InputOption } from "../../../../../shared/components/input/input.component";
 
 @Component({
     standalone: false,
-    templateUrl: './add-professional-user-license.component.html'
+    templateUrl: './create-professional-user-license.component.html'
 })
-export class AddProfessionalUserLicenseComponent {
+export class CreateProfessionalUserLicenseComponent {
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
     public license: ProfessionalUserLicense = {};
 
-    public readonly professionalTypeOptions = Object.values(ProfessionalType)
+    public readonly professionalTypeOptions: InputOption[] = Object.values(ProfessionalType)
         .filter(v => typeof v === 'number')
-        .map(v => ({ value: v as ProfessionalType, label: professionalTypeLabels[v as ProfessionalType] }));
+        .map(v => ({ id: v as ProfessionalType, text: professionalTypeLabels[v as ProfessionalType] }));
 
     constructor(
         private readonly _modalReference: ModalReference<number, ProfessionalUserLicense>,

@@ -1,0 +1,28 @@
+<ng-template #typeCell let-license="rowData">
+    {{ getProfessionalTypeLabel(license.professionalType) }}
+</ng-template>
+
+<ng-template #dateCell let-license="rowData">
+    {{ license.expirationDate ? (license.expirationDate | date) : 'Pending verification' }}
+</ng-template>
+
+<vp-section header="Licenses">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading" />
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [canAdd]="true"
+                  (add)="add()"
+                  [canEdit]="true"
+                  (edit)="edit($event)"
+                  [canDelete]="true"
+                  (delete)="delete($event)"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getLicenses()"
+                  [(query)]="table.query"
+                  (queryChange)="getLicenses()"
+                  (queryReset)="getLicenses()" />
+    </div>
+</vp-section>

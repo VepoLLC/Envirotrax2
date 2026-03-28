@@ -5,10 +5,12 @@ import { RouterModule } from "@angular/router";
 import { SharedComponentsModule } from "../shared/components/shared.components.module";
 import { CsiRoutingModule } from "./csi-routing.module";
 import { CsiSearchComponent } from "./search/csi-search.component";
+import { InspectorManagementComponent } from './inspector-management/inspector-management.component';
 
 @NgModule({
     declarations: [
-        CsiSearchComponent
+        CsiSearchComponent,
+        InspectorManagementComponent
     ],
     imports: [
         CommonModule,

@@ -1,13 +1,13 @@
 import { Component, Input, OnInit, ViewChild, TemplateRef } from "@angular/core";
-import { ProfessionalUserLicense, professionalTypeLabels } from "../../../../../shared/models/professionals/professional-user-license";
+import { ProfessionalUserLicense, professionalTypeLabels } from "../../../../../shared/models/professionals/licenses/professional-user-license";
 import { ProfessionalUserLicenseService } from "../../../../../shared/services/professionals/professional-user-license.service";
 import { ModalHelperService } from "../../../../../shared/services/helpers/modal-helper.service";
 import { ToastService } from "../../../../../shared/services/toast.service";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
 import { CellTemplateData, TableColumn } from "../../../../../shared/components/data-components/table/table.component";
 import { ColumnType } from "../../../../../shared/components/data-components/sorting-filtering/query-view-model";
-import { CreateProfessionalUserLicenseComponent } from "../create/create-professional-user-license.component";
-import { EditProfessionalUserLicenseComponent } from "../edit/edit-professional-user-license.component";
+import { CreateEditLicenseComponent } from "../create-edit/create-edit-license.component";
+import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 
 @Component({
     selector: 'vp-professional-user-license-list',
@@ -28,6 +28,12 @@ export class ProfessionalUserLicenseListComponent implements OnInit {
         query: {
             sort: {},
             filter: []
+        },
+        freeTextSearch: {
+            searchQuery: [
+                { field: 'licenseType.name' },
+                { field: 'licenseNumber' }
+            ]
         }
     };
 
@@ -46,9 +52,14 @@ export class ProfessionalUserLicenseListComponent implements OnInit {
         return [
             {
                 field: 'professionalType',
-                caption: 'Type',
+                caption: 'Profession',
                 type: ColumnType.text,
                 cellTemplate: this.typeCellTemplate
+            },
+            {
+                field: 'licenseType.name',
+                caption: 'Type',
+                type: ColumnType.text
             },
             {
                 field: 'licenseNumber',
@@ -65,7 +76,10 @@ export class ProfessionalUserLicenseListComponent implements OnInit {
     }
 
     public getProfessionalTypeLabel(type?: number): string {
-        if (type === undefined || type === null) return '';
+        if (type === undefined || type === null) {
+            return '';
+        }
+
         return professionalTypeLabels[type as keyof typeof professionalTypeLabels] ?? '';
     }
 
@@ -83,9 +97,10 @@ export class ProfessionalUserLicenseListComponent implements OnInit {
     }
 
     public add(): void {
-        this._modalHelper.show<number, ProfessionalUserLicense>(CreateProfessionalUserLicenseComponent, {
+        this._modalHelper.show<ProfessionalUserLicense, ProfessionalUserLicense>(CreateEditLicenseComponent, {
             title: 'Add License',
-            model: this.userId
+            model: { user: { id: this.userId } },
+            size: ModalSize.large
         }).result().subscribe(() => {
             this._toastService.successfullySaved("License");
             this.getLicenses();
@@ -93,9 +108,10 @@ export class ProfessionalUserLicenseListComponent implements OnInit {
     }
 
     public edit(license: ProfessionalUserLicense): void {
-        this._modalHelper.show<ProfessionalUserLicense, ProfessionalUserLicense>(EditProfessionalUserLicenseComponent, {
+        this._modalHelper.show<ProfessionalUserLicense, ProfessionalUserLicense>(CreateEditLicenseComponent, {
             title: 'Edit License',
-            model: license
+            model: license,
+            size: ModalSize.large
         }).result().subscribe(() => {
             this._toastService.successfullySaved("License");
             this.getLicenses();

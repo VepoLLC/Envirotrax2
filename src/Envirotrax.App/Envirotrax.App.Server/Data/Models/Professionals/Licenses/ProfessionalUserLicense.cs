@@ -22,6 +22,9 @@ public class ProfessionalUserLicense : IProfessionalModel, ICreateAuditableModel
 
     public ProfessionalType ProfessionalType { get; set; }
 
+    public int LicenseTypeId { get; set; }
+    public ProfessionalLicenseType? LicenseType { get; set; }
+
     [Required]
     [StringLength(50)]
     public string LicenseNumber { get; set; } = null!;

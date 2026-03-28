@@ -7,7 +7,7 @@ import { ColumnType } from "../../shared/components/data-components/sorting-filt
 import { AvailableWaterSupplier, ProfessionalWaterSupplier } from "../../shared/models/professionals/professional-water-supplier";
 import { ProfesisonalService } from "../../shared/services/professionals/professional.service";
 import { QueryProperty } from "../../shared/models/query";
-import { State } from "../../shared/models/states/state";
+import { State } from "../../shared/models/lookup/state";
 import { LookupService } from "../../shared/services/lookup/lookup.service";
 import { Professional } from "../../shared/models/professionals/professional";
 import { InputOption } from "../../shared/components/input/input.component";

@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { State } from "../../models/states/state";
+import { State } from "../../models/lookup/state";
 import { UrlResolverService } from "../helpers/url-resolver.service";
 import { lastValueFrom, Observable } from "rxjs";
 import { InputOption } from "../../components/input/input.component";

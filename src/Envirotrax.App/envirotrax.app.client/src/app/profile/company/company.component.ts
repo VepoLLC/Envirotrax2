@@ -2,7 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { Professional } from "../../shared/models/professionals/professional";
 import { Router } from "@angular/router";
 import { HelperService } from "../../shared/services/helpers/helper.service";
-import { State } from "../../shared/models/states/state";
+import { State } from "../../shared/models/lookup/state";
 import { LookupService } from "../../shared/services/lookup/lookup.service";
 import { ProfesisonalService } from "../../shared/services/professionals/professional.service";
 import { NgForm } from "@angular/forms";

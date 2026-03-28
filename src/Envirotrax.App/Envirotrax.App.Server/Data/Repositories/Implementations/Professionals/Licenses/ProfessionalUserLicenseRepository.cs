@@ -15,10 +15,21 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
     {
     }
 
+    protected override IQueryable<ProfessionalUserLicense> GetListQuery()
+    {
+        return base.GetListQuery()
+            .Include(license => license.LicenseType);
+    }
+
+    protected override IQueryable<ProfessionalUserLicense> GetDetailsQuery()
+    {
+        return base.GetDetailsQuery()
+            .Include(license => license.LicenseType);
+    }
+
     public async Task<IEnumerable<ProfessionalUserLicense>> GetAllAsync(int userId, PageInfo pageInfo, Query query)
     {
-        var paginated = await DbContext
-            .ProfessionalUserLicenses
+        var paginated = await GetListQuery()
             .Where(license => license.UserId == userId)
             .Where(query.Filter)
             .OrderBy(query.Sort)

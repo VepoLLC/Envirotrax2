@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Site } from '../../shared/models/sites/site';
 import { NgForm } from "@angular/forms";
-import { State } from "../../shared/models/states/state";
+import { State } from "../../shared/models/lookup/state";
 import { LookupService } from "../../shared/services/lookup/lookup.service";
 import { PropertyType } from "../../shared/enums/property-type.enum";
 import { SiteService } from "../../shared/services/sites/site.service";
@@ -10,16 +10,16 @@ import { HelperService } from "../../shared/services/helpers/helper.service";
 import { Router } from "@angular/router";
 
 @Component({
-  selector: 'app-create-site-component',
-  standalone: false,
-  templateUrl: './create-site-component.html'
+    selector: 'app-create-site-component',
+    standalone: false,
+    templateUrl: './create-site-component.html'
 })
 export class CreateSiteComponent {
 
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
     public site: Site = {
-        propertyType: PropertyType.Residential 
+        propertyType: PropertyType.Residential
     };
 
     public states: State[] = [];
@@ -76,7 +76,7 @@ export class CreateSiteComponent {
             //  this.professional.state = this.professional.state || {};
             this.site.stateId = stateId;
         } else {
-            this.site.stateId  = undefined;
+            this.site.stateId = undefined;
         }
     }
 

@@ -1,7 +1,10 @@
+import { ProfessionalLicenseType } from "./professional-license-type";
+
 export interface ProfessionalUserLicense {
     id?: number;
     user?: { id?: number };
     professionalType?: ProfessionalType;
+    licenseType?: ProfessionalLicenseType;
     licenseNumber?: string;
     expirationDate?: string;
 }

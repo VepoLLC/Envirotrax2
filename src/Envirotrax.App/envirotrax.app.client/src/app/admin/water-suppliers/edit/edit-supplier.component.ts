@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { NgForm } from "@angular/forms";
 import { LookupService } from "../../../shared/services/lookup/lookup.service";
-import { State } from "../../../shared/models/states/state";
+import { State } from "../../../shared/models/lookup/state";
 import { InputOption } from "../../../shared/components/input/input.component";
 import { ToastService } from "../../../shared/services/toast.service";
 

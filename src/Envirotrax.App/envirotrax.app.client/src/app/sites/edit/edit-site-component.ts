@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Site } from '../../shared/models/sites/site';
 import { NgForm } from "@angular/forms";
-import { State } from "../../shared/models/states/state";
+import { State } from "../../shared/models/lookup/state";
 import { PageInfo } from "../../shared/models/page-info";
 import { LookupService } from "../../shared/services/lookup/lookup.service";
 import { PropertyType } from "../../shared/enums/property-type.enum";

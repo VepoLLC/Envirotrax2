@@ -16,11 +16,18 @@ public class ProfessionalUserLicenseProfile : Profile
                 {
                     Id = model.UserId
                 };
+
+                dto.LicenseType ??= new()
+                {
+                    Id = model.LicenseTypeId
+                };
             })
             .ReverseMap()
             .ForMember(l => l.Professional, opt => opt.Ignore())
             .ForMember(l => l.User, opt => opt.Ignore())
             .ForMember(l => l.UserId, opt => opt.MapFrom(l => l.User.Id))
-            .ForMember(l => l.CreatedBy, opt => opt.Ignore());
+            .ForMember(l => l.CreatedBy, opt => opt.Ignore())
+            .ForMember(l => l.LicenseType, opt => opt.Ignore())
+            .ForMember(l => l.LicenseTypeId, opt => opt.MapFrom(l => l.LicenseType.Id));
     }
 }

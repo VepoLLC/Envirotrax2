@@ -11,7 +11,11 @@ public class ProfessionalUserLicenseDto : IDto
     [Required]
     public ReferencedProfessionalUserDto User { get; set; } = null!;
 
-    public ProfessionalType ProfessionalType { get; set; }
+    [Required]
+    public ProfessionalType? ProfessionalType { get; set; }
+
+    [Required]
+    public ReferencedProfessionalLicenseTypeDto LicenseType { get; set; } = null!;
 
     [Required]
     [StringLength(50)]

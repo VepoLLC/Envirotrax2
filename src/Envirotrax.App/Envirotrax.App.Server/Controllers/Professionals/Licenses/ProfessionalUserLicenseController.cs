@@ -13,11 +13,20 @@ namespace Envirotrax.App.Server.Controllers.Professionals.Licenses;
 public class ProfessionalUserLicenseController : ProfessionalCrudController<ProfessionalUserLicenseDto>
 {
     private readonly IProfessionalUserLicenseService _licenseService;
+    private readonly IProfessionalLicenseTypeService _licenseTypeService;
 
-    public ProfessionalUserLicenseController(IProfessionalUserLicenseService service)
+    public ProfessionalUserLicenseController(IProfessionalUserLicenseService service, IProfessionalLicenseTypeService licenseTypeService)
         : base(service)
     {
         _licenseService = service;
+        _licenseTypeService = licenseTypeService;
+    }
+
+    [HttpGet("types")]
+    public async Task<IActionResult> GetAllTypesAsync([FromQuery] Query query, CancellationToken cancellationToken)
+    {
+        var types = await _licenseTypeService.GetAllAsync(query, cancellationToken);
+        return Ok(types);
     }
 
     [HttpGet("/api/professionals/{userId}/licenses")]

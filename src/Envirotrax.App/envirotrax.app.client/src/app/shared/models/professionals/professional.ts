@@ -1,4 +1,4 @@
-import { State } from "../states/state";
+import { State } from "../lookup/state";
 import { ProfessionalUser } from "./professional-user";
 
 export interface Professional {

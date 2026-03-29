@@ -5,6 +5,7 @@ using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Licenses;
+using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Professionals.Licenses;
@@ -12,11 +13,37 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Professionals.Li
 public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, ProfessionalUserLicenseDto>, IProfessionalUserLicenseService
 {
     private readonly IProfessionalUserLicenseRepository _licenseRepository;
+    private readonly ITimeZoneHelperService _timeZoneHelper;
 
-    public ProfessionalUserLicenseService(IMapper mapper, IProfessionalUserLicenseRepository repository)
+    public ProfessionalUserLicenseService(
+        IMapper mapper,
+        IProfessionalUserLicenseRepository repository,
+        ITimeZoneHelperService timeZoneHelper)
         : base(mapper, repository)
     {
         _licenseRepository = repository;
+        _timeZoneHelper = timeZoneHelper;
+    }
+
+    protected override ProfessionalUserLicenseDto? MapToDto(ProfessionalUserLicense? model)
+    {
+        var dto = base.MapToDto(model);
+
+        if (dto != null)
+        {
+            var localTime = _timeZoneHelper.GetUserLocalTime();
+
+            if (localTime > dto.ExpirationDate)
+            {
+                dto.ExpirationType = ExpirationType.Expired;
+            }
+            else if (localTime.AddDays(-30) <= dto.ExpirationDate)
+            {
+                dto.ExpirationType = ExpirationType.AboutToExpire;
+            }
+        }
+
+        return dto;
     }
 
     public async Task<IPagedData<ProfessionalUserLicenseDto>> GetAllAsync(int userId, PageInfo pageInfo, Query query)

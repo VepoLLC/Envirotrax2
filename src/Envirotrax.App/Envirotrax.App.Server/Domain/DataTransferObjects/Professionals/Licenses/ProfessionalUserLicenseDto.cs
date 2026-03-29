@@ -22,4 +22,13 @@ public class ProfessionalUserLicenseDto : IDto
     public string LicenseNumber { get; set; } = null!;
 
     public DateTime? ExpirationDate { get; set; }
+
+    public ExpirationType ExpirationType { get; set; }
+}
+
+public enum ExpirationType
+{
+    Valid,
+    AboutToExpire,
+    Expired
 }

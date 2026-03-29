@@ -7,10 +7,13 @@ import { HelperService } from "../../../../../shared/services/helpers/helper.ser
 import { InputOption } from "../../../../../shared/components/input/input.component";
 import { ProfessionalLicenseType } from "../../../../../shared/models/professionals/licenses/professional-license-type";
 import { ProfesisonalService } from "../../../../../shared/services/professionals/professional.service";
+import { ToastService, ToastType } from "../../../../../shared/services/toast.service";
 
 @Component({
     standalone: false,
-    templateUrl: './create-edit-license.component.html'
+    templateUrl: './create-edit-license.component.html',
+    styles: `
+    `
 })
 export class CreateEditLicenseComponent implements OnInit {
     private _allLicenseTypes: InputOption<ProfessionalLicenseType>[] = [];
@@ -18,6 +21,7 @@ export class CreateEditLicenseComponent implements OnInit {
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
     public license: ProfessionalUserLicense = {};
+    public hasReadHelp: boolean = false;
 
     public licenseTypes: InputOption<ProfessionalLicenseType>[] = [];
 
@@ -37,7 +41,8 @@ export class CreateEditLicenseComponent implements OnInit {
         private readonly _modalReference: ModalReference<ProfessionalUserLicense, ProfessionalUserLicense>,
         private readonly _licenseService: ProfessionalUserLicenseService,
         private readonly _helper: HelperService,
-        private readonly _professionalService: ProfesisonalService
+        private readonly _professionalService: ProfesisonalService,
+        private readonly _toastService: ToastService
     ) {
         this.license = this._modalReference.config.model!;
     }
@@ -69,15 +74,22 @@ export class CreateEditLicenseComponent implements OnInit {
     }
 
     public async save(form: NgForm): Promise<void> {
+        this.validationErrors = [];
+
+        if (!this.isEditMode && !this.hasReadHelp) {
+            this.validationErrors.push('You must check the agreement checkbox below to register a new license ');
+            return;
+        }
+
         if (form.valid) {
             try {
                 this.isLoading = true;
-                this.validationErrors = [];
 
                 const result = this.isEditMode
                     ? await this._licenseService.update(this.license)
                     : await this._licenseService.add(this.license);
 
+                this.showSuccessMessage();
                 this._modalReference.closeSuccess(result);
             } catch (e) {
                 if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
@@ -86,6 +98,19 @@ export class CreateEditLicenseComponent implements OnInit {
             } finally {
                 this.isLoading = false;
             }
+        }
+    }
+
+    private showSuccessMessage(): void {
+        if (this.isEditMode) {
+            this._toastService.successfullySaved('License');
+        } else {
+            const licenseType = this.licenseTypes.find(type => type.data?.id == this.license.licenseType?.id);
+
+            this._toastService.show({
+                type: ToastType.Success,
+                text: `Your ${licenseType?.text} License has been submitted for validation. The validation process may take anywhere from an hour up to 1 business day to process.`
+            })
         }
     }
 

@@ -3,7 +3,14 @@
 </ng-template>
 
 <ng-template #dateCell let-license="rowData">
-    {{ license.expirationDate ? (license.expirationDate | date) : 'Pending verification' }}
+    <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
+         [class.text-bg-primary]="!license.expirationDate"
+         [class.text-bg-success]="license.expirationDate && license.expirationType == expirationType.Valid"
+         [class.text-bg-warning]="license.expirationDate && license.expirationType == expirationType.AboutToExpire"
+         [class.text-bg-danger]="license.expirationDate && license.expirationType == expirationType.Expired"
+         [attr.aria-label]="!license.expirationDate ? 'Validating' : license.expirationType == expirationType.Valid ? 'Valid' : license.expirationType == expirationType.AboutToExpire ? 'About to Expire' : 'Expired'">
+        {{ license.expirationDate ? (license.expirationDate | date) : 'Validating...' }}
+    </div>
 </ng-template>
 
 <vp-section header="Licenses">

@@ -7,6 +7,13 @@ export interface ProfessionalUserLicense {
     licenseType?: ProfessionalLicenseType;
     licenseNumber?: string;
     expirationDate?: string;
+    expirationType?: ExpirationType
+}
+
+export enum ExpirationType {
+    Valid,
+    AboutToExpire,
+    Expired
 }
 
 export enum ProfessionalType {

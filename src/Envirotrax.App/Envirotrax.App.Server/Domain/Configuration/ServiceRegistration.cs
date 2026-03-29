@@ -14,6 +14,8 @@ using Envirotrax.App.Server.Domain.Services.Implementations.Professionals;
 using Envirotrax.App.Server.Domain.Services.Implementations.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
+using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
+using Envirotrax.App.Server.Domain.Services.Implementations.Helpers;
 
 namespace Envirotrax.App.Server.Domain.Configuration;
 
@@ -28,6 +30,7 @@ public static class ServiceRegistration
         });
 
         services.AddInternalApi<AuthApiOptions>(configuration.GetSection("AuthApi"));
+        services.AddTransient<ITimeZoneHelperService, TimeZoneHelperService>();
 
         services.AddTransient<IWaterSupplierService, WaterSupplierService>();
         services.AddTransient<IGeneralSettingsService, GeneralSettingsService>();

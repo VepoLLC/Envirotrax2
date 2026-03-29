@@ -8,6 +8,7 @@ import { SharedComponentsModule } from './shared/components/shared.components.mo
 import { TitleStrategy } from '@angular/router';
 import { AppTitleStrategy } from './shared/services/helpers/title/app-title-strategy.service';
 import { AuthInterceptor } from './shared/services/auth/auth.iterceptor';
+import { TimeZoneInterceptor } from './shared/services/helpers/timezone/timezone.interceptor';
 import { ToastContainerComponent } from './toast-container/toast-container.component';
 
 @NgModule({
@@ -30,6 +31,11 @@ import { ToastContainerComponent } from './toast-container/toast-container.compo
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TimeZoneInterceptor,
       multi: true
     },
   ],

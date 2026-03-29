@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ViewChild, TemplateRef } from "@angular/core";
-import { ProfessionalUserLicense, professionalTypeLabels } from "../../../../../shared/models/professionals/licenses/professional-user-license";
+import { ExpirationType, ProfessionalUserLicense, professionalTypeLabels } from "../../../../../shared/models/professionals/licenses/professional-user-license";
 import { ProfessionalUserLicenseService } from "../../../../../shared/services/professionals/professional-user-license.service";
 import { ModalHelperService } from "../../../../../shared/services/helpers/modal-helper.service";
 import { ToastService } from "../../../../../shared/services/toast.service";
@@ -15,13 +15,16 @@ import { ModalSize } from "@developer-partners/ngx-modal-dialog";
     standalone: false
 })
 export class ProfessionalUserLicenseListComponent implements OnInit {
-    @Input() public userId!: number;
-
     @ViewChild('typeCell', { static: true })
     private typeCellTemplate!: TemplateRef<CellTemplateData<ProfessionalUserLicense>>;
 
     @ViewChild('dateCell', { static: true })
     private dateCellTemplate!: TemplateRef<CellTemplateData<ProfessionalUserLicense>>;
+
+    @Input()
+    public userId!: number;
+
+    public expirationType = ExpirationType;
 
     public table: TableViewModel<ProfessionalUserLicense> = {
         columns: [],
@@ -102,7 +105,6 @@ export class ProfessionalUserLicenseListComponent implements OnInit {
             model: { user: { id: this.userId } },
             size: ModalSize.large
         }).result().subscribe(() => {
-            this._toastService.successfullySaved("License");
             this.getLicenses();
         });
     }
@@ -113,7 +115,6 @@ export class ProfessionalUserLicenseListComponent implements OnInit {
             model: license,
             size: ModalSize.large
         }).result().subscribe(() => {
-            this._toastService.successfullySaved("License");
             this.getLicenses();
         });
     }

@@ -1,12 +1,19 @@
-import { Component, Input, OnInit, Optional } from "@angular/core";
-import { NgForm } from "@angular/forms";
+import { Component, Input, OnInit, Optional, SkipSelf } from "@angular/core";
+import { ControlContainer, NgForm } from "@angular/forms";
 import { FilterPanelComponent } from "./filter-panel.component";
 import { InputOption } from "../../../input/input.component";
 
 @Component({
     selector: 'vp-filter-panel-field',
     templateUrl: './filter-panel-field.component.html',
-    standalone: false
+    standalone: false,
+    viewProviders: [
+        {
+            provide: ControlContainer,
+            useFactory: (container: ControlContainer) => container,
+            deps: [[new SkipSelf(), new Optional(), ControlContainer]]
+        }
+    ]
 })
 export class FilterPanelFieldComponent implements OnInit {
     @Input()

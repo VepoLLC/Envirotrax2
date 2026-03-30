@@ -23,6 +23,26 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
         return nameof(ProfessionalWaterSupplier.WaterSupplierId);
     }
 
+    protected override IQueryable<ProfessionalWaterSupplier> GetListQuery()
+    {
+        return base.GetListQuery().Include(pws => pws.WaterSupplier);
+    }
+
+    protected override IQueryable<ProfessionalWaterSupplier> GetDetailsQuery()
+    {
+        return base.GetDetailsQuery().Include(pws => pws.WaterSupplier);
+    }
+
+    public override Task<IEnumerable<ProfessionalWaterSupplier>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        if (query.Sort.IsNullOrEmpty())
+        {
+            query.Sort[nameof(ProfessionalWaterSupplier.WaterSupplierId)] = SortOperator.Asc;
+        }
+
+        return base.GetAllAsync(pageInfo, query, cancellationToken);
+    }
+
     public async Task<IEnumerable<AvailableWaterSupplier>> GetAllAvailableSuppliersAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         var suppliersQuery = from supplier in DbContext.WaterSuppliers

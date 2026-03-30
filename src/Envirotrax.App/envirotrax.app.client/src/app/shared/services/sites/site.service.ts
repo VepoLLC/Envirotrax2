@@ -29,6 +29,14 @@ export class SiteService {
         return await lastValueFrom(observable);
     }
 
+    public async getAllForProfessional(pageInfo: PageInfo, query: Query): Promise<PagedData<Site>> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/sites');
+        const observable = this._http.get<PagedData<Site>>(url, {
+            params: this._queryHelper.buildQuery(pageInfo, query)
+        });
+        return await lastValueFrom(observable);
+    }
+
     public get(id: number): Promise<Site> {
         const url = this._urlResolver.resolveUrl(`/api/sites/${id}`);
 

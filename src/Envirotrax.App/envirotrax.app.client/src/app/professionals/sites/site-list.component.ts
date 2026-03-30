@@ -4,7 +4,7 @@ import { Site } from "../../shared/models/sites/site";
 import { SiteService } from "../../shared/services/sites/site.service";
 import { TableColumn } from "../../shared/components/data-components/table/table.component";
 import { ColumnType } from "../../shared/components/data-components/sorting-filtering/query-view-model";
-import { Query, QueryProperty } from "../../shared/models/query";
+import { QueryProperty } from "../../shared/models/query";
 import { NgForm } from "@angular/forms";
 import { InputOption } from "../../shared/components/input/input.component";
 import { ProfessionalSupplierService } from "../../shared/services/professionals/professional-supplier.service";
@@ -15,7 +15,6 @@ import { ProfessionalSupplierService } from "../../shared/services/professionals
 })
 export class SiteListComponent implements OnInit {
     public showResults: boolean = false;
-    public selectedWaterSupplierId: number | string = '';
     public waterSupplierOptions: InputOption[] = [];
 
     public table: TableViewModel<Site> = {
@@ -53,13 +52,7 @@ export class SiteListComponent implements OnInit {
     }
 
     public async ngOnInit(): Promise<void> {
-        const suppliers = await this._proSupplierService.getAllMy();
-        this.waterSupplierOptions = [
-            { id: '', text: 'Select a water supplier' },
-            ...suppliers.data
-                .filter(s => s.waterSupplier?.id)
-                .map(s => ({ id: s.waterSupplier!.id!, text: s.waterSupplier!.name ?? '' }))
-        ];
+        this.waterSupplierOptions = await this._proSupplierService.getMyAsOptions();
     }
 
     private getColumns(): TableColumn<Site>[] {
@@ -98,19 +91,11 @@ export class SiteListComponent implements OnInit {
     }
 
     public async getSites(): Promise<void> {
-        const queryWithSupplier: Query = {
-            ...this.table.query,
-            filter: [
-                ...(this.table.query.filter ?? []),
-                { columnName: 'waterSupplierId', comparisonOperator: 'Eq', value: String(this.selectedWaterSupplierId) }
-            ]
-        };
-
         try {
             this.table.isLoading = true;
             this.table.items = await this._siteService.getAllForProfessional(
                 this.table.items?.pageInfo || {},
-                queryWithSupplier
+                this.table.query
             );
         } finally {
             this.table.isLoading = false;

@@ -1,7 +1,9 @@
 <vp-input [label]="label"
           [type]="type"
+          [name]="fieldName"
           [(ngModel)]="value"
           [form]="form"
           [options]="options"
+          [required]="required"
           [borderColor]="borderColor"
           (ngModelChange)="onChange()" />

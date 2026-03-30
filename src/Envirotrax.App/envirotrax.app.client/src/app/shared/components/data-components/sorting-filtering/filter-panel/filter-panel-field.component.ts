@@ -28,6 +28,9 @@ export class FilterPanelFieldComponent implements OnInit {
     public options: InputOption[] = [];
 
     @Input()
+    public required: boolean = false;
+
+    @Input()
     public borderColor?: string;
 
     constructor(@Optional() private readonly _parent: FilterPanelComponent) {

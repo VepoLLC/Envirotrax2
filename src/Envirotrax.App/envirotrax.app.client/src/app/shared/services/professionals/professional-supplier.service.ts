@@ -7,6 +7,7 @@ import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { lastValueFrom } from "rxjs";
 import { AvailableWaterSupplier, ProfessionalWaterSupplier } from "../../models/professionals/professional-water-supplier";
+import { InputOption } from "../../components/input/input.component";
 
 @Injectable({
     providedIn: 'root'
@@ -28,6 +29,16 @@ export class ProfessionalSupplierService {
         });
 
         return lastValueFrom(obsertvable);
+    }
+
+    public async getMyAsOptions(): Promise<InputOption[]> {
+        const suppliers = await this.getAllMy();
+        return [
+            { id: '', text: 'Select a water supplier' },
+            ...suppliers.data
+                .filter(s => s.waterSupplier?.id)
+                .map(s => ({ id: String(s.waterSupplier!.id!), text: s.waterSupplier!.name ?? '' }))
+        ];
     }
 
     public getAllMy(): Promise<PagedData<ProfessionalWaterSupplier>> {

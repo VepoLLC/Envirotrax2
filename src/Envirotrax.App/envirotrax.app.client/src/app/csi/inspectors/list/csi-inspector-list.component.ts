@@ -1,19 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from "@angular/router";
-import { CsiInspectoreManagementService } from "../../shared/services/csi/csi-inspector-management.service";
-import { QueryProperty } from "../../shared/models/query";
-import { TableViewModel } from "../../shared/models/table-view-model";
-import { Professional } from "../../shared/models/professionals/professional";
-import { TableColumn } from "../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../shared/components/data-components/sorting-filtering/query-view-model";
+import { CsiInspectoreManagementService } from "../../../shared/services/csi/csi-inspector-management.service";
+import { QueryProperty } from "../../../shared/models/query";
+import { TableViewModel } from "../../../shared/models/table-view-model";
+import { Professional } from "../../../shared/models/professionals/professional";
+import { TableColumn } from "../../../shared/components/data-components/table/table.component";
+import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
 
 @Component({
-  selector: 'app-inspector-management',
+    selector: 'app-csi-inspector-list',
   standalone: false,
-  templateUrl: './inspector-management.component.html'
+    templateUrl: './csi-inspector-list.component.html'
 })
-export class InspectorManagementComponent implements OnInit {
+export class CsiInspectorListComponent implements OnInit {
     public showResults: boolean = false;
 
     public table: TableViewModel<Professional> = {

@@ -16,6 +16,8 @@ public class Professional : IAuditableModel<AppUser>
     [StringLength(255)]
     public string Name { get; set; } = null!;
 
+    [StringLength(100)]
+    public string? CompanyEmail { get; set; }
     public int? ParentId { get; set; }
     public Professional? Parent { get; set; }
 

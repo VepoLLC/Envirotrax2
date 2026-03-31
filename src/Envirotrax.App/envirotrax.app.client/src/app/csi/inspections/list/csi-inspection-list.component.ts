@@ -1,19 +1,19 @@
 import { Component, OnInit } from "@angular/core";
-import { TableViewModel } from "../../shared/models/table-view-model";
-import { CsiInspection } from "../../shared/models/csi/csi-inspection";
-import { CsiInspectionService } from "../../shared/services/csi/csi-inspection.service";
-import { TableColumn } from "../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../shared/components/data-components/sorting-filtering/query-view-model";
-import { QueryProperty } from "../../shared/models/query";
+import { TableViewModel } from "../../../shared/models/table-view-model";
+import { CsiInspection } from "../../../shared/models/csi/csi-inspection";
+import { CsiInspectionService } from "../../../shared/services/csi/csi-inspection.service";
+import { TableColumn } from "../../../shared/components/data-components/table/table.component";
+import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
+import { QueryProperty } from "../../../shared/models/query";
 import { NgForm } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
-import { InputOption } from "../../shared/components/input/input.component";
+import { InputOption } from "../../../shared/components/input/input.component";
 
 @Component({
     standalone: false,
-    templateUrl: './csi-search.component.html'
+    templateUrl: './csi-inspection-list.component.html'
 })
-export class CsiSearchComponent implements OnInit {
+export class CsiInspectionListComponent implements OnInit {
     public showResults: boolean = false;
 
     public table: TableViewModel<CsiInspection> = {

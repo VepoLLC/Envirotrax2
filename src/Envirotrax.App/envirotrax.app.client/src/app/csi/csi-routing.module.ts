@@ -1,20 +1,29 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
-import { CsiSearchComponent } from "./search/csi-search.component";
 import { PermissionGuard } from "../shared/guards/permission.guard";
 import { PermissionAction, PermissionType } from "../shared/models/permission-type";
-import { InspectorManagementComponent } from "./inspector-management/inspector-management.component";
+import { CsiInspectionListComponent } from "./inspections/list/csi-inspection-list.component";
+import { CsiInspectorListComponent } from "./inspectors/list/csi-inspector-list.component";
 
 const routes: Routes = [
     {
         path: 'inspectors',
         title: 'Inspector Management',
-        component: InspectorManagementComponent
+        component: CsiInspectorListComponent,
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.CsiInspectors,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
     },
     {
         path: '',
         title: 'CSI Search',
-        component: CsiSearchComponent,
+        component: CsiInspectionListComponent,
         canActivate: [PermissionGuard],
         data: {
             permissions: [
@@ -26,7 +35,6 @@ const routes: Routes = [
         }
     }
 ];
-
 @NgModule({
     imports: [
         RouterModule.forChild(routes)
@@ -35,6 +43,4 @@ const routes: Routes = [
         RouterModule
     ]
 })
-export class CsiRoutingModule {
-
-}
+export class CsiRoutingModule {}

@@ -4,13 +4,13 @@ import { FormsModule } from "@angular/forms";
 import { RouterModule } from "@angular/router";
 import { SharedComponentsModule } from "../shared/components/shared.components.module";
 import { CsiRoutingModule } from "./csi-routing.module";
-import { CsiSearchComponent } from "./search/csi-search.component";
-import { InspectorManagementComponent } from './inspector-management/inspector-management.component';
+import { CsiInspectionListComponent } from "./inspections/list/csi-inspection-list.component";
+import { CsiInspectorListComponent } from "./inspectors/list/csi-inspector-list.component";
 
-@NgModule({
+@NgModule({          
     declarations: [
-        CsiSearchComponent,
-        InspectorManagementComponent
+        CsiInspectionListComponent,
+        CsiInspectorListComponent
     ],
     imports: [
         CommonModule,

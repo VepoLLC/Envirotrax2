@@ -11,26 +11,26 @@
 # 2. Create a secret in your repository named AZURE_WEBAPP_PUBLISH_PROFILE, paste the publish profile contents as the value of the secret.
 #    For instructions on obtaining the publish profile see: https://docs.microsoft.com/azure/app-service/deploy-github-actions#configure-the-github-secret
 #
-# 3. Change the value for the AZURE_WEBAPP_NAME. Optionally, change the WEBAPP_PACKAGE_PATH and DOTNET_VERSION environment variables below.
+# 3. Change the value for the AZURE_WEBAPP_NAME. Optionally, change the AZURE_WEBAPP_PACKAGE_PATH and DOTNET_VERSION environment variables below.
 #
 # For more information on GitHub Actions for Azure: https://github.com/Azure/Actions
 # For more information on the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # For more samples to get started with GitHub Action workflows to deploy to Azure: https://github.com/Azure/actions-workflow-samples
 
-name: Envirotrax.Auth - Test - Deploy
+name: Envirotrax.App - Test - Deploy
 
 env:
-  AZURE_WEBAPP_NAME: envirotrax2-auth-test    # set this to the name of your Azure Web App
-  WEBAPP_PACKAGE_PATH: 'src/Envirotrax.Auth'      # set this to the path to your web app project, defaults to the repository root
-  WEBAPP_PROJECT_NAME: 'Envirotrax.Auth'
+  AZURE_WEBAPP_NAME: envirotrax2-app-test    # set this to the name of your Azure Web App
+  WEBAPP_PACKAGE_PATH: 'src/Envirotrax.App'      # set this to the path to your web app project, defaults to the repository root
+  WEBAPP_PROJECT_NAME: 'Envirotrax.App'
   DOTNET_VERSION: '10'                 # set this to the .NET Core version to use
-  ARTIFACT_PATH: './artifacts/Envirotrax.Auth'
+  ARTIFACT_PATH: './artifacts/Envirotrax.App'
 
 on:
   push:
     branches: [ "test" ]
     paths:
-      - "src/Envirotrax.Auth/**"
+      - "src/Envirotrax.App/**"
   workflow_dispatch:
 
 permissions:
@@ -58,7 +58,7 @@ jobs:
 
       - name: Build with dotnet
         working-directory: ${{ env.WEBAPP_PACKAGE_PATH }}
-        run: dotnet build --configuration Release
+        run: dotnet build --configuration Release /p:AngularEnvironment=test
 
       - name: dotnet publish
         working-directory: ${{ env.WEBAPP_PACKAGE_PATH }}
@@ -87,7 +87,7 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.ENVIROTRAX_AUTH_TEST_APP_SERVICE_CLIENT_ID }}
+          client-id: ${{ secrets.ENVIROTRAX_APP_TEST_APP_SERVICE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 

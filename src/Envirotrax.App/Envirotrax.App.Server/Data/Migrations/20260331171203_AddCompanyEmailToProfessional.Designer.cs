@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260331171203_AddCompanyEmailToProfessional")]
+    partial class AddCompanyEmailToProfessional
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -323,83 +326,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("WaterSupplierId", "SiteId");
 
                     b.ToTable("CsiInspections");
-                });
-
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.Licenses.ProfessionalLicenseType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("ProfessionalType")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("StateId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StateId");
-
-                    b.ToTable("ProfessionalLicenseTypes");
-                });
-
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.Licenses.ProfessionalUserLicense", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ExpirationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LicenseNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("LicenseTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProfessionalId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProfessionalType")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("LicenseTypeId");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("ProfessionalId", "UserId");
-
-                    b.ToTable("ProfessionalUserLicenses");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.Professional", b =>
@@ -1510,56 +1436,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("UpdatedBy");
 
                     b.Navigation("WaterSupplier");
-                });
-
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.Licenses.ProfessionalLicenseType", b =>
-                {
-                    b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "State")
-                        .WithMany()
-                        .HasForeignKey("StateId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("State");
-                });
-
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.Licenses.ProfessionalUserLicense", b =>
-                {
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Licenses.ProfessionalLicenseType", "LicenseType")
-                        .WithMany()
-                        .HasForeignKey("LicenseTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
-                        .WithMany()
-                        .HasForeignKey("ProfessionalId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalUser", null)
-                        .WithMany()
-                        .HasForeignKey("ProfessionalId", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("LicenseType");
-
-                    b.Navigation("Professional");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.Professional", b =>

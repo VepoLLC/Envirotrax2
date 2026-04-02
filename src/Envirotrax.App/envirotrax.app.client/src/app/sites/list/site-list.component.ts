@@ -120,6 +120,7 @@ export class SiteListComponent implements OnInit {
         try {
             this.table.isLoading = true;
             this.table.items = await this._siteService.getAll(this.table.items?.pageInfo || {}, this.table.query);
+            console.log(this.table.items);    
         } finally {
             this.table.isLoading = false;
         }
@@ -144,7 +145,6 @@ export class SiteListComponent implements OnInit {
     }
 
     public edit(site: Site): void {
-        console.log('event');
         this._router.navigate([site.id, 'edit'], {
             relativeTo: this._activatedRoute
         });

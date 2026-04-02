@@ -7,4 +7,3 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Csi
     {
     }
 }
-

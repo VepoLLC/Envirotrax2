@@ -56,10 +56,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      - name: Build with dotnet
-        working-directory: ${{ env.WEBAPP_PACKAGE_PATH }}
-        run: dotnet build --configuration Release
-
       - name: dotnet publish
         working-directory: ${{ env.WEBAPP_PACKAGE_PATH }}
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/${{env.WEBAPP_PROJECT_NAME}}

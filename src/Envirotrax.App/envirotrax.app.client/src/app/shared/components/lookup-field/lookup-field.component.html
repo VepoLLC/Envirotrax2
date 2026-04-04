@@ -1,0 +1,17 @@
+<label *ngIf="label" class="form-label">{{ label }}</label>
+<div class="input-group" (click)="onSearch()">
+    <input type="text"
+           [name]="name"
+           class="form-control"
+           [ngModel]="displayText || ''"
+           readonly
+           [required]="true" />
+    <button *ngIf="canSearch"
+            type="button"
+            title="Click to Search"
+            class="btn btn-primary"
+            aria-label="Click to search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+    </button>
+</div>
+<vp-validation-field *ngIf="form" [fieldName]="name" [form]="form" [fieldLabel]="label" />

@@ -1,8 +1,9 @@
+import { ProfessionalUser } from "../professional-user";
 import { ProfessionalLicenseType } from "./professional-license-type";
 
 export interface ProfessionalUserLicense {
     id?: number;
-    user?: { id?: number };
+    user?: ProfessionalUser;
     professionalType?: ProfessionalType;
     licenseType?: ProfessionalLicenseType;
     licenseNumber?: string;

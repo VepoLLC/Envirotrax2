@@ -48,6 +48,16 @@ export class ProfessionalUserLicenseService {
         return options;
     }
 
+    public getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<ProfessionalUserLicense>> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/licenses');
+
+        const observable = this._http.get<PagedData<ProfessionalUserLicense>>(url, {
+            params: this._queryHelper.buildQuery(pageInfo, query)
+        });
+
+        return lastValueFrom(observable);
+    }
+
     public getForUser(userId: number, pageInfo: PageInfo, query: Query): Promise<PagedData<ProfessionalUserLicense>> {
         const url = this._urlResolver.resolveUrl(`/api/professionals/${userId}/licenses`);
 

@@ -9,6 +9,8 @@ import { ColumnType } from "../../../shared/components/data-components/sorting-f
 import { ProfesisonalService } from "../../../shared/services/professionals/professional.service";
 import { NgForm } from "@angular/forms";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
+import { EditInsuranceComponent } from "../edit/edit-insurance.component";
+import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 
 @Component({
     selector: 'vp-insurance-list',
@@ -73,11 +75,6 @@ export class InsuranceListComponent implements OnInit {
     private getColumns(): TableColumn<ProfessionalInsurance>[] {
         return [
             {
-                field: 'professional.name',
-                caption: 'Professional',
-                type: ColumnType.text
-            },
-            {
                 field: 'insuranceNumber',
                 caption: 'Insurance Number',
                 type: ColumnType.text
@@ -101,6 +98,14 @@ export class InsuranceListComponent implements OnInit {
         } finally {
             this.table.isLoading = false;
         }
+    }
+
+    public edit(insurance: ProfessionalInsurance): void {
+        this._modalHelper.show<ProfessionalInsurance>(EditInsuranceComponent, {
+            title: 'Edit Insurance Policy',
+            model: insurance,
+            size: ModalSize.large
+        }).result().subscribe(() => this.getInsurances());
     }
 
     public delete(insurance: ProfessionalInsurance): void {

@@ -134,7 +134,7 @@ export class InsuranceListComponent implements OnInit {
                 this._toastService.show({
                     type: ToastType.Success,
                     text: 'Your insurance has been submitted for validation. The validation process may take anywhere from an hour up to 1 business day to process.'
-                })
+                });
 
                 this.resetNewInsurance();
                 this.getInsurances();

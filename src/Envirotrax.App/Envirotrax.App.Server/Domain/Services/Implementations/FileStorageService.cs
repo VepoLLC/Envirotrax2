@@ -12,7 +12,6 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations;
 
 public class FileStorageService : IFileStorageService
 {
-
     private readonly BlobServiceClient _blobServiceClient;
     private readonly BlobContainerClient _defaultContainerClient;
 
@@ -95,5 +94,11 @@ public class FileStorageService : IFileStorageService
     {
         var delegationKey = await GetUserDelegationKeyAsync();
         return await GenerateSasUrlAsync(delegationKey, blobName);
+    }
+
+    public async Task<bool> DeleteAsync(string blobName)
+    {
+        var blobClient = _defaultContainerClient.GetBlobClient(blobName);
+        return await blobClient.DeleteIfExistsAsync();
     }
 }

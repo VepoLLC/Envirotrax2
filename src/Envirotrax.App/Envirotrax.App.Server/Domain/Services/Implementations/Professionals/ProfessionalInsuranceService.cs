@@ -62,4 +62,20 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
             return added;
         }
     }
+
+    public override async Task<ProfessionalInsuranceDto?> DeleteAsync(int id)
+    {
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            var deleted = await base.DeleteAsync(id);
+
+            if (deleted != null)
+            {
+                await _fileStorageService.DeleteAsync(deleted.FilePath!);
+                scope.Complete();
+            }
+
+            return deleted;
+        }
+    }
 }

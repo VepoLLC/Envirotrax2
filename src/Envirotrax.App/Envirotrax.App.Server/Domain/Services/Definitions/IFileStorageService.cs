@@ -11,4 +11,6 @@ public interface IFileStorageService
 
     // Use this function when need to generate SAS URLs in a foreach loop. First, generate delegation key, then pass it to this funciton in a foreach loop.
     Task<Uri> GenerateSasUrlAsync(UserDelegationKey delegationKey, string blobName);
+
+    Task<bool> DeleteAsync(string blobName);
 }

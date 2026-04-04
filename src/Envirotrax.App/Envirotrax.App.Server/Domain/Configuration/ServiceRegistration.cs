@@ -32,6 +32,9 @@ public static class ServiceRegistration
         services.AddInternalApi<AuthApiOptions>(configuration.GetSection("AuthApi"));
         services.AddTransient<ITimeZoneHelperService, TimeZoneHelperService>();
 
+        services.Configure<FileStorageOptions>(configuration.GetSection("FileStorage"));
+        services.AddTransient<IFileStorageService, FileStorageService>();
+
         services.AddTransient<IWaterSupplierService, WaterSupplierService>();
         services.AddTransient<IGeneralSettingsService, GeneralSettingsService>();
         services.AddTransient<ISiteService, SiteService>();
@@ -50,6 +53,7 @@ public static class ServiceRegistration
         services.AddTransient<IProfessionalSupplierService, ProfessionalSupplierService>();
         services.AddTransient<IProfessionalUserLicenseService, ProfessionalUserLicenseService>();
         services.AddTransient<IProfessionalLicenseTypeService, ProfessionalLicenseTypeService>();
+        services.AddTransient<IProfessionalInsuranceService, ProfessionalInsuranceService>();
 
         return services;
     }

@@ -1,0 +1,125 @@
+<div class="text-center mb-4">
+    <h1 class="h2">
+        License and Insurance Policy Management
+    </h1>
+</div>
+
+<div class="mb-3">
+    <ng-template #dateCell let-insurance="rowData">
+        <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
+             [class.text-bg-primary]="!insurance.expirationDate"
+             [class.text-bg-success]="insurance.expirationDate && insurance.expirationType == expirationType.Valid"
+             [class.text-bg-warning]="insurance.expirationDate && insurance.expirationType == expirationType.AboutToExpire"
+             [class.text-bg-danger]="insurance.expirationDate && insurance.expirationType == expirationType.Expired"
+             [attr.aria-label]="!insurance.expirationDate ? 'Validating' : insurance.expirationType == expirationType.Valid ? 'Valid' : insurance.expirationType == expirationType.AboutToExpire ? 'About to Expire' : 'Expired'">
+            {{ insurance.expirationDate ? (insurance.expirationDate | date) : 'Validating...' }}
+        </div>
+    </ng-template>
+
+    <vp-section header="Insurance Policy Management">
+        <div dp-spinner-parent>
+            <dp-loading-spinner *ngIf="table.isLoading" />
+
+            <vp-table *ngIf="table.items"
+                      [columns]="table.columns!"
+                      [data]="table.items.data"
+                      [canDelete]="true"
+                      (delete)="delete($event)"
+                      [(pageInfo)]="table.items.pageInfo"
+                      (pageInfoChange)="getInsurances()"
+                      [(query)]="table.query"
+                      (queryChange)="getInsurances()"
+                      (queryReset)="getInsurances()"
+                      [freeTextSearch]="table.freeTextSearch" />
+        </div>
+    </vp-section>
+</div>
+
+<vp-section header="Register New Insurance Policy">
+    <p class="text-center text-danger fw-bold">
+        Please read the following important information on how to register and manage your insurance policies
+    </p>
+
+    <h3 class="text-bg-light p-2 border h6">Adding Insurance Policies</h3>
+    <div class="mx-1">
+        <p>
+            When registering an insurance policy, you must upload an electronic copy of your Certificate of Insurance
+            (COI)
+            by clicking the <strong>Choose File</strong> button and selecting the file to upload. Once received, our
+            staff
+            will validate the policy by entering the expiration date.
+        </p>
+        <p>
+            Verify that all information is correct, then click the <strong>Register New Insurance Policy</strong> button
+            to submit your policy for review.
+        </p>
+    </div>
+
+    <h3 class="text-bg-light p-2 border h6">Renewing Your Insurance Policies</h3>
+    <div class="mx-1">
+        <p>
+            To renew an insurance policy, enter the new policy number and upload an updated Certificate of Insurance
+            (COI).
+            Policies are typically validated within an hour, but may take up to one business day in rare cases.
+        </p>
+    </div>
+
+    <h3 class="text-bg-light p-2 border h6">Reinstating Expired Insurance Policies</h3>
+    <div class="mx-3">
+        <p>
+            If your insurance policy has expired, you must obtain a renewed policy from your insurance provider before
+            reinstating it in the system. Once you have the updated policy, contact us so our staff can verify and
+            update
+            it.
+        </p>
+    </div>
+
+    <div *ngIf="newInsurance" class="d-flex justify-content-center" dp-spinner-parent>
+        <dp-loading-spinner *ngIf="isNewInsuranceLoading" />
+        <form #form="ngForm" (ngSubmit)="saveInsurance(form)">
+            <div class="mb-3">
+                <vp-input name="insuranceNumber"
+                          label="Policy number"
+                          [(ngModel)]="newInsurance.insuranceNumber"
+                          [required]="true"
+                          [maxLength]="50"
+                          [form]="form" />
+            </div>
+
+            <div class="mb-3">
+                <p>
+                    Please click on the Choose File button below and select the Certificate of Insurance (COI) you
+                </p>
+
+                <vp-file-upload name="coiFile"
+                                validationLabel="Certificate of Insurance (COI)"
+                                [(ngModel)]="certificateFile"
+                                [required]="true"
+                                [form]="form" />
+            </div>
+
+            <div class="form-check mb-3">
+                <input type="checkbox"
+                       class="form-check-input"
+                       [(ngModel)]="hasReadHelp"
+                       name="hasReadHelp"
+                       required>
+                <label class="form-check-label"
+                       [class.text-danger]="form.submitted && !hasReadHelp">
+                    I have read and understand the requirements and process of registering an insurance policy in my
+                    account.
+                </label>
+            </div>
+
+            <div class="mt-3">
+                <vp-validation-summary [form]="form" [validationErrors]="newInsuranceValidationErrors" />
+
+                <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary w-100">
+                        Submit New Insurance Policy
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</vp-section>

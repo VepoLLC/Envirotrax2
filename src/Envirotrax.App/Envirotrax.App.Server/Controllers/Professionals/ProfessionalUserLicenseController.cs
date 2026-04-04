@@ -6,7 +6,7 @@ using Envirotrax.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Envirotrax.App.Server.Controllers.Professionals.Licenses;
+namespace Envirotrax.App.Server.Controllers.Professionals;
 
 [Route("api/professionals/licenses")]
 [Authorize(Roles = RoleDefinitions.Professionals.Admin)]

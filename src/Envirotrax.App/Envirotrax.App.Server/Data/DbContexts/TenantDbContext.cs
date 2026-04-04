@@ -5,7 +5,6 @@ using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.States;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.Common.Data.DbContexts;
-using Envirotrax.Common.Data.Models;
 using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
@@ -29,6 +28,7 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
     public DbSet<ProfessionalWaterSupplier> ProfessionalWaterSuppliers { get; set; }
     public DbSet<ProfessionalLicenseType> ProfessionalLicenseTypes { get; set; }
     public DbSet<ProfessionalUserLicense> ProfessionalUserLicenses { get; set; }
+    public DbSet<ProfessionalInsurance> ProfessionalInsurances { get; set; }
 
     public DbSet<State> States { get; set; }
     public DbSet<Site> Sites { get; set; }

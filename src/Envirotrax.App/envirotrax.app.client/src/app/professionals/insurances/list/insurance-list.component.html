@@ -4,6 +4,17 @@
     </h1>
 </div>
 
+<div class="text-center mb-3">
+    <ul class="vp-tabs nav nav-pills settings-tabs d-inline-flex">
+        <li class="nav-item">
+            <a class="nav-link active" [routerLink]="['/professionals/insurances']">Insurance Policies</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/professionals/licenses']">Licenses</a>
+        </li>
+    </ul>
+</div>
+
 <div class="mb-3">
     <ng-template #dateCell let-insurance="rowData">
         <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
@@ -18,11 +29,13 @@
 
     <vp-section header="Insurance Policy Management">
         <div dp-spinner-parent>
-            <dp-loading-spinner *ngIf="table.isLoading" />
+            <dp-loading-spinner *ngIf="table.isLoading" message="Loading Insurances" />
 
             <vp-table *ngIf="table.items"
                       [columns]="table.columns!"
                       [data]="table.items.data"
+                      [canEdit]="true"
+                      (edit)="edit($event)"
                       [canDelete]="true"
                       (delete)="delete($event)"
                       [(pageInfo)]="table.items.pageInfo"

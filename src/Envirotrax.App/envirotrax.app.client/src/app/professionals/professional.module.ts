@@ -12,6 +12,9 @@ import { ProfessionalUserLicenseListComponent } from "./users/edit/licenses/list
 import { CreateEditLicenseComponent } from "./users/edit/licenses/create-edit/create-edit-license.component";
 import { SiteListComponent } from "./sites/site-list.component";
 import { InsuranceListComponent } from "./insurances/list/insurance-list.component";
+import { EditInsuranceComponent } from "./insurances/edit/edit-insurance.component";
+import { LicenseHelpTextComponent } from "./users/edit/licenses/help-text/license-help-text.component";
+import { LicenseListComponent } from "./licenses/license-list.component";
 
 @NgModule({
     declarations: [
@@ -21,9 +24,12 @@ import { InsuranceListComponent } from "./insurances/list/insurance-list.compone
         CreateProfessionalUserComponent,
         EditProfessionalUserComponent,
         ProfessionalUserLicenseListComponent,
+        LicenseHelpTextComponent,
         CreateEditLicenseComponent,
         SiteListComponent,
-        InsuranceListComponent
+        InsuranceListComponent,
+        EditInsuranceComponent,
+        LicenseListComponent
     ],
     imports: [
         ProfessionalRoutingModule,

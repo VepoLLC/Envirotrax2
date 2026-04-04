@@ -7,6 +7,7 @@ import { SiteListComponent } from "./sites/site-list.component";
 import { RoleGuard } from "../shared/guards/role.guard";
 import { ROLE_DEFINITIONS } from "../shared/models/role-definitions";
 import { InsuranceListComponent } from "./insurances/list/insurance-list.component";
+import { LicenseListComponent } from "./licenses/license-list.component";
 
 const routes: Routes = [
     {
@@ -49,6 +50,15 @@ const routes: Routes = [
         path: 'insurances',
         title: 'Insurances',
         component: InsuranceListComponent,
+        canActivate: [RoleGuard],
+        data: {
+            roles: [ROLE_DEFINITIONS.PROFESSIONALS.ADMIN]
+        }
+    },
+    {
+        path: 'licenses',
+        title: 'Licenses',
+        component: LicenseListComponent,
         canActivate: [RoleGuard],
         data: {
             roles: [ROLE_DEFINITIONS.PROFESSIONALS.ADMIN]

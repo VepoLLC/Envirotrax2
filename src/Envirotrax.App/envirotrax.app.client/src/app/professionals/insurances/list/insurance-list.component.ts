@@ -2,11 +2,13 @@ import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { ExpirationType, ProfessionalInsurance } from "../../../shared/models/professionals/professional-insurance";
 import { ProfessionalInsuranceService } from "../../../shared/services/professionals/professional-insurance.service";
 import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
-import { ToastService } from "../../../shared/services/toast.service";
+import { ToastService, ToastType } from "../../../shared/services/toast.service";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { CellTemplateData, TableColumn } from "../../../shared/components/data-components/table/table.component";
 import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { ProfesisonalService } from "../../../shared/services/professionals/professional.service";
+import { NgForm } from "@angular/forms";
+import { HelperService } from "../../../shared/services/helpers/helper.service";
 
 @Component({
     selector: 'vp-insurance-list',
@@ -28,7 +30,7 @@ export class InsuranceListComponent implements OnInit {
     };
 
     public newInsurance?: ProfessionalInsurance;
-    public coiFile: File | null = null;
+    public certificateFile: File | null = null;
     public hasReadHelp: boolean = false;
     public newInsuranceValidationErrors: string[] = [];
     public isNewInsuranceLoading: boolean = false;
@@ -41,14 +43,15 @@ export class InsuranceListComponent implements OnInit {
         private readonly _insuranceService: ProfessionalInsuranceService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService,
-        private readonly _professionalService: ProfesisonalService
+        private readonly _professionalService: ProfesisonalService,
+        private readonly _helperService: HelperService
     ) { }
 
     public async ngOnInit(): Promise<void> {
         this.table.columns = this.getColumns();
 
         this.getInsurances();
-        this.newInsurance = await this.newInsuranceObject()
+        this.resetNewInsurance();
     }
 
     private async newInsuranceObject(): Promise<ProfessionalInsurance> {
@@ -59,6 +62,12 @@ export class InsuranceListComponent implements OnInit {
                 id: pro.id
             }
         };
+    }
+
+    private async resetNewInsurance(): Promise<void> {
+        this.newInsurance = await this.newInsuranceObject()
+        this.hasReadHelp = false;
+        this.certificateFile = null;
     }
 
     private getColumns(): TableColumn<ProfessionalInsurance>[] {
@@ -108,5 +117,33 @@ export class InsuranceListComponent implements OnInit {
 
                 await this.getInsurances();
             });
+    }
+
+    public certificateFileSelected(file: File | null): void {
+        this.certificateFile = file;
+    }
+
+    public async saveInsurance(form: NgForm): Promise<void> {
+        if (form.valid) {
+            try {
+                this.isNewInsuranceLoading = true;
+                this.newInsuranceValidationErrors = [];
+
+                await this._insuranceService.add(this.newInsurance!, this.certificateFile!);
+
+                this._toastService.show({
+                    type: ToastType.Success,
+                    text: 'Your insurance has been submitted for validation. The validation process may take anywhere from an hour up to 1 business day to process.'
+                })
+
+                this.resetNewInsurance();
+                this.getInsurances();
+                form.resetForm();
+            } catch (e) {
+
+            } finally {
+                this.isNewInsuranceLoading = false;
+            }
+        }
     }
 }

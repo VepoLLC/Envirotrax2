@@ -76,7 +76,7 @@
 
     <div *ngIf="newInsurance" class="d-flex justify-content-center" dp-spinner-parent>
         <dp-loading-spinner *ngIf="isNewInsuranceLoading" />
-        <form #form="ngForm">
+        <form #form="ngForm" (ngSubmit)="saveInsurance(form)">
             <div class="mb-3">
                 <vp-input name="insuranceNumber"
                           label="Policy number"
@@ -93,7 +93,7 @@
 
                 <vp-file-upload name="coiFile"
                                 validationLabel="Certificate of Insurance (COI)"
-                                [(ngModel)]="coiFile"
+                                [(ngModel)]="certificateFile"
                                 [required]="true"
                                 [form]="form" />
             </div>

@@ -17,8 +17,6 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals.Licenses
 using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
-using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals.Insurances;
-using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals.Insurances;
 
 namespace Envirotrax.App.Server.Data.Configuration;
 

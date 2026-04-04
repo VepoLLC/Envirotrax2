@@ -5,12 +5,10 @@ using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.States;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.Common.Data.DbContexts;
-using Envirotrax.Common.Data.Models;
 using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using System.Reflection;
-using Envirotrax.App.Server.Data.Models.Professionals.Insurances;
 
 namespace Envirotrax.App.Server.Data.DbContexts;
 

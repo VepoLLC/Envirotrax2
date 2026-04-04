@@ -1,7 +1,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Insurances;
+namespace Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 
 public class ProfessionalInsuranceDto
 {
@@ -17,6 +17,15 @@ public class ProfessionalInsuranceDto
     public string InsuranceNumber { get; set; } = null!;
 
     public string? FilePath { get; set; }
+
+    public ExpirationType ExpirationType { get; set; }
+}
+
+public enum ExpirationType
+{
+    Valid,
+    AboutToExpire,
+    Expired
 }
 
 public class CreateInsuranceDto : ProfessionalInsuranceDto

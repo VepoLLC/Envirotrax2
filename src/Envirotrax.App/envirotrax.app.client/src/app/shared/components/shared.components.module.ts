@@ -27,6 +27,7 @@ import { NgSelectModule } from "@ng-select/ng-select";
 import { InputOptionComponent } from "./input/input-option.component";
 import { WaterSupplierHierarchyComponent } from "./water-supplier-hierarchy/water-supplier-hierarchy.component";
 import { InfoIconComponent } from "./info-icon/info-icon.component";
+import { FileUploadComponent } from "./file-upload/file-upload.component";
 
 @NgModule({
     declarations: [
@@ -51,7 +52,8 @@ import { InfoIconComponent } from "./info-icon/info-icon.component";
         FilterPanelComponent,
         FilterPanelFieldComponent,
         WaterSupplierHierarchyComponent,
-        InfoIconComponent
+        InfoIconComponent,
+        FileUploadComponent
     ],
     imports: [
         CommonModule,
@@ -78,7 +80,8 @@ import { InfoIconComponent } from "./info-icon/info-icon.component";
         FilterPanelComponent,
         FilterPanelFieldComponent,
         WaterSupplierHierarchyComponent,
-        InfoIconComponent
+        InfoIconComponent,
+        FileUploadComponent
     ]
 })
 export class SharedComponentsModule {

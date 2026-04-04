@@ -1,7 +1,7 @@
 
-using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Insurances;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions;
-using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Insurances;
+using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

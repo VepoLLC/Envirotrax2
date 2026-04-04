@@ -4,7 +4,7 @@ using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
 
-namespace Envirotrax.App.Server.Data.Models.Professionals.Insurances;
+namespace Envirotrax.App.Server.Data.Models.Professionals;
 
 public class ProfessionalInsurance : IProfessionalModel, ICreateAuditableModel<AppUser>
 {

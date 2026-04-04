@@ -443,16 +443,9 @@ export class App implements OnInit {
             hasFeature: true
           },
           {
-            title: 'Notification Management',
-            iconCss: 'fa-regular fa-bell',
-            routerLink: ['/'],
-            hasPermission: isAdmin,
-            hasFeature: true
-          },
-          {
-            title: 'GIS Area Management',
-            iconCss: 'fa-solid fa-globe',
-            routerLink: ['/'],
+            title: 'Licenses & Insurance Policies',
+            iconCss: 'fa-solid fa-shield-halved',
+            routerLink: ['professionals/insurances'],
             hasPermission: isAdmin,
             hasFeature: true
           }

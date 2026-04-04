@@ -6,6 +6,7 @@ import { EditProfessionalUserComponent } from "./users/edit/edit-professional-us
 import { SiteListComponent } from "./sites/site-list.component";
 import { RoleGuard } from "../shared/guards/role.guard";
 import { ROLE_DEFINITIONS } from "../shared/models/role-definitions";
+import { InsuranceListComponent } from "./insurances/list/insurance-list.component";
 
 const routes: Routes = [
     {
@@ -42,6 +43,15 @@ const routes: Routes = [
         canActivate: [RoleGuard],
         data: {
             roles: [ROLE_DEFINITIONS.PROFESSIONAL]
+        }
+    },
+    {
+        path: 'insurances',
+        title: 'Insurances',
+        component: InsuranceListComponent,
+        canActivate: [RoleGuard],
+        data: {
+            roles: [ROLE_DEFINITIONS.PROFESSIONALS.ADMIN]
         }
     }
 ];

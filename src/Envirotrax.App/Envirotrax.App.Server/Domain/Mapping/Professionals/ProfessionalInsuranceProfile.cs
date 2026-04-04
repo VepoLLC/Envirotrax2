@@ -1,14 +1,15 @@
 
 using AutoMapper;
-using Envirotrax.App.Server.Data.Models.Professionals.Insurances;
+using Envirotrax.App.Server.Data.Models.Professionals;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 
-namespace Envirotrax.App.Server.Domain.Mapping.Professionals.Insurances;
+namespace Envirotrax.App.Server.Domain.Mapping.Professionals;
 
 public class ProfessionalInsuranceProfile : Profile
 {
     public ProfessionalInsuranceProfile()
     {
-        CreateMap<ProfessionalInsurance, ProfessionalInsurance>()
+        CreateMap<ProfessionalInsurance, ProfessionalInsuranceDto>()
             .AfterMap((model, dto) =>
             {
                 dto.Professional ??= new()

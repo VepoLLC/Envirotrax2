@@ -1,0 +1,38 @@
+<label class="drop-zone w-100"
+       [class.drag-over]="isDragOver"
+       [class.has-file]="file"
+       (dragover)="onDragOver($event)"
+       (dragleave)="onDragLeave($event)"
+       (drop)="onDrop($event)">
+
+    <input type="file"
+           class="d-none"
+           [accept]="accept"
+           (change)="onFileSelected($event)" />
+
+    <ng-container *ngIf="!file">
+        <div class="file-icon text-secondary">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+        </div>
+        <div class="text-secondary">{{ label }}</div>
+        <div class="text-muted small mt-1">or click to browse</div>
+    </ng-container>
+
+    <ng-container *ngIf="file">
+        <div class="file-icon text-success">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+        </div>
+        <div class="fw-semibold text-truncate">{{ file.name }}</div>
+        <div class="text-muted small mt-1">{{ formatSize(file.size) }}</div>
+        <button type="button"
+                class="btn btn-sm btn-danger mt-2"
+                (click)="clear($event)">
+            Remove
+        </button>
+    </ng-container>
+
+</label>
+
+<div>
+    <vp-validation-field *ngIf="form" [form]="form" [fieldName]="name" [fieldLabel]="validationLabel" />
+</div>

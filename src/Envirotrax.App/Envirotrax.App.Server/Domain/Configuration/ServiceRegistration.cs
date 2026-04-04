@@ -16,9 +16,6 @@ using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Implementations.Helpers;
-using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Insurances;
-using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Insurances;
-using Envirotrax.App.Server.Domain.Services.Implementations.Professionals.Insurances;
 
 namespace Envirotrax.App.Server.Domain.Configuration;
 

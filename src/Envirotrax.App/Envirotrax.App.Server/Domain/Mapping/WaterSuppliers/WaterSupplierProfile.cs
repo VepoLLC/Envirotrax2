@@ -25,6 +25,8 @@ public class WaterSupplierProfile : Profile
             .ForMember(supplier => supplier.ParentId, opt => opt.MapFrom(supplier => supplier.Parent!.Id));
 
         CreateMap<WaterSupplier, ReferencedWaterSupplierDto>()
-            .ReverseMap();
+            .ForMember(dto => dto.StateAbbreviation, opt => opt.MapFrom(ws => ws.State != null ? ws.State.Code : null))
+            .ReverseMap()
+            .ForMember(ws => ws.State, opt => opt.Ignore());
     }
 }

@@ -1,12 +1,15 @@
 using System.ComponentModel.DataAnnotations;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
+using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 
 public class SiteDto : IDto
 {
     public int Id { get; set; }
+
+    public ReferencedWaterSupplierDto? WaterSupplier { get; set; }
 
     [StringLength(10)]
     public string? SubArea { get; set; }
@@ -33,6 +36,7 @@ public class SiteDto : IDto
     public string? City { get; set; }
 
     public int? StateId { get; set; }
+    public string? StateCode { get; set; }
 
     [StringLength(50)]
     public string? ZipCode { get; set; }
@@ -56,6 +60,7 @@ public class SiteDto : IDto
     public string? MailingCity { get; set; }
 
     public int? MailingStateId { get; set; }
+    public string? MailingStateCode { get; set; }
 
     [StringLength(50)]
     public string? MailingZipCode { get; set; }

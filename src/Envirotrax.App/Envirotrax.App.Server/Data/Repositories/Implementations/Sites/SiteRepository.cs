@@ -23,6 +23,7 @@ public class SiteRepository : Repository<Site>, ISiteRepository
     {
         return base.GetDetailsQuery()
             .Include(s => s.State)
-            .Include(s => s.MailingState);
+            .Include(s => s.MailingState)
+            .Include(s => s.WaterSupplier).ThenInclude(ws => ws!.State);
     }
 }

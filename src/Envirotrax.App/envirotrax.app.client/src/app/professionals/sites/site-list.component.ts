@@ -1,4 +1,5 @@
 import { Component, OnInit } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
 import { TableViewModel } from "../../shared/models/table-view-model";
 import { Site } from "../../shared/models/sites/site";
 import { SiteService } from "../../shared/services/sites/site.service";
@@ -47,7 +48,9 @@ export class SiteListComponent implements OnInit {
 
     constructor(
         private readonly _siteService: SiteService,
-        private readonly _proSupplierService: ProfessionalSupplierService
+        private readonly _proSupplierService: ProfessionalSupplierService,
+        private readonly _router: Router,
+        private readonly _activatedRoute: ActivatedRoute
     ) {
     }
 
@@ -111,5 +114,9 @@ export class SiteListComponent implements OnInit {
             await this.getSites();
             this.showResults = true;
         }
+    }
+
+    public viewSite(site: Site): void {
+        this._router.navigate([site.id], { relativeTo: this._activatedRoute });
     }
 }

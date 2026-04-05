@@ -11,6 +11,7 @@ import { EditProfessionalUserComponent } from "./users/edit/edit-professional-us
 import { ProfessionalUserLicenseListComponent } from "./users/edit/licenses/list/professional-user-license-list.component";
 import { CreateEditLicenseComponent } from "./users/edit/licenses/create-edit/create-edit-license.component";
 import { SiteListComponent } from "./sites/site-list.component";
+import { SiteDetailsComponent } from "./sites/details/site-details.component";
 
 @NgModule({
     declarations: [
@@ -21,7 +22,8 @@ import { SiteListComponent } from "./sites/site-list.component";
         EditProfessionalUserComponent,
         ProfessionalUserLicenseListComponent,
         CreateEditLicenseComponent,
-        SiteListComponent
+        SiteListComponent,
+        SiteDetailsComponent
     ],
     imports: [
         ProfessionalRoutingModule,

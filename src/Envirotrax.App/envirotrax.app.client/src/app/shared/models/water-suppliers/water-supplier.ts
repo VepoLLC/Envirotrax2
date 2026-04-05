@@ -10,6 +10,7 @@ export class WaterSupplier {
     address?: string;
     city?: string;
     stateId?: number | null;
+    stateAbbreviation?: string;
     zipCode?: string;
     phoneNumber?: string;
     faxNumber?: string;

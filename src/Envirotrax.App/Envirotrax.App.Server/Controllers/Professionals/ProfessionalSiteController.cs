@@ -21,4 +21,12 @@ public class ProfessionalSiteController : ProfessionalProtectedController
         var result = await _siteService.GetAllAsync(pageInfo, query, cancellationToken);
         return Ok(result);
     }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
+    {
+        var result = await _siteService.GetAsync(id, cancellationToken);
+        if (result == null) return NotFound();
+        return Ok(result);
+    }
 }

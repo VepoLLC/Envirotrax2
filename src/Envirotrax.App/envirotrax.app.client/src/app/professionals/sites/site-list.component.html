@@ -159,6 +159,8 @@
                   [(query)]="table.query"
                   (queryChange)="getSites()"
                   (queryReset)="getSites()"
-                  [freeTextSearch]="table.freeTextSearch" />
+                  [freeTextSearch]="table.freeTextSearch"
+                  [canSelect]="true"
+                  (select)="viewSite($event)" />
     </vp-section>
 </div>

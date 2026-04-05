@@ -45,6 +45,14 @@ export class SiteService {
         );
     }
 
+    public getForProfessional(id: number): Promise<Site> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/sites/${id}`);
+
+        return lastValueFrom(
+            this._http.get<Site>(url)
+        );
+    }
+
     public add(site: Site): Promise<Site> {
         const url = this._urlResolver.resolveUrl('/api/sites');
 

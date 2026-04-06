@@ -72,12 +72,7 @@ export class CreateSiteComponent {
     }
 
     public stateChanged(stateId: number): void {
-        if (stateId) {
-            //  this.professional.state = this.professional.state || {};
-            this.site.stateId = stateId;
-        } else {
-            this.site.stateId = undefined;
-        }
+        this.site.state = stateId ? { id: stateId } : undefined;
     }
 
     private async loadStates(): Promise<void> {

@@ -1,5 +1,6 @@
 
 using Envirotrax.App.Server.Data.Models.States;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
 using System.ComponentModel.DataAnnotations;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers
@@ -60,7 +61,7 @@ namespace Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers
         public string? PwsId { get; set; }
         public string? Address { get; set; }
         public string? City { get; set; }
-        public string? StateAbbreviation { get; set; }
+        public ReferencedStateDto? State { get; set; }
         public string? ZipCode { get; set; }
         public string? PhoneNumber { get; set; }
         public string? EmailAddress { get; set; }

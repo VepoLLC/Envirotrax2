@@ -1,6 +1,7 @@
 
 using AutoMapper;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
 using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.App.Server.Domain.Mapping.WaterSuppliers;
@@ -25,8 +26,12 @@ public class WaterSupplierProfile : Profile
             .ForMember(supplier => supplier.ParentId, opt => opt.MapFrom(supplier => supplier.Parent!.Id));
 
         CreateMap<WaterSupplier, ReferencedWaterSupplierDto>()
-            .ForMember(dto => dto.StateAbbreviation, opt => opt.MapFrom(ws => ws.State != null ? ws.State.Code : null))
+            .AfterMap((ws, dto) =>
+            {
+                dto.State ??= ws.StateId.HasValue ? new ReferencedStateDto { Id = ws.StateId } : null;
+            })
             .ReverseMap()
-            .ForMember(ws => ws.State, opt => opt.Ignore());
+            .ForMember(ws => ws.State, opt => opt.Ignore())
+            .ForMember(ws => ws.StateId, opt => opt.MapFrom(dto => dto.State != null ? dto.State.Id : (int?)null));
     }
 }

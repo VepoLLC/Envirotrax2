@@ -343,7 +343,8 @@
                                     <vp-input name="stateId"
                                               label="State"
                                               type="select"
-                                              [(ngModel)]="site.stateId"
+                                              [ngModel]="site.state?.id"
+                                              (ngModelChange)="site.state = $event ? { id: $event } : undefined"
                                               [options]="stateOptions"
                                               [form]="form">
                                     </vp-input>
@@ -467,7 +468,8 @@
                                 <vp-input name="mailingStateId"
                                           label="State"
                                           type="select"
-                                          [(ngModel)]="site.mailingStateId"
+                                          [ngModel]="site.mailingState?.id"
+                                          (ngModelChange)="site.mailingState = $event ? { id: $event } : undefined"
                                           [options]="stateOptions"
                                           [form]="form">
                                 </vp-input>

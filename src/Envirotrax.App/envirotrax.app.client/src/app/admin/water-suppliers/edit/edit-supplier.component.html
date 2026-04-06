@@ -48,7 +48,8 @@
                         </div>
 
                         <div class="mb-3">
-                            <vp-input [ngModel]="supplier.stateId"
+                            <vp-input [ngModel]="supplier.state?.id"
+                                      (ngModelChange)="supplier.state = $event ? { id: $event } : undefined"
                                       [options]="states"
                                       [form]="supplierForm"
                                       type="select"

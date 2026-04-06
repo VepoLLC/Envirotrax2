@@ -82,7 +82,9 @@
                     [(query)]="table.query"
                     (queryChange)="getInspectors()"
                     (queryReset)="getInspectors()"
-                    [freeTextSearch]="table.freeTextSearch" />
+                    [freeTextSearch]="table.freeTextSearch" 
+                    [canSelect]="true"
+                    (select)="openDetails($event)"/>
     </vp-section>
 
 </div>

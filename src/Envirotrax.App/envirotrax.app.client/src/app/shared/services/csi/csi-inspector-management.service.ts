@@ -7,6 +7,7 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { Professional } from "../../models/professionals/professional";
+import { CsiInspectorDetails } from "../../models/csi/csi-inspector-details";
 
 @Injectable({
     providedIn: 'root'
@@ -27,5 +28,10 @@ export class CsiInspectoreManagementService {
         });
 
         return await lastValueFrom(observable);
+    }
+
+    public async getDetails(id: number): Promise<CsiInspectorDetails> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${id}/details`);
+        return await lastValueFrom(this._http.get<CsiInspectorDetails>(url));
     }
 }

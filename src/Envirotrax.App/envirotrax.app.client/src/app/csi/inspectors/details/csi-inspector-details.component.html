@@ -1,0 +1,167 @@
+<button type="button" class="btn btn-primary mb-3" (click)="goBack()">
+    <i class="fa-solid fa-arrow-left me-1"></i>
+    Back to Search Results
+</button>
+
+<h1 class="h2 mb-4">CSI Inspector Details</h1>
+
+<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+<div *ngIf="!isLoading && details">
+    <div class="row g-4">
+
+        <div class="col-lg-6">
+            <vp-section header="CSI Account Information">
+                <table class="table table-borderless mb-0">
+                    <tbody>
+                        <tr>
+                            <th class="w-40">Creation Date:</th>
+                            <td>{{ details.createdTime | date:'M/d/yy h:mm a' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Company Email:</th>
+                            <td>{{ details.companyEmail }}</td>
+                        </tr>
+                        <tr>
+                            <th>Company Name:</th>
+                            <td>{{ details.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Address:</th>
+                            <td>{{ getFormattedAddress() }}</td>
+                        </tr>
+                        <tr>
+                            <th>Phone Number:</th>
+                            <td>{{ details.phoneNumber }}</td>
+                        </tr>
+                        <tr>
+                            <th>Fax Number:</th>
+                            <td>{{ details.faxNumber }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </vp-section>
+        </div>
+
+        <div class="col-lg-6">
+            <vp-section header="Account Registration Expiration Date">
+                <div *ngIf="details.waterSuppliers && details.waterSuppliers.length > 0; else noSuppliers">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Water Supplier</th>
+                                    <th class="text-center">CSI</th>
+                                    <th class="text-center">Backflow</th>
+                                    <th class="text-center">Suspended</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let ws of details.waterSuppliers">
+                                    <td>{{ ws.waterSupplier?.name }}</td>
+                                    <td class="text-center">
+                                        <i *ngIf="ws.hasCsiInspection" class="fa-solid fa-check text-success"></i>
+                                        <span *ngIf="!ws.hasCsiInspection" class="text-muted">N/A</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <i *ngIf="ws.hasBackflowTesting" class="fa-solid fa-check text-success"></i>
+                                        <span *ngIf="!ws.hasBackflowTesting" class="text-muted">N/A</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <i *ngIf="ws.isBanned" class="fa-solid fa-ban text-danger"></i>
+                                        <i *ngIf="!ws.isBanned" class="fa-solid fa-check text-success"></i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <ng-template #noSuppliers>
+                    <p class="text-muted mb-0">No water supplier registrations found.</p>
+                </ng-template>
+            </vp-section>
+        </div>
+
+        <div class="col-12">
+            <vp-section header="Licensed Personnel Sub Accounts">
+                <div *ngIf="details.subAccounts && details.subAccounts.length > 0; else noSubAccounts">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Email Address</th>
+                                    <th>Contact Name</th>
+                                    <th>Job Title</th>
+                                    <th>CSI Inspector</th>
+                                    <th>Backflow Tester</th>
+                                    <th>FOG Inspector</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let user of details.subAccounts">
+                                    <td>{{ user.emailAddress }}</td>
+                                    <td>{{ user.contactName }}</td>
+                                    <td>{{ user.jobTitle }}</td>
+                                    <td class="text-center">
+                                        <i *ngIf="user.isCsiInspector" class="fa-solid fa-check text-success"></i>
+                                    </td>
+                                    <td class="text-center">
+                                        <i *ngIf="user.isBackflowTester" class="fa-solid fa-check text-success"></i>
+                                    </td>
+                                    <td class="text-center">
+                                        <i *ngIf="user.isFogInspector" class="fa-solid fa-check text-success"></i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <ng-template #noSubAccounts>
+                    <p class="text-muted mb-0">No sub accounts found.</p>
+                </ng-template>
+            </vp-section>
+        </div>
+
+        <div class="col-12">
+            <vp-section header="License &amp; Insurance Management">
+                <div *ngIf="details.licenses && details.licenses.length > 0; else noLicenses">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>License Number</th>
+                                    <th>Type</th>
+                                    <th>Professional Type</th>
+                                    <th>Email Address</th>
+                                    <th>Expiration Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let license of details.licenses">
+                                    <td>{{ license.licenseNumber }}</td>
+                                    <td>{{ license.licenseType?.name }}</td>
+                                    <td>{{ getProfessionalTypeLabel(license.professionalType) }}</td>
+                                    <td>{{ license.user?.emailAddress }}</td>
+                                    <td>
+                                        <span class="badge border px-2 py-1"
+                                              [class]="getLicenseExpirationClass(license)">
+                                            {{ license.expirationDate ? (license.expirationDate | date) : 'N/A' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <ng-template #noLicenses>
+                    <p class="text-muted mb-0">No licenses found.</p>
+                </ng-template>
+            </vp-section>
+        </div>
+
+    </div>
+</div>
+
+<div *ngIf="!isLoading && !details" class="alert alert-warning">
+    Inspector not found.
+</div>

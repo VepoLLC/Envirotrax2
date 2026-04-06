@@ -13,7 +13,7 @@ public class ProfessionalWaterSupplierDto
 
     public bool HasWiseGuys { get; set; }
     public bool HasBackflowTesting { get; set; }
-    public bool HasCsiInpection { get; set; }
+    public bool HasCsiInspection { get; set; }
     public bool HasFogInspection { get; set; }
     public bool HasFogTransportation { get; set; }
 

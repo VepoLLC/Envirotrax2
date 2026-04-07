@@ -465,14 +465,16 @@
                                     </vp-input>
                                 </div>
 
-                                <vp-input name="mailingStateId"
-                                          label="State"
-                                          type="select"
-                                          [ngModel]="site.mailingState?.id"
-                                          (ngModelChange)="site.mailingState = $event ? { id: $event } : undefined"
-                                          [options]="stateOptions"
-                                          [form]="form">
-                                </vp-input>
+                                <div class="mb-3">
+                                    <vp-input name="mailingStateId"
+                                              label="State"
+                                              type="select"
+                                              [ngModel]="site.mailingState?.id"
+                                              (ngModelChange)="site.mailingState = $event ? { id: $event } : undefined"
+                                              [options]="stateOptions"
+                                              [form]="form">
+                                    </vp-input>
+                                </div>
 
                                 <div class="mb-3">
                                     <vp-input [(ngModel)]="site.mailingZipCode"

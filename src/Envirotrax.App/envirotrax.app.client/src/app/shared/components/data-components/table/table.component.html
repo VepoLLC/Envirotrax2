@@ -1,29 +1,27 @@
 <ng-template #actionsTemplate let-rowData="rowData">
-    <vp-dropdown title="Actions" iconCss="fa-solid fa-ellipsis-vertical" (click)="$event.stopPropagation()">
-        <vp-dropdown-option *ngIf="canViewDetails" (click)="onViewDetails(rowData)">
-            <i class="fa-solid fa-eye"></i>
-            Details
-        </vp-dropdown-option>
-        <vp-dropdown-option *ngIf="canEdit" (click)="onEdit(rowData)">
+    <div class="d-flex gap-1" (click)="$event.stopPropagation()">
+        <button *ngIf="canViewDetails" type="button" class="btn btn-primary" (click)="onViewDetails(rowData)">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            View
+        </button>
+        <button *ngIf="canEdit" type="button" class="btn btn-primary" (click)="onEdit(rowData)">
             <i class="fa-solid fa-pencil"></i>
             Edit
-        </vp-dropdown-option>
-        <vp-dropdown-option *ngIf="canDelete && !showSoftDeleted" (click)="onDelete(rowData)">
+        </button>
+        <button *ngIf="canDelete" type="button" class="btn btn-primary" (click)="onDelete(rowData)">
             <i class="fa-solid fa-trash"></i>
             Delete
-        </vp-dropdown-option>
-        <vp-dropdown-option *ngIf="canDelete && showSoftDeleted" (click)="onReactivate(rowData)">
-            <i class="fa-solid fa-rotate-right"></i>
-            Reactivate
-        </vp-dropdown-option>
-
+        </button>
         <ng-container *ngIf="customActions">
-            <vp-dropdown-option *ngFor="let action of customActions" (click)="customActionClicked(action, rowData)">
+            <button *ngFor="let action of customActions"
+                    type="button"
+                    class="btn btn-primary"
+                    (click)="customActionClicked(action, rowData)">
                 <i [attr.class]="action.iconClass"></i>
                 {{action.text}}
-            </vp-dropdown-option>
+            </button>
         </ng-container>
-    </vp-dropdown>
+    </div>
 </ng-template>
 
 <div>
@@ -79,7 +77,7 @@
                         <th *ngIf="!column.isTableColumnExcluded"
                             [hidden]="column.isInvisible"
                             [class]="column.headerCssClass"
-                            class="text-nowrap text-secondary"
+                            class="text-nowrap vp-table-header"
                             role="button"
                             (click)="sortColumn(column)">
                             {{column.caption}}

@@ -270,7 +270,7 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.mailingContactName = this.site.mailingContactName;
                     this.currentSite.mailingStreetNumber = this.site.mailingStreetNumber;
                     this.currentSite.mailingStreetName = this.site.mailingStreetName;
-                    this.currentSite.propertyNumber = this.site.propertyNumber;
+                    this.currentSite.mailingNumber = this.site.mailingNumber;
                     this.currentSite.mailingCity = this.site.mailingCity;
                     this.currentSite.mailingState = this.site.mailingState;
                     this.currentSite.mailingZipCode = this.site.mailingZipCode;

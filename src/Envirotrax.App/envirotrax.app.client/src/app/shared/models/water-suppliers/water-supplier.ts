@@ -9,8 +9,7 @@ export class WaterSupplier {
     pwsId?: string;
     address?: string;
     city?: string;
-    stateId?: number | null;
-    stateAbbreviation?: string;
+    state?: { id?: number; name?: string; code?: string };
     zipCode?: string;
     phoneNumber?: string;
     faxNumber?: string;
@@ -21,7 +20,7 @@ export class WaterSupplier {
     letterContactName?: string;
     letterAddress?: string;
     letterCity?: string;
-    letterStateId?: number | null;
+    letterState?: { id?: number; name?: string; code?: string };
     letterZipCode?: string;
 
     // Letter Contact
@@ -29,7 +28,7 @@ export class WaterSupplier {
     letterContactContactName?: string;
     letterContactAddress?: string;
     letterContactCity?: string;
-    letterContactStateId?: number | null;
+    letterContactState?: { id?: number; name?: string; code?: string };
     letterContactZipCode?: string;
     letterContactPhoneNumber?: string;
     letterContactFaxNumber?: string;

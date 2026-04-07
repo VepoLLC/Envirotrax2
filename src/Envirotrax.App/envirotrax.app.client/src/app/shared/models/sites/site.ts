@@ -1,6 +1,7 @@
 import { FacilityType } from "../../enums/facility-type.enum";
 import { GreaseTrapType } from "../../enums/grease-trap-type.enum";
 import { PropertyType } from "../../enums/property-type.enum";
+import { State } from "../lookup/state";
 import { WaterSupplier } from "../water-suppliers/water-supplier";
 
 export interface Site {
@@ -14,8 +15,7 @@ export interface Site {
     streetName?: string;
     propertyNumber?: string;
     city?: string;
-    stateId?: number | null;
-    stateCode?: string;
+    state?: State;
     zipCode?: string;
     mailingCompanyName?: string;
     mailingContactName?: string;
@@ -23,8 +23,7 @@ export interface Site {
     mailingStreetName?: string;
     mailingNumber?: string;
     mailingCity?: string;
-    mailingStateId?: number | null;
-    mailingStateCode?: string;
+    mailingState?: State;
     mailingZipCode?: string;
     mailingPhoneNumber?: string;
     mailingEmailAddress?: string;

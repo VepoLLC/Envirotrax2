@@ -56,6 +56,7 @@ public static class ServiceRegistration
         services.AddTransient<LookupRepository>();
 
         services.AddTransient<ICsiSettingsRepository, CsiSettingsRepository>();
+        services.AddTransient<IBackflowSettingsRepository, BackflowSettingsRepository>();
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IRoleRepository, RoleRepository>();
         services.AddTransient<IRolePermissionRepository, RolePermissionRepository>();

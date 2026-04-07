@@ -4,6 +4,7 @@ import { GeneralSettingsComponent } from "./general/general-settings.component";
 import { CsiSettingsComponent } from "./csi-settings/csi-settings.component";
 import { PermissionGuard } from "../../shared/guards/permission.guard";
 import { PermissionAction, PermissionType } from "../../shared/models/permission-type";
+import { BackflowTestingSettings } from "./backflow-testing-settings/admin/settings/backflow-testing-settings/backflow-testing-settings";
 
 const routes: Routes = [
     {
@@ -25,11 +26,17 @@ const routes: Routes = [
             ]
         }
     },
-    {
-        path: 'csi-settings',
-        title: 'CSI Settings',
-        component: CsiSettingsComponent
-    }
+            {
+                path: 'csi-settings',
+                title: 'CSI Settings',
+                component: CsiSettingsComponent
+            },
+            {
+                path: 'backflow-testing-settings',
+                title: 'Backflow Testing Settings',
+                component: BackflowTestingSettings
+            }
+
 ];
 
 @NgModule({

@@ -7,7 +7,7 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 public interface IProfessionalUserService : IService<ProfessionalUser, ProfessionalUserDto>
 {
     Task<ProfessionalUserDto?> GetMyDataAsync(CancellationToken cancellationToken);
-    Task<ProfessionalUserDto> UpdateMyDataAsync(ProfessionalUserDto user);
+    Task<ProfessionalUserDto?> UpdateMyDataAsync(ProfessionalUserDto user);
 
     Task<ProfessionalUserDto?> ResendInvitationAsync(int id);
 }

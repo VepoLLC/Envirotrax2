@@ -36,10 +36,14 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         return GetAsync(_authService.UserId, cancellationToken);
     }
 
-    public Task<ProfessionalUserDto> UpdateMyDataAsync(ProfessionalUserDto user)
+    public async Task<ProfessionalUserDto?> UpdateMyDataAsync(ProfessionalUserDto user)
     {
         user.Id = _authService.UserId;
-        return UpdateAsync(user);
+
+        var model = MapToModel(user);
+        var updated = await _professionalUserRepository.UpdateNonSensitiveDataAsync(model!);
+
+        return MapToDto(updated);
     }
 
     public override async Task<ProfessionalUserDto> AddAsync(ProfessionalUserDto dto)

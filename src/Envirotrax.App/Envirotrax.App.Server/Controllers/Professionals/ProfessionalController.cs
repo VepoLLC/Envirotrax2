@@ -18,27 +18,6 @@ public class ProfessionalControler : ProfessionalProtectedController
         _professionalService = professionalService;
     }
 
-    [HttpGet("my/current")]
-    public async Task<IActionResult> GetLoggedInProfessionalAsync(CancellationToken cancellationToken)
-    {
-        var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
-
-        if (professional != null)
-        {
-            return Ok(professional);
-        }
-
-        return NotFound();
-    }
-
-    [HttpPost("my")]
-    [Authorize(Roles = RoleDefinitions.Professionals.Admin)]
-    public async Task<IActionResult> AddMyAsync(CreateProfessionalDto createProfessional)
-    {
-        var added = await _professionalService.AddMyAsync(createProfessional);
-        return Ok(added);
-    }
-
     [HttpPut("my")]
     [Authorize(Roles = RoleDefinitions.Professionals.Admin)]
     public async Task<IActionResult> UpdateMyAsync(ProfessionalDto professional)
@@ -62,10 +41,30 @@ public class MyProfessionalsController : ControllerBase
         _professionalService = professionalService;
     }
 
+    [HttpGet("my/current")]
+    public async Task<IActionResult> GetLoggedInProfessionalAsync(CancellationToken cancellationToken)
+    {
+        var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
+
+        if (professional != null)
+        {
+            return Ok(professional);
+        }
+
+        return NotFound();
+    }
+
     [HttpGet("my")]
     public async Task<IActionResult> GetAllMyAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
     {
         var professionals = await _professionalService.GetAllMyAsync(pageInfo, query, cancellationToken);
         return Ok(professionals);
+    }
+
+    [HttpPost("my")]
+    public async Task<IActionResult> AddMyAsync(CreateProfessionalDto createProfessional)
+    {
+        var added = await _professionalService.AddMyAsync(createProfessional);
+        return Ok(added);
     }
 }

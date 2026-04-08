@@ -12,4 +12,5 @@ public interface IAuthService : ITenantProvidersService
 
     bool HasAnyFeatures(params FeatureType[] featuresToCheck);
     bool HasAnyPermission(PermissionAction action, params PermissionType[] permissionTypes);
+    bool HasAnyRole(params string[] roles);
 }

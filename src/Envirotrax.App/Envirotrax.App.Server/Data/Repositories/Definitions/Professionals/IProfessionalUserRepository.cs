@@ -5,5 +5,5 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 
 public interface IProfessionalUserRepository : IRepository<ProfessionalUser>
 {
-
+    Task<ProfessionalUser?> UpdateNonSensitiveDataAsync(ProfessionalUser user);
 }

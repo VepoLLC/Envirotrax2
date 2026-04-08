@@ -20,7 +20,7 @@
                 <ng-container *ngIf="site.waterSupplier?.address || site.waterSupplier?.city || site.waterSupplier?.zipCode; else emptyWsAddress">
                     <span *ngIf="site.waterSupplier?.address">{{ site.waterSupplier!.address }}<br /></span>
                     <span *ngIf="site.waterSupplier?.city">{{ site.waterSupplier!.city }}</span>
-                    <span *ngIf="site.waterSupplier?.stateAbbreviation">, {{ site.waterSupplier!.stateAbbreviation }}</span>
+                    <span *ngIf="site.waterSupplier?.state?.code">, {{ site.waterSupplier!.state!.code }}</span>
                     <span *ngIf="site.waterSupplier?.zipCode"> {{ site.waterSupplier!.zipCode }}</span>
                 </ng-container>
                 <ng-template #emptyWsAddress>&mdash;</ng-template>
@@ -60,10 +60,10 @@
                             <span *ngIf="site.streetNumber">{{ site.streetNumber }} </span>
                             <span *ngIf="site.streetName">{{ site.streetName }}</span>
                             <span *ngIf="site.propertyNumber">, {{ site.propertyNumber }}</span>
-                            <ng-container *ngIf="site.city || site.stateCode || site.zipCode">
+                            <ng-container *ngIf="site.city || site.state?.code || site.zipCode">
                                 <br />
                                 <span *ngIf="site.city">{{ site.city }}</span>
-                                <span *ngIf="site.stateCode">, {{ site.stateCode }}</span>
+                                <span *ngIf="site.state?.code">, {{ site.state!.code }}</span>
                                 <span *ngIf="site.zipCode"> {{ site.zipCode }}</span>
                             </ng-container>
                         </ng-container>
@@ -88,10 +88,10 @@
                             <span *ngIf="site.mailingStreetNumber">{{ site.mailingStreetNumber }} </span>
                             <span *ngIf="site.mailingStreetName">{{ site.mailingStreetName }}</span>
                             <span *ngIf="site.mailingNumber">, {{ site.mailingNumber }}</span>
-                            <ng-container *ngIf="site.mailingCity || site.mailingStateCode || site.mailingZipCode">
+                            <ng-container *ngIf="site.mailingCity || site.mailingState?.code || site.mailingZipCode">
                                 <br />
                                 <span *ngIf="site.mailingCity">{{ site.mailingCity }}</span>
-                                <span *ngIf="site.mailingStateCode">, {{ site.mailingStateCode }}</span>
+                                <span *ngIf="site.mailingState?.code">, {{ site.mailingState!.code }}</span>
                                 <span *ngIf="site.mailingZipCode"> {{ site.mailingZipCode }}</span>
                             </ng-container>
                         </ng-container>

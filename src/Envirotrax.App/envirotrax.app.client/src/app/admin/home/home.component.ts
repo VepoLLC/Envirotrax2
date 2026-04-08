@@ -30,6 +30,20 @@ export class HomeComponent implements OnInit {
                 routerLink: ['water-suppliers'],
                 hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.WaterSuppliers),
                 description: 'Manage all water suppliers, their details, and configurations.'
+            },            
+            {
+                title: 'Users',
+                iconCss: 'fa-solid fa-users',
+                routerLink: ['users'],
+                hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Users),
+                description: 'Manage users of your system.'
+            },
+            {
+                title: 'Roles',
+                iconCss: 'fa-solid fa-sitemap',
+                routerLink: ['users/roles'],
+                hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Roles),
+                description: 'Create and assign roles to control permissions and access.'
             },
             {
                 title: 'General Settings & Fees',
@@ -46,18 +60,11 @@ export class HomeComponent implements OnInit {
                 description: 'Configure CSI inspection program settings, automated letter notification schedules, and letter header appearance.'
             },
             {
-                title: 'Users',
-                iconCss: 'fa-solid fa-users',
-                routerLink: ['users'],
-                hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Users),
-                description: 'Manage users of your system.'
-            },
-            {
-                title: 'Roles',
-                iconCss: 'fa-solid fa-sitemap',
-                routerLink: ['users/roles'],
-                hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Roles),
-                description: 'Create and assign roles to control permissions and access.'
+                title: 'Backflow Testing Settings',
+                iconCss: 'fa-solid fa-magnifying-glass-waveform',
+                routerLink: ['settings', 'backflow-testing-settings'],
+                hasPermission: true,
+                description: 'Configure backflow testing program settings, automated letter notification schedules, and letter header appearance.'
             },
         ];
     }

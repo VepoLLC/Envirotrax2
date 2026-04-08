@@ -43,6 +43,7 @@ public static class ServiceRegistration
         services.AddTransient<ILookupService, LookupService>();
 
         services.AddTransient<ICsiSettingsService, CsiSettingsService>();
+        services.AddTransient<IBackflowSettingsService, BackflowSettingsService>();
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IUserRoleService, UserRoleService>();
         services.AddTransient<IRolePermissionService, RolePermissionService>();

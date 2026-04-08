@@ -46,6 +46,16 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
         return dto;
     }
 
+    public async Task<IPagedData<ProfessionalUserLicenseDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<ProfessionalUserLicense, ProfessionalUserLicenseDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<ProfessionalUserLicense, ProfessionalUserLicenseDto>(Mapper);
+
+        var items = await _licenseRepository.GetAllByProfessionalAsync(professionalId, pageInfo, query, cancellationToken);
+
+        return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
+    }
+
     public async Task<IPagedData<ProfessionalUserLicenseDto>> GetAllAsync(int userId, PageInfo pageInfo, Query query)
     {
         query.Sort = query.ConvertSortProperties<ProfessionalUserLicense, ProfessionalUserLicenseDto>(Mapper);

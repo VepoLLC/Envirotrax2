@@ -1,6 +1,7 @@
 
 using System.Runtime.CompilerServices;
 using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Data.Services.Definitions;
@@ -71,5 +72,18 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         }
 
         return existing;
+    }
+
+    public async Task<IEnumerable<ProfessionalUser>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var paginated = await DbContext.ProfessionalUsers
+            .AsNoTracking()
+            .Include(pu => pu.User)
+            .Where(pu => pu.ProfessionalId == professionalId)
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
     }
 }

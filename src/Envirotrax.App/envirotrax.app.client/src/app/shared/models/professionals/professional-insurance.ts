@@ -1,4 +1,5 @@
 import { Professional } from "./professional";
+import { ExpirationType } from "./licenses/professional-user-license";
 
 export interface ProfessionalInsurance {
     id?: number;
@@ -6,10 +7,7 @@ export interface ProfessionalInsurance {
     expirationDate?: Date;
     insuranceNumber?: string;
     filePath?: string;
+    expirationType?: ExpirationType;
 }
 
-export enum ExpirationType {
-    Valid,
-    AboutToExpire,
-    Expired
-}
+export { ExpirationType };

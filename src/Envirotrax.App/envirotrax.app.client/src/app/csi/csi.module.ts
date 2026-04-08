@@ -6,11 +6,13 @@ import { SharedComponentsModule } from "../shared/components/shared.components.m
 import { CsiRoutingModule } from "./csi-routing.module";
 import { CsiInspectionListComponent } from "./inspections/list/csi-inspection-list.component";
 import { CsiInspectorListComponent } from "./inspectors/list/csi-inspector-list.component";
+import { CsiInspectorDetailsComponent } from "./inspectors/details/csi-inspector-details.component";
 
 @NgModule({          
     declarations: [
         CsiInspectionListComponent,
-        CsiInspectorListComponent
+        CsiInspectorListComponent,
+        CsiInspectorDetailsComponent
     ],
     imports: [
         CommonModule,

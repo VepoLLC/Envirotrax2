@@ -112,12 +112,14 @@
             </div>
 
             <div class="form-check mb-3">
-                <input type="checkbox"
+                <input id="has-read-help"
+                       type="checkbox"
                        class="form-check-input"
                        [(ngModel)]="hasReadHelp"
                        name="hasReadHelp"
                        required>
-                <label class="form-check-label"
+                <label for="has-read-help"
+                       class="form-check-label"
                        [class.text-danger]="form.submitted && !hasReadHelp">
                     I have read and understand the requirements and process of registering an insurance policy in my
                     account.

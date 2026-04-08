@@ -7,6 +7,7 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
+using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Professionals;
 
@@ -14,16 +15,19 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
 {
     private readonly IFileStorageService _fileStorageService;
     private readonly ITimeZoneHelperService _timeZoneHelper;
+    private readonly IAuthService _authService;
 
     public ProfessionalInsuranceService(
         IMapper mapper,
         IProfessionalInsuranceRepository repository,
         IFileStorageService fileStorageService,
-        ITimeZoneHelperService timeZoneHelper)
+        ITimeZoneHelperService timeZoneHelper,
+        IAuthService authService)
         : base(mapper, repository)
     {
         _fileStorageService = fileStorageService;
         _timeZoneHelper = timeZoneHelper;
+        _authService = authService;
     }
 
 
@@ -51,7 +55,7 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
     public async Task<ProfessionalInsuranceDto> AddAsync(Stream fileStream, string originalFileName, ProfessionalInsuranceDto insurance)
     {
         var fileExtension = Path.GetExtension(originalFileName);
-        insurance.FilePath = $"insurances/{Guid.NewGuid()}{fileExtension}";
+        insurance.FilePath = $"professionals/{_authService.ProfessionalId}/insurances/{Guid.NewGuid()}{fileExtension}";
 
         using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {

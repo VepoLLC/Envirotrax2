@@ -6,6 +6,6 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Csi
 {
     public interface ICsiInspectorService : IService<Professional, ProfessionalDto>
     {
-        Task<CsiInspectorDetailsDto?> GetDetailsAsync(int id, CancellationToken cancellationToken);
+        Task<CsiInspectorAccountDto?> GetAccountInfoAsync(int id, CancellationToken cancellationToken);
     }
 }

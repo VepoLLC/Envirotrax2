@@ -1,6 +1,8 @@
 
 using System.Transactions;
 using AutoMapper;
+using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
@@ -12,6 +14,7 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Professionals;
 
 public class ProfessionalInsuranceService : Service<ProfessionalInsurance, ProfessionalInsuranceDto>, IProfessionalInsuranceService
 {
+    private readonly IProfessionalInsuranceRepository _insuranceRepository;
     private readonly IFileStorageService _fileStorageService;
     private readonly ITimeZoneHelperService _timeZoneHelper;
 
@@ -22,10 +25,10 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         ITimeZoneHelperService timeZoneHelper)
         : base(mapper, repository)
     {
+        _insuranceRepository = repository;
         _fileStorageService = fileStorageService;
         _timeZoneHelper = timeZoneHelper;
     }
-
 
     protected override ProfessionalInsuranceDto? MapToDto(ProfessionalInsurance? model)
     {
@@ -46,6 +49,16 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         }
 
         return dto;
+    }
+
+    public async Task<IPagedData<ProfessionalInsuranceDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<ProfessionalInsurance, ProfessionalInsuranceDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<ProfessionalInsurance, ProfessionalInsuranceDto>(Mapper);
+
+        var items = await _insuranceRepository.GetAllByProfessionalAsync(professionalId, pageInfo, query, cancellationToken);
+
+        return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
     }
 
     public async Task<ProfessionalInsuranceDto> AddAsync(Stream fileStream, string originalFileName, ProfessionalInsuranceDto insurance)

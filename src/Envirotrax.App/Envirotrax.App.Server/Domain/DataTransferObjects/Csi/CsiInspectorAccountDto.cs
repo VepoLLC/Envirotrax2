@@ -1,10 +1,8 @@
 using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
-using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
-using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Licenses;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 
-public class CsiInspectorDetailsDto
+public class CsiInspectorAccountDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = null!;
@@ -16,10 +14,4 @@ public class CsiInspectorDetailsDto
     public string? PhoneNumber { get; set; }
     public string? FaxNumber { get; set; }
     public DateTime CreatedTime { get; set; }
-
-    public List<ProfessionalWaterSupplierDto> WaterSuppliers { get; set; } = new();
-
-    public List<ProfessionalUserDto> SubAccounts { get; set; } = new();
-
-    public List<ProfessionalUserLicenseDto> Licenses { get; set; } = new();
 }

@@ -1,13 +1,42 @@
-<button type="button" class="btn btn-primary mb-3" (click)="goBack()">
-    <i class="fa-solid fa-arrow-left me-1"></i>
-    Back to Search Results
-</button>
 
-<h1 class="h2 mb-4">CSI Inspector Details</h1>
+<ng-template #supplierNameCell let-ws="rowData">
+    {{ ws.waterSupplier?.name }}
+</ng-template>
 
-<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+<ng-template #bannedCell let-ws="rowData">
+    <i *ngIf="ws.isBanned" class="fa-solid fa-ban text-danger"></i>
+    <i *ngIf="!ws.isBanned" class="fa-solid fa-check text-success"></i>
+</ng-template>
 
-<div *ngIf="!isLoading && details">
+<ng-template #licenseTypeCell let-license="rowData">
+    {{ license.licenseType?.name }}
+</ng-template>
+
+<ng-template #professionalTypeCell let-license="rowData">
+    {{ getProfessionalTypeLabel(license.professionalType) }}
+</ng-template>
+
+<ng-template #userEmailCell let-license="rowData">
+    {{ license.user?.emailAddress }}
+</ng-template>
+
+<ng-template #licenseExpirationCell let-license="rowData">
+    <span class="badge border px-2 py-1" [class]="getLicenseExpirationClass(license)">
+        {{ license.expirationDate ? (license.expirationDate | date) : 'N/A' }}
+    </span>
+</ng-template>
+
+<ng-template #insuranceExpirationCell let-insurance="rowData">
+    <span class="badge border px-2 py-1" [class]="getInsuranceExpirationClass(insurance)">
+        {{ insurance.expirationDate ? (insurance.expirationDate | date) : 'N/A' }}
+    </span>
+</ng-template>
+
+<h1 class="h2 mb-4 text-center">CSI Inspector Details</h1>
+
+<dp-loading-spinner *ngIf="isAccountLoading"></dp-loading-spinner>
+
+<div *ngIf="!isAccountLoading && accountInfo">
     <div class="row g-4">
 
         <div class="col-lg-6">
@@ -16,15 +45,15 @@
                     <tbody>
                         <tr>
                             <th class="w-40">Creation Date:</th>
-                            <td>{{ details.createdTime | date:'M/d/yy h:mm a' }}</td>
+                            <td>{{ accountInfo.createdTime | date:'M/d/yy h:mm a' }}</td>
                         </tr>
                         <tr>
                             <th>Company Email:</th>
-                            <td>{{ details.companyEmail }}</td>
+                            <td>{{ accountInfo.companyEmail }}</td>
                         </tr>
                         <tr>
                             <th>Company Name:</th>
-                            <td>{{ details.name }}</td>
+                            <td>{{ accountInfo.name }}</td>
                         </tr>
                         <tr>
                             <th>Address:</th>
@@ -32,11 +61,11 @@
                         </tr>
                         <tr>
                             <th>Phone Number:</th>
-                            <td>{{ details.phoneNumber }}</td>
+                            <td>{{ accountInfo.phoneNumber }}</td>
                         </tr>
                         <tr>
                             <th>Fax Number:</th>
-                            <td>{{ details.faxNumber }}</td>
+                            <td>{{ accountInfo.faxNumber }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -44,124 +73,91 @@
         </div>
 
         <div class="col-lg-6">
-            <vp-section header="Account Registration Expiration Date">
-                <div *ngIf="details.waterSuppliers && details.waterSuppliers.length > 0; else noSuppliers">
-                    <div class="table-responsive">
-                        <table class="table table-sm table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Water Supplier</th>
-                                    <th class="text-center">CSI</th>
-                                    <th class="text-center">Backflow</th>
-                                    <th class="text-center">Suspended</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let ws of details.waterSuppliers">
-                                    <td>{{ ws.waterSupplier?.name }}</td>
-                                    <td class="text-center">
-                                        <i *ngIf="ws.hasCsiInspection" class="fa-solid fa-check text-success"></i>
-                                        <span *ngIf="!ws.hasCsiInspection" class="text-muted">N/A</span>
-                                    </td>
-                                    <td class="text-center">
-                                        <i *ngIf="ws.hasBackflowTesting" class="fa-solid fa-check text-success"></i>
-                                        <span *ngIf="!ws.hasBackflowTesting" class="text-muted">N/A</span>
-                                    </td>
-                                    <td class="text-center">
-                                        <i *ngIf="ws.isBanned" class="fa-solid fa-ban text-danger"></i>
-                                        <i *ngIf="!ws.isBanned" class="fa-solid fa-check text-success"></i>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+            <vp-section header="Water Supplier Registrations">
+                <div dp-spinner-parent>
+                    <dp-loading-spinner *ngIf="waterSuppliersTable.isLoading"></dp-loading-spinner>
+
+                    <vp-table *ngIf="waterSuppliersTable.items"
+                              [columns]="waterSuppliersTable.columns!"
+                              [data]="waterSuppliersTable.items.data"
+                              [(pageInfo)]="waterSuppliersTable.items.pageInfo"
+                              (pageInfoChange)="loadWaterSuppliers()"
+                              [(query)]="waterSuppliersTable.query"
+                              (queryChange)="loadWaterSuppliers()"
+                              (queryReset)="loadWaterSuppliers()" />
                 </div>
-                <ng-template #noSuppliers>
-                    <p class="text-muted mb-0">No water supplier registrations found.</p>
-                </ng-template>
             </vp-section>
         </div>
 
         <div class="col-12">
             <vp-section header="Licensed Personnel Sub Accounts">
-                <div *ngIf="details.subAccounts && details.subAccounts.length > 0; else noSubAccounts">
-                    <div class="table-responsive">
-                        <table class="table table-sm table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Email Address</th>
-                                    <th>Contact Name</th>
-                                    <th>Job Title</th>
-                                    <th>CSI Inspector</th>
-                                    <th>Backflow Tester</th>
-                                    <th>FOG Inspector</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let user of details.subAccounts">
-                                    <td>{{ user.emailAddress }}</td>
-                                    <td>{{ user.contactName }}</td>
-                                    <td>{{ user.jobTitle }}</td>
-                                    <td class="text-center">
-                                        <i *ngIf="user.isCsiInspector" class="fa-solid fa-check text-success"></i>
-                                    </td>
-                                    <td class="text-center">
-                                        <i *ngIf="user.isBackflowTester" class="fa-solid fa-check text-success"></i>
-                                    </td>
-                                    <td class="text-center">
-                                        <i *ngIf="user.isFogInspector" class="fa-solid fa-check text-success"></i>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div dp-spinner-parent>
+                    <dp-loading-spinner *ngIf="subAccountsTable.isLoading"></dp-loading-spinner>
+
+                    <vp-table *ngIf="subAccountsTable.items"
+                              [columns]="subAccountsTable.columns!"
+                              [data]="subAccountsTable.items.data"
+                              [(pageInfo)]="subAccountsTable.items.pageInfo"
+                              (pageInfoChange)="loadSubAccounts()"
+                              [(query)]="subAccountsTable.query"
+                              (queryChange)="loadSubAccounts()"
+                              (queryReset)="loadSubAccounts()" />
                 </div>
-                <ng-template #noSubAccounts>
-                    <p class="text-muted mb-0">No sub accounts found.</p>
-                </ng-template>
             </vp-section>
         </div>
 
         <div class="col-12">
             <vp-section header="License &amp; Insurance Management">
-                <div *ngIf="details.licenses && details.licenses.length > 0; else noLicenses">
-                    <div class="table-responsive">
-                        <table class="table table-sm table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th>License Number</th>
-                                    <th>Type</th>
-                                    <th>Professional Type</th>
-                                    <th>Email Address</th>
-                                    <th>Expiration Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let license of details.licenses">
-                                    <td>{{ license.licenseNumber }}</td>
-                                    <td>{{ license.licenseType?.name }}</td>
-                                    <td>{{ getProfessionalTypeLabel(license.professionalType) }}</td>
-                                    <td>{{ license.user?.emailAddress }}</td>
-                                    <td>
-                                        <span class="badge border px-2 py-1"
-                                              [class]="getLicenseExpirationClass(license)">
-                                            {{ license.expirationDate ? (license.expirationDate | date) : 'N/A' }}
-                                        </span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="text-center mb-3">
+                    <ul class="vp-tabs nav nav-pills d-inline-flex">
+                        <li class="nav-item">
+                            <a class="nav-link tab-clickable" [class.active]="activeTab === 'insurances'" (click)="activeTab = 'insurances'">
+                                Insurance Policies
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link tab-clickable" [class.active]="activeTab === 'licenses'" (click)="activeTab = 'licenses'">
+                                Licenses
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div *ngIf="activeTab === 'insurances'">
+                    <div dp-spinner-parent>
+                        <dp-loading-spinner *ngIf="insurancesTable.isLoading"></dp-loading-spinner>
+
+                        <vp-table *ngIf="insurancesTable.items"
+                                  [columns]="insurancesTable.columns!"
+                                  [data]="insurancesTable.items.data"
+                                  [(pageInfo)]="insurancesTable.items.pageInfo"
+                                  (pageInfoChange)="loadInsurances()"
+                                  [(query)]="insurancesTable.query"
+                                  (queryChange)="loadInsurances()"
+                                  (queryReset)="loadInsurances()" />
                     </div>
                 </div>
-                <ng-template #noLicenses>
-                    <p class="text-muted mb-0">No licenses found.</p>
-                </ng-template>
+
+                <div *ngIf="activeTab === 'licenses'">
+                    <div dp-spinner-parent>
+                        <dp-loading-spinner *ngIf="licensesTable.isLoading"></dp-loading-spinner>
+
+                        <vp-table *ngIf="licensesTable.items"
+                                  [columns]="licensesTable.columns!"
+                                  [data]="licensesTable.items.data"
+                                  [(pageInfo)]="licensesTable.items.pageInfo"
+                                  (pageInfoChange)="loadLicenses()"
+                                  [(query)]="licensesTable.query"
+                                  (queryChange)="loadLicenses()"
+                                  (queryReset)="loadLicenses()" />
+                    </div>
+                </div>
             </vp-section>
         </div>
 
     </div>
 </div>
 
-<div *ngIf="!isLoading && !details" class="alert alert-warning">
+<div *ngIf="!isAccountLoading && !accountInfo" class="alert alert-warning">
     Inspector not found.
 </div>

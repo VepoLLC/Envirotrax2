@@ -1,5 +1,7 @@
 
 using AutoMapper;
+using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
@@ -71,6 +73,16 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
     {
         await _authApiClient.DeleteAsync<object>(_authService.UserId, $"/api/users/{id}/invitations");
         return await base.DeleteAsync(id);
+    }
+
+    public async Task<IPagedData<ProfessionalUserDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<ProfessionalUser, ProfessionalUserDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<ProfessionalUser, ProfessionalUserDto>(Mapper);
+
+        var items = await _professionalUserRepository.GetAllByProfessionalAsync(professionalId, pageInfo, query, cancellationToken);
+
+        return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
     }
 
     public async Task<ProfessionalUserDto?> ResendInvitationAsync(int id)

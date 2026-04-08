@@ -24,3 +24,14 @@ export enum BackflowNonCompliantType {
     PastDueLastMonth = 7,
     ExpiredTwoMonthsAgo = 8
 }
+
+export enum BackflowTestingMethodType {
+    USC = 1,
+    ASSE = 2,
+    TREEO = 3
+}
+
+export enum BackflowOutOfServiceType {
+    VepoManaged = 1,
+    WaterSuplierManaged = 2
+}

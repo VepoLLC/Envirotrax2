@@ -6,7 +6,7 @@ import { SharedComponentsModule } from "../../shared/components/shared.component
 import { SettingsRoutingModule } from "./settings-routing.module";
 import { GeneralSettingsComponent } from "./general/general-settings.component";
 import { CsiSettingsComponent } from "./csi-settings/csi-settings.component";
-import { BackflowTestingSettings } from './backflow-testing-settings/admin/settings/backflow-testing-settings/backflow-testing-settings';
+import { BackflowTestingSettings } from './backflow-testing-settings/backflow-testing-settings';
 
 @NgModule({
     declarations: [

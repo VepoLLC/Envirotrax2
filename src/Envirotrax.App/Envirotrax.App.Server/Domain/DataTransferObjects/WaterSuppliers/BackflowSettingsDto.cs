@@ -1,19 +1,20 @@
 using Envirotrax.App.Server.Data.Models.Backflow;
 
+
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 public class BackflowSettingsDto : IDto
 {
     public int Id { get; set; }
 
-    public int TestingMethod { get; set; }
+    public BackflowTestingMethodType TestingMethod { get; set; }
     public int? GracePeriodDays { get; set; }
     public bool AdjustBackflowCreepingDates { get; set; }
     public bool NewInstallationsRequireApproval { get; set; }
     public bool ReplacementsRequireApproval { get; set; }
     public bool DetectorAssembliesRequireMeterReading { get; set; }
     public bool OutOfServiceRequiresApproval { get; set; }
-    public int OutOfServiceType { get; set; }
+    public BackflowOutOfServiceType OutOfServiceType { get; set; }
     public bool RequireBackflowTestImages { get; set; }
 
     public BackflowExpiringType ExpiringNotice1 { get; set; }

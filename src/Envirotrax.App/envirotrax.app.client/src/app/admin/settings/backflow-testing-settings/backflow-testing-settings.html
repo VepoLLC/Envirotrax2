@@ -30,7 +30,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-2">
                                 <vp-input type="select"
-                                        label="Expiring Notice 1"
+                                        label="Expiring notice 1"
                                         [(ngModel)]="settings.expiringNotice1"
                                         name="expiringNotice1"
                                         [options]="expiringNoticeOptions"
@@ -38,7 +38,7 @@
                             </div>
                             <div class="col-md-6 mb-2">
                                 <vp-input type="select"
-                                        label="Expiring Notice 2"
+                                        label="Expiring notice 2"
                                         [(ngModel)]="settings.expiringNotice2"
                                         name="expiringNotice2"
                                         [options]="expiringNoticeOptions"
@@ -48,7 +48,7 @@
                         <div class="row mt-3">
                             <div class="col-md-6 mb-2">
                                 <vp-input type="select"
-                                        label="Expired Notice 1"
+                                        label="Expired notice 1"
                                         [(ngModel)]="settings.expiredNotice1"
                                         name="expiredNotice1"
                                         [options]="expiredNoticeOptions"
@@ -56,7 +56,7 @@
                             </div>
                             <div class="col-md-6 mb-2">
                                 <vp-input type="select"
-                                        label="Expired Notice 2"
+                                        label="Expired notice 2"
                                         [(ngModel)]="settings.expiredNotice2"
                                         name="expiredNotice2"
                                         [options]="expiredNoticeOptions"
@@ -66,7 +66,7 @@
                         <div class="row mt-3">
                             <div class="col-md-6 mb-2">
                                 <vp-input type="select"
-                                        label="Non-Compliant Days 1"
+                                        label="Non-compliant days 1"
                                         [(ngModel)]="settings.backflowNonCompliant1"
                                         name="nonCompliantDays1"
                                         [options]="backflowNonCompliantOptions"
@@ -74,7 +74,7 @@
                             </div>
                             <div class="col-md-6 mb-2">
                                 <vp-input type="select"
-                                        label="Non-Compliant Days 2"
+                                        label="Non-compliant days 2"
                                         [(ngModel)]="settings.backflowNonCompliant2"
                                         
                                         name="nonCompliantDays2"
@@ -91,18 +91,17 @@
                         <div class="row mt-3">
                             <div class="col-md-6 mb-2">
                                 <vp-input type="select"
-                                        label="Testing Method"
+                                        label="Testing method"
                                         [(ngModel)]="settings.testingMethod"
                                         name="testingMethod"
                                         [options]="testingMethodOptions"
                                         />
                             </div>
                             <div class="col-md-6 mb-2">
-                                <vp-input type="select"
-                                        label="Grace Period Days"
+                                <vp-input type="number"
+                                        label="Grace period days"
                                         [(ngModel)]="settings.gracePeriodDays"
                                         name="gracePeriodDays"
-                                        [options]="gracePeriodOptions"
                                         />
                             </div>
                         </div>
@@ -113,7 +112,7 @@
                                     <input class="form-check-input" type="checkbox"
                                         [(ngModel)]="settings.adjustBackflowCreepingDates"
                                         name="adjustBackflowCreepingDates" id="adjustBackflowCreepingDates">
-                                    <label class="form-check-label" for="adjustBackflowCreepingDates">Adjust Backflow Creeping Dates</label>
+                                    <label class="form-check-label" for="adjustBackflowCreepingDates">Adjust backflow creeping dates</label>
                                 </div>
                             </div>
                             <div class="col-md-6 mt-2">
@@ -121,7 +120,7 @@
                                     <input class="form-check-input" type="checkbox"
                                         [(ngModel)]="settings.newInstallationsRequireApproval"
                                         name="newInstallationsRequireApproval" id="newInstallationsRequireApproval">
-                                    <label class="form-check-label" for="newInstallationsRequireApproval">New Installations Require Approval</label>
+                                    <label class="form-check-label" for="newInstallationsRequireApproval">New installations require approval</label>
                                 </div>
                             </div>
                             <div class="col-md-6 mt-2">
@@ -129,7 +128,7 @@
                                     <input class="form-check-input" type="checkbox"
                                         [(ngModel)]="settings.replacementsRequireApproval"
                                         name="replacementsRequireApproval" id="replacementsRequireApproval">
-                                    <label class="form-check-label" for="replacementsRequireApproval">Replacements Require Approval</label>
+                                    <label class="form-check-label" for="replacementsRequireApproval">Replacements require approval</label>
                                 </div>
                             </div>
                             <div class="col-md-6 mt-2">
@@ -137,7 +136,7 @@
                                     <input class="form-check-input" type="checkbox"
                                         [(ngModel)]="settings.detectorAssembliesRequireMeterReading"
                                         name="detectorAssembliesRequireMeterReading" id="detectorAssembliesRequireMeterReading">
-                                    <label class="form-check-label" for="detectorAssembliesRequireMeterReading">Detector Assemblies Require Meter Reading</label>
+                                    <label class="form-check-label" for="detectorAssembliesRequireMeterReading">Detector assemblies require meter reading</label>
                                 </div>
                             </div>
                             <div class="col-md-6 mt-2">
@@ -145,7 +144,7 @@
                                     <input class="form-check-input" type="checkbox"
                                         [(ngModel)]="settings.outOfServiceRequiresApproval"
                                         name="outOfServiceRequiresApproval" id="outOfServiceRequiresApproval">
-                                    <label class="form-check-label" for="outOfServiceRequiresApproval">Out of Service Requires Approval</label>
+                                    <label class="form-check-label" for="outOfServiceRequiresApproval">Out of service requires approval</label>
                                 </div>
                             </div>                          
                         </div>
@@ -153,7 +152,7 @@
                         <div class="row mt-3">
                             <div class="col-md-6 mb-2">
                                 <vp-input type="select"
-                                        label="Out of Service Type"
+                                        label="Out of service type"
                                         [(ngModel)]="settings.outOfServiceType"
                                         name="outOfServiceType"
                                         [options]="outOfServiceOptions"
@@ -164,7 +163,7 @@
                                     <input class="form-check-input" type="checkbox"
                                         [(ngModel)]="settings.requireBackflowTestImages"
                                         name="requireBackflowTestImages" id="requireBackflowTestImages">
-                                    <label class="form-check-label" for="requireBackflowTestImages">Require Backflow Test Images</label>
+                                    <label class="form-check-label" for="requireBackflowTestImages">Require backflow test images</label>
                                 </div>
                             </div>
                         </div>
@@ -181,7 +180,7 @@
                                     <input class="form-check-input" type="checkbox"
                                         [(ngModel)]="settings.showWaterMeterNumber"
                                         name="showWaterMeterNumber" id="showWaterMeterNumber">
-                                    <label class="form-check-label" for="showWaterMeterNumber"> Show Water Meter Number</label>
+                                    <label class="form-check-label" for="showWaterMeterNumber"> Show water meter number</label>
                                 </div>
                             </div>
                             <div class="col-md-6 mt-3">
@@ -189,7 +188,7 @@
                                     <input class="form-check-input" type="checkbox"
                                         [(ngModel)]="settings.showRainSensor"
                                         name="showRainSensor" id="showRainSensor">
-                                    <label class="form-check-label" for="showRainSensor">Show Rain Sensor</label>
+                                    <label class="form-check-label" for="showRainSensor">Show rain sensor</label>
                                 </div>
                             </div>
                             <div class="col-md-6 mt-3">
@@ -205,7 +204,7 @@
                                     <input class="form-check-input" type="checkbox"
                                         [(ngModel)]="settings.showPermitNumber"
                                         name="showPermitNumber" id="showPermitNumber">
-                                    <label class="form-check-label" for="showPermitNumber">Show Permit Number</label>
+                                    <label class="form-check-label" for="showPermitNumber">Show permit number</label>
                                 </div>
                             </div>
                         </div>
@@ -219,14 +218,14 @@
                             <thead>
                                 <tr>
                                     <th></th>
-                                    <th class="text-center">Background Color</th>
-                                    <th class="text-center">Foreground Color</th>
-                                    <th class="text-center">Border Color</th>
+                                    <th class="text-center">Background color</th>
+                                    <th class="text-center">Foreground color</th>
+                                    <th class="text-center">Border color</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="fw-semibold align-middle">Expiring Letters</td>
+                                    <td class="fw-semibold align-middle">Expiring letters</td>
                                     <td class="text-center">
                                         <input type="color"
                                             class="form-control form-control-color mx-auto"
@@ -250,7 +249,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="fw-semibold align-middle">Expired Letters</td>
+                                    <td class="fw-semibold align-middle">Expired letters</td>
                                     <td class="text-center">
                                         <input type="color"
                                             class="form-control form-control-color mx-auto"
@@ -274,7 +273,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="fw-semibold align-middle">Non-Compliant Letters</td>
+                                    <td class="fw-semibold align-middle">Non-compliant letters</td>
                                     <td class="text-center">
                                         <input type="color"
                                             class="form-control form-control-color mx-auto"

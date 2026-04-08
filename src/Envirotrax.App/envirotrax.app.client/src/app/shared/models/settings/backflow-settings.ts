@@ -1,17 +1,17 @@
 
-import { BackflowExpiredType, BackflowExpiringType, BackflowNonCompliantType } from "./backflow-testing-settings-enum";
+import { BackflowExpiredType, BackflowExpiringType, BackflowNonCompliantType, BackflowOutOfServiceType, BackflowTestingMethodType } from "./backflow-testing-settings-enum";
 
 export interface BackflowSettings {
     id?: number;
 
-    testingMethod?: number;
+    testingMethod?: BackflowTestingMethodType;
     gracePeriodDays?: number | null;
     adjustBackflowCreepingDates?: boolean;
     newInstallationsRequireApproval?: boolean;
     replacementsRequireApproval?: boolean;
     detectorAssembliesRequireMeterReading?: boolean;
     outOfServiceRequiresApproval?: boolean;
-    outOfServiceType: number;   
+    outOfServiceType: BackflowOutOfServiceType;   
     requireBackflowTestImages?: boolean;
 
     expiringNotice1?: BackflowExpiringType;

@@ -1,10 +1,10 @@
-import { BackflowExpiredType, BackflowExpiringType, BackflowNonCompliantType } from '../../../../../../shared/models/settings/backflow-testing-settings-enum';
-import { BackflowSettings } from '../../../../../../shared/models/settings/backflow-settings';
+import { BackflowExpiredType, BackflowExpiringType, BackflowNonCompliantType, BackflowOutOfServiceType, BackflowTestingMethodType } from '../../../shared/models/settings/backflow-testing-settings-enum';
+import { BackflowSettings } from '../../../shared/models/settings/backflow-settings';
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { ToastService } from '../../../../../../shared/services/toast.service';
-import { HelperService } from '../../../../../../shared/services/helpers/helper.service';
-import { BackflowTestingSettingsService } from '../../../../../../shared/services/settings/backflow-testing-settings.service';
+import { ToastService } from '../../../shared/services/toast.service';
+import { HelperService } from '../../../shared/services/helpers/helper.service';
+import { BackflowTestingSettingsService } from '../../../shared/services/settings/backflow-testing-settings.service';
 
 @Component({
   selector: 'app-backflow-testing-settings',
@@ -14,9 +14,9 @@ import { BackflowTestingSettingsService } from '../../../../../../shared/service
 export class BackflowTestingSettings implements OnInit {
 
     public settings: BackflowSettings = {
-        testingMethod: 1, // Default to USC
+        testingMethod: BackflowTestingMethodType.USC, // Default to USC
         gracePeriodDays: null,
-        outOfServiceType: 1, // Default to Vepo Managed
+        outOfServiceType: BackflowOutOfServiceType.VepoManaged, // Default to Vepo Managed
         expiringNotice1: BackflowExpiringType.Off,
         expiringNotice2: BackflowExpiringType.Off,
         expiredNotice1: BackflowExpiredType.Off,
@@ -38,25 +38,14 @@ export class BackflowTestingSettings implements OnInit {
     public validationErrors: string[] = [];
 
       public readonly testingMethodOptions = [
-          { id: 1, text: 'USC' },
-          { id: 2, text: 'ASSE' },
-          { id: 3, text: 'TREEO' }
-      ];
-
-      public readonly gracePeriodOptions = [
-          { id: null, text: 'None' },
-          { id: 1, text: '1' },
-          { id: 2, text: '2' },
-          { id: 3, text: '3' },
-          { id: 4, text: '4' },
-          { id: 5, text: '5' },
-          { id: 6, text: '6' },
-          { id: 7, text: '7' },
+          { id: BackflowTestingMethodType.USC, text: 'USC' },
+          { id: BackflowTestingMethodType.ASSE, text: 'ASSE' },
+          { id: BackflowTestingMethodType.TREEO, text: 'TREEO' }
       ];
   
       public readonly outOfServiceOptions = [
-          { id: 1, text: 'Vepo Managed' },
-          { id: 2, text: 'Water Suplier Managed' }
+          { id: BackflowOutOfServiceType.VepoManaged, text: 'Vepo Managed' },
+          { id: BackflowOutOfServiceType.WaterSuplierManaged, text: 'Water Suplier Managed' }
       ];
   
       public readonly expiringNoticeOptions = [
@@ -111,12 +100,13 @@ export class BackflowTestingSettings implements OnInit {
         if (form.valid) {
             try {
                 this.isLoading = true;
+                console.log('Saving settings:', this.settings);
 
                 let result;
                 if (this.settings.id) {
-                    result = await this._backflowSettingsService.update(this.settings);
+                    //result = await this._backflowSettingsService.update(this.settings);
                 } else {
-                    result = await this._backflowSettingsService.add(this.settings);
+                    //result = await this._backflowSettingsService.add(this.settings);
                 }
 
                 if (result) {

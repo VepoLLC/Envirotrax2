@@ -28,6 +28,8 @@ import { InputOptionComponent } from "./input/input-option.component";
 import { WaterSupplierHierarchyComponent } from "./water-supplier-hierarchy/water-supplier-hierarchy.component";
 import { InfoIconComponent } from "./info-icon/info-icon.component";
 import { FileUploadComponent } from "./file-upload/file-upload.component";
+import { LookupFieldComponent } from "./lookup-field/lookup-field.component";
+import { ProfessionalUserLookupComponent } from "./lookups/professional-user-lookup/professional-user-lookup.component";
 
 @NgModule({
     declarations: [
@@ -53,7 +55,9 @@ import { FileUploadComponent } from "./file-upload/file-upload.component";
         FilterPanelFieldComponent,
         WaterSupplierHierarchyComponent,
         InfoIconComponent,
-        FileUploadComponent
+        FileUploadComponent,
+        LookupFieldComponent,
+        ProfessionalUserLookupComponent
     ],
     imports: [
         CommonModule,
@@ -81,7 +85,8 @@ import { FileUploadComponent } from "./file-upload/file-upload.component";
         FilterPanelFieldComponent,
         WaterSupplierHierarchyComponent,
         InfoIconComponent,
-        FileUploadComponent
+        FileUploadComponent,
+        LookupFieldComponent
     ]
 })
 export class SharedComponentsModule {

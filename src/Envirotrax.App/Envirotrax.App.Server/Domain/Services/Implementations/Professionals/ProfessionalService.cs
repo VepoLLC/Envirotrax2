@@ -62,7 +62,13 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
                 ProfessionalId = added.Id,
                 UserId = _authService.UserId,
                 ContactName = createProfessional.User.ContactName,
-                JobTitle = createProfessional.User.JobTitle
+                JobTitle = createProfessional.User.JobTitle,
+                IsAdmin = true,
+                IsBackflowTester = createProfessional.Professional.HasBackflowTesting,
+                IsCsiInspector = createProfessional.Professional.HasCsiInspection,
+                IsFogInspector = createProfessional.Professional.HasFogInspection,
+                IsFogTransporter = createProfessional.Professional.HasFogTransportation,
+                IsWiseGuy = createProfessional.Professional.HasWiseGuys
             });
 
             scope.Complete();

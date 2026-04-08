@@ -12,6 +12,7 @@ import { ProfesionalUserService } from "../../shared/services/professionals/prof
 import { InputOption } from "../../shared/components/input/input.component";
 import { HttpErrorResponse } from "@angular/common/http";
 import { ROLE_DEFINITIONS } from "../../shared/models/role-definitions";
+import { ToastService } from "../../shared/services/toast.service";
 
 @Component({
     standalone: false,
@@ -21,18 +22,20 @@ export class CompanyComponent implements OnInit {
     public isLoading: boolean = false;
     public loadingMessage: string = '';
     public validationErrors: string[] = [];
-    public isAdmin: boolean = false;
 
     public professional: Professional = {};
     public user: ProfessionalUser = {};
     public states: InputOption<State>[] = [];
+
+    public canSeeAdminSections: boolean = false;
 
     constructor(
         private readonly _helper: HelperService,
         private readonly _lookupService: LookupService,
         private readonly _professionalService: ProfesisonalService,
         private readonly _professionalUserService: ProfesionalUserService,
-        private readonly _authService: AuthService
+        private readonly _authService: AuthService,
+        private readonly _toastService: ToastService
     ) {
 
     }
@@ -52,7 +55,10 @@ export class CompanyComponent implements OnInit {
             this.states = states;
             this.professional = professional;
             this.user = user;
-            this.isAdmin = isAdmin;
+
+            // If registration is completed, only admin users can see or edit those section.
+            // However, if they are finishing the registration process, they should be able to fill out this section.
+            this.canSeeAdminSections = isAdmin || !this.professional.id;
         } finally {
             this.isLoading = false;
             this.loadingMessage = '';
@@ -115,7 +121,7 @@ export class CompanyComponent implements OnInit {
                 this.loadingMessage = 'Saving Profile';
                 this.validationErrors = [];
 
-                if (this.isAdmin) {
+                if (this.canSeeAdminSections) {
                     if (this.validateServices()) {
                         const updatedProfessional = this.professional.id
                             ? await this._professionalService.updateMyData(this.professional)
@@ -133,10 +139,14 @@ export class CompanyComponent implements OnInit {
                 } else {
                     await this._professionalUserService.updateMyData(this.user);
                 }
+
+                this._toastService.successfullySaved("Profile");
             } catch (e) {
                 if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
                     throw e;
                 }
+
+                this._toastService.failedToSave('Profile');
             } finally {
                 this.isLoading = false;
                 this.loadingMessage = '';

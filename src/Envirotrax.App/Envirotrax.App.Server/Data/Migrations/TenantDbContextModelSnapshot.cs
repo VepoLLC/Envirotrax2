@@ -1139,6 +1139,118 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.ToTable("WaterSupplierUsers");
                 });
 
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.BackflowSettings", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("AdjustBackflowCreepingDates")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("BackflowNonCompliant1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BackflowNonCompliant2")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("DetectorAssembliesRequireMeterReading")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ExpiredLettersBackgroundColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<string>("ExpiredLettersBorderColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<string>("ExpiredLettersForegroundColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<int>("ExpiredNotice1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ExpiredNotice2")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ExpiringLettersBackgroundColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<string>("ExpiringLettersBorderColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<string>("ExpiringLettersForegroundColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<int>("ExpiringNotice1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ExpiringNotice2")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GracePeriodDays")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("NewInstallationsRequireApproval")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("NonCompliantLettersBackgroundColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<string>("NonCompliantLettersBorderColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<string>("NonCompliantLettersForegroundColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<bool>("OutOfServiceRequiresApproval")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("OutOfServiceType")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ReplacementsRequireApproval")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("RequireBackflowTestImages")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ShowOSSF")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ShowPermitNumber")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ShowRainSensor")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ShowWaterMeterNumber")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("TestingMethod")
+                        .HasColumnType("int");
+
+                    b.HasKey("WaterSupplierId");
+
+                    b.ToTable("BackflowSettings");
+                });
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.CsiSettings", b =>
                 {
                     b.Property<int>("WaterSupplierId")
@@ -1855,6 +1967,17 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+
+                    b.Navigation("WaterSupplier");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.BackflowSettings", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("WaterSupplier");
                 });

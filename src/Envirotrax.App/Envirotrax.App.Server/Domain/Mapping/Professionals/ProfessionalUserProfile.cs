@@ -2,6 +2,7 @@
 using AutoMapper;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
+using Envirotrax.App.Server.Data.Models.Users;
 
 namespace Envirotrax.App.Server.Domain.Mapping.Professionals;
 
@@ -15,5 +16,9 @@ public class ProfessionalUserProfile : Profile
             .ReverseMap()
             .ForMember(proUser => proUser.User, opt => opt.Ignore())
             .ForMember(proUser => proUser.UserId, opt => opt.MapFrom(proUser => proUser.Id));
+        
+         CreateMap<AppUser, ReferencedProfessionalUserDto>()
+                .ForMember(d => d.EmailAddress, opt => opt.MapFrom(s => s.Email))
+                .ForMember(d => d.ContactName, opt => opt.Ignore());
     }
 }

@@ -43,6 +43,19 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
         return base.GetAllAsync(pageInfo, query, cancellationToken);
     }
 
+    public async Task<IEnumerable<ProfessionalWaterSupplier>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var paginated = await DbContext.ProfessionalWaterSuppliers
+            .AsNoTracking()
+            .Include(pws => pws.WaterSupplier)
+            .Where(pws => pws.ProfessionalId == professionalId)
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
     public async Task<IEnumerable<AvailableWaterSupplier>> GetAllAvailableSuppliersAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         var suppliersQuery = from supplier in DbContext.WaterSuppliers

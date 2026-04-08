@@ -21,6 +21,16 @@ public class ProfessionalSupplierService : Service<ProfessionalWaterSupplier, Pr
         _proSupplierRepository = repository;
     }
 
+    public async Task<IPagedData<ProfessionalWaterSupplierDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<ProfessionalWaterSupplier, ProfessionalWaterSupplierDto>(_mapper);
+        query.Filter = query.ConvertFilterProperties<ProfessionalWaterSupplier, ProfessionalWaterSupplierDto>(_mapper);
+
+        var items = await _proSupplierRepository.GetAllByProfessionalAsync(professionalId, pageInfo, query, cancellationToken);
+
+        return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
+    }
+
     public async Task<IPagedData<AvailableWaterSupplierDto>> GetAllAvailableSuppliersAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         query.Sort = query.ConvertSortProperties<AvailableWaterSupplier, AvailableWaterSupplierDto>(_mapper);

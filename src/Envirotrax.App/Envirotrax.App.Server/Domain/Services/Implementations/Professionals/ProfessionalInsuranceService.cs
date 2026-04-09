@@ -1,31 +1,38 @@
 
 using System.Transactions;
 using AutoMapper;
+using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
+using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Professionals;
 
 public class ProfessionalInsuranceService : Service<ProfessionalInsurance, ProfessionalInsuranceDto>, IProfessionalInsuranceService
 {
+    private readonly IProfessionalInsuranceRepository _insuranceRepository;
     private readonly IFileStorageService _fileStorageService;
     private readonly ITimeZoneHelperService _timeZoneHelper;
+    private readonly IAuthService _authService;
 
     public ProfessionalInsuranceService(
         IMapper mapper,
         IProfessionalInsuranceRepository repository,
         IFileStorageService fileStorageService,
-        ITimeZoneHelperService timeZoneHelper)
+        ITimeZoneHelperService timeZoneHelper,
+        IAuthService authService)
         : base(mapper, repository)
     {
+        _insuranceRepository = repository;
         _fileStorageService = fileStorageService;
         _timeZoneHelper = timeZoneHelper;
+        _authService = authService;
     }
-
 
     protected override ProfessionalInsuranceDto? MapToDto(ProfessionalInsurance? model)
     {
@@ -48,10 +55,20 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         return dto;
     }
 
+    public async Task<IPagedData<ProfessionalInsuranceDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<ProfessionalInsurance, ProfessionalInsuranceDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<ProfessionalInsurance, ProfessionalInsuranceDto>(Mapper);
+
+        var items = await _insuranceRepository.GetAllByProfessionalAsync(professionalId, pageInfo, query, cancellationToken);
+
+        return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
+    }
+
     public async Task<ProfessionalInsuranceDto> AddAsync(Stream fileStream, string originalFileName, ProfessionalInsuranceDto insurance)
     {
         var fileExtension = Path.GetExtension(originalFileName);
-        insurance.FilePath = $"insurances/{Guid.NewGuid()}{fileExtension}";
+        insurance.FilePath = $"professionals/{_authService.ProfessionalId}/insurances/{Guid.NewGuid()}{fileExtension}";
 
         using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {

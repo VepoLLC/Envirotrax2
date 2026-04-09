@@ -91,6 +91,10 @@ export class CsiInspectorListComponent implements OnInit {
         this.table.query.filter = queryProperties
     }
 
+    public openDetails(row: any): void {
+      this._router.navigate(['/csi/inspectors/details', row.id]);
+    }
+
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
             await this.getInspectors();

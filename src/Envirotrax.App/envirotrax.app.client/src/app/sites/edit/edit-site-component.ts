@@ -89,16 +89,11 @@ export class EditSiteComponent implements OnInit {
         { id: FacilityType.Other, text: "Other" },
     ];
 
-    public mailingStateChanged(stateId: number): void {
-        this.site.mailingStateId = stateId;
-    }
-
     public copyFromPropertyAddress(): void {
         this.site.mailingStreetNumber = this.site.streetNumber;
         this.site.mailingStreetName = this.site.streetName;
-        this.site.propertyNumber = this.site.propertyNumber;
         this.site.mailingCity = this.site.city;
-        this.site.mailingStateId = this.site.stateId;
+        this.site.mailingState = this.site.state ? { ...this.site.state } : undefined;
         this.site.mailingZipCode = this.site.zipCode;
         this.site.mailingPhoneNumber = this.site.fogGeneratorPhoneNumber;
         this.site.mailingEmailAddress = this.site.fogGeneratorEmailAddress;
@@ -242,7 +237,7 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.streetName = this.site.streetName;
                     this.currentSite.propertyNumber = this.site.propertyNumber;
                     this.currentSite.city = this.site.city;
-                    this.currentSite.stateId = this.site.stateId;
+                    this.currentSite.state = this.site.state;
                     this.currentSite.zipCode = this.site.zipCode;
                     this.currentSite.fogGeneratorPhoneNumber = this.site.fogGeneratorPhoneNumber;
                     this.currentSite.fogGeneratorEmailAddress = this.site.fogGeneratorEmailAddress;
@@ -275,9 +270,9 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.mailingContactName = this.site.mailingContactName;
                     this.currentSite.mailingStreetNumber = this.site.mailingStreetNumber;
                     this.currentSite.mailingStreetName = this.site.mailingStreetName;
-                    this.currentSite.propertyNumber = this.site.propertyNumber;
+                    this.currentSite.mailingNumber = this.site.mailingNumber;
                     this.currentSite.mailingCity = this.site.mailingCity;
-                    this.currentSite.mailingStateId = this.site.mailingStateId;
+                    this.currentSite.mailingState = this.site.mailingState;
                     this.currentSite.mailingZipCode = this.site.mailingZipCode;
                     this.currentSite.mailingPhoneNumber = this.site.mailingPhoneNumber;
                     this.currentSite.mailingEmailAddress = this.site.mailingEmailAddress;

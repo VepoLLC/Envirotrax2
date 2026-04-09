@@ -144,4 +144,17 @@ public class AuthService : TenantProviderService, IAuthService
             .Select(c => c.Value)
             ?? [];
     }
+
+    public bool HasAnyRole(params string[] roles)
+    {
+        foreach (var role in roles)
+        {
+            if (_contextAccessor.HttpContext?.User?.IsInRole(role) == true)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

@@ -1,15 +1,16 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { TableViewModel } from "../../shared/models/table-view-model";
 import { Site } from "../../shared/models/sites/site";
 import { SiteService } from "../../shared/services/sites/site.service";
 import { ActivatedRoute, Router } from "@angular/router";
-import { TableColumn } from "../../shared/components/data-components/table/table.component";
+import { CellTemplateData, TableColumn } from "../../shared/components/data-components/table/table.component";
 import { ColumnType } from "../../shared/components/data-components/sorting-filtering/query-view-model";
 import { QueryProperty } from "../../shared/models/query";
 import { NgForm } from "@angular/forms";
 import { ModalHelperService } from "../../shared/services/helpers/modal-helper.service";
 import { CreateSiteComponent } from "../create/create-site-component";
 import { InputOption } from "../../shared/components/input/input.component";
+import { PropertyType } from "../../shared/enums/property-type.enum";
 
 @Component({
     standalone: false,
@@ -19,7 +20,6 @@ export class SiteListComponent implements OnInit {
     public showResults: boolean = false;
 
     public table: TableViewModel<Site> = {
-        columns: this.getColumns(),
         query: {
             sort: {},
             filter: []
@@ -70,6 +70,14 @@ export class SiteListComponent implements OnInit {
         { id: "1", text: "Commercial" }
     ];
 
+    public propertyType = PropertyType;
+
+    @ViewChild('propertyInformation', { static: true })
+    public propertyInformation?: TemplateRef<CellTemplateData<Site>>
+
+    @ViewChild('mailingInformation', { static: true })
+    public mailingInformation?: TemplateRef<CellTemplateData<Site>>;
+
     constructor(
         private readonly _siteService: SiteService,
         private readonly _router: Router,
@@ -79,6 +87,7 @@ export class SiteListComponent implements OnInit {
     }
 
     public async ngOnInit(): Promise<void> {
+        this.table.columns = this.getColumns();
     }
 
     private getColumns(): TableColumn<Site>[] {
@@ -89,29 +98,18 @@ export class SiteListComponent implements OnInit {
                 type: ColumnType.text
             },
             {
-                field: 'businessName',
-                caption: 'Business Name',
-                type: ColumnType.text
+                field: 'Property Information',
+                caption: 'Property Information',
+                type: ColumnType.other,
+                cellTemplate: this.propertyInformation,
+                queryColumnExcluded: true
             },
             {
-                field: 'streetNumber',
-                caption: 'Street Number',
-                type: ColumnType.text
-            },
-            {
-                field: 'streetName',
-                caption: 'Street Name',
-                type: ColumnType.text
-            },
-            {
-                field: 'city',
-                caption: 'City',
-                type: ColumnType.text
-            },
-            {
-                field: 'propertyNumber',
-                caption: 'Property Number',
-                type: ColumnType.text
+                field: 'Mailing Information',
+                caption: 'Mailing Information',
+                type: ColumnType.other,
+                cellTemplate: this.mailingInformation,
+                queryColumnExcluded: true
             }
         ];
     }
@@ -120,7 +118,7 @@ export class SiteListComponent implements OnInit {
         try {
             this.table.isLoading = true;
             this.table.items = await this._siteService.getAll(this.table.items?.pageInfo || {}, this.table.query);
-            console.log(this.table.items);    
+            console.log(this.table.items);
         } finally {
             this.table.isLoading = false;
         }

@@ -278,9 +278,41 @@
 <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
 
 
+<ng-template #propertyInformation let-site="rowData">
+    <div class="gap-2 d-flex align-items-center">
+        <i *ngIf="site.propertyType == propertyType.Residential" class="fa-solid fa-house text-primary"></i>
+        <i *ngIf="site.propertyType == propertyType.Commercial" class="fa-solid fa-building text-danger"></i>
+        <a [routerLink]="[site.id, 'edit']">
+            <div>
+                {{site.businessName}}
+            </div>
+            <div>
+                <div>{{site.streetNumber}} {{site.streetName}} {{site.propertyNumber}} {{site.city}}<span
+                          *ngIf="site.state && site.zipCode">, </span></div>
+                <div>
+                    {{site.state?.code}} {{site.zipCode}}
+                </div>
+            </div>
+        </a>
+    </div>
+</ng-template>
+
+<ng-template #mailingInformation let-site="rowData">
+    <div>
+        {{site.mailingCompanyName}}
+    </div>
+    <div>
+        <div>{{site.mailingStreetNumber}} {{site.mailingStreetName}} {{site.mailingNumber}}
+            {{site.mailingCity}}<span
+                  *ngIf="site.mailingState && site.mailingZipCode">, </span>
+        </div>
+        <div>
+            {{site.mailingState?.code}} {{site.mailingZipCode}}
+        </div>
+    </div>
+</ng-template>
 
 <div *ngIf="showResults">
-
     <div class="d-flex justify-content-between mb-3">
 
         <button type="button"
@@ -300,20 +332,28 @@
 
     </div>
 
+    <vp-section header="Property Search ({{table.items!.pageInfo!.totalItems}})">
+        <div class="container mb-3">
+            <div class="row gap-2 justify-content-center mb-3">
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Active" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Inactive" />
+                </div>
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Needs CSI" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-red-off.png" text="Does not need CSI" />
+                </div>
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-blue-on.png" text="Needs FOG Permit" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-blue-off.png" text="Does not need FOG Permit" />
+                </div>
+                <div class="col-auto mb-2">
+                    <vp-status-icon iconClass="fa-solid fa-house text-primary" text="Residential" />
+                    <vp-status-icon iconClass="fa-solid fa-building text-danger" text="Commercial" />
+                </div>
+            </div>
+        </div>
 
-    <!--<button type="button" class="btn btn-primary" title="Create New Property Record"
-            aria-label="Create New Property Record" (click)="add()">
-        <i class="fa-solid fa-circle-plus"></i>
-        Create New Property Record
-    </button>
-
-    <div class="mb-3 d-flex justify-content-end">
-        <button type="button" class="btn btn-primary vp-section-button" (click)="showResults = false;">
-            Search Again
-        </button>
-    </div>-->
-
-    <vp-section header="Property Record Search">
         <vp-table *ngIf="table.items"
                   [columns]="table.columns!"
                   [data]="table.items.data"

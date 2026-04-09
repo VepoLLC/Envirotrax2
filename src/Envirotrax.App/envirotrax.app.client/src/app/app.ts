@@ -223,7 +223,7 @@ export class App implements OnInit {
           {
             title: 'BPAT Management',
             iconCss: 'fa-regular fa-user',
-            routerLink: ['/'],
+            routerLink: ['backflow/testers'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowTesters),
             hasFeature: true
           },

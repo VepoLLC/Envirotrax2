@@ -1,0 +1,106 @@
+<h1 class="text-center h2">BPAT Management</h1>
+
+<div [hidden]="showResults">
+    <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+        <vp-filter-panel (filterChange)="onFilterChange($event)">
+            <vp-section header="BPAT Account Search Criteria">
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="companyEmail"
+                                                   label="User ID / Email"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="name"
+                                                   label="Company Name"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="contactName"
+                                                   label="Contact Name"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="address"
+                                                   label="Address"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="phoneNumber"
+                                                   label="Work #"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="cellNumber"
+                                                   label="Cell #"
+                                                   [form]="searchForm" />
+                        </div>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-center justify-content-center my-3 my-md-0">
+                        <b><u>OR</u></b>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="bpatLicenseNumber"
+                                                   label="BPAT License Number"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="fireLicenseNumber"
+                                                   label="Fire License Number"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="insurancePolicyNumber"
+                                                   label="Insurance Policy Number"
+                                                   [form]="searchForm" />
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn btn-primary vp-section-button">
+                            <i class="fa-solid fa-magnifying-glass me-1"></i>
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </vp-section>
+        </vp-filter-panel>
+    </form>
+</div>
+
+
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+
+<div *ngIf="showResults">
+
+    <div class="d-flex justify-content-between mb-3">
+        <button type="button"
+                class="btn btn-primary"
+                title="Export excel"
+                aria-label="Export excel">
+            <i class="fa-solid fa-circle-plus me-1"></i>
+            Export Excel
+        </button>
+
+        <button type="button"
+                class="btn btn-primary vp-section-button"
+                (click)="showResults = false;">
+            Search Again
+        </button>
+    </div>
+
+    <vp-section header="Tester Search Results">
+        <vp-table *ngIf="table.items"
+                    [columns]="table.columns!"
+                    [data]="table.items.data"
+                    [(pageInfo)]="table.items.pageInfo"
+                    (pageInfoChange)="getTesters()"
+                    [(query)]="table.query"
+                    (queryChange)="getTesters()"
+                    (queryReset)="getTesters()"
+                    [freeTextSearch]="table.freeTextSearch" />
+    </vp-section>
+
+</div>

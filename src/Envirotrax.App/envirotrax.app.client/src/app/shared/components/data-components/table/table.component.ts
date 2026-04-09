@@ -248,7 +248,7 @@ export class TableComponent implements OnChanges {
         if (this.freeTextSearch) {
             this.query.filter = this.query.filter!.filter(p => p.tag?.location != QueryPropertyLocation.SearchBar);
 
-            if (this.freeTextSearch.text) {
+            if (this.freeTextSearch.text && this.freeTextSearch.searchQuery.length > 0) {
                 const freeTextQueryProperty: QueryProperty = {
                     columnName: this.freeTextSearch.searchQuery.find(Boolean)?.field,
                     children: [],

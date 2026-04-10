@@ -43,6 +43,15 @@ const routes: Routes = [
           features: [FeatureType.CsiInspection],
           roles: [ROLE_DEFINITIONS.WATER_SUPPLIER]
         }
+      },
+      {
+        path: 'backflow',
+        loadChildren: () => import('./backflow/backflow.module').then(m => m.BackflowModule),
+        canActivate: [FeatureGuard, RoleGuard],
+        data: {
+          features: [FeatureType.BackflowTesting],
+          roles: [ROLE_DEFINITIONS.WATER_SUPPLIER]
+        }
       }
     ]
   },

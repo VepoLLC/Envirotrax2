@@ -1,0 +1,15 @@
+
+<vp-section header="Licensed Personnel Sub Accounts">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="loadSubAccounts()"
+                  [(query)]="table.query"
+                  (queryChange)="loadSubAccounts()"
+                  (queryReset)="loadSubAccounts()" />
+    </div>
+</vp-section>

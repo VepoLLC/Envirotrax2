@@ -11,7 +11,7 @@ import { Professional } from "../../models/professionals/professional";
 @Injectable({
     providedIn: 'root'
 })
-export class CsiInspectoreManagementService {
+export class BackflowTesterManagementService {
     constructor(
         private readonly _urlResolver: UrlResolverService,
         private readonly _queryHelper: QueryHelperService,
@@ -20,7 +20,7 @@ export class CsiInspectoreManagementService {
     }
 
     public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<Professional>> {
-        const url = this._urlResolver.resolveUrl('/api/csi/inspectors');
+        const url = this._urlResolver.resolveUrl('/api/backflow/testers');
 
         const observable = this._http.get<PagedData<Professional>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)

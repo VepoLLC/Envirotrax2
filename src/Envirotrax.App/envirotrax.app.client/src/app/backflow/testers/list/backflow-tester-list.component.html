@@ -5,20 +5,15 @@
         <vp-filter-panel (filterChange)="onFilterChange($event)">
             <vp-section header="BPAT Account Search Criteria">
                 <div class="row">
-                    <div class="col-md-5">
+                    <div class="col-md-6">
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="companyEmail"
-                                                   label="User ID / Email"
+                                                   label="Company Email"
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="name"
                                                    label="Company Name"
-                                                   [form]="searchForm" />
-                        </div>
-                        <div class="mb-3">
-                            <vp-filter-panel-field fieldName="contactName"
-                                                   label="Contact Name"
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-3">
@@ -28,29 +23,11 @@
                         </div>
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="phoneNumber"
-                                                   label="Work #"
-                                                   [form]="searchForm" />
-                        </div>
-                        <div class="mb-3">
-                            <vp-filter-panel-field fieldName="cellNumber"
-                                                   label="Cell #"
+                                                   label="Company Phone"
                                                    [form]="searchForm" />
                         </div>
                     </div>
-                    <div class="col-md-2 d-flex align-items-center justify-content-center my-3 my-md-0">
-                        <b><u>OR</u></b>
-                    </div>
-                    <div class="col-md-5">
-                        <div class="mb-3">
-                            <vp-filter-panel-field fieldName="bpatLicenseNumber"
-                                                   label="BPAT License Number"
-                                                   [form]="searchForm" />
-                        </div>
-                        <div class="mb-3">
-                            <vp-filter-panel-field fieldName="fireLicenseNumber"
-                                                   label="Fire License Number"
-                                                   [form]="searchForm" />
-                        </div>
+                    <div class="col-md-6">
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="insurancePolicyNumber"
                                                    label="Insurance Policy Number"

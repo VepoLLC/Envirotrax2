@@ -9,6 +9,8 @@ namespace Envirotrax.App.Server.Domain.Mapping.States
         {
             CreateMap<Data.Models.States.State, StateDto>()
                 .ReverseMap();
+
+            CreateMap<Data.Models.States.State, ReferencedStateDto>();
         }
     }
 }

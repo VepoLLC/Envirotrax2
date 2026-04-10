@@ -4,6 +4,7 @@ import { ProfessionalUser } from "./professional-user";
 export interface Professional {
     id?: number;
     name?: string;
+    companyEmail?: string;
     address?: string
     city?: string;
     state?: State;
@@ -12,6 +13,7 @@ export interface Professional {
     faxNumber?: string;
     websiteUrl?: string;
     hidePublicListing?: boolean;
+    createdTime?: string;
 
     hasWiseGuys?: boolean;
     hasBackflowTesting?: boolean;

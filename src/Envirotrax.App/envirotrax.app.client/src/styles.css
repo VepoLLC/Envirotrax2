@@ -330,6 +330,7 @@ input:-webkit-autofill:active {
     min-width: 175px;
     padding: 3px 25px;
     font-weight: 600;
+    cursor: pointer;
 }
 
 .vp-tabs .nav-link.active {

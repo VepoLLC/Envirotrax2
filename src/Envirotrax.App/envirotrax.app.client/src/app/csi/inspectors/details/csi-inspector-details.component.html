@@ -1,37 +1,4 @@
 
-<ng-template #supplierNameCell let-ws="rowData">
-    {{ ws.waterSupplier?.name }}
-</ng-template>
-
-<ng-template #bannedCell let-ws="rowData">
-    <i *ngIf="ws.isBanned" class="fa-solid fa-ban text-danger"></i>
-    <i *ngIf="!ws.isBanned" class="fa-solid fa-check text-success"></i>
-</ng-template>
-
-<ng-template #licenseTypeCell let-license="rowData">
-    {{ license.licenseType?.name }}
-</ng-template>
-
-<ng-template #professionalTypeCell let-license="rowData">
-    {{ getProfessionalTypeLabel(license.professionalType) }}
-</ng-template>
-
-<ng-template #userEmailCell let-license="rowData">
-    {{ license.user?.emailAddress }}
-</ng-template>
-
-<ng-template #licenseExpirationCell let-license="rowData">
-    <span class="badge border px-2 py-1" [class]="getLicenseExpirationClass(license)">
-        {{ license.expirationDate ? (license.expirationDate | date) : 'N/A' }}
-    </span>
-</ng-template>
-
-<ng-template #insuranceExpirationCell let-insurance="rowData">
-    <span class="badge border px-2 py-1" [class]="getInsuranceExpirationClass(insurance)">
-        {{ insurance.expirationDate ? (insurance.expirationDate | date) : 'N/A' }}
-    </span>
-</ng-template>
-
 <h1 class="h2 mb-4 text-center">CSI Inspector Details</h1>
 
 <dp-loading-spinner *ngIf="isAccountLoading"></dp-loading-spinner>
@@ -73,86 +40,15 @@
         </div>
 
         <div class="col-lg-6">
-            <vp-section header="Water Supplier Registrations">
-                <div dp-spinner-parent>
-                    <dp-loading-spinner *ngIf="waterSuppliersTable.isLoading"></dp-loading-spinner>
-
-                    <vp-table *ngIf="waterSuppliersTable.items"
-                              [columns]="waterSuppliersTable.columns!"
-                              [data]="waterSuppliersTable.items.data"
-                              [(pageInfo)]="waterSuppliersTable.items.pageInfo"
-                              (pageInfoChange)="loadWaterSuppliers()"
-                              [(query)]="waterSuppliersTable.query"
-                              (queryChange)="loadWaterSuppliers()"
-                              (queryReset)="loadWaterSuppliers()" />
-                </div>
-            </vp-section>
+            <app-csi-inspector-water-suppliers [inspectorId]="id!" />
         </div>
 
         <div class="col-12">
-            <vp-section header="Licensed Personnel Sub Accounts">
-                <div dp-spinner-parent>
-                    <dp-loading-spinner *ngIf="subAccountsTable.isLoading"></dp-loading-spinner>
-
-                    <vp-table *ngIf="subAccountsTable.items"
-                              [columns]="subAccountsTable.columns!"
-                              [data]="subAccountsTable.items.data"
-                              [(pageInfo)]="subAccountsTable.items.pageInfo"
-                              (pageInfoChange)="loadSubAccounts()"
-                              [(query)]="subAccountsTable.query"
-                              (queryChange)="loadSubAccounts()"
-                              (queryReset)="loadSubAccounts()" />
-                </div>
-            </vp-section>
+            <app-csi-inspector-sub-accounts [inspectorId]="id!" />
         </div>
 
         <div class="col-12">
-            <vp-section header="License &amp; Insurance Management">
-                <div class="text-center mb-3">
-                    <ul class="vp-tabs nav nav-pills d-inline-flex">
-                        <li class="nav-item">
-                            <a class="nav-link tab-clickable" [class.active]="activeTab === 'insurances'" (click)="activeTab = 'insurances'">
-                                Insurance Policies
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link tab-clickable" [class.active]="activeTab === 'licenses'" (click)="activeTab = 'licenses'">
-                                Licenses
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
-                <div *ngIf="activeTab === 'insurances'">
-                    <div dp-spinner-parent>
-                        <dp-loading-spinner *ngIf="insurancesTable.isLoading"></dp-loading-spinner>
-
-                        <vp-table *ngIf="insurancesTable.items"
-                                  [columns]="insurancesTable.columns!"
-                                  [data]="insurancesTable.items.data"
-                                  [(pageInfo)]="insurancesTable.items.pageInfo"
-                                  (pageInfoChange)="loadInsurances()"
-                                  [(query)]="insurancesTable.query"
-                                  (queryChange)="loadInsurances()"
-                                  (queryReset)="loadInsurances()" />
-                    </div>
-                </div>
-
-                <div *ngIf="activeTab === 'licenses'">
-                    <div dp-spinner-parent>
-                        <dp-loading-spinner *ngIf="licensesTable.isLoading"></dp-loading-spinner>
-
-                        <vp-table *ngIf="licensesTable.items"
-                                  [columns]="licensesTable.columns!"
-                                  [data]="licensesTable.items.data"
-                                  [(pageInfo)]="licensesTable.items.pageInfo"
-                                  (pageInfoChange)="loadLicenses()"
-                                  [(query)]="licensesTable.query"
-                                  (queryChange)="loadLicenses()"
-                                  (queryReset)="loadLicenses()" />
-                    </div>
-                </div>
-            </vp-section>
+            <app-csi-inspector-license-insurance [inspectorId]="id!" />
         </div>
 
     </div>

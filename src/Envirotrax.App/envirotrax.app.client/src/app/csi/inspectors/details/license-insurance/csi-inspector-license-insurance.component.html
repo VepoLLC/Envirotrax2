@@ -1,0 +1,71 @@
+
+<ng-template #licenseTypeCell let-license="rowData">
+    {{ license.licenseType?.name }}
+</ng-template>
+
+<ng-template #professionalTypeCell let-license="rowData">
+    {{ getProfessionalTypeLabel(license.professionalType) }}
+</ng-template>
+
+<ng-template #userEmailCell let-license="rowData">
+    {{ license.user?.emailAddress }}
+</ng-template>
+
+<ng-template #licenseExpirationCell let-license="rowData">
+    <span class="badge border px-2 py-1" [class]="getLicenseExpirationClass(license)">
+        {{ license.expirationDate ? (license.expirationDate | date) : 'N/A' }}
+    </span>
+</ng-template>
+
+<ng-template #insuranceExpirationCell let-insurance="rowData">
+    <span class="badge border px-2 py-1" [class]="getInsuranceExpirationClass(insurance)">
+        {{ insurance.expirationDate ? (insurance.expirationDate | date) : 'N/A' }}
+    </span>
+</ng-template>
+
+<vp-section header="License &amp; Insurance Management">
+    <div class="text-center mb-3">
+        <ul class="vp-tabs nav nav-pills d-inline-flex">
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'insurances'" (click)="setActiveTab('insurances')">
+                    Insurance Policies
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'licenses'" (click)="setActiveTab('licenses')">
+                    Licenses
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div *ngIf="activeTab === 'insurances'">
+        <div dp-spinner-parent>
+            <dp-loading-spinner *ngIf="insurancesTable.isLoading"></dp-loading-spinner>
+
+            <vp-table *ngIf="insurancesTable.items"
+                      [columns]="insurancesTable.columns!"
+                      [data]="insurancesTable.items.data"
+                      [(pageInfo)]="insurancesTable.items.pageInfo"
+                      (pageInfoChange)="loadInsurances()"
+                      [(query)]="insurancesTable.query"
+                      (queryChange)="loadInsurances()"
+                      (queryReset)="loadInsurances()" />
+        </div>
+    </div>
+
+    <div *ngIf="activeTab === 'licenses'">
+        <div dp-spinner-parent>
+            <dp-loading-spinner *ngIf="licensesTable.isLoading"></dp-loading-spinner>
+
+            <vp-table *ngIf="licensesTable.items"
+                      [columns]="licensesTable.columns!"
+                      [data]="licensesTable.items.data"
+                      [(pageInfo)]="licensesTable.items.pageInfo"
+                      (pageInfoChange)="loadLicenses()"
+                      [(query)]="licensesTable.query"
+                      (queryChange)="loadLicenses()"
+                      (queryReset)="loadLicenses()" />
+        </div>
+    </div>
+</vp-section>

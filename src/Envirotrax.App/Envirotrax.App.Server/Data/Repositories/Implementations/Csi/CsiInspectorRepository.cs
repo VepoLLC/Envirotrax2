@@ -12,12 +12,9 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Csi
         {
         }
 
-        public async Task<Professional?> GetWithStateAsync(int id, CancellationToken cancellationToken)
+        protected override IQueryable<Professional> GetDetailsQuery()
         {
-            return await DbContext.Professionals
-                .AsNoTracking()
-                .Include(p => p.State)
-                .SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
+            return Entity.AsNoTracking().Include(p => p.State);
         }
     }
 }

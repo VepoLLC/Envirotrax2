@@ -1,0 +1,24 @@
+
+<ng-template #supplierNameCell let-ws="rowData">
+    {{ ws.waterSupplier?.name }}
+</ng-template>
+
+<ng-template #bannedCell let-ws="rowData">
+    <span *ngIf="ws.isBanned" class="badge text-bg-danger">Suspended</span>
+    <span *ngIf="!ws.isBanned" class="badge text-bg-success">Active</span>
+</ng-template>
+
+<vp-section header="Water Supplier Registrations">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="loadWaterSuppliers()"
+                  [(query)]="table.query"
+                  (queryChange)="loadWaterSuppliers()"
+                  (queryReset)="loadWaterSuppliers()" />
+    </div>
+</vp-section>

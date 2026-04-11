@@ -12,6 +12,12 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Csi
         {
         }
 
+        protected override IQueryable<Professional> GetListQuery()
+        {
+            return base.GetListQuery()
+                .Include(p => p.State);
+        }
+
         protected override IQueryable<Professional> GetDetailsQuery()
         {
             return Entity.AsNoTracking().Include(p => p.State);

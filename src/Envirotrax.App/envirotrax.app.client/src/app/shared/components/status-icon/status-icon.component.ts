@@ -1,4 +1,4 @@
-import { Component, Input } from "@angular/core";
+import { Component, input, Input } from "@angular/core";
 
 @Component({
     selector: 'vp-status-icon',
@@ -14,4 +14,7 @@ export class StatusIconComponent {
 
     @Input()
     public text: string = null!;
+
+    @Input()
+    public showText: boolean = true;
 }

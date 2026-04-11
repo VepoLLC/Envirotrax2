@@ -12,6 +12,12 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Csi
         {
         }
 
+        protected override IQueryable<Professional> GetListQuery()
+        {
+            return base.GetListQuery()
+                .Include(p => p.State);
+        }
+
         public async Task<Professional?> GetWithStateAsync(int id, CancellationToken cancellationToken)
         {
             return await DbContext.Professionals

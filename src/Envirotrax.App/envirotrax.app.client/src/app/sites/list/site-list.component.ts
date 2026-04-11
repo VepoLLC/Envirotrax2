@@ -78,6 +78,9 @@ export class SiteListComponent implements OnInit {
     @ViewChild('mailingInformation', { static: true })
     public mailingInformation?: TemplateRef<CellTemplateData<Site>>;
 
+    @ViewChild('keyIndicators', { static: true })
+    public keyIndicators?: TemplateRef<CellTemplateData<Site>>;
+
     constructor(
         private readonly _siteService: SiteService,
         private readonly _router: Router,
@@ -92,6 +95,12 @@ export class SiteListComponent implements OnInit {
 
     private getColumns(): TableColumn<Site>[] {
         return [
+            {
+                field: 'Key Indicators',
+                caption: 'Key Indicators',
+                type: ColumnType.other,
+                cellTemplate: this.keyIndicators
+            },
             {
                 field: 'accountNumber',
                 caption: 'Account Number',

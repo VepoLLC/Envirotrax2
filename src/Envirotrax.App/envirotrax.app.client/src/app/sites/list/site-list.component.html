@@ -288,7 +288,8 @@
             </div>
             <div>
                 <div>{{site.streetNumber}} {{site.streetName}} {{site.propertyNumber}} {{site.city}}<span
-                          *ngIf="site.state && site.zipCode">, </span></div>
+                          *ngIf="(site.streetNumber || site.streetName || site.propertyNumber || site.city) && (site.state || site.zipCode)">,
+                    </span></div>
                 <div>
                     {{site.state?.code}} {{site.zipCode}}
                 </div>
@@ -304,11 +305,48 @@
     <div>
         <div>{{site.mailingStreetNumber}} {{site.mailingStreetName}} {{site.mailingNumber}}
             {{site.mailingCity}}<span
-                  *ngIf="site.mailingState && site.mailingZipCode">, </span>
+                  *ngIf="(site.mailingStreetNumber || site.mailingStreetName || site.mailingNumber || site.mailingCity) && (site.mailingState || site.mailingZipCode)">,
+            </span>
         </div>
         <div>
             {{site.mailingState?.code}} {{site.mailingZipCode}}
         </div>
+    </div>
+</ng-template>
+
+<ng-template #keyIndicators let-site="rowData">
+    <div class="d-flex gap-1">
+        <vp-status-icon *ngIf="site.active"
+                        imageSrc="/images/icons/bstatus-green-on.png"
+                        text="Active"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!site.active"
+                        imageSrc="/images/icons/bstatus-green-off.png"
+                        text="Inactive"
+                        [showText]="false" />
+
+        <ng-container *ngIf="site.needsCsiInspection">
+            <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png"
+                            text="Needs CSI"
+                            [showText]="false" />
+            {{site.csiRenewalDate | date}}
+        </ng-container>
+
+        <vp-status-icon *ngIf="!site.needsCsiInspection"
+                        imageSrc="/images/icons/bstatus-red-off.png"
+                        text="Does not need CSI"
+                        [showText]="false" />
+
+        <ng-container *ngIf="site.needsFogPermit">
+            <vp-status-icon imageSrc="/images/icons/bstatus-blue-on.png"
+                            text="Needs FOG Permit"
+                            [showText]="false" />
+            {{site.fogPermitExpirationDate | date}}
+        </ng-container>
+        <vp-status-icon *ngIf="!site.needsFogPermit"
+                        imageSrc="/images/icons/bstatus-blue-off.png"
+                        text="Does not need FOG Permit"
+                        [showText]="false" />
     </div>
 </ng-template>
 

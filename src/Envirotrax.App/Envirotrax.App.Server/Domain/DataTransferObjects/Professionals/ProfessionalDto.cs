@@ -12,6 +12,7 @@ public class ProfessionalDto : IDto
     [StringLength(255)]
     public string Name { get; set; } = null!;
 
+    [EmailAddress]
     [StringLength(100)]
     public string? CompanyEmail { get; set; }
 

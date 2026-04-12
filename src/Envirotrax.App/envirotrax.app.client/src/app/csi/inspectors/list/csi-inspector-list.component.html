@@ -50,13 +50,22 @@
         </vp-filter-panel>
     </form>
 </div>
-    
+
 
 <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
 
+<ng-template #addressCell let-inspector="rowData">
+    <div>
+        <div>{{inspector.address}} {{inspector.city}}<span
+                  *ngIf="(inspector.address || inspector.city) && (inspector.state || inspector.zipCode)">, </span>
+        </div>
+        <div>
+            {{inspector.state?.code}} {{inspector.zipCode}}
+        </div>
+    </div>
+</ng-template>
 
 <div *ngIf="showResults">
-
     <div class="d-flex justify-content-between mb-3">
         <button type="button"
                 class="btn btn-primary"
@@ -75,16 +84,15 @@
 
     <vp-section header="Inspector Search Results">
         <vp-table *ngIf="table.items"
-                    [columns]="table.columns!"
-                    [data]="table.items.data"
-                    [(pageInfo)]="table.items.pageInfo"
-                    (pageInfoChange)="getInspectors()"
-                    [(query)]="table.query"
-                    (queryChange)="getInspectors()"
-                    (queryReset)="getInspectors()"
-                    [freeTextSearch]="table.freeTextSearch" 
-                    [canSelect]="true"
-                    (select)="openDetails($event)"/>
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getInspectors()"
+                  [(query)]="table.query"
+                  (queryChange)="getInspectors()"
+                  (queryReset)="getInspectors()"
+                  [freeTextSearch]="table.freeTextSearch"
+                  [canSelect]="true"
+                  (select)="openDetails($event)" />
     </vp-section>
-
 </div>

@@ -323,7 +323,7 @@ export class App implements OnInit {
           {
             title: 'Inspector Management',
             iconCss: 'fa-regular fa-user',
-            routerLink: ['/'],
+            routerLink: ['/fog/inspectors'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogInspectors),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
           },
@@ -658,7 +658,7 @@ export class App implements OnInit {
           {
             title: 'Inspector Management',
             iconCss: 'fa-regular fa-user',
-            routerLink: ['/'],
+            routerLink: ['/fog/inspectors'],
             hasPermission: isAdmin && isFogInspector,
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
           },

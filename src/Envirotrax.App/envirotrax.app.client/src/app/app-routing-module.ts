@@ -52,6 +52,15 @@ const routes: Routes = [
           features: [FeatureType.BackflowTesting],
           roles: [ROLE_DEFINITIONS.WATER_SUPPLIER]
         }
+      },
+      {
+        path: 'fog',
+        loadChildren: () => import('./fog/fog.module').then(m => m.FogModule),
+        canActivate: [FeatureGuard, RoleGuard],
+        data: {
+          features: [FeatureType.FogInspection],
+          roles: [ROLE_DEFINITIONS.WATER_SUPPLIER]
+        }
       }
     ]
   },

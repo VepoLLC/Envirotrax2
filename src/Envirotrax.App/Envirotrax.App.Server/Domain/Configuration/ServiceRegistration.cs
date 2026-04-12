@@ -1,10 +1,12 @@
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
+using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Implementations.Backflow;
 using Envirotrax.App.Server.Domain.Services.Implementations.Csi;
+using Envirotrax.App.Server.Domain.Services.Implementations.Fog;
 using Envirotrax.App.Server.Domain.Services.Implementations.Sites;
 using Envirotrax.App.Server.Domain.Services.Implementations.Users;
 using Envirotrax.App.Server.Domain.Services.Implementations;
@@ -42,6 +44,7 @@ public static class ServiceRegistration
         services.AddTransient<ISiteService, SiteService>();
         services.AddTransient<ICsiInspectionService, CsiInspectionService>();
         services.AddTransient<ICsiInspectorService, CsiInspectorService>();
+        services.AddTransient<IFogInspectorService, FogInspectorService>();
         services.AddTransient<IBackflowTesterService, BackflowTesterService>();
         services.AddTransient<ILookupService, LookupService>();
 

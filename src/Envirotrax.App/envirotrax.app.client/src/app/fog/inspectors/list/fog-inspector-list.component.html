@@ -48,6 +48,15 @@
 
 <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
 
+<ng-template #addressCell let-inspector="rowData">
+    <div>
+        <div>{{inspector.address}} {{inspector.city}}<span
+                  *ngIf="(inspector.address || inspector.city) && (inspector.state || inspector.zipCode)">, </span>
+        </div>
+        <div>{{inspector.state?.code}} {{inspector.zipCode}}</div>
+    </div>
+</ng-template>
+
 <div *ngIf="showResults">
 
     <div class="d-flex justify-content-between mb-3">

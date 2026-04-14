@@ -14,7 +14,9 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Fog
 
         protected override IQueryable<Professional> GetListQuery()
         {
-            return Entity.AsNoTracking().Where(p => p.HasFogInspection);
+            return Entity.AsNoTracking()
+            .Include(p => p.State)
+            .Where(p => p.HasFogInspection);
         }
     }
 }

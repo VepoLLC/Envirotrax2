@@ -11,7 +11,7 @@ import { Professional } from "../../models/professionals/professional";
 @Injectable({
     providedIn: 'root'
 })
-export class FogInspectorManagementService {
+export class FogInspectorService {
     constructor(
         private readonly _urlResolver: UrlResolverService,
         private readonly _queryHelper: QueryHelperService,

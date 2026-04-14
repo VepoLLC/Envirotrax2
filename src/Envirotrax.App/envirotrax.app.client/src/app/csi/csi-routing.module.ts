@@ -5,6 +5,9 @@ import { PermissionAction, PermissionType } from "../shared/models/permission-ty
 import { CsiInspectionListComponent } from "./inspections/list/csi-inspection-list.component";
 import { CsiInspectorListComponent } from "./inspectors/list/csi-inspector-list.component";
 import { CsiInspectorDetailsComponent } from "./inspectors/details/csi-inspector-details.component";
+import { CsiSubmissionPropertySearchComponent } from "./inspections/create/csi-submission-property-search.component";
+import { RoleGuard } from "../shared/guards/role.guard";
+import { ROLE_DEFINITIONS } from "../shared/models/role-definitions";
 
 const routes: Routes = [
     
@@ -49,6 +52,15 @@ const routes: Routes = [
                     action: PermissionAction.CanView
                 }
             ]
+        }
+    },
+    {
+        path: 'submissions',
+        title:'Submit CSI',
+        component: CsiSubmissionPropertySearchComponent,
+        canActivate: [RoleGuard],
+        data:{
+            roles: [ROLE_DEFINITIONS.PROFESSIONAL]        
         }
     }
 ];

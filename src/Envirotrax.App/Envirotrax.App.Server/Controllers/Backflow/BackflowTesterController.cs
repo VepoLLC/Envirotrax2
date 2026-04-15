@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Envirotrax.App.Server.Controllers.Backflow
 {
     [Route("api/backflow/testers")]
+    [HasFeature(FeatureType.BackflowTesting)]
     [PermissionResource(PermissionType.BackflowTesters)]
     public class BackflowTesterController : WaterSupplierCrudController<ProfessionalDto>
     {

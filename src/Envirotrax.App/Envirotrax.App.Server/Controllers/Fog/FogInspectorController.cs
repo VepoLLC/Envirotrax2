@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Envirotrax.App.Server.Controllers.Fog
 {
     [Route("api/fog/inspectors")]
+    [HasFeature(FeatureType.FogInspection)]
     [PermissionResource(PermissionType.FogInspectors)]
     public class FogInspectorController : WaterSupplierCrudController<ProfessionalDto>
     {

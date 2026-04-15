@@ -6,7 +6,7 @@ import { ColumnType } from "../../../../shared/components/data-components/sortin
 import { CsiInspectorWaterSuppliersService } from "../../../../shared/services/csi/csi-inspector-water-suppliers.service";
 
 @Component({
-    selector: 'app-csi-inspector-water-suppliers',
+    selector: 'vp-csi-inspector-water-suppliers',
     standalone: false,
     templateUrl: './csi-inspector-water-suppliers.component.html'
 })
@@ -24,7 +24,7 @@ export class CsiInspectorWaterSuppliersComponent implements OnInit {
     @ViewChild('bannedCell', { static: true })
     private bannedCellTemplate!: TemplateRef<CellTemplateData<ProfessionalWaterSupplier>>;
 
-    constructor(private readonly _service: CsiInspectorWaterSuppliersService) {}
+    constructor(private readonly _service: CsiInspectorWaterSuppliersService) { }
 
     public async ngOnInit(): Promise<void> {
         this.setupColumns();
@@ -35,7 +35,7 @@ export class CsiInspectorWaterSuppliersComponent implements OnInit {
         this.table.columns = this.getColumns();
     }
 
-    private getColumns(): TableColumn<ProfessionalWaterSupplier>[]{
+    private getColumns(): TableColumn<ProfessionalWaterSupplier>[] {
         return [
             {
                 field: 'waterSupplierId',

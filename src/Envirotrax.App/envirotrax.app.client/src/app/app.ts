@@ -204,7 +204,7 @@ export class App implements OnInit {
           {
             title: 'Backflow Test Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['/'],
+            routerLink: ['backflow/tests'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowTests),
             hasFeature: true
           },
@@ -539,7 +539,7 @@ export class App implements OnInit {
           {
             title: 'Backflow Test Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['/'],
+            routerLink: ['backflow/tests'],
             hasPermission: isBackflowTester,
             hasFeature: true
           },

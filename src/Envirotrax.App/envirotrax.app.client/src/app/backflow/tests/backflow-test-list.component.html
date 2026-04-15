@@ -1,0 +1,252 @@
+<h1 class="text-center h2">Backflow Test Search</h1>
+
+<div [hidden]="showResults">
+    <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+        <vp-filter-panel (filterChange)="onFilterChange($event)">
+
+            <!-- Main Search Criteria -->
+            <vp-section header="Search Criteria">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="accountNumber"
+                                                   label="Account Number"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="serialNumber"
+                                                   label="Serial Number"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="reasonForTest"
+                                                   label="Reason for Test"
+                                                   type="select"
+                                                   [options]="reasonForTestOptions"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="hazardType"
+                                                   label="Hazard Type"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="deviceType"
+                                                   label="Device Type"
+                                                   [form]="searchForm" />
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="isCurrent"
+                                                   label="Test History"
+                                                   type="select"
+                                                   [options]="testHistoryOptions"
+                                                   [form]="searchForm"
+                                                   borderColor="#00a000" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="testResult"
+                                                   label="Test Result"
+                                                   type="select"
+                                                   [options]="testResultOptions"
+                                                   [form]="searchForm"
+                                                   borderColor="#00a000" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="outOfService"
+                                                   label="Service Status"
+                                                   type="select"
+                                                   [options]="serviceStatusOptions"
+                                                   [form]="searchForm"
+                                                   borderColor="orange" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="disapproved"
+                                                   label="Approval Status"
+                                                   type="select"
+                                                   [options]="approvalStatusOptions"
+                                                   [form]="searchForm"
+                                                   borderColor="cyan" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="rejected"
+                                                   label="Rejected Status"
+                                                   type="select"
+                                                   [options]="rejectedStatusOptions"
+                                                   [form]="searchForm"
+                                                   borderColor="red" />
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="ossf"
+                                                   label="OSSF"
+                                                   type="select"
+                                                   [options]="yesNoOptions"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="meterNumber"
+                                                   label="Water Meter Number"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="testDate"
+                                                   label="Test Date Range"
+                                                   type="daterange"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="properlyInstalled"
+                                                   label="Installed per Recommendations"
+                                                   type="select"
+                                                   [options]="yesNoOptions"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="nonPotable"
+                                                   label="Non-Potable Water Supply"
+                                                   type="select"
+                                                   [options]="yesNoOptions"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="gaugeNonPotable"
+                                                   label="Non-Potable Test Gauge"
+                                                   type="select"
+                                                   [options]="yesNoOptions"
+                                                   [form]="searchForm" />
+                        </div>
+                    </div>
+                </div>
+            </vp-section>
+
+            <!-- BPAT Criteria -->
+            <div class="mt-3">
+                <vp-section header="BPAT Criteria">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <vp-filter-panel-field fieldName="bpatLicenseNumber"
+                                                   label="BPAT License Number"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <vp-filter-panel-field fieldName="bpatCompanyName"
+                                                   label="BPAT Company Name"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <vp-filter-panel-field fieldName="bpatContactName"
+                                                   label="BPAT Contact Name"
+                                                   [form]="searchForm" />
+                        </div>
+                    </div>
+                </vp-section>
+            </div>
+
+            <!-- Location / Property + Contact / Mailing side by side -->
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <vp-section header="Location / Property Criteria">
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <vp-filter-panel-field fieldName="propertyType"
+                                                       label="Property Type"
+                                                       type="select"
+                                                       [options]="propertyTypeOptions"
+                                                       [form]="searchForm" />
+                            </div>
+                            <div class="col-12 mb-3">
+                                <vp-filter-panel-field fieldName="propertyBusinessName"
+                                                       label="Business Name"
+                                                       [form]="searchForm" />
+                            </div>
+                            <div class="col-4 mb-3">
+                                <vp-filter-panel-field fieldName="propertyStreetNumber"
+                                                       label="Street #"
+                                                       [form]="searchForm" />
+                            </div>
+                            <div class="col-5 mb-3">
+                                <vp-filter-panel-field fieldName="propertyStreetName"
+                                                       label="Street Name"
+                                                       [form]="searchForm" />
+                            </div>
+                            <div class="col-3 mb-3">
+                                <vp-filter-panel-field fieldName="propertyNumber"
+                                                       label="Suite/Apt #"
+                                                       [form]="searchForm" />
+                            </div>
+                        </div>
+                    </vp-section>
+                </div>
+
+                <div class="col-md-6 mt-3 mt-md-0">
+                    <vp-section header="Contact / Mailing Criteria">
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <vp-filter-panel-field fieldName="mailingCompanyName"
+                                                       label="Company Name"
+                                                       [form]="searchForm" />
+                            </div>
+                            <div class="col-12 mb-3">
+                                <vp-filter-panel-field fieldName="mailingContactName"
+                                                       label="Contact Name"
+                                                       [form]="searchForm" />
+                            </div>
+                            <div class="col-4 mb-3">
+                                <vp-filter-panel-field fieldName="mailingStreetNumber"
+                                                       label="Street #"
+                                                       [form]="searchForm" />
+                            </div>
+                            <div class="col-5 mb-3">
+                                <vp-filter-panel-field fieldName="mailingStreetName"
+                                                       label="Street Name"
+                                                       [form]="searchForm" />
+                            </div>
+                            <div class="col-3 mb-3">
+                                <vp-filter-panel-field fieldName="mailingNumber"
+                                                       label="Suite/Apt #"
+                                                       [form]="searchForm" />
+                            </div>
+                        </div>
+                    </vp-section>
+                </div>
+            </div>
+
+        </vp-filter-panel>
+
+        <div class="mt-3">
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>
+                    Search
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+<div *ngIf="showResults">
+    <div class="d-flex justify-content-end mb-3">
+        <button type="button"
+                class="btn btn-primary vp-section-button"
+                (click)="showResults = false;">
+            Search Again
+        </button>
+    </div>
+
+    <vp-section header="Backflow Test Search Results">
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getTests()"
+                  [(query)]="table.query"
+                  (queryChange)="getTests()"
+                  (queryReset)="getTests()"
+                  [freeTextSearch]="table.freeTextSearch" />
+    </vp-section>
+</div>

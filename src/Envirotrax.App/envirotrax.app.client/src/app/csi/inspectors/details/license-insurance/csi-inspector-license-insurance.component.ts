@@ -8,7 +8,7 @@ import { CsiInspectorLicensesService } from "../../../../shared/services/csi/csi
 import { CsiInspectorInsurancesService } from "../../../../shared/services/csi/csi-inspector-insurances.service";
 
 @Component({
-    selector: 'app-csi-inspector-license-insurance',
+    selector: 'vp-csi-inspector-license-insurances',
     standalone: false,
     templateUrl: './csi-inspector-license-insurance.component.html'
 })
@@ -48,14 +48,14 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
     constructor(
         private readonly _licensesService: CsiInspectorLicensesService,
         private readonly _insurancesService: CsiInspectorInsurancesService
-    ) {}
+    ) { }
 
     public async ngOnInit(): Promise<void> {
         this.setupColumns();
         await this.loadInsurances();
     }
 
-    public async setActiveTab(tab: 'insurances' | 'licenses'): Promise<void>{
+    public async setActiveTab(tab: 'insurances' | 'licenses'): Promise<void> {
         this.activeTab = tab;
         if (tab === 'licenses' && !this.licensesTable.items) {
             await this.loadLicenses();

@@ -1,4 +1,3 @@
-
 <h1 class="h2 mb-4 text-center">CSI Inspector Details</h1>
 
 <dp-loading-spinner *ngIf="isAccountLoading"></dp-loading-spinner>
@@ -40,15 +39,15 @@
         </div>
 
         <div class="col-lg-6">
-            <app-csi-inspector-water-suppliers [inspectorId]="id!" />
+            <vp-csi-inspector-water-suppliers [inspectorId]="id!" />
         </div>
 
         <div class="col-12">
-            <app-csi-inspector-sub-accounts [inspectorId]="id!" />
+            <vp-csi-inspector-users [inspectorId]="id!" />
         </div>
 
         <div class="col-12">
-            <app-csi-inspector-license-insurance [inspectorId]="id!" />
+            <vp-csi-inspector-license-insurances [inspectorId]="id!" />
         </div>
 
     </div>

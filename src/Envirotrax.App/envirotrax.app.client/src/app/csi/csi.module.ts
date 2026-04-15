@@ -8,7 +8,7 @@ import { CsiInspectionListComponent } from "./inspections/list/csi-inspection-li
 import { CsiInspectorListComponent } from "./inspectors/list/csi-inspector-list.component";
 import { CsiInspectorDetailsComponent } from "./inspectors/details/csi-inspector-details.component";
 import { CsiInspectorWaterSuppliersComponent } from "./inspectors/details/water-suppliers/csi-inspector-water-suppliers.component";
-import { CsiInspectorSubAccountsComponent } from "./inspectors/details/sub-accounts/csi-inspector-sub-accounts.component";
+import { CsiInspectorUsersComponent } from "./inspectors/details/users/csi-inspector-users.component";
 import { CsiInspectorLicenseInsuranceComponent } from "./inspectors/details/license-insurance/csi-inspector-license-insurance.component";
 
 @NgModule({
@@ -17,7 +17,7 @@ import { CsiInspectorLicenseInsuranceComponent } from "./inspectors/details/lice
         CsiInspectorListComponent,
         CsiInspectorDetailsComponent,
         CsiInspectorWaterSuppliersComponent,
-        CsiInspectorSubAccountsComponent,
+        CsiInspectorUsersComponent,
         CsiInspectorLicenseInsuranceComponent
     ],
     imports: [

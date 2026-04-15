@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Envirotrax.App.Server.Controllers.Csi;
 
 [Route("api/csi/inspections")]
+[HasFeature(FeatureType.CsiInspection)]
 [PermissionResource(PermissionType.CsiInspections)]
 public class CsiInspectionController : WaterSupplierCrudController<CsiInspectionDto>
 {

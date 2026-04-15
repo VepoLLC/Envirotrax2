@@ -20,7 +20,7 @@ export class CsiInspectorSubAccountsService {
     }
 
     public async getSubAccounts(id: number, pageInfo: PageInfo, query: Query): Promise<PagedData<ProfessionalUser>> {
-        const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${id}/sub-accounts`);
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${id}/users`);
         return await lastValueFrom(this._http.get<PagedData<ProfessionalUser>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));

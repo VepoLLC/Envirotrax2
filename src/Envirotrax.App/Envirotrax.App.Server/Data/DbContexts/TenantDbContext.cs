@@ -9,6 +9,7 @@ using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using System.Reflection;
+using Envirotrax.App.Server.Data.Models.WaterSuppliers.Features;
 
 namespace Envirotrax.App.Server.Data.DbContexts;
 
@@ -19,6 +20,8 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
     public DbSet<BackflowSettings> BackflowSettings { get; set; }
 
     public DbSet<WaterSupplierUser> WaterSupplierUsers { get; set; }
+    public DbSet<Feature> Features { get; set; }
+    public DbSet<WaterSupplierFeature> WaterSupplierFeatures { get; set; }
     public DbSet<Permission> Permissions { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<RolePermission> RolePermissions { get; set; }

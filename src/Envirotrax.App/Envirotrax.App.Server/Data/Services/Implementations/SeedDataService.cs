@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Models.States;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
+using Envirotrax.App.Server.Data.Models.WaterSuppliers.Features;
 using Envirotrax.App.Server.Data.SeedData;
 using Envirotrax.Common;
 using Microsoft.EntityFrameworkCore;
@@ -37,6 +38,7 @@ public class SeedDataService : IHostedService
             dbContext.SkipSaveSecurityProperties = true;
 
             await AddTenantsAsync(dbContext);
+            await AddFeaturesAsync(dbContext);
             await AddStatesAsync(dbContext);
 
             await AddPermissionsAsync(dbContext);
@@ -155,6 +157,25 @@ public class SeedDataService : IHostedService
         if (!await dbContext.ProfessionalLicenseTypes.AnyAsync())
         {
             dbContext.ProfessionalLicenseTypes.AddRange(ProfessionalLicenseTypeSeedData.GetTypes(_states!));
+            await dbContext.SaveChangesAsync();
+        }
+    }
+
+    private async Task AddFeaturesAsync(TenantDbContext dbContext)
+    {
+        if (!await dbContext.Features.AnyAsync())
+        {
+            dbContext.Features.AddRange(FeatureSeedData.Features);
+
+            var waterSupplierFeatures = FeatureSeedData
+                .Features
+                .Select(feature => new WaterSupplierFeature
+                {
+                    WaterSupplierId = _defaultTenant!.Id,
+                    FeatureId = feature.Id
+                });
+
+            dbContext.WaterSupplierFeatures.AddRange(waterSupplierFeatures);
             await dbContext.SaveChangesAsync();
         }
     }

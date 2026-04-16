@@ -16,13 +16,21 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
     protected override IQueryable<BackflowTest> GetListQuery()
     {
         return base.GetListQuery()
-            .Include(bt => bt.Site);
+            .Include(bt => bt.Site)
+            .Include(bt => bt.Bpat)
+            .Include(bt => bt.BpatState)
+            .Include(bt => bt.PropertyState)
+            .Include(bt => bt.MailingState);
     }
 
     protected override IQueryable<BackflowTest> GetDetailsQuery()
     {
         return base.GetDetailsQuery()
-            .Include(bt => bt.Site);
+            .Include(bt => bt.Site)
+            .Include(bt => bt.Bpat)
+            .Include(bt => bt.BpatState)
+            .Include(bt => bt.PropertyState)
+            .Include(bt => bt.MailingState);
     }
 
     public override Task<IEnumerable<BackflowTest>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)

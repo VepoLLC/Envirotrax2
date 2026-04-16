@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Envirotrax.App.Server.Data.Models.Backflow;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 
@@ -10,8 +12,6 @@ public class BackflowTestDto : IDto
 
     public ReferencedSiteDto? Site { get; set; }
 
-    public DateTime CreationDate { get; set; }
-
     [StringLength(50)]
     public string? SubmissionId { get; set; }
 
@@ -19,6 +19,9 @@ public class BackflowTestDto : IDto
     public string? JobNumber { get; set; }
 
     // BPAT
+    public int? ProfessionalId { get; set; }
+    public int? BpatId { get; set; }
+
     [StringLength(50)]
     public string? BpatLicenseNumber { get; set; }
 
@@ -29,6 +32,8 @@ public class BackflowTestDto : IDto
 
     [StringLength(100)]
     public string? BpatContactName { get; set; }
+
+    public ReferencedStateDto? BpatState { get; set; }
 
     // Property / Site fields
     [StringLength(50)]
@@ -51,8 +56,7 @@ public class BackflowTestDto : IDto
     [StringLength(50)]
     public string? PropertyCity { get; set; }
 
-    [StringLength(50)]
-    public string? PropertyState { get; set; }
+    public ReferencedStateDto? PropertyState { get; set; }
 
     [StringLength(20)]
     public string? PropertyZip { get; set; }
@@ -72,6 +76,8 @@ public class BackflowTestDto : IDto
 
     [StringLength(50)]
     public string? MailingNumber { get; set; }
+
+    public ReferencedStateDto? MailingState { get; set; }
 
     // Device
     [StringLength(50)]
@@ -127,6 +133,7 @@ public class BackflowTestDto : IDto
     public DateTime? OutOfServiceDate { get; set; }
 
     public DateTime? ApprovalDate { get; set; }
+    public int? ApprovedById { get; set; }
 
     [StringLength(100)]
     public string? TransactionId { get; set; }
@@ -134,5 +141,15 @@ public class BackflowTestDto : IDto
     public decimal Amount { get; set; }
     public decimal AmountShare { get; set; }
 
+    public bool Rejected { get; set; }
+    public int? RejectedById { get; set; }
+    public DateTime? RejectedDate { get; set; }
+    public string? RejectedReason { get; set; }
+
     public bool NeedsValidation { get; set; }
+
+    // Audit
+    public DateTime CreatedTime { get; set; }
+    public DateTime? UpdatedTime { get; set; }
+    public AppUserDto? UpdatedBy { get; set; }
 }

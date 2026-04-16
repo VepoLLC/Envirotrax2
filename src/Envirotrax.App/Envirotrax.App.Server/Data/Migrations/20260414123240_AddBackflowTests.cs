@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -11,12 +11,8 @@ namespace Envirotrax.App.Server.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.EnsureSchema(
-                name: "dbo");
-
             migrationBuilder.CreateTable(
                 name: "BackflowTests",
-                schema: "dbo",
                 columns: table => new
                 {
                     WaterSupplierId = table.Column<int>(type: "int", nullable: false),
@@ -125,7 +121,6 @@ namespace Envirotrax.App.Server.Data.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_BackflowTests_WaterSupplierId_SiteId",
-                schema: "dbo",
                 table: "BackflowTests",
                 columns: new[] { "WaterSupplierId", "SiteId" });
         }
@@ -134,8 +129,7 @@ namespace Envirotrax.App.Server.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BackflowTests",
-                schema: "dbo");
+                name: "BackflowTests");
         }
     }
 }

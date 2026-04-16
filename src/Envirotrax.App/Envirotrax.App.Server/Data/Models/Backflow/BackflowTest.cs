@@ -1,23 +1,25 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Models.Sites;
+using Envirotrax.App.Server.Data.Models.States;
+using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Envirotrax.App.Server.Data.Models.Backflow;
 
 [Table("BackflowTests")]
-public class BackflowTest : TenantModel<WaterSupplier>
+public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }
 
     public int? SiteId { get; set; }
     public Site? Site { get; set; }
-
-    public DateTime CreationDate { get; set; }
 
     [StringLength(50)]
     public string? SubmissionId { get; set; }
@@ -26,11 +28,9 @@ public class BackflowTest : TenantModel<WaterSupplier>
     public string? JobNumber { get; set; }
 
     // BPAT (Backflow Prevention Assembly Tester)
-    [StringLength(50)]
-    public string? MasterBpatId { get; set; }
-
-    [StringLength(50)]
-    public string? BpatId { get; set; }
+    public int? ProfessionalId { get; set; }
+    public int? BpatId { get; set; }
+    public ProfessionalUser? Bpat { get; set; }
 
     [StringLength(50)]
     public string? BpatLicenseNumber { get; set; }
@@ -49,8 +49,8 @@ public class BackflowTest : TenantModel<WaterSupplier>
     [StringLength(50)]
     public string? BpatCity { get; set; }
 
-    [StringLength(50)]
-    public string? BpatState { get; set; }
+    public int? BpatStateId { get; set; }
+    public State? BpatState { get; set; }
 
     [StringLength(20)]
     public string? BpatZip { get; set; }
@@ -82,8 +82,8 @@ public class BackflowTest : TenantModel<WaterSupplier>
     [StringLength(50)]
     public string? PropertyCity { get; set; }
 
-    [StringLength(50)]
-    public string? PropertyState { get; set; }
+    public int? PropertyStateId { get; set; }
+    public State? PropertyState { get; set; }
 
     [StringLength(20)]
     public string? PropertyZip { get; set; }
@@ -107,8 +107,8 @@ public class BackflowTest : TenantModel<WaterSupplier>
     [StringLength(50)]
     public string? MailingCity { get; set; }
 
-    [StringLength(50)]
-    public string? MailingState { get; set; }
+    public int? MailingStateId { get; set; }
+    public State? MailingState { get; set; }
 
     [StringLength(20)]
     public string? MailingZip { get; set; }
@@ -193,8 +193,8 @@ public class BackflowTest : TenantModel<WaterSupplier>
     // Approval / Payment
     public DateTime? ApprovalDate { get; set; }
 
-    [StringLength(100)]
-    public string? ApprovedBy { get; set; }
+    public int? ApprovedById { get; set; }
+    public WaterSupplierUser? ApprovedBy { get; set; }
 
     [StringLength(100)]
     public string? TransactionId { get; set; }
@@ -212,8 +212,8 @@ public class BackflowTest : TenantModel<WaterSupplier>
     // Rejection
     public bool Rejected { get; set; }
 
-    [StringLength(100)]
-    public string? RejectedBy { get; set; }
+    public int? RejectedById { get; set; }
+    public WaterSupplierUser? RejectedBy { get; set; }
 
     public DateTime? RejectedDate { get; set; }
 
@@ -225,4 +225,26 @@ public class BackflowTest : TenantModel<WaterSupplier>
     public bool ValidationSiteInformationChanged { get; set; }
     public bool ValidationUnknownSerialNumber { get; set; }
     public bool ValidationDeviceInformationChanged { get; set; }
+
+    // Audit
+    public int? CreatedById { get; set; }
+    public AppUser? CreatedBy { get; set; }
+    public DateTime CreatedTime { get; set; }
+    public int? UpdatedById { get; set; }
+    public AppUser? UpdatedBy { get; set; }
+    public DateTime? UpdatedTime { get; set; }
+    public int? DeletedById { get; set; }
+    public AppUser? DeletedBy { get; set; }
+    public DateTime? DeletedTime { get; set; }
+}
+
+public class BackflowTestConfiguration : IEntityTypeConfiguration<BackflowTest>
+{
+    public void Configure(EntityTypeBuilder<BackflowTest> builder)
+    {
+        builder.HasOne<ProfessionalUser>(bt => bt.Bpat)
+            .WithMany()
+            .HasForeignKey(bt => new { bt.ProfessionalId, bt.BpatId })
+            .HasPrincipalKey(pu => new { pu.ProfessionalId, pu.UserId });
+    }
 }

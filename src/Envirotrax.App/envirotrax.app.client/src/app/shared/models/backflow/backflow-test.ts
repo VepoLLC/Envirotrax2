@@ -1,13 +1,17 @@
 export interface BackflowTest {
     id: number;
     site?: { id: number; accountNumber?: string } | null;
-    creationDate?: string;
+    createdTime?: string;
+    updatedTime?: string;
     submissionId?: string;
     jobNumber?: string;
+    professionalId?: number;
+    bpatId?: number;
     bpatLicenseNumber?: string;
     bpatLicenseExpiration?: string;
     bpatCompanyName?: string;
     bpatContactName?: string;
+    bpatState?: { id?: number; name?: string; code?: string } | null;
     accountNumber?: string;
     propertyBusinessName?: string;
     propertyType?: number;
@@ -15,10 +19,11 @@ export interface BackflowTest {
     propertyStreetName?: string;
     propertyNumber?: string;
     propertyCity?: string;
-    propertyState?: string;
+    propertyState?: { id?: number; name?: string; code?: string } | null;
     propertyZip?: string;
     mailingCompanyName?: string;
     mailingContactName?: string;
+    mailingState?: { id?: number; name?: string; code?: string } | null;
     deviceType?: string;
     manufacturer?: string;
     model?: string;
@@ -45,7 +50,12 @@ export interface BackflowTest {
     outOfService?: boolean;
     outOfServiceDate?: string;
     approvalDate?: string;
+    approvedById?: number;
     transactionId?: string;
     amount?: number;
+    rejected?: boolean;
+    rejectedById?: number;
+    rejectedDate?: string;
+    rejectedReason?: string;
     needsValidation?: boolean;
 }

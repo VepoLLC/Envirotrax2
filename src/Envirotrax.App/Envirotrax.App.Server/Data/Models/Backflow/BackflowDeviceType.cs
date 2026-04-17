@@ -9,5 +9,6 @@ public enum BackflowDeviceType
     RPPD2 = 4,
     AG = 5,
     PVB = 6,
-    SVB = 7
+    SVB = 7,
+    DC = 8
 }

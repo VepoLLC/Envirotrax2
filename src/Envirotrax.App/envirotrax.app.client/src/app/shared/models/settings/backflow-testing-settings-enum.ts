@@ -26,12 +26,12 @@ export enum BackflowNonCompliantType {
 }
 
 export enum BackflowTestingMethodType {
-    USC = 1,
-    ASSE = 2,
-    TREEO = 3
+    USC = 0,
+    ASSE = 1,
+    TREEO = 2
 }
 
 export enum BackflowOutOfServiceType {
-    VepoManaged = 1,
-    WaterSuplierManaged = 2
+    VepoManaged = 0,
+    WaterSupplierManaged = 1
 }

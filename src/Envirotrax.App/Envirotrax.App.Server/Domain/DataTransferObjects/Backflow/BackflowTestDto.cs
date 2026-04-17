@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 
@@ -19,8 +20,8 @@ public class BackflowTestDto : IDto
     public string? JobNumber { get; set; }
 
     // BPAT
-    public int? ProfessionalId { get; set; }
-    public int? BpatId { get; set; }
+    public ReferencedProfessionalDto? Professional { get; set; }
+    public ReferencedProfessionalUserDto? Bpat { get; set; }
 
     [StringLength(50)]
     public string? BpatLicenseNumber { get; set; }
@@ -133,7 +134,7 @@ public class BackflowTestDto : IDto
     public DateTime? OutOfServiceDate { get; set; }
 
     public DateTime? ApprovalDate { get; set; }
-    public int? ApprovedById { get; set; }
+    public ReferencedWaterSupplierUserDto? ApprovedBy { get; set; }
 
     [StringLength(100)]
     public string? TransactionId { get; set; }
@@ -142,7 +143,7 @@ public class BackflowTestDto : IDto
     public decimal AmountShare { get; set; }
 
     public bool Rejected { get; set; }
-    public int? RejectedById { get; set; }
+    public ReferencedWaterSupplierUserDto? RejectedBy { get; set; }
     public DateTime? RejectedDate { get; set; }
     public string? RejectedReason { get; set; }
 

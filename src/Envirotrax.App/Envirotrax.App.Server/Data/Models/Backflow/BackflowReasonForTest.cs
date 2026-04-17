@@ -4,7 +4,7 @@ public enum BackflowReasonForTest
 {
     AnnualTest = 0,
     NewInstallation = 1,
-    Relocation = 2,
+    ExistingInstallation = 2,
     Replacement = 3,
     Repair = 4,
     AnnualTestAfterRepairs = 5

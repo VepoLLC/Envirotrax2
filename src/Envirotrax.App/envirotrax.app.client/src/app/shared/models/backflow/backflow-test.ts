@@ -1,17 +1,23 @@
+import { Professional } from '../professionals/professional';
+import { ProfessionalUser } from '../professionals/professional-user';
+import { Site } from '../sites/site';
+import { State } from '../lookup/state';
+import { WaterSupplierUser } from '../users/water-supplier-user';
+
 export interface BackflowTest {
     id: number;
-    site?: { id: number; accountNumber?: string } | null;
+    site?: Site | null;
     createdTime?: string;
     updatedTime?: string;
     submissionId?: string;
     jobNumber?: string;
-    professionalId?: number;
-    bpatId?: number;
+    professional?: Professional | null;
+    bpat?: ProfessionalUser | null;
     bpatLicenseNumber?: string;
     bpatLicenseExpiration?: string;
     bpatCompanyName?: string;
     bpatContactName?: string;
-    bpatState?: { id?: number; name?: string; code?: string } | null;
+    bpatState?: State | null;
     accountNumber?: string;
     propertyBusinessName?: string;
     propertyType?: number;
@@ -19,11 +25,11 @@ export interface BackflowTest {
     propertyStreetName?: string;
     propertyNumber?: string;
     propertyCity?: string;
-    propertyState?: { id?: number; name?: string; code?: string } | null;
+    propertyState?: State | null;
     propertyZip?: string;
     mailingCompanyName?: string;
     mailingContactName?: string;
-    mailingState?: { id?: number; name?: string; code?: string } | null;
+    mailingState?: State | null;
     deviceType?: string;
     manufacturer?: string;
     model?: string;
@@ -50,11 +56,11 @@ export interface BackflowTest {
     outOfService?: boolean;
     outOfServiceDate?: string;
     approvalDate?: string;
-    approvedById?: number;
+    approvedBy?: WaterSupplierUser | null;
     transactionId?: string;
     amount?: number;
     rejected?: boolean;
-    rejectedById?: number;
+    rejectedBy?: WaterSupplierUser | null;
     rejectedDate?: string;
     rejectedReason?: string;
     needsValidation?: boolean;

@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using System.Reflection;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers.Features;
+using Envirotrax.App.Server.Data.Models.GisAreas;
 
 namespace Envirotrax.App.Server.Data.DbContexts;
 
@@ -26,6 +27,9 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
     public DbSet<Role> Roles { get; set; }
     public DbSet<RolePermission> RolePermissions { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
+
+    public DbSet<GisArea> GisAreas { get; set; }
+    public DbSet<GisAreaCoordinate> GisAreaCoordinates { get; set; }
 
     public DbSet<Professional> Professionals { get; set; }
     public DbSet<ProfessionalUser> ProfessionalUsers { get; set; }

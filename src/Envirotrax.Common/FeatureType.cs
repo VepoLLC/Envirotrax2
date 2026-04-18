@@ -11,5 +11,6 @@ public enum FeatureType
     ManagePermissions = 6,
     ManageProfessionalLicenses = 7,
     ManageProfessionalInsurances = 8,
-    ManageProfessionalRegistrationFees = 9
+    ManageProfessionalRegistrationFees = 9,
+    ManageGisAreas = 10
 }

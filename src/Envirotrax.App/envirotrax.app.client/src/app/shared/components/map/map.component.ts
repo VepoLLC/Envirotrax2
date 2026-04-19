@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, input, OnInit, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, HostListener, Input, input, OnInit, ViewChild } from "@angular/core";
 import { HelperService } from "../../services/helpers/helper.service";
 import { HttpClient } from "@angular/common/http";
 import { lastValueFrom, Observable, shareReplay } from "rxjs";
@@ -10,10 +10,13 @@ import { importLibrary, setOptions } from "@googlemaps/js-api-loader";
     selector: 'vp-map',
     templateUrl: './map.component.html'
 })
-export class MapComponent implements OnInit {
+export class MapComponent implements OnInit, AfterViewInit {
     private _map!: any;
+    private _container!: HTMLElement;
 
     private static _apiKey$?: Observable<ApiKey>;
+
+    public autoSetHeight?: string;
 
     @ViewChild('mapElement', { static: true })
     public mapElement!: ElementRef<HTMLElement>;
@@ -26,6 +29,9 @@ export class MapComponent implements OnInit {
 
     @Input()
     public zoom?: number;
+
+    @Input()
+    public height?: string;
 
     constructor(
         private readonly _helper: HelperService,
@@ -45,6 +51,10 @@ export class MapComponent implements OnInit {
     }
 
     public async ngOnInit(): Promise<void> {
+        this._container = document.getElementById('main-content')!;
+    }
+
+    public async ngAfterViewInit(): Promise<void> {
         const apiKey = await this.getApiKey();
         setOptions({ key: apiKey.apiKey });
 
@@ -53,19 +63,26 @@ export class MapComponent implements OnInit {
 
         // Set map options.
         const mapOptions = {
-            center: { lat: this.latitude, lng: this.longitude },
-            zoom: this.zoom || 1,
+            center: { lat: this.latitude ?? 0, lng: this.longitude ?? 0 },
+            zoom: this.zoom ?? 1,
             clickableIcons: false,
             gestureHandling: "greedy",
             streetViewControl: false,
             zoomControl: false,
         };
 
+        this.autoSetHeight = this._container.getBoundingClientRect().height.toString() + 'px';
+
         // Declare the map.
         this._map = new Map(
-            this.mapElement,
+            this.mapElement.nativeElement,
             mapOptions
         );
+    }
+
+    @HostListener('window:resize', ['$event'])
+    public windowResized(_: any): void {
+        this.autoSetHeight = this._container.getBoundingClientRect().height.toString() + 'px';
     }
 }
 

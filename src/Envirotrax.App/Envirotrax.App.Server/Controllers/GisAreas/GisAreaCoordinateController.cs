@@ -1,5 +1,7 @@
 using Envirotrax.App.Server.Domain.DataTransferObjects.GisAreas;
 using Envirotrax.App.Server.Domain.Services.Definitions.GisAreas;
+using Envirotrax.App.Server.Filters;
+using Envirotrax.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers.GisAreas;
@@ -15,6 +17,7 @@ public class GisAreaCoordinateController : WaterSupplierProtectedController
     }
 
     [HttpGet]
+    [HasPermission(PermissionAction.CanView, PermissionType.Settings)]
     public async Task<IActionResult> GetByAreaIdAsync(int areaId, CancellationToken cancellationToken)
     {
         var result = await _coordinateService.GetByAreaIdAsync(areaId, cancellationToken);
@@ -22,6 +25,7 @@ public class GisAreaCoordinateController : WaterSupplierProtectedController
     }
 
     [HttpPut]
+    [HasPermission(PermissionAction.CanCreate | PermissionAction.CanEdit, PermissionType.Settings)]
     public async Task<IActionResult> AddOrUpdateAsync(int areaId, IEnumerable<GisAreaCoordinateDto> coordinates)
     {
         var result = await _coordinateService.AddOrUpdateAsync(areaId, coordinates);

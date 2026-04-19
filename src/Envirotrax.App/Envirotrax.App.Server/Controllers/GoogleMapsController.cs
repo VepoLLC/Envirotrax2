@@ -19,7 +19,7 @@ public class GoogleMapsApiController : ControllerBase
     {
         return Ok(new
         {
-            apiKey = _configuration["GoogleMaps:ApiKey"]
+            apiKey = _configuration["GoogleMaps:PublicApiKey"]
         });
     }
 }

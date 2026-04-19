@@ -1,20 +1,22 @@
-import { AfterViewInit, Component, ElementRef, HostListener, Input, input, OnInit, ViewChild } from "@angular/core";
-import { HelperService } from "../../services/helpers/helper.service";
+import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, NgZone, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { lastValueFrom, Observable, shareReplay } from "rxjs";
 import { UrlResolverService } from "../../services/helpers/url-resolver.service";
 import { importLibrary, setOptions } from "@googlemaps/js-api-loader";
+import { MapPolygon } from "../../models/map/map-polygon";
 
 @Component({
     standalone: false,
     selector: 'vp-map',
     templateUrl: './map.component.html'
 })
-export class MapComponent implements OnInit, AfterViewInit {
+export class MapComponent implements OnInit, AfterViewInit, OnChanges {
     private _map!: any;
     private _container!: HTMLElement;
+    private _polygonInstances: any[] = [];
 
     private static _apiKey$?: Observable<ApiKey>;
+    private static _mapsLibrary?: any;
 
     public autoSetHeight?: string;
 
@@ -33,10 +35,22 @@ export class MapComponent implements OnInit, AfterViewInit {
     @Input()
     public height?: string;
 
+    @Input()
+    public polygons?: MapPolygon[];
+
+    @Output()
+    public mouseMoved = new EventEmitter<{ lat: number, lng: number }>();
+
+    @Output()
+    public centerChanged = new EventEmitter<{ lat: number, lng: number }>();
+
+    @Output()
+    public zoomChanged = new EventEmitter<number>();
+
     constructor(
-        private readonly _helper: HelperService,
         private readonly _http: HttpClient,
-        private readonly _urlResolver: UrlResolverService
+        private readonly _urlResolver: UrlResolverService,
+        private readonly _ngZone: NgZone
     ) {
 
     }
@@ -59,7 +73,8 @@ export class MapComponent implements OnInit, AfterViewInit {
         setOptions({ key: apiKey.apiKey });
 
         // Load the Maps library.
-        const { Map } = (await importLibrary('maps'));
+        MapComponent._mapsLibrary ??= await importLibrary('maps');
+        const { Map } = MapComponent._mapsLibrary;
 
         // Set map options.
         const mapOptions = {
@@ -78,6 +93,63 @@ export class MapComponent implements OnInit, AfterViewInit {
             this.mapElement.nativeElement,
             mapOptions
         );
+
+        await this.renderPolygons();
+
+        this._map.addListener('mousemove', (event: any) => {
+            this._ngZone.run(() => this.mouseMoved.emit({ lat: event.latLng.lat(), lng: event.latLng.lng() }));
+        });
+
+        this._map.addListener('center_changed', () => {
+            const center = this._map.getCenter();
+            this._ngZone.run(() => this.centerChanged.emit({ lat: center.lat(), lng: center.lng() }));
+        });
+
+        this._map.addListener('zoom_changed', () => {
+            this._ngZone.run(() => this.zoomChanged.emit(this._map.getZoom()));
+        });
+    }
+
+    public async ngOnChanges(changes: SimpleChanges): Promise<void> {
+        if (!this._map) {
+            return;
+        }
+
+        if (changes['latitude'] || changes['longitude']) {
+            this._map.setCenter({ lat: this.latitude ?? 0, lng: this.longitude ?? 0 });
+        }
+
+        if (changes['zoom']) {
+            this._map.setZoom(this.zoom ?? 1);
+        }
+
+        if (changes['polygons']) {
+            await this.renderPolygons();
+        }
+    }
+
+    private async renderPolygons(): Promise<void> {
+        this._polygonInstances.forEach(p => p.setMap(null));
+        this._polygonInstances = [];
+
+        if (!this.polygons?.length) {
+            return;
+        }
+
+        const { Polygon } = MapComponent._mapsLibrary as any;
+
+        for (const polygon of this.polygons) {
+            const instance = new Polygon({
+                paths: polygon.coordinates,
+                strokeColor: polygon.color,
+                strokeOpacity: 0.8,
+                strokeWeight: 1,
+                fillColor: polygon.color,
+                fillOpacity: 0.2,
+            });
+            instance.setMap(this._map);
+            this._polygonInstances.push(instance);
+        }
     }
 
     @HostListener('window:resize', ['$event'])

@@ -1,4 +1,29 @@
+<dp-loading-spinner *ngIf="isLoading" [message]="loadingMessage" />
+
 <vp-map height="650px"
         [latitude]="latitude"
         [longitude]="longitude"
-        [zoom]="zoom" />
+        [zoom]="zoom"
+        [polygons]="polygons"
+        (mouseMoved)="onMouseMoved($event)"
+        (centerChanged)="onCenterChanged($event)"
+        (zoomChanged)="onZoomChanged($event)" />
+
+<div class="bg-white border border-top-0 gap-3 p-2 row">
+    <div class="col-md d-flex align-items-center">
+        <span class="fw-bold me-1">Lat/Lng:</span><span class="bg-light border p-2 flex-fill rounded">{{ cursorPosition
+            ?
+            ((cursorPosition.lat | number:'1.6-6') + ', ' +
+            (cursorPosition.lng | number:'1.6-6')) : '-' }}</span>
+    </div>
+    <div class="col-md d-flex align-items-center">
+        <span class="fw-bold me-1">Map Center:</span><span class="bg-light border p-2 flex-fill rounded">{{ (latitude |
+            number:'1.6-6') + ', ' + (longitude | number:'1.6-6') }}</span>
+    </div>
+    <div class="col-md d-flex align-items-center">
+        <span class="fw-bold me-1">Zoom:</span><span class="bg-light border p-2 flex-fill rounded">{{ zoom }}</span>
+    </div>
+    <button type="button" class="btn btn-primary col-md" (click)="saveDefaultView()">
+        Save Map View for WS
+    </button>
+</div>

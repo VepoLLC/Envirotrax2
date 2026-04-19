@@ -25,6 +25,7 @@ public class GisAreaCoordinateController : WaterSupplierProtectedController
     }
 
     [HttpPut]
+    [HasFeature(FeatureType.ManageGisAreas)]
     [HasPermission(PermissionAction.CanCreate | PermissionAction.CanEdit, PermissionType.Settings)]
     public async Task<IActionResult> AddOrUpdateAsync(int areaId, IEnumerable<GisAreaCoordinateDto> coordinates)
     {

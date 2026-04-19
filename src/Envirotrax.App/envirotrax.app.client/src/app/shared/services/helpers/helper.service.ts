@@ -65,4 +65,8 @@ export class HelperService {
             document.body.appendChild(script);
         });
     }
+
+    public isDefined(value: any): boolean {
+        return value != undefined && value != null;
+    }
 }

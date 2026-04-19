@@ -27,3 +27,10 @@ public class GisArea : TenantModel<WaterSupplier>, IDeleteAutitableModel<AppUser
     public AppUser? DeletedBy { get; set; }
     public DateTime? DeletedTime { get; set; }
 }
+
+public class DefaultGisMapView
+{
+    public double? GisCenterLatitude { get; set; }
+    public double? GisCenterLongitude { get; set; }
+    public double? GisCenterZoom { get; set; }
+}

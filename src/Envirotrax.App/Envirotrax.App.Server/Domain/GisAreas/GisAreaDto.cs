@@ -25,3 +25,15 @@ public class ReferencedGisAreaDto
 
     public string? Color { get; set; }
 }
+
+public class DefaultGiisMapViewDto
+{
+    [Required]
+    public double? GisCenterLatitude { get; set; }
+
+    [Required]
+    public double? GisCenterLongitude { get; set; }
+
+    [Required]
+    public double? GisCenterZoom { get; set; }
+}

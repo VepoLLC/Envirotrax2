@@ -8,9 +8,9 @@ import { TableColumn } from '../../shared/components/data-components/table/table
 import { ColumnType } from '../../shared/components/data-components/sorting-filtering/query-view-model';
 import { InputOption } from '../../shared/components/input/input.component';
 import { BackflowTestResult, BackflowReasonForTest } from '../../shared/models/backflow/backflow-test-enums';
+import { FacilityType } from '../../shared/enums/facility-type.enum';
 
 @Component({
-    selector: 'app-backflow-test-list',
     standalone: false,
     templateUrl: './backflow-test-list.component.html'
 })
@@ -113,6 +113,21 @@ export class BackflowTestListComponent implements OnInit {
         { id: "Fountains/Garden Ponds/Water Features", text: "Fountains/Garden Ponds/Water Features" },
         { id: "Water Softener", text: "Water Softener" },
         { id: "Other", text: "Other" }
+    ];
+
+    public facilityTypeOptions: InputOption[] = [
+        { id: FacilityType.Other.toString(), text: "Other" },
+        { id: FacilityType.Restaurant.toString(), text: "Restaurant" },
+        { id: FacilityType.FastFoodEstablishment.toString(), text: "Fast food establishment" },
+        { id: FacilityType.HotelMotel.toString(), text: "Hotel/motel" },
+        { id: FacilityType.CarWash.toString(), text: "Car wash" },
+        { id: FacilityType.SchoolUniversity.toString(), text: "School/university" },
+        { id: FacilityType.GroceryStore.toString(), text: "Grocery store" },
+        { id: FacilityType.ConvenienceStore.toString(), text: "Convenience store" },
+        { id: FacilityType.AssistedLivingFacility.toString(), text: "Assisted living facility" },
+        { id: FacilityType.MedicalFacility.toString(), text: "Medical facility" },
+        { id: FacilityType.Industrial.toString(), text: "Industrial" },
+        { id: FacilityType.CityOwnedFacility.toString(), text: "City-owned facility" }
     ];
 
     public deviceTypeOptions: InputOption[] = [

@@ -155,6 +155,13 @@
                     <vp-section header="Location / property criteria">
                         <div class="row">
                             <div class="col-12 mb-3">
+                                <vp-filter-panel-field fieldName="facilityType"
+                                                       label="Facility type"
+                                                       type="multi-select"
+                                                       [options]="facilityTypeOptions"
+                                                       [form]="searchForm" />
+                            </div>
+                            <div class="col-12 mb-3">
                                 <vp-filter-panel-field fieldName="propertyType"
                                                        label="Property type"
                                                        type="select"

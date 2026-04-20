@@ -23,10 +23,10 @@ export class FilterPanelFieldComponent implements OnInit {
     public label: string = null!;
 
     @Input()
-    public type: 'text' | 'number' | 'date' | 'daterange' | 'select' = 'text';
+    public type: 'text' | 'number' | 'date' | 'daterange' | 'select' | 'multi-select' = 'text';
 
     @Input()
-    public value?: string | DateRange;
+    public value?: string | string[] | DateRange;
 
     @Input()
     public form?: NgForm;
@@ -47,6 +47,9 @@ export class FilterPanelFieldComponent implements OnInit {
     public ngOnInit(): void {
         if (this.type === 'select' && this.value === undefined) {
             this.value = '';
+        }
+        if (this.type === 'multi-select' && this.value === undefined) {
+            this.value = [];
         }
     }
 

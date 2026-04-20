@@ -1,5 +1,7 @@
 using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Backflow;
+using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
@@ -40,5 +42,22 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             query.Sort[nameof(BackflowTest.Id)] = SortOperator.Asc;
         }
         return base.GetAllAsync(pageInfo, query, cancellationToken);
+    }
+
+    public async Task<IEnumerable<BackflowTest>> GetAllWithFacilityTypesAsync(PageInfo pageInfo, Query query, List<FacilityType> facilityTypes, CancellationToken cancellationToken)
+    {
+        var q = GetListQuery();
+
+        if (facilityTypes.Count > 0)
+        {
+            q = q.Where(bt => facilityTypes.Contains(bt.Site!.FacilityType));
+        }
+
+        var paginated = await q
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
     }
 }

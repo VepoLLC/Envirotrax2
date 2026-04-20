@@ -45,7 +45,7 @@ export class BackflowTestingSettings implements OnInit {
   
       public readonly outOfServiceOptions = [
           { id: BackflowOutOfServiceType.VepoManaged, text: 'Vepo Managed' },
-          { id: BackflowOutOfServiceType.WaterSuplierManaged, text: 'Water Suplier Managed' }
+          { id: BackflowOutOfServiceType.WaterSupplierManaged, text: 'Water Supplier Managed' }
       ];
   
       public readonly expiringNoticeOptions = [

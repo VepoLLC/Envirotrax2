@@ -11,6 +11,7 @@ import { CsiInspectorWaterSuppliersComponent } from "./inspectors/details/water-
 import { CsiInspectorSubAccountsComponent } from "./inspectors/details/sub-accounts/csi-inspector-sub-accounts.component";
 import { CsiInspectorLicenseInsuranceComponent } from "./inspectors/details/license-insurance/csi-inspector-license-insurance.component";
 import { CsiSubmissionPropertySearchComponent } from "./inspections/create/csi-submission-property-search.component";
+import { CsiSubmissionCreateComponent } from "./inspections/create/csi-submission-create.component";
 
 @NgModule({
     declarations: [
@@ -20,7 +21,8 @@ import { CsiSubmissionPropertySearchComponent } from "./inspections/create/csi-s
         CsiInspectorWaterSuppliersComponent,
         CsiInspectorSubAccountsComponent,
         CsiInspectorLicenseInsuranceComponent,
-        CsiSubmissionPropertySearchComponent
+        CsiSubmissionPropertySearchComponent,
+        CsiSubmissionCreateComponent
     ],
     imports: [
         CommonModule,

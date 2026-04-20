@@ -1,11 +1,11 @@
-import { Component, OnInit } from "@angular/core";
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { SiteService } from "../../../shared/services/sites/site.service";
-import { ProfessionalSupplierService } from "../../../shared/services/professionals/professional-supplier.service";
-import { TableColumn } from "../../../shared/components/data-components/table/table.component";
+import { CellTemplateData, TableColumn, TableCustomAction } from "../../../shared/components/data-components/table/table.component";
 import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { Site } from "../../../shared/models/sites/site";
+import { PropertyType } from "../../../shared/enums/property-type.enum";
 import { QueryProperty } from "../../../shared/models/query";
 import { NgForm } from "@angular/forms";
 
@@ -13,63 +13,62 @@ import { NgForm } from "@angular/forms";
     standalone: false,
     templateUrl: './csi-submission-property-search.component.html'
 })
-export class CsiSubmissionPropertySearchComponent implements OnInit {
+export class CsiSubmissionPropertySearchComponent implements OnInit, AfterViewInit {
+
+    @ViewChild('propertyTypeTemplate') private propertyTypeTemplate!: TemplateRef<CellTemplateData<Site>>;
+    @ViewChild('propertyInfoTemplate') private propertyInfoTemplate!: TemplateRef<CellTemplateData<Site>>;
+    @ViewChild('contactInfoTemplate') private contactInfoTemplate!: TemplateRef<CellTemplateData<Site>>;
+
+    public readonly PropertyType = PropertyType;
 
     public showResults: boolean = false;
-    public hasRegistrations: boolean = true;
-    public isSubAccount: boolean = false;
     public accountNumber: string = '';
     public streetNumber: string = '';
 
     public errorMessage: string = '';
 
     public table: TableViewModel<Site> = {
-        columns: this.getColumns(),
+        columns: [],
         query: {
             sort: {},
             filter: []
         }
     };
 
+    public readonly customActions: TableCustomAction<Site>[] = [
+        {
+            text: 'Submit CSI',
+            action: (site: Site) => this.viewSite(site)
+        }
+    ];
+
     constructor(
         private readonly _siteService: SiteService,
-        private readonly _proSupplierService: ProfessionalSupplierService,
         private readonly _router: Router,
-        private readonly _activatedRoute: ActivatedRoute
+        private readonly _activatedRoute: ActivatedRoute,
+        private readonly _cdr: ChangeDetectorRef
     ) { }
 
     public async ngOnInit(): Promise<void> {
-        await this.checkRegistrations();
     }
 
-    private async checkRegistrations(): Promise<void> {
-        try {
-            // TODO: replace with real service call once getMyRegistrations is implemented
-            // const registrations = await this._proSupplierService.getMyRegistrations();
-            const registrations = [{ id: 1 }]; // temp mock - assume registered
-
-            if (!registrations || registrations.length === 0) {
-                this.hasRegistrations = false;
-            }
-        } catch {
-            this.hasRegistrations = false;
-        }
+    public ngAfterViewInit(): void {
+        this.table.columns = this.getColumns();
+        this._cdr.detectChanges();
     }
 
     public async search(searchForm: NgForm): Promise<void> {
         if (!searchForm.valid) {
             return;
         }
-        if(!searchForm.value.streetNumber) {
-            this.errorMessage = 'The Property Street Number and Property Street Name fields are required.';
+
+        if (!this.accountNumber && !this.streetNumber) {
+            this.errorMessage = 'Please enter an Account Number or a Street Number to search.';
+            return;
         }
-        else{
-            this.accountNumber = searchForm.value.accountNumber?.trim();
-            this.streetNumber = searchForm.value.streetNumber?.trim();
-        }
-           
+
+        this.errorMessage = '';
         await this.getSites();
-        
         this.showResults = true;
     }
 
@@ -85,7 +84,8 @@ export class CsiSubmissionPropertySearchComponent implements OnInit {
                     comparisonOperator: 'Eq',
                     value: this.accountNumber
                 });
-            } else if (this.streetNumber) {
+            };
+            if (this.streetNumber) {
                 filter.push({
                     columnName: 'streetNumber',
                     comparisonOperator: 'StW',
@@ -100,17 +100,12 @@ export class CsiSubmissionPropertySearchComponent implements OnInit {
                 this.table.query
             );
         } finally {
-            //this.table.items =  { data: [], pageInfo: {} };
             this.table.isLoading = false;
         }
     }
 
     public viewSite(site: Site): void {
         this._router.navigate([site.id], { relativeTo: this._activatedRoute });
-    }
-
-    public submitUnlisted(): void {
-        this._router.navigate([0], { relativeTo: this._activatedRoute });
     }
 
     private getColumns(): TableColumn<Site>[] {
@@ -123,22 +118,23 @@ export class CsiSubmissionPropertySearchComponent implements OnInit {
             {
                 field: 'propertyType',
                 caption: 'Property Type',
-                type: ColumnType.text
-            },
-            {
-                field: 'propertyInformation',
-                caption: 'Property Information',
-                type: ColumnType.text
-            },
-            {
-                field: 'contactInformation',
-                caption: 'Contact Information',
-                type: ColumnType.text
-            },
-            {
-                field: 'action',
-                caption: '',
                 type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.propertyTypeTemplate
+            },
+            {
+                field: '',
+                caption: 'Property Information',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.propertyInfoTemplate
+            },
+            {
+                field: '',
+                caption: 'Contact Information',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.contactInfoTemplate
             }
         ];
     }

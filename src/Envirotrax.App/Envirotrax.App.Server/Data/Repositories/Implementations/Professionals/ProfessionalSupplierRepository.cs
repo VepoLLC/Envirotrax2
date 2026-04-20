@@ -56,6 +56,16 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<ProfessionalWaterSupplier>> GetCsiSuppliersForProfessionalAsync(int professionalId, CancellationToken cancellationToken)
+    {
+        return await DbContext.ProfessionalWaterSuppliers
+            .AsNoTracking()
+            .Include(pws => pws.WaterSupplier)
+            .Where(pws => pws.ProfessionalId == professionalId && pws.HasCsiInpection)
+            .OrderBy(pws => pws.WaterSupplier!.Name)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<IEnumerable<AvailableWaterSupplier>> GetAllAvailableSuppliersAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         var suppliersQuery = from supplier in DbContext.WaterSuppliers

@@ -9,4 +9,5 @@ public interface IProfessionalSupplierService : IService<ProfessionalWaterSuppli
 {
     Task<IPagedData<AvailableWaterSupplierDto>> GetAllAvailableSuppliersAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<IPagedData<ProfessionalWaterSupplierDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<IEnumerable<ProfessionalWaterSupplierDto>> GetCsiSuppliersForProfessionalAsync(int professionalId, CancellationToken cancellationToken);
 }

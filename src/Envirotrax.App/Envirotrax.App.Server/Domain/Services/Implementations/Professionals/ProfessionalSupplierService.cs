@@ -31,6 +31,12 @@ public class ProfessionalSupplierService : Service<ProfessionalWaterSupplier, Pr
         return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
     }
 
+    public async Task<IEnumerable<ProfessionalWaterSupplierDto>> GetCsiSuppliersForProfessionalAsync(int professionalId, CancellationToken cancellationToken)
+    {
+        var items = await _proSupplierRepository.GetCsiSuppliersForProfessionalAsync(professionalId, cancellationToken);
+        return items.Select(i => MapToDto(i)!);
+    }
+
     public async Task<IPagedData<AvailableWaterSupplierDto>> GetAllAvailableSuppliersAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         query.Sort = query.ConvertSortProperties<AvailableWaterSupplier, AvailableWaterSupplierDto>(_mapper);

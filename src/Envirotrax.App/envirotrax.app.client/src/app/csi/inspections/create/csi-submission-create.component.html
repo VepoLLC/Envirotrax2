@@ -1,0 +1,446 @@
+<h1 class="text-center h2">CSI Inspection Submission</h1>
+
+<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+<div *ngIf="!isLoading">
+
+    <div *ngIf="errorMessage && !viewModel" class="alert alert-danger">{{ errorMessage }}</div>
+
+    <div *ngIf="viewModel">
+
+        <!-- Tabs -->
+        <ul class="nav vp-tabs justify-content-center mb-3">
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'main'" (click)="activeTab = 'main'" role="button">
+                    CSI Main Form
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'assemblies'" (click)="activeTab = 'assemblies'" role="button">
+                    Assemblies at this Location (0)
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'additional'" (click)="activeTab = 'additional'" role="button">
+                    Additional Information
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'images'" (click)="activeTab = 'images'" role="button">
+                    Images
+                </a>
+            </li>
+        </ul>
+
+        <!-- Confirmation Screen -->
+        <div *ngIf="isSubmitted">
+            <vp-section header="CSI Submission Confirmation" class="text-center">
+                <p class="text-center fw-bold text-danger">Completion of the checkout process is required for this inspection to be valid within the system.</p>
+                <p>Please read the following information on CSI submission and the checkout process:</p>
+                <ol>
+                    <li class="mb-2">To finalize the procedure and conclude the submission of the inspection, you must complete the checkout process on the Checkout page. Click on the Checkout button below or click on Checkout in the menu system above.</li>
+                    <li class="mb-2">The checkout process can complete payment on multiple inspections. This will allow you to continue submitting as many inspections as desired and then complete a batch payment on the unpaid inspections.</li>
+                    <li>If the payment process is not completed within ten (10) days of the initial inspection submission date, the unpaid inspections will be deleted from the online system.</li>
+                </ol>
+                <div class="d-flex justify-content-center gap-2 mt-3">
+                    <button type="button" class="btn btn-primary vp-section-button" (click)="returnToAccountOverview()">Return to Account Overview</button>
+                    <button type="button" class="btn btn-primary vp-section-button" (click)="submitAnother()">Submit Another Inspection</button>
+                    <button type="button" class="btn btn-primary vp-section-button">Checkout</button>
+                </div>
+            </vp-section>
+        </div>
+
+        <!-- CSI Main Form Tab -->
+        <div *ngIf="activeTab === 'main' && !isSubmitted">
+            <form #submitForm="ngForm" (ngSubmit)="submit(submitForm)">
+
+                <!-- Account Selection & License Verification -->
+                <vp-section header="Account Selection &amp; License Verification">
+                    <div class="row align-items-center mb-2">
+                        <div class="col-md-6 d-flex align-items-center">
+                            <span class="fw-semibold text-nowrap" style="width: 120px;">CSI Account:</span>
+                            <div class="flex-grow-1">
+                                <vp-input type="select"
+                                          name="csiAccountUserId"
+                                          [ngModel]="selectedCsiAccountUserId"
+                                          (ngModelChange)="onCsiAccountChange($event)"
+                                          [options]="csiAccountOptions"
+                                          [required]="true" />
+                            </div>
+                        </div>
+                        <div class="col-md-6 ps-4">
+                            <span class="fw-semibold">Texas CSI/Plumbing Inspector/WSPS:</span>
+                            <span class="ms-1" [ngClass]="licenseStatusClass">{{ licenseStatusText }}</span>
+                        </div>
+                    </div>
+                    <div class="row align-items-center">
+                        <div class="col-md-6 d-flex align-items-center">
+                            <span class="fw-semibold text-nowrap" style="width: 120px;">Water Supplier:</span>
+                            <div class="flex-grow-1">
+                                <vp-input type="select"
+                                          name="waterSupplierId"
+                                          [(ngModel)]="selectedWaterSupplierId"
+                                          [options]="waterSupplierOptions"
+                                          [required]="true" />
+                            </div>
+                        </div>
+                    </div>
+                </vp-section>
+
+                <!-- Water Supplier Information -->
+                <vp-section *ngIf="hasValidLicense" header="Water Supplier Information" class="mt-3 d-block">
+                    <div *ngIf="selectedWaterSupplier; else noSupplierSelected">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table class="table table-borderless table-sm mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <th class="w-40">Water Supplier:</th>
+                                            <td>{{ selectedWaterSupplier.name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Address:</th>
+                                            <td>
+                                                {{ selectedWaterSupplier.address }}<br *ngIf="selectedWaterSupplier.address">
+                                                {{ selectedWaterSupplier.city }}<span *ngIf="selectedWaterSupplier.city && selectedWaterSupplier.state">, </span>{{ selectedWaterSupplier.state }} {{ selectedWaterSupplier.zipCode }}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-borderless table-sm mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <th class="w-40">PWS ID:</th>
+                                            <td>{{ selectedWaterSupplier.pwsId }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Contact Name:</th>
+                                            <td>{{ selectedWaterSupplier.contactName }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Phone Number:</th>
+                                            <td>{{ selectedWaterSupplier.phoneNumber }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Email Address:</th>
+                                            <td>{{ selectedWaterSupplier.emailAddress }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <ng-template #noSupplierSelected>
+                        <p class="text-muted mb-0">Select a water supplier above to view their information.</p>
+                    </ng-template>
+                </vp-section>
+
+                <!-- CSI Inspector -->
+                <vp-section *ngIf="hasValidLicense" header="CSI Inspector" class="mt-3 d-block">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless table-sm mb-0">
+                                <tbody>
+                                    <tr>
+                                        <th class="w-40">Company Name:</th>
+                                        <td>{{ currentInspector?.companyName }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Title of Inspector:</th>
+                                        <td>{{ currentInspector?.jobTitle }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Inspector Name:</th>
+                                        <td>{{ currentInspector?.contactName }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Address:</th>
+                                        <td>
+                                            {{ currentInspector?.address }}<br *ngIf="currentInspector?.address">
+                                            {{ currentInspector?.city }}<span *ngIf="currentInspector?.city && currentInspector?.state">, </span>{{ currentInspector?.state }} {{ currentInspector?.zipCode }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless table-sm mb-0">
+                                <tbody>
+                                    <tr>
+                                        <th class="w-40">Phone Number:</th>
+                                        <td>{{ currentInspector?.phoneNumber }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Email Address:</th>
+                                        <td>{{ currentInspector?.emailAddress }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>License Number:</th>
+                                        <td>{{ currentLicense?.licenseNumber }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>License Type:</th>
+                                        <td>{{ currentLicense?.licenseTypeName }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </vp-section>
+
+                <!-- Location / Property + Assembly Owner side by side -->
+                <div *ngIf="hasValidLicense" class="row mt-3">
+                    <div class="col-md-6">
+                        <vp-section header="Location / Property Information">
+                            <table class="table table-borderless table-sm mb-0">
+                                <tbody>
+                                    <tr>
+                                        <th class="w-40">Property Type:</th>
+                                        <td>{{ viewModel.site.propertyType === 0 ? 'Residential' : 'Commercial' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Business Name:</th>
+                                        <td>{{ viewModel.site.businessName }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Property Address:</th>
+                                        <td>
+                                            {{ viewModel.site.streetNumber }} {{ viewModel.site.streetName }}<span *ngIf="viewModel.site.propertyNumber"> #{{ viewModel.site.propertyNumber }}</span><br>
+                                            {{ viewModel.site.city }}<span *ngIf="viewModel.site.city && viewModel.site.state?.name">, </span>{{ viewModel.site.state?.name }} {{ viewModel.site.zipCode }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </vp-section>
+                    </div>
+                    <div class="col-md-6">
+                        <vp-section header="Assembly Owner's Contact Information">
+                            <table class="table table-borderless table-sm mb-0">
+                                <tbody>
+                                    <tr>
+                                        <th class="w-40">Company Name:</th>
+                                        <td>{{ viewModel.site.mailingCompanyName }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Contact Name:</th>
+                                        <td>{{ viewModel.site.mailingContactName }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Mailing Address:</th>
+                                        <td>
+                                            {{ viewModel.site.mailingStreetNumber }} {{ viewModel.site.mailingStreetName }}<span *ngIf="viewModel.site.mailingNumber"> #{{ viewModel.site.mailingNumber }}</span><br>
+                                            {{ viewModel.site.mailingCity }}<span *ngIf="viewModel.site.mailingCity && viewModel.site.mailingState?.name">, </span>{{ viewModel.site.mailingState?.name }} {{ viewModel.site.mailingZipCode }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Phone Number:</th>
+                                        <td>{{ viewModel.site.mailingPhoneNumber }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Email Address:</th>
+                                        <td>{{ viewModel.site.mailingEmailAddress }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </vp-section>
+                    </div>
+                </div>
+
+                <!-- Inspection Results -->
+                <vp-section *ngIf="hasValidLicense" header="Inspection Results" class="mt-3 d-block">
+
+                    <!-- Reason + Date -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <vp-input type="select"
+                                      label="Reason for Inspection"
+                                      name="reasonForInspection"
+                                      [(ngModel)]="form.reasonForInspection"
+                                      [options]="reasonOptions"
+                                      [required]="true"
+                                      [form]="submitForm"
+                                      [placeholder]="'Select a reason'" />
+                        </div>
+                        <div class="col-md-6">
+                            <vp-input type="datetime"
+                                      label="Inspection Date"
+                                      name="inspectionDate"
+                                      [(ngModel)]="form.inspectionDate"
+                                      [required]="true"
+                                      [form]="submitForm" />
+                        </div>
+                    </div>
+
+                    <!-- Certification + Compliance radio buttons -->
+                    <div class="border p-3 mb-3" [class.border-danger]="complianceIsInvalid">
+                        <p class="mb-3">
+                            I, <u>{{ currentInspector?.contactName }}</u>, upon inspection of the private water distribution facilities connected to the aforementioned public water supply do hereby certify that, to the best of my knowledge:
+                        </p>
+                        <table class="table table-sm table-bordered mb-0">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th class="text-center" style="width: 110px;">Compliance</th>
+                                    <th class="text-center" style="width: 140px;">Non-compliance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let statement of complianceStatements; let i = index">
+                                    <td>{{ i + 1 }}. {{ statement }}</td>
+                                    <td class="text-center align-middle">
+                                        <input type="radio"
+                                               [name]="'compliance' + i"
+                                               [value]="true"
+                                               [(ngModel)]="complianceValues[i]"
+                                               required />
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <input type="radio"
+                                               [name]="'compliance' + i"
+                                               [value]="false"
+                                               [(ngModel)]="complianceValues[i]" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div *ngIf="complianceIsInvalid" class="text-danger small mt-2">
+                            Please answer all 6 compliance items.
+                        </div>
+                    </div>
+
+                    <!-- Materials -->
+                    <p class="mb-2">I further certify that the following materials were used in the installation of the private water distribution facilities:</p>
+
+                    <table class="mb-3 d-flex justify-content-center">
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold pe-3 text-end text-nowrap align-middle" style="width: 120px;">Service Lines:</td>
+                                <td class="pe-4 align-middle">
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input" type="checkbox" id="slLead" name="slLead" [(ngModel)]="form.materialServiceLineLead" />
+                                        <label class="form-check-label" for="slLead">Lead</label>
+                                    </div>
+                                </td>
+                                <td class="pe-4 align-middle">
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input" type="checkbox" id="slCopper" name="slCopper" [(ngModel)]="form.materialServiceLineCopper" />
+                                        <label class="form-check-label" for="slCopper">Copper</label>
+                                    </div>
+                                </td>
+                                <td class="pe-4 align-middle">
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input" type="checkbox" id="slPVC" name="slPVC" [(ngModel)]="form.materialServiceLinePVC" />
+                                        <label class="form-check-label" for="slPVC">PVC</label>
+                                    </div>
+                                </td>
+                                <td class="pe-3 align-middle">
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input" type="checkbox" id="slOther" name="slOther" [(ngModel)]="form.materialServiceLineOther" />
+                                        <label class="form-check-label" for="slOther">Other</label>
+                                    </div>
+                                </td>
+                                <td class="align-middle">
+                                    <ng-container *ngIf="form.materialServiceLineOther">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="text"
+                                                   class="form-control form-control-sm"
+                                                   style="width: 180px;"
+                                                   name="slOtherDesc"
+                                                   [(ngModel)]="form.materialServiceLineOtherDescription"
+                                                   required />
+                                            <span *ngIf="submitForm.controls['slOtherDesc']?.invalid && (submitted || submitForm.controls['slOtherDesc']?.touched)"
+                                                  class="text-danger small">Required</span>
+                                        </div>
+                                    </ng-container>
+                                </td>
+                            </tr>
+                            <tr *ngIf="serviceLineIsInvalid">
+                                <td colspan="6" class="text-danger small pt-0 pb-1">Please select at least one Service Line material.</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold pe-3 text-end text-nowrap align-middle">Solder:</td>
+                                <td class="pe-4 align-middle">
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input" type="checkbox" id="soldLead" name="soldLead" [(ngModel)]="form.materialSolderLead" />
+                                        <label class="form-check-label" for="soldLead">Lead</label>
+                                    </div>
+                                </td>
+                                <td class="pe-4 align-middle">
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input" type="checkbox" id="soldLeadFree" name="soldLeadFree" [(ngModel)]="form.materialSolderLeadFree" />
+                                        <label class="form-check-label" for="soldLeadFree">Lead Free</label>
+                                    </div>
+                                </td>
+                                <td class="pe-4 align-middle">
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input" type="checkbox" id="soldSolvent" name="soldSolvent" [(ngModel)]="form.materialSolderSolventWeld" />
+                                        <label class="form-check-label" for="soldSolvent">Solvent Weld</label>
+                                    </div>
+                                </td>
+                                <td class="pe-3 align-middle">
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input" type="checkbox" id="soldOther" name="soldOther" [(ngModel)]="form.materialSolderOther" />
+                                        <label class="form-check-label" for="soldOther">Other</label>
+                                    </div>
+                                </td>
+                                <td class="align-middle">
+                                    <ng-container *ngIf="form.materialSolderOther">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="text"
+                                                   class="form-control form-control-sm"
+                                                   style="width: 180px;"
+                                                   name="soldOtherDesc"
+                                                   [(ngModel)]="form.materialSolderOtherDescription"
+                                                   required />
+                                            <span *ngIf="submitForm.controls['soldOtherDesc']?.invalid && (submitted || submitForm.controls['soldOtherDesc']?.touched)"
+                                                  class="text-danger small">Required</span>
+                                        </div>
+                                    </ng-container>
+                                </td>
+                            </tr>
+                            <tr *ngIf="solderIsInvalid">
+                                <td colspan="6" class="text-danger small pt-0 pb-1">Please select at least one Solder material.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="legalAck" name="legalAck" [(ngModel)]="legalAcknowledgment" />
+                        <label class="form-check-label" for="legalAck">
+                            "I recognize that this document shall be retained by the aforementioned Public Water System for a minimum of ten years and that I am legally responsible for the validity of the information I have provided."
+                        </label>
+                    </div>
+
+                </vp-section>
+
+                <vp-section *ngIf="hasValidLicense" [header]="'Remarks (' + remarksLength + '/1000 Characters)'" class="mt-3 d-block">
+                    <vp-input type="textarea"
+                              name="comments"
+                              [(ngModel)]="form.comments"
+                              [maxLength]="1000" />
+                </vp-section>
+
+                <!-- Footer note -->
+                <p *ngIf="hasValidLicense" class="text-center text-muted small mt-2">
+                    A Customer Service Inspection Certificate should be on file for each connection in a public water system to document compliance with 30 TAC &sect;290.44(h)/290.46(j).
+                </p>
+
+                <!-- Validation & Submit -->
+                <div *ngIf="hasValidLicense" class="mt-3">
+                    <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+                    <vp-validation-summary [form]="submitForm" [validationErrors]="validationErrors" />
+                </div>
+
+                <div *ngIf="hasValidLicense" class="mt-3 d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary vp-section-button" [disabled]="isSaving">
+                        <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-1"></span>
+                        Complete Submission
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

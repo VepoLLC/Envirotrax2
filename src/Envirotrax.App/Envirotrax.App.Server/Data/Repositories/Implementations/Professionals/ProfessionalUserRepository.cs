@@ -86,4 +86,13 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
 
         return await paginated.ToListAsync(cancellationToken);
     }
+
+    public async Task<IEnumerable<ProfessionalUser>> GetCsiInspectorsForProfessionalAsync(int professionalId, CancellationToken cancellationToken)
+    {
+        return await DbContext.ProfessionalUsers
+            .AsNoTracking()
+            .Where(pu => pu.ProfessionalId == professionalId && pu.IsCsiInspector)
+            .OrderBy(pu => pu.ContactName)
+            .ToListAsync(cancellationToken);
+    }
 }

@@ -1,5 +1,5 @@
 <div class="d-flex flex-column flex-fill justify-content-between mt-3">
-    <form #form="ngForm">
+    <form #form="ngForm" class="d-flex flex-column flex-fill">
         <div class="row">
             <div *ngIf="gisArea.id" class="col-md-4 mb-3">
                 <vp-input label="ID"
@@ -18,11 +18,11 @@
             </div>
         </div>
 
-        <div>
+        <div class="mb-3">
             <label class="form-label" for="area-color">
                 Area color
             </label>
-            <div class="d-flex gap-1 mb-3 ms-1"
+            <div class="d-flex flex-wrap gap-1 mb-3 ms-1"
                  role="group"
                  aria-label="Predefined color shortcuts. Select a swatch to quickly apply it, or use the color picker below for a custom color.">
                 <div class="vp-color-option vp-red"
@@ -81,15 +81,20 @@
                    class="form-control form-control-color w-100" />
         </div>
 
-        <div>
-
+        <div class="mb-3 flex-fill">
+            <vp-input name="coordinates"
+                      label="Area coordinates"
+                      type="textarea"
+                      class="d-flex h-100"
+                      [flexFill]="true"
+                      [(ngModel)]="coordinatesText" />
         </div>
     </form>
 
     <div>
         <vp-validation-summary [form]="form" [validationErrors]="validationErrors" />
 
-        <div class="d-flex gap-2 mb-3">
+        <div class="d-flex gap-2">
             <button type="submit" class="btn btn-primary w-100">
                 Save
             </button>
@@ -99,7 +104,7 @@
             </button>
         </div>
 
-        <button *ngIf="gisArea.id" class="btn btn-danger w-100">
+        <button *ngIf="gisArea.id" class="btn btn-danger w-100 mt-3">
             Delete Area
         </button>
     </div>

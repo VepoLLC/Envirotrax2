@@ -5,6 +5,9 @@ import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { GisArea, GisAreaCoordinate } from "../../../shared/models/gis-areas/gis-area";
 import { MapPolygon } from "../../../shared/components/map/map.component";
+import { AuthService } from "../../../shared/services/auth/auth.service";
+import { FeatureType } from "../../../shared/models/feature-tyype";
+import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
 
 @Component({
     standalone: false,
@@ -22,12 +25,16 @@ export class GisAreaListComponent implements OnInit {
     public loadingMessage?: string;
 
     public editRecord?: GisAreaVm;
+    public canModifyData: boolean = false;
 
     constructor(
         private readonly _helper: HelperService,
         private readonly _gisAreaService: GisAreaService,
         private readonly _gisAreaCoordinateService: GisAreaCoordinateService,
-    ) { }
+        private readonly _authService: AuthService
+    ) {
+
+    }
 
     public onMouseMoved(pos: { lat: number, lng: number }): void {
         this.cursorPosition = pos;
@@ -79,8 +86,15 @@ export class GisAreaListComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         await Promise.all([
             this.getAreas(),
-            this.getDefaultView()
+            this.getDefaultView(),
+            this.setPermissions()
         ]);
+    }
+
+    private async setPermissions(): Promise<void> {
+        this.canModifyData = await this._authService.hasAnyFeatures(FeatureType.ManageGisAreas) &&
+            (await this._authService.hasAnyPermisison(PermissionAction.CanCreate, PermissionType.Settings) ||
+                await this._authService.hasAnyPermisison(PermissionAction.CanEdit, PermissionType.Settings));
     }
 
     private async getAreas(): Promise<void> {
@@ -96,13 +110,15 @@ export class GisAreaListComponent implements OnInit {
             this.polygons = areas.data.map(area => ({
                 name: area.name,
                 color: area.color ?? '#000000',
+                onClick: this.edit.bind(this),
                 coordinates: allCoordinates
                     .filter(c => c.area?.id === area.id)
-                    .map(c => ({ lat: c.latitude!, lng: c.longitde! })),
+                    .map(c => ({ lat: c.latitude!, lng: c.longitude! })),
                 data: {
                     area: area,
                     coordinates: allCoordinates.filter(c => c.area?.id === area.id),
-                }
+                },
+
             } satisfies MapPolygon<GisAreaVm>));
         } finally {
             this.isLoading = false;
@@ -115,6 +131,10 @@ export class GisAreaListComponent implements OnInit {
             area: {},
             coordinates: []
         };
+    }
+
+    public edit(polygon: MapPolygon<GisAreaVm>): void {
+        this.editRecord = polygon.data;
     }
 
     public cancelEdit(): void {

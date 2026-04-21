@@ -8,7 +8,7 @@
 
 <vp-section header="GIS Areas">
     <div class="row border">
-        <div class="col-md mb-3">
+        <div class="col mb-3">
             <vp-map height="650px"
                     [latitude]="latitude"
                     [longitude]="longitude"
@@ -19,7 +19,7 @@
                     (zoomChanged)="onZoomChanged($event)" />
         </div>
 
-        <div *ngIf="editRecord" class="col-md-3 mb-3 d-flex">
+        <div *ngIf="editRecord" class="col-sm-4 col-md-3 col-xl-2 mb-3 d-flex">
             <vp-create-edit-gis-area [gisArea]="editRecord.area"
                                      [coordinates]="editRecord.coordinates"
                                      (cancel)="cancelEdit()" />
@@ -47,7 +47,7 @@
         </button>
     </div>
 
-    <button class="btn btn-primary" (click)="add()">
+    <button *ngIf="canModifyData" class="btn btn-primary" (click)="add()">
         Add New Area
     </button>
 </vp-section>

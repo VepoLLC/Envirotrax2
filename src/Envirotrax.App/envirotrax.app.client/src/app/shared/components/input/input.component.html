@@ -1,4 +1,6 @@
-<div class="vp-input-container">
+<div class="vp-input-container flex-column"
+     [class.d-flex]="flexFill"
+     [class.flex-fill]="flexFill">
     <div class="d-flex justify-content-between">
         <label *ngIf="label" [attr.for]="id" class="form-label">
             {{label}}
@@ -32,7 +34,7 @@
               [attr.id]="id"
               [attr.name]="name"
               [attr.type]="type"
-              class="form-control"
+              class="form-control flex-fill"
               [required]="required"
               [readonly]="readonly"
               [disabled]="disabled"

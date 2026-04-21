@@ -153,7 +153,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
                 instance.addEventListener('click', () => {
                     this._ngZone.run(() => {
                         if (polygon.onClick) {
-                            polygon.onClick();
+                            polygon.onClick(instance);
                         }
                     })
                 })
@@ -175,6 +175,6 @@ export interface MapPolygon<TData extends any> {
     name?: string;
     color: string;
     coordinates: { lat: number; lng: number }[];
-    onClick?: () => void;
+    onClick?: (poligon: MapPolygon<TData>) => void;
     data?: TData;
 }

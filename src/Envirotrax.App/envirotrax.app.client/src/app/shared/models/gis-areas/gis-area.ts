@@ -14,7 +14,7 @@ export interface GisAreaCoordinate {
     id?: number;
     area?: ReferencedGisArea;
     latitude?: number;
-    longitde?: number;
+    longitude?: number;
 }
 
 export interface DefaultGisMapView {

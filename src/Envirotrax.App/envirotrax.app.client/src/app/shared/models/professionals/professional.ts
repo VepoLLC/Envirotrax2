@@ -4,7 +4,6 @@ import { ProfessionalUser } from "./professional-user";
 export interface Professional {
     id?: number;
     name?: string;
-    companyEmail?: string;
     address?: string
     city?: string;
     state?: State;

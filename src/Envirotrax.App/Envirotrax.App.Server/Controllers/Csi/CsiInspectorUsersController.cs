@@ -7,17 +7,18 @@ using Microsoft.AspNetCore.Mvc;
 namespace Envirotrax.App.Server.Controllers.Csi
 {
     [Route("api/csi/inspectors")]
+    [HasFeature(FeatureType.CsiInspection)]
     [PermissionResource(PermissionType.CsiInspectors)]
-    public class CsiInspectorSubAccountsController : WaterSupplierProtectedController
+    public class CsiInspectorUsersController : WaterSupplierProtectedController
     {
         private readonly IProfessionalUserService _userService;
 
-        public CsiInspectorSubAccountsController(IProfessionalUserService userService)
+        public CsiInspectorUsersController(IProfessionalUserService userService)
         {
             _userService = userService;
         }
 
-        [HttpGet("{id}/sub-accounts")]
+        [HttpGet("{id}/users")]
         [HasPermission(PermissionAction.CanView)]
         public async Task<IActionResult> GetSubAccountsAsync(int id, [FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
         {

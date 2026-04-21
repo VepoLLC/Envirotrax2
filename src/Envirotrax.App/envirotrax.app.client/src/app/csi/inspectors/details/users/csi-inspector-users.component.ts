@@ -3,14 +3,14 @@ import { ProfessionalUser } from "../../../../shared/models/professionals/profes
 import { TableViewModel } from "../../../../shared/models/table-view-model";
 import { TableColumn } from "../../../../shared/components/data-components/table/table.component";
 import { ColumnType } from "../../../../shared/components/data-components/sorting-filtering/query-view-model";
-import { CsiInspectorSubAccountsService } from "../../../../shared/services/csi/csi-inspector-sub-accounts.service";
+import { CsiInspectorSubAccountsService } from "../../../../shared/services/csi/csi-inspector-user.service";
 
 @Component({
-    selector: 'app-csi-inspector-sub-accounts',
+    selector: 'vp-csi-inspector-users',
     standalone: false,
-    templateUrl: './csi-inspector-sub-accounts.component.html'
+    templateUrl: './csi-inspector-users.component.html'
 })
-export class CsiInspectorSubAccountsComponent implements OnInit {
+export class CsiInspectorUsersComponent implements OnInit {
     @Input() public inspectorId!: number;
 
     public table: TableViewModel<ProfessionalUser> = {
@@ -18,7 +18,7 @@ export class CsiInspectorSubAccountsComponent implements OnInit {
         query: { sort: {}, filter: [] }
     };
 
-    constructor(private readonly _service: CsiInspectorSubAccountsService) {}
+    constructor(private readonly _service: CsiInspectorSubAccountsService) { }
 
     public async ngOnInit(): Promise<void> {
         this.setupColumns();

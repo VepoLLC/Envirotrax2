@@ -204,7 +204,7 @@ export class App implements OnInit {
           {
             title: 'Backflow Test Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['/'],
+            routerLink: ['backflow/tests'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowTests),
             hasFeature: true
           },
@@ -323,7 +323,7 @@ export class App implements OnInit {
           {
             title: 'Inspector Management',
             iconCss: 'fa-regular fa-user',
-            routerLink: ['/'],
+            routerLink: ['/fog/inspectors'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogInspectors),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
           },
@@ -496,7 +496,7 @@ export class App implements OnInit {
           {
             title: 'Backflow Test Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['/'],
+            routerLink: ['backflow/tests'],
             hasPermission: isBackflowTester,
             hasFeature: true
           },
@@ -615,7 +615,7 @@ export class App implements OnInit {
           {
             title: 'Inspector Management',
             iconCss: 'fa-regular fa-user',
-            routerLink: ['/'],
+            routerLink: ['/fog/inspectors'],
             hasPermission: isAdmin && isFogInspector,
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
           },

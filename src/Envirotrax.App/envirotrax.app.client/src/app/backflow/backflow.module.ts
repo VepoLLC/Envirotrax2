@@ -5,10 +5,12 @@ import { RouterModule } from "@angular/router";
 import { SharedComponentsModule } from "../shared/components/shared.components.module";
 import { BackflowRoutingModule } from "./backflow-routing.module";
 import { BackflowTesterListComponent } from "./testers/list/backflow-tester-list.component";
+import { BackflowTestListComponent } from "./tests/backflow-test-list.component";
 
 @NgModule({
     declarations: [
-        BackflowTesterListComponent
+        BackflowTesterListComponent,
+        BackflowTestListComponent
     ],
     imports: [
         CommonModule,
@@ -18,6 +20,4 @@ import { BackflowTesterListComponent } from "./testers/list/backflow-tester-list
         BackflowRoutingModule
     ]
 })
-export class BackflowModule {
-
-}
+export class BackflowModule {}

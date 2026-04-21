@@ -6,12 +6,12 @@ import { QueryHelperService } from "../helpers/query-helper.service";
 import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
-import { ProfessionalUser } from "../../models/professionals/professional-user";
+import { Professional } from "../../models/professionals/professional";
 
 @Injectable({
     providedIn: 'root'
 })
-export class CsiInspectorSubAccountsService {
+export class FogInspectorService {
     constructor(
         private readonly _urlResolver: UrlResolverService,
         private readonly _queryHelper: QueryHelperService,
@@ -19,10 +19,13 @@ export class CsiInspectorSubAccountsService {
     ) {
     }
 
-    public async getSubAccounts(id: number, pageInfo: PageInfo, query: Query): Promise<PagedData<ProfessionalUser>> {
-        const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${id}/sub-accounts`);
-        return await lastValueFrom(this._http.get<PagedData<ProfessionalUser>>(url, {
+    public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<Professional>> {
+        const url = this._urlResolver.resolveUrl('/api/fog/inspectors');
+
+        const observable = this._http.get<PagedData<Professional>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)
-        }));
+        });
+
+        return await lastValueFrom(observable);
     }
 }

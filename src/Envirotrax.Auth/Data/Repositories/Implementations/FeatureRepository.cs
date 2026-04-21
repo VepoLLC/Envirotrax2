@@ -13,7 +13,7 @@ public class FeatureRepository : IFeatureRepository
         _dbContext = dbContext;
     }
 
-    private IEnumerable<FeatureType> ConvertToFeatureTypes(IEnumerable<FeatureProjection> featureProjections)
+    private List<FeatureType> ConvertToFeatureTypes(IEnumerable<FeatureProjection> featureProjections)
     {
         var features = new List<FeatureType>();
 
@@ -48,11 +48,11 @@ public class FeatureRepository : IFeatureRepository
         return features;
     }
 
-    public async Task<IEnumerable<FeatureType>> GetAllAsync(int? supplierId, int? professionalId)
+    public async Task<IEnumerable<FeatureType>> GetAllAsync(int? supplierId, int? supplierIdRequested, int? professionalId)
     {
         var supplierFeatures = _dbContext
             .GeneralSettings
-            .Where(settings => settings.WaterSupplierId == supplierId)
+            .Where(settings => settings.WaterSupplierId == supplierIdRequested)
             .Select(settings => new FeatureProjection
             {
                 HasWiseGuys = settings.WiseGuys,
@@ -78,7 +78,20 @@ public class FeatureRepository : IFeatureRepository
             .Concat(professionalFeatures)
             .ToListAsync();
 
-        return ConvertToFeatureTypes(combinedFeatures);
+        var features = ConvertToFeatureTypes(combinedFeatures);
+
+        if (supplierId.HasValue)
+        {
+            var waterSupplierFeatures = await _dbContext
+                .WaterSupplierFeatures
+                .Where(f => f.WaterSupplierId == supplierId.Value)
+                .Select(f => f.FeatureId)
+                .ToListAsync();
+
+            features.AddRange(waterSupplierFeatures);
+        }
+
+        return features;
     }
 }
 

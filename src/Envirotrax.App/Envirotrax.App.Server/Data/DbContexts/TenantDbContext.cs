@@ -1,3 +1,4 @@
+using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Csi;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Models.Sites;
@@ -9,6 +10,7 @@ using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using System.Reflection;
+using Envirotrax.App.Server.Data.Models.WaterSuppliers.Features;
 
 namespace Envirotrax.App.Server.Data.DbContexts;
 
@@ -19,6 +21,8 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
     public DbSet<BackflowSettings> BackflowSettings { get; set; }
 
     public DbSet<WaterSupplierUser> WaterSupplierUsers { get; set; }
+    public DbSet<Feature> Features { get; set; }
+    public DbSet<WaterSupplierFeature> WaterSupplierFeatures { get; set; }
     public DbSet<Permission> Permissions { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<RolePermission> RolePermissions { get; set; }
@@ -34,6 +38,7 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
     public DbSet<State> States { get; set; }
     public DbSet<Site> Sites { get; set; }
     public DbSet<CsiInspection> CsiInspections { get; set; }
+    public DbSet<BackflowTest> BackflowTests { get; set; }
 
     protected TenantDbContext(
         DbContextOptions options,

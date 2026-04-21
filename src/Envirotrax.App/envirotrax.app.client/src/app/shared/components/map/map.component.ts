@@ -3,7 +3,6 @@ import { HttpClient } from "@angular/common/http";
 import { lastValueFrom, Observable, shareReplay } from "rxjs";
 import { UrlResolverService } from "../../services/helpers/url-resolver.service";
 import { importLibrary, setOptions } from "@googlemaps/js-api-loader";
-import { MapPolygon } from "../../models/map/map-polygon";
 
 @Component({
     standalone: false,
@@ -36,7 +35,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
     public height?: string;
 
     @Input()
-    public polygons?: MapPolygon[];
+    public polygons?: MapPolygon<any>[];
 
     @Output()
     public mouseMoved = new EventEmitter<{ lat: number, lng: number }>();
@@ -149,6 +148,16 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
             });
             instance.setMap(this._map);
             this._polygonInstances.push(instance);
+
+            if (polygon.onClick) {
+                instance.addEventListener('click', () => {
+                    this._ngZone.run(() => {
+                        if (polygon.onClick) {
+                            polygon.onClick();
+                        }
+                    })
+                })
+            }
         }
     }
 
@@ -160,4 +169,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
 
 interface ApiKey {
     apiKey: string;
+}
+
+export interface MapPolygon<TData extends any> {
+    name?: string;
+    color: string;
+    coordinates: { lat: number; lng: number }[];
+    onClick?: () => void;
+    data?: TData;
 }

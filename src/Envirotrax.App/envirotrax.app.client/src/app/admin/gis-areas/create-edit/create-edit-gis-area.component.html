@@ -1,0 +1,106 @@
+<div class="d-flex flex-column flex-fill justify-content-between mt-3">
+    <form #form="ngForm">
+        <div class="row">
+            <div *ngIf="gisArea.id" class="col-md-4 mb-3">
+                <vp-input label="ID"
+                          name="id"
+                          [readonly]="true"
+                          [ngModel]="gisArea.id" />
+            </div>
+
+            <div class="col-md mb-3">
+                <vp-input label="Name"
+                          name="name"
+                          [required]="true"
+                          [maxLength]="50"
+                          [form]="form"
+                          [(ngModel)]="gisArea.name" />
+            </div>
+        </div>
+
+        <div>
+            <label class="form-label" for="area-color">
+                Area color
+            </label>
+            <div class="d-flex gap-1 mb-3 ms-1"
+                 role="group"
+                 aria-label="Predefined color shortcuts. Select a swatch to quickly apply it, or use the color picker below for a custom color.">
+                <div class="vp-color-option vp-red"
+                     role="button" tabindex="0" title="Red"
+                     aria-label="Red — predefined color shortcut"
+                     (click)="gisArea.color = '#ff0000'"
+                     (keydown.enter)="gisArea.color = '#ff0000'"
+                     (keydown.space)="gisArea.color = '#ff0000'"></div>
+                <div class="vp-color-option vp-orange"
+                     role="button" tabindex="0" title="Orange"
+                     aria-label="Orange — predefined color shortcut"
+                     (click)="gisArea.color = '#ff8000'"
+                     (keydown.enter)="gisArea.color = '#ff8000'"
+                     (keydown.space)="gisArea.color = '#ff8000'"></div>
+                <div class="vp-color-option vp-yellow"
+                     role="button" tabindex="0" title="Yellow"
+                     aria-label="Yellow — predefined color shortcut"
+                     (click)="gisArea.color = '#ffff00'"
+                     (keydown.enter)="gisArea.color = '#ffff00'"
+                     (keydown.space)="gisArea.color = '#ffff00'"></div>
+                <div class="vp-color-option vp-green"
+                     role="button" tabindex="0" title="Green"
+                     aria-label="Green — predefined color shortcut"
+                     (click)="gisArea.color = '#00ff00'"
+                     (keydown.enter)="gisArea.color = '#00ff00'"
+                     (keydown.space)="gisArea.color = '#00ff00'"></div>
+                <div class="vp-color-option vp-teal"
+                     role="button" tabindex="0" title="Teal"
+                     aria-label="Teal — predefined color shortcut"
+                     (click)="gisArea.color = '#00ffff'"
+                     (keydown.enter)="gisArea.color = '#00ffff'"
+                     (keydown.space)="gisArea.color = '#00ffff'"></div>
+                <div class="vp-color-option vp-blue"
+                     role="button" tabindex="0" title="Blue"
+                     aria-label="Blue — predefined color shortcut"
+                     (click)="gisArea.color = '#0000ff'"
+                     (keydown.enter)="gisArea.color = '#0000ff'"
+                     (keydown.space)="gisArea.color = '#0000ff'"></div>
+                <div class="vp-color-option vp-purple"
+                     role="button" tabindex="0" title="Purple"
+                     aria-label="Purple — predefined color shortcut"
+                     (click)="gisArea.color = '#8000ff'"
+                     (keydown.enter)="gisArea.color = '#8000ff'"
+                     (keydown.space)="gisArea.color = '#8000ff'"></div>
+                <div class="vp-color-option vp-pink"
+                     role="button" tabindex="0" title="Pink"
+                     aria-label="Pink — predefined color shortcut"
+                     (click)="gisArea.color = '#ff00ff'"
+                     (keydown.enter)="gisArea.color = '#ff00ff'"
+                     (keydown.space)="gisArea.color = '#ff00ff'"></div>
+            </div>
+            <input id="area-color"
+                   type="color"
+                   name="color"
+                   [(ngModel)]="gisArea.color"
+                   class="form-control form-control-color w-100" />
+        </div>
+
+        <div>
+
+        </div>
+    </form>
+
+    <div>
+        <vp-validation-summary [form]="form" [validationErrors]="validationErrors" />
+
+        <div class="d-flex gap-2 mb-3">
+            <button type="submit" class="btn btn-primary w-100">
+                Save
+            </button>
+
+            <button type="button" class="btn btn-primary w-100" (click)="cancel.emit()">
+                Cancel
+            </button>
+        </div>
+
+        <button *ngIf="gisArea.id" class="btn btn-danger w-100">
+            Delete Area
+        </button>
+    </div>
+</div>

@@ -6,11 +6,13 @@ import { SharedComponentsModule } from "../shared/components/shared.components.m
 import { AdminRoutingModule } from "./admin-routing.module";
 import { RouterModule } from "@angular/router";
 import { GisAreaListComponent } from "./gis-areas/list/gis-area-list.component";
+import { CreateEditGisAreaComponent } from "./gis-areas/create-edit/create-edit-gis-area.component";
 
 @NgModule({
     declarations: [
         HomeComponent,
-        GisAreaListComponent
+        GisAreaListComponent,
+        CreateEditGisAreaComponent
     ],
     imports: [
         CommonModule,

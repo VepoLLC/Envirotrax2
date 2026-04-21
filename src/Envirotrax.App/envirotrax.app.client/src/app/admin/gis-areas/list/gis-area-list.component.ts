@@ -1,9 +1,10 @@
 import { Component, OnInit } from "@angular/core";
 import { GisAreaService } from "../../../shared/services/gis-areas/gis-area.service";
 import { GisAreaCoordinateService } from "../../../shared/services/gis-areas/gis-area-coordinate.service";
-import { MapPolygon } from "../../../shared/models/map/map-polygon";
 import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
+import { GisArea, GisAreaCoordinate } from "../../../shared/models/gis-areas/gis-area";
+import { MapPolygon } from "../../../shared/components/map/map.component";
 
 @Component({
     standalone: false,
@@ -13,12 +14,14 @@ export class GisAreaListComponent implements OnInit {
     public latitude = 30.9;
     public longitude = -97.2829;
     public zoom = 7;
-    public polygons: MapPolygon[] = [];
+    public polygons: MapPolygon<GisAreaVm>[] = [];
 
     public cursorPosition: { lat: number, lng: number } | null = null;
 
     public isLoading: boolean = false;
     public loadingMessage?: string;
+
+    public editRecord?: GisAreaVm;
 
     constructor(
         private readonly _helper: HelperService,
@@ -91,16 +94,35 @@ export class GisAreaListComponent implements OnInit {
             ]);
 
             this.polygons = areas.data.map(area => ({
-                id: area.id,
                 name: area.name,
                 color: area.color ?? '#000000',
                 coordinates: allCoordinates
                     .filter(c => c.area?.id === area.id)
-                    .map(c => ({ lat: c.latitude!, lng: c.longitde! }))
-            } satisfies MapPolygon));
+                    .map(c => ({ lat: c.latitude!, lng: c.longitde! })),
+                data: {
+                    area: area,
+                    coordinates: allCoordinates.filter(c => c.area?.id === area.id),
+                }
+            } satisfies MapPolygon<GisAreaVm>));
         } finally {
             this.isLoading = false;
             this.loadingMessage = '';
         }
     }
+
+    public add(): void {
+        this.editRecord = {
+            area: {},
+            coordinates: []
+        };
+    }
+
+    public cancelEdit(): void {
+        this.editRecord = undefined;
+    }
+}
+
+interface GisAreaVm {
+    area: GisArea;
+    coordinates: GisAreaCoordinate[];
 }

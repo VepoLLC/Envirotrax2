@@ -19,7 +19,7 @@ import { CsiSubmissionCreateComponent } from "./inspections/create/csi-submissio
         CsiInspectorListComponent,
         CsiInspectorDetailsComponent,
         CsiInspectorWaterSuppliersComponent,
-        CsiInspectorSubAccountsComponent,
+        CsiInspectorUsersComponent,
         CsiInspectorLicenseInsuranceComponent,
         CsiSubmissionPropertySearchComponent,
         CsiSubmissionCreateComponent

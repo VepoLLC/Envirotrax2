@@ -25,4 +25,19 @@ export class CsiInspectorInsurancesService {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));
     }
+
+    public add(inspectorId: number, insurance: ProfessionalInsurance): Promise<ProfessionalInsurance> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${inspectorId}/insurances`);
+        return lastValueFrom(this._http.post<ProfessionalInsurance>(url, insurance));
+    }
+
+    public update(inspectorId: number, insurance: ProfessionalInsurance): Promise<ProfessionalInsurance> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${inspectorId}/insurances/${insurance.id}`);
+        return lastValueFrom(this._http.put<ProfessionalInsurance>(url, insurance));
+    }
+
+    public delete(inspectorId: number, insuranceId: number): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${inspectorId}/insurances/${insuranceId}`);
+        return lastValueFrom(this._http.delete<void>(url));
+    }
 }

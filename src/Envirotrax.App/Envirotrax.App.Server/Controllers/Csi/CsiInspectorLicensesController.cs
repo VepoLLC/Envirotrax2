@@ -13,7 +13,7 @@ namespace Envirotrax.App.Server.Controllers.Csi
     {
         private readonly IProfessionalUserLicenseService _licenseService;
 
-        public CsiInspectorLicensesController(IProfessionalUserLicenseService licenseService)
+        public CsiInspectorLicensesController(IProfessionalUserLicenseService licenseService, IProfessionalLicenseTypeService licenseTypeService)
         {
             _licenseService = licenseService;
         }

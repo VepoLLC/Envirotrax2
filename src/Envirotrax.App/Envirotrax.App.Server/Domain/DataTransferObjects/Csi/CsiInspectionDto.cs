@@ -13,6 +13,9 @@ public class CsiInspectionDto : IDto
 
     public ReferencedSiteDto? Site { get; set; }
 
+    public int? WaterSupplierId { get; set; }
+    public int? InspectorUserId { get; set; }
+
     public DateTime? InspectionDate { get; set; }
 
     [StringLength(50)]
@@ -70,13 +73,6 @@ public class CsiInspectionDto : IDto
 
     [StringLength(100)]
     public string? MailingEmailAddress { get; set; }
-
-    // Inspector fields
-    [StringLength(50)]
-    public string? MasterInspectorId { get; set; }
-
-    [StringLength(50)]
-    public string? InspectorId { get; set; }
 
     [StringLength(50)]
     public string? InspectorLicenseNumber { get; set; }

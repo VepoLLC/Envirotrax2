@@ -84,7 +84,7 @@ public class CsiInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser
     public int ProfessionalId { get; set; }
     public Professional? Professional { get; set; }
 
-    public int UserId { get; set; }
+    public int InspectorId { get; set; }
     public ProfessionalUser? Inspector { get; set; }
 
     [StringLength(50)]
@@ -207,7 +207,7 @@ public class CsiInspectionConfiguration : IEntityTypeConfiguration<CsiInspection
     {
         builder.HasOne(i=> i.Inspector)
             .WithMany()
-            .HasForeignKey(i => new { i.ProfessionalId, i.UserId })
+            .HasForeignKey(i => new { i.ProfessionalId, i.InspectorId })
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

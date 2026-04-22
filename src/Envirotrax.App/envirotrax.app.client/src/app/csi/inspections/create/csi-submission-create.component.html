@@ -4,9 +4,7 @@
 
 <div *ngIf="!isLoading">
 
-    <div *ngIf="errorMessage && !viewModel" class="alert alert-danger">{{ errorMessage }}</div>
-
-    <div *ngIf="viewModel">
+<div *ngIf="site">
 
         <!-- Tabs -->
         <ul class="nav vp-tabs justify-content-center mb-3">
@@ -33,7 +31,7 @@
         </ul>
 
         <!-- Confirmation Screen -->
-        <div *ngIf="isSubmitted">
+        <div *ngIf="submitSuccess">
             <vp-section header="CSI Submission Confirmation" class="text-center">
                 <p class="text-center fw-bold text-danger">Completion of the checkout process is required for this inspection to be valid within the system.</p>
                 <p>Please read the following information on CSI submission and the checkout process:</p>
@@ -51,7 +49,7 @@
         </div>
 
         <!-- CSI Main Form Tab -->
-        <div *ngIf="activeTab === 'main' && !isSubmitted">
+        <div *ngIf="activeTab === 'main' && !submitSuccess">
             <form #submitForm="ngForm" (ngSubmit)="submit(submitForm)">
 
                 <!-- Account Selection & License Verification -->
@@ -62,7 +60,7 @@
                             <div class="flex-grow-1">
                                 <vp-input type="select"
                                           name="csiAccountUserId"
-                                          [ngModel]="selectedCsiAccountUserId"
+                                          [ngModel]="selectedCsiUserId"
                                           (ngModelChange)="onCsiAccountChange($event)"
                                           [options]="csiAccountOptions"
                                           [required]="true" />
@@ -79,7 +77,8 @@
                             <div class="flex-grow-1">
                                 <vp-input type="select"
                                           name="waterSupplierId"
-                                          [(ngModel)]="selectedWaterSupplierId"
+                                          [ngModel]="selectedWaterSupplierId"
+                                          (ngModelChange)="onWaterSupplierChange($event)"
                                           [options]="waterSupplierOptions"
                                           [required]="true" />
                             </div>
@@ -89,103 +88,64 @@
 
                 <!-- Water Supplier Information -->
                 <vp-section *ngIf="hasValidLicense" header="Water Supplier Information" class="mt-3 d-block">
-                    <div *ngIf="selectedWaterSupplier; else noSupplierSelected">
+                    <div *ngIf="selectedWaterSupplier">
                         <div class="row">
                             <div class="col-md-6">
-                                <table class="table table-borderless table-sm mb-0">
-                                    <tbody>
-                                        <tr>
-                                            <th class="w-40">Water Supplier:</th>
-                                            <td>{{ selectedWaterSupplier.name }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Address:</th>
-                                            <td>
-                                                {{ selectedWaterSupplier.address }}<br *ngIf="selectedWaterSupplier.address">
-                                                {{ selectedWaterSupplier.city }}<span *ngIf="selectedWaterSupplier.city && selectedWaterSupplier.state">, </span>{{ selectedWaterSupplier.state }} {{ selectedWaterSupplier.zipCode }}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <dl class="row mb-0">
+                                    <dt class="col-5">Water Supplier:</dt>
+                                    <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.name }}</dd>
+                                    <dt class="col-5">Address:</dt>
+                                    <dd class="col-7 mb-1">
+                                        {{ selectedWaterSupplier.waterSupplier?.address }}<br *ngIf="selectedWaterSupplier.waterSupplier?.address">
+                                        {{ selectedWaterSupplier.waterSupplier?.city }}<span *ngIf="selectedWaterSupplier.waterSupplier?.city && selectedWaterSupplier.waterSupplier?.state?.name">, </span>{{ selectedWaterSupplier.waterSupplier?.state?.name }} {{ selectedWaterSupplier.waterSupplier?.zipCode }}
+                                    </dd>
+                                </dl>
                             </div>
                             <div class="col-md-6">
-                                <table class="table table-borderless table-sm mb-0">
-                                    <tbody>
-                                        <tr>
-                                            <th class="w-40">PWS ID:</th>
-                                            <td>{{ selectedWaterSupplier.pwsId }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Contact Name:</th>
-                                            <td>{{ selectedWaterSupplier.contactName }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Phone Number:</th>
-                                            <td>{{ selectedWaterSupplier.phoneNumber }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Email Address:</th>
-                                            <td>{{ selectedWaterSupplier.emailAddress }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <dl class="row mb-0">
+                                    <dt class="col-5">PWS ID:</dt>
+                                    <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.pwsId }}</dd>
+                                    <dt class="col-5">Contact Name:</dt>
+                                    <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.contactName }}</dd>
+                                    <dt class="col-5">Phone Number:</dt>
+                                    <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.phoneNumber }}</dd>
+                                    <dt class="col-5">Email Address:</dt>
+                                    <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.emailAddress }}</dd>
+                                </dl>
                             </div>
                         </div>
                     </div>
-                    <ng-template #noSupplierSelected>
-                        <p class="text-muted mb-0">Select a water supplier above to view their information.</p>
-                    </ng-template>
                 </vp-section>
 
                 <!-- CSI Inspector -->
                 <vp-section *ngIf="hasValidLicense" header="CSI Inspector" class="mt-3 d-block">
                     <div class="row">
                         <div class="col-md-6">
-                            <table class="table table-borderless table-sm mb-0">
-                                <tbody>
-                                    <tr>
-                                        <th class="w-40">Company Name:</th>
-                                        <td>{{ currentInspector?.companyName }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Title of Inspector:</th>
-                                        <td>{{ currentInspector?.jobTitle }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Inspector Name:</th>
-                                        <td>{{ currentInspector?.contactName }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Address:</th>
-                                        <td>
-                                            {{ currentInspector?.address }}<br *ngIf="currentInspector?.address">
-                                            {{ currentInspector?.city }}<span *ngIf="currentInspector?.city && currentInspector?.state">, </span>{{ currentInspector?.state }} {{ currentInspector?.zipCode }}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <dl class="row mb-0">
+                                <dt class="col-5">Company Name:</dt>
+                                <dd class="col-7 mb-1">{{ professional?.name }}</dd>
+                                <dt class="col-5">Title of Inspector:</dt>
+                                <dd class="col-7 mb-1">{{ selectedCsiUser?.jobTitle }}</dd>
+                                <dt class="col-5">Inspector Name:</dt>
+                                <dd class="col-7 mb-1">{{ selectedCsiUser?.contactName }}</dd>
+                                <dt class="col-5">Address:</dt>
+                                <dd class="col-7 mb-1">
+                                    {{ professional?.address }}<br *ngIf="professional?.address">
+                                    {{ professional?.city }}<span *ngIf="professional?.city && professional?.state?.name">, </span>{{ professional?.state?.name }} {{ professional?.zipCode }}
+                                </dd>
+                            </dl>
                         </div>
                         <div class="col-md-6">
-                            <table class="table table-borderless table-sm mb-0">
-                                <tbody>
-                                    <tr>
-                                        <th class="w-40">Phone Number:</th>
-                                        <td>{{ currentInspector?.phoneNumber }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Email Address:</th>
-                                        <td>{{ currentInspector?.emailAddress }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>License Number:</th>
-                                        <td>{{ currentLicense?.licenseNumber }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>License Type:</th>
-                                        <td>{{ currentLicense?.licenseTypeName }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <dl class="row mb-0">
+                                <dt class="col-5">Phone Number:</dt>
+                                <dd class="col-7 mb-1">{{ professional?.phoneNumber }}</dd>
+                                <dt class="col-5">Email Address:</dt>
+                                <dd class="col-7 mb-1">{{ selectedCsiUser?.emailAddress }}</dd>
+                                <dt class="col-5">License Number:</dt>
+                                <dd class="col-7 mb-1">{{ currentLicense?.licenseNumber }}</dd>
+                                <dt class="col-5">License Type:</dt>
+                                <dd class="col-7 mb-1">{{ currentLicense?.licenseType?.name }}</dd>
+                            </dl>
                         </div>
                     </div>
                 </vp-section>
@@ -194,56 +154,36 @@
                 <div *ngIf="hasValidLicense" class="row mt-3">
                     <div class="col-md-6">
                         <vp-section header="Location / Property Information">
-                            <table class="table table-borderless table-sm mb-0">
-                                <tbody>
-                                    <tr>
-                                        <th class="w-40">Property Type:</th>
-                                        <td>{{ viewModel.site.propertyType === 0 ? 'Residential' : 'Commercial' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Business Name:</th>
-                                        <td>{{ viewModel.site.businessName }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Property Address:</th>
-                                        <td>
-                                            {{ viewModel.site.streetNumber }} {{ viewModel.site.streetName }}<span *ngIf="viewModel.site.propertyNumber"> #{{ viewModel.site.propertyNumber }}</span><br>
-                                            {{ viewModel.site.city }}<span *ngIf="viewModel.site.city && viewModel.site.state?.name">, </span>{{ viewModel.site.state?.name }} {{ viewModel.site.zipCode }}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <dl class="row mb-0">
+                                <dt class="col-5">Property Type:</dt>
+                                <dd class="col-7 mb-1">{{ site.propertyType === 0 ? 'Residential' : 'Commercial' }}</dd>
+                                <dt class="col-5">Business Name:</dt>
+                                <dd class="col-7 mb-1">{{ site.businessName }}</dd>
+                                <dt class="col-5">Property Address:</dt>
+                                <dd class="col-7 mb-1">
+                                    {{ site.streetNumber }} {{ site.streetName }}<span *ngIf="site.propertyNumber"> #{{ site.propertyNumber }}</span><br>
+                                    {{ site.city }}<span *ngIf="site.city && site.state?.name">, </span>{{ site.state?.name }} {{ site.zipCode }}
+                                </dd>
+                            </dl>
                         </vp-section>
                     </div>
                     <div class="col-md-6">
                         <vp-section header="Assembly Owner's Contact Information">
-                            <table class="table table-borderless table-sm mb-0">
-                                <tbody>
-                                    <tr>
-                                        <th class="w-40">Company Name:</th>
-                                        <td>{{ viewModel.site.mailingCompanyName }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Contact Name:</th>
-                                        <td>{{ viewModel.site.mailingContactName }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Mailing Address:</th>
-                                        <td>
-                                            {{ viewModel.site.mailingStreetNumber }} {{ viewModel.site.mailingStreetName }}<span *ngIf="viewModel.site.mailingNumber"> #{{ viewModel.site.mailingNumber }}</span><br>
-                                            {{ viewModel.site.mailingCity }}<span *ngIf="viewModel.site.mailingCity && viewModel.site.mailingState?.name">, </span>{{ viewModel.site.mailingState?.name }} {{ viewModel.site.mailingZipCode }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>Phone Number:</th>
-                                        <td>{{ viewModel.site.mailingPhoneNumber }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Email Address:</th>
-                                        <td>{{ viewModel.site.mailingEmailAddress }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <dl class="row mb-0">
+                                <dt class="col-5">Company Name:</dt>
+                                <dd class="col-7 mb-1">{{ site.mailingCompanyName }}</dd>
+                                <dt class="col-5">Contact Name:</dt>
+                                <dd class="col-7 mb-1">{{ site.mailingContactName }}</dd>
+                                <dt class="col-5">Mailing Address:</dt>
+                                <dd class="col-7 mb-1">
+                                    {{ site.mailingStreetNumber }} {{ site.mailingStreetName }}<span *ngIf="site.mailingNumber"> #{{ site.mailingNumber }}</span><br>
+                                    {{ site.mailingCity }}<span *ngIf="site.mailingCity && site.mailingState?.name">, </span>{{ site.mailingState?.name }} {{ site.mailingZipCode }}
+                                </dd>
+                                <dt class="col-5">Phone Number:</dt>
+                                <dd class="col-7 mb-1">{{ site.mailingPhoneNumber }}</dd>
+                                <dt class="col-5">Email Address:</dt>
+                                <dd class="col-7 mb-1">{{ site.mailingEmailAddress }}</dd>
+                            </dl>
                         </vp-section>
                     </div>
                 </div>
@@ -274,33 +214,71 @@
                     </div>
 
                     <!-- Certification + Compliance radio buttons -->
-                    <div class="border p-3 mb-3" [class.border-danger]="complianceIsInvalid">
+                    <div class="border p-3 mb-3" [class.border-danger]="complianceIsInvalid" (change)="onComplianceChange()">
                         <p class="mb-3">
-                            I, <u>{{ currentInspector?.contactName }}</u>, upon inspection of the private water distribution facilities connected to the aforementioned public water supply do hereby certify that, to the best of my knowledge:
+                            I, <u>{{ selectedCsiUser?.contactName }}</u>, upon inspection of the private water distribution facilities connected to the aforementioned public water supply do hereby certify that, to the best of my knowledge:
                         </p>
                         <table class="table table-sm table-bordered mb-0">
                             <thead>
                                 <tr>
                                     <th></th>
-                                    <th class="text-center" style="width: 110px;">Compliance</th>
-                                    <th class="text-center" style="width: 140px;">Non-compliance</th>
+                                    <th class="text-center col-compliance">Compliance</th>
+                                    <th class="text-center col-noncompliance">Non-compliance</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let statement of complianceStatements; let i = index">
-                                    <td>{{ i + 1 }}. {{ statement }}</td>
+                                <tr>
+                                    <td>1. No direct or indirect connection between the public drinking water supply and a potential source of contamination exists. Potential sources of contamination are isolated from the public water system by an air gap or an appropriate backflow prevention assembly in accordance with Commission regulations.</td>
                                     <td class="text-center align-middle">
-                                        <input type="radio"
-                                               [name]="'compliance' + i"
-                                               [value]="true"
-                                               [(ngModel)]="complianceValues[i]"
-                                               required />
+                                        <input type="radio" name="compliance0" [value]="true" [(ngModel)]="compliance1" required />
                                     </td>
                                     <td class="text-center align-middle">
-                                        <input type="radio"
-                                               [name]="'compliance' + i"
-                                               [value]="false"
-                                               [(ngModel)]="complianceValues[i]" />
+                                        <input type="radio" name="compliance0" [value]="false" [(ngModel)]="compliance1" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2. No cross-connection between the public drinking water supply and a private water system exists. Where an actual air gap is not maintained between the public water supply and a private water supply, an approved reduced pressure principle backflow prevention assembly is properly installed.</td>
+                                    <td class="text-center align-middle">
+                                        <input type="radio" name="compliance1" [value]="true" [(ngModel)]="compliance2" required />
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <input type="radio" name="compliance1" [value]="false" [(ngModel)]="compliance2" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>3. No connection exists which would allow the return of water used for condensing, cooling or industrial processes back to the public water supply.</td>
+                                    <td class="text-center align-middle">
+                                        <input type="radio" name="compliance2" [value]="true" [(ngModel)]="compliance3" required />
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <input type="radio" name="compliance2" [value]="false" [(ngModel)]="compliance3" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>4. No pipe or pipe fitting which contains more than 8.0% lead exists in private water distribution facilities installed on or after July 1, 1988 and prior to January 4, 2014.</td>
+                                    <td class="text-center align-middle">
+                                        <input type="radio" name="compliance3" [value]="true" [(ngModel)]="compliance4" required />
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <input type="radio" name="compliance3" [value]="false" [(ngModel)]="compliance4" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>5. Plumbing installed on or after January 4, 2014 bears the expected labeling indicating &le;0.25% lead content. If not properly labeled, please provide written comment.</td>
+                                    <td class="text-center align-middle">
+                                        <input type="radio" name="compliance4" [value]="true" [(ngModel)]="compliance5" required />
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <input type="radio" name="compliance4" [value]="false" [(ngModel)]="compliance5" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>6. No solder or flux which contains more than 0.2% lead exists in private water distribution facilities installed on or after July 1, 1988.</td>
+                                    <td class="text-center align-middle">
+                                        <input type="radio" name="compliance5" [value]="true" [(ngModel)]="compliance6" required />
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <input type="radio" name="compliance5" [value]="false" [(ngModel)]="compliance6" />
                                     </td>
                                 </tr>
                             </tbody>
@@ -313,10 +291,10 @@
                     <!-- Materials -->
                     <p class="mb-2">I further certify that the following materials were used in the installation of the private water distribution facilities:</p>
 
-                    <table class="mb-3 d-flex justify-content-center">
+                    <table class="mb-3 d-flex justify-content-center" (change)="onMaterialChange()">
                         <tbody>
                             <tr>
-                                <td class="fw-bold pe-3 text-end text-nowrap align-middle" style="width: 120px;">Service Lines:</td>
+                                <td class="fw-bold pe-3 text-end text-nowrap align-middle col-material-label">Service Lines:</td>
                                 <td class="pe-4 align-middle">
                                     <div class="form-check form-check-inline mb-0">
                                         <input class="form-check-input" type="checkbox" id="slLead" name="slLead" [(ngModel)]="form.materialServiceLineLead" />
@@ -346,7 +324,7 @@
                                         <div class="d-flex align-items-center gap-2">
                                             <input type="text"
                                                    class="form-control form-control-sm"
-                                                   style="width: 180px;"
+                                                   class="input-other-desc"
                                                    name="slOtherDesc"
                                                    [(ngModel)]="form.materialServiceLineOtherDescription"
                                                    required />
@@ -390,7 +368,7 @@
                                         <div class="d-flex align-items-center gap-2">
                                             <input type="text"
                                                    class="form-control form-control-sm"
-                                                   style="width: 180px;"
+                                                   class="input-other-desc"
                                                    name="soldOtherDesc"
                                                    [(ngModel)]="form.materialSolderOtherDescription"
                                                    required />
@@ -418,7 +396,8 @@
                 <vp-section *ngIf="hasValidLicense" [header]="'Remarks (' + remarksLength + '/1000 Characters)'" class="mt-3 d-block">
                     <vp-input type="textarea"
                               name="comments"
-                              [(ngModel)]="form.comments"
+                              [ngModel]="form.comments"
+                              (ngModelChange)="onCommentsChange($event)"
                               [maxLength]="1000" />
                 </vp-section>
 
@@ -429,8 +408,7 @@
 
                 <!-- Validation & Submit -->
                 <div *ngIf="hasValidLicense" class="mt-3">
-                    <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-                    <vp-validation-summary [form]="submitForm" [validationErrors]="validationErrors" />
+                  <vp-validation-summary [form]="submitForm" [validationErrors]="validationErrors" />
                 </div>
 
                 <div *ngIf="hasValidLicense" class="mt-3 d-flex justify-content-center">

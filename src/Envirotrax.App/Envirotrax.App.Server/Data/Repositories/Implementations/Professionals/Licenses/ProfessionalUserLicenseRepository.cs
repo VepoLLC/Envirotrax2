@@ -38,32 +38,6 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
         return await paginated.ToListAsync();
     }
 
-    public Task<ProfessionalUserLicense?> GetCsiLicenseForUserAsync(int userId, CancellationToken cancellationToken)
-    {
-        var now = DateTime.UtcNow;
-        return GetListQuery()
-            .Where(l => l.UserId == userId && l.ProfessionalType == ProfessionalType.CsiInspector)
-            .OrderByDescending(l => l.ExpirationDate == null || l.ExpirationDate > now)
-            .ThenByDescending(l => l.Id)
-            .FirstOrDefaultAsync(cancellationToken);
-    }
-
-    public async Task<IEnumerable<ProfessionalUserLicense>> GetCsiLicensesForProfessionalAsync(int professionalId, CancellationToken cancellationToken)
-    {
-        var now = DateTime.UtcNow;
-        var licenses = await GetListQuery()
-            .Where(l => l.ProfessionalId == professionalId && l.ProfessionalType == ProfessionalType.CsiInspector)
-            .ToListAsync(cancellationToken);
-
-        return licenses
-            .GroupBy(l => l.UserId)
-            .Select(g => g
-                .OrderByDescending(l => l.ExpirationDate == null || l.ExpirationDate > now)
-                .ThenByDescending(l => l.Id)
-                .First())
-            .ToList();
-    }
-
     public async Task<IEnumerable<ProfessionalUserLicense>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         var paginated = await DbContext.ProfessionalUserLicenses

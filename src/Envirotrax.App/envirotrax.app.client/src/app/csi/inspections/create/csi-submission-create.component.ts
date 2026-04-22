@@ -1,44 +1,72 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
-import { CsiSubmissionService } from '../../../shared/services/csi/csi-submission.service';
-import {
-    CsiAccountOption,
-    CsiInspectorData,
-    CsiLicenseData,
-    CsiSubmissionCreateViewModel,
-    CsiSubmissionSaveRequest,
-    CsiWaterSupplierOption
-} from '../../../shared/models/csi/csi-submission-create-view-model';
+import { CsiInspectionService } from '../../../shared/services/csi/csi-inspection.service';
+import { ProfesisonalService } from '../../../shared/services/professionals/professional.service';
+import { ProfesionalUserService } from '../../../shared/services/professionals/professional-user.service';
+import { ProfessionalUserLicenseService } from '../../../shared/services/professionals/professional-user-license.service';
+import { SiteService } from '../../../shared/services/sites/site.service';
+import { CsiInspection } from '../../../shared/models/csi/csi-inspection';
+import { Professional } from '../../../shared/models/professionals/professional';
+import { ProfessionalUser } from '../../../shared/models/professionals/professional-user';
+import { ProfessionalUserLicense, ExpirationType, ProfessionalType } from '../../../shared/models/professionals/licenses/professional-user-license';
+import { ProfessionalWaterSupplier } from '../../../shared/models/professionals/professional-water-supplier';
+import { Site } from '../../../shared/models/sites/site';
 import { CsiInspectionReason, csiInspectionReasonLabels } from '../../../shared/enums/csi-inspection-reason.enum';
 import { InputOption } from '../../../shared/components/input/input.component';
+import { MAX_PAGE_SIZE } from '../../../shared/models/page-info';
+import { ProfessionalSupplierService } from '../../../shared/services/professionals/professional-supplier.service';
 
 @Component({
     standalone: false,
-    templateUrl: './csi-submission-create.component.html'
+    templateUrl: './csi-submission-create.component.html',
+    styleUrl: './csi-submission-create.component.scss'
 })
 export class CsiSubmissionCreateComponent implements OnInit {
     public isLoading = true;
     public isSaving = false;
-    public isSubmitted = false;
-    public viewModel?: CsiSubmissionCreateViewModel;
+    public submitSuccess = false;
     public activeTab: 'main' | 'assemblies' | 'additional' | 'images' = 'main';
-    public errorMessage = '';
     public submitted = false;
     public validationErrors: string[] = [];
 
-    public selectedCsiAccountUserId!: number;
+    public site?: Site;
+    public professional?: Professional;
+
+    private csiUsers: ProfessionalUser[] = [];
+    private waterSuppliers: ProfessionalWaterSupplier[] = [];
+
+
+    public selectedCsiUserId!: number;
     public selectedWaterSupplierId?: number;
+    public currentLicense?: ProfessionalUserLicense;
+    public isLoadingLicense = false;
+
+    public csiAccountOptions: InputOption[] = [];
+    public waterSupplierOptions: InputOption[] = [];
+
     public legalAcknowledgment = false;
+    public compliance1: boolean | null = null;
+    public compliance2: boolean | null = null;
+    public compliance3: boolean | null = null;
+    public compliance4: boolean | null = null;
+    public compliance5: boolean | null = null;
+    public compliance6: boolean | null = null;
 
-    // null = not yet selected, true = Compliance, false = Non-compliance
-    public complianceValues: (boolean | null)[] = [null, null, null, null, null, null];
-
-    public form: Omit<CsiSubmissionSaveRequest,
-        'siteId' | 'waterSupplierId' | 'selectedCsiAccountUserId' |
-        'compliance1' | 'compliance2' | 'compliance3' |
-        'compliance4' | 'compliance5' | 'compliance6' | 'reasonForInspection'> & {
-        reasonForInspection: CsiInspectionReason | null
+    public form: {
+        inspectionDate: string | undefined;
+        reasonForInspection: CsiInspectionReason | null;
+        materialServiceLineLead: boolean;
+        materialServiceLineCopper: boolean;
+        materialServiceLinePVC: boolean;
+        materialServiceLineOther: boolean;
+        materialServiceLineOtherDescription: string | undefined;
+        materialSolderLead: boolean;
+        materialSolderLeadFree: boolean;
+        materialSolderSolventWeld: boolean;
+        materialSolderOther: boolean;
+        materialSolderOtherDescription: string | undefined;
+        comments: string | undefined;
     } = {
         inspectionDate: undefined,
         reasonForInspection: null,
@@ -61,114 +89,71 @@ export class CsiSubmissionCreateComponent implements OnInit {
         { id: CsiInspectionReason.MajorRenovationOrExpansion, text: csiInspectionReasonLabels[CsiInspectionReason.MajorRenovationOrExpansion] }
     ];
 
-    public readonly complianceStatements: string[] = [
-        'No direct or indirect connection between the public drinking water supply and a potential source of contamination exists. Potential sources of contamination are isolated from the public water system by an air gap or an appropriate backflow prevention assembly in accordance with Commission regulations.',
-        'No cross-connection between the public drinking water supply and a private water system exists. Where an actual air gap is not maintained between the public water supply and a private water supply, an approved reduced pressure principle backflow prevention assembly is properly installed.',
-        'No connection exists which would allow the return of water used for condensing, cooling or industrial processes back to the public water supply.',
-        'No pipe or pipe fitting which contains more than 8.0% lead exists in private water distribution facilities installed on or after July 1, 1988 and prior to January 4, 2014.',
-        'Plumbing installed on or after January 4, 2014 bears the expected labeling indicating \u22640.25% lead content. If not properly labeled, please provide written comment.',
-        'No solder or flux which contains more than 0.2% lead exists in private water distribution facilities installed on or after July 1, 1988.'
-    ];
+    public selectedCsiUser: ProfessionalUser | undefined = undefined;
+    public selectedWaterSupplier: ProfessionalWaterSupplier | undefined = undefined;
+    public hasValidLicense = false;
+    public licenseStatusText = 'No license found';
+    public licenseStatusClass = 'text-danger';
+    public remarksLength = 0;
+    public complianceIsInvalid = false;
+    public serviceLineIsInvalid = false;
+    public solderIsInvalid = false;
 
     private _siteId!: number;
 
     constructor(
         private readonly _activatedRoute: ActivatedRoute,
         private readonly _router: Router,
-        private readonly _submissionService: CsiSubmissionService
+        private readonly _professionalService: ProfesisonalService,
+        private readonly _userService: ProfesionalUserService,
+        private readonly _licenseService: ProfessionalUserLicenseService,
+        private readonly _siteService: SiteService,
+        private readonly _inspectionService: CsiInspectionService,
+        private readonly _professionalSupplierService: ProfessionalSupplierService
     ) {}
 
     public async ngOnInit(): Promise<void> {
-        await this.initialize();
-    }
-
-    private async initialize(): Promise<void>{
-        const idParam = this._activatedRoute.snapshot.paramMap.get('siteId');
-        this._siteId = idParam ? Number(idParam) : 0;
-
-        if(this._siteId <= 0){
-            this.isLoading = false;
+        if (!this.initializeSiteId()) {
             return;
         }
 
-        await this.loadViewModel();
+        await this.loadData();
     }
 
-    public get selectedCsiAccount(): CsiAccountOption | undefined {
-        return this.viewModel?.availableCsiAccounts.find(a => a.userId === this.selectedCsiAccountUserId);
+    public async onCsiAccountChange(value: number): Promise<void> {
+        this.selectedCsiUserId = value;
+        this.selectedCsiUser = this.csiUsers.find(u => u.id === value);
+        await this.loadLicense(value);
     }
 
-    public get currentLicense(): CsiLicenseData | undefined {
-        return this.selectedCsiAccount?.csiLicense;
+    public onWaterSupplierChange(value: number): void {
+        this.selectedWaterSupplierId = value;
+        this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === value);
     }
 
-    public get hasValidLicense(): boolean {
-        return this.currentLicense?.isValid === true;
+    public onCommentsChange(value: string | undefined): void {
+        this.form.comments = value;
+        this.remarksLength = value?.length ?? 0;
     }
 
-    public get currentInspector(): CsiInspectorData | undefined {
-    if (!this.viewModel?.inspector) {
-        return undefined;
-    }
-
-    const inspector = this.viewModel.inspector;
-    const selectedInspector = this.selectedCsiAccount;
-
-    return {
-        ...inspector,
-        contactName: selectedInspector?.contactName,
-        jobTitle: selectedInspector?.jobTitle,
-        emailAddress: selectedInspector?.emailAddress,
-    };
-}
-
-    public get selectedWaterSupplier(): CsiWaterSupplierOption | undefined {
-        return this.viewModel?.availableWaterSuppliers.find(s => s.id === this.selectedWaterSupplierId);
-    }
-
-    public waterSupplierOptions: InputOption[] = [];
-    public csiAccountOptions: InputOption[] = [];
-
-    public get licenseStatusText(): string {
-        if (!this.currentLicense){
-           return 'No license found'; 
+    public onComplianceChange(): void {
+        if (this.submitted) {
+            this.complianceIsInvalid = this.compliance1 === null || this.compliance2 === null || this.compliance3 === null ||
+                this.compliance4 === null || this.compliance5 === null || this.compliance6 === null;
         }
-        return this.currentLicense.isValid ? 'License valid' : 'License expired';
     }
 
-    public get licenseStatusClass(): string {
-        if (!this.currentLicense){
-            return 'text-danger';
+    public onMaterialChange(): void {
+        if (this.submitted) {
+            this.serviceLineIsInvalid = !this.form.materialServiceLineLead &&
+                !this.form.materialServiceLineCopper &&
+                !this.form.materialServiceLinePVC &&
+                !this.form.materialServiceLineOther;
+            this.solderIsInvalid = !this.form.materialSolderLead &&
+                !this.form.materialSolderLeadFree &&
+                !this.form.materialSolderSolventWeld &&
+                !this.form.materialSolderOther;
         }
-        return this.currentLicense.isValid ? 'text-success' : 'text-danger';
-    }
-
-    public get remarksLength(): number {
-        return this.form.comments?.length ?? 0;
-    }
-
-    public get complianceIsInvalid(): boolean {
-        return this.submitted && this.complianceValues.some(v => v === null);
-    }
-
-    public get serviceLineIsInvalid(): boolean {
-        return this.submitted &&
-            !this.form.materialServiceLineLead &&
-            !this.form.materialServiceLineCopper &&
-            !this.form.materialServiceLinePVC &&
-            !this.form.materialServiceLineOther;
-    }
-
-    public get solderIsInvalid(): boolean {
-        return this.submitted &&
-            !this.form.materialSolderLead &&
-            !this.form.materialSolderLeadFree &&
-            !this.form.materialSolderSolventWeld &&
-            !this.form.materialSolderOther;
-    }
-
-    public onCsiAccountChange(value: number): void {
-        this.selectedCsiAccountUserId = value;
     }
 
     public async submit(submitForm: NgForm): Promise<void> {
@@ -179,31 +164,136 @@ export class CsiSubmissionCreateComponent implements OnInit {
             return;
         }
 
-        if (!this.selectedWaterSupplierId) {
-            this.errorMessage = 'Please select a water supplier.';
-            return;
-        }
-
         this.isSaving = true;
         try {
-            await this._submissionService.submit(this.buildRequest());
-            this.isSubmitted = true;
+            await this._inspectionService.submit(this.buildRequest());
+            this.submitSuccess = true;
         } finally {
             this.isSaving = false;
         }
     }
 
+    public returnToAccountOverview(): void {
+        this._router.navigate(['/']);
+    }
+
+    public submitAnother(): void {
+        this._router.navigate(['..'], { relativeTo: this._activatedRoute });
+    }
+
+    private initializeSiteId(): boolean{
+         const idParam = this._activatedRoute.snapshot.paramMap.get('siteId');
+        this._siteId = idParam ? Number(idParam) : 0;
+
+        if (this._siteId <= 0) {
+            this.isLoading = false;
+            return false;
+        }
+        return true;
+    }
+
+    private async loadData(): Promise<void> {
+        try {
+            this.isLoading = true;
+
+            const [professional, usersPage, site] = await Promise.all([
+                this._professionalService.getLoggedInProfessional(),
+                this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, {}),
+                this._siteService.getForProfessional(this._siteId)
+            ]);
+
+            this.professional = professional;
+            this.csiUsers = (usersPage.data ?? []).filter(u => u.isCsiInspector);
+            this.site = site;
+
+            const waterSuppliersPage = await this._professionalSupplierService.getAllMy(true);
+            this.waterSuppliers = waterSuppliersPage.data ?? [];
+
+            this.buildDropdownOptions();
+            await this.setDefaultCsiUser();
+            this.setDefaultWaterSupplier(site);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    private buildDropdownOptions(): void {
+        this.csiAccountOptions = this.csiUsers.map(u => ({
+            id: u.id,
+            text: u.contactName ?? `User ${u.id}`
+        }));
+
+        this.waterSupplierOptions = this.waterSuppliers.map(ws => ({
+            id: ws.waterSupplier?.id,
+            text: ws.waterSupplier?.name ?? ''
+        }));
+    }
+
+    private async setDefaultCsiUser(): Promise<void> {
+        const myUser = await this._userService.getMyData();
+        const defaultUser = this.csiUsers.find(u => u.id === myUser.id) ?? this.csiUsers[0];
+        if (defaultUser?.id != null) {
+            this.selectedCsiUserId = defaultUser.id;
+            this.selectedCsiUser = defaultUser;
+            await this.loadLicense(defaultUser.id);
+        }
+    }
+
+    private setDefaultWaterSupplier(site: Site): void {
+        if (this.waterSuppliers.length === 1) {
+            this.selectedWaterSupplierId = this.waterSuppliers[0].waterSupplier?.id;
+        }
+
+        const siteWsId = site.waterSupplier?.id;
+        if (siteWsId && this.waterSuppliers.some(ws => ws.waterSupplier?.id === siteWsId)) {
+            this.selectedWaterSupplierId = siteWsId;
+        }
+
+        this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === this.selectedWaterSupplierId);
+    }
+
+    private async loadLicense(userId: number): Promise<void> {
+        this.isLoadingLicense = true;
+        try {
+            const page = await this._licenseService.getForUser(userId, { pageSize: MAX_PAGE_SIZE }, {});
+            this.currentLicense = (page.data ?? []).find(l => l.professionalType === ProfessionalType.CsiInspector);
+            this.hasValidLicense = this.currentLicense != null && this.currentLicense.expirationType !== ExpirationType.Expired;
+            if (!this.currentLicense) {
+                this.licenseStatusText = 'No license found';
+                this.licenseStatusClass = 'text-danger';
+            } else if (this.currentLicense.expirationType === ExpirationType.Expired) {
+                this.licenseStatusText = 'License expired';
+                this.licenseStatusClass = 'text-danger';
+            } else {
+                this.licenseStatusText = 'License valid';
+                this.licenseStatusClass = 'text-success';
+            }
+        } finally {
+            this.isLoadingLicense = false;
+        }
+    }
+
     private resetValidation(): void {
         this.submitted = true;
-        this.errorMessage = '';
+
         this.validationErrors = [];
+        this.complianceIsInvalid = this.compliance1 === null || this.compliance2 === null || this.compliance3 === null ||
+            this.compliance4 === null || this.compliance5 === null || this.compliance6 === null;
+        this.serviceLineIsInvalid = !this.form.materialServiceLineLead &&
+            !this.form.materialServiceLineCopper &&
+            !this.form.materialServiceLinePVC &&
+            !this.form.materialServiceLineOther;
+        this.solderIsInvalid = !this.form.materialSolderLead &&
+            !this.form.materialSolderLeadFree &&
+            !this.form.materialSolderSolventWeld &&
+            !this.form.materialSolderOther;
     }
 
     private collectValidationErrors(): void {
         if (this.form.inspectionDate && new Date(this.form.inspectionDate) > new Date()) {
             this.validationErrors.push('Inspection Date cannot be in the future.');
         }
-        if (this.complianceValues.some(v => v === null)) {
+        if (this.complianceIsInvalid) {
             this.validationErrors.push('Please answer all 6 compliance items before submitting.');
         }
         if (this.serviceLineIsInvalid) {
@@ -217,60 +307,30 @@ export class CsiSubmissionCreateComponent implements OnInit {
         }
     }
 
-    private buildRequest(): CsiSubmissionSaveRequest {
+    private buildRequest(): CsiInspection {
         return {
-            siteId: this._siteId,
-            waterSupplierId: this.selectedWaterSupplierId!,
-            selectedCsiAccountUserId: this.selectedCsiAccountUserId,
-            ...this.form,
-            reasonForInspection: this.form.reasonForInspection!,
-            compliance1: this.complianceValues[0] === true,
-            compliance2: this.complianceValues[1] === true,
-            compliance3: this.complianceValues[2] === true,
-            compliance4: this.complianceValues[3] === true,
-            compliance5: this.complianceValues[4] === true,
-            compliance6: this.complianceValues[5] === true,
+            site: { id: this._siteId },
+            waterSupplierId: this.selectedWaterSupplierId,
+            inspectorUserId: this.selectedCsiUserId,
+            inspectionDate: this.form.inspectionDate,
+            reasonForInspection: this.form.reasonForInspection ?? undefined,
+            compliance1: this.compliance1 === true,
+            compliance2: this.compliance2 === true,
+            compliance3: this.compliance3 === true,
+            compliance4: this.compliance4 === true,
+            compliance5: this.compliance5 === true,
+            compliance6: this.compliance6 === true,
+            materialServiceLineLead: this.form.materialServiceLineLead,
+            materialServiceLineCopper: this.form.materialServiceLineCopper,
+            materialServiceLinePVC: this.form.materialServiceLinePVC,
+            materialServiceLineOther: this.form.materialServiceLineOther,
+            materialServiceLineOtherDescription: this.form.materialServiceLineOtherDescription,
+            materialSolderLead: this.form.materialSolderLead,
+            materialSolderLeadFree: this.form.materialSolderLeadFree,
+            materialSolderSolventWeld: this.form.materialSolderSolventWeld,
+            materialSolderOther: this.form.materialSolderOther,
+            materialSolderOtherDescription: this.form.materialSolderOtherDescription,
+            comments: this.form.comments,
         };
-    }
-
-    public returnToAccountOverview(): void {
-        this._router.navigate(['/']);
-    }
-
-    public submitAnother(): void {
-        this._router.navigate(['..'], { relativeTo: this._activatedRoute });
-    }
-
-    private async loadViewModel(): Promise<void> {
-        try {
-            this.isLoading = true;
-            this.viewModel = await this._submissionService.getCreateViewModel(this._siteId);
-            this.csiAccountOptions = (this.viewModel.availableCsiAccounts ?? []).map(a => ({
-                id: a.userId,
-                text: a.contactName ?? `User ${a.userId}`
-            }));
-            this.waterSupplierOptions = (this.viewModel.availableWaterSuppliers ?? []).map(s => ({
-                id: s.id,
-                text: s.name
-            }));
-
-            const accounts = this.viewModel.availableCsiAccounts;
-            const defaultId = this.viewModel.defaultCsiAccountUserId;
-            const defaultInList = accounts.find(a => a.userId === defaultId);
-            this.selectedCsiAccountUserId = defaultInList?.userId ?? accounts[0]?.userId;
-
-            const siteWaterSupplierId = this.viewModel.defaultWaterSupplierId;
-            const matchesSite = siteWaterSupplierId
-                ? this.viewModel.availableWaterSuppliers.find(s => s.id === siteWaterSupplierId)
-                : undefined;
-
-            if (matchesSite) {
-                this.selectedWaterSupplierId = matchesSite.id;
-            } else if (this.viewModel.availableWaterSuppliers.length === 1) {
-                this.selectedWaterSupplierId = this.viewModel.availableWaterSuppliers[0].id;
-            }
-        }finally {
-            this.isLoading = false;
-        }
     }
 }

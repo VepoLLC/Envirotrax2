@@ -8,5 +8,4 @@ public interface IProfessionalUserRepository : IRepository<ProfessionalUser>
 {
     Task<ProfessionalUser?> UpdateNonSensitiveDataAsync(ProfessionalUser user);
     Task<IEnumerable<ProfessionalUser>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
-    Task<IEnumerable<ProfessionalUser>> GetCsiInspectorsForProfessionalAsync(int professionalId, CancellationToken cancellationToken);
 }

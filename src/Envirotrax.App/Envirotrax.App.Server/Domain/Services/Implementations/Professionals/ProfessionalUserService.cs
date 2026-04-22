@@ -89,12 +89,6 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
     }
 
-    public async Task<IEnumerable<ProfessionalUserDto>> GetCsiInspectorsForProfessionalAsync(int professionalId, CancellationToken cancellationToken)
-    {
-        var users = await _professionalUserRepository.GetCsiInspectorsForProfessionalAsync(professionalId, cancellationToken);
-        return users.Select(u => MapToDto(u)!);
-    }
-
     public async Task<ProfessionalUserDto?> ResendInvitationAsync(int id)
     {
         var user = await _professionalUserRepository.GetAsync(id, CancellationToken.None) ?? throw new InvalidOperationException();

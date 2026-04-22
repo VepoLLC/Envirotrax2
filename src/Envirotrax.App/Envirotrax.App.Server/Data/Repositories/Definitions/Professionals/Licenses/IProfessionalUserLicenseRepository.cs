@@ -8,6 +8,4 @@ public interface IProfessionalUserLicenseRepository : IRepository<ProfessionalUs
 {
     Task<IEnumerable<ProfessionalUserLicense>> GetAllAsync(int userId, PageInfo pageInfo, Query query);
     Task<IEnumerable<ProfessionalUserLicense>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
-    Task<ProfessionalUserLicense?> GetCsiLicenseForUserAsync(int userId, CancellationToken cancellationToken);
-    Task<IEnumerable<ProfessionalUserLicense>> GetCsiLicensesForProfessionalAsync(int professionalId, CancellationToken cancellationToken);
 }

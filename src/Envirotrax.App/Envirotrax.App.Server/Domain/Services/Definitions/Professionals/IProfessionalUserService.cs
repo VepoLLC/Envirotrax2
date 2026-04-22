@@ -12,5 +12,4 @@ public interface IProfessionalUserService : IService<ProfessionalUser, Professio
 
     Task<ProfessionalUserDto?> ResendInvitationAsync(int id);
     Task<IPagedData<ProfessionalUserDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
-    Task<IEnumerable<ProfessionalUserDto>> GetCsiInspectorsForProfessionalAsync(int professionalId, CancellationToken cancellationToken);
 }

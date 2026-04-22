@@ -1,0 +1,26 @@
+using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
+using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
+using Envirotrax.App.Server.Filters;
+using Envirotrax.Common;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Envirotrax.App.Server.Controllers.Csi;
+
+[Route("api/csi/inspections")]
+[HasFeature(FeatureType.CsiInspection)]
+public class CsiInspectionProfessionalController : ProfessionalProtectedController
+{
+    private readonly ICsiInspectionService _inspectionService;
+
+    public CsiInspectionProfessionalController(ICsiInspectionService inspectionService)
+    {
+        _inspectionService = inspectionService;
+    }
+
+    [HttpPost("submit")]
+    public async Task<IActionResult> SubmitAsync([FromBody] CsiInspectionDto request, CancellationToken cancellationToken)
+    {
+        var result = await _inspectionService.SubmitAsync(request, cancellationToken);
+        return Ok(result);
+    }
+}

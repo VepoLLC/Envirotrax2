@@ -13,9 +13,11 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
     private _map!: any;
     private _container!: HTMLElement;
     private _polygonInstances: any[] = [];
+    private _drawingManager: any;
 
     private static _apiKey$?: Observable<ApiKey>;
     private static _mapsLibrary?: any;
+    private static _drawingLibrary?: any;
 
     public autoSetHeight?: string;
 
@@ -71,8 +73,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
         const apiKey = await this.getApiKey();
         setOptions({ key: apiKey.apiKey });
 
-        // Load the Maps library.
+        // Load the Maps and Drawing libraries.
         MapComponent._mapsLibrary ??= await importLibrary('maps');
+        MapComponent._drawingLibrary ??= await importLibrary('drawing');
         const { Map } = MapComponent._mapsLibrary;
 
         // Set map options.
@@ -131,6 +134,11 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
         this._polygonInstances.forEach(p => p.setMap(null));
         this._polygonInstances = [];
 
+        if (this._drawingManager) {
+            this._drawingManager.setMap(null);
+            this._drawingManager = null;
+        }
+
         if (!this.polygons?.length) {
             return;
         }
@@ -138,6 +146,11 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
         const { Polygon } = MapComponent._mapsLibrary as any;
 
         for (const polygon of this.polygons) {
+            if (polygon.onDrawComplete) {
+                this.activateDrawingManager(polygon);
+                continue;
+            }
+
             const instance = new Polygon({
                 paths: polygon.coordinates,
                 strokeColor: polygon.color,
@@ -145,19 +158,87 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
                 strokeWeight: 1,
                 fillColor: polygon.color,
                 fillOpacity: 0.2,
+                editable: !!polygon.onEdit,
+                clickable: !!polygon.onClick
             });
             instance.setMap(this._map);
             this._polygonInstances.push(instance);
 
             if (polygon.onClick) {
-                instance.addEventListener('click', () => {
+                instance.addListener('click', () => {
                     this._ngZone.run(() => {
                         if (polygon.onClick) {
-                            polygon.onClick(instance);
+                            polygon.onClick(polygon);
                         }
                     })
                 })
             }
+
+            if (polygon.onEdit) {
+                const path = instance.getPath();
+                if (path) {
+                    path.addListener("set_at", () => this._ngZone.run(() => this.onPolygonEdit(polygon, instance)));
+                    path.addListener("insert_at", () => this._ngZone.run(() => this.onPolygonEdit(polygon, instance)));
+                }
+            }
+        }
+    }
+
+    private activateDrawingManager(polygon: MapPolygon<any>): void {
+        const { DrawingManager } = MapComponent._drawingLibrary as any;
+
+        this._drawingManager = new DrawingManager({
+            drawingMode: 'polygon',
+            drawingControl: false,
+            polygonOptions: {
+                strokeColor: polygon.color,
+                fillColor: polygon.color,
+                strokeOpacity: 0.8,
+                strokeWeight: 1,
+                fillOpacity: 0.2,
+            }
+        });
+        this._drawingManager.setMap(this._map);
+
+        this._drawingManager.addListener('polygoncomplete', (polygonInstance: any) => {
+            polygonInstance.setMap(null);
+            this._drawingManager.setMap(null);
+            this._drawingManager = null;
+
+            polygon.coordinates = [];
+
+            const path = polygonInstance.getPath();
+
+            for (let i = 0; i < path.getLength(); i++) {
+                const point = path.getAt(i);
+                polygon.coordinates.push({ lat: point.lat(), lng: point.lng() });
+            }
+
+            this._ngZone.run(() => {
+                if (polygon.onDrawComplete) {
+                    polygon.onDrawComplete(polygon);
+                }
+            });
+        });
+    }
+
+    private onPolygonEdit(polygonVm: MapPolygon<any>, polygonInstance: any): void {
+        const coordinates: { lat: number; lng: number }[] = [];
+        const vertices = polygonInstance.getPath();
+
+        for (let i = 0; i < vertices.getLength(); i++) {
+            const xy = vertices.getAt(i);
+
+            coordinates.push({
+                lat: xy.lat(),
+                lng: xy.lng()
+            });
+        }
+
+        polygonVm.coordinates = coordinates;
+
+        if (polygonVm.onEdit) {
+            polygonVm.onEdit(polygonVm);
         }
     }
 
@@ -175,6 +256,8 @@ export interface MapPolygon<TData extends any> {
     name?: string;
     color: string;
     coordinates: { lat: number; lng: number }[];
-    onClick?: (poligon: MapPolygon<TData>) => void;
+    onClick?: (polygon: MapPolygon<TData>) => void;
+    onEdit?: (polygon: MapPolygon<TData>) => void;
+    onDrawComplete?: (polygon: MapPolygon<TData>) => void;
     data?: TData;
 }

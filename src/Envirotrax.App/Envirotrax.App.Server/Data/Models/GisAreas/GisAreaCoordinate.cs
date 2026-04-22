@@ -14,5 +14,5 @@ public class GisAreaCoordinate : TenantModel<WaterSupplier>
     public GisArea? Area { get; set; }
 
     public double Latitude { get; set; }
-    public double Longitde { get; set; }
+    public double Longitude { get; set; }
 }

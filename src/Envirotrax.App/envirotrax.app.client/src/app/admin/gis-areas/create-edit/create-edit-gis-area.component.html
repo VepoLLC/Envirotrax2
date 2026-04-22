@@ -1,11 +1,13 @@
+<dp-loading-spinner *ngIf="isLoading" />
+
 <div class="d-flex flex-column flex-fill justify-content-between mt-3">
-    <form #form="ngForm" class="d-flex flex-column flex-fill">
+    <form #form="ngForm" class="d-flex flex-column flex-fill" (ngSubmit)="save(form)">
         <div class="row">
-            <div *ngIf="gisArea.id" class="col-md-4 mb-3">
+            <div *ngIf="polygon.data!.area.id" class="col-md-4 mb-3">
                 <vp-input label="ID"
                           name="id"
                           [readonly]="true"
-                          [ngModel]="gisArea.id" />
+                          [ngModel]="polygon.data!.area.id" />
             </div>
 
             <div class="col-md mb-3">
@@ -14,7 +16,7 @@
                           [required]="true"
                           [maxLength]="50"
                           [form]="form"
-                          [(ngModel)]="gisArea.name" />
+                          [(ngModel)]="polygon.data!.area.name" />
             </div>
         </div>
 
@@ -28,56 +30,56 @@
                 <div class="vp-color-option vp-red"
                      role="button" tabindex="0" title="Red"
                      aria-label="Red — predefined color shortcut"
-                     (click)="gisArea.color = '#ff0000'"
-                     (keydown.enter)="gisArea.color = '#ff0000'"
-                     (keydown.space)="gisArea.color = '#ff0000'"></div>
+                     (click)="polygon.data!.area.color = '#ff0000'"
+                     (keydown.enter)="polygon.data!.area.color = '#ff0000'"
+                     (keydown.space)="polygon.data!.area.color = '#ff0000'"></div>
                 <div class="vp-color-option vp-orange"
                      role="button" tabindex="0" title="Orange"
                      aria-label="Orange — predefined color shortcut"
-                     (click)="gisArea.color = '#ff8000'"
-                     (keydown.enter)="gisArea.color = '#ff8000'"
-                     (keydown.space)="gisArea.color = '#ff8000'"></div>
+                     (click)="polygon.data!.area.color = '#ff8000'"
+                     (keydown.enter)="polygon.data!.area.color = '#ff8000'"
+                     (keydown.space)="polygon.data!.area.color = '#ff8000'"></div>
                 <div class="vp-color-option vp-yellow"
                      role="button" tabindex="0" title="Yellow"
                      aria-label="Yellow — predefined color shortcut"
-                     (click)="gisArea.color = '#ffff00'"
-                     (keydown.enter)="gisArea.color = '#ffff00'"
-                     (keydown.space)="gisArea.color = '#ffff00'"></div>
+                     (click)="polygon.data!.area.color = '#ffff00'"
+                     (keydown.enter)="polygon.data!.area.color = '#ffff00'"
+                     (keydown.space)="polygon.data!.area.color = '#ffff00'"></div>
                 <div class="vp-color-option vp-green"
                      role="button" tabindex="0" title="Green"
                      aria-label="Green — predefined color shortcut"
-                     (click)="gisArea.color = '#00ff00'"
-                     (keydown.enter)="gisArea.color = '#00ff00'"
-                     (keydown.space)="gisArea.color = '#00ff00'"></div>
+                     (click)="polygon.data!.area.color = '#00ff00'"
+                     (keydown.enter)="polygon.data!.area.color = '#00ff00'"
+                     (keydown.space)="polygon.data!.area.color = '#00ff00'"></div>
                 <div class="vp-color-option vp-teal"
                      role="button" tabindex="0" title="Teal"
                      aria-label="Teal — predefined color shortcut"
-                     (click)="gisArea.color = '#00ffff'"
-                     (keydown.enter)="gisArea.color = '#00ffff'"
-                     (keydown.space)="gisArea.color = '#00ffff'"></div>
+                     (click)="polygon.data!.area.color = '#00ffff'"
+                     (keydown.enter)="polygon.data!.area.color = '#00ffff'"
+                     (keydown.space)="polygon.data!.area.color = '#00ffff'"></div>
                 <div class="vp-color-option vp-blue"
                      role="button" tabindex="0" title="Blue"
                      aria-label="Blue — predefined color shortcut"
-                     (click)="gisArea.color = '#0000ff'"
-                     (keydown.enter)="gisArea.color = '#0000ff'"
-                     (keydown.space)="gisArea.color = '#0000ff'"></div>
+                     (click)="polygon.data!.area.color = '#0000ff'"
+                     (keydown.enter)="polygon.data!.area.color = '#0000ff'"
+                     (keydown.space)="polygon.data!.area.color = '#0000ff'"></div>
                 <div class="vp-color-option vp-purple"
                      role="button" tabindex="0" title="Purple"
                      aria-label="Purple — predefined color shortcut"
-                     (click)="gisArea.color = '#8000ff'"
-                     (keydown.enter)="gisArea.color = '#8000ff'"
-                     (keydown.space)="gisArea.color = '#8000ff'"></div>
+                     (click)="polygon.data!.area.color = '#8000ff'"
+                     (keydown.enter)="polygon.data!.area.color = '#8000ff'"
+                     (keydown.space)="polygon.data!.area.color = '#8000ff'"></div>
                 <div class="vp-color-option vp-pink"
                      role="button" tabindex="0" title="Pink"
                      aria-label="Pink — predefined color shortcut"
-                     (click)="gisArea.color = '#ff00ff'"
-                     (keydown.enter)="gisArea.color = '#ff00ff'"
-                     (keydown.space)="gisArea.color = '#ff00ff'"></div>
+                     (click)="polygon.data!.area.color = '#ff00ff'"
+                     (keydown.enter)="polygon.data!.area.color = '#ff00ff'"
+                     (keydown.space)="polygon.data!.area.color = '#ff00ff'"></div>
             </div>
             <input id="area-color"
                    type="color"
                    name="color"
-                   [(ngModel)]="gisArea.color"
+                   [(ngModel)]="polygon.data!.area.color"
                    class="form-control form-control-color w-100" />
         </div>
 
@@ -89,23 +91,23 @@
                       [flexFill]="true"
                       [(ngModel)]="coordinatesText" />
         </div>
-    </form>
 
-    <div>
-        <vp-validation-summary [form]="form" [validationErrors]="validationErrors" />
+        <div>
+            <vp-validation-summary [form]="form" [validationErrors]="validationErrors" />
 
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary w-100">
-                Save
-            </button>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    Save
+                </button>
 
-            <button type="button" class="btn btn-primary w-100" (click)="cancel.emit()">
-                Cancel
+                <button type="button" class="btn btn-primary w-100" (click)="cancel.emit()">
+                    Cancel
+                </button>
+            </div>
+
+            <button *ngIf="polygon.data!.area.id" type="button" class="btn btn-danger w-100 mt-3" (click)="delete()">
+                Delete Area
             </button>
         </div>
-
-        <button *ngIf="gisArea.id" class="btn btn-danger w-100 mt-3">
-            Delete Area
-        </button>
-    </div>
+    </form>
 </div>

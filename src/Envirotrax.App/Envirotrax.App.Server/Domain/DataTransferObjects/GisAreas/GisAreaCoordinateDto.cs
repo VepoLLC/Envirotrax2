@@ -12,5 +12,5 @@ public class GisAreaCoordinateDto
     public ReferencedGisAreaDto Area { get; set; } = null!;
 
     public double Latitude { get; set; }
-    public double Longitde { get; set; }
+    public double Longitude { get; set; }
 }

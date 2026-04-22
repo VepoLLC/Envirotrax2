@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, EventEmitter, OnInit } from "@angular/core";
 import { GisAreaService } from "../../../shared/services/gis-areas/gis-area.service";
 import { GisAreaCoordinateService } from "../../../shared/services/gis-areas/gis-area-coordinate.service";
 import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
@@ -24,7 +24,8 @@ export class GisAreaListComponent implements OnInit {
     public isLoading: boolean = false;
     public loadingMessage?: string;
 
-    public editRecord?: GisAreaVm;
+    public editRecord?: MapPolygon<GisAreaVm>;
+    public polygonChanged?: EventEmitter<MapPolygon<GisAreaVm>> = new EventEmitter();
     public canModifyData: boolean = false;
 
     constructor(
@@ -97,7 +98,7 @@ export class GisAreaListComponent implements OnInit {
                 await this._authService.hasAnyPermisison(PermissionAction.CanEdit, PermissionType.Settings));
     }
 
-    private async getAreas(): Promise<void> {
+    public async getAreas(): Promise<void> {
         try {
             this.isLoading = true;
             this.loadingMessage = 'Loading GIS Areas...'
@@ -128,17 +129,61 @@ export class GisAreaListComponent implements OnInit {
 
     public add(): void {
         this.editRecord = {
-            area: {},
-            coordinates: []
+            color: '#FF00ff',
+            name: 'New Area',
+            coordinates: [],
+            data: {
+                area: {
+                    name: 'New Area',
+                    color: '#FF00ff'
+                },
+                coordinates: []
+            },
+            onDrawComplete: (newPalygon: MapPolygon<GisAreaVm>) => {
+                newPalygon.onDrawComplete = undefined;
+
+                newPalygon.data!.coordinates = newPalygon.coordinates.map(c => ({
+                    latitude: c.lat,
+                    longitude: c.lng
+                }));
+
+                newPalygon.onEdit = this.createOnEditHandler();
+
+                this.editRecord = newPalygon;
+                this.polygons = [...this.polygons]; // re-render: now has onEdit, no onDrawComplete
+                this.polygonChanged?.emit(newPalygon);
+            }
         };
+
+        this.polygons = [...this.polygons, this.editRecord];
     }
 
     public edit(polygon: MapPolygon<GisAreaVm>): void {
-        this.editRecord = polygon.data;
+        polygon.onEdit = this.createOnEditHandler();
+        this.editRecord = polygon;
+        this.polygons = [...this.polygons]; // re-render to enable drag editing
     }
 
     public cancelEdit(): void {
+        if (this.editRecord) {
+            if (!this.editRecord.data?.area.id) {
+                this.polygons = this.polygons.filter(p => p !== this.editRecord);
+            } else {
+                this.editRecord.onEdit = undefined;
+                this.polygons = [...this.polygons]; // re-render to remove drag handles
+            }
+        }
         this.editRecord = undefined;
+    }
+
+    private createOnEditHandler(): (polygon: MapPolygon<GisAreaVm>) => void {
+        return (polygon) => {
+            polygon.data!.coordinates = polygon.coordinates.map(c => ({
+                latitude: c.lat,
+                longitude: c.lng
+            }));
+            this.polygonChanged?.emit(polygon);
+        };
     }
 }
 

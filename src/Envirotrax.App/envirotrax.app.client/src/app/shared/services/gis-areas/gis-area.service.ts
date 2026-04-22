@@ -35,8 +35,8 @@ export class GisAreaService {
         return lastValueFrom(this._http.post<GisArea>(url, dto));
     }
 
-    public update(id: number, dto: GisArea): Promise<GisArea> {
-        const url = this._urlResolver.resolveUrl(`/api/gis-areas/${id}`);
+    public update(dto: GisArea): Promise<GisArea> {
+        const url = this._urlResolver.resolveUrl(`/api/gis-areas/${dto.id}`);
         return lastValueFrom(this._http.put<GisArea>(url, dto));
     }
 

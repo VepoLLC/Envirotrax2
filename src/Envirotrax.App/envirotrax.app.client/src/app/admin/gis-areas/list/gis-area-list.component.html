@@ -9,7 +9,7 @@
 <vp-section header="GIS Areas">
     <div class="row border">
         <div class="col mb-3">
-            <vp-map height="650px"
+            <vp-map height="700px"
                     [latitude]="latitude"
                     [longitude]="longitude"
                     [zoom]="zoom"
@@ -20,9 +20,10 @@
         </div>
 
         <div *ngIf="editRecord" class="col-sm-4 col-md-3 col-xl-2 mb-3 d-flex">
-            <vp-create-edit-gis-area [gisArea]="editRecord.area"
-                                     [coordinates]="editRecord.coordinates"
-                                     (cancel)="cancelEdit()" />
+            <vp-create-edit-gis-area [polygon]="editRecord"
+                                     [polygonChanged]="polygonChanged"
+                                     (cancel)="cancelEdit()"
+                                     (dataSaved)="getAreas()" />
         </div>
     </div>
 

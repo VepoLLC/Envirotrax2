@@ -15,6 +15,7 @@ import { ToastService } from "../../../../shared/services/toast.service";
 import { CsiInspectorAddEditInsuranceComponent } from "./modals/add-edit-csi-inspector-insurance.component";
 import { CsiInspectorAddEditLicenseComponent } from "./modals/add-edit-csi-inspector-license.component";
 
+
 @Component({
     selector: 'vp-csi-inspector-license-insurances',
     standalone: false,

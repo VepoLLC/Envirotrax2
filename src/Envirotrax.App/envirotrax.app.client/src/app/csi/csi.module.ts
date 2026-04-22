@@ -12,6 +12,8 @@ import { CsiInspectorUsersComponent } from "./inspectors/details/users/csi-inspe
 import { CsiInspectorLicenseInsuranceComponent } from "./inspectors/details/license-insurance/csi-inspector-license-insurance.component";
 import { CsiSubmissionPropertySearchComponent } from "./inspections/create/csi-submission-property-search.component";
 import { CsiSubmissionCreateComponent } from "./inspections/create/csi-submission-create.component";
+import { CsiInspectorAddEditLicenseComponent } from "./inspectors/details/license-insurance/modals/add-edit-csi-inspector-license.component";
+import { CsiInspectorAddEditInsuranceComponent } from "./inspectors/details/license-insurance/modals/add-edit-csi-inspector-insurance.component";
 
 @NgModule({
     declarations: [
@@ -22,7 +24,9 @@ import { CsiSubmissionCreateComponent } from "./inspections/create/csi-submissio
         CsiInspectorUsersComponent,
         CsiInspectorLicenseInsuranceComponent,
         CsiSubmissionPropertySearchComponent,
-        CsiSubmissionCreateComponent
+        CsiSubmissionCreateComponent,
+        CsiInspectorAddEditLicenseComponent,
+        CsiInspectorAddEditInsuranceComponent
     ],
     imports: [
         CommonModule,

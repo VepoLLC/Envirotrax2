@@ -1,12 +1,14 @@
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
+using Envirotrax.App.Server.Domain.Services.Definitions.GisAreas;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Implementations.Backflow;
 using Envirotrax.App.Server.Domain.Services.Implementations.Csi;
 using Envirotrax.App.Server.Domain.Services.Implementations.Fog;
+using Envirotrax.App.Server.Domain.Services.Implementations.GisAreas;
 using Envirotrax.App.Server.Domain.Services.Implementations.Sites;
 using Envirotrax.App.Server.Domain.Services.Implementations.Users;
 using Envirotrax.App.Server.Domain.Services.Implementations;
@@ -62,6 +64,9 @@ public static class ServiceRegistration
         services.AddTransient<IProfessionalUserLicenseService, ProfessionalUserLicenseService>();
         services.AddTransient<IProfessionalLicenseTypeService, ProfessionalLicenseTypeService>();
         services.AddTransient<IProfessionalInsuranceService, ProfessionalInsuranceService>();
+
+        services.AddTransient<IGisAreaService, GisAreaService>();
+        services.AddTransient<IGisAreaCoordinateService, GisAreaCoordinateService>();
 
         return services;
     }

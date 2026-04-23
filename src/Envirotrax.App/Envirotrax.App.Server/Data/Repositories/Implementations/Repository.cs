@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations;
 
-public abstract class Repository<TModel> : Repository<TModel, TenantDbContext>, IRepository<TModel>
+public abstract class Repository<TModel> : Repository<TModel, int, TenantDbContext>, IRepository<TModel>
         where TModel : class
 {
     public Repository(IDbContextSelector dbContextSelector)
@@ -21,16 +21,14 @@ public abstract class Repository<TModel> : Repository<TModel, TenantDbContext>, 
     }
 }
 
-public abstract class Repository<TModel, TDbContext> : Repository<TModel, int, TDbContext>, IRepository<TModel>
+public abstract class Repository<TModel, TKey> : Repository<TModel, TKey, TenantDbContext>, IRepository<TModel, TKey>
         where TModel : class
-        where TDbContext : DbContext
 {
-    public Repository(TDbContext dbContext)
-        : base(dbContext)
+    public Repository(IDbContextSelector dbContextSelector)
+        : base(dbContextSelector.Current)
     {
     }
 }
-
 
 public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel, TKey>
     where TModel : class

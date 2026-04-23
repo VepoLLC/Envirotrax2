@@ -43,4 +43,30 @@ export class HelperService {
 
         return false;
     }
+
+    public loadJavaScript(elementId: string, async: boolean, url: string): Promise<void> {
+        const existingScript = document.getElementById(elementId);
+
+        if (existingScript) {
+            return Promise.resolve();
+        }
+
+        return new Promise<void>((resolve, reject) => {
+            const script = document.createElement('script');
+
+            script.id = elementId;
+            script.innerHTML = '';
+            script.src = url;
+            script.async = async;
+
+            script.onload = () => resolve();
+            script.onerror = err => reject(err);
+
+            document.body.appendChild(script);
+        });
+    }
+
+    public isDefined(value: any): boolean {
+        return value != undefined && value != null;
+    }
 }

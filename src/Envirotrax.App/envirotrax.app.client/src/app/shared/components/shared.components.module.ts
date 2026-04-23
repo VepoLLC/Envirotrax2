@@ -31,6 +31,7 @@ import { FileUploadComponent } from "./file-upload/file-upload.component";
 import { LookupFieldComponent } from "./lookup-field/lookup-field.component";
 import { ProfessionalUserLookupComponent } from "./lookups/professional-user-lookup/professional-user-lookup.component";
 import { StatusIconComponent } from "./status-icon/status-icon.component";
+import { MapComponent } from "./map/map.component";
 
 @NgModule({
     declarations: [
@@ -59,7 +60,8 @@ import { StatusIconComponent } from "./status-icon/status-icon.component";
         FileUploadComponent,
         LookupFieldComponent,
         ProfessionalUserLookupComponent,
-        StatusIconComponent
+        StatusIconComponent,
+        MapComponent
     ],
     imports: [
         CommonModule,
@@ -89,7 +91,8 @@ import { StatusIconComponent } from "./status-icon/status-icon.component";
         InfoIconComponent,
         FileUploadComponent,
         LookupFieldComponent,
-        StatusIconComponent
+        StatusIconComponent,
+        MapComponent
     ]
 })
 export class SharedComponentsModule {

@@ -60,4 +60,9 @@ export class CsiInspectionService {
             this._http.delete<CsiInspection>(url)
         );
     }
+
+    public submit(inspection: CsiInspection): Promise<CsiInspection> {
+        const url = this._urlResolver.resolveUrl('/api/csi/inspections/submit');
+        return lastValueFrom(this._http.post<CsiInspection>(url, inspection));
+    }
 }

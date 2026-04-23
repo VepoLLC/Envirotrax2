@@ -472,52 +472,9 @@ export class App implements OnInit {
             hasFeature: true
           },
           {
-            type: 'separator',
-            hasPermission: isCsiInspector,
-            hasFeature: true
-          },
-          {
-            title: 'Inspector Management',
-            iconCss: 'fa-regular fa-user',
-            routerLink: ['/'],
-            hasPermission: isAdmin && isCsiInspector,
-            hasFeature: true
-          },
-          {
-            title: 'Letter History',
-            iconCss: 'fa-regular fa-envelope',
-            routerLink: ['/'],
-            hasPermission: isCsiInspector,
-            hasFeature: true
-          },
-          {
-            type: 'separator',
-            hasPermission: isCsiInspector,
-            hasFeature: true
-          },
-          {
-            title: 'System Reports',
-            iconCss: 'fa-regular fa-chart-simple-horizontal',
-            routerLink: ['/'],
-            hasPermission: isCsiInspector,
-            hasFeature: true
-          },
-          {
-            type: 'separator',
-            hasPermission: isCsiInspector,
-            hasFeature: false
-          },
-          {
-            title: 'Compliance Management',
-            iconCss: 'fa-solid fa-list-check',
-            routerLink: ['/'],
-            hasPermission: isCsiInspector,
-            hasFeature: true
-          },
-          {
-            title: 'Property Log Management',
-            iconCss: 'fa-light fa-building-memo',
-            routerLink: ['/'],
+            title: 'Submit CSI',
+            iconCss: 'fa-regular fa-file-plus',
+            routerLink: ['csi/inspections/create'],
             hasPermission: isCsiInspector,
             hasFeature: true
           }

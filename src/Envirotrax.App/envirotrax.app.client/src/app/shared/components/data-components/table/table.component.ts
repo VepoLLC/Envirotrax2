@@ -111,7 +111,7 @@ export class TableComponent implements OnChanges {
         const actionsColumn = this.columns.find(c => c.tag?.specialColumn == SpecialColumnType.ActionsColumn);
 
         if (this.canHaveAction() && !actionsColumn) {
-            this.columns.splice(0, 0, {
+            this.columns.push({
                 field: '',
                 caption: 'Actions',
                 type: ColumnType.other,
@@ -176,7 +176,7 @@ export class TableComponent implements OnChanges {
         }
     }
 
-    public ngOnChanges(changes: SimpleChanges): void {
+     public ngOnChanges(changes: SimpleChanges): void {
         if (changes['columns']?.currentValue) {
             this.setActionsColumn();
 

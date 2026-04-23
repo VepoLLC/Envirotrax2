@@ -41,7 +41,7 @@ const routes: Routes = [
         canActivate: [FeatureGuard, RoleGuard],
         data: {
           features: [FeatureType.CsiInspection],
-          roles: [ROLE_DEFINITIONS.WATER_SUPPLIER]
+          roles: [ROLE_DEFINITIONS.WATER_SUPPLIER, ROLE_DEFINITIONS.PROFESSIONAL]
         }
       },
       {

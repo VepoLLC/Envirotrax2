@@ -5,4 +5,5 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 
 public interface ICsiInspectionService : IService<CsiInspection, CsiInspectionDto>
 {
+    Task<CsiInspectionDto> SubmitAsync(CsiInspectionDto request, CancellationToken cancellationToken);
 }

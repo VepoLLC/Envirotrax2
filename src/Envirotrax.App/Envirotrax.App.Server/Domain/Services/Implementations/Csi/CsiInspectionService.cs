@@ -39,8 +39,8 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
     public async Task<CsiInspectionDto> SubmitAsync(CsiInspectionDto request, CancellationToken cancellationToken)
     {
         var siteId = request.Site!.Id.Value;
-        var waterSupplierId = request.WaterSupplierId!.Value;
-        var inspectorUserId = request.InspectorUserId!.Value;
+        var waterSupplierId = request.WaterSupplier!.Id.Value;
+        var inspectorUserId = request.InspectorUser!.Id.Value;
 
         var site = await _siteService.GetAsync(siteId, cancellationToken);
         var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
@@ -48,7 +48,6 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         var licenses = await _licenseService.GetAllAsync(inspectorUserId, new PageInfo(), new Query());
 
         var  csiLicense = licenses.Data.FirstOrDefault();
-
 
         var inspection = new CsiInspection
         {

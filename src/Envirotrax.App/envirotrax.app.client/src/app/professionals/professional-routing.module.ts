@@ -9,6 +9,8 @@ import { RoleGuard } from "../shared/guards/role.guard";
 import { ROLE_DEFINITIONS } from "../shared/models/role-definitions";
 import { InsuranceListComponent } from "./insurances/list/insurance-list.component";
 import { LicenseListComponent } from "./licenses/license-list.component";
+import { FeatureGuard } from "../shared/guards/feature.guard";
+import { FeatureType } from "../shared/models/feature-tyype";
 
 const routes: Routes = [
     {
@@ -72,6 +74,15 @@ const routes: Routes = [
         canActivate: [RoleGuard],
         data: {
             roles: [ROLE_DEFINITIONS.PROFESSIONALS.ADMIN]
+        }
+    },
+    {
+        path: 'csi',
+        loadChildren: () => import('./csi/professionals-csi.module').then(m => m.ProfessionalsCsiModule),
+        canActivate: [FeatureGuard, RoleGuard],
+        data: {
+            features: [FeatureType.CsiInspection],
+            roles: [ROLE_DEFINITIONS.PROFESSIONAL]
         }
     }
 ];

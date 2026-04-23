@@ -4,9 +4,9 @@ using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Envirotrax.App.Server.Controllers.Csi;
+namespace Envirotrax.App.Server.Controllers.Professionals.Csi;
 
-[Route("api/csi/inspections")]
+[Route("api/professionals/csi/inspections")]
 [HasFeature(FeatureType.CsiInspection)]
 public class CsiInspectionProfessionalController : ProfessionalProtectedController
 {

@@ -304,7 +304,7 @@ export class App implements OnInit {
           {
             title: 'Inspection Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['/'],
+            routerLink: ['/fog/inspections'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogInspections),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
           },
@@ -639,7 +639,7 @@ export class App implements OnInit {
           {
             title: 'Inspection Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['/'],
+            routerLink: ['/fog/inspections'],
             hasPermission: isFogInspector,
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
           },

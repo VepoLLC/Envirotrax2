@@ -14,6 +14,7 @@ builder.Services.AddControllers(options =>
 {
     options.Filters.Add(typeof(CheckFeaturesFilter));
     options.Filters.Add(typeof(CheckPermissionFilter));
+    options.Filters.Add(typeof(QueryFilter));
 });
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

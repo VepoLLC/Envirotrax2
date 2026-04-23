@@ -7,4 +7,5 @@ public interface IGisAreaCoordinateService : IService<GisAreaCoordinate, GisArea
 {
     Task<IEnumerable<GisAreaCoordinateDto>> GetByAreaIdAsync(int areaId, CancellationToken cancellationToken);
     Task<IEnumerable<GisAreaCoordinateDto>> AddOrUpdateAsync(int areaId, IEnumerable<GisAreaCoordinateDto> coordinates);
+    Task DeleteByAreaAsync(int areaId);
 }

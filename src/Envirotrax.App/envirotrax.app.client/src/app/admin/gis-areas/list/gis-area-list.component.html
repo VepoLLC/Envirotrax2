@@ -23,7 +23,7 @@
             <vp-create-edit-gis-area [polygon]="editRecord"
                                      [polygonChanged]="polygonChanged"
                                      (cancel)="cancelEdit()"
-                                     (dataSaved)="getAreas()" />
+                                     (dataSaved)="dataSaved()" />
         </div>
     </div>
 
@@ -48,7 +48,9 @@
         </button>
     </div>
 
-    <button *ngIf="canModifyData" class="btn btn-primary" (click)="add()">
-        Add New Area
-    </button>
+    <div class="pt-2 d-flex justify-content-end">
+        <button *ngIf="canModifyData && !editRecord" class="btn btn-primary" (click)="add()">
+            Add New Area
+        </button>
+    </div>
 </vp-section>

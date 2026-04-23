@@ -185,6 +185,11 @@ export class GisAreaListComponent implements OnInit {
             this.polygonChanged?.emit(polygon);
         };
     }
+
+    public dataSaved(): void {
+        this.editRecord = undefined;
+        this.getAreas();
+    }
 }
 
 interface GisAreaVm {

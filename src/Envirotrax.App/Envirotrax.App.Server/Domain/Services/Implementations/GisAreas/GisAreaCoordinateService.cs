@@ -30,4 +30,9 @@ public class GisAreaCoordinateService : Service<GisAreaCoordinate, GisAreaCoordi
 
         return Mapper.Map<IEnumerable<GisAreaCoordinate>, IEnumerable<GisAreaCoordinateDto>>(added);
     }
+
+    public async Task DeleteByAreaAsync(int areaId)
+    {
+        await _coordinateRepository.DeleteByAreaAsyc(areaId);
+    }
 }

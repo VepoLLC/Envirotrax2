@@ -32,4 +32,13 @@ public class GisAreaCoordinateController : WaterSupplierProtectedController
         var result = await _coordinateService.AddOrUpdateAsync(areaId, coordinates);
         return Ok(result);
     }
+
+    [HttpDelete]
+    [HasFeature(FeatureType.ManageGisAreas)]
+    [HasPermission(PermissionAction.CanCreate | PermissionAction.CanEdit, PermissionType.Settings)]
+    public async Task<IActionResult> DeleteByAreaAsync(int areaId)
+    {
+        await _coordinateService.DeleteByAreaAsync(areaId);
+        return Ok();
+    }
 }

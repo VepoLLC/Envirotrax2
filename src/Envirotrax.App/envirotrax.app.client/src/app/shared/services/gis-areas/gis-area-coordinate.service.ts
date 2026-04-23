@@ -27,4 +27,11 @@ export class GisAreaCoordinateService {
         const url = this._urlResolver.resolveUrl(`/api/gis-areas/${areaId}/coordinates`);
         return lastValueFrom(this._http.put<GisAreaCoordinate[]>(url, coordinates));
     }
+
+    public deleteByArea(areaId: number): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/gis-areas/${areaId}/coordinates`);
+        const observable = this._http.delete<void>(url);
+
+        return lastValueFrom(observable);
+    }
 }

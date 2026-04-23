@@ -6,6 +6,7 @@ import { MapPolygon } from "../../../shared/components/map/map.component";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { NgForm } from "@angular/forms";
 import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
+import { ToastService } from "../../../shared/services/toast.service";
 
 
 @Component({
@@ -36,7 +37,8 @@ export class CreateEditGisAreaComponent implements OnInit, OnChanges {
         private readonly _gisAreaService: GisAreaService,
         private readonly _coordianteService: GisAreaCoordinateService,
         private readonly _helper: HelperService,
-        private readonly _modalHelper: ModalHelperService
+        private readonly _modalHelper: ModalHelperService,
+        private readonly _toastService: ToastService
     ) {
 
     }
@@ -99,9 +101,12 @@ export class CreateEditGisAreaComponent implements OnInit, OnChanges {
                 }
 
                 await this._coordianteService.addOrUpdate(result.id!, coordiantes);
+                this._toastService.successfullySaved('GIS Area');
 
                 this.dataSaved.emit();
             } catch (e) {
+                this._toastService.failedToSave('GIS Area');
+
                 if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
                     throw e;
                 }
@@ -116,6 +121,10 @@ export class CreateEditGisAreaComponent implements OnInit, OnChanges {
             this.isLoading = true;
 
             await this._gisAreaService.delete(this.polygon.data?.area.id!);
+            await this._coordianteService.deleteByArea(this.polygon.data?.area.id!);
+
+            this._toastService.successFullyDeleted('GIS Area');
+
             this.dataSaved.emit();
         } finally {
             this.isLoading = false;

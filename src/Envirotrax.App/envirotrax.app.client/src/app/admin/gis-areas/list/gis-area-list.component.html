@@ -1,0 +1,56 @@
+<dp-loading-spinner *ngIf="isLoading" [message]="loadingMessage" />
+
+<div class="text-center mb-4">
+    <h1 class="h2">
+        GIS Area Management
+    </h1>
+</div>
+
+<vp-section header="GIS Areas">
+    <div class="row border">
+        <div class="col mb-3">
+            <vp-map height="700px"
+                    [latitude]="latitude"
+                    [longitude]="longitude"
+                    [zoom]="zoom"
+                    [polygons]="polygons"
+                    (mouseMoved)="onMouseMoved($event)"
+                    (centerChanged)="onCenterChanged($event)"
+                    (zoomChanged)="onZoomChanged($event)" />
+        </div>
+
+        <div *ngIf="editRecord" class="col-sm-4 col-md-3 col-xl-2 mb-3 d-flex">
+            <vp-create-edit-gis-area [polygon]="editRecord"
+                                     [polygonChanged]="polygonChanged"
+                                     (cancel)="cancelEdit()"
+                                     (dataSaved)="dataSaved()" />
+        </div>
+    </div>
+
+    <div class="bg-white border border-top-0 gap-3 p-2 row">
+        <div class="col-md d-flex align-items-center">
+            <span class="fw-bold me-1">Lat/Lng:</span><span class="bg-light border p-2 flex-fill rounded">{{
+                cursorPosition
+                ?
+                ((cursorPosition.lat | number:'1.6-6') + ', ' +
+                (cursorPosition.lng | number:'1.6-6')) : '-' }}</span>
+        </div>
+        <div class="col-md d-flex align-items-center">
+            <span class="fw-bold me-1">Map Center:</span><span class="bg-light border p-2 flex-fill rounded">{{
+                (latitude |
+                number:'1.6-6') + ', ' + (longitude | number:'1.6-6') }}</span>
+        </div>
+        <div class="col-md d-flex align-items-center">
+            <span class="fw-bold me-1">Zoom:</span><span class="bg-light border p-2 flex-fill rounded">{{ zoom }}</span>
+        </div>
+        <button type="button" class="btn btn-primary col-md" (click)="saveDefaultView()">
+            Save Map View for WS
+        </button>
+    </div>
+
+    <div class="pt-2 d-flex justify-content-end">
+        <button *ngIf="canModifyData && !editRecord" class="btn btn-primary" (click)="add()">
+            Add New Area
+        </button>
+    </div>
+</vp-section>

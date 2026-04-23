@@ -23,6 +23,8 @@ export class HomeComponent implements OnInit {
     }
 
     private async createMenuItems(): Promise<MenuItem[]> {
+        const canViewSettings = await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Settings)
+
         return [
             {
                 title: 'Water Suppliers',
@@ -30,7 +32,7 @@ export class HomeComponent implements OnInit {
                 routerLink: ['water-suppliers'],
                 hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.WaterSuppliers),
                 description: 'Manage all water suppliers, their details, and configurations.'
-            },            
+            },
             {
                 title: 'Users',
                 iconCss: 'fa-solid fa-users',
@@ -49,7 +51,7 @@ export class HomeComponent implements OnInit {
                 title: 'General Settings & Fees',
                 iconCss: 'fa-solid fa-gear',
                 routerLink: ['settings'],
-                hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Settings),
+                hasPermission: canViewSettings,
                 description: 'Manage program settings and submissions fees.'
             },
             {
@@ -66,6 +68,13 @@ export class HomeComponent implements OnInit {
                 hasPermission: true,
                 description: 'Configure backflow testing program settings, automated letter notification schedules, and letter header appearance.'
             },
+            {
+                title: 'GIS Area Management',
+                iconCss: 'fa-solid fa-globe',
+                routerLink: ['gis-areas'],
+                hasPermission: canViewSettings,
+                description: 'Manage GIS areas and assign them to sites.'
+            }
         ];
     }
 

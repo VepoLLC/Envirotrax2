@@ -31,6 +31,12 @@ public static class FeatureSeedData
             Id = FeatureType.ManageProfessionalRegistrationFees,
             Name = "Manage Professional Fees",
             Description = "Allows managing fees for permorming various tests and inspections by registered professionals for each water supplier."
+        },
+        new()
+        {
+            Id = FeatureType.ManageGisAreas,
+            Name = "Manage GIS Areas",
+            Description = "Allow making changes to GIS areas. This includes creating, editing, deleting, and assiging areas to sites."
         }
     ];
 }

@@ -110,8 +110,8 @@ export class App implements OnInit {
           {
             title: 'GIS Area Management',
             iconCss: 'fa-solid fa-globe',
-            routerLink: ['/'],
-            hasPermission: true,
+            routerLink: ['admin/gis-areas'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Settings),
             hasFeature: true
           }
         ]

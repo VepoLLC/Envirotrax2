@@ -4,5 +4,7 @@ export enum FeatureType {
     BackflowTesting = 2,
     CsiInspection = 3,
     FogInspection = 4,
-    FogTransportation = 5
+    FogTransportation = 5,
+
+    ManageGisAreas = 10
 }

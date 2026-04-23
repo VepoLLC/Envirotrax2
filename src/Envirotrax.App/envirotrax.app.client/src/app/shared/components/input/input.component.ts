@@ -85,6 +85,9 @@ export class InputComponent implements ControlValueAccessor, OnInit, AfterViewIn
     @Input()
     public borderColor?: string;
 
+    @Input()
+    public flexFill: boolean = false;
+
     public value: any | DateRange;
 
     @ViewChild('flatpickr')

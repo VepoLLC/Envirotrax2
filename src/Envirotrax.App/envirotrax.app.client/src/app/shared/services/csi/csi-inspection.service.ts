@@ -62,7 +62,7 @@ export class CsiInspectionService {
     }
 
     public submit(inspection: CsiInspection): Promise<CsiInspection> {
-        const url = this._urlResolver.resolveUrl('/api/csi/inspections/submit');
+        const url = this._urlResolver.resolveUrl('/api/professionals/csi/inspections/submit');
         return lastValueFrom(this._http.post<CsiInspection>(url, inspection));
     }
 }

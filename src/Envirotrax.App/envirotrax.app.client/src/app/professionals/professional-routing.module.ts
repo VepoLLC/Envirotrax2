@@ -82,7 +82,7 @@ const routes: Routes = [
         canActivate: [FeatureGuard, RoleGuard],
         data: {
             features: [FeatureType.CsiInspection],
-            roles: [ROLE_DEFINITIONS.PROFESSIONAL]
+            roles: [ROLE_DEFINITIONS.PROFESSIONAL, ROLE_DEFINITIONS.PROFESSIONALS.CSI_INSPECTOR]
         }
     }
 ];

@@ -2,8 +2,10 @@ using System.ComponentModel.DataAnnotations;
 using Envirotrax.App.Server.Data.Models.Csi;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
+using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 
@@ -13,8 +15,11 @@ public class CsiInspectionDto : IDto
 
     public ReferencedSiteDto? Site { get; set; }
 
-    public int? WaterSupplierId { get; set; }
-    public int? InspectorUserId { get; set; }
+    [Required]
+    public ReferencedWaterSupplierDto? WaterSupplier { get; set; }
+
+    [Required]
+    public ReferencedProfessionalUserDto? InspectorUser { get; set; }
 
     public DateTime? InspectionDate { get; set; }
 

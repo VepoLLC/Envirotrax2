@@ -26,14 +26,30 @@ export class CsiInspectorInsurancesService {
         }));
     }
 
-    public add(inspectorId: number, insurance: ProfessionalInsurance): Promise<ProfessionalInsurance> {
+    public add(inspectorId: number, insurance: ProfessionalInsurance, file: File | null): Promise<ProfessionalInsurance> {
         const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${inspectorId}/insurances`);
-        return lastValueFrom(this._http.post<ProfessionalInsurance>(url, insurance));
+        const formData = new FormData();
+        formData.append('insuranceNumber', insurance.insuranceNumber ?? '');
+        if (insurance.expirationDate) {
+            formData.append('expirationDate', insurance.expirationDate.toString());
+        }
+        if (file) {
+            formData.append('file', file);
+        }
+        return lastValueFrom(this._http.post<ProfessionalInsurance>(url, formData));
     }
 
-    public update(inspectorId: number, insurance: ProfessionalInsurance): Promise<ProfessionalInsurance> {
+    public update(inspectorId: number, insurance: ProfessionalInsurance, file: File | null): Promise<ProfessionalInsurance> {
         const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${inspectorId}/insurances/${insurance.id}`);
-        return lastValueFrom(this._http.put<ProfessionalInsurance>(url, insurance));
+        const formData = new FormData();
+        formData.append('insuranceNumber', insurance.insuranceNumber ?? '');
+        if (insurance.expirationDate) {
+            formData.append('expirationDate', insurance.expirationDate.toString());
+        }
+        if (file) {
+            formData.append('file', file);
+        }
+        return lastValueFrom(this._http.put<ProfessionalInsurance>(url, formData));
     }
 
     public delete(inspectorId: number, insuranceId: number): Promise<void> {

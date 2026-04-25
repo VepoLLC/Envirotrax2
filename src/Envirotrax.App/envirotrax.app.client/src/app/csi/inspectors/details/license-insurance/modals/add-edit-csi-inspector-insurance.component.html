@@ -1,5 +1,46 @@
+
 <div dp-spinner-parent>
     <dp-loading-spinner *ngIf="isLoading" />
+
+    <div *ngIf="!isEditMode" class="mb-4">
+        <p class="text-center text-danger fw-bold">
+            Please read the following important information on how to register and manage insurance policies
+        </p>
+
+        <h3 class="text-bg-light p-2 border h6">Adding Insurance Policies</h3>
+        <div class="mx-1">
+            <p>
+                When registering an insurance policy, you must upload an electronic copy of Certificate of Insurance
+                (COI)
+                by clicking the <strong>Choose File</strong> button and selecting the file to upload. Once received, our
+                staff
+                will validate the policy by entering the expiration date.
+            </p>
+            <p>
+                Verify that all information is correct, then click the <strong>Save</strong> button
+                to submit policy for review.
+            </p>
+        </div>
+
+        <h3 class="text-bg-light p-2 border h6">Renewing An Insurance Policies</h3>
+        <div class="mx-1">
+            <p>
+                To renew an insurance policy, enter the new policy number and upload an updated Certificate of Insurance
+                (COI).
+                Policies are typically validated within an hour, but may take up to one business day in rare cases.
+            </p>
+        </div>
+
+        <h3 class="text-bg-light p-2 border h6">Reinstating Expired Insurance Policies</h3>
+        <div class="mx-3">
+            <p>
+                If your insurance policy has expired, you must obtain a renewed policy from your insurance provider before
+                reinstating it in the system. Once you have the updated policy, contact us so our staff can verify and
+                update
+                it.
+            </p>
+        </div>
+    </div>
 
     <form #form="ngForm" (ngSubmit)="save(form)">
         <div class="mb-3">
@@ -12,11 +53,39 @@
         </div>
 
         <div class="mb-3">
+            <p *ngIf="!isEditMode">
+                Please click on the Choose File button below and select the Certificate of Insurance (COI) you wish to upload.
+            </p>
+            <p *ngIf="isEditMode" class="text-muted small">
+                Upload a new Certificate of Insurance (COI) only if you want to replace the existing file.
+            </p>
+            <vp-file-upload name="coiFile"
+                            validationLabel="Certificate of Insurance (COI)"
+                            [(ngModel)]="certificateFile"
+                            [required]="!isEditMode"
+                            [form]="form" />
+        </div>
+
+        <div class="mb-3">
             <vp-input name="expirationDate"
                       label="Expiration Date"
                       type="date"
                       [(ngModel)]="insurance.expirationDate"
                       [form]="form" />
+        </div>
+
+        <div *ngIf="!isEditMode" class="form-check mb-3">
+            <input id="has-read-help"
+                   type="checkbox"
+                   class="form-check-input"
+                   [(ngModel)]="hasReadHelp"
+                   name="hasReadHelp"
+                   required>
+            <label for="has-read-help"
+                   class="form-check-label"
+                   [class.text-danger]="form.submitted && !hasReadHelp">
+                I have read and understand the requirements and process of registering an insurance policy.
+            </label>
         </div>
 
         <div class="mt-3">

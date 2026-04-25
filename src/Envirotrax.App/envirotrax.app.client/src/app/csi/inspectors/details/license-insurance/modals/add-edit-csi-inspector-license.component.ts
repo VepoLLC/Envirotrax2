@@ -3,9 +3,10 @@ import { NgForm } from "@angular/forms";
 import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { ProfessionalUserLicense, ProfessionalType, professionalTypeLabels } from "../../../../../shared/models/professionals/licenses/professional-user-license";
 import { CsiInspectorLicensesService } from "../../../../../shared/services/csi/csi-inspector-licenses.service";
-import { ProfessionalUserLicenseService } from "../../../../../shared/services/professionals/professional-user-license.service";
+import { CsiInspectorSubAccountsService } from "../../../../../shared/services/csi/csi-inspector-user.service";
 import { InputOption } from "../../../../../shared/components/input/input.component";
 import { ProfessionalLicenseType } from "../../../../../shared/models/professionals/licenses/professional-license-type";
+import { ProfessionalUser } from "../../../../../shared/models/professionals/professional-user";
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
 import { ToastService } from "../../../../../shared/services/toast.service";
 
@@ -23,8 +24,10 @@ export class CsiInspectorAddEditLicenseComponent implements OnInit {
 
     public license: ProfessionalUserLicense;
     public isLoading: boolean = false;
+    public hasReadHelp: boolean = false;
     public validationErrors: string[] = [];
     public licenseTypes: InputOption<ProfessionalLicenseType>[] = [];
+    public userOptions: InputOption<ProfessionalUser>[] = [];
 
     public readonly professionalTypeOptions: InputOption<ProfessionalType>[] = Object.values(ProfessionalType)
         .filter(v => typeof v === 'number')
@@ -41,7 +44,7 @@ export class CsiInspectorAddEditLicenseComponent implements OnInit {
     constructor(
         private readonly _modalReference: ModalReference<CsiLicenseModalData, ProfessionalUserLicense>,
         private readonly _licensesService: CsiInspectorLicensesService,
-        private readonly _licenseTypeService: ProfessionalUserLicenseService,
+        private readonly _subAccountsService: CsiInspectorSubAccountsService,
         private readonly _helper: HelperService,
         private readonly _toastService: ToastService
     ) {
@@ -49,9 +52,15 @@ export class CsiInspectorAddEditLicenseComponent implements OnInit {
     }
 
     public async ngOnInit(): Promise<void> {
+        const { inspectorId } = this._modalReference.config.model!;
         try {
             this.isLoading = true;
-            this._allLicenseTypes = await this._licenseTypeService.getAllTypesAsOptions({}, true);
+            const [types, users] = await Promise.all([
+                this._licensesService.getLicenseTypes(),
+                this._subAccountsService.getSubAccounts(inspectorId, { pageNumber: 1, pageSize: 1000 }, {})
+            ]);
+            this._allLicenseTypes = types;
+            this.userOptions = users.data.map((u: ProfessionalUser) => ({ id: u.id, text: u.emailAddress ?? u.contactName, data: u }));
 
             if (this.license.professionalType !== undefined) {
                 this.licenseTypes = this._allLicenseTypes.filter(t => t.data?.professionalType == this.license.professionalType);
@@ -59,6 +68,10 @@ export class CsiInspectorAddEditLicenseComponent implements OnInit {
         } finally {
             this.isLoading = false;
         }
+    }
+
+    public userChange(userId: number): void {
+        this.license.user = userId ? { id: userId } : undefined;
     }
 
     public professionalTypeChange(): void {
@@ -71,29 +84,33 @@ export class CsiInspectorAddEditLicenseComponent implements OnInit {
     }
 
     public async save(form: NgForm): Promise<void> {
-        if (!form.valid) {
+        this.validationErrors = [];
+
+        if (!this.isEditMode && !this.hasReadHelp) {
+            this.validationErrors.push('You must check the agreement checkbox below to register a new license ');
             return;
         }
 
-        try {
-            this.isLoading = true;
-            this.validationErrors = [];
+        if (form.valid) {
+            try {
+                this.isLoading = true;
 
-            const { inspectorId } = this._modalReference.config.model!;
+                const { inspectorId } = this._modalReference.config.model!;
 
-            const result = this.isEditMode
-                ? await this._licensesService.update(inspectorId, this.license)
-                : await this._licensesService.add(inspectorId, this.license);
+                const result = this.isEditMode
+                    ? await this._licensesService.update(inspectorId, this.license)
+                    : await this._licensesService.add(inspectorId, this.license);
 
-            this._toastService.successfullySaved('License');
-            this._modalReference.closeSuccess(result);
-        } catch (error) {
-            if (!this._helper.parseValidationErrors(error, this.validationErrors)) {
-                throw error;
+                this._toastService.successfullySaved('License');
+                this._modalReference.closeSuccess(result);
+            } catch (error) {
+                if (!this._helper.parseValidationErrors(error, this.validationErrors)) {
+                    throw error;
+                }
+                this._toastService.failedToSave('License');
+            } finally {
+                this.isLoading = false;
             }
-            this._toastService.failedToSave('License');
-        } finally {
-            this.isLoading = false;
         }
     }
 

@@ -19,6 +19,8 @@ export class CsiInspectorAddEditInsuranceComponent {
     public insurance: ProfessionalInsurance;
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
+    public hasReadHelp: boolean = false;
+    public certificateFile: File | null = null;
 
     public get isEditMode(): boolean {
         return !!this._modalReference.config.model?.insurance?.id;
@@ -45,8 +47,8 @@ export class CsiInspectorAddEditInsuranceComponent {
             const { inspectorId } = this._modalReference.config.model!;
 
             const result = this.isEditMode
-                ? await this._insurancesService.update(inspectorId, this.insurance)
-                : await this._insurancesService.add(inspectorId, this.insurance);
+                ? await this._insurancesService.update(inspectorId, this.insurance, this.certificateFile)
+                : await this._insurancesService.add(inspectorId, this.insurance, this.certificateFile);
 
             this._toastService.successfullySaved('Insurance');
             this._modalReference.closeSuccess(result);

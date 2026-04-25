@@ -11,4 +11,6 @@ public interface IProfessionalUserLicenseService : IService<ProfessionalUserLice
     Task<IPagedData<ProfessionalUserLicenseDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<ProfessionalUserLicenseDto?> GetCsiLicenseForUserAsync(int userId, CancellationToken cancellationToken);
     Task<IEnumerable<ProfessionalUserLicenseDto>> GetCsiLicensesForProfessionalAsync(int professionalId, CancellationToken cancellationToken);
+    Task<ProfessionalUserLicenseDto> AddForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto);
+    Task<ProfessionalUserLicenseDto> UpdateForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto);
 }

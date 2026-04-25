@@ -1,4 +1,5 @@
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -24,6 +25,55 @@ namespace Envirotrax.App.Server.Controllers.Csi
         {
             var result = await _insuranceService.GetAllByProfessionalAsync(id, pageInfo, query, cancellationToken);
             return Ok(result);
+        }
+
+        [HttpPost("{id}/insurances")]
+        [HasFeature(FeatureType.ManageProfessionalInsurances)]
+        [HasPermission(PermissionAction.CanEdit)]
+        public async Task<IActionResult> AddInsuranceAsync(int id, [FromForm] CreateCsiInsuranceDto dto, CancellationToken cancellationToken)
+        {
+            var insuranceDto = new ProfessionalInsuranceDto
+            {
+                InsuranceNumber = dto.InsuranceNumber,
+                ExpirationDate = dto.ExpirationDate,
+                Professional = new ReferencedProfessionalDto { Id = id }
+            };
+            using var stream = dto.File.OpenReadStream();
+            var result = await _insuranceService.AddForProfessionalAsync(id, stream, dto.File.FileName, insuranceDto);
+            return Ok(result);
+        }
+
+        [HttpPut("{id}/insurances/{insuranceId}")]
+        [HasFeature(FeatureType.ManageProfessionalInsurances)]
+        [HasPermission(PermissionAction.CanEdit)]
+        public async Task<IActionResult> UpdateInsuranceAsync(int id, int insuranceId, [FromForm] UpdateCsiInsuranceDto dto, CancellationToken cancellationToken)
+        {
+            var insuranceDto = new ProfessionalInsuranceDto
+            {
+                Id = insuranceId,
+                InsuranceNumber = dto.InsuranceNumber,
+                ExpirationDate = dto.ExpirationDate,
+                Professional = new ReferencedProfessionalDto { Id = id }
+            };
+
+            if (dto.File != null)
+            {
+                using var stream = dto.File.OpenReadStream();
+                var result = await _insuranceService.UpdateForProfessionalAsync(id, stream, dto.File.FileName, insuranceDto);
+
+                return Ok(result);
+            }
+
+            return Ok(await _insuranceService.UpdateForProfessionalAsync(id, insuranceDto));
+        }
+
+        [HttpDelete("{id}/insurances/{insuranceId}")]
+        [HasFeature(FeatureType.ManageProfessionalInsurances)]
+        [HasPermission(PermissionAction.CanEdit)]
+        public async Task<IActionResult> DeleteInsuranceAsync(int id, int insuranceId, CancellationToken cancellationToken)
+        {
+            await _insuranceService.DeleteAsync(insuranceId);
+            return Ok();
         }
     }
 }

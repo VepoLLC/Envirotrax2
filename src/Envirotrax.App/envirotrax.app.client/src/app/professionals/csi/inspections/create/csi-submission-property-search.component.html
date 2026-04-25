@@ -31,7 +31,7 @@
 
     <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
 
-        <div class="row">                    
+        <div class="row">
             <div class="mb-3">
                 <vp-section header="Property Search Instructions">
 
@@ -88,7 +88,7 @@
                     </div>
 
                 </vp-section>
-            </div>                       
+            </div>
         </div>
         <div class="row">
             <div class="mb-3">
@@ -99,11 +99,11 @@
                             <div class="row">
                                 <vp-input type="text"
                                     label="Account Number"
-                                    [(ngModel)]="accountNumber"                      
-                                    name="accountNumber"                                  
+                                    [(ngModel)]="accountNumber"
+                                    name="accountNumber"
                                     />
                                 <div class="col">
-                                    
+
                                     <p class="form-text text-muted">Example: XXXX-XXXX-XXXX</p>
                                 </div>
                             </div>
@@ -114,7 +114,7 @@
                                 <vp-input type="text"
                                     label="Street Number"
                                     [(ngModel)]="streetNumber"
-                                    name="streetNumber"                                  
+                                    name="streetNumber"
                                     />
                                 <div class="col">
                                     <p class="form-text text-muted">Example: 123 Main</p>

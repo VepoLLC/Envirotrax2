@@ -31,8 +31,8 @@ export class ProfessionalSupplierService {
         return lastValueFrom(obsertvable);
     }
 
-    public async getMyAsOptions(): Promise<InputOption[]> {
-        const suppliers = await this.getAllMy();
+    public async getMyAsOptions(hasCsiInspection = false): Promise<InputOption[]> {
+        const suppliers = await this.getAllMy(hasCsiInspection);
         return [
             { id: '', text: 'Select a water supplier' },
             ...suppliers.data
@@ -41,16 +41,25 @@ export class ProfessionalSupplierService {
         ];
     }
 
-    public getAllMy(): Promise<PagedData<ProfessionalWaterSupplier>> {
+    public getAllMy(hasCsiInspection = false): Promise<PagedData<ProfessionalWaterSupplier>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/water-suppliers');
+        const pageInfo: PageInfo = {pageSize: MAX_PAGE_SIZE };
 
-        const observable = this._http.get<PagedData<ProfessionalWaterSupplier>>(url, {
-            params: {
-                pageSize: MAX_PAGE_SIZE
-            }
-        });
-
-        return lastValueFrom(observable);
+        const query: Query = hasCsiInspection
+         ? {
+            filter:[
+                {
+                    columnName: 'hasCsiInspection',
+                    comparisonOperator: 'Eq',
+                    value: 'true'
+                }
+            ]
+         }: {};
+       return lastValueFrom(
+            this._http.get<PagedData<ProfessionalWaterSupplier>>(url, {
+                params: this._queryHelper.buildQuery(pageInfo, query)
+            })
+        );
     }
 
     public get(supplierId: number): Promise<ProfessionalWaterSupplier> {

@@ -1,6 +1,9 @@
 export interface CsiInspection {
     id?: number;
+    site?: { id?: number } | null;
     siteId?: number | null;
+    waterSupplier?: { id?: number } | null;
+    inspectorUser?: { id?: number } | null;
     inspectionDate?: string | null;
     submissionId?: string | null;
 
@@ -27,8 +30,6 @@ export interface CsiInspection {
     mailingEmailAddress?: string | null;
 
     // Inspector
-    masterInspectorId?: string | null;
-    inspectorId?: string | null;
     inspectorLicenseNumber?: string | null;
     inspectorLicenseType?: string | null;
     inspectorCompanyName?: string | null;

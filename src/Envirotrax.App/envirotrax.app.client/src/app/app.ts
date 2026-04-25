@@ -474,7 +474,7 @@ export class App implements OnInit {
           {
             title: 'Submit CSI',
             iconCss: 'fa-regular fa-file-plus',
-            routerLink: ['csi/inspections/create'],
+            routerLink: ['professionals/csi/inspections/create'],
             hasPermission: isCsiInspector,
             hasFeature: true
           }

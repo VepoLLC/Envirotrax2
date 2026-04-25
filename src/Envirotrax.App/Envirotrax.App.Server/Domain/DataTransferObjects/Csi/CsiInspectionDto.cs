@@ -2,8 +2,10 @@ using System.ComponentModel.DataAnnotations;
 using Envirotrax.App.Server.Data.Models.Csi;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
+using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 
@@ -12,6 +14,12 @@ public class CsiInspectionDto : IDto
     public int Id { get; set; }
 
     public ReferencedSiteDto? Site { get; set; }
+
+    [Required]
+    public ReferencedWaterSupplierDto? WaterSupplier { get; set; }
+
+    [Required]
+    public ReferencedProfessionalUserDto? InspectorUser { get; set; }
 
     public DateTime? InspectionDate { get; set; }
 
@@ -70,13 +78,6 @@ public class CsiInspectionDto : IDto
 
     [StringLength(100)]
     public string? MailingEmailAddress { get; set; }
-
-    // Inspector fields
-    [StringLength(50)]
-    public string? MasterInspectorId { get; set; }
-
-    [StringLength(50)]
-    public string? InspectorId { get; set; }
 
     [StringLength(50)]
     public string? InspectorLicenseNumber { get; set; }

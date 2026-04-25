@@ -10,8 +10,6 @@ import { CsiInspectorDetailsComponent } from "./inspectors/details/csi-inspector
 import { CsiInspectorWaterSuppliersComponent } from "./inspectors/details/water-suppliers/csi-inspector-water-suppliers.component";
 import { CsiInspectorUsersComponent } from "./inspectors/details/users/csi-inspector-users.component";
 import { CsiInspectorLicenseInsuranceComponent } from "./inspectors/details/license-insurance/csi-inspector-license-insurance.component";
-import { CsiSubmissionPropertySearchComponent } from "./inspections/create/csi-submission-property-search.component";
-import { CsiSubmissionCreateComponent } from "./inspections/create/csi-submission-create.component";
 import { CsiInspectorAddEditLicenseComponent } from "./inspectors/details/license-insurance/modals/add-edit-csi-inspector-license.component";
 import { CsiInspectorAddEditInsuranceComponent } from "./inspectors/details/license-insurance/modals/add-edit-csi-inspector-insurance.component";
 import { LicenseHelpTextComponent } from "../professionals/users/edit/licenses/help-text/license-help-text.component";
@@ -25,8 +23,6 @@ import { ProfessionalModule } from "../professionals/professional.module";
         CsiInspectorWaterSuppliersComponent,
         CsiInspectorUsersComponent,
         CsiInspectorLicenseInsuranceComponent,
-        CsiSubmissionPropertySearchComponent,
-        CsiSubmissionCreateComponent,
         CsiInspectorAddEditLicenseComponent,
         CsiInspectorAddEditInsuranceComponent
     ],
@@ -36,7 +32,7 @@ import { ProfessionalModule } from "../professionals/professional.module";
         RouterModule,
         SharedComponentsModule,
         CsiRoutingModule,
-        ProfessionalModule
+        ProfessionalModule,
     ]
 })
 export class CsiModule {

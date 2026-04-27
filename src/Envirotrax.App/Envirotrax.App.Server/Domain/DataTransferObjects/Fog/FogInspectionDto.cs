@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Envirotrax.App.Server.Data.Models.Fog;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 
@@ -72,11 +73,8 @@ public class FogInspectionDto : IDto
     public string? MailingEmailAddress { get; set; }
 
     // Inspector fields
-    [StringLength(50)]
-    public string? MasterInspectorId { get; set; }
-
-    [StringLength(50)]
-    public string? InspectorId { get; set; }
+    [Required]
+    public ReferencedProfessionalUserDto? InspectorUser { get; set; }
 
     [StringLength(255)]
     public string? InspectorCompanyName { get; set; }
@@ -195,18 +193,8 @@ public class FogInspectionDto : IDto
 
     // Validation
     public bool NeedsValidation { get; set; }
-    public bool ValidationOnHold { get; set; }
     public bool ValidationNewSite { get; set; }
     public bool ValidationSiteInformationChanged { get; set; }
-
-    [StringLength(50)]
-    public string? ValidatedBy { get; set; }
-
-    public DateTime? ValidationClearedDate { get; set; }
-    public DateTime? ValidationLockedDate { get; set; }
-
-    [StringLength(255)]
-    public string? ValidationNotes { get; set; }
 
     // Payment / transaction
     [StringLength(100)]

@@ -7,7 +7,7 @@ import { FogInspection } from '../../../shared/models/fog/fog-inspection';
 import { CellTemplateData, TableColumn } from '../../../shared/components/data-components/table/table.component';
 import { ColumnType } from '../../../shared/components/data-components/sorting-filtering/query-view-model';
 import { InputOption } from '../../../shared/components/input/input.component';
-import { FogInspectionResult, FogReasonForInspection } from '../../../shared/models/fog/fog-inspection-enums';
+import { FogInspectionResult } from '../../../shared/models/fog/fog-inspection-enums';
 import { FacilityType } from '../../../shared/enums/facility-type.enum';
 
 @Component({
@@ -55,11 +55,15 @@ export class FogInspectionListComponent implements OnInit {
         { id: FogInspectionResult.Failed.toString(), text: 'Failed' }
     ];
 
-    public reasonForInspectionOptions: InputOption[] = [
-        { id: '', text: 'All Reasons' },
-        { id: FogReasonForInspection.Scheduled.toString(), text: 'Scheduled' },
-        { id: FogReasonForInspection.Unscheduled.toString(), text: 'Unscheduled' },
-        { id: FogReasonForInspection.Complaint.toString(), text: 'Complaint' }
+    public paymentStatusOptions: InputOption[] = [
+        { id: '', text: 'Any value' },
+        { id: 'paid', text: 'Paid' },
+        { id: 'unpaid', text: 'Unpaid' }
+    ];
+
+    public dateTypeOptions: InputOption[] = [
+        { id: 'createdTime', text: 'Record creation date' },
+        { id: 'inspectionDate', text: 'Inspection date' }
     ];
 
     public interceptorTypeOptions: InputOption[] = [
@@ -165,13 +169,23 @@ export class FogInspectionListComponent implements OnInit {
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
-        this.table.query.filter = queryProperties.map(qp => {
-            if (qp.columnName === 'totalCapacityPercent') {
-                if (qp.value === 'lte25') return { ...qp, value: '25', comparisonOperator: 'Lte' as const };
-                if (qp.value === 'gt25') return { ...qp, value: '25', comparisonOperator: 'Gt' as const };
-            }
-            return qp;
-        });
+        const dateType = queryProperties.find(qp => qp.columnName === 'dateType')?.value as string;
+
+        this.table.query.filter = queryProperties
+            .filter(qp => qp.columnName !== 'dateType')
+            .map(qp => {
+                if (qp.columnName === 'totalCapacityPercent') {
+                    if (qp.value === 'lte25') return { ...qp, value: '25', comparisonOperator: 'Lte' as const };
+                    if (qp.value === 'gt25') return { ...qp, value: '25', comparisonOperator: 'Gt' as const };
+                }
+                if (qp.columnName === 'dateValue') {
+                    return { ...qp, columnName: dateType || 'createdTime' };
+                }
+                if (qp.columnName === 'paymentStatus') {
+                    return { columnName: 'transactionId', isValueNull: qp.value === 'unpaid' };
+                }
+                return qp;
+            });
     }
 
     public async search(searchForm: NgForm): Promise<void> {

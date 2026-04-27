@@ -7,7 +7,7 @@
             <!-- Main Search Criteria -->
             <vp-section header="Search criteria">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="site.accountNumber"
                                                    label="Account number"
@@ -27,8 +27,13 @@
                                                    [options]="interceptorTypeOptions"
                                                    [form]="searchForm" />
                         </div>
-                    </div>
-                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="totalCapacityPercent"
+                                                   label="Total capacity %"
+                                                   type="select"
+                                                   [options]="totalCapacityPercentOptions"
+                                                   [form]="searchForm" />
+                        </div>
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="inspectionResult"
                                                    label="Inspection result"
@@ -38,27 +43,15 @@
                                                    borderColor="#00a000" />
                         </div>
                         <div class="mb-3">
-                            <vp-filter-panel-field fieldName="totalCapacityPercent"
-                                                   label="Total capacity %"
+                            <vp-filter-panel-field fieldName="paymentStatus"
+                                                   label="Payment status"
                                                    type="select"
-                                                   [options]="totalCapacityPercentOptions"
-                                                   [form]="searchForm" />
-                        </div>
-                        <div class="mb-3">
-                            <vp-filter-panel-field fieldName="reasonForInspection"
-                                                   label="Reason for inspection"
-                                                   type="select"
-                                                   [options]="reasonForInspectionOptions"
-                                                   [form]="searchForm" />
-                        </div>
-                        <div class="mb-3">
-                            <vp-filter-panel-field fieldName="inspectionDate"
-                                                   label="Inspection date range"
-                                                   type="daterange"
-                                                   [form]="searchForm" />
+                                                   [options]="paymentStatusOptions"
+                                                   [form]="searchForm"
+                                                   borderColor="orange" />
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="inspectorCompanyName"
                                                    label="Inspector company name"
@@ -67,6 +60,19 @@
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="inspectorContactName"
                                                    label="Inspector contact name"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="dateType"
+                                                   label="Date type"
+                                                   type="select"
+                                                   [options]="dateTypeOptions"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="dateValue"
+                                                   label="Date range"
+                                                   type="daterange"
                                                    [form]="searchForm" />
                         </div>
                     </div>

@@ -14,6 +14,7 @@ public class FogInspectionProfile : Profile
             .ForMember(dest => dest.PropertyState, opt => opt.Ignore())
             .ForMember(dest => dest.MailingState, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())
+            .ForMember(dest => dest.InspectorUser, opt => opt.Ignore())
             .AfterMap((model, dto) =>
             {
                 dto.Site ??= new ReferencedSiteDto { Id = model.SiteId };
@@ -37,6 +38,10 @@ public class FogInspectionProfile : Profile
             .ForMember(m => m.MailingStateId, opt => opt.MapFrom(dto => dto.MailingState != null ? dto.MailingState.Id : null))
             .ForMember(m => m.CreatedBy, opt => opt.Ignore())
             .ForMember(m => m.UpdatedBy, opt => opt.Ignore())
-            .ForMember(m => m.DeletedBy, opt => opt.Ignore());
+            .ForMember(m => m.DeletedBy, opt => opt.Ignore())
+            .ForMember(m => m.Professional, opt => opt.Ignore())
+            .ForMember(m => m.Inspector, opt => opt.Ignore())
+            .ForMember(m => m.ProfessionalId, opt => opt.Ignore())
+            .ForMember(m => m.InspectorId, opt => opt.Ignore());
     }
 }

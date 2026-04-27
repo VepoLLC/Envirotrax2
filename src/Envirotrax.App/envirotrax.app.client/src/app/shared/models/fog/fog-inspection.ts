@@ -27,8 +27,7 @@ export interface FogInspection {
     mailingZip?: string;
     mailingPhoneNumber?: string;
     mailingEmailAddress?: string;
-    masterInspectorId?: string;
-    inspectorId?: string;
+    inspectorUser?: { id?: number } | null;
     inspectorCompanyName?: string;
     inspectorJobTitle?: string;
     inspectorContactName?: string;
@@ -77,13 +76,8 @@ export interface FogInspection {
     lastTripTicketDate?: string;
     tripTicketInterval?: number;
     needsValidation?: boolean;
-    validationOnHold?: boolean;
     validationNewSite?: boolean;
     validationSiteInformationChanged?: boolean;
-    validatedBy?: string;
-    validationClearedDate?: string;
-    validationLockedDate?: string;
-    validationNotes?: string;
     transactionId?: string;
     transactionDate?: string;
     amount?: number;

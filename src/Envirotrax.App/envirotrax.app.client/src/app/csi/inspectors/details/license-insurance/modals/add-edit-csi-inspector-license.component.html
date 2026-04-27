@@ -1,0 +1,82 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="isLoading" />
+
+    <form #form="ngForm" (ngSubmit)="save(form)">
+        <div *ngIf="!isEditMode" class="mb-4">
+            <vp-license-help-text />
+
+            <div class="form-check mb-3">
+                <input type="checkbox"
+                       class="form-check-input"
+                       [(ngModel)]="hasReadHelp"
+                       name="hasReadHelp"
+                       required>
+                <label class="form-check-label"
+                       [class.text-danger]="form.submitted && !hasReadHelp">
+                    I have read and understand the requirements and process of registering a license number.
+                </label>
+            </div>
+        </div>
+        
+        <div>
+            <div class="mb-3">
+                <vp-input type="select"
+                        name="professionalType"
+                        label="Professional Type"
+                        [(ngModel)]="license.professionalType"
+                        (ngModelChange)="professionalTypeChange()"
+                        [required]="true"
+                        [options]="professionalTypeOptions"
+                        [form]="form" />
+            </div>
+
+            <div class="mb-3">
+                <vp-input type="select"
+                        name="user"
+                        label="User"
+                        [ngModel]="license.user?.id"
+                        (ngModelChange)="userChange($event)"
+                        [required]="true"
+                        [options]="userOptions"
+                        [form]="form" />
+            </div>
+
+            <div class="mb-3" *ngIf="license.professionalType !== undefined">
+                <vp-input type="select"
+                        name="licenseType"
+                        label="License Type"
+                        [ngModel]="license.licenseType?.id"
+                        (ngModelChange)="licenseTypeChange($event)"
+                        [required]="true"
+                        [options]="licenseTypes"
+                        [form]="form" />
+            </div>
+
+            <div class="mb-3">
+                <vp-input name="licenseNumber"
+                        label="License Number"
+                        [(ngModel)]="license.licenseNumber"
+                        [required]="true"
+                        [maxLength]="50"
+                        [form]="form" />
+            </div>
+
+            <div class="mb-3">
+                <vp-input name="expirationDate"
+                        label="Expiration Date"
+                        type="date"
+                        [(ngModel)]="license.expirationDate"
+                        [form]="form" />
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="form" [validationErrors]="validationErrors" />
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-primary w-100" (click)="cancel()">Cancel</button>
+                <button type="submit" class="btn btn-primary w-100">Save</button>
+            </div>
+        </div>
+    </form>
+</div>

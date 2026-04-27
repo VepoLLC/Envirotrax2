@@ -10,6 +10,10 @@ import { CsiInspectorDetailsComponent } from "./inspectors/details/csi-inspector
 import { CsiInspectorWaterSuppliersComponent } from "./inspectors/details/water-suppliers/csi-inspector-water-suppliers.component";
 import { CsiInspectorUsersComponent } from "./inspectors/details/users/csi-inspector-users.component";
 import { CsiInspectorLicenseInsuranceComponent } from "./inspectors/details/license-insurance/csi-inspector-license-insurance.component";
+import { CsiInspectorAddEditLicenseComponent } from "./inspectors/details/license-insurance/modals/add-edit-csi-inspector-license.component";
+import { CsiInspectorAddEditInsuranceComponent } from "./inspectors/details/license-insurance/modals/add-edit-csi-inspector-insurance.component";
+import { LicenseHelpTextComponent } from "../professionals/users/edit/licenses/help-text/license-help-text.component";
+import { ProfessionalModule } from "../professionals/professional.module";
 
 @NgModule({
     declarations: [
@@ -18,14 +22,17 @@ import { CsiInspectorLicenseInsuranceComponent } from "./inspectors/details/lice
         CsiInspectorDetailsComponent,
         CsiInspectorWaterSuppliersComponent,
         CsiInspectorUsersComponent,
-        CsiInspectorLicenseInsuranceComponent
+        CsiInspectorLicenseInsuranceComponent,
+        CsiInspectorAddEditLicenseComponent,
+        CsiInspectorAddEditInsuranceComponent
     ],
     imports: [
         CommonModule,
         FormsModule,
         RouterModule,
         SharedComponentsModule,
-        CsiRoutingModule
+        CsiRoutingModule,
+        ProfessionalModule,
     ]
 })
 export class CsiModule {

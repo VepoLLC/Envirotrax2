@@ -6,6 +6,15 @@ import { CellTemplateData, TableColumn } from "../../../../shared/components/dat
 import { ColumnType } from "../../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { CsiInspectorLicensesService } from "../../../../shared/services/csi/csi-inspector-licenses.service";
 import { CsiInspectorInsurancesService } from "../../../../shared/services/csi/csi-inspector-insurances.service";
+import { AuthService } from "../../../../shared/services/auth/auth.service";
+import { FeatureType } from "../../../../shared/models/feature-tyype";
+import { PermissionAction, PermissionType } from "../../../../shared/models/permission-type";
+import { ModalHelperService } from "../../../../shared/services/helpers/modal-helper.service";
+import { ModalSize } from "@developer-partners/ngx-modal-dialog";
+import { ToastService } from "../../../../shared/services/toast.service";
+import { CsiInspectorAddEditInsuranceComponent } from "./modals/add-edit-csi-inspector-insurance.component";
+import { CsiInspectorAddEditLicenseComponent } from "./modals/add-edit-csi-inspector-license.component";
+
 
 @Component({
     selector: 'vp-csi-inspector-license-insurances',
@@ -19,6 +28,9 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
 
     public expirationType = ExpirationType;
     public insuranceExpirationType = InsuranceExpirationType;
+
+    public canManageLicenses: boolean = false;
+    public canManageInsurances: boolean = false;
 
     public licensesTable: TableViewModel<ProfessionalUserLicense> = {
         columns: [],
@@ -45,12 +57,23 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
     @ViewChild('insuranceExpirationCell', { static: true })
     private insuranceExpirationCellTemplate!: TemplateRef<CellTemplateData<ProfessionalInsurance>>;
 
+    @ViewChild('licenseActionsCell', { static: true })
+    private licenseActionsCellTemplate!: TemplateRef<CellTemplateData<ProfessionalUserLicense>>;
+
+    @ViewChild('insuranceActionsCell', { static: true })
+    private insuranceActionsCellTemplate!: TemplateRef<CellTemplateData<ProfessionalInsurance>>;
+
     constructor(
         private readonly _licensesService: CsiInspectorLicensesService,
-        private readonly _insurancesService: CsiInspectorInsurancesService
+        private readonly _insurancesService: CsiInspectorInsurancesService,
+        private readonly _authService: AuthService,
+        private readonly _modalHelper: ModalHelperService,
+        private readonly _toastService: ToastService,
     ) { }
 
     public async ngOnInit(): Promise<void> {
+        await this.setPermissions();
+
         this.setupColumns();
         await this.loadInsurances();
     }
@@ -62,6 +85,13 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
         } else if (tab === 'insurances' && !this.insurancesTable.items) {
             await this.loadInsurances();
         }
+    }
+
+    private async setPermissions(): Promise<void> {
+        const canEditCsiInspectors = await this._authService.hasAnyPermisison(PermissionAction.CanEdit, PermissionType.CsiInspectors);
+
+        this.canManageLicenses = canEditCsiInspectors && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalLicenses);
+        this.canManageInsurances = canEditCsiInspectors && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalInsurances);
     }
 
     setupColumns(): void {
@@ -99,6 +129,13 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
                 caption: 'Expiration Date',
                 cellTemplate: this.licenseExpirationCellTemplate,
                 type: ColumnType.date
+            },
+            {
+                field: '',
+                caption: '',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.licenseActionsCellTemplate
             }
         ];
     }
@@ -115,8 +152,73 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
                 caption: 'Expiration Date',
                 cellTemplate: this.insuranceExpirationCellTemplate,
                 type: ColumnType.date
+            },
+            {
+                field: '',
+                caption: '',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.insuranceActionsCellTemplate
             }
         ];
+    }
+
+    public addInsurance(): void {
+        this._modalHelper.show<any, ProfessionalInsurance>(CsiInspectorAddEditInsuranceComponent, {
+            title: 'Add Insurance Policy',
+            model: { inspectorId: this.inspectorId, insurance: {} },
+            size: ModalSize.large
+        }).result().subscribe(() => this.loadInsurances());
+    }
+
+    public addLicense(): void {
+        this._modalHelper.show<any, ProfessionalUserLicense>(CsiInspectorAddEditLicenseComponent, {
+            title: 'Add License',
+            model: { inspectorId: this.inspectorId, license: {} },
+            size: ModalSize.large
+        }).result().subscribe(() => this.loadLicenses());
+    }
+
+    public editLicense(license: ProfessionalUserLicense): void {
+        this._modalHelper.show<any, ProfessionalUserLicense>(CsiInspectorAddEditLicenseComponent, {
+            title: 'Edit License',
+            model: { inspectorId: this.inspectorId, license },
+            size: ModalSize.large
+        }).result().subscribe(() => this.loadLicenses());
+    }
+
+    public deleteLicense(license: ProfessionalUserLicense): void {
+        this._modalHelper.showDeleteConfirmation().result().subscribe(async () => {
+            try {
+                this.licensesTable.isLoading = true;
+                await this._licensesService.delete(this.inspectorId, license.id!);
+                this._toastService.successFullyDeleted('License');
+            } finally {
+                this.licensesTable.isLoading = false;
+            }
+            await this.loadLicenses();
+        });
+    }
+
+    public editInsurance(insurance: ProfessionalInsurance): void {
+        this._modalHelper.show<any, ProfessionalInsurance>(CsiInspectorAddEditInsuranceComponent, {
+            title: 'Edit Insurance Policy',
+            model: { inspectorId: this.inspectorId, insurance },
+            size: ModalSize.large
+        }).result().subscribe(() => this.loadInsurances());
+    }
+
+    public deleteInsurance(insurance: ProfessionalInsurance): void {
+        this._modalHelper.showDeleteConfirmation().result().subscribe(async () => {
+            try {
+                this.insurancesTable.isLoading = true;
+                await this._insurancesService.delete(this.inspectorId, insurance.id!);
+                this._toastService.successFullyDeleted('Insurance');
+            } finally {
+                this.insurancesTable.isLoading = false;
+            }
+            await this.loadInsurances();
+        });
     }
 
     public async loadLicenses(): Promise<void> {

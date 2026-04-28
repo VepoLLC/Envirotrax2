@@ -20,6 +20,8 @@ using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Implementations.Helpers;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Fog;
 
 namespace Envirotrax.App.Server.Domain.Configuration;
 
@@ -49,6 +51,7 @@ public static class ServiceRegistration
         services.AddTransient<IBackflowTesterService, BackflowTesterService>();
         services.AddTransient<IBackflowTestService, BackflowTestService>();
         services.AddTransient<ILookupService, LookupService>();
+        services.AddTransient<IFogInspectionRepository, FogInspectionRepository>();
 
         services.AddTransient<ICsiSettingsService, CsiSettingsService>();
         services.AddTransient<IBackflowSettingsService, BackflowSettingsService>();

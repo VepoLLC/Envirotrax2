@@ -61,11 +61,6 @@ export class FogInspectionListComponent implements OnInit {
         { id: 'unpaid', text: 'Unpaid' }
     ];
 
-    public dateTypeOptions: InputOption[] = [
-        { id: 'createdTime', text: 'Record creation date' },
-        { id: 'inspectionDate', text: 'Inspection date' }
-    ];
-
     public interceptorTypeOptions: InputOption[] = [
         { id: '', text: 'Any Type' },
         { id: 'Grease Trap', text: 'Grease Trap' },
@@ -169,23 +164,16 @@ export class FogInspectionListComponent implements OnInit {
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
-        const dateType = queryProperties.find(qp => qp.columnName === 'dateType')?.value as string;
-
-        this.table.query.filter = queryProperties
-            .filter(qp => qp.columnName !== 'dateType')
-            .map(qp => {
-                if (qp.columnName === 'totalCapacityPercent') {
-                    if (qp.value === 'lte25') return { ...qp, value: '25', comparisonOperator: 'Lte' as const };
-                    if (qp.value === 'gt25') return { ...qp, value: '25', comparisonOperator: 'Gt' as const };
-                }
-                if (qp.columnName === 'dateValue') {
-                    return { ...qp, columnName: dateType || 'createdTime' };
-                }
-                if (qp.columnName === 'paymentStatus') {
-                    return { columnName: 'transactionId', isValueNull: qp.value === 'unpaid' };
-                }
-                return qp;
-            });
+        this.table.query.filter = queryProperties.map(qp => {
+            if (qp.columnName === 'totalCapacityPercent') {
+                if (qp.value === 'lte25') return { ...qp, value: '25', comparisonOperator: 'Lte' as const };
+                if (qp.value === 'gt25') return { ...qp, value: '25', comparisonOperator: 'Gt' as const };
+            }
+            if (qp.columnName === 'paymentStatus') {
+                return { columnName: 'transactionId', isValueNull: qp.value === 'unpaid' };
+            }
+            return qp;
+        });
     }
 
     public async search(searchForm: NgForm): Promise<void> {

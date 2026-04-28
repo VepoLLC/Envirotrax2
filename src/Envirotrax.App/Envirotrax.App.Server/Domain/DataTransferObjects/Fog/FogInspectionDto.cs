@@ -74,7 +74,10 @@ public class FogInspectionDto : IDto
 
     // Inspector fields
     [Required]
-    public ReferencedProfessionalUserDto? InspectorUser { get; set; }
+    public ReferencedProfessionalDto? Professional { get; set; }
+
+    [Required]
+    public ReferencedProfessionalUserDto? Inspector { get; set; }
 
     [StringLength(255)]
     public string? InspectorCompanyName { get; set; }

@@ -63,15 +63,14 @@
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-3">
-                            <vp-filter-panel-field fieldName="dateType"
-                                                   label="Date type"
-                                                   type="select"
-                                                   [options]="dateTypeOptions"
+                            <vp-filter-panel-field fieldName="createdTime"
+                                                   label="Record creation date"
+                                                   type="daterange"
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-3">
-                            <vp-filter-panel-field fieldName="dateValue"
-                                                   label="Date range"
+                            <vp-filter-panel-field fieldName="inspectionDate"
+                                                   label="Inspection date"
                                                    type="daterange"
                                                    [form]="searchForm" />
                         </div>

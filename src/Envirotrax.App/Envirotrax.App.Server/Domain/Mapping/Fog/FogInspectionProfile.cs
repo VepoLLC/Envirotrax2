@@ -14,7 +14,8 @@ public class FogInspectionProfile : Profile
             .ForMember(dest => dest.PropertyState, opt => opt.Ignore())
             .ForMember(dest => dest.MailingState, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())
-            .ForMember(dest => dest.InspectorUser, opt => opt.Ignore())
+            .ForMember(dest => dest.Professional, opt => opt.Ignore())
+            .ForMember(dest => dest.Inspector, opt => opt.Ignore())
             .AfterMap((model, dto) =>
             {
                 dto.Site ??= new ReferencedSiteDto { Id = model.SiteId };
@@ -28,6 +29,9 @@ public class FogInspectionProfile : Profile
                 {
                     dto.MailingState ??= new() { Id = model.MailingStateId.Value };
                 }
+
+                dto.Professional ??= new() { Id = model.ProfessionalId };
+                dto.Inspector ??= new() { Id = model.InspectorId };
             })
             .ReverseMap()
             .ForMember(m => m.Site, opt => opt.Ignore())
@@ -41,7 +45,7 @@ public class FogInspectionProfile : Profile
             .ForMember(m => m.DeletedBy, opt => opt.Ignore())
             .ForMember(m => m.Professional, opt => opt.Ignore())
             .ForMember(m => m.Inspector, opt => opt.Ignore())
-            .ForMember(m => m.ProfessionalId, opt => opt.Ignore())
-            .ForMember(m => m.InspectorId, opt => opt.Ignore());
+            .ForMember(m => m.ProfessionalId, opt => opt.MapFrom(dto => dto.Professional != null ? dto.Professional.Id ?? 0 : 0))
+            .ForMember(m => m.InspectorId, opt => opt.MapFrom(dto => dto.Inspector != null ? dto.Inspector.Id ?? 0 : 0));
     }
 }

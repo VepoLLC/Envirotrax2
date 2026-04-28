@@ -241,6 +241,7 @@ public class FogInspectionConfiguration : IEntityTypeConfiguration<FogInspection
         builder.HasOne(i => i.Inspector)
             .WithMany()
             .HasForeignKey(i => new { i.ProfessionalId, i.InspectorId })
+            .HasPrincipalKey(pu => new { pu.ProfessionalId, pu.UserId })
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

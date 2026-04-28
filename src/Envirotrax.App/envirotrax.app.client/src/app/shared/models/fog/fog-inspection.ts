@@ -1,5 +1,7 @@
 import { Site } from '../sites/site';
 import { State } from '../lookup/state';
+import { Professional } from '../professionals/professional';
+import { ProfessionalUser } from '../professionals/professional-user';
 import { FogInspectionResult, FogReasonForInspection } from './fog-inspection-enums';
 import { PropertyType } from '../../enums/property-type.enum';
 import { FacilityType } from '../../enums/facility-type.enum';
@@ -27,7 +29,8 @@ export interface FogInspection {
     mailingZip?: string;
     mailingPhoneNumber?: string;
     mailingEmailAddress?: string;
-    inspectorUser?: { id?: number } | null;
+    professional?: Professional | null;
+    inspector?: ProfessionalUser | null;
     inspectorCompanyName?: string;
     inspectorJobTitle?: string;
     inspectorContactName?: string;

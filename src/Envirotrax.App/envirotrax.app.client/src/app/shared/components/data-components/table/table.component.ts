@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, TemplateRef, Type, ViewChild } from "@angular/core";
+import { Component, EventEmitter, input, Input, OnChanges, Output, SimpleChanges, TemplateRef, Type, ViewChild } from "@angular/core";
 import { ModalService } from "@developer-partners/ngx-modal-dialog";
 import { ColumnType, QueryColumn, QueryPropertyLocation, SpecialColumnType } from "../sorting-filtering/query-view-model";
 import { PageInfo } from "../../../models/page-info";
@@ -90,6 +90,9 @@ export class TableComponent implements OnChanges {
     @Input()
     public layoutName?: string;
 
+    @Input()
+    public showActionLabels: boolean = true;
+
     public queryColumns?: TableColumn<any>[];
     public searchId: string;
     public resetSearchId: string;
@@ -176,7 +179,7 @@ export class TableComponent implements OnChanges {
         }
     }
 
-     public ngOnChanges(changes: SimpleChanges): void {
+    public ngOnChanges(changes: SimpleChanges): void {
         if (changes['columns']?.currentValue) {
             this.setActionsColumn();
 

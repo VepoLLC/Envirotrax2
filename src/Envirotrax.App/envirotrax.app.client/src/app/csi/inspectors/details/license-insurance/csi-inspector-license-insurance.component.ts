@@ -57,12 +57,6 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
     @ViewChild('insuranceExpirationCell', { static: true })
     private insuranceExpirationCellTemplate!: TemplateRef<CellTemplateData<ProfessionalInsurance>>;
 
-    @ViewChild('licenseActionsCell', { static: true })
-    private licenseActionsCellTemplate!: TemplateRef<CellTemplateData<ProfessionalUserLicense>>;
-
-    @ViewChild('insuranceActionsCell', { static: true })
-    private insuranceActionsCellTemplate!: TemplateRef<CellTemplateData<ProfessionalInsurance>>;
-
     constructor(
         private readonly _licensesService: CsiInspectorLicensesService,
         private readonly _insurancesService: CsiInspectorInsurancesService,
@@ -129,13 +123,6 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
                 caption: 'Expiration Date',
                 cellTemplate: this.licenseExpirationCellTemplate,
                 type: ColumnType.date
-            },
-            {
-                field: '',
-                caption: '',
-                type: ColumnType.other,
-                queryColumnExcluded: true,
-                cellTemplate: this.licenseActionsCellTemplate
             }
         ];
     }
@@ -152,13 +139,6 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
                 caption: 'Expiration Date',
                 cellTemplate: this.insuranceExpirationCellTemplate,
                 type: ColumnType.date
-            },
-            {
-                field: '',
-                caption: '',
-                type: ColumnType.other,
-                queryColumnExcluded: true,
-                cellTemplate: this.insuranceActionsCellTemplate
             }
         ];
     }

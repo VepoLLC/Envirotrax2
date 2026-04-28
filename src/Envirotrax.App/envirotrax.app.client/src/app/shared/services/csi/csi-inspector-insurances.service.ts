@@ -25,4 +25,35 @@ export class CsiInspectorInsurancesService {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));
     }
+
+    public add(inspectorId: number, insurance: ProfessionalInsurance, file: File | null): Promise<ProfessionalInsurance> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${inspectorId}/insurances`);
+        const formData = new FormData();
+        formData.append('insuranceNumber', insurance.insuranceNumber ?? '');
+        if (insurance.expirationDate) {
+            formData.append('expirationDate', insurance.expirationDate.toString());
+        }
+        if (file) {
+            formData.append('file', file);
+        }
+        return lastValueFrom(this._http.post<ProfessionalInsurance>(url, formData));
+    }
+
+    public update(inspectorId: number, insurance: ProfessionalInsurance, file: File | null): Promise<ProfessionalInsurance> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${inspectorId}/insurances/${insurance.id}`);
+        const formData = new FormData();
+        formData.append('insuranceNumber', insurance.insuranceNumber ?? '');
+        if (insurance.expirationDate) {
+            formData.append('expirationDate', insurance.expirationDate.toString());
+        }
+        if (file) {
+            formData.append('file', file);
+        }
+        return lastValueFrom(this._http.put<ProfessionalInsurance>(url, formData));
+    }
+
+    public delete(inspectorId: number, insuranceId: number): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${inspectorId}/insurances/${insuranceId}`);
+        return lastValueFrom(this._http.delete<void>(url));
+    }
 }

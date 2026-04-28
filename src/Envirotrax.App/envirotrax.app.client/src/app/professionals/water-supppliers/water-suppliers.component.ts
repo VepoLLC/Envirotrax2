@@ -14,6 +14,10 @@ import { InputOption } from "../../shared/components/input/input.component";
 import { ModalHelperService } from "../../shared/services/helpers/modal-helper.service";
 import { WaterSupplierRegistrationComponent, WaterSupplierRegistrationVm } from "./registration/water-supplier-registration.component";
 import { ToastService } from "../../shared/services/toast.service";
+import { AuthService } from "../../shared/services/auth/auth.service";
+import { FeatureType } from "../../shared/models/feature-tyype";
+
+type TabType = 'backflow' | 'csi' | 'fogInspection' | 'fogTransport';
 
 @Component({
     standalone: false,
@@ -41,6 +45,11 @@ export class WaterSuppliersComponent implements OnInit {
         columnName: 'stateId'
     };
 
+    private readonly _tabQuery: QueryProperty = {
+        columnName: 'hasBackflowTesting',
+        value: 'true'
+    };
+
     public suppliers: TableViewModel<ProfessionalSupplierVm> = {
         query: {
             sort: {},
@@ -56,6 +65,12 @@ export class WaterSuppliersComponent implements OnInit {
     public states: InputOption<State>[] = [];
     public stateId?: number;
     public professional: Professional = {};
+
+    public activeTab: TabType = 'backflow';
+    public hasBackflowTesting = false;
+    public hasCsiInspection = false;
+    public hasFogInspection = false;
+    public hasFogTransportation = false;
 
     @ViewChild('supportedPrograms', { static: true })
     public supportedPrograms?: TemplateRef<CellTemplateData<AvailableWaterSupplier>>;
@@ -77,13 +92,29 @@ export class WaterSuppliersComponent implements OnInit {
         private readonly _professionalService: ProfesisonalService,
         private readonly _lookupService: LookupService,
         private readonly _modalHelper: ModalHelperService,
-        private readonly _toastService: ToastService
+        private readonly _toastService: ToastService,
+        private readonly _authService: AuthService
     ) {
 
     }
 
     public async ngOnInit(): Promise<void> {
+        [this.hasBackflowTesting, this.hasCsiInspection, this.hasFogInspection, this.hasFogTransportation] = await Promise.all([
+            this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
+            this._authService.hasAnyFeatures(FeatureType.CsiInspection),
+            this._authService.hasAnyFeatures(FeatureType.FogInspection),
+            this._authService.hasAnyFeatures(FeatureType.FogTransportation)
+        ]);
+
+        if (this.hasBackflowTesting) this.activeTab = 'backflow';
+        else if (this.hasCsiInspection) this.activeTab = 'csi';
+        else if (this.hasFogInspection) this.activeTab = 'fogInspection';
+        else if (this.hasFogTransportation) this.activeTab = 'fogTransport';
+
+        this._tabQuery.columnName = this._getTabColumnName();
+
         this.suppliers.query.filter?.push(this._stateQuuery);
+        this.suppliers.query.filter?.push(this._tabQuery);
         this.suppliers.columns = this.getColumns();
 
         await this.setSupplierFilters();
@@ -99,50 +130,11 @@ export class WaterSuppliersComponent implements OnInit {
                 this._lookupService.getAllStatesAsOptions(true)
             ]);
 
-            this.states = states;
+            this.states = states.filter(s => s.data?.code === 'TX' || s.data?.code === 'KS');
             this.professional = currentProfessional;
 
             this.stateId = states.find(s => s.data?.code == 'TX')?.id;
             this._stateQuuery.value = this.stateId?.toString();
-
-            const queryProperty: QueryProperty = {
-                children: [],
-                columnName: 'id'
-            };
-
-            if (currentProfessional.hasBackflowTesting) {
-                queryProperty.children!.push({
-                    columnName: 'hasBackflowTesting',
-                    value: 'true',
-                    logicalOperator: 'Or'
-                });
-            }
-
-            if (currentProfessional.hasCsiInspection) {
-                queryProperty.children!.push({
-                    columnName: 'hasCsiInspection',
-                    value: 'true',
-                    logicalOperator: 'Or'
-                });
-            }
-
-            if (currentProfessional.hasFogInspection) {
-                queryProperty.children!.push({
-                    columnName: 'hasFogInspection',
-                    value: 'true',
-                    logicalOperator: 'Or'
-                });
-            }
-
-            if (currentProfessional.hasFogTransportation) {
-                queryProperty.children!.push({
-                    columnName: 'hasFogTransportation',
-                    value: 'true',
-                    logicalOperator: 'Or'
-                });
-            }
-
-            this.suppliers.query.filter?.push(queryProperty);
         } finally {
             this.suppliers.isLoading = false;
         }
@@ -167,6 +159,13 @@ export class WaterSuppliersComponent implements OnInit {
         } finally {
             this.suppliers.isLoading = false;
         }
+    }
+
+    public setActiveTab(tab: TabType): void {
+        this.activeTab = tab;
+        this._tabQuery.columnName = this._getTabColumnName();
+        this.suppliers.columns = this.getColumns();
+        this.getSuppliers();
     }
 
     public openRegistration(supplier: ProfessionalSupplierVm): void {
@@ -201,8 +200,17 @@ export class WaterSuppliersComponent implements OnInit {
         await this.getSuppliers();
     }
 
+    private _getTabColumnName(): string {
+        switch (this.activeTab) {
+            case 'backflow': return 'hasBackflowTesting';
+            case 'csi': return 'hasCsiInspection';
+            case 'fogInspection': return 'hasFogInspection';
+            case 'fogTransport': return 'hasFogTransportation';
+        }
+    }
+
     private getColumns(): TableColumn<ProfessionalSupplierVm>[] {
-        return [
+        const baseColumns: TableColumn<ProfessionalSupplierVm>[] = [
             {
                 field: 'Actions',
                 caption: 'Actions',
@@ -227,83 +235,114 @@ export class WaterSuppliersComponent implements OnInit {
                 queryColumnExcluded: true,
                 headerCssClass: 'vp-registration-table-column text-center',
                 rowCssClass: 'vp-registration-table-column text-center'
-            },
-            {
-                field: 'BPAT Requirements',
-                caption: 'BPAT Requirements',
-                type: ColumnType.other,
-                cellTemplate: this.bpatRequirements,
-                queryColumnExcluded: true,
-                headerCssClass: 'vp-registration-table-column text-center',
-                rowCssClass: 'vp-registration-table-column text-center'
-            },
-            {
-                field: 'backflowResidentialTestFee',
-                caption: 'BPAT Residential Fee',
-                type: ColumnType.number,
-                cellComponent: CurrencyCellComponent,
-                headerCssClass: 'vp-registration-table-column text-center',
-                rowCssClass: 'vp-registration-table-column text-center'
-            },
-            {
-                field: 'backflowCommercialTestFee',
-                caption: 'BPAT Commercial Fee',
-                type: ColumnType.number,
-                cellComponent: CurrencyCellComponent,
-                headerCssClass: 'vp-registration-table-column text-center',
-                rowCssClass: 'vp-registration-table-column text-center'
-            },
-            {
-                field: 'CSI Requirements',
-                caption: 'CSI Requirements',
-                type: ColumnType.other,
-                cellTemplate: this.csiRequirements,
-                queryColumnExcluded: true,
-                headerCssClass: 'vp-registration-table-column text-center',
-                rowCssClass: 'vp-registration-table-column text-center'
-            },
-            {
-                field: 'csiResidentialInspectionFee',
-                caption: 'CSI Residential Fee',
-                type: ColumnType.number,
-                cellComponent: CurrencyCellComponent,
-                headerCssClass: 'vp-registration-table-column text-center',
-                rowCssClass: 'vp-registration-table-column text-center'
-            },
-            {
-                field: 'csiCommercialInspectionFee',
-                caption: 'CSI Commercial Fee',
-                type: ColumnType.number,
-                cellComponent: CurrencyCellComponent,
-                headerCssClass: 'vp-registration-table-column text-center',
-                rowCssClass: 'vp-registration-table-column text-center'
-            },
-            {
-                field: 'FOG Requirements',
-                caption: 'FOG Requirements',
-                type: ColumnType.other,
-                cellTemplate: this.fogRequirements,
-                queryColumnExcluded: true,
-                headerCssClass: 'vp-registration-table-column text-center',
-                rowCssClass: 'vp-registration-table-column text-center'
-            },
-            {
-                field: 'fogInspectorFee',
-                caption: 'FOG Inspection Fee',
-                type: ColumnType.number,
-                cellComponent: CurrencyCellComponent,
-                headerCssClass: 'vp-registration-table-column text-center',
-                rowCssClass: 'vp-registration-table-column text-center'
-            },
-            {
-                field: 'fogTransportFee',
-                caption: 'FOG Transport Fee',
-                type: ColumnType.number,
-                cellComponent: CurrencyCellComponent,
-                headerCssClass: 'vp-registration-table-column text-center',
-                rowCssClass: 'vp-registration-table-column text-center'
             }
-        ]
+        ];
+
+        switch (this.activeTab) {
+            case 'backflow':
+                return [
+                    ...baseColumns,
+                    {
+                        field: 'BPAT Requirements',
+                        caption: 'BPAT Requirements',
+                        type: ColumnType.other,
+                        cellTemplate: this.bpatRequirements,
+                        queryColumnExcluded: true,
+                        headerCssClass: 'vp-registration-table-column text-center',
+                        rowCssClass: 'vp-registration-table-column text-center'
+                    },
+                    {
+                        field: 'backflowResidentialTestFee',
+                        caption: 'BPAT Residential Fee',
+                        type: ColumnType.number,
+                        cellComponent: CurrencyCellComponent,
+                        headerCssClass: 'vp-registration-table-column text-center',
+                        rowCssClass: 'vp-registration-table-column text-center'
+                    },
+                    {
+                        field: 'backflowCommercialTestFee',
+                        caption: 'BPAT Commercial Fee',
+                        type: ColumnType.number,
+                        cellComponent: CurrencyCellComponent,
+                        headerCssClass: 'vp-registration-table-column text-center',
+                        rowCssClass: 'vp-registration-table-column text-center'
+                    }
+                ];
+
+            case 'csi':
+                return [
+                    ...baseColumns,
+                    {
+                        field: 'CSI Requirements',
+                        caption: 'CSI Requirements',
+                        type: ColumnType.other,
+                        cellTemplate: this.csiRequirements,
+                        queryColumnExcluded: true,
+                        headerCssClass: 'vp-registration-table-column text-center',
+                        rowCssClass: 'vp-registration-table-column text-center'
+                    },
+                    {
+                        field: 'csiResidentialInspectionFee',
+                        caption: 'CSI Residential Fee',
+                        type: ColumnType.number,
+                        cellComponent: CurrencyCellComponent,
+                        headerCssClass: 'vp-registration-table-column text-center',
+                        rowCssClass: 'vp-registration-table-column text-center'
+                    },
+                    {
+                        field: 'csiCommercialInspectionFee',
+                        caption: 'CSI Commercial Fee',
+                        type: ColumnType.number,
+                        cellComponent: CurrencyCellComponent,
+                        headerCssClass: 'vp-registration-table-column text-center',
+                        rowCssClass: 'vp-registration-table-column text-center'
+                    }
+                ];
+
+            case 'fogInspection':
+                return [
+                    ...baseColumns,
+                    {
+                        field: 'FOG Requirements',
+                        caption: 'FOG Requirements',
+                        type: ColumnType.other,
+                        cellTemplate: this.fogRequirements,
+                        queryColumnExcluded: true,
+                        headerCssClass: 'vp-registration-table-column text-center',
+                        rowCssClass: 'vp-registration-table-column text-center'
+                    },
+                    {
+                        field: 'fogInspectorFee',
+                        caption: 'FOG Inspection Fee',
+                        type: ColumnType.number,
+                        cellComponent: CurrencyCellComponent,
+                        headerCssClass: 'vp-registration-table-column text-center',
+                        rowCssClass: 'vp-registration-table-column text-center'
+                    }
+                ];
+
+            case 'fogTransport':
+                return [
+                    ...baseColumns,
+                    {
+                        field: 'FOG Requirements',
+                        caption: 'FOG Requirements',
+                        type: ColumnType.other,
+                        cellTemplate: this.fogRequirements,
+                        queryColumnExcluded: true,
+                        headerCssClass: 'vp-registration-table-column text-center',
+                        rowCssClass: 'vp-registration-table-column text-center'
+                    },
+                    {
+                        field: 'fogTransportFee',
+                        caption: 'FOG Transport Fee',
+                        type: ColumnType.number,
+                        cellComponent: CurrencyCellComponent,
+                        headerCssClass: 'vp-registration-table-column text-center',
+                        rowCssClass: 'vp-registration-table-column text-center'
+                    }
+                ];
+        }
     }
 
     public stateChanged(): void {

@@ -23,6 +23,28 @@
     </span>
 </ng-template>
 
+<ng-template #licenseActionsCell let-license="rowData">
+    <div class="d-flex justify-content-end gap-1" (click)="$event.stopPropagation()">
+        <button *ngIf="canManageLicenses" type="button" class="btn btn-sm btn-outline-primary" title="Edit" (click)="editLicense(license)">
+            <i class="fa-solid fa-pencil"></i>
+        </button>
+        <button *ngIf="canManageLicenses" type="button" class="btn btn-sm btn-outline-danger" title="Delete" (click)="deleteLicense(license)">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+    </div>
+</ng-template>
+
+<ng-template #insuranceActionsCell let-insurance="rowData">
+    <div class="d-flex justify-content-end gap-1" (click)="$event.stopPropagation()">
+        <button *ngIf="canManageInsurances" type="button" class="btn btn-sm btn-outline-primary" title="Edit" (click)="editInsurance(insurance)">
+            <i class="fa-solid fa-pencil"></i>
+        </button>
+        <button *ngIf="canManageInsurances" type="button" class="btn btn-sm btn-outline-danger" title="Delete" (click)="deleteInsurance(insurance)">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+    </div>
+</ng-template>
+
 <vp-section header="License &amp; Insurance Management">
     <div class="text-center mb-3">
         <ul class="vp-tabs nav nav-pills d-inline-flex">
@@ -50,7 +72,10 @@
                       (pageInfoChange)="loadInsurances()"
                       [(query)]="insurancesTable.query"
                       (queryChange)="loadInsurances()"
-                      (queryReset)="loadInsurances()" />
+                      (queryReset)="loadInsurances()"
+                      [canAdd]="canManageInsurances"
+                      (add)="addInsurance()"
+                      />
         </div>
     </div>
 
@@ -65,7 +90,10 @@
                       (pageInfoChange)="loadLicenses()"
                       [(query)]="licensesTable.query"
                       (queryChange)="loadLicenses()"
-                      (queryReset)="loadLicenses()" />
+                      (queryReset)="loadLicenses()"
+                      [canAdd]="canManageLicenses"
+                      (add)="addLicense()"
+                      />
         </div>
     </div>
 </vp-section>

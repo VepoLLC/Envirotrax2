@@ -80,6 +80,54 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         }
     }
 
+    public async Task<ProfessionalInsuranceDto> AddForProfessionalAsync(int professionalId, Stream fileStream, string originalFileName, ProfessionalInsuranceDto dto)
+    {
+        var fileExtension = Path.GetExtension(originalFileName);
+        dto.FilePath = $"professionals/{professionalId}/insurances/{Guid.NewGuid()}{fileExtension}";
+
+        var model = MapToModel(dto)!;
+        model.ProfessionalId = professionalId;
+
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        var added = await Repository.AddAsync(model);
+        await _fileStorageService.UploadAsync(dto.FilePath, fileStream);
+        scope.Complete();
+
+        return MapToDto(added)!;
+    }
+
+    public async Task<ProfessionalInsuranceDto> UpdateForProfessionalAsync(int professionalId, ProfessionalInsuranceDto dto)
+    {
+        var existing = await Repository.GetAsync(dto.Id, CancellationToken.None);
+        dto.FilePath = existing?.FilePath;
+
+        var model = MapToModel(dto)!;
+        model.ProfessionalId = professionalId;
+        var updated = await Repository.UpdateAsync(model);
+        return MapToDto(updated)!;
+    }
+
+    public async Task<ProfessionalInsuranceDto> UpdateForProfessionalAsync(int professionalId, Stream fileStream, string originalFileName, ProfessionalInsuranceDto dto)
+    {
+        var existing = await Repository.GetAsync(dto.Id, CancellationToken.None);
+        var oldFilePath = existing?.FilePath;
+
+        var fileExtension = Path.GetExtension(originalFileName);
+        dto.FilePath = $"professionals/{professionalId}/insurances/{Guid.NewGuid()}{fileExtension}";
+
+        var model = MapToModel(dto)!;
+        model.ProfessionalId = professionalId;
+
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        var updated = await Repository.UpdateAsync(model);
+        await _fileStorageService.UploadAsync(dto.FilePath, fileStream);
+        if (oldFilePath != null)
+            await _fileStorageService.DeleteAsync(oldFilePath);
+        scope.Complete();
+
+        return MapToDto(updated)!;
+    }
+
     public override async Task<ProfessionalInsuranceDto?> DeleteAsync(int id)
     {
         using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))

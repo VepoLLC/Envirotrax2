@@ -110,8 +110,8 @@ export class App implements OnInit {
           {
             title: 'GIS Area Management',
             iconCss: 'fa-solid fa-globe',
-            routerLink: ['/'],
-            hasPermission: true,
+            routerLink: ['admin/gis-areas'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Settings),
             hasFeature: true
           }
         ]
@@ -304,7 +304,7 @@ export class App implements OnInit {
           {
             title: 'Inspection Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['/'],
+            routerLink: ['/fog/inspections'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogInspections),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
           },
@@ -596,7 +596,7 @@ export class App implements OnInit {
           {
             title: 'Inspection Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['/'],
+            routerLink: ['/fog/inspections'],
             hasPermission: isFogInspector,
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
           },

@@ -1,12 +1,14 @@
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
+using Envirotrax.App.Server.Domain.Services.Definitions.GisAreas;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Implementations.Backflow;
 using Envirotrax.App.Server.Domain.Services.Implementations.Csi;
 using Envirotrax.App.Server.Domain.Services.Implementations.Fog;
+using Envirotrax.App.Server.Domain.Services.Implementations.GisAreas;
 using Envirotrax.App.Server.Domain.Services.Implementations.Sites;
 using Envirotrax.App.Server.Domain.Services.Implementations.Users;
 using Envirotrax.App.Server.Domain.Services.Implementations;
@@ -20,6 +22,8 @@ using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Implementations.Helpers;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Fog;
 
 namespace Envirotrax.App.Server.Domain.Configuration;
 
@@ -45,9 +49,11 @@ public static class ServiceRegistration
         services.AddTransient<ICsiInspectionService, CsiInspectionService>();
         services.AddTransient<ICsiInspectorService, CsiInspectorService>();
         services.AddTransient<IFogInspectorService, FogInspectorService>();
+        services.AddTransient<IFogInspectionService, FogInspectionService>();
         services.AddTransient<IBackflowTesterService, BackflowTesterService>();
         services.AddTransient<IBackflowTestService, BackflowTestService>();
         services.AddTransient<ILookupService, LookupService>();
+        services.AddTransient<IFogInspectionRepository, FogInspectionRepository>();
 
         services.AddTransient<ICsiSettingsService, CsiSettingsService>();
         services.AddTransient<IBackflowSettingsService, BackflowSettingsService>();
@@ -62,6 +68,9 @@ public static class ServiceRegistration
         services.AddTransient<IProfessionalUserLicenseService, ProfessionalUserLicenseService>();
         services.AddTransient<IProfessionalLicenseTypeService, ProfessionalLicenseTypeService>();
         services.AddTransient<IProfessionalInsuranceService, ProfessionalInsuranceService>();
+
+        services.AddTransient<IGisAreaService, GisAreaService>();
+        services.AddTransient<IGisAreaCoordinateService, GisAreaCoordinateService>();
 
         return services;
     }

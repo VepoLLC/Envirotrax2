@@ -1,5 +1,6 @@
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Csi;
+using Envirotrax.App.Server.Data.Models.Fog;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Models.Users;
@@ -11,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using System.Reflection;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers.Features;
+using Envirotrax.App.Server.Data.Models.GisAreas;
 
 namespace Envirotrax.App.Server.Data.DbContexts;
 
@@ -28,6 +30,9 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
     public DbSet<RolePermission> RolePermissions { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
 
+    public DbSet<GisArea> GisAreas { get; set; }
+    public DbSet<GisAreaCoordinate> GisAreaCoordinates { get; set; }
+
     public DbSet<Professional> Professionals { get; set; }
     public DbSet<ProfessionalUser> ProfessionalUsers { get; set; }
     public DbSet<ProfessionalWaterSupplier> ProfessionalWaterSuppliers { get; set; }
@@ -38,6 +43,7 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
     public DbSet<State> States { get; set; }
     public DbSet<Site> Sites { get; set; }
     public DbSet<CsiInspection> CsiInspections { get; set; }
+    public DbSet<FogInspection> FogInspections { get; set; }
     public DbSet<BackflowTest> BackflowTests { get; set; }
 
     protected TenantDbContext(

@@ -45,6 +45,10 @@ namespace Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers
         public string? LetterContactEmailAddress { get; set; } = null!;
         public ReferencedStateDto? LetterContactState { get; set; }
 
+        public double? GisCenterLatitude { get; set; }
+        public double? GisCenterLongitude { get; set; }
+        public double? GisCenterZoom { get; set; }
+
         public ReferencedWaterSupplierDto? Parent { get; set; }
     }
 

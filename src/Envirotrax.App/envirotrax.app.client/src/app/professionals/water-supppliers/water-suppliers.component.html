@@ -5,6 +5,31 @@
         </h1>
     </header>
 
+    <div class="text-center mb-3">
+        <ul class="vp-tabs nav nav-pills settings-tabs d-inline-flex">
+            <li *ngIf="hasBackflowTesting" class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'backflow'" (click)="setActiveTab('backflow')">
+                    <i class="fa-regular fa-gauge me-2"></i>Backflow Tester
+                </a>
+            </li>
+            <li *ngIf="hasCsiInspection" class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'csi'" (click)="setActiveTab('csi')">
+                    <i class="fa-solid fa-building-magnifying-glass me-2"></i>CSI Inspector
+                </a>
+            </li>
+            <li *ngIf="hasFogInspection" class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'fogInspection'" (click)="setActiveTab('fogInspection')">
+                    <i class="fa-regular fa-tank-water me-2"></i>FOG Inspector
+                </a>
+            </li>
+            <li *ngIf="hasFogTransportation" class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'fogTransport'" (click)="setActiveTab('fogTransport')">
+                    <i class="fa-regular fa-tank-water me-2"></i>FOG Transporter
+                </a>
+            </li>
+        </ul>
+    </div>
+
     <vp-section header="Water Suppliers">
         <dp-loading-spinner *ngIf="suppliers.isLoading"></dp-loading-spinner>
 
@@ -33,25 +58,32 @@
                     Insurance Required
                 </div>
 
-                <div *ngIf="professional.hasBackflowTesting || professional.hasCsiInspection"
+                <div *ngIf="activeTab === 'backflow'"
                      class="mx-2 d-flex align-items-center mb-2">
                     <img src="/images/camera-icon.png"
-                         alt="Water supplier requires assembly or inspection photos"
+                         alt="Water supplier requires assembly photos"
                          class="vp-requirement-icon me-2" />
-                    Requires Assembly or Inspection Photos
+                    Requires Assembly Photos
                 </div>
 
-                <ng-container *ngIf="professional.hasFogTransportation">
+                <div *ngIf="activeTab === 'csi'"
+                     class="mx-2 d-flex align-items-center mb-2">
+                    <img src="/images/camera-icon.png"
+                         alt="Water supplier requires inspection photos"
+                         class="vp-requirement-icon me-2" />
+                    Requires Inspection Photos
+                </div>
+
+                <ng-container *ngIf="activeTab === 'fogTransport'">
                     <div class="mx-2 d-flex align-items-center mb-2">
                         <img src="/images/vehicle-permit-icon.png"
-                             alt="Water supplier requires assembly photos"
+                             alt="Water supplier requires vehicle permit"
                              class="vp-requirement-icon me-2" />
                         Vehicle Permit Required
                     </div>
-
                     <div class="mx-2 d-flex align-items-center mb-2">
                         <img src="/images/vehicle-inspection-icon.png"
-                             alt="Water supplier requires assembly photos"
+                             alt="Water supplier requires vehicle inspection"
                              class="vp-requirement-icon me-2" />
                         Vehicle Inspection Required
                     </div>
@@ -61,7 +93,7 @@
             <div class="vp-filter">
                 <vp-input *ngIf="states"
                           name="state"
-                          label="Select Sate to Filter"
+                          label="Select State to Filter"
                           type="select"
                           class="mt-4"
                           [(ngModel)]="stateId"

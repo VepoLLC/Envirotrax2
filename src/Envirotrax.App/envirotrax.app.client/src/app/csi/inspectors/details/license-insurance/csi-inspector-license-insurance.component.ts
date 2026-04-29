@@ -2,7 +2,7 @@ import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core"
 import { ExpirationType, ProfessionalUserLicense, professionalTypeLabels, ProfessionalType } from "../../../../shared/models/professionals/licenses/professional-user-license";
 import { ProfessionalInsurance, ExpirationType as InsuranceExpirationType } from "../../../../shared/models/professionals/professional-insurance";
 import { TableViewModel } from "../../../../shared/models/table-view-model";
-import { CellTemplateData, TableColumn } from "../../../../shared/components/data-components/table/table.component";
+import { CellTemplateData, TableColumn, TableCustomAction } from "../../../../shared/components/data-components/table/table.component";
 import { ColumnType } from "../../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { CsiInspectorLicensesService } from "../../../../shared/services/csi/csi-inspector-licenses.service";
 import { CsiInspectorInsurancesService } from "../../../../shared/services/csi/csi-inspector-insurances.service";
@@ -14,6 +14,7 @@ import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { ToastService } from "../../../../shared/services/toast.service";
 import { CsiInspectorAddEditInsuranceComponent } from "./modals/add-edit-csi-inspector-insurance.component";
 import { CsiInspectorAddEditLicenseComponent } from "./modals/add-edit-csi-inspector-license.component";
+import { Professional } from "../../../../shared/models/professionals/professional";
 
 
 @Component({
@@ -23,6 +24,7 @@ import { CsiInspectorAddEditLicenseComponent } from "./modals/add-edit-csi-inspe
 })
 export class CsiInspectorLicenseInsuranceComponent implements OnInit {
     @Input() public inspectorId!: number;
+    @Input() public inspector: Professional | null = null;
 
     public activeTab: 'insurances' | 'licenses' = 'insurances';
 
@@ -41,6 +43,19 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
         columns: [],
         query: { sort: {}, filter: [] }
     };
+
+    public readonly insuranceCustomActions: TableCustomAction<ProfessionalInsurance>[] = [
+        {
+            text: 'View',
+            iconClass: 'fa-solid fa-eye',
+            action: (insurance: ProfessionalInsurance) => this.viewInsuranceFile(insurance)
+        },
+        {
+            text: 'Email',
+            iconClass: 'fa-solid fa-envelope',
+            action: (insurance: ProfessionalInsurance) => this.prepareEmail(insurance)
+        }
+    ];
 
     @ViewChild('licenseTypeCell', { static: true })
     private licenseTypeCellTemplate!: TemplateRef<CellTemplateData<ProfessionalUserLicense>>;
@@ -199,6 +214,34 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
             }
             await this.loadInsurances();
         });
+    }
+
+    public async viewInsuranceFile(insurance: ProfessionalInsurance): Promise<void> {
+        try{
+            this.insurancesTable.isLoading = true;
+            
+            const url = await this._insurancesService.getFileUrl(this.inspectorId, insurance.id!);
+            window.open(url, '_blank');
+        }finally{
+            this.insurancesTable.isLoading = false;
+        }
+    }
+
+    public async prepareEmail(insurance: ProfessionalInsurance): Promise<void> {
+        if (!this.inspector){
+            return;
+        }
+        
+        const adminEmail = await this._authService.getUserEmail();
+        const body = `${this.inspector.name},%0D%0A%0D%0A` +
+            `We have the Insurance: ${insurance.insuranceNumber} updated in your account. ` +
+            `Please let us know if you need anything else.%0D%0A%0D%0A` +
+            `Sincerely,%0D%0A${adminEmail} - Envirotrax`;
+        const link = `mailto:${this.inspector.companyEmail}` +
+            `?subject=${encodeURIComponent('Envirotrax - Insurance Validation')}` +
+            `&body=${body}`;
+            
+        window.open(link);
     }
 
     public async loadLicenses(): Promise<void> {

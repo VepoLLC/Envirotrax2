@@ -65,35 +65,18 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
     }
 
-    public async Task<ProfessionalInsuranceDto> AddAsync(Stream fileStream, string originalFileName, ProfessionalInsuranceDto insurance)
+    public async Task<ProfessionalInsuranceDto> AddAsync(Stream fileStream, string originalFileName, ProfessionalInsuranceDto dto)
     {
-        var fileExtension = Path.GetExtension(originalFileName);
-        insurance.FilePath = $"professionals/{_authService.ProfessionalId}/insurances/{Guid.NewGuid()}{fileExtension}";
-
-        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-        {
-            var added = await AddAsync(insurance);
-            await _fileStorageService.UploadAsync(insurance.FilePath, fileStream);
-
-            scope.Complete();
-            return added;
-        }
-    }
-
-    public async Task<ProfessionalInsuranceDto> AddForProfessionalAsync(int professionalId, Stream fileStream, string originalFileName, ProfessionalInsuranceDto dto)
-    {
+        var professionalId = dto.Professional?.Id ?? _authService.ProfessionalId;
         var fileExtension = Path.GetExtension(originalFileName);
         dto.FilePath = $"professionals/{professionalId}/insurances/{Guid.NewGuid()}{fileExtension}";
 
-        var model = MapToModel(dto)!;
-        model.ProfessionalId = professionalId;
-
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        var added = await Repository.AddAsync(model);
+        var added = await AddAsync(dto);
         await _fileStorageService.UploadAsync(dto.FilePath, fileStream);
         scope.Complete();
 
-        return MapToDto(added)!;
+        return added;
     }
 
     public async Task<ProfessionalInsuranceDto> UpdateForProfessionalAsync(int professionalId, ProfessionalInsuranceDto dto)
@@ -101,31 +84,7 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         var existing = await Repository.GetAsync(dto.Id, CancellationToken.None);
         dto.FilePath = existing?.FilePath;
 
-        var model = MapToModel(dto)!;
-        model.ProfessionalId = professionalId;
-        var updated = await Repository.UpdateAsync(model);
-        return MapToDto(updated)!;
-    }
-
-    public async Task<ProfessionalInsuranceDto> UpdateForProfessionalAsync(int professionalId, Stream fileStream, string originalFileName, ProfessionalInsuranceDto dto)
-    {
-        var existing = await Repository.GetAsync(dto.Id, CancellationToken.None);
-        var oldFilePath = existing?.FilePath;
-
-        var fileExtension = Path.GetExtension(originalFileName);
-        dto.FilePath = $"professionals/{professionalId}/insurances/{Guid.NewGuid()}{fileExtension}";
-
-        var model = MapToModel(dto)!;
-        model.ProfessionalId = professionalId;
-
-        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        var updated = await Repository.UpdateAsync(model);
-        await _fileStorageService.UploadAsync(dto.FilePath, fileStream);
-        if (oldFilePath != null)
-            await _fileStorageService.DeleteAsync(oldFilePath);
-        scope.Complete();
-
-        return MapToDto(updated)!;
+        return await UpdateAsync(dto);
     }
 
     public override async Task<ProfessionalInsuranceDto?> DeleteAsync(int id)

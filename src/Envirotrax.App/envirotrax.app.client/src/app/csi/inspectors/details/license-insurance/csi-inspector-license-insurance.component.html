@@ -52,6 +52,7 @@
                       (queryChange)="loadInsurances()"
                       (queryReset)="loadInsurances()"
                       [showActionLabels]="false"
+                      [customActions]="insuranceCustomActions"
                       [canAdd]="canManageInsurances"
                       (add)="addInsurance()"
                       [canEdit]="canManageInsurances"

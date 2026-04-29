@@ -24,7 +24,6 @@ export class CsiInspectorAddEditLicenseComponent implements OnInit {
 
     public license: ProfessionalUserLicense;
     public isLoading: boolean = false;
-    public hasReadHelp: boolean = false;
     public validationErrors: string[] = [];
     public licenseTypes: InputOption<ProfessionalLicenseType>[] = [];
     public userOptions: InputOption<ProfessionalUser>[] = [];
@@ -85,11 +84,6 @@ export class CsiInspectorAddEditLicenseComponent implements OnInit {
 
     public async save(form: NgForm): Promise<void> {
         this.validationErrors = [];
-
-        if (!this.isEditMode && !this.hasReadHelp) {
-            this.validationErrors.push('You must check the agreement checkbox below to register a new license ');
-            return;
-        }
 
         if (form.valid) {
             try {

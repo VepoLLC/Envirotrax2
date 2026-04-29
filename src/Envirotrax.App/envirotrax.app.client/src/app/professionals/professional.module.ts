@@ -38,9 +38,6 @@ import { LicenseListComponent } from "./licenses/license-list.component";
         CommonModule,
         FormsModule,
         SharedComponentsModule,
-    ],
-    exports:[
-        LicenseHelpTextComponent
     ]
 })
 export class ProfessionalModule {

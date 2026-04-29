@@ -1,5 +1,6 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
+using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -13,10 +14,12 @@ namespace Envirotrax.App.Server.Controllers.Csi
     public class CsiInspectorInsurancesController : WaterSupplierProtectedController
     {
         private readonly IProfessionalInsuranceService _insuranceService;
+        private readonly IFileStorageService _fileStorageService;
 
-        public CsiInspectorInsurancesController(IProfessionalInsuranceService insuranceService)
+        public CsiInspectorInsurancesController(IProfessionalInsuranceService insuranceService, IFileStorageService fileStorageService)
         {
             _insuranceService = insuranceService;
+            _fileStorageService = fileStorageService;
         }
 
         [HttpGet("{id}/insurances")]
@@ -39,14 +42,14 @@ namespace Envirotrax.App.Server.Controllers.Csi
                 Professional = new ReferencedProfessionalDto { Id = id }
             };
             using var stream = dto.File.OpenReadStream();
-            var result = await _insuranceService.AddForProfessionalAsync(id, stream, dto.File.FileName, insuranceDto);
+            var result = await _insuranceService.AddAsync(stream, dto.File.FileName, insuranceDto);
             return Ok(result);
         }
 
         [HttpPut("{id}/insurances/{insuranceId}")]
         [HasFeature(FeatureType.ManageProfessionalInsurances)]
         [HasPermission(PermissionAction.CanEdit)]
-        public async Task<IActionResult> UpdateInsuranceAsync(int id, int insuranceId, [FromForm] UpdateCsiInsuranceDto dto, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateInsuranceAsync(int id, int insuranceId, [FromBody] UpdateCsiInsuranceDto dto, CancellationToken cancellationToken)
         {
             var insuranceDto = new ProfessionalInsuranceDto
             {
@@ -55,16 +58,18 @@ namespace Envirotrax.App.Server.Controllers.Csi
                 ExpirationDate = dto.ExpirationDate,
                 Professional = new ReferencedProfessionalDto { Id = id }
             };
-
-            if (dto.File != null)
-            {
-                using var stream = dto.File.OpenReadStream();
-                var result = await _insuranceService.UpdateForProfessionalAsync(id, stream, dto.File.FileName, insuranceDto);
-
-                return Ok(result);
-            }
-
             return Ok(await _insuranceService.UpdateForProfessionalAsync(id, insuranceDto));
+        }
+
+        [HttpGet("{id}/insurances/{insuranceId}/file-url")]
+        [HasPermission(PermissionAction.CanView)]
+        public async Task<IActionResult> GetInsuranceFileUrlAsync(int id, int insuranceId, CancellationToken cancellationToken)
+        {
+            var insurance = await _insuranceService.GetAsync(insuranceId, cancellationToken);
+            if (insurance?.FilePath == null)
+                return NotFound();
+            var url = await _fileStorageService.GenerateSasUrlAsync(insurance.FilePath);
+            return Ok(url);
         }
 
         [HttpDelete("{id}/insurances/{insuranceId}")]

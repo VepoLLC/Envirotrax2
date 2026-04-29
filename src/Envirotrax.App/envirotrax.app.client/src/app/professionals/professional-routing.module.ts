@@ -84,6 +84,15 @@ const routes: Routes = [
             features: [FeatureType.CsiInspection],
             roles: [ROLE_DEFINITIONS.PROFESSIONAL, ROLE_DEFINITIONS.PROFESSIONALS.CSI_INSPECTOR]
         }
+    },
+    {
+        path: 'backflow',
+        loadChildren: () => import('./backflow/professionals-backflow.module').then(m => m.ProfessionalsBackflowModule),
+        canActivate: [FeatureGuard, RoleGuard],
+        data: {
+            features: [FeatureType.BackflowTesting],
+            roles: [ROLE_DEFINITIONS.PROFESSIONAL, ROLE_DEFINITIONS.PROFESSIONALS.BACKFLOW_TESTER]
+        }
     }
 ];
 

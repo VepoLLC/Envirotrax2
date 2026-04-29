@@ -1,0 +1,139 @@
+<div class="text-center mb-4">
+    <h1 class="h2">
+        Gauge Management
+    </h1>
+</div>
+
+<div class="mb-3">
+    <ng-template #dateCell let-gauge="rowData">
+        {{ gauge.lastCalibrationDate ? (gauge.lastCalibrationDate | date) : '&mdash;' }}
+    </ng-template>
+
+    <ng-template #portableCell let-gauge="rowData">
+        <span *ngIf="gauge.isPortable" class="badge text-bg-success">Yes</span>
+        <span *ngIf="!gauge.isPortable" class="badge text-bg-secondary">No</span>
+    </ng-template>
+
+    <vp-section header="Gauges">
+        <div dp-spinner-parent>
+            <dp-loading-spinner *ngIf="table.isLoading" message="Loading gauges" />
+
+            <vp-table *ngIf="table.items"
+                      [columns]="table.columns!"
+                      [data]="table.items.data"
+                      [canEdit]="true"
+                      (edit)="edit($event)"
+                      [canDelete]="true"
+                      (delete)="delete($event)"
+                      [(pageInfo)]="table.items.pageInfo"
+                      (pageInfoChange)="getGauges()"
+                      [(query)]="table.query"
+                      (queryChange)="getGauges()"
+                      (queryReset)="getGauges()"
+                      [freeTextSearch]="table.freeTextSearch" />
+        </div>
+    </vp-section>
+</div>
+
+<vp-section header="Register new gauge">
+    <p class="text-center text-danger fw-bold">
+        Please read the following important information on how to register and manage your gauges
+    </p>
+
+    <h3 class="text-bg-light p-2 border h6">Adding gauges</h3>
+    <div class="mx-1">
+        <p>
+            When registering a gauge, enter the manufacturer, model, and serial number along with the last calibration
+            date. This information is used to track and validate gauges associated with your backflow tests.
+        </p>
+        <p>
+            Verify that all information is correct, then click the <strong>Register New Gauge</strong> button to add
+            your gauge to the system.
+        </p>
+    </div>
+
+    <h3 class="text-bg-light p-2 border h6">Keeping calibration dates current</h3>
+    <div class="mx-1">
+        <p>
+            Gauges must have a current calibration date to be used in backflow tests. Use the edit button on an existing
+            gauge to update the last calibration date after recalibration. Gauges with outdated calibration dates may
+            not be accepted when submitting backflow tests.
+        </p>
+    </div>
+
+    <div *ngIf="newGauge" class="d-flex justify-content-center" dp-spinner-parent>
+        <dp-loading-spinner *ngIf="isNewGaugeLoading" />
+        <form #form="ngForm" (ngSubmit)="saveGauge(form)" style="width: 100%; max-width: 480px;">
+            <div class="mb-3">
+                <vp-input name="manufacturer"
+                          label="Manufacturer"
+                          [(ngModel)]="newGauge.manufacturer"
+                          [required]="true"
+                          [maxLength]="100"
+                          [form]="form" />
+            </div>
+
+            <div class="mb-3">
+                <vp-input name="model"
+                          label="Model"
+                          [(ngModel)]="newGauge.model"
+                          [required]="true"
+                          [maxLength]="100"
+                          [form]="form" />
+            </div>
+
+            <div class="mb-3">
+                <vp-input name="serialNumber"
+                          label="Serial number"
+                          [(ngModel)]="newGauge.serialNumber"
+                          [required]="true"
+                          [maxLength]="50"
+                          [form]="form" />
+            </div>
+
+            <div class="mb-3">
+                <vp-input type="date"
+                          name="lastCalibrationDate"
+                          label="Last calibration date"
+                          [(ngModel)]="newGauge.lastCalibrationDate"
+                          [required]="true"
+                          [form]="form" />
+            </div>
+
+            <div class="form-check mb-3">
+                <input id="is-portable"
+                       type="checkbox"
+                       class="form-check-input"
+                       [(ngModel)]="newGauge.isPortable"
+                       name="isPortable">
+                <label for="is-portable" class="form-check-label">
+                    Portable gauge
+                </label>
+            </div>
+
+            <div class="form-check mb-3">
+                <input id="has-read-help"
+                       type="checkbox"
+                       class="form-check-input"
+                       [(ngModel)]="hasReadHelp"
+                       name="hasReadHelp"
+                       required>
+                <label for="has-read-help"
+                       class="form-check-label"
+                       [class.text-danger]="form.submitted && !hasReadHelp">
+                    I have read and understand the requirements and process of registering a gauge in my account.
+                </label>
+            </div>
+
+            <div class="mt-3">
+                <vp-validation-summary [form]="form" [validationErrors]="newGaugeValidationErrors" />
+
+                <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary w-100">
+                        Register New Gauge
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</vp-section>

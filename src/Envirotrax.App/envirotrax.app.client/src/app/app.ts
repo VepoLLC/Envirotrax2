@@ -494,6 +494,13 @@ export class App implements OnInit {
             hasFeature: true
           },
           {
+            title: 'Gauge Management',
+            iconCss: 'fa-solid fa-gauge-simple',
+            routerLink: ['professionals/backflow/gauges'],
+            hasPermission: isBackflowTester,
+            hasFeature: await this._authService.hasAnyFeatures(FeatureType.BackflowTesting)
+          },
+          {
             title: 'Backflow Test Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
             routerLink: ['backflow/tests'],

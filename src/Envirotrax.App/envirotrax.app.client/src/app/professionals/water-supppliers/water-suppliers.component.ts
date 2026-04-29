@@ -130,7 +130,7 @@ export class WaterSuppliersComponent implements OnInit {
                 this._lookupService.getAllStatesAsOptions(true)
             ]);
 
-            this.states = states.filter(s => s.data?.code === 'TX' || s.data?.code === 'KS');
+            this.states = states.filter(s => s.data?.code === 'TX' || s.data?.code === 'KS' || s.data?.code === 'WA');
             this.professional = currentProfessional;
 
             this.stateId = states.find(s => s.data?.code == 'TX')?.id;

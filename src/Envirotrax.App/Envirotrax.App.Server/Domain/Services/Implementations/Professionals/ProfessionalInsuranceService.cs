@@ -79,14 +79,6 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         return added;
     }
 
-    public async Task<ProfessionalInsuranceDto> UpdateForProfessionalAsync(int professionalId, ProfessionalInsuranceDto dto)
-    {
-        var existing = await Repository.GetAsync(dto.Id, CancellationToken.None);
-        dto.FilePath = existing?.FilePath;
-
-        return await UpdateAsync(dto);
-    }
-
     public override async Task<ProfessionalInsuranceDto?> DeleteAsync(int id)
     {
         using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
@@ -101,5 +93,17 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
 
             return deleted;
         }
+    }
+
+    public async Task<Uri?> GenerateFileUrlAsync(int id, CancellationToken cancellationToken)
+    {
+        var insurance = await _insuranceRepository.GetNoIncludesAsync(id, cancellationToken);
+
+        if (insurance != null && !string.IsNullOrWhiteSpace(insurance.FilePath))
+        {
+            return await _fileStorageService.GenerateSasUrlAsync(insurance.FilePath);
+        }
+
+        return null;
     }
 }

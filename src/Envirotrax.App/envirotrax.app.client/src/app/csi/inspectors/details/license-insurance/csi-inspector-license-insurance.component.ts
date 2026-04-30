@@ -15,6 +15,7 @@ import { ToastService } from "../../../../shared/services/toast.service";
 import { CsiInspectorAddEditInsuranceComponent } from "./modals/add-edit-csi-inspector-insurance.component";
 import { CsiInspectorAddEditLicenseComponent } from "./modals/add-edit-csi-inspector-license.component";
 import { Professional } from "../../../../shared/models/professionals/professional";
+import { HelperService } from "../../../../shared/services/helpers/helper.service";
 
 
 @Component({
@@ -44,18 +45,7 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
         query: { sort: {}, filter: [] }
     };
 
-    public readonly insuranceCustomActions: TableCustomAction<ProfessionalInsurance>[] = [
-        {
-            text: 'View',
-            iconClass: 'fa-solid fa-eye',
-            action: (insurance: ProfessionalInsurance) => this.viewInsuranceFile(insurance)
-        },
-        {
-            text: 'Email',
-            iconClass: 'fa-solid fa-envelope',
-            action: (insurance: ProfessionalInsurance) => this.prepareEmail(insurance)
-        }
-    ];
+    public insuranceCustomActions: TableCustomAction<ProfessionalInsurance>[] = [];
 
     @ViewChild('licenseTypeCell', { static: true })
     private licenseTypeCellTemplate!: TemplateRef<CellTemplateData<ProfessionalUserLicense>>;
@@ -78,6 +68,7 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
         private readonly _authService: AuthService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService,
+        private readonly _helper: HelperService
     ) { }
 
     public async ngOnInit(): Promise<void> {
@@ -101,9 +92,24 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
 
         this.canManageLicenses = canEditCsiInspectors && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalLicenses);
         this.canManageInsurances = canEditCsiInspectors && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalInsurances);
+
+        if (this.canManageInsurances) {
+            this.insuranceCustomActions = [
+                {
+                    text: 'View',
+                    iconClass: 'fa-solid fa-eye',
+                    action: (insurance: ProfessionalInsurance) => this.viewInsuranceFile(insurance)
+                },
+                {
+                    text: 'Email',
+                    iconClass: 'fa-solid fa-envelope',
+                    action: (insurance: ProfessionalInsurance) => this.prepareEmail(insurance)
+                }
+            ];
+        }
     }
 
-    setupColumns(): void {
+    private setupColumns(): void {
         this.licensesTable.columns = this.getLicenseColumns();
         this.insurancesTable.columns = this.getInsuranceColumns();
     }
@@ -217,21 +223,21 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
     }
 
     public async viewInsuranceFile(insurance: ProfessionalInsurance): Promise<void> {
-        try{
+        try {
             this.insurancesTable.isLoading = true;
-            
+
             const url = await this._insurancesService.getFileUrl(this.inspectorId, insurance.id!);
-            window.open(url, '_blank');
-        }finally{
+            this._helper.downloadFileFromUrl(url);
+        } finally {
             this.insurancesTable.isLoading = false;
         }
     }
 
     public async prepareEmail(insurance: ProfessionalInsurance): Promise<void> {
-        if (!this.inspector){
+        if (!this.inspector) {
             return;
         }
-        
+
         const adminEmail = await this._authService.getUserEmail();
         const body = `${this.inspector.name},%0D%0A%0D%0A` +
             `We have the Insurance: ${insurance.insuranceNumber} updated in your account. ` +
@@ -240,7 +246,7 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
         const link = `mailto:${this.inspector.companyEmail}` +
             `?subject=${encodeURIComponent('Envirotrax - Insurance Validation')}` +
             `&body=${body}`;
-            
+
         window.open(link);
     }
 

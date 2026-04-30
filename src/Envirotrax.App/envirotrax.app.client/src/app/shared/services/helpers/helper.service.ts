@@ -44,29 +44,16 @@ export class HelperService {
         return false;
     }
 
-    public loadJavaScript(elementId: string, async: boolean, url: string): Promise<void> {
-        const existingScript = document.getElementById(elementId);
+    public downloadFileFromUrl(url: string): void {
+        const link = document.createElement('a');
 
-        if (existingScript) {
-            return Promise.resolve();
-        }
+        link.href = url;
+        link.target = '_blank';
+        // this is necessary as link.click() does not work on the latest firefox
+        link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
 
-        return new Promise<void>((resolve, reject) => {
-            const script = document.createElement('script');
-
-            script.id = elementId;
-            script.innerHTML = '';
-            script.src = url;
-            script.async = async;
-
-            script.onload = () => resolve();
-            script.onerror = err => reject(err);
-
-            document.body.appendChild(script);
-        });
-    }
-
-    public isDefined(value: any): boolean {
-        return value != undefined && value != null;
+        window.setTimeout(function () {
+            link.remove();
+        }, 5000);
     }
 }

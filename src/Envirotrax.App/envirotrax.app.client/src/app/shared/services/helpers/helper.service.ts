@@ -56,4 +56,8 @@ export class HelperService {
             link.remove();
         }, 5000);
     }
+
+    public isDefined(value: any): boolean {
+        return value != undefined && value != null;
+    }
 }

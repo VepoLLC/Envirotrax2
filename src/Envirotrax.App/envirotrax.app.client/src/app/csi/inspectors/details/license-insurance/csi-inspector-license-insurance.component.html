@@ -11,15 +11,25 @@
 </ng-template>
 
 <ng-template #licenseExpirationCell let-license="rowData">
-    <span class="badge border px-2 py-1" [class]="getLicenseExpirationClass(license)">
-        {{ license.expirationDate ? (license.expirationDate | date) : 'N/A' }}
-    </span>
+    <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
+         [class.text-bg-primary]="!license.expirationDate"
+         [class.text-bg-success]="license.expirationDate && license.expirationType == expirationType.Valid"
+         [class.text-bg-warning]="license.expirationDate && license.expirationType == expirationType.AboutToExpire"
+         [class.text-bg-danger]="license.expirationDate && license.expirationType == expirationType.Expired"
+         [attr.aria-label]="!license.expirationDate ? 'Validating' : license.expirationType == expirationType.Valid ? 'Valid' : license.expirationType == expirationType.AboutToExpire ? 'About to Expire' : 'Expired'">
+        {{ license.expirationDate ? (license.expirationDate | date) : 'Validating...' }}
+    </div>
 </ng-template>
 
 <ng-template #insuranceExpirationCell let-insurance="rowData">
-    <span class="badge border px-2 py-1" [class]="getInsuranceExpirationClass(insurance)">
-        {{ insurance.expirationDate ? (insurance.expirationDate | date) : 'N/A' }}
-    </span>
+    <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
+         [class.text-bg-primary]="!insurance.expirationDate"
+         [class.text-bg-success]="insurance.expirationDate && insurance.expirationType == insuranceExpirationType.Valid"
+         [class.text-bg-warning]="insurance.expirationDate && insurance.expirationType == insuranceExpirationType.AboutToExpire"
+         [class.text-bg-danger]="insurance.expirationDate && insurance.expirationType == insuranceExpirationType.Expired"
+         [attr.aria-label]="!insurance.expirationDate ? 'Validating' : insurance.expirationType == insuranceExpirationType.Valid ? 'Valid' : insurance.expirationType == insuranceExpirationType.AboutToExpire ? 'About to Expire' : 'Expired'">
+         {{ insurance.expirationDate ? (insurance.expirationDate | date) : 'Validating...' }}
+    </div>
 </ng-template>
 
 

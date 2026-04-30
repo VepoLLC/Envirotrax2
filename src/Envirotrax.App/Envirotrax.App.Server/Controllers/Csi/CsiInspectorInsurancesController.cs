@@ -14,12 +14,10 @@ namespace Envirotrax.App.Server.Controllers.Csi
     public class CsiInspectorInsurancesController : WaterSupplierProtectedController
     {
         private readonly IProfessionalInsuranceService _insuranceService;
-        private readonly IFileStorageService _fileStorageService;
 
-        public CsiInspectorInsurancesController(IProfessionalInsuranceService insuranceService, IFileStorageService fileStorageService)
+        public CsiInspectorInsurancesController(IProfessionalInsuranceService insuranceService)
         {
             _insuranceService = insuranceService;
-            _fileStorageService = fileStorageService;
         }
 
         [HttpGet("{id}/insurances")]
@@ -58,18 +56,22 @@ namespace Envirotrax.App.Server.Controllers.Csi
                 ExpirationDate = dto.ExpirationDate,
                 Professional = new ReferencedProfessionalDto { Id = id }
             };
-            return Ok(await _insuranceService.UpdateForProfessionalAsync(id, insuranceDto));
+
+            return Ok(await _insuranceService.UpdateAsync(insuranceDto));
         }
 
         [HttpGet("{id}/insurances/{insuranceId}/file-url")]
         [HasPermission(PermissionAction.CanView)]
         public async Task<IActionResult> GetInsuranceFileUrlAsync(int id, int insuranceId, CancellationToken cancellationToken)
         {
-            var insurance = await _insuranceService.GetAsync(insuranceId, cancellationToken);
-            if (insurance?.FilePath == null)
-                return NotFound();
-            var url = await _fileStorageService.GenerateSasUrlAsync(insurance.FilePath);
-            return Ok(url);
+            var url = await _insuranceService.GenerateFileUrlAsync(insuranceId, cancellationToken);
+
+            if (url != null)
+            {
+                return Ok(url);
+            }
+
+            return NotFound();
         }
 
         [HttpDelete("{id}/insurances/{insuranceId}")]

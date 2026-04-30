@@ -1,5 +1,6 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
+using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -39,14 +40,14 @@ namespace Envirotrax.App.Server.Controllers.Csi
                 Professional = new ReferencedProfessionalDto { Id = id }
             };
             using var stream = dto.File.OpenReadStream();
-            var result = await _insuranceService.AddForProfessionalAsync(id, stream, dto.File.FileName, insuranceDto);
+            var result = await _insuranceService.AddAsync(stream, dto.File.FileName, insuranceDto);
             return Ok(result);
         }
 
         [HttpPut("{id}/insurances/{insuranceId}")]
         [HasFeature(FeatureType.ManageProfessionalInsurances)]
         [HasPermission(PermissionAction.CanEdit)]
-        public async Task<IActionResult> UpdateInsuranceAsync(int id, int insuranceId, [FromForm] UpdateCsiInsuranceDto dto, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateInsuranceAsync(int id, int insuranceId, [FromBody] UpdateCsiInsuranceDto dto, CancellationToken cancellationToken)
         {
             var insuranceDto = new ProfessionalInsuranceDto
             {
@@ -56,15 +57,21 @@ namespace Envirotrax.App.Server.Controllers.Csi
                 Professional = new ReferencedProfessionalDto { Id = id }
             };
 
-            if (dto.File != null)
-            {
-                using var stream = dto.File.OpenReadStream();
-                var result = await _insuranceService.UpdateForProfessionalAsync(id, stream, dto.File.FileName, insuranceDto);
+            return Ok(await _insuranceService.UpdateAsync(insuranceDto));
+        }
 
-                return Ok(result);
+        [HttpGet("{id}/insurances/{insuranceId}/file-url")]
+        [HasPermission(PermissionAction.CanView)]
+        public async Task<IActionResult> GetInsuranceFileUrlAsync(int id, int insuranceId, CancellationToken cancellationToken)
+        {
+            var url = await _insuranceService.GenerateFileUrlAsync(insuranceId, cancellationToken);
+
+            if (url != null)
+            {
+                return Ok(url);
             }
 
-            return Ok(await _insuranceService.UpdateForProfessionalAsync(id, insuranceDto));
+            return NotFound();
         }
 
         [HttpDelete("{id}/insurances/{insuranceId}")]

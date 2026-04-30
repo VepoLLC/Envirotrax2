@@ -2,22 +2,6 @@
     <dp-loading-spinner *ngIf="isLoading" />
 
     <form #form="ngForm" (ngSubmit)="save(form)">
-        <div *ngIf="!isEditMode" class="mb-4">
-            <vp-license-help-text />
-
-            <div class="form-check mb-3">
-                <input type="checkbox"
-                       class="form-check-input"
-                       [(ngModel)]="hasReadHelp"
-                       name="hasReadHelp"
-                       required>
-                <label class="form-check-label"
-                       [class.text-danger]="form.submitted && !hasReadHelp">
-                    I have read and understand the requirements and process of registering a license number.
-                </label>
-            </div>
-        </div>
-        
         <div>
             <div class="mb-3">
                 <vp-input type="select"

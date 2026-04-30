@@ -1,24 +1,36 @@
 <ng-template #actionsTemplate let-rowData="rowData">
     <div class="d-flex gap-1" (click)="$event.stopPropagation()">
-        <button *ngIf="canViewDetails" type="button" class="btn btn-primary" (click)="onViewDetails(rowData)">
+        <button *ngIf="canViewDetails"
+                type="button"
+                class="btn btn-primary"
+                (click)="onViewDetails(rowData)"
+                aria-label="View">
             <i class="fa-solid fa-magnifying-glass"></i>
-            View
+            <span class="ms-1" *ngIf="showActionLabels">View</span>
         </button>
-        <button *ngIf="canEdit" type="button" class="btn btn-primary" (click)="onEdit(rowData)">
+        <button *ngIf="canEdit"
+                type="button"
+                class="btn btn-primary"
+                (click)="onEdit(rowData)"
+                aria-label="Edit">
             <i class="fa-solid fa-pencil"></i>
-            Edit
+            <span class="ms-1" *ngIf="showActionLabels">Edit</span>
         </button>
-        <button *ngIf="canDelete" type="button" class="btn btn-primary" (click)="onDelete(rowData)">
+        <button *ngIf="canDelete"
+                type="button" class="btn btn-primary"
+                (click)="onDelete(rowData)"
+                aria-label="Delete">
             <i class="fa-solid fa-trash"></i>
-            Delete
+            <span class="ms-1" *ngIf="showActionLabels">Delete</span>
         </button>
         <ng-container *ngIf="customActions">
             <button *ngFor="let action of customActions"
                     type="button"
                     class="btn btn-primary"
-                    (click)="customActionClicked(action, rowData)">
+                    (click)="customActionClicked(action, rowData)"
+                    [attr.aria-label]="action.text">
                 <i [attr.class]="action.iconClass"></i>
-                {{action.text}}
+                <span class="ms-1" *ngIf="showActionLabels">{{action.text}}</span>
             </button>
         </ng-container>
     </div>

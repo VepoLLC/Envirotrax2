@@ -39,17 +39,14 @@ export class CsiInspectorInsurancesService {
         return lastValueFrom(this._http.post<ProfessionalInsurance>(url, formData));
     }
 
-    public update(inspectorId: number, insurance: ProfessionalInsurance, file: File | null): Promise<ProfessionalInsurance> {
+    public update(inspectorId: number, insurance: ProfessionalInsurance): Promise<ProfessionalInsurance> {
         const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${inspectorId}/insurances/${insurance.id}`);
-        const formData = new FormData();
-        formData.append('insuranceNumber', insurance.insuranceNumber ?? '');
-        if (insurance.expirationDate) {
-            formData.append('expirationDate', insurance.expirationDate.toString());
-        }
-        if (file) {
-            formData.append('file', file);
-        }
-        return lastValueFrom(this._http.put<ProfessionalInsurance>(url, formData));
+        return lastValueFrom(this._http.put<ProfessionalInsurance>(url, insurance));
+    }
+
+    public async getFileUrl(inspectorId: number, insuranceId: number): Promise<string> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${inspectorId}/insurances/${insuranceId}/file-url`);
+        return await lastValueFrom(this._http.get<string>(url));
     }
 
     public delete(inspectorId: number, insuranceId: number): Promise<void> {

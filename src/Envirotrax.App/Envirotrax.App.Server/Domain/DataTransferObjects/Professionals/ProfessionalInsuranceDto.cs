@@ -41,8 +41,6 @@ public class UpdateCsiInsuranceDto
     public string InsuranceNumber { get; set; } = null!;
 
     public DateTime? ExpirationDate { get; set; }
-
-    public IFormFile? File { get; set; }
 }
 
 public class CreateCsiInsuranceDto

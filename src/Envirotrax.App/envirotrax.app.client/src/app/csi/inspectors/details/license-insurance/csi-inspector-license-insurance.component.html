@@ -1,4 +1,3 @@
-
 <ng-template #licenseTypeCell let-license="rowData">
     {{ license.licenseType?.name }}
 </ng-template>
@@ -23,27 +22,6 @@
     </span>
 </ng-template>
 
-<ng-template #licenseActionsCell let-license="rowData">
-    <div class="d-flex justify-content-end gap-1" (click)="$event.stopPropagation()">
-        <button *ngIf="canManageLicenses" type="button" class="btn btn-sm btn-outline-primary" title="Edit" (click)="editLicense(license)">
-            <i class="fa-solid fa-pencil"></i>
-        </button>
-        <button *ngIf="canManageLicenses" type="button" class="btn btn-sm btn-outline-danger" title="Delete" (click)="deleteLicense(license)">
-            <i class="fa-solid fa-trash"></i>
-        </button>
-    </div>
-</ng-template>
-
-<ng-template #insuranceActionsCell let-insurance="rowData">
-    <div class="d-flex justify-content-end gap-1" (click)="$event.stopPropagation()">
-        <button *ngIf="canManageInsurances" type="button" class="btn btn-sm btn-outline-primary" title="Edit" (click)="editInsurance(insurance)">
-            <i class="fa-solid fa-pencil"></i>
-        </button>
-        <button *ngIf="canManageInsurances" type="button" class="btn btn-sm btn-outline-danger" title="Delete" (click)="deleteInsurance(insurance)">
-            <i class="fa-solid fa-trash"></i>
-        </button>
-    </div>
-</ng-template>
 
 <vp-section header="License &amp; Insurance Management">
     <div class="text-center mb-3">
@@ -73,9 +51,14 @@
                       [(query)]="insurancesTable.query"
                       (queryChange)="loadInsurances()"
                       (queryReset)="loadInsurances()"
+                      [showActionLabels]="false"
+                      [customActions]="insuranceCustomActions"
                       [canAdd]="canManageInsurances"
                       (add)="addInsurance()"
-                      />
+                      [canEdit]="canManageInsurances"
+                      (edit)="editInsurance($event)"
+                      [canDelete]="canManageInsurances"
+                      (delete)="deleteInsurance($event)" />
         </div>
     </div>
 
@@ -91,9 +74,13 @@
                       [(query)]="licensesTable.query"
                       (queryChange)="loadLicenses()"
                       (queryReset)="loadLicenses()"
+                      [showActionLabels]="false"
                       [canAdd]="canManageLicenses"
                       (add)="addLicense()"
-                      />
+                      [canEdit]="canManageLicenses"
+                      (edit)="editLicense($event)"
+                      [canDelete]="canManageLicenses"
+                      (delete)="deleteLicense($event)" />
         </div>
     </div>
 </vp-section>

@@ -1,4 +1,5 @@
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -23,6 +24,14 @@ namespace Envirotrax.App.Server.Controllers.Csi
         public async Task<IActionResult> GetWaterSuppliersAsync(int id, [FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
         {
             var result = await _supplierService.GetAllByProfessionalAsync(id, pageInfo, query, cancellationToken);
+            return Ok(result);
+        }
+
+        [HttpPut("{id}/water-suppliers/{supplierId}")]
+        [HasPermission(PermissionAction.CanEdit)]
+        public async Task<IActionResult> UpdateWaterSupplierAsync([FromBody] ProfessionalWaterSupplierDto dto, CancellationToken cancellationToken)
+        {
+            var result = await _supplierService.UpdateAsync(dto);
             return Ok(result);
         }
     }

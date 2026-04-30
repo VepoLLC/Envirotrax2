@@ -12,6 +12,7 @@ import { CsiInspectorUsersComponent } from "./inspectors/details/users/csi-inspe
 import { CsiInspectorLicenseInsuranceComponent } from "./inspectors/details/license-insurance/csi-inspector-license-insurance.component";
 import { CsiInspectorAddEditLicenseComponent } from "./inspectors/details/license-insurance/modals/add-edit-csi-inspector-license.component";
 import { CsiInspectorAddEditInsuranceComponent } from "./inspectors/details/license-insurance/modals/add-edit-csi-inspector-insurance.component";
+import { EditCsiInspectorWaterSupplierComponent } from "./inspectors/details/water-suppliers/modals/edit-csi-inspector-water-supplier.component";
 import { LicenseHelpTextComponent } from "../professionals/users/edit/licenses/help-text/license-help-text.component";
 import { ProfessionalModule } from "../professionals/professional.module";
 
@@ -24,7 +25,8 @@ import { ProfessionalModule } from "../professionals/professional.module";
         CsiInspectorUsersComponent,
         CsiInspectorLicenseInsuranceComponent,
         CsiInspectorAddEditLicenseComponent,
-        CsiInspectorAddEditInsuranceComponent
+        CsiInspectorAddEditInsuranceComponent,
+        EditCsiInspectorWaterSupplierComponent
     ],
     imports: [
         CommonModule,

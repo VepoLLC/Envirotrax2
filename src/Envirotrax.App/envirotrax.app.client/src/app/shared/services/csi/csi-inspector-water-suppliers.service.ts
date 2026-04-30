@@ -25,4 +25,9 @@ export class CsiInspectorWaterSuppliersService {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));
     }
+
+    public async updateWaterSupplier(inspectorId: number, supplier: ProfessionalWaterSupplier): Promise<ProfessionalWaterSupplier> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${inspectorId}/water-suppliers/${supplier.waterSupplier?.id}`);
+        return await lastValueFrom(this._http.put<ProfessionalWaterSupplier>(url, supplier));
+    }
 }

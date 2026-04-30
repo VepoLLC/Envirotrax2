@@ -1,6 +1,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
+using Microsoft.AspNetCore.Http;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 
@@ -55,4 +56,6 @@ public class CreateBackflowGaugeDto
     public bool IsManaged { get; set; }
 
     public string? FilePath { get; set; }
+
+    public IFormFile? File { get; set; }
 }

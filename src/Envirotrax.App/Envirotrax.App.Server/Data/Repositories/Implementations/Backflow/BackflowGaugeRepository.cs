@@ -17,7 +17,7 @@ public class BackflowGaugeRepository : Repository<BackflowGauge>, IBackflowGauge
 
     public async Task<IEnumerable<BackflowGauge>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        var paginated = await DbContext.Set<BackflowGauge>()
+        var paginated = await DbContext.BackflowGauges
             .AsNoTracking()
             .Where(g => g.ProfessionalId == professionalId)
             .Where(query.Filter)

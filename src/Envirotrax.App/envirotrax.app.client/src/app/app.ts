@@ -448,6 +448,13 @@ export class App implements OnInit {
             routerLink: ['professionals/insurances'],
             hasPermission: isAdmin,
             hasFeature: true
+          },
+          {
+            title: 'Gauge Management',
+            iconCss: 'fa-solid fa-gauge-simple',
+            routerLink: ['professionals/backflow/gauges'],
+            hasPermission: isBackflowTester,
+            hasFeature: await this._authService.hasAnyFeatures(FeatureType.BackflowTesting)
           }
         ]
       },
@@ -492,13 +499,6 @@ export class App implements OnInit {
             routerLink: ['professionals/sites'],
             hasPermission: isBackflowTester,
             hasFeature: true
-          },
-          {
-            title: 'Gauge Management',
-            iconCss: 'fa-solid fa-gauge-simple',
-            routerLink: ['professionals/backflow/gauges'],
-            hasPermission: isBackflowTester,
-            hasFeature: await this._authService.hasAnyFeatures(FeatureType.BackflowTesting)
           },
           {
             title: 'Backflow Test Search',

@@ -2,7 +2,7 @@ import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { BackflowGauge } from "../../../shared/models/backflow/backflow-gauge";
 import { BackflowGaugeService } from "../../../shared/services/backflow/backflow-gauge.service";
 import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
-import { ToastService } from "../../../shared/services/toast.service";
+import { ToastService, ToastType } from "../../../shared/services/toast.service";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { CellTemplateData, TableColumn } from "../../../shared/components/data-components/table/table.component";
 import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
@@ -33,6 +33,7 @@ export class GaugeListComponent implements OnInit {
     };
 
     public newGauge?: BackflowGauge;
+    public tfaFile: File | null = null;
     public hasReadHelp: boolean = false;
     public newGaugeValidationErrors: string[] = [];
     public isNewGaugeLoading: boolean = false;
@@ -40,8 +41,8 @@ export class GaugeListComponent implements OnInit {
     @ViewChild('dateCell', { static: true })
     private dateCellTemplate!: TemplateRef<CellTemplateData<BackflowGauge>>;
 
-    @ViewChild('portableCell', { static: true })
-    private portableCellTemplate!: TemplateRef<CellTemplateData<BackflowGauge>>;
+    @ViewChild('typeCell', { static: true })
+    private typeCellTemplate!: TemplateRef<CellTemplateData<BackflowGauge>>;
 
     constructor(
         private readonly _gaugeService: BackflowGaugeService,
@@ -68,6 +69,7 @@ export class GaugeListComponent implements OnInit {
 
     private async resetNewGauge(): Promise<void> {
         this.newGauge = await this.newGaugeObject();
+        this.tfaFile = null;
         this.hasReadHelp = false;
     }
 
@@ -84,23 +86,33 @@ export class GaugeListComponent implements OnInit {
                 type: ColumnType.text
             },
             {
+                field: 'isPortable',
+                caption: 'Type',
+                cellTemplate: this.typeCellTemplate,
+                type: ColumnType.text
+            },
+            {
                 field: 'serialNumber',
                 caption: 'Serial number',
                 type: ColumnType.text
             },
             {
                 field: 'lastCalibrationDate',
-                caption: 'Last calibration date',
+                caption: 'Test date',
                 cellTemplate: this.dateCellTemplate,
                 type: ColumnType.date
-            },
-            {
-                field: 'isPortable',
-                caption: 'Portable',
-                cellTemplate: this.portableCellTemplate,
-                type: ColumnType.text
             }
         ];
+    }
+
+    public async viewFile(gauge: BackflowGauge): Promise<void> {
+        if (!gauge.filePath) {
+            this._toastService.show({ text: 'No file has been uploaded for this gauge.', type: ToastType.Warning });
+            return;
+        }
+
+        const url = await this._gaugeService.getFileUrl(gauge.id!);
+        window.open(url, '_blank');
     }
 
     public async getGauges(): Promise<void> {
@@ -145,7 +157,7 @@ export class GaugeListComponent implements OnInit {
                 this.isNewGaugeLoading = true;
                 this.newGaugeValidationErrors = [];
 
-                await this._gaugeService.add(this.newGauge!);
+                await this._gaugeService.add(this.newGauge!, this.tfaFile);
 
                 this._toastService.successfullySaved('Gauge');
 

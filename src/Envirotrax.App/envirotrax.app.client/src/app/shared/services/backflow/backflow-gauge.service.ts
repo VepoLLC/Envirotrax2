@@ -29,8 +29,22 @@ export class BackflowGaugeService {
         return lastValueFrom(observable);
     }
 
-    public add(gauge: BackflowGauge): Promise<BackflowGauge> {
+    public add(gauge: BackflowGauge, file: File | null): Promise<BackflowGauge> {
         const url = this._urlResolver.resolveUrl('/api/professionals/backflow/gauges');
+
+        if (file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            if (gauge.professionalId) formData.append('professionalId', gauge.professionalId.toString());
+            if (gauge.manufacturer) formData.append('manufacturer', gauge.manufacturer);
+            if (gauge.model) formData.append('model', gauge.model);
+            if (gauge.serialNumber) formData.append('serialNumber', gauge.serialNumber);
+            if (gauge.lastCalibrationDate) formData.append('lastCalibrationDate', new Date(gauge.lastCalibrationDate).toISOString());
+            formData.append('isPortable', gauge.isPortable ? 'true' : 'false');
+            formData.append('isManaged', gauge.isManaged ? 'true' : 'false');
+            return lastValueFrom(this._http.post<BackflowGauge>(url, formData));
+        }
+
         return lastValueFrom(this._http.post<BackflowGauge>(url, gauge));
     }
 
@@ -42,5 +56,10 @@ export class BackflowGaugeService {
     public delete(id: number): Promise<BackflowGauge> {
         const url = this._urlResolver.resolveUrl(`/api/professionals/backflow/gauges/${id}`);
         return lastValueFrom(this._http.delete<BackflowGauge>(url));
+    }
+
+    public async getFileUrl(id: number): Promise<string> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/backflow/gauges/${id}/file`);
+        return lastValueFrom(this._http.get<string>(url));
     }
 }

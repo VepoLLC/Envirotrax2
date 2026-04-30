@@ -6,12 +6,16 @@
 
 <div class="mb-3">
     <ng-template #dateCell let-gauge="rowData">
-        {{ gauge.lastCalibrationDate ? (gauge.lastCalibrationDate | date) : '&mdash;' }}
+        <span *ngIf="gauge.isManaged" class="badge bg-success">
+            {{ gauge.lastCalibrationDate | date }}
+        </span>
+        <span *ngIf="!gauge.isManaged" class="badge bg-primary">
+            Validating...
+        </span>
     </ng-template>
 
-    <ng-template #portableCell let-gauge="rowData">
-        <span *ngIf="gauge.isPortable" class="badge text-bg-success">Yes</span>
-        <span *ngIf="!gauge.isPortable" class="badge text-bg-secondary">No</span>
+    <ng-template #typeCell let-gauge="rowData">
+        {{ gauge.isPortable ? 'Portable' : 'Non-portable' }}
     </ng-template>
 
     <vp-section header="Gauges">
@@ -21,6 +25,8 @@
             <vp-table *ngIf="table.items"
                       [columns]="table.columns!"
                       [data]="table.items.data"
+                      [canViewDetails]="true"
+                      (viewDetails)="viewFile($event)"
                       [canEdit]="true"
                       (edit)="edit($event)"
                       [canDelete]="true"
@@ -40,24 +46,24 @@
         Please read the following important information on how to register and manage your gauges
     </p>
 
-    <h3 class="text-bg-light p-2 border h6">Adding gauges</h3>
+    <h3 class="text-bg-light p-2 border h6">Register your gauge</h3>
     <div class="mx-1">
         <p>
-            When registering a gauge, enter the manufacturer, model, and serial number along with the last calibration
-            date. This information is used to track and validate gauges associated with your backflow tests.
-        </p>
-        <p>
-            Verify that all information is correct, then click the <strong>Register New Gauge</strong> button to add
-            your gauge to the system.
+            Click the <strong>Register New Gauge</strong> button below to register a new gauge with your account.
+            A new blank gauge will be added to the Gauge Management section above. Please enter the gauge's
+            Manufacturer, Model, Serial Number, and click the OK button. This will complete the registration, however,
+            your gauge will still need to be validated by Vepo personnel before it can be used.
         </p>
     </div>
 
-    <h3 class="text-bg-light p-2 border h6">Keeping calibration dates current</h3>
+    <h3 class="text-bg-light p-2 border h6">Gauge validation</h3>
     <div class="mx-1">
         <p>
-            Gauges must have a current calibration date to be used in backflow tests. Use the edit button on an existing
-            gauge to update the last calibration date after recalibration. Gauges with outdated calibration dates may
-            not be accepted when submitting backflow tests.
+            For Test for Accuracy Reports (TFA) you must upload an electronic copy of your Test for Accuracy Report
+            to your account by clicking on the <strong>Choose File</strong> button and selecting the TFA file to upload.
+            The gauge will not be available for use until the test for accuracy expiration date is entered by Vepo
+            personnel into the system. Test for accuracy reports are normally validated within an hour, but could take
+            as long as one business day on rare occasions.
         </p>
     </div>
 
@@ -100,6 +106,17 @@
                           [form]="form" />
             </div>
 
+            <div class="mb-3">
+                <p>
+                    Please click on the Choose File button below and select the Test for Accuracy Report (TFA) you wish to upload.
+                </p>
+                <vp-file-upload name="tfaFile"
+                                validationLabel="Test for Accuracy Report (TFA)"
+                                [(ngModel)]="tfaFile"
+                                [required]="false"
+                                [form]="form" />
+            </div>
+
             <div class="form-check mb-3">
                 <input id="is-portable"
                        type="checkbox"
@@ -121,7 +138,7 @@
                 <label for="has-read-help"
                        class="form-check-label"
                        [class.text-danger]="form.submitted && !hasReadHelp">
-                    I have read and understand the requirements and process of registering a gauge in my account.
+                    I have read and understand the process of registering and validating a gauge with my account.
                 </label>
             </div>
 

@@ -2,6 +2,7 @@ using AutoMapper;
 using Envirotrax.App.Server.Data.Models.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
+using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.App.Server.Domain.Mapping.Csi;
 
@@ -10,9 +11,18 @@ public class CsiInspectionProfile : Profile
     public CsiInspectionProfile()
     {
         CreateMap<CsiInspection, CsiInspectionDto>()
+            .ForMember(dto => dto.Site, opt => opt.Ignore())
+            .ForMember(dto => dto.WaterSupplier, opt => opt.Ignore())
             .AfterMap((model, dto) =>
             {
-                dto.Site ??= new ReferencedSiteDto { Id = model.SiteId };
+                dto.Site ??= new ReferencedSiteDto
+                {
+                    Id = model.SiteId,
+                    BusinessName = model.Site?.BusinessName,
+                    AccountNumber = model.Site?.AccountNumber,
+                };
+
+                dto.WaterSupplier ??= new ReferencedWaterSupplierDto { Id = model.WaterSupplierId };
 
                 if (model.PropertyStateId.HasValue)
                 {

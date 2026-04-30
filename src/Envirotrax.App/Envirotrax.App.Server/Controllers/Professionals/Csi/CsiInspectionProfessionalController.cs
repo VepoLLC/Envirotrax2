@@ -1,4 +1,4 @@
-using Envirotrax.App.Server.Data.Models.Users;
+using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.App.Server.Filters;
@@ -18,6 +18,25 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
     public CsiInspectionProfessionalController(ICsiInspectionService inspectionService)
     {
         _inspectionService = inspectionService;
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
+    {
+        var result = await _inspectionService.GetForProfessionalAsync(id, cancellationToken);
+        if (result == null)
+        {
+            return NotFound();
+        }
+        
+        return Ok(result);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetProfessionalInspectionsAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, [FromQuery] CsiInspectionProfessionalSearchRequest searchRequest, CancellationToken cancellationToken)
+    {
+        var result = await _inspectionService.SearchForProfessionalAsync(pageInfo, query, searchRequest, cancellationToken);
+        return Ok(result);
     }
 
     [HttpPost("submit")]

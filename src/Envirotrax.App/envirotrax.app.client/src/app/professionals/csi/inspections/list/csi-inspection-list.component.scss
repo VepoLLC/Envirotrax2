@@ -1,0 +1,63 @@
+.csi-status-badge {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    vertical-align: middle;
+}
+
+.csi-status-pass { 
+    background-color: #28a745; 
+}
+
+.csi-status-fail {
+    background-color: transparent;
+    border-color: #28a745;
+    position: relative;
+
+    &::before,
+    &::after {
+        content: '';
+        position: absolute;
+        background-color: #28a745;
+        width: 2px;
+        height: 100%;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%) rotate(45deg);
+        transform-origin: center;
+    }
+
+    &::after {
+        transform: translateX(-50%) rotate(-45deg);
+    }
+}
+
+.csi-status-paid { 
+    background: radial-gradient(circle, #ffffff 15%, #ff9a9a 45%, #dc3545 100%);
+    border-color: #dc3545;
+}
+.csi-status-unpaid { 
+    background-color: transparent;
+    border-color: #dc3545;
+    position: relative;
+
+    &::before,
+    &::after {
+        content: '';
+        position: absolute;
+        background-color: #dc3545;
+        width: 2px;
+        height: 100%;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%) rotate(45deg);
+        transform-origin: center;
+    }
+
+    &::after { transform: translateX(-50%) rotate(-45deg); }
+}
+
+.zip-field {
+    max-width: 150px;
+}

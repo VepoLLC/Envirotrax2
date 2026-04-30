@@ -1,0 +1,255 @@
+<h1 class="text-center h2">CSI Search</h1>
+
+<ng-template #statusTemplate let-data="rowData">
+    <div class="d-flex gap-1 justify-content-center">
+        <span class="csi-status-badge"
+              [class.csi-status-pass]="isPassed(data)"
+              [class.csi-status-fail]="!isPassed(data)"
+              [title]="isPassed(data) ? 'Passed Inspection' : 'Failed Inspection'">
+        </span>
+        <span class="csi-status-badge"
+              [class.csi-status-paid]="isPaid(data)"
+              [class.csi-status-unpaid]="!isPaid(data)"
+              [title]="isPaid(data) ? 'Paid' : 'Unpaid'">
+        </span>
+    </div>
+</ng-template>
+
+<ng-template #propertyTemplate let-data="rowData">
+    <div>
+        <div *ngIf="data.propertyBusinessName" class="fw-semibold">{{ data.propertyBusinessName }}</div>
+        <div>
+            {{ data.propertyStreetNumber }} {{ data.propertyStreetName }}
+            <span *ngIf="data.propertyNumber">#{{ data.propertyNumber }}</span>
+        </div>
+        <div>{{ data.propertyCity }}<span *ngIf="data.propertyCity">, </span>{{ data.propertyZip }}</div>
+    </div>
+</ng-template>
+
+<ng-template #mailingTemplate let-data="rowData">
+    <div>
+        <div *ngIf="data.mailingCompanyName" class="fw-semibold">{{ data.mailingCompanyName }}</div>
+        <div *ngIf="data.mailingContactName">{{ data.mailingContactName }}</div>
+        <div>
+            {{ data.mailingStreetNumber }} {{ data.mailingStreetName }}
+            <span *ngIf="data.mailingNumber">#{{ data.mailingNumber }}</span>
+        </div>
+        <div>{{ data.mailingCity }}<span *ngIf="data.mailingCity">, </span>{{ data.mailingZip }}</div>
+    </div>
+</ng-template>
+
+<ng-template #inspectorTemplate let-data="rowData">
+    <div>
+        <div *ngIf="data.inspectorCompanyName">{{ data.inspectorCompanyName }}</div>
+        <div *ngIf="data.inspectorContactName">{{ data.inspectorContactName }}</div>
+    </div>
+</ng-template>
+
+
+<div [hidden]="showResults">
+    <vp-section header="General Search Criteria">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Record Search Scope:</label>
+                    <vp-input type="select"
+                              [options]="waterSupplierScopeOptions"
+                              [ngModel]="scopeValue"
+                              (ngModelChange)="onScopeChange($event)" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Account Number:</label>
+                    <vp-input [(ngModel)]="searchRequest.accountNumber" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Inspection History:</label>
+                    <vp-input type="select"
+                              [options]="inspectionHistoryOptions"
+                              [ngModel]="searchRequest.latestOnly ? 'true' : 'false'"
+                              (ngModelChange)="onLatestOnlyChange($event)" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Inspection Pass/Fail:</label>
+                    <vp-input type="select"
+                              [options]="passFailOptions"
+                              [(ngModel)]="searchRequest.passFail" />
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Date To Search:</label>
+                    <vp-input type="select"
+                              [options]="dateTypeOptions"
+                              [(ngModel)]="searchRequest.dateType" />
+                </div>
+
+                <ng-container *ngIf="searchRequest.dateType">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">From Date:</label>
+                        <input type="date" class="form-control" [(ngModel)]="searchRequest.fromDate" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">To Date:</label>
+                        <input type="date" class="form-control" [(ngModel)]="searchRequest.toDate" />
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+
+        <div class="text-center mt-2 text-muted fst-italic small">
+            * Water suppliers marked by an asterisk are private and cannot be searched.
+        </div>
+    </vp-section>
+
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <vp-section header="Location / Property Criteria">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Property Type:</label>
+                    <vp-input type="select"
+                              [options]="propertyTypeOptions"
+                              [(ngModel)]="searchRequest.propertyType" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Business Name:</label>
+                    <vp-input [(ngModel)]="searchRequest.propertyBusinessName" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Address:</label>
+                    <div class="row g-2 align-items-end">
+                        <div class="col-3">
+                            <label class="form-label small mb-1">Street #:</label>
+                            <vp-input [(ngModel)]="searchRequest.propertyStreetNumber" />
+                        </div>
+                        <div class="col-5">
+                            <label class="form-label small mb-1">Street Name:</label>
+                            <vp-input [(ngModel)]="searchRequest.propertyStreetName" />
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label small mb-1">Suite/Apt #:</label>
+                            <vp-input [(ngModel)]="searchRequest.propertyNumber" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3 zip-field">
+                    <label class="form-label fw-semibold">ZIP:</label>
+                    <vp-input [(ngModel)]="searchRequest.propertyZip" />
+                </div>
+            </vp-section>
+        </div>
+
+        <div class="col-md-6 mt-3 mt-md-0">
+            <vp-section header="Contact / Mailing Criteria">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Company Name:</label>
+                    <vp-input [(ngModel)]="searchRequest.mailingCompanyName" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Contact Name:</label>
+                    <vp-input [(ngModel)]="searchRequest.mailingContactName" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Address:</label>
+                    <div class="row g-2 align-items-end">
+                        <div class="col-3">
+                            <label class="form-label small mb-1">Street #:</label>
+                            <vp-input [(ngModel)]="searchRequest.mailingStreetNumber" />
+                        </div>
+                        <div class="col-5">
+                            <label class="form-label small mb-1">Street Name:</label>
+                            <vp-input [(ngModel)]="searchRequest.mailingStreetName" />
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label small mb-1">Suite/Apt #:</label>
+                            <vp-input [(ngModel)]="searchRequest.mailingNumber" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3 zip-field">
+                    <label class="form-label fw-semibold">ZIP:</label>
+                    <vp-input [(ngModel)]="searchRequest.mailingZip" />
+                </div>
+            </vp-section>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <div *ngIf="searchAttempted && !isLoading && inspections.length === 0"
+             class="alert alert-info text-center mb-3">
+            No records found matching the search criteria.
+        </div>
+
+        <div class="d-flex justify-content-center">
+            <button type="button"
+                    class="btn btn-primary vp-section-button"
+                    [disabled]="isLoading"
+                    (click)="search()">
+                <i class="fa-solid fa-magnifying-glass me-1"></i>
+                Search
+            </button>
+        </div>
+    </div>
+</div>
+
+<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+
+<div *ngIf="showResults && !isLoading">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <button type="button" class="btn btn-primary vp-section-button">
+            <i class="fa-regular fa-file-export me-1"></i>
+            Export Results
+        </button>
+        <button type="button" class="btn btn-primary vp-section-button">
+            <i class="fa-regular fa-table me-1"></i>
+            View Printable Table
+        </button>
+        <button type="button" class="btn btn-primary vp-section-button" (click)="searchAgain()">
+            <i class="fa-solid fa-magnifying-glass me-1"></i>
+            Search Again
+        </button>
+    </div>
+
+    <div class="results-section">
+    <vp-section [header]="'Inspection Search - ' + resultCount + ' Results'">
+        <div class="text-center mb-3">
+            <span class="me-3">
+                <span class="csi-status-badge csi-status-pass d-inline-block me-1"></span>Passed Inspection
+            </span>
+            <span class="me-3">
+                <span class="csi-status-badge csi-status-fail d-inline-block me-1"></span>Failed Inspection
+            </span>
+            <span class="me-3">
+                <span class="csi-status-badge csi-status-paid d-inline-block me-1"></span>Paid
+            </span>
+            <span>
+                <span class="csi-status-badge csi-status-unpaid d-inline-block me-1"></span>Unpaid
+            </span>
+        </div>
+
+        <vp-table *ngIf="inspections.length > 0"
+                  [columns]="columns"
+                  [data]="inspections"
+                  [(pageInfo)]="pageInfo"
+                  (pageInfoChange)="loadInspections()"
+                  [(query)]="query"
+                  (queryChange)="loadInspections()"
+                  (queryReset)="loadInspections()"
+                  [customActions]="customActions" />
+
+        <div *ngIf="inspections.length === 0" class="text-center py-3 text-muted">
+            No records found matching the search criteria.
+        </div>
+    </vp-section>
+    </div>
+</div>

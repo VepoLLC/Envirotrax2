@@ -1,6 +1,6 @@
 export interface CsiInspection {
     id?: number;
-    site?: { id?: number } | null;
+    site?: { id?: number; accountNumber?: string | null } | null;
     siteId?: number | null;
     waterSupplier?: { id?: number } | null;
     inspectorUser?: { id?: number } | null;

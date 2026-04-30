@@ -1,4 +1,6 @@
 using AutoMapper;
+using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Csi;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
@@ -8,7 +10,6 @@ using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
-using DeveloperPartners.SortingFiltering;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Csi;
 
@@ -34,6 +35,13 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         _professionalUserService = professionalUserService;
         _licenseService = licenseService;
         _siteService = siteService;
+    }
+
+    public async Task<CsiInspectionDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken)
+    {
+        var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
+        var inspection = await _repository.GetForProfessionalAsync(id, professional!.Id, cancellationToken);
+        return inspection == null ? null : Mapper.Map<CsiInspectionDto>(inspection);
     }
 
     public async Task<CsiInspectionDto> SubmitAsync(CsiInspectionDto request, CancellationToken cancellationToken)
@@ -80,6 +88,15 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
 
         var added = await _repository.AddAsync(inspection);
         return Mapper.Map<CsiInspectionDto>(added);
+    }
+
+     public async Task<IPagedData<CsiInspectionDto>> SearchForProfessionalAsync(PageInfo pageInfo, Query query, CsiInspectionProfessionalSearchRequest request, CancellationToken cancellationToken)
+    {
+        query.Filter = query.ConvertFilterProperties<CsiInspection, CsiInspectionDto>(Mapper);
+        query.Sort = query.ConvertSortProperties<CsiInspection, CsiInspectionDto>(Mapper);
+        var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
+        var inspections = await _repository.SearchForProfessionalAsync(professional!.Id, pageInfo, query, request, cancellationToken);
+        return inspections.Select(m => Mapper.Map<CsiInspectionDto>(m)!).ToPagedData(pageInfo);
     }
 
     private static void ApplySiteSnapshot(CsiInspection inspection, DataTransferObjects.Sites.SiteDto site)

@@ -1,3 +1,4 @@
+using Envirotrax.TaskRunner.Configuration;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.Configuration;
@@ -15,5 +16,7 @@ builder.ConfigureFunctionsWebApplication();
 builder.Services
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
+
+builder.Services.AddTaskRunnerServices(builder.Configuration);
 
 builder.Build().Run();

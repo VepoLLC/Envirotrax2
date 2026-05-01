@@ -5,4 +5,5 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 
 public interface ISiteService : IService<Site, SiteDto>
 {
+    Task<IEnumerable<SiteDto>> GetAllPendingGeocodingAsync(int batchSize);
 }

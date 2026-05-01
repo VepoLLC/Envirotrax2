@@ -118,7 +118,7 @@ public class Site : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 
     public bool FireSeparateWater { get; set; }
 
-    public GreaseTrapType GreaseTrapType { get; set; }    
+    public GreaseTrapType GreaseTrapType { get; set; }
 
     public bool HasGritTrap { get; set; }
 
@@ -146,7 +146,7 @@ public class Site : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 
     public double? GisLongitude { get; set; }
 
-    public int GisStatus { get; set; }
+    public GisStatusType GisStatus { get; set; }
 
     [Column(TypeName = "date")]
     public DateTime? GisDate { get; set; }
@@ -206,7 +206,7 @@ public class Site : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 
     public DateTime? FogAccountAssignmentDate { get; set; }
 
-    public bool Active { get;set; }
+    public bool Active { get; set; }
 
     // Audit properties
     public int? CreatedById { get; set; }

@@ -37,7 +37,7 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
             {
                 dto.ExpirationType = ExpirationType.Expired;
             }
-            else if (localTime.AddDays(-30) <= dto.ExpirationDate)
+            else if (localTime.AddDays(30) >= dto.ExpirationDate)
             {
                 dto.ExpirationType = ExpirationType.AboutToExpire;
             }

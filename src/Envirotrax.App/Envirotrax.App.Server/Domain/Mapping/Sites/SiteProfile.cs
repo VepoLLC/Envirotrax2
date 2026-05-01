@@ -27,5 +27,7 @@ public class SiteProfile : Profile
             .ForMember(s => s.StateId, opt => opt.MapFrom(dto => dto.State != null ? dto.State.Id : (int?)null))
             .ForMember(s => s.MailingState, opt => opt.Ignore())
             .ForMember(s => s.MailingStateId, opt => opt.MapFrom(dto => dto.MailingState != null ? dto.MailingState.Id : (int?)null));
+
+        CreateMap<Site, ReferencedSiteDto>();
     }
 }

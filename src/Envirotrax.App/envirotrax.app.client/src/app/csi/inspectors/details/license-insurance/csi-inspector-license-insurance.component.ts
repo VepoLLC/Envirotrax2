@@ -283,29 +283,4 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
         return professionalTypeLabels[type as ProfessionalType] ?? '';
     }
 
-    public getLicenseExpirationClass(license: ProfessionalUserLicense): string {
-        if (!license.expirationDate) {
-            return 'text-bg-primary';
-        }
-        if (license.expirationType === ExpirationType.Expired) {
-            return 'text-bg-danger';
-        }
-        if (license.expirationType === ExpirationType.AboutToExpire) {
-            return 'text-bg-warning';
-        }
-        return 'text-bg-success';
-    }
-
-    public getInsuranceExpirationClass(insurance: ProfessionalInsurance): string {
-        if (!insurance.expirationDate) {
-            return 'text-bg-primary';
-        }
-        if (insurance.expirationType === InsuranceExpirationType.Expired) {
-            return 'text-bg-danger';
-        }
-        if (insurance.expirationType === InsuranceExpirationType.AboutToExpire) {
-            return 'text-bg-warning';
-        }
-        return 'text-bg-success';
-    }
 }

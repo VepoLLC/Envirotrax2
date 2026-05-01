@@ -3,12 +3,7 @@
     {{ ws.waterSupplier?.name }}
 </ng-template>
 
-<ng-template #bannedCell let-ws="rowData">
-    <span *ngIf="ws.isBanned" class="badge text-bg-danger">Suspended</span>
-    <span *ngIf="!ws.isBanned" class="badge text-bg-success">Active</span>
-</ng-template>
-
-<vp-section header="Water Supplier Registrations">
+<vp-section header="Account Registration Expiration Date">
     <div dp-spinner-parent>
         <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
 
@@ -19,6 +14,9 @@
                   (pageInfoChange)="loadWaterSuppliers()"
                   [(query)]="table.query"
                   (queryChange)="loadWaterSuppliers()"
-                  (queryReset)="loadWaterSuppliers()" />
+                  (queryReset)="loadWaterSuppliers()"
+                  [canEdit]="canEdit"
+                  (edit)="editWaterSupplier($event)"
+                  [showActionLabels]="false" />
     </div>
 </vp-section>

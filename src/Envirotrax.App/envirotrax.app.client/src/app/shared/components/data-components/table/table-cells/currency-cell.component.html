@@ -1,3 +1,4 @@
 <div>
-    <span *ngIf="rowData[column.field]">{{rowData[column.field] | currency}}</span>
+    <span *ngIf="rowData[column.field] != null">{{rowData[column.field] | currency}}</span>
+    <span *ngIf="rowData[column.field] == null">N/A</span>
 </div>

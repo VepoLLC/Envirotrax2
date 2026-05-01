@@ -34,23 +34,3 @@ public class CreateInsuranceDto : ProfessionalInsuranceDto
     public IFormFile File { get; set; } = null!;
 }
 
-public class UpdateCsiInsuranceDto
-{
-    [Required]
-    [StringLength(50)]
-    public string InsuranceNumber { get; set; } = null!;
-
-    public DateTime? ExpirationDate { get; set; }
-}
-
-public class CreateCsiInsuranceDto
-{
-    [Required]
-    [StringLength(50)]
-    public string InsuranceNumber { get; set; } = null!;
-
-    public DateTime? ExpirationDate { get; set; }
-
-    [Required]
-    public IFormFile File { get; set; } = null!;
-}

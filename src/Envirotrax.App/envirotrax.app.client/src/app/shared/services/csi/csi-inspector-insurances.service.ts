@@ -29,6 +29,7 @@ export class CsiInspectorInsurancesService {
     public add(inspectorId: number, insurance: ProfessionalInsurance, file: File | null): Promise<ProfessionalInsurance> {
         const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${inspectorId}/insurances`);
         const formData = new FormData();
+        formData.append('professional.id', inspectorId.toString());
         formData.append('insuranceNumber', insurance.insuranceNumber ?? '');
         if (insurance.expirationDate) {
             formData.append('expirationDate', insurance.expirationDate.toString());

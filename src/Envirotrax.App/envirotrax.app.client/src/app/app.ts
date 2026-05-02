@@ -448,6 +448,13 @@ export class App implements OnInit {
             routerLink: ['professionals/insurances'],
             hasPermission: isAdmin,
             hasFeature: true
+          },
+          {
+            title: 'Gauge Management',
+            iconCss: 'fa-solid fa-gauge-simple',
+            routerLink: ['professionals/backflow/gauges'],
+            hasPermission: isBackflowTester,
+            hasFeature: await this._authService.hasAnyFeatures(FeatureType.BackflowTesting)
           }
         ]
       },
@@ -467,7 +474,7 @@ export class App implements OnInit {
           {
             title: 'Inspection Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['csi'],
+            routerLink: ['professionals/csi/inspections'],
             hasPermission: isCsiInspector,
             hasFeature: true
           },

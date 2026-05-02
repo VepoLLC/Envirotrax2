@@ -52,6 +52,7 @@ public static class ServiceRegistration
         services.AddTransient<IFogInspectionService, FogInspectionService>();
         services.AddTransient<IBackflowTesterService, BackflowTesterService>();
         services.AddTransient<IBackflowTestService, BackflowTestService>();
+        services.AddTransient<IBackflowGaugeService, BackflowGaugeService>();
         services.AddTransient<ILookupService, LookupService>();
 
         services.AddTransient<ICsiSettingsService, CsiSettingsService>();

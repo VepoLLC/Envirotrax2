@@ -1,0 +1,307 @@
+<h1 class="text-center h2">CSI Inspection</h1>
+
+<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+<div *ngIf="!isLoading && inspection">
+
+    <ul class="nav vp-tabs justify-content-center mb-3">
+        <li class="nav-item">
+            <a class="nav-link" [class.active]="activeTab === 'main'" (click)="activeTab = 'main'" role="button">
+                CSI Main Form
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" [class.active]="activeTab === 'assemblies'" (click)="activeTab = 'assemblies'" role="button">
+                Assemblies at this Location
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" [class.active]="activeTab === 'additional'" (click)="activeTab = 'additional'" role="button">
+                Additional Information
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" [class.active]="activeTab === 'images'" (click)="activeTab = 'images'" role="button">
+                Images
+            </a>
+        </li>
+    </ul>
+
+    <div *ngIf="activeTab === 'main'">
+
+        <!-- Account Selection & License Verification -->
+        <vp-section header="Account Selection &amp; License Verification">
+            <div class="row align-items-center mb-2">
+                <div class="col-md-6 d-flex align-items-center">
+                    <span class="fw-semibold text-nowrap me-2">CSI Account:</span>
+                    <span>{{ inspection.inspectorContactName }}</span>
+                </div>
+                <div class="col-md-6 ps-4">
+                    <span class="fw-semibold">Texas CSI/Plumbing Inspector/WSPS:</span>
+                    <span class="ms-1 text-success">License valid</span>
+                </div>
+            </div>
+            <div class="row align-items-center">
+                <div class="col-md-6 d-flex align-items-center">
+                    <span class="fw-semibold text-nowrap me-2">Water Supplier:</span>
+                    <span>{{ inspection.waterSupplier?.name }}</span>
+                </div>
+            </div>
+        </vp-section>
+
+        <vp-section *ngIf="inspection.waterSupplier" header="Water Supplier Information" class="mt-3 d-block">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row mb-0">
+                        <dt class="col-5">Water Supplier:</dt>
+                        <dd class="col-7 mb-1">{{ inspection.waterSupplier.name }}</dd>
+                        <dt class="col-5">Address:</dt>
+                        <dd class="col-7 mb-1">
+                            {{ inspection.waterSupplier.address }}<br *ngIf="inspection.waterSupplier.address">
+                            {{ inspection.waterSupplier.city }}<span *ngIf="inspection.waterSupplier.city && inspection.waterSupplier.state?.name">, </span>{{ inspection.waterSupplier.state?.name }} {{ inspection.waterSupplier.zipCode }}
+                        </dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <dl class="row mb-0">
+                        <dt class="col-5">PWS ID:</dt>
+                        <dd class="col-7 mb-1">{{ inspection.waterSupplier.pwsId }}</dd>
+                        <dt class="col-5">Contact Name:</dt>
+                        <dd class="col-7 mb-1">{{ inspection.waterSupplier.contactName }}</dd>
+                        <dt class="col-5">Phone Number:</dt>
+                        <dd class="col-7 mb-1">{{ inspection.waterSupplier.phoneNumber }}</dd>
+                        <dt class="col-5">Email Address:</dt>
+                        <dd class="col-7 mb-1">{{ inspection.waterSupplier.emailAddress }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </vp-section>
+
+        <vp-section header="CSI Inspector" class="mt-3 d-block">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row mb-0">
+                        <dt class="col-5">Company Name:</dt>
+                        <dd class="col-7 mb-1">{{ inspection.inspectorCompanyName }}</dd>
+                        <dt class="col-5">Title of Inspector:</dt>
+                        <dd class="col-7 mb-1">{{ inspection.inspectorJobTitle }}</dd>
+                        <dt class="col-5">Inspector Name:</dt>
+                        <dd class="col-7 mb-1">{{ inspection.inspectorContactName }}</dd>
+                        <dt class="col-5">Address:</dt>
+                        <dd class="col-7 mb-1">
+                            {{ inspection.inspectorAddress }}<br *ngIf="inspection.inspectorAddress">
+                            {{ inspection.inspectorCity }}<span *ngIf="inspection.inspectorCity && inspection.inspectorState">, </span>{{ inspection.inspectorState }} {{ inspection.inspectorZip }}
+                        </dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <dl class="row mb-0">
+                        <dt class="col-5">Phone Number:</dt>
+                        <dd class="col-7 mb-1">{{ inspection.inspectorWorkNumber }}</dd>
+                        <dt class="col-5">License Number:</dt>
+                        <dd class="col-7 mb-1">{{ inspection.inspectorLicenseNumber }}</dd>
+                        <dt class="col-5">License Type:</dt>
+                        <dd class="col-7 mb-1">{{ inspection.inspectorLicenseType }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </vp-section>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <vp-section header="Location / Property Information">
+                    <dl class="row mb-0">
+                        <dt class="col-5">Property Type:</dt>
+                        <dd class="col-7 mb-1">{{ inspection.propertyType === 0 ? 'Residential' : 'Commercial' }}</dd>
+                        <dt class="col-5">Business Name:</dt>
+                        <dd class="col-7 mb-1">{{ inspection.propertyBusinessName }}</dd>
+                        <dt class="col-5">Property Address:</dt>
+                        <dd class="col-7 mb-1">
+                            {{ inspection.propertyStreetNumber }} {{ inspection.propertyStreetName }}<span *ngIf="inspection.propertyNumber"> #{{ inspection.propertyNumber }}</span><br>
+                            {{ inspection.propertyCity }} {{ inspection.propertyZip }}
+                        </dd>
+                    </dl>
+                </vp-section>
+            </div>
+            <div class="col-md-6">
+                <vp-section header="Assembly Owner's Contact Information">
+                    <dl class="row mb-0">
+                        <dt class="col-5">Company Name:</dt>
+                        <dd class="col-7 mb-1">{{ inspection.mailingCompanyName }}</dd>
+                        <dt class="col-5">Contact Name:</dt>
+                        <dd class="col-7 mb-1">{{ inspection.mailingContactName }}</dd>
+                        <dt class="col-5">Mailing Address:</dt>
+                        <dd class="col-7 mb-1">
+                            {{ inspection.mailingStreetNumber }} {{ inspection.mailingStreetName }}<span *ngIf="inspection.mailingNumber"> #{{ inspection.mailingNumber }}</span><br>
+                            {{ inspection.mailingCity }} {{ inspection.mailingZip }}
+                        </dd>
+                        <dt class="col-5">Phone Number:</dt>
+                        <dd class="col-7 mb-1">{{ inspection.mailingPhoneNumber }}</dd>
+                        <dt class="col-5">Email Address:</dt>
+                        <dd class="col-7 mb-1">{{ inspection.mailingEmailAddress }}</dd>
+                    </dl>
+                </vp-section>
+            </div>
+        </div>
+
+        <vp-section header="Inspection Results" class="mt-3 d-block">
+
+            <!-- Reason + Date -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <span class="fw-semibold me-2">Reason for Inspection:</span>
+                    <span>{{ getReasonLabel(inspection.reasonForInspection) }}</span>
+                </div>
+                <div class="col-md-6">
+                    <span class="fw-semibold me-2">Inspection Date:</span>
+                    <span>{{ inspection.inspectionDate | date:'MM/dd/yyyy' }}</span>
+                </div>
+            </div>
+
+            <div class="border p-3 mb-3">
+                <p class="mb-3">
+                    I, <u>{{ inspection.inspectorContactName }}</u>, upon inspection of the private water distribution facilities connected to the aforementioned public water supply do hereby certify that, to the best of my knowledge:
+                </p>
+                <table class="table table-sm table-bordered mb-0">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th class="text-center col-compliance">Compliance</th>
+                            <th class="text-center col-noncompliance">Non-compliance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1. No direct or indirect connection between the public drinking water supply and a potential source of contamination exists. Potential sources of contamination are isolated from the public water system by an air gap or an appropriate backflow prevention assembly in accordance with Commission regulations.</td>
+                            <td class="text-center align-middle"><i *ngIf="inspection.compliance1 === true" class="fa-solid fa-check"></i></td>
+                            <td class="text-center align-middle"><i *ngIf="inspection.compliance1 === false" class="fa-solid fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td>2. No cross-connection between the public drinking water supply and a private water system exists. Where an actual air gap is not maintained between the public water supply and a private water supply, an approved reduced pressure principle backflow prevention assembly is properly installed.</td>
+                            <td class="text-center align-middle"><i *ngIf="inspection.compliance2 === true" class="fa-solid fa-check"></i></td>
+                            <td class="text-center align-middle"><i *ngIf="inspection.compliance2 === false" class="fa-solid fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td>3. No connection exists which would allow the return of water used for condensing, cooling or industrial processes back to the public water supply.</td>
+                            <td class="text-center align-middle"><i *ngIf="inspection.compliance3 === true" class="fa-solid fa-check"></i></td>
+                            <td class="text-center align-middle"><i *ngIf="inspection.compliance3 === false" class="fa-solid fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td>4. No pipe or pipe fitting which contains more than 8.0% lead exists in private water distribution facilities installed on or after July 1, 1988 and prior to January 4, 2014.</td>
+                            <td class="text-center align-middle"><i *ngIf="inspection.compliance4 === true" class="fa-solid fa-check"></i></td>
+                            <td class="text-center align-middle"><i *ngIf="inspection.compliance4 === false" class="fa-solid fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td>5. Plumbing installed on or after January 4, 2014 bears the expected labeling indicating &le;0.25% lead content. If not properly labeled, please provide written comment.</td>
+                            <td class="text-center align-middle"><i *ngIf="inspection.compliance5 === true" class="fa-solid fa-check"></i></td>
+                            <td class="text-center align-middle"><i *ngIf="inspection.compliance5 === false" class="fa-solid fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td>6. No solder or flux which contains more than 0.2% lead exists in private water distribution facilities installed on or after July 1, 1988.</td>
+                            <td class="text-center align-middle"><i *ngIf="inspection.compliance6 === true" class="fa-solid fa-check"></i></td>
+                            <td class="text-center align-middle"><i *ngIf="inspection.compliance6 === false" class="fa-solid fa-check"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="mb-2">I further certify that the following materials were used in the installation of the private water distribution facilities:</p>
+
+            <table class="mb-3 d-flex justify-content-center">
+                <tbody>
+                    <tr>
+                        <td class="fw-bold pe-3 text-end text-nowrap align-middle col-material-label">Service Lines:</td>
+                        <td class="pe-4 align-middle">
+                            <div class="form-check form-check-inline mb-0">
+                                <input class="form-check-input" type="checkbox" id="slLead" disabled [checked]="inspection.materialServiceLineLead" />
+                                <label class="form-check-label" for="slLead">Lead</label>
+                            </div>
+                        </td>
+                        <td class="pe-4 align-middle">
+                            <div class="form-check form-check-inline mb-0">
+                                <input class="form-check-input" type="checkbox" id="slCopper" disabled [checked]="inspection.materialServiceLineCopper" />
+                                <label class="form-check-label" for="slCopper">Copper</label>
+                            </div>
+                        </td>
+                        <td class="pe-4 align-middle">
+                            <div class="form-check form-check-inline mb-0">
+                                <input class="form-check-input" type="checkbox" id="slPVC" disabled [checked]="inspection.materialServiceLinePVC" />
+                                <label class="form-check-label" for="slPVC">PVC</label>
+                            </div>
+                        </td>
+                        <td class="pe-3 align-middle">
+                            <div class="form-check form-check-inline mb-0">
+                                <input class="form-check-input" type="checkbox" id="slOther" disabled [checked]="inspection.materialServiceLineOther" />
+                                <label class="form-check-label" for="slOther">Other</label>
+                            </div>
+                        </td>
+                        <td class="align-middle">
+                            <ng-container *ngIf="inspection.materialServiceLineOther">
+                                <input type="text" class="form-control form-control-sm input-other-desc" disabled [value]="inspection.materialServiceLineOtherDescription" />
+                            </ng-container>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold pe-3 text-end text-nowrap align-middle">Solder:</td>
+                        <td class="pe-4 align-middle">
+                            <div class="form-check form-check-inline mb-0">
+                                <input class="form-check-input" type="checkbox" id="soldLead" disabled [checked]="inspection.materialSolderLead" />
+                                <label class="form-check-label" for="soldLead">Lead</label>
+                            </div>
+                        </td>
+                        <td class="pe-4 align-middle">
+                            <div class="form-check form-check-inline mb-0">
+                                <input class="form-check-input" type="checkbox" id="soldLeadFree" disabled [checked]="inspection.materialSolderLeadFree" />
+                                <label class="form-check-label" for="soldLeadFree">Lead Free</label>
+                            </div>
+                        </td>
+                        <td class="pe-4 align-middle">
+                            <div class="form-check form-check-inline mb-0">
+                                <input class="form-check-input" type="checkbox" id="soldSolvent" disabled [checked]="inspection.materialSolderSolventWeld" />
+                                <label class="form-check-label" for="soldSolvent">Solvent Weld</label>
+                            </div>
+                        </td>
+                        <td class="pe-3 align-middle">
+                            <div class="form-check form-check-inline mb-0">
+                                <input class="form-check-input" type="checkbox" id="soldOther" disabled [checked]="inspection.materialSolderOther" />
+                                <label class="form-check-label" for="soldOther">Other</label>
+                            </div>
+                        </td>
+                        <td class="align-middle">
+                            <ng-container *ngIf="inspection.materialSolderOther">
+                                <input type="text" class="form-control form-control-sm input-other-desc" disabled [value]="inspection.materialSolderOtherDescription" />
+                            </ng-container>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="legalAck" disabled [checked]="true" />
+                <label class="form-check-label" for="legalAck">
+                    "I recognize that this document shall be retained by the aforementioned Public Water System for a minimum of ten years and that I am legally responsible for the validity of the information I have provided."
+                </label>
+            </div>
+
+        </vp-section>
+
+        <vp-section header="Remarks" class="mt-3 d-block">
+            <p class="mb-0">{{ inspection.comments }}</p>
+        </vp-section>
+
+        <p class="text-center text-muted small mt-2">
+            A Customer Service Inspection Certificate should be on file for each connection in a public water system to document compliance with 30 TAC &sect;290.44(h)/290.46(j).
+        </p>
+
+    </div>
+
+    <div *ngIf="activeTab === 'assemblies'">
+    </div>
+
+    <div *ngIf="activeTab === 'additional'">
+    </div>
+    
+    <div *ngIf="activeTab === 'images'">
+    </div>
+
+</div>

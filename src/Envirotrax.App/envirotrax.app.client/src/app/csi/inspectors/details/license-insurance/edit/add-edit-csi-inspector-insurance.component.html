@@ -5,7 +5,7 @@
     <form #form="ngForm" (ngSubmit)="save(form)">
         <div class="mb-3">
             <vp-input name="insuranceNumber"
-                      label="Policy Number"
+                      label="Policy number"
                       [(ngModel)]="insurance.insuranceNumber"
                       [required]="true"
                       [maxLength]="50"
@@ -14,7 +14,7 @@
 
         <div *ngIf="!isEditMode" class="mb-3">
             <vp-file-upload name="coiFile"
-                            validationLabel="Certificate of Insurance (COI)"
+                            validationLabel="Certificate of insurance (COI)"
                             [(ngModel)]="certificateFile"
                             [required]="true"
                             [form]="form" />
@@ -22,7 +22,7 @@
 
         <div class="mb-3">
             <vp-input name="expirationDate"
-                      label="Expiration Date"
+                      label="Expiration date"
                       type="date"
                       [(ngModel)]="insurance.expirationDate"
                       [form]="form" />

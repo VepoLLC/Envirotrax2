@@ -1,4 +1,4 @@
 <div class="fw-bold">
-    <i *ngIf="rowData[column.field]" class="fa-solid fa-check"></i>
-    <i *ngIf="!rowData[column.field]" class="fa-solid fa-xmark"></i>
+    <i *ngIf="rowData[column.field]" class="fa-solid fa-check text-success" aria-label="Checked" role="checkbox"></i>
+    <i *ngIf="!rowData[column.field]" class="fa-solid fa-xmark text-danger" aria-label="Unchecked" role="checkbox"></i>
 </div>

@@ -30,6 +30,7 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
     public async Task<CsiInspection?> GetForProfessionalAsync(int id, int professionalId, CancellationToken cancellationToken)
     {
         return await GetDetailsQuery()
+            .Include(c => c.WaterSupplier)
             .Where(c => c.Id == id && c.ProfessionalId == professionalId)
             .FirstOrDefaultAsync(cancellationToken);
     }

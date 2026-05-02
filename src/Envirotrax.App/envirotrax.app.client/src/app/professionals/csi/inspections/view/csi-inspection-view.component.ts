@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CsiInspectionService } from '../../../../shared/services/csi/csi-inspection.service';
-import { ProfessionalSupplierService } from '../../../../shared/services/professionals/professional-supplier.service';
 import { CsiInspection } from '../../../../shared/models/csi/csi-inspection';
-import { ProfessionalWaterSupplier } from '../../../../shared/models/professionals/professional-water-supplier';
 import { CsiInspectionReason, csiInspectionReasonLabels } from '../../../../shared/enums/csi-inspection-reason.enum';
 
 @Component({
@@ -14,13 +12,11 @@ import { CsiInspectionReason, csiInspectionReasonLabels } from '../../../../shar
 export class CsiInspectionViewComponent implements OnInit {
     public isLoading = true;
     public inspection?: CsiInspection;
-    public selectedWaterSupplier?: ProfessionalWaterSupplier;
     public activeTab: 'main' | 'assemblies' | 'additional' | 'images' = 'main';
 
     constructor(
         private readonly _route: ActivatedRoute,
-        private readonly _inspectionService: CsiInspectionService,
-        private readonly _professionalSupplierService: ProfessionalSupplierService
+        private readonly _inspectionService: CsiInspectionService
     ) {}
 
     public async ngOnInit(): Promise<void> {
@@ -44,16 +40,7 @@ export class CsiInspectionViewComponent implements OnInit {
 
         try {
             this.isLoading = true;
-
-            const [inspection, waterSuppliersPage] = await Promise.all([
-                this._inspectionService.getProfessionalInspection(Number(idParam)),
-                this._professionalSupplierService.getAllMy(true)
-            ]);
-
-            this.inspection = inspection;
-
-            const waterSuppliers = waterSuppliersPage.data ?? [];
-            this.selectedWaterSupplier = waterSuppliers.find(ws => ws.waterSupplier?.id === inspection.waterSupplier?.id);
+            this.inspection = await this._inspectionService.getProfessionalInspection(Number(idParam));
         } finally {
             this.isLoading = false;
         }

@@ -44,34 +44,34 @@
             <div class="row align-items-center">
                 <div class="col-md-6 d-flex align-items-center">
                     <span class="fw-semibold text-nowrap me-2">Water Supplier:</span>
-                    <span>{{ selectedWaterSupplier?.waterSupplier?.name }}</span>
+                    <span>{{ inspection.waterSupplier?.name }}</span>
                 </div>
             </div>
         </vp-section>
 
-        <vp-section *ngIf="selectedWaterSupplier" header="Water Supplier Information" class="mt-3 d-block">
+        <vp-section *ngIf="inspection.waterSupplier" header="Water Supplier Information" class="mt-3 d-block">
             <div class="row">
                 <div class="col-md-6">
                     <dl class="row mb-0">
                         <dt class="col-5">Water Supplier:</dt>
-                        <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.name }}</dd>
+                        <dd class="col-7 mb-1">{{ inspection.waterSupplier.name }}</dd>
                         <dt class="col-5">Address:</dt>
                         <dd class="col-7 mb-1">
-                            {{ selectedWaterSupplier.waterSupplier?.address }}<br *ngIf="selectedWaterSupplier.waterSupplier?.address">
-                            {{ selectedWaterSupplier.waterSupplier?.city }}<span *ngIf="selectedWaterSupplier.waterSupplier?.city && selectedWaterSupplier.waterSupplier?.state?.name">, </span>{{ selectedWaterSupplier.waterSupplier?.state?.name }} {{ selectedWaterSupplier.waterSupplier?.zipCode }}
+                            {{ inspection.waterSupplier.address }}<br *ngIf="inspection.waterSupplier.address">
+                            {{ inspection.waterSupplier.city }}<span *ngIf="inspection.waterSupplier.city && inspection.waterSupplier.state?.name">, </span>{{ inspection.waterSupplier.state?.name }} {{ inspection.waterSupplier.zipCode }}
                         </dd>
                     </dl>
                 </div>
                 <div class="col-md-6">
                     <dl class="row mb-0">
                         <dt class="col-5">PWS ID:</dt>
-                        <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.pwsId }}</dd>
+                        <dd class="col-7 mb-1">{{ inspection.waterSupplier.pwsId }}</dd>
                         <dt class="col-5">Contact Name:</dt>
-                        <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.contactName }}</dd>
+                        <dd class="col-7 mb-1">{{ inspection.waterSupplier.contactName }}</dd>
                         <dt class="col-5">Phone Number:</dt>
-                        <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.phoneNumber }}</dd>
+                        <dd class="col-7 mb-1">{{ inspection.waterSupplier.phoneNumber }}</dd>
                         <dt class="col-5">Email Address:</dt>
-                        <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.emailAddress }}</dd>
+                        <dd class="col-7 mb-1">{{ inspection.waterSupplier.emailAddress }}</dd>
                     </dl>
                 </div>
             </div>

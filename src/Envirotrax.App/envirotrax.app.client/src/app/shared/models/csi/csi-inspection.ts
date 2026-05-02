@@ -1,8 +1,22 @@
+export interface ReferencedWaterSupplier {
+    id?: number;
+    name?: string | null;
+    domain?: string | null;
+    contactName?: string | null;
+    pwsId?: string | null;
+    address?: string | null;
+    city?: string | null;
+    state?: { id?: number; name?: string | null } | null;
+    zipCode?: string | null;
+    phoneNumber?: string | null;
+    emailAddress?: string | null;
+}
+
 export interface CsiInspection {
     id?: number;
     site?: { id?: number; accountNumber?: string | null } | null;
     siteId?: number | null;
-    waterSupplier?: { id?: number } | null;
+    waterSupplier?: ReferencedWaterSupplier | null;
     inspectorUser?: { id?: number } | null;
     inspectionDate?: string | null;
     submissionId?: string | null;

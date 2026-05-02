@@ -10,27 +10,10 @@ import { InputOption } from '../../../../shared/components/input/input.component
 import { TableColumn, TableCustomAction, CellTemplateData } from '../../../../shared/components/data-components/table/table.component';
 import { ColumnType } from '../../../../shared/components/data-components/sorting-filtering/query-view-model';
 
-interface SearchForm extends CsiProfessionalSearchRequest {
-    waterSupplierId?: number | null;
-    accountNumber?: string | null;
-    propertyType?: string | null;
-    propertyBusinessName?: string | null;
-    propertyStreetNumber?: string | null;
-    propertyStreetName?: string | null;
-    propertyNumber?: string | null;
-    propertyZip?: string | null;
-    mailingCompanyName?: string | null;
-    mailingContactName?: string | null;
-    mailingStreetNumber?: string | null;
-    mailingStreetName?: string | null;
-    mailingNumber?: string | null;
-    mailingZip?: string | null;
-}
 
 @Component({
     standalone: false,
-    templateUrl: './csi-inspection-list.component.html',
-    styleUrl: './csi-inspection-list.component.scss'
+    templateUrl: './csi-inspection-list.component.html'
 })
 export class CsiInspectionListComponent implements OnInit, AfterViewInit {
     @ViewChild('statusTemplate') statusTemplate!: TemplateRef<CellTemplateData<CsiInspection>>;
@@ -44,7 +27,10 @@ export class CsiInspectionListComponent implements OnInit, AfterViewInit {
 
     public pageInfo: PageInfo = {};
     public inspections: CsiInspection[] = [];
-    public query: Query = {};
+    public query: Query = {
+        sort: {},
+        filter: []
+    };
     public columns: TableColumn<CsiInspection>[] = [];
     public customActions: TableCustomAction<CsiInspection>[] = [
         {
@@ -54,14 +40,12 @@ export class CsiInspectionListComponent implements OnInit, AfterViewInit {
         }
     ];
 
-    public searchRequest: SearchForm = {
-        waterSupplierId: null,
+    public searchRequest: CsiProfessionalSearchRequest = {
         latestOnly: true,
         passFail: '',
         dateType: ''
     };
 
-    public scopeValue: string = '';
     public searchAttempted = false;
 
     public waterSupplierScopeOptions: InputOption[] = [
@@ -106,10 +90,13 @@ export class CsiInspectionListComponent implements OnInit, AfterViewInit {
         this.columns = this.buildColumns();
     }
 
+    public onFilterChange(queryProperties: QueryProperty[]): void {
+        this.query = { ...this.query, filter: queryProperties };
+    }
+
     public async search(): Promise<void> {
         this.searchAttempted = true;
         this.pageInfo = {};
-        this.query = this.buildSearchQuery();
         await this.loadInspections();
         if (this.inspections.length > 0) {
             this.showResults = true;
@@ -140,11 +127,6 @@ export class CsiInspectionListComponent implements OnInit, AfterViewInit {
         this.searchRequest.latestOnly = value === 'true';
     }
 
-    public onScopeChange(value: string): void {
-        this.scopeValue = value;
-        this.searchRequest.waterSupplierId = value ? Number(value) : null;
-    }
-
     public searchAgain(): void {
         this.showResults = false;
         this.inspections = [];
@@ -155,6 +137,16 @@ export class CsiInspectionListComponent implements OnInit, AfterViewInit {
     public viewInspection(inspection: CsiInspection): void {
         const url = this._router.serializeUrl(
             this._router.createUrlTree([inspection.id], { relativeTo: this._activatedRoute })
+        );
+        window.open(url, '_blank');
+    }
+
+    public viewSite(siteId?: number): void {
+        if (!siteId){
+            return;
+        }
+        const url = this._router.serializeUrl(
+            this._router.createUrlTree(['/professionals/sites', siteId])
         );
         window.open(url, '_blank');
     }
@@ -177,47 +169,6 @@ export class CsiInspectionListComponent implements OnInit, AfterViewInit {
             { id: '', text: 'My inspection history only' },
             ...supplierOptions
         ];
-    }
-
-    private buildSearchQuery(): Query {
-        const filter: QueryProperty[] = [];
-        const f = this.searchRequest;
-
-        this.addFilter(filter, 'waterSupplierId', f.waterSupplierId, 'Eq');
-        this.addFilter(filter, 'site.accountNumber', f.accountNumber, 'Eq');
-        this.addFilter(filter, 'propertyType', f.propertyType, 'Eq');
-        this.addFilter(filter, 'propertyBusinessName', f.propertyBusinessName, 'Ct');
-        this.addFilter(filter, 'propertyStreetNumber', f.propertyStreetNumber, 'Ct');
-        this.addFilter(filter, 'propertyStreetName', f.propertyStreetName,'Ct');
-        this.addFilter(filter, 'propertyNumber', f.propertyNumber, 'Eq');
-        this.addFilter(filter, 'propertyZip', f.propertyZip, 'Eq');
-        this.addFilter(filter, 'mailingCompanyName', f.mailingCompanyName,'Ct');
-        this.addFilter(filter, 'mailingContactName', f.mailingContactName, 'Ct');
-        this.addFilter(filter, 'mailingStreetNumber', f.mailingStreetNumber, 'Ct');
-        this.addFilter(filter, 'mailingStreetName', f.mailingStreetName, 'Ct');
-        this.addFilter(filter, 'mailingNumber', f.mailingNumber, 'Eq');
-        this.addFilter(filter, 'mailingZip', f.mailingZip, 'Eq');
-
-        return { filter };
-    }
-
-    private addFilter(
-        filter: QueryProperty[],
-        columnName: string,
-        value: string | number | null | undefined,
-        comparisonOperator: 'Eq' | 'Ct'
-    ): void {
-        if (value === null || value === undefined || value === '')
-        {
-            return;
-        }
-
-        filter.push({
-            columnName,
-            value: String(value),
-            comparisonOperator,
-            logicalOperator: 'And'
-        });
     }
 
     private buildColumns(): TableColumn<CsiInspection>[] {

@@ -27,35 +27,14 @@ public class BackflowGaugeDto : IDto
 
     public bool IsPortable { get; set; }
 
-    public bool IsManaged { get; set; }
-
     public string? FilePath { get; set; }
 
     // Audit
     public DateTime CreatedTime { get; set; }
 }
 
-public class CreateBackflowGaugeDto
+public class CreateBackflowGaugeDto : BackflowGaugeDto
 {
     [Required]
-    [StringLength(100)]
-    public string Manufacturer { get; set; } = null!;
-
-    [Required]
-    [StringLength(100)]
-    public string Model { get; set; } = null!;
-
-    [Required]
-    [StringLength(50)]
-    public string SerialNumber { get; set; } = null!;
-
-    public DateTime? LastCalibrationDate { get; set; }
-
-    public bool IsPortable { get; set; }
-
-    public bool IsManaged { get; set; }
-
-    public string? FilePath { get; set; }
-
-    public IFormFile? File { get; set; }
+    public IFormFile File { get; set; } = null!;
 }

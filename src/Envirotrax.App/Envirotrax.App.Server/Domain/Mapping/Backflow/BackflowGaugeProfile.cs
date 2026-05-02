@@ -23,6 +23,6 @@ public class BackflowGaugeProfile : Profile
             .ForMember(g => g.ProfessionalId, opt => opt.MapFrom(dto => dto.Professional != null ? dto.Professional.Id : (int?)null))
             .ForMember(g => g.CreatedBy, opt => opt.Ignore());
 
-        CreateMap<CreateBackflowGaugeDto, BackflowGauge>();
+        CreateMap<CreateBackflowGaugeDto, BackflowGauge>().IncludeBase<BackflowGaugeDto, BackflowGauge>();
     }
 }

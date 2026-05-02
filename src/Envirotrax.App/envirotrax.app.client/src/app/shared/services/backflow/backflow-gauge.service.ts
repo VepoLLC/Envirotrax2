@@ -29,23 +29,15 @@ export class BackflowGaugeService {
         return lastValueFrom(observable);
     }
 
-    public add(gauge: BackflowGauge, file: File | null): Promise<BackflowGauge> {
+    public add(gauge: BackflowGauge, file: File): Promise<BackflowGauge> {
         const url = this._urlResolver.resolveUrl('/api/professionals/backflow/gauges');
-
-        if (file) {
-            const formData = new FormData();
-            formData.append('file', file);
-            if (gauge.professionalId) formData.append('professionalId', gauge.professionalId.toString());
-            if (gauge.manufacturer) formData.append('manufacturer', gauge.manufacturer);
-            if (gauge.model) formData.append('model', gauge.model);
-            if (gauge.serialNumber) formData.append('serialNumber', gauge.serialNumber);
-            if (gauge.lastCalibrationDate) formData.append('lastCalibrationDate', new Date(gauge.lastCalibrationDate).toISOString());
-            formData.append('isPortable', gauge.isPortable ? 'true' : 'false');
-            formData.append('isManaged', gauge.isManaged ? 'true' : 'false');
-            return lastValueFrom(this._http.post<BackflowGauge>(url, formData));
-        }
-
-        return lastValueFrom(this._http.post<BackflowGauge>(url, gauge));
+        const formData = new FormData();
+        formData.append('file', file);
+        if (gauge.manufacturer) formData.append('manufacturer', gauge.manufacturer);
+        if (gauge.model) formData.append('model', gauge.model);
+        if (gauge.serialNumber) formData.append('serialNumber', gauge.serialNumber);
+        formData.append('isPortable', gauge.isPortable ? 'true' : 'false');
+        return lastValueFrom(this._http.post<BackflowGauge>(url, formData));
     }
 
     public update(gauge: BackflowGauge): Promise<BackflowGauge> {

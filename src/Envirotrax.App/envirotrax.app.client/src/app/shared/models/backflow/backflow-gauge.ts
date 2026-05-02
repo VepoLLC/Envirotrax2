@@ -6,6 +6,5 @@ export interface BackflowGauge {
     serialNumber?: string;
     lastCalibrationDate?: Date | string;
     isPortable?: boolean;
-    isManaged?: boolean;
     filePath?: string;
 }

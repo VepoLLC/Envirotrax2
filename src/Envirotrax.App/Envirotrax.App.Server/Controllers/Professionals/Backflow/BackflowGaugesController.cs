@@ -1,5 +1,4 @@
 
-using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
@@ -32,25 +31,9 @@ public class BackflowGaugesController : ProfessionalCrudController<BackflowGauge
     [HttpPost]
     public async Task<IActionResult> AddAsync([FromForm] CreateBackflowGaugeDto gauge)
     {
-        var dto = new BackflowGaugeDto
-        {
-            Manufacturer = gauge.Manufacturer,
-            Model = gauge.Model,
-            SerialNumber = gauge.SerialNumber,
-            LastCalibrationDate = gauge.LastCalibrationDate,
-            IsPortable = gauge.IsPortable,
-            IsManaged = gauge.IsManaged,
-            FilePath = gauge.FilePath
-        };
-
-        if (gauge.File != null)
-        {
-            await using var stream = gauge.File.OpenReadStream();
-            var result = await _gaugeService.AddWithFileAsync(stream, gauge.File.FileName, dto);
-            return Ok(result);
-        }
-
-        return Ok(await _gaugeService.AddAsync(dto));
+        await using var stream = gauge.File.OpenReadStream();
+        var result = await _gaugeService.AddWithFileAsync(stream, gauge.File.FileName, gauge);
+        return Ok(result);
     }
 
     [HttpGet("{id}/file")]

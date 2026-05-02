@@ -105,6 +105,22 @@ export class GaugeListComponent implements OnInit {
         ];
     }
 
+    public getTestDateBadgeClass(gauge: BackflowGauge): string {
+        if (!gauge.lastCalibrationDate) return 'bg-primary';
+
+        const expDate = new Date(gauge.lastCalibrationDate);
+        expDate.setFullYear(expDate.getFullYear() + 1);
+
+        const now = new Date();
+        if (now >= expDate) return 'bg-danger';
+
+        const thirtyDaysFromNow = new Date();
+        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+        if (thirtyDaysFromNow >= expDate) return 'bg-warning';
+
+        return 'bg-success';
+    }
+
     public async viewFile(gauge: BackflowGauge): Promise<void> {
         if (!gauge.filePath) {
             this._toastService.show({ text: 'No file has been uploaded for this gauge.', type: ToastType.Warning });
@@ -157,7 +173,7 @@ export class GaugeListComponent implements OnInit {
                 this.isNewGaugeLoading = true;
                 this.newGaugeValidationErrors = [];
 
-                await this._gaugeService.add(this.newGauge!, this.tfaFile);
+                await this._gaugeService.add(this.newGauge!, this.tfaFile!);
 
                 this._toastService.successfullySaved('Gauge');
 

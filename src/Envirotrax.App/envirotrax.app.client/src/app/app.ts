@@ -467,7 +467,7 @@ export class App implements OnInit {
           {
             title: 'Inspection Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['csi'],
+            routerLink: ['professionals/csi/inspections'],
             hasPermission: isCsiInspector,
             hasFeature: true
           },

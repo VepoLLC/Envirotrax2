@@ -29,8 +29,17 @@ public class BackflowGaugeDto : IDto
 
     public string? FilePath { get; set; }
 
+    public GaugeExpirationType ExpirationType { get; set; }
+
     // Audit
     public DateTime CreatedTime { get; set; }
+}
+
+public enum GaugeExpirationType
+{
+    Valid,
+    AboutToExpire,
+    Expired
 }
 
 public class CreateBackflowGaugeDto : BackflowGaugeDto

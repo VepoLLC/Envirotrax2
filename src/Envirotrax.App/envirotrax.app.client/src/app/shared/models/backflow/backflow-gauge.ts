@@ -7,4 +7,11 @@ export interface BackflowGauge {
     lastCalibrationDate?: Date | string;
     isPortable?: boolean;
     filePath?: string;
+    expirationType?: GaugeExpirationType;
+}
+
+export enum GaugeExpirationType {
+    Valid,
+    AboutToExpire,
+    Expired
 }

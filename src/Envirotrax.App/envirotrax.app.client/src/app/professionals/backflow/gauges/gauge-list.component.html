@@ -6,12 +6,13 @@
 
 <div class="mb-3">
     <ng-template #dateCell let-gauge="rowData">
-        <span *ngIf="!gauge.lastCalibrationDate" class="badge bg-primary">
-            Validating...
-        </span>
-        <span *ngIf="gauge.lastCalibrationDate" [class]="'badge ' + getTestDateBadgeClass(gauge)">
-            {{ gauge.lastCalibrationDate | date }}
-        </span>
+        <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
+             [class.text-bg-primary]="!gauge.lastCalibrationDate"
+             [class.text-bg-success]="gauge.lastCalibrationDate && gauge.expirationType == gaugeExpirationType.Valid"
+             [class.text-bg-warning]="gauge.lastCalibrationDate && gauge.expirationType == gaugeExpirationType.AboutToExpire"
+             [class.text-bg-danger]="gauge.lastCalibrationDate && gauge.expirationType == gaugeExpirationType.Expired">
+            {{ gauge.lastCalibrationDate ? (gauge.lastCalibrationDate | date) : 'Validating...' }}
+        </div>
     </ng-template>
 
     <ng-template #typeCell let-gauge="rowData">
@@ -21,6 +22,7 @@
     <vp-section header="Gauges">
         <div dp-spinner-parent>
             <dp-loading-spinner *ngIf="table.isLoading" message="Loading gauges" />
+            <dp-loading-spinner *ngIf="isFileLoading" message="Generating download link..." />
 
             <vp-table *ngIf="table.items"
                       [columns]="table.columns!"

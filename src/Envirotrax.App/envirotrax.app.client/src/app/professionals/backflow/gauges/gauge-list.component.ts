@@ -1,5 +1,5 @@
 import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { BackflowGauge } from "../../../shared/models/backflow/backflow-gauge";
+import { BackflowGauge, GaugeExpirationType } from "../../../shared/models/backflow/backflow-gauge";
 import { BackflowGaugeService } from "../../../shared/services/backflow/backflow-gauge.service";
 import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
 import { ToastService, ToastType } from "../../../shared/services/toast.service";
@@ -32,11 +32,14 @@ export class GaugeListComponent implements OnInit {
         }
     };
 
+    public readonly gaugeExpirationType = GaugeExpirationType;
+
     public newGauge?: BackflowGauge;
     public tfaFile: File | null = null;
     public hasReadHelp: boolean = false;
     public newGaugeValidationErrors: string[] = [];
     public isNewGaugeLoading: boolean = false;
+    public isFileLoading: boolean = false;
 
     @ViewChild('dateCell', { static: true })
     private dateCellTemplate!: TemplateRef<CellTemplateData<BackflowGauge>>;
@@ -105,30 +108,19 @@ export class GaugeListComponent implements OnInit {
         ];
     }
 
-    public getTestDateBadgeClass(gauge: BackflowGauge): string {
-        if (!gauge.lastCalibrationDate) return 'bg-primary';
-
-        const expDate = new Date(gauge.lastCalibrationDate);
-        expDate.setFullYear(expDate.getFullYear() + 1);
-
-        const now = new Date();
-        if (now >= expDate) return 'bg-danger';
-
-        const thirtyDaysFromNow = new Date();
-        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
-        if (thirtyDaysFromNow >= expDate) return 'bg-warning';
-
-        return 'bg-success';
-    }
-
     public async viewFile(gauge: BackflowGauge): Promise<void> {
         if (!gauge.filePath) {
             this._toastService.show({ text: 'No file has been uploaded for this gauge.', type: ToastType.Warning });
             return;
         }
 
-        const url = await this._gaugeService.getFileUrl(gauge.id!);
-        window.open(url, '_blank');
+        try {
+            this.isFileLoading = true;
+            const url = await this._gaugeService.getFileUrl(gauge.id!);
+            window.open(url, '_blank');
+        } finally {
+            this.isFileLoading = false;
+        }
     }
 
     public async getGauges(): Promise<void> {

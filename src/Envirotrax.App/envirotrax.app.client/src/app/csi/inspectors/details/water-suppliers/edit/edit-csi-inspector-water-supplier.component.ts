@@ -17,8 +17,6 @@ export interface EditWaterSupplierModalData {
 })
 export class EditCsiInspectorWaterSupplierComponent {
     public supplier: ProfessionalWaterSupplier;
-    //isActive need to be replaced with db property
-    public isActive: boolean = false;
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
 

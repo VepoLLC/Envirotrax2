@@ -1,21 +1,21 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { ExpirationType, ProfessionalUserLicense, professionalTypeLabels, ProfessionalType } from "../../../../shared/models/professionals/licenses/professional-user-license";
-import { ProfessionalInsurance, ExpirationType as InsuranceExpirationType } from "../../../../shared/models/professionals/professional-insurance";
-import { TableViewModel } from "../../../../shared/models/table-view-model";
-import { CellTemplateData, TableColumn, TableCustomAction } from "../../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../../shared/components/data-components/sorting-filtering/query-view-model";
-import { CsiInspectorLicensesService } from "../../../../shared/services/csi/csi-inspector-licenses.service";
-import { CsiInspectorInsurancesService } from "../../../../shared/services/csi/csi-inspector-insurances.service";
-import { AuthService } from "../../../../shared/services/auth/auth.service";
-import { FeatureType } from "../../../../shared/models/feature-tyype";
-import { PermissionAction, PermissionType } from "../../../../shared/models/permission-type";
-import { ModalHelperService } from "../../../../shared/services/helpers/modal-helper.service";
+import { ExpirationType, ProfessionalUserLicense, professionalTypeLabels, ProfessionalType } from "../../../../../shared/models/professionals/licenses/professional-user-license";
+import { ProfessionalInsurance, ExpirationType as InsuranceExpirationType } from "../../../../../shared/models/professionals/professional-insurance";
+import { TableViewModel } from "../../../../../shared/models/table-view-model";
+import { CellTemplateData, TableColumn, TableCustomAction } from "../../../../../shared/components/data-components/table/table.component";
+import { ColumnType } from "../../../../../shared/components/data-components/sorting-filtering/query-view-model";
+import { CsiInspectorLicensesService } from "../../../../../shared/services/csi/csi-inspector-licenses.service";
+import { CsiInspectorInsurancesService } from "../../../../../shared/services/csi/csi-inspector-insurances.service";
+import { AuthService } from "../../../../../shared/services/auth/auth.service";
+import { FeatureType } from "../../../../../shared/models/feature-tyype";
+import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
+import { ModalHelperService } from "../../../../../shared/services/helpers/modal-helper.service";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
-import { ToastService } from "../../../../shared/services/toast.service";
-import { CsiInspectorAddEditInsuranceComponent } from "./modals/add-edit-csi-inspector-insurance.component";
-import { CsiInspectorAddEditLicenseComponent } from "./modals/add-edit-csi-inspector-license.component";
-import { Professional } from "../../../../shared/models/professionals/professional";
-import { HelperService } from "../../../../shared/services/helpers/helper.service";
+import { ToastService } from "../../../../../shared/services/toast.service";
+import { CsiInspectorAddEditInsuranceComponent } from "../edit/add-edit-csi-inspector-insurance.component";
+import { CsiInspectorAddEditLicenseComponent } from "../edit/add-edit-csi-inspector-license.component";
+import { Professional } from "../../../../../shared/models/professionals/professional";
+import { HelperService } from "../../../../../shared/services/helpers/helper.service";
 
 
 @Component({

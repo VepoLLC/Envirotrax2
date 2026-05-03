@@ -9,7 +9,7 @@
         <div class="mb-3">
             <vp-input type="number"
                       name="csiCommercialInspectionFee"
-                      label="Commercial Fee"
+                      label="Commercial fee"
                       [(ngModel)]="supplier.csiCommercialInspectionFee"
                       [form]="form" />
         </div>
@@ -17,26 +17,26 @@
         <div class="mb-3">
             <vp-input type="number"
                       name="csiResidentialInspectionFee"
-                      label="Residential Fee"
+                      label="Residential fee"
                       [(ngModel)]="supplier.csiResidentialInspectionFee"
                       [form]="form" />
         </div>
 
         <div class="mb-3">
             <small class="text-muted">
-                <strong>Fee Value of -1:</strong> Use Water Supplier fee.<br />
-                <strong>Fee Value of 0:</strong> Free submission.<br />
-                <strong>Fee Value of &gt;0:</strong> Overrides the Water Supplier fee and uses this fee.
+                <strong>Fee value of -1:</strong> Use Water Supplier fee.<br />
+                <strong>Fee value of 0:</strong> Free submission.<br />
+                <strong>Fee value of &gt;0:</strong> Overrides the Water Supplier fee and uses this fee.
             </small>
         </div>
 
         <div class="mb-3 form-check">
             <input type="checkbox"
                    class="form-check-input"
-                   id="isActive"
-                   name="isActive"
-                   [(ngModel)]="isActive" />
-            <label class="form-check-label" for="isActive">Active</label>
+                   id="hasCsiInspection"
+                   name="hasCsiInspection"
+                   [(ngModel)]="supplier.hasCsiInspection" />
+            <label class="form-check-label" for="hasCsiInspection">Active</label>
         </div>
 
         <div class="mb-3 form-check">

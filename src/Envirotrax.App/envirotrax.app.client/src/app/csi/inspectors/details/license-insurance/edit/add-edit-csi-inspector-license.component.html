@@ -6,7 +6,7 @@
             <div class="mb-3">
                 <vp-input type="select"
                         name="professionalType"
-                        label="Professional Type"
+                        label="Professional type"
                         [(ngModel)]="license.professionalType"
                         (ngModelChange)="professionalTypeChange()"
                         [required]="true"
@@ -28,7 +28,7 @@
             <div class="mb-3" *ngIf="license.professionalType !== undefined">
                 <vp-input type="select"
                         name="licenseType"
-                        label="License Type"
+                        label="License type"
                         [ngModel]="license.licenseType?.id"
                         (ngModelChange)="licenseTypeChange($event)"
                         [required]="true"
@@ -38,7 +38,7 @@
 
             <div class="mb-3">
                 <vp-input name="licenseNumber"
-                        label="License Number"
+                        label="License number"
                         [(ngModel)]="license.licenseNumber"
                         [required]="true"
                         [maxLength]="50"
@@ -47,7 +47,7 @@
 
             <div class="mb-3">
                 <vp-input name="expirationDate"
-                        label="Expiration Date"
+                        label="Expiration date"
                         type="date"
                         [(ngModel)]="license.expirationDate"
                         [form]="form" />

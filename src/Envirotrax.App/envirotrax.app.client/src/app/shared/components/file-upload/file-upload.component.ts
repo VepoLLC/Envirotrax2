@@ -50,6 +50,9 @@ export class FileUploadComponent implements ControlValueAccessor {
     public accept: string = '*/*';
 
     @Input()
+    public allowedExtensions: string[] = [];
+
+    @Input()
     public label: string = 'Choose a file or drag and drop here';
 
     @Input()
@@ -68,6 +71,14 @@ export class FileUploadComponent implements ControlValueAccessor {
     public fileChange = new EventEmitter<File | null>();
 
     public isDragOver: boolean = false;
+    public extensionError: string | null = null;
+
+    public get computedAccept(): string {
+        if (this.allowedExtensions.length > 0) {
+            return this.allowedExtensions.map(e => e.startsWith('.') ? e : `.${e}`).join(',');
+        }
+        return this.accept;
+    }
 
     public get fileNameValue(): string {
         return this.file?.name ?? '';
@@ -121,6 +132,17 @@ export class FileUploadComponent implements ControlValueAccessor {
     }
 
     private setFile(file: File | null): void {
+        if (file && this.allowedExtensions.length > 0) {
+            const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+            const normalized = this.allowedExtensions.map(e =>
+                (e.startsWith('.') ? e : `.${e}`).toLowerCase()
+            );
+            if (!normalized.includes(ext)) {
+                this.extensionError = `Only ${this.allowedExtensions.join(', ')} files are accepted.`;
+                return;
+            }
+        }
+        this.extensionError = null;
         this.file = file;
         this.fileChange.emit(file);
         if (this._onChanged) this._onChanged(file);

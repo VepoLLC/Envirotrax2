@@ -108,6 +108,7 @@
                                 validationLabel="Test for Accuracy Report (TFA)"
                                 [(ngModel)]="tfaFile"
                                 [required]="true"
+                                [allowedExtensions]="['jpg', 'jpeg', 'gif', 'png', 'bmp', 'pdf']"
                                 [form]="form" />
             </div>
 

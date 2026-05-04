@@ -1,4 +1,5 @@
 
+using System.ComponentModel.DataAnnotations;
 using System.Transactions;
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
@@ -15,6 +16,8 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Professionals;
 
 public class ProfessionalInsuranceService : Service<ProfessionalInsurance, ProfessionalInsuranceDto>, IProfessionalInsuranceService
 {
+    private static readonly string[] AllowedFileExtensions = [".jpg", ".jpeg", ".gif", ".png", ".bmp", ".pdf"];
+
     private readonly IProfessionalInsuranceRepository _insuranceRepository;
     private readonly IFileStorageService _fileStorageService;
     private readonly ITimeZoneHelperService _timeZoneHelper;
@@ -67,7 +70,10 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
 
     public async Task<ProfessionalInsuranceDto> AddAsync(Stream fileStream, string originalFileName, ProfessionalInsuranceDto insurance)
     {
-        var fileExtension = Path.GetExtension(originalFileName);
+        var fileExtension = Path.GetExtension(originalFileName).ToLower();
+        if (!AllowedFileExtensions.Contains(fileExtension))
+            throw new ValidationException($"Only {string.Join(", ", AllowedFileExtensions)} files are accepted.");
+
         insurance.FilePath = $"professionals/{_authService.ProfessionalId}/insurances/{Guid.NewGuid()}{fileExtension}";
 
         using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
@@ -82,7 +88,10 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
 
     public async Task<ProfessionalInsuranceDto> AddForProfessionalAsync(int professionalId, Stream fileStream, string originalFileName, ProfessionalInsuranceDto dto)
     {
-        var fileExtension = Path.GetExtension(originalFileName);
+        var fileExtension = Path.GetExtension(originalFileName).ToLower();
+        if (!AllowedFileExtensions.Contains(fileExtension))
+            throw new ValidationException($"Only {string.Join(", ", AllowedFileExtensions)} files are accepted.");
+
         dto.FilePath = $"professionals/{professionalId}/insurances/{Guid.NewGuid()}{fileExtension}";
 
         var model = MapToModel(dto)!;
@@ -112,7 +121,10 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         var existing = await Repository.GetAsync(dto.Id, CancellationToken.None);
         var oldFilePath = existing?.FilePath;
 
-        var fileExtension = Path.GetExtension(originalFileName);
+        var fileExtension = Path.GetExtension(originalFileName).ToLower();
+        if (!AllowedFileExtensions.Contains(fileExtension))
+            throw new ValidationException($"Only {string.Join(", ", AllowedFileExtensions)} files are accepted.");
+
         dto.FilePath = $"professionals/{professionalId}/insurances/{Guid.NewGuid()}{fileExtension}";
 
         var model = MapToModel(dto)!;

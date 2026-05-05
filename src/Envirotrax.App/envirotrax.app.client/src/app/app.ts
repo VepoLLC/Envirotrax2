@@ -503,7 +503,7 @@ export class App implements OnInit {
           {
             title: 'Backflow Test Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['backflow/tests'],
+            routerLink: ['professionals/backflow/tests'],
             hasPermission: isBackflowTester,
             hasFeature: true
           },

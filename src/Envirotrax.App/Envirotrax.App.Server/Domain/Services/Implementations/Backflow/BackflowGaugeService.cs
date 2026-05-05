@@ -1,4 +1,5 @@
 
+using System.ComponentModel.DataAnnotations;
 using System.Transactions;
 using AutoMapper;
 using Envirotrax.App.Server.Data.Models.Backflow;
@@ -13,6 +14,8 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Backflow;
 
 public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IBackflowGaugeService
 {
+    private static readonly string[] AllowedFileExtensions = [".jpg", ".jpeg", ".gif", ".png", ".bmp", ".pdf"];
+
     private readonly IFileStorageService _fileStorageService;
     private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly IAuthService _authService;
@@ -50,7 +53,10 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
 
     public async Task<BackflowGaugeDto> AddWithFileAsync(Stream fileStream, string originalFileName, BackflowGaugeDto dto)
     {
-        var fileExtension = Path.GetExtension(originalFileName);
+        var fileExtension = Path.GetExtension(originalFileName).ToLower();
+        if (!AllowedFileExtensions.Contains(fileExtension))
+            throw new ValidationException($"Only {string.Join(", ", AllowedFileExtensions)} files are accepted.");
+
         dto.FilePath = $"professionals/{_authService.ProfessionalId}/gauges/{Guid.NewGuid()}{fileExtension}";
 
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);

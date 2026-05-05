@@ -44,108 +44,113 @@
 </div>
 
 <div class="mt-3">
-<vp-section header="Register new gauge">
-    <p class="text-center text-danger fw-bold">
-        Please read the following important information on how to register and manage your gauges
-    </p>
-
-    <h3 class="text-bg-light p-2 border h6">Register your gauge</h3>
-    <div class="mx-1">
-        <p>
-            Click the <strong>Register New Gauge</strong> button below to register a new gauge with your account.
-            A new blank gauge will be added to the Gauge Management section above. Please enter the gauge's
-            Manufacturer, Model, Serial Number, and click the OK button. This will complete the registration, however,
-            your gauge will still need to be validated by Vepo personnel before it can be used.
+    <vp-section header="Register new gauge">
+        <p class="text-center text-danger fw-bold">
+            Please read the following important information on how to register and manage your gauges
         </p>
-    </div>
 
-    <h3 class="text-bg-light p-2 border h6">Gauge validation</h3>
-    <div class="mx-1">
-        <p>
-            For Test for Accuracy Reports (TFA) you must upload an electronic copy of your Test for Accuracy Report
-            to your account by clicking on the <strong>Choose File</strong> button and selecting the TFA file to upload.
-            The gauge will not be available for use until the test for accuracy expiration date is entered by Vepo
-            personnel into the system. Test for accuracy reports are normally validated within an hour, but could take
-            as long as one business day on rare occasions.
-        </p>
-    </div>
+        <h3 class="text-bg-light p-2 border h6">Register your gauge</h3>
+        <div class="mx-1">
+            <p>
+                Click the <strong>Register New Gauge</strong> button below to register a new gauge with your account.
+                A new blank gauge will be added to the Gauge Management section above. Please enter the gauge's
+                Manufacturer, Model, Serial Number, and click the OK button. This will complete the registration,
+                however,
+                your gauge will still need to be validated by Vepo personnel before it can be used.
+            </p>
+        </div>
 
-    <div *ngIf="newGauge" class="d-flex justify-content-center" dp-spinner-parent>
-        <dp-loading-spinner *ngIf="isNewGaugeLoading" />
-        <form #form="ngForm" (ngSubmit)="saveGauge(form)" style="width: 100%; max-width: 480px;">
-            <div class="mb-3">
-                <vp-input name="manufacturer"
-                          label="Manufacturer"
-                          [(ngModel)]="newGauge.manufacturer"
-                          [required]="true"
-                          [maxLength]="100"
-                          [form]="form" />
-            </div>
+        <h3 class="text-bg-light p-2 border h6">Gauge validation</h3>
+        <div class="mx-1">
+            <p>
+                For Test for Accuracy Reports (TFA) you must upload an electronic copy of your Test for Accuracy Report
+                to your account by clicking on the <strong>Choose File</strong> button and selecting the TFA file to
+                upload.
+                The gauge will not be available for use until the test for accuracy expiration date is entered by Vepo
+                personnel into the system. Test for accuracy reports are normally validated within an hour, but could
+                take
+                as long as one business day on rare occasions.
+            </p>
+        </div>
 
-            <div class="mb-3">
-                <vp-input name="model"
-                          label="Model"
-                          [(ngModel)]="newGauge.model"
-                          [required]="true"
-                          [maxLength]="100"
-                          [form]="form" />
-            </div>
-
-            <div class="mb-3">
-                <vp-input name="serialNumber"
-                          label="Serial number"
-                          [(ngModel)]="newGauge.serialNumber"
-                          [required]="true"
-                          [maxLength]="50"
-                          [form]="form" />
-            </div>
-
-            <div class="mb-3">
-                <p>
-                    Please click on the Choose File button below and select the Test for Accuracy Report (TFA) you wish to upload.
-                </p>
-                <vp-file-upload name="tfaFile"
-                                validationLabel="Test for Accuracy Report (TFA)"
-                                [(ngModel)]="tfaFile"
-                                [required]="true"
-                                [form]="form" />
-            </div>
-
-            <div class="form-check mb-3">
-                <input id="is-portable"
-                       type="checkbox"
-                       class="form-check-input"
-                       [(ngModel)]="newGauge.isPortable"
-                       name="isPortable">
-                <label for="is-portable" class="form-check-label">
-                    Portable gauge
-                </label>
-            </div>
-
-            <div class="form-check mb-3">
-                <input id="has-read-help"
-                       type="checkbox"
-                       class="form-check-input"
-                       [(ngModel)]="hasReadHelp"
-                       name="hasReadHelp"
-                       required>
-                <label for="has-read-help"
-                       class="form-check-label"
-                       [class.text-danger]="form.submitted && !hasReadHelp">
-                    I have read and understand the process of registering and validating a gauge with my account.
-                </label>
-            </div>
-
-            <div class="mt-3">
-                <vp-validation-summary [form]="form" [validationErrors]="newGaugeValidationErrors" />
-
-                <div class="d-flex justify-content-center">
-                    <button type="submit" class="btn btn-primary w-100">
-                        Register New Gauge
-                    </button>
+        <div *ngIf="newGauge" class="d-flex justify-content-center" dp-spinner-parent>
+            <dp-loading-spinner *ngIf="isNewGaugeLoading" />
+            <form #form="ngForm" (ngSubmit)="saveGauge(form)" style="width: 100%; max-width: 480px;">
+                <div class="mb-3">
+                    <vp-input name="manufacturer"
+                              label="Manufacturer"
+                              [(ngModel)]="newGauge.manufacturer"
+                              [required]="true"
+                              [maxLength]="100"
+                              [form]="form" />
                 </div>
-            </div>
-        </form>
-    </div>
-</vp-section>
+
+                <div class="mb-3">
+                    <vp-input name="model"
+                              label="Model"
+                              [(ngModel)]="newGauge.model"
+                              [required]="true"
+                              [maxLength]="100"
+                              [form]="form" />
+                </div>
+
+                <div class="mb-3">
+                    <vp-input name="serialNumber"
+                              label="Serial number"
+                              [(ngModel)]="newGauge.serialNumber"
+                              [required]="true"
+                              [maxLength]="50"
+                              [form]="form" />
+                </div>
+
+                <div class="mb-3">
+                    <p>
+                        Please click on the Choose File button below and select the Test for Accuracy Report (TFA) you
+                        wish to upload.
+                    </p>
+                    <vp-file-upload name="tfaFile"
+                                    validationLabel="Test for Accuracy Report (TFA)"
+                                    [(ngModel)]="tfaFile"
+                                    [required]="true"
+                                    accept=".jpg, .jpeg, .gif, .png, .bmp, .pdf"
+                                    [form]="form" />
+                </div>
+
+                <div class="form-check mb-3">
+                    <input id="is-portable"
+                           type="checkbox"
+                           class="form-check-input"
+                           [(ngModel)]="newGauge.isPortable"
+                           name="isPortable">
+                    <label for="is-portable" class="form-check-label">
+                        Portable gauge
+                    </label>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input id="has-read-help"
+                           type="checkbox"
+                           class="form-check-input"
+                           [(ngModel)]="hasReadHelp"
+                           name="hasReadHelp"
+                           required>
+                    <label for="has-read-help"
+                           class="form-check-label"
+                           [class.text-danger]="form.submitted && !hasReadHelp">
+                        I have read and understand the process of registering and validating a gauge with my account.
+                    </label>
+                </div>
+
+                <div class="mt-3">
+                    <vp-validation-summary [form]="form" [validationErrors]="newGaugeValidationErrors" />
+
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn btn-primary w-100">
+                            Register New Gauge
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </vp-section>
 </div>

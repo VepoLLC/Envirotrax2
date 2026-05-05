@@ -68,6 +68,7 @@ export class FileUploadComponent implements ControlValueAccessor {
     public fileChange = new EventEmitter<File | null>();
 
     public isDragOver: boolean = false;
+    public extensionError: string | null = null;
 
     public get fileNameValue(): string {
         return this.file?.name ?? '';
@@ -120,11 +121,33 @@ export class FileUploadComponent implements ControlValueAccessor {
         this.setFile(null);
     }
 
+    private validateExtension(file: File | null): boolean {
+        if (file && this.accept != '*/*') {
+            const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+
+            const normalized = this.accept.split(',').map(e => {
+                const cleaned = e.trim().toLowerCase();
+                return cleaned.startsWith('.') ? cleaned : `.${cleaned}`
+            });
+
+            if (!normalized.includes(ext)) {
+                this.extensionError = `Only ${normalized.join(', ')} files are accepted.`;
+                return false;
+            }
+        }
+
+        this.extensionError = null;
+
+        return true;
+    }
+
     private setFile(file: File | null): void {
-        this.file = file;
-        this.fileChange.emit(file);
-        if (this._onChanged) this._onChanged(file);
-        if (this._onTouched) this._onTouched();
+        if (this.validateExtension(file)) {
+            this.file = file;
+            this.fileChange.emit(file);
+            if (this._onChanged) this._onChanged(file);
+            if (this._onTouched) this._onTouched();
+        }
     }
 
     public formatSize(bytes: number): string {

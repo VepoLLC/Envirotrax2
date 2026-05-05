@@ -1,4 +1,3 @@
-
 <div dp-spinner-parent>
     <dp-loading-spinner *ngIf="isLoading" />
 
@@ -15,6 +14,7 @@
         <div *ngIf="!isEditMode" class="mb-3">
             <vp-file-upload name="coiFile"
                             validationLabel="Certificate of insurance (COI)"
+                            accept=".jpg, .jpeg, .gif, .png, .bmp, .pdf"
                             [(ngModel)]="certificateFile"
                             [required]="true"
                             [form]="form" />

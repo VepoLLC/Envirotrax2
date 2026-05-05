@@ -1,4 +1,5 @@
 
+using System.ComponentModel.DataAnnotations;
 using System.Transactions;
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
@@ -15,6 +16,8 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Professionals;
 
 public class ProfessionalInsuranceService : Service<ProfessionalInsurance, ProfessionalInsuranceDto>, IProfessionalInsuranceService
 {
+    private static readonly string[] AllowedFileExtensions = [".jpg", ".jpeg", ".gif", ".png", ".bmp", ".pdf"];
+
     private readonly IProfessionalInsuranceRepository _insuranceRepository;
     private readonly IFileStorageService _fileStorageService;
     private readonly ITimeZoneHelperService _timeZoneHelper;
@@ -67,8 +70,15 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
 
     public async Task<ProfessionalInsuranceDto> AddAsync(Stream fileStream, string originalFileName, ProfessionalInsuranceDto dto)
     {
-        var professionalId = dto.Professional?.Id ?? _authService.ProfessionalId;
         var fileExtension = Path.GetExtension(originalFileName);
+
+        if (!AllowedFileExtensions.Contains(fileExtension, StringComparer.OrdinalIgnoreCase))
+        {
+            throw new ValidationException($"Only {string.Join(", ", AllowedFileExtensions)} files are accepted.");
+        }
+
+        var professionalId = dto.Professional?.Id ?? _authService.ProfessionalId;
+
         dto.FilePath = $"professionals/{professionalId}/insurances/{Guid.NewGuid()}{fileExtension}";
 
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);

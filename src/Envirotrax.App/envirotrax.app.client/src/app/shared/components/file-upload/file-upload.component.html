@@ -34,5 +34,6 @@
 </label>
 
 <div>
+    <div *ngIf="extensionError" class="text-danger small mt-1">{{ extensionError }}</div>
     <vp-validation-field *ngIf="form" [form]="form" [fieldName]="name" [fieldLabel]="validationLabel" />
 </div>

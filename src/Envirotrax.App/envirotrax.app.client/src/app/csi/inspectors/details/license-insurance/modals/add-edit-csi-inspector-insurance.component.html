@@ -1,4 +1,3 @@
-
 <div dp-spinner-parent>
     <dp-loading-spinner *ngIf="isLoading" />
 
@@ -34,7 +33,8 @@
         <h3 class="text-bg-light p-2 border h6">Reinstating Expired Insurance Policies</h3>
         <div class="mx-3">
             <p>
-                If your insurance policy has expired, you must obtain a renewed policy from your insurance provider before
+                If your insurance policy has expired, you must obtain a renewed policy from your insurance provider
+                before
                 reinstating it in the system. Once you have the updated policy, contact us so our staff can verify and
                 update
                 it.
@@ -54,13 +54,15 @@
 
         <div class="mb-3">
             <p *ngIf="!isEditMode">
-                Please click on the Choose File button below and select the Certificate of Insurance (COI) you wish to upload.
+                Please click on the Choose File button below and select the Certificate of Insurance (COI) you wish to
+                upload.
             </p>
             <p *ngIf="isEditMode" class="text-muted small">
                 Upload a new Certificate of Insurance (COI) only if you want to replace the existing file.
             </p>
             <vp-file-upload name="coiFile"
                             validationLabel="Certificate of Insurance (COI)"
+                            accept=".jpg, .jpeg, .gif, .png, .bmp, .pdf"
                             [(ngModel)]="certificateFile"
                             [required]="!isEditMode"
                             [form]="form" />

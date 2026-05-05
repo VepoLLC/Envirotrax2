@@ -50,9 +50,6 @@ export class FileUploadComponent implements ControlValueAccessor {
     public accept: string = '*/*';
 
     @Input()
-    public allowedExtensions: string[] = [];
-
-    @Input()
     public label: string = 'Choose a file or drag and drop here';
 
     @Input()
@@ -72,13 +69,6 @@ export class FileUploadComponent implements ControlValueAccessor {
 
     public isDragOver: boolean = false;
     public extensionError: string | null = null;
-
-    public get computedAccept(): string {
-        if (this.allowedExtensions.length > 0) {
-            return this.allowedExtensions.map(e => e.startsWith('.') ? e : `.${e}`).join(',');
-        }
-        return this.accept;
-    }
 
     public get fileNameValue(): string {
         return this.file?.name ?? '';
@@ -131,22 +121,33 @@ export class FileUploadComponent implements ControlValueAccessor {
         this.setFile(null);
     }
 
-    private setFile(file: File | null): void {
-        if (file && this.allowedExtensions.length > 0) {
+    private validateExtension(file: File | null): boolean {
+        if (file && this.accept != '*/*') {
             const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-            const normalized = this.allowedExtensions.map(e =>
-                (e.startsWith('.') ? e : `.${e}`).toLowerCase()
-            );
+
+            const normalized = this.accept.split(',').map(e => {
+                const cleaned = e.trim().toLowerCase();
+                return cleaned.startsWith('.') ? cleaned : `.${cleaned}`
+            });
+
             if (!normalized.includes(ext)) {
-                this.extensionError = `Only ${this.allowedExtensions.join(', ')} files are accepted.`;
-                return;
+                this.extensionError = `Only ${normalized.join(', ')} files are accepted.`;
+                return false;
             }
         }
+
         this.extensionError = null;
-        this.file = file;
-        this.fileChange.emit(file);
-        if (this._onChanged) this._onChanged(file);
-        if (this._onTouched) this._onTouched();
+
+        return true;
+    }
+
+    private setFile(file: File | null): void {
+        if (this.validateExtension(file)) {
+            this.file = file;
+            this.fileChange.emit(file);
+            if (this._onChanged) this._onChanged(file);
+            if (this._onTouched) this._onTouched();
+        }
     }
 
     public formatSize(bytes: number): string {

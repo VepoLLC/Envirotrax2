@@ -7,7 +7,7 @@
 
     <input type="file"
            class="d-none"
-           [accept]="computedAccept"
+           [accept]="accept"
            (change)="onFileSelected($event)" />
 
     <ng-container *ngIf="!file">

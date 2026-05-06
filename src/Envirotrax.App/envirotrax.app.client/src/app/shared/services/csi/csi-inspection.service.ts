@@ -7,7 +7,6 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { CsiInspection } from "../../models/csi/csi-inspection";
-import { CsiProfessionalSearchRequest } from "../../models/csi/csi-inspection-enums";
 
 @Injectable({
     providedIn: 'root'
@@ -72,26 +71,10 @@ export class CsiInspectionService {
         return lastValueFrom(this._http.post<CsiInspection>(url, inspection));
     }
 
-    public getProfessionalInspections(pageInfo: PageInfo, query: Query, searchRequest: CsiProfessionalSearchRequest): Promise<PagedData<CsiInspection>> {
+    public getProfessionalInspections(pageInfo: PageInfo, query: Query, latestOnly: boolean): Promise<PagedData<CsiInspection>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/csi/inspections');
         let params: HttpParams = this._queryHelper.buildQuery(pageInfo, query);
-        params = params.append('latestOnly', String(searchRequest.latestOnly));
-        if (searchRequest.passFail)
-        {
-            params = params.append('passFail', searchRequest.passFail);
-        }
-        if (searchRequest.dateType)
-        {
-            params = params.append('dateType', searchRequest.dateType);
-        }
-        if (searchRequest.fromDate)
-        {
-            params = params.append('fromDate', searchRequest.fromDate);
-        }
-        if (searchRequest.toDate)
-        {
-            params = params.append('toDate', searchRequest.toDate);
-        }
+        params = params.append('latestOnly', String(latestOnly));
         return lastValueFrom(this._http.get<PagedData<CsiInspection>>(url, { params }));
     }
 }

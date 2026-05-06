@@ -23,7 +23,7 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
     {
-        var result = await _inspectionService.GetForProfessionalAsync(id, cancellationToken);
+        var result = await _inspectionService.GetAsync(id, cancellationToken);
         if (result == null)
         {
             return NotFound();
@@ -33,9 +33,9 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetProfessionalInspectionsAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, [FromQuery] CsiInspectionProfessionalSearchRequest searchRequest, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetProfessionalInspectionsAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, [FromQuery] bool latestOnly, CancellationToken cancellationToken)
     {
-        var result = await _inspectionService.SearchForProfessionalAsync(pageInfo, query, searchRequest, cancellationToken);
+        var result = await _inspectionService.SearchForProfessionalAsync(pageInfo, query, latestOnly, cancellationToken);
         return Ok(result);
     }
 

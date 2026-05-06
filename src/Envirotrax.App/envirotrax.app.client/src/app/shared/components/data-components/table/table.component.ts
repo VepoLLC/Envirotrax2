@@ -104,7 +104,7 @@ export class TableComponent implements OnChanges {
     }
 
     private canHaveAction(): boolean {
-        return this.canEdit || this.canDelete || this.customActions?.length > 0
+        return this.canEdit || this.canDelete || this.canViewDetails || this.customActions?.length > 0
     }
 
     private setActionsColumn(): void {

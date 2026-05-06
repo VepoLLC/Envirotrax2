@@ -508,79 +508,8 @@ export class App implements OnInit {
             hasFeature: true
           },
           {
-            title: 'Out of Service Requests',
-            iconCss: 'fa-regular fa-file-minus',
-            routerLink: ['/'],
-            hasPermission: isBackflowTester,
-            hasFeature: true
-          },
-          {
-            type: 'separator',
-            hasPermission: isBackflowTester,
-            hasFeature: true
-          },
-          {
-            title: 'BPAT Management',
-            iconCss: 'fa-regular fa-user',
-            routerLink: ['/'],
-            hasPermission: isAdmin && isBackflowTester,
-            hasFeature: true
-          },
-          {
-            title: 'Letter History',
-            iconCss: 'fa-regular fa-envelope',
-            routerLink: ['/'],
-            hasPermission: isBackflowTester,
-            hasFeature: true
-          },
-          {
-            type: 'separator',
-            hasPermission: isBackflowTester,
-            hasFeature: true
-          },
-          {
-            title: 'Backflow Report',
-            iconCss: 'fa-regular fa-chart-simple-horizontal',
-            routerLink: ['/'],
-            hasPermission: isBackflowTester,
-            hasFeature: true
-          },
-          {
-            title: 'Current Compliance Report',
-            iconCss: 'fa-regular fa-chart-pie-simple',
-            routerLink: ['/'],
-            hasPermission: isBackflowTester,
-            hasFeature: true
-          },
-          {
-            title: 'Compliance History Report',
-            iconCss: 'fa-solid fa-chart-line-up',
-            routerLink: ['/'],
-            hasPermission: isBackflowTester,
-            hasFeature: true
-          },
-          {
-            title: 'New/Removed Assemblies Report',
-            iconCss: 'fa-solid fa-chart-column',
-            routerLink: ['/'],
-            hasPermission: isBackflowTester,
-            hasFeature: true
-          },
-          {
-            type: 'separator',
-            hasPermission: isBackflowTester,
-            hasFeature: true
-          },
-          {
-            title: 'Compliance Management',
-            iconCss: 'fa-solid fa-list-check',
-            routerLink: ['/'],
-            hasPermission: isBackflowTester,
-            hasFeature: true
-          },
-          {
-            title: 'Property Log Management',
-            iconCss: 'fa-light fa-building-memo',
+            title: 'Submit Backflow Test',
+            iconCss: 'fa-regular fa-file-plus',
             routerLink: ['/'],
             hasPermission: isBackflowTester,
             hasFeature: true

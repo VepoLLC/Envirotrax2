@@ -37,13 +37,6 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         _siteService = siteService;
     }
 
-    public async Task<CsiInspectionDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken)
-    {
-        var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
-        var inspection = await _repository.GetForProfessionalAsync(id, professional!.Id, cancellationToken);
-        return inspection == null ? null : Mapper.Map<CsiInspectionDto>(inspection);
-    }
-
     public async Task<CsiInspectionDto> SubmitAsync(CsiInspectionDto request, CancellationToken cancellationToken)
     {
         var siteId = request.Site!.Id.Value;
@@ -90,12 +83,11 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         return Mapper.Map<CsiInspectionDto>(added);
     }
 
-     public async Task<IPagedData<CsiInspectionDto>> SearchForProfessionalAsync(PageInfo pageInfo, Query query, CsiInspectionProfessionalSearchRequest request, CancellationToken cancellationToken)
+    public async Task<IPagedData<CsiInspectionDto>> SearchForProfessionalAsync(PageInfo pageInfo, Query query, bool latestOnly, CancellationToken cancellationToken)
     {
         query.Filter = query.ConvertFilterProperties<CsiInspection, CsiInspectionDto>(Mapper);
         query.Sort = query.ConvertSortProperties<CsiInspection, CsiInspectionDto>(Mapper);
-        var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
-        var inspections = await _repository.SearchForProfessionalAsync(professional!.Id, pageInfo, query, request, cancellationToken);
+        var inspections = await _repository.SearchForProfessionalAsync(pageInfo, query, latestOnly, cancellationToken);
         return inspections.Select(m => Mapper.Map<CsiInspectionDto>(m)!).ToPagedData(pageInfo);
     }
 

@@ -1,13 +1,23 @@
 <h1 class="text-center h2">CSI Search</h1>
 
 <ng-template #statusTemplate let-data="rowData">
-    <div class="d-flex gap-1 justify-content-center">
-        <img [src]="isPassed(data) ? '/images/bstatus_green_on.png' : '/images/bstatus_green_off.png'"
-             [title]="isPassed(data) ? 'Passed Inspection' : 'Failed Inspection'"
-             alt="" />
-        <img [src]="isPaid(data) ? '/images/bstatus_red_on.png' : '/images/bstatus_red_off.png'"
-             [title]="isPaid(data) ? 'Paid' : 'Unpaid'"
-             alt="" />
+    <div class="d-flex gap-1">
+        <vp-status-icon *ngIf="isPassed(data)"
+                        imageSrc="/images/icons/bstatus-green-on.png"
+                        text="Passed inspection"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!isPassed(data)"
+                        imageSrc="/images/icons/bstatus-green-off.png"
+                        text="Failed inspection"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="isPaid(data)"
+                        imageSrc="/images/icons/bstatus-red-on.png"
+                        text="Paid"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!isPaid(data)"
+                        imageSrc="/images/icons/bstatus-red-off.png"
+                        text="Unpaid"
+                        [showText]="false" />
     </div>
 </ng-template>
 
@@ -57,8 +67,8 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <vp-filter-panel-field fieldName="waterSupplierId"
-                                                   label="Record Search Scope"
+                            <vp-filter-panel-field fieldName="waterSupplier.id"
+                                                   label="Record search scope"
                                                    type="select"
                                                    [form]="searchForm"
                                                    [options]="waterSupplierScopeOptions" />
@@ -66,51 +76,42 @@
 
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="site.accountNumber"
-                                                   label="Account Number"
+                                                   label="Account number"
                                                    [form]="searchForm" />
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Inspection History:</label>
+                            <label class="form-label">Inspection history:</label>
                             <vp-input type="select"
                                       [options]="inspectionHistoryOptions"
-                                      [ngModel]="searchRequest.latestOnly ? 'true' : 'false'"
+                                      [ngModel]="latestOnly ? 'true' : 'false'"
                                       (ngModelChange)="onLatestOnlyChange($event)"
                                       [ngModelOptions]="{standalone: true}" />
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Inspection Pass/Fail:</label>
+                            <label class="form-label">Inspection pass/fail:</label>
                             <vp-input type="select"
                                       [options]="passFailOptions"
-                                      [(ngModel)]="searchRequest.passFail"
+                                      [(ngModel)]="passFail"
                                       [ngModelOptions]="{standalone: true}" />
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label">Date To Search:</label>
-                            <vp-input type="select"
-                                      [options]="dateTypeOptions"
-                                      [(ngModel)]="searchRequest.dateType"
-                                      [ngModelOptions]="{standalone: true}" />
+                            <vp-filter-panel-field fieldName="inspectionDate"
+                                                   label="Inspection date"
+                                                   type="daterange"
+                                                   [form]="searchForm" />
                         </div>
 
-                        <ng-container *ngIf="searchRequest.dateType">
-                            <div class="mb-3">
-                                <label class="form-label">From Date:</label>
-                                <input type="date" class="form-control"
-                                       [(ngModel)]="searchRequest.fromDate"
-                                       [ngModelOptions]="{standalone: true}" />
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">To Date:</label>
-                                <input type="date" class="form-control"
-                                       [(ngModel)]="searchRequest.toDate"
-                                       [ngModelOptions]="{standalone: true}" />
-                            </div>
-                        </ng-container>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="createdTime"
+                                                   label="Submission date"
+                                                   type="daterange"
+                                                   [form]="searchForm" />
+                        </div>
                     </div>
                 </div>
 
@@ -125,7 +126,7 @@
                         <div class="row">
                             <div class="col-12 mb-3">
                                 <vp-filter-panel-field fieldName="propertyType"
-                                                       label="Property Type"
+                                                       label="Property type"
                                                        type="select"
                                                        [form]="searchForm"
                                                        [options]="propertyTypeOptions" />
@@ -133,7 +134,7 @@
 
                             <div class="col-12 mb-3">
                                 <vp-filter-panel-field fieldName="propertyBusinessName"
-                                                       label="Business Name"
+                                                       label="Business name"
                                                        [form]="searchForm" />
                             </div>
 
@@ -149,13 +150,13 @@
 
                             <div class="col-5 mb-3">
                                 <vp-filter-panel-field fieldName="propertyStreetName"
-                                                       label="Street Name"
+                                                       label="Street name"
                                                        [form]="searchForm" />
                             </div>
 
                             <div class="col-3 mb-3">
                                 <vp-filter-panel-field fieldName="propertyNumber"
-                                                       label="Suite/Apt #"
+                                                       label="Suite/apt #"
                                                        [form]="searchForm" />
                             </div>
 
@@ -173,13 +174,13 @@
                         <div class="row">
                             <div class="col-12 mb-3">
                                 <vp-filter-panel-field fieldName="mailingCompanyName"
-                                                       label="Company Name"
+                                                       label="Company name"
                                                        [form]="searchForm" />
                             </div>
 
                             <div class="col-12 mb-3">
                                 <vp-filter-panel-field fieldName="mailingContactName"
-                                                       label="Contact Name"
+                                                       label="Contact name"
                                                        [form]="searchForm" />
                             </div>
 
@@ -195,13 +196,13 @@
 
                             <div class="col-5 mb-3">
                                 <vp-filter-panel-field fieldName="mailingStreetName"
-                                                       label="Street Name"
+                                                       label="Street name"
                                                        [form]="searchForm" />
                             </div>
 
                             <div class="col-3 mb-3">
                                 <vp-filter-panel-field fieldName="mailingNumber"
-                                                       label="Suite/Apt #"
+                                                       label="Suite/apt #"
                                                        [form]="searchForm" />
                             </div>
 
@@ -256,19 +257,17 @@
 
     <div class="results-section">
     <vp-section [header]="'Inspection Search - ' + resultCount + ' Results'">
-        <div class="text-center mb-3">
-            <span class="me-3">
-                <img src="/images/bstatus_green_on.png" alt="Passed Inspection" class="me-1" />Passed Inspection
-            </span>
-            <span class="me-3">
-                <img src="/images/bstatus_green_off.png" alt="Failed Inspection" class="me-1" />Failed Inspection
-            </span>
-            <span class="me-3">
-                <img src="/images/bstatus_red_on.png" alt="Paid" class="me-1" />Paid
-            </span>
-            <span>
-                <img src="/images/bstatus_red_off.png" alt="Unpaid" class="me-1" />Unpaid
-            </span>
+        <div class="container mb-3">
+            <div class="row gap-2 justify-content-center mb-3">
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Passed inspection" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Failed inspection" />
+                </div>
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Paid" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-red-off.png" text="Unpaid" />
+                </div>
+            </div>
         </div>
 
         <vp-table *ngIf="inspections.length > 0"
@@ -279,7 +278,8 @@
                   [(query)]="query"
                   (queryChange)="loadInspections()"
                   (queryReset)="loadInspections()"
-                  [customActions]="customActions" />
+                  [canViewDetails]="true"
+                  (viewDetails)="viewInspection($event)" />
 
         <div *ngIf="inspections.length === 0" class="text-center py-3 text-muted">
             No records found matching the search criteria.

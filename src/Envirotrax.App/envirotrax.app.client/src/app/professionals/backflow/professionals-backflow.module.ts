@@ -5,9 +5,10 @@ import { SharedComponentsModule } from "../../shared/components/shared.component
 import { ProfessionalsBackflowRoutingModule } from "./professionals-backflow-routing.module";
 import { GaugeListComponent } from "./gauges/gauge-list.component";
 import { EditGaugeComponent } from "./gauges/edit/edit-gauge.component";
+import { ProfessionalBackflowTestListComponent } from "./tests/professional-backflow-test-list.component";
 
 @NgModule({
-    declarations: [GaugeListComponent, EditGaugeComponent],
+    declarations: [GaugeListComponent, EditGaugeComponent, ProfessionalBackflowTestListComponent],
     imports: [CommonModule, FormsModule, SharedComponentsModule, ProfessionalsBackflowRoutingModule]
 })
 export class ProfessionalsBackflowModule {}

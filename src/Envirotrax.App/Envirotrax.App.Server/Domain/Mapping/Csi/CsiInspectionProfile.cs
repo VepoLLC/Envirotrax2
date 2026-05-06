@@ -12,7 +12,6 @@ public class CsiInspectionProfile : Profile
     {
         CreateMap<CsiInspection, CsiInspectionDto>()
             .ForMember(dto => dto.Site, opt => opt.Ignore())
-            .ForMember(dto => dto.WaterSupplier, opt => opt.Ignore())
             .AfterMap((model, dto, context) =>
             {
                 dto.Site ??= new ReferencedSiteDto
@@ -22,9 +21,7 @@ public class CsiInspectionProfile : Profile
                     AccountNumber = model.Site?.AccountNumber,
                 };
 
-                dto.WaterSupplier = model.WaterSupplier != null
-                    ? context.Mapper.Map<ReferencedWaterSupplierDto>(model.WaterSupplier)
-                    : new ReferencedWaterSupplierDto { Id = model.WaterSupplierId };
+                dto.WaterSupplier ??= new ReferencedWaterSupplierDto { Id = model.WaterSupplierId };
 
                 if (model.PropertyStateId.HasValue)
                 {

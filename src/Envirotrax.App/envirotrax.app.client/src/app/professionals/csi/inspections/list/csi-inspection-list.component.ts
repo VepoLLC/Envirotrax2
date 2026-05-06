@@ -1,13 +1,12 @@
 import { Component, OnInit, AfterViewInit, ViewChild, TemplateRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CsiInspectionService } from '../../../../shared/services/csi/csi-inspection.service';
-import { CsiProfessionalSearchRequest } from '../../../../shared/models/csi/csi-inspection-enums';
 import { ProfessionalSupplierService } from '../../../../shared/services/professionals/professional-supplier.service';
 import { CsiInspection } from '../../../../shared/models/csi/csi-inspection';
 import { PageInfo } from '../../../../shared/models/page-info';
-import { Query, QueryProperty } from '../../../../shared/models/query';
+import { Query, QueryProperty, ComparisonOperator } from '../../../../shared/models/query';
 import { InputOption } from '../../../../shared/components/input/input.component';
-import { TableColumn, TableCustomAction, CellTemplateData } from '../../../../shared/components/data-components/table/table.component';
+import { TableColumn, CellTemplateData } from '../../../../shared/components/data-components/table/table.component';
 import { ColumnType } from '../../../../shared/components/data-components/sorting-filtering/query-view-model';
 
 
@@ -32,19 +31,9 @@ export class CsiInspectionListComponent implements OnInit, AfterViewInit {
         filter: []
     };
     public columns: TableColumn<CsiInspection>[] = [];
-    public customActions: TableCustomAction<CsiInspection>[] = [
-        {
-            text: 'View',
-            iconClass: 'fa-solid fa-magnifying-glass',
-            action: (inspection: CsiInspection) => this.viewInspection(inspection)
-        }
-    ];
 
-    public searchRequest: CsiProfessionalSearchRequest = {
-        latestOnly: true,
-        passFail: '',
-        dateType: ''
-    };
+    public latestOnly = true;
+    public passFail = '';
 
     public searchAttempted = false;
 
@@ -61,12 +50,6 @@ export class CsiInspectionListComponent implements OnInit, AfterViewInit {
         { id: '', text: 'Any result' },
         { id: '1', text: 'Passed' },
         { id: '2', text: 'Failed' }
-    ];
-
-    public dateTypeOptions: InputOption[] = [
-        { id: '', text: 'Any date range' },
-        { id: '1', text: 'Inspection Date' },
-        { id: '2', text: 'Submission Date' }
     ];
 
     public propertyTypeOptions: InputOption[] = [
@@ -107,14 +90,12 @@ export class CsiInspectionListComponent implements OnInit, AfterViewInit {
         try {
             this.isLoading = true;
 
-            const request: CsiProfessionalSearchRequest = {
-                latestOnly: this.searchRequest.latestOnly,
-                passFail: this.searchRequest.passFail,
-                dateType: this.searchRequest.dateType,
-                fromDate: this.searchRequest.fromDate,
-                toDate: this.searchRequest.toDate
+            const query: Query = {
+                ...this.query,
+                filter: [...(this.query.filter ?? []), ...this.buildExtraFilters()]
             };
-            const result = await this._inspectionService.getProfessionalInspections(this.pageInfo, this.query, request);
+
+            const result = await this._inspectionService.getProfessionalInspections(this.pageInfo, query, this.latestOnly);
             this.inspections = result.data ?? [];
             this.pageInfo = result.pageInfo ?? {};
             this.resultCount = this.pageInfo.totalItems ?? this.inspections.length;
@@ -123,8 +104,34 @@ export class CsiInspectionListComponent implements OnInit, AfterViewInit {
         }
     }
 
+    private buildExtraFilters(): QueryProperty[] {
+        const filters: QueryProperty[] = [];
+
+        if (this.passFail === '1') {
+            for (let n = 1; n <= 6; n++) {
+                filters.push({
+                    columnName: `compliance${n}`,
+                    value: 'true',
+                    comparisonOperator: 'Eq' as ComparisonOperator,
+                    logicalOperator: 'And' as const
+                });
+            }
+        } else if (this.passFail === '2') {
+            for (let n = 1; n <= 6; n++) {
+                filters.push({
+                    columnName: `compliance${n}`,
+                    value: 'false',
+                    comparisonOperator: 'Eq' as ComparisonOperator,
+                    logicalOperator: 'Or' as const
+                });
+            }
+        }
+
+        return filters;
+    }
+
     public onLatestOnlyChange(value: string): void {
-        this.searchRequest.latestOnly = value === 'true';
+        this.latestOnly = value === 'true';
     }
 
     public searchAgain(): void {

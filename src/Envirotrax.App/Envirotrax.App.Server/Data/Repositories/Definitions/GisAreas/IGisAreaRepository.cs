@@ -6,4 +6,6 @@ public interface IGisAreaRepository : IRepository<GisArea>
 {
     Task<DefaultGisMapView> GetDefaultMapViewAsync(CancellationToken cancellationToken);
     Task<DefaultGisMapView> UpdateDefaultMapViewAsync(DefaultGisMapView mapView);
+
+    Task UpdateBoundsAsync(int areaId, double minLongitude, double minLatitude, double maxLongitude, double maxLatitude);
 }

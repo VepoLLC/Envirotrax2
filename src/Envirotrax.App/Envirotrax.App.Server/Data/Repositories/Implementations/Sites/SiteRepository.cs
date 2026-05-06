@@ -53,4 +53,9 @@ public class SiteRepository : Repository<Site>, ISiteRepository
             .AsNoTracking()
             .ToListAsync();
     }
+
+    // public async Task<Site> UpdateGisCoordinatesAsync(Site site)
+    // {
+
+    // }
 }

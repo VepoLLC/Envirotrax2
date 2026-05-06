@@ -43,4 +43,15 @@ public class GisAreaCoordinateRepository : Repository<GisAreaCoordinate, long>, 
             .Where(c => c.AreaId == areaId)
             .ExecuteDeleteAsync();
     }
+
+    public async Task<IEnumerable<IGrouping<int, GisAreaCoordinate>>> GetByPointAsync(double longitude, double latitude, CancellationToken cancellationToken)
+    {
+        return await DbContext
+            .GisAreaCoordinates
+            .Where(coordiante =>
+                coordiante.Area!.MinLongitude <= longitude && coordiante.Area!.MaxLongitude >= longitude &&
+                coordiante.Area!.MinLatitude <= latitude && coordiante.Area!.MaxLatitude >= latitude
+            ).GroupBy(coordinate => coordinate.AreaId)
+            .ToListAsync(cancellationToken);
+    }
 }

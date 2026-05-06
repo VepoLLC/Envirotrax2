@@ -17,6 +17,18 @@ public class GisAreaRepository : Repository<GisArea>, IGisAreaRepository
         _tenantProvider = tenantProvider;
     }
 
+    protected override void UpdateEntity(GisArea model)
+    {
+        base.UpdateEntity(model);
+
+        var entry = DbContext.Entry(model);
+
+        entry.Property(a => a.MinLongitude).IsModified = false;
+        entry.Property(a => a.MinLatitude).IsModified = false;
+        entry.Property(a => a.MaxLongitude).IsModified = false;
+        entry.Property(a => a.MaxLatitude).IsModified = false;
+    }
+
     public async Task<DefaultGisMapView> GetDefaultMapViewAsync(CancellationToken cancellationToken)
     {
         return await DbContext
@@ -46,5 +58,18 @@ public class GisAreaRepository : Repository<GisArea>, IGisAreaRepository
         await DbContext.SaveChangesAsync();
 
         return mapView;
+    }
+
+    public async Task UpdateBoundsAsync(int areaId, double minLongitude, double minLatitude, double maxLongitude, double maxLatitude)
+    {
+        await DbContext
+            .GisAreas
+            .Where(a => a.Id == areaId)
+            .ExecuteUpdateAsync(set => set
+                .SetProperty(a => a.MinLongitude, minLongitude)
+                .SetProperty(a => a.MinLatitude, minLatitude)
+                .SetProperty(a => a.MaxLongitude, maxLongitude)
+                .SetProperty(a => a.MaxLatitude, maxLatitude)
+            );
     }
 }

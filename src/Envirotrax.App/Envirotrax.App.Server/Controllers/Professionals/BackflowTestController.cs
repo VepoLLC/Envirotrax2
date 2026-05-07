@@ -22,7 +22,7 @@ public class BackflowTestController : ProfessionalProtectedController
     [HttpGet]
     public async Task<IActionResult> GetAllAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
     {
-        var result = await _backflowTestService.GetAllAsync(pageInfo, query, cancellationToken);
+        var result = await _backflowTestService.SearchForProfessionalAsync(pageInfo, query, cancellationToken);
         return Ok(result);
     }
 }

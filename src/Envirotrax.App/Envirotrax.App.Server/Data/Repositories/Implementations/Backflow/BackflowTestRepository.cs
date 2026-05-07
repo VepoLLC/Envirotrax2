@@ -60,4 +60,15 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
 
         return await paginated.ToListAsync(cancellationToken);
     }
+
+    public async Task<IEnumerable<BackflowTest>> SearchForProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var paginated = await GetListQuery()
+            .Where(bt => bt.ProfessionalId == professionalId)
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
 }

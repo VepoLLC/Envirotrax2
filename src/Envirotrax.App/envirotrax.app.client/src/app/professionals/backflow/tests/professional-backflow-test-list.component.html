@@ -5,14 +5,14 @@
         <vp-filter-panel (filterChange)="onFilterChange($event)">
 
             <!-- General Search Criteria -->
-            <vp-section header="Search criteria">
+            <vp-section header="Search Criteria">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <vp-filter-panel-field fieldName="recordScope"
+                            <vp-filter-panel-field fieldName="waterSupplierId"
                                                    label="Record search scope"
                                                    type="select"
-                                                   [options]="recordScopeOptions"
+                                                   [options]="waterSupplierScopeOptions"
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-3">
@@ -53,7 +53,7 @@
             <!-- Location / Property + Contact / Mailing side by side -->
             <div class="row mt-3">
                 <div class="col-md-6">
-                    <vp-section header="Location / property criteria">
+                    <vp-section header="Location / Property Criteria">
                         <div class="row">
                             <div class="col-12 mb-3">
                                 <vp-filter-panel-field fieldName="propertyType"
@@ -87,7 +87,7 @@
                 </div>
 
                 <div class="col-md-6 mt-3 mt-md-0">
-                    <vp-section header="Contact / mailing criteria">
+                    <vp-section header="Contact / Mailing Criteria">
                         <div class="row">
                             <div class="col-12 mb-3">
                                 <vp-filter-panel-field fieldName="mailingCompanyName"
@@ -143,7 +143,7 @@
         </button>
     </div>
 
-    <vp-section header="Backflow test search results">
+    <vp-section header="Backflow Test Search Results">
         <vp-table *ngIf="table.items"
                   [columns]="table.columns!"
                   [data]="table.items.data"

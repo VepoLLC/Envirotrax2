@@ -78,6 +78,7 @@ export class CsiInspectionListComponent implements OnInit, AfterViewInit {
     }
 
     public async search(): Promise<void> {
+        this.columns = this.buildColumns();
         this.searchAttempted = true;
         this.pageInfo = {};
         await this.loadInspections();
@@ -107,24 +108,13 @@ export class CsiInspectionListComponent implements OnInit, AfterViewInit {
     private buildExtraFilters(): QueryProperty[] {
         const filters: QueryProperty[] = [];
 
-        if (this.passFail === '1') {
-            for (let n = 1; n <= 6; n++) {
-                filters.push({
-                    columnName: `compliance${n}`,
-                    value: 'true',
-                    comparisonOperator: 'Eq' as ComparisonOperator,
-                    logicalOperator: 'And' as const
-                });
-            }
-        } else if (this.passFail === '2') {
-            for (let n = 1; n <= 6; n++) {
-                filters.push({
-                    columnName: `compliance${n}`,
-                    value: 'false',
-                    comparisonOperator: 'Eq' as ComparisonOperator,
-                    logicalOperator: 'Or' as const
-                });
-            }
+        if (this.passFail) {
+            filters.push({
+                columnName: 'inspectionResult',
+                value: this.passFail === '1' ? 'true' : 'false',
+                comparisonOperator: 'Eq' as ComparisonOperator,
+                logicalOperator: 'And' as const
+            });
         }
 
         return filters;
@@ -159,8 +149,7 @@ export class CsiInspectionListComponent implements OnInit, AfterViewInit {
     }
 
     public isPassed(inspection: CsiInspection): boolean {
-        return !!(inspection.compliance1 && inspection.compliance2 && inspection.compliance3 &&
-                  inspection.compliance4 && inspection.compliance5 && inspection.compliance6);
+        return !!inspection.inspectionResult;
     }
 
     public isPaid(inspection: CsiInspection): boolean {

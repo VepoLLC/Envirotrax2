@@ -96,6 +96,7 @@ export interface CsiInspection {
     aiIrrigationSystem2?: boolean;
     aiHasDomesticPremisesIsolation?: boolean;
     aiRequiresDomesticPremisesIsolation?: boolean;
+    inspectionResult?: boolean;
 
     comments?: string | null;
 

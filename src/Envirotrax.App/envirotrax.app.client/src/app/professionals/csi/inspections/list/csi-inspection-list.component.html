@@ -1,20 +1,20 @@
 <h1 class="text-center h2">CSI Search</h1>
 
-<ng-template #statusTemplate let-data="rowData">
+<ng-template #statusTemplate let-inspection="rowData">
     <div class="d-flex gap-1">
-        <vp-status-icon *ngIf="isPassed(data)"
+        <vp-status-icon *ngIf="inspection.inspectionResult"
                         imageSrc="/images/icons/bstatus-green-on.png"
                         text="Passed inspection"
                         [showText]="false" />
-        <vp-status-icon *ngIf="!isPassed(data)"
+        <vp-status-icon *ngIf="!inspection.inspectionResult"
                         imageSrc="/images/icons/bstatus-green-off.png"
                         text="Failed inspection"
                         [showText]="false" />
-        <vp-status-icon *ngIf="isPaid(data)"
+        <vp-status-icon *ngIf="inspection.transactionId"
                         imageSrc="/images/icons/bstatus-red-on.png"
                         text="Paid"
                         [showText]="false" />
-        <vp-status-icon *ngIf="!isPaid(data)"
+        <vp-status-icon *ngIf="!inspection.transactionId"
                         imageSrc="/images/icons/bstatus-red-off.png"
                         text="Unpaid"
                         [showText]="false" />
@@ -90,11 +90,11 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Inspection pass/fail:</label>
-                            <vp-input type="select"
-                                      [options]="passFailOptions"
-                                      [(ngModel)]="passFail"
-                                      [ngModelOptions]="{standalone: true}" />
+                            <vp-filter-panel-field fieldName="inspectionResult"
+                                                   label="Inspection pass/fail:"
+                                                   type="select"
+                                                   [options]="passFailOptions"
+                                                   [form]="searchForm" />
                         </div>
                     </div>
 
@@ -219,7 +219,7 @@
         </vp-filter-panel>
 
         <div class="mt-3">
-            <div *ngIf="searchAttempted && !isLoading && inspections.length === 0"
+            <div *ngIf="searchAttempted && !inspections.items!.data!.length"
                  class="alert alert-info text-center mb-3">
                 No records found matching the search criteria.
             </div>
@@ -227,7 +227,7 @@
             <div class="d-flex justify-content-center">
                 <button type="submit"
                         class="btn btn-primary vp-section-button"
-                        [disabled]="isLoading">
+                        [disabled]="inspections.isLoading">
                     <i class="fa-solid fa-magnifying-glass me-1"></i>
                     Search
                 </button>
@@ -236,10 +236,10 @@
     </form>
 </div>
 
-<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+<dp-loading-spinner *ngIf="inspections.isLoading"></dp-loading-spinner>
 
 
-<div *ngIf="showResults && !isLoading">
+<div *ngIf="showResults && !inspections.isLoading">
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <button type="button" class="btn btn-primary vp-section-button">
             <i class="fa-regular fa-file-export me-1"></i>
@@ -256,34 +256,34 @@
     </div>
 
     <div class="results-section">
-    <vp-section [header]="'Inspection Search - ' + resultCount + ' Results'">
-        <div class="container mb-3">
-            <div class="row gap-2 justify-content-center mb-3">
-                <div class="col-auto mb-2">
-                    <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Passed inspection" />
-                    <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Failed inspection" />
-                </div>
-                <div class="col-auto mb-2">
-                    <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Paid" />
-                    <vp-status-icon imageSrc="/images/icons/bstatus-red-off.png" text="Unpaid" />
+        <vp-section header="Inspection Search - {{inspections.items?.pageInfo?.totalItems || 0}} Results">
+            <div class="container mb-3">
+                <div class="row gap-2 justify-content-center mb-3">
+                    <div class="col-auto mb-2">
+                        <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Passed inspection" />
+                        <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Failed inspection" />
+                    </div>
+                    <div class="col-auto mb-2">
+                        <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Paid" />
+                        <vp-status-icon imageSrc="/images/icons/bstatus-red-off.png" text="Unpaid" />
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <vp-table *ngIf="inspections.length > 0"
-                  [columns]="columns"
-                  [data]="inspections"
-                  [(pageInfo)]="pageInfo"
-                  (pageInfoChange)="loadInspections()"
-                  [(query)]="query"
-                  (queryChange)="loadInspections()"
-                  (queryReset)="loadInspections()"
-                  [canViewDetails]="true"
-                  (viewDetails)="viewInspection($event)" />
+            <vp-table *ngIf="inspections.items && inspections.items.data && inspections.items.data.length > 0"
+                      [columns]="inspections.columns!"
+                      [data]="inspections.items.data"
+                      [(pageInfo)]="inspections.items.pageInfo"
+                      (pageInfoChange)="loadInspections()"
+                      [(query)]="inspections.query"
+                      (queryChange)="loadInspections()"
+                      (queryReset)="loadInspections()"
+                      [canViewDetails]="true"
+                      (viewDetails)="viewInspection($event)" />
 
-        <div *ngIf="inspections.length === 0" class="text-center py-3 text-muted">
-            No records found matching the search criteria.
-        </div>
-    </vp-section>
+            <div *ngIf="inspections?.items?.data?.length === 0" class="text-center py-3 text-muted">
+                No records found matching the search criteria.
+            </div>
+        </vp-section>
     </div>
 </div>

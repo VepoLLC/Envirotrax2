@@ -72,6 +72,11 @@ export class CsiInspectionService {
         return lastValueFrom(this._http.post<CsiInspection>(url, inspection));
     }
 
+    public updateApproval(id: number, request: { disapproved: boolean; disapprovedReason?: string | null }): Promise<CsiInspection> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${id}/approval`);
+        return lastValueFrom(this._http.put<CsiInspection>(url, request));
+    }
+
     public getProfessionalInspections(pageInfo: PageInfo, query: Query, searchRequest: CsiProfessionalSearchRequest): Promise<PagedData<CsiInspection>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/csi/inspections');
         let params: HttpParams = this._queryHelper.buildQuery(pageInfo, query);

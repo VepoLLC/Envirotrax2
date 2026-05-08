@@ -90,7 +90,13 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         return Mapper.Map<CsiInspectionDto>(added);
     }
 
-     public async Task<IPagedData<CsiInspectionDto>> SearchForProfessionalAsync(PageInfo pageInfo, Query query, CsiInspectionProfessionalSearchRequest request, CancellationToken cancellationToken)
+    public async Task<CsiInspectionDto?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken)
+    {
+        var inspection = await _repository.UpdateApprovalAsync(id, request, cancellationToken);
+        return inspection == null ? null : Mapper.Map<CsiInspectionDto>(inspection);
+    }
+
+    public async Task<IPagedData<CsiInspectionDto>> SearchForProfessionalAsync(PageInfo pageInfo, Query query, CsiInspectionProfessionalSearchRequest request, CancellationToken cancellationToken)
     {
         query.Filter = query.ConvertFilterProperties<CsiInspection, CsiInspectionDto>(Mapper);
         query.Sort = query.ConvertSortProperties<CsiInspection, CsiInspectionDto>(Mapper);

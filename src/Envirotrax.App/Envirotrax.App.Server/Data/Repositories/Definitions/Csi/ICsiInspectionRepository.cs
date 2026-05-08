@@ -8,4 +8,5 @@ public interface ICsiInspectionRepository : IRepository<CsiInspection>
 {
     Task<CsiInspection?> GetForProfessionalAsync(int id, int professionalId, CancellationToken cancellationToken);
     Task<IEnumerable<CsiInspection>> SearchForProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CsiInspectionProfessionalSearchRequest request, CancellationToken cancellationToken);
+    Task<CsiInspection?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken);
 }

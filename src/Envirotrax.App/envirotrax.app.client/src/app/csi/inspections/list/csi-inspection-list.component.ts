@@ -128,8 +128,8 @@ export class CsiInspectionListComponent implements OnInit {
         }
     }
 
-    public edit(inspection: CsiInspection): void {
-        this._router.navigate([inspection.id, 'edit'], {
+    public viewDetails(inspection: CsiInspection): void {
+        this._router.navigate([inspection.id, 'view'], {
             relativeTo: this._activatedRoute
         });
     }

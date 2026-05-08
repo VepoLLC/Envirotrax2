@@ -1,0 +1,343 @@
+<div>
+    <h1 class="text-center h2">CSI Inspection</h1>
+
+    <div class="d-flex">
+        <div>
+            <button class="btn me-auto"
+                    [class.btn-success]="!inspection?.disapproved"
+                    [class.btn-danger]="inspection?.disapproved"
+                    [disabled]="isLoading"
+                    (click)="toggleApproval()">
+                {{ inspection?.disapproved ? 'Disapproved' : 'Approved' }}
+            </button>
+        </div>
+        <div class="text-center mb-3 ms-auto me-auto">
+            <ul class="vp-tabs nav nav-pills settings-tabs d-inline-flex">
+                <li class="nav-item">
+                    <a class="nav-link" [class.active]="selectedTab === 'main'" [routerLink]="['/csi', id, 'view']" (click)="selectedTab = 'main'">Csi Main Form</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" [class.active]="selectedTab === 'assemblies'" [routerLink]="['/csi', id, 'view']" (click)="selectedTab = 'assemblies'">Assemblies At This Location</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" [class.active]="selectedTab === 'additional'" [routerLink]="['/csi', id, 'view']" (click)="selectedTab = 'additional'">Additional Information</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" [class.active]="selectedTab === 'images'" [routerLink]="['/csi', id, 'view']" (click)="selectedTab = 'images'">Images</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+    <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+    <div *ngIf="!isLoading && inspection">
+        <div class="row mt-3">
+            <vp-section header="Water Supplier">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <th>Water supplier:</th>
+                                    <td>{{ inspection.waterSupplier?.name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Address:</th>
+                                    <td>{{ inspection.waterSupplier?.address }}</td>
+                                </tr>
+                                <tr>
+                                    <th>PWS ID:</th>
+                                    <td>{{ inspection.waterSupplier?.pwsId }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="col-md-6">
+                        <table class="table table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <th>Contact name:</th>
+                                    <td>{{ inspection.waterSupplier?.contactName }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Phone number:</th>
+                                    <td>{{ inspection.waterSupplier?.phoneNumber }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Email address:</th>
+                                    <td>{{ inspection.waterSupplier?.emailAddress }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </vp-section>
+        </div>
+
+        <div class="row mt-3">
+            <vp-section header="CSI Inspector">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <th>Company name:</th>
+                                    <td>{{ inspection.inspectorCompanyName }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Title of inspector:</th>
+                                    <td>{{ inspection.inspectorJobTitle }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Inspector name:</th>
+                                    <td>{{ inspection.inspectorContactName }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Address:</th>
+                                    <td>{{ inspection.inspectorAddress }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="col-md-6">
+                        <table class="table table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <th>Phone number:</th>
+                                    <td>{{ inspection.inspectorCellNumber }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Email address:</th>
+                                    <td>{{ inspection.id }}</td>
+                                </tr>
+                                <tr>
+                                    <th>License number:</th>
+                                    <td>{{ inspection.inspectorLicenseNumber }}</td>
+                                </tr>
+                                <tr>
+                                    <th>License type:</th>
+                                    <td>{{ inspection.inspectorLicenseType }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </vp-section>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <vp-section header="Location / Property Information">
+                    <table class="table table-borderless mb-0">
+                        <tbody>
+                            <tr>
+                                <th>Property type:</th>
+                                <td>{{ getPropertyTypeLabel() }}</td>
+                            </tr>
+                            <tr>
+                                <th>Business name:</th>
+                                <td>{{ inspection.propertyBusinessName }}</td>
+                            </tr>
+                            <tr>
+                                <th>Property address:</th>
+                                <td>{{ inspection.propertyStreetNumber }} {{ inspection.propertyStreetName }} {{ inspection.propertyCity }} {{ inspection.propertyZip }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </vp-section>
+            </div>
+
+            <div class="col-md-6">
+                <vp-section header="Contact / Mailing Information">
+                    <table class="table table-borderless mb-0">
+                        <tbody>
+                            <tr>
+                                <th>Company name:</th>
+                                <td>{{ inspection.mailingCompanyName }}</td>
+                            </tr>
+                            <tr>
+                                <th>Contact name:</th>
+                                <td>{{ inspection.mailingContactName }}</td>
+                            </tr>
+                            <tr>
+                                <th>Mailing address:</th>
+                                <td>{{ inspection.mailingStreetNumber }} {{ inspection.mailingStreetName }} {{ inspection.mailingCity }} {{ inspection.mailingZip }}</td>
+                            </tr>
+                            <tr>
+                                <th>Phone number:</th>
+                                <td>{{ inspection.mailingPhoneNumber }}</td>
+                            </tr>
+                            <tr>
+                                <th>Email address:</th>
+                                <td>{{ inspection.mailingEmailAddress }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </vp-section>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <vp-section header="Inspection Results">
+                <div class="content">
+                    <table class="table table-sm mb-3">
+                        <tr>
+                            <td class="w-75 pe-2">Reason for Inspection:&nbsp;&nbsp;
+                                {{ getReasonForInspectionLabel() }}
+                            </td>
+                            <td class="w-25 ps-2">Inspection Date:&nbsp;&nbsp;
+                                {{ inspection.inspectionDate | date:'dd.MM.yyyy' }}
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="p-2 mb-3 border border-5 border-secondary-subtle">
+                        <table class="table tbl-round table-borderless table-sm">
+                            <tr>
+                                <td colspan="4">I,
+                                    <span class="text-decoration-underline">{{ inspection.inspectorContactName }}</span>, upon inspection of the private water distribution facilities connected to the aforementioned public water supply do hereby certify that, to the best of my knowledge.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td class="text-nowrap pe-2">Compliance</td>
+                                <td class="text-nowrap ps-2">Non-compliance</td>
+                            </tr>
+                            <tr>
+                                <td class="align-top">1.</td>
+                                <td class="align-top">No direct or indirect connection between the public drinking water supply and a
+                                    potential source of contamination exists. Potential sources of
+                                    contamination are isolated from the public water system by an air gap
+                                    or an appropriate backflow prevention assembly in accordance with
+                                    Commission regulations.
+                                </td>
+                                <td class="text-center">
+                                    <input type="radio" [checked]="inspection.compliance1 === true" disabled />
+                                </td>
+                                <td class="text-center">
+                                    <input type="radio" [checked]="inspection.compliance1 === false" disabled />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="align-top">2.</td>
+                                <td class="align-top">No cross-connection between the public drinking water supply and a
+                                    private water system exists. Where an actual air gap is not maintained
+                                    between the public water supply and a private water supply, an
+                                    approved reduced pressure principle backflow prevention assembly is
+                                    properly installed.
+                                </td>
+                                <td class="text-center">
+                                    <input type="radio" [checked]="inspection.compliance2 === true" disabled />
+                                </td>
+                                <td class="text-center">
+                                    <input type="radio" [checked]="inspection.compliance2 === false" disabled />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="align-top">3.</td>
+                                <td class="align-top">No connection exists which would allow the return of water used for
+                                    condensing, cooling or industrial processes back to the public water supply.
+                                </td>
+                                <td class="text-center">
+                                    <input type="radio" [checked]="inspection.compliance3 === true" disabled />
+                                </td>
+                                <td class="text-center">
+                                    <input type="radio" [checked]="inspection.compliance3 === false" disabled />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="align-top">4.</td>
+                                <td class="align-top">No pipe or pipe fitting which contains more than 8.0% lead exists in private
+                                    water distribution facilities installed on or after July 1, 1988 and prior to January 4, 2014.
+                                </td>
+                                <td class="text-center">
+                                    <input type="radio" [checked]="inspection.compliance4 === true" disabled />
+                                </td>
+                                <td class="text-center">
+                                    <input type="radio" [checked]="inspection.compliance4 === false" disabled />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="align-top">5.</td>
+                                <td class="align-top">Plumbing installed on or after January 4, 2014 bears the expected labeling indicating ≤0.25% lead content. If not properly labeled, please provide written comment.
+                                </td>
+                                <td class="text-center">
+                                    <input type="radio" [checked]="inspection.compliance5 === true" disabled />
+                                </td>
+                                <td class="text-center">
+                                    <input type="radio" [checked]="inspection.compliance5 === false" disabled />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="align-top">6.</td>
+                                <td class="align-top">No solder or flux which contains more than 0.2% lead exists in
+                                    private water distribution facilities installed on or after July 1, 1988.
+                                </td>
+                                <td class="text-center">
+                                    <input type="radio" [checked]="inspection.compliance6 === true" disabled />
+                                </td>
+                                <td class="text-center">
+                                    <input type="radio" [checked]="inspection.compliance6 === false" disabled />
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <table class="table table-sm table-borderless mb-3">
+                        <tr>
+                            <td colspan="5">I further certify that the following materials were used in the installation of the private water distribution facilities:</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Service Lines:</td>
+                            <td><input type="checkbox" [checked]="inspection.materialServiceLineLead" disabled />&nbsp;Lead</td>
+                            <td><input type="checkbox" [checked]="inspection.materialServiceLineCopper" disabled />&nbsp;Copper</td>
+                            <td><input type="checkbox" [checked]="inspection.materialServiceLinePVC" disabled />&nbsp;PVC</td>
+                            <td><input type="checkbox" [checked]="inspection.materialServiceLineOther" disabled />&nbsp;Other</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Solder:</td>
+                            <td><input type="checkbox" [checked]="inspection.materialSolderLead" disabled />&nbsp;Lead</td>
+                            <td><input type="checkbox" [checked]="inspection.materialSolderLeadFree" disabled />&nbsp;Lead Free</td>
+                            <td><input type="checkbox" [checked]="inspection.materialSolderSolventWeld" disabled />&nbsp;Solvent Weld</td>
+                            <td><input type="checkbox" [checked]="inspection.materialSolderOther" disabled />&nbsp;Other</td>
+                        </tr>
+                    </table>
+                    <table class="table table-sm table-borderless">
+                        <tr>
+                            <td>
+                                <input type="checkbox" [checked]="true" disabled />
+                                I recognize that this document shall be retained by the aforementioned Public Water System for a minimum of ten years and that I am legally responsible for the validity of the information I have provided.
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </vp-section>
+        </div>
+
+        <div class="row mt-3">
+            <vp-section header="Remarks">
+                <p>{{ inspection.comments }}</p>
+            </vp-section>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-12 text-center text-muted">
+                A Customer Service Inspection Certificate should be on file for each connection in a public water system to document compliance with 30 TAC §290.44(h)/290.46(j).
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-center mt-3">
+            <button class="btn btn-primary vp-section-button" [disabled]="isLoading" (click)="exportPdf()">
+                Export inspection to printable document
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="!isLoading && !inspection" class="alert alert-warning">
+        Inspection not found.
+    </div>
+
+</div>

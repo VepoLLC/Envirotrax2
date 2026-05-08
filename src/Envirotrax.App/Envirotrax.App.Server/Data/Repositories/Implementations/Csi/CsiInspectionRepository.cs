@@ -24,7 +24,9 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
     protected override IQueryable<CsiInspection> GetDetailsQuery()
     {
         return base.GetDetailsQuery()
-            .Include(c => c.Site);
+            .Include(c => c.Site)
+            .Include(c => c.WaterSupplier)
+            .Include(c => c.Professional);
     }
 
     public async Task<CsiInspection?> GetForProfessionalAsync(int id, int professionalId, CancellationToken cancellationToken)
@@ -51,11 +53,27 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         dbQuery = await ApplyLatestOnlyFilterAsync(dbQuery, request, cancellationToken);
         dbQuery = ApplyPassFailFilter(dbQuery, request);
 
-          var paginated = await dbQuery
-                .OrderBy(query.Sort)
-                .PaginateAsync(pageInfo, cancellationToken);
+        var paginated = await dbQuery
+              .OrderBy(query.Sort)
+              .PaginateAsync(pageInfo, cancellationToken);
 
         return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public async Task<CsiInspection?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken)
+    {
+        var inspection = await GetNoIncludesAsync(id, cancellationToken);
+        if (inspection == null) return null;
+
+        inspection.Disapproved = request.Disapproved;
+        inspection.DisapprovedReason = request.Disapproved ? request.DisapprovedReason : null;
+
+        DbContext.Entry(inspection).Property(x => x.Disapproved).IsModified = true;
+        DbContext.Entry(inspection).Property(x => x.DisapprovedReason).IsModified = true;
+
+        await DbContext.SaveChangesAsync(cancellationToken);
+
+        return await GetAsync(id, cancellationToken);
     }
 
     private static IQueryable<CsiInspection> ApplyDateFilter(IQueryable<CsiInspection> query, CsiInspectionProfessionalSearchRequest request)

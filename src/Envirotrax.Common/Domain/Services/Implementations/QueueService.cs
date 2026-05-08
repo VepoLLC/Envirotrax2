@@ -2,7 +2,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Azure.Identity;
 using Azure.Storage.Queues;
+using Azure.Storage.Queues.Models;
 using Envirotrax.Common.Configuration;
+using Envirotrax.Common.Domain.DataTransferObjects;
 using Envirotrax.Common.Domain.Services.Defintions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -25,7 +27,6 @@ public class QueueService<TOptions> : IQueueService<TOptions>
 
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         ReferenceHandler = ReferenceHandler.IgnoreCycles
     };
 
@@ -51,5 +52,37 @@ public class QueueService<TOptions> : IQueueService<TOptions>
         var json = JsonSerializer.Serialize(message, _jsonOptions);
 
         await queueClient.SendMessageAsync(json, visibilityTimeout, timeToLive, cancellationToken);
+    }
+
+    public async Task SendMessageAsync(string queueName, string message, CancellationToken cancellationToken = default)
+    {
+        var queueClient = _queueServiceClient.GetQueueClient(queueName);
+        await queueClient.SendMessageAsync(message, cancellationToken);
+    }
+
+    public IQueueMessageReceiver CreateMessageReceiver(string queueName)
+    {
+        return new QueueMessageReceiver(_queueServiceClient.GetQueueClient(queueName));
+    }
+}
+
+public class QueueMessageReceiver : IQueueMessageReceiver
+{
+    private readonly QueueClient _queueClient;
+
+    public QueueMessageReceiver(QueueClient queueClient)
+    {
+        _queueClient = queueClient;
+    }
+
+    public async Task<QueueMessage[]> ReceiveMessagesAsync(int? maxMessages, TimeSpan? visibilityTimeout, CancellationToken cancellationToken)
+    {
+        var response = await _queueClient.ReceiveMessagesAsync(maxMessages, visibilityTimeout, cancellationToken);
+        return response.Value;
+    }
+
+    public async Task DeleteMessageAsync(string messageId, string popReceipt, CancellationToken cancellationToken)
+    {
+        await _queueClient.DeleteMessageAsync(messageId, popReceipt, cancellationToken);
     }
 }

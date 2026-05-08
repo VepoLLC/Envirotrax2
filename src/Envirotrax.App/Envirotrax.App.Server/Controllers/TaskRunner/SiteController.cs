@@ -20,4 +20,17 @@ public class SiteController : TaskRunnerBaseContoller
         var sites = await _siteService.GetAllPendingGeocodingAsync(batchSize);
         return Ok(sites);
     }
+
+    [HttpPost("{siteId}/geocode")]
+    public async Task<IActionResult> GeocodeAsync(int siteId, [FromQuery] bool assignGisArea, CancellationToken cancellationToken)
+    {
+        var site = await _siteService.GeocodeAsync(siteId, assignGisArea, cancellationToken);
+
+        if (site == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(site);
+    }
 }

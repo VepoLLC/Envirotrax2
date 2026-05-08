@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 namespace Envirotrax.TaskRunner.Controllers;
 
 [ApiController]
+[Route("api/sites")]
 public class SiteController : ControllerBase
 {
     private readonly IQueueService _queueService;

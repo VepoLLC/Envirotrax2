@@ -15,23 +15,45 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     private readonly ISiteRepository _siteRepository;
     private readonly IGeocodingService _geocodingService;
     private readonly IGisAreaCoordinateRepository _coordinateRepository;
+    private readonly ILogger<SiteService> _logger;
 
     public SiteService(
         IMapper mapper,
         ISiteRepository repository,
         IGeocodingService geocodingService,
-        IGisAreaCoordinateRepository coordinateRepository)
+        IGisAreaCoordinateRepository coordinateRepository,
+        ILogger<SiteService> logger)
         : base(mapper, repository)
     {
         _siteRepository = repository;
         _geocodingService = geocodingService;
         _coordinateRepository = coordinateRepository;
+        _logger = logger;
     }
 
     public async Task<IEnumerable<SiteDto>> GetAllPendingGeocodingAsync(int batchSize)
     {
         var sites = await _siteRepository.GetAllPendingGeocodingAsync(batchSize);
         return Mapper.Map<IEnumerable<Site>, IEnumerable<SiteDto>>(sites);
+    }
+
+    private async Task AssignGisAreaAsync(Site site, GeocodingResponseDto coordinates, CancellationToken cancellationToken)
+    {
+        var gisCoordiantesByArea = await _coordinateRepository.GetByPointAsync(coordinates.Longitude, coordinates.Latitude, cancellationToken);
+
+        foreach (var group in gisCoordiantesByArea)
+        {
+            var gisPoints = group.Select(c => new CoordinateDto
+            {
+                Latitude = c.Latitude,
+                Longitude = c.Longitude
+            }).ToList();
+
+            if (_geocodingService.IsPointInArea(gisPoints, coordinates))
+            {
+                site.GisAreaId = group.Key;
+            }
+        }
     }
 
     public async Task<SiteDto?> GeocodeAsync(int siteId, bool assignGisArea, CancellationToken cancellationToken)
@@ -54,32 +76,37 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
         var address = string.Join(" ", addressParts);
 
-        var coordinates = await _geocodingService.GeocodeAsync(address, cancellationToken);
-
-        site.GisLatitude = coordinates.Latitude;
-        site.GisLongitude = coordinates.Longitude;
-        site.GisDate = DateTime.UtcNow;
-        site.GisStatus = GisStatusType.Geocoded;
-
-        if (assignGisArea)
+        try
         {
-            var gisCoordiantesByArea = await _coordinateRepository.GetByPointAsync(coordinates.Longitude, coordinates.Latitude, cancellationToken);
+            var coordinates = await _geocodingService.GeocodeAsync(address, cancellationToken);
 
-            foreach (var group in gisCoordiantesByArea)
+            site.GisLatitude = coordinates.Latitude;
+            site.GisLongitude = coordinates.Longitude;
+            site.GisDate = DateTime.UtcNow;
+            site.GisStatus = GisStatusType.Geocoded;
+
+            if (assignGisArea)
             {
-                var gisPoints = group.Select(c => new CoordinateDto
-                {
-                    Latitude = c.Latitude,
-                    Longitude = c.Longitude
-                }).ToList();
-
-                if (_geocodingService.IsPointInArea(gisPoints, coordinates))
-                {
-                    site.GisAreaId = group.Key;
-                }
+                await AssignGisAreaAsync(site, coordinates, cancellationToken);
             }
+
+            await _siteRepository.UpdateGisCoordinatesAsync(site);
+        }
+        catch (Exception ex)
+        {
+            await HadnleGeocodingErrorAsync(ex, site);
         }
 
         return MapToDto(site);
+    }
+
+    private async Task HadnleGeocodingErrorAsync(Exception ex, Site site)
+    {
+        _logger.LogError(ex, "Error goecoding site.");
+
+        site.GisStatus = GisStatusType.Error;
+        site.GisDate = DateTime.UtcNow;
+
+        await _siteRepository.UpdateGisCoordinatesAsync(site);
     }
 }

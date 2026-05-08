@@ -15,7 +15,7 @@ public class QueueWorkerBase<TWorker, TMessage> : BackgroundService
     private readonly IQueueMessageReceiver _queueClient;
     private readonly ILogger<QueueWorkerBase<TWorker, TMessage>> _logger;
 
-    protected QueueWorkerBase(
+    public QueueWorkerBase(
         IServiceProvider serviceProvider,
         QueueWorkerOptions<TWorker, TMessage> options,
         IQueueService queueService,

@@ -54,8 +54,15 @@ public class SiteRepository : Repository<Site>, ISiteRepository
             .ToListAsync();
     }
 
-    // public async Task<Site> UpdateGisCoordinatesAsync(Site site)
-    // {
-
-    // }
+    public async Task UpdateGisCoordinatesAsync(Site site)
+    {
+        await DbContext
+            .Sites
+            .Where(s => s.Id == site.Id)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(site => site.GisLongitude, site.GisLongitude)
+                .SetProperty(site => site.GisLatitude, site.GisLatitude)
+                .SetProperty(site => site.GisDate, site.GisDate)
+                .SetProperty(site => site.GisAreaId, site.GisAreaId));
+    }
 }

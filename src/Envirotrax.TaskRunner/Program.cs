@@ -16,8 +16,14 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+var controllerBuilder = app.MapControllers();
+
+if (!builder.Environment.IsDevelopment())
+{
+    controllerBuilder.RequireAuthorization();
+}
 
 app.Run();

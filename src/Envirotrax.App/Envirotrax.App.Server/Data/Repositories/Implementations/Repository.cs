@@ -114,12 +114,16 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
 
     public virtual async Task<TModel?> GetNoIncludesAsync(TKey id, CancellationToken cancellationToken)
     {
-        return await Entity.SingleOrDefaultAsync(m => EF.Property<TKey>(m, _primaryKeyName)!.Equals(id), cancellationToken);
+        return await Entity
+            .AsNoTracking()
+            .SingleOrDefaultAsync(m => EF.Property<TKey>(m, _primaryKeyName)!.Equals(id), cancellationToken);
     }
 
     public virtual async Task<TModel?> GetAsync(TKey id, CancellationToken cancellationToken)
     {
-        return await GetDetailsQuery().SingleOrDefaultAsync(m => EF.Property<TKey>(m, _primaryKeyName)!.Equals(id), cancellationToken);
+        return await GetDetailsQuery()
+            .AsNoTracking()
+            .SingleOrDefaultAsync(m => EF.Property<TKey>(m, _primaryKeyName)!.Equals(id), cancellationToken);
     }
 
     public virtual async Task<TModel> AddAsync(TModel model)

@@ -5,4 +5,5 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 public interface ISiteRepository : IRepository<Site>
 {
     Task<IEnumerable<Site>> GetAllPendingGeocodingAsync(int batchSize);
+    Task UpdateGisCoordinatesAsync(Site site);
 }

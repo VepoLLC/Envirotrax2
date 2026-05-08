@@ -48,12 +48,12 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         return model.Select(m => MapToDto(m)!).ToPagedData(pageInfo);
     }
 
-    public async Task<IPagedData<BackflowTestDto>> SearchForProfessionalAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public async Task<IPagedData<BackflowTestDto>> SearchForProfessionalAsync(PageInfo pageInfo, Query query, bool latestOnly, CancellationToken cancellationToken)
     {
         query.Filter = query.ConvertFilterProperties<BackflowTest, BackflowTestDto>(Mapper);
         query.Sort = query.ConvertSortProperties<BackflowTest, BackflowTestDto>(Mapper);
         var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
-        var tests = await _backflowTestRepository.SearchForProfessionalAsync(professional!.Id, pageInfo, query, cancellationToken);
+        var tests = await _backflowTestRepository.SearchForProfessionalAsync(professional!.Id, pageInfo, query, latestOnly, cancellationToken);
         return tests.Select(m => MapToDto(m)!).ToPagedData(pageInfo);
     }
 }

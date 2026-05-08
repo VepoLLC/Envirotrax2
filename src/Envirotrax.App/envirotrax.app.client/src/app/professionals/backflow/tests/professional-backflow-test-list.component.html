@@ -16,11 +16,12 @@
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-3">
-                            <vp-filter-panel-field fieldName="isCurrent"
-                                                   label="Test history"
-                                                   type="select"
-                                                   [options]="testHistoryOptions"
-                                                   [form]="searchForm" />
+                            <label class="form-label">Test history:</label>
+                            <vp-input type="select"
+                                      [options]="testHistoryOptions"
+                                      [ngModel]="latestOnly ? 'true' : 'false'"
+                                      (ngModelChange)="onLatestOnlyChange($event)"
+                                      [ngModelOptions]="{standalone: true}" />
                         </div>
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="accountNumber"
@@ -40,10 +41,15 @@
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-3">
-                            <vp-filter-panel-field fieldName="dateType"
-                                                   label="Date type"
-                                                   type="select"
-                                                   [options]="dateTypeOptions"
+                            <vp-filter-panel-field fieldName="testDate"
+                                                   label="Inspection date"
+                                                   type="daterange"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="createdTime"
+                                                   label="Submission date"
+                                                   type="daterange"
                                                    [form]="searchForm" />
                         </div>
                     </div>

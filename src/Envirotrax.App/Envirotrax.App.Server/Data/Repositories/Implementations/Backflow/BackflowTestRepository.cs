@@ -61,14 +61,23 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return await paginated.ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<BackflowTest>> SearchForProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public async Task<IEnumerable<BackflowTest>> SearchForProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, bool latestOnly, CancellationToken cancellationToken)
     {
-        var paginated = await GetListQuery()
+        var dbQuery = GetListQuery()
             .Where(bt => bt.ProfessionalId == professionalId)
-            .Where(query.Filter)
+            .Where(query.Filter);
+
+        dbQuery = ApplyLatestOnlyFilter(dbQuery, latestOnly);
+
+        var paginated = await dbQuery
             .OrderBy(query.Sort)
             .PaginateAsync(pageInfo, cancellationToken);
 
         return await paginated.ToListAsync(cancellationToken);
+    }
+
+    private static IQueryable<BackflowTest> ApplyLatestOnlyFilter(IQueryable<BackflowTest> query, bool latestOnly)
+    {
+        return latestOnly ? query.Where(bt => bt.IsCurrent) : query;
     }
 }

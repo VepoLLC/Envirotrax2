@@ -159,6 +159,7 @@ public class CsiInspectionDto : IDto
     public bool AiIrrigationSystem2 { get; set; }
     public bool AiHasDomesticPremisesIsolation { get; set; }
     public bool AiRequiresDomesticPremisesIsolation { get; set; }
+    public bool InspectionResult { get; set; }
 
     public string? Comments { get; set; }
 

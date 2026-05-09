@@ -47,9 +47,14 @@ public class SiteRepository : Repository<Site>, ISiteRepository
         return await DbContext
             .Sites
             .IgnoreQueryFilters()
-            .Where(site => site.GisStatus == GisStatusType.NotSet || (site.GisStatus == GisStatusType.Error && site.GisDate < thirthyDaysAgo))
+            .Where(site => site.DeletedTime == null && site.GisStatus == GisStatusType.NotSet || (site.GisStatus == GisStatusType.Error && site.GisDate < thirthyDaysAgo))
             .OrderBy(site => site.GisDate)
             .Take(batchSize)
+            .Select(s => new Site
+            {
+                WaterSupplierId = s.WaterSupplierId,
+                Id = s.Id
+            })
             .AsNoTracking()
             .ToListAsync();
     }
@@ -63,6 +68,7 @@ public class SiteRepository : Repository<Site>, ISiteRepository
                 .SetProperty(site => site.GisLongitude, site.GisLongitude)
                 .SetProperty(site => site.GisLatitude, site.GisLatitude)
                 .SetProperty(site => site.GisDate, site.GisDate)
+                .SetProperty(site => site.GisStatus, site.GisStatus)
                 .SetProperty(site => site.GisAreaId, site.GisAreaId));
     }
 }

@@ -64,7 +64,8 @@ namespace Envirotrax.Auth.Domain.Configuration
                         "profile",
                         "offline_access",
                         "envirotrax_app",
-                        "envirotrax_app_internal");
+                        "envirotrax_app_internal",
+                        "task_runner");
 
                     // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
                     var aspNetOptions = options.UseAspNetCore();

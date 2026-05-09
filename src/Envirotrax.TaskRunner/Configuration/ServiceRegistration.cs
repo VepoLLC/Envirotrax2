@@ -29,16 +29,20 @@ public static class ServiceRegistration
         services.AddAuthorization();
 
         services.Configure<GeocodingOptions>(configuration.GetSection("Tasks:Geocoding"));
-        services.AddQueueWorker(new QueueWorkerOptions<SiteGeocoder, SiteDto>(QueueNames.Sites.Geocode));
+        services.AddQueueWorker(new QueueWorkerOptions<SiteGeocoder, SiteDto>(QueueNames.Sites.Geocode)
+        {
+            MaxDequeuCount = 2
+        });
 
         return services;
     }
 
     private static IServiceCollection AddQueueWorker<TWorker, TMessage>(this IServiceCollection services, QueueWorkerOptions<TWorker, TMessage> options)
-        where TWorker : notnull, IQueueWorker<TMessage>
+        where TWorker : class, IQueueWorker<TMessage>
     {
         return services
             .AddSingleton(options)
+            .AddTransient<TWorker>()
             .AddHostedService<QueueWorkerBase<TWorker, TMessage>>();
     }
 }

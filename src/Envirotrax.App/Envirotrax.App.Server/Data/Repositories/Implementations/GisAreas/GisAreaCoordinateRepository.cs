@@ -48,7 +48,7 @@ public class GisAreaCoordinateRepository : Repository<GisAreaCoordinate, long>, 
     {
         return await DbContext
             .GisAreaCoordinates
-            .Where(coordiante =>
+            .Where(coordiante => coordiante.Area!.DeletedTime == null &&
                 coordiante.Area!.MinLongitude <= longitude && coordiante.Area!.MaxLongitude >= longitude &&
                 coordiante.Area!.MinLatitude <= latitude && coordiante.Area!.MaxLatitude >= latitude
             ).GroupBy(coordinate => coordinate.AreaId)

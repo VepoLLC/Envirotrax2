@@ -62,8 +62,13 @@ public class QueueWorkerBase<TWorker, TMessage> : BackgroundService
     {
         try
         {
-            await _queuService.EnsureQueueExistsAsync(_options.QueueName + "-poison");
-            await _queuService.SendMessageAsync(_options.QueueName, message.MessageText, cancellationToken);
+            var poisonQueueName = _options.QueueName + "-poison";
+            _logger.LogInformation("{QueueName} reached max dequeue count {Count}. Moving it to poison queue {PoisonQueueName}", _options.QueueName, _options.MaxDequeuCount, poisonQueueName);
+
+            await _queuService.EnsureQueueExistsAsync(poisonQueueName);
+
+            await _queuService.SendMessageAsync(poisonQueueName, message.MessageText, cancellationToken);
+            await _queueClient.DeleteMessageAsync(message.MessageId, message.PopReceipt, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -101,7 +106,7 @@ public class QueueWorkerOptions<TWorker, TMessage>
 {
     public string QueueName { get; }
     public int MaxMessages { get; set; } = 10;
-    public int MaxDequeuCount { get; set; }
+    public int MaxDequeuCount { get; set; } = 5;
     public TimeSpan PollingInterval { get; set; } = TimeSpan.FromSeconds(5);
     public TimeSpan VisibilityTimeout { get; set; } = TimeSpan.FromMinutes(5);
 

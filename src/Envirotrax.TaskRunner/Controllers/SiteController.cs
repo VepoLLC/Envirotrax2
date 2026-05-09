@@ -46,6 +46,6 @@ public class SiteController : ControllerBase
             }
         });
 
-        return Ok(sites!.Count);
+        return Accepted(sites!.Count);
     }
 }

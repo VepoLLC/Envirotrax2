@@ -60,7 +60,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     {
         var site = await _siteRepository.GetAsync(siteId, cancellationToken);
 
-        if (site == null)
+        if (site == null || site.DeletedTime.HasValue)
         {
             return null;
         }
@@ -78,6 +78,11 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
         try
         {
+            if (string.IsNullOrWhiteSpace(address))
+            {
+                throw new InvalidOperationException($"Site has no address, so we can't geocode its location. WaterSupplierId: {site.WaterSupplierId}, SiteId: {site.Id}");
+            }
+
             var coordinates = await _geocodingService.GeocodeAsync(address, cancellationToken);
 
             site.GisLatitude = coordinates.Latitude;

@@ -21,9 +21,11 @@ public class SiteGeocoder : IQueueWorker<SiteDto>
 
     public async Task DoWorkAsync(SiteDto? site, CancellationToken cancellationToken)
     {
-        await _internalApi.PostAsync<SiteDto, SiteDto>($"/api/task-runner/sites?assignGisArea={_geocodingOptions.AssignGisAreas}", new ServiceMessageDto<SiteDto>(site!.WaterSupplier.Id)
+        var apiRequest = new ServiceMessageDto<SiteDto>(waterSupplierId: site!.WaterSupplier.Id, loggedInUserId: null)
         {
             Data = site
-        });
+        };
+
+        await _internalApi.PostAsync<SiteDto, SiteDto>($"/api/task-runner/sites/{site!.Id}/geocode?assignGisArea={_geocodingOptions.AssignGisAreas}", apiRequest);
     }
 }

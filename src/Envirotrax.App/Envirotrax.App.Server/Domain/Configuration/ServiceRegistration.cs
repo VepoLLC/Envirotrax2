@@ -72,6 +72,9 @@ public static class ServiceRegistration
         services.AddTransient<IGisAreaService, GisAreaService>();
         services.AddTransient<IGisAreaCoordinateService, GisAreaCoordinateService>();
 
+        services.AddTransient<IRazorRenderService, RazorRenderService>();
+        services.AddTransient<ICsiInspectionPdfService, CsiInspectionPdfService>();
+
         return services;
     }
 }

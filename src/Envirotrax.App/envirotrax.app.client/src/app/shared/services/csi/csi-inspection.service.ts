@@ -77,6 +77,13 @@ export class CsiInspectionService {
         return lastValueFrom(this._http.put<CsiInspection>(url, request));
     }
 
+    public getPdf(id: number): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${id}/pdf`);
+        return lastValueFrom(
+            this._http.get(url, { responseType: 'blob' })
+        );
+    }
+
     public getProfessionalInspections(pageInfo: PageInfo, query: Query, searchRequest: CsiProfessionalSearchRequest): Promise<PagedData<CsiInspection>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/csi/inspections');
         let params: HttpParams = this._queryHelper.buildQuery(pageInfo, query);

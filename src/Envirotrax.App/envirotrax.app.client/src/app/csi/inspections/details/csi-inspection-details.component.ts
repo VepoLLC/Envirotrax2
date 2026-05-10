@@ -10,7 +10,6 @@ import { DisapproveCsiInspectionComponent } from "./disapprove/disapprove-csi-in
     selector: 'app-csi-inspection-details',
     standalone: false,
     templateUrl: './csi-inspection-details.component.html',
-    styleUrl: './csi-inspection-details.component.scss'
 })
 export class CsiInspectionDetailsComponent implements OnInit {
     public id: number = 0;
@@ -84,7 +83,16 @@ export class CsiInspectionDetailsComponent implements OnInit {
         return this._propertyTypeLabels[this.inspection.propertyType] ?? '';
     }
 
-    public exportPdf(): void {
-        //generate PDf logic
+    public async exportPdf(): Promise<void> {
+        if (this.inspection?.id == null) return;
+        try {
+            this.isLoading = true;
+            const blob = await this._inspectionService.getPdf(this.inspection.id);
+            const objectUrl = URL.createObjectURL(blob);
+            window.open(objectUrl, '_blank');
+            setTimeout(() => URL.revokeObjectURL(objectUrl), 300_000);
+        } finally {
+            this.isLoading = false;
+        }
     }
 }

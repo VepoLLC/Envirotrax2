@@ -1,8 +1,8 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild, TemplateRef } from "@angular/core";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { CsiInspection } from "../../../shared/models/csi/csi-inspection";
 import { CsiInspectionService } from "../../../shared/services/csi/csi-inspection.service";
-import { TableColumn } from "../../../shared/components/data-components/table/table.component";
+import { TableColumn, CellTemplateData } from "../../../shared/components/data-components/table/table.component";
 import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { QueryProperty } from "../../../shared/models/query";
 import { NgForm } from "@angular/forms";
@@ -14,10 +14,22 @@ import { InputOption } from "../../../shared/components/input/input.component";
     templateUrl: './csi-inspection-list.component.html'
 })
 export class CsiInspectionListComponent implements OnInit {
+    @ViewChild('statusTemplate', { static: true })
+    public statusTemplate!: TemplateRef<CellTemplateData<CsiInspection>>;
+
+    @ViewChild('propertyTemplate', { static: true })
+    public propertyTemplate!: TemplateRef<CellTemplateData<CsiInspection>>;
+
+    @ViewChild('mailingTemplate', { static: true })
+    public mailingTemplate!: TemplateRef<CellTemplateData<CsiInspection>>;
+
+    @ViewChild('inspectorTemplate', { static: true })
+    public inspectorTemplate!: TemplateRef<CellTemplateData<CsiInspection>>;
+
     public showResults: boolean = false;
 
     public table: TableViewModel<CsiInspection> = {
-        columns: this.getColumns(),
+        columns: [],
         query: {
             sort: {},
             filter: []
@@ -63,44 +75,48 @@ export class CsiInspectionListComponent implements OnInit {
     }
 
     public async ngOnInit(): Promise<void> {
+        this.table.columns = this.getColumns();
     }
 
     private getColumns(): TableColumn<CsiInspection>[] {
         return [
+            {
+                field: '',
+                caption: 'Status',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.statusTemplate
+            },
             {
                 field: 'inspectionDate',
                 caption: 'Inspection Date',
                 type: ColumnType.date
             },
             {
-                field: 'propertyBusinessName',
-                caption: 'Business Name',
+                field: 'site.accountNumber',
+                caption: 'Account Number',
                 type: ColumnType.text
             },
             {
-                field: 'propertyStreetNumber',
-                caption: 'Street #',
-                type: ColumnType.text
+                field: '',
+                caption: 'Property Information',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.propertyTemplate
             },
             {
-                field: 'propertyStreetName',
-                caption: 'Street Name',
-                type: ColumnType.text
+                field: '',
+                caption: 'Mailing / Contact Information',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.mailingTemplate
             },
             {
-                field: 'propertyCity',
-                caption: 'City',
-                type: ColumnType.text
-            },
-            {
-                field: 'inspectorCompanyName',
-                caption: 'Inspector Company',
-                type: ColumnType.text
-            },
-            {
-                field: 'inspectorContactName',
-                caption: 'Inspector Contact',
-                type: ColumnType.text
+                field: '',
+                caption: 'Inspector',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.inspectorTemplate
             }
         ];
     }
@@ -128,9 +144,20 @@ export class CsiInspectionListComponent implements OnInit {
         }
     }
 
-    public edit(inspection: CsiInspection): void {
-        this._router.navigate([inspection.id, 'edit'], {
-            relativeTo: this._activatedRoute
-        });
+    public searchAgain(): void {
+        this.showResults = false;
+    }
+
+    public viewInspection(_inspection: CsiInspection): void {
+    }
+
+    public viewSite(siteId?: number): void {
+        if (!siteId) {
+            return;
+        }
+        const url = this._router.serializeUrl(
+            this._router.createUrlTree(['/sites', siteId, 'edit'])
+        );
+        window.open(url, '_blank');
     }
 }

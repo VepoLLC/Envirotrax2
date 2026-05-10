@@ -1,5 +1,71 @@
 <h1 class="text-center h2">CSI Search</h1>
 
+<ng-template #statusTemplate let-inspection="rowData">
+    <div class="d-flex gap-1">
+        <vp-status-icon *ngIf="inspection.inspectionResult"
+                        imageSrc="/images/icons/bstatus-green-on.png"
+                        text="Passed inspection"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!inspection.inspectionResult"
+                        imageSrc="/images/icons/bstatus-green-off.png"
+                        text="Failed inspection"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="inspection.transactionId"
+                        imageSrc="/images/icons/bstatus-orange-on.png"
+                        text="Paid"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!inspection.transactionId"
+                        imageSrc="/images/icons/bstatus-orange-off.png"
+                        text="Unpaid"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!inspection.disapproved"
+                        imageSrc="/images/icons/bstatus-cyan-on.png"
+                        text="Approved"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="inspection.disapproved"
+                        imageSrc="/images/icons/bstatus-cyan-off.png"
+                        text="Disapproved"
+                        [showText]="false" />
+    </div>
+</ng-template>
+
+<ng-template #propertyTemplate let-data="rowData">
+    <div class="d-flex gap-2 align-items-center">
+        <i class="fa-solid fs-5"
+           [ngClass]="data.propertyType == 0 ? 'fa-home text-primary' : 'fa-building text-danger'">
+        </i>
+
+        <a href=""
+           (click)="$event.preventDefault(); viewSite(data.site?.id)">
+            <div *ngIf="data.propertyBusinessName" class="fw-semibold">{{ data.propertyBusinessName }}</div>
+            <div>
+                {{ data.propertyStreetNumber }} {{ data.propertyStreetName }}
+                <span *ngIf="data.propertyNumber">#{{ data.propertyNumber }}</span>
+            </div>
+            <div>{{ data.propertyCity }}<span *ngIf="data.propertyCity">, </span>{{ data.propertyZip }}</div>
+        </a>
+    </div>
+</ng-template>
+
+<ng-template #mailingTemplate let-data="rowData">
+    <div>
+        <div *ngIf="data.mailingCompanyName" class="fw-semibold">{{ data.mailingCompanyName }}</div>
+        <div *ngIf="data.mailingContactName">{{ data.mailingContactName }}</div>
+        <div>
+            {{ data.mailingStreetNumber }} {{ data.mailingStreetName }}
+            <span *ngIf="data.mailingNumber">#{{ data.mailingNumber }}</span>
+        </div>
+        <div>{{ data.mailingCity }}<span *ngIf="data.mailingCity">, </span>{{ data.mailingZip }}</div>
+    </div>
+</ng-template>
+
+<ng-template #inspectorTemplate let-data="rowData">
+    <div>
+        <div *ngIf="data.inspectorCompanyName">{{ data.inspectorCompanyName }}</div>
+        <div *ngIf="data.inspectorContactName">{{ data.inspectorContactName }}</div>
+    </div>
+</ng-template>
+
 <div [hidden]="showResults">
     <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
         <vp-filter-panel (filterChange)="onFilterChange($event)">
@@ -40,7 +106,7 @@
 
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <vp-filter-panel-field fieldName="compliance1"
+                            <vp-filter-panel-field fieldName="inspectionResult"
                                                    label="Inspection pass/fail"
                                                    type="select"
                                                    [form]="searchForm"
@@ -205,26 +271,60 @@
 
 <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
 
-<div *ngIf="showResults">
-    <div class="d-flex justify-content-end mb-3">
-        <button type="button"
-                class="btn btn-primary vp-section-button"
-                (click)="showResults = false;">
+<div *ngIf="showResults && !table.isLoading">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <button type="button" class="btn btn-primary vp-section-button">
+            <i class="fa-regular fa-file-export me-1"></i>
+            Export Results
+        </button>
+        <button type="button" class="btn btn-primary vp-section-button">
+            <i class="fa-regular fa-table me-1"></i>
+            View Printable Table
+        </button>
+        <button type="button" class="btn btn-primary vp-section-button" (click)="searchAgain()">
+            <i class="fa-solid fa-magnifying-glass me-1"></i>
             Search Again
         </button>
     </div>
 
-    <vp-section header="CSI Search Results">
-        <vp-table *ngIf="table.items"
-                  [columns]="table.columns!"
-                  [data]="table.items.data"
-                  [(pageInfo)]="table.items.pageInfo"
-                  (pageInfoChange)="getInspections()"
-                  [(query)]="table.query"
-                  (queryChange)="getInspections()"
-                  (queryReset)="getInspections()"
-                  [canEdit]="true"
-                  (edit)="edit($event)"
-                  [freeTextSearch]="table.freeTextSearch" />
-    </vp-section>
+    <div class="results-section">
+        <vp-section header="Inspection Search - {{table.items?.pageInfo?.totalItems || 0}} Results">
+            <div class="container mb-3">
+                <div class="row gap-2 justify-content-center mb-3">
+                    <div class="col-auto mb-2">
+                        <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Passed inspection" />
+                        <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Failed inspection" />
+                    </div>
+                    <div class="col-auto mb-2">
+                        <vp-status-icon imageSrc="/images/icons/bstatus-orange-on.png" text="Paid" />
+                        <vp-status-icon imageSrc="/images/icons/bstatus-orange-off.png" text="Unpaid" />
+                    </div>
+                    <div class="col-auto mb-2">
+                        <vp-status-icon imageSrc="/images/icons/bstatus-cyan-on.png" text="Approved" />
+                        <vp-status-icon imageSrc="/images/icons/bstatus-cyan-off.png" text="Disapproved" />
+                    </div>
+                    <div class="col-auto mb-2">
+                        <vp-status-icon iconClass="fa-solid fa-home text-primary" text="Residential" />
+                        <vp-status-icon iconClass="fa-solid fa-building text-danger" text="Commercial" />
+                    </div>
+                </div>
+            </div>
+
+            <vp-table *ngIf="table.items && table.items.data && table.items.data.length > 0"
+                      [columns]="table.columns!"
+                      [data]="table.items.data"
+                      [(pageInfo)]="table.items.pageInfo"
+                      (pageInfoChange)="getInspections()"
+                      [(query)]="table.query"
+                      (queryChange)="getInspections()"
+                      (queryReset)="getInspections()"
+                      [canViewDetails]="true"
+                      (viewDetails)="viewInspection($event)"
+                      [freeTextSearch]="table.freeTextSearch" />
+
+            <div *ngIf="table.items?.data?.length === 0" class="text-center py-3 text-muted">
+                No records found matching the search criteria.
+            </div>
+        </vp-section>
+    </div>
 </div>

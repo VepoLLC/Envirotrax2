@@ -32,10 +32,8 @@ export class BackflowTestService {
     public async getAllForProfessional(pageInfo: PageInfo, query: Query): Promise<PagedData<BackflowTest>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/backflow/tests');
 
-        const observable = this._http.get<PagedData<BackflowTest>>(url, {
+        return await lastValueFrom(this._http.get<PagedData<BackflowTest>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)
-        });
-
-        return await lastValueFrom(observable);
+        }));
     }
 }

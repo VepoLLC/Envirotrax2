@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { BackflowTestService } from '../../../shared/services/backflow/backflow-test.service';
+import { ProfessionalSupplierService } from '../../../shared/services/professionals/professional-supplier.service';
 import { QueryProperty } from '../../../shared/models/query';
 import { TableViewModel } from '../../../shared/models/table-view-model';
 import { BackflowTest } from '../../../shared/models/backflow/backflow-test';
@@ -29,33 +30,40 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
         }
     };
 
-    public recordScopeOptions: InputOption[] = [
-        { id: "", text: "All tests for water supplier" },
-        { id: "true", text: "My test history only" }
+    public waterSupplierScopeOptions: InputOption[] = [
+        { id: '', text: 'My test history only' }
     ];
 
     public testHistoryOptions: InputOption[] = [
-        { id: "", text: "All Tests" },
-        { id: "true", text: "Latest Test Only" }
-    ];
-
-    public dateTypeOptions: InputOption[] = [
-        { id: "", text: "Any date range" },
-        { id: "testDate", text: "Inspection date" },
-        { id: "submissionDate", text: "Submission date" }
+        { id: 'true', text: 'Latest test only' },
+        { id: 'false', text: 'Complete test history' }
     ];
 
     public propertyTypeOptions: InputOption[] = [
-        { id: "", text: "Any value" },
-        { id: "0", text: "Residential" },
-        { id: "1", text: "Commercial" }
+        { id: '', text: 'Any value' },
+        { id: '0', text: 'Residential' },
+        { id: '1', text: 'Commercial' }
     ];
 
     constructor(
-        private readonly _backflowTestService: BackflowTestService
-    ) {}
+        private readonly _backflowTestService: BackflowTestService,
+        private readonly _supplierService: ProfessionalSupplierService
+    ) { }
 
-    public async ngOnInit(): Promise<void> {}
+    public async ngOnInit(): Promise<void> {
+        await this.loadWaterSupplierScopeOptions();
+    }
+
+    private async loadWaterSupplierScopeOptions(): Promise<void> {
+        const suppliers = await this._supplierService.getAllMy(false, true);
+        const supplierOptions: InputOption[] = suppliers.data
+            .filter(s => s.waterSupplier?.id)
+            .map(s => ({ id: String(s.waterSupplier!.id!), text: s.waterSupplier!.name ?? '' }));
+        this.waterSupplierScopeOptions = [
+            { id: '', text: 'My test history only' },
+            ...supplierOptions
+        ];
+    }
 
     private getColumns(): TableColumn<BackflowTest>[] {
         return [

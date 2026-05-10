@@ -8,6 +8,7 @@ import { PagedData } from "../../models/paged-data";
 import { lastValueFrom } from "rxjs";
 import { AvailableWaterSupplier, ProfessionalWaterSupplier } from "../../models/professionals/professional-water-supplier";
 import { InputOption } from "../../components/input/input.component";
+import { QueryProperty } from "../../models/query";
 
 @Injectable({
     providedIn: 'root'
@@ -41,21 +42,20 @@ export class ProfessionalSupplierService {
         ];
     }
 
-    public getAllMy(hasCsiInspection = false): Promise<PagedData<ProfessionalWaterSupplier>> {
+    public getAllMy(hasCsiInspection = false, hasBackflowTesting = false): Promise<PagedData<ProfessionalWaterSupplier>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/water-suppliers');
-        const pageInfo: PageInfo = {pageSize: MAX_PAGE_SIZE };
+        const pageInfo: PageInfo = { pageSize: MAX_PAGE_SIZE };
+        const filter: QueryProperty[] = [];
 
-        const query: Query = hasCsiInspection
-         ? {
-            filter:[
-                {
-                    columnName: 'hasCsiInspection',
-                    comparisonOperator: 'Eq',
-                    value: 'true'
-                }
-            ]
-         }: {};
-       return lastValueFrom(
+        if (hasCsiInspection) {
+            filter.push({ columnName: 'hasCsiInspection', comparisonOperator: 'Eq', value: 'true' });
+        }
+        if (hasBackflowTesting) {
+            filter.push({ columnName: 'hasBackflowTesting', comparisonOperator: 'Eq', value: 'true' });
+        }
+
+        const query: Query = filter.length > 0 ? { filter } : {};
+        return lastValueFrom(
             this._http.get<PagedData<ProfessionalWaterSupplier>>(url, {
                 params: this._queryHelper.buildQuery(pageInfo, query)
             })

@@ -161,4 +161,6 @@ public class ReferencedSiteDto
     public string? AccountNumber { get; set; }
 
     public string? BusinessName { get; set; }
+
+    public FacilityType FacilityType { get; set; }
 }

@@ -5,7 +5,7 @@ using Envirotrax.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Envirotrax.App.Server.Controllers.Professionals;
+namespace Envirotrax.App.Server.Controllers.Professionals.Backflow;
 
 [Route("api/professionals/backflow/tests")]
 [HasFeature(FeatureType.BackflowTesting)]

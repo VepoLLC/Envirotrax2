@@ -11,7 +11,10 @@ public class BackflowTestProfile : Profile
         CreateMap<BackflowTest, BackflowTestDto>()
             .AfterMap((model, dto) =>
             {
-                dto.Site ??= model.SiteId.HasValue ? new() { Id = model.SiteId.Value } : null;
+                if (model.SiteId.HasValue)
+                {
+                    dto.Site ??= new() { Id = model.SiteId.Value };
+                }
 
                 if (model.ProfessionalId.HasValue)
                 {
@@ -50,19 +53,19 @@ public class BackflowTestProfile : Profile
             })
             .ReverseMap()
             .ForMember(m => m.Site, opt => opt.Ignore())
-            .ForMember(m => m.SiteId, opt => opt.MapFrom(dto => dto.Site != null ? dto.Site.Id : (int?)null))
+            .ForMember(m => m.SiteId, opt => opt.MapFrom(dto => dto.Site!.Id))
             .ForMember(m => m.Bpat, opt => opt.Ignore())
-            .ForMember(m => m.ProfessionalId, opt => opt.MapFrom(dto => dto.Professional != null ? dto.Professional.Id : null))
-            .ForMember(m => m.BpatId, opt => opt.MapFrom(dto => dto.Bpat != null ? dto.Bpat.Id : null))
+            .ForMember(m => m.ProfessionalId, opt => opt.MapFrom(dto => dto.Professional!.Id))
+            .ForMember(m => m.BpatId, opt => opt.MapFrom(dto => dto.Bpat!.Id))
             .ForMember(m => m.BpatState, opt => opt.Ignore())
-            .ForMember(m => m.BpatStateId, opt => opt.MapFrom(dto => dto.BpatState != null ? dto.BpatState.Id : null))
+            .ForMember(m => m.BpatStateId, opt => opt.MapFrom(dto => dto.BpatState!.Id))
             .ForMember(m => m.PropertyState, opt => opt.Ignore())
-            .ForMember(m => m.PropertyStateId, opt => opt.MapFrom(dto => dto.PropertyState != null ? dto.PropertyState.Id : null))
+            .ForMember(m => m.PropertyStateId, opt => opt.MapFrom(dto => dto.PropertyState!.Id))
             .ForMember(m => m.MailingState, opt => opt.Ignore())
-            .ForMember(m => m.MailingStateId, opt => opt.MapFrom(dto => dto.MailingState != null ? dto.MailingState.Id : null))
+            .ForMember(m => m.MailingStateId, opt => opt.MapFrom(dto => dto.MailingState!.Id))
             .ForMember(m => m.ApprovedBy, opt => opt.Ignore())
-            .ForMember(m => m.ApprovedById, opt => opt.MapFrom(dto => dto.ApprovedBy != null ? dto.ApprovedBy.Id : null))
+            .ForMember(m => m.ApprovedById, opt => opt.MapFrom(dto => dto.ApprovedBy!.Id))
             .ForMember(m => m.RejectedBy, opt => opt.Ignore())
-            .ForMember(m => m.RejectedById, opt => opt.MapFrom(dto => dto.RejectedBy != null ? dto.RejectedBy.Id : null));
+            .ForMember(m => m.RejectedById, opt => opt.MapFrom(dto => dto.RejectedBy!.Id));
     }
 }

@@ -15,7 +15,6 @@ import { InputOption } from '../../../shared/components/input/input.component';
 })
 export class ProfessionalBackflowTestListComponent implements OnInit {
     public showResults: boolean = false;
-    public latestOnly: boolean = true;
 
     public table: TableViewModel<BackflowTest> = {
         columns: this.getColumns(),
@@ -49,14 +48,10 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
     constructor(
         private readonly _backflowTestService: BackflowTestService,
         private readonly _supplierService: ProfessionalSupplierService
-    ) {}
+    ) { }
 
     public async ngOnInit(): Promise<void> {
         await this.loadWaterSupplierScopeOptions();
-    }
-
-    public onLatestOnlyChange(value: string): void {
-        this.latestOnly = value === 'true';
     }
 
     private async loadWaterSupplierScopeOptions(): Promise<void> {
@@ -130,8 +125,7 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
             this.table.isLoading = true;
             this.table.items = await this._backflowTestService.getAllForProfessional(
                 this.table.items?.pageInfo || {},
-                this.table.query,
-                this.latestOnly
+                this.table.query
             );
         } finally {
             this.table.isLoading = false;

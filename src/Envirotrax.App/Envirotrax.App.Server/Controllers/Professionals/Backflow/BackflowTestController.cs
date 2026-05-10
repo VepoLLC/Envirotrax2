@@ -5,7 +5,7 @@ using Envirotrax.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Envirotrax.App.Server.Controllers.Professionals;
+namespace Envirotrax.App.Server.Controllers.Professionals.Backflow;
 
 [Route("api/professionals/backflow/tests")]
 [HasFeature(FeatureType.BackflowTesting)]
@@ -20,9 +20,9 @@ public class BackflowTestController : ProfessionalProtectedController
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, [FromQuery] bool latestOnly, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
     {
-        var result = await _backflowTestService.SearchForProfessionalAsync(pageInfo, query, latestOnly, cancellationToken);
+        var result = await _backflowTestService.GetAllAsync(pageInfo, query, cancellationToken);
         return Ok(result);
     }
 }

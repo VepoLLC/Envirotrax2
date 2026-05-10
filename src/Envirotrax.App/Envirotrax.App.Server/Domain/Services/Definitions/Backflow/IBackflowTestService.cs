@@ -6,5 +6,4 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 
 public interface IBackflowTestService : IService<BackflowTest, BackflowTestDto>
 {
-    Task<IPagedData<BackflowTestDto>> SearchForProfessionalAsync(PageInfo pageInfo, Query query, bool latestOnly, CancellationToken cancellationToken);
 }

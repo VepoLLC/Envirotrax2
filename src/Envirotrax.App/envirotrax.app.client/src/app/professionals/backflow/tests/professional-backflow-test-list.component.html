@@ -16,12 +16,11 @@
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Test history:</label>
-                            <vp-input type="select"
-                                      [options]="testHistoryOptions"
-                                      [ngModel]="latestOnly ? 'true' : 'false'"
-                                      (ngModelChange)="onLatestOnlyChange($event)"
-                                      [ngModelOptions]="{standalone: true}" />
+                            <vp-filter-panel-field fieldName="isCurrent"
+                                                   label="Test history"
+                                                   type="select"
+                                                   [options]="testHistoryOptions"
+                                                   [form]="searchForm" />
                         </div>
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="accountNumber"

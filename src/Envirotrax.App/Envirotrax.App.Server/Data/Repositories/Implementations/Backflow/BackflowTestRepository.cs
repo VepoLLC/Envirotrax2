@@ -43,41 +43,4 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         }
         return base.GetAllAsync(pageInfo, query, cancellationToken);
     }
-
-    public async Task<IEnumerable<BackflowTest>> GetAllWithFacilityTypesAsync(PageInfo pageInfo, Query query, List<FacilityType> facilityTypes, CancellationToken cancellationToken)
-    {
-        var q = GetListQuery();
-
-        if (facilityTypes.Count > 0)
-        {
-            q = q.Where(bt => facilityTypes.Contains(bt.Site!.FacilityType));
-        }
-
-        var paginated = await q
-            .Where(query.Filter)
-            .OrderBy(query.Sort)
-            .PaginateAsync(pageInfo, cancellationToken);
-
-        return await paginated.ToListAsync(cancellationToken);
-    }
-
-    public async Task<IEnumerable<BackflowTest>> SearchForProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, bool latestOnly, CancellationToken cancellationToken)
-    {
-        var dbQuery = GetListQuery()
-            .Where(bt => bt.ProfessionalId == professionalId)
-            .Where(query.Filter);
-
-        dbQuery = ApplyLatestOnlyFilter(dbQuery, latestOnly);
-
-        var paginated = await dbQuery
-            .OrderBy(query.Sort)
-            .PaginateAsync(pageInfo, cancellationToken);
-
-        return await paginated.ToListAsync(cancellationToken);
-    }
-
-    private static IQueryable<BackflowTest> ApplyLatestOnlyFilter(IQueryable<BackflowTest> query, bool latestOnly)
-    {
-        return latestOnly ? query.Where(bt => bt.IsCurrent) : query;
-    }
 }

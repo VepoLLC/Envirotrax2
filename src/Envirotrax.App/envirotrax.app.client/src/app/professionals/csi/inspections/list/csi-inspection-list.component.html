@@ -27,8 +27,7 @@
            [ngClass]="data.propertyType == 0 ? 'fa-home text-primary' : 'fa-building text-danger'">
         </i>
 
-        <a href=""
-           (click)="$event.preventDefault(); viewSite(data.site?.id)">
+        <a [routerLink]="['/professionals/sites', data.site?.id]" target="_blank">
             <div *ngIf="data.propertyBusinessName" class="fw-semibold">{{ data.propertyBusinessName }}</div>
             <div>
                 {{ data.propertyStreetNumber }} {{ data.propertyStreetName }}

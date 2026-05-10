@@ -150,14 +150,4 @@ export class CsiInspectionListComponent implements OnInit {
 
     public viewInspection(_inspection: CsiInspection): void {
     }
-
-    public viewSite(siteId?: number): void {
-        if (!siteId) {
-            return;
-        }
-        const url = this._router.serializeUrl(
-            this._router.createUrlTree(['/sites', siteId, 'edit'])
-        );
-        window.open(url, '_blank');
-    }
 }

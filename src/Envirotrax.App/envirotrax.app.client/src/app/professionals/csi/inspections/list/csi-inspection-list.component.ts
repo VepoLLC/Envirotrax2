@@ -108,16 +108,6 @@ export class CsiInspectionListComponent implements OnInit {
         window.open(url, '_blank');
     }
 
-    public viewSite(siteId?: number): void {
-        if (!siteId) {
-            return;
-        }
-        const url = this._router.serializeUrl(
-            this._router.createUrlTree(['/professionals/sites', siteId])
-        );
-        window.open(url, '_blank');
-    }
-
     private async loadWaterSupplierScopeOptions(): Promise<void> {
         const suppliers = await this._supplierService.getAllMy(true);
         const supplierOptions: InputOption[] = suppliers.data

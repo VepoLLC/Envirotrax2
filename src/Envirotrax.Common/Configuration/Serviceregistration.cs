@@ -29,6 +29,12 @@ public static class ServiceRegistrations
         return services;
     }
 
+    public static IServiceCollection AddPdfTemplateService(this IServiceCollection services)
+    {
+        services.AddTransient<IPdfTemplateService, PdfTemplateService>();
+        return services;
+    }
+
     public static IServiceCollection AddEmailService(this IServiceCollection services, IConfigurationSection emailConfigSection, Action<HtmlTemplateOptions> templateConfigAction)
     {
         services.AddHtmlTemplateService(templateConfigAction);

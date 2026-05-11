@@ -1,8 +1,6 @@
 using Azure.Identity;
 using Envirotrax.App.Server.Configuration;
 using Envirotrax.App.Server.Filters;
-using Microsoft.Extensions.DependencyInjection;
-using PuppeteerSharp;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +9,7 @@ builder.Configuration.AddAzureKeyVault(
     vaultUri: new Uri(builder.Configuration["KeyVault:Url"] ?? throw new InvalidOperationException()),
     credential: new DefaultAzureCredential());
 
-builder.Services.AddControllersWithViews(options =>
+builder.Services.AddControllers(options =>
 {
     options.Filters.Add(typeof(CheckFeaturesFilter));
     options.Filters.Add(typeof(CheckPermissionFilter));
@@ -40,7 +38,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
-
-await new BrowserFetcher().DownloadAsync();
 
 app.Run();

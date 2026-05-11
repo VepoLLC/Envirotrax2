@@ -55,7 +55,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         var inspectorUser = await _professionalUserService.GetAsync(inspectorUserId, cancellationToken);
         var licenses = await _licenseService.GetAllAsync(inspectorUserId, new PageInfo(), new Query());
 
-        var  csiLicense = licenses.Data.FirstOrDefault();
+        var csiLicense = licenses.Data.FirstOrDefault();
 
         var inspection = new CsiInspection
         {

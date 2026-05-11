@@ -22,6 +22,7 @@ public class CsiInspectionController : WaterSupplierCrudController<CsiInspection
     }
 
     [HttpPut("{id}/approval")]
+    [HasPermission(PermissionAction.CanEdit)]
     public async Task<IActionResult> UpdateApprovalAsync(int id, [FromBody] CsiInspectionApprovalRequest request, CancellationToken cancellationToken)
     {
         var result = await _inspectionService.UpdateApprovalAsync(id, request, cancellationToken);

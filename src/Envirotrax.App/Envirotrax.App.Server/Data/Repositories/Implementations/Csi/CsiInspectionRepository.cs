@@ -62,7 +62,7 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
 
     public async Task<CsiInspection?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken)
     {
-        var inspection = await GetNoIncludesAsync(id, cancellationToken);
+        var inspection = await GetAsync(id, cancellationToken);
         if (inspection == null) return null;
 
         inspection.Disapproved = request.Disapproved;
@@ -73,7 +73,7 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
 
         await DbContext.SaveChangesAsync(cancellationToken);
 
-        return await GetAsync(id, cancellationToken);
+        return inspection;
     }
 
     private static IQueryable<CsiInspection> ApplyDateFilter(IQueryable<CsiInspection> query, CsiInspectionProfessionalSearchRequest request)

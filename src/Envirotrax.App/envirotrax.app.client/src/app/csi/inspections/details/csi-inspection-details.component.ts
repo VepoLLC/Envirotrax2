@@ -35,8 +35,14 @@ export class CsiInspectionDetailsComponent implements OnInit {
     ) {}
 
     public async ngOnInit(): Promise<void> {
-        this.id = Number(this._activatedRoute.snapshot.paramMap.get('id'));
-        await this.loadInspection();
+        this._activatedRoute.paramMap.subscribe(async params => {
+            const id = params.get('id');
+
+            if (id) {
+                this.id = +id;
+                await this.loadInspection();
+            }
+        });
     }
 
     private async loadInspection(): Promise<void> {

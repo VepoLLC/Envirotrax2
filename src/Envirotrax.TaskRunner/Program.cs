@@ -14,7 +14,8 @@ builder.Services.AddTaskRunnerServices(builder.Configuration);
 
 var app = builder.Build();
 
-app.UseHttpsRedirection();
+// This doesn't work for internally bound sites in IIS.
+//app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -43,6 +43,7 @@ public static class ServiceRegistrations
         where TOptions : InternalApiOptions
     {
         return services
+            .AddHttpClient()
             .Configure<TOptions>(configuration)
             .AddTransient<IInternalApiClientService<TOptions>, InternalApiClientService<TOptions>>();
     }
@@ -50,7 +51,23 @@ public static class ServiceRegistrations
     public static IServiceCollection AddInternalApi(this IServiceCollection services, IConfigurationSection configuration)
     {
         return services
+            .AddHttpClient()
             .Configure<InternalApiOptions>(configuration)
             .AddTransient<IInternalApiClientService, InternalApiClientService>();
+    }
+
+    public static IServiceCollection AddQueueService<TOptions>(this IServiceCollection services, IConfigurationSection configuration)
+        where TOptions : QueueOptions
+    {
+        return services
+            .Configure<TOptions>(configuration)
+            .AddTransient<IQueueService<TOptions>, QueueService<TOptions>>();
+    }
+
+    public static IServiceCollection AddQueueService(this IServiceCollection services, IConfigurationSection configuration)
+    {
+        return services
+            .Configure<QueueOptions>(configuration)
+            .AddTransient<IQueueService, QueueService>();
     }
 }

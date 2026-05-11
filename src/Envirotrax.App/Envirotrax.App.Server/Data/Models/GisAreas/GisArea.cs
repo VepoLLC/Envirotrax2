@@ -20,6 +20,12 @@ public class GisArea : TenantModel<WaterSupplier>, IDeleteAutitableModel<AppUser
     [StringLength(10)]
     public string Color { get; set; } = null!;
 
+    public double? MinLongitude { get; set; }
+    public double? MinLatitude { get; set; }
+
+    public double? MaxLongitude { get; set; }
+    public double? MaxLatitude { get; set; }
+
     public int? CreatedById { get; set; }
     public AppUser? CreatedBy { get; set; }
     public DateTime CreatedTime { get; set; }

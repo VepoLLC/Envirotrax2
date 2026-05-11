@@ -1077,6 +1077,18 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<double?>("MaxLatitude")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("MaxLongitude")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("MinLatitude")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("MinLongitude")
+                        .HasColumnType("float");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)

@@ -35,4 +35,13 @@ export interface BackflowSettings {
     nonCompliantLettersBackgroundColor?: string;
     nonCompliantLettersForegroundColor?: string;
     nonCompliantLettersBorderColor?: string;
+
+    noticeBodyFont?: string | null;
+    noticeBodyFontSize?: number | null;
+    expiringTitle?: string | null;
+    expiringMessage?: string | null;
+    expiredTitle?: string | null;
+    expiredMessage?: string | null;
+    nonCompliantTitle?: string | null;
+    nonCompliantMessage?: string | null;
 }

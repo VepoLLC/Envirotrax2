@@ -7,7 +7,6 @@ import { HelperService } from '../../../shared/services/helpers/helper.service';
 import { BackflowTestingSettingsService } from '../../../shared/services/settings/backflow-testing-settings.service';
 
 @Component({
-  selector: 'app-backflow-testing-settings',
   standalone: false,
   templateUrl: './backflow-testing-settings.html',
 })
@@ -100,13 +99,12 @@ export class BackflowTestingSettings implements OnInit {
         if (form.valid) {
             try {
                 this.isLoading = true;
-                console.log('Saving settings:', this.settings);
 
                 let result;
                 if (this.settings.id) {
-                    //result = await this._backflowSettingsService.update(this.settings);
+                    result = await this._backflowSettingsService.update(this.settings);
                 } else {
-                    //result = await this._backflowSettingsService.add(this.settings);
+                    result = await this._backflowSettingsService.add(this.settings);
                 }
 
                 if (result) {

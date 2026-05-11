@@ -29,4 +29,14 @@ public class CsiSettingsDto : IDto
     public string NonCompliantLettersBackgroundColor { get; set; } = "#d3d3d3";
     public string NonCompliantLettersForegroundColor { get; set; } = "#000000";
     public string NonCompliantLettersBorderColor { get; set; } = "#000000";
+
+    // CSI Letter Message Settings
+    public string? NoticeBodyFont { get; set; }
+    public int? NoticeBodyFontSize { get; set; }
+    public string? ImpendingTitle { get; set; }
+    public string? ImpendingMessage { get; set; }
+    public string? PastDueTitle { get; set; }
+    public string? PastDueMessage { get; set; }
+    public string? NonCompliantTitle { get; set; }
+    public string? NonCompliantMessage { get; set; }
 }

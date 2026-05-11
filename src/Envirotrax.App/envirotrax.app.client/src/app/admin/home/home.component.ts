@@ -69,6 +69,20 @@ export class HomeComponent implements OnInit {
                 description: 'Configure backflow testing program settings, automated letter notification schedules, and letter header appearance.'
             },
             {
+                title: 'CSI Letter Message Setup',
+                iconCss: 'fa-solid fa-envelope-open-text',
+                routerLink: ['settings', 'csi-letter-message-settings'],
+                hasPermission: true,
+                description: 'Configure CSI letter message content including fonts, titles, and messages for each letter type.'
+            },
+            {
+                title: 'Backflow Letter Message Setup',
+                iconCss: 'fa-solid fa-envelope-open-text',
+                routerLink: ['settings', 'backflow-letter-message-settings'],
+                hasPermission: true,
+                description: 'Configure backflow letter message content including fonts, titles, and messages for each letter type.'
+            },
+            {
                 title: 'GIS Area Management',
                 iconCss: 'fa-solid fa-globe',
                 routerLink: ['gis-areas'],

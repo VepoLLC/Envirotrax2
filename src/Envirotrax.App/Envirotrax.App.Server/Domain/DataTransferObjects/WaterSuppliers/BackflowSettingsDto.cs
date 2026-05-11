@@ -38,4 +38,14 @@ public class BackflowSettingsDto : IDto
     public string NonCompliantLettersBackgroundColor { get; set; } = "#d3d3d3";
     public string NonCompliantLettersForegroundColor { get; set; } = "#000000";
     public string NonCompliantLettersBorderColor { get; set; } = "#000000";
+
+    // Backflow Letter Message Settings
+    public string? NoticeBodyFont { get; set; }
+    public int? NoticeBodyFontSize { get; set; }
+    public string? ExpiringTitle { get; set; }
+    public string? ExpiringMessage { get; set; }
+    public string? ExpiredTitle { get; set; }
+    public string? ExpiredMessage { get; set; }
+    public string? NonCompliantTitle { get; set; }
+    public string? NonCompliantMessage { get; set; }
 }

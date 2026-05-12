@@ -8,8 +8,7 @@ import { ToastService } from "../../../shared/services/toast.service";
 
 @Component({
     templateUrl: './csi-letter-message-settings.component.html',
-    standalone: false,
-    styles: ['.vp-tabs .nav-link { color: #ffffff !important; } .vp-tabs .nav-link.active { color: #ffffff !important; }']
+    standalone: false
 })
 export class CsiLetterMessageSettingsComponent implements OnInit {
     public settings: CsiSettings = {
@@ -61,7 +60,7 @@ export class CsiLetterMessageSettingsComponent implements OnInit {
         private readonly _csiSettingsService: CsiSettingsService,
         private readonly _helper: HelperService,
         private readonly _toastService: ToastService,
-    ) {}
+    ) { }
 
     public async ngOnInit(): Promise<void> {
         await this.getSettings();

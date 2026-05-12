@@ -9,7 +9,7 @@ import { ToastService } from "../../../shared/services/toast.service";
 @Component({
     templateUrl: './csi-letter-message-settings.component.html',
     standalone: false,
-    styles: ['.vp-tabs .nav-link { color: var(--bs-body-color) !important; } .vp-tabs .nav-link.active { color: var(--bs-body-color) !important; }']
+    styles: ['.vp-tabs .nav-link { color: #ffffff !important; } .vp-tabs .nav-link.active { color: #ffffff !important; }']
 })
 export class CsiLetterMessageSettingsComponent implements OnInit {
     public settings: CsiSettings = {

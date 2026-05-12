@@ -46,4 +46,21 @@ public class BackflowSettings : TenantModel<WaterSupplier>
     public string NonCompliantLettersForegroundColor { get; set; } = "#000000";
     [MaxLength(7)]
     public string NonCompliantLettersBorderColor { get; set; } = "#000000";
+
+    // Backflow Letter Message Settings
+    [MaxLength(50)]
+    public string? NoticeBodyFont { get; set; }
+    public int? NoticeBodyFontSize { get; set; }
+
+    [MaxLength(100)]
+    public string? ExpiringTitle { get; set; }
+    public string? ExpiringMessage { get; set; }
+
+    [MaxLength(100)]
+    public string? ExpiredTitle { get; set; }
+    public string? ExpiredMessage { get; set; }
+
+    [MaxLength(100)]
+    public string? NonCompliantTitle { get; set; }
+    public string? NonCompliantMessage { get; set; }
 }

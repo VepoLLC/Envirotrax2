@@ -1,0 +1,33 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+    <form #form="ngForm" (ngSubmit)="save(form)">
+        <div class="mb-3">
+            <vp-input type="textarea"
+                      label="Disapproval reason"
+                      name="disapprovedReason"
+                      [(ngModel)]="disapprovedReason"
+                      [required]="false"
+                      [maxLength]="500"
+                      [form]="form" />
+        </div>
+           
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox"
+                [(ngModel)]="sendEmailNotification"
+                name="emailCheckbox" id="emailCheckbox">
+            <label class="form-check-label" for="emailCheckbox">Email notice of disapproval to the CSI</label>
+        </div>
+
+        <vp-validation-summary [form]="form" [validationErrors]="validationErrors" />
+
+        <div class="d-flex justify-content-center gap-2">
+            <button type="submit" class="btn btn-primary w-100">
+                Disapprove CSI
+            </button>
+            <button type="button" class="btn btn-primary w-100" (click)="cancel()">
+                Cancel
+            </button>
+        </div>
+    </form>
+</div>

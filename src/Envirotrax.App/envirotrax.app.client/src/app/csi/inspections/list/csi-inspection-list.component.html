@@ -318,7 +318,7 @@
                       (queryChange)="getInspections()"
                       (queryReset)="getInspections()"
                       [canViewDetails]="true"
-                      (viewDetails)="viewInspection($event)"
+                      (viewDetails)="viewDetails($event)"
                       [freeTextSearch]="table.freeTextSearch" />
 
             <div *ngIf="table.items?.data?.length === 0" class="text-center py-3 text-muted">

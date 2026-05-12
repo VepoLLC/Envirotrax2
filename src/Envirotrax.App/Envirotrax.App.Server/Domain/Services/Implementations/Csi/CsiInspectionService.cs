@@ -48,7 +48,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         var inspectorUser = await _professionalUserService.GetAsync(inspectorUserId, cancellationToken);
         var licenses = await _licenseService.GetAllAsync(inspectorUserId, new PageInfo(), new Query());
 
-        var  csiLicense = licenses.Data.FirstOrDefault();
+        var csiLicense = licenses.Data.FirstOrDefault();
 
         var inspection = new CsiInspection
         {
@@ -81,6 +81,12 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
 
         var added = await _repository.AddAsync(inspection);
         return Mapper.Map<CsiInspectionDto>(added);
+    }
+
+    public async Task<CsiInspectionDto?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken)
+    {
+        var inspection = await _repository.UpdateApprovalAsync(id, request, cancellationToken);
+        return inspection == null ? null : Mapper.Map<CsiInspectionDto>(inspection);
     }
 
     public async Task<IPagedData<CsiInspectionDto>> SearchForProfessionalAsync(PageInfo pageInfo, Query query, bool latestOnly, CancellationToken cancellationToken)

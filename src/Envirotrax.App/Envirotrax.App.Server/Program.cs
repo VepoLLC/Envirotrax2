@@ -1,7 +1,6 @@
 using Azure.Identity;
 using Envirotrax.App.Server.Configuration;
 using Envirotrax.App.Server.Filters;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 

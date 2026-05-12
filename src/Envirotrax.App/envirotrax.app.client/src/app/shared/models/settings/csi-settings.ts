@@ -26,4 +26,13 @@ export interface CsiSettings {
     nonCompliantLettersBackgroundColor?: string;
     nonCompliantLettersForegroundColor?: string;
     nonCompliantLettersBorderColor?: string;
+
+    noticeBodyFont?: string | null;
+    noticeBodyFontSize?: number | null;
+    impendingTitle?: string | null;
+    impendingMessage?: string | null;
+    pastDueTitle?: string | null;
+    pastDueMessage?: string | null;
+    nonCompliantTitle?: string | null;
+    nonCompliantMessage?: string | null;
 }

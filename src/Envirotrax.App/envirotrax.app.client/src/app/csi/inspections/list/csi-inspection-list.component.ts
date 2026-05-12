@@ -148,6 +148,9 @@ export class CsiInspectionListComponent implements OnInit {
         this.showResults = false;
     }
 
-    public viewInspection(_inspection: CsiInspection): void {
+    public viewDetails(inspection: CsiInspection): void {
+        this._router.navigate([inspection.id, 'view'], {
+            relativeTo: this._activatedRoute
+        });
     }
 }

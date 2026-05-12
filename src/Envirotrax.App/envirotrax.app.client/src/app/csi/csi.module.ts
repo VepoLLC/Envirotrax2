@@ -5,6 +5,8 @@ import { RouterModule } from "@angular/router";
 import { SharedComponentsModule } from "../shared/components/shared.components.module";
 import { CsiRoutingModule } from "./csi-routing.module";
 import { CsiInspectionListComponent } from "./inspections/list/csi-inspection-list.component";
+import { CsiInspectionDetailsComponent } from "./inspections/details/csi-inspection-details.component";
+import { DisapproveCsiInspectionComponent } from "./inspections/details/disapprove/disapprove-csi-inspection.component";
 import { CsiInspectorListComponent } from "./inspectors/list/csi-inspector-list.component";
 import { CsiInspectorDetailsComponent } from "./inspectors/details/csi-inspector-details.component";
 import { CsiInspectorWaterSuppliersComponent } from "./inspectors/details/water-suppliers/list/csi-inspector-water-suppliers.component";
@@ -18,6 +20,8 @@ import { ProfessionalModule } from "../professionals/professional.module";
 @NgModule({
     declarations: [
         CsiInspectionListComponent,
+        CsiInspectionDetailsComponent,
+        DisapproveCsiInspectionComponent,
         CsiInspectorListComponent,
         CsiInspectorDetailsComponent,
         CsiInspectorWaterSuppliersComponent,

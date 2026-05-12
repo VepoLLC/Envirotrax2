@@ -8,8 +8,7 @@ import { ToastService } from "../../../shared/services/toast.service";
 
 @Component({
     templateUrl: './backflow-letter-message-settings.component.html',
-    standalone: false,
-    styles: ['.vp-tabs .nav-link { color: var(--bs-body-color) !important; } .vp-tabs .nav-link.active { color: var(--bs-body-color) !important; }']
+    standalone: false
 })
 export class BackflowLetterMessageSettingsComponent implements OnInit {
     public settings: BackflowSettings = {
@@ -63,7 +62,7 @@ export class BackflowLetterMessageSettingsComponent implements OnInit {
         private readonly _backflowSettingsService: BackflowTestingSettingsService,
         private readonly _helper: HelperService,
         private readonly _toastService: ToastService,
-    ) {}
+    ) { }
 
     public async ngOnInit(): Promise<void> {
         await this.getSettings();

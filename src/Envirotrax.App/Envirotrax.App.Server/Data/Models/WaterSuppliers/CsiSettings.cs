@@ -37,4 +37,21 @@ public class CsiSettings : TenantModel<WaterSupplier>
     public string NonCompliantLettersForegroundColor { get; set; } = "#000000";
     [MaxLength(7)]
     public string NonCompliantLettersBorderColor { get; set; } = "#000000";
+
+    // CSI Letter Message Settings
+    [MaxLength(50)]
+    public string? NoticeBodyFont { get; set; }
+    public int? NoticeBodyFontSize { get; set; }
+
+    [MaxLength(100)]
+    public string? ImpendingTitle { get; set; }
+    public string? ImpendingMessage { get; set; }
+
+    [MaxLength(100)]
+    public string? PastDueTitle { get; set; }
+    public string? PastDueMessage { get; set; }
+
+    [MaxLength(100)]
+    public string? NonCompliantTitle { get; set; }
+    public string? NonCompliantMessage { get; set; }
 }

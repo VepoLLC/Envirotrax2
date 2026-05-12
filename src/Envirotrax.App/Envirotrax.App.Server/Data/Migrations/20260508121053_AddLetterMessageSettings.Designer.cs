@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260508121053_AddLetterMessageSettings")]
+    partial class AddLetterMessageSettings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -513,11 +516,6 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.Property<DateTime?>("InspectionDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("InspectionResult")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("bit")
-                        .HasComputedColumnSql("CASE WHEN [Compliance1] = 1 AND [Compliance2] = 1 AND [Compliance3] = 1 AND [Compliance4] = 1 AND [Compliance5] = 1 AND [Compliance6] = 1 THEN CAST(1 AS bit) ELSE CAST(0 AS bit) END", true);
 
                     b.Property<string>("InspectorAddress")
                         .HasMaxLength(200)
@@ -1076,18 +1074,6 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<double?>("MaxLatitude")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("MaxLongitude")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("MinLatitude")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("MinLongitude")
-                        .HasColumnType("float");
 
                     b.Property<string>("Name")
                         .IsRequired()

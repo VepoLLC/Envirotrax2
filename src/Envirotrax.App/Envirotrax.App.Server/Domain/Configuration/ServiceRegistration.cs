@@ -75,6 +75,14 @@ public static class ServiceRegistration
         services.Configure<GeocodingOptions>(configuration.GetSection("Geocoding"));
         services.AddHttpClient<IGeocodingService, GeocodingService>();
 
+        services.AddHtmlTemplateService(opts =>
+        {
+            opts.Assembly = typeof(ServiceRegistration).Assembly;
+            opts.Namespace = "Envirotrax.App.Server";
+        });
+        services.AddPdfTemplateService();
+        services.AddTransient<ICsiInspectionPdfService, CsiInspectionPdfService>();
+
         return services;
     }
 }

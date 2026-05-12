@@ -11,8 +11,35 @@ namespace Envirotrax.App.Server.Controllers.Csi;
 [PermissionResource(PermissionType.CsiInspections)]
 public class CsiInspectionController : WaterSupplierCrudController<CsiInspectionDto>
 {
-    public CsiInspectionController(ICsiInspectionService service)
+    private readonly ICsiInspectionService _inspectionService;
+    private readonly ICsiInspectionPdfService _pdfService;
+
+    public CsiInspectionController(ICsiInspectionService service, ICsiInspectionPdfService pdfService)
         : base(service)
     {
+        _inspectionService = service;
+        _pdfService = pdfService;
+    }
+
+    [HttpPut("{id}/approval")]
+    [HasPermission(PermissionAction.CanEdit)]
+    public async Task<IActionResult> UpdateApprovalAsync(int id, [FromBody] CsiInspectionApprovalRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _inspectionService.UpdateApprovalAsync(id, request, cancellationToken);
+        return result == null ? NotFound() : Ok(result);
+    }
+
+    [HttpGet("{id}/pdf")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetPdfAsync(int id, CancellationToken cancellationToken)
+    {
+        var inspection = await _inspectionService.GetAsync(id, cancellationToken);
+        if (inspection == null)
+        {
+            return NotFound();
+        }
+
+        var pdfBytes = await _pdfService.GenerateAsync(inspection);
+        return File(pdfBytes, "application/pdf");
     }
 }

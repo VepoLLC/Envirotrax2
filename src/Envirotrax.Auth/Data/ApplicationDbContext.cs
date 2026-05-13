@@ -20,6 +20,7 @@ public class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRole<int>
 
     public DbSet<UserInvitation> UserInvitations { get; set; }
 
+    public DbSet<Role> AppRoles { get; set; }
     public DbSet<UserRole> AppUserRoles { get; set; }
     public DbSet<RolePermission> RolePermissions { get; set; }
 
@@ -73,6 +74,7 @@ public class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRole<int>
         base.OnModelCreating(builder);
 
         builder.Entity<UserRole>().ToTable("UserRoles");
+        builder.Entity<Role>().ToTable("Roles");
 
         foreach (var entity in builder.Model.GetEntityTypes())
         {

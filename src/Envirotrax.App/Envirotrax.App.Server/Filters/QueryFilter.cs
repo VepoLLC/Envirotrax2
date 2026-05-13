@@ -17,13 +17,13 @@ public class QueryFilter : ActionFilterAttribute
 
                 // when client is not passing DeletedById filter,
                 // we add a new one to make database query return only active entries by default
-                var isActiveFilter = query.Filter.Find(f => f.ColumnName == nameof(IDeleteAutitableModel<>.DeletedById));
+                var isActiveFilter = query.Filter.Find(f => f.ColumnName == nameof(IDeleteAutitableModel<>.DeletedTime));
 
                 if (isActiveFilter == null)
                 {
                     query.Filter.Add(new QueryProperty
                     {
-                        ColumnName = nameof(IDeleteAutitableModel<>.DeletedById),
+                        ColumnName = nameof(IDeleteAutitableModel<>.DeletedTime),
                         IsValueNull = true,
                         LogicalOperator = LogicalOperator.And
                     });

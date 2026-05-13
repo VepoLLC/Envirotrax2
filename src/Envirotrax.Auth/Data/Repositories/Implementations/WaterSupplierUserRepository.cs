@@ -44,7 +44,11 @@ public class WaterSupplierUserRepository : IWaterSupplierUserRepository
                                   join userRole in _dbContext.AppUserRoles.IgnoreQueryFilters()
                                   on new { rolePermission.WaterSupplierId, rolePermission.RoleId } equals new { userRole.WaterSupplierId, userRole.RoleId }
 
+                                  join role in _dbContext.AppRoles.IgnoreQueryFilters()
+                                  on new { userRole.WaterSupplierId, Id = userRole.RoleId } equals new { role.WaterSupplierId, role.Id }
+
                                   where rolePermission.WaterSupplierId == supplierId &&
+                                    role.DeletedTime == null &&
                                     rolePermission.RoleId == userRole.RoleId &&
                                     userRole.WaterSupplierId == supplierId &&
                                     userRole.UserId == userId

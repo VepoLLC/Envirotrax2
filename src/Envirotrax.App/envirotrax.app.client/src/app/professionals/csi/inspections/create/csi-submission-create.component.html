@@ -384,8 +384,9 @@
 
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="legalAck" name="legalAck" [(ngModel)]="legalAcknowledgment" />
-                        <label class="form-check-label" for="legalAck">
+                        <label class="form-check-label" [ngClass]="{'text-danger': submitted && !legalAcknowledgment}" for="legalAck">
                             "I recognize that this document shall be retained by the aforementioned Public Water System for a minimum of ten years and that I am legally responsible for the validity of the information I have provided."
+                            <span class="text-danger">*</span>
                         </label>
                     </div>
 
@@ -410,12 +411,11 @@
                 </div>
 
                 <div *ngIf="hasValidLicense" class="mt-3 d-flex justify-content-center">
-                    <button type="submit" class="btn btn-primary vp-section-button" [disabled]="isSaving">
-                        <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-1"></span>
+                    <dp-loading-spinner *ngIf="isSaving"></dp-loading-spinner>
+                    <button *ngIf="!isSaving" type="submit" class="btn btn-primary vp-section-button">
                         Complete Submission
                     </button>
                 </div>
-
             </form>
         </div>
     </div>

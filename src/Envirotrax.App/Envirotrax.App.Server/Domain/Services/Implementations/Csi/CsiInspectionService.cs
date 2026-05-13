@@ -10,6 +10,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
+using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Csi;
 
@@ -20,6 +21,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
     private readonly IProfessionalUserService _professionalUserService;
     private readonly IProfessionalUserLicenseService _licenseService;
     private readonly ISiteService _siteService;
+    private readonly IPdfTemplateService _pdfTemplateService;
 
     public CsiInspectionService(
         IMapper mapper,
@@ -27,7 +29,8 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         IProfessionalService professionalService,
         IProfessionalUserService professionalUserService,
         IProfessionalUserLicenseService licenseService,
-        ISiteService siteService)
+        ISiteService siteService,
+        IPdfTemplateService pdfTemplateService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -35,6 +38,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         _professionalUserService = professionalUserService;
         _licenseService = licenseService;
         _siteService = siteService;
+        _pdfTemplateService = pdfTemplateService;
     }
 
     public async Task<CsiInspectionDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken)
@@ -125,6 +129,11 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         inspection.MailingZip = site.MailingZipCode;
         inspection.MailingPhoneNumber = site.MailingPhoneNumber;
         inspection.MailingEmailAddress = site.MailingEmailAddress;
+    }
+
+    public Task<byte[]> GeneratePdfAsync(CsiInspectionDto inspection)
+    {
+        return _pdfTemplateService.GenerateAsync("Csi.CsiInspection", inspection);
     }
 
     private static void ApplyInspectorSnapshot(

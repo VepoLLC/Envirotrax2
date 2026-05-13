@@ -30,12 +30,7 @@ namespace Envirotrax.Common.Domain.Services.Implementations
             return await ParseStringAsync($"Emails.{pageName}", model, viewBag);
         }
 
-        public async Task<string> ParseAsync<T>(string templatePath, T model)
-        {
-            return await ParseStringAsync(templatePath, model, null);
-        }
-
-        private async Task<string> ParseStringAsync<T>(string pageName, T model, ExpandoObject? viewBag)
+        public async Task<string> ParseStringAsync<T>(string pageName, T model, ExpandoObject? viewBag)
         {
             return await _engine.CompileRenderAsync($"Templates.{pageName}", model, viewBag: viewBag);
         }

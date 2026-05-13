@@ -20,7 +20,7 @@ public class PdfTemplateService : IPdfTemplateService
     {
         await EnsureChromiumAsync();
 
-        var html = await _htmlTemplateService.ParseAsync($"Pdf.{pageName}", model);
+        var html = await _htmlTemplateService.ParseStringAsync($"Pdf.{pageName}", model, null);
 
         await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
         {
@@ -40,8 +40,10 @@ public class PdfTemplateService : IPdfTemplateService
             PrintBackground = true,
             MarginOptions = new MarginOptions
             {
-                Top = "1.5cm", Bottom = "1.5cm",
-                Left = "1.5cm", Right = "1.5cm"
+                Top = "1.5cm",
+                Bottom = "1.5cm",
+                Left = "1.5cm",
+                Right = "1.5cm"
             }
         });
     }

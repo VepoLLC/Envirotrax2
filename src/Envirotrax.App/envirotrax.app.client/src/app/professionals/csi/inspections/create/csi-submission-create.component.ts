@@ -23,8 +23,7 @@ import { ProfessionalSupplierService } from '../../../../shared/services/profess
     styleUrl: './csi-submission-create.component.scss'
 })
 export class CsiSubmissionCreateComponent implements OnInit {
-    public isLoading = true;
-    public isSaving = false;
+    public isLoading = false;
     public submitSuccess = false;
     public activeTab: 'main' | 'assemblies' | 'additional' | 'images' = 'main';
     public submitted = false;
@@ -87,14 +86,17 @@ export class CsiSubmissionCreateComponent implements OnInit {
         private readonly _siteService: SiteService,
         private readonly _inspectionService: CsiInspectionService,
         private readonly _professionalSupplierService: ProfessionalSupplierService
-    ) {}
+    ) { }
 
-    public async ngOnInit(): Promise<void> {
-        if (!this.initializeSiteId()) {
-            return;
-        }
+    public ngOnInit(): void {
+        this._activatedRoute.paramMap.subscribe(async params => {
+            const idParam = params.get('siteId');
+            this._siteId = this._siteId = idParam ? Number(idParam) : 0;
 
-        await this.loadData();
+            if (this._siteId > 0) {
+                await this.loadData();
+            }
+        });
     }
 
     public async onCsiAccountChange(value: number): Promise<void> {
@@ -143,12 +145,12 @@ export class CsiSubmissionCreateComponent implements OnInit {
             return;
         }
 
-        this.isSaving = true;
+        this.isLoading = true;
         try {
             await this._inspectionService.submit({ ...this.model, site: { id: this._siteId } });
             this.submitSuccess = true;
         } finally {
-            this.isSaving = false;
+            this.isLoading = false;
         }
     }
 
@@ -257,12 +259,15 @@ export class CsiSubmissionCreateComponent implements OnInit {
     private resetValidation(): void {
         this.submitted = true;
         this.validationErrors = [];
+
         this.complianceIsInvalid = this.model.compliance1 == null || this.model.compliance2 == null || this.model.compliance3 == null ||
             this.model.compliance4 == null || this.model.compliance5 == null || this.model.compliance6 == null;
+
         this.serviceLineIsInvalid = !this.model.materialServiceLineLead &&
             !this.model.materialServiceLineCopper &&
             !this.model.materialServiceLinePVC &&
             !this.model.materialServiceLineOther;
+
         this.solderIsInvalid = !this.model.materialSolderLead &&
             !this.model.materialSolderLeadFree &&
             !this.model.materialSolderSolventWeld &&

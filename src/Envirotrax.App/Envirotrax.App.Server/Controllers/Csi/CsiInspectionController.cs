@@ -12,13 +12,11 @@ namespace Envirotrax.App.Server.Controllers.Csi;
 public class CsiInspectionController : WaterSupplierCrudController<CsiInspectionDto>
 {
     private readonly ICsiInspectionService _inspectionService;
-    private readonly ICsiInspectionPdfService _pdfService;
 
-    public CsiInspectionController(ICsiInspectionService service, ICsiInspectionPdfService pdfService)
+    public CsiInspectionController(ICsiInspectionService service)
         : base(service)
     {
         _inspectionService = service;
-        _pdfService = pdfService;
     }
 
     [HttpPut("{id}/approval")]
@@ -34,12 +32,9 @@ public class CsiInspectionController : WaterSupplierCrudController<CsiInspection
     public async Task<IActionResult> GetPdfAsync(int id, CancellationToken cancellationToken)
     {
         var inspection = await _inspectionService.GetAsync(id, cancellationToken);
-        if (inspection == null)
-        {
-            return NotFound();
-        }
+        if (inspection == null) return NotFound();
 
-        var pdfBytes = await _pdfService.GenerateAsync(inspection);
+        var pdfBytes = await _inspectionService.GeneratePdfAsync(inspection);
         return File(pdfBytes, "application/pdf");
     }
 }

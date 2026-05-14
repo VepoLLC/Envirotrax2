@@ -81,7 +81,6 @@ public static class ServiceRegistration
             opts.Namespace = "Envirotrax.App.Server";
         });
         services.AddPdfTemplateService();
-        services.AddTransient<ICsiInspectionPdfService, CsiInspectionPdfService>();
 
         return services;
     }

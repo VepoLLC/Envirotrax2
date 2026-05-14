@@ -20,7 +20,7 @@ public class PdfTemplateService : IPdfTemplateService
     {
         await EnsureChromiumAsync();
 
-        var html = await _htmlTemplateService.ParseStringAsync($"Pdf.{pageName}", model, null);
+        var html = await _htmlTemplateService.ParsePdfAsync(pageName, model);
 
         await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
         {

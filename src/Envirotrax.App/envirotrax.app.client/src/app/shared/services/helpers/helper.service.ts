@@ -82,4 +82,9 @@ export class HelperService {
             link.remove();
         }, 5000);
     }
+
+    public downloadFileFromBlob(blob: Blob): void {
+        const objectUrl = URL.createObjectURL(blob);
+        this.downloadFileFromUrl(objectUrl);
+    }
 }

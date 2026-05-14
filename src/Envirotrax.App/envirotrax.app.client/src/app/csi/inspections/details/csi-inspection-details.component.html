@@ -14,16 +14,22 @@
         <div class="text-center mb-3 ms-auto me-auto">
             <ul class="vp-tabs nav nav-pills settings-tabs d-inline-flex">
                 <li class="nav-item">
-                    <a class="nav-link" [class.active]="selectedTab === 'main'" [routerLink]="['/csi', id, 'view']" (click)="selectedTab = 'main'">Csi Main Form</a>
+                    <a class="nav-link" [class.active]="selectedTab === 'main'" [routerLink]="['/csi', id, 'view']"
+                       (click)="selectedTab = 'main'">Csi Main Form</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" [class.active]="selectedTab === 'assemblies'" [routerLink]="['/csi', id, 'view']" (click)="selectedTab = 'assemblies'">Assemblies At This Location</a>
+                    <a class="nav-link" [class.active]="selectedTab === 'assemblies'"
+                       [routerLink]="['/csi', id, 'view']" (click)="selectedTab = 'assemblies'">Assemblies At This
+                        Location</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" [class.active]="selectedTab === 'additional'" [routerLink]="['/csi', id, 'view']" (click)="selectedTab = 'additional'">Additional Information</a>
+                    <a class="nav-link" [class.active]="selectedTab === 'additional'"
+                       [routerLink]="['/csi', id, 'view']" (click)="selectedTab = 'additional'">Additional
+                        Information</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" [class.active]="selectedTab === 'images'" [routerLink]="['/csi', id, 'view']" (click)="selectedTab = 'images'">Images</a>
+                    <a class="nav-link" [class.active]="selectedTab === 'images'" [routerLink]="['/csi', id, 'view']"
+                       (click)="selectedTab = 'images'">Images</a>
                 </li>
             </ul>
         </div>
@@ -99,7 +105,8 @@
                         <dt class="col-sm-5">Business name:</dt>
                         <dd class="col-sm-7">{{ inspection.propertyBusinessName }}</dd>
                         <dt class="col-sm-5">Property address:</dt>
-                        <dd class="col-sm-7">{{ inspection.propertyStreetNumber }} {{ inspection.propertyStreetName }} {{ inspection.propertyCity }} {{ inspection.propertyZip }}</dd>
+                        <dd class="col-sm-7">{{ inspection.propertyStreetNumber }} {{ inspection.propertyStreetName }}
+                            {{ inspection.propertyCity }} {{ inspection.propertyZip }}</dd>
                     </dl>
                 </vp-section>
             </div>
@@ -112,7 +119,8 @@
                         <dt class="col-sm-5">Contact name:</dt>
                         <dd class="col-sm-7">{{ inspection.mailingContactName }}</dd>
                         <dt class="col-sm-5">Mailing address:</dt>
-                        <dd class="col-sm-7">{{ inspection.mailingStreetNumber }} {{ inspection.mailingStreetName }} {{ inspection.mailingCity }} {{ inspection.mailingZip }}</dd>
+                        <dd class="col-sm-7">{{ inspection.mailingStreetNumber }} {{ inspection.mailingStreetName }} {{
+                            inspection.mailingCity }} {{ inspection.mailingZip }}</dd>
                         <dt class="col-sm-5">Phone number:</dt>
                         <dd class="col-sm-7">{{ inspection.mailingPhoneNumber }}</dd>
                         <dt class="col-sm-5">Email address:</dt>
@@ -135,7 +143,10 @@
                         <table class="table tbl-round table-borderless table-sm">
                             <tr>
                                 <td colspan="4">I,
-                                    <span class="text-decoration-underline">{{ inspection.inspectorContactName }}</span>, upon inspection of the private water distribution facilities connected to the aforementioned public water supply do hereby certify that, to the best of my knowledge.
+                                    <span class="text-decoration-underline">{{ inspection.inspectorContactName
+                                        }}</span>, upon inspection of the private water distribution facilities
+                                    connected to the aforementioned public water supply do hereby certify that, to the
+                                    best of my knowledge.
                                 </td>
                             </tr>
                             <tr>
@@ -146,7 +157,8 @@
                             </tr>
                             <tr>
                                 <td class="align-top">1.</td>
-                                <td class="align-top">No direct or indirect connection between the public drinking water supply and a
+                                <td class="align-top">No direct or indirect connection between the public drinking water
+                                    supply and a
                                     potential source of contamination exists. Potential sources of
                                     contamination are isolated from the public water system by an air gap
                                     or an appropriate backflow prevention assembly in accordance with
@@ -176,7 +188,8 @@
                             </tr>
                             <tr>
                                 <td class="align-top">3.</td>
-                                <td class="align-top">No connection exists which would allow the return of water used for
+                                <td class="align-top">No connection exists which would allow the return of water used
+                                    for
                                     condensing, cooling or industrial processes back to the public water supply.
                                 </td>
                                 <td class="text-center">
@@ -188,8 +201,10 @@
                             </tr>
                             <tr>
                                 <td class="align-top">4.</td>
-                                <td class="align-top">No pipe or pipe fitting which contains more than 8.0% lead exists in private
-                                    water distribution facilities installed on or after July 1, 1988 and prior to January 4, 2014.
+                                <td class="align-top">No pipe or pipe fitting which contains more than 8.0% lead exists
+                                    in private
+                                    water distribution facilities installed on or after July 1, 1988 and prior to
+                                    January 4, 2014.
                                 </td>
                                 <td class="text-center">
                                     <input type="radio" [checked]="inspection.compliance4 === true" disabled />
@@ -200,7 +215,9 @@
                             </tr>
                             <tr>
                                 <td class="align-top">5.</td>
-                                <td class="align-top">Plumbing installed on or after January 4, 2014 bears the expected labeling indicating ≤0.25% lead content. If not properly labeled, please provide written comment.
+                                <td class="align-top">Plumbing installed on or after January 4, 2014 bears the expected
+                                    labeling indicating ≤0.25% lead content. If not properly labeled, please provide
+                                    written comment.
                                 </td>
                                 <td class="text-center">
                                     <input type="radio" [checked]="inspection.compliance5 === true" disabled />
@@ -225,28 +242,39 @@
                     </div>
                     <table class="table table-sm table-borderless mb-3">
                         <tr>
-                            <td colspan="5">I further certify that the following materials were used in the installation of the private water distribution facilities:</td>
+                            <td colspan="5">I further certify that the following materials were used in the installation
+                                of the private water distribution facilities:</td>
                         </tr>
                         <tr>
                             <td class="fw-bold">Service Lines:</td>
-                            <td><input type="checkbox" [checked]="inspection.materialServiceLineLead" disabled />&nbsp;Lead</td>
-                            <td><input type="checkbox" [checked]="inspection.materialServiceLineCopper" disabled />&nbsp;Copper</td>
-                            <td><input type="checkbox" [checked]="inspection.materialServiceLinePVC" disabled />&nbsp;PVC</td>
-                            <td><input type="checkbox" [checked]="inspection.materialServiceLineOther" disabled />&nbsp;Other</td>
+                            <td><input type="checkbox" [checked]="inspection.materialServiceLineLead"
+                                       disabled />&nbsp;Lead</td>
+                            <td><input type="checkbox" [checked]="inspection.materialServiceLineCopper"
+                                       disabled />&nbsp;Copper</td>
+                            <td><input type="checkbox" [checked]="inspection.materialServiceLinePVC"
+                                       disabled />&nbsp;PVC</td>
+                            <td><input type="checkbox" [checked]="inspection.materialServiceLineOther"
+                                       disabled />&nbsp;Other</td>
                         </tr>
                         <tr>
                             <td class="fw-bold">Solder:</td>
-                            <td><input type="checkbox" [checked]="inspection.materialSolderLead" disabled />&nbsp;Lead</td>
-                            <td><input type="checkbox" [checked]="inspection.materialSolderLeadFree" disabled />&nbsp;Lead Free</td>
-                            <td><input type="checkbox" [checked]="inspection.materialSolderSolventWeld" disabled />&nbsp;Solvent Weld</td>
-                            <td><input type="checkbox" [checked]="inspection.materialSolderOther" disabled />&nbsp;Other</td>
+                            <td><input type="checkbox" [checked]="inspection.materialSolderLead" disabled />&nbsp;Lead
+                            </td>
+                            <td><input type="checkbox" [checked]="inspection.materialSolderLeadFree"
+                                       disabled />&nbsp;Lead Free</td>
+                            <td><input type="checkbox" [checked]="inspection.materialSolderSolventWeld"
+                                       disabled />&nbsp;Solvent Weld</td>
+                            <td><input type="checkbox" [checked]="inspection.materialSolderOther" disabled />&nbsp;Other
+                            </td>
                         </tr>
                     </table>
                     <table class="table table-sm table-borderless">
                         <tr>
                             <td>
                                 <input type="checkbox" [checked]="true" disabled />
-                                I recognize that this document shall be retained by the aforementioned Public Water System for a minimum of ten years and that I am legally responsible for the validity of the information I have provided.
+                                I recognize that this document shall be retained by the aforementioned Public Water
+                                System for a minimum of ten years and that I am legally responsible for the validity of
+                                the information I have provided.
                             </td>
                         </tr>
                     </table>
@@ -262,13 +290,14 @@
 
         <div class="row mt-3">
             <div class="col-12 text-center text-muted">
-                A Customer Service Inspection Certificate should be on file for each connection in a public water system to document compliance with 30 TAC §290.44(h)/290.46(j).
+                A Customer Service Inspection Certificate should be on file for each connection in a public water system
+                to document compliance with 30 TAC §290.44(h)/290.46(j).
             </div>
         </div>
 
         <div class="d-flex justify-content-center mt-3">
             <button class="btn btn-primary vp-section-button" [disabled]="isLoading" (click)="exportPdf()">
-                Export inspection to printable document
+                Export Inspection to Printable Document
             </button>
         </div>
     </div>

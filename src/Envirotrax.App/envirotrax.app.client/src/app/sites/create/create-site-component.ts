@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
 import { Site } from '../../shared/models/sites/site';
 import { NgForm } from "@angular/forms";
-import { State } from "../../shared/models/lookup/state";
 import { LookupService } from "../../shared/services/lookup/lookup.service";
 import { PropertyType } from "../../shared/enums/property-type.enum";
 import { SiteService } from "../../shared/services/sites/site.service";
 import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { HelperService } from "../../shared/services/helpers/helper.service";
 import { Router } from "@angular/router";
+import { InputOption } from "../../shared/components/input/input.component";
 
 @Component({
     selector: 'app-create-site-component',
@@ -22,7 +22,7 @@ export class CreateSiteComponent {
         propertyType: PropertyType.Residential
     };
 
-    public states: State[] = [];
+    public stateOptions: InputOption[] = [];
 
     public selectedPropertyType = {
         propertyType: PropertyType.Residential
@@ -76,6 +76,6 @@ export class CreateSiteComponent {
     }
 
     private async loadStates(): Promise<void> {
-        this.states = await this._stateService.getAllStates();
+        this.stateOptions = await this._stateService.getAllStatesAsOptions(true);
     }
 }

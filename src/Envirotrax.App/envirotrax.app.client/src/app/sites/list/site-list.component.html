@@ -20,10 +20,17 @@
             <vp-section header="General Search Criteria">
                 <div class="row">
                     <div class="col-md-6">
+
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="accountNumber"
                                                    label="Account number"
                                                    [form]="searchForm" />
+                        </div>
+                        
+                         <div class="mb-3">
+                            <app-gis-area-lookup fieldName="gisAreaId"
+                                                 label="GIS Area"
+                                                 [form]="searchForm" />
                         </div>
 
                         <div class="mb-3">

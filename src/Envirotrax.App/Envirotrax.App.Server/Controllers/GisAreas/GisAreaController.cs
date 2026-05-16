@@ -20,6 +20,14 @@ public class GisAreaController : WaterSupplierCrudController<GisAreaDto>
         _coordinateService = coordinateService;
     }
 
+    [HttpGet("all")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetAllForLookupAsync(CancellationToken cancellationToken)
+    {
+        var areas = await _gisAreaService.GetAllActiveAsync(cancellationToken);
+        return Ok(areas);
+    }
+
     [HttpGet("coordinates")]
     [HasPermission(PermissionAction.CanView)]
     public async Task<IActionResult> GetAllCoordinatesAsync(CancellationToken cancellationToken)

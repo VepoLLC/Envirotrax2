@@ -16,6 +16,12 @@ public class GisAreaService : Service<GisArea, GisAreaDto>, IGisAreaService
         _gisAreaRepository = repository;
     }
 
+    public async Task<IEnumerable<GisAreaDto>> GetAllActiveAsync(CancellationToken cancellationToken)
+    {
+        var areas = await _gisAreaRepository.GetAllActiveAsync(cancellationToken);
+        return Mapper.Map<IEnumerable<GisAreaDto>>(areas);
+    }
+
     public async Task<DefaultGiisMapViewDto> GetDefaultMapViewAsync(CancellationToken cancellationToken)
     {
         var mapView = await _gisAreaRepository.GetDefaultMapViewAsync(cancellationToken);

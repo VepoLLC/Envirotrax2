@@ -29,6 +29,13 @@ public class GisAreaRepository : Repository<GisArea>, IGisAreaRepository
         entry.Property(a => a.MaxLatitude).IsModified = false;
     }
 
+    public async Task<IEnumerable<GisArea>> GetAllActiveAsync(CancellationToken cancellationToken)
+    {
+        return await GetListQuery()
+            .Where(a => a.DeletedTime == null)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<DefaultGisMapView> GetDefaultMapViewAsync(CancellationToken cancellationToken)
     {
         return await DbContext

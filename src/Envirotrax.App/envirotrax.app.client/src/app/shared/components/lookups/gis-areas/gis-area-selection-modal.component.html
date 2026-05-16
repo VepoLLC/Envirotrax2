@@ -1,0 +1,21 @@
+<dp-loading-spinner *ngIf="isLoading" />
+
+<div *ngIf="!isLoading">
+    <vp-map height="500px"
+            [latitude]="latitude"
+            [longitude]="longitude"
+            [zoom]="zoom"
+            [polygons]="polygons" />
+
+    <div class="d-flex justify-content-center gap-2 mt-3">
+        <button type="button" class="btn btn-secondary" (click)="cancel()">
+            Cancel
+        </button>
+        <button type="button"
+                class="btn btn-primary"
+                [disabled]="!selectedAreaId"
+                (click)="ok()">
+            OK
+        </button>
+    </div>
+</div>

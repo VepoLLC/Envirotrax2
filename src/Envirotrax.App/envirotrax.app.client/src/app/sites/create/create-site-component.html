@@ -92,11 +92,8 @@
                           type="select"
                           [form]="form"
                           [ngModel]="site.state?.id"
-                          (ngModelChange)="stateChanged($event)">
-                    <option value=""></option>
-                    <option *ngFor="let state of states" [value]="state.id">
-                        {{state.name}}
-                    </option>
+                          (ngModelChange)="stateChanged($event)"
+                          [options]="stateOptions">
                 </vp-input>
             </div>
 

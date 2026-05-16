@@ -1,0 +1,17 @@
+<div class="d-flex gap-1">
+    <div class="flex-fill">
+        <vp-input [label]="label"
+                  type="select"
+                  [name]="fieldName"
+                  [(ngModel)]="value"
+                  [form]="form"
+                  [options]="options"
+                  (ngModelChange)="onChange()" />
+    </div>
+    <button type="button"
+            class="btn btn-primary align-self-end mb-0"
+            (click)="selectArea()">
+             <i class="far fa-hand-pointer me-1"></i>
+        Select Area
+    </button>
+</div>

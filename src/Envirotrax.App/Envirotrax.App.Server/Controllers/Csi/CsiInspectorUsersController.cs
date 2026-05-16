@@ -1,4 +1,5 @@
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -24,6 +25,33 @@ namespace Envirotrax.App.Server.Controllers.Csi
         {
             var result = await _userService.GetAllByProfessionalAsync(id, pageInfo, query, cancellationToken);
             return Ok(result);
+        }
+
+        [HttpPost("{id}/users")]
+        [HasFeature(FeatureType.ManageProfessionalUsers)]
+        [HasPermission(PermissionAction.CanEdit)]
+        public async Task<IActionResult> AddSubAccountAsync(int id, [FromBody] ProfessionalUserDto dto)
+        {
+            var result = await _userService.AddForProfessionalAsync(id, dto);
+            return Ok(result);
+        }
+
+        [HttpPut("{id}/users/{userId}")]
+        [HasFeature(FeatureType.ManageProfessionalUsers)]
+        [HasPermission(PermissionAction.CanEdit)]
+        public async Task<IActionResult> UpdateSubAccountAsync(int id, int userId, [FromBody] ProfessionalUserDto dto)
+        {
+            var result = await _userService.UpdateContactNameAsync(id, userId, dto.ContactName);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}/users/{userId}")]
+        [HasFeature(FeatureType.ManageProfessionalUsers)]
+        [HasPermission(PermissionAction.CanEdit)]
+        public async Task<IActionResult> DeleteSubAccountAsync(int userId)
+        {
+            await _userService.DeleteAsync(userId);
+            return Ok();
         }
     }
 }

@@ -74,6 +74,20 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         return existing;
     }
 
+    public async Task<ProfessionalUser?> UpdateContactNameAsync(int professionalId, int userId, string? contactName)
+    {
+        var existing = await DbContext.ProfessionalUsers
+            .SingleOrDefaultAsync(u => u.ProfessionalId == professionalId && u.UserId == userId);
+
+        if (existing != null)
+        {
+            existing.ContactName = contactName;
+            await DbContext.SaveChangesAsync();
+        }
+
+        return existing;
+    }
+
     public async Task<IEnumerable<ProfessionalUser>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         var paginated = await DbContext.ProfessionalUsers

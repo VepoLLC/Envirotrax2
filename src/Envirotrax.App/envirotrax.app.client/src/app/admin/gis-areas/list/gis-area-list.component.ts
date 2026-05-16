@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit } from "@angular/core";
+﻿import { Component, EventEmitter, OnInit } from "@angular/core";
 import { GisAreaService } from "../../../shared/services/gis-areas/gis-area.service";
 import { GisAreaCoordinateService } from "../../../shared/services/gis-areas/gis-area-coordinate.service";
 import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
@@ -6,7 +6,7 @@ import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { GisArea, GisAreaCoordinate } from "../../../shared/models/gis-areas/gis-area";
 import { MapPolygon } from "../../../shared/components/map/map.component";
 import { AuthService } from "../../../shared/services/auth/auth.service";
-import { FeatureType } from "../../../shared/models/feature-tyype";
+import { FeatureType } from "../../../shared/models/feature-type";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
 
 @Component({

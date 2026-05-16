@@ -19,10 +19,25 @@ export class CsiInspectorSubAccountsService {
     ) {
     }
 
-    public async getSubAccounts(id: number, pageInfo: PageInfo, query: Query): Promise<PagedData<ProfessionalUser>> {
-        const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${id}/users`);
+    public async getSubAccounts(inspectorId: number, pageInfo: PageInfo, query: Query): Promise<PagedData<ProfessionalUser>> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${inspectorId}/users`);
         return await lastValueFrom(this._http.get<PagedData<ProfessionalUser>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));
+    }
+
+    public add(inspectorId: number, user: ProfessionalUser): Promise<ProfessionalUser> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${inspectorId}/users`);
+        return lastValueFrom(this._http.post<ProfessionalUser>(url, user));
+    }
+
+    public update(inspectorId: number, user: ProfessionalUser): Promise<ProfessionalUser> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${inspectorId}/users/${user.id}`);
+        return lastValueFrom(this._http.put<ProfessionalUser>(url, user));
+    }
+
+    public delete(inspectorId: number, userId: number): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${inspectorId}/users/${userId}`);
+        return lastValueFrom(this._http.delete<void>(url));
     }
 }

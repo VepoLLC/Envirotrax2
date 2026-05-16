@@ -1,8 +1,8 @@
-import { NgModule } from '@angular/core';
+﻿import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './shared/guards/auth.guard';
 import { FeatureGuard } from './shared/guards/feature.guard';
-import { FeatureType } from './shared/models/feature-tyype';
+import { FeatureType } from './shared/models/feature-type';
 import { RoleGuard } from './shared/guards/role.guard';
 import { ROLE_DEFINITIONS } from './shared/models/role-definitions';
 const routes: Routes = [

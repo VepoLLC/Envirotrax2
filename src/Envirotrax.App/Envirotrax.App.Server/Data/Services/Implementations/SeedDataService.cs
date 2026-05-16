@@ -163,21 +163,25 @@ public class SeedDataService : IHostedService
 
     private async Task AddFeaturesAsync(TenantDbContext dbContext)
     {
-        if (!await dbContext.Features.AnyAsync())
+        var existingIds = await dbContext.Features.Select(f => f.Id).ToListAsync();
+        var newFeatures = FeatureSeedData.Features.Where(f => !existingIds.Contains(f.Id)).ToList();
+
+        if (newFeatures.Count == 0)
         {
-            dbContext.Features.AddRange(FeatureSeedData.Features);
-
-            var waterSupplierFeatures = FeatureSeedData
-                .Features
-                .Select(feature => new WaterSupplierFeature
-                {
-                    WaterSupplierId = _defaultTenant!.Id,
-                    FeatureId = feature.Id
-                });
-
-            dbContext.WaterSupplierFeatures.AddRange(waterSupplierFeatures);
-            await dbContext.SaveChangesAsync();
+            return;
         }
+
+        dbContext.Features.AddRange(newFeatures);
+
+        var waterSupplierFeatures = newFeatures
+            .Select(feature => new WaterSupplierFeature
+            {
+                WaterSupplierId = _defaultTenant!.Id,
+                FeatureId = feature.Id
+            });
+
+        dbContext.WaterSupplierFeatures.AddRange(waterSupplierFeatures);
+        await dbContext.SaveChangesAsync();
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

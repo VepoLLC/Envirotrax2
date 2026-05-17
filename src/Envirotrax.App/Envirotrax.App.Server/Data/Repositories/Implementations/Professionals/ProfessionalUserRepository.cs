@@ -74,7 +74,7 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         return existing;
     }
 
-    public async Task<ProfessionalUser?> UpdateContactNameAsync(int professionalId, int userId, string? contactName)
+    public async Task<ProfessionalUser?> UpdateSubAccountAsync(int professionalId, int userId, string? contactName, string? jobTitle)
     {
         var existing = await DbContext.ProfessionalUsers
             .SingleOrDefaultAsync(u => u.ProfessionalId == professionalId && u.UserId == userId);
@@ -82,6 +82,7 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         if (existing != null)
         {
             existing.ContactName = contactName;
+            existing.JobTitle = jobTitle;
             await DbContext.SaveChangesAsync();
         }
 

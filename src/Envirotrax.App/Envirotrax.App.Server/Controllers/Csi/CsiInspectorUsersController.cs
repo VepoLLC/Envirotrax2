@@ -41,7 +41,7 @@ namespace Envirotrax.App.Server.Controllers.Csi
         [HasPermission(PermissionAction.CanEdit)]
         public async Task<IActionResult> UpdateSubAccountAsync(int id, int userId, [FromBody] ProfessionalUserDto dto)
         {
-            var result = await _userService.UpdateContactNameAsync(id, userId, dto.ContactName);
+            var result = await _userService.UpdateSubAccountAsync(id, userId, dto.ContactName, dto.JobTitle);
             return Ok(result);
         }
 

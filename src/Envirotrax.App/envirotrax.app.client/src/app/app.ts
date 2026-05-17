@@ -1,9 +1,9 @@
-import { Component, signal, OnInit } from '@angular/core';
+﻿import { Component, signal, OnInit } from '@angular/core';
 import { AuthService } from './shared/services/auth/auth.service';
 import { WaterSupplierService } from './shared/services/water-suppliers/water-supplier.service';
 import { ProfesisonalService } from './shared/services/professionals/professional.service';
 import { createPopper, flip, preventOverflow } from '@popperjs/core';
-import { FeatureType } from './shared/models/feature-tyype';
+import { FeatureType } from './shared/models/feature-type';
 import { PermissionAction, PermissionType } from './shared/models/permission-type';
 import { ROLE_DEFINITIONS } from './shared/models/role-definitions';
 

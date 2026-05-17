@@ -3,4 +3,7 @@
     <div *ngIf="form?.controls![fieldName]?.errors!['required']">
         The {{fieldLabel}} field is required.
     </div>
+    <div *ngIf="form?.controls![fieldName]?.errors!['email']">
+        The {{fieldLabel}} field is not valid.
+    </div>
 </div>

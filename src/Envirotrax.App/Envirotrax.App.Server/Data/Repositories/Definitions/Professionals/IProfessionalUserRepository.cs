@@ -7,5 +7,6 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 public interface IProfessionalUserRepository : IRepository<ProfessionalUser>
 {
     Task<ProfessionalUser?> UpdateNonSensitiveDataAsync(ProfessionalUser user);
+    Task<ProfessionalUser?> UpdateContactNameAsync(int professionalId, int userId, string? contactName);
     Task<IEnumerable<ProfessionalUser>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
 }

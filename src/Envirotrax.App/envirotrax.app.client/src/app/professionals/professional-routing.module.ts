@@ -1,4 +1,4 @@
-import { NgModule } from "@angular/core";
+﻿import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
 import { WaterSuppliersComponent } from "./water-supppliers/water-suppliers.component";
 import { ProfessionalUserListComponent } from "./users/list/professional-user-list.component";
@@ -10,7 +10,7 @@ import { ROLE_DEFINITIONS } from "../shared/models/role-definitions";
 import { InsuranceListComponent } from "./insurances/list/insurance-list.component";
 import { LicenseListComponent } from "./licenses/license-list.component";
 import { FeatureGuard } from "../shared/guards/feature.guard";
-import { FeatureType } from "../shared/models/feature-tyype";
+import { FeatureType } from "../shared/models/feature-type";
 
 const routes: Routes = [
     {

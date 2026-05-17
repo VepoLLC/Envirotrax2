@@ -63,7 +63,7 @@ namespace Envirotrax.App.Server.Controllers.Csi
         [HttpDelete("{id}/insurances/{insuranceId}")]
         [HasFeature(FeatureType.ManageProfessionalInsurances)]
         [HasPermission(PermissionAction.CanEdit)]
-        public async Task<IActionResult> DeleteInsuranceAsync(int insuranceId, CancellationToken cancellationToken)
+        public async Task<IActionResult> DeleteInsuranceAsync(int insuranceId)
         {
             await _insuranceService.DeleteAsync(insuranceId);
             return Ok();

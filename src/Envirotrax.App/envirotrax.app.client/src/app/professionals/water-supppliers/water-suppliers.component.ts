@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
+﻿import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { TableViewModel } from "../../shared/models/table-view-model";
 import { ProfessionalSupplierService } from "../../shared/services/professionals/professional-supplier.service";
 import { CellTemplateData, TableColumn, TableCustomAction } from "../../shared/components/data-components/table/table.component";
@@ -15,7 +15,7 @@ import { ModalHelperService } from "../../shared/services/helpers/modal-helper.s
 import { WaterSupplierRegistrationComponent, WaterSupplierRegistrationVm } from "./registration/water-supplier-registration.component";
 import { ToastService } from "../../shared/services/toast.service";
 import { AuthService } from "../../shared/services/auth/auth.service";
-import { FeatureType } from "../../shared/models/feature-tyype";
+import { FeatureType } from "../../shared/models/feature-type";
 
 type TabType = 'backflow' | 'csi' | 'fogInspection' | 'fogTransport';
 

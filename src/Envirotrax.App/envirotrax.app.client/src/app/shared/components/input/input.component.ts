@@ -1,6 +1,6 @@
 import { DatePipe } from "@angular/common";
 import { AfterViewInit, Component, ElementRef, forwardRef, input, Input, OnInit, ViewChild } from "@angular/core";
-import { ControlValueAccessor, NgForm, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { AbstractControl, ControlValueAccessor, NgForm, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from "@angular/forms";
 import flatpickr from "flatpickr";
 import { Instance } from "flatpickr/dist/types/instance";
 
@@ -11,6 +11,11 @@ import { Instance } from "flatpickr/dist/types/instance";
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => InputComponent),
+            multi: true
+        },
+        {
+            provide: NG_VALIDATORS,
             useExisting: forwardRef(() => InputComponent),
             multi: true
         },
@@ -26,7 +31,7 @@ import { Instance } from "flatpickr/dist/types/instance";
         }
     `
 })
-export class InputComponent implements ControlValueAccessor, OnInit, AfterViewInit {
+export class InputComponent implements ControlValueAccessor, Validator, OnInit, AfterViewInit {
     private _onChanged: (value: any) => void = null!;
     private _onTouched: (event: FocusEvent) => void = null!;
 
@@ -155,6 +160,16 @@ export class InputComponent implements ControlValueAccessor, OnInit, AfterViewIn
 
     public setDisabledState?(isDisabled: boolean): void {
         this.disabled = isDisabled;
+    }
+
+    public validate(control: AbstractControl): ValidationErrors | null {
+        if (this.type === 'email' && control.value) {
+            const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+            if (!emailRegex.test(control.value)) {
+                return { email: true };
+            }
+        }
+        return null;
     }
 
     public ngOnInit(): void {

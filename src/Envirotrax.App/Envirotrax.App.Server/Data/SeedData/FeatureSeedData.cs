@@ -37,6 +37,12 @@ public static class FeatureSeedData
             Id = FeatureType.ManageGisAreas,
             Name = "Manage GIS Areas",
             Description = "Allow making changes to GIS areas. This includes creating, editing, deleting, and assiging areas to sites."
+        },
+        new()
+        {
+            Id = FeatureType.ManageProfessionalUsers,
+            Name = "Manage Professional Users",
+            Description = "Allows adding, editing, and deleting sub-accounts of registered professionals."
         }
     ];
 }

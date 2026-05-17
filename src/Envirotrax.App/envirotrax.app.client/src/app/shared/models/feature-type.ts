@@ -11,5 +11,6 @@ export enum FeatureType {
     ManageProfessionalInsurances = 8,
     ManageProfessionalRegistrationFees = 9,
 
-    ManageGisAreas = 10
+    ManageGisAreas = 10,
+    ManageProfessionalUsers = 11
 }

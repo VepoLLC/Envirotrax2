@@ -52,6 +52,252 @@
 <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
 
 <div *ngIf="!isLoading">
+
+    <!-- View mode toggle -->
+    <div *ngIf="isAdmin || hasBackflow" class="d-flex justify-content-end mb-3">
+        <select class="form-select w-auto"
+                [ngModel]="viewMode"
+                (ngModelChange)="setViewMode($event)">
+            <option value="quick">Show Quick Overview</option>
+            <option value="full">Show Full Overview</option>
+        </select>
+    </div>
+
+    <!-- Quick view: count tiles -->
+    <div *ngIf="viewMode === 'quick' && (isAdmin || hasBackflow)" class="mb-4">
+        <dp-loading-spinner *ngIf="isAdminDataLoading || isGaugeDataLoading"></dp-loading-spinner>
+        <div *ngIf="!isAdminDataLoading && !isGaugeDataLoading" class="row gy-2">
+            <div *ngIf="isAdmin" class="col-sm-12 col-md-6 col-xl-3">
+                <a routerLink="/professionals/water-suppliers" class="overview-box bordered">
+                    <i class="fa-solid fa-building-user overview-icon"></i>
+                    <span class="overview-label">Selected Water Suppliers</span>
+                    <div class="number-box">{{ selectedSupplierCount }}</div>
+                </a>
+            </div>
+            <div *ngIf="isAdmin" class="col-sm-12 col-md-6 col-xl-3">
+                <a routerLink="/professionals/users" class="overview-box bordered">
+                    <i class="fa-solid fa-users overview-icon"></i>
+                    <span class="overview-label">Licensed Personnel Sub Accounts</span>
+                    <div class="number-box">{{ subAccounts.length }}</div>
+                </a>
+            </div>
+            <div *ngIf="isAdmin" class="col-sm-12 col-md-6 col-xl-3">
+                <a routerLink="/professionals/licenses" class="overview-box bordered">
+                    <i class="fa-solid fa-id-card overview-icon"></i>
+                    <span class="overview-label">License &amp; Insurance Policies</span>
+                    <div class="number-box">{{ licenseAndInsuranceCount }}</div>
+                </a>
+            </div>
+            <div *ngIf="hasBackflow" class="col-sm-12 col-md-6 col-xl-3">
+                <a routerLink="/professionals/backflow/gauges" class="overview-box bordered">
+                    <i class="fa-solid fa-gauge overview-icon"></i>
+                    <span class="overview-label">Registered Gauges</span>
+                    <div class="number-box">{{ gauges.length }}</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full view: side-by-side sections -->
+    <div *ngIf="viewMode === 'full'">
+
+        <!-- Row 1: Water Suppliers + Sub Accounts (admin only) -->
+        <div *ngIf="isAdmin" class="row mb-4">
+            <div class="col-md-6 mb-4 mb-md-0">
+                <vp-section header="Water Suppliers">
+                    <dp-loading-spinner *ngIf="isAdminDataLoading"></dp-loading-spinner>
+                    <div *ngIf="!isAdminDataLoading">
+                        <table class="table table-striped mb-0">
+                            <tbody>
+                                <tr>
+                                    <td>Number of selected water suppliers</td>
+                                    <td class="fw-bold">{{ selectedSupplierCount }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="text-end mt-3">
+                            <a routerLink="/professionals/water-suppliers" class="btn btn-primary vp-section-button">
+                                <i class="fa-solid fa-building-user me-1"></i>
+                                Water Supplier Management
+                            </a>
+                        </div>
+                    </div>
+                </vp-section>
+            </div>
+
+            <div class="col-md-6">
+                <vp-section header="Licensed Personnel Sub Accounts">
+                    <dp-loading-spinner *ngIf="isAdminDataLoading"></dp-loading-spinner>
+                    <div *ngIf="!isAdminDataLoading">
+                        <table *ngIf="subAccounts.length" class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>UserID</th>
+                                    <th>Contact Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let user of subAccounts">
+                                    <td>{{ user.emailAddress }}</td>
+                                    <td>{{ user.contactName }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div *ngIf="!subAccounts.length" class="text-center py-3 text-muted">
+                            No sub accounts found.
+                        </div>
+                        <div class="text-end mt-3">
+                            <a routerLink="/professionals/users" class="btn btn-primary vp-section-button">
+                                <i class="fa-solid fa-users me-1"></i>
+                                Sub Account Management
+                            </a>
+                        </div>
+                    </div>
+                </vp-section>
+            </div>
+        </div>
+
+        <!-- Row 2: License & Insurance (admin) + Registered Gauges (backflow) -->
+        <div *ngIf="isAdmin || hasBackflow" class="row mb-4">
+            <div *ngIf="isAdmin" [ngClass]="hasBackflow ? 'col-md-6' : 'col-md-12'" class="mb-4 mb-md-0">
+                <vp-section header="License &amp; Insurance">
+                    <dp-loading-spinner *ngIf="isAdminDataLoading"></dp-loading-spinner>
+                    <div *ngIf="!isAdminDataLoading">
+                        <div class="text-center mb-3">
+                            <ul class="vp-tabs nav nav-pills d-inline-flex">
+                                <li class="nav-item">
+                                    <a class="nav-link" [class.active]="licenseInsuranceTab === 'insurances'" (click)="setLicenseInsuranceTab('insurances')">
+                                        Insurance Policies
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" [class.active]="licenseInsuranceTab === 'licenses'" (click)="setLicenseInsuranceTab('licenses')">
+                                        Licenses
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div *ngIf="licenseInsuranceTab === 'licenses'">
+                            <table *ngIf="licenses.length" class="table table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Number</th>
+                                        <th>Exp. Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let license of licenses">
+                                        <td>{{ license.licenseType?.name }}</td>
+                                        <td>{{ license.licenseNumber }}</td>
+                                        <td>
+                                            <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
+                                                 [class.text-bg-primary]="!license.expirationDate"
+                                                 [class.text-bg-success]="license.expirationDate && license.expirationType === ExpirationType.Valid"
+                                                 [class.text-bg-warning]="license.expirationDate && license.expirationType === ExpirationType.AboutToExpire"
+                                                 [class.text-bg-danger]="license.expirationDate && license.expirationType === ExpirationType.Expired">
+                                                {{ license.expirationDate ? (license.expirationDate | date) : 'Validating...' }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div *ngIf="!licenses.length" class="text-center py-3 text-muted">
+                                No licenses found.
+                            </div>
+                            <div class="text-end mt-3">
+                                <a routerLink="/professionals/licenses" class="btn btn-primary vp-section-button">
+                                    <i class="fa-solid fa-id-card me-1"></i>
+                                    License Management
+                                </a>
+                            </div>
+                        </div>
+
+                        <div *ngIf="licenseInsuranceTab === 'insurances'">
+                            <table *ngIf="insurances.length" class="table table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Policy Number</th>
+                                        <th>Exp. Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let insurance of insurances">
+                                        <td>{{ insurance.insuranceNumber }}</td>
+                                        <td>
+                                            <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
+                                                 [class.text-bg-primary]="!insurance.expirationDate"
+                                                 [class.text-bg-success]="insurance.expirationDate && insurance.expirationType === ExpirationType.Valid"
+                                                 [class.text-bg-warning]="insurance.expirationDate && insurance.expirationType === ExpirationType.AboutToExpire"
+                                                 [class.text-bg-danger]="insurance.expirationDate && insurance.expirationType === ExpirationType.Expired">
+                                                {{ insurance.expirationDate ? (insurance.expirationDate | date) : 'Validating...' }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div *ngIf="!insurances.length" class="text-center py-3 text-muted">
+                                No insurance policies found.
+                            </div>
+                            <div class="text-end mt-3">
+                                <a routerLink="/professionals/insurances" class="btn btn-primary vp-section-button">
+                                    <i class="fa-solid fa-shield-halved me-1"></i>
+                                    Insurance Management
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </vp-section>
+            </div>
+
+            <div *ngIf="hasBackflow" [ngClass]="isAdmin ? 'col-md-6' : 'col-md-12'">
+                <vp-section header="Registered Gauges">
+                    <dp-loading-spinner *ngIf="isGaugeDataLoading"></dp-loading-spinner>
+                    <div *ngIf="!isGaugeDataLoading">
+                        <table *ngIf="gauges.length" class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Gauge</th>
+                                    <th>Type</th>
+                                    <th>Serial Number</th>
+                                    <th>Test Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let gauge of gauges">
+                                    <td>{{ gauge.manufacturer }} {{ gauge.model }}</td>
+                                    <td>{{ gauge.isPortable ? 'Portable' : 'Non-portable' }}</td>
+                                    <td>{{ gauge.serialNumber }}</td>
+                                    <td>
+                                        <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
+                                             [class.text-bg-primary]="!gauge.lastCalibrationDate"
+                                             [class.text-bg-success]="gauge.lastCalibrationDate && gauge.expirationType === GaugeExpirationType.Valid"
+                                             [class.text-bg-warning]="gauge.lastCalibrationDate && gauge.expirationType === GaugeExpirationType.AboutToExpire"
+                                             [class.text-bg-danger]="gauge.lastCalibrationDate && gauge.expirationType === GaugeExpirationType.Expired">
+                                            {{ gauge.lastCalibrationDate ? (gauge.lastCalibrationDate | date) : 'N/A' }}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div *ngIf="!gauges.length" class="text-center py-3 text-muted">
+                            No gauges found.
+                        </div>
+                        <div class="text-end mt-3">
+                            <a routerLink="/professionals/backflow/gauges" class="btn btn-primary vp-section-button">
+                                <i class="fa-solid fa-gauge me-1"></i>
+                                Manage Gauges
+                            </a>
+                        </div>
+                    </div>
+                </vp-section>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Recent CSI Inspections (both views, at bottom) -->
     <div *ngIf="hasCsi" class="mb-4">
         <vp-section header="Recent CSI Inspections">
             <dp-loading-spinner *ngIf="recentInspections.isLoading"></dp-loading-spinner>
@@ -94,129 +340,16 @@
         </vp-section>
     </div>
 
+    <!-- Backflow Testing (both views, at bottom) -->
     <div *ngIf="hasBackflow" class="mb-4">
         <vp-section header="Backflow Testing">
-            <div class="text-center py-3 d-flex gap-2 justify-content-center">
+            <div class="text-center py-3">
                 <a routerLink="/professionals/backflow/tests" class="btn btn-primary vp-section-button">
                     <i class="fa-solid fa-droplet me-1"></i>
                     View Backflow Tests
                 </a>
-                <a routerLink="/professionals/backflow/gauges" class="btn btn-primary vp-section-button">
-                    <i class="fa-solid fa-gauge me-1"></i>
-                    Manage Gauges
-                </a>
             </div>
         </vp-section>
     </div>
 
-    <div *ngIf="isAdmin" class="mb-4">
-        <vp-section header="Water Suppliers">
-            <dp-loading-spinner *ngIf="isAdminDataLoading"></dp-loading-spinner>
-            <div *ngIf="!isAdminDataLoading">
-                <table class="table table-striped mb-0">
-                    <tbody>
-                        <tr>
-                            <td>Number of selected water suppliers</td>
-                            <td class="fw-bold">{{ selectedSupplierCount }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="text-end mt-3">
-                    <a routerLink="/professionals/water-suppliers" class="btn btn-primary vp-section-button">
-                        <i class="fa-solid fa-building-user me-1"></i>
-                        Water Supplier Management
-                    </a>
-                </div>
-            </div>
-        </vp-section>
-    </div>
-
-    <div *ngIf="isAdmin" class="mb-4">
-        <vp-section header="Licensed Personnel Sub Accounts">
-            <dp-loading-spinner *ngIf="isAdminDataLoading"></dp-loading-spinner>
-            <div *ngIf="!isAdminDataLoading">
-                <table *ngIf="subAccounts.length" class="table table-striped mb-0">
-                    <thead>
-                        <tr>
-                            <th>UserID</th>
-                            <th>Contact Name</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let user of subAccounts">
-                            <td>{{ user.emailAddress }}</td>
-                            <td>{{ user.contactName }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div *ngIf="!subAccounts.length" class="text-center py-3 text-muted">
-                    No sub accounts found.
-                </div>
-                <div class="text-end mt-3">
-                    <a routerLink="/professionals/users" class="btn btn-primary vp-section-button">
-                        <i class="fa-solid fa-users me-1"></i>
-                        Sub Account Management
-                    </a>
-                </div>
-            </div>
-        </vp-section>
-    </div>
-
-    <div *ngIf="isAdmin" class="mb-4">
-        <vp-section header="License &amp; Insurance">
-            <dp-loading-spinner *ngIf="isAdminDataLoading"></dp-loading-spinner>
-            <div *ngIf="!isAdminDataLoading">
-                <table *ngIf="licenses.length || insurances.length" class="table table-striped mb-0">
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Number</th>
-                            <th>Exp. Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let license of licenses">
-                            <td>{{ license.licenseType?.name }}</td>
-                            <td>{{ license.licenseNumber }}</td>
-                            <td>
-                                <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
-                                     [class.text-bg-primary]="!license.expirationDate"
-                                     [class.text-bg-success]="license.expirationDate && license.expirationType === ExpirationType.Valid"
-                                     [class.text-bg-warning]="license.expirationDate && license.expirationType === ExpirationType.AboutToExpire"
-                                     [class.text-bg-danger]="license.expirationDate && license.expirationType === ExpirationType.Expired">
-                                    {{ license.expirationDate ? (license.expirationDate | date) : 'Validating...' }}
-                                </div>
-                            </td>
-                        </tr>
-                        <tr *ngFor="let insurance of insurances">
-                            <td>Insurance Policy</td>
-                            <td>{{ insurance.insuranceNumber }}</td>
-                            <td>
-                                <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
-                                     [class.text-bg-primary]="!insurance.expirationDate"
-                                     [class.text-bg-success]="insurance.expirationDate && insurance.expirationType === ExpirationType.Valid"
-                                     [class.text-bg-warning]="insurance.expirationDate && insurance.expirationType === ExpirationType.AboutToExpire"
-                                     [class.text-bg-danger]="insurance.expirationDate && insurance.expirationType === ExpirationType.Expired">
-                                    {{ insurance.expirationDate ? (insurance.expirationDate | date) : 'Validating...' }}
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div *ngIf="!licenses.length && !insurances.length" class="text-center py-3 text-muted">
-                    No licenses or insurance policies found.
-                </div>
-                <div class="text-end mt-3 d-flex gap-2 justify-content-end">
-                    <a routerLink="/professionals/licenses" class="btn btn-primary vp-section-button">
-                        <i class="fa-solid fa-id-card me-1"></i>
-                        License Management
-                    </a>
-                    <a routerLink="/professionals/insurances" class="btn btn-primary vp-section-button">
-                        <i class="fa-solid fa-shield-halved me-1"></i>
-                        Insurance Management
-                    </a>
-                </div>
-            </div>
-        </vp-section>
-    </div>
 </div>

@@ -16,8 +16,7 @@ export class RolePermissionListComponent implements OnInit {
     public roleId!: number;
 
     public allView: boolean = false;
-    public allCreate: boolean = false;
-    public allEdit: boolean = false;
+    public allModify: boolean = false;
     public allDelete: boolean = false;
 
     constructor(
@@ -68,9 +67,30 @@ export class RolePermissionListComponent implements OnInit {
 
     private setAllToggles(rolePermissions: RolePermission[]): void {
         this.allView = rolePermissions.every(r => r.canView);
-        this.allCreate = rolePermissions.every(r => r.canCreate);
-        this.allEdit = rolePermissions.every(r => r.canEdit);
+
+        const modifiable = rolePermissions.filter(r => r.permission?.canCreate || r.permission?.canEdit);
+        this.allModify = modifiable.length > 0 && modifiable.every(r => r.canCreate || r.canEdit);
+
         this.allDelete = rolePermissions.every(r => r.canDelete);
+    }
+
+    public getModify(rolePermission: RolePermission): boolean {
+        return !!(rolePermission.canCreate || rolePermission.canEdit);
+    }
+
+    public async onModifyChange(rolePermission: RolePermission, value: boolean): Promise<void> {
+        if (value) {
+            if (rolePermission.permission?.canCreate) {
+                rolePermission.canCreate = true;
+            }
+            if (rolePermission.permission?.canEdit) {
+                rolePermission.canEdit = true;
+            }
+        } else {
+            rolePermission.canCreate = false;
+            rolePermission.canEdit = false;
+        }
+        await this.update(rolePermission);
     }
 
     public async update(rolePermission: RolePermission) {
@@ -110,13 +130,22 @@ export class RolePermissionListComponent implements OnInit {
         await this.bulkUpdate();
     }
 
-    public async toggleAllCreate(newValue: boolean): Promise<void> {
-        this.toggleAll('canCreate', newValue);
-        await this.bulkUpdate();
-    }
-
-    public async toggleAllEdit(newValue: boolean): Promise<void> {
-        this.toggleAll('canEdit', newValue);
+    public async toggleAllModify(newValue: boolean): Promise<void> {
+        for (let group of this.rolePermissions) {
+            for (let permission of group.permissions) {
+                if (newValue) {
+                    if (permission.permission?.canCreate) {
+                        permission.canCreate = true;
+                    }
+                    if (permission.permission?.canEdit) {
+                        permission.canEdit = true;
+                    }
+                } else {
+                    permission.canCreate = false;
+                    permission.canEdit = false;
+                }
+            }
+        }
         await this.bulkUpdate();
     }
 

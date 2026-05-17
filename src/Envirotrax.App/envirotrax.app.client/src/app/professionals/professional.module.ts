@@ -16,9 +16,11 @@ import { InsuranceListComponent } from "./insurances/list/insurance-list.compone
 import { EditInsuranceComponent } from "./insurances/edit/edit-insurance.component";
 import { LicenseHelpTextComponent } from "./users/edit/licenses/help-text/license-help-text.component";
 import { LicenseListComponent } from "./licenses/license-list.component";
+import { DashboardComponent } from "./dashboard/dashboard.component";
 
 @NgModule({
     declarations: [
+        DashboardComponent,
         WaterSuppliersComponent,
         WaterSupplierRegistrationComponent,
         ProfessionalUserListComponent,

@@ -13,5 +13,5 @@ public interface IProfessionalUserService : IService<ProfessionalUser, Professio
     Task<ProfessionalUserDto?> ResendInvitationAsync(int id);
     Task<IPagedData<ProfessionalUserDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<ProfessionalUserDto> AddForProfessionalAsync(int professionalId, ProfessionalUserDto dto);
-    Task<ProfessionalUserDto?> UpdateContactNameAsync(int professionalId, int userId, string? contactName);
+    Task<ProfessionalUserDto?> UpdateSubAccountAsync(int professionalId, int userId, string? contactName, string? jobTitle);
 }

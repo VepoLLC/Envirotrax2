@@ -78,9 +78,9 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         return MapToDto(added)!;
     }
 
-    public async Task<ProfessionalUserDto?> UpdateContactNameAsync(int professionalId, int userId, string? contactName)
+    public async Task<ProfessionalUserDto?> UpdateSubAccountAsync(int professionalId, int userId, string? contactName, string? jobTitle)
     {
-        var updated = await _professionalUserRepository.UpdateContactNameAsync(professionalId, userId, contactName);
+        var updated = await _professionalUserRepository.UpdateSubAccountAsync(professionalId, userId, contactName, jobTitle);
         return MapToDto(updated);
     }
 

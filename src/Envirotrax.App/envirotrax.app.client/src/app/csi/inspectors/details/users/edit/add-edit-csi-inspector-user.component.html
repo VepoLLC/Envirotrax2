@@ -11,7 +11,7 @@
                               [form]="form" />
             </div>
 
-            <ng-container *ngIf="!isEditMode">          
+            <ng-container *ngIf="!isEditMode">
                 <div class="mb-3 w-100">
                     <vp-input [(ngModel)]="user.emailAddress"
                                   [required]="true"
@@ -21,14 +21,15 @@
                                   [maxLength]="100"
                                   [form]="form" />
                 </div>
-                <div class="mb-3 w-100">
-                    <vp-input [(ngModel)]="user.jobTitle"
-                                  name="jobTitle"
-                                  label="Job title"
-                                  [maxLength]="150"
-                                  [form]="form" />
-                </div>      
             </ng-container>
+
+            <div class="mb-3 w-100">
+                <vp-input [(ngModel)]="user.jobTitle"
+                              name="jobTitle"
+                              label="Job title"
+                              [maxLength]="150"
+                              [form]="form" />
+            </div>
         </div>
 
         <div class="mt-3">

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
+﻿import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { ExpirationType, ProfessionalUserLicense, professionalTypeLabels, ProfessionalType } from "../../../../../shared/models/professionals/licenses/professional-user-license";
 import { ProfessionalInsurance, ExpirationType as InsuranceExpirationType } from "../../../../../shared/models/professionals/professional-insurance";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
@@ -7,7 +7,7 @@ import { ColumnType } from "../../../../../shared/components/data-components/sor
 import { CsiInspectorLicensesService } from "../../../../../shared/services/csi/csi-inspector-licenses.service";
 import { CsiInspectorInsurancesService } from "../../../../../shared/services/csi/csi-inspector-insurances.service";
 import { AuthService } from "../../../../../shared/services/auth/auth.service";
-import { FeatureType } from "../../../../../shared/models/feature-tyype";
+import { FeatureType } from "../../../../../shared/models/feature-type";
 import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
 import { ModalHelperService } from "../../../../../shared/services/helpers/modal-helper.service";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";

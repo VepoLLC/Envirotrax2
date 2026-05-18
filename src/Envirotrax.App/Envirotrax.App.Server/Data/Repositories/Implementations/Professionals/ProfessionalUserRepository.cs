@@ -74,6 +74,21 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         return existing;
     }
 
+    public async Task<ProfessionalUser?> UpdateSubAccountAsync(int professionalId, int userId, string? contactName, string? jobTitle)
+    {
+        var existing = await DbContext.ProfessionalUsers
+            .SingleOrDefaultAsync(u => u.ProfessionalId == professionalId && u.UserId == userId);
+
+        if (existing != null)
+        {
+            existing.ContactName = contactName;
+            existing.JobTitle = jobTitle;
+            await DbContext.SaveChangesAsync();
+        }
+
+        return existing;
+    }
+
     public async Task<IEnumerable<ProfessionalUser>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         var paginated = await DbContext.ProfessionalUsers

@@ -7,6 +7,7 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { DefaultGisMapView, GisArea } from "../../models/gis-areas/gis-area";
+import { InputOption } from "../../components/input/input.component";
 
 @Injectable({
     providedIn: 'root'
@@ -17,6 +18,19 @@ export class GisAreaService {
         private readonly _urlResolver: UrlResolverService,
         private readonly _queryHelper: QueryHelperService,
     ) { }
+
+    public getAllAreas(): Promise<GisArea[]> {
+        const url = this._urlResolver.resolveUrl('/api/gis-areas/all');
+        return lastValueFrom(this._http.get<GisArea[]>(url));
+    }
+
+    public async getAllAsOptions(): Promise<InputOption[]> {
+        const areas = await this.getAllAreas();
+        const options: InputOption[] = areas.map(a => ({ id: String(a.id), text: a.name }));
+        options.splice(0, 0, { id: '0', text: 'Unassigned' });
+        options.splice(0, 0, { id: '', text: 'Any Area' });
+        return options;
+    }
 
     public getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<GisArea>> {
         const url = this._urlResolver.resolveUrl('/api/gis-areas');

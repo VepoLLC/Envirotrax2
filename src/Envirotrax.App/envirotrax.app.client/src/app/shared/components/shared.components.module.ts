@@ -30,6 +30,8 @@ import { InfoIconComponent } from "./info-icon/info-icon.component";
 import { FileUploadComponent } from "./file-upload/file-upload.component";
 import { LookupFieldComponent } from "./lookup-field/lookup-field.component";
 import { ProfessionalUserLookupComponent } from "./lookups/professional-user-lookup/professional-user-lookup.component";
+import { GisAreaLookupComponent } from "./lookups/gis-areas/gis-area-lookup.component";
+import { GisAreaSelectionModalComponent } from "./lookups/gis-areas/gis-area-selection-modal.component";
 import { StatusIconComponent } from "./status-icon/status-icon.component";
 import { MapComponent } from "./map/map.component";
 
@@ -60,6 +62,8 @@ import { MapComponent } from "./map/map.component";
         FileUploadComponent,
         LookupFieldComponent,
         ProfessionalUserLookupComponent,
+        GisAreaLookupComponent,
+        GisAreaSelectionModalComponent,
         StatusIconComponent,
         MapComponent
     ],
@@ -91,6 +95,7 @@ import { MapComponent } from "./map/map.component";
         InfoIconComponent,
         FileUploadComponent,
         LookupFieldComponent,
+        GisAreaLookupComponent,
         StatusIconComponent,
         MapComponent
     ]

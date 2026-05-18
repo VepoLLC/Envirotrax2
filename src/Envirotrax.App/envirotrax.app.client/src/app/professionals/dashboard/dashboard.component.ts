@@ -5,16 +5,17 @@ import { CsiInspectionService } from '../../shared/services/csi/csi-inspection.s
 import { CsiInspection } from '../../shared/models/csi/csi-inspection';
 import { FeatureType } from '../../shared/models/feature-tyype';
 import { ROLE_DEFINITIONS } from '../../shared/models/role-definitions';
-import { ProfessionalSupplierService } from '../../shared/services/professionals/professional-supplier.service';
 import { ProfesionalUserService } from '../../shared/services/professionals/professional-user.service';
 import { ProfessionalUserLicenseService } from '../../shared/services/professionals/professional-user-license.service';
 import { ProfessionalInsuranceService } from '../../shared/services/professionals/professional-insurance.service';
 import { BackflowGaugeService } from '../../shared/services/backflow/backflow-gauge.service';
+import { ProfessionalDashboardService } from '../../shared/services/professionals/professional-dashboard.service';
 import { ProfessionalUser } from '../../shared/models/professionals/professional-user';
 import { ProfessionalUserLicense, ExpirationType } from '../../shared/models/professionals/licenses/professional-user-license';
 import { ProfessionalInsurance } from '../../shared/models/professionals/professional-insurance';
 import { BackflowGauge, GaugeExpirationType } from '../../shared/models/backflow/backflow-gauge';
-import { TableColumn, CellTemplateData } from '../../shared/components/data-components/table/table.component';
+import { ProfessionalDashboardStats } from '../../shared/models/professionals/professional-dashboard-stats';
+import { FreeTextSearchSettings, TableColumn, CellTemplateData } from '../../shared/components/data-components/table/table.component';
 import { ColumnType } from '../../shared/components/data-components/sorting-filtering/query-view-model';
 import { TableViewModel } from '../../shared/models/table-view-model';
 
@@ -25,6 +26,7 @@ const VIEW_MODE_KEY = 'dashboardViewMode';
     templateUrl: './dashboard.component.html'
 })
 export class DashboardComponent implements OnInit {
+    // CSI inspection table templates
     @ViewChild('statusTemplate', { static: true })
     public statusTemplate!: TemplateRef<CellTemplateData<CsiInspection>>;
 
@@ -34,20 +36,76 @@ export class DashboardComponent implements OnInit {
     @ViewChild('mailingTemplate', { static: true })
     public mailingTemplate!: TemplateRef<CellTemplateData<CsiInspection>>;
 
+    // License & insurance cell templates
+    @ViewChild('licenseExpirationTemplate', { static: true })
+    public licenseExpirationTemplate!: TemplateRef<CellTemplateData<ProfessionalUserLicense>>;
+
+    @ViewChild('insuranceExpirationTemplate', { static: true })
+    public insuranceExpirationTemplate!: TemplateRef<CellTemplateData<ProfessionalInsurance>>;
+
+    // Gauge cell templates
+    @ViewChild('gaugeCellTemplate', { static: true })
+    public gaugeCellTemplate!: TemplateRef<CellTemplateData<BackflowGauge>>;
+
+    @ViewChild('gaugeTypeTemplate', { static: true })
+    public gaugeTypeTemplate!: TemplateRef<CellTemplateData<BackflowGauge>>;
+
+    @ViewChild('gaugeTestDateTemplate', { static: true })
+    public gaugeTestDateTemplate!: TemplateRef<CellTemplateData<BackflowGauge>>;
+
     public hasCsi = false;
     public hasBackflow = false;
     public isAdmin = false;
     public isLoading = true;
-    public isAdminDataLoading = false;
-    public isGaugeDataLoading = false;
+    public isStatsLoading = false;
 
     public viewMode: 'quick' | 'full' = 'full';
 
-    public selectedSupplierCount = 0;
-    public subAccounts: ProfessionalUser[] = [];
-    public licenses: ProfessionalUserLicense[] = [];
-    public insurances: ProfessionalInsurance[] = [];
-    public gauges: BackflowGauge[] = [];
+    public dashboardStats: ProfessionalDashboardStats = {};
+
+    public subAccountsTable: TableViewModel<ProfessionalUser> = {
+        query: { sort: {}, filter: [] },
+        columns: [],
+        freeTextSearch: {
+            searchQuery: [
+                { field: 'contactName', operator: 'Ct', multiWordSearch: true },
+                { field: 'emailAddress', operator: 'Ct' }
+            ]
+        } as FreeTextSearchSettings
+    };
+
+    public licensesTable: TableViewModel<ProfessionalUserLicense> = {
+        query: { sort: {}, filter: [] },
+        columns: [],
+        freeTextSearch: {
+            searchQuery: [
+                { field: 'licenseType.name' },
+                { field: 'licenseNumber' }
+            ]
+        } as FreeTextSearchSettings
+    };
+
+    public insurancesTable: TableViewModel<ProfessionalInsurance> = {
+        query: { sort: {}, filter: [] },
+        columns: [],
+        freeTextSearch: {
+            searchQuery: [
+                { field: 'insuranceNumber' }
+            ]
+        } as FreeTextSearchSettings
+    };
+
+    public gaugesTable: TableViewModel<BackflowGauge> = {
+        query: { sort: {}, filter: [] },
+        columns: [],
+        freeTextSearch: {
+            searchQuery: [
+                { field: 'manufacturer' },
+                { field: 'model' },
+                { field: 'serialNumber' }
+            ]
+        } as FreeTextSearchSettings
+    };
 
     public readonly ExpirationType = ExpirationType;
     public readonly GaugeExpirationType = GaugeExpirationType;
@@ -59,7 +117,7 @@ export class DashboardComponent implements OnInit {
     }
 
     public get licenseAndInsuranceCount(): number {
-        return this.licenses.length + this.insurances.length;
+        return (this.dashboardStats.licenseCount ?? 0) + (this.dashboardStats.insuranceCount ?? 0);
     }
 
     public recentInspections: TableViewModel<CsiInspection> = {
@@ -70,16 +128,18 @@ export class DashboardComponent implements OnInit {
     constructor(
         private readonly _authService: AuthService,
         private readonly _inspectionService: CsiInspectionService,
-        private readonly _supplierService: ProfessionalSupplierService,
         private readonly _userService: ProfesionalUserService,
         private readonly _licenseService: ProfessionalUserLicenseService,
         private readonly _insuranceService: ProfessionalInsuranceService,
         private readonly _gaugeService: BackflowGaugeService,
+        private readonly _dashboardService: ProfessionalDashboardService,
         private readonly _router: Router
     ) {}
 
     public async ngOnInit(): Promise<void> {
         this.viewMode = (localStorage.getItem(VIEW_MODE_KEY) as 'quick' | 'full') ?? 'full';
+
+        this.setupColumns();
 
         try {
             [this.hasCsi, this.hasBackflow, this.isAdmin] = await Promise.all([
@@ -88,16 +148,29 @@ export class DashboardComponent implements OnInit {
                 this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.ADMIN)
             ]);
 
-            this.recentInspections.columns = this.buildColumns();
-
             const promises: Promise<void>[] = [];
             if (this.hasCsi) promises.push(this.loadRecentInspections());
-            if (this.isAdmin) promises.push(this.loadAdminData());
-            if (this.hasBackflow) promises.push(this.loadGaugeData());
+            if (this.isAdmin) {
+                promises.push(
+                    this.loadStats(),
+                    this.loadSubAccounts(),
+                    this.loadLicenses(),
+                    this.loadInsurances()
+                );
+            }
+            if (this.hasBackflow) promises.push(this.loadGauges());
             await Promise.all(promises);
         } finally {
             this.isLoading = false;
         }
+    }
+
+    private setupColumns(): void {
+        this.recentInspections.columns = this.buildInspectionColumns();
+        this.subAccountsTable.columns = this.buildSubAccountsColumns();
+        this.licensesTable.columns = this.buildLicensesColumns();
+        this.insurancesTable.columns = this.buildInsurancesColumns();
+        this.gaugesTable.columns = this.buildGaugesColumns();
     }
 
     public setViewMode(mode: 'quick' | 'full'): void {
@@ -124,31 +197,60 @@ export class DashboardComponent implements OnInit {
         }
     }
 
-    private async loadAdminData(): Promise<void> {
+    public async loadStats(): Promise<void> {
         try {
-            this.isAdminDataLoading = true;
-            const [suppliers, users, licenses, insurances] = await Promise.all([
-                this._supplierService.getAllMy(),
-                this._userService.getAll({}, {}),
-                this._licenseService.getAll({}, {}),
-                this._insuranceService.getAll({}, {})
-            ]);
-            this.selectedSupplierCount = suppliers.pageInfo?.totalItems ?? suppliers.data.length;
-            this.subAccounts = users.data;
-            this.licenses = licenses.data;
-            this.insurances = insurances.data;
+            this.isStatsLoading = true;
+            this.dashboardStats = await this._dashboardService.getStats();
         } finally {
-            this.isAdminDataLoading = false;
+            this.isStatsLoading = false;
         }
     }
 
-    private async loadGaugeData(): Promise<void> {
+    public async loadSubAccounts(): Promise<void> {
         try {
-            this.isGaugeDataLoading = true;
-            const result = await this._gaugeService.getAll({}, {});
-            this.gauges = result.data;
+            this.subAccountsTable.isLoading = true;
+            this.subAccountsTable.items = await this._userService.getAll(
+                this.subAccountsTable.items?.pageInfo || {},
+                this.subAccountsTable.query
+            );
         } finally {
-            this.isGaugeDataLoading = false;
+            this.subAccountsTable.isLoading = false;
+        }
+    }
+
+    public async loadLicenses(): Promise<void> {
+        try {
+            this.licensesTable.isLoading = true;
+            this.licensesTable.items = await this._licenseService.getAll(
+                this.licensesTable.items?.pageInfo || {},
+                this.licensesTable.query
+            );
+        } finally {
+            this.licensesTable.isLoading = false;
+        }
+    }
+
+    public async loadInsurances(): Promise<void> {
+        try {
+            this.insurancesTable.isLoading = true;
+            this.insurancesTable.items = await this._insuranceService.getAll(
+                this.insurancesTable.items?.pageInfo || {},
+                this.insurancesTable.query
+            );
+        } finally {
+            this.insurancesTable.isLoading = false;
+        }
+    }
+
+    public async loadGauges(): Promise<void> {
+        try {
+            this.gaugesTable.isLoading = true;
+            this.gaugesTable.items = await this._gaugeService.getAll(
+                this.gaugesTable.items?.pageInfo || {},
+                this.gaugesTable.query
+            );
+        } finally {
+            this.gaugesTable.isLoading = false;
         }
     }
 
@@ -159,7 +261,7 @@ export class DashboardComponent implements OnInit {
         window.open(url, '_blank');
     }
 
-    private buildColumns(): TableColumn<CsiInspection>[] {
+    private buildInspectionColumns(): TableColumn<CsiInspection>[] {
         return [
             {
                 field: '',
@@ -191,6 +293,63 @@ export class DashboardComponent implements OnInit {
                 type: ColumnType.other,
                 queryColumnExcluded: true,
                 cellTemplate: this.mailingTemplate
+            }
+        ];
+    }
+
+    private buildSubAccountsColumns(): TableColumn<ProfessionalUser>[] {
+        return [
+            { field: 'emailAddress', caption: 'UserID', type: ColumnType.text },
+            { field: 'contactName', caption: 'Contact Name', type: ColumnType.text }
+        ];
+    }
+
+    private buildLicensesColumns(): TableColumn<ProfessionalUserLicense>[] {
+        return [
+            { field: 'licenseType.name', caption: 'Type', type: ColumnType.text },
+            { field: 'licenseNumber', caption: 'License Number', type: ColumnType.text },
+            {
+                field: 'expirationDate',
+                caption: 'Expiration Date',
+                type: ColumnType.date,
+                cellTemplate: this.licenseExpirationTemplate
+            }
+        ];
+    }
+
+    private buildInsurancesColumns(): TableColumn<ProfessionalInsurance>[] {
+        return [
+            { field: 'insuranceNumber', caption: 'Policy Number', type: ColumnType.text },
+            {
+                field: 'expirationDate',
+                caption: 'Expiration Date',
+                type: ColumnType.date,
+                cellTemplate: this.insuranceExpirationTemplate
+            }
+        ];
+    }
+
+    private buildGaugesColumns(): TableColumn<BackflowGauge>[] {
+        return [
+            {
+                field: 'manufacturer',
+                caption: 'Gauge',
+                type: ColumnType.text,
+                cellTemplate: this.gaugeCellTemplate
+            },
+            {
+                field: 'isPortable',
+                caption: 'Type',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.gaugeTypeTemplate
+            },
+            { field: 'serialNumber', caption: 'Serial Number', type: ColumnType.text },
+            {
+                field: 'lastCalibrationDate',
+                caption: 'Test Date',
+                type: ColumnType.date,
+                cellTemplate: this.gaugeTestDateTemplate
             }
         ];
     }

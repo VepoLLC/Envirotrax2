@@ -25,6 +25,11 @@ public class ProfessionalUserDto : IDto
     public bool IsBackflowTester { get; set; }
     public bool IsFogInspector { get; set; }
     public bool IsFogTransporter { get; set; }
+
+    public string? BpatLicenseNumber { get; set; }
+    public string? BpatLicenseTypeName { get; set; }
+    public DateTime? BpatLicenseExpirationDate { get; set; }
+    public ExpirationType? BpatLicenseExpirationType { get; set; }
 }
 
 public class ReferencedProfessionalUserDto

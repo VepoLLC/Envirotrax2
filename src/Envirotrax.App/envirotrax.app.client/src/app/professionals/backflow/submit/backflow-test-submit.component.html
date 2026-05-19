@@ -1,0 +1,698 @@
+<h1 class="text-center h2">Backflow Test Submission</h1>
+
+<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+<div *ngIf="!isLoading">
+
+    <!-- Confirmation Screen -->
+    <div *ngIf="submitSuccess">
+        <vp-section header="Backflow Test Submission Confirmation" class="text-center">
+            <p class="text-center fw-bold text-success">Your backflow test has been submitted successfully.</p>
+            <p>The test record has been recorded in the system. The water supplier may review the submission for approval.</p>
+            <div class="d-flex justify-content-center gap-2 mt-3">
+                <button type="button" class="btn btn-primary vp-section-button" (click)="returnToAccountOverview()">Return to Account Overview</button>
+                <button type="button" class="btn btn-primary vp-section-button" (click)="submitAnother()">Submit Another Test</button>
+            </div>
+        </vp-section>
+    </div>
+
+    <form *ngIf="!submitSuccess" #submitForm="ngForm" (ngSubmit)="submit(submitForm)">
+        <p class="text-center">The following form must be completed for each assembly tested for recordkeeping purposes:</p>
+
+        <!-- Verification -->
+        <vp-section header="Verification">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="fw-semibold text-nowrap me-2" style="min-width:130px;">BPAT Account:</span>
+                        <div class="flex-grow-1">
+                            <vp-input type="select" name="bpatId" [ngModel]="selectedBpatId" (ngModelChange)="onBpatChange($event)"
+                                      [options]="bpatOptions" [required]="true" />
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="fw-semibold text-nowrap me-2" style="min-width:130px;">Water Supplier:</span>
+                        <div class="flex-grow-1">
+                            <vp-input type="select" name="waterSupplierId" [ngModel]="selectedWaterSupplierId" (ngModelChange)="onWaterSupplierChange($event)"
+                                      [options]="waterSupplierOptions" [required]="true" />
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="fw-semibold text-nowrap me-2" style="min-width:130px;">Hazard Type:</span>
+                        <div class="flex-grow-1">
+                            <vp-input type="select" name="hazardType" [(ngModel)]="model.hazardType"
+                                      [options]="hazardTypeOptions" [required]="true" [placeholder]="'Select Hazard Type'" />
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-2" *ngIf="model.hazardType === 'Other'">
+                        <span class="fw-semibold text-nowrap me-2" style="min-width:130px;">Description:</span>
+                        <div class="flex-grow-1">
+                            <vp-input type="text" name="hazardTypeOtherDescription" [(ngModel)]="model.hazardTypeOtherDescription" [required]="true" [form]="submitForm" />
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-2" *ngIf="!isAirGap">
+                        <span class="fw-semibold text-nowrap me-2" style="min-width:130px;">Test Gauge:</span>
+                        <div class="flex-grow-1">
+                            <vp-input type="select" name="gaugeId" [ngModel]="selectedGaugeId" (ngModelChange)="onGaugeChange($event)"
+                                      [options]="gaugeOptions" [required]="!isAirGap" [placeholder]="'Select Gauge'" />
+                        </div>
+                    </div>
+                </div>
+                <!-- Right: status panel -->
+                <div class="col-md-6 border-start ps-3" *ngIf="selectedBpat?.bpatLicenseExpirationType != null || professional?.insuranceExpirationType != null || selectedGauge">
+                    <dl class="row mb-0 small">
+                        <ng-container *ngIf="selectedBpat?.bpatLicenseExpirationType != null">
+                            <dt class="col-5 text-nowrap fw-semibold">TCEQ - BPAT License:</dt>
+                            <dd class="col-7 mb-1"
+                                [class.text-success]="selectedBpat?.bpatLicenseExpirationType === ExpirationType.Valid"
+                                [class.text-warning]="selectedBpat?.bpatLicenseExpirationType === ExpirationType.AboutToExpire"
+                                [class.text-danger]="selectedBpat?.bpatLicenseExpirationType === ExpirationType.Expired">
+                                {{ selectedBpat?.bpatLicenseExpirationType === ExpirationType.Valid ? 'License valid' :
+                                   selectedBpat?.bpatLicenseExpirationType === ExpirationType.AboutToExpire ? 'License about to expire' :
+                                   'License expired' }}
+                            </dd>
+                        </ng-container>
+                        <ng-container *ngIf="professional?.insuranceExpirationType != null">
+                            <dt class="col-5 text-nowrap fw-semibold">Insurance Policy:</dt>
+                            <dd class="col-7 mb-1"
+                                [class.text-success]="professional?.insuranceExpirationType === ExpirationType.Valid"
+                                [class.text-warning]="professional?.insuranceExpirationType === ExpirationType.AboutToExpire"
+                                [class.text-danger]="professional?.insuranceExpirationType === ExpirationType.Expired">
+                                {{ professional?.insuranceExpirationType === ExpirationType.Valid ? 'Insurance policy valid' :
+                                   professional?.insuranceExpirationType === ExpirationType.AboutToExpire ? 'Insurance policy about to expire' :
+                                   'Insurance policy expired' }}
+                            </dd>
+                        </ng-container>
+                        <ng-container *ngIf="selectedGauge">
+                            <dt class="col-5 text-nowrap fw-semibold">Test Gauge:</dt>
+                            <dd class="col-7 mb-1 text-success">{{ selectedGauge.manufacturer }} {{ selectedGauge.model }} {{ selectedGauge.serialNumber }}</dd>
+                        </ng-container>
+                    </dl>
+                </div>
+            </div>
+        </vp-section>
+
+        <!-- Water Supplier Information -->
+        <div class="mt-3" *ngIf="selectedWaterSupplier">
+            <vp-section header="Water Supplier Information">
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row mb-0">
+                            <dt class="col-5">Water Supplier:</dt>
+                            <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.name }}</dd>
+                            <dt class="col-5">Address:</dt>
+                            <dd class="col-7 mb-1">
+                                {{ selectedWaterSupplier.waterSupplier?.address }}<br *ngIf="selectedWaterSupplier.waterSupplier?.address">
+                                {{ selectedWaterSupplier.waterSupplier?.city }}<span *ngIf="selectedWaterSupplier.waterSupplier?.city && selectedWaterSupplier.waterSupplier?.state?.name">, </span>{{ selectedWaterSupplier.waterSupplier?.state?.name }} {{ selectedWaterSupplier.waterSupplier?.zipCode }}
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row mb-0">
+                            <dt class="col-5">PWS ID:</dt>
+                            <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.pwsId }}</dd>
+                            <dt class="col-5">Contact Name:</dt>
+                            <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.contactName }}</dd>
+                            <dt class="col-5">Phone Number:</dt>
+                            <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.phoneNumber }}</dd>
+                            <dt class="col-5">Email Address:</dt>
+                            <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.emailAddress }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </vp-section>
+        </div>
+
+        <!-- BPAT Information -->
+        <div class="mt-3" *ngIf="selectedBpat">
+            <vp-section header="BPAT Information">
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row mb-0">
+                            <dt class="col-5">Company Name:</dt>
+                            <dd class="col-7 mb-1">{{ professional?.name }}</dd>
+                            <dt class="col-5">Title of BPAT:</dt>
+                            <dd class="col-7 mb-1">{{ selectedBpat.jobTitle }}</dd>
+                            <dt class="col-5">BPAT Name:</dt>
+                            <dd class="col-7 mb-1">{{ selectedBpat.contactName }}</dd>
+                            <dt class="col-5">Address:</dt>
+                            <dd class="col-7 mb-1">
+                                {{ professional?.address }}<br *ngIf="professional?.address">
+                                {{ professional?.city }}<span *ngIf="professional?.city && professional?.state?.name">, </span>{{ professional?.state?.name }} {{ professional?.zipCode }}
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row mb-0">
+                            <dt class="col-5">Phone Number:</dt>
+                            <dd class="col-7 mb-1">{{ professional?.phoneNumber }}</dd>
+                            <dt class="col-5">Email Address:</dt>
+                            <dd class="col-7 mb-1">{{ selectedBpat.emailAddress }}</dd>
+                            <dt class="col-5">License Number:</dt>
+                            <dd class="col-7 mb-1">{{ selectedBpat.bpatLicenseNumber }}</dd>
+                            <dt class="col-5">License Type:</dt>
+                            <dd class="col-7 mb-1">{{ selectedBpat.bpatLicenseTypeName }}</dd>
+                            <dt class="col-5">License Exp Date:</dt>
+                            <dd class="col-7 mb-1">{{ selectedBpat.bpatLicenseExpirationDate | date:'MM/dd/yyyy' }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </vp-section>
+        </div>
+
+        <!-- Main test form — only visible after BPAT + water supplier are selected (matches V1 divTest reveal) -->
+        <ng-container *ngIf="verificationComplete">
+
+        <!-- Location / Property + Assembly Owner side by side -->
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <vp-section header="Location / Property Information">
+                    <dl class="row mb-0">
+                        <dt class="col-5">Property Type:</dt>
+                        <dd class="col-7 mb-1">{{ model.propertyType === 0 ? 'Residential' : 'Commercial' }}</dd>
+                        <dt class="col-5">Business Name:</dt>
+                        <dd class="col-7 mb-1">{{ model.propertyBusinessName }}</dd>
+                        <dt class="col-5">Property Address:</dt>
+                        <dd class="col-7 mb-1">
+                            {{ model.propertyStreetNumber }} {{ model.propertyStreetName }}<span *ngIf="model.propertyNumber"> #{{ model.propertyNumber }}</span><br>
+                            {{ model.propertyCity }}<span *ngIf="model.propertyCity && model.propertyState?.name">, </span>{{ model.propertyState?.name }} {{ model.propertyZip }}
+                        </dd>
+                    </dl>
+                </vp-section>
+            </div>
+            <div class="col-md-6">
+                <vp-section header="Assembly Owner's Contact Information">
+                    <dl class="row mb-0">
+                        <dt class="col-5">Company Name:</dt>
+                        <dd class="col-7 mb-1">{{ model.mailingCompanyName }}</dd>
+                        <dt class="col-5">Contact Name:</dt>
+                        <dd class="col-7 mb-1">{{ model.mailingContactName }}</dd>
+                        <dt class="col-5">Mailing Address:</dt>
+                        <dd class="col-7 mb-1">
+                            {{ model.mailingStreetNumber }} {{ model.mailingStreetName }}<span *ngIf="model.mailingNumber"> #{{ model.mailingNumber }}</span><br>
+                            {{ model.mailingCity }}<span *ngIf="model.mailingCity && model.mailingState?.name">, </span>{{ model.mailingState?.name }} {{ model.mailingZip }}
+                        </dd>
+                        <dt class="col-5">Phone Number:</dt>
+                        <dd class="col-7 mb-1">{{ model.mailingPhoneNumber }}</dd>
+                        <dt class="col-5">Email Address:</dt>
+                        <dd class="col-7 mb-1">{{ model.mailingEmailAddress }}</dd>
+                    </dl>
+                </vp-section>
+            </div>
+        </div>
+
+        <!-- Backflow Information (assembly details — V1 section 6) -->
+        <div class="mt-3">
+            <vp-section header="Backflow Information">
+                <!-- Device Type -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <vp-input type="select" label="Backflow Method" name="deviceType" [(ngModel)]="model.deviceType"
+                                  [options]="deviceTypeOptions" [required]="true" [form]="submitForm"
+                                  [placeholder]="'Select device type'" />
+                    </div>
+                </div>
+
+                <!-- Main assembly -->
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <vp-input type="text" label="Manufacturer" name="manufacturer" [(ngModel)]="model.manufacturer" [required]="true" [form]="submitForm" />
+                    </div>
+                    <div class="col-md-3">
+                        <vp-input type="text" label="Model" name="model" [(ngModel)]="model.model" [required]="true" [form]="submitForm" />
+                    </div>
+                    <div class="col-md-2">
+                        <vp-input type="text" label="Size" name="size" [(ngModel)]="model.size" />
+                    </div>
+                    <div class="col-md-4">
+                        <vp-input type="text" label="Serial number" name="serialNumber" [(ngModel)]="model.serialNumber" [required]="!model.unknownSerialNumber" [form]="submitForm" />
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox" id="unknownSN" name="unknownSN" [(ngModel)]="model.unknownSerialNumber" />
+                            <label class="form-check-label" for="unknownSN">Unknown serial number</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bypass assembly (DCD/DCD2/RPPD/RPPD2) -->
+                <div class="row mb-3" *ngIf="hasBypassCV || hasBypassBC">
+                    <div class="col-12 fw-semibold mb-1">Bypass Assembly</div>
+                    <div class="col-md-3">
+                        <vp-input type="text" label="Manufacturer" name="manufacturer2" [(ngModel)]="model.manufacturer2" [required]="true" [form]="submitForm" />
+                    </div>
+                    <div class="col-md-3">
+                        <vp-input type="text" label="Model" name="model2" [(ngModel)]="model.model2" [required]="true" [form]="submitForm" />
+                    </div>
+                    <div class="col-md-2">
+                        <vp-input type="text" label="Size" name="size2" [(ngModel)]="model.size2" />
+                    </div>
+                    <div class="col-md-4">
+                        <vp-input type="text" label="Serial number" name="serialNumber2" [(ngModel)]="model.serialNumber2" />
+                    </div>
+                </div>
+
+                <!-- Location description -->
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <vp-input type="text" label="Location description" name="locationDescription" [(ngModel)]="model.locationDescription" />
+                    </div>
+                </div>
+            </vp-section>
+        </div>
+
+        <!-- Backflow Test Information (V1 section 7) -->
+        <div class="mt-3">
+            <vp-section header="Backflow Test Information">
+                <!-- Test Result + Reason for Test (left) | Job Number (right) — matches V1 layout -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <span class="fw-semibold">Test Result:</span>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="testResult"
+                                       [value]="BackflowTestResult.Pass" [(ngModel)]="model.testResult" id="resultPass" required />
+                                <label class="form-check-label" for="resultPass">Passed</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="testResult"
+                                       [value]="BackflowTestResult.Fail" [(ngModel)]="model.testResult" id="resultFail" />
+                                <label class="form-check-label" for="resultFail">Failed</label>
+                            </div>
+                        </div>
+                        <vp-input type="select" label="Reason for test" name="reasonForTest" [(ngModel)]="model.reasonForTest"
+                                  [options]="reasonOptions" [required]="true" [form]="submitForm"
+                                  [placeholder]="'Select reason'" />
+                    </div>
+                    <div class="col-md-6">
+                        <vp-input type="text" label="Job number" name="jobNumber" [(ngModel)]="model.jobNumber" />
+                        <span class="form-text text-muted">(Optional)</span>
+                    </div>
+                </div>
+
+                <!-- Replacement assembly -->
+                <div class="row mb-3" *ngIf="model.reasonForTest === BackflowReasonForTest.Replacement">
+                    <div class="col-md-6">
+                        <vp-input type="text" label="Old model / serial #" name="replacementAssembly" [(ngModel)]="model.replacementAssembly" />
+                    </div>
+                </div>
+
+                <!-- Installation questions (stacked vertically, Yes/No inline — matches V1) -->
+                <div class="mb-2">
+                    Is the assembly installed in accordance with manufacturer recommendations and/or local codes?
+                    <div class="form-check form-check-inline ms-2">
+                        <input class="form-check-input" type="radio" name="properlyInstalled" [value]="true" [(ngModel)]="model.properlyInstalled" id="installedYes" required />
+                        <label class="form-check-label" for="installedYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="properlyInstalled" [value]="false" [(ngModel)]="model.properlyInstalled" id="installedNo" />
+                        <label class="form-check-label" for="installedNo">No</label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    Is the assembly installed on a non-potable water supply (auxiliary)?
+                    <div class="form-check form-check-inline ms-2">
+                        <input class="form-check-input" type="radio" name="nonPotable" [value]="true" [(ngModel)]="model.nonPotable" id="nonPotableYes" required />
+                        <label class="form-check-label" for="nonPotableYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="nonPotable" [value]="false" [(ngModel)]="model.nonPotable" id="nonPotableNo" />
+                        <label class="form-check-label" for="nonPotableNo">No</label>
+                    </div>
+                </div>
+
+                <!-- Test Gauge display -->
+                <div class="mb-3" *ngIf="selectedGauge">
+                    <span class="fw-semibold">Test Gauge:</span>
+                    <span class="ms-2">{{ selectedGauge.manufacturer }} {{ selectedGauge.model }} {{ selectedGauge.serialNumber }}</span>
+                </div>
+
+                <!-- Air Gap Test -->
+                <ng-container *ngIf="isAirGap">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <vp-input type="datetime" label="Test date and time" name="airGapDate" [(ngModel)]="model.initialTestDate" [required]="true" [form]="submitForm" />
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center gap-3 mt-3">
+                                <span class="fw-semibold">Air Gap:</span>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="airGapValid" [value]="true" [(ngModel)]="model.airGapValid" id="agValid" required />
+                                    <label class="form-check-label" for="agValid">Valid</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="airGapValid" [value]="false" [(ngModel)]="model.airGapValid" id="agInvalid" />
+                                    <label class="form-check-label" for="agInvalid">Invalid</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+
+                <!-- DC / RP / PVB Test Table -->
+                <ng-container *ngIf="!isAirGap && model.deviceType">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th></th>
+                                    <th colspan="10" class="text-center">{{ deviceTypeLabel }}</th>
+                                </tr>
+                                <tr>
+                                    <th style="width:180px;"></th>
+                                    <ng-container *ngIf="isDC || isRP">
+                                        <th class="text-center">Check Valve #1</th>
+                                        <th class="text-center" *ngIf="isRP">Relief Valve</th>
+                                        <th class="text-center" *ngIf="isDC">Check Valve #2</th>
+                                        <th class="text-center" *ngIf="hasBypassCV">Bypass CV #1</th>
+                                        <th class="text-center" *ngIf="hasBypassCV && isRP">Bypass RV</th>
+                                        <th class="text-center" *ngIf="hasBypassCV && isDC">Bypass CV #2</th>
+                                        <th class="text-center" *ngIf="hasBypassBC">Bypass Check</th>
+                                    </ng-container>
+                                    <ng-container *ngIf="isPVB">
+                                        <th class="text-center">Air Inlet</th>
+                                        <th class="text-center">Check Valve</th>
+                                    </ng-container>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Initial Test -->
+                                <tr *ngIf="submitted && !model.initialTestDate">
+                                    <td colspan="10" class="py-1">
+                                        <span class="badge bg-warning text-dark">Please enter a test date and time.</span>
+                                    </td>
+                                </tr>
+                                <tr [ngClass]="{'table-secondary': !submitted || !!model.initialTestDate, 'table-danger': submitted && !model.initialTestDate}">
+                                    <td colspan="10" class="fw-bold">Initial Test</td>
+                                </tr>
+                                <tr [class.table-danger]="submitted && !model.initialTestDate">
+                                    <td>
+                                        <strong>Date and Time:</strong><br>
+                                        <vp-input type="datetime" name="initialTestDate" [(ngModel)]="model.initialTestDate" [required]="true" [form]="submitForm" />
+                                    </td>
+                                    <!-- DC/RP columns -->
+                                    <ng-container *ngIf="isDC || isRP">
+                                        <td>
+                                            <div class="mb-1">
+                                                Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initCV1PSID" [(ngModel)]="model.initCV1HeldPSID" step="0.1" min="0" max="15" /> PSID
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="initCV1CT" name="initCV1CT" [(ngModel)]="model.initCV1ClosedTight" />
+                                                <label class="form-check-label" for="initCV1CT">Closed Tight</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="initCV1L" name="initCV1L" [(ngModel)]="model.initCV1Leaked" />
+                                                <label class="form-check-label" for="initCV1L">Leaked</label>
+                                            </div>
+                                        </td>
+                                        <td *ngIf="isRP">
+                                            <div class="mb-1">
+                                                Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initRVPSID" [(ngModel)]="model.initRVOpenedPSID" step="0.1" min="0" max="15" /> PSID
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="initRVDNO" name="initRVDNO" [(ngModel)]="model.initRVDidNotOpen" />
+                                                <label class="form-check-label" for="initRVDNO">Did Not Open</label>
+                                            </div>
+                                        </td>
+                                        <td *ngIf="isDC">
+                                            <div class="mb-1">
+                                                Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initCV2PSID" [(ngModel)]="model.initCV2HeldPSID" step="0.1" min="0" max="15" /> PSID
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="initCV2CT" name="initCV2CT" [(ngModel)]="model.initCV2ClosedTight" />
+                                                <label class="form-check-label" for="initCV2CT">Closed Tight</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="initCV2L" name="initCV2L" [(ngModel)]="model.initCV2Leaked" />
+                                                <label class="form-check-label" for="initCV2L">Leaked</label>
+                                            </div>
+                                        </td>
+                                        <!-- Bypass CV1 (DCD/RPPD) -->
+                                        <td *ngIf="hasBypassCV">
+                                            <div class="mb-1">
+                                                Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initCV1PSID2" [(ngModel)]="model.initCV1HeldPSID2" step="0.1" min="0" max="15" /> PSID
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="initCV1CT2" name="initCV1CT2" [(ngModel)]="model.initCV1ClosedTight2" />
+                                                <label class="form-check-label" for="initCV1CT2">Closed Tight</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="initCV1L2" name="initCV1L2" [(ngModel)]="model.initCV1Leaked2" />
+                                                <label class="form-check-label" for="initCV1L2">Leaked</label>
+                                            </div>
+                                        </td>
+                                        <td *ngIf="hasBypassCV && isRP">
+                                            <div class="mb-1">
+                                                Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initRVPSID2" [(ngModel)]="model.initRVOpenedPSID2" step="0.1" min="0" max="15" /> PSID
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="initRVDNO2" name="initRVDNO2" [(ngModel)]="model.initRVDidNotOpen2" />
+                                                <label class="form-check-label" for="initRVDNO2">Did Not Open</label>
+                                            </div>
+                                        </td>
+                                        <td *ngIf="hasBypassCV && isDC">
+                                            <div class="mb-1">
+                                                Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initCV2PSID2" [(ngModel)]="model.initCV2HeldPSID2" step="0.1" min="0" max="15" /> PSID
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="initCV2CT2" name="initCV2CT2" [(ngModel)]="model.initCV2ClosedTight2" />
+                                                <label class="form-check-label" for="initCV2CT2">Closed Tight</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="initCV2L2" name="initCV2L2" [(ngModel)]="model.initCV2Leaked2" />
+                                                <label class="form-check-label" for="initCV2L2">Leaked</label>
+                                            </div>
+                                        </td>
+                                        <!-- Bypass BC (DCD2/RPPD2) -->
+                                        <td *ngIf="hasBypassBC">
+                                            <div class="mb-1">
+                                                Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initBCPSID" [(ngModel)]="model.initBCHeldPSID" step="0.1" min="0" max="15" /> PSID
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="initBCCT" name="initBCCT" [(ngModel)]="model.initBCClosedTight" />
+                                                <label class="form-check-label" for="initBCCT">Closed Tight</label>
+                                            </div>
+                                        </td>
+                                    </ng-container>
+                                    <!-- PVB columns -->
+                                    <ng-container *ngIf="isPVB">
+                                        <td>
+                                            <div class="mb-1">
+                                                Opened at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initPvbAiPSID" [(ngModel)]="model.initPvbAirInletOpenedPSID" step="0.1" min="0" max="15" /> PSID
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="initAiDNO" name="initAiDNO" [(ngModel)]="model.initPvbAirInletDidNotOpen" />
+                                                <label class="form-check-label" for="initAiDNO">Did Not Open</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="initAiFO" name="initAiFO" [(ngModel)]="model.initPvbAirInletFullyOpened" />
+                                                <label class="form-check-label" for="initAiFO">Fully Opened</label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="mb-1">
+                                                Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initPvbCVPSID" [(ngModel)]="model.initPvbCVHeldPSID" step="0.1" min="0" max="15" /> PSID
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="initPvbCVL" name="initPvbCVL" [(ngModel)]="model.initPvbCVLeaked" />
+                                                <label class="form-check-label" for="initPvbCVL">Leaked</label>
+                                            </div>
+                                        </td>
+                                    </ng-container>
+                                </tr>
+
+                                <!-- Repairs (shown when initial test failed) -->
+                                <ng-container *ngIf="initialTestFailed">
+                                    <tr class="table-secondary">
+                                        <td colspan="10" class="fw-bold">Repairs and Materials Used</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted small">Check all repairs performed</td>
+                                        <ng-container *ngIf="isDC">
+                                            <td>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV1.cleaned" name="rCV1Cleaned" id="rCV1Cleaned"><label class="form-check-label" for="rCV1Cleaned">Cleaned</label></div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV1.disc" name="rCV1Disc" id="rCV1Disc"><label class="form-check-label" for="rCV1Disc">Disc</label></div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV1.spring" name="rCV1Spring" id="rCV1Spring"><label class="form-check-label" for="rCV1Spring">Spring</label></div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV1.guide" name="rCV1Guide" id="rCV1Guide"><label class="form-check-label" for="rCV1Guide">Guide</label></div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV1.pinRetainer" name="rCV1PR" id="rCV1PR"><label class="form-check-label" for="rCV1PR">Pin Retainer</label></div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV1.hingePin" name="rCV1HP" id="rCV1HP"><label class="form-check-label" for="rCV1HP">Hinge Pin</label></div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV1.seat" name="rCV1Seat" id="rCV1Seat"><label class="form-check-label" for="rCV1Seat">Seat</label></div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV1.diaphragm" name="rCV1Dia" id="rCV1Dia"><label class="form-check-label" for="rCV1Dia">Diaphragm</label></div>
+                                            </td>
+                                            <td>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV2.cleaned" name="rCV2Cleaned" id="rCV2Cleaned"><label class="form-check-label" for="rCV2Cleaned">Cleaned</label></div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV2.disc" name="rCV2Disc" id="rCV2Disc"><label class="form-check-label" for="rCV2Disc">Disc</label></div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV2.spring" name="rCV2Spring" id="rCV2Spring"><label class="form-check-label" for="rCV2Spring">Spring</label></div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV2.guide" name="rCV2Guide" id="rCV2Guide"><label class="form-check-label" for="rCV2Guide">Guide</label></div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV2.pinRetainer" name="rCV2PR" id="rCV2PR"><label class="form-check-label" for="rCV2PR">Pin Retainer</label></div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV2.hingePin" name="rCV2HP" id="rCV2HP"><label class="form-check-label" for="rCV2HP">Hinge Pin</label></div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV2.seat" name="rCV2Seat" id="rCV2Seat"><label class="form-check-label" for="rCV2Seat">Seat</label></div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV2.diaphragm" name="rCV2Dia" id="rCV2Dia"><label class="form-check-label" for="rCV2Dia">Diaphragm</label></div>
+                                            </td>
+                                        </ng-container>
+                                        <ng-container *ngIf="isRP">
+                                            <td>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV1.cleaned" name="rCV1CleanedRP" id="rCV1CleanedRP"><label class="form-check-label" for="rCV1CleanedRP">Cleaned</label></div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV1.disc" name="rCV1DiscRP" id="rCV1DiscRP"><label class="form-check-label" for="rCV1DiscRP">Disc</label></div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV1.spring" name="rCV1SpringRP" id="rCV1SpringRP"><label class="form-check-label" for="rCV1SpringRP">Spring</label></div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV1.seat" name="rCV1SeatRP" id="rCV1SeatRP"><label class="form-check-label" for="rCV1SeatRP">Seat</label></div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairCV1.diaphragm" name="rCV1DiaRP" id="rCV1DiaRP"><label class="form-check-label" for="rCV1DiaRP">Diaphragm</label></div>
+                                            </td>
+                                            <td>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairRV.cleaned" name="rRVCleaned" id="rRVCleaned"><label class="form-check-label" for="rRVCleaned">Cleaned</label></div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairRV.discUpper" name="rRVDU" id="rRVDU"><label class="form-check-label" for="rRVDU">Disc Upper</label></div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairRV.discLower" name="rRVDL" id="rRVDL"><label class="form-check-label" for="rRVDL">Disc Lower</label></div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairRV.spring" name="rRVS" id="rRVS"><label class="form-check-label" for="rRVS">Spring</label></div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairRV.diaphragmUpper" name="rRVDiaU" id="rRVDiaU"><label class="form-check-label" for="rRVDiaU">Diaphragm Upper</label></div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairRV.seatUpper" name="rRVSU" id="rRVSU"><label class="form-check-label" for="rRVSU">Seat Upper</label></div>
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairRV.seatLower" name="rRVSL" id="rRVSL"><label class="form-check-label" for="rRVSL">Seat Lower</label></div>
+                                            </td>
+                                        </ng-container>
+                                        <td class="text-muted" *ngIf="isPVB" colspan="2">No component repairs tracked for PVB/SVB.</td>
+                                        <td *ngIf="hasBypassBC">
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairBC.cleaned" name="rBCCleaned" id="rBCCleaned"><label class="form-check-label" for="rBCCleaned">Cleaned</label></div>
+                                            <div class="text-muted small mb-1">Replaced:</div>
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairBC.disc" name="rBCDisc" id="rBCDisc"><label class="form-check-label" for="rBCDisc">Disc</label></div>
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairBC.spring" name="rBCSpring" id="rBCSpring"><label class="form-check-label" for="rBCSpring">Spring</label></div>
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairBC.guide" name="rBCGuide" id="rBCGuide"><label class="form-check-label" for="rBCGuide">Guide</label></div>
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairBC.pinRetainer" name="rBCPR" id="rBCPR"><label class="form-check-label" for="rBCPR">Pin Retainer</label></div>
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairBC.hingePin" name="rBCHP" id="rBCHP"><label class="form-check-label" for="rBCHP">Hinge Pin</label></div>
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairBC.seat" name="rBCSeat" id="rBCSeat"><label class="form-check-label" for="rBCSeat">Seat</label></div>
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" [(ngModel)]="repairBC.diaphragm" name="rBCDia" id="rBCDia"><label class="form-check-label" for="rBCDia">Diaphragm</label></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Repair Details:</strong></td>
+                                        <td colspan="6">
+                                            <vp-input type="textarea" name="repairCV1Details" [(ngModel)]="model.repairCV1Details" [maxLength]="100" />
+                                        </td>
+                                    </tr>
+
+                                    <!-- Final Test After Repair -->
+                                    <tr *ngIf="submitted && !model.finalTestDate">
+                                        <td colspan="10" class="py-1">
+                                            <span class="badge bg-warning text-dark">Please enter a test date and time.</span>
+                                        </td>
+                                    </tr>
+                                    <tr [ngClass]="{'table-secondary': !submitted || !!model.finalTestDate, 'table-danger': submitted && !model.finalTestDate}">
+                                        <td colspan="10" class="fw-bold">Test After Repair</td>
+                                    </tr>
+                                    <tr [class.table-danger]="submitted && !model.finalTestDate">
+                                        <td>
+                                            <strong>Date and Time:</strong><br>
+                                            <vp-input type="datetime" name="finalTestDate" [(ngModel)]="model.finalTestDate" [required]="true" [form]="submitForm" />
+                                        </td>
+                                        <ng-container *ngIf="isDC">
+                                            <td>
+                                                <div class="mb-1">Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalCV1PSID" [(ngModel)]="model.finalCV1HeldPSID" step="0.1" min="0" max="15" /> PSID</div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="finalCV1CT" name="finalCV1CT" [(ngModel)]="model.finalCV1ClosedTight" />
+                                                    <label class="form-check-label" for="finalCV1CT">Closed Tight</label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="mb-1">Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalCV2PSID" [(ngModel)]="model.finalCV2HeldPSID" step="0.1" min="0" max="15" /> PSID</div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="finalCV2CT" name="finalCV2CT" [(ngModel)]="model.finalCV2ClosedTight" />
+                                                    <label class="form-check-label" for="finalCV2CT">Closed Tight</label>
+                                                </div>
+                                            </td>
+                                        </ng-container>
+                                        <ng-container *ngIf="isRP">
+                                            <td>
+                                                <div class="mb-1">Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalCV1PSID" [(ngModel)]="model.finalCV1HeldPSID" step="0.1" min="0" max="15" /> PSID</div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="finalCV1CT" name="finalCV1CT" [(ngModel)]="model.finalCV1ClosedTight" />
+                                                    <label class="form-check-label" for="finalCV1CT">Closed Tight</label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="mb-1">Opened at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalRVPSID" [(ngModel)]="model.finalRVOpenedPSID" step="0.1" min="0" max="15" /> PSID</div>
+                                            </td>
+                                        </ng-container>
+                                        <ng-container *ngIf="isPVB">
+                                            <td>
+                                                <div class="mb-1">Opened at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalPvbAiPSID" [(ngModel)]="model.finalPvbAirInletOpenedPSID" step="0.1" min="0" max="15" /> PSID</div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="finalAiFO" name="finalAiFO" [(ngModel)]="model.finalPvbAirInletFullyOpened" />
+                                                    <label class="form-check-label" for="finalAiFO">Fully Opened</label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="mb-1">Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalPvbCVPSID" [(ngModel)]="model.finalPvbCVHeldPSID" step="0.1" min="0" max="15" /> PSID</div>
+                                            </td>
+                                        </ng-container>
+                                    </tr>
+                                </ng-container>
+                            </tbody>
+                        </table>
+                    </div>
+                </ng-container>
+            </vp-section>
+        </div>
+
+        <!-- Bypass Meter Test — shown for DCD/DCD2/RPPD/RPPD2 (matches V1 trMeterTest) -->
+        <div class="mt-3" *ngIf="hasBypassCV || hasBypassBC">
+            <vp-section header="Bypass Meter Test">
+                <div class="row">
+                    <div class="col-md-3">
+                        <vp-input type="text" label="Bypass Meter Number" name="meterNumber" [(ngModel)]="model.meterNumber" />
+                    </div>
+                    <div class="col-md-3">
+                        <vp-input type="number" label="Meter reading prior to test" name="meterReadingBefore" [(ngModel)]="model.meterReadingBefore" />
+                    </div>
+                    <div class="col-md-3">
+                        <vp-input type="number" label="Meter reading upon completion" name="meterReadingAfter" [(ngModel)]="model.meterReadingAfter" />
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-check mt-4">
+                            <input class="form-check-input" type="checkbox" id="meterRegisters" name="meterRegisters" [(ngModel)]="model.meterRegisters" />
+                            <label class="form-check-label" for="meterRegisters">Bypass Meter registers a flow?</label>
+                        </div>
+                    </div>
+                </div>
+            </vp-section>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="mt-3">
+            <vp-section header="Additional Information">
+                <div class="row">
+                    <div class="col-md-4">
+                        <vp-input type="text" label="Permit number" name="permitNumber" [(ngModel)]="model.permitNumber" />
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check mt-4">
+                            <input class="form-check-input" type="checkbox" id="ossf" name="ossf" [(ngModel)]="model.ossf" />
+                            <label class="form-check-label" for="ossf">Is there an On-Site Sewage Facility?</label>
+                        </div>
+                    </div>
+                </div>
+            </vp-section>
+        </div>
+
+        <!-- Remarks -->
+        <div class="mt-3">
+            <vp-section [header]="'Remarks (' + remarksLength + '/1000 Characters)'">
+                <vp-input type="textarea" name="comments" [(ngModel)]="model.comments" [maxLength]="1000" />
+            </vp-section>
+        </div>
+
+        <!-- Footer note -->
+        <p class="text-center text-muted small mt-2">The above is certified to be true at the time of testing.</p>
+        <p class="text-center text-muted small">* TEST RECORDS MUST BE KEPT FOR AT LEAST THREE YEARS</p>
+        <p class="text-center text-muted small">** USE ONLY MANUFACTURER'S REPLACEMENT PARTS</p>
+
+        <!-- Validation & Submit -->
+        <div class="mt-3">
+            <vp-validation-summary [form]="submitForm" [validationErrors]="validationErrors" />
+        </div>
+        <div class="mt-3 d-flex justify-content-center">
+            <button type="submit" class="btn btn-primary vp-section-button">Complete Submission</button>
+        </div>
+
+        </ng-container>
+    </form>
+</div>

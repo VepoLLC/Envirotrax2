@@ -137,6 +137,18 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 
     public bool UnknownSerialNumber { get; set; }
 
+    [StringLength(100)]
+    public string? Manufacturer2 { get; set; }
+
+    [StringLength(100)]
+    public string? Model2 { get; set; }
+
+    [StringLength(50)]
+    public string? Size2 { get; set; }
+
+    [StringLength(100)]
+    public string? SerialNumber2 { get; set; }
+
     [StringLength(200)]
     public string? LocationDescription { get; set; }
 
@@ -148,6 +160,9 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 
     // Test info
     public BackflowReasonForTest ReasonForTest { get; set; }
+
+    [StringLength(100)]
+    public string? ReplacementAssembly { get; set; }
 
     public DateTime? InstallationDate { get; set; }
     public DateTime? TestDate { get; set; }
@@ -177,6 +192,12 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     // Optional fields
     [StringLength(50)]
     public string? MeterNumber { get; set; }
+
+    [Precision(5, 2)]
+    public decimal? MeterReadingBefore { get; set; }
+    public bool MeterRegisters { get; set; }
+    [Precision(5, 2)]
+    public decimal? MeterReadingAfter { get; set; }
 
     [StringLength(50)]
     public string? PermitNumber { get; set; }
@@ -225,6 +246,127 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public bool ValidationSiteInformationChanged { get; set; }
     public bool ValidationUnknownSerialNumber { get; set; }
     public bool ValidationDeviceInformationChanged { get; set; }
+
+    // Initial test readings - main assembly
+    [Precision(5, 2)]
+    public decimal? InitCV1HeldPSID { get; set; }
+    public bool InitCV1ClosedTight { get; set; }
+    public bool InitCV1Leaked { get; set; }
+
+    [Precision(5, 2)]
+    public decimal? InitCV2HeldPSID { get; set; }
+    public bool InitCV2ClosedTight { get; set; }
+    public bool InitCV2Leaked { get; set; }
+
+    [Precision(5, 2)]
+    public decimal? InitRVOpenedPSID { get; set; }
+    public bool InitRVDidNotOpen { get; set; }
+
+    [Precision(5, 2)]
+    public decimal? InitBCHeldPSID { get; set; }
+    public bool InitBCClosedTight { get; set; }
+    public bool InitBCLeaked { get; set; }
+
+    [Precision(5, 2)]
+    public decimal? InitPvbAirInletOpenedPSID { get; set; }
+    public bool InitPvbAirInletDidNotOpen { get; set; }
+    public bool InitPvbAirInletFullyOpened { get; set; }
+
+    [Precision(5, 2)]
+    public decimal? InitPvbCVHeldPSID { get; set; }
+    public bool InitPvbCVLeaked { get; set; }
+
+    // Air gap
+    public bool AirGapValid { get; set; }
+
+    // Repairs (stored as comma-separated text, e.g. "Cleaned, Replaced Disc, Replaced Spring")
+    [StringLength(200)]
+    public string? RepairCV1 { get; set; }
+
+    [StringLength(100)]
+    public string? RepairCV1Details { get; set; }
+
+    [StringLength(200)]
+    public string? RepairCV2 { get; set; }
+
+    [StringLength(100)]
+    public string? RepairCV2Details { get; set; }
+
+    [StringLength(200)]
+    public string? RepairRV { get; set; }
+
+    [StringLength(100)]
+    public string? RepairRVDetails { get; set; }
+
+    [StringLength(200)]
+    public string? RepairBC { get; set; }
+
+    [StringLength(100)]
+    public string? RepairBCDetails { get; set; }
+
+    // Final test readings - main assembly
+    [Precision(5, 2)]
+    public decimal? FinalCV1HeldPSID { get; set; }
+    public bool FinalCV1ClosedTight { get; set; }
+
+    [Precision(5, 2)]
+    public decimal? FinalCV2HeldPSID { get; set; }
+    public bool FinalCV2ClosedTight { get; set; }
+
+    [Precision(5, 2)]
+    public decimal? FinalRVOpenedPSID { get; set; }
+
+    [Precision(5, 2)]
+    public decimal? FinalBCHeldPSID { get; set; }
+    public bool FinalBCClosedTight { get; set; }
+
+    [Precision(5, 2)]
+    public decimal? FinalPvbAirInletOpenedPSID { get; set; }
+    public bool FinalPvbAirInletFullyOpened { get; set; }
+
+    [Precision(5, 2)]
+    public decimal? FinalPvbCVHeldPSID { get; set; }
+
+    // Bypass assembly readings (DCD/RPPD device types only)
+    [Precision(5, 2)]
+    public decimal? InitCV1HeldPSID2 { get; set; }
+    public bool InitCV1ClosedTight2 { get; set; }
+    public bool InitCV1Leaked2 { get; set; }
+
+    [Precision(5, 2)]
+    public decimal? InitCV2HeldPSID2 { get; set; }
+    public bool InitCV2ClosedTight2 { get; set; }
+    public bool InitCV2Leaked2 { get; set; }
+
+    [Precision(5, 2)]
+    public decimal? InitRVOpenedPSID2 { get; set; }
+    public bool InitRVDidNotOpen2 { get; set; }
+
+    [StringLength(200)]
+    public string? RepairCV12 { get; set; }
+
+    [StringLength(100)]
+    public string? RepairCV1Details2 { get; set; }
+
+    [StringLength(200)]
+    public string? RepairCV22 { get; set; }
+
+    [StringLength(100)]
+    public string? RepairCV2Details2 { get; set; }
+
+    [StringLength(200)]
+    public string? RepairRV2 { get; set; }
+
+    [StringLength(100)]
+    public string? RepairRVDetails2 { get; set; }
+
+    [Precision(5, 2)]
+    public decimal? FinalCV1HeldPSID2 { get; set; }
+    public bool FinalCV1ClosedTight2 { get; set; }
+    public bool FinalCV2ClosedTight2 { get; set; }
+
+    [Precision(5, 2)]
+    public decimal? FinalRVOpenedPSID2 { get; set; }
 
     // Audit
     public int? CreatedById { get; set; }

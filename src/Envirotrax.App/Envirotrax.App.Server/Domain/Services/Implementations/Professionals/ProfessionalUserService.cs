@@ -5,8 +5,10 @@ using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Configuration;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
+using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.Common.Domain.Services.Defintions;
 
@@ -18,19 +20,55 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
     private readonly IAuthService _authService;
     private readonly IInternalApiClientService<AuthApiOptions> _authApiClient;
     private readonly IProfessionalService _professionalService;
+    private readonly IProfessionalUserLicenseRepository _licenseRepository;
+    private readonly ITimeZoneHelperService _timeZoneHelper;
 
     public ProfessionalUserService(
         IMapper mapper,
         IProfessionalUserRepository repository,
         IAuthService authService,
         IInternalApiClientService<AuthApiOptions> authApiClient,
-        IProfessionalService professionalService)
+        IProfessionalService professionalService,
+        IProfessionalUserLicenseRepository licenseRepository,
+        ITimeZoneHelperService timeZoneHelper)
         : base(mapper, repository)
     {
         _professionalUserRepository = repository;
         _authService = authService;
         _authApiClient = authApiClient;
         _professionalService = professionalService;
+        _licenseRepository = licenseRepository;
+        _timeZoneHelper = timeZoneHelper;
+    }
+
+    public override async Task<IPagedData<ProfessionalUserDto>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var result = await base.GetAllAsync(pageInfo, query, cancellationToken);
+        var users = result.Data.ToList();
+        await EnrichWithBpatLicensesAsync(users, cancellationToken);
+        return users.ToPagedData(pageInfo);
+    }
+
+    private async Task EnrichWithBpatLicensesAsync(IEnumerable<ProfessionalUserDto> users, CancellationToken cancellationToken)
+    {
+        var licenses = await _licenseRepository.GetBpatLicensesForProfessionalAsync(_authService.ProfessionalId, cancellationToken);
+        var localTime = _timeZoneHelper.GetUserLocalTime();
+
+        foreach (var user in users)
+        {
+            var license = licenses.FirstOrDefault(l => l.UserId == user.Id);
+            if (license != null)
+            {
+                user.BpatLicenseNumber = license.LicenseNumber;
+                user.BpatLicenseTypeName = license.LicenseType?.Name;
+                user.BpatLicenseExpirationDate = license.ExpirationDate;
+                user.BpatLicenseExpirationType = localTime > license.ExpirationDate
+                    ? ExpirationType.Expired
+                    : localTime.AddDays(30) >= license.ExpirationDate
+                        ? ExpirationType.AboutToExpire
+                        : ExpirationType.Valid;
+            }
+        }
     }
 
     public Task<ProfessionalUserDto?> GetMyDataAsync(CancellationToken cancellationToken)

@@ -6,9 +6,17 @@ import { ProfessionalsBackflowRoutingModule } from "./professionals-backflow-rou
 import { GaugeListComponent } from "./gauges/gauge-list.component";
 import { EditGaugeComponent } from "./gauges/edit/edit-gauge.component";
 import { ProfessionalBackflowTestListComponent } from "./tests/professional-backflow-test-list.component";
+import { BackflowTestAssemblySearchComponent } from "./submit/backflow-test-assembly-search.component";
+import { BackflowTestSubmitComponent } from "./submit/backflow-test-submit.component";
 
 @NgModule({
-    declarations: [GaugeListComponent, EditGaugeComponent, ProfessionalBackflowTestListComponent],
+    declarations: [
+        GaugeListComponent,
+        EditGaugeComponent,
+        ProfessionalBackflowTestListComponent,
+        BackflowTestAssemblySearchComponent,
+        BackflowTestSubmitComponent
+    ],
     imports: [CommonModule, FormsModule, SharedComponentsModule, ProfessionalsBackflowRoutingModule]
 })
 export class ProfessionalsBackflowModule {}

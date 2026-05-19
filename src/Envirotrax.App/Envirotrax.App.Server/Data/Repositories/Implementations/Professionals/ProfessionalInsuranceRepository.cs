@@ -34,4 +34,13 @@ public class ProfessionalInsuranceRepository : Repository<ProfessionalInsurance>
 
         return await paginated.ToListAsync(cancellationToken);
     }
+
+    public async Task<ProfessionalInsurance?> GetCurrentForProfessionalAsync(int professionalId, CancellationToken cancellationToken)
+    {
+        return await DbContext.Set<ProfessionalInsurance>()
+            .AsNoTracking()
+            .Where(i => i.ProfessionalId == professionalId)
+            .OrderByDescending(i => i.ExpirationDate)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
 }

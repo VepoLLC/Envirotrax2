@@ -1,0 +1,19 @@
+
+<ng-template #supplierNameCell let-ws="rowData">
+    {{ ws.waterSupplier?.name }}
+</ng-template>
+
+<vp-section header="Account Registration">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="loadWaterSuppliers()"
+                  [(query)]="table.query"
+                  (queryChange)="loadWaterSuppliers()"
+                  (queryReset)="loadWaterSuppliers()" />
+    </div>
+</vp-section>

@@ -89,6 +89,12 @@ export class BackflowTesterListComponent implements OnInit {
         this.table.query.filter = queryProperties;
     }
 
+    public openDetails(row: any): void {
+        this._router.navigate(['details', row.id], {
+            relativeTo: this._activatedRoute
+        });
+    }
+
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
             await this.getTesters();

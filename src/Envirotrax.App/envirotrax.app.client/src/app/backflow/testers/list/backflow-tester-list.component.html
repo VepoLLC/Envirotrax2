@@ -77,7 +77,9 @@
                     [(query)]="table.query"
                     (queryChange)="getTesters()"
                     (queryReset)="getTesters()"
-                    [freeTextSearch]="table.freeTextSearch" />
+                    [freeTextSearch]="table.freeTextSearch"
+                    [canSelect]="true"
+                    (select)="openDetails($event)" />
     </vp-section>
 
 </div>

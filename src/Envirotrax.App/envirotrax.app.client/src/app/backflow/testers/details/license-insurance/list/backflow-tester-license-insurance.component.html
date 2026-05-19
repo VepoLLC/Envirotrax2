@@ -1,0 +1,81 @@
+<ng-template #licenseTypeCell let-license="rowData">
+    {{ license.licenseType?.name }}
+</ng-template>
+
+<ng-template #professionalTypeCell let-license="rowData">
+    {{ getProfessionalTypeLabel(license.professionalType) }}
+</ng-template>
+
+<ng-template #userEmailCell let-license="rowData">
+    {{ license.user?.emailAddress }}
+</ng-template>
+
+<ng-template #licenseExpirationCell let-license="rowData">
+    <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
+         [class.text-bg-primary]="!license.expirationDate"
+         [class.text-bg-success]="license.expirationDate && license.expirationType == expirationType.Valid"
+         [class.text-bg-warning]="license.expirationDate && license.expirationType == expirationType.AboutToExpire"
+         [class.text-bg-danger]="license.expirationDate && license.expirationType == expirationType.Expired"
+         [attr.aria-label]="!license.expirationDate ? 'Validating' : license.expirationType == expirationType.Valid ? 'Valid' : license.expirationType == expirationType.AboutToExpire ? 'About to Expire' : 'Expired'">
+        {{ license.expirationDate ? (license.expirationDate | date) : 'Validating...' }}
+    </div>
+</ng-template>
+
+<ng-template #insuranceExpirationCell let-insurance="rowData">
+    <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
+         [class.text-bg-primary]="!insurance.expirationDate"
+         [class.text-bg-success]="insurance.expirationDate && insurance.expirationType == insuranceExpirationType.Valid"
+         [class.text-bg-warning]="insurance.expirationDate && insurance.expirationType == insuranceExpirationType.AboutToExpire"
+         [class.text-bg-danger]="insurance.expirationDate && insurance.expirationType == insuranceExpirationType.Expired"
+         [attr.aria-label]="!insurance.expirationDate ? 'Validating' : insurance.expirationType == insuranceExpirationType.Valid ? 'Valid' : insurance.expirationType == insuranceExpirationType.AboutToExpire ? 'About to Expire' : 'Expired'">
+         {{ insurance.expirationDate ? (insurance.expirationDate | date) : 'Validating...' }}
+    </div>
+</ng-template>
+
+
+<vp-section header="License &amp; Insurance Management">
+    <div class="text-center mb-3">
+        <ul class="vp-tabs nav nav-pills d-inline-flex">
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'insurances'" (click)="setActiveTab('insurances')">
+                    Insurance Policies
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'licenses'" (click)="setActiveTab('licenses')">
+                    Licenses
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div *ngIf="activeTab === 'insurances'">
+        <div dp-spinner-parent>
+            <dp-loading-spinner *ngIf="insurancesTable.isLoading"></dp-loading-spinner>
+
+            <vp-table *ngIf="insurancesTable.items"
+                      [columns]="insurancesTable.columns!"
+                      [data]="insurancesTable.items.data"
+                      [(pageInfo)]="insurancesTable.items.pageInfo"
+                      (pageInfoChange)="loadInsurances()"
+                      [(query)]="insurancesTable.query"
+                      (queryChange)="loadInsurances()"
+                      (queryReset)="loadInsurances()" />
+        </div>
+    </div>
+
+    <div *ngIf="activeTab === 'licenses'">
+        <div dp-spinner-parent>
+            <dp-loading-spinner *ngIf="licensesTable.isLoading"></dp-loading-spinner>
+
+            <vp-table *ngIf="licensesTable.items"
+                      [columns]="licensesTable.columns!"
+                      [data]="licensesTable.items.data"
+                      [(pageInfo)]="licensesTable.items.pageInfo"
+                      (pageInfoChange)="loadLicenses()"
+                      [(query)]="licensesTable.query"
+                      (queryChange)="loadLicenses()"
+                      (queryReset)="loadLicenses()" />
+        </div>
+    </div>
+</vp-section>

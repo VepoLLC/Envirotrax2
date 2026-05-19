@@ -1,9 +1,11 @@
+using System.Net;
 using Azure.Identity;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Envirotrax.Auth.Data;
 using Envirotrax.Auth.Data.Configuration;
 using Envirotrax.Auth.Data.Models;
 using Envirotrax.Auth.Domain.Configuration;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,6 +29,18 @@ if (!builder.Environment.IsDevelopment())
 builder.Configuration.AddAzureKeyVault(
     vaultUri: new Uri(builder.Configuration["KeyVault:Url"] ?? throw new InvalidOperationException()),
     credential: new DefaultAzureCredential());
+
+if (!builder.Environment.IsDevelopment())
+{
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+
+        var ipAddress = builder.Configuration["LoadBalacerIpAddress"] ?? throw new InvalidOperationException("Load balancer IP was not found.");
+
+        options.KnownProxies.Add(IPAddress.Parse(ipAddress));
+    });
+}
 
 builder
     .Services
@@ -70,6 +84,7 @@ else
 
 app.UseCors(allowedCorsOrigins);
 
+app.UseForwardedHeaders();
 app.UseHttpsRedirection();
 
 app.UseRouting();

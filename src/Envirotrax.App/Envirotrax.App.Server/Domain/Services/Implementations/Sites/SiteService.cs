@@ -105,6 +105,11 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         return MapToDto(site);
     }
 
+    public async Task UpdateGisDataAsync(int siteId, UpdateSiteGisDataDto dto, CancellationToken cancellationToken)
+    {
+        await _siteRepository.UpdateManualGisDataAsync(siteId, dto.Latitude, dto.Longitude, dto.Status);
+    }
+
     private async Task HadnleGeocodingErrorAsync(Exception ex, Site site)
     {
         _logger.LogError(ex, "Error goecoding site.");

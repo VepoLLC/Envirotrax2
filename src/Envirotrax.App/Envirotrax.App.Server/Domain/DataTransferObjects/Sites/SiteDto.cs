@@ -153,6 +153,13 @@ public class SiteDto : IDto
     public AppUserDto? UpdatedBy { get; set; }
 }
 
+public class UpdateSiteGisDataDto
+{
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
+    public GisStatusType Status { get; set; }
+}
+
 public class ReferencedSiteDto
 {
     [Required]

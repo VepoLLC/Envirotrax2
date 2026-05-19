@@ -23,7 +23,7 @@ namespace Envirotrax.App.Server.Controllers.Csi
         [HasPermission(PermissionAction.CanView)]
         public async Task<IActionResult> GetSubAccountsAsync(int id, [FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
         {
-            var result = await _userService.GetAllByProfessionalAsync(id, pageInfo, query, cancellationToken);
+            var result = await _userService.GetAllByProfessionalAsync(id, pageInfo, query, cancellationToken, pu => pu.IsCsiInspector);
             return Ok(result);
         }
 

@@ -10,8 +10,18 @@ namespace Envirotrax.App.Server.Controllers.Sites;
 [PermissionResource(PermissionType.Sites)]
 public class SiteController : WaterSupplierCrudController<SiteDto>
 {
+    private readonly ISiteService _siteService;
+
     public SiteController(ISiteService service)
         : base(service)
     {
+        _siteService = service;
+    }
+
+    [HttpPut("{id}/gis-data")]
+    public async Task<IActionResult> UpdateGisDataAsync(int id, [FromBody] UpdateSiteGisDataDto dto, CancellationToken cancellationToken)
+    {
+        await _siteService.UpdateGisDataAsync(id, dto, cancellationToken);
+        return Ok();
     }
 }

@@ -69,6 +69,17 @@ export class SiteService {
         );
     }
 
+    public updateGisData(siteId: number, data: { gisLatitude?: number, gisLongitude?: number, gisStatus?: number }): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}/gis-data`);
+        return lastValueFrom(
+            this._http.put<void>(url, {
+                latitude: data.gisLatitude,
+                longitude: data.gisLongitude,
+                status: data.gisStatus
+            })
+        );
+    }
+
     public delete(id: number): Promise<Site> {
         const url = this._urlResolver.resolveUrl(`/api/sites/${id}`);
 

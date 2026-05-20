@@ -1,8 +1,22 @@
 using Azure.Identity;
+using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Envirotrax.App.Server.Configuration;
 using Envirotrax.App.Server.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
+
+if (!builder.Environment.IsDevelopment())
+{
+    builder
+        .Services
+        .AddOpenTelemetry()
+        .UseAzureMonitor(options =>
+        {
+            options.ConnectionString = builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"] ?? throw new InvalidOperationException();
+            options.Credential = new DefaultAzureCredential();
+        });
+
+}
 
 // Add services to the container.
 builder.Configuration.AddAzureKeyVault(

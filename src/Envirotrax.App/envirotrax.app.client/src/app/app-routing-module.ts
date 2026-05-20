@@ -61,6 +61,14 @@ const routes: Routes = [
           features: [FeatureType.FogInspection],
           roles: [ROLE_DEFINITIONS.WATER_SUPPLIER]
         }
+      },
+            {
+        path: 'dashboard',
+        loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule),
+        canActivate: [RoleGuard],
+        data: {
+          roles: [ROLE_DEFINITIONS.WATER_SUPPLIER]
+        }
       }
     ]
   },

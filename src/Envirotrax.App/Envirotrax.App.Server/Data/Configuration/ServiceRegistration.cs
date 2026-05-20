@@ -83,6 +83,8 @@ public static class ServiceRegistration
         services.AddTransient<IGisAreaRepository, GisAreaRepository>();
         services.AddTransient<IGisAreaCoordinateRepository, GisAreaCoordinateRepository>();
 
+        services.AddTransient<IWaterSupplierDashboardRepository, WaterSupplierDashboardRepository>();
+
         return services;
     }
 }

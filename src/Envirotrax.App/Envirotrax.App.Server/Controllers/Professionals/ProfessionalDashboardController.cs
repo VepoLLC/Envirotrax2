@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
+using Envirotrax.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers.Professionals;
@@ -34,19 +35,30 @@ public class ProfessionalDashboardController : ProfessionalProtectedController
     [HttpGet("stats")]
     public async Task<IActionResult> GetStatsAsync(CancellationToken cancellationToken)
     {
-        var supplierResult  = await _supplierService.GetAllAsync(new PageInfo { PageSize = 1 }, new Query(), cancellationToken);
-        var userResult      = await _userService.GetAllAsync(new PageInfo { PageSize = 1 }, new Query(), cancellationToken);
-        var licenseResult   = await _licenseService.GetAllAsync(new PageInfo { PageSize = 1 }, new Query(), cancellationToken);
-        var insuranceResult = await _insuranceService.GetAllAsync(new PageInfo { PageSize = 1 }, new Query(), cancellationToken);
-        var gaugeResult     = await _gaugeService.GetAllAsync(new PageInfo { PageSize = 1 }, new Query(), cancellationToken);
+        var isAdmin        = User.IsInRole(RoleDefinitions.Professionals.Admin);
+        var canAccessGauges = isAdmin || User.IsInRole(RoleDefinitions.Professionals.BackflowTester);
 
-        return Ok(new ProfessionalDashboardStatsDto
+        var dto = new ProfessionalDashboardStatsDto();
+
+        if (isAdmin)
         {
-            SupplierCount   = (int)(supplierResult.PageInfo?.TotalItems  ?? 0),
-            SubAccountCount = (int)(userResult.PageInfo?.TotalItems      ?? 0),
-            LicenseCount    = (int)(licenseResult.PageInfo?.TotalItems   ?? 0),
-            InsuranceCount  = (int)(insuranceResult.PageInfo?.TotalItems ?? 0),
-            GaugeCount      = (int)(gaugeResult.PageInfo?.TotalItems     ?? 0)
-        });
+            var supplierResult  = await _supplierService.GetAllAsync(new PageInfo { PageSize = 1 }, new Query(), cancellationToken);
+            var userResult      = await _userService.GetAllAsync(new PageInfo { PageSize = 1 }, new Query(), cancellationToken);
+            var licenseResult   = await _licenseService.GetAllAsync(new PageInfo { PageSize = 1 }, new Query(), cancellationToken);
+            var insuranceResult = await _insuranceService.GetAllAsync(new PageInfo { PageSize = 1 }, new Query(), cancellationToken);
+
+            dto.SupplierCount   = (int)(supplierResult.PageInfo?.TotalItems  ?? 0);
+            dto.SubAccountCount = (int)(userResult.PageInfo?.TotalItems      ?? 0);
+            dto.LicenseCount    = (int)(licenseResult.PageInfo?.TotalItems   ?? 0);
+            dto.InsuranceCount  = (int)(insuranceResult.PageInfo?.TotalItems ?? 0);
+        }
+
+        if (canAccessGauges)
+        {
+            var gaugeResult  = await _gaugeService.GetAllAsync(new PageInfo { PageSize = 1 }, new Query(), cancellationToken);
+            dto.GaugeCount   = (int)(gaugeResult.PageInfo?.TotalItems ?? 0);
+        }
+
+        return Ok(dto);
     }
 }

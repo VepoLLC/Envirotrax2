@@ -144,7 +144,7 @@ export class DashboardComponent implements OnInit {
         try {
             [this.hasCsi, this.hasBackflow, this.isAdmin] = await Promise.all([
                 this._authService.hasAnyFeatures(FeatureType.CsiInspection),
-                this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
+                this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.ADMIN, ROLE_DEFINITIONS.PROFESSIONALS.BACKFLOW_TESTER),
                 this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.ADMIN)
             ]);
 

@@ -411,7 +411,7 @@ export class App implements OnInit {
       {
         title: 'Account Overview',
         iconCss: 'fa-regular fa-house',
-        routerLink: ['/'],
+        routerLink: ['/professionals/dashboard'],
         hasFeature: true,
         hasPermission: true
       },

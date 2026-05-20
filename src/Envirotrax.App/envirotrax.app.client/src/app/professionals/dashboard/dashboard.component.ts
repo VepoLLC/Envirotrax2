@@ -142,14 +142,24 @@ export class DashboardComponent implements OnInit {
         this.setupColumns();
 
         try {
-            [this.hasCsi, this.hasBackflow, this.isAdmin] = await Promise.all([
+            const [hasCsi, hasBackflow, isCsiInspector, isBackflowTester, isAdmin] = await Promise.all([
                 this._authService.hasAnyFeatures(FeatureType.CsiInspection),
-                this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.ADMIN, ROLE_DEFINITIONS.PROFESSIONALS.BACKFLOW_TESTER),
+                this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
+                this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.CSI_INSPECTOR),
+                this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.BACKFLOW_TESTER),
                 this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.ADMIN)
             ]);
 
+            this.isAdmin = isAdmin;
+            this.hasCsi = hasCsi && (isCsiInspector || isAdmin);
+            this.hasBackflow = hasBackflow && (isBackflowTester || isAdmin);
+
             const promises: Promise<void>[] = [];
-            if (this.hasCsi) promises.push(this.loadRecentInspections());
+
+            if (this.hasCsi) {
+                promises.push(this.loadRecentInspections());
+            }
+
             if (this.isAdmin) {
                 promises.push(
                     this.loadStats(),
@@ -158,7 +168,10 @@ export class DashboardComponent implements OnInit {
                     this.loadInsurances()
                 );
             }
-            if (this.hasBackflow) promises.push(this.loadGauges());
+            if (this.hasBackflow) {
+                promises.push(this.loadGauges());
+            }
+
             await Promise.all(promises);
         } finally {
             this.isLoading = false;

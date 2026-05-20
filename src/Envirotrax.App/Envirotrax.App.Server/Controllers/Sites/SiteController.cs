@@ -19,6 +19,7 @@ public class SiteController : WaterSupplierCrudController<SiteDto>
     }
 
     [HttpPut("{id}/gis-data")]
+    [HasPermission(PermissionAction.CanEdit)]
     public async Task<IActionResult> UpdateGisDataAsync(int id, [FromBody] UpdateSiteGisDataDto dto, CancellationToken cancellationToken)
     {
         await _siteService.UpdateGisDataAsync(id, dto, cancellationToken);

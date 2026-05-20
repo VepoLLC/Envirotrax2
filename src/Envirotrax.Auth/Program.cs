@@ -22,25 +22,12 @@ if (!builder.Environment.IsDevelopment())
             options.ConnectionString = builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"] ?? throw new InvalidOperationException();
             options.Credential = new DefaultAzureCredential();
         });
-
 }
 
 // Add services to the container.
 builder.Configuration.AddAzureKeyVault(
     vaultUri: new Uri(builder.Configuration["KeyVault:Url"] ?? throw new InvalidOperationException()),
     credential: new DefaultAzureCredential());
-
-if (!builder.Environment.IsDevelopment())
-{
-    builder.Services.Configure<ForwardedHeadersOptions>(options =>
-    {
-        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-
-        var ipAddress = builder.Configuration["LoadBalacerIpAddress"] ?? throw new InvalidOperationException("Load balancer IP was not found.");
-
-        options.KnownProxies.Add(IPAddress.Parse(ipAddress));
-    });
-}
 
 builder
     .Services
@@ -84,7 +71,6 @@ else
 
 app.UseCors(allowedCorsOrigins);
 
-app.UseForwardedHeaders();
 app.UseHttpsRedirection();
 
 app.UseRouting();

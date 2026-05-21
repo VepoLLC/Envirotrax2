@@ -48,6 +48,8 @@ public class ProfessionalDto : IDto
     public bool HasFogTransportation { get; set; }
 
     public DateTime CreatedTime { get; set; }
+
+    public ExpirationType? InsuranceExpirationType { get; set; }
 }
 
 public class ReferencedProfessionalDto

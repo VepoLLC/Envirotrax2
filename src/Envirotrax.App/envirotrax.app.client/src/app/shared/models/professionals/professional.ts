@@ -1,5 +1,5 @@
 import { State } from "../lookup/state";
-import { ProfessionalUser } from "./professional-user";
+import { ExpirationType, ProfessionalUser } from "./professional-user";
 
 export interface Professional {
     id?: number;
@@ -20,6 +20,8 @@ export interface Professional {
     hasCsiInspection?: boolean;
     hasFogInspection?: boolean;
     hasFogTransportation?: boolean;
+
+    insuranceExpirationType?: ExpirationType;
 }
 
 export interface CreateProfessional {

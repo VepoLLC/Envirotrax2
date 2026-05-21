@@ -7,4 +7,5 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 public interface IProfessionalInsuranceRepository : IRepository<ProfessionalInsurance>
 {
     Task<IEnumerable<ProfessionalInsurance>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<ProfessionalInsurance?> GetCurrentForProfessionalAsync(int professionalId, CancellationToken cancellationToken);
 }

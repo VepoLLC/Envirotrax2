@@ -51,4 +51,13 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
 
         return await paginated.ToListAsync(cancellationToken);
     }
+
+    public async Task<IEnumerable<ProfessionalUserLicense>> GetBpatLicensesForProfessionalAsync(int professionalId, CancellationToken cancellationToken)
+    {
+        return await DbContext.ProfessionalUserLicenses
+            .AsNoTracking()
+            .Include(l => l.LicenseType)
+            .Where(l => l.ProfessionalId == professionalId && l.ProfessionalType == ProfessionalType.Bpat)
+            .ToListAsync(cancellationToken);
+    }
 }

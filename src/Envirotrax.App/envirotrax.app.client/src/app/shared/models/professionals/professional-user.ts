@@ -10,4 +10,15 @@ export interface ProfessionalUser {
     isBackflowTester?: boolean;
     isFogInspector?: boolean;
     isFogTransporter?: boolean;
+
+    bpatLicenseNumber?: string;
+    bpatLicenseTypeName?: string;
+    bpatLicenseExpirationDate?: string;
+    bpatLicenseExpirationType?: ExpirationType;
+}
+
+export enum ExpirationType {
+    Valid = 0,
+    AboutToExpire = 1,
+    Expired = 2
 }

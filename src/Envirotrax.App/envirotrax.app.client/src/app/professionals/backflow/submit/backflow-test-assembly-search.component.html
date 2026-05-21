@@ -19,6 +19,23 @@
     <div *ngIf="test?.expirationDate">Exp: {{ test.expirationDate | date:'MM/dd/yyyy' }}</div>
 </ng-template>
 
+<ng-template #siteTypeTemplate let-site="rowData">
+    {{ site?.propertyType === PropertyType.Residential ? 'Residential' : 'Commercial' }}
+</ng-template>
+
+<ng-template #sitePropertyInfoTemplate let-site="rowData">
+    <div *ngIf="site?.businessName">{{ site.businessName }}</div>
+    <div>{{ site?.streetNumber }} {{ site?.streetName }}<span *ngIf="site?.propertyNumber"> #{{ site.propertyNumber }}</span></div>
+    <div>{{ site?.city }}<span *ngIf="site?.city && site?.state?.name">, </span>{{ site?.state?.name }} {{ site?.zipCode }}</div>
+</ng-template>
+
+<ng-template #siteContactInfoTemplate let-site="rowData">
+    <div *ngIf="site?.mailingCompanyName">{{ site.mailingCompanyName }}</div>
+    <div *ngIf="site?.mailingContactName">{{ site.mailingContactName }}</div>
+    <div>{{ site?.mailingStreetNumber }} {{ site?.mailingStreetName }}<span *ngIf="site?.mailingNumber"> #{{ site.mailingNumber }}</span></div>
+    <div>{{ site?.mailingCity }}<span *ngIf="site?.mailingCity && site?.mailingState?.name">, </span>{{ site?.mailingState?.name }} {{ site?.mailingZipCode }}</div>
+</ng-template>
+
 <h1 class="text-center h2">Submit Backflow Test</h1>
 
 <div [hidden]="showResults">
@@ -66,32 +83,64 @@
     </form>
 </div>
 
-<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+<dp-loading-spinner *ngIf="siteTable.isLoading || testTable.isLoading"></dp-loading-spinner>
 
 <div *ngIf="showResults">
-    <vp-section [header]="table.items?.data?.length === 0 ? 'No Assembly Records Found' : 'Assembly Search Results'">
-        <ng-container *ngIf="table.items?.data?.length === 0">
-            <p class="text-center mt-2 mb-0 fw-bold fs-5">No assembly records were found matching the specified search criteria.</p>
-            <p class="mt-2">If no record exists for the assembly you tested, click <strong>Submit Test for Unlisted Assembly</strong> below.</p>
-        </ng-container>
-        <ng-container *ngIf="table.items?.data?.length !== 0">
-            <p class="mt-2"><strong>Assembly found:</strong> If one of the results matches the assembly you tested, click <strong>Submit Test</strong> to proceed.</p>
-            <p><strong>No match found:</strong> If none of the records match, click <strong>Submit Test for Unlisted Assembly</strong> below.</p>
-        </ng-container>
-        <div class="d-flex justify-content-center mb-4 gap-2">
-            <button type="button" class="btn btn-primary vp-section-button" (click)="submitUnlisted()">Submit Test for Unlisted Assembly</button>
-            <button type="button" class="btn btn-primary vp-section-button" (click)="showResults = false">
-                <i class="fa-solid fa-magnifying-glass me-1"></i>Search Again
-            </button>
-        </div>
-        <vp-table *ngIf="table.items"
-                  [columns]="table.columns!"
-                  [data]="table.items.data"
-                  [(pageInfo)]="table.items.pageInfo"
-                  (pageInfoChange)="getAssemblies()"
-                  [(query)]="table.query"
-                  (queryChange)="getAssemblies()"
-                  (queryReset)="getAssemblies()"
-                  [customActions]="customActions" />
-    </vp-section>
+
+    <ng-container *ngIf="searchType === 'sites'">
+        <vp-section [header]="siteTable.items?.data?.length === 0 ? 'No Property Records Found' : 'Property Search Results'">
+            <ng-container *ngIf="siteTable.items?.data?.length === 0">
+                <p class="text-center mt-2 mb-0 fw-bold fs-5">No property records were found matching the specified search criteria.</p>
+                <p class="mt-2">If no record exists for the assembly you tested, click <strong>Submit Test for Unlisted Assembly</strong> below.</p>
+            </ng-container>
+            <ng-container *ngIf="siteTable.items?.data?.length !== 0">
+                <p class="mt-2"><strong>Property found:</strong> If one of the results matches the property where the assembly is located, click <strong>Submit Test for Unlisted Assembly</strong> to proceed.</p>
+                <p><strong>No match found:</strong> If none of the records match, click <strong>Submit Test for Unlisted Assembly</strong> below.</p>
+            </ng-container>
+            <div class="d-flex justify-content-center mb-4 gap-2">
+                <button type="button" class="btn btn-primary vp-section-button" (click)="submitUnlisted()">Submit Test for Unlisted Assembly</button>
+                <button type="button" class="btn btn-primary vp-section-button" (click)="showResults = false">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>Search Again
+                </button>
+            </div>
+            <vp-table *ngIf="siteTable.items"
+                      [columns]="siteTable.columns!"
+                      [data]="siteTable.items.data"
+                      [(pageInfo)]="siteTable.items.pageInfo"
+                      (pageInfoChange)="getSites()"
+                      [(query)]="siteTable.query"
+                      (queryChange)="getSites()"
+                      (queryReset)="getSites()"
+                      [customActions]="siteCustomActions" />
+        </vp-section>
+    </ng-container>
+
+    <ng-container *ngIf="searchType === 'tests'">
+        <vp-section [header]="testTable.items?.data?.length === 0 ? 'No Assembly Records Found' : 'Assembly Search Results'">
+            <ng-container *ngIf="testTable.items?.data?.length === 0">
+                <p class="text-center mt-2 mb-0 fw-bold fs-5">No assembly records were found matching the specified search criteria.</p>
+                <p class="mt-2">If no record exists for the assembly you tested, click <strong>Submit Test for Unlisted Assembly</strong> below.</p>
+            </ng-container>
+            <ng-container *ngIf="testTable.items?.data?.length !== 0">
+                <p class="mt-2"><strong>Assembly found:</strong> If one of the results matches the assembly you tested, click <strong>Submit Test</strong> to proceed.</p>
+                <p><strong>No match found:</strong> If none of the records match, click <strong>Submit Test for Unlisted Assembly</strong> below.</p>
+            </ng-container>
+            <div class="d-flex justify-content-center mb-4 gap-2">
+                <button type="button" class="btn btn-primary vp-section-button" (click)="submitUnlisted()">Submit Test for Unlisted Assembly</button>
+                <button type="button" class="btn btn-primary vp-section-button" (click)="showResults = false">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>Search Again
+                </button>
+            </div>
+            <vp-table *ngIf="testTable.items"
+                      [columns]="testTable.columns!"
+                      [data]="testTable.items.data"
+                      [(pageInfo)]="testTable.items.pageInfo"
+                      (pageInfoChange)="getAssemblies()"
+                      [(query)]="testTable.query"
+                      (queryChange)="getAssemblies()"
+                      (queryReset)="getAssemblies()"
+                      [customActions]="testCustomActions" />
+        </vp-section>
+    </ng-container>
+
 </div>

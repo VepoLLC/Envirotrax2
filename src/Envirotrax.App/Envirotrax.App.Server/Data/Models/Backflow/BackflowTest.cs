@@ -193,10 +193,10 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     [StringLength(50)]
     public string? MeterNumber { get; set; }
 
-    [Precision(5, 2)]
+    [Precision(10, 2)]
     public decimal? MeterReadingBefore { get; set; }
     public bool MeterRegisters { get; set; }
-    [Precision(5, 2)]
+    [Precision(10, 2)]
     public decimal? MeterReadingAfter { get; set; }
 
     [StringLength(50)]

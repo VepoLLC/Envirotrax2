@@ -1,8 +1,6 @@
-﻿using AutoMapper;
-using Envirotrax.App.Server.Data.Models.Csi;
+using AutoMapper;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
-using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 

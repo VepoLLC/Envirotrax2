@@ -1,9 +1,15 @@
 using Envirotrax.App.Server.Data.DbContexts;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
+using Envirotrax.App.Server.Data.Repositories.Definitions.GisAreas;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Users;
 using Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Csi;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Fog;
+using Envirotrax.App.Server.Data.Repositories.Implementations.GisAreas;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Sites;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Users;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Lookup;
@@ -53,9 +59,14 @@ public static class ServiceRegistration
         services.AddTransient<ISiteRepository, SiteRepository>();
         services.AddTransient<ICsiInspectionRepository, CsiInspectionRepository>();
         services.AddTransient<ICsiInspectorRepository, CsiInspectorRepository>();
+        services.AddTransient<IFogInspectorRepository, FogInspectorRepository>();
+        services.AddTransient<IFogInspectionRepository, FogInspectionRepository>();
+        services.AddTransient<IBackflowTesterRepository, BackflowTesterRepository>();
+        services.AddTransient<IBackflowTestRepository, BackflowTestRepository>();
         services.AddTransient<LookupRepository>();
 
         services.AddTransient<ICsiSettingsRepository, CsiSettingsRepository>();
+        services.AddTransient<IBackflowSettingsRepository, BackflowSettingsRepository>();
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IRoleRepository, RoleRepository>();
         services.AddTransient<IRolePermissionRepository, RolePermissionRepository>();
@@ -66,6 +77,11 @@ public static class ServiceRegistration
         services.AddTransient<IProfessionalSupplierRepository, ProfessionalSupplierRepository>();
         services.AddTransient<IProfessionalUserLicenseRepository, ProfessionalUserLicenseRepository>();
         services.AddTransient<IProfessionalLicenseTypeRepository, ProfessionalLicenseTypeRepository>();
+        services.AddTransient<IProfessionalInsuranceRepository, ProfessionalInsuranceRepository>();
+        services.AddTransient<IBackflowGaugeRepository, BackflowGaugeRepository>();
+
+        services.AddTransient<IGisAreaRepository, GisAreaRepository>();
+        services.AddTransient<IGisAreaCoordinateRepository, GisAreaCoordinateRepository>();
 
         return services;
     }

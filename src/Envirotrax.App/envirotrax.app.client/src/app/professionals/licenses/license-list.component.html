@@ -1,0 +1,126 @@
+<div class="text-center mb-4">
+    <h1 class="h2">
+        License and Insurance Policy Management
+    </h1>
+</div>
+
+<div class="text-center mb-3">
+    <ul class="vp-tabs nav nav-pills settings-tabs d-inline-flex">
+        <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/professionals/insurances']">Insurance Policies</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" [routerLink]="['/professionals/licenses']">Licenses</a>
+        </li>
+    </ul>
+</div>
+
+<ng-template #typeCell let-license="rowData">
+    {{ getProfessionalTypeLabel(license.professionalType) }}
+</ng-template>
+
+<ng-template #dateCell let-license="rowData">
+    <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
+         [class.text-bg-primary]="!license.expirationDate"
+         [class.text-bg-success]="license.expirationDate && license.expirationType == expirationType.Valid"
+         [class.text-bg-warning]="license.expirationDate && license.expirationType == expirationType.AboutToExpire"
+         [class.text-bg-danger]="license.expirationDate && license.expirationType == expirationType.Expired"
+         [attr.aria-label]="!license.expirationDate ? 'Validating' : license.expirationType == expirationType.Valid ? 'Valid' : license.expirationType == expirationType.AboutToExpire ? 'About to Expire' : 'Expired'">
+        {{ license.expirationDate ? (license.expirationDate | date) : 'Validating...' }}
+    </div>
+</ng-template>
+
+<div class="mb-3">
+    <vp-section header="License Management">
+        <div dp-spinner-parent>
+            <dp-loading-spinner *ngIf="table.isLoading" message="Loading Licenses" />
+
+            <vp-table *ngIf="table.items"
+                      [columns]="table.columns!"
+                      [data]="table.items.data"
+                      [canEdit]="true"
+                      (edit)="edit($event)"
+                      [canDelete]="true"
+                      (delete)="delete($event)"
+                      [(pageInfo)]="table.items.pageInfo"
+                      (pageInfoChange)="getLicenses()"
+                      [(query)]="table.query"
+                      (queryChange)="getLicenses()"
+                      (queryReset)="getLicenses()"
+                      [freeTextSearch]="table.freeTextSearch" />
+        </div>
+    </vp-section>
+</div>
+
+<vp-section header="Register New License">
+    <vp-license-help-text />
+
+    <div class="d-flex justify-content-center mt-3" dp-spinner-parent>
+        <dp-loading-spinner *ngIf="isNewLicenseLoading" />
+
+        <form #form="ngForm" (ngSubmit)="add(form)">
+            <div class="mb-3">
+                <vp-lookup-field label="Account"
+                                 [canSearch]="true"
+                                 [form]="form"
+                                 [required]="true"
+                                 [displayText]="newLicense.user?.contactName"
+                                 (search)="lookupUser()" />
+            </div>
+
+            <div class="mb-3">
+                <vp-input type="select"
+                          [(ngModel)]="newLicense.professionalType"
+                          (ngModelChange)="professionChange()"
+                          [required]="true"
+                          name="professionalType"
+                          label="Profession"
+                          [options]="professionalTypeOptions"
+                          [form]="form" />
+            </div>
+
+            <div class="mb-3">
+                <vp-input type="select"
+                          name="licenseType"
+                          label="Type"
+                          [ngModel]="newLicense.licenseType?.id"
+                          (ngModelChange)="licenseTypeChange($event)"
+                          [required]="true"
+                          [form]="form"
+                          [options]="licenseTypes" />
+            </div>
+
+            <div class="mb-3">
+                <vp-input name="licenseNumber"
+                          label="License Number"
+                          [(ngModel)]="newLicense.licenseNumber"
+                          [required]="true"
+                          [maxLength]="50"
+                          [form]="form" />
+            </div>
+
+            <div class="form-check mb-3">
+                <input type="checkbox"
+                       id="has-read-help"
+                       class="form-check-input"
+                       [(ngModel)]="hasReadHelp"
+                       name="hasReadHelp"
+                       required>
+                <label for="has-read-help"
+                       class="form-check-label"
+                       [class.text-danger]="form.submitted && !hasReadHelp">
+                    I have read and understand the requirements and process of registering a license in my
+                    account.
+                </label>
+            </div>
+
+            <div class="mt-3">
+                <vp-validation-summary [form]="form" [validationErrors]="newLicenseValidationErrors" />
+
+                <button type="submit" class="btn btn-primary w-100">
+                    Add New License
+                </button>
+            </div>
+        </form>
+    </div>
+</vp-section>

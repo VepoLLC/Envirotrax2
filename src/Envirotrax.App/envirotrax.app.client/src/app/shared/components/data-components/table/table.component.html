@@ -1,29 +1,39 @@
 <ng-template #actionsTemplate let-rowData="rowData">
-    <vp-dropdown title="Actions" iconCss="fa-solid fa-ellipsis-vertical" (click)="$event.stopPropagation()">
-        <vp-dropdown-option *ngIf="canViewDetails" (click)="onViewDetails(rowData)">
-            <i class="fa-solid fa-eye"></i>
-            Details
-        </vp-dropdown-option>
-        <vp-dropdown-option *ngIf="canEdit" (click)="onEdit(rowData)">
+    <div class="d-flex gap-1" (click)="$event.stopPropagation()">
+        <button *ngIf="canViewDetails"
+                type="button"
+                class="btn btn-primary"
+                (click)="onViewDetails(rowData)"
+                aria-label="View">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span class="ms-1" *ngIf="showActionLabels">View</span>
+        </button>
+        <button *ngIf="canEdit"
+                type="button"
+                class="btn btn-primary"
+                (click)="onEdit(rowData)"
+                aria-label="Edit">
             <i class="fa-solid fa-pencil"></i>
-            Edit
-        </vp-dropdown-option>
-        <vp-dropdown-option *ngIf="canDelete && !showSoftDeleted" (click)="onDelete(rowData)">
+            <span class="ms-1" *ngIf="showActionLabels">Edit</span>
+        </button>
+        <button *ngIf="canDelete"
+                type="button" class="btn btn-primary"
+                (click)="onDelete(rowData)"
+                aria-label="Delete">
             <i class="fa-solid fa-trash"></i>
-            Delete
-        </vp-dropdown-option>
-        <vp-dropdown-option *ngIf="canDelete && showSoftDeleted" (click)="onReactivate(rowData)">
-            <i class="fa-solid fa-rotate-right"></i>
-            Reactivate
-        </vp-dropdown-option>
-
+            <span class="ms-1" *ngIf="showActionLabels">Delete</span>
+        </button>
         <ng-container *ngIf="customActions">
-            <vp-dropdown-option *ngFor="let action of customActions" (click)="customActionClicked(action, rowData)">
+            <button *ngFor="let action of customActions"
+                    type="button"
+                    class="btn btn-primary"
+                    (click)="customActionClicked(action, rowData)"
+                    [attr.aria-label]="action.text">
                 <i [attr.class]="action.iconClass"></i>
-                {{action.text}}
-            </vp-dropdown-option>
+                <span class="ms-1" *ngIf="showActionLabels">{{action.text}}</span>
+            </button>
         </ng-container>
-    </vp-dropdown>
+    </div>
 </ng-template>
 
 <div>
@@ -72,14 +82,14 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table align-middle" [class.table-hover]="canSelect || canEdit">
+        <table class="table align-middle table-striped">
             <thead>
                 <tr>
                     <ng-container *ngFor="let column of columns">
                         <th *ngIf="!column.isTableColumnExcluded"
                             [hidden]="column.isInvisible"
                             [class]="column.headerCssClass"
-                            class="text-nowrap text-secondary"
+                            class="text-nowrap vp-table-header"
                             role="button"
                             (click)="sortColumn(column)">
                             {{column.caption}}

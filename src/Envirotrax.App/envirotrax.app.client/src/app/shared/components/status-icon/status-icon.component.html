@@ -1,0 +1,8 @@
+<div class="d-flex align-items-center gap-2">
+    <img *ngIf="imageSrc" [src]="imageSrc" [attr.alt]="text" />
+    <i *ngIf="iconClass" [class]="iconClass"></i>
+
+    <ng-container *ngIf="showText">
+        {{ text }}
+    </ng-container>
+</div>

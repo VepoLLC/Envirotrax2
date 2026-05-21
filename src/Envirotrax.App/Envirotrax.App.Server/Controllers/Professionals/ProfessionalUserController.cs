@@ -28,8 +28,10 @@ public class ProfessionalUserContoller : ProfessionalCrudController<Professional
     }
 }
 
+[Authorize]
+[ApiController]
 [Route("api/professionals/users")]
-public class MyProfessionalUserContoller : ProfessionalProtectedController
+public class MyProfessionalUserContoller : ControllerBase
 {
     private readonly IProfessionalUserService _userService;
 
@@ -55,7 +57,12 @@ public class MyProfessionalUserContoller : ProfessionalProtectedController
     public async Task<IActionResult> UpdateMyDataAsync(ProfessionalUserDto user)
     {
         var updated = await _userService.UpdateMyDataAsync(user);
+
+        if (updated == null)
+        {
+            return Conflict();
+        }
+
         return Ok(updated);
     }
-
 }

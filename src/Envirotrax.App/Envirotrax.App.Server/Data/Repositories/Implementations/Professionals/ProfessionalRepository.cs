@@ -19,6 +19,14 @@ public class ProfessionalRepository : Repository<Professional>, IProfessionalRep
         _tenantProvider = tenantProvider;
     }
 
+    protected override void UpdateEntity(Professional model)
+    {
+        base.UpdateEntity(model);
+
+        // We are not going to update HasWiseGuys from API. If needed, it will only be updated from the database.
+        DbContext.Entry(model).Property(p => p.HasWiseGuys).IsModified = false;
+    }
+
     public async Task<IEnumerable<Professional>> GetAllMyAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         var paginated = await DbContext

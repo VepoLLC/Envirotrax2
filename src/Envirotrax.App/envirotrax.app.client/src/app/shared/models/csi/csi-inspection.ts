@@ -1,6 +1,23 @@
+export interface ReferencedWaterSupplier {
+    id?: number;
+    name?: string | null;
+    domain?: string | null;
+    contactName?: string | null;
+    pwsId?: string | null;
+    address?: string | null;
+    city?: string | null;
+    state?: { id?: number; name?: string | null } | null;
+    zipCode?: string | null;
+    phoneNumber?: string | null;
+    emailAddress?: string | null;
+}
+
 export interface CsiInspection {
     id?: number;
+    site?: { id?: number; accountNumber?: string | null } | null;
     siteId?: number | null;
+    waterSupplier?: ReferencedWaterSupplier | null;
+    inspectorUser?: { id?: number } | null;
     inspectionDate?: string | null;
     submissionId?: string | null;
 
@@ -27,8 +44,6 @@ export interface CsiInspection {
     mailingEmailAddress?: string | null;
 
     // Inspector
-    masterInspectorId?: string | null;
-    inspectorId?: string | null;
     inspectorLicenseNumber?: string | null;
     inspectorLicenseType?: string | null;
     inspectorCompanyName?: string | null;
@@ -81,6 +96,7 @@ export interface CsiInspection {
     aiIrrigationSystem2?: boolean;
     aiHasDomesticPremisesIsolation?: boolean;
     aiRequiresDomesticPremisesIsolation?: boolean;
+    inspectionResult?: boolean;
 
     comments?: string | null;
 

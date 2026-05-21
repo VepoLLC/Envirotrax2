@@ -12,6 +12,10 @@ public class ProfessionalDto : IDto
     [StringLength(255)]
     public string Name { get; set; } = null!;
 
+    [EmailAddress]
+    [StringLength(100)]
+    public string? CompanyEmail { get; set; }
+
     [StringLength(255)]
     public string? Address { get; set; }
 
@@ -42,6 +46,8 @@ public class ProfessionalDto : IDto
     public bool HasCsiInspection { get; set; }
     public bool HasFogInspection { get; set; }
     public bool HasFogTransportation { get; set; }
+
+    public DateTime CreatedTime { get; set; }
 }
 
 public class ReferencedProfessionalDto

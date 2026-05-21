@@ -8,4 +8,5 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 public interface IProfessionalSupplierService : IService<ProfessionalWaterSupplier, ProfessionalWaterSupplierDto>
 {
     Task<IPagedData<AvailableWaterSupplierDto>> GetAllAvailableSuppliersAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<IPagedData<ProfessionalWaterSupplierDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
 }

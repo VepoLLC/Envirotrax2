@@ -37,4 +37,18 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
 
         return await paginated.ToListAsync();
     }
+
+    public async Task<IEnumerable<ProfessionalUserLicense>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var paginated = await DbContext.ProfessionalUserLicenses
+            .AsNoTracking()
+            .Include(l => l.LicenseType)
+            .Include(l => l.User)
+            .Where(l => l.ProfessionalId == professionalId)
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
 }

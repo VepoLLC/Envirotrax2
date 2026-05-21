@@ -8,6 +8,7 @@ import { PagedData } from "../../models/paged-data";
 import { lastValueFrom } from "rxjs";
 import { AvailableWaterSupplier, ProfessionalWaterSupplier } from "../../models/professionals/professional-water-supplier";
 import { InputOption } from "../../components/input/input.component";
+import { QueryProperty } from "../../models/query";
 
 @Injectable({
     providedIn: 'root'
@@ -31,8 +32,8 @@ export class ProfessionalSupplierService {
         return lastValueFrom(obsertvable);
     }
 
-    public async getMyAsOptions(): Promise<InputOption[]> {
-        const suppliers = await this.getAllMy();
+    public async getMyAsOptions(hasCsiInspection = false): Promise<InputOption[]> {
+        const suppliers = await this.getAllMy(hasCsiInspection);
         return [
             { id: '', text: 'Select a water supplier' },
             ...suppliers.data
@@ -41,16 +42,24 @@ export class ProfessionalSupplierService {
         ];
     }
 
-    public getAllMy(): Promise<PagedData<ProfessionalWaterSupplier>> {
+    public getAllMy(hasCsiInspection = false, hasBackflowTesting = false): Promise<PagedData<ProfessionalWaterSupplier>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/water-suppliers');
+        const pageInfo: PageInfo = { pageSize: MAX_PAGE_SIZE };
+        const filter: QueryProperty[] = [];
 
-        const observable = this._http.get<PagedData<ProfessionalWaterSupplier>>(url, {
-            params: {
-                pageSize: MAX_PAGE_SIZE
-            }
-        });
+        if (hasCsiInspection) {
+            filter.push({ columnName: 'hasCsiInspection', comparisonOperator: 'Eq', value: 'true' });
+        }
+        if (hasBackflowTesting) {
+            filter.push({ columnName: 'hasBackflowTesting', comparisonOperator: 'Eq', value: 'true' });
+        }
 
-        return lastValueFrom(observable);
+        const query: Query = filter.length > 0 ? { filter } : {};
+        return lastValueFrom(
+            this._http.get<PagedData<ProfessionalWaterSupplier>>(url, {
+                params: this._queryHelper.buildQuery(pageInfo, query)
+            })
+        );
     }
 
     public get(supplierId: number): Promise<ProfessionalWaterSupplier> {

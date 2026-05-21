@@ -1,8 +1,8 @@
-import { NgModule } from '@angular/core';
+﻿import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './shared/guards/auth.guard';
 import { FeatureGuard } from './shared/guards/feature.guard';
-import { FeatureType } from './shared/models/feature-tyype';
+import { FeatureType } from './shared/models/feature-type';
 import { RoleGuard } from './shared/guards/role.guard';
 import { ROLE_DEFINITIONS } from './shared/models/role-definitions';
 const routes: Routes = [
@@ -41,6 +41,24 @@ const routes: Routes = [
         canActivate: [FeatureGuard, RoleGuard],
         data: {
           features: [FeatureType.CsiInspection],
+          roles: [ROLE_DEFINITIONS.WATER_SUPPLIER, ROLE_DEFINITIONS.PROFESSIONAL]
+        }
+      },
+      {
+        path: 'backflow',
+        loadChildren: () => import('./backflow/backflow.module').then(m => m.BackflowModule),
+        canActivate: [FeatureGuard, RoleGuard],
+        data: {
+          features: [FeatureType.BackflowTesting],
+          roles: [ROLE_DEFINITIONS.WATER_SUPPLIER]
+        }
+      },
+      {
+        path: 'fog',
+        loadChildren: () => import('./fog/fog.module').then(m => m.FogModule),
+        canActivate: [FeatureGuard, RoleGuard],
+        data: {
+          features: [FeatureType.FogInspection],
           roles: [ROLE_DEFINITIONS.WATER_SUPPLIER]
         }
       }

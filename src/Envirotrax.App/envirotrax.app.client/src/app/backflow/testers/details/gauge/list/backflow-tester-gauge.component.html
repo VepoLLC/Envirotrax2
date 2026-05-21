@@ -1,0 +1,28 @@
+<ng-template #dateCell let-gauge="rowData">
+    <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
+         [class.text-bg-primary]="!gauge.lastCalibrationDate"
+         [class.text-bg-success]="gauge.lastCalibrationDate && gauge.expirationType == gaugeExpirationType.Valid"
+         [class.text-bg-warning]="gauge.lastCalibrationDate && gauge.expirationType == gaugeExpirationType.AboutToExpire"
+         [class.text-bg-danger]="gauge.lastCalibrationDate && gauge.expirationType == gaugeExpirationType.Expired">
+        {{ gauge.lastCalibrationDate ? (gauge.lastCalibrationDate | date) : 'Validating...' }}
+    </div>
+</ng-template>
+
+<ng-template #typeCell let-gauge="rowData">
+    {{ gauge.isPortable ? 'Portable' : 'Non-portable' }}
+</ng-template>
+
+<vp-section header="Gauge Management">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="loadGauge()"
+                  [(query)]="table.query"
+                  (queryChange)="loadGauge()"
+                  (queryReset)="loadGauge()" />
+    </div>
+</vp-section>

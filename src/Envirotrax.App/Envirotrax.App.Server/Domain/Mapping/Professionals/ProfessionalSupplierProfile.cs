@@ -10,6 +10,7 @@ public class ProfessionalSupplierProfile : Profile
     public ProfessionalSupplierProfile()
     {
         CreateMap<ProfessionalWaterSupplier, ProfessionalWaterSupplierDto>()
+        .ForMember(dto=> dto.HasCsiInspection, opt => opt.MapFrom(model => model.HasCsiInpection))
             .AfterMap((model, dto) =>
             {
                 dto.WaterSupplier ??= new()

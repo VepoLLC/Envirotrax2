@@ -14,7 +14,7 @@ namespace Envirotrax.Common.Data.Services.Implementations
         {
             get
             {
-                if (HasScopes("envirotrax_app_internal"))
+                if (HasScopes("envirotrax_app_internal", "task_runner"))
                 {
                     var supplierIdHeader = _contextAccessor.HttpContext?.Request?.Headers["Vp-Water-Supplier-Id"];
 
@@ -49,7 +49,7 @@ namespace Envirotrax.Common.Data.Services.Implementations
         {
             get
             {
-                if (HasScopes("envirotrax_app_internal"))
+                if (HasScopes("envirotrax_app_internal", "task_runner"))
                 {
                     var userIdHeader = _contextAccessor.HttpContext?.Request?.Headers["Vp-User-Id"];
 

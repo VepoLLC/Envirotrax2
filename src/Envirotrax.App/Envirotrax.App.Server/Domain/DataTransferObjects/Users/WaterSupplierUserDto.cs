@@ -15,3 +15,13 @@ public class WaterSupplierUserDto : IDto
     [StringLength(100)]
     public string EmailAddress { get; set; } = null!;
 }
+
+public class ReferencedWaterSupplierUserDto
+{
+    [Required]
+    public int? Id { get; set; }
+
+    public string? ContactName { get; set; }
+
+    public string? EmailAddress { get; set; }
+}

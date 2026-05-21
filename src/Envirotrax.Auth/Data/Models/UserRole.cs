@@ -13,4 +13,5 @@ public class UserRole : TenantModel<WaterSupplier>
 
     [AppPrimaryKey(false)]
     public int RoleId { get; set; }
+    public Role? Role { get; set; }
 }

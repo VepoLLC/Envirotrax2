@@ -85,6 +85,10 @@ public class WaterSupplier : TenantBase, IAuditableModel<AppUser>
     public int? LetterContactStateId { get; set; }
     public State? LetterContactState { get; set; }
 
+    public double? GisCenterLatitude { get; set; }
+    public double? GisCenterLongitude { get; set; }
+    public double? GisCenterZoom { get; set; }
+
     [ForeignKey(nameof(ParentId))]
     public WaterSupplier? Parent { get; set; }
 

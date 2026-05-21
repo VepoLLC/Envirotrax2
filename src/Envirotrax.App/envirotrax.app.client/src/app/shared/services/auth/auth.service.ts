@@ -1,8 +1,8 @@
-import { Injectable } from "@angular/core";
+﻿import { Injectable } from "@angular/core";
 import { BehaviorSubject, from, lastValueFrom, merge, Observable, shareReplay } from "rxjs";
 import { UserManager } from "oidc-client-ts";
 import { environment } from "../../../../environments/environment";
-import { FeatureType } from "../../models/feature-tyype";
+import { FeatureType } from "../../models/feature-type";
 import { UrlResolverService } from "../helpers/url-resolver.service";
 import { HttpClient } from "@angular/common/http";
 import { PermissionAction, PermissionType } from "../../models/permission-type";

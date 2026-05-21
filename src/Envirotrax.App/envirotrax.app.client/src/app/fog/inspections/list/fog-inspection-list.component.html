@@ -1,0 +1,263 @@
+<h1 class="text-center h2">FOG inspection search</h1>
+
+<div [hidden]="showResults">
+    <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+        <vp-filter-panel (filterChange)="onFilterChange($event)">
+
+            <!-- Main Search Criteria -->
+            <vp-section header="Search criteria">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="site.accountNumber"
+                                                   label="Account number"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="facilityType"
+                                                   label="Facility type"
+                                                   type="multi-select"
+                                                   [options]="facilityTypeOptions"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="interceptorType"
+                                                   label="Interceptor type"
+                                                   type="select"
+                                                   [options]="interceptorTypeOptions"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="totalCapacityPercent"
+                                                   label="Total capacity %"
+                                                   type="select"
+                                                   [options]="totalCapacityPercentOptions"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="inspectionResult"
+                                                   label="Inspection result"
+                                                   type="select"
+                                                   [options]="inspectionResultOptions"
+                                                   [form]="searchForm"
+                                                   borderColor="#00a000" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="paymentStatus"
+                                                   label="Payment status"
+                                                   type="select"
+                                                   [options]="paymentStatusOptions"
+                                                   [form]="searchForm"
+                                                   borderColor="orange" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="inspectorCompanyName"
+                                                   label="Inspector company name"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="inspectorContactName"
+                                                   label="Inspector contact name"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="createdTime"
+                                                   label="Record creation date"
+                                                   type="daterange"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="inspectionDate"
+                                                   label="Inspection date"
+                                                   type="daterange"
+                                                   [form]="searchForm" />
+                        </div>
+                    </div>
+                </div>
+            </vp-section>
+
+            <!-- Location / Property + Contact / Mailing side by side -->
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <vp-section header="Location / property criteria">
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <vp-filter-panel-field fieldName="propertyType"
+                                                       label="Property type"
+                                                       type="select"
+                                                       [options]="propertyTypeOptions"
+                                                       [form]="searchForm" />
+                            </div>
+                            <div class="col-12 mb-3">
+                                <vp-filter-panel-field fieldName="propertyBusinessName"
+                                                       label="Business name"
+                                                       [form]="searchForm" />
+                            </div>
+                            <div class="col-4 mb-3">
+                                <vp-filter-panel-field fieldName="propertyStreetNumber"
+                                                       label="Street #"
+                                                       [form]="searchForm" />
+                            </div>
+                            <div class="col-5 mb-3">
+                                <vp-filter-panel-field fieldName="propertyStreetName"
+                                                       label="Street name"
+                                                       [form]="searchForm" />
+                            </div>
+                            <div class="col-3 mb-3">
+                                <vp-filter-panel-field fieldName="propertyNumber"
+                                                       label="Suite/Apt #"
+                                                       [form]="searchForm" />
+                            </div>
+                            <div class="col-12">
+                                <vp-filter-panel-field fieldName="propertyZip"
+                                                       label="ZIP"
+                                                       [form]="searchForm" />
+                            </div>
+                        </div>
+                    </vp-section>
+                </div>
+
+                <div class="col-md-6 mt-3 mt-md-0">
+                    <vp-section header="Contact / mailing criteria">
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <vp-filter-panel-field fieldName="mailingCompanyName"
+                                                       label="Company name"
+                                                       [form]="searchForm" />
+                            </div>
+                            <div class="col-12 mb-3">
+                                <vp-filter-panel-field fieldName="mailingContactName"
+                                                       label="Contact name"
+                                                       [form]="searchForm" />
+                            </div>
+                            <div class="col-4 mb-3">
+                                <vp-filter-panel-field fieldName="mailingStreetNumber"
+                                                       label="Street #"
+                                                       [form]="searchForm" />
+                            </div>
+                            <div class="col-5 mb-3">
+                                <vp-filter-panel-field fieldName="mailingStreetName"
+                                                       label="Street name"
+                                                       [form]="searchForm" />
+                            </div>
+                            <div class="col-3 mb-3">
+                                <vp-filter-panel-field fieldName="mailingNumber"
+                                                       label="Suite/Apt #"
+                                                       [form]="searchForm" />
+                            </div>
+                            <div class="col-12">
+                                <vp-filter-panel-field fieldName="mailingZip"
+                                                       label="ZIP"
+                                                       [form]="searchForm" />
+                            </div>
+                        </div>
+                    </vp-section>
+                </div>
+            </div>
+
+        </vp-filter-panel>
+
+        <div class="mt-3">
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>
+                    Search
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+<!-- Cell Templates (must be outside the hidden div to be available with ViewChild static:true) -->
+<ng-template #iconsCell let-inspection="rowData">
+    <div class="d-flex gap-1">
+        <vp-status-icon *ngIf="inspection.inspectionResult === FogInspectionResult.Passed"
+                        imageSrc="/images/icons/bstatus-green-on.png"
+                        text="Passed"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="inspection.inspectionResult === FogInspectionResult.Failed"
+                        imageSrc="/images/icons/bstatus-red-on.png"
+                        text="Failed"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="inspection.transactionId"
+                        imageSrc="/images/icons/bstatus-orange-on.png"
+                        text="Paid"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!inspection.transactionId"
+                        imageSrc="/images/icons/bstatus-orange-off.png"
+                        text="Unpaid"
+                        [showText]="false" />
+        <i *ngIf="inspection.propertyType === 0" class="fa-solid fa-house text-primary"></i>
+        <i *ngIf="inspection.propertyType === 1" class="fa-solid fa-building text-danger"></i>
+    </div>
+</ng-template>
+
+<ng-template #generatorCell let-inspection="rowData">
+    <div>
+        {{inspection.propertyBusinessName}}
+    </div>
+    <div>
+        <div>{{inspection.propertyStreetNumber}} {{inspection.propertyStreetName}} {{inspection.propertyNumber}} {{inspection.propertyCity}}</div>
+    </div>
+</ng-template>
+
+<ng-template #interceptorCell let-inspection="rowData">
+    <div>{{inspection.interceptorType}}<span *ngIf="inspection.interceptorType === 'Other'"> - {{inspection.interceptorOtherDescription}}</span></div>
+    <div *ngIf="inspection.interceptorCapacity">{{inspection.interceptorCapacity}} Gallons</div>
+    <div *ngIf="inspection.interceptorLocationDescription">{{inspection.interceptorLocationDescription}}</div>
+</ng-template>
+
+<ng-template #inspectorCell let-inspection="rowData">
+    <div>{{inspection.inspectorCompanyName}}</div>
+    <div>{{inspection.inspectorContactName}}</div>
+</ng-template>
+
+<ng-template #resultCell let-inspection="rowData">
+    <span *ngIf="inspection.inspectionResult === FogInspectionResult.Passed"
+          class="badge bg-success">Passed</span>
+    <span *ngIf="inspection.inspectionResult === FogInspectionResult.Failed"
+          class="badge bg-danger">Failed</span>
+</ng-template>
+
+<div *ngIf="showResults">
+    <div class="d-flex justify-content-end mb-3">
+        <button type="button"
+                class="btn btn-primary vp-section-button"
+                (click)="showResults = false;">
+            Search Again
+        </button>
+    </div>
+
+    <vp-section header="FOG inspection search results">
+        <div class="container mb-3">
+            <div class="row gap-2 justify-content-center mb-3">
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Passed" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Failed" />
+                </div>
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-orange-on.png" text="Paid" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-orange-off.png" text="Unpaid" />
+                </div>
+                <div class="col-auto mb-2">
+                    <vp-status-icon iconClass="fa-solid fa-house text-primary" text="Residential" />
+                    <vp-status-icon iconClass="fa-solid fa-building text-danger" text="Commercial" />
+                </div>
+            </div>
+        </div>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getInspections()"
+                  [(query)]="table.query"
+                  (queryChange)="getInspections()"
+                  (queryReset)="getInspections()"
+                  [freeTextSearch]="table.freeTextSearch" />
+    </vp-section>
+</div>

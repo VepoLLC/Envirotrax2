@@ -1,0 +1,38 @@
+.vp-color-option {
+    border: 1px solid black;
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+}
+
+.vp-color-option.vp-red {
+    background-color: #ff0000;
+}
+
+.vp-color-option.vp-orange {
+    background-color: #ff8000;
+}
+
+.vp-color-option.vp-yellow {
+    background-color: #ffff00;
+}
+
+.vp-color-option.vp-green {
+    background-color: #00ff00;
+}
+
+.vp-color-option.vp-teal {
+    background-color: #00ffff;
+}
+
+.vp-color-option.vp-blue {
+    background-color: #0000ff;
+}
+
+.vp-color-option.vp-purple {
+    background-color: #8000ff;
+}
+
+.vp-color-option.vp-pink {
+    background-color: #ff00ff;
+}

@@ -1,5 +1,8 @@
 
+using System.Linq.Expressions;
 using AutoMapper;
+using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
@@ -36,33 +39,22 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         return GetAsync(_authService.UserId, cancellationToken);
     }
 
-    public Task<ProfessionalUserDto> UpdateMyDataAsync(ProfessionalUserDto user)
+    public async Task<ProfessionalUserDto?> UpdateMyDataAsync(ProfessionalUserDto user)
     {
         user.Id = _authService.UserId;
-        return UpdateAsync(user);
+
+        var model = MapToModel(user);
+        var updated = await _professionalUserRepository.UpdateNonSensitiveDataAsync(model!);
+
+        return MapToDto(updated);
     }
 
     public override async Task<ProfessionalUserDto> AddAsync(ProfessionalUserDto dto)
     {
-        var professional = await _professionalService.GetLoggedInProfessionalAsync() ?? throw new InvalidOperationException("User is not logged in to a registered professional.");
+        var professional = await _professionalService.GetLoggedInProfessionalAsync()
+            ?? throw new InvalidOperationException("User is not logged in to a registered professional.");
 
-        var invitation = new UserInvitationDto
-        {
-            EmailAddress = dto.EmailAddress,
-            InvitedByCompany = professional.Name
-        };
-
-        var addedInvitation = await _authApiClient.PostAsync<UserInvitationDto, UserInvitationDto>("/api/users/invitations", new(_authService.UserId)
-        {
-            Data = invitation
-        });
-
-        if (addedInvitation == null)
-        {
-            throw new InvalidOperationException("Adding user failed.");
-        }
-
-        dto.Id = addedInvitation.UserId;
+        dto.Id = await SendInvitationAsync(dto.EmailAddress, professional.Name);
 
         return await base.AddAsync(dto);
     }
@@ -73,15 +65,54 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         return await base.DeleteAsync(id);
     }
 
+    public async Task<ProfessionalUserDto> AddForProfessionalAsync(int professionalId, ProfessionalUserDto dto)
+    {
+        var professional = await _professionalService.GetAsync(professionalId, CancellationToken.None)
+            ?? throw new InvalidOperationException("Professional not found.");
+
+        dto.Id = await SendInvitationAsync(dto.EmailAddress, professional.Name);
+
+        var model = MapToModel(dto)!;
+        model.ProfessionalId = professionalId;
+
+        var added = await _professionalUserRepository.AddAsync(model);
+        return MapToDto(added)!;
+    }
+
+    public async Task<ProfessionalUserDto?> UpdateSubAccountAsync(int professionalId, int userId, string? contactName, string? jobTitle)
+    {
+        var updated = await _professionalUserRepository.UpdateSubAccountAsync(professionalId, userId, contactName, jobTitle);
+        return MapToDto(updated);
+    }
+
+    public async Task<IPagedData<ProfessionalUserDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null)
+    {
+        query.Sort = query.ConvertSortProperties<ProfessionalUser, ProfessionalUserDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<ProfessionalUser, ProfessionalUserDto>(Mapper);
+
+        var items = await _professionalUserRepository.GetAllByProfessionalAsync(professionalId, pageInfo, query, cancellationToken, roleFilter);
+
+        return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
+    }
+
     public async Task<ProfessionalUserDto?> ResendInvitationAsync(int id)
     {
-        var user = await _professionalUserRepository.GetAsync(id, CancellationToken.None) ?? throw new InvalidOperationException();
-        var professional = await _professionalService.GetLoggedInProfessionalAsync() ?? throw new InvalidOperationException("User is not logged in to a registered professional.");
+        var user = await _professionalUserRepository.GetAsync(id, CancellationToken.None)
+            ?? throw new InvalidOperationException();
+        var professional = await _professionalService.GetLoggedInProfessionalAsync()
+            ?? throw new InvalidOperationException("User is not logged in to a registered professional.");
 
+        await SendInvitationAsync(user.User!.Email!, professional.Name);
+
+        return MapToDto(user);
+    }
+
+    private async Task<int> SendInvitationAsync(string emailAddress, string companyName)
+    {
         var invitation = new UserInvitationDto
         {
-            EmailAddress = user.User!.Email!,
-            InvitedByCompany = professional.Name
+            EmailAddress = emailAddress,
+            InvitedByCompany = companyName
         };
 
         var addedInvitation = await _authApiClient.PostAsync<UserInvitationDto, UserInvitationDto>("/api/users/invitations", new(_authService.UserId)
@@ -89,12 +120,7 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
             Data = invitation
         });
 
-        if (addedInvitation == null)
-        {
-            throw new InvalidOperationException("Resending invitation failed.");
-        }
-
-        return MapToDto(user);
+        return addedInvitation?.UserId ?? throw new InvalidOperationException("Adding user failed.");
     }
 }
 

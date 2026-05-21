@@ -2,12 +2,12 @@
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers.Csi
 {
     [Route("api/csi/inspectors")]
+    [HasFeature(FeatureType.CsiInspection)]
     [PermissionResource(PermissionType.CsiInspectors)]
     public class CsiInspectorController : WaterSupplierCrudController<ProfessionalDto>
     {
@@ -17,3 +17,4 @@ namespace Envirotrax.App.Server.Controllers.Csi
         }
     }
 }
+

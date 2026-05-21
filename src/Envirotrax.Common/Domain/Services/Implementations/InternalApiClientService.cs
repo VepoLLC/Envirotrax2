@@ -102,7 +102,7 @@ public class InternalApiClientService<TOptions> : IInternalApiClientService<TOpt
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new InvalidOperationException(content);
+            throw new InvalidOperationException($"API call response failed with {response.StatusCode} code. Content: {content}");
         }
 
         if (!string.IsNullOrWhiteSpace(content))

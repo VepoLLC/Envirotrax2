@@ -1,9 +1,9 @@
-import { Component, signal, OnInit } from '@angular/core';
+﻿import { Component, signal, OnInit } from '@angular/core';
 import { AuthService } from './shared/services/auth/auth.service';
 import { WaterSupplierService } from './shared/services/water-suppliers/water-supplier.service';
 import { ProfesisonalService } from './shared/services/professionals/professional.service';
 import { createPopper, flip, preventOverflow } from '@popperjs/core';
-import { FeatureType } from './shared/models/feature-tyype';
+import { FeatureType } from './shared/models/feature-type';
 import { PermissionAction, PermissionType } from './shared/models/permission-type';
 import { ROLE_DEFINITIONS } from './shared/models/role-definitions';
 
@@ -110,8 +110,8 @@ export class App implements OnInit {
           {
             title: 'GIS Area Management',
             iconCss: 'fa-solid fa-globe',
-            routerLink: ['/'],
-            hasPermission: true,
+            routerLink: ['admin/gis-areas'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Settings),
             hasFeature: true
           }
         ]
@@ -204,7 +204,7 @@ export class App implements OnInit {
           {
             title: 'Backflow Test Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['/'],
+            routerLink: ['backflow/tests'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowTests),
             hasFeature: true
           },
@@ -223,7 +223,7 @@ export class App implements OnInit {
           {
             title: 'BPAT Management',
             iconCss: 'fa-regular fa-user',
-            routerLink: ['/'],
+            routerLink: ['backflow/testers'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowTesters),
             hasFeature: true
           },
@@ -304,7 +304,7 @@ export class App implements OnInit {
           {
             title: 'Inspection Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['/'],
+            routerLink: ['/fog/inspections'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogInspections),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
           },
@@ -323,7 +323,7 @@ export class App implements OnInit {
           {
             title: 'Inspector Management',
             iconCss: 'fa-regular fa-user',
-            routerLink: ['/'],
+            routerLink: ['/fog/inspectors'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogInspectors),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
           },
@@ -411,7 +411,7 @@ export class App implements OnInit {
       {
         title: 'Account Overview',
         iconCss: 'fa-regular fa-house',
-        routerLink: ['/'],
+        routerLink: ['/professionals/dashboard'],
         hasFeature: true,
         hasPermission: true
       },
@@ -443,18 +443,18 @@ export class App implements OnInit {
             hasFeature: true
           },
           {
-            title: 'Notification Management',
-            iconCss: 'fa-regular fa-bell',
-            routerLink: ['/'],
+            title: 'Licenses & Insurance Policies',
+            iconCss: 'fa-solid fa-shield-halved',
+            routerLink: ['professionals/insurances'],
             hasPermission: isAdmin,
             hasFeature: true
           },
           {
-            title: 'GIS Area Management',
-            iconCss: 'fa-solid fa-globe',
-            routerLink: ['/'],
-            hasPermission: isAdmin,
-            hasFeature: true
+            title: 'Gauge Management',
+            iconCss: 'fa-solid fa-gauge-simple',
+            routerLink: ['professionals/backflow/gauges'],
+            hasPermission: isBackflowTester,
+            hasFeature: await this._authService.hasAnyFeatures(FeatureType.BackflowTesting)
           }
         ]
       },
@@ -474,57 +474,14 @@ export class App implements OnInit {
           {
             title: 'Inspection Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['csi'],
+            routerLink: ['professionals/csi/inspections'],
             hasPermission: isCsiInspector,
             hasFeature: true
           },
           {
-            type: 'separator',
-            hasPermission: isCsiInspector,
-            hasFeature: true
-          },
-          {
-            title: 'Inspector Management',
-            iconCss: 'fa-regular fa-user',
-            routerLink: ['/'],
-            hasPermission: isAdmin && isCsiInspector,
-            hasFeature: true
-          },
-          {
-            title: 'Letter History',
-            iconCss: 'fa-regular fa-envelope',
-            routerLink: ['/'],
-            hasPermission: isCsiInspector,
-            hasFeature: true
-          },
-          {
-            type: 'separator',
-            hasPermission: isCsiInspector,
-            hasFeature: true
-          },
-          {
-            title: 'System Reports',
-            iconCss: 'fa-regular fa-chart-simple-horizontal',
-            routerLink: ['/'],
-            hasPermission: isCsiInspector,
-            hasFeature: true
-          },
-          {
-            type: 'separator',
-            hasPermission: isCsiInspector,
-            hasFeature: false
-          },
-          {
-            title: 'Compliance Management',
-            iconCss: 'fa-solid fa-list-check',
-            routerLink: ['/'],
-            hasPermission: isCsiInspector,
-            hasFeature: true
-          },
-          {
-            title: 'Property Log Management',
-            iconCss: 'fa-light fa-building-memo',
-            routerLink: ['/'],
+            title: 'Submit CSI',
+            iconCss: 'fa-regular fa-file-plus',
+            routerLink: ['professionals/csi/inspections/create'],
             hasPermission: isCsiInspector,
             hasFeature: true
           }
@@ -546,84 +503,13 @@ export class App implements OnInit {
           {
             title: 'Backflow Test Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['/'],
+            routerLink: ['professionals/backflow/tests'],
             hasPermission: isBackflowTester,
             hasFeature: true
           },
           {
-            title: 'Out of Service Requests',
-            iconCss: 'fa-regular fa-file-minus',
-            routerLink: ['/'],
-            hasPermission: isBackflowTester,
-            hasFeature: true
-          },
-          {
-            type: 'separator',
-            hasPermission: isBackflowTester,
-            hasFeature: true
-          },
-          {
-            title: 'BPAT Management',
-            iconCss: 'fa-regular fa-user',
-            routerLink: ['/'],
-            hasPermission: isAdmin && isBackflowTester,
-            hasFeature: true
-          },
-          {
-            title: 'Letter History',
-            iconCss: 'fa-regular fa-envelope',
-            routerLink: ['/'],
-            hasPermission: isBackflowTester,
-            hasFeature: true
-          },
-          {
-            type: 'separator',
-            hasPermission: isBackflowTester,
-            hasFeature: true
-          },
-          {
-            title: 'Backflow Report',
-            iconCss: 'fa-regular fa-chart-simple-horizontal',
-            routerLink: ['/'],
-            hasPermission: isBackflowTester,
-            hasFeature: true
-          },
-          {
-            title: 'Current Compliance Report',
-            iconCss: 'fa-regular fa-chart-pie-simple',
-            routerLink: ['/'],
-            hasPermission: isBackflowTester,
-            hasFeature: true
-          },
-          {
-            title: 'Compliance History Report',
-            iconCss: 'fa-solid fa-chart-line-up',
-            routerLink: ['/'],
-            hasPermission: isBackflowTester,
-            hasFeature: true
-          },
-          {
-            title: 'New/Removed Assemblies Report',
-            iconCss: 'fa-solid fa-chart-column',
-            routerLink: ['/'],
-            hasPermission: isBackflowTester,
-            hasFeature: true
-          },
-          {
-            type: 'separator',
-            hasPermission: isBackflowTester,
-            hasFeature: true
-          },
-          {
-            title: 'Compliance Management',
-            iconCss: 'fa-solid fa-list-check',
-            routerLink: ['/'],
-            hasPermission: isBackflowTester,
-            hasFeature: true
-          },
-          {
-            title: 'Property Log Management',
-            iconCss: 'fa-light fa-building-memo',
+            title: 'Submit Backflow Test',
+            iconCss: 'fa-regular fa-file-plus',
             routerLink: ['/'],
             hasPermission: isBackflowTester,
             hasFeature: true
@@ -646,7 +532,7 @@ export class App implements OnInit {
           {
             title: 'Inspection Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['/'],
+            routerLink: ['/fog/inspections'],
             hasPermission: isFogInspector,
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
           },
@@ -665,7 +551,7 @@ export class App implements OnInit {
           {
             title: 'Inspector Management',
             iconCss: 'fa-regular fa-user',
-            routerLink: ['/'],
+            routerLink: ['/fog/inspectors'],
             hasPermission: isAdmin && isFogInspector,
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
           },

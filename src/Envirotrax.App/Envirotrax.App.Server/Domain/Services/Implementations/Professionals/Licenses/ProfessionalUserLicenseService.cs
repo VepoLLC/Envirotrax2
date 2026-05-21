@@ -37,13 +37,39 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
             {
                 dto.ExpirationType = ExpirationType.Expired;
             }
-            else if (localTime.AddDays(-30) <= dto.ExpirationDate)
+            else if (localTime.AddDays(30) >= dto.ExpirationDate)
             {
                 dto.ExpirationType = ExpirationType.AboutToExpire;
             }
         }
 
         return dto;
+    }
+
+    public async Task<IPagedData<ProfessionalUserLicenseDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<ProfessionalUserLicense, ProfessionalUserLicenseDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<ProfessionalUserLicense, ProfessionalUserLicenseDto>(Mapper);
+
+        var items = await _licenseRepository.GetAllByProfessionalAsync(professionalId, pageInfo, query, cancellationToken);
+
+        return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
+    }
+
+    public async Task<ProfessionalUserLicenseDto> AddForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto)
+    {
+        var model = MapToModel(dto)!;
+        model.ProfessionalId = professionalId;
+        var added = await Repository.AddAsync(model);
+        return MapToDto(added)!;
+    }
+
+    public async Task<ProfessionalUserLicenseDto> UpdateForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto)
+    {
+        var model = MapToModel(dto)!;
+        model.ProfessionalId = professionalId;
+        var updated = await Repository.UpdateAsync(model);
+        return MapToDto(updated)!;
     }
 
     public async Task<IPagedData<ProfessionalUserLicenseDto>> GetAllAsync(int userId, PageInfo pageInfo, Query query)

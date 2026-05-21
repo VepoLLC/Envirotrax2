@@ -106,7 +106,7 @@ public static class PermissionSeedData
             SortOrder = 9,
             CanView = true,
             CanCreate = false,
-            CanEdit = false,
+            CanEdit = true,
             CanDelete = false
         },
         new()

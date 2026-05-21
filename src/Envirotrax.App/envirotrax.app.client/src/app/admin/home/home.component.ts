@@ -23,6 +23,8 @@ export class HomeComponent implements OnInit {
     }
 
     private async createMenuItems(): Promise<MenuItem[]> {
+        const canViewSettings = await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Settings)
+
         return [
             {
                 title: 'Water Suppliers',
@@ -30,20 +32,6 @@ export class HomeComponent implements OnInit {
                 routerLink: ['water-suppliers'],
                 hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.WaterSuppliers),
                 description: 'Manage all water suppliers, their details, and configurations.'
-            },
-            {
-                title: 'General Settings & Fees',
-                iconCss: 'fa-solid fa-gear',
-                routerLink: ['settings'],
-                hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Settings),
-                description: 'Manage program settings and submissions fees.'
-            },
-            {
-                title: 'CSI Settings',
-                iconCss: 'fa-solid fa-magnifying-glass-chart',
-                routerLink: ['settings', 'csi-settings'],
-                hasPermission: true,
-                description: 'Configure CSI inspection program settings, automated letter notification schedules, and letter header appearance.'
             },
             {
                 title: 'Users',
@@ -59,6 +47,48 @@ export class HomeComponent implements OnInit {
                 hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Roles),
                 description: 'Create and assign roles to control permissions and access.'
             },
+            {
+                title: 'General Settings & Fees',
+                iconCss: 'fa-solid fa-gear',
+                routerLink: ['settings'],
+                hasPermission: canViewSettings,
+                description: 'Manage program settings and submissions fees.'
+            },
+            {
+                title: 'CSI Settings',
+                iconCss: 'fa-solid fa-magnifying-glass-chart',
+                routerLink: ['settings', 'csi-settings'],
+                hasPermission: true,
+                description: 'Configure CSI inspection program settings, automated letter notification schedules, and letter header appearance.'
+            },
+            {
+                title: 'Backflow Testing Settings',
+                iconCss: 'fa-solid fa-magnifying-glass-waveform',
+                routerLink: ['settings', 'backflow-testing-settings'],
+                hasPermission: true,
+                description: 'Configure backflow testing program settings, automated letter notification schedules, and letter header appearance.'
+            },
+            {
+                title: 'CSI Letter Message Setup',
+                iconCss: 'fa-solid fa-envelope-open-text',
+                routerLink: ['settings', 'csi-letter-message-settings'],
+                hasPermission: true,
+                description: 'Configure CSI letter message content including fonts, titles, and messages for each letter type.'
+            },
+            {
+                title: 'Backflow Letter Message Setup',
+                iconCss: 'fa-solid fa-envelope-open-text',
+                routerLink: ['settings', 'backflow-letter-message-settings'],
+                hasPermission: true,
+                description: 'Configure backflow letter message content including fonts, titles, and messages for each letter type.'
+            },
+            {
+                title: 'GIS Area Management',
+                iconCss: 'fa-solid fa-globe',
+                routerLink: ['gis-areas'],
+                hasPermission: canViewSettings,
+                description: 'Manage GIS areas and assign them to sites.'
+            }
         ];
     }
 

@@ -1,0 +1,6 @@
+@Envirotrax.TaskRunner_HostAddress = http://localhost:5231
+
+GET {{Envirotrax.TaskRunner_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

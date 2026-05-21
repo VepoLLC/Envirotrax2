@@ -44,7 +44,7 @@ public class AuthService : TenantProviderService, IAuthService
             SetProfessionalClaims(principal, userAccess);
         }
 
-        var features = await _featureRepository.GetAllAsync(userAccess.WaterSupplierIdRequested, userAccess.ProfessionalIdRequested);
+        var features = await _featureRepository.GetAllAsync(userAccess.WaterSupplierId, userAccess.WaterSupplierIdRequested, userAccess.ProfessionalIdRequested);
 
         AddClaim(principal, "fts", string.Join(',', features.Select(f => (int)f)));
     }

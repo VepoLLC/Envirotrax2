@@ -43,7 +43,14 @@ export class EditSiteComponent implements OnInit {
         facilityType: false,
         location: false,
         mailing: false,
+        gisData: false,
     };
+
+    public gisStatusOptions: InputOption[] = [
+        { id: -1, text: 'Error' },
+        { id: 0, text: 'Not Set' },
+        { id: 1, text: 'Geocoded' },
+    ];
 
     constructor(
         private readonly _siteService: SiteService,
@@ -89,16 +96,11 @@ export class EditSiteComponent implements OnInit {
         { id: FacilityType.Other, text: "Other" },
     ];
 
-    public mailingStateChanged(stateId: number): void {
-        this.site.mailingStateId = stateId;
-    }
-
     public copyFromPropertyAddress(): void {
         this.site.mailingStreetNumber = this.site.streetNumber;
         this.site.mailingStreetName = this.site.streetName;
-        this.site.propertyNumber = this.site.propertyNumber;
         this.site.mailingCity = this.site.city;
-        this.site.mailingStateId = this.site.stateId;
+        this.site.mailingState = this.site.state ? { ...this.site.state } : undefined;
         this.site.mailingZipCode = this.site.zipCode;
         this.site.mailingPhoneNumber = this.site.fogGeneratorPhoneNumber;
         this.site.mailingEmailAddress = this.site.fogGeneratorEmailAddress;
@@ -242,7 +244,7 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.streetName = this.site.streetName;
                     this.currentSite.propertyNumber = this.site.propertyNumber;
                     this.currentSite.city = this.site.city;
-                    this.currentSite.stateId = this.site.stateId;
+                    this.currentSite.state = this.site.state;
                     this.currentSite.zipCode = this.site.zipCode;
                     this.currentSite.fogGeneratorPhoneNumber = this.site.fogGeneratorPhoneNumber;
                     this.currentSite.fogGeneratorEmailAddress = this.site.fogGeneratorEmailAddress;
@@ -275,9 +277,9 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.mailingContactName = this.site.mailingContactName;
                     this.currentSite.mailingStreetNumber = this.site.mailingStreetNumber;
                     this.currentSite.mailingStreetName = this.site.mailingStreetName;
-                    this.currentSite.propertyNumber = this.site.propertyNumber;
+                    this.currentSite.mailingNumber = this.site.mailingNumber;
                     this.currentSite.mailingCity = this.site.mailingCity;
-                    this.currentSite.mailingStateId = this.site.mailingStateId;
+                    this.currentSite.mailingState = this.site.mailingState;
                     this.currentSite.mailingZipCode = this.site.mailingZipCode;
                     this.currentSite.mailingPhoneNumber = this.site.mailingPhoneNumber;
                     this.currentSite.mailingEmailAddress = this.site.mailingEmailAddress;
@@ -297,13 +299,40 @@ export class EditSiteComponent implements OnInit {
         }
     }
 
+    public async updateGisData(form: NgForm): Promise<void> {
+        if (form.valid) {
+            try {
+                this.sectionLoading.gisData = true;
+                this.validationErrors = [];
+
+                if (this.site.id) {
+                    await this._siteService.updateGisData(this.site.id, {
+                        gisLatitude: this.site.gisLatitude,
+                        gisLongitude: this.site.gisLongitude,
+                        gisStatus: this.site.gisStatus
+                    });
+
+                    this._toastService.successfullySaved('GIS Data');
+                }
+            } catch (e) {
+                if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
+                    throw e;
+                }
+
+                this._toastService.failedToSave('GIS Data');
+            } finally {
+                this.sectionLoading.gisData = false;
+            }
+        }
+    }
+
     private async getSite(id: number): Promise<void> {
         try {
-
             this.sectionLoading.facilityType = true;
             this.sectionLoading.location = true;
             this.sectionLoading.mailing = true;
             this.sectionLoading.siteSettings = true;
+            this.sectionLoading.gisData = true;
 
             const apiSite = await this._siteService.get(id);
 
@@ -316,6 +345,7 @@ export class EditSiteComponent implements OnInit {
             this.sectionLoading.location = false;
             this.sectionLoading.mailing = false;
             this.sectionLoading.siteSettings = false;
+            this.sectionLoading.gisData = false;
         }
     }
 

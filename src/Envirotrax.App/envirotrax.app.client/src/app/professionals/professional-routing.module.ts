@@ -1,13 +1,33 @@
-import { NgModule } from "@angular/core";
+﻿import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
 import { WaterSuppliersComponent } from "./water-supppliers/water-suppliers.component";
 import { ProfessionalUserListComponent } from "./users/list/professional-user-list.component";
 import { EditProfessionalUserComponent } from "./users/edit/edit-professional-user.component";
 import { SiteListComponent } from "./sites/site-list.component";
+import { SiteDetailsComponent } from "./sites/details/site-details.component";
 import { RoleGuard } from "../shared/guards/role.guard";
 import { ROLE_DEFINITIONS } from "../shared/models/role-definitions";
+import { InsuranceListComponent } from "./insurances/list/insurance-list.component";
+import { LicenseListComponent } from "./licenses/license-list.component";
+import { FeatureGuard } from "../shared/guards/feature.guard";
+import { FeatureType } from "../shared/models/feature-type";
+import { DashboardComponent } from "./dashboard/dashboard.component";
 
 const routes: Routes = [
+    {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+    },
+    {
+        path: 'dashboard',
+        title: 'Dashboard',
+        component: DashboardComponent,
+        canActivate: [RoleGuard],
+        data: {
+            roles: [ROLE_DEFINITIONS.PROFESSIONAL]
+        }
+    },
     {
         path: 'water-suppliers',
         title: 'Water Supplier Registration',
@@ -42,6 +62,51 @@ const routes: Routes = [
         canActivate: [RoleGuard],
         data: {
             roles: [ROLE_DEFINITIONS.PROFESSIONAL]
+        }
+    },
+    {
+        path: 'sites/:id',
+        title: 'Property Record',
+        component: SiteDetailsComponent,
+        canActivate: [RoleGuard],
+        data: {
+            roles: [ROLE_DEFINITIONS.PROFESSIONAL]
+        }
+    },
+    {
+        path: 'insurances',
+        title: 'Insurances',
+        component: InsuranceListComponent,
+        canActivate: [RoleGuard],
+        data: {
+            roles: [ROLE_DEFINITIONS.PROFESSIONALS.ADMIN]
+        }
+    },
+    {
+        path: 'licenses',
+        title: 'Licenses',
+        component: LicenseListComponent,
+        canActivate: [RoleGuard],
+        data: {
+            roles: [ROLE_DEFINITIONS.PROFESSIONALS.ADMIN]
+        }
+    },
+    {
+        path: 'csi',
+        loadChildren: () => import('./csi/professionals-csi.module').then(m => m.ProfessionalsCsiModule),
+        canActivate: [FeatureGuard, RoleGuard],
+        data: {
+            features: [FeatureType.CsiInspection],
+            roles: [ROLE_DEFINITIONS.PROFESSIONAL, ROLE_DEFINITIONS.PROFESSIONALS.CSI_INSPECTOR]
+        }
+    },
+    {
+        path: 'backflow',
+        loadChildren: () => import('./backflow/professionals-backflow.module').then(m => m.ProfessionalsBackflowModule),
+        canActivate: [FeatureGuard, RoleGuard],
+        data: {
+            features: [FeatureType.BackflowTesting],
+            roles: [ROLE_DEFINITIONS.PROFESSIONAL, ROLE_DEFINITIONS.PROFESSIONALS.BACKFLOW_TESTER]
         }
     }
 ];

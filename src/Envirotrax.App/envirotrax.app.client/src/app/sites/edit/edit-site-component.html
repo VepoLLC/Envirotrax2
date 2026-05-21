@@ -2,7 +2,7 @@
     <form #form="ngForm">
 
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-12">
                 <div class="h-100">
                     <vp-section header="Site Settings">
                         <div class="d-flex flex-column justify-content-between h-100" dp-spinner-parent>
@@ -146,6 +146,9 @@
                     </vp-section>
                 </div>
             </div>
+        </div>
+
+        <div class="row mt-3">
             <div class="col-md-6">
                 <div class="h-100">
                     <vp-section header="Facility Type">
@@ -260,6 +263,79 @@
                     </vp-section>
                 </div>
             </div>
+
+            <div class="col-md-6">
+                <div class="h-100">
+                    <vp-section header="GIS Data">
+                        <div class="d-flex flex-column justify-content-between h-100" dp-spinner-parent>
+                            <dp-loading-spinner *ngIf="sectionLoading.gisData"></dp-loading-spinner>
+
+                            <div class="row mb-2">
+                                <div class="col-md-6 mb-3">
+                                    <vp-input [(ngModel)]="site.gisLatitude"
+                                              name="gisLatitude"
+                                              label="Latitude"
+                                              type="number"
+                                              [form]="form">
+                                    </vp-input>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <vp-input [(ngModel)]="site.gisLongitude"
+                                              name="gisLongitude"
+                                              label="Longitude"
+                                              type="number"
+                                              [form]="form">
+                                    </vp-input>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <vp-input name="gisStatus"
+                                              label="GIS Status"
+                                              type="select"
+                                              [(ngModel)]="site.gisStatus"
+                                              [options]="gisStatusOptions"
+                                              [form]="form">
+                                    </vp-input>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">GIS Date</label>
+                                    <div class="form-control-plaintext">{{ site.gisDate | date:'M/d/yyyy' }}</div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <vp-map *ngIf="site.gisLatitude != null && site.gisLongitude != null"
+                                        [latitude]="site.gisLatitude"
+                                        [longitude]="site.gisLongitude"
+                                        [zoom]="15"
+                                        [showMarker]="true"
+                                        height="400px">
+                                </vp-map>
+                                <div *ngIf="site.gisLatitude == null || site.gisLongitude == null"
+                                     class="d-flex align-items-center justify-content-center text-muted py-5">
+                                    <span>No location available</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <vp-validation-summary [form]="form"
+                                                       [validationErrors]="validationErrors">
+                                </vp-validation-summary>
+
+                                <div class="d-flex justify-content-end mt-1">
+                                    <button type="button"
+                                            class="btn btn-primary vp-section-button"
+                                            (click)="updateGisData(form)">
+                                        Update
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </vp-section>
+                </div>
+            </div>
         </div>
 
         <div class="row mt-3">
@@ -343,7 +419,8 @@
                                     <vp-input name="stateId"
                                               label="State"
                                               type="select"
-                                              [(ngModel)]="site.stateId"
+                                              [ngModel]="site.state?.id"
+                                              (ngModelChange)="site.state = $event ? { id: $event } : undefined"
                                               [options]="stateOptions"
                                               [form]="form">
                                     </vp-input>
@@ -449,7 +526,7 @@
                                         <div class="mb-3">
                                             <vp-input [(ngModel)]="site.mailingNumber"
                                                       name="mailingNumber"
-                                                      label="Suite/Apt #"
+                                                      label="Suite / Apt #"
                                                       [form]="form">
                                             </vp-input>
                                         </div>
@@ -464,13 +541,16 @@
                                     </vp-input>
                                 </div>
 
-                                <vp-input name="mailingStateId"
-                                          label="State"
-                                          type="select"
-                                          [(ngModel)]="site.mailingStateId"
-                                          [options]="stateOptions"
-                                          [form]="form">
-                                </vp-input>
+                                <div class="mb-3">
+                                    <vp-input name="mailingStateId"
+                                              label="State"
+                                              type="select"
+                                              [ngModel]="site.mailingState?.id"
+                                              (ngModelChange)="site.mailingState = $event ? { id: $event } : undefined"
+                                              [options]="stateOptions"
+                                              [form]="form">
+                                    </vp-input>
+                                </div>
 
                                 <div class="mb-3">
                                     <vp-input [(ngModel)]="site.mailingZipCode"

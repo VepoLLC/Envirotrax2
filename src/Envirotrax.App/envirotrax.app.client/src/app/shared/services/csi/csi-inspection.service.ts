@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { lastValueFrom } from "rxjs";
 import { UrlResolverService } from "../helpers/url-resolver.service";
 import { QueryHelperService } from "../helpers/query-helper.service";
@@ -59,5 +59,34 @@ export class CsiInspectionService {
         return lastValueFrom(
             this._http.delete<CsiInspection>(url)
         );
+    }
+
+    public getProfessionalInspection(id: number): Promise<CsiInspection> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${id}`);
+        return lastValueFrom(this._http.get<CsiInspection>(url));
+    }
+
+    public submit(inspection: CsiInspection): Promise<CsiInspection> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/csi/inspections/submit');
+        return lastValueFrom(this._http.post<CsiInspection>(url, inspection));
+    }
+
+    public updateApproval(id: number, request: { disapproved: boolean; disapprovedReason?: string | null }): Promise<CsiInspection> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${id}/approval`);
+        return lastValueFrom(this._http.put<CsiInspection>(url, request));
+    }
+
+    public getPdf(id: number): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${id}/pdf`);
+        return lastValueFrom(
+            this._http.get(url, { responseType: 'blob' })
+        );
+    }
+
+    public getProfessionalInspections(pageInfo: PageInfo, query: Query, latestOnly: boolean): Promise<PagedData<CsiInspection>> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/csi/inspections');
+        let params: HttpParams = this._queryHelper.buildQuery(pageInfo, query);
+        params = params.append('latestOnly', String(latestOnly));
+        return lastValueFrom(this._http.get<PagedData<CsiInspection>>(url, { params }));
     }
 }

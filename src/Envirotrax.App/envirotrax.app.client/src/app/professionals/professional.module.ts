@@ -11,17 +11,29 @@ import { EditProfessionalUserComponent } from "./users/edit/edit-professional-us
 import { ProfessionalUserLicenseListComponent } from "./users/edit/licenses/list/professional-user-license-list.component";
 import { CreateEditLicenseComponent } from "./users/edit/licenses/create-edit/create-edit-license.component";
 import { SiteListComponent } from "./sites/site-list.component";
+import { SiteDetailsComponent } from "./sites/details/site-details.component";
+import { InsuranceListComponent } from "./insurances/list/insurance-list.component";
+import { EditInsuranceComponent } from "./insurances/edit/edit-insurance.component";
+import { LicenseHelpTextComponent } from "./users/edit/licenses/help-text/license-help-text.component";
+import { LicenseListComponent } from "./licenses/license-list.component";
+import { DashboardComponent } from "./dashboard/dashboard.component";
 
 @NgModule({
     declarations: [
+        DashboardComponent,
         WaterSuppliersComponent,
         WaterSupplierRegistrationComponent,
         ProfessionalUserListComponent,
         CreateProfessionalUserComponent,
         EditProfessionalUserComponent,
         ProfessionalUserLicenseListComponent,
+        LicenseHelpTextComponent,
         CreateEditLicenseComponent,
-        SiteListComponent
+        SiteListComponent,
+        SiteDetailsComponent,
+        InsuranceListComponent,
+        EditInsuranceComponent,
+        LicenseListComponent
     ],
     imports: [
         ProfessionalRoutingModule,

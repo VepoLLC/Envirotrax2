@@ -7,6 +7,8 @@ using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
+using Envirotrax.App.Server.Data.Models.Professionals;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Envirotrax.App.Server.Data.Models.Csi;
 
@@ -79,12 +81,11 @@ public class CsiInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser
     [StringLength(100)]
     public string? MailingEmailAddress { get; set; }
 
-    // Inspector fields
-    [StringLength(50)]
-    public string? MasterInspectorId { get; set; }
+    public int ProfessionalId { get; set; }
+    public Professional? Professional { get; set; }
 
-    [StringLength(50)]
-    public string? InspectorId { get; set; }
+    public int InspectorId { get; set; }
+    public ProfessionalUser? Inspector { get; set; }
 
     [StringLength(50)]
     public string? InspectorLicenseNumber { get; set; }
@@ -166,6 +167,7 @@ public class CsiInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser
     public bool AiIrrigationSystem2 { get; set; }
     public bool AiHasDomesticPremisesIsolation { get; set; }
     public bool AiRequiresDomesticPremisesIsolation { get; set; }
+    public bool InspectionResult { get; set; }
 
     public string? Comments { get; set; }
 
@@ -198,4 +200,20 @@ public class CsiInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser
     public int? DeletedById { get; set; }
     public AppUser? DeletedBy { get; set; }
     public DateTime? DeletedTime { get; set; }
+}
+
+public class CsiInspectionConfiguration : IEntityTypeConfiguration<CsiInspection>
+{
+    public void Configure(EntityTypeBuilder<CsiInspection> builder)
+    {
+        builder.HasOne(i=> i.Inspector)
+            .WithMany()
+            .HasForeignKey(i => new { i.ProfessionalId, i.InspectorId })
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(i => i.InspectionResult)
+            .HasComputedColumnSql(
+                "CASE WHEN [Compliance1] = 1 AND [Compliance2] = 1 AND [Compliance3] = 1 AND [Compliance4] = 1 AND [Compliance5] = 1 AND [Compliance6] = 1 THEN CAST(1 AS bit) ELSE CAST(0 AS bit) END",
+                stored: true);
+    }
 }

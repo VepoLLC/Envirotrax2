@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, TemplateRef, Type, ViewChild } from "@angular/core";
+import { Component, EventEmitter, input, Input, OnChanges, Output, SimpleChanges, TemplateRef, Type, ViewChild } from "@angular/core";
 import { ModalService } from "@developer-partners/ngx-modal-dialog";
 import { ColumnType, QueryColumn, QueryPropertyLocation, SpecialColumnType } from "../sorting-filtering/query-view-model";
 import { PageInfo } from "../../../models/page-info";
@@ -90,6 +90,9 @@ export class TableComponent implements OnChanges {
     @Input()
     public layoutName?: string;
 
+    @Input()
+    public showActionLabels: boolean = true;
+
     public queryColumns?: TableColumn<any>[];
     public searchId: string;
     public resetSearchId: string;
@@ -104,14 +107,14 @@ export class TableComponent implements OnChanges {
     }
 
     private canHaveAction(): boolean {
-        return this.canEdit || this.canDelete || this.customActions?.length > 0
+        return this.canEdit || this.canDelete || this.canViewDetails || this.customActions?.length > 0
     }
 
     private setActionsColumn(): void {
         const actionsColumn = this.columns.find(c => c.tag?.specialColumn == SpecialColumnType.ActionsColumn);
 
         if (this.canHaveAction() && !actionsColumn) {
-            this.columns.splice(0, 0, {
+            this.columns.push({
                 field: '',
                 caption: 'Actions',
                 type: ColumnType.other,
@@ -248,7 +251,7 @@ export class TableComponent implements OnChanges {
         if (this.freeTextSearch) {
             this.query.filter = this.query.filter!.filter(p => p.tag?.location != QueryPropertyLocation.SearchBar);
 
-            if (this.freeTextSearch.text) {
+            if (this.freeTextSearch.text && this.freeTextSearch.searchQuery.length > 0) {
                 const freeTextQueryProperty: QueryProperty = {
                     columnName: this.freeTextSearch.searchQuery.find(Boolean)?.field,
                     children: [],

@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { CanActivate, Router, UrlTree } from "@angular/router";
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from "@angular/router";
 import { AuthService } from "../services/auth/auth.service";
 
 @Injectable({
@@ -13,7 +13,7 @@ export class AuthGuard implements CanActivate {
 
     }
 
-    public async canActivate(): Promise<boolean | UrlTree> {
+    public async canActivate(_route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean | UrlTree> {
         if (await this._authService.isAuthenticated(false)) {
             const [supplierId, professionalId] = await Promise.all([
                 this._authService.getWaterSupplierId(),
@@ -28,6 +28,11 @@ export class AuthGuard implements CanActivate {
             // Let's navigate to profile page to collect the missing information
             if (!professionalId) {
                 return this._router.createUrlTree(['/profile']);
+            }
+
+            // Professional - redirect to dashboard unless already navigating to a professionals route
+            if (!state.url.startsWith('/professionals')) {
+                return this._router.createUrlTree(['/professionals/dashboard']);
             }
 
             return true;

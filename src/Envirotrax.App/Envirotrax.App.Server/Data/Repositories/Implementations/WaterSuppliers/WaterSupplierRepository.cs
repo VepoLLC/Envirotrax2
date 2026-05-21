@@ -88,34 +88,6 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
         return dbSupplier;
     }
 
-    private IQueryable<WaterSupplier> GetMySuppliersQuery()
-    {
-        if (_tenantProvider.ProfessionalId > 0)
-        {
-            return DbContext
-                .ProfessionalWaterSuppliers
-                .IgnoreQueryFilters()
-                .Where(professionalSupplier => professionalSupplier.ProfessionalId == _tenantProvider.ProfessionalId)
-                .Select(professionalSupplier => professionalSupplier.WaterSupplier!);
-        }
-
-        var suppliersQuery = DbContext
-            .WaterSupplierUsers
-            .IgnoreQueryFilters()
-            .Where(supplierUser => supplierUser.UserId == _tenantProvider.UserId)
-            .Select(supplierUser => supplierUser.WaterSupplier!);
-
-        var childSupplierQuery = from supplier in DbContext.WaterSuppliers.IgnoreQueryFilters()
-                                 join childSupplier in DbContext.WaterSuppliers.IgnoreQueryFilters()
-                                 on supplier.Id equals childSupplier.ParentId
-                                 join supplierUser in DbContext.WaterSupplierUsers.IgnoreQueryFilters()
-                                 on supplier.Id equals supplierUser.WaterSupplierId
-                                 where supplierUser.UserId == _tenantProvider.UserId
-                                 select childSupplier;
-
-        return suppliersQuery.Union(childSupplierQuery);
-    }
-
     public async Task<IEnumerable<WaterSupplier>> GetAllMySuppliersAsync(CancellationToken cancellationToken)
     {
         var suppliersQuery = DbContext

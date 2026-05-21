@@ -28,7 +28,7 @@
         </vp-section>
     </div>
 
-    <div class="mb-3" *ngIf="isAdmin">
+    <div class="mb-3" *ngIf="canSeeAdminSections">
         <vp-section header="Company Information">
             <div class="row">
                 <div class="col-md-6 mb-3">
@@ -121,13 +121,25 @@
         </vp-section>
     </div>
 
-    <vp-section *ngIf="isAdmin" header="Services Provided">
+    <vp-section *ngIf="canSeeAdminSections" header="Services Provided">
         <p class="text-danger">
             Please note that you must select at least one service.
         </p>
 
         <div class="row">
             <div class="col-md-6">
+                 <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="hasBackflowTesting"
+                               id="has-backflow-testing"
+                               [(ngModel)]="professional.hasBackflowTesting">
+                        <label class="form-check-label" for="has-backflow-testing">
+                            Backflow testing
+                        </label>
+                    </div>
+                </div>
                 <div class="mb-3">
                     <div class="form-check">
                         <input class="form-check-input"
@@ -169,20 +181,8 @@
 
             </div>
 
-            <div class="col-md-6">
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input"
-                               type="checkbox"
-                               name="hasBackflowTesting"
-                               id="has-backflow-testing"
-                               [(ngModel)]="professional.hasBackflowTesting">
-                        <label class="form-check-label" for="has-backflow-testing">
-                            Backflow testing
-                        </label>
-                    </div>
-                </div>
-
+            <!-- WISE Guys hidden for now per current business request -->
+            <!-- <div class="col-md-6">
                 <div class="mb-3">
                     <div class="form-check">
                         <input class="form-check-input"
@@ -195,7 +195,7 @@
                         </label>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </vp-section>
 

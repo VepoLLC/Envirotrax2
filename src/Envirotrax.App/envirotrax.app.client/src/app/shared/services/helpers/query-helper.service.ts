@@ -89,7 +89,7 @@ export class QueryHelperService {
         }
     }
 
-    private isDateRange(value: string | DateRange | undefined): value is DateRange {
+    private isDateRange(value: string | string[] | DateRange | undefined): value is DateRange {
         if (value && !(typeof value == 'string')) {
             if ('startDate' in value || 'endDate' in value) {
                 return true;
@@ -127,13 +127,30 @@ export class QueryHelperService {
 
     public convertFilterPanelFields(fields: FilterFieldVm[]): QueryProperty[] {
         return fields
-            .filter(f => f.value)
-            .map(f => ({
-                columnName: f.fieldName,
-                value: typeof f.value == 'string' ? f.value : undefined,
-                comparisonOperator: this.getOperator(f),
-                children: this.getChildren(f)
-            }));
+            .filter(f => {
+                if (Array.isArray(f.value)) return (f.value as string[]).length > 0;
+                return !!f.value;
+            })
+            .map(f => {
+                if (Array.isArray(f.value)) {
+                    return {
+                        columnName: f.fieldName,
+                        comparisonOperator: 'Eq' as ComparisonOperator,
+                        children: (f.value as string[]).map(v => ({
+                            columnName: f.fieldName,
+                            value: v,
+                            comparisonOperator: 'Eq' as ComparisonOperator,
+                            logicalOperator: 'Or' as 'Or'
+                        }))
+                    };
+                }
+                return {
+                    columnName: f.fieldName,
+                    value: typeof f.value == 'string' ? f.value : undefined,
+                    comparisonOperator: this.getOperator(f),
+                    children: this.getChildren(f)
+                };
+            });
     }
 }
 
@@ -156,6 +173,6 @@ class ParamEncoder extends HttpUrlEncodingCodec {
 export interface FilterFieldVm {
     fieldName: string;
     label: string;
-    type: 'text' | 'number' | 'date' | 'daterange' | 'select';
-    value?: string | DateRange;
+    type: 'text' | 'number' | 'date' | 'daterange' | 'select' | 'multi-select';
+    value?: string | string[] | DateRange;
 }

@@ -3,9 +3,11 @@ import { ProfessionalUser } from '../professionals/professional-user';
 import { Site } from '../sites/site';
 import { State } from '../lookup/state';
 import { WaterSupplierUser } from '../users/water-supplier-user';
+import { BackflowReasonForTest, BackflowTestResult } from './backflow-test-enums';
 
 export interface BackflowTest {
     id: number;
+    waterSupplier?: { id?: number } | null;
     site?: Site | null;
     createdTime?: string;
     updatedTime?: string;
@@ -29,25 +31,48 @@ export interface BackflowTest {
     propertyZip?: string;
     mailingCompanyName?: string;
     mailingContactName?: string;
+    mailingStreetNumber?: string;
+    mailingStreetName?: string;
+    mailingNumber?: string;
+    mailingCity?: string;
     mailingState?: State | null;
+    mailingZip?: string;
+    mailingPhoneNumber?: string;
+    mailingEmailAddress?: string;
     deviceType?: string;
     manufacturer?: string;
     model?: string;
     size?: string;
     serialNumber?: string;
     unknownSerialNumber?: boolean;
+    // Bypass assembly identity (DCD/DCD2/RPPD/RPPD2 only)
+    manufacturer2?: string;
+    model2?: string;
+    size2?: string;
+    serialNumber2?: string;
     locationDescription?: string;
     hazardType?: string;
-    reasonForTest?: number;
+    hazardTypeOtherDescription?: string;
+    reasonForTest?: BackflowReasonForTest;
+    replacementAssembly?: string;
+    installationDate?: string;
     testDate?: string;
     initialTestDate?: string;
+    repairTestDate?: string;
     finalTestDate?: string;
     expirationDate?: string;
-    testResult?: number;
+    testResult?: BackflowTestResult;
     properlyInstalled?: boolean;
     nonPotable?: boolean;
+    gaugeManufacturer?: string;
+    gaugeModel?: string;
+    gaugeSerialNumber?: string;
+    gaugeLastCalibrationDate?: string;
     gaugeNonPotable?: boolean;
     meterNumber?: string;
+    meterReadingBefore?: number;
+    meterRegisters?: boolean;
+    meterReadingAfter?: number;
     permitNumber?: string;
     ossf?: boolean;
     comments?: string;
@@ -64,4 +89,65 @@ export interface BackflowTest {
     rejectedDate?: string;
     rejectedReason?: string;
     needsValidation?: boolean;
+
+    // Initial test readings - main assembly
+    initCV1HeldPSID?: number;
+    initCV1ClosedTight?: boolean;
+    initCV1Leaked?: boolean;
+    initCV2HeldPSID?: number;
+    initCV2ClosedTight?: boolean;
+    initCV2Leaked?: boolean;
+    initRVOpenedPSID?: number;
+    initRVDidNotOpen?: boolean;
+    initBCHeldPSID?: number;
+    initBCClosedTight?: boolean;
+    initBCLeaked?: boolean;
+    initPvbAirInletOpenedPSID?: number;
+    initPvbAirInletDidNotOpen?: boolean;
+    initPvbAirInletFullyOpened?: boolean;
+    initPvbCVHeldPSID?: number;
+    initPvbCVLeaked?: boolean;
+    airGapValid?: boolean;
+
+    // Repairs
+    repairCV1?: string;
+    repairCV1Details?: string;
+    repairCV2?: string;
+    repairCV2Details?: string;
+    repairRV?: string;
+    repairRVDetails?: string;
+    repairBC?: string;
+    repairBCDetails?: string;
+
+    // Final test readings - main assembly
+    finalCV1HeldPSID?: number;
+    finalCV1ClosedTight?: boolean;
+    finalCV2HeldPSID?: number;
+    finalCV2ClosedTight?: boolean;
+    finalRVOpenedPSID?: number;
+    finalBCHeldPSID?: number;
+    finalBCClosedTight?: boolean;
+    finalPvbAirInletOpenedPSID?: number;
+    finalPvbAirInletFullyOpened?: boolean;
+    finalPvbCVHeldPSID?: number;
+
+    // Bypass readings (DCD/RPPD)
+    initCV1HeldPSID2?: number;
+    initCV1ClosedTight2?: boolean;
+    initCV1Leaked2?: boolean;
+    initCV2HeldPSID2?: number;
+    initCV2ClosedTight2?: boolean;
+    initCV2Leaked2?: boolean;
+    initRVOpenedPSID2?: number;
+    initRVDidNotOpen2?: boolean;
+    repairCV12?: string;
+    repairCV1Details2?: string;
+    repairCV22?: string;
+    repairCV2Details2?: string;
+    repairRV2?: string;
+    repairRVDetails2?: string;
+    finalCV1HeldPSID2?: number;
+    finalCV1ClosedTight2?: boolean;
+    finalCV2ClosedTight2?: boolean;
+    finalRVOpenedPSID2?: number;
 }

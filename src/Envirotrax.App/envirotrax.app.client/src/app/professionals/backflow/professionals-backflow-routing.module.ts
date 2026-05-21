@@ -4,6 +4,8 @@ import { RoleGuard } from "../../shared/guards/role.guard";
 import { ROLE_DEFINITIONS } from "../../shared/models/role-definitions";
 import { GaugeListComponent } from "./gauges/gauge-list.component";
 import { ProfessionalBackflowTestListComponent } from "./tests/professional-backflow-test-list.component";
+import { BackflowTestAssemblySearchComponent } from "./submit/backflow-test-assembly-search.component";
+import { BackflowTestSubmitComponent } from "./submit/backflow-test-submit.component";
 
 const routes: Routes = [
     {
@@ -16,7 +18,23 @@ const routes: Routes = [
     {
         path: 'tests',
         title: 'Backflow Test Search',
-        component: ProfessionalBackflowTestListComponent
+        component: ProfessionalBackflowTestListComponent,
+        canActivate: [RoleGuard],
+        data: { roles: [ROLE_DEFINITIONS.PROFESSIONAL] }
+    },
+    {
+        path: 'submit',
+        title: 'Submit Backflow Test',
+        component: BackflowTestAssemblySearchComponent,
+        canActivate: [RoleGuard],
+        data: { roles: [ROLE_DEFINITIONS.PROFESSIONAL] }
+    },
+    {
+        path: 'submit/:testId',
+        title: 'Submit Backflow Test',
+        component: BackflowTestSubmitComponent,
+        canActivate: [RoleGuard],
+        data: { roles: [ROLE_DEFINITIONS.PROFESSIONAL] }
     }
 ];
 

@@ -17,4 +17,7 @@ export class SectionComponent {
 
     @Input()
     public header: string = '';
+
+    @Input()
+    public noPadding: boolean = false;
 }

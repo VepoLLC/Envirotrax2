@@ -17,6 +17,16 @@ public class WaterSupplierDashboardController : WaterSupplierProtectedController
     public async Task<IActionResult> GetStatsAsync(CancellationToken cancellationToken)
     {
         var stats = await _dashboardService.GetStatsAsync(cancellationToken);
+
+        return Ok(stats);
+    }
+
+
+    [HttpGet("csi-submission-stats")]
+    public async Task<IActionResult> GetCsiSubmissionStatsAsync(CancellationToken cancellationToken)
+    {
+        var stats = await _dashboardService.GetCsiSubmissionStatsAsync(cancellationToken);
+
         return Ok(stats);
     }
 }

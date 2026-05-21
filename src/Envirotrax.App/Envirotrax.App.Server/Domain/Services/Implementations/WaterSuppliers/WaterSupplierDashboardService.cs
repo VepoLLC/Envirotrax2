@@ -13,8 +13,17 @@ public class WaterSupplierDashboardService : IWaterSupplierDashboardService
         _repository = repository;
     }
 
-    public async Task<WaterSupplierDashboardStatsDto> GetStatsAsync(CancellationToken cancellationToken)
+    public Task<WaterSupplierDashboardStatsDto> GetStatsAsync(CancellationToken cancellationToken)
     {
-        return await _repository.GetStatsAsync(cancellationToken);
+        var stats = _repository.GetStatsAsync(cancellationToken);
+
+        return stats;
+    }
+
+    public Task<CsiSubmissionStatsDto> GetCsiSubmissionStatsAsync(CancellationToken cancellationToken)
+    {
+        var stats = _repository.GetCsiSubmissionStatsAsync(cancellationToken);
+
+        return stats;
     }
 }

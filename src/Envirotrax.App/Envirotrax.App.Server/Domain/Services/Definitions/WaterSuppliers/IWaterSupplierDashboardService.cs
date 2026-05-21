@@ -5,4 +5,5 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 public interface IWaterSupplierDashboardService
 {
     Task<WaterSupplierDashboardStatsDto> GetStatsAsync(CancellationToken cancellationToken);
+    Task<CsiSubmissionStatsDto> GetCsiSubmissionStatsAsync(CancellationToken cancellationToken);
 }

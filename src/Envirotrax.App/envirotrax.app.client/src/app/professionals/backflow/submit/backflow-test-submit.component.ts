@@ -11,7 +11,7 @@ import { Professional } from '../../../shared/models/professionals/professional'
 import { ExpirationType, ProfessionalUser } from '../../../shared/models/professionals/professional-user';
 import { ProfessionalWaterSupplier } from '../../../shared/models/professionals/professional-water-supplier';
 import { BackflowGauge } from '../../../shared/models/backflow/backflow-gauge';
-import { BackflowTestResult, BackflowReasonForTest } from '../../../shared/models/backflow/backflow-test-enums';
+import { BackflowTestResult, BackflowReasonForTest, BackflowDeviceType } from '../../../shared/models/backflow/backflow-test-enums';
 import { InputOption } from '../../../shared/components/input/input.component';
 import { MAX_PAGE_SIZE } from '../../../shared/models/page-info';
 
@@ -45,18 +45,19 @@ export class BackflowTestSubmitComponent implements OnInit {
 
     public readonly BackflowTestResult = BackflowTestResult;
     public readonly BackflowReasonForTest = BackflowReasonForTest;
+    public readonly BackflowDeviceType = BackflowDeviceType;
     public readonly ExpirationType = ExpirationType;
 
     public readonly deviceTypeOptions: InputOption[] = [
-        { id: 'DC', text: 'DC - Double Check Valve' },
-        { id: 'DCD', text: 'DCD - Double Check Detector' },
-        { id: 'DCD2', text: 'DCD2 - Double Check Detector Type II' },
-        { id: 'RP', text: 'RP - Reduced Pressure Principle' },
-        { id: 'RPPD', text: 'RPPD - Reduced Pressure Principle Detector' },
-        { id: 'RPPD2', text: 'RPPD2 - Reduced Pressure Principle Detector Type II' },
-        { id: 'PVB', text: 'PVB - Pressure Vacuum Breaker' },
-        { id: 'SVB', text: 'SVB - Spill-Resistant Pressure Vacuum Breaker' },
-        { id: 'AG', text: 'AG - Air Gap' }
+        { id: BackflowDeviceType.DC, text: 'DC - Double Check Valve' },
+        { id: BackflowDeviceType.DCD, text: 'DCD - Double Check Detector' },
+        { id: BackflowDeviceType.DCD2, text: 'DCD2 - Double Check Detector Type II' },
+        { id: BackflowDeviceType.RP, text: 'RP - Reduced Pressure Principle' },
+        { id: BackflowDeviceType.RPPD, text: 'RPPD - Reduced Pressure Principle Detector' },
+        { id: BackflowDeviceType.RPPD2, text: 'RPPD2 - Reduced Pressure Principle Detector Type II' },
+        { id: BackflowDeviceType.PVB, text: 'PVB - Pressure Vacuum Breaker' },
+        { id: BackflowDeviceType.SVB, text: 'SVB - Spill-Resistant Pressure Vacuum Breaker' },
+        { id: BackflowDeviceType.AG, text: 'AG - Air Gap' }
     ];
 
     public readonly hazardTypeOptions: InputOption[] = [
@@ -106,15 +107,15 @@ export class BackflowTestSubmitComponent implements OnInit {
     public get verificationComplete(): boolean {
         return !!this.selectedBpatId && !!this.selectedWaterSupplierId;
     }
-    public get isAirGap(): boolean { return this.model.deviceType === 'AG'; }
+    public get isAirGap(): boolean { return this.model.deviceType === BackflowDeviceType.AG; }
     public get deviceTypeLabel(): string {
         return this.deviceTypeOptions.find(o => o.id === this.model.deviceType)?.text ?? '';
     }
-    public get isDC(): boolean { return ['DC', 'DCD', 'DCD2'].includes(this.model.deviceType ?? ''); }
-    public get isRP(): boolean { return ['RP', 'RPPD', 'RPPD2'].includes(this.model.deviceType ?? ''); }
-    public get isPVB(): boolean { return ['PVB', 'SVB'].includes(this.model.deviceType ?? ''); }
-    public get hasBypassCV(): boolean { return ['DCD', 'RPPD'].includes(this.model.deviceType ?? ''); }
-    public get hasBypassBC(): boolean { return ['DCD2', 'RPPD2'].includes(this.model.deviceType ?? ''); }
+    public get isDC(): boolean { return [BackflowDeviceType.DC, BackflowDeviceType.DCD, BackflowDeviceType.DCD2].includes(this.model.deviceType as BackflowDeviceType); }
+    public get isRP(): boolean { return [BackflowDeviceType.RP, BackflowDeviceType.RPPD, BackflowDeviceType.RPPD2].includes(this.model.deviceType as BackflowDeviceType); }
+    public get isPVB(): boolean { return [BackflowDeviceType.PVB, BackflowDeviceType.SVB].includes(this.model.deviceType as BackflowDeviceType); }
+    public get hasBypassCV(): boolean { return [BackflowDeviceType.DCD, BackflowDeviceType.RPPD].includes(this.model.deviceType as BackflowDeviceType); }
+    public get hasBypassBC(): boolean { return [BackflowDeviceType.DCD2, BackflowDeviceType.RPPD2].includes(this.model.deviceType as BackflowDeviceType); }
     public get initialTestFailed(): boolean {
         if (!this.model.initialTestDate) return false;
         if (this.isDC) return !this.model.initCV1ClosedTight || !!this.model.initCV1Leaked || !this.model.initCV2ClosedTight || !!this.model.initCV2Leaked;
@@ -122,6 +123,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         if (this.isPVB) return !!this.model.initPvbAirInletDidNotOpen || !this.model.initPvbAirInletFullyOpened || !!this.model.initPvbCVLeaked;
         return false;
     }
+    public get isOtherHazardType(): boolean { return this.model.hazardType === 'Other'; }
     public get remarksLength(): number { return this.model.comments?.length ?? 0; }
 
     constructor(

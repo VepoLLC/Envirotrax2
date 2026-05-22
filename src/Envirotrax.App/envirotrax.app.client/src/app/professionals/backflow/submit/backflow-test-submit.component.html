@@ -21,7 +21,7 @@
 
         <!-- Verification -->
         <vp-section header="Verification">
-            <div class="row">
+            <div class="row">0101
                 <div class="col-md-6">
                     <div class="d-flex align-items-center mb-2">
                         <span class="fw-semibold text-nowrap me-2" style="min-width:130px;">BPAT Account:</span>
@@ -44,7 +44,7 @@
                                       [options]="hazardTypeOptions" [required]="true" [placeholder]="'Select Hazard Type'" />
                         </div>
                     </div>
-                    <div class="d-flex align-items-center mb-2" *ngIf="model.hazardType === 'Other'">
+                    <div class="d-flex align-items-center mb-2" *ngIf="isOtherHazardType">
                         <span class="fw-semibold text-nowrap me-2" style="min-width:130px;">Description:</span>
                         <div class="flex-grow-1">
                             <vp-input type="text" name="hazardTypeOtherDescription" [(ngModel)]="model.hazardTypeOtherDescription" [required]="true" [form]="submitForm" />

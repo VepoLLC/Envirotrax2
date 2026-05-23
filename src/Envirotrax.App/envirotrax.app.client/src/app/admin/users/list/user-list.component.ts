@@ -44,8 +44,7 @@ export class UserListComponent implements OnInit {
     }
 
     public async ngOnInit(): Promise<void> {
-        this.canAdd = await this._authService.hasAnyPermisison(PermissionAction.CanCreate, PermissionType.Users);
-        this.canEdit = await this._authService.hasAnyPermisison(PermissionAction.CanEdit, PermissionType.Users);
+        this.canAdd = this.canEdit = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.Users);
         this.canDelete = await this._authService.hasAnyPermisison(PermissionAction.CanDelete, PermissionType.Users);
 
         await this.getUsers();

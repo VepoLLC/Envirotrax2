@@ -142,8 +142,7 @@ public class SeedDataService : IHostedService
                 RoleId = adminRole.Id,
                 PermissionId = permissionId,
                 CanView = true,
-                CanCreate = true,
-                CanEdit = true,
+                CanModify = true,
                 CanDelete = true
             });
 

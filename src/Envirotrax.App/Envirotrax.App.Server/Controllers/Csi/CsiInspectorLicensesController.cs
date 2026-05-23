@@ -39,7 +39,7 @@ namespace Envirotrax.App.Server.Controllers.Csi
 
         [HttpPost("{id}/licenses")]
         [HasFeature(FeatureType.ManageProfessionalLicenses)]
-        [HasPermission(PermissionAction.CanEdit)]
+        [HasPermission(PermissionAction.CanModify)]
         public async Task<IActionResult> AddLicenseAsync(int id, [FromBody] ProfessionalUserLicenseDto dto, CancellationToken cancellationToken)
         {
             var result = await _licenseService.AddForProfessionalAsync(id, dto);
@@ -48,7 +48,7 @@ namespace Envirotrax.App.Server.Controllers.Csi
 
         [HttpPut("{id}/licenses/{licenseId}")]
         [HasFeature(FeatureType.ManageProfessionalLicenses)]
-        [HasPermission(PermissionAction.CanEdit)]
+        [HasPermission(PermissionAction.CanModify)]
         public async Task<IActionResult> UpdateLicenseAsync(int id, int licenseId, [FromBody] ProfessionalUserLicenseDto dto, CancellationToken cancellationToken)
         {
             dto.Id = licenseId;
@@ -58,7 +58,7 @@ namespace Envirotrax.App.Server.Controllers.Csi
 
         [HttpDelete("{id}/licenses/{licenseId}")]
         [HasFeature(FeatureType.ManageProfessionalLicenses)]
-        [HasPermission(PermissionAction.CanEdit)]
+        [HasPermission(PermissionAction.CanModify)]
         public async Task<IActionResult> DeleteLicenseAsync(int id, int licenseId, CancellationToken cancellationToken)
         {
             await _licenseService.DeleteAsync(licenseId);

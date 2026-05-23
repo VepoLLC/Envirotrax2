@@ -17,7 +17,6 @@ public class RolePermission : TenantModel<WaterSupplier>
     public Permission? Permission { get; set; }
 
     public bool CanView { get; set; }
-    public bool CanCreate { get; set; }
-    public bool CanEdit { get; set; }
+    public bool CanModify { get; set; }
     public bool CanDelete { get; set; }
 }

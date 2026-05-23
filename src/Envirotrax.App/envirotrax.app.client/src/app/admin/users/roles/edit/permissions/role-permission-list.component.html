@@ -75,12 +75,12 @@
                             </td>
                             <td>
                                 <div class="form-switch">
-                                    <input *ngIf="rolePermission.permission?.canCreate || rolePermission.permission?.canEdit"
+                                    <input *ngIf="rolePermission.permission?.canModify"
                                            type="checkbox"
                                            name="canModify{{gi}}_{{i}}"
                                            class="form-check-input"
-                                           [ngModel]="getModify(rolePermission)"
-                                           (ngModelChange)="onModifyChange(rolePermission, $event)"
+                                           [(ngModel)]="rolePermission.canModify"
+                                           (ngModelChange)="update(rolePermission)"
                                            switch />
                                 </div>
                             </td>

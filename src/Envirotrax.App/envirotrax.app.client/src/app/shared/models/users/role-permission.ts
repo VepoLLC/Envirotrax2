@@ -6,7 +6,6 @@ export interface RolePermission {
     permission?: Permission;
 
     canView?: boolean;
-    canCreate?: boolean;
-    canEdit?: boolean;
+    canModify?: boolean;
     canDelete?: boolean;
 }

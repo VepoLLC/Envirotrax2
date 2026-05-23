@@ -28,7 +28,7 @@ namespace Envirotrax.App.Server.Controllers.Csi
         }
 
         [HttpPut("{id}/water-suppliers/{supplierId}")]
-        [HasPermission(PermissionAction.CanEdit)]
+        [HasPermission(PermissionAction.CanModify)]
         public async Task<IActionResult> UpdateWaterSupplierAsync([FromBody] ProfessionalWaterSupplierDto dto, CancellationToken cancellationToken)
         {
             var result = await _supplierService.UpdateAsync(dto);

@@ -70,6 +70,7 @@
                                            class="form-check-input"
                                            [(ngModel)]="rolePermission.canView"
                                            (ngModelChange)="update(rolePermission)"
+                                           [disabled]="(!!rolePermission.canModify && !!rolePermission.permission?.canModify) || (!!rolePermission.canDelete && !!rolePermission.permission?.canDelete)"
                                            switch />
                                 </div>
                             </td>

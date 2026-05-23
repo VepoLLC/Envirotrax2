@@ -75,6 +75,10 @@ export class RolePermissionListComponent implements OnInit {
     }
 
     public async update(rolePermission: RolePermission) {
+        if (rolePermission.canModify || rolePermission.canDelete) {
+            rolePermission.canView = true;
+        }
+
         try {
             this.isLoading = true;
 
@@ -90,7 +94,9 @@ export class RolePermissionListComponent implements OnInit {
     private toggleAll(permissionName: keyof RolePermission, newValue: boolean): void {
         for (let group of this.rolePermissions) {
             for (let permission of group.permissions) {
-                permission[permissionName] = newValue
+                if (permission.permission?.[permissionName as keyof Permission]) {
+                    permission[permissionName] = newValue;
+                }
             }
         }
     }
@@ -107,18 +113,38 @@ export class RolePermissionListComponent implements OnInit {
     }
 
     public async toggleAllView(newValue: boolean): Promise<void> {
-        this.toggleAll('canView', newValue);
+        for (let group of this.rolePermissions) {
+            for (let permission of group.permissions) {
+                const hasActiveModify = !!permission.canModify && !!permission.permission?.canModify;
+                const hasActiveDelete = !!permission.canDelete && !!permission.permission?.canDelete;
+                if (newValue || (!hasActiveModify && !hasActiveDelete)) {
+                    permission.canView = newValue;
+                }
+            }
+        }
         await this.bulkUpdate();
+        const allPermissions = this.rolePermissions.flatMap(g => g.permissions);
+        this.setAllToggles(allPermissions);
     }
 
     public async toggleAllModify(newValue: boolean): Promise<void> {
         this.toggleAll('canModify', newValue);
+        if (newValue) {
+            this.toggleAll('canView', true);
+        }
         await this.bulkUpdate();
+        const allPermissions = this.rolePermissions.flatMap(g => g.permissions);
+        this.setAllToggles(allPermissions);
     }
 
     public async toggleAllDelete(newValue: boolean): Promise<void> {
         this.toggleAll('canDelete', newValue);
+        if (newValue) {
+            this.toggleAll('canView', true);
+        }
         await this.bulkUpdate();
+        const allPermissions = this.rolePermissions.flatMap(g => g.permissions);
+        this.setAllToggles(allPermissions);
     }
 }
 

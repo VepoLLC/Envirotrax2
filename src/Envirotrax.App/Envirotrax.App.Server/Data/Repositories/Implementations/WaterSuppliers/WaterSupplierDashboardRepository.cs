@@ -2,87 +2,79 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
+using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.WaterSuppliers;
 
-public class WaterSupplierDashboardRepository : IWaterSupplierDashboardRepository
+public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider, ITimeZoneHelperService timeZoneHelper) : IWaterSupplierDashboardRepository
 {
-    private readonly TenantDbContext _context;
-    private readonly ITenantProvidersService _tenantProvider;
-
-    public WaterSupplierDashboardRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider)
-    {
-        _context = dbContextSelector.Current;
-        _tenantProvider = tenantProvider;
-    }
+    private readonly TenantDbContext _context = dbContextSelector.Current;
+    private readonly ITenantProvidersService _tenantProvider = tenantProvider;
+    private readonly ITimeZoneHelperService _timeZoneHelper = timeZoneHelper;
 
     public async Task<WaterSupplierDashboardStatsDto> GetStatsAsync(CancellationToken cancellationToken)
     {
-        var wsId = _tenantProvider.WaterSupplierId;
-        var now = DateTime.UtcNow;
+        var now = _timeZoneHelper.GetUserLocalTime();
         var in30Days = now.AddDays(30);
-
-        var professionalIds = _context.ProfessionalWaterSuppliers
-            .IgnoreQueryFilters()
-            .Where(pws => pws.WaterSupplierId == wsId)
-            .Select(pws => pws.ProfessionalId);
-
-        var users = _context.ProfessionalUsers.IgnoreQueryFilters();
-        var licenses = _context.ProfessionalUserLicenses.IgnoreQueryFilters();
-        var insurances = _context.ProfessionalInsurances.IgnoreQueryFilters();
-        var gauges = _context.BackflowGauges.IgnoreQueryFilters();
 
         return new WaterSupplierDashboardStatsDto
         {
-            WiseGuyCount       = await users.CountAsync(pu => professionalIds.Contains(pu.ProfessionalId) && pu.IsWiseGuy, cancellationToken),
-            CsiInspectorCount  = await users.CountAsync(pu => professionalIds.Contains(pu.ProfessionalId) && pu.IsCsiInspector, cancellationToken),
-            BpatCount = await users.CountAsync(pu => professionalIds.Contains(pu.ProfessionalId) && pu.IsBackflowTester, cancellationToken),
-            FogTransporterCount = await users.CountAsync(pu => professionalIds.Contains(pu.ProfessionalId) && pu.IsFogTransporter, cancellationToken),
-            FogInspectorCount = await users.CountAsync(pu => professionalIds.Contains(pu.ProfessionalId) && pu.IsFogInspector, cancellationToken),
+            WiseGuyCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsWiseGuy, cancellationToken),
+            CsiInspectorCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsCsiInspector, cancellationToken),
+            BpatCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsBackflowTester, cancellationToken),
+            FogTransporterCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsFogTransporter, cancellationToken),
+            FogInspectorCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsFogInspector, cancellationToken),
 
-            UnverifiedLicenseCount = await licenses.CountAsync(l => professionalIds.Contains(l.ProfessionalId) && l.ExpirationDate == null, cancellationToken),
-            ExpiredLicenseCount = await licenses.CountAsync(l => professionalIds.Contains(l.ProfessionalId) && l.ExpirationDate < now, cancellationToken),
-            ExpiringLicenseCount = await licenses.CountAsync(l => professionalIds.Contains(l.ProfessionalId) && l.ExpirationDate >= now && l.ExpirationDate < in30Days, cancellationToken),
+            UnverifiedLicenseCount = await _context.ProfessionalUserLicenses.CountAsync(l => l.ExpirationDate == null, cancellationToken),
+            ExpiredLicenseCount = await _context.ProfessionalUserLicenses.CountAsync(l => l.ExpirationDate < now, cancellationToken),
+            ExpiringLicenseCount = await _context.ProfessionalUserLicenses.CountAsync(l => l.ExpirationDate >= now && l.ExpirationDate < in30Days, cancellationToken),
 
-            InsurancePolicyCount = await insurances.CountAsync(i => professionalIds.Contains(i.ProfessionalId) && i.ExpirationDate == null, cancellationToken),
-            TestGaugeCount = await gauges.CountAsync(g => professionalIds.Contains(g.ProfessionalId) && g.LastCalibrationDate == null, cancellationToken),
-            TransporterRegistrationCount = await licenses.CountAsync(l => professionalIds.Contains(l.ProfessionalId) && l.LicenseTypeId == 9 && l.ExpirationDate == null, cancellationToken)
+            InsurancePolicyCount = await _context.ProfessionalInsurances.CountAsync(i => i.ExpirationDate == null, cancellationToken),
+            TestGaugeCount = await _context.BackflowGauges.CountAsync(g => g.LastCalibrationDate == null, cancellationToken),
+            TransporterRegistrationCount = await _context.ProfessionalUserLicenses.CountAsync(l => l.LicenseTypeId == 9 && l.ExpirationDate == null, cancellationToken)
         };
     }
 
     public async Task<CsiSubmissionStatsDto> GetCsiSubmissionStatsAsync(CancellationToken cancellationToken)
     {
         var wsId = _tenantProvider.WaterSupplierId;
-        var start = DateTime.UtcNow.Date.AddDays(-9);
-        var end = DateTime.UtcNow.Date.AddDays(1);
+        var userTz = _timeZoneHelper.GetUserTimeZone();
+        var localToday = _timeZoneHelper.GetUserLocalTime().Date;
+        var localStart = localToday.AddDays(-9);
+
+        var utcStart = TimeZoneInfo.ConvertTimeToUtc(localStart, userTz);
+        var utcEnd = TimeZoneInfo.ConvertTimeToUtc(localToday.AddDays(1), userTz);
 
         var allDates = Enumerable.Range(0, 10)
-            .Select(i => DateOnly.FromDateTime(start.AddDays(i)))
+            .Select(i => DateOnly.FromDateTime(localStart.AddDays(i)))
             .ToList();
 
         var rawMain = await _context.CsiInspections
-            .IgnoreQueryFilters()
-            .Where(c => c.WaterSupplierId == wsId && c.CreatedTime >= start && c.CreatedTime < end)
-            .GroupBy(c => c.CreatedTime.Date)
+            .Where(c => c.WaterSupplierId == wsId && c.CreatedTime >= utcStart && c.CreatedTime < utcEnd)
+            .Select(c => new { c.CreatedTime, c.TransactionId })
+            .ToListAsync(cancellationToken);
+
+        var groupedMain = rawMain
+            .GroupBy(c => DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(c.CreatedTime, userTz)))
             .Select(g => new
             {
                 Date = g.Key,
                 Total = g.Count(),
-                Paid = g.Count(c => c.TransactionId != null && c.TransactionId != "")
+                Paid = g.Count(c => !string.IsNullOrEmpty(c.TransactionId))
             })
-            .ToListAsync(cancellationToken);
+            .ToList();
 
         var dailyStats = allDates.Select(d => new CsiDailyStatsDto
         {
             Date = d,
-            TotalInspections = rawMain.FirstOrDefault(r => DateOnly.FromDateTime(r.Date) == d)?.Total ?? 0,
-            TotalPaidInspections = rawMain.FirstOrDefault(r => DateOnly.FromDateTime(r.Date) == d)?.Paid ?? 0
+            IsWeekend = d.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday,
+            TotalInspections = groupedMain.FirstOrDefault(r => r.Date == d)?.Total ?? 0,
+            TotalPaidInspections = groupedMain.FirstOrDefault(r => r.Date == d)?.Paid ?? 0
         }).ToList();
 
         var childWaterSuppliers = await _context.WaterSuppliers
-            .IgnoreQueryFilters()
             .Where(ws => ws.ParentId == wsId)
             .Select(ws => new { ws.Id, ws.Name })
             .ToListAsync(cancellationToken);
@@ -92,17 +84,20 @@ public class WaterSupplierDashboardRepository : IWaterSupplierDashboardRepositor
         {
             var childIds = childWaterSuppliers.Select(ws => ws.Id).ToList();
             var rawSub = await _context.CsiInspections
-                .IgnoreQueryFilters()
-                .Where(c => childIds.Contains(c.WaterSupplierId) && c.CreatedTime >= start && c.CreatedTime < end)
-                .GroupBy(c => new { c.WaterSupplierId, c.CreatedTime.Date })
+                .Where(c => childIds.Contains(c.WaterSupplierId) && c.CreatedTime >= utcStart && c.CreatedTime < utcEnd)
+                .Select(c => new { c.WaterSupplierId, c.CreatedTime, c.TransactionId })
+                .ToListAsync(cancellationToken);
+
+            var groupedSub = rawSub
+                .GroupBy(c => new { c.WaterSupplierId, Date = DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(c.CreatedTime, userTz)) })
                 .Select(g => new
                 {
                     g.Key.WaterSupplierId,
                     g.Key.Date,
                     Total = g.Count(),
-                    Paid = g.Count(c => c.TransactionId != null && c.TransactionId != "")
+                    Paid = g.Count(c => !string.IsNullOrEmpty(c.TransactionId))
                 })
-                .ToListAsync(cancellationToken);
+                .ToList();
 
             subAccountStats = [..childWaterSuppliers.Select(ws => new CsiSubAccountStatsDto
             {
@@ -110,8 +105,9 @@ public class WaterSupplierDashboardRepository : IWaterSupplierDashboardRepositor
                 DailyStats = [..allDates.Select(d => new CsiDailyStatsDto
                 {
                     Date = d,
-                    TotalInspections = rawSub.FirstOrDefault(r => r.WaterSupplierId == ws.Id && DateOnly.FromDateTime(r.Date) == d)?.Total ?? 0,
-                    TotalPaidInspections = rawSub.FirstOrDefault(r => r.WaterSupplierId == ws.Id && DateOnly.FromDateTime(r.Date) == d)?.Paid ?? 0
+                    IsWeekend = d.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday,
+                    TotalInspections = groupedSub.FirstOrDefault(r => r.WaterSupplierId == ws.Id && r.Date == d)?.Total ?? 0,
+                    TotalPaidInspections = groupedSub.FirstOrDefault(r => r.WaterSupplierId == ws.Id && r.Date == d)?.Paid ?? 0
                 })]
             })];
         }

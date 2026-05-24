@@ -160,7 +160,7 @@
                                         </thead>
                                         <tbody>
                                             @for (day of csiStats?.dailyStats ?? []; track day.date) {
-                                                <tr [class.table-secondary]="isWeekend(day.date)">
+                                                <tr [class.table-secondary]="day.isWeekend">
                                                     <td class="ps-3">{{getDayName(day.date)}}</td>
                                                     <td>{{getFormattedDate(day.date)}}</td>
                                                     <td>

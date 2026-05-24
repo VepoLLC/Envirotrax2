@@ -1,5 +1,6 @@
 export interface CsiDailyStats {
     date: string;
+    isWeekend: boolean;
     totalInspections: number;
     totalPaidInspections: number;
 }

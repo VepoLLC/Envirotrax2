@@ -27,19 +27,35 @@ export class DashboardComponent implements OnInit {
     }
 
     public get csiTotalInspections(): number {
-        return this.csiStats?.dailyStats.reduce((s, d) => s + d.totalInspections, 0) ?? 0;
+        if (this.csiStats) {
+            return this.csiStats.dailyStats.reduce((s, d) => s + d.totalInspections, 0);
+        } else {
+            return 0;
+        }
     }
 
     public get csiTotalPaidInspections(): number {
-        return this.csiStats?.dailyStats.reduce((s, d) => s + d.totalPaidInspections, 0) ?? 0;
+        if (this.csiStats) {
+            return this.csiStats.dailyStats.reduce((s, d) => s + d.totalPaidInspections, 0);
+        } else {
+            return 0;
+        }
     }
 
     public get csiSubAccountTotalInspections(): number {
-        return this.csiStats?.subAccountStats?.reduce((s, sub) => s + this.getSubAccountTotal(sub, 'totalInspections'), 0) ?? 0;
+        if (this.csiStats?.subAccountStats) {
+            return this.csiStats.subAccountStats.reduce((s, sub) => s + this.getSubAccountTotal(sub, 'totalInspections'), 0);
+        } else {
+            return 0;
+        }
     }
 
     public get csiSubAccountTotalPaidInspections(): number {
-        return this.csiStats?.subAccountStats?.reduce((s, sub) => s + this.getSubAccountTotal(sub, 'totalPaidInspections'), 0) ?? 0;
+        if (this.csiStats?.subAccountStats) {
+            return this.csiStats.subAccountStats.reduce((s, sub) => s + this.getSubAccountTotal(sub, 'totalPaidInspections'), 0);
+        } else {
+            return 0;
+        }
     }
 
     constructor(
@@ -83,24 +99,27 @@ export class DashboardComponent implements OnInit {
     }
 
     public getThresholdBgClass(count: number): string {
-        if (count === 0) return 'bg-success';
-        if (count < 5) return 'bg-warning';
-        return 'bg-danger';
+        if (count === 0) {
+            return 'bg-success';
+        } else if (count < 5) {
+            return 'bg-warning';
+        } else {
+            return 'bg-danger';
+        }
     }
 
     public getThresholdTextClass(count: number): string {
-        if (count === 0) return 'text-success';
-        if (count < 5) return 'text-warning';
-        return 'text-danger';
+        if (count === 0) {
+            return 'text-success';
+        } else if (count < 5) {
+            return 'text-warning';
+        } else {
+            return 'text-danger';
+        }
     }
 
     public getBarPercent(value: number): number {
         return this.csiTotalInspections > 0 ? Math.round((value / this.csiTotalInspections) * 100) : 0;
-    }
-
-    public isWeekend(date: string): boolean {
-        const day = new Date(date + 'T00:00:00').getDay();
-        return day === 0 || day === 6;
     }
 
     public getDayName(date: string): string {

@@ -46,7 +46,7 @@ public class GisAreaController : WaterSupplierCrudController<GisAreaDto>
 
     [HttpPut("default-view")]
     [HasFeature(FeatureType.ManageGisAreas)]
-    [HasPermission(PermissionAction.CanCreate | PermissionAction.CanEdit)]
+    [HasPermission(PermissionAction.CanModify)]
     public async Task<IActionResult> UpdateDefaultMapViewAsync(DefaultGiisMapViewDto mapView)
     {
         var savedView = await _gisAreaService.UpdateDefaultMapViewAsync(mapView);

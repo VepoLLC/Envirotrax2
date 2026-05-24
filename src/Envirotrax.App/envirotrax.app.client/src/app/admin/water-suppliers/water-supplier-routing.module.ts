@@ -29,7 +29,7 @@ const routes: Routes = [
             permissions: [
                 {
                     type: PermissionType.WaterSuppliers,
-                    action: PermissionAction.CanEdit
+                    action: PermissionAction.CanModify
                 }
             ]
         }

@@ -161,14 +161,12 @@ export class AuthService {
 
         if (matchingPermission) {
             switch (action) {
-                case PermissionAction.CanCreate:
-                    return matchingPermission.canCreate!;
+                case PermissionAction.CanModify:
+                    return matchingPermission.canModify!;
                 case PermissionAction.CanDelete:
                     return matchingPermission.canDelete!;
-                case PermissionAction.CanEdit:
-                    return matchingPermission.canEdit!;
                 case PermissionAction.CanView:
-                    return matchingPermission.canEdit! || matchingPermission.canView!;
+                    return matchingPermission.canModify! || matchingPermission.canView!;
             }
         }
 
@@ -210,7 +208,6 @@ interface RolePermission {
     permission: PermissionType;
 
     canView?: boolean;
-    canCreate?: boolean;
-    canEdit?: boolean;
+    canModify?: boolean;
     canDelete?: boolean;
 }

@@ -141,8 +141,7 @@ public class AuthService : TenantProviderService, IAuthService
             {
                 PermissionId = group.Key,
                 CanView = group.Any(p => p.CanView),
-                CanCreate = group.Any(p => p.CanCreate),
-                CanEdit = group.Any(p => p.CanEdit),
+                CanModify = group.Any(p => p.CanModify),
                 CanDelete = group.Any(p => p.CanDelete)
             }).ToList();
 
@@ -159,14 +158,9 @@ public class AuthService : TenantProviderService, IAuthService
                 action = action | PermissionAction.CanView;
             }
 
-            if (rolePermission.CanCreate)
+            if (rolePermission.CanModify)
             {
-                action = action | PermissionAction.CanCreate;
-            }
-
-            if (rolePermission.CanEdit)
-            {
-                action = action | PermissionAction.CanEdit;
+                action = action | PermissionAction.CanModify;
             }
 
             if (rolePermission.CanDelete)

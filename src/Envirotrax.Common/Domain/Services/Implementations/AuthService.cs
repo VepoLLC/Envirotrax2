@@ -52,14 +52,9 @@ public class AuthService : TenantProviderService, IAuthService
             permission.CanView = true;
         }
 
-        if (permissionAction.HasFlag(PermissionAction.CanCreate))
+        if (permissionAction.HasFlag(PermissionAction.CanModify))
         {
-            permission.CanCreate = true;
-        }
-
-        if (permissionAction.HasFlag(PermissionAction.CanEdit))
-        {
-            permission.CanEdit = true;
+            permission.CanModify = true;
         }
 
         if (permissionAction.HasFlag(PermissionAction.CanDelete))
@@ -108,10 +103,8 @@ public class AuthService : TenantProviderService, IAuthService
                     {
                         case PermissionAction.CanView:
                             return permissionToCheck.CanView;
-                        case PermissionAction.CanCreate:
-                            return permissionToCheck.CanCreate;
-                        case PermissionAction.CanEdit:
-                            return permissionToCheck.CanEdit;
+                        case PermissionAction.CanModify:
+                            return permissionToCheck.CanModify;
                         case PermissionAction.CanDelete:
                             return permissionToCheck.CanDelete;
                     }

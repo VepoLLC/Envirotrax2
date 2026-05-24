@@ -41,7 +41,7 @@ export class CsiInspectorUsersComponent implements OnInit {
     }
 
     private async setPermissions(): Promise<void> {
-        const canEdit = await this._authService.hasAnyPermisison(PermissionAction.CanEdit, PermissionType.CsiInspectors);
+        const canEdit = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.CsiInspectors);
         this.canManage = canEdit && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalUsers);
     }
 

@@ -59,8 +59,7 @@ public class WaterSupplierUserRepository : IWaterSupplierUserRepository
                                       RoleId = rolePermission.RoleId,
                                       PermissionId = rolePermission.PermissionId,
                                       CanView = rolePermission.CanView,
-                                      CanCreate = rolePermission.CanCreate,
-                                      CanEdit = rolePermission.CanEdit,
+                                      CanModify = rolePermission.CanModify,
                                       CanDelete = rolePermission.CanDelete
                                   };
 

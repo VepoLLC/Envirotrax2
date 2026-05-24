@@ -7,7 +7,6 @@ export interface Permission {
     category?: string;
 
     canView?: boolean;
-    canCreate?: boolean;
-    canEdit?: boolean;
+    canModify?: boolean;
     canDelete?: boolean;
 }

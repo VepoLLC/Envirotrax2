@@ -2,6 +2,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Transactions;
 using AutoMapper;
+using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.AutoMapper;
+using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
@@ -16,6 +19,7 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
 {
     private static readonly string[] AllowedFileExtensions = [".jpg", ".jpeg", ".gif", ".png", ".bmp", ".pdf"];
 
+    private readonly IBackflowGaugeRepository _gaugeRepository;
     private readonly IFileStorageService _fileStorageService;
     private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly IAuthService _authService;
@@ -28,6 +32,7 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         IAuthService authService)
         : base(mapper, repository)
     {
+        _gaugeRepository = repository;
         _fileStorageService = fileStorageService;
         _timeZoneHelper = timeZoneHelper;
         _authService = authService;
@@ -49,6 +54,15 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         }
 
         return dto;
+    }
+
+    public async Task<IPagedData<BackflowGaugeDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<BackflowGauge, BackflowGaugeDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<BackflowGauge, BackflowGaugeDto>(Mapper);
+
+        var items = await _gaugeRepository.GetAllByProfessionalAsync(professionalId, pageInfo, query, cancellationToken);
+        return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
     }
 
     public async Task<BackflowGaugeDto> AddWithFileAsync(Stream fileStream, string originalFileName, BackflowGaugeDto dto)

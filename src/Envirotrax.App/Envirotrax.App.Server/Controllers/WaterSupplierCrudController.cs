@@ -46,7 +46,7 @@ namespace Envirotrax.App.Server.Controllers
         }
 
         [HttpGet("{id}")]
-        [HasPermission(PermissionAction.CanView | PermissionAction.CanEdit)]
+        [HasPermission(PermissionAction.CanView | PermissionAction.CanModify)]
         public virtual async Task<IActionResult> GetAsync(TKey id, CancellationToken cancellationToken)
         {
             var dto = await ProcessGetAsync(id, cancellationToken);
@@ -65,7 +65,7 @@ namespace Envirotrax.App.Server.Controllers
         }
 
         [HttpPost]
-        [HasPermission(PermissionAction.CanCreate)]
+        [HasPermission(PermissionAction.CanModify)]
         public virtual async Task<IActionResult> AddAsync(TDto dto)
         {
             var added = await ProcessAddAsync(dto);
@@ -84,7 +84,7 @@ namespace Envirotrax.App.Server.Controllers
         }
 
         [HttpPut("{id}")]
-        [HasPermission(PermissionAction.CanEdit)]
+        [HasPermission(PermissionAction.CanModify)]
         public virtual async Task<IActionResult> UpdateAsync(TKey id, TDto dto)
         {
             var updated = await ProcessUpdateAsync(dto!);

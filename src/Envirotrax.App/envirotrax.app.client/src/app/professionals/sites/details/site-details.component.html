@@ -10,32 +10,52 @@
 
 <div *ngIf="site">
 
-    <vp-section header="Water Supplier">
-        <dl class="row mb-0">
-            <dt class="col-sm-4">Water Supplier</dt>
-            <dd class="col-sm-8">{{ site.waterSupplier?.name || '&mdash;' }}</dd>
+    <div class="row">
+        <div class="col-md-6">
+            <vp-section header="Water Supplier">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Water Supplier</dt>
+                    <dd class="col-sm-8">{{ site.waterSupplier?.name || '&mdash;' }}</dd>
 
-            <dt class="col-sm-4">Address</dt>
-            <dd class="col-sm-8">
-                <ng-container *ngIf="site.waterSupplier?.address || site.waterSupplier?.city || site.waterSupplier?.zipCode; else emptyWsAddress">
-                    <span *ngIf="site.waterSupplier?.address">{{ site.waterSupplier!.address }}<br /></span>
-                    <span *ngIf="site.waterSupplier?.city">{{ site.waterSupplier!.city }}</span>
-                    <span *ngIf="site.waterSupplier?.state?.code">, {{ site.waterSupplier!.state!.code }}</span>
-                    <span *ngIf="site.waterSupplier?.zipCode"> {{ site.waterSupplier!.zipCode }}</span>
-                </ng-container>
-                <ng-template #emptyWsAddress>&mdash;</ng-template>
-            </dd>
+                    <dt class="col-sm-4">Address</dt>
+                    <dd class="col-sm-8">
+                        <ng-container *ngIf="site.waterSupplier?.address || site.waterSupplier?.city || site.waterSupplier?.zipCode; else emptyWsAddress">
+                            <span *ngIf="site.waterSupplier?.address">{{ site.waterSupplier!.address }}<br /></span>
+                            <span *ngIf="site.waterSupplier?.city">{{ site.waterSupplier!.city }}</span>
+                            <span *ngIf="site.waterSupplier?.state?.code">, {{ site.waterSupplier!.state!.code }}</span>
+                            <span *ngIf="site.waterSupplier?.zipCode"> {{ site.waterSupplier!.zipCode }}</span>
+                        </ng-container>
+                        <ng-template #emptyWsAddress>&mdash;</ng-template>
+                    </dd>
 
-            <dt class="col-sm-4">PWS ID</dt>
-            <dd class="col-sm-8">{{ site.waterSupplier?.pwsId || '&mdash;' }}</dd>
+                    <dt class="col-sm-4">PWS ID</dt>
+                    <dd class="col-sm-8">{{ site.waterSupplier?.pwsId || '&mdash;' }}</dd>
 
-            <dt class="col-sm-4">Phone Number</dt>
-            <dd class="col-sm-8">{{ site.waterSupplier?.phoneNumber || '&mdash;' }}</dd>
+                    <dt class="col-sm-4">Phone Number</dt>
+                    <dd class="col-sm-8">{{ site.waterSupplier?.phoneNumber || '&mdash;' }}</dd>
 
-            <dt class="col-sm-4">Email Address</dt>
-            <dd class="col-sm-8">{{ site.waterSupplier?.emailAddress || '&mdash;' }}</dd>
-        </dl>
-    </vp-section>
+                    <dt class="col-sm-4">Email Address</dt>
+                    <dd class="col-sm-8">{{ site.waterSupplier?.emailAddress || '&mdash;' }}</dd>
+                </dl>
+            </vp-section>
+        </div>
+
+        <div class="col-md-6 mt-3 mt-md-0">
+            <vp-section header="GIS Location">
+                <vp-map *ngIf="site.gisLatitude != null && site.gisLongitude != null"
+                        [latitude]="site.gisLatitude"
+                        [longitude]="site.gisLongitude"
+                        [zoom]="15"
+                        [showMarker]="true"
+                        height="300px">
+                </vp-map>
+                <div *ngIf="site.gisLatitude == null || site.gisLongitude == null"
+                     class="d-flex align-items-center justify-content-center  text-muted py-5">
+                    <span>No location available</span>
+                </div>
+            </vp-section>
+        </div>
+    </div>
 
     <div class="row mt-3">
         <div class="col-md-6">

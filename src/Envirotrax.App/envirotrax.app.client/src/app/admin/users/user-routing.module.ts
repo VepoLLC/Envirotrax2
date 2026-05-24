@@ -31,7 +31,7 @@ const routes: Routes = [
             permissions: [
                 {
                     type: PermissionType.Users,
-                    action: PermissionAction.CanEdit
+                    action: PermissionAction.CanModify
                 }
             ]
         }
@@ -59,7 +59,7 @@ const routes: Routes = [
             permissions: [
                 {
                     type: PermissionType.Roles,
-                    action: PermissionAction.CanEdit
+                    action: PermissionAction.CanModify
                 }
             ]
         }

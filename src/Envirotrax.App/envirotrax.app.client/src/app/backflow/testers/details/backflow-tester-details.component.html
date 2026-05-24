@@ -1,0 +1,62 @@
+<h1 class="h2 mb-4 text-center">BPAT Tester Details</h1>
+
+<dp-loading-spinner *ngIf="isAccountLoading"></dp-loading-spinner>
+
+<div *ngIf="!isAccountLoading && accountInfo">
+    <div class="row g-4">
+
+        <div class="col-lg-6">
+            <vp-section header="BPAT Account Information">
+                <table class="table table-borderless mb-0">
+                    <tbody>
+                        <tr>
+                            <th class="w-40">Creation Date:</th>
+                            <td>{{ accountInfo.createdTime | date:'M/d/yy h:mm a' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Company Email:</th>
+                            <td>{{ accountInfo.companyEmail }}</td>
+                        </tr>
+                        <tr>
+                            <th>Company Name:</th>
+                            <td>{{ accountInfo.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Address:</th>
+                            <td>{{ getFormattedAddress() }}</td>
+                        </tr>
+                        <tr>
+                            <th>Phone Number:</th>
+                            <td>{{ accountInfo.phoneNumber }}</td>
+                        </tr>
+                        <tr>
+                            <th>Fax Number:</th>
+                            <td>{{ accountInfo.faxNumber }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </vp-section>
+        </div>
+
+        <div class="col-lg-6">
+            <vp-backflow-tester-water-suppliers [testerId]="id!" />
+        </div>
+
+        <div class="col-12">
+            <vp-backflow-tester-users [testerId]="id!" />
+        </div>
+
+        <div class="col-lg-6">
+            <vp-backflow-tester-license-insurances [testerId]="id!" [tester]="accountInfo" />
+        </div>
+
+        <div class="col-lg-6">
+            <vp-backflow-tester-gauge [testerId]="id!"/>
+        </div>
+
+    </div>
+</div>
+
+<div *ngIf="!isAccountLoading && !accountInfo" class="alert alert-warning">
+    Tester not found.
+</div>

@@ -1,6 +1,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Licenses;
 
@@ -24,11 +25,4 @@ public class ProfessionalUserLicenseDto : IDto
     public DateTime? ExpirationDate { get; set; }
 
     public ExpirationType ExpirationType { get; set; }
-}
-
-public enum ExpirationType
-{
-    Valid,
-    AboutToExpire,
-    Expired
 }

@@ -37,7 +37,7 @@ export class CsiInspectorWaterSuppliersComponent implements OnInit {
     ) { }
 
     public async ngOnInit(): Promise<void> {
-        this.canEdit = await this._authService.hasAnyPermisison(PermissionAction.CanEdit, PermissionType.CsiInspectors);
+        this.canEdit = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.CsiInspectors);
         this.setupColumns();
         await this.loadWaterSuppliers();
     }

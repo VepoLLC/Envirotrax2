@@ -16,8 +16,7 @@ export class RolePermissionListComponent implements OnInit {
     public roleId!: number;
 
     public allView: boolean = false;
-    public allCreate: boolean = false;
-    public allEdit: boolean = false;
+    public allModify: boolean = false;
     public allDelete: boolean = false;
 
     constructor(
@@ -68,12 +67,18 @@ export class RolePermissionListComponent implements OnInit {
 
     private setAllToggles(rolePermissions: RolePermission[]): void {
         this.allView = rolePermissions.every(r => r.canView);
-        this.allCreate = rolePermissions.every(r => r.canCreate);
-        this.allEdit = rolePermissions.every(r => r.canEdit);
+
+        const modifiable = rolePermissions.filter(r => r.permission?.canModify);
+        this.allModify = modifiable.length > 0 && modifiable.every(r => r.canModify);
+
         this.allDelete = rolePermissions.every(r => r.canDelete);
     }
 
     public async update(rolePermission: RolePermission) {
+        if (rolePermission.canModify || rolePermission.canDelete) {
+            rolePermission.canView = true;
+        }
+
         try {
             this.isLoading = true;
 
@@ -89,7 +94,9 @@ export class RolePermissionListComponent implements OnInit {
     private toggleAll(permissionName: keyof RolePermission, newValue: boolean): void {
         for (let group of this.rolePermissions) {
             for (let permission of group.permissions) {
-                permission[permissionName] = newValue
+                if (permission.permission?.[permissionName as keyof Permission]) {
+                    permission[permissionName] = newValue;
+                }
             }
         }
     }
@@ -106,23 +113,38 @@ export class RolePermissionListComponent implements OnInit {
     }
 
     public async toggleAllView(newValue: boolean): Promise<void> {
-        this.toggleAll('canView', newValue);
+        for (let group of this.rolePermissions) {
+            for (let permission of group.permissions) {
+                const hasActiveModify = !!permission.canModify && !!permission.permission?.canModify;
+                const hasActiveDelete = !!permission.canDelete && !!permission.permission?.canDelete;
+                if (newValue || (!hasActiveModify && !hasActiveDelete)) {
+                    permission.canView = newValue;
+                }
+            }
+        }
         await this.bulkUpdate();
+        const allPermissions = this.rolePermissions.flatMap(g => g.permissions);
+        this.setAllToggles(allPermissions);
     }
 
-    public async toggleAllCreate(newValue: boolean): Promise<void> {
-        this.toggleAll('canCreate', newValue);
+    public async toggleAllModify(newValue: boolean): Promise<void> {
+        this.toggleAll('canModify', newValue);
+        if (newValue) {
+            this.toggleAll('canView', true);
+        }
         await this.bulkUpdate();
-    }
-
-    public async toggleAllEdit(newValue: boolean): Promise<void> {
-        this.toggleAll('canEdit', newValue);
-        await this.bulkUpdate();
+        const allPermissions = this.rolePermissions.flatMap(g => g.permissions);
+        this.setAllToggles(allPermissions);
     }
 
     public async toggleAllDelete(newValue: boolean): Promise<void> {
         this.toggleAll('canDelete', newValue);
+        if (newValue) {
+            this.toggleAll('canView', true);
+        }
         await this.bulkUpdate();
+        const allPermissions = this.rolePermissions.flatMap(g => g.permissions);
+        this.setAllToggles(allPermissions);
     }
 }
 

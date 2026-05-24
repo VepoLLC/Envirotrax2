@@ -33,7 +33,7 @@ namespace Envirotrax.App.Server.Controllers.Users
         }
 
         [HttpPut("{roleId}/permissions/add-or-update")]
-        [HasPermission(PermissionAction.CanCreate | PermissionAction.CanEdit, PermissionType.Roles)]
+        [HasPermission(PermissionAction.CanModify, PermissionType.Roles)]
         public async Task<IActionResult> AddOrUpdateAsync(int roleId, RolePermissionDto rolePermission)
         {
             if (roleId != rolePermission?.Role?.Id)
@@ -47,7 +47,7 @@ namespace Envirotrax.App.Server.Controllers.Users
         }
 
         [HttpPut("{roleId}/permissions/bulk-update")]
-        [HasPermission(PermissionAction.CanCreate | PermissionAction.CanEdit, PermissionType.Roles)]
+        [HasPermission(PermissionAction.CanModify, PermissionType.Roles)]
         public async Task<IActionResult> BulkUpdateAsync(int roleId, IEnumerable<RolePermissionDto> rolePermissions)
         {
             if (!rolePermissions.All(r => r.Role?.Id == roleId))

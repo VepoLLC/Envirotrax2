@@ -4,6 +4,7 @@ import { PermissionGuard } from "../shared/guards/permission.guard";
 import { PermissionAction, PermissionType } from "../shared/models/permission-type";
 import { BackflowTesterListComponent } from "./testers/list/backflow-tester-list.component";
 import { BackflowTestListComponent } from "./tests/backflow-test-list.component";
+import { BackflowTesterDetailsComponent } from "./testers/details/backflow-tester-details.component";
 
 const routes: Routes = [
     {
@@ -24,6 +25,20 @@ const routes: Routes = [
         path: 'testers',
         title: 'BPAT Management',
         component: BackflowTesterListComponent,
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.BackflowTesters,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
+    },
+    {
+        path: 'testers/details/:id',
+        title: 'BPAT Details',
+        component: BackflowTesterDetailsComponent,
         canActivate: [PermissionGuard],
         data: {
             permissions: [

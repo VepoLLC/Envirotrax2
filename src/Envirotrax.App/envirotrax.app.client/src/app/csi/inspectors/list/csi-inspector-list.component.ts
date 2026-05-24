@@ -74,7 +74,6 @@ export class CsiInspectorListComponent implements OnInit {
         try {
             this.table.isLoading = true;
             this.table.items = await this._csiInspectoreManagementService.getAll(this.table.items?.pageInfo || {}, this.table.query);
-            console.log(this.table.items);
         } finally {
             this.table.isLoading = false;
         }

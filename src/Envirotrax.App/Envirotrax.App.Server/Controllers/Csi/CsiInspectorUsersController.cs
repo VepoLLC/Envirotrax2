@@ -23,13 +23,13 @@ namespace Envirotrax.App.Server.Controllers.Csi
         [HasPermission(PermissionAction.CanView)]
         public async Task<IActionResult> GetSubAccountsAsync(int id, [FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
         {
-            var result = await _userService.GetAllByProfessionalAsync(id, pageInfo, query, cancellationToken);
+            var result = await _userService.GetAllByProfessionalAsync(id, pageInfo, query, cancellationToken, pu => pu.IsCsiInspector);
             return Ok(result);
         }
 
         [HttpPost("{id}/users")]
         [HasFeature(FeatureType.ManageProfessionalUsers)]
-        [HasPermission(PermissionAction.CanEdit)]
+        [HasPermission(PermissionAction.CanModify)]
         public async Task<IActionResult> AddSubAccountAsync(int id, [FromBody] ProfessionalUserDto dto)
         {
             var result = await _userService.AddForProfessionalAsync(id, dto);
@@ -38,7 +38,7 @@ namespace Envirotrax.App.Server.Controllers.Csi
 
         [HttpPut("{id}/users/{userId}")]
         [HasFeature(FeatureType.ManageProfessionalUsers)]
-        [HasPermission(PermissionAction.CanEdit)]
+        [HasPermission(PermissionAction.CanModify)]
         public async Task<IActionResult> UpdateSubAccountAsync(int id, int userId, [FromBody] ProfessionalUserDto dto)
         {
             var result = await _userService.UpdateSubAccountAsync(id, userId, dto.ContactName, dto.JobTitle);
@@ -47,7 +47,7 @@ namespace Envirotrax.App.Server.Controllers.Csi
 
         [HttpDelete("{id}/users/{userId}")]
         [HasFeature(FeatureType.ManageProfessionalUsers)]
-        [HasPermission(PermissionAction.CanEdit)]
+        [HasPermission(PermissionAction.CanModify)]
         public async Task<IActionResult> DeleteSubAccountAsync(int userId)
         {
             await _userService.DeleteAsync(userId);

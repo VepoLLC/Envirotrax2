@@ -36,4 +36,14 @@ export class BackflowTestService {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));
     }
+
+    public async submit(test: BackflowTest): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/backflow/tests');
+        return await lastValueFrom(this._http.post<BackflowTest>(url, test));
+    }
+
+    public async getForProfessional(id: number): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/backflow/tests/${id}`);
+        return await lastValueFrom(this._http.get<BackflowTest>(url));
+    }
 }

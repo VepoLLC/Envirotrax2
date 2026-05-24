@@ -51,8 +51,7 @@ public class RolePermissionRepository : IRolePermissionRepository
         }
 
         dbRecord.CanView = rolePermission.CanView;
-        dbRecord.CanCreate = rolePermission.CanCreate;
-        dbRecord.CanEdit = rolePermission.CanEdit;
+        dbRecord.CanModify = rolePermission.CanModify;
         dbRecord.CanDelete = rolePermission.CanDelete;
 
         await _dbContext.SaveChangesAsync();
@@ -80,8 +79,7 @@ public class RolePermissionRepository : IRolePermissionRepository
             }
 
             dbRecord.CanView = rolePermission.CanView;
-            dbRecord.CanCreate = rolePermission.CanCreate;
-            dbRecord.CanEdit = rolePermission.CanEdit;
+            dbRecord.CanModify = rolePermission.CanModify;
             dbRecord.CanDelete = rolePermission.CanDelete;
         }
 

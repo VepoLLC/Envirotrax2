@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260523124211_ConsolidatePermissionsToCanModify")]
+    partial class ConsolidatePermissionsToCanModify
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -89,9 +92,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<string>("AccountNumber")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<bool>("AirGapValid")
-                        .HasColumnType("bit");
 
                     b.Property<decimal>("Amount")
                         .HasPrecision(19, 4)
@@ -176,56 +176,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<DateTime?>("ExpirationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("FinalBCClosedTight")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal?>("FinalBCHeldPSID")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<bool>("FinalCV1ClosedTight")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("FinalCV1ClosedTight2")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal?>("FinalCV1HeldPSID")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<decimal?>("FinalCV1HeldPSID2")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<bool>("FinalCV2ClosedTight")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("FinalCV2ClosedTight2")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal?>("FinalCV2HeldPSID")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<bool>("FinalPvbAirInletFullyOpened")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal?>("FinalPvbAirInletOpenedPSID")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<decimal?>("FinalPvbCVHeldPSID")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<decimal?>("FinalRVOpenedPSID")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<decimal?>("FinalRVOpenedPSID2")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
                     b.Property<DateTime?>("FinalTestDate")
                         .HasColumnType("datetime2");
 
@@ -254,87 +204,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<string>("HazardTypeOtherDescription")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
-
-                    b.Property<bool>("InitBCClosedTight")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal?>("InitBCHeldPSID")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<bool>("InitBCLeaked")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("InitCV1ClosedTight")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("InitCV1ClosedTight2")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal?>("InitCV1HeldPSID")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<decimal?>("InitCV1HeldPSID2")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<bool>("InitCV1Leaked")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("InitCV1Leaked2")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("InitCV2ClosedTight")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("InitCV2ClosedTight2")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal?>("InitCV2HeldPSID")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<decimal?>("InitCV2HeldPSID2")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<bool>("InitCV2Leaked")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("InitCV2Leaked2")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("InitPvbAirInletDidNotOpen")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("InitPvbAirInletFullyOpened")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal?>("InitPvbAirInletOpenedPSID")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<decimal?>("InitPvbCVHeldPSID")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<bool>("InitPvbCVLeaked")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("InitRVDidNotOpen")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("InitRVDidNotOpen2")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal?>("InitRVOpenedPSID")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<decimal?>("InitRVOpenedPSID2")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
 
                     b.Property<DateTime?>("InitialTestDate")
                         .HasColumnType("datetime2");
@@ -396,30 +265,11 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Manufacturer2")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<string>("MeterNumber")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<decimal?>("MeterReadingAfter")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<decimal?>("MeterReadingBefore")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<bool>("MeterRegisters")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Model")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Model2")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -493,74 +343,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<string>("RejectedReason")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RepairBC")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("RepairBCDetails")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("RepairCV1")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("RepairCV12")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("RepairCV1Details")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("RepairCV1Details2")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("RepairCV2")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("RepairCV22")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("RepairCV2Details")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("RepairCV2Details2")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("RepairRV")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("RepairRV2")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("RepairRVDetails")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("RepairRVDetails2")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<DateTime?>("RepairTestDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ReplacementAssembly")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<string>("SerialNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("SerialNumber2")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -568,10 +354,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Size")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Size2")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 

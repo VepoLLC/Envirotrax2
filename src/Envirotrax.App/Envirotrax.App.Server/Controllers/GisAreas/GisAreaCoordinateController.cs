@@ -26,7 +26,7 @@ public class GisAreaCoordinateController : WaterSupplierProtectedController
 
     [HttpPut]
     [HasFeature(FeatureType.ManageGisAreas)]
-    [HasPermission(PermissionAction.CanCreate | PermissionAction.CanEdit, PermissionType.Settings)]
+    [HasPermission(PermissionAction.CanModify, PermissionType.Settings)]
     public async Task<IActionResult> AddOrUpdateAsync(int areaId, IEnumerable<GisAreaCoordinateDto> coordinates)
     {
         var result = await _coordinateService.AddOrUpdateAsync(areaId, coordinates);
@@ -35,7 +35,7 @@ public class GisAreaCoordinateController : WaterSupplierProtectedController
 
     [HttpDelete]
     [HasFeature(FeatureType.ManageGisAreas)]
-    [HasPermission(PermissionAction.CanCreate | PermissionAction.CanEdit, PermissionType.Settings)]
+    [HasPermission(PermissionAction.CanModify, PermissionType.Settings)]
     public async Task<IActionResult> DeleteByAreaAsync(int areaId)
     {
         await _coordinateService.DeleteByAreaAsync(areaId);

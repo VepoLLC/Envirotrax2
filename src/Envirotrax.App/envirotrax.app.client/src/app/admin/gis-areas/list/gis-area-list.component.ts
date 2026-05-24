@@ -94,8 +94,7 @@ export class GisAreaListComponent implements OnInit {
 
     private async setPermissions(): Promise<void> {
         this.canModifyData = await this._authService.hasAnyFeatures(FeatureType.ManageGisAreas) &&
-            (await this._authService.hasAnyPermisison(PermissionAction.CanCreate, PermissionType.Settings) ||
-                await this._authService.hasAnyPermisison(PermissionAction.CanEdit, PermissionType.Settings));
+            await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.Settings);
     }
 
     public async getAreas(): Promise<void> {

@@ -60,8 +60,7 @@ export class RoleListComponent implements OnInit {
     }
 
     public async ngOnInit(): Promise<void> {
-        this.canAdd = await this._authService.hasAnyPermisison(PermissionAction.CanCreate, PermissionType.Roles);
-        this.canEdit = await this._authService.hasAnyPermisison(PermissionAction.CanEdit, PermissionType.Roles);
+        this.canAdd = this.canEdit = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.Roles);
         this.canDelete = await this._authService.hasAnyPermisison(PermissionAction.CanDelete, PermissionType.Roles);
 
         this.getRoles();

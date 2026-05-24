@@ -88,7 +88,7 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
     }
 
     private async setPermissions(): Promise<void> {
-        const canEditCsiInspectors = await this._authService.hasAnyPermisison(PermissionAction.CanEdit, PermissionType.CsiInspectors);
+        const canEditCsiInspectors = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.CsiInspectors);
 
         this.canManageLicenses = canEditCsiInspectors && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalLicenses);
         this.canManageInsurances = canEditCsiInspectors && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalInsurances);

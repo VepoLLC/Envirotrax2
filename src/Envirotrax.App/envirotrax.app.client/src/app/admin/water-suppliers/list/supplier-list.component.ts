@@ -59,8 +59,7 @@ export class SupplierListComponent implements OnInit {
     }
 
     public async ngOnInit(): Promise<void> {
-        this.canAdd = await this._authService.hasAnyPermisison(PermissionAction.CanCreate, PermissionType.WaterSuppliers);
-        this.canEdit = await this._authService.hasAnyPermisison(PermissionAction.CanEdit, PermissionType.WaterSuppliers);
+        this.canAdd = this.canEdit = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.WaterSuppliers);
         this.canDelete = await this._authService.hasAnyPermisison(PermissionAction.CanDelete, PermissionType.WaterSuppliers);
 
         await this.getSuppliers();

@@ -23,7 +23,8 @@ namespace Envirotrax.App.Server.Controllers.Backflow
         [HasPermission(PermissionAction.CanView)]
         public async Task<IActionResult> GetSubAccountsAsync(int id, [FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
         {
-            var result = await _userService.GetAllByProfessionalAsync(id, pageInfo, query, cancellationToken, pu => pu.IsBackflowTester);
+            query.Filter.Add(new() { ColumnName = nameof(ProfessionalUserDto.IsBackflowTester), Value = bool.TrueString });
+            var result = await _userService.GetAllByProfessionalAsync(id, pageInfo, query, cancellationToken);
             return Ok(result);
         }
 

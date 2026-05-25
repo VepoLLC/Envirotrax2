@@ -1,4 +1,6 @@
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -32,6 +34,7 @@ namespace Envirotrax.App.Server.Controllers.Backflow
         [HasPermission(PermissionAction.CanView)]
         public async Task<IActionResult> GetLicensesAsync(int id, [FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
         {
+            query.Filter.Add(new() { ColumnName = nameof(ProfessionalUserLicenseDto.ProfessionalType), Value = ((int)ProfessionalType.Bpat).ToString() });
             var result = await _licenseService.GetAllByProfessionalAsync(id, pageInfo, query, cancellationToken);
             return Ok(result);
         }

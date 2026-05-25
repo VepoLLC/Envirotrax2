@@ -10,7 +10,7 @@ import { ProfessionalSupplierService } from '../../../shared/services/profession
 import { Professional } from '../../../shared/models/professionals/professional';
 import { ExpirationType, ProfessionalUser } from '../../../shared/models/professionals/professional-user';
 import { ProfessionalWaterSupplier } from '../../../shared/models/professionals/professional-water-supplier';
-import { BackflowGauge } from '../../../shared/models/backflow/backflow-gauge';
+import { BackflowGauge, GaugeExpirationType } from '../../../shared/models/backflow/backflow-gauge';
 import { BackflowTestResult, BackflowReasonForTest, BackflowDeviceType } from '../../../shared/models/backflow/backflow-test-enums';
 import { InputOption } from '../../../shared/components/input/input.component';
 import { MAX_PAGE_SIZE } from '../../../shared/models/page-info';
@@ -47,6 +47,7 @@ export class BackflowTestSubmitComponent implements OnInit {
     public readonly BackflowReasonForTest = BackflowReasonForTest;
     public readonly BackflowDeviceType = BackflowDeviceType;
     public readonly ExpirationType = ExpirationType;
+    public readonly GaugeExpirationType = GaugeExpirationType;
 
     public readonly deviceTypeOptions: InputOption[] = [
         { id: BackflowDeviceType.DC, text: 'DC - Double Check Valve' },
@@ -202,12 +203,12 @@ export class BackflowTestSubmitComponent implements OnInit {
         try {
             const [professional, usersPage, gaugesPage] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
-                this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, {}),
+                this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isBackflowTester', comparisonOperator: 'Eq', value: 'true' }] }),
                 this._gaugeService.getAll({ pageSize: MAX_PAGE_SIZE }, {})
             ]);
 
             this.professional = professional;
-            this._bpats = (usersPage.data ?? []).filter(u => u.isBackflowTester);
+            this._bpats = usersPage.data ?? [];
             this._gauges = gaugesPage.data ?? [];
 
             const suppliersPage = await this._supplierService.getAllMy(false, true);
@@ -229,7 +230,9 @@ export class BackflowTestSubmitComponent implements OnInit {
     private buildOptions(): void {
         this.bpatOptions = this._bpats.map(u => ({ id: u.id, text: u.contactName ?? `User ${u.id}` }));
         this.waterSupplierOptions = this._waterSuppliers.map(ws => ({ id: ws.waterSupplier?.id, text: ws.waterSupplier?.name ?? '' }));
-        this.gaugeOptions = this._gauges.map(g => ({ id: g.id, text: `${g.manufacturer} ${g.model} ${g.serialNumber}` }));
+        this.gaugeOptions = this._gauges
+            .filter(g => g.expirationType !== GaugeExpirationType.Expired)
+            .map(g => ({ id: g.id, text: `${g.manufacturer} ${g.model} ${g.serialNumber}` }));
     }
 
     private async setDefaults(): Promise<void> {
@@ -245,9 +248,10 @@ export class BackflowTestSubmitComponent implements OnInit {
             this.selectedWaterSupplierId = this._waterSuppliers[0].waterSupplier?.id;
             this.selectedWaterSupplier = this._waterSuppliers[0];
         }
-        if (this._gauges.length === 1) {
-            this.selectedGaugeId = this._gauges[0].id;
-            this.selectedGauge = this._gauges[0];
+        const validGauges = this._gauges.filter(g => g.expirationType !== GaugeExpirationType.Expired);
+        if (validGauges.length === 1) {
+            this.selectedGaugeId = validGauges[0].id;
+            this.selectedGauge = validGauges[0];
         }
     }
 

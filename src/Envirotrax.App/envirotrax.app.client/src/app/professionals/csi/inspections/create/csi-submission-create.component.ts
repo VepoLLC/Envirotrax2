@@ -179,12 +179,12 @@ export class CsiSubmissionCreateComponent implements OnInit {
 
             const [professional, usersPage, site] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
-                this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, {}),
+                this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isCsiInspector', comparisonOperator: 'Eq', value: 'true' }] }),
                 this._siteService.getForProfessional(this._siteId)
             ]);
 
             this.professional = professional;
-            this.csiUsers = (usersPage.data ?? []).filter(u => u.isCsiInspector);
+            this.csiUsers = usersPage.data ?? [];
             this.site = site;
 
             const waterSuppliersPage = await this._professionalSupplierService.getAllMy(true);

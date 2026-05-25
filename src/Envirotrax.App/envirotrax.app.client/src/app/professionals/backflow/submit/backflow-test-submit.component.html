@@ -85,7 +85,16 @@
                         </ng-container>
                         <ng-container *ngIf="selectedGauge">
                             <dt class="col-5 text-nowrap fw-semibold">Test Gauge:</dt>
-                            <dd class="col-7 mb-1 text-success">{{ selectedGauge.manufacturer }} {{ selectedGauge.model }} {{ selectedGauge.serialNumber }}</dd>
+                            <dd class="col-7 mb-1">{{ selectedGauge.manufacturer }} {{ selectedGauge.model }} {{ selectedGauge.serialNumber }}</dd>
+                            <dt class="col-5 text-nowrap fw-semibold">Gauge Calibration:</dt>
+                            <dd class="col-7 mb-1"
+                                [class.text-success]="selectedGauge.expirationType === GaugeExpirationType.Valid"
+                                [class.text-warning]="selectedGauge.expirationType === GaugeExpirationType.AboutToExpire"
+                                [class.text-danger]="selectedGauge.expirationType === GaugeExpirationType.Expired">
+                                {{ selectedGauge.expirationType === GaugeExpirationType.Valid ? 'Calibration valid' :
+                                   selectedGauge.expirationType === GaugeExpirationType.AboutToExpire ? 'Calibration about to expire' :
+                                   'Calibration expired' }}
+                            </dd>
                         </ng-container>
                     </dl>
                 </div>

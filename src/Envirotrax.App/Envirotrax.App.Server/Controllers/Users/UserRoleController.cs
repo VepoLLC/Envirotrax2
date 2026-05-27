@@ -25,7 +25,7 @@ namespace Envirotrax.App.Server.Controllers.Users
         }
 
         [HttpPost]
-        [HasPermission(PermissionAction.CanCreate, PermissionType.Users)]
+        [HasPermission(PermissionAction.CanModify, PermissionType.Users)]
         public async Task<IActionResult> AddAsync(int userId, UserRoleDto userRole)
         {
             if (userId != userRole?.User?.Id)

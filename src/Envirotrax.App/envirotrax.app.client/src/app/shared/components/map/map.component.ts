@@ -13,11 +13,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
     private _map!: any;
     private _container!: HTMLElement;
     private _polygonInstances: any[] = [];
+    private _markerInstance: any;
     private _drawingManager: any;
 
     private static _apiKey$?: Observable<ApiKey>;
     private static _mapsLibrary?: any;
     private static _drawingLibrary?: any;
+    private static _markerLibrary?: any;
 
     public autoSetHeight?: string;
 
@@ -38,6 +40,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
 
     @Input()
     public polygons?: MapPolygon<any>[];
+
+    @Input()
+    public showMarker?: boolean;
 
     @Output()
     public mouseMoved = new EventEmitter<{ lat: number, lng: number }>();
@@ -73,9 +78,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
         const apiKey = await this.getApiKey();
         setOptions({ key: apiKey.apiKey });
 
-        // Load the Maps and Drawing libraries.
+        // Load the Maps, Drawing, and Marker libraries.
         MapComponent._mapsLibrary ??= await importLibrary('maps');
         MapComponent._drawingLibrary ??= await importLibrary('drawing');
+        MapComponent._markerLibrary ??= await importLibrary('marker');
         const { Map } = MapComponent._mapsLibrary;
 
         // Set map options.
@@ -97,6 +103,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
         );
 
         await this.renderPolygons();
+        this.renderMarker();
 
         this._map.addListener('mousemove', (event: any) => {
             this._ngZone.run(() => this.mouseMoved.emit({ lat: event.latLng.lat(), lng: event.latLng.lng() }));
@@ -119,6 +126,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
 
         if (changes['latitude'] || changes['longitude']) {
             this._map.setCenter({ lat: this.latitude ?? 0, lng: this.longitude ?? 0 });
+            this.renderMarker();
         }
 
         if (changes['zoom']) {
@@ -128,6 +136,27 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
         if (changes['polygons']) {
             await this.renderPolygons();
         }
+
+        if (changes['showMarker']) {
+            this.renderMarker();
+        }
+    }
+
+    private renderMarker(): void {
+        if (this._markerInstance) {
+            this._markerInstance.setMap(null);
+            this._markerInstance = null;
+        }
+
+        if (!this.showMarker || this.latitude == null || this.longitude == null) {
+            return;
+        }
+
+        const { Marker } = MapComponent._markerLibrary as any;
+        this._markerInstance = new Marker({
+            position: { lat: this.latitude, lng: this.longitude },
+            map: this._map
+        });
     }
 
     private async renderPolygons(): Promise<void> {

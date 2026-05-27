@@ -85,18 +85,22 @@ namespace Envirotrax.Auth.Domain.Configuration
                     else
                     {
                         // IMPORTANT:
-                        // The certificate must not be checked in to source control. 
-                        // For example, If we host the App in Azure, it can be stored in App Service
-                        string certThumbprint = configuration["OpenIddict:CertThumbprint"] ?? throw new InvalidOperationException("We need certificate thumbprint from Azure App Service");
+                        // The certificate must not be checked in to source control.
+                        // On a Windows VM, import the certificate into the Local Machine > Personal store
+                        // and set OpenIddict:CertThumbprint in configuration to its thumbprint.
+                        string certThumbprint = configuration["OpenIddict:CertThumbprint"] ?? throw new InvalidOperationException("Certificate thumbprint is required (OpenIddict:CertThumbprint)");
 
-                        var filePath = $"/var/ssl/private/{certThumbprint}.p12";
+                        using var store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+                        store.Open(OpenFlags.ReadOnly);
 
-                        if (!File.Exists(filePath))
+                        var matches = store.Certificates.Find(X509FindType.FindByThumbprint, certThumbprint, validOnly: false);
+
+                        if (matches.Count == 0)
                         {
-                            throw new Exception($"Certificate with thumbprint {certThumbprint} was not found");
+                            throw new Exception($"Certificate with thumbprint '{certThumbprint}' was not found in LocalMachine\\My store");
                         }
 
-                        var cert = X509CertificateLoader.LoadPkcs12FromFile(filePath, password: null);
+                        var cert = matches[0];
 
                         options
                             .AddEncryptionCertificate(cert)

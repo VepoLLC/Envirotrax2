@@ -2029,13 +2029,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<int>("Id")
                         .HasColumnType("int");
 
-                    b.Property<bool>("CanCreate")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("CanDelete")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("CanEdit")
+                    b.Property<bool>("CanModify")
                         .HasColumnType("bit");
 
                     b.Property<bool>("CanView")
@@ -2101,13 +2098,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<int>("PermissionId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("CanCreate")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("CanDelete")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("CanEdit")
+                    b.Property<bool>("CanModify")
                         .HasColumnType("bit");
 
                     b.Property<bool>("CanView")

@@ -30,7 +30,7 @@ namespace Envirotrax.App.Server.Controllers.Csi
 
         [HttpPost("{id}/insurances")]
         [HasFeature(FeatureType.ManageProfessionalInsurances)]
-        [HasPermission(PermissionAction.CanEdit)]
+        [HasPermission(PermissionAction.CanModify)]
         public async Task<IActionResult> AddInsuranceAsync([FromForm] CreateInsuranceDto dto, CancellationToken cancellationToken)
         {
             using var stream = dto.File.OpenReadStream();
@@ -39,7 +39,7 @@ namespace Envirotrax.App.Server.Controllers.Csi
 
         [HttpPut("{id}/insurances/{insuranceId}")]
         [HasFeature(FeatureType.ManageProfessionalInsurances)]
-        [HasPermission(PermissionAction.CanEdit)]
+        [HasPermission(PermissionAction.CanModify)]
         public async Task<IActionResult> UpdateInsuranceAsync(int insuranceId, [FromBody] ProfessionalInsuranceDto dto, CancellationToken cancellationToken)
         {
             dto.Id = insuranceId;
@@ -62,7 +62,7 @@ namespace Envirotrax.App.Server.Controllers.Csi
 
         [HttpDelete("{id}/insurances/{insuranceId}")]
         [HasFeature(FeatureType.ManageProfessionalInsurances)]
-        [HasPermission(PermissionAction.CanEdit)]
+        [HasPermission(PermissionAction.CanModify)]
         public async Task<IActionResult> DeleteInsuranceAsync(int insuranceId)
         {
             await _insuranceService.DeleteAsync(insuranceId);

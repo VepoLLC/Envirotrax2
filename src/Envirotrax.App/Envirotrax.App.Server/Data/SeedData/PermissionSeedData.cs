@@ -15,8 +15,7 @@ public static class PermissionSeedData
             Name = "Water Suppliers",
             SortOrder = 1,
             CanView = true,
-            CanCreate = true,
-            CanEdit = true,
+            CanModify = true,
             CanDelete = true
         },
         new()
@@ -26,8 +25,7 @@ public static class PermissionSeedData
             Name = "Settings",
             SortOrder = 2,
             CanView = true,
-            CanCreate = false,
-            CanEdit = true,
+            CanModify = true,
             CanDelete = false
         },
         new()
@@ -37,8 +35,7 @@ public static class PermissionSeedData
             Name = "Roles",
             SortOrder = 3,
             CanView = true,
-            CanCreate = true,
-            CanEdit = true,
+            CanModify = true,
             CanDelete = true
         },
         new()
@@ -48,8 +45,7 @@ public static class PermissionSeedData
             Name = "Account Information",
             SortOrder = 4,
             CanView = true,
-            CanCreate = false,
-            CanEdit = true,
+            CanModify = true,
             CanDelete = false
         },
         new()
@@ -59,8 +55,7 @@ public static class PermissionSeedData
             Name = "Users",
             SortOrder = 5,
             CanView = true,
-            CanCreate = true,
-            CanEdit = true,
+            CanModify = true,
             CanDelete = true
         },
         new()
@@ -70,8 +65,7 @@ public static class PermissionSeedData
             Name = "Notifications",
             SortOrder = 6,
             CanView = true,
-            CanCreate = false,
-            CanEdit = true,
+            CanModify = true,
             CanDelete = false
         },
         new()
@@ -81,8 +75,7 @@ public static class PermissionSeedData
             Name = "Sites",
             SortOrder = 7,
             CanView = true,
-            CanCreate = true,
-            CanEdit = true,
+            CanModify = true,
             CanDelete = true
         },
 
@@ -94,8 +87,7 @@ public static class PermissionSeedData
             Name = "Inspections",
             SortOrder = 8,
             CanView = true,
-            CanCreate = false,
-            CanEdit = false,
+            CanModify = false,
             CanDelete = false
         },
         new()
@@ -105,8 +97,7 @@ public static class PermissionSeedData
             Name = "Inspectors",
             SortOrder = 9,
             CanView = true,
-            CanCreate = false,
-            CanEdit = true,
+            CanModify = true,
             CanDelete = false
         },
         new()
@@ -116,8 +107,7 @@ public static class PermissionSeedData
             Name = "Reports",
             SortOrder = 10,
             CanView = true,
-            CanCreate = false,
-            CanEdit = false,
+            CanModify = false,
             CanDelete = false
         },
 
@@ -129,8 +119,7 @@ public static class PermissionSeedData
             Name = "Backflow Tests",
             SortOrder = 11,
             CanView = true,
-            CanCreate = false,
-            CanEdit = true,
+            CanModify = true,
             CanDelete = false
         },
         new()
@@ -140,8 +129,7 @@ public static class PermissionSeedData
             Name = "BPAT Management",
             SortOrder = 12,
             CanView = true,
-            CanCreate = false,
-            CanEdit = false,
+            CanModify = false,
             CanDelete = false
         },
         new()
@@ -151,8 +139,7 @@ public static class PermissionSeedData
             Name = "Out of Service",
             SortOrder = 13,
             CanView = true,
-            CanCreate = false,
-            CanEdit = true,
+            CanModify = true,
             CanDelete = false
         },
         new()
@@ -162,8 +149,7 @@ public static class PermissionSeedData
             Name = "Reports",
             SortOrder = 14,
             CanView = true,
-            CanCreate = false,
-            CanEdit = false,
+            CanModify = false,
             CanDelete = false
         },
 
@@ -175,8 +161,7 @@ public static class PermissionSeedData
             Name = "Trip Tickets",
             SortOrder = 15,
             CanView = true,
-            CanCreate = false,
-            CanEdit = true,
+            CanModify = true,
             CanDelete = false
         },
         new()
@@ -186,8 +171,7 @@ public static class PermissionSeedData
             Name = "Vehicle Management",
             SortOrder = 16,
             CanView = true,
-            CanCreate = false,
-            CanEdit = true,
+            CanModify = true,
             CanDelete = false
         },
         new()
@@ -197,8 +181,7 @@ public static class PermissionSeedData
             Name = "Transporter Management",
             SortOrder = 17,
             CanView = true,
-            CanCreate = false,
-            CanEdit = false,
+            CanModify = false,
             CanDelete = false
         },
         new()
@@ -208,8 +191,7 @@ public static class PermissionSeedData
             Name = "Inspections",
             SortOrder = 18,
             CanView = true,
-            CanCreate = false,
-            CanEdit = true,
+            CanModify = true,
             CanDelete = false
         },
         new()
@@ -219,8 +201,7 @@ public static class PermissionSeedData
             Name = "Inspector Management",
             SortOrder = 19,
             CanView = true,
-            CanCreate = false,
-            CanEdit = false,
+            CanModify = false,
             CanDelete = false
         },
         new()
@@ -230,8 +211,7 @@ public static class PermissionSeedData
             Name = "Reports",
             SortOrder = 20,
             CanView = true,
-            CanCreate = false,
-            CanEdit = false,
+            CanModify = false,
             CanDelete = false
         },
     ];

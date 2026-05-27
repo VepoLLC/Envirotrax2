@@ -71,4 +71,15 @@ public class SiteRepository : Repository<Site>, ISiteRepository
                 .SetProperty(site => site.GisStatus, site.GisStatus)
                 .SetProperty(site => site.GisAreaId, site.GisAreaId));
     }
+
+    public async Task UpdateManualGisDataAsync(int siteId, double? latitude, double? longitude, GisStatusType status)
+    {
+        await DbContext
+            .Sites
+            .Where(s => s.Id == siteId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(s => s.GisLatitude, latitude)
+                .SetProperty(s => s.GisLongitude, longitude)
+                .SetProperty(s => s.GisStatus, status));
+    }
 }

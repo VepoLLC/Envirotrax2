@@ -25,7 +25,7 @@ public class UserController : WaterSupplierCrudController<WaterSupplierUserDto>
     }
 
     [HttpPost("{id}/invitations")]
-    [HasPermission(PermissionAction.CanEdit, PermissionType.Users)]
+    [HasPermission(PermissionAction.CanModify, PermissionType.Users)]
     public async Task<IActionResult> ResendInvitationAsync(int id)
     {
         var result = await _userService.ResendInvitationAsync(id);

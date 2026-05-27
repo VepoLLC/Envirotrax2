@@ -11,7 +11,7 @@
 # 2. Create a secret in your repository named AZURE_WEBAPP_PUBLISH_PROFILE, paste the publish profile contents as the value of the secret.
 #    For instructions on obtaining the publish profile see: https://docs.microsoft.com/azure/app-service/deploy-github-actions#configure-the-github-secret
 #
-# 3. Change the value for the AZURE_WEBAPP_NAME. Optionally, change the AZURE_WEBAPP_PACKAGE_PATH and DOTNET_VERSION environment variables below.
+# 3. Change the value for the AZURE_WEBAPP_NAME. Optionally, change the WEBAPP_PACKAGE_PATH and DOTNET_VERSION environment variables below.
 #
 # For more information on GitHub Actions for Azure: https://github.com/Azure/Actions
 # For more information on the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
@@ -21,15 +21,16 @@ name: Envirotrax.Auth - Test - Deploy
 
 env:
   AZURE_WEBAPP_NAME: envirotrax2-auth-test    # set this to the name of your Azure Web App
-  AZURE_WEBAPP_PACKAGE_PATH: 'src/Envirotrax.Auth'      # set this to the path to your web app project, defaults to the repository root
+  WEBAPP_PACKAGE_PATH: 'src/Envirotrax.Auth'      # set this to the path to your web app project, defaults to the repository root
+  WEBAPP_PROJECT_NAME: 'Envirotrax.Auth'
   DOTNET_VERSION: '10'                 # set this to the .NET Core version to use
+  ARTIFACT_PATH: './artifacts/Envirotrax.Auth'
 
 on:
   push:
     branches: [ "test" ]
     paths:
       - "src/Envirotrax.Auth/**"
-      - "src/Envirotrax.Common/**"
   workflow_dispatch:
 
 permissions:
@@ -56,18 +57,18 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Build with dotnet
-        working-directory: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        working-directory: ${{ env.WEBAPP_PACKAGE_PATH }}
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        working-directory: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/Envirotrax.Auth
+        working-directory: ${{ env.WEBAPP_PACKAGE_PATH }}
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/${{env.WEBAPP_PROJECT_NAME}}
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/Envirotrax.Auth
+          path: ${{env.DOTNET_ROOT}}/${{env.WEBAPP_PROJECT_NAME}}
 
   deploy:
     runs-on: ubuntu-latest
@@ -81,7 +82,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-          path: ./artifacts/Envirotrax.Auth
+          path: ${{ env.ARTIFACT_PATH }}
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -96,4 +97,4 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: 'Production'
-          package: ./artifacts/Envirotrax.Auth
+          package: ${{ env.ARTIFACT_PATH }}

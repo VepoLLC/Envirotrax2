@@ -1,5 +1,4 @@
 
-using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
@@ -90,17 +89,12 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         return existing;
     }
 
-    public async Task<IEnumerable<ProfessionalUser>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null)
+    public async Task<IEnumerable<ProfessionalUser>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        var q = DbContext.ProfessionalUsers
+        var paginated = await DbContext.ProfessionalUsers
             .AsNoTracking()
             .Include(pu => pu.User)
-            .Where(pu => pu.ProfessionalId == professionalId);
-
-        if (roleFilter != null)
-            q = q.Where(roleFilter);
-
-        var paginated = await q
+            .Where(pu => pu.ProfessionalId == professionalId)
             .Where(query.Filter)
             .OrderBy(query.Sort)
             .PaginateAsync(pageInfo, cancellationToken);

@@ -1,5 +1,4 @@
 
-using System.Linq.Expressions;
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
@@ -12,7 +11,7 @@ public interface IProfessionalUserService : IService<ProfessionalUser, Professio
     Task<ProfessionalUserDto?> UpdateMyDataAsync(ProfessionalUserDto user);
 
     Task<ProfessionalUserDto?> ResendInvitationAsync(int id);
-    Task<IPagedData<ProfessionalUserDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null);
+    Task<IPagedData<ProfessionalUserDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<ProfessionalUserDto> AddForProfessionalAsync(int professionalId, ProfessionalUserDto dto);
     Task<ProfessionalUserDto?> UpdateSubAccountAsync(int professionalId, int userId, string? contactName, string? jobTitle);
 }

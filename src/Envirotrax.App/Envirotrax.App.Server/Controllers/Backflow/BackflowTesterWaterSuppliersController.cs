@@ -1,4 +1,5 @@
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -22,6 +23,7 @@ namespace Envirotrax.App.Server.Controllers.Backflow
         [HasPermission(PermissionAction.CanView)]
         public async Task<IActionResult> GetWaterSuppliersAsync(int id, [FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
         {
+            query.Filter.Add(new() { ColumnName = nameof(ProfessionalWaterSupplierDto.HasBackflowTesting), Value = bool.TrueString });
             var result = await _supplierService.GetAllByProfessionalAsync(id, pageInfo, query, cancellationToken);
             return Ok(result);
         }

@@ -28,4 +28,9 @@ export class BackflowTesterManagementService {
 
         return await lastValueFrom(observable);
     }
+
+        public async getAccountInfo(id: number): Promise<Professional> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${id}`);
+        return await lastValueFrom(this._http.get<Professional>(url));
+    }
 }

@@ -9,8 +9,7 @@
 
     @if (!isLoading) {
         <div class="mb-3">
-            <!-- add [noPadding]="true" after merge dashboard on dev-->
-            <vp-section [header]="(fromDate | date:'dd.MM.yyyy') + ' - ' + (toDate | date:'dd.MM.yyyy') + ' Totals'">
+            <vp-section [header]="(fromDate | date:'dd.MM.yyyy') + ' - ' + (toDate | date:'dd.MM.yyyy') + ' Totals'" [noPadding]="true">
 
                 <div class="d-flex justify-content-center align-items-center gap-3 py-2 flex-wrap">
                     <span class="fw-semibold">From:</span>
@@ -62,8 +61,7 @@
 
         @if (report && report.stats.length > 0) {
             <div class="mb-3">
-                <!-- add [noPadding]="true" after merge dashboard on dev-->
-                <vp-section [header]="(fromDate | date:'dd.MM.yyyy') + ' - ' + (toDate | date:'dd.MM.yyyy') + ' Statistics'">
+                <vp-section [header]="(fromDate | date:'dd.MM.yyyy') + ' - ' + (toDate | date:'dd.MM.yyyy') + ' Statistics'" [noPadding]="true">
                     <div class="table-responsive">
                         <table class="table table-sm mb-0">
                             <thead>
@@ -104,7 +102,7 @@
                                         <tr>
                                             <td class="ps-3">{{ item.label }}</td>
                                             <td class="align-middle">
-                                                <div class="reportbar" [class.green]="category.title !== 'Inspection Reason'" [class.blue]="category.title === 'Inspection Reason'" [style.width.%]="item.percentage">&nbsp;</div>
+                                                <div class="reportbar" [class.green]="category.title !== 'Inspection Reason'" [class.steelblue]="category.title === 'Inspection Reason'" [style.width.%]="item.percentage">&nbsp;</div>
                                             </td>
                                             <td>{{ item.count }}</td>
                                             <td>{{ item.percentage }}%</td>

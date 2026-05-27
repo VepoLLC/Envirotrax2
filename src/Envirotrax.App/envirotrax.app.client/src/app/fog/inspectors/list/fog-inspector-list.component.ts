@@ -1,5 +1,6 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { ActivatedRoute, Router } from "@angular/router";
 import { FogInspectorService } from "../../../shared/services/fog/fog-inspector.service";
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
@@ -16,7 +17,6 @@ export class FogInspectorListComponent implements OnInit {
     public showResults: boolean = false;
 
     public table: TableViewModel<Professional> = {
-        columns: this.getColumns(),
         query: {
             sort: {},
             filter: []
@@ -34,7 +34,9 @@ export class FogInspectorListComponent implements OnInit {
     public addressCell?: TemplateRef<CellTemplateData<Professional>>;
 
     constructor(
-        private readonly _fogInspectorService: FogInspectorService
+        private readonly _fogInspectorService: FogInspectorService,
+        private readonly _router: Router,
+        private readonly _activatedRoute: ActivatedRoute
     ) {
     }
 
@@ -79,6 +81,12 @@ export class FogInspectorListComponent implements OnInit {
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
         this.table.query.filter = queryProperties;
+    }
+
+    public openDetails(row: any): void {
+        this._router.navigate(['details', row.id], {
+            relativeTo: this._activatedRoute
+        });
     }
 
     public async search(searchForm: NgForm): Promise<void> {

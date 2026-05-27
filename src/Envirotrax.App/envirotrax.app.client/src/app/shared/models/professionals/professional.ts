@@ -9,6 +9,7 @@ export interface Professional {
     state?: State;
     zipCode?: string;
     companyEmail?: string;
+    contactName?: string;
     phoneNumber?: string;
     faxNumber?: string;
     websiteUrl?: string;

@@ -1,0 +1,122 @@
+<div class="container-fluid">
+    <header class="text-center mb-3">
+        <h1 class="h3">CSI System Report</h1>
+    </header>
+
+    @if (isLoading) {
+        <dp-loading-spinner />
+    }
+
+    @if (!isLoading) {
+        <div class="mb-3">
+            <!-- add [noPadding]="true" after merge dashboard on dev-->
+            <vp-section [header]="(fromDate | date:'dd.MM.yyyy') + ' - ' + (toDate | date:'dd.MM.yyyy') + ' Totals'">
+
+                <div class="d-flex justify-content-center align-items-center gap-3 py-2 flex-wrap">
+                    <span class="fw-semibold">From:</span>
+                    <input type="date" class="form-control" style="width: auto" [(ngModel)]="fromDate" />
+                    <span class="fw-semibold">To:</span>
+                    <input type="date" class="form-control" style="width: auto" [(ngModel)]="toDate" />
+                    <button type="button" class="btn btn-primary" (click)="loadReport()">Update</button>
+                </div>
+                @if (dateRangeError) {
+                    <div class="text-danger text-center pb-2">{{ dateRangeError }}</div>
+                }
+
+                @if (report) {
+                    <div class="fw-semibold text-center py-2">Total Inspections: {{ report.totalCount }}</div>
+
+                    <div class="table-responsive">
+                        <table class="table table-striped table-sm mb-0">
+                            <thead>
+                                <tr class="table-primary">
+                                    <th class="ps-3 text-center" style="width: 10%">{{ isYearView() ? 'Year' : 'Month' }}</th>
+                                    <th></th>
+                                    <th style="width: 4%">#</th>
+                                    <th style="width: 4%">%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (period of report.periods; track period.label) {
+                                    <tr>
+                                        <td class="text-start ps-3 pe-3">
+                                            <a class="btn btn-primary py-0 w-100 period-btn"
+                                               (click)="isYearView() ? showByMonth(period) : filterToMonth(period)">
+                                                {{ period.label }}
+                                            </a>
+                                        </td>
+                                        <td class="align-middle">
+                                            <div class="reportbar orange" [style.width.%]="getBarPercent(period.count)">&nbsp;</div>
+                                        </td>
+                                        <td>{{ period.count }}</td>
+                                        <td>{{ period.percentage }}%</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+            </vp-section>
+        </div>
+
+        @if (report && report.stats.length > 0) {
+            <div class="mb-3">
+                <!-- add [noPadding]="true" after merge dashboard on dev-->
+                <vp-section [header]="(fromDate | date:'dd.MM.yyyy') + ' - ' + (toDate | date:'dd.MM.yyyy') + ' Statistics'">
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr class="table-primary">
+                                    <th class="ps-3 text-center" style="width: 20%">Statistic</th>
+                                    <th></th>
+                                    <th style="width: 4%">#</th>
+                                    <th style="width: 4%">%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="ps-3 fw-semibold">Total Inspections</td>
+                                    <td></td>
+                                    <td>{{ report.totalCount }}</td>
+                                    <td></td>
+                                </tr>
+                                @if (report.subAccounts.length) {
+                                    <tr class="table-secondary">
+                                        <td class="ps-3 fw-semibold" colspan="4">Sub Accounts</td>
+                                    </tr>
+                                    @for (sub of report.subAccounts; track sub.name) {
+                                        <tr>
+                                            <td class="ps-3">{{ sub.name }}</td>
+                                            <td class="align-middle">
+                                                <div class="reportbar green" [style.width.%]="sub.percentage">&nbsp;</div>
+                                            </td>
+                                            <td>{{ sub.count }}</td>
+                                            <td>{{ sub.percentage }}%</td>
+                                        </tr>
+                                    }
+                                }
+                                @for (category of report.stats; track category.title) {
+                                    <tr class="table-secondary">
+                                        <td class="ps-3 fw-semibold" colspan="4">{{ category.title }}</td>
+                                    </tr>
+                                    @for (item of category.items; track item.label) {
+                                        <tr>
+                                            <td class="ps-3">{{ item.label }}</td>
+                                            <td class="align-middle">
+                                                <div class="reportbar" [class.green]="category.title !== 'Inspection Reason'" [class.blue]="category.title === 'Inspection Reason'" [style.width.%]="item.percentage">&nbsp;</div>
+                                            </td>
+                                            <td>{{ item.count }}</td>
+                                            <td>{{ item.percentage }}%</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </vp-section>
+            </div>
+        }
+    }
+
+</div>

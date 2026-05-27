@@ -163,7 +163,7 @@ export class App implements OnInit {
           {
             title: 'System Reports',
             iconCss: 'fa-regular fa-chart-simple-horizontal',
-            routerLink: ['/'],
+            routerLink: ['csi/reports/system'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports),
             hasFeature: true
           },

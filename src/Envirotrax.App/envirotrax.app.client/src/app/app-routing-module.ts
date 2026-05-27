@@ -5,6 +5,8 @@ import { FeatureGuard } from './shared/guards/feature.guard';
 import { FeatureType } from './shared/models/feature-type';
 import { RoleGuard } from './shared/guards/role.guard';
 import { ROLE_DEFINITIONS } from './shared/models/role-definitions';
+import { HomeComponent } from './home/home.component';
+
 const routes: Routes = [
   {
     path: '',
@@ -14,7 +16,7 @@ const routes: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        loadChildren: () => import('./home/home.module').then(m => m.HomeModule)
+        component: HomeComponent
       },
       {
         path: 'admin',
@@ -67,7 +69,7 @@ const routes: Routes = [
           roles: [ROLE_DEFINITIONS.WATER_SUPPLIER]
         }
       },
-            {
+      {
         path: 'dashboard',
         loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule),
         canActivate: [RoleGuard],

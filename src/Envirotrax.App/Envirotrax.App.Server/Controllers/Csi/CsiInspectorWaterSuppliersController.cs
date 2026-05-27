@@ -23,6 +23,7 @@ namespace Envirotrax.App.Server.Controllers.Csi
         [HasPermission(PermissionAction.CanView)]
         public async Task<IActionResult> GetWaterSuppliersAsync(int id, [FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
         {
+            query.Filter.Add(new() { ColumnName = nameof(ProfessionalWaterSupplierDto.HasCsiInspection), Value = bool.TrueString });
             var result = await _supplierService.GetAllByProfessionalAsync(id, pageInfo, query, cancellationToken);
             return Ok(result);
         }

@@ -1,7 +1,8 @@
 import { Component, OnInit } from "@angular/core";
-import { BackflowTesterAccountInfoService } from "../../../shared/services/backflow/backflow-tester-account-info.service";
+
 import { ActivatedRoute } from "@angular/router";
 import { Professional } from "../../../shared/models/professionals/professional";
+import { BackflowTesterManagementService } from "../../../shared/services/backflow/backflow-tester-management.service";
 
 @Component({
     selector: 'app-backflow-tester-details',
@@ -15,7 +16,7 @@ export class BackflowTesterDetailsComponent implements OnInit {
 
     constructor(
         private readonly _activatedRoute: ActivatedRoute,
-        private readonly _accountInfoService: BackflowTesterAccountInfoService
+        private readonly _backflowTesterManagementService: BackflowTesterManagementService,
     ) {}
 
     public async ngOnInit(): Promise<void> {
@@ -36,7 +37,7 @@ export class BackflowTesterDetailsComponent implements OnInit {
         }
         try {
             this.isAccountLoading = true;
-            this.accountInfo = await this._accountInfoService.getAccountInfo(this.id);
+            this.accountInfo = await this._backflowTesterManagementService.getAccountInfo(this.id);
         } finally {
             this.isAccountLoading = false;
         }

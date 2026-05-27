@@ -30,11 +30,6 @@ export class AuthGuard implements CanActivate {
                 return this._router.createUrlTree(['/profile']);
             }
 
-            // Professional - redirect to dashboard unless already navigating to a professionals route
-            if (!state.url.startsWith('/professionals')) {
-                return this._router.createUrlTree(['/professionals/dashboard']);
-            }
-
             return true;
         }
 

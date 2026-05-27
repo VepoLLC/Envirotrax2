@@ -10,11 +10,13 @@ import { AppTitleStrategy } from './shared/services/helpers/title/app-title-stra
 import { AuthInterceptor } from './shared/services/auth/auth.iterceptor';
 import { TimeZoneInterceptor } from './shared/services/helpers/timezone/timezone.interceptor';
 import { ToastContainerComponent } from './toast-container/toast-container.component';
+import { HomeComponent } from './home/home.component';
 
 @NgModule({
   declarations: [
     App,
-    ToastContainerComponent
+    ToastContainerComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,

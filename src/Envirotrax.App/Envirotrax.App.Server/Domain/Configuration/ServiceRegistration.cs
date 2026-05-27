@@ -72,6 +72,8 @@ public static class ServiceRegistration
         services.AddTransient<IGisAreaService, GisAreaService>();
         services.AddTransient<IGisAreaCoordinateService, GisAreaCoordinateService>();
 
+        services.AddTransient<IWaterSupplierDashboardService, WaterSupplierDashboardService>();
+
         services.Configure<GeocodingOptions>(configuration.GetSection("Geocoding"));
         services.AddHttpClient<IGeocodingService, GeocodingService>();
 

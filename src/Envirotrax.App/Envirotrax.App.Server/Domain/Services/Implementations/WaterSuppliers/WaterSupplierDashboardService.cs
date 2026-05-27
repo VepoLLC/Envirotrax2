@@ -1,0 +1,29 @@
+using Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
+using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
+using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
+
+namespace Envirotrax.App.Server.Domain.Services.Implementations.WaterSuppliers;
+
+public class WaterSupplierDashboardService : IWaterSupplierDashboardService
+{
+    private readonly IWaterSupplierDashboardRepository _repository;
+
+    public WaterSupplierDashboardService(IWaterSupplierDashboardRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public Task<WaterSupplierDashboardStatsDto> GetStatsAsync(CancellationToken cancellationToken)
+    {
+        var stats = _repository.GetStatsAsync(cancellationToken);
+
+        return stats;
+    }
+
+    public Task<CsiSubmissionStatsDto> GetCsiSubmissionStatsAsync(CancellationToken cancellationToken)
+    {
+        var stats = _repository.GetCsiSubmissionStatsAsync(cancellationToken);
+
+        return stats;
+    }
+}

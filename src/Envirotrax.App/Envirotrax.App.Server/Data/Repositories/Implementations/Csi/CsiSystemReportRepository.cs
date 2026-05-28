@@ -50,7 +50,7 @@ public class CsiSystemReportRepository(IDbContextSelector dbContextSelector, ITe
                 .Select(year =>
                 {
                     var count = countByYear.GetValueOrDefault(year, 0);
-                    return new CsiReportPeriodDto { Label = year.ToString(), Count = count, Percentage = Pct(count, totalCount), Year = year };
+                    return new CsiReportPeriodDto { Label = year.ToString(), Count = count, Percentage = CalculatePercentage(count, totalCount), Year = year };
                 })
                 .ToList();
         }
@@ -77,7 +77,7 @@ public class CsiSystemReportRepository(IDbContextSelector dbContextSelector, ITe
                     {
                         Label = new DateTime(year, month, 1).ToString("MMM yyyy", System.Globalization.CultureInfo.InvariantCulture),
                         Count = count,
-                        Percentage = Pct(count, totalCount),
+                        Percentage = CalculatePercentage(count, totalCount),
                         Year = year,
                         Month = month
                     };
@@ -105,8 +105,8 @@ public class CsiSystemReportRepository(IDbContextSelector dbContextSelector, ITe
                 Title = "Inspection Result",
                 Items =
                 [
-                    new CsiReportStatItemDto { Label = "Passed", Count = passed, Percentage = Pct(passed, totalCount) },
-                    new CsiReportStatItemDto { Label = "Failed", Count = failed, Percentage = Pct(failed, totalCount) }
+                    new CsiReportStatItemDto { Label = "Passed", Count = passed, Percentage = CalculatePercentage(passed, totalCount) },
+                    new CsiReportStatItemDto { Label = "Failed", Count = failed, Percentage = CalculatePercentage(failed, totalCount) }
                 ]
             },
             new CsiReportStatCategoryDto
@@ -114,8 +114,8 @@ public class CsiSystemReportRepository(IDbContextSelector dbContextSelector, ITe
                 Title = "Property Type",
                 Items =
                 [
-                    new CsiReportStatItemDto { Label = "Residential", Count = residential, Percentage = Pct(residential, totalCount) },
-                    new CsiReportStatItemDto { Label = "Commercial", Count = commercial, Percentage = Pct(commercial, totalCount) }
+                    new CsiReportStatItemDto { Label = "Residential", Count = residential, Percentage = CalculatePercentage(residential, totalCount) },
+                    new CsiReportStatItemDto { Label = "Commercial", Count = commercial, Percentage = CalculatePercentage(commercial, totalCount) }
                 ]
             },
             new CsiReportStatCategoryDto
@@ -123,9 +123,9 @@ public class CsiSystemReportRepository(IDbContextSelector dbContextSelector, ITe
                 Title = "Inspection Reason",
                 Items =
                 [
-                    new CsiReportStatItemDto { Label = "New Construction", Count = newConstruction, Percentage = Pct(newConstruction, totalCount) },
-                    new CsiReportStatItemDto { Label = "Existing Service", Count = existingService, Percentage = Pct(existingService, totalCount) },
-                    new CsiReportStatItemDto { Label = "Renovation / Expansion", Count = renovation, Percentage = Pct(renovation, totalCount) }
+                    new CsiReportStatItemDto { Label = "New Construction", Count = newConstruction, Percentage = CalculatePercentage(newConstruction, totalCount) },
+                    new CsiReportStatItemDto { Label = "Existing Service", Count = existingService, Percentage = CalculatePercentage(existingService, totalCount) },
+                    new CsiReportStatItemDto { Label = "Renovation / Expansion", Count = renovation, Percentage = CalculatePercentage(renovation, totalCount) }
                 ]
             }
         ];
@@ -155,11 +155,11 @@ public class CsiSystemReportRepository(IDbContextSelector dbContextSelector, ITe
         return [..childWaterSuppliers.Select(ws =>
         {
             var count = subCounts.FirstOrDefault(x => x.WaterSupplierId == ws.Id)?.Count ?? 0;
-            return new CsiSubAccountReportItemDto { Name = ws.Name, Count = count, Percentage = Pct(count, subTotal) };
+            return new CsiSubAccountReportItemDto { Name = ws.Name, Count = count, Percentage = CalculatePercentage(count, subTotal) };
         })];
     }
 
-    private static double Pct(int count, int total)
+    private static double CalculatePercentage(int count, int total)
     {
         return total > 0 ? Math.Round((double)count / total * 100) : 0;
     }

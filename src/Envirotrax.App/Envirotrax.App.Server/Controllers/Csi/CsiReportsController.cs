@@ -5,19 +5,26 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers.Csi;
 
-[Route("api/csi/reports/system")]
+[Route("api/csi/reports")]
 [HasFeature(FeatureType.CsiInspection)]
 [PermissionResource(PermissionType.CsiReports)]
-public class CsiSystemReportController(ICsiSystemReportService reportService) : WaterSupplierProtectedController
+public class CsiReportsController : WaterSupplierProtectedController
 {
-    [HttpGet]
+    private readonly ICsiSystemReportService _systemReportService;
+
+    public CsiReportsController(ICsiSystemReportService systemReportService)
+    {
+        _systemReportService = systemReportService;
+    }
+
+    [HttpGet("system")]
     [HasPermission(PermissionAction.CanView)]
-    public async Task<IActionResult> GetAsync(
+    public async Task<IActionResult> GetSystemReportAsync(
         [FromQuery] DateTime fromDate,
         [FromQuery] DateTime toDate,
         CancellationToken cancellationToken)
     {
-        var report = await reportService.GetSystemReportAsync(fromDate, toDate, cancellationToken);
+        var report = await _systemReportService.GetSystemReportAsync(fromDate, toDate, cancellationToken);
         return Ok(report);
     }
 }

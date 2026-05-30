@@ -14,6 +14,8 @@ using Envirotrax.App.Server.Domain.Services.Implementations.Users;
 using Envirotrax.App.Server.Domain.Services.Implementations;
 using Envirotrax.App.Server.Domain.Services.Implementations.WaterSuppliers;
 using Envirotrax.Common.Configuration;
+using Envirotrax.Common.Domain.Services.Defintions;
+using Envirotrax.Common.Domain.Services.Implementations;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Implementations.Professionals;
@@ -22,8 +24,6 @@ using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Implementations.Helpers;
-using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
-using Envirotrax.App.Server.Data.Repositories.Implementations.Fog;
 
 namespace Envirotrax.App.Server.Domain.Configuration;
 
@@ -83,6 +83,8 @@ public static class ServiceRegistration
             opts.Namespace = "Envirotrax.App.Server";
         });
         services.AddPdfTemplateService();
+
+        services.AddTransient<ICsvHelperService, CsvHelperService>();
 
         return services;
     }

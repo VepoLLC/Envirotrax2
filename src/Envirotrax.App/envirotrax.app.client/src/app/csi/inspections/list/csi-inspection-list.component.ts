@@ -8,6 +8,9 @@ import { QueryProperty } from "../../../shared/models/query";
 import { NgForm } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { InputOption } from "../../../shared/components/input/input.component";
+import { DownloadConfig } from "../../../shared/models/download-config";
+import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
+import { DownloadManagerComponent } from "../../../shared/components/data-components/download-manager/download-manager.component";
 
 @Component({
     standalone: false,
@@ -43,6 +46,8 @@ export class CsiInspectionListComponent implements OnInit {
         }
     };
 
+    public downloadConfig: DownloadConfig;
+
     public passFailOptions: InputOption[] = [
         { id: '', text: 'Any result' },
         { id: 'true', text: 'Pass' },
@@ -70,8 +75,19 @@ export class CsiInspectionListComponent implements OnInit {
     constructor(
         private readonly _csiInspectionService: CsiInspectionService,
         private readonly _router: Router,
-        private readonly _activatedRoute: ActivatedRoute
+        private readonly _activatedRoute: ActivatedRoute,
+        private readonly _modalHelper: ModalHelperService
     ) {
+        this.downloadConfig = {
+            fileName: 'CSI Inspections',
+            endpoint: this._csiInspectionService.getAllEndpoint(),
+            suppoertedFormats: ['CSV', 'Excel', "PDF"],
+            columns: [
+                {
+                    field: 'inspectionDate'
+                }
+            ]
+        };
     }
 
     public async ngOnInit(): Promise<void> {
@@ -164,6 +180,13 @@ export class CsiInspectionListComponent implements OnInit {
     public viewDetails(inspection: CsiInspection): void {
         this._router.navigate([inspection.id, 'view'], {
             relativeTo: this._activatedRoute
+        });
+    }
+
+    public showDownlaodManager(): void {
+        this._modalHelper.show(DownloadManagerComponent, {
+            title: 'Export Results',
+            model: this.downloadConfig
         });
     }
 }

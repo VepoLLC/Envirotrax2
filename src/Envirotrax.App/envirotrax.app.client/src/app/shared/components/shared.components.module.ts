@@ -34,6 +34,7 @@ import { GisAreaLookupComponent } from "./lookups/gis-areas/gis-area-lookup.comp
 import { GisAreaSelectionModalComponent } from "./lookups/gis-areas/gis-area-selection-modal.component";
 import { StatusIconComponent } from "./status-icon/status-icon.component";
 import { MapComponent } from "./map/map.component";
+import { DownloadManagerComponent } from "./data-components/download-manager/download-manager.component";
 
 @NgModule({
     declarations: [
@@ -65,7 +66,8 @@ import { MapComponent } from "./map/map.component";
         GisAreaLookupComponent,
         GisAreaSelectionModalComponent,
         StatusIconComponent,
-        MapComponent
+        MapComponent,
+        DownloadManagerComponent
     ],
     imports: [
         CommonModule,

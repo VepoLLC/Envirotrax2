@@ -65,6 +65,18 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
     }
 
+    public async Task<Uri?> GenerateFileUrlAsync(int id, CancellationToken cancellationToken)
+    {
+        var gauge = await _gaugeRepository.GetNoIncludesAsync(id, cancellationToken);
+
+        if (gauge != null && !string.IsNullOrWhiteSpace(gauge.FilePath))
+        {
+            return await _fileStorageService.GenerateSasUrlAsync(gauge.FilePath);
+        }
+
+        return null;
+    }
+
     public async Task<BackflowGaugeDto> AddWithFileAsync(Stream fileStream, string originalFileName, BackflowGaugeDto dto)
     {
         var fileExtension = Path.GetExtension(originalFileName).ToLower();

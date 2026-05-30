@@ -1,12 +1,21 @@
-import { Component, input, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
+import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { ExpirationType, ProfessionalUserLicense, professionalTypeLabels, ProfessionalType } from "../../../../../shared/models/professionals/licenses/professional-user-license";
 import { ProfessionalInsurance, ExpirationType as InsuranceExpirationType } from "../../../../../shared/models/professionals/professional-insurance";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
-import { CellTemplateData, TableColumn } from "../../../../../shared/components/data-components/table/table.component";
+import { CellTemplateData, TableColumn, TableCustomAction } from "../../../../../shared/components/data-components/table/table.component";
 import { ColumnType } from "../../../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { BackflowTesterLicensesService } from "../../../../../shared/services/backflow/backflow-tester-licenses.service";
 import { BackflowTesterInsurancesService } from "../../../../../shared/services/backflow/backflow-tester-insurances.service";
 import { Professional } from "../../../../../shared/models/professionals/professional";
+import { AuthService } from "../../../../../shared/services/auth/auth.service";
+import { FeatureType } from "../../../../../shared/models/feature-type";
+import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
+import { ModalHelperService } from "../../../../../shared/services/helpers/modal-helper.service";
+import { ModalSize } from "@developer-partners/ngx-modal-dialog";
+import { ToastService } from "../../../../../shared/services/toast.service";
+import { HelperService } from "../../../../../shared/services/helpers/helper.service";
+import { AddEditBackflowTesterInsuranceComponent } from "../edit/add-edit-backflow-tester-insurance.component";
+import { AddEditBackflowTesterLicenseComponent } from "../edit/add-edit-backflow-tester-license.component";
 
 @Component({
     selector: 'vp-backflow-tester-license-insurances',
@@ -22,6 +31,9 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
     public expirationType = ExpirationType;
     public insuranceExpirationType = InsuranceExpirationType;
 
+    public canManageLicenses: boolean = false;
+    public canManageInsurances: boolean = false;
+
     public licensesTable: TableViewModel<ProfessionalUserLicense> = {
         columns: [],
         query: { sort: {}, filter: [] }
@@ -31,6 +43,8 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
         columns: [],
         query: { sort: {}, filter: [] }
     };
+
+    public insuranceCustomActions: TableCustomAction<ProfessionalInsurance>[] = [];
 
     @ViewChild('licenseTypeCell', { static: true })
     private licenseTypeCellTemplate!: TemplateRef<CellTemplateData<ProfessionalUserLicense>>;
@@ -49,10 +63,15 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
 
     constructor(
         private readonly _licensesService: BackflowTesterLicensesService,
-        private readonly _insurancesService: BackflowTesterInsurancesService
+        private readonly _insurancesService: BackflowTesterInsurancesService,
+        private readonly _authService: AuthService,
+        private readonly _modalHelper: ModalHelperService,
+        private readonly _toastService: ToastService,
+        private readonly _helper: HelperService
     ) { }
 
     public async ngOnInit(): Promise<void> {
+        await this.setPermissions();
         this.licensesTable.columns = this.getLicenseColumns();
         this.insurancesTable.columns = this.getInsuranceColumns();
         await this.loadInsurances();
@@ -60,10 +79,38 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
 
     public async setActiveTab(tab: 'insurances' | 'licenses'): Promise<void> {
         this.activeTab = tab;
-        if (tab === 'licenses' && !this.licensesTable.items) {
-            await this.loadLicenses();
-        } else if (tab === 'insurances' && !this.insurancesTable.items) {
-            await this.loadInsurances();
+        if (tab === 'licenses') {
+            this.licensesTable.columns = this.getLicenseColumns();
+            if (!this.licensesTable.items) {
+                await this.loadLicenses();
+            }
+        } else if (tab === 'insurances') {
+            this.insurancesTable.columns = this.getInsuranceColumns();
+            if (!this.insurancesTable.items) {
+                await this.loadInsurances();
+            }
+        }
+    }
+
+    private async setPermissions(): Promise<void> {
+        const canEditBackflowTesters = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.BackflowTesters);
+
+        this.canManageLicenses = canEditBackflowTesters && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalLicenses);
+        this.canManageInsurances = canEditBackflowTesters && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalInsurances);
+
+        if (this.canManageInsurances) {
+            this.insuranceCustomActions = [
+                {
+                    text: 'View',
+                    iconClass: 'fa-solid fa-eye',
+                    action: (insurance: ProfessionalInsurance) => this.viewInsuranceFile(insurance)
+                },
+                {
+                    text: 'Email',
+                    iconClass: 'fa-solid fa-envelope',
+                    action: (insurance: ProfessionalInsurance) => this.prepareEmail(insurance)
+                }
+            ];
         }
     }
 
@@ -117,9 +164,96 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
         ];
     }
 
-    public async loadLicenses(): Promise<void> {
+    public addInsurance(): void {
+        this._modalHelper.show<any, ProfessionalInsurance>(AddEditBackflowTesterInsuranceComponent, {
+            title: 'Add Insurance Policy',
+            model: { testerId: this.testerId, insurance: {} },
+            size: ModalSize.large
+        }).result().subscribe(() => this.loadInsurances(false));
+    }
+
+    public addLicense(): void {
+        this._modalHelper.show<any, ProfessionalUserLicense>(AddEditBackflowTesterLicenseComponent, {
+            title: 'Add License',
+            model: { testerId: this.testerId, license: {} },
+            size: ModalSize.large
+        }).result().subscribe(() => this.loadLicenses(false));
+    }
+
+    public editLicense(license: ProfessionalUserLicense): void {
+        this._modalHelper.show<any, ProfessionalUserLicense>(AddEditBackflowTesterLicenseComponent, {
+            title: 'Edit License',
+            model: { testerId: this.testerId, license },
+            size: ModalSize.large
+        }).result().subscribe(() => this.loadLicenses(false));
+    }
+
+    public deleteLicense(license: ProfessionalUserLicense): void {
+        this._modalHelper.showDeleteConfirmation().result().subscribe(async () => {
+            try {
+                this.licensesTable.isLoading = true;
+                await this._licensesService.delete(this.testerId, license.id!);
+                this._toastService.successFullyDeleted('License');
+            } finally {
+                this.licensesTable.isLoading = false;
+            }
+            await this.loadLicenses(false);
+        });
+    }
+
+    public editInsurance(insurance: ProfessionalInsurance): void {
+        this._modalHelper.show<any, ProfessionalInsurance>(AddEditBackflowTesterInsuranceComponent, {
+            title: 'Edit Insurance Policy',
+            model: { testerId: this.testerId, insurance },
+            size: ModalSize.large
+        }).result().subscribe(() => this.loadInsurances(false));
+    }
+
+    public deleteInsurance(insurance: ProfessionalInsurance): void {
+        this._modalHelper.showDeleteConfirmation().result().subscribe(async () => {
+            try {
+                this.insurancesTable.isLoading = true;
+                await this._insurancesService.delete(this.testerId, insurance.id!);
+                this._toastService.successFullyDeleted('Insurance');
+            } finally {
+                this.insurancesTable.isLoading = false;
+            }
+            await this.loadInsurances(false);
+        });
+    }
+
+    public async viewInsuranceFile(insurance: ProfessionalInsurance): Promise<void> {
         try {
-            this.licensesTable.isLoading = true;
+            this.insurancesTable.isLoading = true;
+            const url = await this._insurancesService.getFileUrl(this.testerId, insurance.id!);
+            this._helper.downloadFileFromUrl(url);
+        } finally {
+            this.insurancesTable.isLoading = false;
+        }
+    }
+
+    public async prepareEmail(insurance: ProfessionalInsurance): Promise<void> {
+        if (!this.tester) {
+            return;
+        }
+
+        const adminEmail = await this._authService.getUserEmail();
+        const body = `${this.tester.name},%0D%0A%0D%0A` +
+            `We have the Insurance: ${insurance.insuranceNumber} updated in your account. ` +
+            `Please let us know if you need anything else.%0D%0A%0D%0A` +
+            `Sincerely,%0D%0A${adminEmail} - Envirotrax`;
+        const link = `mailto:${this.tester.companyEmail}` +
+            `?subject=${encodeURIComponent('Envirotrax - Insurance Validation')}` +
+            `&body=${body}`;
+
+        window.open(link);
+    }
+
+    public async loadLicenses(showLoading: boolean = true): Promise<void> {
+        try {
+            if (showLoading){ 
+                this.licensesTable.isLoading = true; 
+            }
             this.licensesTable.items = await this._licensesService.getLicenses(
                 this.testerId,
                 this.licensesTable.items?.pageInfo || {},
@@ -130,9 +264,11 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
         }
     }
 
-    public async loadInsurances(): Promise<void> {
+    public async loadInsurances(showLoading: boolean = true): Promise<void> {
         try {
-            this.insurancesTable.isLoading = true;
+            if (showLoading){ 
+                this.insurancesTable.isLoading = true; 
+            }
             this.insurancesTable.items = await this._insurancesService.getInsurances(
                 this.testerId,
                 this.insurancesTable.items?.pageInfo || {},

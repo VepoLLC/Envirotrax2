@@ -23,6 +23,14 @@
                   (pageInfoChange)="loadGauge()"
                   [(query)]="table.query"
                   (queryChange)="loadGauge()"
-                  (queryReset)="loadGauge()" />
+                  (queryReset)="loadGauge()"
+                  [showActionLabels]="false"
+                  [customActions]="gaugeCustomActions"
+                  [canAdd]="canManage"
+                  (add)="addGauge()"
+                  [canEdit]="canManage"
+                  (edit)="editGauge($event)"
+                  [canDelete]="canManage"
+                  (delete)="deleteGauge($event)" />
     </div>
 </vp-section>

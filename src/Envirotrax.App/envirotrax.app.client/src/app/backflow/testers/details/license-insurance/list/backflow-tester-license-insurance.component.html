@@ -60,7 +60,15 @@
                       (pageInfoChange)="loadInsurances()"
                       [(query)]="insurancesTable.query"
                       (queryChange)="loadInsurances()"
-                      (queryReset)="loadInsurances()" />
+                      (queryReset)="loadInsurances()"
+                      [showActionLabels]="false"
+                      [customActions]="insuranceCustomActions"
+                      [canAdd]="canManageInsurances"
+                      (add)="addInsurance()"
+                      [canEdit]="canManageInsurances"
+                      (edit)="editInsurance($event)"
+                      [canDelete]="canManageInsurances"
+                      (delete)="deleteInsurance($event)" />
         </div>
     </div>
 
@@ -75,7 +83,14 @@
                       (pageInfoChange)="loadLicenses()"
                       [(query)]="licensesTable.query"
                       (queryChange)="loadLicenses()"
-                      (queryReset)="loadLicenses()" />
+                      (queryReset)="loadLicenses()"
+                      [showActionLabels]="false"
+                      [canAdd]="canManageLicenses"
+                      (add)="addLicense()"
+                      [canEdit]="canManageLicenses"
+                      (edit)="editLicense($event)"
+                      [canDelete]="canManageLicenses"
+                      (delete)="deleteLicense($event)" />
         </div>
     </div>
 </vp-section>

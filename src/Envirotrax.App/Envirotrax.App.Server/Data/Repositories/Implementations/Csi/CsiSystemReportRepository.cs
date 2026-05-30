@@ -17,8 +17,7 @@ public class CsiSystemReportRepository(IDbContextSelector dbContextSelector, ITe
     public async Task<CsiSystemReportDto> GetSystemReportAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)
     {
         var query = Entity.AsQueryable()
-        .IgnoreQueryFilters()
-        .Where(c => c.InspectionDate >= fromDate && c.InspectionDate <= toDate);
+            .Where(c => c.InspectionDate >= fromDate && c.InspectionDate <= toDate);
 
         var totalCount = await query.CountAsync(cancellationToken);
         var wsId = _tenantProvider.WaterSupplierId;
@@ -89,15 +88,15 @@ public class CsiSystemReportRepository(IDbContextSelector dbContextSelector, ITe
 
     private static async Task<List<CsiReportStatCategoryDto>> BuildStatsAsync(IQueryable<CsiInspection> query, int totalCount, CancellationToken cancellationToken)
     {
-        var passed = await query.IgnoreQueryFilters().CountAsync(c => c.InspectionResult, cancellationToken);
+        var passed = await query.CountAsync(c => c.InspectionResult, cancellationToken);
         var failed = totalCount - passed;
 
-        var residential = await query.IgnoreQueryFilters().CountAsync(c => c.PropertyType == PropertyType.Residential, cancellationToken);
-        var commercial = await query.IgnoreQueryFilters().CountAsync(c => c.PropertyType == PropertyType.Commercial, cancellationToken);
+        var residential = await query.CountAsync(c => c.PropertyType == PropertyType.Residential, cancellationToken);
+        var commercial = await query.CountAsync(c => c.PropertyType == PropertyType.Commercial, cancellationToken);
 
-        var newConstruction = await query.IgnoreQueryFilters().CountAsync(c => c.ReasonForInspection == CsiInspectionReason.NewConstruction, cancellationToken);
-        var existingService = await query.IgnoreQueryFilters().CountAsync(c => c.ReasonForInspection == CsiInspectionReason.ExistingServiceContaminantHazardsSuspected, cancellationToken);
-        var renovation = await query.IgnoreQueryFilters().CountAsync(c => c.ReasonForInspection == CsiInspectionReason.MajorRenovationOrExpansion, cancellationToken);
+        var newConstruction = await query.CountAsync(c => c.ReasonForInspection == CsiInspectionReason.NewConstruction, cancellationToken);
+        var existingService = await query.CountAsync(c => c.ReasonForInspection == CsiInspectionReason.ExistingServiceContaminantHazardsSuspected, cancellationToken);
+        var renovation = await query.CountAsync(c => c.ReasonForInspection == CsiInspectionReason.MajorRenovationOrExpansion, cancellationToken);
 
         return
         [
@@ -148,7 +147,6 @@ public class CsiSystemReportRepository(IDbContextSelector dbContextSelector, ITe
             .Where(c => childIds.Contains(c.WaterSupplierId) && c.InspectionDate >= fromDate && c.InspectionDate <= toDate);
 
         var subCounts = await subQuery
-            .IgnoreQueryFilters()
             .GroupBy(c => c.WaterSupplierId)
             .Select(g => new { WaterSupplierId = g.Key, Count = g.Count() })
             .ToListAsync(cancellationToken);

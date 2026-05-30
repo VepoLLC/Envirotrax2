@@ -44,7 +44,6 @@ export class DownloadService {
 
     public async download(config: DownloadConfig): Promise<void> {
         const downloadColumns = config.columns
-            .filter(c => c.isSelected)
             .map(c => `${c.field}=${encodeURIComponent(c.caption ?? c.field)}`)
             .join('&')
 

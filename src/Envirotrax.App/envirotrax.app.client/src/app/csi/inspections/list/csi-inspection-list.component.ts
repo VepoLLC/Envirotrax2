@@ -83,9 +83,33 @@ export class CsiInspectionListComponent implements OnInit {
             endpoint: this._csiInspectionService.getAllEndpoint(),
             suppoertedFormats: ['CSV', 'Excel', "PDF"],
             columns: [
-                {
-                    field: 'inspectionDate'
-                }
+                { field: 'inspectionDate', caption: 'InspectionDate' },
+                { field: 'inspectionResult', caption: 'PassedInspection' },
+                { field: 'site.accountNumber', caption: 'AccountNumber' },
+                { field: 'propertyBusinessName', caption: 'PropertyBusinessName' },
+                { field: 'propertyStreetNumber', caption: 'PropertyStreetNumber' },
+                { field: 'propertyStreetName', caption: 'PropertyStreetName' },
+                { field: 'propertyNumber', caption: 'PropertyNumber' },
+                { field: 'propertyCity', caption: 'PropertyCity' },
+                { field: 'propertyState.code', caption: 'PropertyState' },
+                { field: 'propertyZip', caption: 'PropertyZIP' },
+                { field: 'mailingCompanyName', caption: 'MailingCompanyName' },
+                { field: 'mailingContactName', caption: 'MailingContactName' },
+                { field: 'mailingStreetNumber', caption: 'MailingStreetNumber' },
+                { field: 'mailingStreetName', caption: 'MailingStreetName' },
+                { field: 'mailingNumber', caption: 'MailingNumber' },
+                { field: 'mailingCity', caption: 'MailingCity' },
+                { field: 'mailingState.code', caption: 'MailingState' },
+                { field: 'mailingZip', caption: 'MailingZIP' },
+                { field: 'mailingPhoneNumber', caption: 'MailingPhoneNumber' },
+                { field: 'mailingEmailAddress', caption: 'MailingEmailAddress' },
+                { field: 'inspectorCompanyName', caption: 'InspectorCompanyName' },
+                { field: 'inspectorContactName', caption: 'InspectorContactName' },
+                { field: 'inspectorAddress', caption: 'InspectorAddress' },
+                { field: 'inspectorCity', caption: 'InspectorCity' },
+                { field: 'inspectorState', caption: 'InspectorState' },
+                { field: 'inspectorZip', caption: 'InspectorZip' },
+                { field: 'comments', caption: 'Remarks' }
             ]
         };
     }

@@ -14,7 +14,6 @@ export type FileFormat = 'CSV' | 'Excel' | 'PDF';
 export interface DownloadColumn {
     field: string;
     caption?: string;
-    isSelected?: boolean
 }
 
 export interface DownloadEndpoint {

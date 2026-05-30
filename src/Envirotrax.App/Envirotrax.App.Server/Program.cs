@@ -31,6 +31,7 @@ builder.Services.AddControllers(options =>
     options.Filters.Add(typeof(QueryFilter));
 
     options.OutputFormatters.Add(new CsvMediaTypeFormatter());
+    options.OutputFormatters.Add(new ExcelMediaTypeFormatter());
 });
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

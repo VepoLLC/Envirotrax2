@@ -76,7 +76,7 @@ namespace Envirotrax.App.Server.MediaTypeFormatters
                         .Value
                         .FirstOrDefault(v => !string.IsNullOrEmpty(v));
 
-                    list.Add(keyValuePair.Key, value);
+                    list.Add(keyValuePair.Key, value ?? keyValuePair.Key);
                 }
             }
 

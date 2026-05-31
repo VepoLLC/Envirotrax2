@@ -11,6 +11,11 @@ import { ModalHelperService } from "../../shared/services/helpers/modal-helper.s
 import { CreateSiteComponent } from "../create/create-site-component";
 import { InputOption } from "../../shared/components/input/input.component";
 import { PropertyType } from "../../shared/enums/property-type.enum";
+import { GisAreaService } from "../../shared/services/gis-areas/gis-area.service";
+import { GisAreaCoordinateService } from "../../shared/services/gis-areas/gis-area-coordinate.service";
+import { GisMapService } from "../../shared/services/gis-areas/gis-map.service";
+import { GisArea } from "../../shared/models/gis-areas/gis-area";
+import { MapMarker, MapPolygon } from "../../shared/components/map/map.component";
 
 @Component({
     standalone: false,
@@ -18,6 +23,14 @@ import { PropertyType } from "../../shared/enums/property-type.enum";
 })
 export class SiteListComponent implements OnInit {
     public showResults: boolean = false;
+    public showMapResults: boolean = false;
+    public isMapLoading: boolean = false;
+    public mapResultCount: number = 0;
+    public mapMarkers: MapMarker<Site>[] = [];
+    public mapPolygons: MapPolygon<GisArea>[] = [];
+    public mapLatitude: number = 30.9;
+    public mapLongitude: number = -97.2829;
+    public mapZoom: number = 10;
 
     public table: TableViewModel<Site> = {
         query: {
@@ -85,7 +98,10 @@ export class SiteListComponent implements OnInit {
         private readonly _siteService: SiteService,
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
-        private readonly _modalHelper: ModalHelperService
+        private readonly _modalHelper: ModalHelperService,
+        private readonly _gisAreaService: GisAreaService,
+        private readonly _coordinateService: GisAreaCoordinateService,
+        private readonly _gisMapService: GisMapService
     ) {
     }
 
@@ -127,7 +143,6 @@ export class SiteListComponent implements OnInit {
         try {
             this.table.isLoading = true;
             this.table.items = await this._siteService.getAll(this.table.items?.pageInfo || {}, this.table.query);
-            console.log(this.table.items);
         } finally {
             this.table.isLoading = false;
         }
@@ -139,8 +154,47 @@ export class SiteListComponent implements OnInit {
 
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
+            this.showMapResults = false;
             await this.getSites();
             this.showResults = true;
+        }
+    }
+
+    public async searchMap(searchForm: NgForm): Promise<void> {
+        if (!searchForm.valid) {
+            return;
+        }
+
+        try {
+            this.isMapLoading = true;
+            this.showResults = false;
+            this.showMapResults = false;
+
+            const [sitesPage, areas, coordinates, defaultView] = await Promise.all([
+                this._siteService.getAll({ pageSize: 10000, pageNumber: 1 }, this.table.query),
+                this._gisAreaService.getAllAreas(),
+                this._coordinateService.getAll(),
+                this._gisAreaService.getDefaultView()
+            ]);
+
+            this.mapResultCount = sitesPage.pageInfo?.totalItems ?? sitesPage.data.length;
+            this.mapMarkers = this.buildMapMarkers(sitesPage.data);
+            this.mapPolygons = this._gisMapService.buildMapPolygons(areas, coordinates);
+
+            if (defaultView.gisCenterLatitude != null) {
+                this.mapLatitude = defaultView.gisCenterLatitude;
+            }
+            if (defaultView.gisCenterLongitude != null) {
+                this.mapLongitude = defaultView.gisCenterLongitude;
+            }
+            if (defaultView.gisCenterZoom != null) {
+                this.mapZoom = defaultView.gisCenterZoom;
+            }
+
+            this.showMapResults = true;
+            window.scrollTo({ top: 0 });
+        } finally {
+            this.isMapLoading = false;
         }
     }
 
@@ -155,6 +209,23 @@ export class SiteListComponent implements OnInit {
         this._router.navigate([site.id, 'edit'], {
             relativeTo: this._activatedRoute
         });
+    }
+
+    private buildMapMarkers(sites: Site[]): MapMarker<Site>[] {
+        return sites
+            .filter(s => s.gisLatitude != null && s.gisLongitude != null)
+            .map(s => {
+                const siteUrl = this._router.serializeUrl(
+                    this._router.createUrlTree([s.id, 'edit'], { relativeTo: this._activatedRoute })
+                );
+                const label = [s.businessName, s.streetNumber, s.streetName, s.city]
+                    .filter(Boolean)
+                    .map(v => this._gisMapService.escapeHtml(v!))
+                    .join(', ');
+                const popupHtml = this._gisMapService.buildSitePopupHtml(label, siteUrl);
+                const icon = { path: 0, fillColor: '#e8342e', fillOpacity: 0.85, strokeWeight: 0, scale: 7 };
+                return { lat: s.gisLatitude!, lng: s.gisLongitude!, popupHtml, icon, data: s };
+            });
     }
 
 }

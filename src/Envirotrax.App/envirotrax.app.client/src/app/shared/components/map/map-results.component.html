@@ -1,0 +1,25 @@
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <button type="button" class="btn btn-primary vp-section-button">
+        <i class="fa-solid fa-file-export me-1"></i>Export Results
+    </button>
+    <span class="fw-bold fs-5">{{ title }} ({{ resultCount }} Results)</span>
+    <button type="button" class="btn btn-primary vp-section-button" (click)="searchAgain.emit()">
+        <i class="fa-solid fa-magnifying-glass me-1"></i>Search Again
+    </button>
+</div>
+
+<vp-map [markers]="markers"
+        [polygons]="polygons"
+        [latitude]="latitude"
+        [longitude]="longitude"
+        [zoom]="zoom"
+        height="calc(100vh - 160px)"
+        (mouseMoved)="onMouseMoved($event)"
+        (centerChanged)="onCenterChanged($event)"
+        (zoomChanged)="onZoomChanged($event)" />
+
+<div class="d-flex align-items-center gap-3 mt-2 pt-2 border-top flex-wrap">
+    <vp-input label="Lat/Lng" [readonly]="true" [ngModel]="mousePosition" style="width:190px" />
+    <vp-input label="Map Center" [readonly]="true" [ngModel]="centerPosition" style="width:190px" />
+    <vp-input label="Zoom" [readonly]="true" [ngModel]="currentZoom" style="width:70px" />
+</div>

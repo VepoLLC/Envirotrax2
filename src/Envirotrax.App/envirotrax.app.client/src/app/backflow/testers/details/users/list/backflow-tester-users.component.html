@@ -10,6 +10,13 @@
                   (pageInfoChange)="loadSubAccounts()"
                   [(query)]="table.query"
                   (queryChange)="loadSubAccounts()"
-                  (queryReset)="loadSubAccounts()" />
+                  (queryReset)="loadSubAccounts()"
+                  [showActionLabels]="false"
+                  [canAdd]="canManage"
+                  (add)="addUser()"
+                  [canEdit]="canManage"
+                  (edit)="editUser($event)"
+                  [canDelete]="canManage"
+                  (delete)="deleteUser($event)" />
     </div>
 </vp-section>

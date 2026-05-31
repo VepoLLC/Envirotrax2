@@ -125,7 +125,12 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
 
     public Task<byte[]> GeneratePdfAsync(CsiInspectionDto inspection)
     {
-        return _pdfTemplateService.GenerateAsync("Csi.CsiInspection", inspection);
+        return GeneratePdfAsync([inspection]);
+    }
+
+    public Task<byte[]> GeneratePdfAsync(IEnumerable<CsiInspectionDto> inspections)
+    {
+        return _pdfTemplateService.GenerateAsync("Csi.CsiInspection", inspections);
     }
 
     private static void ApplyInspectorSnapshot(

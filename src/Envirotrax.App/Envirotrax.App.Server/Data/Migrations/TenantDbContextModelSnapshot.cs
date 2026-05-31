@@ -1626,6 +1626,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasPrecision(19, 4)
                         .HasColumnType("decimal(19,4)");
 
+                    b.Property<decimal?>("FogInspectorFee")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("decimal(19,4)");
+
                     b.Property<decimal?>("FogTransportFee")
                         .HasPrecision(19, 4)
                         .HasColumnType("decimal(19,4)");

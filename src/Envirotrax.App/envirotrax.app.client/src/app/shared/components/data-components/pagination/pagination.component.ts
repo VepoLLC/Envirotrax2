@@ -5,9 +5,6 @@ import { PageInfo } from "../../../models/page-info";
     selector: 'vp-pagination',
     templateUrl: './pagination.component.html',
     standalone: false,
-    styleUrls: [
-        './pagination.component.css'
-    ]
 })
 export class PaginationComponent implements OnChanges {
     @Input()

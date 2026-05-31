@@ -1,4 +1,5 @@
 
+using System.Linq.Expressions;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.DbContexts;
@@ -43,12 +44,17 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
         return base.GetAllAsync(pageInfo, query, cancellationToken);
     }
 
-    public async Task<IEnumerable<ProfessionalWaterSupplier>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public async Task<IEnumerable<ProfessionalWaterSupplier>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalWaterSupplier, bool>>? filter = null)
     {
-        var paginated = await DbContext.ProfessionalWaterSuppliers
+        var q = DbContext.ProfessionalWaterSuppliers
             .AsNoTracking()
             .Include(pws => pws.WaterSupplier)
-            .Where(pws => pws.ProfessionalId == professionalId)
+            .Where(pws => pws.ProfessionalId == professionalId);
+
+        if (filter != null)
+            q = q.Where(filter);
+
+        var paginated = await q
             .Where(query.Filter)
             .OrderBy(query.Sort)
             .PaginateAsync(pageInfo, cancellationToken);

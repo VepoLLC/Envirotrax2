@@ -5,7 +5,7 @@ import { CsiInspectionService } from "../../../shared/services/csi/csi-inspectio
 import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { DisapproveCsiInspectionComponent } from "./disapprove/disapprove-csi-inspection.component";
-import { HelperService } from "../../../shared/services/helpers/helper.service";
+import { DownloadService } from "../../../shared/services/download.service";
 
 @Component({
     selector: 'app-csi-inspection-details',
@@ -33,7 +33,7 @@ export class CsiInspectionDetailsComponent implements OnInit {
         private readonly _activatedRoute: ActivatedRoute,
         private readonly _inspectionService: CsiInspectionService,
         private readonly _modalHelper: ModalHelperService,
-        private readonly _helper: HelperService
+        private readonly _downloadService: DownloadService
     ) { }
 
     public async ngOnInit(): Promise<void> {
@@ -97,7 +97,7 @@ export class CsiInspectionDetailsComponent implements OnInit {
             this.isLoading = true;
 
             const blob = await this._inspectionService.getPdf(this.inspection.id);
-            this._helper.downloadFileFromBlob(blob);
+            this._downloadService.downloadFileFromBlob(blob);
         } finally {
             this.isLoading = false;
         }

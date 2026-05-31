@@ -8,6 +8,9 @@ import { QueryProperty } from "../../../shared/models/query";
 import { NgForm } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { InputOption } from "../../../shared/components/input/input.component";
+import { DownloadConfig } from "../../../shared/models/download-config";
+import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
+import { DownloadManagerComponent } from "../../../shared/components/data-components/download-manager/download-manager.component";
 
 @Component({
     standalone: false,
@@ -43,6 +46,8 @@ export class CsiInspectionListComponent implements OnInit {
         }
     };
 
+    public downloadConfig: DownloadConfig;
+
     public passFailOptions: InputOption[] = [
         { id: '', text: 'Any result' },
         { id: 'true', text: 'Pass' },
@@ -70,8 +75,44 @@ export class CsiInspectionListComponent implements OnInit {
     constructor(
         private readonly _csiInspectionService: CsiInspectionService,
         private readonly _router: Router,
-        private readonly _activatedRoute: ActivatedRoute
+        private readonly _activatedRoute: ActivatedRoute,
+        private readonly _modalHelper: ModalHelperService
     ) {
+        this.downloadConfig = {
+            fileName: 'CSI Inspections',
+            endpoint: this._csiInspectionService.getAllEndpoint(),
+            pdfEndpoint: this._csiInspectionService.getAllPdfEndpoint(),
+            suppoertedFormats: ['CSV', 'Excel', "PDF"],
+            columns: [
+                { field: 'inspectionDate', caption: 'InspectionDate' },
+                { field: 'inspectionResult', caption: 'PassedInspection' },
+                { field: 'site.accountNumber', caption: 'AccountNumber' },
+                { field: 'propertyBusinessName', caption: 'PropertyBusinessName' },
+                { field: 'propertyStreetNumber', caption: 'PropertyStreetNumber' },
+                { field: 'propertyStreetName', caption: 'PropertyStreetName' },
+                { field: 'propertyNumber', caption: 'PropertyNumber' },
+                { field: 'propertyCity', caption: 'PropertyCity' },
+                { field: 'propertyState.code', caption: 'PropertyState' },
+                { field: 'propertyZip', caption: 'PropertyZIP' },
+                { field: 'mailingCompanyName', caption: 'MailingCompanyName' },
+                { field: 'mailingContactName', caption: 'MailingContactName' },
+                { field: 'mailingStreetNumber', caption: 'MailingStreetNumber' },
+                { field: 'mailingStreetName', caption: 'MailingStreetName' },
+                { field: 'mailingNumber', caption: 'MailingNumber' },
+                { field: 'mailingCity', caption: 'MailingCity' },
+                { field: 'mailingState.code', caption: 'MailingState' },
+                { field: 'mailingZip', caption: 'MailingZIP' },
+                { field: 'mailingPhoneNumber', caption: 'MailingPhoneNumber' },
+                { field: 'mailingEmailAddress', caption: 'MailingEmailAddress' },
+                { field: 'inspectorCompanyName', caption: 'InspectorCompanyName' },
+                { field: 'inspectorContactName', caption: 'InspectorContactName' },
+                { field: 'inspectorAddress', caption: 'InspectorAddress' },
+                { field: 'inspectorCity', caption: 'InspectorCity' },
+                { field: 'inspectorState', caption: 'InspectorState' },
+                { field: 'inspectorZip', caption: 'InspectorZip' },
+                { field: 'comments', caption: 'Remarks' }
+            ]
+        };
     }
 
     public async ngOnInit(): Promise<void> {
@@ -164,6 +205,13 @@ export class CsiInspectionListComponent implements OnInit {
     public viewDetails(inspection: CsiInspection): void {
         this._router.navigate([inspection.id, 'view'], {
             relativeTo: this._activatedRoute
+        });
+    }
+
+    public showDownlaodManager(): void {
+        this._modalHelper.show(DownloadManagerComponent, {
+            title: 'Export Results',
+            model: this.downloadConfig
         });
     }
 }

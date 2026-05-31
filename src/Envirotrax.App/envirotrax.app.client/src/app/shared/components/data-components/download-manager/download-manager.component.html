@@ -1,0 +1,29 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner [hidden]="!isLoading"></dp-loading-spinner>
+
+    <form #downloadForm="ngForm" (ngSubmit)="download(downloadForm)">
+        <div class="mb-3">
+            <vp-input label="File Name"
+                      name="fileName"
+                      [maxLength]="100"
+                      [required]="true"
+                      [form]="downloadForm"
+                      [(ngModel)]="downloadConfig.fileName">
+            </vp-input>
+        </div>
+
+        <div class="mb-3">
+            <vp-input label="Format"
+                      name="format" ,
+                      type="select"
+                      [options]="formatOptions"
+                      [(ngModel)]="downloadConfig.selectedFormat" />
+        </div>
+
+        <div class="text-center mt-3">
+            <button type="submit" class="btn btn-primary vp-section-button">
+                Download
+            </button>
+        </div>
+    </form>
+</div>

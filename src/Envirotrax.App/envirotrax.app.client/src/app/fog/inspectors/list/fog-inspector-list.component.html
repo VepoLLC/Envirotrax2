@@ -8,12 +8,12 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="companyEmail"
-                                                   label="Company Email"
+                                                   label="Company email"
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="name"
-                                                   label="Company Name"
+                                                   label="Company name"
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-3">
@@ -23,14 +23,19 @@
                         </div>
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="phoneNumber"
-                                                   label="Company Phone"
+                                                   label="Company phone"
                                                    [form]="searchForm" />
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
+                            <vp-filter-panel-field fieldName="inspectorLicenseNumber"
+                                                   label="Inspector license number"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-3">
                             <vp-filter-panel-field fieldName="insurancePolicyNumber"
-                                                   label="Insurance Policy Number"
+                                                   label="Insurance policy number"
                                                    [form]="searchForm" />
                         </div>
                     </div>
@@ -84,7 +89,9 @@
                     [(query)]="table.query"
                     (queryChange)="getInspectors()"
                     (queryReset)="getInspectors()"
-                    [freeTextSearch]="table.freeTextSearch"/>
+                    [freeTextSearch]="table.freeTextSearch"
+                    [canSelect]="true"
+                    (select)="openDetails($event)"/>
     </vp-section>
 
 </div>

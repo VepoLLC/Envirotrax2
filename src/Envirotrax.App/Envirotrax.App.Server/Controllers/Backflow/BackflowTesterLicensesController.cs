@@ -38,5 +38,33 @@ namespace Envirotrax.App.Server.Controllers.Backflow
             var result = await _licenseService.GetAllByProfessionalAsync(id, pageInfo, query, cancellationToken);
             return Ok(result);
         }
+
+        [HttpPost("{id}/licenses")]
+        [HasFeature(FeatureType.ManageProfessionalLicenses)]
+        [HasPermission(PermissionAction.CanModify)]
+        public async Task<IActionResult> AddLicenseAsync(int id, [FromBody] ProfessionalUserLicenseDto dto)
+        {
+            var result = await _licenseService.AddForProfessionalAsync(id, dto);
+            return Ok(result);
+        }
+
+        [HttpPut("{id}/licenses/{licenseId}")]
+        [HasFeature(FeatureType.ManageProfessionalLicenses)]
+        [HasPermission(PermissionAction.CanModify)]
+        public async Task<IActionResult> UpdateLicenseAsync(int id, int licenseId, [FromBody] ProfessionalUserLicenseDto dto)
+        {
+            dto.Id = licenseId;
+            var result = await _licenseService.UpdateForProfessionalAsync(id, dto);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}/licenses/{licenseId}")]
+        [HasFeature(FeatureType.ManageProfessionalLicenses)]
+        [HasPermission(PermissionAction.CanModify)]
+        public async Task<IActionResult> DeleteLicenseAsync(int licenseId)
+        {
+            await _licenseService.DeleteAsync(licenseId);
+            return Ok();
+        }
     }
 }

@@ -170,4 +170,8 @@ public class ReferencedSiteDto
     public string? BusinessName { get; set; }
 
     public FacilityType FacilityType { get; set; }
+
+    public double? GisLatitude { get; set; }
+
+    public double? GisLongitude { get; set; }
 }

@@ -27,5 +27,13 @@ namespace Envirotrax.App.Server.Controllers.Backflow
             var result = await _supplierService.GetAllByProfessionalAsync(id, pageInfo, query, cancellationToken);
             return Ok(result);
         }
+
+        [HttpPut("{id}/water-suppliers/{supplierId}")]
+        [HasPermission(PermissionAction.CanModify)]
+        public async Task<IActionResult> UpdateWaterSupplierAsync([FromBody] ProfessionalWaterSupplierDto dto)
+        {
+            var result = await _supplierService.UpdateAsync(dto);
+            return Ok(result);
+        }
     }
 }

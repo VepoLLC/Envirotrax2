@@ -6,4 +6,5 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 
 public interface IBackflowTestRepository : IRepository<BackflowTest>
 {
+    Task<IEnumerable<BackflowTest>> GetAllAsync(PageInfo pageInfo, Query query, int? gisAreaId, CancellationToken cancellationToken);
 }

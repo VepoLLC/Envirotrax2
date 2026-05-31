@@ -264,6 +264,12 @@
                                                   [(ngModel)]="settings.fogTransportFeeWsShare"
                                                   name="fogTransportFeeWsShare" /></td>
                                 </tr>
+                                <tr>
+                                    <td class="text-end pe-2 text-nowrap"><strong>FOG Inspection Fees:</strong></td>
+                                    <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.fogInspectorFee"
+                                                  name="fogInspectorFee" /></td>
+                                    <td></td>
+                                </tr>
                             </tbody>
                         </table>
                     </vp-section>

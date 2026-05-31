@@ -28,6 +28,31 @@ namespace Envirotrax.App.Server.Controllers.Backflow
             return Ok(result);
         }
 
+        [HttpPost("{id}/users")]
+        [HasFeature(FeatureType.ManageProfessionalUsers)]
+        [HasPermission(PermissionAction.CanModify)]
+        public async Task<IActionResult> AddSubAccountAsync(int id, [FromBody] ProfessionalUserDto dto)
+        {
+            var result = await _userService.AddForProfessionalAsync(id, dto);
+            return Ok(result);
+        }
 
+        [HttpPut("{id}/users/{userId}")]
+        [HasFeature(FeatureType.ManageProfessionalUsers)]
+        [HasPermission(PermissionAction.CanModify)]
+        public async Task<IActionResult> UpdateSubAccountAsync(int id, int userId, [FromBody] ProfessionalUserDto dto)
+        {
+            var result = await _userService.UpdateSubAccountAsync(id, userId, dto.ContactName, dto.JobTitle);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}/users/{userId}")]
+        [HasFeature(FeatureType.ManageProfessionalUsers)]
+        [HasPermission(PermissionAction.CanModify)]
+        public async Task<IActionResult> DeleteSubAccountAsync(int userId)
+        {
+            await _userService.DeleteAsync(userId);
+            return Ok();
+        }
     }
 }

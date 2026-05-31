@@ -1,5 +1,6 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
+import { Subscription } from "rxjs";
 import { Professional } from "../../../shared/models/professionals/professional";
 import { CsiInspectorAccountInfoService } from "../../../shared/services/csi/csi-inspector-account-info.service";
 
@@ -8,26 +9,31 @@ import { CsiInspectorAccountInfoService } from "../../../shared/services/csi/csi
     standalone: false,
     templateUrl: './csi-inspector-details.component.html'
 })
-export class CsiInspectorDetailsComponent implements OnInit {
+export class CsiInspectorDetailsComponent implements OnInit, OnDestroy {
     public id: number | null = null;
     public accountInfo: Professional | null = null;
     public isAccountLoading: boolean = false;
+    public formattedAddress: string = '';
+
+    private _routeSub?: Subscription;
 
     constructor(
         private readonly _activatedRoute: ActivatedRoute,
         private readonly _accountInfoService: CsiInspectorAccountInfoService
     ) {}
 
-    public async ngOnInit(): Promise<void> {
-        this.setIdFromRoute();
-        if (this.id !== null) {
-            await this.loadAccountInfo();
-        }
+    public ngOnInit(): void {
+        this._routeSub = this._activatedRoute.paramMap.subscribe(async params => {
+            const idParam = params.get('id');
+            this.id = idParam ? Number(idParam) : null;
+            if (this.id !== null) {
+                await this.loadAccountInfo();
+            }
+        });
     }
 
-     private setIdFromRoute(): void {
-        const idParam = this._activatedRoute.snapshot.paramMap.get('id');
-        this.id = idParam ? Number(idParam) : null;
+    public ngOnDestroy(): void {
+        this._routeSub?.unsubscribe();
     }
 
     private async loadAccountInfo(): Promise<void> {
@@ -37,21 +43,21 @@ export class CsiInspectorDetailsComponent implements OnInit {
         try {
             this.isAccountLoading = true;
             this.accountInfo = await this._accountInfoService.getAccountInfo(this.id);
+            this.formattedAddress = this.buildFormattedAddress();
         } finally {
             this.isAccountLoading = false;
         }
     }
 
-    public getFormattedAddress(): string {
+    private buildFormattedAddress(): string {
         if (!this.accountInfo) {
             return '';
         }
-        const parts = [
+        return [
             this.accountInfo.address,
             this.accountInfo.city,
             this.accountInfo.state?.name,
             this.accountInfo.zipCode
-        ].filter(p => p);
-        return parts.join(', ');
+        ].filter(p => p).join(', ');
     }
 }

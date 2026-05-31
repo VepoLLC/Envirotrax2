@@ -25,4 +25,34 @@ export class BackflowTesterGaugeService {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));
     }
+
+    public add(testerId: number, gauge: BackflowGauge, file: File): Promise<BackflowGauge> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/gauges`);
+        const formData = new FormData();
+        formData.append('professional.id', testerId.toString());
+        formData.append('manufacturer', gauge.manufacturer ?? '');
+        formData.append('model', gauge.model ?? '');
+        formData.append('serialNumber', gauge.serialNumber ?? '');
+        formData.append('isPortable', (gauge.isPortable ?? false).toString());
+        if (gauge.lastCalibrationDate) {
+            formData.append('lastCalibrationDate', gauge.lastCalibrationDate.toString());
+        }
+        formData.append('file', file);
+        return lastValueFrom(this._http.post<BackflowGauge>(url, formData));
+    }
+
+    public update(testerId: number, gauge: BackflowGauge): Promise<BackflowGauge> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/gauges/${gauge.id}`);
+        return lastValueFrom(this._http.put<BackflowGauge>(url, gauge));
+    }
+
+    public async getFileUrl(testerId: number, gaugeId: number): Promise<string> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/gauges/${gaugeId}/file-url`);
+        return await lastValueFrom(this._http.get<string>(url));
+    }
+
+    public delete(testerId: number, gaugeId: number): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/gauges/${gaugeId}`);
+        return lastValueFrom(this._http.delete<void>(url));
+    }
 }

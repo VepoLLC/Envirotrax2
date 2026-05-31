@@ -15,7 +15,7 @@ import { ToastService } from "../../../../../shared/services/toast.service";
 import { CsiInspectorAddEditInsuranceComponent } from "../edit/add-edit-csi-inspector-insurance.component";
 import { CsiInspectorAddEditLicenseComponent } from "../edit/add-edit-csi-inspector-license.component";
 import { Professional } from "../../../../../shared/models/professionals/professional";
-import { HelperService } from "../../../../../shared/services/helpers/helper.service";
+import { DownloadService } from "../../../../../shared/services/download.service";
 
 
 @Component({
@@ -68,7 +68,7 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
         private readonly _authService: AuthService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService,
-        private readonly _helper: HelperService
+        private readonly _downloadService: DownloadService
     ) { }
 
     public async ngOnInit(): Promise<void> {
@@ -227,7 +227,7 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
             this.insurancesTable.isLoading = true;
 
             const url = await this._insurancesService.getFileUrl(this.inspectorId, insurance.id!);
-            this._helper.downloadFileFromUrl(url);
+            this._downloadService.downloadFileFromUrl(url);
         } finally {
             this.insurancesTable.isLoading = false;
         }

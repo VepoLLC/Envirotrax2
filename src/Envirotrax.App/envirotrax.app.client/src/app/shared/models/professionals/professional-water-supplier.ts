@@ -16,6 +16,7 @@ export interface ProfessionalWaterSupplier {
     csiCommercialInspectionFee?: number;
     csiResidentialInspectionFee?: number;
     fogTransportFee?: number;
+    fogInspectorFee?: number;
 }
 
 export interface AvailableWaterSupplier {

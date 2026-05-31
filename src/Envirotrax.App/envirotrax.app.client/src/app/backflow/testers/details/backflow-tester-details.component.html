@@ -23,7 +23,7 @@
                         </tr>
                         <tr>
                             <th>Address:</th>
-                            <td>{{ getFormattedAddress() }}</td>
+                            <td>{{ formattedAddress }}</td>
                         </tr>
                         <tr>
                             <th>Phone Number:</th>
@@ -51,7 +51,7 @@
         </div>
 
         <div class="col-lg-12">
-            <vp-backflow-tester-gauge [testerId]="id!"/>
+            <vp-backflow-tester-gauge [testerId]="id!" [tester]="accountInfo" />
         </div>
 
     </div>

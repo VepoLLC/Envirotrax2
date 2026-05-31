@@ -1,8 +1,4 @@
 
-<ng-template #supplierNameCell let-ws="rowData">
-    {{ ws.waterSupplier?.name }}
-</ng-template>
-
 <vp-section header="Account Registration">
     <div dp-spinner-parent>
         <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
@@ -14,6 +10,9 @@
                   (pageInfoChange)="loadWaterSuppliers()"
                   [(query)]="table.query"
                   (queryChange)="loadWaterSuppliers()"
-                  (queryReset)="loadWaterSuppliers()" />
+                  (queryReset)="loadWaterSuppliers()"
+                  [canEdit]="canEdit"
+                  (edit)="editWaterSupplier($event)"
+                  [showActionLabels]="false" />
     </div>
 </vp-section>

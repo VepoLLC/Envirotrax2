@@ -1,3 +1,4 @@
+using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.App.Server.Filters;
@@ -17,6 +18,16 @@ public class CsiInspectionController : WaterSupplierCrudController<CsiInspection
         : base(service)
     {
         _inspectionService = service;
+    }
+
+    [HttpGet("pdf")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetAllPdfAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
+    {
+        var inspections = await _inspectionService.GetAllAsync(pageInfo, query, cancellationToken);
+        var pdfBytes = await _inspectionService.GeneratePdfAsync(inspections.Data);
+
+        return File(pdfBytes, "application/pdf");
     }
 
     [HttpPut("{id}/approval")]

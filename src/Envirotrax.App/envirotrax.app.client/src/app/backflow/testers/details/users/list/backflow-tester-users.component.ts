@@ -4,6 +4,13 @@ import { TableViewModel } from "../../../../../shared/models/table-view-model";
 import { TableColumn } from "../../../../../shared/components/data-components/table/table.component";
 import { ColumnType } from "../../../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { BackflowTesterUserService } from "../../../../../shared/services/backflow/backflow-tester-user.service";
+import { ModalHelperService } from "../../../../../shared/services/helpers/modal-helper.service";
+import { ToastService } from "../../../../../shared/services/toast.service";
+import { AuthService } from "../../../../../shared/services/auth/auth.service";
+import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
+import { FeatureType } from "../../../../../shared/models/feature-type";
+import { ModalSize } from "@developer-partners/ngx-modal-dialog";
+import { AddEditBackflowTesterUserComponent, BackflowUserModalData } from "../edit/add-edit-backflow-tester-user.component";
 
 @Component({
     selector: 'vp-backflow-tester-users',
@@ -13,16 +20,29 @@ import { BackflowTesterUserService } from "../../../../../shared/services/backfl
 export class BackflowTesterUsersComponent implements OnInit {
     @Input() public testerId!: number;
 
+    public canManage: boolean = false;
+
     public table: TableViewModel<ProfessionalUser> = {
         columns: [],
         query: { sort: {}, filter: [] }
     };
 
-    constructor(private readonly _service: BackflowTesterUserService) { }
+    constructor(
+        private readonly _service: BackflowTesterUserService,
+        private readonly _modalHelper: ModalHelperService,
+        private readonly _toastService: ToastService,
+        private readonly _authService: AuthService
+    ) { }
 
     public async ngOnInit(): Promise<void> {
+        await this.setPermissions();
         this.table.columns = this.getColumns();
         await this.loadSubAccounts();
+    }
+
+    private async setPermissions(): Promise<void> {
+        const canEdit = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.BackflowTesters);
+        this.canManage = canEdit && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalUsers);
     }
 
     private getColumns(): TableColumn<ProfessionalUser>[] {
@@ -43,6 +63,35 @@ export class BackflowTesterUsersComponent implements OnInit {
                 type: ColumnType.text
             }
         ];
+    }
+
+    public addUser(): void {
+        this._modalHelper.show<BackflowUserModalData, ProfessionalUser>(AddEditBackflowTesterUserComponent, {
+            title: 'Add Sub Account',
+            model: { testerId: this.testerId, user: {} },
+            size: ModalSize.large
+        }).result().subscribe(() => this.loadSubAccounts());
+    }
+
+    public editUser(user: ProfessionalUser): void {
+        this._modalHelper.show<BackflowUserModalData, ProfessionalUser>(AddEditBackflowTesterUserComponent, {
+            title: 'Edit Sub Account',
+            model: { testerId: this.testerId, user },
+            size: ModalSize.large
+        }).result().subscribe(() => this.loadSubAccounts());
+    }
+
+    public deleteUser(user: ProfessionalUser): void {
+        this._modalHelper.showDeleteConfirmation().result().subscribe(async () => {
+            try {
+                this.table.isLoading = true;
+                await this._service.delete(this.testerId, user.id!);
+                this._toastService.successFullyDeleted('Sub Account');
+            } finally {
+                this.table.isLoading = false;
+            }
+            await this.loadSubAccounts();
+        });
     }
 
     public async loadSubAccounts(): Promise<void> {

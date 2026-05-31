@@ -2,6 +2,7 @@ using Azure.Identity;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Envirotrax.App.Server.Configuration;
 using Envirotrax.App.Server.Filters;
+using Envirotrax.App.Server.MediaTypeFormatters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,9 @@ builder.Services.AddControllers(options =>
     options.Filters.Add(typeof(CheckFeaturesFilter));
     options.Filters.Add(typeof(CheckPermissionFilter));
     options.Filters.Add(typeof(QueryFilter));
+
+    options.OutputFormatters.Add(new CsvMediaTypeFormatter());
+    options.OutputFormatters.Add(new ExcelMediaTypeFormatter());
 });
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

@@ -7,6 +7,7 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { CsiInspection } from "../../models/csi/csi-inspection";
+import { DownloadEndpoint } from "../../models/download-config";
 
 @Injectable({
     providedIn: 'root'
@@ -27,6 +28,24 @@ export class CsiInspectionService {
         });
 
         return await lastValueFrom(observable);
+    }
+
+    public getAllEndpoint(): DownloadEndpoint {
+        const url = this._urlResolver.resolveUrl('/api/csi/inspections');
+
+        return {
+            method: 'GET',
+            url: url
+        };
+    }
+
+    public getAllPdfEndpoint(): DownloadEndpoint {
+        const url = this._urlResolver.resolveUrl('/api/csi/inspections/pdf');
+
+        return {
+            method: 'GET',
+            url: url
+        };
     }
 
     public get(id: number): Promise<CsiInspection> {

@@ -1,4 +1,5 @@
 
+using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Configuration;
 using Envirotrax.App.Server.Domain.Configuration;
 using OpenIddict.Validation.AspNetCore;
@@ -9,6 +10,8 @@ public static class ServiceRegistration
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
+        PageInfo.MaxPageSize = 2000;
+
         services.AddAuthentication(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
 
         services

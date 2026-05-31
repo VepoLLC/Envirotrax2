@@ -61,6 +61,20 @@ a:hover {
     border-color: #dde3eb !important;
 }
 
+.page-item.active .page-link {
+    background-color: #3282b8;
+    border-color: #3282b8;
+}
+
+.page-link {
+    color: #3282b8;
+}
+
+.page-link.active,
+.active>.page-link {
+    color: #fff;
+}
+
 .dp-modal-header:not(.dp-error):not(.dp-success):not(.dp-warning) {
     background-color: #05bfdf !important;
     color: #ffffff;

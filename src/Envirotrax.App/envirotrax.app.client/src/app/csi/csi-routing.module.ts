@@ -6,9 +6,24 @@ import { CsiInspectionListComponent } from "./inspections/list/csi-inspection-li
 import { CsiInspectorListComponent } from "./inspectors/list/csi-inspector-list.component";
 import { CsiInspectorDetailsComponent } from "./inspectors/details/csi-inspector-details.component";
 import { CsiInspectionDetailsComponent } from "./inspections/details/csi-inspection-details.component";
+import { CsiSystemReportComponent } from "./reports/system/csi-system-report.component";
 
 const routes: Routes = [
 
+    {
+        path: 'reports/system',
+        title: 'CSI System Report',
+        component: CsiSystemReportComponent,
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.CsiReports,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
+    },
     {
         path: ':id/view',
         title: 'Inspection Details',

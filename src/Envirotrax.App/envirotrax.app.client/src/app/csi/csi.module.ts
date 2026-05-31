@@ -17,6 +17,7 @@ import { CsiInspectorAddEditInsuranceComponent } from "./inspectors/details/lice
 import { EditCsiInspectorWaterSupplierComponent } from "./inspectors/details/water-suppliers/edit/edit-csi-inspector-water-supplier.component";
 import { AddEditCsiInspectorUserComponent } from "./inspectors/details/users/edit/add-edit-csi-inspector-user.component";
 import { ProfessionalModule } from "../professionals/professional.module";
+import { CsiSystemReportComponent } from "./reports/system/csi-system-report.component";
 
 @NgModule({
     declarations: [
@@ -31,7 +32,8 @@ import { ProfessionalModule } from "../professionals/professional.module";
         CsiInspectorAddEditLicenseComponent,
         CsiInspectorAddEditInsuranceComponent,
         EditCsiInspectorWaterSupplierComponent,
-        AddEditCsiInspectorUserComponent
+        AddEditCsiInspectorUserComponent,
+        CsiSystemReportComponent
     ],
     imports: [
         CommonModule,

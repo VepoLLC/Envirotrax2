@@ -15,7 +15,7 @@ export class FogInspectorAccountInfoService {
     }
 
     public async getAccountInfo(id: number): Promise<Professional> {
-        const url = this._urlResolver.resolveUrl(`/api/fog/inspectors/${id}/account-info`);
+        const url = this._urlResolver.resolveUrl(`/api/fog/inspectors/${id}`);
         return await lastValueFrom(this._http.get<Professional>(url));
     }
 }

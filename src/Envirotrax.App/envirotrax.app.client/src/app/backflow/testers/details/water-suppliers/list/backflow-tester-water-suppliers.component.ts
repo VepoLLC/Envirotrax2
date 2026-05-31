@@ -1,7 +1,7 @@
-import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { ProfessionalWaterSupplier } from "../../../../../shared/models/professionals/professional-water-supplier";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
-import { CellTemplateData, TableColumn } from "../../../../../shared/components/data-components/table/table.component";
+import { TableColumn } from "../../../../../shared/components/data-components/table/table.component";
 import { ColumnType } from "../../../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { BackflowTesterWaterSuppliersService } from "../../../../../shared/services/backflow/backflow-tester-water-suppliers.service";
 import { CheckboxCellComponent } from "../../../../../shared/components/data-components/table/table-cells/checkbox-cell.component";
@@ -20,9 +20,6 @@ export class BackflowTesterWaterSuppliersComponent implements OnInit {
         query: { sort: {}, filter: [] }
     };
 
-    @ViewChild('supplierNameCell', { static: true })
-    private supplierNameCellTemplate!: TemplateRef<CellTemplateData<ProfessionalWaterSupplier>>;
-
     constructor(private readonly _service: BackflowTesterWaterSuppliersService) { }
 
     public async ngOnInit(): Promise<void> {
@@ -33,9 +30,8 @@ export class BackflowTesterWaterSuppliersComponent implements OnInit {
     private getColumns(): TableColumn<ProfessionalWaterSupplier>[] {
         return [
             {
-                field: 'waterSupplierId',
+                field: 'waterSupplier.name',
                 caption: 'Water Supplier',
-                cellTemplate: this.supplierNameCellTemplate,
                 type: ColumnType.text
             },
             {

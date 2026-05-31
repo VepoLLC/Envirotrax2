@@ -17,9 +17,6 @@ public class ProfessionalDto : IDto
     public string? CompanyEmail { get; set; }
 
     [StringLength(255)]
-    public string? ContactName { get; set; }
-
-    [StringLength(255)]
     public string? Address { get; set; }
 
     [StringLength(255)]

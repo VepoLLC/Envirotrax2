@@ -22,7 +22,7 @@ namespace Envirotrax.App.Server.Controllers.Fog
         [HasPermission(PermissionAction.CanView)]
         public async Task<IActionResult> GetWaterSuppliersAsync(int id, [FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
         {
-            var result = await _supplierService.GetAllByProfessionalAsync(id, pageInfo, query, cancellationToken);
+            var result = await _supplierService.GetAllByProfessionalAsync(id, pageInfo, query, cancellationToken, pws => pws.HasFogInspection);
             return Ok(result);
         }
     }

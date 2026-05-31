@@ -14,6 +14,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
     private _container!: HTMLElement;
     private _polygonInstances: any[] = [];
     private _markerInstance: any;
+    private _markerInstances: any[] = [];
+    private _infoWindow: any;
     private _drawingManager: any;
 
     private static _apiKey$?: Observable<ApiKey>;
@@ -43,6 +45,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
 
     @Input()
     public showMarker?: boolean;
+
+    @Input()
+    public markers?: MapMarker<any>[];
 
     @Output()
     public mouseMoved = new EventEmitter<{ lat: number, lng: number }>();
@@ -104,6 +109,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
 
         await this.renderPolygons();
         this.renderMarker();
+        this.renderMarkers();
 
         this._map.addListener('mousemove', (event: any) => {
             this._ngZone.run(() => this.mouseMoved.emit({ lat: event.latLng.lat(), lng: event.latLng.lng() }));
@@ -140,6 +146,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
         if (changes['showMarker']) {
             this.renderMarker();
         }
+
+        if (changes['markers']) {
+            this.renderMarkers();
+        }
     }
 
     private renderMarker(): void {
@@ -157,6 +167,39 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
             position: { lat: this.latitude, lng: this.longitude },
             map: this._map
         });
+    }
+
+    private renderMarkers(): void {
+        this._markerInstances.forEach(m => m.setMap(null));
+        this._markerInstances = [];
+
+        if (!this.markers?.length || !this._map) {
+            return;
+        }
+
+        const { Marker } = MapComponent._markerLibrary as any;
+        const { InfoWindow } = MapComponent._mapsLibrary as any;
+
+        if (!this._infoWindow) {
+            this._infoWindow = new InfoWindow();
+        }
+
+        for (const marker of this.markers) {
+            const instance = new Marker({
+                position: { lat: marker.lat, lng: marker.lng },
+                map: this._map,
+                ...(marker.icon ? { icon: marker.icon } : {})
+            });
+
+            if (marker.popupHtml) {
+                instance.addListener('click', () => {
+                    this._infoWindow.setContent(marker.popupHtml);
+                    this._infoWindow.open({ anchor: instance, map: this._map });
+                });
+            }
+
+            this._markerInstances.push(instance);
+        }
     }
 
     private async renderPolygons(): Promise<void> {
@@ -288,5 +331,13 @@ export interface MapPolygon<TData extends any> {
     onClick?: (polygon: MapPolygon<TData>) => void;
     onEdit?: (polygon: MapPolygon<TData>) => void;
     onDrawComplete?: (polygon: MapPolygon<TData>) => void;
+    data?: TData;
+}
+
+export interface MapMarker<TData = any> {
+    lat: number;
+    lng: number;
+    popupHtml?: string;
+    icon?: any;
     data?: TData;
 }

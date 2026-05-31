@@ -1,14 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { BackflowTestService } from '../../shared/services/backflow/backflow-test.service';
+import { GisAreaService } from '../../shared/services/gis-areas/gis-area.service';
+import { GisAreaCoordinateService } from '../../shared/services/gis-areas/gis-area-coordinate.service';
+import { GisMapService } from '../../shared/services/gis-areas/gis-map.service';
 import { QueryProperty } from '../../shared/models/query';
 import { TableViewModel } from '../../shared/models/table-view-model';
 import { BackflowTest } from '../../shared/models/backflow/backflow-test';
+import { GisArea } from '../../shared/models/gis-areas/gis-area';
 import { TableColumn } from '../../shared/components/data-components/table/table.component';
 import { ColumnType } from '../../shared/components/data-components/sorting-filtering/query-view-model';
 import { InputOption } from '../../shared/components/input/input.component';
 import { BackflowTestResult, BackflowReasonForTest } from '../../shared/models/backflow/backflow-test-enums';
 import { FacilityType } from '../../shared/enums/facility-type.enum';
+import { MapMarker, MapPolygon } from '../../shared/components/map/map.component';
 
 @Component({
     standalone: false,
@@ -16,6 +22,14 @@ import { FacilityType } from '../../shared/enums/facility-type.enum';
 })
 export class BackflowTestListComponent implements OnInit {
     public showResults: boolean = false;
+    public showMapResults: boolean = false;
+    public isMapLoading: boolean = false;
+    public mapResultCount: number = 0;
+    public mapMarkers: MapMarker<BackflowTest>[] = [];
+    public mapPolygons: MapPolygon<GisArea>[] = [];
+    public mapLatitude: number = 30.9;
+    public mapLongitude: number = -97.2829;
+    public mapZoom: number = 10;
 
     public table: TableViewModel<BackflowTest> = {
         columns: this.getColumns(),
@@ -144,7 +158,11 @@ export class BackflowTestListComponent implements OnInit {
     ];
 
     constructor(
-        private readonly _backflowTestService: BackflowTestService
+        private readonly _backflowTestService: BackflowTestService,
+        private readonly _router: Router,
+        private readonly _gisAreaService: GisAreaService,
+        private readonly _coordinateService: GisAreaCoordinateService,
+        private readonly _gisMapService: GisMapService
     ) {}
 
     public async ngOnInit(): Promise<void> {}
@@ -222,8 +240,64 @@ export class BackflowTestListComponent implements OnInit {
 
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
+            this.showMapResults = false;
             await this.getTests();
             this.showResults = true;
         }
     }
+
+    public async searchMap(searchForm: NgForm): Promise<void> {
+        if (!searchForm.valid) {
+            return;
+        }
+        try {
+            this.isMapLoading = true;
+            this.showResults = false;
+            this.showMapResults = false;
+
+            const [testsPage, areas, coordinates, defaultView] = await Promise.all([
+                this._backflowTestService.getAll({ pageSize: 10000, pageNumber: 1 }, this.table.query),
+                this._gisAreaService.getAllAreas(),
+                this._coordinateService.getAll(),
+                this._gisAreaService.getDefaultView()
+            ]);
+
+            this.mapResultCount = testsPage.pageInfo?.totalItems ?? testsPage.data.length;
+            this.mapMarkers = this.buildMapMarkers(testsPage.data);
+            this.mapPolygons = this._gisMapService.buildMapPolygons(areas, coordinates);
+
+            if (defaultView.gisCenterLatitude != null) {
+                this.mapLatitude = defaultView.gisCenterLatitude;
+            }
+            if (defaultView.gisCenterLongitude != null) {
+                this.mapLongitude = defaultView.gisCenterLongitude;
+            }
+            if (defaultView.gisCenterZoom != null) {
+                this.mapZoom = defaultView.gisCenterZoom;
+            }
+
+            this.showMapResults = true;
+            window.scrollTo({ top: 0 });
+        } finally {
+            this.isMapLoading = false;
+        }
+    }
+
+    private buildMapMarkers(tests: BackflowTest[]): MapMarker<BackflowTest>[] {
+        return tests
+            .filter(t => t.site?.gisLatitude != null && t.site?.gisLongitude != null)
+            .map(t => {
+                const siteUrl = this._router.serializeUrl(
+                    this._router.createUrlTree(['/sites', t.site!.id!, 'edit'])
+                );
+                const label = [t.propertyBusinessName, t.propertyStreetNumber, t.propertyStreetName, t.propertyCity]
+                    .filter(Boolean)
+                    .map(v => this._gisMapService.escapeHtml(v!))
+                    .join(', ');
+                const popupHtml = this._gisMapService.buildSitePopupHtml(label, siteUrl);
+                const icon = { path: 0, fillColor: '#e8342e', fillOpacity: 0.85, strokeWeight: 0, scale: 7 };
+                return { lat: t.site!.gisLatitude!, lng: t.site!.gisLongitude!, popupHtml, icon, data: t };
+            });
+    }
+
 }

@@ -1,4 +1,5 @@
 
+using System.Linq.Expressions;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
@@ -38,13 +39,18 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
         return await paginated.ToListAsync();
     }
 
-    public async Task<IEnumerable<ProfessionalUserLicense>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public async Task<IEnumerable<ProfessionalUserLicense>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUserLicense, bool>>? filter = null)
     {
-        var paginated = await DbContext.ProfessionalUserLicenses
+        var q = DbContext.ProfessionalUserLicenses
             .AsNoTracking()
             .Include(l => l.LicenseType)
             .Include(l => l.User)
-            .Where(l => l.ProfessionalId == professionalId)
+            .Where(l => l.ProfessionalId == professionalId);
+
+        if (filter != null)
+            q = q.Where(filter);
+
+        var paginated = await q
             .Where(query.Filter)
             .OrderBy(query.Sort)
             .PaginateAsync(pageInfo, cancellationToken);

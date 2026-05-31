@@ -1,5 +1,5 @@
 
-<vp-section header="Account Registration Expiration Date">
+<vp-section header="Licensed Personnel Sub Accounts">
     <div dp-spinner-parent>
         <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
 
@@ -7,12 +7,10 @@
                   [columns]="table.columns!"
                   [data]="table.items.data"
                   [(pageInfo)]="table.items.pageInfo"
-                  (pageInfoChange)="loadWaterSuppliers()"
+                  (pageInfoChange)="loadSubAccounts()"
                   [(query)]="table.query"
-                  (queryChange)="loadWaterSuppliers()"
-                  (queryReset)="loadWaterSuppliers()"
-                  [canEdit]="canEdit"
-                  (edit)="editWaterSupplier($event)"
+                  (queryChange)="loadSubAccounts()"
+                  (queryReset)="loadSubAccounts()"
                   [showActionLabels]="false" />
     </div>
 </vp-section>

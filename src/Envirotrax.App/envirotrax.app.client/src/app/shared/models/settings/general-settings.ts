@@ -40,4 +40,5 @@ export interface GeneralSettings {
     csiResidentialInspectionFeeWsShare?: number;
     fogTransportFee?: number;
     fogTransportFeeWsShare?: number;
+    fogInspectorFee?: number;
 }

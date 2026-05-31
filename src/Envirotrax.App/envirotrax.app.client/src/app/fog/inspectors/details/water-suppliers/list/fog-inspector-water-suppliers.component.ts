@@ -3,24 +3,17 @@ import { ProfessionalWaterSupplier } from "../../../../../shared/models/professi
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
 import { TableColumn } from "../../../../../shared/components/data-components/table/table.component";
 import { ColumnType } from "../../../../../shared/components/data-components/sorting-filtering/query-view-model";
-import { CsiInspectorWaterSuppliersService } from "../../../../../shared/services/csi/csi-inspector-water-suppliers.service";
+import { FogInspectorWaterSuppliersService } from "../../../../../shared/services/fog/fog-inspector-water-suppliers.service";
 import { CheckboxCellComponent } from "../../../../../shared/components/data-components/table/table-cells/checkbox-cell.component";
 import { CurrencyCellComponent } from "../../../../../shared/components/data-components/table/table-cells/currency-cell.component";
-import { AuthService } from "../../../../../shared/services/auth/auth.service";
-import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
-import { ModalHelperService } from "../../../../../shared/services/helpers/modal-helper.service";
-import { ModalSize } from "@developer-partners/ngx-modal-dialog";
-import { EditCsiInspectorWaterSupplierComponent, EditWaterSupplierModalData } from "../edit/edit-csi-inspector-water-supplier.component";
 
 @Component({
-    selector: 'vp-csi-inspector-water-suppliers',
+    selector: 'vp-fog-inspector-water-suppliers',
     standalone: false,
-    templateUrl: './csi-inspector-water-suppliers.component.html'
+    templateUrl: './fog-inspector-water-suppliers.component.html'
 })
-export class CsiInspectorWaterSuppliersComponent implements OnInit {
+export class FogInspectorWaterSuppliersComponent implements OnInit {
     @Input() public inspectorId!: number;
-
-    public canEdit: boolean = false;
 
     public table: TableViewModel<ProfessionalWaterSupplier> = {
         columns: [],
@@ -28,13 +21,10 @@ export class CsiInspectorWaterSuppliersComponent implements OnInit {
     };
 
     constructor(
-        private readonly _service: CsiInspectorWaterSuppliersService,
-        private readonly _authService: AuthService,
-        private readonly _modalHelper: ModalHelperService
+        private readonly _service: FogInspectorWaterSuppliersService
     ) { }
 
     public async ngOnInit(): Promise<void> {
-        this.canEdit = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.CsiInspectors);
         this.setupColumns();
         await this.loadWaterSuppliers();
     }
@@ -51,19 +41,13 @@ export class CsiInspectorWaterSuppliersComponent implements OnInit {
                 type: ColumnType.text
             },
             {
-                field: 'csiCommercialInspectionFee',
+                field: 'fogInspectorFee',
                 caption: 'Com. Fee',
                 cellComponent: CurrencyCellComponent,
                 type: ColumnType.number
             },
             {
-                field: 'csiResidentialInspectionFee',
-                caption: 'Res. Fee',
-                cellComponent: CurrencyCellComponent,
-                type: ColumnType.number
-            },
-            {
-                field: 'hasCsiInspection',
+                field: 'hasFogInspection',
                 caption: 'Active',
                 cellComponent: CheckboxCellComponent,
                 type: ColumnType.text
@@ -89,13 +73,4 @@ export class CsiInspectorWaterSuppliersComponent implements OnInit {
             this.table.isLoading = false;
         }
     }
-
-    public editWaterSupplier(supplier: ProfessionalWaterSupplier): void {
-        this._modalHelper.show<EditWaterSupplierModalData, ProfessionalWaterSupplier>(EditCsiInspectorWaterSupplierComponent, {
-            title: 'Edit Water Supplier Registration',
-            model: { inspectorId: this.inspectorId, supplier },
-            size: ModalSize.medium
-        }).result().subscribe(() => this.loadWaterSuppliers());
-    }
-
 }

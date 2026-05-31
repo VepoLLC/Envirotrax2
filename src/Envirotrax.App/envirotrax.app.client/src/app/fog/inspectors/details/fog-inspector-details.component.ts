@@ -1,27 +1,25 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
-
 import { ActivatedRoute } from "@angular/router";
 import { Subscription } from "rxjs";
 import { Professional } from "../../../shared/models/professionals/professional";
-import { BackflowTesterManagementService } from "../../../shared/services/backflow/backflow-tester-management.service";
+import { FogInspectorAccountInfoService } from "../../../shared/services/fog/fog-inspector-account-info.service";
 
 @Component({
-    selector: 'app-backflow-tester-details',
     standalone: false,
-    templateUrl: './backflow-tester-details.component.html'
+    templateUrl: './fog-inspector-details.component.html'
 })
-export class BackflowTesterDetailsComponent implements OnInit, OnDestroy {
+export class FogInspectorDetailsComponent implements OnInit, OnDestroy {
     public id: number | null = null;
-    public isAccountLoading: boolean = false;
     public accountInfo: Professional | null = null;
+    public isAccountLoading: boolean = false;
     public formattedAddress: string = '';
 
     private _routeSub?: Subscription;
 
     constructor(
         private readonly _activatedRoute: ActivatedRoute,
-        private readonly _backflowTesterManagementService: BackflowTesterManagementService,
-    ) { }
+        private readonly _accountInfoService: FogInspectorAccountInfoService
+    ) {}
 
     public ngOnInit(): void {
         this._routeSub = this._activatedRoute.paramMap.subscribe(async params => {
@@ -43,7 +41,7 @@ export class BackflowTesterDetailsComponent implements OnInit, OnDestroy {
         }
         try {
             this.isAccountLoading = true;
-            this.accountInfo = await this._backflowTesterManagementService.getAccountInfo(this.id);
+            this.accountInfo = await this._accountInfoService.getAccountInfo(this.id);
             this.formattedAddress = this.buildFormattedAddress();
         } finally {
             this.isAccountLoading = false;

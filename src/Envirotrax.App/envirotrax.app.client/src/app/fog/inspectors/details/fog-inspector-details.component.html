@@ -1,4 +1,4 @@
-<h1 class="h2 mb-4 text-center">CSI Inspector Details</h1>
+<h1 class="h2 mb-4 text-center">FOG Inspector Details</h1>
 
 <dp-loading-spinner *ngIf="isAccountLoading"></dp-loading-spinner>
 
@@ -6,7 +6,7 @@
     <div class="row g-4">
 
         <div class="col-lg-6">
-            <vp-section header="CSI Account Information">
+            <vp-section header="FOG Account Information">
                 <table class="table table-borderless mb-0">
                     <tbody>
                         <tr>
@@ -39,15 +39,15 @@
         </div>
 
         <div class="col-lg-6">
-            <vp-csi-inspector-water-suppliers [inspectorId]="id!" />
+            <vp-fog-inspector-water-suppliers [inspectorId]="id!" />
         </div>
 
         <div class="col-12">
-            <vp-csi-inspector-users [inspectorId]="id!" />
+            <vp-fog-inspector-users [inspectorId]="id!" />
         </div>
 
         <div class="col-12">
-            <vp-csi-inspector-license-insurances [inspectorId]="id!" [inspector]="accountInfo" />
+            <vp-fog-inspector-license-insurances [inspectorId]="id!" />
         </div>
 
     </div>

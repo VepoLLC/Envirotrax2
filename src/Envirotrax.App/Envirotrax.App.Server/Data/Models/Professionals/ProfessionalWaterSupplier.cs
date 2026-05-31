@@ -32,6 +32,9 @@ public class ProfessionalWaterSupplier : TenantModel<WaterSupplier>, IProfession
 
     [Precision(19, 4)]
     public decimal? FogTransportFee { get; set; }
+
+    [Precision(19, 4)]
+    public decimal? FogInspectorFee { get; set; }
 }
 
 public class AvailableWaterSupplier

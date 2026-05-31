@@ -81,6 +81,7 @@ export class CsiInspectionListComponent implements OnInit {
         this.downloadConfig = {
             fileName: 'CSI Inspections',
             endpoint: this._csiInspectionService.getAllEndpoint(),
+            pdfEndpoint: this._csiInspectionService.getAllPdfEndpoint(),
             suppoertedFormats: ['CSV', 'Excel', "PDF"],
             columns: [
                 { field: 'inspectionDate', caption: 'InspectionDate' },

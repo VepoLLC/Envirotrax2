@@ -28,6 +28,13 @@ export class DownloadManagerComponent {
             pageSize: MAX_PAGE_SIZE
         };
 
+        if (this.downloadConfig.pdfEndpoint) {
+            this.downloadConfig.pdfEndpoint.pageInfo = {
+                pageNumber: 1,
+                pageSize: MAX_PAGE_SIZE
+            };
+        }
+
         this.downloadConfig.selectedFormat = 'CSV';
 
         this.formatOptions = (this.downloadConfig.suppoertedFormats ?? ['CSV']).map(f => ({

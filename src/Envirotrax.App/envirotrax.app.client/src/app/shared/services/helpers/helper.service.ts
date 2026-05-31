@@ -69,22 +69,4 @@ export class HelperService {
     public isDefined(value: any): boolean {
         return value != undefined && value != null;
     }
-
-    public downloadFileFromUrl(url: string): void {
-        const link = document.createElement('a');
-
-        link.href = url;
-        link.target = '_blank';
-        // this is necessary as link.click() does not work on the latest firefox
-        link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
-
-        window.setTimeout(function () {
-            link.remove();
-        }, 5000);
-    }
-
-    public downloadFileFromBlob(blob: Blob): void {
-        const objectUrl = URL.createObjectURL(blob);
-        this.downloadFileFromUrl(objectUrl);
-    }
 }

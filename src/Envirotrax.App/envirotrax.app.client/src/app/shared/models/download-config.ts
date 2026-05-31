@@ -5,6 +5,7 @@ export interface DownloadConfig {
     fileName?: string;
     columns: DownloadColumn[];
     endpoint: DownloadEndpoint;
+    pdfEndpoint?: DownloadEndpoint;
     suppoertedFormats?: FileFormat[]
     selectedFormat?: FileFormat;
 }

@@ -39,6 +39,15 @@ export class CsiInspectionService {
         };
     }
 
+    public getAllPdfEndpoint(): DownloadEndpoint {
+        const url = this._urlResolver.resolveUrl('/api/csi/inspections/pdf');
+
+        return {
+            method: 'GET',
+            url: url
+        };
+    }
+
     public get(id: number): Promise<CsiInspection> {
         const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${id}`);
 

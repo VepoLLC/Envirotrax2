@@ -36,4 +36,19 @@ export class BackflowTesterLicensesService {
         }));
     }
 
+    public add(testerId: number, license: ProfessionalUserLicense): Promise<ProfessionalUserLicense> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/licenses`);
+        return lastValueFrom(this._http.post<ProfessionalUserLicense>(url, license));
+    }
+
+    public update(testerId: number, license: ProfessionalUserLicense): Promise<ProfessionalUserLicense> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/licenses/${license.id}`);
+        return lastValueFrom(this._http.put<ProfessionalUserLicense>(url, license));
+    }
+
+    public delete(testerId: number, licenseId: number): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/licenses/${licenseId}`);
+        return lastValueFrom(this._http.delete<void>(url));
+    }
+
 }

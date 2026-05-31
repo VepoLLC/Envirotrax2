@@ -1,4 +1,5 @@
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -26,6 +27,24 @@ namespace Envirotrax.App.Server.Controllers.Backflow
             return Ok(result);
         }
 
+        [HttpPost("{id}/insurances")]
+        [HasFeature(FeatureType.ManageProfessionalInsurances)]
+        [HasPermission(PermissionAction.CanModify)]
+        public async Task<IActionResult> AddInsuranceAsync([FromForm] CreateInsuranceDto dto, CancellationToken cancellationToken)
+        {
+            using var stream = dto.File.OpenReadStream();
+            return Ok(await _insuranceService.AddAsync(stream, dto.File.FileName, dto));
+        }
+
+        [HttpPut("{id}/insurances/{insuranceId}")]
+        [HasFeature(FeatureType.ManageProfessionalInsurances)]
+        [HasPermission(PermissionAction.CanModify)]
+        public async Task<IActionResult> UpdateInsuranceAsync(int insuranceId, [FromBody] ProfessionalInsuranceDto dto, CancellationToken cancellationToken)
+        {
+            dto.Id = insuranceId;
+            return Ok(await _insuranceService.UpdateAsync(dto));
+        }
+
         [HttpGet("{id}/insurances/{insuranceId}/file-url")]
         [HasPermission(PermissionAction.CanView)]
         public async Task<IActionResult> GetInsuranceFileUrlAsync(int insuranceId, CancellationToken cancellationToken)
@@ -38,6 +57,15 @@ namespace Envirotrax.App.Server.Controllers.Backflow
             }
 
             return NotFound();
+        }
+
+        [HttpDelete("{id}/insurances/{insuranceId}")]
+        [HasFeature(FeatureType.ManageProfessionalInsurances)]
+        [HasPermission(PermissionAction.CanModify)]
+        public async Task<IActionResult> DeleteInsuranceAsync(int insuranceId)
+        {
+            await _insuranceService.DeleteAsync(insuranceId);
+            return Ok();
         }
     }
 }

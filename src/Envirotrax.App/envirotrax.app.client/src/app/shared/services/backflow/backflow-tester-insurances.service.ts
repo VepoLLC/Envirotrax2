@@ -25,4 +25,33 @@ export class BackflowTesterInsurancesService {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));
     }
+
+    public add(testerId: number, insurance: ProfessionalInsurance, file: File | null): Promise<ProfessionalInsurance> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/insurances`);
+        const formData = new FormData();
+        formData.append('professional.id', testerId.toString());
+        formData.append('insuranceNumber', insurance.insuranceNumber ?? '');
+        if (insurance.expirationDate) {
+            formData.append('expirationDate', insurance.expirationDate.toString());
+        }
+        if (file) {
+            formData.append('file', file);
+        }
+        return lastValueFrom(this._http.post<ProfessionalInsurance>(url, formData));
+    }
+
+    public update(testerId: number, insurance: ProfessionalInsurance): Promise<ProfessionalInsurance> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/insurances/${insurance.id}`);
+        return lastValueFrom(this._http.put<ProfessionalInsurance>(url, insurance));
+    }
+
+    public async getFileUrl(testerId: number, insuranceId: number): Promise<string> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/insurances/${insuranceId}/file-url`);
+        return await lastValueFrom(this._http.get<string>(url));
+    }
+
+    public delete(testerId: number, insuranceId: number): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/insurances/${insuranceId}`);
+        return lastValueFrom(this._http.delete<void>(url));
+    }
 }

@@ -26,4 +26,19 @@ export class BackflowTesterUserService {
         }));
     }
 
+    public add(testerId: number, user: ProfessionalUser): Promise<ProfessionalUser> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/users`);
+        return lastValueFrom(this._http.post<ProfessionalUser>(url, user));
+    }
+
+    public update(testerId: number, user: ProfessionalUser): Promise<ProfessionalUser> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/users/${user.id}`);
+        return lastValueFrom(this._http.put<ProfessionalUser>(url, user));
+    }
+
+    public delete(testerId: number, userId: number): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/users/${userId}`);
+        return lastValueFrom(this._http.delete<void>(url));
+    }
+
 }

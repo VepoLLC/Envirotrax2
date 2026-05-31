@@ -10,6 +10,9 @@
                   (pageInfoChange)="loadWaterSuppliers()"
                   [(query)]="table.query"
                   (queryChange)="loadWaterSuppliers()"
-                  (queryReset)="loadWaterSuppliers()" />
+                  (queryReset)="loadWaterSuppliers()"
+                  [canEdit]="canEdit"
+                  (edit)="editWaterSupplier($event)"
+                  [showActionLabels]="false" />
     </div>
 </vp-section>

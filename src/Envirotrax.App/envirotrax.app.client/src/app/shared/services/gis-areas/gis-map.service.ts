@@ -1,4 +1,5 @@
-import { Injectable } from "@angular/core";
+import { Injectable, SecurityContext } from "@angular/core";
+import { DomSanitizer } from "@angular/platform-browser";
 import { GisArea, GisAreaCoordinate } from "../../models/gis-areas/gis-area";
 import { MapPolygon } from "../../components/map/map.component";
 
@@ -6,6 +7,8 @@ import { MapPolygon } from "../../components/map/map.component";
     providedIn: 'root'
 })
 export class GisMapService {
+    constructor(private readonly _sanitizer: DomSanitizer) {}
+
     public buildMapPolygons(areas: GisArea[], coordinates: GisAreaCoordinate[]): MapPolygon<GisArea>[] {
         return areas
             .map((area): MapPolygon<GisArea> | null => {
@@ -21,19 +24,12 @@ export class GisMapService {
     }
 
     public buildSitePopupHtml(label: string, siteUrl: string): string {
+        const safeLabel = this._sanitizer.sanitize(SecurityContext.HTML, label) ?? '';
+        const safeUrl = this._sanitizer.sanitize(SecurityContext.URL, siteUrl) ?? '';
         return `<div class="px-2 py-1" style="min-width:160px">` +
-            `<div class="mb-2">${label}</div>` +
-            `<button onclick="window.open('${siteUrl}','_blank')" ` +
+            `<div class="mb-2">${safeLabel}</div>` +
+            `<button onclick="window.open('${safeUrl}','_blank')" ` +
             `class="btn btn-primary btn-sm">` +
             `View Site</button></div>`;
-    }
-
-    public escapeHtml(text?: string | null): string {
-        return text
-            ?.replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;') ?? '';
     }
 }

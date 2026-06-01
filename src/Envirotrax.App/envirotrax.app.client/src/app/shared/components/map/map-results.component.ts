@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { MapMarker, MapPolygon } from "./map.component";
 
 @Component({
@@ -7,15 +7,11 @@ import { MapMarker, MapPolygon } from "./map.component";
     templateUrl: './map-results.component.html'
 })
 export class MapResultsComponent implements OnInit {
-    @Input() public title: string = '';
-    @Input() public resultCount: number = 0;
     @Input() public markers: MapMarker<any>[] = [];
     @Input() public polygons: MapPolygon<any>[] = [];
     @Input() public latitude: number = 0;
     @Input() public longitude: number = 0;
     @Input() public zoom: number = 10;
-
-    @Output() public searchAgain = new EventEmitter<void>();
 
     public mouseLat: number | null = null;
     public mouseLng: number | null = null;

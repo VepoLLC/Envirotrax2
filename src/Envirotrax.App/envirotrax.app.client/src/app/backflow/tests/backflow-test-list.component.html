@@ -40,7 +40,7 @@
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-3">
-                            <app-gis-area-lookup fieldName="gisAreaId"
+                            <app-gis-area-lookup fieldName="site.gisAreaId"
                                                  label="GIS Area"
                                                  [form]="searchForm" />
                         </div>
@@ -271,12 +271,19 @@
     </vp-section>
 </div>
 
-<app-map-results *ngIf="showMapResults && !isMapLoading"
-                 title="Backflow Test Search"
-                 [resultCount]="mapResultCount"
-                 [markers]="mapMarkers"
-                 [polygons]="mapPolygons"
-                 [latitude]="mapLatitude"
-                 [longitude]="mapLongitude"
-                 [zoom]="mapZoom"
-                 (searchAgain)="showMapResults = false" />
+<div *ngIf="showMapResults && !isMapLoading">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <button type="button" class="btn btn-primary vp-section-button">
+            <i class="fa-solid fa-file-export me-1"></i>Export Results
+        </button>
+        <span class="fw-bold fs-5">Backflow Test Search ({{ mapResultCount }} Results)</span>
+        <button type="button" class="btn btn-primary vp-section-button" (click)="showMapResults = false">
+            <i class="fa-solid fa-magnifying-glass me-1"></i>Search Again
+        </button>
+    </div>
+    <app-map-results [markers]="mapMarkers"
+                     [polygons]="mapPolygons"
+                     [latitude]="mapLatitude"
+                     [longitude]="mapLongitude"
+                     [zoom]="mapZoom" />
+</div>

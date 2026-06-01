@@ -292,7 +292,6 @@ export class BackflowTestListComponent implements OnInit {
                 );
                 const label = [t.propertyBusinessName, t.propertyStreetNumber, t.propertyStreetName, t.propertyCity]
                     .filter(Boolean)
-                    .map(v => this._gisMapService.escapeHtml(v!))
                     .join(', ');
                 const popupHtml = this._gisMapService.buildSitePopupHtml(label, siteUrl);
                 const icon = { path: 0, fillColor: '#e8342e', fillOpacity: 0.85, strokeWeight: 0, scale: 7 };

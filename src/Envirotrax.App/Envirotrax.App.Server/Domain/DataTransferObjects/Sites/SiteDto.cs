@@ -174,4 +174,6 @@ public class ReferencedSiteDto
     public double? GisLatitude { get; set; }
 
     public double? GisLongitude { get; set; }
+
+    public int? GisAreaId { get; set; }
 }

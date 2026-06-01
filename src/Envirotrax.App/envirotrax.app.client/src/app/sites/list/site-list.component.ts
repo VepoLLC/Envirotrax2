@@ -220,7 +220,6 @@ export class SiteListComponent implements OnInit {
                 );
                 const label = [s.businessName, s.streetNumber, s.streetName, s.city]
                     .filter(Boolean)
-                    .map(v => this._gisMapService.escapeHtml(v!))
                     .join(', ');
                 const popupHtml = this._gisMapService.buildSitePopupHtml(label, siteUrl);
                 const icon = { path: 0, fillColor: '#e8342e', fillOpacity: 0.85, strokeWeight: 0, scale: 7 };

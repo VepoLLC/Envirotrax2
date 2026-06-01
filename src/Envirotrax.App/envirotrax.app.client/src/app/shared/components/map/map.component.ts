@@ -13,7 +13,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
     private _map!: any;
     private _container!: HTMLElement;
     private _polygonInstances: any[] = [];
-    private _markerInstance: any;
     private _markerInstances: any[] = [];
     private _infoWindow: any;
     private _drawingManager: any;
@@ -108,7 +107,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
         );
 
         await this.renderPolygons();
-        this.renderMarker();
         this.renderMarkers();
 
         this._map.addListener('mousemove', (event: any) => {
@@ -132,7 +130,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
 
         if (changes['latitude'] || changes['longitude']) {
             this._map.setCenter({ lat: this.latitude ?? 0, lng: this.longitude ?? 0 });
-            this.renderMarker();
+            this.renderMarkers();
         }
 
         if (changes['zoom']) {
@@ -143,62 +141,51 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
             await this.renderPolygons();
         }
 
-        if (changes['showMarker']) {
-            this.renderMarker();
-        }
-
-        if (changes['markers']) {
+        if (changes['showMarker'] || changes['markers']) {
             this.renderMarkers();
         }
-    }
-
-    private renderMarker(): void {
-        if (this._markerInstance) {
-            this._markerInstance.setMap(null);
-            this._markerInstance = null;
-        }
-
-        if (!this.showMarker || this.latitude == null || this.longitude == null) {
-            return;
-        }
-
-        const { Marker } = MapComponent._markerLibrary as any;
-        this._markerInstance = new Marker({
-            position: { lat: this.latitude, lng: this.longitude },
-            map: this._map
-        });
     }
 
     private renderMarkers(): void {
         this._markerInstances.forEach(m => m.setMap(null));
         this._markerInstances = [];
 
-        if (!this.markers?.length || !this._map) {
+        if (!this._map) {
             return;
         }
 
         const { Marker } = MapComponent._markerLibrary as any;
-        const { InfoWindow } = MapComponent._mapsLibrary as any;
 
-        if (!this._infoWindow) {
-            this._infoWindow = new InfoWindow();
+        if (this.showMarker && this.latitude != null && this.longitude != null) {
+            this._markerInstances.push(new Marker({
+                position: { lat: this.latitude, lng: this.longitude },
+                map: this._map
+            }));
         }
 
-        for (const marker of this.markers) {
-            const instance = new Marker({
-                position: { lat: marker.lat, lng: marker.lng },
-                map: this._map,
-                ...(marker.icon ? { icon: marker.icon } : {})
-            });
+        if (this.markers?.length) {
+            const { InfoWindow } = MapComponent._mapsLibrary as any;
 
-            if (marker.popupHtml) {
-                instance.addListener('click', () => {
-                    this._infoWindow.setContent(marker.popupHtml);
-                    this._infoWindow.open({ anchor: instance, map: this._map });
-                });
+            if (!this._infoWindow) {
+                this._infoWindow = new InfoWindow();
             }
 
-            this._markerInstances.push(instance);
+            for (const marker of this.markers) {
+                const instance = new Marker({
+                    position: { lat: marker.lat, lng: marker.lng },
+                    map: this._map,
+                    ...(marker.icon ? { icon: marker.icon } : {})
+                });
+
+                if (marker.popupHtml) {
+                    instance.addListener('click', () => {
+                        this._infoWindow.setContent(marker.popupHtml);
+                        this._infoWindow.open({ anchor: instance, map: this._map });
+                    });
+                }
+
+                this._markerInstances.push(instance);
+            }
         }
     }
 

@@ -1,6 +1,4 @@
 using AutoMapper;
-using DeveloperPartners.SortingFiltering;
-using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
@@ -12,7 +10,6 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Backflow;
 
 public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBackflowTestService
 {
-    private readonly IBackflowTestRepository _backflowTestRepository;
     private readonly IProfessionalRepository _professionalRepository;
     private readonly IProfessionalUserRepository _professionalUserRepository;
 
@@ -23,31 +20,8 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         IProfessionalUserRepository professionalUserRepository)
         : base(mapper, repository)
     {
-        _backflowTestRepository = repository;
         _professionalRepository = professionalRepository;
         _professionalUserRepository = professionalUserRepository;
-    }
-
-    public override async Task<IPagedData<BackflowTestDto>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
-    {
-        var gisAreaFilter = query.Filter.Find(f =>
-            string.Equals(f.ColumnName, "gisAreaId", StringComparison.OrdinalIgnoreCase));
-
-        int? gisAreaId = null;
-        if (gisAreaFilter != null)
-        {
-            query.Filter.Remove(gisAreaFilter);
-            if (int.TryParse(gisAreaFilter.Value?.ToString(), out var parsed))
-            {
-                gisAreaId = parsed;
-            }
-        }
-
-        query.Sort = query.ConvertSortProperties<BackflowTest, BackflowTestDto>(Mapper);
-        query.Filter = query.ConvertFilterProperties<BackflowTest, BackflowTestDto>(Mapper);
-
-        var model = await _backflowTestRepository.GetAllAsync(pageInfo, query, gisAreaId, cancellationToken);
-        return model.Select(m => MapToDto(m)!).ToPagedData(pageInfo);
     }
 
     public override async Task<BackflowTestDto> AddAsync(BackflowTestDto dto)

@@ -88,6 +88,33 @@ export class BackflowTestSubmitComponent implements OnInit {
         { id: BackflowReasonForTest.AnnualTestAfterRepairs, text: 'Annual Test After Repairs' }
     ];
 
+    public assemblyImageFile: File | null = null;
+    public assemblyImagePreview: string | null = null;
+    public serialNumberImageFile: File | null = null;
+    public serialNumberImagePreview: string | null = null;
+
+    public onAssemblyFileInputChange(event: Event): void {
+        const file = (event.target as HTMLInputElement).files?.[0] ?? null;
+        this.onAssemblyImageChange(file);
+        (event.target as HTMLInputElement).value = '';
+    }
+
+    public onAssemblyImageChange(file: File | null): void {
+        this.assemblyImageFile = file;
+        this.assemblyImagePreview = file ? URL.createObjectURL(file) : null;
+    }
+
+    public onSerialNumberFileInputChange(event: Event): void {
+        const file = (event.target as HTMLInputElement).files?.[0] ?? null;
+        this.onSerialNumberImageChange(file);
+        (event.target as HTMLInputElement).value = '';
+    }
+
+    public onSerialNumberImageChange(file: File | null): void {
+        this.serialNumberImageFile = file;
+        this.serialNumberImagePreview = file ? URL.createObjectURL(file) : null;
+    }
+
     public model: BackflowTest = {
         id: 0,
         testResult: BackflowTestResult.Pass,
@@ -106,7 +133,17 @@ export class BackflowTestSubmitComponent implements OnInit {
     public repairBC = { cleaned: false, disc: false, spring: false, guide: false, pinRetainer: false, hingePin: false, seat: false, diaphragm: false };
 
     public get verificationComplete(): boolean {
-        return !!this.selectedBpatId && !!this.selectedWaterSupplierId;
+        if (!this.selectedBpatId || !this.selectedWaterSupplierId || (!this.isAirGap && !this.selectedGaugeId)) {
+            return false;
+        }
+        if (this.selectedBpat?.bpatLicenseExpirationType === ExpirationType.Expired
+            || this.professional?.insuranceExpirationType === ExpirationType.Expired
+            || this.selectedGauge?.expirationType === GaugeExpirationType.Expired
+        ) {
+            return false;
+        }
+        
+        return true;
     }
     public get isAirGap(): boolean { return this.model.deviceType === BackflowDeviceType.AG; }
     public get deviceTypeLabel(): string {

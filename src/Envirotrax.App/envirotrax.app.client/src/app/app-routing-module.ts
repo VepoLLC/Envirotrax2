@@ -76,6 +76,14 @@ const routes: Routes = [
         data: {
           roles: [ROLE_DEFINITIONS.WATER_SUPPLIER]
         }
+      },
+      {
+        path: 'licenses',
+        loadChildren: () => import('./licenses/licenses.module').then(m => m.LicensesModule),
+        canActivate: [RoleGuard],
+        data: {
+          roles: [ROLE_DEFINITIONS.WATER_SUPPLIER]
+        }
       }
     ]
   },

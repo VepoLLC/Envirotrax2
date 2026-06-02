@@ -11,4 +11,8 @@ public interface IProfessionalUserLicenseService : IService<ProfessionalUserLice
     Task<IPagedData<ProfessionalUserLicenseDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<ProfessionalUserLicenseDto> AddForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto);
     Task<ProfessionalUserLicenseDto> UpdateForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto);
+    Task<IPagedData<WaterSupplierLicenseDto>> GetAllByWaterSupplierAsync(PageInfo pageInfo, Query query, string? licenseFilter, CancellationToken cancellationToken);
+    Task<LicenseCountsDto> GetCountsByWaterSupplierAsync(CancellationToken cancellationToken);
+    Task<WaterSupplierLicenseDto> UpdateForWaterSupplierAsync(int id, UpdateWaterSupplierLicenseDto dto, CancellationToken cancellationToken);
+    Task DeleteForWaterSupplierAsync(int id, CancellationToken cancellationToken);
 }

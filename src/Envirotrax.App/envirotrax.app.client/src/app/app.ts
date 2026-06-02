@@ -65,6 +65,9 @@ export class App implements OnInit {
   }
 
   private async createWaterSupplierMenuItems(): Promise<MenuItem[]> {
+    const hasLicenseAccess = await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Licenses)
+      || await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalLicenses);
+
     return [
       {
         title: 'Account Overview',
@@ -149,6 +152,13 @@ export class App implements OnInit {
             hasFeature: true
           },
           {
+            title: 'License Management',
+            iconCss: 'fa-regular fa-id-card',
+            routerLink: ['licenses'],
+            hasPermission: hasLicenseAccess,
+            hasFeature: true
+          },
+          {
             title: 'Letter History',
             iconCss: 'fa-regular fa-envelope',
             routerLink: ['/'],
@@ -225,6 +235,13 @@ export class App implements OnInit {
             iconCss: 'fa-regular fa-user',
             routerLink: ['backflow/testers'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowTesters),
+            hasFeature: true
+          },
+          {
+            title: 'License Management',
+            iconCss: 'fa-regular fa-id-card',
+            routerLink: ['licenses'],
+            hasPermission: hasLicenseAccess,
             hasFeature: true
           },
           {
@@ -344,8 +361,8 @@ export class App implements OnInit {
           {
             title: 'License Management',
             iconCss: 'fa-regular fa-id-card',
-            routerLink: ['/'],
-            hasPermission: true,
+            routerLink: ['licenses'],
+            hasPermission: hasLicenseAccess,
             hasFeature: true
           },
           {

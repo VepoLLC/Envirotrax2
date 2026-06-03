@@ -14,6 +14,11 @@ export class DownloadManagerComponent {
     public isLoading: boolean = false;
     public downloadConfig: DownloadConfig;
     public formatOptions: InputOption[];
+    public delimiterOptions: InputOption[] = [
+        { id: ',', text: 'Comma' },
+        { id: '|', text: 'Pipe' },
+        { id: 'tab', text: 'Tab' }
+    ];
 
     constructor(
         private readonly _modalReference: ModalReference<DownloadConfig, void>,
@@ -36,6 +41,7 @@ export class DownloadManagerComponent {
         }
 
         this.downloadConfig.selectedFormat = 'CSV';
+        this.downloadConfig.csvDelimiter = ',';
 
         this.formatOptions = (this.downloadConfig.suppoertedFormats ?? ['CSV']).map(f => ({
             id: f,

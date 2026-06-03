@@ -28,8 +28,10 @@ public class SiteRepository : Repository<Site>, ISiteRepository
     protected override IQueryable<Site> GetListQuery()
     {
         return base.GetListQuery()
+            .Include(s => s.UpdatedBy)
             .Include(s => s.State)
-            .Include(s => s.MailingState);
+            .Include(s => s.MailingState)
+            .AsNoTracking();
     }
 
     protected override IQueryable<Site> GetDetailsQuery()

@@ -26,5 +26,6 @@ public enum PermissionType
     FogTransporters = 17,
     FogInspections = 18,
     FogInspectors = 19,
-    FogReports = 20
+    FogReports = 20,
+    Licenses = 21
 }

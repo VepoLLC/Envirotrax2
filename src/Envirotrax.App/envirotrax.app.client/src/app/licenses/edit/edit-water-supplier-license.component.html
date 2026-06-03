@@ -1,0 +1,57 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="isLoading" />
+
+    <form #form="ngForm" (ngSubmit)="save(form)">
+        <div class="mb-3">
+            <label class="form-label">Company name</label>
+            <input class="form-control" [value]="license.companyName" readonly />
+        </div>
+
+        <div class="mb-3">
+            <vp-input name="contactName"
+                      label="Contact name"
+                      [(ngModel)]="model.contactName"
+                      [maxLength]="255"
+                      [form]="form" />
+        </div>
+
+        <div class="mb-3">
+            <vp-input name="contactEmail"
+                      label="Contact Email"
+                      [ngModel]="license.userEmail"
+                      [readonly]="true" />
+        </div>
+
+        <div class="mb-3">
+            <vp-input name="licenseType"
+                      label="License Type"
+                      [ngModel]="license.licenseTypeName"
+                      [readonly]="true" />
+        </div>
+
+        <div class="mb-3">
+            <vp-input name="licenseNumber"
+                      label="License number"
+                      [(ngModel)]="model.licenseNumber"
+                      [required]="true"
+                      [maxLength]="50"
+                      [form]="form" />
+        </div>
+
+        <div class="mb-3">
+            <vp-input type="date"
+                      name="expirationDate"
+                      label="Expiration date"
+                      [(ngModel)]="model.expirationDate"
+                      [form]="form" />
+        </div>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="form" [validationErrors]="validationErrors" />
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-primary w-100" (click)="cancel()">Cancel</button>
+                <button type="submit" class="btn btn-primary w-100">Save</button>
+            </div>
+        </div>
+    </form>
+</div>

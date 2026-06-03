@@ -29,8 +29,16 @@ public static class ServiceRegistrations
         return services;
     }
 
-    public static IServiceCollection AddPdfTemplateService(this IServiceCollection services)
+    public static IServiceCollection AddPdfTemplateService(
+        this IServiceCollection services,
+        bool isDevelopment,
+        IConfigurationSection? pdfConfigSection = null)
     {
+        services.Configure<PdfTemplateOptions>(opts =>
+        {
+            opts.IsDevelopment = isDevelopment;
+            pdfConfigSection?.Bind(opts);
+        });
         services.AddTransient<IPdfTemplateService, PdfTemplateService>();
         return services;
     }

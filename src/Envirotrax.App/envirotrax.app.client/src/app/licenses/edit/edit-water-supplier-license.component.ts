@@ -15,6 +15,7 @@ export interface WaterSupplierLicenseModalData {
     templateUrl: './edit-water-supplier-license.component.html'
 })
 export class EditWaterSupplierLicenseComponent {
+    public license: WaterSupplierLicense;
     public model: UpdateWaterSupplierLicense;
     public isLoading = false;
     public validationErrors: string[] = [];
@@ -26,6 +27,7 @@ export class EditWaterSupplierLicenseComponent {
         private readonly _toastService: ToastService
     ) {
         const { license } = this._modalReference.config.model!;
+        this.license = license;
         this.model = {
             licenseNumber: license.licenseNumber ?? '',
             contactName: license.contactName,

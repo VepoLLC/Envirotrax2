@@ -111,7 +111,7 @@ export class LicenseManagementComponent implements OnInit {
 
     public editLicense(license: WaterSupplierLicense): void {
         this._modalHelper.show<WaterSupplierLicenseModalData, WaterSupplierLicense>(EditWaterSupplierLicenseComponent, {
-            title: 'Edit License',
+            title: `Edit License - ${license.contactName ?? license.userEmail}`,
             model: { license },
             size: ModalSize.large
         }).result().subscribe(() => this.loadLicenses());

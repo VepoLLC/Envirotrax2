@@ -1,28 +1,31 @@
 import { PageInfo } from "./page-info";
 import { Query } from "./query";
 
-export interface DownloadConfig {
+export interface DownloadConfig<T extends string = string> {
     fileName?: string;
-    columnCategories?: ColumnCategory[];
-    columns: DownloadColumn[];
+    categories?: ColumnCategory<T>[];
+    columns: DownloadColumn<T>[];
     endpoint: DownloadEndpoint;
     pdfEndpoint?: DownloadEndpoint;
     suppoertedFormats?: FileFormat[]
     selectedFormat?: FileFormat;
+    csvDelimiter?: CsvDelimiter;
 }
+
+export type CsvDelimiter = ',' | '|' | 'tab';
 
 export type FileFormat = 'CSV' | 'Excel' | 'PDF' | 'XML';
 
-export interface ColumnCategory {
-    field?: string;
+export interface ColumnCategory<T extends string = string> {
+    name?: T;
     caption?: string;
-    isSelected: boolean
+    isSelected: boolean;
 }
 
-export interface DownloadColumn {
+export interface DownloadColumn<T extends string = string> {
     field: string;
     caption?: string;
-    category?: string;
+    category?: T;
 }
 
 export interface DownloadEndpoint {

@@ -17,7 +17,9 @@ import { GisMapService } from "../../shared/services/gis-areas/gis-map.service";
 import { GisArea } from "../../shared/models/gis-areas/gis-area";
 import { MapMarker, MapPolygon } from "../../shared/components/map/map.component";
 import { DownloadConfig } from "../../shared/models/download-config";
-import { DownloadManagerComponent } from "../../shared/components/data-components/download-manager/download-manager.component";
+import { AuthService } from "../../shared/services/auth/auth.service";
+import { FeatureType } from "../../shared/models/feature-type";
+import { DownloadService } from "../../shared/services/download.service";
 
 @Component({
     standalone: false,
@@ -87,7 +89,7 @@ export class SiteListComponent implements OnInit {
 
     public propertyType = PropertyType;
 
-    public downloadConfig: DownloadConfig;
+    public downloadConfig?: DownloadConfig<'Property Information' | 'Mailing Information' | 'GIS Data' | 'Additional Information'>;
 
     @ViewChild('propertyInformation', { static: true })
     public propertyInformation?: TemplateRef<CellTemplateData<Site>>
@@ -105,12 +107,24 @@ export class SiteListComponent implements OnInit {
         private readonly _modalHelper: ModalHelperService,
         private readonly _gisAreaService: GisAreaService,
         private readonly _coordinateService: GisAreaCoordinateService,
-        private readonly _gisMapService: GisMapService
+        private readonly _gisMapService: GisMapService,
+        private readonly _authService: AuthService,
+        private readonly _downloadService: DownloadService
     ) {
+
+    }
+
+    private async setDownloadConfig(): Promise<void> {
         this.downloadConfig = {
             fileName: 'Sites',
             endpoint: this._siteService.getAllEndpoint(),
             suppoertedFormats: ['CSV', 'Excel', 'XML'],
+            categories: [
+                { name: 'Property Information', isSelected: true },
+                { name: 'Mailing Information', isSelected: true },
+                { name: 'GIS Data', isSelected: true },
+                { name: 'Additional Information', isSelected: true, caption: 'Additional Information - Facility Type, Has On-Site Sewage Facility, Has Grease Trap, Has Fire System, Has Irrigation System, etc.' }
+            ],
             columns: [
                 { field: 'id', caption: 'SiteID' },
                 { field: 'accountNumber', caption: 'AccountNumber' },
@@ -118,59 +132,76 @@ export class SiteListComponent implements OnInit {
                 { field: 'outOfArea', caption: 'OutOfArea' },
                 { field: 'invalidMailingAddress', caption: 'InvalidMailingAddress' },
                 { field: 'isFeeExempt', caption: 'IsFeeExempt' },
-                { field: 'propertyType', caption: 'PropertyType' },
-                { field: 'businessName', caption: 'PropertyBusinessName' },
-                { field: 'streetNumber', caption: 'PropertyStreetNumber' },
-                { field: 'streetName', caption: 'PropertyStreetName' },
-                { field: 'propertyNumber', caption: 'PropertyNumber' },
-                { field: 'city', caption: 'PropertyCity' },
-                { field: 'state.code', caption: 'PropertyState' },
-                { field: 'zipCode', caption: 'PropertyZIP' },
-                { field: 'mailingCompanyName', caption: 'MailingCompanyName' },
-                { field: 'mailingContactName', caption: 'MailingContactName' },
-                { field: 'mailingStreetNumber', caption: 'MailingStreetNumber' },
-                { field: 'mailingStreetName', caption: 'MailingStreetName' },
-                { field: 'mailingNumber', caption: 'MailingNumber' },
-                { field: 'mailingCity', caption: 'MailingCity' },
-                { field: 'mailingState.code', caption: 'MailingState' },
-                { field: 'mailingZipCode', caption: 'MailingZIP' },
-                { field: 'mailingPhoneNumber', caption: 'MailingPhoneNumber' },
-                { field: 'mailingEmailAddress', caption: 'MailingEmailAddress' },
-                { field: 'gisLatitude', caption: 'GisLatitude' },
-                { field: 'gisLongitude', caption: 'GisLongitude' },
-                { field: 'gisStatus', caption: 'GisStatus' },
-                { field: 'gisDate', caption: 'GisDate' },
-                { field: 'gisAreaId', caption: 'GisAreaID' },
-                { field: 'backflowScheduleMonth', caption: 'BackflowScheduleMonth' },
+                { field: 'propertyType', caption: 'PropertyType', category: 'Property Information' },
+                { field: 'businessName', caption: 'PropertyBusinessName', category: 'Property Information' },
+                { field: 'streetNumber', caption: 'PropertyStreetNumber', category: 'Property Information' },
+                { field: 'streetName', caption: 'PropertyStreetName', category: 'Property Information' },
+                { field: 'propertyNumber', caption: 'PropertyNumber', category: 'Property Information' },
+                { field: 'city', caption: 'PropertyCity', category: 'Property Information' },
+                { field: 'state.code', caption: 'PropertyState', category: 'Property Information' },
+                { field: 'zipCode', caption: 'PropertyZIP', category: 'Property Information' },
+                { field: 'mailingCompanyName', caption: 'MailingCompanyName', category: 'Mailing Information' },
+                { field: 'mailingContactName', caption: 'MailingContactName', category: 'Mailing Information' },
+                { field: 'mailingStreetNumber', caption: 'MailingStreetNumber', category: 'Mailing Information' },
+                { field: 'mailingStreetName', caption: 'MailingStreetName', category: 'Mailing Information' },
+                { field: 'mailingNumber', caption: 'MailingNumber', category: 'Mailing Information' },
+                { field: 'mailingCity', caption: 'MailingCity', category: 'Mailing Information' },
+                { field: 'mailingState.code', caption: 'MailingState', category: 'Mailing Information' },
+                { field: 'mailingZipCode', caption: 'MailingZIP', category: 'Mailing Information' },
+                { field: 'mailingPhoneNumber', caption: 'MailingPhoneNumber', category: 'Mailing Information' },
+                { field: 'mailingEmailAddress', caption: 'MailingEmailAddress', category: 'Mailing Information' },
+                { field: 'gisLatitude', caption: 'GisLatitude', category: 'GIS Data' },
+                { field: 'gisLongitude', caption: 'GisLongitude', category: 'GIS Data' },
+                { field: 'gisStatus', caption: 'GisStatus', category: 'GIS Data' },
+                { field: 'gisDate', caption: 'GisDate', category: 'GIS Data' },
+                { field: 'gisAreaId', caption: 'GisAreaID', category: 'GIS Data' }
+            ]
+        };
+
+        if (await this._authService.hasAnyFeatures(FeatureType.BackflowTesting)) {
+            this.downloadConfig.columns.push({ field: 'backflowScheduleMonth', caption: 'BackflowScheduleMonth' });
+        }
+
+        if (await this._authService.hasAnyFeatures(FeatureType.CsiInspection)) {
+            this.downloadConfig.columns.push(
                 { field: 'needsCsiInspection', caption: 'NeedsCSIInspection' },
-                { field: 'csiRenewalDate', caption: 'CSIRenewalDate' },
+                { field: 'csiRenewalDate', caption: 'CSIRenewalDate' }
+            );
+        }
+
+        if (await this._authService.hasAnyFeatures(FeatureType.FogInspection, FeatureType.FogTransportation)) {
+            this.downloadConfig.columns.push(
                 { field: 'needsFogInspection', caption: 'NeedsFogInspection' },
                 { field: 'fogInspectionExpirationDate', caption: 'FogInspectionExpirationDate' },
                 { field: 'needsFogPermit', caption: 'NeedsFogPermit' },
                 { field: 'fogPermitExpirationDate', caption: 'FogPermitExpirationDate' },
                 { field: 'lastTripTicketDate', caption: 'LastTripTicketDate' },
                 { field: 'tripTicketInterval', caption: 'TripTicketInterval' },
-                { field: 'fogDaysOverdue', caption: 'FogDaysOverdue' },
-                { field: 'facilityType', caption: 'FacilityType' },
-                { field: 'hasOnSiteSewageFacility', caption: 'HasOnSiteSewageFacility' },
-                { field: 'hasAuxWaterSupply', caption: 'HasAuxWaterSupply' },
-                { field: 'hasFireSystem', caption: 'HasFireSystem' },
-                { field: 'fireSeparateWater', caption: 'FireSeparateWater' },
-                { field: 'greaseTrapType', caption: 'HasGreaseTrap' },
-                { field: 'hasGritTrap', caption: 'HasGritTrap' },
-                { field: 'hasReclaimed', caption: 'HasReclaimed' },
-                { field: 'hasIrrigation', caption: 'HasIrrigation' },
-                { field: 'irrigationSeparateWater', caption: 'IrrigationSeparateWater' },
-                { field: 'hasDomesticPremisesIsolation', caption: 'HasDomesticPremisesIsolation' },
-                { field: 'requiresDomesticPremisesIsolation', caption: 'RequiresDomesticPremisesIsolation' },
-                { field: 'lastModifiedBy', caption: 'LastModifiedBy' },
-                { field: 'lastModifiedDate', caption: 'LastModifiedDate' }
-            ]
-        };
+                { field: 'fogDaysOverdue', caption: 'FogDaysOverdue' }
+            );
+        }
+
+        this.downloadConfig.columns.push(
+            { field: 'facilityType', caption: 'FacilityType', category: 'Additional Information' },
+            { field: 'hasOnSiteSewageFacility', caption: 'HasOnSiteSewageFacility', category: 'Additional Information' },
+            { field: 'hasAuxWaterSupply', caption: 'HasAuxWaterSupply', category: 'Additional Information' },
+            { field: 'hasFireSystem', caption: 'HasFireSystem', category: 'Additional Information' },
+            { field: 'fireSeparateWater', caption: 'FireSeparateWater', category: 'Additional Information' },
+            { field: 'greaseTrapType', caption: 'HasGreaseTrap', category: 'Additional Information' },
+            { field: 'hasGritTrap', caption: 'HasGritTrap', category: 'Additional Information' },
+            { field: 'hasReclaimed', caption: 'HasReclaimed', category: 'Additional Information' },
+            { field: 'hasIrrigation', caption: 'HasIrrigation', category: 'Additional Information' },
+            { field: 'irrigationSeparateWater', caption: 'IrrigationSeparateWater', category: 'Additional Information' },
+            { field: 'hasDomesticPremisesIsolation', caption: 'HasDomesticPremisesIsolation', category: 'Additional Information' },
+            { field: 'requiresDomesticPremisesIsolation', caption: 'RequiresDomesticPremisesIsolation', category: 'Additional Information' },
+            { field: 'updatedBy.email', caption: 'LastModifiedBy' },
+            { field: 'updatedTime', caption: 'LastModifiedDate' }
+        );
     }
 
     public async ngOnInit(): Promise<void> {
         this.table.columns = this.getColumns();
+        this.setDownloadConfig();
     }
 
     private getColumns(): TableColumn<Site>[] {
@@ -276,16 +307,7 @@ export class SiteListComponent implements OnInit {
     }
 
     public showDownloadManager(): void {
-        this._modalHelper.show(DownloadManagerComponent, {
-            title: 'Export Results',
-            model: {
-                ...this.downloadConfig,
-                endpoint: {
-                    ...this.downloadConfig.endpoint,
-                    query: this.table.query
-                }
-            }
-        });
+        this._downloadService.showDownloadManager(this.downloadConfig!, this.table.query);
     }
 
     private buildMapMarkers(sites: Site[]): MapMarker<Site>[] {

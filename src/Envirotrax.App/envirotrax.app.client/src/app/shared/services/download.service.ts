@@ -4,6 +4,9 @@ import { QueryHelperService } from "./helpers/query-helper.service";
 import { lastValueFrom } from "rxjs";
 import { MAX_PAGE_SIZE } from "../models/page-info";
 import { DownloadConfig, FileFormat } from "../models/download-config";
+import { Query } from "../models/query";
+import { ModalHelperService } from "./helpers/modal-helper.service";
+import { DownloadManagerComponent } from "../components/data-components/download-manager/download-manager.component";
 
 @Injectable({
     providedIn: 'root'
@@ -11,7 +14,8 @@ import { DownloadConfig, FileFormat } from "../models/download-config";
 export class DownloadService {
     constructor(
         private readonly _http: HttpClient,
-        private readonly _queryHelper: QueryHelperService
+        private readonly _queryHelper: QueryHelperService,
+        private readonly _modalHelper: ModalHelperService
     ) {
 
     }
@@ -72,15 +76,26 @@ export class DownloadService {
 
             await this.downloadPdf(config);
         } else {
+            const deselectedCategories = new Set(
+                (config.categories ?? []).filter(c => !c.isSelected).map(c => c.name)
+            );
+
             const downloadColumns = config.columns
+                .filter(c => !c.category || !deselectedCategories.has(c.category))
                 .map(c => `${c.field}=${encodeURIComponent(c.caption ?? c.field)}`)
                 .join('&')
 
-            const headers = new HttpHeaders({
+            let headerMap: { [name: string]: string } = {
                 'Vp-File-Name': config.fileName!,
                 'Vp-Columns': downloadColumns,
                 'Accept': this.getAcceptHeader(config.selectedFormat ?? 'CSV')
-            });
+            };
+
+            if (config.selectedFormat === 'CSV' && config.csvDelimiter) {
+                headerMap['Vp-Delimiter'] = config.csvDelimiter;
+            }
+
+            const headers = new HttpHeaders(headerMap);
 
             const observable = this._http.request(config.endpoint!.method || 'GET', config.endpoint.url, {
                 headers: headers,
@@ -94,5 +109,18 @@ export class DownloadService {
 
             this.downloadFileFromBlob(response.body!, fileName);
         }
+    }
+
+    public showDownloadManager(config: DownloadConfig, query: Query): void {
+        this._modalHelper.show(DownloadManagerComponent, {
+            title: 'Export Results',
+            model: {
+                ...config,
+                endpoint: {
+                    ...config.endpoint,
+                    query: query
+                }
+            }
+        });
     }
 }

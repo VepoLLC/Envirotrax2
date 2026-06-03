@@ -18,10 +18,7 @@ public class BackflowTestProfile : Profile
                     dto.Site ??= new() { Id = model.SiteId.Value };
                 }
 
-                if (model.ProfessionalId.HasValue)
-                {
-                    dto.Professional ??= new() { Id = model.ProfessionalId.Value };
-                }
+                dto.Professional ??= new() { Id = model.ProfessionalId };
 
                 if (model.BpatId.HasValue)
                 {
@@ -58,8 +55,9 @@ public class BackflowTestProfile : Profile
             .ForMember(m => m.WaterSupplierId, opt => opt.MapFrom(dto => dto.WaterSupplier != null && dto.WaterSupplier.Id.HasValue ? dto.WaterSupplier.Id.Value : 0))
             .ForMember(m => m.Site, opt => opt.Ignore())
             .ForMember(m => m.SiteId, opt => opt.MapFrom(dto => dto.Site != null ? dto.Site.Id : (int?)null))
+            .ForMember(m => m.Professional, opt => opt.Ignore())
             .ForMember(m => m.Bpat, opt => opt.Ignore())
-            .ForMember(m => m.ProfessionalId, opt => opt.MapFrom(dto => dto.Professional != null ? dto.Professional.Id : (int?)null))
+            .ForMember(m => m.ProfessionalId, opt => opt.MapFrom(dto => dto.Professional != null && dto.Professional.Id.HasValue ? dto.Professional.Id.Value : 0))
             .ForMember(m => m.BpatId, opt => opt.MapFrom(dto => dto.Bpat != null ? dto.Bpat.Id : (int?)null))
             .ForMember(m => m.BpatState, opt => opt.Ignore())
             .ForMember(m => m.BpatStateId, opt => opt.MapFrom(dto => dto.BpatState != null ? dto.BpatState.Id : (int?)null))

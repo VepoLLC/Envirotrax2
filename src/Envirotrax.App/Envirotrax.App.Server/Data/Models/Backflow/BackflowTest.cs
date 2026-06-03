@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Envirotrax.App.Server.Data.Models.Backflow;
 
 [Table("BackflowTests")]
-public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
+public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IProfessionalModel
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }
@@ -28,7 +28,8 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public string? JobNumber { get; set; }
 
     // BPAT (Backflow Prevention Assembly Tester)
-    public int? ProfessionalId { get; set; }
+    public int ProfessionalId { get; set; }
+    public Professional? Professional { get; set; }
     public int? BpatId { get; set; }
     public ProfessionalUser? Bpat { get; set; }
 
@@ -384,6 +385,11 @@ public class BackflowTestConfiguration : IEntityTypeConfiguration<BackflowTest>
 {
     public void Configure(EntityTypeBuilder<BackflowTest> builder)
     {
+        builder.HasOne(bt => bt.Professional)
+            .WithMany()
+            .HasForeignKey(bt => bt.ProfessionalId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasOne<ProfessionalUser>(bt => bt.Bpat)
             .WithMany()
             .HasForeignKey(bt => new { bt.ProfessionalId, bt.BpatId })

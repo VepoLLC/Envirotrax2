@@ -13,12 +13,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Envirotrax.App.Server.Data.Models.Csi;
 
 [Table("CsiInspections")]
-public class CsiInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
+public class CsiInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IProfessionalModel
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }
 
     public int SiteId { get; set; }
+
     public Site? Site { get; set; }
 
     public DateTime? InspectionDate { get; set; }
@@ -206,7 +207,7 @@ public class CsiInspectionConfiguration : IEntityTypeConfiguration<CsiInspection
 {
     public void Configure(EntityTypeBuilder<CsiInspection> builder)
     {
-        builder.HasOne(i=> i.Inspector)
+        builder.HasOne(i => i.Inspector)
             .WithMany()
             .HasForeignKey(i => new { i.ProfessionalId, i.InspectorId })
             .OnDelete(DeleteBehavior.Restrict);

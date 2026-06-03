@@ -89,6 +89,8 @@ export interface BackflowTest {
     rejectedDate?: string;
     rejectedReason?: string;
     needsValidation?: boolean;
+    assemblyImagePath?: string;
+    serialNumberImagePath?: string;
 
     // Initial test readings - main assembly
     initCV1HeldPSID?: number;

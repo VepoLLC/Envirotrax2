@@ -6,4 +6,5 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 
 public interface IBackflowTestService : IService<BackflowTest, BackflowTestDto>
 {
+    Task<BackflowTestDto> SubmitWithImagesAsync(BackflowTestDto dto, Stream? assemblyStream, string? assemblyFileName, Stream? serialStream, string? serialFileName, CancellationToken cancellationToken = default);
 }

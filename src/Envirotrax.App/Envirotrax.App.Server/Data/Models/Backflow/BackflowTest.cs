@@ -368,6 +368,13 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     [Precision(5, 2)]
     public decimal? FinalRVOpenedPSID2 { get; set; }
 
+    // Images
+    [StringLength(500)]
+    public string? AssemblyImagePath { get; set; }
+
+    [StringLength(500)]
+    public string? SerialNumberImagePath { get; set; }
+
     // Audit
     public int? CreatedById { get; set; }
     public AppUser? CreatedBy { get; set; }

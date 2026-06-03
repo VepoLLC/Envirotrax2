@@ -1,3 +1,4 @@
+using System.Text.Json;
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
@@ -13,6 +14,8 @@ namespace Envirotrax.App.Server.Controllers.Professionals.Backflow;
 [Authorize(Roles = RoleDefinitions.Professionals.BackflowTester)]
 public class BackflowTestController : ProfessionalProtectedController
 {
+    private static readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
+
     private readonly IBackflowTestService _backflowTestService;
 
     public BackflowTestController(IBackflowTestService backflowTestService)
@@ -35,10 +38,21 @@ public class BackflowTestController : ProfessionalProtectedController
     }
 
     [HttpPost]
-    public async Task<IActionResult> SubmitAsync([FromBody] BackflowTestDto dto)
+    public async Task<IActionResult> SubmitAsync([FromForm] SubmitBackflowTestRequest request, CancellationToken cancellationToken)
     {
+        var dto = JsonSerializer.Deserialize<BackflowTestDto>(request.TestData, _jsonOptions)
+            ?? throw new InvalidOperationException("Invalid test data.");
         dto.Id = 0;
-        var result = await _backflowTestService.AddAsync(dto);
+
+        await using var assemblyStream = request.AssemblyImage?.OpenReadStream();
+        await using var serialStream = request.SerialNumberImage?.OpenReadStream();
+
+        var result = await _backflowTestService.SubmitWithImagesAsync(
+            dto,
+            assemblyStream, request.AssemblyImage?.FileName,
+            serialStream, request.SerialNumberImage?.FileName,
+            cancellationToken);
+
         return Ok(result);
     }
 }

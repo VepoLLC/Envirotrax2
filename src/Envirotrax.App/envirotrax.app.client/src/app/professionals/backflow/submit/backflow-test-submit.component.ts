@@ -220,7 +220,7 @@ export class BackflowTestSubmitComponent implements OnInit {
 
         this.isLoading = true;
         try {
-            await this._backflowTestService.submit(submission);
+            await this._backflowTestService.submit(submission, this.assemblyImageFile, this.serialNumberImageFile);
             this.submitSuccess = true;
         } finally {
             this.isLoading = false;

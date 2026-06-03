@@ -37,9 +37,13 @@ export class BackflowTestService {
         }));
     }
 
-    public async submit(test: BackflowTest): Promise<BackflowTest> {
+    public async submit(test: BackflowTest, assemblyImage?: File | null, serialNumberImage?: File | null): Promise<BackflowTest> {
         const url = this._urlResolver.resolveUrl('/api/professionals/backflow/tests');
-        return await lastValueFrom(this._http.post<BackflowTest>(url, test));
+        const formData = new FormData();
+        formData.append('testData', JSON.stringify(test));
+        if (assemblyImage) formData.append('assemblyImage', assemblyImage);
+        if (serialNumberImage) formData.append('serialNumberImage', serialNumberImage);
+        return await lastValueFrom(this._http.post<BackflowTest>(url, formData));
     }
 
     public async getForProfessional(id: number): Promise<BackflowTest> {

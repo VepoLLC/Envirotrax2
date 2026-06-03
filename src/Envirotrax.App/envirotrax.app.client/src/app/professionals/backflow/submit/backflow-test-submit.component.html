@@ -701,12 +701,12 @@
                                 Upload an image of the entire assembly
                             </div>
                             <input #assemblyFileInput type="file" class="d-none"
-                               accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff,.webp"
+                               accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
                                (change)="onAssemblyFileInputChange($event)" />
 
                             <vp-file-upload *ngIf="!assemblyImagePreview"
                                 name="assemblyImage"
-                                accept=".jpg,.jpeg,.png,.gif,.webp"
+                                accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
                                 label="Choose an image or drag and drop here"
                                 [file]="assemblyImageFile"
                                 (fileChange)="onAssemblyImageChange($event)" />

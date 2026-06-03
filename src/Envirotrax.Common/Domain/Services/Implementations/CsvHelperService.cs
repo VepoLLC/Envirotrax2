@@ -73,13 +73,14 @@ namespace Envirotrax.Common.Domain.Services.Implementations
             }
         }
 
-        public async Task<string> WriteAsStringAsync(IEnumerable records, IDictionary<string, string> selectedColumns)
+        public async Task<string> WriteAsStringAsync(IEnumerable records, IDictionary<string, string> selectedColumns, CsvConfigurationDto configuration)
         {
             if (records != null)
             {
                 var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
-                    ShouldQuote = args => true
+                    ShouldQuote = args => true,
+                    Delimiter = configuration.Delimiter ?? ","
                 };
 
                 using (var memoryStream = new MemoryStream())

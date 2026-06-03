@@ -3,6 +3,7 @@ import { Query } from "./query";
 
 export interface DownloadConfig {
     fileName?: string;
+    columnCategories?: ColumnCategory[];
     columns: DownloadColumn[];
     endpoint: DownloadEndpoint;
     pdfEndpoint?: DownloadEndpoint;
@@ -10,11 +11,18 @@ export interface DownloadConfig {
     selectedFormat?: FileFormat;
 }
 
-export type FileFormat = 'CSV' | 'Excel' | 'PDF';
+export type FileFormat = 'CSV' | 'Excel' | 'PDF' | 'XML';
+
+export interface ColumnCategory {
+    field?: string;
+    caption?: string;
+    isSelected: boolean
+}
 
 export interface DownloadColumn {
     field: string;
     caption?: string;
+    category?: string;
 }
 
 export interface DownloadEndpoint {

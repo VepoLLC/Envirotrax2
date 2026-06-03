@@ -16,6 +16,8 @@ import { GisAreaCoordinateService } from "../../shared/services/gis-areas/gis-ar
 import { GisMapService } from "../../shared/services/gis-areas/gis-map.service";
 import { GisArea } from "../../shared/models/gis-areas/gis-area";
 import { MapMarker, MapPolygon } from "../../shared/components/map/map.component";
+import { DownloadConfig } from "../../shared/models/download-config";
+import { DownloadManagerComponent } from "../../shared/components/data-components/download-manager/download-manager.component";
 
 @Component({
     standalone: false,
@@ -85,6 +87,8 @@ export class SiteListComponent implements OnInit {
 
     public propertyType = PropertyType;
 
+    public downloadConfig: DownloadConfig;
+
     @ViewChild('propertyInformation', { static: true })
     public propertyInformation?: TemplateRef<CellTemplateData<Site>>
 
@@ -103,6 +107,66 @@ export class SiteListComponent implements OnInit {
         private readonly _coordinateService: GisAreaCoordinateService,
         private readonly _gisMapService: GisMapService
     ) {
+        this.downloadConfig = {
+            fileName: 'Sites',
+            endpoint: this._siteService.getAllEndpoint(),
+            suppoertedFormats: ['CSV', 'Excel', 'XML'],
+            columns: [
+                { field: 'id', caption: 'SiteID' },
+                { field: 'accountNumber', caption: 'AccountNumber' },
+                { field: 'active', caption: 'Active' },
+                { field: 'outOfArea', caption: 'OutOfArea' },
+                { field: 'invalidMailingAddress', caption: 'InvalidMailingAddress' },
+                { field: 'isFeeExempt', caption: 'IsFeeExempt' },
+                { field: 'propertyType', caption: 'PropertyType' },
+                { field: 'businessName', caption: 'PropertyBusinessName' },
+                { field: 'streetNumber', caption: 'PropertyStreetNumber' },
+                { field: 'streetName', caption: 'PropertyStreetName' },
+                { field: 'propertyNumber', caption: 'PropertyNumber' },
+                { field: 'city', caption: 'PropertyCity' },
+                { field: 'state.code', caption: 'PropertyState' },
+                { field: 'zipCode', caption: 'PropertyZIP' },
+                { field: 'mailingCompanyName', caption: 'MailingCompanyName' },
+                { field: 'mailingContactName', caption: 'MailingContactName' },
+                { field: 'mailingStreetNumber', caption: 'MailingStreetNumber' },
+                { field: 'mailingStreetName', caption: 'MailingStreetName' },
+                { field: 'mailingNumber', caption: 'MailingNumber' },
+                { field: 'mailingCity', caption: 'MailingCity' },
+                { field: 'mailingState.code', caption: 'MailingState' },
+                { field: 'mailingZipCode', caption: 'MailingZIP' },
+                { field: 'mailingPhoneNumber', caption: 'MailingPhoneNumber' },
+                { field: 'mailingEmailAddress', caption: 'MailingEmailAddress' },
+                { field: 'gisLatitude', caption: 'GisLatitude' },
+                { field: 'gisLongitude', caption: 'GisLongitude' },
+                { field: 'gisStatus', caption: 'GisStatus' },
+                { field: 'gisDate', caption: 'GisDate' },
+                { field: 'gisAreaId', caption: 'GisAreaID' },
+                { field: 'backflowScheduleMonth', caption: 'BackflowScheduleMonth' },
+                { field: 'needsCsiInspection', caption: 'NeedsCSIInspection' },
+                { field: 'csiRenewalDate', caption: 'CSIRenewalDate' },
+                { field: 'needsFogInspection', caption: 'NeedsFogInspection' },
+                { field: 'fogInspectionExpirationDate', caption: 'FogInspectionExpirationDate' },
+                { field: 'needsFogPermit', caption: 'NeedsFogPermit' },
+                { field: 'fogPermitExpirationDate', caption: 'FogPermitExpirationDate' },
+                { field: 'lastTripTicketDate', caption: 'LastTripTicketDate' },
+                { field: 'tripTicketInterval', caption: 'TripTicketInterval' },
+                { field: 'fogDaysOverdue', caption: 'FogDaysOverdue' },
+                { field: 'facilityType', caption: 'FacilityType' },
+                { field: 'hasOnSiteSewageFacility', caption: 'HasOnSiteSewageFacility' },
+                { field: 'hasAuxWaterSupply', caption: 'HasAuxWaterSupply' },
+                { field: 'hasFireSystem', caption: 'HasFireSystem' },
+                { field: 'fireSeparateWater', caption: 'FireSeparateWater' },
+                { field: 'greaseTrapType', caption: 'HasGreaseTrap' },
+                { field: 'hasGritTrap', caption: 'HasGritTrap' },
+                { field: 'hasReclaimed', caption: 'HasReclaimed' },
+                { field: 'hasIrrigation', caption: 'HasIrrigation' },
+                { field: 'irrigationSeparateWater', caption: 'IrrigationSeparateWater' },
+                { field: 'hasDomesticPremisesIsolation', caption: 'HasDomesticPremisesIsolation' },
+                { field: 'requiresDomesticPremisesIsolation', caption: 'RequiresDomesticPremisesIsolation' },
+                { field: 'lastModifiedBy', caption: 'LastModifiedBy' },
+                { field: 'lastModifiedDate', caption: 'LastModifiedDate' }
+            ]
+        };
     }
 
     public async ngOnInit(): Promise<void> {
@@ -208,6 +272,19 @@ export class SiteListComponent implements OnInit {
     public edit(site: Site): void {
         this._router.navigate([site.id, 'edit'], {
             relativeTo: this._activatedRoute
+        });
+    }
+
+    public showDownloadManager(): void {
+        this._modalHelper.show(DownloadManagerComponent, {
+            title: 'Export Results',
+            model: {
+                ...this.downloadConfig,
+                endpoint: {
+                    ...this.downloadConfig.endpoint,
+                    query: this.table.query
+                }
+            }
         });
     }
 

@@ -47,6 +47,8 @@ export class DownloadService {
                 return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
             case 'PDF':
                 return 'application/pdf';
+            case 'XML':
+                return 'application/xml';
         }
     }
 

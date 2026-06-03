@@ -1,0 +1,63 @@
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+<ng-template #expirationDateCell let-rowData="rowData">
+    <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
+         [class.text-bg-primary]="!rowData.expirationDate"
+         [class.text-bg-success]="rowData.expirationDate && rowData.expirationType === expirationType.Valid"
+         [class.text-bg-warning]="rowData.expirationDate && rowData.expirationType === expirationType.AboutToExpire"
+         [class.text-bg-danger]="rowData.expirationDate && rowData.expirationType === expirationType.Expired"
+         [attr.aria-label]="!rowData.expirationDate ? 'Validating' : rowData.expirationType === expirationType.Valid ? 'Valid' : rowData.expirationType === expirationType.AboutToExpire ? 'About to Expire' : 'Expired'">
+        {{ rowData.expirationDate ? (rowData.expirationDate | date) : 'Validating...' }}
+    </div>
+</ng-template>
+
+<ng-template #actionsCell let-rowData="rowData">
+    <div class="d-flex gap-1" (click)="$event.stopPropagation()">
+        <button type="button" class="btn btn-primary" (click)="editLicense(rowData)" aria-label="Edit">
+            <i class="fa-solid fa-pencil"></i>
+        </button>
+        <button type="button" class="btn btn-primary" (click)="deleteLicense(rowData)" aria-label="Delete">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+    </div>
+</ng-template>
+
+<vp-section header="License Management">
+    <div class="text-center mb-3">
+        <ul class="vp-tabs nav nav-pills settings-tabs d-inline-flex">
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="activeFilter === 'unverified'" (click)="setFilter('unverified')">
+                    Unverified Licenses ({{ counts.unverifiedCount }})
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="activeFilter === 'expired'" (click)="setFilter('expired')">
+                    Expired Licenses ({{ counts.expiredCount }})
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="activeFilter === 'expiring'" (click)="setFilter('expiring')">
+                    Expiring Licenses ({{ counts.expiringCount }})
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div *ngIf="activeFilter === 'expired'" class="alert alert-info text-center mb-3 py-2">
+        Licenses Expired Last Month ({{ expiredMonthRange }})
+    </div>
+
+    <div *ngIf="activeFilter === 'expiring'" class="alert alert-info text-center mb-3 py-2">
+        Licenses Expiring This Month ({{ expiringMonthRange }})
+    </div>
+
+    <vp-table *ngIf="table.items"
+              [columns]="table.columns!"
+              [data]="table.items.data"
+              [(pageInfo)]="table.items.pageInfo"
+              (pageInfoChange)="loadLicenses()"
+              [(query)]="table.query"
+              (queryChange)="loadLicenses()"
+              (queryReset)="loadLicenses()"
+              [freeTextSearch]="table.freeTextSearch" />
+</vp-section>

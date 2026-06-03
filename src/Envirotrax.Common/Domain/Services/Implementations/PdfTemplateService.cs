@@ -1,4 +1,6 @@
+using Envirotrax.Common.Configuration;
 using Envirotrax.Common.Domain.Services.Defintions;
+using Microsoft.Extensions.Options;
 using PuppeteerSharp;
 using PuppeteerSharp.Media;
 
@@ -10,21 +12,24 @@ public class PdfTemplateService : IPdfTemplateService
     private static bool _chromiumReady;
 
     private readonly IHtmlTemplateService _htmlTemplateService;
+    private readonly PdfTemplateOptions _options;
 
-    public PdfTemplateService(IHtmlTemplateService htmlTemplateService)
+    public PdfTemplateService(IHtmlTemplateService htmlTemplateService, IOptions<PdfTemplateOptions> options)
     {
         _htmlTemplateService = htmlTemplateService;
+        _options = options.Value;
     }
 
     public async Task<byte[]> GenerateAsync<T>(string pageName, T model)
     {
-        await EnsureChromiumAsync();
+        var executablePath = await ResolveChromiumPathAsync();
 
         var html = await _htmlTemplateService.ParsePdfAsync(pageName, model);
 
         await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
         {
             Headless = true,
+            ExecutablePath = executablePath,
             Args = ["--no-sandbox", "--disable-setuid-sandbox"]
         });
 
@@ -48,11 +53,25 @@ public class PdfTemplateService : IPdfTemplateService
         });
     }
 
-    private static async Task EnsureChromiumAsync()
+    private async Task<string?> ResolveChromiumPathAsync()
     {
-        if (_chromiumReady) return;
+        if (!_options.IsDevelopment)
+        {
+            if (string.IsNullOrEmpty(_options.ChromiumExecutablePath))
+            {
+                throw new InvalidOperationException("PdfTemplate:ChromiumExecutablePath must be configured in non-development environments.");
+            }
+
+            return _options.ChromiumExecutablePath;
+        }
+
+        if (_chromiumReady)
+        {
+            return null;
+        }
 
         await _downloadLock.WaitAsync();
+
         try
         {
             if (!_chromiumReady)
@@ -65,5 +84,7 @@ public class PdfTemplateService : IPdfTemplateService
         {
             _downloadLock.Release();
         }
+
+        return null;
     }
 }

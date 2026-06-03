@@ -78,6 +78,16 @@ public static class PermissionSeedData
             CanModify = true,
             CanDelete = true
         },
+        new()
+        {
+            Id = PermissionType.Licenses,
+            Category = PermissionCategoryType.General,
+            Name = "Licenses",
+            SortOrder = 21,
+            CanView = true,
+            CanModify = true,
+            CanDelete = false
+        },
 
         // CSI
         new()

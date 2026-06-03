@@ -7,6 +7,7 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { Site } from "../../models/sites/site";
+import { DownloadEndpoint } from "../../models/download-config";
 
 @Injectable({
     providedIn: 'root'
@@ -17,6 +18,13 @@ export class SiteService {
         private readonly _queryHelper: QueryHelperService,
         private readonly _http: HttpClient
     ) {
+    }
+
+    public getAllEndpoint(): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/sites')
+        };
     }
 
     public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<Site>> {

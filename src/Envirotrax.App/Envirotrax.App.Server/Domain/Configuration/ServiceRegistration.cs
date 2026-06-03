@@ -83,7 +83,7 @@ public static class ServiceRegistration
             opts.Assembly = typeof(ServiceRegistration).Assembly;
             opts.Namespace = "Envirotrax.App.Server";
         });
-        services.AddPdfTemplateService();
+        services.AddPdfTemplateService(environment.IsDevelopment(), configuration.GetSection("PdfTemplate"));
 
         services.AddTransient<ICsvHelperService, CsvHelperService>();
 

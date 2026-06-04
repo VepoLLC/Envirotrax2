@@ -7,12 +7,16 @@ import { SiteListComponent } from "./list/site-list.component";
 import { SiteRoutingModule } from "./site-routing.module";
 import { CreateSiteComponent } from './create/create-site-component';
 import { EditSiteComponent } from './edit/edit-site-component';
+import { SiteCsiInspectionsComponent } from './edit/tabs/site-csi-inspections.component';
+import { SiteBackflowTestsComponent } from './edit/tabs/site-backflow-tests.component';
 
 @NgModule({
     declarations: [
         SiteListComponent,
         CreateSiteComponent,
-        EditSiteComponent
+        EditSiteComponent,
+        SiteCsiInspectionsComponent,
+        SiteBackflowTestsComponent
     ],
     imports: [
         CommonModule,

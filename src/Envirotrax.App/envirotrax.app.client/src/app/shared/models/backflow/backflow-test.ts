@@ -19,6 +19,9 @@ export interface BackflowTest {
     bpatLicenseExpiration?: string;
     bpatCompanyName?: string;
     bpatContactName?: string;
+    bpatAddress?: string;
+    bpatCity?: string;
+    bpatZip?: string;
     bpatState?: State | null;
     accountNumber?: string;
     propertyBusinessName?: string;

@@ -597,4 +597,27 @@
             </div>
         </div>
     </form>
+
+    <div class="text-center my-3" *ngIf="canViewCsi || canViewBackflow">
+        <ul class="vp-tabs nav nav-pills d-inline-flex">
+            <li class="nav-item" *ngIf="canViewCsi">
+                <a class="nav-link" role="button"
+                   [class.active]="activeTab === 'csi'"
+                   (click)="setActiveTab('csi')">CSI Inspections</a>
+            </li>
+            <li class="nav-item" *ngIf="canViewBackflow">
+                <a class="nav-link" role="button"
+                   [class.active]="activeTab === 'backflow'"
+                   (click)="setActiveTab('backflow')">Backflow Tests</a>
+            </li>
+        </ul>
+    </div>
+
+    <div *ngIf="csiInitialized && canViewCsi && site.id" [hidden]="activeTab !== 'csi'">
+        <app-site-csi-inspections [siteId]="site.id" />
+    </div>
+
+    <div *ngIf="backflowInitialized && canViewBackflow && site.id" [hidden]="activeTab !== 'backflow'">
+        <app-site-backflow-tests [siteId]="site.id" />
+    </div>
 </div>

@@ -20,5 +20,10 @@ public class ProfessionalUserProfile : Profile
          CreateMap<AppUser, ReferencedProfessionalUserDto>()
                 .ForMember(d => d.EmailAddress, opt => opt.MapFrom(s => s.Email))
                 .ForMember(d => d.ContactName, opt => opt.Ignore());
+
+        CreateMap<ProfessionalUser, ReferencedProfessionalUserDto>()
+            .ForMember(d => d.Id, opt => opt.MapFrom(s => s.UserId))
+            .ForMember(d => d.EmailAddress, opt => opt.MapFrom(s => s.User != null ? s.User.Email : null))
+            .ForMember(d => d.ContactName, opt => opt.MapFrom(s => s.ContactName));
     }
 }

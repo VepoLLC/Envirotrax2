@@ -6,6 +6,7 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.Common.Domain.Services.Defintions;
@@ -65,24 +66,61 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         BackflowTestDto dto,
         Stream? assemblyStream, string? assemblyFileName,
         Stream? serialStream, string? serialFileName,
+        Stream? bypassAssemblyStream, string? bypassAssemblyFileName,
+        Stream? bypassSerialStream, string? bypassSerialFileName,
+        Stream? airGapStream, string? airGapFileName,
         CancellationToken cancellationToken = default)
     {
+        var professionalId = _authService.ProfessionalId;
+        dto.Professional = new ReferencedProfessionalDto { Id = professionalId };
+
         await PopulateBpatSnapshotAsync(dto);
 
         // Set paths before AddAsync to avoid a second EF update (double-tracking conflict)
-        var professionalId = _authService.ProfessionalId;
         if (assemblyStream != null && assemblyFileName != null)
+        {
             dto.AssemblyImagePath = $"professionals/{professionalId}/backflow-tests/assembly/{Guid.NewGuid()}{ValidateAndGetExtension(assemblyFileName)}";
+        }
         if (serialStream != null && serialFileName != null)
+        {
             dto.SerialNumberImagePath = $"professionals/{professionalId}/backflow-tests/serial-number/{Guid.NewGuid()}{ValidateAndGetExtension(serialFileName)}";
+        }
+        if (bypassAssemblyStream != null && bypassAssemblyFileName != null)
+        {
+            dto.BypassAssemblyImagePath = $"professionals/{professionalId}/backflow-tests/bypass-assembly/{Guid.NewGuid()}{ValidateAndGetExtension(bypassAssemblyFileName)}";
+        }
+        if (bypassSerialStream != null && bypassSerialFileName != null)
+        {
+            dto.BypassSerialNumberImagePath = $"professionals/{professionalId}/backflow-tests/bypass-serial-number/{Guid.NewGuid()}{ValidateAndGetExtension(bypassSerialFileName)}";
+        }
+        if (airGapStream != null && airGapFileName != null)
+        {
+            dto.AirGapImagePath = $"professionals/{professionalId}/backflow-tests/air-gap/{Guid.NewGuid()}{ValidateAndGetExtension(airGapFileName)}";
+        }
 
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         var saved = await base.AddAsync(dto);
 
         if (assemblyStream != null && dto.AssemblyImagePath != null)
+        {
             await _fileStorageService.UploadAsync(dto.AssemblyImagePath, assemblyStream);
+        }
         if (serialStream != null && dto.SerialNumberImagePath != null)
+        {
             await _fileStorageService.UploadAsync(dto.SerialNumberImagePath, serialStream);
+        }
+        if (bypassAssemblyStream != null && dto.BypassAssemblyImagePath != null)
+        {
+            await _fileStorageService.UploadAsync(dto.BypassAssemblyImagePath, bypassAssemblyStream);
+        }
+        if (bypassSerialStream != null && dto.BypassSerialNumberImagePath != null)
+        {
+            await _fileStorageService.UploadAsync(dto.BypassSerialNumberImagePath, bypassSerialStream);
+        }
+        if (airGapStream != null && dto.AirGapImagePath != null)
+        {
+            await _fileStorageService.UploadAsync(dto.AirGapImagePath, airGapStream);
+        }
 
         scope.Complete();
         return saved;
@@ -90,8 +128,9 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
     private static string ValidateAndGetExtension(string fileName)
     {
-        var ext = Path.GetExtension(fileName).ToLower();
-        if (!AllowedFileExtensions.Contains(ext))
+        var ext = Path.GetExtension(fileName);
+
+        if (!AllowedFileExtensions.Contains(ext, StringComparer.OrdinalIgnoreCase))
         {
             throw new ValidationException($"Only {string.Join(", ", AllowedFileExtensions)} files are accepted.");
         }

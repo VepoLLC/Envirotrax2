@@ -375,6 +375,15 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     [StringLength(500)]
     public string? SerialNumberImagePath { get; set; }
 
+    [StringLength(500)]
+    public string? BypassAssemblyImagePath { get; set; }
+
+    [StringLength(500)]
+    public string? BypassSerialNumberImagePath { get; set; }
+
+    [StringLength(500)]
+    public string? AirGapImagePath { get; set; }
+
     // Audit
     public int? CreatedById { get; set; }
     public AppUser? CreatedBy { get; set; }

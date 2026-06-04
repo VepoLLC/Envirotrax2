@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { BackflowTest } from '../../../shared/models/backflow/backflow-test';
+import { BackflowTestImages } from '../../../shared/models/backflow/backflow-test-images';
 import { BackflowTestService } from '../../../shared/services/backflow/backflow-test.service';
 import { BackflowGaugeService } from '../../../shared/services/backflow/backflow-gauge.service';
 import { ProfesisonalService } from '../../../shared/services/professionals/professional.service';
@@ -88,10 +89,12 @@ export class BackflowTestSubmitComponent implements OnInit {
         { id: BackflowReasonForTest.AnnualTestAfterRepairs, text: 'Annual Test After Repairs' }
     ];
 
-    public assemblyImageFile: File | null = null;
+    public images: BackflowTestImages = {};
     public assemblyImagePreview: string | null = null;
-    public serialNumberImageFile: File | null = null;
     public serialNumberImagePreview: string | null = null;
+    public bypassAssemblyImagePreview: string | null = null;
+    public bypassSerialNumberImagePreview: string | null = null;
+    public airGapImagePreview: string | null = null;
 
     public onAssemblyFileInputChange(event: Event): void {
         const file = (event.target as HTMLInputElement).files?.[0] ?? null;
@@ -100,7 +103,7 @@ export class BackflowTestSubmitComponent implements OnInit {
     }
 
     public onAssemblyImageChange(file: File | null): void {
-        this.assemblyImageFile = file;
+        this.images.assemblyImage = file;
         this.assemblyImagePreview = file ? URL.createObjectURL(file) : null;
     }
 
@@ -111,8 +114,41 @@ export class BackflowTestSubmitComponent implements OnInit {
     }
 
     public onSerialNumberImageChange(file: File | null): void {
-        this.serialNumberImageFile = file;
+        this.images.serialNumberImage = file;
         this.serialNumberImagePreview = file ? URL.createObjectURL(file) : null;
+    }
+
+    public onBypassAssemblyFileInputChange(event: Event): void {
+        const file = (event.target as HTMLInputElement).files?.[0] ?? null;
+        this.onBypassAssemblyImageChange(file);
+        (event.target as HTMLInputElement).value = '';
+    }
+
+    public onBypassAssemblyImageChange(file: File | null): void {
+        this.images.bypassAssemblyImage = file;
+        this.bypassAssemblyImagePreview = file ? URL.createObjectURL(file) : null;
+    }
+
+    public onBypassSerialNumberFileInputChange(event: Event): void {
+        const file = (event.target as HTMLInputElement).files?.[0] ?? null;
+        this.onBypassSerialNumberImageChange(file);
+        (event.target as HTMLInputElement).value = '';
+    }
+
+    public onBypassSerialNumberImageChange(file: File | null): void {
+        this.images.bypassSerialNumberImage = file;
+        this.bypassSerialNumberImagePreview = file ? URL.createObjectURL(file) : null;
+    }
+
+    public onAirGapFileInputChange(event: Event): void {
+        const file = (event.target as HTMLInputElement).files?.[0] ?? null;
+        this.onAirGapImageChange(file);
+        (event.target as HTMLInputElement).value = '';
+    }
+
+    public onAirGapImageChange(file: File | null): void {
+        this.images.airGapImage = file;
+        this.airGapImagePreview = file ? URL.createObjectURL(file) : null;
     }
 
     public model: BackflowTest = {
@@ -220,7 +256,7 @@ export class BackflowTestSubmitComponent implements OnInit {
 
         this.isLoading = true;
         try {
-            await this._backflowTestService.submit(submission, this.assemblyImageFile, this.serialNumberImageFile);
+            await this._backflowTestService.submit(submission, this.images);
             this.submitSuccess = true;
         } finally {
             this.isLoading = false;

@@ -1,10 +1,10 @@
-using System.Text.Json;
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers.Professionals.Backflow;
@@ -14,8 +14,6 @@ namespace Envirotrax.App.Server.Controllers.Professionals.Backflow;
 [Authorize(Roles = RoleDefinitions.Professionals.BackflowTester)]
 public class BackflowTestController : ProfessionalProtectedController
 {
-    private static readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
-
     private readonly IBackflowTestService _backflowTestService;
 
     public BackflowTestController(IBackflowTestService backflowTestService)
@@ -38,19 +36,34 @@ public class BackflowTestController : ProfessionalProtectedController
     }
 
     [HttpPost]
-    public async Task<IActionResult> SubmitAsync([FromForm] SubmitBackflowTestRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> SubmitAsync(
+        [FromForm] BackflowTestDto dto,
+        [FromForm] IFormFile? assemblyImage,
+        [FromForm] IFormFile? serialNumberImage,
+        [FromForm] IFormFile? bypassAssemblyImage,
+        [FromForm] IFormFile? bypassSerialNumberImage,
+        [FromForm] IFormFile? airGapImage,
+        CancellationToken cancellationToken)
     {
-        var dto = JsonSerializer.Deserialize<BackflowTestDto>(request.TestData, _jsonOptions)
-            ?? throw new InvalidOperationException("Invalid test data.");
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
         dto.Id = 0;
 
-        await using var assemblyStream = request.AssemblyImage?.OpenReadStream();
-        await using var serialStream = request.SerialNumberImage?.OpenReadStream();
+        await using var assemblyStream = assemblyImage?.OpenReadStream();
+        await using var serialStream = serialNumberImage?.OpenReadStream();
+        await using var bypassAssemblyStream = bypassAssemblyImage?.OpenReadStream();
+        await using var bypassSerialStream = bypassSerialNumberImage?.OpenReadStream();
+        await using var airGapStream = airGapImage?.OpenReadStream();
 
         var result = await _backflowTestService.SubmitWithImagesAsync(
             dto,
-            assemblyStream, request.AssemblyImage?.FileName,
-            serialStream, request.SerialNumberImage?.FileName,
+            assemblyStream, assemblyImage?.FileName,
+            serialStream, serialNumberImage?.FileName,
+            bypassAssemblyStream, bypassAssemblyImage?.FileName,
+            bypassSerialStream, bypassSerialNumberImage?.FileName,
+            airGapStream, airGapImage?.FileName,
             cancellationToken);
 
         return Ok(result);

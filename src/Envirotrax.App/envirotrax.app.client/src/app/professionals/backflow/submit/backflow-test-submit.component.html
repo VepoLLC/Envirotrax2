@@ -690,76 +690,192 @@
         </div>
 
         <!-- Images -->
-        <div class="mt-3">
-            <vp-section header="Backflow Assembly Images">
-                <div class="row gy-3">
+        <div *ngIf="model.deviceType !== BackflowDeviceType.AG">
+            <div class="mt-3">
+                <vp-section header="Backflow Assembly Images">
+                    <div class="row gy-3">
 
-                    <!-- Assembly image -->
-                    <div class="col-lg-6">
-                        <div class="image-cell border rounded p-3 h-100">
-                            <div class="text-center fw-semibold mb-2">
-                                Upload an image of the entire assembly
-                            </div>
-                            <input #assemblyFileInput type="file" class="d-none"
-                               accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
-                               (change)="onAssemblyFileInputChange($event)" />
-
-                            <vp-file-upload *ngIf="!assemblyImagePreview"
-                                name="assemblyImage"
+                        <!--Backflow Assembly image -->
+                        <div class="col-lg-6">
+                            <div class="image-cell border rounded p-3 h-100">
+                                <div class="text-center fw-semibold mb-2">
+                                    Upload an image of the entire assembly
+                                </div>
+                                <input #assemblyFileInput type="file" class="d-none"
                                 accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
-                                label="Choose an image or drag and drop here"
-                                [file]="assemblyImageFile"
-                                (fileChange)="onAssemblyImageChange($event)" />
+                                (change)="onAssemblyFileInputChange($event)" />
 
-                            <div *ngIf="assemblyImagePreview" class="text-center mb-2">
-                                <div class="d-flex justify-content-between align-items-center mb-2 px-3 py-2 border rounded bg-success-subtle">
-                                    <button type="button" class="btn btn-sm btn-primary" (click)="assemblyFileInput.click()">
-                                        Choose File
-                                    </button>
-                                    <span class="fw-semibold small">{{ assemblyImageFile?.name }}</span>
-                                    <button type="button" class="btn btn-sm btn-primary" (click)="onAssemblyImageChange(null)">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
+                                <vp-file-upload *ngIf="!assemblyImagePreview"
+                                    name="assemblyImage"
+                                    accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
+                                    label="Choose an image or drag and drop here"
+                                    [file]="images.assemblyImage ?? null"
+                                    (fileChange)="onAssemblyImageChange($event)" />
+
+                                <div *ngIf="assemblyImagePreview" class="text-center mb-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-2 px-3 py-2 border rounded bg-success-subtle">
+                                        <button type="button" class="btn btn-sm btn-primary" (click)="assemblyFileInput.click()">
+                                            Choose File
+                                        </button>
+                                        <span class="fw-semibold small">{{ images.assemblyImage?.name }}</span>
+                                        <button type="button" class="btn btn-sm btn-primary" (click)="onAssemblyImageChange(null)">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <img [src]="assemblyImagePreview" alt="Assembly" class="rounded img-fluid" style="max-height: 350px;" />
                                 </div>
-                                <img [src]="assemblyImagePreview" alt="Assembly"  class="rounded img-fluid" style="max-height: 350px; " />
+                            </div>
+                        </div>
+
+                        <!--Backflow Serial number image -->
+                        <div class="col-lg-6">
+                            <div class="image-cell border rounded p-3 h-100">
+                                <div class="text-center fw-semibold mb-2">
+                                    Upload an image of the Serial Number of the assembly
+                                </div>
+                                <input #serialNumberFileInput type="file" class="d-none"
+                                accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
+                                (change)="onSerialNumberFileInputChange($event)" />
+
+                                <vp-file-upload *ngIf="!serialNumberImagePreview"
+                                    name="serialNumberImage"
+                                    accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
+                                    label="Choose an image or drag and drop here"
+                                    [file]="images.serialNumberImage ?? null"
+                                    (fileChange)="onSerialNumberImageChange($event)" />
+
+                                <div *ngIf="serialNumberImagePreview" class="text-center mb-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-2 px-3 py-2 border rounded bg-success-subtle">
+                                        <button type="button" class="btn btn-sm btn-primary" (click)="serialNumberFileInput.click()">
+                                            Choose File
+                                        </button>
+                                        <span class="fw-semibold small">{{ images.serialNumberImage?.name }}</span>
+                                        <button type="button" class="btn btn-sm btn-primary" (click)="onSerialNumberImageChange(null)">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <img [src]="serialNumberImagePreview" alt="Serial number" class="rounded img-fluid" style="max-height: 350px;" />
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </vp-section>
+            </div>
+
+            <div class="mt-3" *ngIf="model.deviceType === BackflowDeviceType.DCD
+                || model.deviceType === BackflowDeviceType.DCD2
+                || model.deviceType === BackflowDeviceType.RPPD
+                || model.deviceType === BackflowDeviceType.RPPD2">
+                <vp-section header="Bypass Assembly Images">
+                    <div class="row gy-3">
+
+                        <!-- Bypass Assembly image -->
+                        <div class="col-lg-6">
+                            <div class="image-cell border rounded p-3 h-100">
+                                <div class="text-center fw-semibold mb-2">
+                                    Upload an image of the entire Bypass assembly
+                                </div>
+                                <input #bypassAssemblyFileInput type="file" class="d-none"
+                                accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
+                                (change)="onBypassAssemblyFileInputChange($event)" />
+
+                                <vp-file-upload *ngIf="!bypassAssemblyImagePreview"
+                                    name="bypassAssemblyImage"
+                                    accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
+                                    label="Choose an image or drag and drop here"
+                                    [file]="images.bypassAssemblyImage ?? null"
+                                    (fileChange)="onBypassAssemblyImageChange($event)" />
+
+                                <div *ngIf="bypassAssemblyImagePreview" class="text-center mb-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-2 px-3 py-2 border rounded bg-success-subtle">
+                                        <button type="button" class="btn btn-sm btn-primary" (click)="bypassAssemblyFileInput.click()">
+                                            Choose File
+                                        </button>
+                                        <span class="fw-semibold small">{{ images.bypassAssemblyImage?.name }}</span>
+                                        <button type="button" class="btn btn-sm btn-primary" (click)="onBypassAssemblyImageChange(null)">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <img [src]="bypassAssemblyImagePreview" alt="Bypass assembly" class="rounded img-fluid" style="max-height: 350px;" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bypass Serial number image -->
+                        <div class="col-lg-6">
+                            <div class="image-cell border rounded p-3 h-100">
+                                <div class="text-center fw-semibold mb-2">
+                                    Upload an image of the Serial Number of the Bypass assembly
+                                </div>
+                                <input #bypassSerialNumberFileInput type="file" class="d-none"
+                                accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
+                                (change)="onBypassSerialNumberFileInputChange($event)" />
+
+                                <vp-file-upload *ngIf="!bypassSerialNumberImagePreview"
+                                    name="bypassSerialNumberImage"
+                                    accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
+                                    label="Choose an image or drag and drop here"
+                                    [file]="images.bypassSerialNumberImage ?? null"
+                                    (fileChange)="onBypassSerialNumberImageChange($event)" />
+
+                                <div *ngIf="bypassSerialNumberImagePreview" class="text-center mb-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-2 px-3 py-2 border rounded bg-success-subtle">
+                                        <button type="button" class="btn btn-sm btn-primary" (click)="bypassSerialNumberFileInput.click()">
+                       
+                                            Choose File
+                                        </button>
+                                        <span class="fw-semibold small">{{ images.bypassSerialNumberImage?.name }}</span>
+                                        <button type="button" class="btn btn-sm btn-primary" (click)="onBypassSerialNumberImageChange(null)">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <img [src]="bypassSerialNumberImagePreview" alt="Bypass serial number" class="rounded img-fluid" style="max-height: 350px;" />
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </vp-section>
+            </div>
+        </div>
+        <div *ngIf="model.deviceType === BackflowDeviceType.AG">
+            <div class="mt-3">
+                <vp-section header="Air Gap Image">
+                    <div class="row gy-3">
+                        <div class="col-lg-12">
+                            <div class="image-cell border rounded p-3 h-100">
+                                <div class="text-center fw-semibold mb-2">
+                                    Upload an image of the air gap
+                                </div>
+                                <input #airGapFileInput type="file" class="d-none"
+                                accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
+                                (change)="onAirGapFileInputChange($event)" />
+
+                                <vp-file-upload *ngIf="!airGapImagePreview"
+                                    name="airGapImage"
+                                    accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
+                                    label="Choose an image or drag and drop here"
+                                    [file]="images.airGapImage ?? null"
+                                    (fileChange)="onAirGapImageChange($event)" />
+
+                                <div *ngIf="airGapImagePreview" class="text-center mb-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-2 px-3 py-2 border rounded bg-success-subtle">
+                                        <button type="button" class="btn btn-sm btn-primary" (click)="airGapFileInput.click()">
+                                            Choose File
+                                        </button>
+                                        <span class="fw-semibold small">{{ images.airGapImage?.name }}</span>
+                                        <button type="button" class="btn btn-sm btn-primary" (click)="onAirGapImageChange(null)">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <img [src]="airGapImagePreview" alt="Air gap" class="rounded img-fluid" style="max-height: 350px;" />
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Serial number image -->
-                    <div class="col-lg-6">
-                        <div class="image-cell border rounded p-3 h-100">
-                            <div class="text-center fw-semibold mb-2">
-                                Upload an image of the Serial Number of the assembly
-                            </div>
-                            <input #serialNumberFileInput type="file" class="d-none"
-                               accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff,.webp"
-                               (change)="onSerialNumberFileInputChange($event)" />
-
-                            <vp-file-upload *ngIf="!serialNumberImagePreview"
-                                name="serialNumberImage"
-                                accept=".jpg,.jpeg,.png,.gif,.webp"
-                                label="Choose an image or drag and drop here"
-                                [file]="serialNumberImageFile"
-                                (fileChange)="onSerialNumberImageChange($event)" />
-
-                            <div *ngIf="serialNumberImagePreview" class="text-center mb-2">
-                                <div class="d-flex justify-content-between align-items-center mb-2 px-3 py-2 border rounded bg-success-subtle">
-                                    <button type="button" class="btn btn-sm btn-primary" (click)="serialNumberFileInput.click()">
-                                        Choose File
-                                    </button>
-                                    <span class="fw-semibold small">{{ serialNumberImageFile?.name }}</span>
-                                    <button type="button" class="btn btn-sm btn-primary" (click)="onSerialNumberImageChange(null)">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </div>
-                                <img [src]="serialNumberImagePreview" alt="Serial number" style="max-height: 350px;" class="rounded img-fluid" />
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </vp-section>
+                </vp-section>
+            </div>
         </div>
 
 

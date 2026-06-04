@@ -5,7 +5,6 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
@@ -344,17 +343,12 @@ public class BackflowTestDto : IDto
     // Images
     public string? AssemblyImagePath { get; set; }
     public string? SerialNumberImagePath { get; set; }
+    public string? BypassAssemblyImagePath { get; set; }
+    public string? BypassSerialNumberImagePath { get; set; }
+    public string? AirGapImagePath { get; set; }
 
     // Audit
     public DateTime CreatedTime { get; set; }
     public DateTime? UpdatedTime { get; set; }
     public AppUserDto? UpdatedBy { get; set; }
-}
-
-public class SubmitBackflowTestRequest
-{
-    [Required]
-    public string TestData { get; set; } = null!;
-    public IFormFile? AssemblyImage { get; set; }
-    public IFormFile? SerialNumberImage { get; set; }
 }

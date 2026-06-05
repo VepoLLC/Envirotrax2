@@ -1,0 +1,179 @@
+<ng-template #statusTemplate let-test="rowData">
+    <div class="d-flex gap-1 flex-wrap">
+        <vp-status-icon *ngIf="test.isCurrent"
+                        imageSrc="/images/icons/bstatus-green-on.png"
+                        text="Current Test"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!test.isCurrent"
+                        imageSrc="/images/icons/bstatus-green-off.png"
+                        text="Non Current Test"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="test.testResult === BackflowTestResult.Pass || test.testResult === BackflowTestResult.PassAfterRepairs"
+                        imageSrc="/images/icons/bstatus-blue-on.png"
+                        text="Passed Test"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="test.testResult === BackflowTestResult.Fail"
+                        imageSrc="/images/icons/bstatus-blue-off.png"
+                        text="Failed Test"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!test.outOfService"
+                        imageSrc="/images/icons/bstatus-cyan-on.png"
+                        text="In Service"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="test.outOfService"
+                        imageSrc="/images/icons/bstatus-cyan-off.png"
+                        text="Out of Service"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="test.transactionId"
+                        imageSrc="/images/icons/bstatus-red-on.png"
+                        text="Paid"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!test.transactionId"
+                        imageSrc="/images/icons/bstatus-red-off.png"
+                        text="Unpaid"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="test.approvalDate && !test.disapproved"
+                        imageSrc="/images/icons/bstatus-orange-on.png"
+                        text="Approved"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!test.approvalDate || test.disapproved"
+                        imageSrc="/images/icons/bstatus-orange-off.png"
+                        text="Disapproved"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!test.rejected"
+                        imageSrc="/images/icons/bstatus-magenta-on.png"
+                        text="Accepted"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="test.rejected"
+                        imageSrc="/images/icons/bstatus-magenta-off.png"
+                        text="Rejected"
+                        [showText]="false" />
+    </div>
+</ng-template>
+
+<ng-template #testDateTemplate let-test="rowData">
+    <div class="small">
+        <div *ngIf="test.createdTime">
+            <span class="text-muted">Submitted: </span>{{ test.createdTime | date:'M/d/yyyy' }}
+        </div>
+        <div *ngIf="test.testDate">
+            <span class="text-muted">Tested On: </span>{{ test.testDate | date:'M/d/yyyy' }}
+        </div>
+        <div *ngIf="test.expirationDate">
+            <span class="text-muted">Expires: </span>
+            <span [class.text-danger]="test.expirationDate! < todayIso">
+                {{ test.expirationDate | date:'M/d/yyyy' }}
+            </span>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #serialTemplate let-test="rowData">
+    <div class="small">
+        <div *ngIf="test.serialNumber">
+            <span class="text-muted">Main: </span>{{ test.serialNumber }}
+        </div>
+        <div *ngIf="test.serialNumber2">
+            <span class="text-muted">Bypass: </span>{{ test.serialNumber2 }}
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #assemblyTemplate let-test="rowData">
+    <div class="small">
+        <div *ngIf="test.deviceType || test.manufacturer || test.model">
+            <span class="fw-semibold">Main Assembly: </span>
+            {{ test.manufacturer }} {{ test.model }}
+            <span *ngIf="test.size"> {{ test.size }}</span>
+            <span *ngIf="test.deviceType"> - {{ test.deviceType }}</span>
+        </div>
+        <div *ngIf="test.manufacturer2 || test.model2">
+            <span class="fw-semibold">Bypass Assembly: </span>
+            {{ test.manufacturer2 }} {{ test.model2 }}
+            <span *ngIf="test.size2"> {{ test.size2 }}</span>
+        </div>
+        <div *ngIf="test.hazardType">
+            <span class="fw-semibold">Hazard Type: </span>{{ test.hazardType }}
+        </div>
+        <div *ngIf="test.locationDescription">
+            <span class="fw-semibold">Location Desc: </span>{{ test.locationDescription }}
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #bpatTemplate let-test="rowData">
+    <div class="small">
+        <div *ngIf="test.bpatCompanyName" class="fw-semibold">{{ test.bpatCompanyName }}</div>
+        <div *ngIf="test.bpatContactName">{{ test.bpatContactName }}</div>
+        <div *ngIf="test.bpatAddress">{{ test.bpatAddress }}</div>
+        <div *ngIf="test.bpatCity || test.bpatState || test.bpatZip">
+            <span *ngIf="test.bpatCity">{{ test.bpatCity }}</span><span *ngIf="test.bpatState?.code">, {{ test.bpatState!.code }}</span><span *ngIf="test.bpatZip"> {{ test.bpatZip }}</span>
+        </div>
+    </div>
+</ng-template>
+
+<ng-container *ngIf="isVisible">
+    <div class="mt-3">
+        <vp-section header="Backflow Assembly Tests">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+                <div class="d-flex align-items-center gap-2">
+                    <label class="form-label mb-0">View type:</label>
+                    <div style="min-width: 200px;">
+                        <vp-input type="select"
+                                  [options]="viewTypeOptions"
+                                  [ngModel]="currentOnly ? 'true' : 'false'"
+                                  (ngModelChange)="onViewTypeChange($event)"
+                                  [ngModelOptions]="{standalone: true}" />
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <label class="form-label mb-0">Service status:</label>
+                    <div style="min-width: 170px;">
+                        <vp-input type="select"
+                                  [options]="serviceStatusOptions"
+                                  [ngModel]="selectedServiceStatus"
+                                  (ngModelChange)="onServiceStatusChange($event)"
+                                  [ngModelOptions]="{standalone: true}" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center mb-3">
+                <div style="display: grid; grid-template-columns: repeat(6, auto); row-gap: 0.25rem; column-gap: 1.5rem;">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Current Test" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-blue-on.png" text="Passed Test" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-cyan-on.png" text="In Service" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Paid" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-orange-on.png" text="Approved" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-magenta-on.png" text="Accepted" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Non Current Test" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-blue-off.png" text="Failed Test" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-cyan-off.png" text="Out of Service" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-red-off.png" text="Unpaid" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-orange-off.png" text="Disapproved" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-magenta-off.png" text="Rejected" />
+                </div>
+            </div>
+
+            <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+            <div *ngIf="!table.isLoading">
+                <vp-table *ngIf="table.items && table.items.data && table.items.data.length > 0"
+                          [columns]="table.columns!"
+                          [data]="table.items.data"
+                          [(pageInfo)]="table.items.pageInfo"
+                          (pageInfoChange)="loadTests()"
+                          [(query)]="table.query"
+                          (queryChange)="loadTests()"
+                          (queryReset)="loadTests()"
+                          [canViewDetails]="true"
+                          (viewDetails)="viewTest($event)" />
+
+                <div *ngIf="!table.items || table.items.data.length === 0"
+                     class="text-center py-3 text-muted">
+                    No backflow assembly tests found for this site.
+                </div>
+            </div>
+        </vp-section>
+    </div>
+</ng-container>

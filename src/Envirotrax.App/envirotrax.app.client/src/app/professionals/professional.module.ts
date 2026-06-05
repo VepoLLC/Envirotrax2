@@ -12,6 +12,8 @@ import { ProfessionalUserLicenseListComponent } from "./users/edit/licenses/list
 import { CreateEditLicenseComponent } from "./users/edit/licenses/create-edit/create-edit-license.component";
 import { SiteListComponent } from "./sites/site-list.component";
 import { SiteDetailsComponent } from "./sites/details/site-details.component";
+import { SiteBackflowTestsComponent } from "./sites/details/site-backflow-tests.component";
+import { SiteCsiInspectionsComponent } from "./sites/details/site-csi-inspections.component";
 import { InsuranceListComponent } from "./insurances/list/insurance-list.component";
 import { EditInsuranceComponent } from "./insurances/edit/edit-insurance.component";
 import { LicenseHelpTextComponent } from "./users/edit/licenses/help-text/license-help-text.component";
@@ -31,6 +33,8 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
         CreateEditLicenseComponent,
         SiteListComponent,
         SiteDetailsComponent,
+        SiteBackflowTestsComponent,
+        SiteCsiInspectionsComponent,
         InsuranceListComponent,
         EditInsuranceComponent,
         LicenseListComponent

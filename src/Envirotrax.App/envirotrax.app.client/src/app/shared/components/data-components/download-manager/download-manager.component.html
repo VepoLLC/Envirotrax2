@@ -20,6 +20,32 @@
                       [(ngModel)]="downloadConfig.selectedFormat" />
         </div>
 
+        <div class="mb-3" *ngIf="downloadConfig.selectedFormat === 'CSV'">
+            <vp-input label="Delimiter"
+                      name="delimiter"
+                      type="select"
+                      [options]="delimiterOptions"
+                      [(ngModel)]="downloadConfig.csvDelimiter" />
+        </div>
+
+        <div class="mb-3" *ngIf="downloadConfig.categories?.length">
+            <h3 class="h6">
+                Columns to Include
+            </h3>
+            <div class="container">
+                <div *ngFor="let category of downloadConfig.categories; let i = index" class="form-check mb-1">
+                    <input type="checkbox"
+                           class="form-check-input"
+                           [id]="'category-' + i"
+                           [name]="'category-' + i"
+                           [(ngModel)]="category.isSelected" />
+                    <label class="form-check-label" [attr.for]="'category-' + i">
+                        {{ category.caption ?? category.name }}
+                    </label>
+                </div>
+            </div>
+        </div>
+
         <div class="text-center mt-3">
             <button type="submit" class="btn btn-primary vp-section-button">
                 Download

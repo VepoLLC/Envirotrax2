@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260602170250_AddBackflowTestImagePaths")]
+    partial class AddBackflowTestImagePaths
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -90,10 +93,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("AirGapImagePath")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<bool>("AirGapValid")
                         .HasColumnType("bit");
 
@@ -155,14 +154,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<string>("BpatZip")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("BypassAssemblyImagePath")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("BypassSerialNumberImagePath")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Comments")
                         .HasColumnType("nvarchar(max)");
@@ -1646,10 +1637,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasPrecision(19, 4)
                         .HasColumnType("decimal(19,4)");
 
-                    b.Property<decimal?>("FogInspectorFee")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
-
                     b.Property<decimal?>("FogTransportFee")
                         .HasPrecision(19, 4)
                         .HasColumnType("decimal(19,4)");
@@ -3069,10 +3056,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalUser", "ProfessionalUser")
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalUser", null)
                         .WithMany()
                         .HasForeignKey("ProfessionalId", "UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
@@ -3080,8 +3067,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("LicenseType");
 
                     b.Navigation("Professional");
-
-                    b.Navigation("ProfessionalUser");
 
                     b.Navigation("User");
                 });

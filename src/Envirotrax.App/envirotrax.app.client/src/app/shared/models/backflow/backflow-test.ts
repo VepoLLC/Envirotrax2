@@ -19,6 +19,9 @@ export interface BackflowTest {
     bpatLicenseExpiration?: string;
     bpatCompanyName?: string;
     bpatContactName?: string;
+    bpatAddress?: string;
+    bpatCity?: string;
+    bpatZip?: string;
     bpatState?: State | null;
     accountNumber?: string;
     propertyBusinessName?: string;
@@ -89,6 +92,11 @@ export interface BackflowTest {
     rejectedDate?: string;
     rejectedReason?: string;
     needsValidation?: boolean;
+    assemblyImagePath?: string;
+    serialNumberImagePath?: string;
+    bypassAssemblyImagePath?: string;
+    bypassSerialNumberImagePath?: string;
+    airGapImagePath?: string;
 
     // Initial test readings - main assembly
     initCV1HeldPSID?: number;

@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers.Professionals.Backflow;
@@ -35,10 +36,36 @@ public class BackflowTestController : ProfessionalProtectedController
     }
 
     [HttpPost]
-    public async Task<IActionResult> SubmitAsync([FromBody] BackflowTestDto dto)
+    public async Task<IActionResult> SubmitAsync(
+        [FromForm] BackflowTestDto dto,
+        [FromForm] IFormFile? assemblyImage,
+        [FromForm] IFormFile? serialNumberImage,
+        [FromForm] IFormFile? bypassAssemblyImage,
+        [FromForm] IFormFile? bypassSerialNumberImage,
+        [FromForm] IFormFile? airGapImage,
+        CancellationToken cancellationToken)
     {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
         dto.Id = 0;
-        var result = await _backflowTestService.AddAsync(dto);
+
+        await using var assemblyStream = assemblyImage?.OpenReadStream();
+        await using var serialStream = serialNumberImage?.OpenReadStream();
+        await using var bypassAssemblyStream = bypassAssemblyImage?.OpenReadStream();
+        await using var bypassSerialStream = bypassSerialNumberImage?.OpenReadStream();
+        await using var airGapStream = airGapImage?.OpenReadStream();
+
+        var result = await _backflowTestService.SubmitWithImagesAsync(
+            dto,
+            assemblyStream, assemblyImage?.FileName,
+            serialStream, serialNumberImage?.FileName,
+            bypassAssemblyStream, bypassAssemblyImage?.FileName,
+            bypassSerialStream, bypassSerialNumberImage?.FileName,
+            airGapStream, airGapImage?.FileName,
+            cancellationToken);
+
         return Ok(result);
     }
 }

@@ -1,0 +1,80 @@
+<ng-template #statusTemplate let-inspection="rowData">
+    <div class="d-flex gap-1">
+        <vp-status-icon *ngIf="inspection.inspectionResult"
+                        imageSrc="/images/icons/bstatus-green-on.png"
+                        text="Passed inspection"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!inspection.inspectionResult"
+                        imageSrc="/images/icons/bstatus-green-off.png"
+                        text="Failed inspection"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="inspection.transactionId"
+                        imageSrc="/images/icons/bstatus-orange-on.png"
+                        text="Paid"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!inspection.transactionId"
+                        imageSrc="/images/icons/bstatus-orange-off.png"
+                        text="Unpaid"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!inspection.disapproved"
+                        imageSrc="/images/icons/bstatus-cyan-on.png"
+                        text="Approved"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="inspection.disapproved"
+                        imageSrc="/images/icons/bstatus-cyan-off.png"
+                        text="Disapproved"
+                        [showText]="false" />
+    </div>
+</ng-template>
+
+<ng-template #reasonTemplate let-inspection="rowData">
+    <span>{{ reasonLabel(inspection.reasonForInspection) }}</span>
+</ng-template>
+
+<ng-template #inspectorTemplate let-data="rowData">
+    <div>
+        <a *ngIf="canViewInspectors && data.professional?.id; else plainInspector"
+           [routerLink]="['/csi', 'inspectors', 'details', data.professional?.id]">
+            <div *ngIf="data.inspectorCompanyName" class="fw-semibold">{{ data.inspectorCompanyName }}</div>
+            <div *ngIf="data.inspectorContactName">{{ data.inspectorContactName }}</div>
+        </a>
+        <ng-template #plainInspector>
+            <div *ngIf="data.inspectorCompanyName" class="fw-semibold">{{ data.inspectorCompanyName }}</div>
+            <div *ngIf="data.inspectorContactName">{{ data.inspectorContactName }}</div>
+        </ng-template>
+    </div>
+</ng-template>
+
+<vp-section header="CSI Inspections">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+        <div class="container mb-3">
+        <div class="row gap-2 justify-content-center mb-3">
+            <div class="col-auto mb-2">
+                <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Passed inspection" />
+                <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Failed inspection" />
+            </div>
+            <div class="col-auto mb-2">
+                <vp-status-icon imageSrc="/images/icons/bstatus-orange-on.png" text="Paid" />
+                <vp-status-icon imageSrc="/images/icons/bstatus-orange-off.png" text="Unpaid" />
+            </div>
+            <div class="col-auto mb-2">
+                <vp-status-icon imageSrc="/images/icons/bstatus-cyan-on.png" text="Approved" />
+                <vp-status-icon imageSrc="/images/icons/bstatus-cyan-off.png" text="Disapproved" />
+            </div>
+        </div>
+    </div>
+
+    <vp-table *ngIf="table.items"
+              [columns]="table.columns!"
+              [data]="table.items.data"
+              [(pageInfo)]="table.items.pageInfo"
+              (pageInfoChange)="getInspections()"
+              [(query)]="table.query"
+              (queryChange)="getInspections()"
+              (queryReset)="getInspections()"
+              [canViewDetails]="true"
+              (viewDetails)="viewInspection($event)" />
+    </div>
+</vp-section>

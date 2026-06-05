@@ -42,17 +42,18 @@ namespace Envirotrax.App.Server.MediaTypeFormatters
             throw new InvalidOperationException("The object type cannot be converted to CSV");
         }
 
-        private async Task WriteBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding, string csvData)
+        private async Task WriteBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding, string csvData, string delimiter)
         {
             var downloadFileNmaeHeader = context.HttpContext.Request.Headers[FileNameHeader];
 
             if (!string.IsNullOrEmpty(downloadFileNmaeHeader))
             {
                 var cleanFileName = new string(downloadFileNmaeHeader.ToString().Select(ch => _invalidFileNameChars.Contains(ch) ? '_' : ch).ToArray());
+                var extension = delimiter == "," ? ".csv" : ".txt";
 
                 var contentDispositionValue = new ContentDisposition
                 {
-                    FileName = Path.ChangeExtension(cleanFileName, ".csv")
+                    FileName = Path.ChangeExtension(cleanFileName, extension)
                 };
 
                 context.HttpContext.Response.ContentType = "application/octet-stream";
@@ -93,6 +94,11 @@ namespace Envirotrax.App.Server.MediaTypeFormatters
                 return ",";
             }
 
+            if (delimiter == "tab")
+            {
+                return "\t";
+            }
+
             return delimiter!;
         }
 
@@ -104,12 +110,14 @@ namespace Envirotrax.App.Server.MediaTypeFormatters
                 var selectedColumns = GetSelectedColumns(context.HttpContext.Request.Headers);
 
                 var csvHelper = context.HttpContext.RequestServices.GetRequiredService<ICsvHelperService>();
+                var delimiter = GetDelimiter(context);
+
                 var csvData = await csvHelper.WriteAsStringAsync(enumerableObject, selectedColumns, new()
                 {
-                    Delimiter = GetDelimiter(context)
+                    Delimiter = delimiter
                 });
 
-                await WriteBodyAsync(context, selectedEncoding, csvData);
+                await WriteBodyAsync(context, selectedEncoding, csvData, delimiter);
             }
         }
 

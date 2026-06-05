@@ -1,0 +1,82 @@
+<ng-template #statusTemplate let-inspection="rowData">
+    <div class="d-flex gap-1">
+        <vp-status-icon *ngIf="inspection.inspectionResult"
+                        imageSrc="/images/icons/bstatus-green-on.png"
+                        text="Passed Inspection"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!inspection.inspectionResult"
+                        imageSrc="/images/icons/bstatus-green-off.png"
+                        text="Failed Inspection"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="inspection.transactionId"
+                        imageSrc="/images/icons/bstatus-red-on.png"
+                        text="Paid"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!inspection.transactionId"
+                        imageSrc="/images/icons/bstatus-red-off.png"
+                        text="Unpaid"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!inspection.disapproved"
+                        imageSrc="/images/icons/bstatus-orange-on.png"
+                        text="Approved"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="inspection.disapproved"
+                        imageSrc="/images/icons/bstatus-orange-off.png"
+                        text="Disapproved"
+                        [showText]="false" />
+    </div>
+</ng-template>
+
+<ng-template #reasonTemplate let-inspection="rowData">
+    <span class="small">{{ getReasonLabel(inspection.reasonForInspection) }}</span>
+</ng-template>
+
+<ng-template #inspectorTemplate let-inspection="rowData">
+    <div class="small">
+        <div *ngIf="inspection.inspectorCompanyName" class="fw-semibold">{{ inspection.inspectorCompanyName }}</div>
+        <div *ngIf="inspection.inspectorContactName">{{ inspection.inspectorContactName }}</div>
+    </div>
+</ng-template>
+
+<ng-container *ngIf="isVisible">
+    <div class="mt-3">
+        <vp-section header="CSI Inspections">
+            <div class="d-flex justify-content-center mb-3">
+                <div style="display: grid; grid-template-columns: repeat(3, auto); row-gap: 0.25rem; column-gap: 2rem;">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Passed Inspection" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Paid" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-orange-on.png" text="Approved" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Failed Inspection" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-red-off.png" text="Unpaid" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-orange-off.png" text="Disapproved" />
+                </div>
+            </div>
+
+            <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+            <div *ngIf="!table.isLoading">
+                <vp-table *ngIf="table.items && table.items.data && table.items.data.length > 0"
+                          [columns]="table.columns!"
+                          [data]="table.items.data"
+                          [(pageInfo)]="table.items.pageInfo"
+                          (pageInfoChange)="loadInspections()"
+                          [(query)]="table.query"
+                          (queryChange)="loadInspections()"
+                          (queryReset)="loadInspections()"
+                          [canViewDetails]="true"
+                          (viewDetails)="viewInspection($event)" />
+
+                <div *ngIf="!table.items || table.items.data.length === 0"
+                     class="text-center py-3 text-muted">
+                    No CSI inspections found for this site.
+                </div>
+            </div>
+
+            <div class="mt-3 text-center">
+                <button type="button" class="btn btn-primary" (click)="submitNewInspection()">
+                    Submit New CSI
+                </button>
+            </div>
+        </vp-section>
+    </div>
+</ng-container>

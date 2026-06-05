@@ -9,8 +9,7 @@ import { NgForm } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { InputOption } from "../../../shared/components/input/input.component";
 import { DownloadConfig } from "../../../shared/models/download-config";
-import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
-import { DownloadManagerComponent } from "../../../shared/components/data-components/download-manager/download-manager.component";
+import { DownloadService } from "../../../shared/services/download.service";
 
 @Component({
     standalone: false,
@@ -76,7 +75,7 @@ export class CsiInspectionListComponent implements OnInit {
         private readonly _csiInspectionService: CsiInspectionService,
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
-        private readonly _modalHelper: ModalHelperService
+        private readonly _downloadService: DownloadService
     ) {
         this.downloadConfig = {
             fileName: 'CSI Inspections',
@@ -209,9 +208,6 @@ export class CsiInspectionListComponent implements OnInit {
     }
 
     public showDownlaodManager(): void {
-        this._modalHelper.show(DownloadManagerComponent, {
-            title: 'Export Results',
-            model: this.downloadConfig
-        });
+        this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
     }
 }

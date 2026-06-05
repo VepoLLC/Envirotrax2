@@ -23,7 +23,7 @@ export class SiteService {
     public getAllEndpoint(): DownloadEndpoint {
         return {
             method: 'GET',
-            url: this._urlResolver.resolveUrl('/api/sites')
+            url: this._urlResolver.resolveUrl('/api/sites'),
         };
     }
 

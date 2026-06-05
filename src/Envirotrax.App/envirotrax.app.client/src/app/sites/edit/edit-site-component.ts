@@ -13,6 +13,10 @@ import { FacilityType } from '../../shared/enums/facility-type.enum';
 import { InputOption } from "../../shared/components/input/input.component";
 import { GreaseTrapType } from '../../shared/enums/grease-trap-type.enum';
 import { ToastService, ToastType } from '../../shared/services/toast.service';
+import { AuthService } from '../../shared/services/auth/auth.service';
+import { PermissionAction, PermissionType } from '../../shared/models/permission-type';
+
+type SiteTab = 'csi' | 'backflow';
 
 @Component({
     selector: 'app-edit-site-component',
@@ -21,6 +25,12 @@ import { ToastService, ToastType } from '../../shared/services/toast.service';
 })
 export class EditSiteComponent implements OnInit {
     public validationErrors: string[] = [];
+
+    public activeTab: SiteTab = 'csi';
+    public canViewCsi: boolean = false;
+    public canViewBackflow: boolean = false;
+    public csiInitialized: boolean = false;
+    public backflowInitialized: boolean = false;
 
     public site: Site = {
         backflowScheduleMonth: 0,
@@ -59,11 +69,13 @@ export class EditSiteComponent implements OnInit {
         private readonly _router: Router,
         private readonly _helper: HelperService,
         private readonly _userService: UserService,
-        private readonly _toastService: ToastService
+        private readonly _toastService: ToastService,
+        private readonly _authService: AuthService
     ) {
     }
 
     public async ngOnInit(): Promise<void> {
+        await this.loadPermissions();
         await this.loadStates();
         await this.getUsers();
         this._acitvatedRoute.paramMap.subscribe(async params => {
@@ -73,6 +85,28 @@ export class EditSiteComponent implements OnInit {
                 this.currentSite = { ...this.site };
             }
         });
+    }
+
+    private async loadPermissions(): Promise<void> {
+        this.canViewCsi = await this._authService.hasAnyPermisison(
+            PermissionAction.CanView, PermissionType.CsiInspections);
+        this.canViewBackflow = await this._authService.hasAnyPermisison(
+            PermissionAction.CanView, PermissionType.BackflowTests);
+        this.activeTab = this.canViewCsi ? 'csi' : 'backflow';
+        this.markActiveTabInitialized();
+    }
+
+    public setActiveTab(tab: SiteTab): void {
+        this.activeTab = tab;
+        this.markActiveTabInitialized();
+    }
+
+    private markActiveTabInitialized(): void {
+        if (this.activeTab === 'csi') {
+            this.csiInitialized = true;
+        } else if (this.activeTab === 'backflow') {
+            this.backflowInitialized = true;
+        }
     }
 
     public propertyTypeOptions: InputOption[] = [

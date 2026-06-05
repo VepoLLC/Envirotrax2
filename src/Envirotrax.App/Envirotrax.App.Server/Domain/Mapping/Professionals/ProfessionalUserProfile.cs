@@ -16,14 +16,13 @@ public class ProfessionalUserProfile : Profile
             .ReverseMap()
             .ForMember(proUser => proUser.User, opt => opt.Ignore())
             .ForMember(proUser => proUser.UserId, opt => opt.MapFrom(proUser => proUser.Id));
-        
-         CreateMap<AppUser, ReferencedProfessionalUserDto>()
-                .ForMember(d => d.EmailAddress, opt => opt.MapFrom(s => s.Email))
-                .ForMember(d => d.ContactName, opt => opt.Ignore());
+
+        CreateMap<AppUser, ReferencedProfessionalUserDto>()
+               .ForMember(d => d.EmailAddress, opt => opt.MapFrom(s => s.Email))
+               .ForMember(d => d.ContactName, opt => opt.Ignore());
 
         CreateMap<ProfessionalUser, ReferencedProfessionalUserDto>()
-            .ForMember(d => d.Id, opt => opt.MapFrom(s => s.UserId))
-            .ForMember(d => d.EmailAddress, opt => opt.MapFrom(s => s.User != null ? s.User.Email : null))
-            .ForMember(d => d.ContactName, opt => opt.MapFrom(s => s.ContactName));
+            .ForMember(proUser => proUser.Id, opt => opt.MapFrom(proUser => proUser.UserId))
+            .ForMember(proUser => proUser.EmailAddress, opt => opt.MapFrom(proUser => proUser.User!.Email));
     }
 }

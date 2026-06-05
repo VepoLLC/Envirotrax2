@@ -340,6 +340,13 @@ public class BackflowTestDto : IDto
 
     public bool NeedsValidation { get; set; }
 
+    // Images
+    public string? AssemblyImagePath { get; set; }
+    public string? SerialNumberImagePath { get; set; }
+    public string? BypassAssemblyImagePath { get; set; }
+    public string? BypassSerialNumberImagePath { get; set; }
+    public string? AirGapImagePath { get; set; }
+
     // Audit
     public DateTime CreatedTime { get; set; }
     public DateTime? UpdatedTime { get; set; }

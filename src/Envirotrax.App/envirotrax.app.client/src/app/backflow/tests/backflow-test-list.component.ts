@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BackflowTestService } from '../../shared/services/backflow/backflow-test.service';
+import { BackflowTestOptionsService } from '../../shared/services/backflow/backflow-test-options.service';
 import { GisAreaService } from '../../shared/services/gis-areas/gis-area.service';
 import { GisAreaCoordinateService } from '../../shared/services/gis-areas/gis-area-coordinate.service';
 import { GisMapService } from '../../shared/services/gis-areas/gis-map.service';
@@ -12,7 +13,6 @@ import { GisArea } from '../../shared/models/gis-areas/gis-area';
 import { TableColumn } from '../../shared/components/data-components/table/table.component';
 import { ColumnType } from '../../shared/components/data-components/sorting-filtering/query-view-model';
 import { InputOption } from '../../shared/components/input/input.component';
-import { BackflowTestResult, BackflowReasonForTest } from '../../shared/models/backflow/backflow-test-enums';
 import { FacilityType } from '../../shared/enums/facility-type.enum';
 import { MapMarker, MapPolygon } from '../../shared/components/map/map.component';
 
@@ -51,29 +51,10 @@ export class BackflowTestListComponent implements OnInit {
         { id: "true", text: "Latest Test Only" }
     ];
 
-    public testResultOptions: InputOption[] = [
-        { id: "", text: "All Test Results" },
-        { id: BackflowTestResult.Pass.toString(), text: "Pass" },
-        { id: BackflowTestResult.Fail.toString(), text: "Fail" },
-        { id: BackflowTestResult.PassAfterRepairs.toString(), text: "Pass After Repairs" }
-    ];
-
     public serviceStatusOptions: InputOption[] = [
         { id: "", text: "All Status Types" },
         { id: "false", text: "Active Only" },
         { id: "true", text: "Out of Service Only" }
-    ];
-
-    public paymentStatusOptions: InputOption[] = [
-        { id: "", text: "Any Status" },
-        { id: "true", text: "Paid" },
-        { id: "false", text: "Unpaid" }
-    ];
-
-    public approvalStatusOptions: InputOption[] = [
-        { id: "", text: "Any Status" },
-        { id: "false", text: "Approved" },
-        { id: "true", text: "Disapproved" }
     ];
 
     public rejectedStatusOptions: InputOption[] = [
@@ -82,15 +63,10 @@ export class BackflowTestListComponent implements OnInit {
         { id: "true", text: "Rejected" }
     ];
 
-    public reasonForTestOptions: InputOption[] = [
-        { id: "", text: "All Values" },
-        { id: BackflowReasonForTest.AnnualTest.toString(), text: "Annual Test" },
-        { id: BackflowReasonForTest.NewInstallation.toString(), text: "New Installation" },
-        { id: BackflowReasonForTest.ExistingInstallation.toString(), text: "Existing Installation" },
-        { id: BackflowReasonForTest.Replacement.toString(), text: "Replacement" },
-        { id: BackflowReasonForTest.Repair.toString(), text: "Repair" },
-        { id: BackflowReasonForTest.AnnualTestAfterRepairs.toString(), text: "Annual Test After Repairs" }
-    ];
+    public testResultOptions: InputOption[];
+    public paymentStatusOptions: InputOption[];
+    public approvalStatusOptions: InputOption[];
+    public reasonForTestOptions: InputOption[];
 
     public yesNoOptions: InputOption[] = [
         { id: "", text: "Any Value" },
@@ -110,24 +86,7 @@ export class BackflowTestListComponent implements OnInit {
         { id: "1", text: "Commercial" }
     ];
 
-    public hazardTypeOptions: InputOption[] = [
-        { id: "", text: "All Hazard Types" },
-        { id: "Agricultural/Feed Lot", text: "Agricultural/Feed Lot" },
-        { id: "Domestic/Premises Isolation", text: "Domestic/Premises Isolation" },
-        { id: "Fire System", text: "Fire System" },
-        { id: "Gas Station/Car Wash", text: "Gas Station/Car Wash" },
-        { id: "Irrigation - Non Chemical", text: "Irrigation - Non Chemical" },
-        { id: "Irrigation - Chemical Feed", text: "Irrigation - Chemical Feed" },
-        { id: "Laundry/Cleaners", text: "Laundry/Cleaners" },
-        { id: "Medical/Dental/Laboratory/Mortuary", text: "Medical/Dental/Laboratory/Mortuary" },
-        { id: "Nails/Salon/Grooming", text: "Nails/Salon/Grooming" },
-        { id: "Pool/Recreation/Athletics", text: "Pool/Recreation/Athletics" },
-        { id: "Restaurant/Vending/Grocery", text: "Restaurant/Vending/Grocery" },
-        { id: "Fire Hydrant/Temporary Construction", text: "Fire Hydrant/Temporary Construction" },
-        { id: "Fountains/Garden Ponds/Water Features", text: "Fountains/Garden Ponds/Water Features" },
-        { id: "Water Softener", text: "Water Softener" },
-        { id: "Other", text: "Other" }
-    ];
+    public hazardTypeOptions: InputOption[];
 
     public facilityTypeOptions: InputOption[] = [
         { id: FacilityType.Other.toString(), text: "Other" },
@@ -144,26 +103,23 @@ export class BackflowTestListComponent implements OnInit {
         { id: FacilityType.CityOwnedFacility.toString(), text: "City-owned facility" }
     ];
 
-    public deviceTypeOptions: InputOption[] = [
-        { id: "", text: "All Device Types" },
-        { id: "DC", text: "DC - Double Check Valve" },
-        { id: "DCD", text: "DCD - Double Check Detector" },
-        { id: "DCD2", text: "DCD2 - Double Check Detector Type II" },
-        { id: "RP", text: "RP - Reduced Pressure Principle" },
-        { id: "RPPD", text: "RPPD - Reduced Pressure Principle Detector" },
-        { id: "RPPD2", text: "RPPD2 - Reduced Pressure Principle Detector Type II" },
-        { id: "PVB", text: "PVB - Pressure Vacuum Breaker" },
-        { id: "SVB", text: "SVB - Spill-Resistant Pressure Vacuum Breaker" },
-        { id: "AG", text: "AG - Air Gap" }
-    ];
+    public deviceTypeOptions: InputOption[];
 
     constructor(
         private readonly _backflowTestService: BackflowTestService,
         private readonly _router: Router,
         private readonly _gisAreaService: GisAreaService,
         private readonly _coordinateService: GisAreaCoordinateService,
-        private readonly _gisMapService: GisMapService
-    ) {}
+        private readonly _gisMapService: GisMapService,
+        private readonly _options: BackflowTestOptionsService
+    ) {
+        this.testResultOptions = this._options.testResultOptions;
+        this.paymentStatusOptions = this._options.paymentStatusOptions;
+        this.approvalStatusOptions = this._options.approvalStatusOptions;
+        this.reasonForTestOptions = this._options.reasonFilterOptions;
+        this.hazardTypeOptions = this._options.hazardTypeFilterOptions;
+        this.deviceTypeOptions = this._options.deviceTypeFilterOptions;
+    }
 
     public async ngOnInit(): Promise<void> {}
 

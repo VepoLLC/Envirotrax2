@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { BackflowTest } from '../../../shared/models/backflow/backflow-test';
 import { BackflowTestService } from '../../../shared/services/backflow/backflow-test.service';
+import { BackflowTestOptionsService } from '../../../shared/services/backflow/backflow-test-options.service';
 import { BackflowGaugeService } from '../../../shared/services/backflow/backflow-gauge.service';
 import { ProfesisonalService } from '../../../shared/services/professionals/professional.service';
 import { ProfesionalUserService } from '../../../shared/services/professionals/professional-user.service';
@@ -49,44 +50,9 @@ export class BackflowTestSubmitComponent implements OnInit {
     public readonly ExpirationType = ExpirationType;
     public readonly GaugeExpirationType = GaugeExpirationType;
 
-    public readonly deviceTypeOptions: InputOption[] = [
-        { id: BackflowDeviceType.DC, text: 'DC - Double Check Valve' },
-        { id: BackflowDeviceType.DCD, text: 'DCD - Double Check Detector' },
-        { id: BackflowDeviceType.DCD2, text: 'DCD2 - Double Check Detector Type II' },
-        { id: BackflowDeviceType.RP, text: 'RP - Reduced Pressure Principle' },
-        { id: BackflowDeviceType.RPPD, text: 'RPPD - Reduced Pressure Principle Detector' },
-        { id: BackflowDeviceType.RPPD2, text: 'RPPD2 - Reduced Pressure Principle Detector Type II' },
-        { id: BackflowDeviceType.PVB, text: 'PVB - Pressure Vacuum Breaker' },
-        { id: BackflowDeviceType.SVB, text: 'SVB - Spill-Resistant Pressure Vacuum Breaker' },
-        { id: BackflowDeviceType.AG, text: 'AG - Air Gap' }
-    ];
-
-    public readonly hazardTypeOptions: InputOption[] = [
-        { id: 'Agricultural/Feed Lot', text: 'Agricultural/Feed Lot' },
-        { id: 'Domestic/Premises Isolation', text: 'Domestic/Premises Isolation' },
-        { id: 'Fire System', text: 'Fire System' },
-        { id: 'Gas Station/Car Wash', text: 'Gas Station/Car Wash' },
-        { id: 'Irrigation - Non Chemical', text: 'Irrigation - Non Chemical' },
-        { id: 'Irrigation - Chemical Feed', text: 'Irrigation - Chemical Feed' },
-        { id: 'Laundry/Cleaners', text: 'Laundry/Cleaners' },
-        { id: 'Medical/Dental/Laboratory/Mortuary', text: 'Medical/Dental/Laboratory/Mortuary' },
-        { id: 'Nails/Salon/Grooming', text: 'Nails/Salon/Grooming' },
-        { id: 'Pool/Recreation/Athletics', text: 'Pool/Recreation/Athletics' },
-        { id: 'Restaurant/Vending/Grocery', text: 'Restaurant/Vending/Grocery' },
-        { id: 'Fire Hydrant/Temporary Construction', text: 'Fire Hydrant/Temporary Construction' },
-        { id: 'Fountains/Garden Ponds/Water Features', text: 'Fountains/Garden Ponds/Water Features' },
-        { id: 'Water Softener', text: 'Water Softener' },
-        { id: 'Other', text: 'Other' }
-    ];
-
-    public readonly reasonOptions: InputOption[] = [
-        { id: BackflowReasonForTest.AnnualTest, text: 'Annual Test' },
-        { id: BackflowReasonForTest.NewInstallation, text: 'New Installation' },
-        { id: BackflowReasonForTest.ExistingInstallation, text: 'Existing Installation' },
-        { id: BackflowReasonForTest.Replacement, text: 'Replacement' },
-        { id: BackflowReasonForTest.Repair, text: 'Repair' },
-        { id: BackflowReasonForTest.AnnualTestAfterRepairs, text: 'Annual Test After Repairs' }
-    ];
+    public readonly deviceTypeOptions: InputOption[];
+    public readonly hazardTypeOptions: InputOption[];
+    public readonly reasonOptions: InputOption[];
 
     public model: BackflowTest = {
         id: 0,
@@ -134,8 +100,13 @@ export class BackflowTestSubmitComponent implements OnInit {
         private readonly _gaugeService: BackflowGaugeService,
         private readonly _professionalService: ProfesisonalService,
         private readonly _userService: ProfesionalUserService,
-        private readonly _supplierService: ProfessionalSupplierService
-    ) { }
+        private readonly _supplierService: ProfessionalSupplierService,
+        private readonly _options: BackflowTestOptionsService
+    ) {
+        this.deviceTypeOptions = this._options.deviceTypeOptions;
+        this.hazardTypeOptions = this._options.hazardTypeOptions;
+        this.reasonOptions = this._options.reasonOptions;
+    }
 
     public ngOnInit(): void {
         this._activatedRoute.paramMap.subscribe(async params => {

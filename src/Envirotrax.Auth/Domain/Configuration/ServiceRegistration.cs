@@ -3,9 +3,11 @@ using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using Envirotrax.Auth.Areas.OpenIdConnect.Services;
 using Envirotrax.Auth.Data;
+using Envirotrax.Auth.Data.Models;
 using Envirotrax.Auth.Domain.Services.Definitions;
 using Envirotrax.Auth.Domain.Services.Implementations;
 using Envirotrax.Common.Configuration;
+using Microsoft.AspNetCore.Identity;
 using Quartz;
 
 namespace Envirotrax.Auth.Domain.Configuration
@@ -66,7 +68,8 @@ namespace Envirotrax.Auth.Domain.Configuration
                         "envirotrax_app",
                         "envirotrax_app_internal",
                         "task_runner",
-                        "envirotrax_admin");
+                        "envirotrax_admin",
+                        "envirotrax_admin_internal");
 
                     // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
                     var aspNetOptions = options.UseAspNetCore();
@@ -125,6 +128,8 @@ namespace Envirotrax.Auth.Domain.Configuration
         public static IServiceCollection AddDomainServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
         {
             AddOpenIdConnect(services, configuration, environment);
+
+            services.AddScoped<IUserClaimsPrincipalFactory<AppUser>, AppUserClaimsPrincipalFactory>();
 
             services.AddEmailService(configuration.GetSection("Email"), options =>
             {

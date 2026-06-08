@@ -5,6 +5,7 @@ public class RoleDefinitions
 {
     public const string WaterSupplier = "Ws";
     public const string Professional = "Pro";
+    public const string SuperUser = "SpUsr";
 
     public class Professionals
     {

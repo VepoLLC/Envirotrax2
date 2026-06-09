@@ -2,6 +2,7 @@ import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core'
 import { NgForm } from '@angular/forms';
 import { BackflowTest } from '../../../shared/models/backflow/backflow-test';
 import { BackflowTestService } from '../../../shared/services/backflow/backflow-test.service';
+import { BackflowTestOptionsService } from '../../../shared/services/backflow/backflow-test-options.service';
 import { TableViewModel } from '../../../shared/models/table-view-model';
 import { CellTemplateData, TableColumn } from '../../../shared/components/data-components/table/table.component';
 import { ColumnType } from '../../../shared/components/data-components/sorting-filtering/query-view-model';
@@ -54,29 +55,10 @@ export class SiteBackflowTestsComponent implements OnInit {
         { id: 'true', text: 'View current tests only' }
     ];
 
-    public testResultOptions: InputOption[] = [
-        { id: '', text: 'All Test Results' },
-        { id: BackflowTestResult.Pass.toString(), text: 'Pass' },
-        { id: BackflowTestResult.Fail.toString(), text: 'Fail' },
-        { id: BackflowTestResult.PassAfterRepairs.toString(), text: 'Pass After Repairs' }
-    ];
-
     public serviceStatusOptions: InputOption[] = [
         { id: '', text: 'All Status Types' },
         { id: 'false', text: 'In Service' },
         { id: 'true', text: 'Out of Service' }
-    ];
-
-    public paymentStatusOptions: InputOption[] = [
-        { id: '', text: 'Any Status' },
-        { id: 'true', text: 'Paid' },
-        { id: 'false', text: 'Unpaid' }
-    ];
-
-    public approvalStatusOptions: InputOption[] = [
-        { id: '', text: 'Any Status' },
-        { id: 'false', text: 'Approved' },
-        { id: 'true', text: 'Disapproved' }
     ];
 
     public rejectedStatusOptions: InputOption[] = [
@@ -85,29 +67,19 @@ export class SiteBackflowTestsComponent implements OnInit {
         { id: 'true', text: 'Rejected' }
     ];
 
-    public hazardTypeOptions: InputOption[] = [
-        { id: '', text: 'All Hazard Types' },
-        { id: 'Agricultural/Feed Lot', text: 'Agricultural/Feed Lot' },
-        { id: 'Domestic/Premises Isolation', text: 'Domestic/Premises Isolation' },
-        { id: 'Fire System', text: 'Fire System' },
-        { id: 'Gas Station/Car Wash', text: 'Gas Station/Car Wash' },
-        { id: 'Irrigation - Non Chemical', text: 'Irrigation - Non Chemical' },
-        { id: 'Irrigation - Chemical Feed', text: 'Irrigation - Chemical Feed' },
-        { id: 'Laundry/Cleaners', text: 'Laundry/Cleaners' },
-        { id: 'Medical/Dental/Laboratory/Mortuary', text: 'Medical/Dental/Laboratory/Mortuary' },
-        { id: 'Nails/Salon/Grooming', text: 'Nails/Salon/Grooming' },
-        { id: 'Pool/Recreation/Athletics', text: 'Pool/Recreation/Athletics' },
-        { id: 'Restaurant/Vending/Grocery', text: 'Restaurant/Vending/Grocery' },
-        { id: 'Fire Hydrant/Temporary Construction', text: 'Fire Hydrant/Temporary Construction' },
-        { id: 'Fountains/Garden Ponds/Water Features', text: 'Fountains/Garden Ponds/Water Features' },
-        { id: 'Water Softener', text: 'Water Softener' },
-        { id: 'Other', text: 'Other' }
-    ];
+    public testResultOptions: InputOption[];
+    public approvalStatusOptions: InputOption[];
+    public hazardTypeOptions: InputOption[];
 
     constructor(
         private readonly _backflowTestService: BackflowTestService,
-        private readonly _authService: AuthService
-    ) { }
+        private readonly _authService: AuthService,
+        private readonly _options: BackflowTestOptionsService
+    ) {
+        this.testResultOptions = this._options.testResultOptions;
+        this.approvalStatusOptions = this._options.approvalStatusOptions;
+        this.hazardTypeOptions = this._options.hazardTypeFilterOptions;
+    }
 
     public async ngOnInit(): Promise<void> {
         this.canViewTesters = await this._authService.hasAnyPermisison(

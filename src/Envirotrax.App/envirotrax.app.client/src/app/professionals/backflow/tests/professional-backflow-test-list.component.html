@@ -277,6 +277,11 @@
             Export Results
         </button>
         <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
+                (click)="viewPrintableTable()">
+            <i class="fa-regular fa-table me-1"></i>
+            View Printable Table
+        </button>
+        <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
                 (click)="showResults = false;">
             <i class="fa-solid fa-magnifying-glass me-1"></i>
             Search Again
@@ -284,51 +289,55 @@
     </div>
 
     <vp-section [noPadding]="true" header="Backflow Assembly Tests Matching the Search Filter - {{ table.items?.pageInfo?.totalItems ?? 0 }} Results">
-        <div class="row gap-2 justify-content-center mb-3">
-            <div class="col-auto mb-2">
-                <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Current Test" />
-                <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Non Current Test" />
+        <div #printableSection>
+            <div  class="row gap-2 justify-content-center mb-3">
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Current Test" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Non Current Test" />
+                </div>
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-magenta-on.png" text="Passed Test" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-magenta-off.png" text="Failed Test" />
+                </div>
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-blue-on.png" text="In Service" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-blue-off.png" text="Out of Service" />
+                </div>
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-orange-on.png" text="Paid" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-orange-off.png" text="Unpaid" />
+                </div>
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-cyan-on.png" text="Approved" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-cyan-off.png" text="Disapproved" />
+                </div>
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Accepted" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-red-off.png" text="Rejected" />
+                </div>
+                <div class="col-auto mb-2">
+                    <div><i class="fa-solid fa-home text-primary me-1"></i>Residential</div>
+                    <div><i class="fa-solid fa-building text-danger me-1"></i>Commercial</div>
+                </div>
             </div>
-            <div class="col-auto mb-2">
-                <vp-status-icon imageSrc="/images/icons/bstatus-magenta-on.png" text="Passed Test" />
-                <vp-status-icon imageSrc="/images/icons/bstatus-magenta-off.png" text="Failed Test" />
-            </div>
-            <div class="col-auto mb-2">
-                <vp-status-icon imageSrc="/images/icons/bstatus-blue-on.png" text="In Service" />
-                <vp-status-icon imageSrc="/images/icons/bstatus-blue-off.png" text="Out of Service" />
-            </div>
-            <div class="col-auto mb-2">
-                <vp-status-icon imageSrc="/images/icons/bstatus-orange-on.png" text="Paid" />
-                <vp-status-icon imageSrc="/images/icons/bstatus-orange-off.png" text="Unpaid" />
-            </div>
-            <div class="col-auto mb-2">
-                <vp-status-icon imageSrc="/images/icons/bstatus-cyan-on.png" text="Approved" />
-                <vp-status-icon imageSrc="/images/icons/bstatus-cyan-off.png" text="Disapproved" />
-            </div>
-            <div class="col-auto mb-2">
-                <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Accepted" />
-                <vp-status-icon imageSrc="/images/icons/bstatus-red-off.png" text="Rejected" />
-            </div>
-            <div class="col-auto mb-2">
-                <div><i class="fa-solid fa-home text-primary me-1"></i>Residential</div>
-                <div><i class="fa-solid fa-building text-danger me-1"></i>Commercial</div>
-            </div>
-        </div>
 
-        @if (table.items && table.items.data && table.items.data.length > 0) {
-            <vp-table [columns]="table.columns!"
-                      [data]="table.items.data"
-                      [(pageInfo)]="table.items.pageInfo"
-                      (pageInfoChange)="getTests()"
-                      [(query)]="table.query"
-                      (queryChange)="getTests()"
-                      (queryReset)="getTests()"
-                      [freeTextSearch]="table.freeTextSearch" />
-        }
-        @if (table.items?.data?.length === 0) {
-            <div class="text-center py-3 text-muted">
-                No records found matching the search criteria.
-            </div>
-        }
+            @if (table.items && table.items.data && table.items.data.length > 0) {
+                <vp-table [columns]="table.columns!"
+                        [data]="table.items.data"
+                        [(pageInfo)]="table.items.pageInfo"
+                        (pageInfoChange)="getTests()"
+                        [(query)]="table.query"
+                        (queryChange)="getTests()"
+                        (queryReset)="getTests()"
+                        [freeTextSearch]="table.freeTextSearch" />
+            }
+            @if (table.items?.data?.length === 0) {
+                <div class="text-center py-3 text-muted">
+                    No records found matching the search criteria.
+                </div>
+            }
+        </div>
+        
     </vp-section>
+
 </div>

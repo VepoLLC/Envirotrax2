@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BackflowTestService } from '../../../shared/services/backflow/backflow-test.service';
@@ -12,6 +12,7 @@ import { InputOption } from '../../../shared/components/input/input.component';
 import { BackflowTestResult } from '../../../shared/models/backflow/backflow-test-enums';
 import { DownloadConfig } from '../../../shared/models/download-config';
 import { DownloadService } from '../../../shared/services/download.service';
+import { PrintableTableService } from '../../../shared/services/printable-table.service';
 
 @Component({
     standalone: false,
@@ -35,6 +36,9 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
 
     @ViewChild('viewTemplate', { static: true })
     public viewTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
+
+    @ViewChild('printableSection')
+    private _printableSection!: ElementRef;
 
     public readonly BackflowTestResult = BackflowTestResult;
 
@@ -75,7 +79,8 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
         private readonly _backflowTestService: BackflowTestService,
         private readonly _supplierService: ProfessionalSupplierService,
         private readonly _router: Router,
-        private readonly _downloadService: DownloadService
+        private readonly _downloadService: DownloadService,
+        private readonly _printService: PrintableTableService
     ) {
         this.downloadConfig = {
             fileName: 'Backflow Tests',
@@ -128,6 +133,10 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
 
     public showDownloadManager(): void {
         this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
+    }
+
+    public viewPrintableTable(): void {
+        this._printService.open(this._printableSection.nativeElement);
     }
 
     public viewTest(test: BackflowTest): void {

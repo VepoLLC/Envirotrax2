@@ -3,7 +3,8 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { NgForm } from "@angular/forms";
 import { BackflowTest } from "../../../shared/models/backflow/backflow-test";
 import { BackflowTestService } from "../../../shared/services/backflow/backflow-test.service";
-import { BackflowReasonForTest, BackflowTestResult } from "../../../shared/models/backflow/backflow-test-enums";
+import { BackflowTestOptionsService } from "../../../shared/services/backflow/backflow-test-options.service";
+import { BackflowDeviceType, BackflowReasonForTest, BackflowTestResult } from "../../../shared/models/backflow/backflow-test-enums";
 import { State } from "../../../shared/models/lookup/state";
 import { LookupService } from "../../../shared/services/lookup/lookup.service";
 import { InputOption } from "../../../shared/components/input/input.component";
@@ -66,6 +67,7 @@ export class BackflowTestDetailsComponent implements OnInit {
 
     public readonly BackflowTestResult = BackflowTestResult;
     public readonly BackflowReasonForTest = BackflowReasonForTest;
+    public readonly BackflowDeviceType = BackflowDeviceType;
 
     @ViewChild('historyStatusTemplate', { static: true })
     public historyStatusTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
@@ -111,27 +113,10 @@ export class BackflowTestDetailsComponent implements OnInit {
     public stagedImagePreviews: Record<string, string | null> = {};
     public savingImageTypes: string[] = [];
 
-    private readonly _bypassDeviceTypes = ['DCD', 'DCD2', 'RPPD', 'RPPD2'];
-    private readonly _meterTestDeviceTypes = ['DCD', 'DCD2', 'RPPD', 'RPPD2'];
+    private readonly _bypassDeviceTypes: string[] = [BackflowDeviceType.DCD, BackflowDeviceType.DCD2, BackflowDeviceType.RPPD, BackflowDeviceType.RPPD2];
+    private readonly _meterTestDeviceTypes: string[] = [BackflowDeviceType.DCD, BackflowDeviceType.DCD2, BackflowDeviceType.RPPD, BackflowDeviceType.RPPD2];
 
-    public hazardTypeOptions: InputOption[] = [
-        { id: '', text: '' },
-        { id: 'Agricultural/Feed Lot', text: 'Agricultural/Feed Lot' },
-        { id: 'Domestic/Premises Isolation', text: 'Domestic/Premises Isolation' },
-        { id: 'Fire System', text: 'Fire System' },
-        { id: 'Gas Station/Car Wash', text: 'Gas Station/Car Wash' },
-        { id: 'Irrigation - Non Chemical', text: 'Irrigation - Non Chemical' },
-        { id: 'Irrigation - Chemical Feed', text: 'Irrigation - Chemical Feed' },
-        { id: 'Laundry/Cleaners', text: 'Laundry/Cleaners' },
-        { id: 'Medical/Dental/Laboratory/Mortuary', text: 'Medical/Dental/Laboratory/Mortuary' },
-        { id: 'Nails/Salon/Grooming', text: 'Nails/Salon/Grooming' },
-        { id: 'Pool/Recreation/Athletics', text: 'Pool/Recreation/Athletics' },
-        { id: 'Restaurant/Vending/Grocery', text: 'Restaurant/Vending/Grocery' },
-        { id: 'Fire Hydrant/Temporary Construction', text: 'Fire Hydrant/Temporary Construction' },
-        { id: 'Fountains/Garden Ponds/Water Features', text: 'Fountains/Garden Ponds/Water Features' },
-        { id: 'Water Softener', text: 'Water Softener' },
-        { id: 'Other', text: 'Other' }
-    ];
+    public hazardTypeOptions: InputOption[] = [];
 
     private readonly _valveColumns: ValveColumn[] = [
         {
@@ -207,14 +192,14 @@ export class BackflowTestDetailsComponent implements OnInit {
     ];
 
     private readonly _deviceColumnMap: Record<string, number[]> = {
-        DC: [1, 2],
-        DCD: [1, 2, 4, 5],
-        DCD2: [1, 2, 7],
-        RP: [1, 2, 3],
-        RPPD: [1, 2, 3, 4, 5, 6],
-        RPPD2: [1, 2, 3, 7],
-        PVB: [8, 9],
-        SVB: [8, 9]
+        [BackflowDeviceType.DC]: [1, 2],
+        [BackflowDeviceType.DCD]: [1, 2, 4, 5],
+        [BackflowDeviceType.DCD2]: [1, 2, 7],
+        [BackflowDeviceType.RP]: [1, 2, 3],
+        [BackflowDeviceType.RPPD]: [1, 2, 3, 4, 5, 6],
+        [BackflowDeviceType.RPPD2]: [1, 2, 3, 7],
+        [BackflowDeviceType.PVB]: [8, 9],
+        [BackflowDeviceType.SVB]: [8, 9]
     };
 
     private readonly _propertyTypeLabels: Record<number, string> = {
@@ -222,31 +207,10 @@ export class BackflowTestDetailsComponent implements OnInit {
         1: 'Commercial'
     };
 
-    private readonly _reasonForTestLabels: Record<number, string> = {
-        [BackflowReasonForTest.AnnualTest]: 'Annual Test',
-        [BackflowReasonForTest.NewInstallation]: 'New Installation',
-        [BackflowReasonForTest.ExistingInstallation]: 'Existing Installation',
-        [BackflowReasonForTest.Replacement]: 'Replacement',
-        [BackflowReasonForTest.Repair]: 'Repair',
-        [BackflowReasonForTest.AnnualTestAfterRepairs]: 'Annual Test After Repairs'
-    };
-
     private readonly _testResultLabels: Record<number, string> = {
         [BackflowTestResult.Pass]: 'Passed',
         [BackflowTestResult.Fail]: 'Failed',
         [BackflowTestResult.PassAfterRepairs]: 'Passed After Repairs'
-    };
-
-    private readonly _deviceTypeLabels: Record<string, string> = {
-        DC: 'DC - Double Check Valve',
-        DCD: 'DCD - Double Check Detector',
-        DCD2: 'DCD2 - Double Check Detector Type II',
-        RP: 'RP - Reduced Pressure Principle',
-        RPPD: 'RPPD - Reduced Pressure Principle Detector',
-        RPPD2: 'RPPD2 - Reduced Pressure Principle Detector Type II',
-        PVB: 'PVB - Pressure Vacuum Breaker',
-        SVB: 'SVB - Spill-Resistant Pressure Vacuum Breaker',
-        AG: 'AG - Air Gap'
     };
 
     constructor(
@@ -256,8 +220,11 @@ export class BackflowTestDetailsComponent implements OnInit {
         private readonly _lookupService: LookupService,
         private readonly _authService: AuthService,
         private readonly _toastService: ToastService,
-        private readonly _helper: HelperService
-    ) { }
+        private readonly _helper: HelperService,
+        private readonly _optionsService: BackflowTestOptionsService
+    ) {
+        this.hazardTypeOptions = [{ id: '', text: '' }, ...this._optionsService.hazardTypeOptions];
+    }
 
     public async ngOnInit(): Promise<void> {
         await this.initialize();
@@ -376,7 +343,7 @@ export class BackflowTestDetailsComponent implements OnInit {
     }
 
     public get showAirGapImages(): boolean {
-        return this.test?.deviceType === 'AG';
+        return this.test?.deviceType === BackflowDeviceType.AG;
     }
 
     private get visibleImageSlots(): ImageSlot[] {
@@ -549,7 +516,7 @@ export class BackflowTestDetailsComponent implements OnInit {
         if (this.test?.reasonForTest == null) {
             return '';
         }
-        return this._reasonForTestLabels[this.test.reasonForTest] ?? '';
+        return this._optionsService.reasonOptions.find(o => o.id === this.test!.reasonForTest)?.text ?? '';
     }
 
     public getTestResultLabel(): string {
@@ -563,7 +530,7 @@ export class BackflowTestDetailsComponent implements OnInit {
         if (!this.test?.deviceType) {
             return '';
         }
-        return this._deviceTypeLabels[this.test.deviceType] ?? this.test.deviceType;
+        return this._optionsService.deviceTypeOptions.find(o => o.id === this.test!.deviceType)?.text ?? this.test.deviceType;
     }
 
     private updateDisplayState(): void {

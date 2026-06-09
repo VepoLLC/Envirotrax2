@@ -284,7 +284,7 @@
                         </div>
                     </div>
 
-                    <div class="mt-2" *ngIf="test.deviceType !== 'AG'">
+                    <div class="mt-2" *ngIf="test.deviceType !== BackflowDeviceType.AG">
                         <div class="row mb-1">
                             <div class="col-md-9 fw-bold">
                                 Is the assembly installed in accordance with manufacturer recommendations and/or local codes?
@@ -299,7 +299,7 @@
                         </div>
                     </div>
 
-                    <div class="row mt-3" *ngIf="test.deviceType !== 'AG'">
+                    <div class="row mt-3" *ngIf="test.deviceType !== BackflowDeviceType.AG">
                         <div class="col-md-5"><strong>Differential Pressure Gauge Used:</strong> {{ gaugeDescription }}</div>
                         <div class="col-md-3"><strong>Serial Number:</strong> {{ test.gaugeSerialNumber }}</div>
                         <div class="col-md-4">
@@ -307,7 +307,7 @@
                         </div>
                     </div>
 
-                    <div class="table-responsive mt-3" *ngIf="test.deviceType !== 'AG'">
+                    <div class="table-responsive mt-3" *ngIf="test.deviceType !== BackflowDeviceType.AG">
                         <table class="table table-bordered table-sm text-center align-middle mb-0">
                             <thead>
                                 <tr>
@@ -400,7 +400,7 @@
                         </table>
                     </div>
 
-                    <div class="table-responsive mt-3" *ngIf="test.deviceType === 'AG'">
+                    <div class="table-responsive mt-3" *ngIf="test.deviceType === BackflowDeviceType.AG">
                         <table class="table table-bordered table-sm mb-0">
                             <tbody>
                                 <tr>

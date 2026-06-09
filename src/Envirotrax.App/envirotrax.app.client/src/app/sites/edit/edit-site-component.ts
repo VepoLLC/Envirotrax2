@@ -15,6 +15,7 @@ import { GreaseTrapType } from '../../shared/enums/grease-trap-type.enum';
 import { ToastService, ToastType } from '../../shared/services/toast.service';
 import { AuthService } from '../../shared/services/auth/auth.service';
 import { PermissionAction, PermissionType } from '../../shared/models/permission-type';
+import { FeatureType } from '../../shared/models/feature-type';
 
 type SiteTab = 'csi' | 'backflow';
 
@@ -26,7 +27,7 @@ type SiteTab = 'csi' | 'backflow';
 export class EditSiteComponent implements OnInit {
     public validationErrors: string[] = [];
 
-    public activeTab: SiteTab = 'csi';
+    public activeTab?: SiteTab;
     public canViewCsi: boolean = false;
     public canViewBackflow: boolean = false;
     public csiInitialized: boolean = false;
@@ -88,12 +89,19 @@ export class EditSiteComponent implements OnInit {
     }
 
     private async loadPermissions(): Promise<void> {
-        this.canViewCsi = await this._authService.hasAnyPermisison(
+        const canViewCsiPermission = await this._authService.hasAnyPermisison(
             PermissionAction.CanView, PermissionType.CsiInspections);
+        const hasCsiFeature = await this._authService.hasAnyFeatures(FeatureType.CsiInspection);
+        this.canViewCsi = canViewCsiPermission && hasCsiFeature;
+
         this.canViewBackflow = await this._authService.hasAnyPermisison(
             PermissionAction.CanView, PermissionType.BackflowTests);
-        this.activeTab = this.canViewCsi ? 'csi' : 'backflow';
-        this.markActiveTabInitialized();
+
+        if (this.canViewCsi) {
+            this.setActiveTab('csi');
+        } else if (this.canViewBackflow) {
+            this.setActiveTab('backflow');
+        }
     }
 
     public setActiveTab(tab: SiteTab): void {

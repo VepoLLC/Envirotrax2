@@ -4,7 +4,7 @@ import { ProfesionalUserService } from "../../../shared/services/professionals/p
 import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { NgForm } from "@angular/forms";
-import { InputOption } from "../../../shared/components/input/input.component";
+import { InputOption } from "@envirotrax/common-ui";
 
 @Component({
     standalone: false,

@@ -2,11 +2,10 @@ import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core"
 import { ExpirationType, ProfessionalUserLicense, professionalTypeLabels, ProfessionalType } from "../../../../../shared/models/professionals/licenses/professional-user-license";
 import { ProfessionalInsurance, ExpirationType as InsuranceExpirationType } from "../../../../../shared/models/professionals/professional-insurance";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
-import { CellTemplateData, TableColumn, TableCustomAction } from "../../../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { FogInspectorLicensesService } from "../../../../../shared/services/fog/fog-inspector-licenses.service";
 import { FogInspectorInsurancesService } from "../../../../../shared/services/fog/fog-inspector-insurances.service";
 import { DownloadService } from "../../../../../shared/services/download.service";
+import { CellTemplateData, ColumnType, TableColumn, TableCustomAction } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'vp-fog-inspector-license-insurances',

@@ -6,10 +6,9 @@ import { BackflowTest } from "../../../shared/models/backflow/backflow-test";
 import { Site } from "../../../shared/models/sites/site";
 import { BackflowTestService } from "../../../shared/services/backflow/backflow-test.service";
 import { SiteService } from "../../../shared/services/sites/site.service";
-import { CellTemplateData, TableColumn, TableCustomAction } from "../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { QueryProperty } from "../../../shared/models/query";
 import { PropertyType } from "../../../shared/enums/property-type.enum";
+import { CellTemplateData, ColumnType, TableColumn, TableCustomAction } from "@envirotrax/common-ui";
 
 @Component({
     standalone: false,

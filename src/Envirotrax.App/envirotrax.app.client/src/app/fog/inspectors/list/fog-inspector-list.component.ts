@@ -5,8 +5,7 @@ import { FogInspectorService } from "../../../shared/services/fog/fog-inspector.
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { Professional } from "../../../shared/models/professionals/professional";
-import { CellTemplateData, TableColumn } from "../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
+import { CellTemplateData, ColumnType, TableColumn } from '@envirotrax/common-ui';
 
 @Component({
     selector: 'app-fog-inspector-list',
@@ -23,9 +22,9 @@ export class FogInspectorListComponent implements OnInit {
         },
         freeTextSearch: {
             searchQuery: [
-                {field: 'name', operator: 'Ct', multiWordSearch: true},
-                {field: 'companyEmail', operator: 'Ct', multiWordSearch: true},
-                {field: 'phoneNumber', operator: 'Ct', multiWordSearch: true}
+                { field: 'name', operator: 'Ct', multiWordSearch: true },
+                { field: 'companyEmail', operator: 'Ct', multiWordSearch: true },
+                { field: 'phoneNumber', operator: 'Ct', multiWordSearch: true }
             ]
         }
     };

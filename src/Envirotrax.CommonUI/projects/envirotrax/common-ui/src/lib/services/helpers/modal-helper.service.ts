@@ -1,5 +1,5 @@
 import { Injectable, Type } from "@angular/core";
-import { ModalConfig, ModalReference, ModalService, ModalSize } from "@developer-partners/ngx-modal-dialog";
+import { ModalConfig, ModalReference, ModalService } from "@developer-partners/ngx-modal-dialog";
 import { ConfirmModalComponent } from "../../components/modals/confirm-modal.component";
 import { MessageModalComponent } from "../../components/modals/message-modal.component";
 

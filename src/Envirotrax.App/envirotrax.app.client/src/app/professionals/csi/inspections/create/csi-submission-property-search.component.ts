@@ -2,12 +2,11 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnInit, TemplateRef, ViewC
 import { ActivatedRoute, Router } from "@angular/router";
 import { TableViewModel } from "../../../../shared/models/table-view-model";
 import { SiteService } from "../../../../shared/services/sites/site.service";
-import { CellTemplateData, TableColumn, TableCustomAction } from "../../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { Site } from "../../../../shared/models/sites/site";
 import { PropertyType } from "../../../../shared/enums/property-type.enum";
 import { QueryProperty } from "../../../../shared/models/query";
 import { NgForm } from "@angular/forms";
+import { CellTemplateData, ColumnType, TableColumn, TableCustomAction } from "@envirotrax/common-ui";
 
 @Component({
     standalone: false,

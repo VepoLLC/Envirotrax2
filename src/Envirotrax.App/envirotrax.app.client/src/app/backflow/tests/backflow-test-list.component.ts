@@ -10,11 +10,8 @@ import { QueryProperty } from '../../shared/models/query';
 import { TableViewModel } from '../../shared/models/table-view-model';
 import { BackflowTest } from '../../shared/models/backflow/backflow-test';
 import { GisArea } from '../../shared/models/gis-areas/gis-area';
-import { TableColumn } from '../../shared/components/data-components/table/table.component';
-import { ColumnType } from '../../shared/components/data-components/sorting-filtering/query-view-model';
-import { InputOption } from '../../shared/components/input/input.component';
 import { FacilityType } from '../../shared/enums/facility-type.enum';
-import { MapMarker, MapPolygon } from '../../shared/components/map/map.component';
+import { ColumnType, InputOption, MapMarker, MapPolygon, TableColumn } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,
@@ -121,7 +118,7 @@ export class BackflowTestListComponent implements OnInit {
         this.deviceTypeOptions = this._options.deviceTypeFilterOptions;
     }
 
-    public async ngOnInit(): Promise<void> {}
+    public async ngOnInit(): Promise<void> { }
 
     private getColumns(): TableColumn<BackflowTest>[] {
         return [

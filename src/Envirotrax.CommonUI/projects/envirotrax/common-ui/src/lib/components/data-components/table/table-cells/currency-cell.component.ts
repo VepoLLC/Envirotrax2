@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { TableColumn } from "../table.component";
+import { TableColumn } from "../table-models";
 import { TableRowData } from "./table-cell.component";
 
 @Component({

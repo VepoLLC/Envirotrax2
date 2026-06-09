@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, Optional, SkipSelf } from "@angular/core";
 import { ControlContainer, NgForm } from "@angular/forms";
 import { FilterPanelComponent } from "./filter-panel.component";
-import { InputOption } from "../../../input/input.component";
+import { DateRange, InputOption } from "../../../input/input.component";
 
 @Component({
     selector: 'vp-filter-panel-field',
@@ -58,9 +58,4 @@ export class FilterPanelFieldComponent implements OnInit {
             this._parent.onFilterChanged();
         }
     }
-}
-
-export interface DateRange {
-    startDate?: string;
-    endDate?: string;
 }

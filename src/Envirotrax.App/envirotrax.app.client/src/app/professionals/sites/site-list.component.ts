@@ -3,12 +3,10 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { TableViewModel } from "../../shared/models/table-view-model";
 import { Site } from "../../shared/models/sites/site";
 import { SiteService } from "../../shared/services/sites/site.service";
-import { TableColumn } from "../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../shared/components/data-components/sorting-filtering/query-view-model";
 import { QueryProperty } from "../../shared/models/query";
 import { NgForm } from "@angular/forms";
-import { InputOption } from "../../shared/components/input/input.component";
 import { ProfessionalSupplierService } from "../../shared/services/professionals/professional-supplier.service";
+import { ColumnType, InputOption, TableColumn } from "@envirotrax/common-ui";
 
 @Component({
     standalone: false,

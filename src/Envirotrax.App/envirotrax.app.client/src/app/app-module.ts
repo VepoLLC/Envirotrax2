@@ -11,6 +11,8 @@ import { AuthInterceptor } from './shared/services/auth/auth.iterceptor';
 import { TimeZoneInterceptor } from './shared/services/helpers/timezone/timezone.interceptor';
 import { ToastContainerComponent } from './toast-container/toast-container.component';
 import { HomeComponent } from './home/home.component';
+import { API_BASE_URL } from '@envirotrax/common-ui';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [
@@ -26,6 +28,7 @@ import { HomeComponent } from './home/home.component';
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideHttpClient(withInterceptorsFromDi()),
+    { provide: API_BASE_URL, useValue: environment.apiUrl },
     {
       provide: TitleStrategy,
       useClass: AppTitleStrategy

@@ -1,5 +1,5 @@
 import { Component, Injectable, Injector, Input, OnInit, Type } from "@angular/core";
-import { TableColumn } from "./../table.component";
+import { TableColumn } from "./../table-models";
 
 @Component({
     selector: 'vp-table-cell',

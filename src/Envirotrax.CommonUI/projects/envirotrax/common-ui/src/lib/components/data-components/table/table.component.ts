@@ -1,8 +1,9 @@
 import { Component, EventEmitter, input, Input, OnChanges, Output, SimpleChanges, TemplateRef, Type, ViewChild } from "@angular/core";
 import { ModalService } from "@developer-partners/ngx-modal-dialog";
-import { ColumnType, QueryColumn, QueryPropertyLocation, SpecialColumnType } from "../sorting-filtering/query-view-model";
+import { ColumnType, QueryPropertyLocation, SpecialColumnType } from "../sorting-filtering/query-view-model";
 import { PageInfo } from "../../../models/page-info";
 import { ComparisonOperator, Query, QueryProperty } from "../../../models/query";
+import { CellTemplateData, ColumnSize, FreeTextQuery, FreeTextSearchSettings, TableColumn, TableCustomAction } from "./table-models";
 
 @Component({
     selector: 'vp-table',
@@ -308,91 +309,5 @@ export class TableComponent implements OnChanges {
     }
 }
 
-
-
-export interface TableColumn<T> extends QueryColumn {
-    /**
-     * Tells whether this column should be excluded from the table columns.
-     * Use this if you want to have only queryable property for this field, but not a column.
-     */
-    isTableColumnExcluded?: boolean;
-
-    /**
-     * Tells whether this should be excluded from the queryable fields.
-     * Use this if you want to exclude this field from table columns, but us it in sorting and filtering.
-     */
-    queryColumnExcluded?: boolean;
-
-    /**
-     * Tells whether the table column is invisible, but can be added back to table column from the column manager menu.
-     */
-    isInvisible?: boolean;
-
-    /**
-     * Custom cell template HTML to display.
-     */
-    cellTemplate?: TemplateRef<CellTemplateData<T>>;
-
-    /**
-     * Custom Angular component to use.
-     */
-    cellComponent?: Type<any>
-
-    /**
-    * CSS class to be added to the header row columns
-    */
-    headerCssClass?: string;
-
-    /**
-    * CSS class to be added to the body row cells
-    */
-    rowCssClass?: string;
-
-    /**
-     * Tells whether the column should be exluded from the downloaded CSV file.
-     */
-    isDownloadExcluded?: boolean;
-}
-
-//export { ColumnType, QueryColumnOption } from '../sorting-filtering/query-view-model'
-
-export interface CellTemplateData<T> {
-    rowData?: T;
-    column?: TableColumn<T>;
-}
-
-export interface TableCustomAction<T> {
-    text: string;
-    iconClass?: string;
-    action: (record: T) => Promise<void> | void;
-    hideAction?: (row: T) => boolean;
-}
-
-export enum ColumnSize {
-    OneUnit = 'col-md-1',
-    TwoUnits = 'col-md-2',
-    ThreeUnits = 'col-md-3',
-    FourUnit = 'col-md-4',
-    FiveUnits = 'col-md-5',
-    SixUnits = 'col-md-6',
-    SevenUnit = 'col-md-7',
-    EightUnits = 'col-md-8',
-    NineUnits = 'col-md-9',
-    TenUnit = 'col-md-10',
-    ElevenUnits = 'col-md-11',
-    TwelveUnits = 'col-md-12'
-}
-
-export interface FreeTextSearchSettings {
-    placeholder?: string;
-    text?: string;
-    searchQuery: FreeTextQuery[];
-}
-
-export interface FreeTextQuery {
-    field?: string;
-    operator?: ComparisonOperator;
-    logicalOperator?: 'And' | 'Or';
-    multiWordSearch?: boolean
-    placeholder?: string;
-}
+export type { TableColumn, CellTemplateData, TableCustomAction, FreeTextSearchSettings, FreeTextQuery } from './table-models';
+export { ColumnSize } from './table-models';

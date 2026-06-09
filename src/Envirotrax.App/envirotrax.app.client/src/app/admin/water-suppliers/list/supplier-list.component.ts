@@ -2,13 +2,11 @@ import { Component, OnInit } from "@angular/core";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { WaterSupplier } from "../../../shared/models/water-suppliers/water-supplier";
 import { WaterSupplierService } from "../../../shared/services/water-suppliers/water-supplier.service";
-import { TableColumn } from "../../../shared/components/data-components/table/table.component";
 import { ActivatedRoute, Router } from "@angular/router";
-import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
-import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { CreateSupplierComponent } from "../create/create-supplier.component";
 import { AuthService } from "../../../shared/services/auth/auth.service";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
+import { ColumnType, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 
 @Component({
     templateUrl: './supplier-list.component.html',

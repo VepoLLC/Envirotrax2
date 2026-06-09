@@ -4,10 +4,11 @@ import { Site } from '../sites/site';
 import { State } from '../lookup/state';
 import { WaterSupplierUser } from '../users/water-supplier-user';
 import { BackflowReasonForTest, BackflowTestResult } from './backflow-test-enums';
+import { ReferencedWaterSupplier } from '../csi/csi-inspection';
 
 export interface BackflowTest {
     id: number;
-    waterSupplier?: { id?: number } | null;
+    waterSupplier?: ReferencedWaterSupplier | null;
     site?: Site | null;
     createdTime?: string;
     updatedTime?: string;
@@ -23,6 +24,8 @@ export interface BackflowTest {
     bpatCity?: string;
     bpatZip?: string;
     bpatState?: State | null;
+    bpatWorkNumber?: string;
+    bpatCellNumber?: string;
     accountNumber?: string;
     propertyBusinessName?: string;
     propertyType?: number;

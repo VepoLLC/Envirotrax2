@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BackflowTestService } from '../../shared/services/backflow/backflow-test.service';
 import { GisAreaService } from '../../shared/services/gis-areas/gis-area.service';
 import { GisAreaCoordinateService } from '../../shared/services/gis-areas/gis-area-coordinate.service';
@@ -160,12 +160,17 @@ export class BackflowTestListComponent implements OnInit {
     constructor(
         private readonly _backflowTestService: BackflowTestService,
         private readonly _router: Router,
+        private readonly _activatedRoute: ActivatedRoute,
         private readonly _gisAreaService: GisAreaService,
         private readonly _coordinateService: GisAreaCoordinateService,
         private readonly _gisMapService: GisMapService
     ) {}
 
     public async ngOnInit(): Promise<void> {}
+
+    public viewDetails(test: BackflowTest): void {
+        this._router.navigate([test.id, 'view'], { relativeTo: this._activatedRoute });
+    }
 
     private getColumns(): TableColumn<BackflowTest>[] {
         return [

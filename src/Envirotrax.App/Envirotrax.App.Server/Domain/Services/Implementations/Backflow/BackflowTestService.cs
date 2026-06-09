@@ -17,6 +17,11 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 {
     private static readonly string[] AllowedFileExtensions = [".jpg", ".jpeg", ".gif", ".png", ".bmp", ".tiff"];
 
+    private static readonly HashSet<string> ValidImageTypes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "assembly", "serial-number", "bypass-assembly", "bypass-serial-number", "air-gap"
+    };
+
     private readonly IProfessionalRepository _professionalRepository;
     private readonly IProfessionalUserRepository _professionalUserRepository;
     private readonly IFileStorageService _fileStorageService;
@@ -128,6 +133,79 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
         scope.Complete();
         return saved;
+    }
+
+    public async Task<Uri?> GenerateImageUrlAsync(int id, string imageType, CancellationToken cancellationToken = default)
+    {
+        var dto = await GetAsync(id, cancellationToken);
+        if (dto == null)
+        {
+            return null;
+        }
+
+        var path = GetImagePath(dto, imageType);
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return null;
+        }
+
+        return await _fileStorageService.GenerateSasUrlAsync(path);
+    }
+
+    public async Task<BackflowTestDto?> UpdateImageAsync(int id, string imageType, Stream fileStream, string fileName, CancellationToken cancellationToken = default)
+    {
+        if (!ValidImageTypes.Contains(imageType))
+        {
+            throw new ValidationException("Invalid image type.");
+        }
+
+        var dto = await GetAsync(id, cancellationToken);
+        if (dto == null)
+        {
+            return null;
+        }
+
+        var extension = ValidateAndGetExtension(fileName);
+        var oldPath = GetImagePath(dto, imageType);
+        var newPath = $"backflow-tests/{id}/{imageType.ToLowerInvariant()}/{Guid.NewGuid()}{extension}";
+        SetImagePath(dto, imageType, newPath);
+
+        BackflowTestDto saved;
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            saved = await base.UpdateAsync(dto);
+            await _fileStorageService.UploadAsync(newPath, fileStream);
+            scope.Complete();
+        }
+
+        if (!string.IsNullOrWhiteSpace(oldPath))
+        {
+            await _fileStorageService.DeleteAsync(oldPath);
+        }
+
+        return saved;
+    }
+
+    private static string? GetImagePath(BackflowTestDto dto, string imageType) => imageType.ToLowerInvariant() switch
+    {
+        "assembly" => dto.AssemblyImagePath,
+        "serial-number" => dto.SerialNumberImagePath,
+        "bypass-assembly" => dto.BypassAssemblyImagePath,
+        "bypass-serial-number" => dto.BypassSerialNumberImagePath,
+        "air-gap" => dto.AirGapImagePath,
+        _ => null
+    };
+
+    private static void SetImagePath(BackflowTestDto dto, string imageType, string? path)
+    {
+        switch (imageType.ToLowerInvariant())
+        {
+            case "assembly": dto.AssemblyImagePath = path; break;
+            case "serial-number": dto.SerialNumberImagePath = path; break;
+            case "bypass-assembly": dto.BypassAssemblyImagePath = path; break;
+            case "bypass-serial-number": dto.BypassSerialNumberImagePath = path; break;
+            case "air-gap": dto.AirGapImagePath = path; break;
+        }
     }
 
     private static string ValidateAndGetExtension(string fileName)

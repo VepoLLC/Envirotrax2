@@ -51,6 +51,28 @@ export class BackflowTestService {
         return await lastValueFrom(this._http.post<BackflowTest>(url, formData));
     }
 
+    public async get(id: number): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}`);
+        return await lastValueFrom(this._http.get<BackflowTest>(url));
+    }
+
+    public async update(test: BackflowTest): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${test.id}`);
+        return await lastValueFrom(this._http.put<BackflowTest>(url, test));
+    }
+
+    public async getImageUrl(id: number, imageType: string): Promise<string> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/images/${imageType}`);
+        return await lastValueFrom(this._http.get<string>(url));
+    }
+
+    public async uploadImage(id: number, imageType: string, file: File): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/images/${imageType}`);
+        const formData = new FormData();
+        formData.append('file', file);
+        return await lastValueFrom(this._http.post<BackflowTest>(url, formData));
+    }
+
     public async getForProfessional(id: number): Promise<BackflowTest> {
         const url = this._urlResolver.resolveUrl(`/api/professionals/backflow/tests/${id}`);
         return await lastValueFrom(this._http.get<BackflowTest>(url));

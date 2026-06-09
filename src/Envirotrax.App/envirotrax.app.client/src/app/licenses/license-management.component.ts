@@ -6,11 +6,10 @@ import { ExpirationType } from '../shared/models/professionals/licenses/professi
 import { AuthService } from '../shared/services/auth/auth.service';
 import { FeatureType } from '../shared/models/feature-type';
 import { PermissionAction, PermissionType } from '../shared/models/permission-type';
-import { ModalHelperService } from '../shared/services/helpers/modal-helper.service';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
 import { ToastService } from '../shared/services/toast.service';
 import { EditWaterSupplierLicenseComponent, WaterSupplierLicenseModalData } from './edit/edit-water-supplier-license.component';
-import { CellTemplateData, ColumnType, TableColumn } from '@envirotrax/common-ui';
+import { CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 
 @Component({
     templateUrl: './license-management.component.html',

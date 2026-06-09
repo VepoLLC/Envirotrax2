@@ -14,8 +14,8 @@ import { ExpirationType, ProfessionalUser } from '../../../shared/models/profess
 import { ProfessionalWaterSupplier } from '../../../shared/models/professionals/professional-water-supplier';
 import { BackflowGauge, GaugeExpirationType } from '../../../shared/models/backflow/backflow-gauge';
 import { BackflowTestResult, BackflowReasonForTest, BackflowDeviceType } from '../../../shared/models/backflow/backflow-test-enums';
-import { InputOption } from '../../../shared/components/input/input.component';
 import { MAX_PAGE_SIZE } from '../../../shared/models/page-info';
+import { InputOption } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,
@@ -144,7 +144,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         ) {
             return false;
         }
-        
+
         return true;
     }
     public get isAirGap(): boolean { return this.model.deviceType === BackflowDeviceType.AG; }

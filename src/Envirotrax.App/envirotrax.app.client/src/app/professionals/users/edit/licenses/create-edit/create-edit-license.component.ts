@@ -4,10 +4,10 @@ import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { ProfessionalUserLicense, ProfessionalType, professionalTypeLabels } from "../../../../../shared/models/professionals/licenses/professional-user-license";
 import { ProfessionalUserLicenseService } from "../../../../../shared/services/professionals/professional-user-license.service";
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
-import { InputOption } from "../../../../../shared/components/input/input.component";
 import { ProfessionalLicenseType } from "../../../../../shared/models/professionals/licenses/professional-license-type";
 import { ProfesisonalService } from "../../../../../shared/services/professionals/professional.service";
 import { ToastService, ToastType } from "../../../../../shared/services/toast.service";
+import { InputOption } from "@envirotrax/common-ui";
 
 @Component({
     standalone: false,

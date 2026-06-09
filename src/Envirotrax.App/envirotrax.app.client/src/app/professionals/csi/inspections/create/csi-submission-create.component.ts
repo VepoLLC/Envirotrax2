@@ -13,9 +13,9 @@ import { ProfessionalUserLicense, ExpirationType, ProfessionalType } from '../..
 import { ProfessionalWaterSupplier } from '../../../../shared/models/professionals/professional-water-supplier';
 import { Site } from '../../../../shared/models/sites/site';
 import { CsiInspectionReason, csiInspectionReasonLabels } from '../../../../shared/enums/csi-inspection-reason.enum';
-import { InputOption } from '../../../../shared/components/input/input.component';
 import { MAX_PAGE_SIZE } from '../../../../shared/models/page-info';
 import { ProfessionalSupplierService } from '../../../../shared/services/professionals/professional-supplier.service';
+import { InputOption } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,

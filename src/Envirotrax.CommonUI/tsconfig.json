@@ -3,11 +3,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "paths": {
-      "@envirotrax/common-ui": [
-        "./dist/envirotrax/common-ui"
-      ]
-    },
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,

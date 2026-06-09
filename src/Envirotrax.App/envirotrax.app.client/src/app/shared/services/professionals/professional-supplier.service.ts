@@ -7,8 +7,8 @@ import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { lastValueFrom } from "rxjs";
 import { AvailableWaterSupplier, ProfessionalWaterSupplier } from "../../models/professionals/professional-water-supplier";
-import { InputOption } from "../../components/input/input.component";
 import { QueryProperty } from "../../models/query";
+import { InputOption } from "@envirotrax/common-ui";
 
 @Injectable({
     providedIn: 'root'

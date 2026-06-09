@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { PageInfo } from "../../models/page-info";
 import { HttpParams, HttpUrlEncodingCodec } from "@angular/common/http";
 import { ComparisonOperator, Query, QueryProperty } from "../../models/query";
-import { DateRange } from "../../components/input/input.component";
+import { DateRange } from "@envirotrax/common-ui";
 
 @Injectable({
     providedIn: 'root'

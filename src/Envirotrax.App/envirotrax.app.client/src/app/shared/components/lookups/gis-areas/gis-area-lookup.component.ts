@@ -2,9 +2,8 @@ import { Component, forwardRef, Input, OnInit, Optional, SkipSelf } from "@angul
 import { ControlContainer, NgForm } from "@angular/forms";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { GisAreaService } from "../../../services/gis-areas/gis-area.service";
-import { ModalHelperService } from "../../../services/helpers/modal-helper.service";
 import { GisAreaSelectionModalComponent, GisAreaSelectionModel } from "./gis-area-selection-modal.component";
-import { FilterPanelComponent, FilterPanelFieldComponent, InputOption } from "@envirotrax/common-ui";
+import { FilterPanelComponent, FilterPanelFieldComponent, InputOption, ModalHelperService } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'app-gis-area-lookup',

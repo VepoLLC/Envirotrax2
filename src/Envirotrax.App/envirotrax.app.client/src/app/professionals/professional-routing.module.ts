@@ -108,6 +108,15 @@ const routes: Routes = [
             features: [FeatureType.BackflowTesting],
             roles: [ROLE_DEFINITIONS.PROFESSIONAL, ROLE_DEFINITIONS.PROFESSIONALS.BACKFLOW_TESTER]
         }
+    },
+    {
+        path: 'fog',
+        loadChildren: () => import('./fog/professionals-fog.module').then(m => m.ProfessionalsFogModule),
+        canActivate: [FeatureGuard, RoleGuard],
+        data: {
+            features: [FeatureType.FogInspection],
+            roles: [ROLE_DEFINITIONS.PROFESSIONAL, ROLE_DEFINITIONS.PROFESSIONALS.FOG_INSPECTOR]
+        }
     }
 ];
 

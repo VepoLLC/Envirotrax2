@@ -6,6 +6,7 @@ import { SharedComponentsModule } from "../shared/components/shared.components.m
 import { BackflowRoutingModule } from "./backflow-routing.module";
 import { BackflowTesterListComponent } from "./testers/list/backflow-tester-list.component";
 import { BackflowTestListComponent } from "./tests/backflow-test-list.component";
+import { BackflowTestDetailsComponent } from "./tests/details/backflow-test-details.component";
 import { BackflowTesterDetailsComponent } from "./testers/details/backflow-tester-details.component";
 import { BackflowTesterWaterSuppliersComponent } from "./testers/details/water-suppliers/list/backflow-tester-water-suppliers.component";
 import { EditBackflowTesterWaterSupplierComponent } from "./testers/details/water-suppliers/edit/edit-backflow-tester-water-supplier.component";
@@ -22,6 +23,7 @@ import { AddEditBackflowTesterGaugeComponent } from "./testers/details/gauge/edi
     declarations: [
         BackflowTesterListComponent,
         BackflowTestListComponent,
+        BackflowTestDetailsComponent,
         BackflowTesterDetailsComponent,
         BackflowTesterWaterSuppliersComponent,
         EditBackflowTesterWaterSupplierComponent,

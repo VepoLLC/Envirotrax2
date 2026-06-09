@@ -1,0 +1,675 @@
+<div>
+    <h1 class="text-center h2">Backflow Assembly Test</h1>
+
+    <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+    <div *ngIf="!isLoading && test">
+        <div class="alert alert-danger" *ngIf="validationErrors.length">
+            <ul class="mb-0">
+                <li *ngFor="let error of validationErrors">{{ error }}</li>
+            </ul>
+        </div>
+
+        <div class="row mt-3">
+            <vp-section header="Water Supplier">
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5">Water supplier:</dt>
+                            <dd class="col-sm-7">{{ test.waterSupplier?.name }}</dd>
+                            <dt class="col-sm-5">Address:</dt>
+                            <dd class="col-sm-7">{{ test.waterSupplier?.address }}</dd>
+                            <dt class="col-sm-5">PWS ID:</dt>
+                            <dd class="col-sm-7">{{ test.waterSupplier?.pwsId }}</dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5">Contact name:</dt>
+                            <dd class="col-sm-7">{{ test.waterSupplier?.contactName }}</dd>
+                            <dt class="col-sm-5">Phone number:</dt>
+                            <dd class="col-sm-7">{{ test.waterSupplier?.phoneNumber }}</dd>
+                            <dt class="col-sm-5">Email address:</dt>
+                            <dd class="col-sm-7">{{ test.waterSupplier?.emailAddress }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </vp-section>
+        </div>
+
+        <div class="row mt-3">
+            <vp-section header="BPAT Information">
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5">Company name:</dt>
+                            <dd class="col-sm-7">{{ test.bpatCompanyName }}</dd>
+                            <dt class="col-sm-5">Tester name:</dt>
+                            <dd class="col-sm-7">{{ test.bpatContactName }}</dd>
+                            <dt class="col-sm-5">Address:</dt>
+                            <dd class="col-sm-7">
+                                <div>{{ test.bpatAddress }}</div>
+                                <div *ngIf="test.bpatCity || test.bpatState?.name || test.bpatZip">
+                                    {{ test.bpatCity }}<span *ngIf="test.bpatCity && (test.bpatState?.name || test.bpatZip)">, </span>{{ test.bpatState?.name }} {{ test.bpatZip }}
+                                </div>
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5">Phone number:</dt>
+                            <dd class="col-sm-7">{{ test.bpatCellNumber }}</dd>
+                            <dt class="col-sm-5">License number:</dt>
+                            <dd class="col-sm-7">{{ test.bpatLicenseNumber }}</dd>
+                            <dt class="col-sm-5">License exp date:</dt>
+                            <dd class="col-sm-7">{{ test.bpatLicenseExpiration | date:'dd.MM.yyyy' }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </vp-section>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <vp-section header="Location / Property Information">
+                    <form #propertyForm="ngForm" dp-spinner-parent>
+                        <dp-loading-spinner *ngIf="savingSection === 'Property information'"></dp-loading-spinner>
+                        <div class="mb-3">
+                            <vp-input name="propertyType" label="Property type" type="select" [form]="propertyForm"
+                                      [options]="propertyTypeOptions" [disabled]="!canModify"
+                                      [(ngModel)]="test.propertyType" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-input name="propertyBusinessName" label="Business name" [maxLength]="100"
+                                      [form]="propertyForm" [disabled]="!canModify"
+                                      [(ngModel)]="test.propertyBusinessName" />
+                        </div>
+                        <p class="fw-bold">Property Address</p>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <vp-input name="propertyStreetNumber" label="Street #"
+                                          [form]="propertyForm" [disabled]="!canModify"
+                                          [(ngModel)]="test.propertyStreetNumber" />
+                            </div>
+                            <div class="col-md-5 mb-3">
+                                <vp-input name="propertyStreetName" label="Street name"
+                                          [form]="propertyForm" [disabled]="!canModify"
+                                          [(ngModel)]="test.propertyStreetName" />
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <vp-input name="propertyNumber" label="Suite/Apt #"
+                                          [form]="propertyForm" [disabled]="!canModify"
+                                          [(ngModel)]="test.propertyNumber" />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <vp-input name="propertyCity" label="City" [form]="propertyForm"
+                                      [disabled]="!canModify" [(ngModel)]="test.propertyCity" />
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <vp-input name="propertyStateId" label="State" type="select" [form]="propertyForm"
+                                          [options]="states" [disabled]="!canModify"
+                                          [ngModel]="test.propertyState?.id"
+                                          (ngModelChange)="propertyStateChanged($event)" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <vp-input name="propertyZip" label="ZIP" [maxLength]="20" [form]="propertyForm"
+                                          [disabled]="!canModify" [(ngModel)]="test.propertyZip" />
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <button type="button" class="btn btn-primary vp-section-button"
+                                    [disabled]="test.site?.id == null" (click)="viewPropertyRecord()">
+                                View Property Record
+                            </button>
+                            <button type="button" class="btn btn-primary vp-section-button" *ngIf="canModify"
+                                    [disabled]="savingSection === 'Property information'" (click)="save(propertyForm, 'Property information')">
+                                Update
+                            </button>
+                        </div>
+                    </form>
+                </vp-section>
+            </div>
+
+            <div class="col-md-6">
+                <vp-section header="Contact / Mailing Information">
+                    <form #mailingForm="ngForm" dp-spinner-parent>
+                        <dp-loading-spinner *ngIf="savingSection === 'Mailing information'"></dp-loading-spinner>
+                        <div class="mb-3">
+                            <vp-input name="mailingCompanyName" label="Company name" [maxLength]="100"
+                                      [form]="mailingForm" [disabled]="!canModify"
+                                      [(ngModel)]="test.mailingCompanyName" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-input name="mailingContactName" label="Contact name" [maxLength]="100"
+                                      [form]="mailingForm" [disabled]="!canModify"
+                                      [(ngModel)]="test.mailingContactName" />
+                        </div>
+                        <div class="mb-2" *ngIf="canModify">
+                            <button type="button" class="btn btn-primary vp-section-button"
+                                    (click)="copyFromPropertyAddress()">
+                                Copy from Property Address
+                            </button>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <vp-input name="mailingStreetNumber" label="Street #"
+                                          [form]="mailingForm" [disabled]="!canModify"
+                                          [(ngModel)]="test.mailingStreetNumber" />
+                            </div>
+                            <div class="col-md-5 mb-3">
+                                <vp-input name="mailingStreetName" label="Street name"
+                                          [form]="mailingForm" [disabled]="!canModify"
+                                          [(ngModel)]="test.mailingStreetName" />
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <vp-input name="mailingNumber" label="Suite/Apt #"
+                                          [form]="mailingForm" [disabled]="!canModify"
+                                          [(ngModel)]="test.mailingNumber" />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <vp-input name="mailingCity" label="City" [form]="mailingForm"
+                                      [disabled]="!canModify" [(ngModel)]="test.mailingCity" />
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <vp-input name="mailingStateId" label="State" type="select" [form]="mailingForm"
+                                          [options]="states" [disabled]="!canModify"
+                                          [ngModel]="test.mailingState?.id"
+                                          (ngModelChange)="mailingStateChanged($event)" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <vp-input name="mailingZip" label="ZIP" [maxLength]="20" [form]="mailingForm"
+                                          [disabled]="!canModify" [(ngModel)]="test.mailingZip" />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <vp-input name="mailingPhoneNumber" label="Phone number"
+                                      [form]="mailingForm" [disabled]="!canModify"
+                                      [(ngModel)]="test.mailingPhoneNumber" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-input name="mailingEmailAddress" label="Email address" type="email"
+                                      [form]="mailingForm" [disabled]="!canModify"
+                                      [(ngModel)]="test.mailingEmailAddress" />
+                        </div>
+                        <div class="d-flex justify-content-end mt-2" *ngIf="canModify">
+                            <button type="button" class="btn btn-primary vp-section-button" [disabled]="savingSection === 'Mailing information'"
+                                    (click)="save(mailingForm, 'Mailing information')">
+                                Update
+                            </button>
+                        </div>
+                    </form>
+                </vp-section>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <vp-section header="Backflow Information">
+                <div class="text-center mb-3">
+                    The backflow prevention assembly detailed below has been tested and maintained as required by
+                    commission regulations and is certified to be operating within acceptable parameters.
+                </div>
+
+                <div class="mb-2"><strong>Backflow Method:</strong>&nbsp;&nbsp;{{ getDeviceTypeLabel() }}</div>
+
+                <div class="row mb-2">
+                    <div class="col-lg-6"><strong>Main Assembly Manufacturer:</strong>&nbsp;&nbsp;{{ test.manufacturer }}</div>
+                    <div class="col-lg-6">
+                        <span class="me-3"><strong>Model:</strong>&nbsp;{{ test.model }}</span>
+                        <span class="me-3"><strong>Size:</strong>&nbsp;{{ test.size }}</span>
+                        <span><strong>Serial #:</strong>&nbsp;{{ test.serialNumber }}</span>
+                    </div>
+                </div>
+
+                <div class="row mb-3" *ngIf="test.manufacturer2 || test.model2 || test.serialNumber2 || test.size2">
+                    <div class="col-lg-6"><strong>Bypass Assembly Manufacturer:</strong>&nbsp;&nbsp;{{ test.manufacturer2 }}</div>
+                    <div class="col-lg-6">
+                        <span class="me-3"><strong>Model:</strong>&nbsp;{{ test.model2 }}</span>
+                        <span class="me-3"><strong>Size:</strong>&nbsp;{{ test.size2 }}</span>
+                        <span><strong>Serial #:</strong>&nbsp;{{ test.serialNumber2 }}</span>
+                    </div>
+                </div>
+
+                <form #backflowForm="ngForm" dp-spinner-parent>
+                    <dp-loading-spinner *ngIf="savingSection === 'Backflow information'"></dp-loading-spinner>
+                    <div class="mb-2">
+                        <vp-input name="locationDescription" label="Location" [form]="backflowForm"
+                                  [disabled]="!canModify" [(ngModel)]="test.locationDescription" />
+                    </div>
+                    <div class="mb-2">
+                        <vp-input name="hazardType" label="Hazard Type" type="select" [options]="hazardTypeOptions"
+                                  [form]="backflowForm" [disabled]="!canModify" [(ngModel)]="test.hazardType" />
+                    </div>
+                    <div class="mb-2" *ngIf="test.hazardType === 'Other'">
+                        <vp-input name="hazardTypeOtherDescription" label="Hazard Type Description"
+                                  [form]="backflowForm" [disabled]="!canModify"
+                                  [(ngModel)]="test.hazardTypeOtherDescription" />
+                    </div>
+                    <div class="d-flex justify-content-end mt-2" *ngIf="canModify">
+                        <button type="button" class="btn btn-primary vp-section-button" [disabled]="savingSection === 'Backflow information'"
+                                (click)="save(backflowForm, 'Backflow information')">
+                            Update
+                        </button>
+                    </div>
+                </form>
+            </vp-section>
+        </div>
+
+        <div class="row mt-3">
+            <vp-section header="Backflow Test Information">
+                <form #testInfoForm="ngForm" dp-spinner-parent>
+                    <dp-loading-spinner *ngIf="savingSection === 'Test information'"></dp-loading-spinner>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Test Result:</dt>
+                                <dd class="col-sm-8">{{ getTestResultLabel() }}</dd>
+                                <dt class="col-sm-4">Reason for Test:</dt>
+                                <dd class="col-sm-8">
+                                    {{ getReasonForTestLabel() }}
+                                    <span *ngIf="test.reasonForTest === BackflowReasonForTest.Replacement && test.replacementAssembly">
+                                        &nbsp;<strong>Old Model/Serial #:</strong> {{ test.replacementAssembly }}
+                                    </span>
+                                </dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6" *ngIf="test.jobNumber">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Job Number:</dt>
+                                <dd class="col-sm-8">{{ test.jobNumber }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <div class="mt-2" *ngIf="test.deviceType !== BackflowDeviceType.AG">
+                        <div class="row mb-1">
+                            <div class="col-md-9 fw-bold">
+                                Is the assembly installed in accordance with manufacturer recommendations and/or local codes?
+                            </div>
+                            <div class="col-md-3">{{ test.properlyInstalled ? 'Yes' : 'No' }}</div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col-md-9 fw-bold">
+                                Is the assembly installed on a non-potable water supply (auxiliary)?
+                            </div>
+                            <div class="col-md-3">{{ test.nonPotable ? 'Yes' : 'No' }}</div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3" *ngIf="test.deviceType !== BackflowDeviceType.AG">
+                        <div class="col-md-5"><strong>Differential Pressure Gauge Used:</strong> {{ gaugeDescription }}</div>
+                        <div class="col-md-3"><strong>Serial Number:</strong> {{ test.gaugeSerialNumber }}</div>
+                        <div class="col-md-4">
+                            <strong>Date Tested for Accuracy:</strong> {{ test.gaugeLastCalibrationDate | date:'dd.MM.yyyy' }}
+                        </div>
+                    </div>
+
+                    <div class="table-responsive mt-3" *ngIf="test.deviceType !== BackflowDeviceType.AG">
+                        <table class="table table-bordered table-sm text-center align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="border-0"></th>
+                                    <th [attr.colspan]="visibleValveColumns.length">{{ getDeviceTypeLabel() }}</th>
+                                </tr>
+                                <tr *ngIf="showAssemblySubheader">
+                                    <th class="border-0"></th>
+                                    <th [attr.colspan]="mainColumnCount">Main Assembly</th>
+                                    <th [attr.colspan]="bypassColumnCount">Bypass Assembly</th>
+                                </tr>
+                                <tr>
+                                    <th class="border-0"></th>
+                                    <th *ngFor="let col of visibleValveColumns">{{ col.header }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th class="text-start">
+                                        <div class="fw-bold text-center mb-1">Initial Test</div>
+                                        <div><strong>Date:</strong> {{ test.initialTestDate | date:'dd.MM.yyyy' }}</div>
+                                        <div><strong>Time:</strong> {{ test.initialTestDate | date:'h:mm a' }}</div>
+                                    </th>
+                                    <td *ngFor="let col of visibleValveColumns" class="text-start">
+                                        <div *ngIf="col.initialValue" class="mb-1">
+                                            {{ col.initialVerb }} {{ field(col.initialValue) }} PSID
+                                        </div>
+                                        <div *ngFor="let c of col.initialChecks" class="mt-1">
+                                            <div class="form-check form-check-inline mb-0">
+                                                <input type="checkbox" class="form-check-input"
+                                                       [name]="'init_chk_' + col.index + '_' + c.field"
+                                                       [(ngModel)]="$any(test)[c.field]"
+                                                       [disabled]="!canModify" />
+                                                <label class="form-check-label">{{ c.label }}</label>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="text-start">Repairs and Materials Used **</th>
+                                    <td *ngFor="let col of visibleValveColumns" class="text-start">{{ field(col.repairField) }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-start">Repair Details</th>
+                                    <td *ngFor="let col of visibleValveColumns" class="text-start">{{ field(col.repairDetailsField) }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-start">
+                                        <div class="fw-bold text-center mb-1">Test After Repairs</div>
+                                        <div><strong>Date:</strong> {{ test.repairTestDate | date:'dd.MM.yyyy' }}</div>
+                                        <div><strong>Time:</strong> {{ test.repairTestDate | date:'h:mm a' }}</div>
+                                    </th>
+                                    <td *ngFor="let col of visibleValveColumns" class="text-start">
+                                        <div *ngIf="col.finalValue" class="mb-1">
+                                            {{ col.finalVerb }} {{ field(col.finalValue) }} PSID
+                                        </div>
+                                        <div *ngFor="let c of col.finalChecks" class="mt-1">
+                                            <div class="form-check form-check-inline mb-0">
+                                                <input type="checkbox" class="form-check-input"
+                                                       [name]="'final_chk_' + col.index + '_' + c.field"
+                                                       [(ngModel)]="$any(test)[c.field]"
+                                                       [disabled]="!canModify" />
+                                                <label class="form-check-label">{{ c.label }}</label>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="showMeterTest">
+                                    <th class="text-start">Bypass Meter Test ****</th>
+                                    <td [attr.colspan]="visibleValveColumns.length" class="text-start">
+                                        <div class="row g-2 align-items-center">
+                                            <div class="col-lg">Bypass Meter Number: {{ test.meterNumber }}</div>
+                                            <div class="col-lg">Meter reading prior to test: {{ test.meterReadingBefore }}</div>
+                                            <div class="col-lg">
+                                                <div class="form-check mb-0">
+                                                    <input type="checkbox" class="form-check-input"
+                                                           id="meterRegisters" name="meterRegisters"
+                                                           [(ngModel)]="test.meterRegisters"
+                                                           [disabled]="!canModify" />
+                                                    <label class="form-check-label" for="meterRegisters">
+                                                        Meter registers a flow?
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg">Meter reading upon completion: {{ test.meterReadingAfter }}</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-responsive mt-3" *ngIf="test.deviceType === BackflowDeviceType.AG">
+                        <table class="table table-bordered table-sm mb-0">
+                            <tbody>
+                                <tr>
+                                    <td class="text-center fw-bold" colspan="2">Air Gap Test Information</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Do you certify that the air gap between the potable water supply and the overflow rim
+                                        of the containment vessel complies with the requirements of an approved air gap and has
+                                        not been bypassed, or otherwise made ineffective?
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input" id="airGapValid"
+                                                   name="airGapValid" [(ngModel)]="test.airGapValid"
+                                                   [disabled]="!canModify" />
+                                            <label class="form-check-label" for="airGapValid">Yes</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2"><strong>Test Date:</strong> {{ test.testDate | date:'dd.MM.yyyy' }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        (An approved air gap shall be at least twice the diameter of the supply pipe measured
+                                        vertically above the overflow rim of the receiving vessel, and in no case less than 1 inch.)
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-3" *ngIf="canModify">
+                        <button type="button" class="btn btn-primary vp-section-button" [disabled]="savingSection === 'Test information'"
+                                (click)="save(testInfoForm, 'Test information')">
+                            Update
+                        </button>
+                    </div>
+                </form>
+            </vp-section>
+        </div>
+
+        <div class="row mt-3">
+            <vp-section header="Remarks">
+                <p>{{ test.comments }}</p>
+            </vp-section>
+        </div>
+
+        <div class="row mt-3" *ngIf="!showAirGapImages">
+            <vp-section header="Backflow Assembly Images">
+                <div dp-spinner-parent>
+                    <dp-loading-spinner *ngIf="isSavingImages(assemblyImageSlots)"></dp-loading-spinner>
+                    <div class="row gy-3">
+                        <div class="col-lg-6" *ngFor="let slot of assemblyImageSlots">
+                            <ng-container *ngTemplateOutlet="imageCell; context: { slot: slot }"></ng-container>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mt-3" *ngIf="canModify">
+                        <button type="button" class="btn btn-primary vp-section-button"
+                                [disabled]="isSavingImages(assemblyImageSlots) || !hasStagedImages(assemblyImageSlots)"
+                                (click)="saveImages(assemblyImageSlots)">
+                            Update
+                        </button>
+                    </div>
+                </div>
+            </vp-section>
+        </div>
+
+        <div class="row mt-3" *ngIf="showBypassImages">
+            <vp-section header="Bypass Assembly Images">
+                <div dp-spinner-parent>
+                    <dp-loading-spinner *ngIf="isSavingImages(bypassImageSlots)"></dp-loading-spinner>
+                    <div class="row gy-3">
+                        <div class="col-lg-6" *ngFor="let slot of bypassImageSlots">
+                            <ng-container *ngTemplateOutlet="imageCell; context: { slot: slot }"></ng-container>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mt-3" *ngIf="canModify">
+                        <button type="button" class="btn btn-primary vp-section-button"
+                                [disabled]="isSavingImages(bypassImageSlots) || !hasStagedImages(bypassImageSlots)"
+                                (click)="saveImages(bypassImageSlots)">
+                            Update
+                        </button>
+                    </div>
+                </div>
+            </vp-section>
+        </div>
+
+        <div class="row mt-3" *ngIf="showAirGapImages">
+            <vp-section header="Air Gap Image">
+                <div dp-spinner-parent>
+                    <dp-loading-spinner *ngIf="isSavingImages(airGapImageSlots)"></dp-loading-spinner>
+                    <div class="row gy-3">
+                        <div class="col-lg-12" *ngFor="let slot of airGapImageSlots">
+                            <ng-container *ngTemplateOutlet="imageCell; context: { slot: slot }"></ng-container>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mt-3" *ngIf="canModify">
+                        <button type="button" class="btn btn-primary vp-section-button"
+                                [disabled]="isSavingImages(airGapImageSlots) || !hasStagedImages(airGapImageSlots)"
+                                (click)="saveImages(airGapImageSlots)">
+                            Update
+                        </button>
+                    </div>
+                </div>
+            </vp-section>
+        </div>
+
+        <div class="row mt-3" *ngIf="test.site?.id">
+            <vp-section header="Assembly Test History">
+                <div class="container mb-3">
+                    <div class="row gap-2 justify-content-center mb-3">
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Current Test" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Non Current Test" />
+                        </div>
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-magenta-on.png" text="Passed Test" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-magenta-off.png" text="Failed Test" />
+                        </div>
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-blue-on.png" text="In Service" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-blue-off.png" text="Out of Service" />
+                        </div>
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-orange-on.png" text="Paid" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-orange-off.png" text="Unpaid" />
+                        </div>
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-cyan-on.png" text="Approved" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-cyan-off.png" text="Disapproved" />
+                        </div>
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Accepted" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-red-off.png" text="Rejected" />
+                        </div>
+                    </div>
+                </div>
+
+                <div dp-spinner-parent>
+                    <dp-loading-spinner *ngIf="historyTable.isLoading"></dp-loading-spinner>
+
+                    <vp-table *ngIf="historyTable.items"
+                              [columns]="historyTable.columns!"
+                              [data]="historyTable.items.data"
+                              [(pageInfo)]="historyTable.items.pageInfo"
+                              (pageInfoChange)="loadHistoryPage()"
+                              [(query)]="historyTable.query"
+                              (queryChange)="loadHistoryPage()"
+                              (queryReset)="loadHistoryPage()"
+                              [canViewDetails]="true"
+                              (viewDetails)="viewHistoryTest($event)" />
+                </div>
+            </vp-section>
+        </div>
+    </div>
+
+    <ng-template #historyStatusTemplate let-test="rowData">
+        <div class="d-flex gap-1 flex-wrap">
+            <vp-status-icon [imageSrc]="test.isCurrent ? '/images/icons/bstatus-green-on.png' : '/images/icons/bstatus-green-off.png'"
+                            [text]="test.isCurrent ? 'Current Test' : 'Non Current Test'"
+                            [showText]="false" />
+            <vp-status-icon [imageSrc]="test.testResult === BackflowTestResult.Fail ? '/images/icons/bstatus-magenta-off.png' : '/images/icons/bstatus-magenta-on.png'"
+                            [text]="test.testResult === BackflowTestResult.Fail ? 'Failed Test' : 'Passed Test'"
+                            [showText]="false" />
+            <vp-status-icon [imageSrc]="test.outOfService ? '/images/icons/bstatus-blue-off.png' : '/images/icons/bstatus-blue-on.png'"
+                            [text]="test.outOfService ? 'Out of Service' : 'In Service'"
+                            [showText]="false" />
+            <vp-status-icon [imageSrc]="test.transactionId ? '/images/icons/bstatus-orange-on.png' : '/images/icons/bstatus-orange-off.png'"
+                            [text]="test.transactionId ? 'Paid' : 'Unpaid'"
+                            [showText]="false" />
+            <vp-status-icon [imageSrc]="test.disapproved ? '/images/icons/bstatus-cyan-off.png' : '/images/icons/bstatus-cyan-on.png'"
+                            [text]="test.disapproved ? 'Disapproved' : 'Approved'"
+                            [showText]="false" />
+            <vp-status-icon [imageSrc]="test.rejected ? '/images/icons/bstatus-red-off.png' : '/images/icons/bstatus-red-on.png'"
+                            [text]="test.rejected ? 'Rejected' : 'Accepted'"
+                            [showText]="false" />
+        </div>
+    </ng-template>
+
+    <ng-template #historyDatesTemplate let-test="rowData">
+        <div>
+            <div><strong>Submitted:</strong> {{ test.createdTime | date:'M/d/yyyy' }}</div>
+            <div><strong>Tested On:</strong> {{ test.testDate | date:'M/d/yyyy' }}</div>
+            <div class="mt-1">
+                <strong>Expires:</strong>
+                <span *ngIf="test.expirationDate" class="badge bg-danger ms-1">{{ test.expirationDate | date:'M/d/yyyy' }}</span>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #historyAssemblyTemplate let-test="rowData">
+        <div>
+            <div>
+                <strong>Assembly Desc:</strong>
+                {{ test.manufacturer }} {{ test.model }} {{ test.size }}<span *ngIf="test.deviceType"> - {{ test.deviceType }}</span>
+            </div>
+            <div><strong>Hazard Type:</strong> {{ test.hazardType }}</div>
+            <div *ngIf="test.locationDescription"><strong>Location Desc:</strong> {{ test.locationDescription }}</div>
+        </div>
+    </ng-template>
+
+    <ng-template #historyBpatTemplate let-test="rowData">
+        <a *ngIf="canViewTesters && test.professional?.id; else plainBpat"
+           [routerLink]="['/backflow', 'testers', 'details', test.professional?.id]">
+            <div *ngIf="test.bpatCompanyName" class="fw-semibold">{{ test.bpatCompanyName }}</div>
+            <div *ngIf="test.bpatContactName">{{ test.bpatContactName }}</div>
+            <div *ngIf="test.bpatAddress">{{ test.bpatAddress }}</div>
+            <div *ngIf="test.bpatCity || test.bpatState?.name || test.bpatZip">
+                {{ test.bpatCity }}<span *ngIf="test.bpatCity && (test.bpatState?.name || test.bpatZip)">, </span>{{ test.bpatState?.name }} {{ test.bpatZip }}
+            </div>
+        </a>
+        <ng-template #plainBpat>
+            <div *ngIf="test.bpatCompanyName" class="fw-semibold">{{ test.bpatCompanyName }}</div>
+            <div *ngIf="test.bpatContactName">{{ test.bpatContactName }}</div>
+            <div *ngIf="test.bpatAddress">{{ test.bpatAddress }}</div>
+            <div *ngIf="test.bpatCity || test.bpatState?.name || test.bpatZip">
+                {{ test.bpatCity }}<span *ngIf="test.bpatCity && (test.bpatState?.name || test.bpatZip)">, </span>{{ test.bpatState?.name }} {{ test.bpatZip }}
+            </div>
+        </ng-template>
+    </ng-template>
+
+    <ng-template #imageCell let-slot="slot">
+        <div class="image-cell border rounded p-3 h-100">
+            <div class="text-center fw-semibold mb-2">{{ slot.label }}</div>
+
+            <input #fileInput type="file" class="d-none"
+                   accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
+                   (change)="onImageInputChange($event, slot.type)" />
+
+            <div *ngIf="stagedImagePreviews[slot.type]" class="text-center mb-2">
+                <div class="d-flex justify-content-between align-items-center mb-2 px-3 py-2 border rounded bg-success-subtle">
+                    <button type="button" class="btn btn-sm btn-primary" (click)="fileInput.click()">
+                        Choose File
+                    </button>
+                    <span class="fw-semibold small text-truncate">{{ stagedImageFiles[slot.type]?.name }}</span>
+                    <button type="button" class="btn btn-sm btn-primary" (click)="removeStagedImage(slot.type)">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </div>
+                <img [src]="stagedImagePreviews[slot.type]" [alt]="slot.alt"
+                     class="rounded img-fluid" style="max-height: 350px;" />
+            </div>
+
+            <ng-container *ngIf="!stagedImagePreviews[slot.type] && imageUrls[slot.type]">
+                <div *ngIf="canModify" class="d-flex justify-content-center mb-2">
+                    <button type="button" class="btn btn-sm btn-primary" (click)="fileInput.click()">
+                        Choose File
+                    </button>
+                </div>
+                <div class="text-center mb-2">
+                    <img [src]="imageUrls[slot.type]" [alt]="slot.alt"
+                         class="rounded img-fluid" style="max-height: 350px;" />
+                </div>
+            </ng-container>
+
+            <vp-file-upload *ngIf="!stagedImagePreviews[slot.type] && !imageUrls[slot.type] && canModify"
+                [name]="slot.type"
+                accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
+                label="Choose an image or drag and drop here"
+                [file]="null"
+                (fileChange)="onImageFileChange($event, slot.type)" />
+
+            <div *ngIf="!stagedImagePreviews[slot.type] && !imageUrls[slot.type] && !canModify"
+                 class="d-flex align-items-center justify-content-center text-muted border rounded"
+                 style="min-height: 200px;">
+                NO IMAGE AVAILABLE
+            </div>
+        </div>
+    </ng-template>
+</div>

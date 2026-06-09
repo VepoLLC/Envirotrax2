@@ -28,6 +28,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
     protected override IQueryable<BackflowTest> GetDetailsQuery()
     {
         return base.GetDetailsQuery()
+            .Include(bt => bt.WaterSupplier)
             .Include(bt => bt.Site)
             .Include(bt => bt.Bpat)
             .Include(bt => bt.BpatState)

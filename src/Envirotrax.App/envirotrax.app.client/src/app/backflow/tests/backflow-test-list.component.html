@@ -458,6 +458,8 @@
                         [(query)]="table.query"
                         (queryChange)="getTests()"
                         (queryReset)="getTests()"
+                        [canViewDetails]="true"
+                        (viewDetails)="viewDetails($event)"
                         [freeTextSearch]="table.freeTextSearch" />
             }
             @if (table.items?.data?.length === 0) {

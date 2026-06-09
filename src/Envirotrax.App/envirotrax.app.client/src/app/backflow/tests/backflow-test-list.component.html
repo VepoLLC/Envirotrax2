@@ -143,12 +143,6 @@
     </div>
 </ng-template>
 
-<ng-template #viewTemplate let-test="rowData">
-    <button type="button" class="btn btn-primary btn-sm" (click)="viewTest(test)">
-        <i class="fa-solid fa-magnifying-glass me-1"></i>View
-    </button>
-</ng-template>
-
 <div [hidden]="showResults || showMapResults">
     <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
         <vp-filter-panel (filterChange)="onFilterChange($event)">

@@ -320,14 +320,6 @@ export class BackflowTestListComponent implements OnInit {
                 type: ColumnType.other,
                 queryColumnExcluded: true,
                 cellTemplate: this.bpatTemplate
-            },
-            {
-                field: '',
-                caption: '',
-                type: ColumnType.other,
-                queryColumnExcluded: true,
-                isDownloadExcluded: true,
-                cellTemplate: this.viewTemplate
             }
         ];
     }

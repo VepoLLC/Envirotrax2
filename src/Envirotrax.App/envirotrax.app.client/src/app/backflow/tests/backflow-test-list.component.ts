@@ -16,6 +16,8 @@ import { InputOption } from '../../shared/components/input/input.component';
 import { FacilityType } from '../../shared/enums/facility-type.enum';
 import { MapMarker, MapPolygon } from '../../shared/components/map/map.component';
 import { BackflowTestResult } from '../../shared/models/backflow/backflow-test-enums';
+import { DownloadConfig } from '../../shared/models/download-config';
+import { DownloadService } from '../../shared/services/download.service';
 
 @Component({
     standalone: false,
@@ -129,13 +131,16 @@ export class BackflowTestListComponent implements OnInit {
 
     public deviceTypeOptions: InputOption[];
 
+    public downloadConfig: DownloadConfig<'property' | 'mailing' | 'bpat' | 'assembly' | 'testResults' | 'internal'>;
+
     constructor(
         private readonly _backflowTestService: BackflowTestService,
         private readonly _router: Router,
         private readonly _gisAreaService: GisAreaService,
         private readonly _coordinateService: GisAreaCoordinateService,
         private readonly _gisMapService: GisMapService,
-        private readonly _options: BackflowTestOptionsService
+        private readonly _options: BackflowTestOptionsService,
+        private readonly _downloadService: DownloadService
     ) {
         this.testResultOptions = this._options.testResultOptions;
         this.paymentStatusOptions = this._options.paymentStatusOptions;
@@ -143,10 +148,77 @@ export class BackflowTestListComponent implements OnInit {
         this.reasonForTestOptions = this._options.reasonFilterOptions;
         this.hazardTypeOptions = this._options.hazardTypeFilterOptions;
         this.deviceTypeOptions = this._options.deviceTypeFilterOptions;
+
+        this.downloadConfig = {
+            fileName: 'Backflow Tests',
+            endpoint: this._backflowTestService.getAllEndpoint(),
+            suppoertedFormats: ['CSV', 'Excel'],
+            categories: [
+                { name: 'property', caption: 'Property Information', isSelected: true },
+                { name: 'mailing', caption: 'Mailing Information', isSelected: true },
+                { name: 'bpat', caption: 'BPAT Extended Information', isSelected: true },
+                { name: 'assembly', caption: 'Assembly Information', isSelected: true },
+                { name: 'testResults', caption: 'Test Results', isSelected: true },
+                { name: 'internal', caption: 'Internal Data - Schedule Month, Approval, Rejection Status, Transaction ID, Amount, etc.', isSelected: false }
+            ],
+            columns: [
+                { field: 'testDate', caption: 'TestDate' },
+                { field: 'expirationDate', caption: 'ExpirationDate' },
+                { field: 'accountNumber', caption: 'AccountNumber' },
+                { field: 'waterSupplier.name', caption: 'WaterSupplier' },
+                { field: 'meterNumber', caption: 'MeterNumber' },
+                { field: 'serialNumber', caption: 'SerialNumber' },
+                // Assembly
+                { field: 'manufacturer', caption: 'Manufacturer', category: 'assembly' },
+                { field: 'model', caption: 'Model', category: 'assembly' },
+                { field: 'size', caption: 'Size', category: 'assembly' },
+                { field: 'deviceType', caption: 'DeviceType', category: 'assembly' },
+                { field: 'hazardType', caption: 'HazardType', category: 'assembly' },
+                { field: 'locationDescription', caption: 'LocationDescription', category: 'assembly' },
+                // Property
+                { field: 'propertyBusinessName', caption: 'PropertyBusinessName', category: 'property' },
+                { field: 'propertyStreetNumber', caption: 'PropertyStreetNumber', category: 'property' },
+                { field: 'propertyStreetName', caption: 'PropertyStreetName', category: 'property' },
+                { field: 'propertyNumber', caption: 'PropertyNumber', category: 'property' },
+                { field: 'propertyCity', caption: 'PropertyCity', category: 'property' },
+                { field: 'propertyState.code', caption: 'PropertyState', category: 'property' },
+                { field: 'propertyZip', caption: 'PropertyZip', category: 'property' },
+                // Mailing
+                { field: 'mailingCompanyName', caption: 'MailingCompanyName', category: 'mailing' },
+                { field: 'mailingContactName', caption: 'MailingContactName', category: 'mailing' },
+                { field: 'mailingStreetNumber', caption: 'MailingStreetNumber', category: 'mailing' },
+                { field: 'mailingStreetName', caption: 'MailingStreetName', category: 'mailing' },
+                { field: 'mailingNumber', caption: 'MailingNumber', category: 'mailing' },
+                { field: 'mailingCity', caption: 'MailingCity', category: 'mailing' },
+                { field: 'mailingState.code', caption: 'MailingState', category: 'mailing' },
+                { field: 'mailingZip', caption: 'MailingZip', category: 'mailing' },
+                { field: 'mailingPhoneNumber', caption: 'MailingPhoneNumber', category: 'mailing' },
+                { field: 'mailingEmailAddress', caption: 'MailingEmailAddress', category: 'mailing' },
+                // BPAT
+                { field: 'bpatLicenseNumber', caption: 'BPATLicenseNumber', category: 'bpat' },
+                { field: 'bpatLicenseExpiration', caption: 'BPATLicenseExpiration', category: 'bpat' },
+                { field: 'bpatCompanyName', caption: 'BPATCompanyName', category: 'bpat' },
+                { field: 'bpatContactName', caption: 'BPATContactName', category: 'bpat' },
+                // Test Results
+                { field: 'testResult', caption: 'TestResult', category: 'testResults' },
+                { field: 'reasonForTest', caption: 'ReasonForTest', category: 'testResults' },
+                { field: 'properlyInstalled', caption: 'ProperlyInstalled', category: 'testResults' },
+                // Internal
+                { field: 'scheduleMonth', caption: 'ScheduleMonth', category: 'internal' },
+                { field: 'disapproved', caption: 'Disapproved', category: 'internal' },
+                { field: 'rejected', caption: 'Rejected', category: 'internal' },
+                { field: 'transactionId', caption: 'TransactionID', category: 'internal' },
+                { field: 'transactionAmount', caption: 'TransactionAmount', category: 'internal' }
+            ]
+        };
     }
 
     public async ngOnInit(): Promise<void> {
         this.setupColumns();
+    }
+
+    public showDownloadManager(): void {
+        this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
     }
 
     public viewTest(test: BackflowTest): void {
@@ -174,7 +246,7 @@ export class BackflowTestListComponent implements OnInit {
             },
             {
                 field: '',
-                caption: 'Status',
+                caption: 'status',
                 type: ColumnType.other,
                 queryColumnExcluded: true,
                 cellTemplate: this.statusTemplate

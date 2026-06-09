@@ -37,7 +37,7 @@
 </ng-template>
 
 <div>
-    <div class="align-items-center border-bottom d-md-flex flex-row-reverse pb-2">
+    <div class="align-items-center border-bottom d-md-flex flex-row-reverse pb-2 ms-2">
         <div class="d-flex justify-content-end">
             <div *ngIf="canFilterAdvanced" class="me-2">
                 <vp-sorting-filtering *ngIf="query" [(query)]="query" (queryChange)="onQueryChange($event)"

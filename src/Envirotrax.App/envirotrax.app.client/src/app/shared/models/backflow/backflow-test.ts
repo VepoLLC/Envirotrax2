@@ -7,7 +7,7 @@ import { BackflowReasonForTest, BackflowTestResult } from './backflow-test-enums
 
 export interface BackflowTest {
     id: number;
-    waterSupplier?: { id?: number } | null;
+    waterSupplier?: { id?: number; name?: string } | null;
     site?: Site | null;
     createdTime?: string;
     updatedTime?: string;

@@ -8,6 +8,7 @@ import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { BackflowTest } from "../../models/backflow/backflow-test";
 import { BackflowTestImages } from "../../models/backflow/backflow-test-images";
+import { DownloadEndpoint } from "../../models/download-config";
 
 @Injectable({
     providedIn: 'root'
@@ -28,6 +29,20 @@ export class BackflowTestService {
         });
 
         return await lastValueFrom(observable);
+    }
+
+    public getAllEndpoint(): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/backflow/tests')
+        };
+    }
+
+    public getAllForProfessionalEndpoint(): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/professionals/backflow/tests')
+        };
     }
 
     public async getAllForProfessional(pageInfo: PageInfo, query: Query): Promise<PagedData<BackflowTest>> {

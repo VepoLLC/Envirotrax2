@@ -10,6 +10,8 @@ import { CellTemplateData } from '../../../shared/components/data-components/tab
 import { ColumnType } from '../../../shared/components/data-components/sorting-filtering/query-view-model';
 import { InputOption } from '../../../shared/components/input/input.component';
 import { BackflowTestResult } from '../../../shared/models/backflow/backflow-test-enums';
+import { DownloadConfig } from '../../../shared/models/download-config';
+import { DownloadService } from '../../../shared/services/download.service';
 
 @Component({
     standalone: false,
@@ -37,6 +39,8 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
     public readonly BackflowTestResult = BackflowTestResult;
 
     public showResults: boolean = false;
+
+    public downloadConfig: DownloadConfig<'property' | 'mailing' | 'assembly' | 'testResults'>;
 
     public table: TableViewModel<BackflowTest> = {
         columns: [],
@@ -70,8 +74,61 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
     constructor(
         private readonly _backflowTestService: BackflowTestService,
         private readonly _supplierService: ProfessionalSupplierService,
-        private readonly _router: Router
-    ) { }
+        private readonly _router: Router,
+        private readonly _downloadService: DownloadService
+    ) {
+        this.downloadConfig = {
+            fileName: 'Backflow Tests',
+            endpoint: this._backflowTestService.getAllForProfessionalEndpoint(),
+            suppoertedFormats: ['CSV', 'Excel'],
+            categories: [
+                { name: 'property', caption: 'Property Information', isSelected: true },
+                { name: 'mailing', caption: 'Mailing Information', isSelected: true },
+                { name: 'assembly', caption: 'Assembly Information', isSelected: true },
+                { name: 'testResults', caption: 'Test Results', isSelected: true }
+            ],
+            columns: [
+                { field: 'testDate', caption: 'TestDate' },
+                { field: 'expirationDate', caption: 'ExpirationDate' },
+                { field: 'accountNumber', caption: 'AccountNumber' },
+                { field: 'serialNumber', caption: 'SerialNumber' },
+                // Assembly
+                { field: 'manufacturer', caption: 'Manufacturer', category: 'assembly' },
+                { field: 'model', caption: 'Model', category: 'assembly' },
+                { field: 'size', caption: 'Size', category: 'assembly' },
+                { field: 'deviceType', caption: 'DeviceType', category: 'assembly' },
+                { field: 'hazardType', caption: 'HazardType', category: 'assembly' },
+                { field: 'locationDescription', caption: 'LocationDescription', category: 'assembly' },
+                // Property
+                { field: 'propertyBusinessName', caption: 'PropertyBusinessName', category: 'property' },
+                { field: 'propertyStreetNumber', caption: 'PropertyStreetNumber', category: 'property' },
+                { field: 'propertyStreetName', caption: 'PropertyStreetName', category: 'property' },
+                { field: 'propertyNumber', caption: 'PropertyNumber', category: 'property' },
+                { field: 'propertyCity', caption: 'PropertyCity', category: 'property' },
+                { field: 'propertyState.code', caption: 'PropertyState', category: 'property' },
+                { field: 'propertyZip', caption: 'PropertyZip', category: 'property' },
+                // Mailing
+                { field: 'mailingCompanyName', caption: 'MailingCompanyName', category: 'mailing' },
+                { field: 'mailingContactName', caption: 'MailingContactName', category: 'mailing' },
+                { field: 'mailingStreetNumber', caption: 'MailingStreetNumber', category: 'mailing' },
+                { field: 'mailingStreetName', caption: 'MailingStreetName', category: 'mailing' },
+                { field: 'mailingNumber', caption: 'MailingNumber', category: 'mailing' },
+                { field: 'mailingCity', caption: 'MailingCity', category: 'mailing' },
+                { field: 'mailingState.code', caption: 'MailingState', category: 'mailing' },
+                { field: 'mailingZip', caption: 'MailingZip', category: 'mailing' },
+                { field: 'mailingPhoneNumber', caption: 'MailingPhoneNumber', category: 'mailing' },
+                { field: 'mailingEmailAddress', caption: 'MailingEmailAddress', category: 'mailing' },
+                // Test Results
+                { field: 'testResult', caption: 'TestResult', category: 'testResults' },
+                { field: 'reasonForTest', caption: 'ReasonForTest', category: 'testResults' },
+                { field: 'properlyInstalled', caption: 'ProperlyInstalled', category: 'testResults' }
+            ]
+        };
+    }
+
+    public showDownloadManager(): void {
+        this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
+    }
 
     public viewTest(test: BackflowTest): void {
         const url = this._router.serializeUrl(

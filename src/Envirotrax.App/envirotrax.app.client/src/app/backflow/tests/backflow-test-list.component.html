@@ -398,10 +398,10 @@
 <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
 <dp-loading-spinner *ngIf="isMapLoading"></dp-loading-spinner>
 
-<div *ngIf="showResults">
+<div *ngIf="showResults && !table.isLoading">
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
-                >
+                (click)="showDownloadManager()">
             <i class="fa-regular fa-file-export me-1"></i>
             Export Results
         </button>
@@ -416,8 +416,8 @@
         </button>
     </div>
 
-    <vp-section header="Backflow Test Search Results - {{ table.items?.pageInfo?.totalItems ?? 0 }} Results">
-        <div class="row gap-2 justify-content-center mb-3">
+    <vp-section [noPadding]="true" header="Backflow Test Search Results - {{ table.items?.pageInfo?.totalItems ?? 0 }} Results">
+        <div class="row gap-2 justify-content-center mb-2 mt-2">
             <div class="col-auto mb-2">
                 <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Current Test" />
                 <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Non Current Test" />
@@ -448,7 +448,7 @@
             </div>
         </div>
 
-        @if (table.items) {
+        @if (table.items && table.items.data && table.items.data.length > 0) {
             <vp-table [columns]="table.columns!"
                       [data]="table.items.data"
                       [(pageInfo)]="table.items.pageInfo"
@@ -457,6 +457,11 @@
                       (queryChange)="getTests()"
                       (queryReset)="getTests()"
                       [freeTextSearch]="table.freeTextSearch" />
+        }
+        @if (table.items?.data?.length === 0) {
+            <div class="text-center py-3 text-muted">
+                No records found matching the search criteria.
+            </div>
         }
     </vp-section>
 </div>

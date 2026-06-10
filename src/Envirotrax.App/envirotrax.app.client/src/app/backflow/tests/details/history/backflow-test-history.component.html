@@ -1,0 +1,110 @@
+<vp-section header="Assembly Test History">
+    <div class="container mb-3">
+        <div class="row gap-2 justify-content-center mb-3">
+            <div class="col-auto mb-2">
+                <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Current Test" />
+                <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Non Current Test" />
+            </div>
+            <div class="col-auto mb-2">
+                <vp-status-icon imageSrc="/images/icons/bstatus-magenta-on.png" text="Passed Test" />
+                <vp-status-icon imageSrc="/images/icons/bstatus-magenta-off.png" text="Failed Test" />
+            </div>
+            <div class="col-auto mb-2">
+                <vp-status-icon imageSrc="/images/icons/bstatus-blue-on.png" text="In Service" />
+                <vp-status-icon imageSrc="/images/icons/bstatus-blue-off.png" text="Out of Service" />
+            </div>
+            <div class="col-auto mb-2">
+                <vp-status-icon imageSrc="/images/icons/bstatus-orange-on.png" text="Paid" />
+                <vp-status-icon imageSrc="/images/icons/bstatus-orange-off.png" text="Unpaid" />
+            </div>
+            <div class="col-auto mb-2">
+                <vp-status-icon imageSrc="/images/icons/bstatus-cyan-on.png" text="Approved" />
+                <vp-status-icon imageSrc="/images/icons/bstatus-cyan-off.png" text="Disapproved" />
+            </div>
+            <div class="col-auto mb-2">
+                <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Accepted" />
+                <vp-status-icon imageSrc="/images/icons/bstatus-red-off.png" text="Rejected" />
+            </div>
+        </div>
+    </div>
+
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="historyTable.isLoading"></dp-loading-spinner>
+
+        <vp-table *ngIf="historyTable.items"
+                  [columns]="historyTable.columns!"
+                  [data]="historyTable.items.data"
+                  [(pageInfo)]="historyTable.items.pageInfo"
+                  (pageInfoChange)="loadHistoryPage()"
+                  [(query)]="historyTable.query"
+                  (queryChange)="loadHistoryPage()"
+                  (queryReset)="loadHistoryPage()"
+                  [canViewDetails]="true"
+                  (viewDetails)="viewHistoryTest($event)" />
+    </div>
+</vp-section>
+
+<ng-template #historyStatusTemplate let-test="rowData">
+    <div class="d-flex gap-1 flex-wrap">
+        <vp-status-icon [imageSrc]="test.isCurrent ? '/images/icons/bstatus-green-on.png' : '/images/icons/bstatus-green-off.png'"
+                        [text]="test.isCurrent ? 'Current Test' : 'Non Current Test'"
+                        [showText]="false" />
+        <vp-status-icon [imageSrc]="test.testResult === BackflowTestResult.Fail ? '/images/icons/bstatus-magenta-off.png' : '/images/icons/bstatus-magenta-on.png'"
+                        [text]="test.testResult === BackflowTestResult.Fail ? 'Failed Test' : 'Passed Test'"
+                        [showText]="false" />
+        <vp-status-icon [imageSrc]="test.outOfService ? '/images/icons/bstatus-blue-off.png' : '/images/icons/bstatus-blue-on.png'"
+                        [text]="test.outOfService ? 'Out of Service' : 'In Service'"
+                        [showText]="false" />
+        <vp-status-icon [imageSrc]="test.transactionId ? '/images/icons/bstatus-orange-on.png' : '/images/icons/bstatus-orange-off.png'"
+                        [text]="test.transactionId ? 'Paid' : 'Unpaid'"
+                        [showText]="false" />
+        <vp-status-icon [imageSrc]="test.disapproved ? '/images/icons/bstatus-cyan-off.png' : '/images/icons/bstatus-cyan-on.png'"
+                        [text]="test.disapproved ? 'Disapproved' : 'Approved'"
+                        [showText]="false" />
+        <vp-status-icon [imageSrc]="test.rejected ? '/images/icons/bstatus-red-off.png' : '/images/icons/bstatus-red-on.png'"
+                        [text]="test.rejected ? 'Rejected' : 'Accepted'"
+                        [showText]="false" />
+    </div>
+</ng-template>
+
+<ng-template #historyDatesTemplate let-test="rowData">
+    <div>
+        <div><strong>Submitted:</strong> {{ test.createdTime | date:'M/d/yyyy' }}</div>
+        <div><strong>Tested On:</strong> {{ test.testDate | date:'M/d/yyyy' }}</div>
+        <div class="mt-1">
+            <strong>Expires:</strong>
+            <span *ngIf="test.expirationDate" class="badge bg-danger ms-1">{{ test.expirationDate | date:'M/d/yyyy' }}</span>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #historyAssemblyTemplate let-test="rowData">
+    <div>
+        <div>
+            <strong>Assembly Desc:</strong>
+            {{ test.manufacturer }} {{ test.model }} {{ test.size }}<span *ngIf="test.deviceType"> - {{ test.deviceType }}</span>
+        </div>
+        <div><strong>Hazard Type:</strong> {{ test.hazardType }}</div>
+        <div *ngIf="test.locationDescription"><strong>Location Desc:</strong> {{ test.locationDescription }}</div>
+    </div>
+</ng-template>
+
+<ng-template #historyBpatTemplate let-test="rowData">
+    <a *ngIf="canViewTesters && test.professional?.id; else plainBpat"
+       [routerLink]="['/backflow', 'testers', 'details', test.professional?.id]">
+        <div *ngIf="test.bpatCompanyName" class="fw-semibold">{{ test.bpatCompanyName }}</div>
+        <div *ngIf="test.bpatContactName">{{ test.bpatContactName }}</div>
+        <div *ngIf="test.bpatAddress">{{ test.bpatAddress }}</div>
+        <div *ngIf="test.bpatCity || test.bpatState?.name || test.bpatZip">
+            {{ test.bpatCity }}<span *ngIf="test.bpatCity && (test.bpatState?.name || test.bpatZip)">, </span>{{ test.bpatState?.name }} {{ test.bpatZip }}
+        </div>
+    </a>
+    <ng-template #plainBpat>
+        <div *ngIf="test.bpatCompanyName" class="fw-semibold">{{ test.bpatCompanyName }}</div>
+        <div *ngIf="test.bpatContactName">{{ test.bpatContactName }}</div>
+        <div *ngIf="test.bpatAddress">{{ test.bpatAddress }}</div>
+        <div *ngIf="test.bpatCity || test.bpatState?.name || test.bpatZip">
+            {{ test.bpatCity }}<span *ngIf="test.bpatCity && (test.bpatState?.name || test.bpatZip)">, </span>{{ test.bpatState?.name }} {{ test.bpatZip }}
+        </div>
+    </ng-template>
+</ng-template>

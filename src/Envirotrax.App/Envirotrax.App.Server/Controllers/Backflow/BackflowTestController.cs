@@ -19,20 +19,6 @@ public class BackflowTestController : WaterSupplierCrudController<BackflowTestDt
         _testService = service;
     }
 
-    [HttpGet("{id}/images/{imageType}")]
-    [HasPermission(PermissionAction.CanView)]
-    public async Task<IActionResult> GetImageUrlAsync(int id, string imageType, CancellationToken cancellationToken)
-    {
-        var url = await _testService.GenerateImageUrlAsync(id, imageType, cancellationToken);
-
-        if (url == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(url);
-    }
-
     [HttpPost("{id}/images/{imageType}")]
     [HasPermission(PermissionAction.CanModify)]
     public async Task<IActionResult> UploadImageAsync(int id, string imageType, [FromForm] IFormFile file, CancellationToken cancellationToken)

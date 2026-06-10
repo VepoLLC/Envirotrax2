@@ -1,0 +1,49 @@
+<vp-section header="Backflow Information">
+    <div class="text-center mb-3">
+        The backflow prevention assembly detailed below has been tested and maintained as required by
+        commission regulations and is certified to be operating within acceptable parameters.
+    </div>
+
+    <div class="mb-2"><strong>Backflow Method:</strong>&nbsp;&nbsp;{{ getDeviceTypeLabel() }}</div>
+
+    <div class="row mb-2">
+        <div class="col-lg-6"><strong>Main Assembly Manufacturer:</strong>&nbsp;&nbsp;{{ test.manufacturer }}</div>
+        <div class="col-lg-6">
+            <span class="me-3"><strong>Model:</strong>&nbsp;{{ test.model }}</span>
+            <span class="me-3"><strong>Size:</strong>&nbsp;{{ test.size }}</span>
+            <span><strong>Serial #:</strong>&nbsp;{{ test.serialNumber }}</span>
+        </div>
+    </div>
+
+    <div class="row mb-3" *ngIf="test.manufacturer2 || test.model2 || test.serialNumber2 || test.size2">
+        <div class="col-lg-6"><strong>Bypass Assembly Manufacturer:</strong>&nbsp;&nbsp;{{ test.manufacturer2 }}</div>
+        <div class="col-lg-6">
+            <span class="me-3"><strong>Model:</strong>&nbsp;{{ test.model2 }}</span>
+            <span class="me-3"><strong>Size:</strong>&nbsp;{{ test.size2 }}</span>
+            <span><strong>Serial #:</strong>&nbsp;{{ test.serialNumber2 }}</span>
+        </div>
+    </div>
+
+    <form #backflowForm="ngForm" dp-spinner-parent>
+        <dp-loading-spinner *ngIf="saving"></dp-loading-spinner>
+        <div class="mb-2">
+            <vp-input name="locationDescription" label="Location" [form]="backflowForm"
+                      [disabled]="!canModify" [(ngModel)]="test.locationDescription" />
+        </div>
+        <div class="mb-2">
+            <vp-input name="hazardType" label="Hazard Type" type="select" [options]="hazardTypeOptions"
+                      [form]="backflowForm" [disabled]="!canModify" [(ngModel)]="test.hazardType" />
+        </div>
+        <div class="mb-2" *ngIf="test.hazardType === 'Other'">
+            <vp-input name="hazardTypeOtherDescription" label="Hazard Type Description"
+                      [form]="backflowForm" [disabled]="!canModify"
+                      [(ngModel)]="test.hazardTypeOtherDescription" />
+        </div>
+        <div class="d-flex justify-content-end mt-2" *ngIf="canModify">
+            <button type="button" class="btn btn-primary vp-section-button" [disabled]="saving"
+                    (click)="save.emit(backflowForm)">
+                Update
+            </button>
+        </div>
+    </form>
+</vp-section>

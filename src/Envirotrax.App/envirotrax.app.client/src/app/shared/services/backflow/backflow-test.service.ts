@@ -76,11 +76,6 @@ export class BackflowTestService {
         return await lastValueFrom(this._http.put<BackflowTest>(url, test));
     }
 
-    public async getImageUrl(id: number, imageType: string): Promise<string> {
-        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/images/${imageType}`);
-        return await lastValueFrom(this._http.get<string>(url));
-    }
-
     public async uploadImage(id: number, imageType: string, file: File): Promise<BackflowTest> {
         const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/images/${imageType}`);
         const formData = new FormData();

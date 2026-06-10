@@ -44,4 +44,28 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         }
         return base.GetAllAsync(pageInfo, query, cancellationToken);
     }
+
+    // Image paths are owned by the dedicated image flow (UpdateImagePathAsync),
+    // so a regular update must never overwrite them.
+    protected override void UpdateEntity(BackflowTest model)
+    {
+        base.UpdateEntity(model);
+
+        var entry = DbContext.Entry(model);
+        entry.Property(m => m.AssemblyImagePath).IsModified = false;
+        entry.Property(m => m.SerialNumberImagePath).IsModified = false;
+        entry.Property(m => m.BypassAssemblyImagePath).IsModified = false;
+        entry.Property(m => m.BypassSerialNumberImagePath).IsModified = false;
+        entry.Property(m => m.AirGapImagePath).IsModified = false;
+    }
+
+    public async Task<BackflowTest> UpdateImagePathAsync(BackflowTest model, string imagePathPropertyName)
+    {
+        DbContext.Attach(model);
+        DbContext.Entry(model).Property(imagePathPropertyName).IsModified = true;
+
+        await DbContext.SaveChangesAsync();
+
+        return model;
+    }
 }

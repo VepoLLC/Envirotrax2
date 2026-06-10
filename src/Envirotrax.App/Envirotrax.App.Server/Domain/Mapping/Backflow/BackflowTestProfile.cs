@@ -9,6 +9,11 @@ public class BackflowTestProfile : Profile
     public BackflowTestProfile()
     {
         CreateMap<BackflowTest, BackflowTestDto>()
+            .ForMember(dto => dto.AssemblyImageUrl, opt => opt.Ignore())
+            .ForMember(dto => dto.SerialNumberImageUrl, opt => opt.Ignore())
+            .ForMember(dto => dto.BypassAssemblyImageUrl, opt => opt.Ignore())
+            .ForMember(dto => dto.BypassSerialNumberImageUrl, opt => opt.Ignore())
+            .ForMember(dto => dto.AirGapImageUrl, opt => opt.Ignore())
             .AfterMap((model, dto) =>
             {
                 dto.WaterSupplier ??= new() { Id = model.WaterSupplierId };

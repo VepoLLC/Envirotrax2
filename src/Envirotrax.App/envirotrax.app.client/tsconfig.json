@@ -3,15 +3,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "paths": {
-      "@angular/core": ["./node_modules/@angular/core"],
-      "@angular/common": ["./node_modules/@angular/common"],
-      "@angular/common/http": ["./node_modules/@angular/common/http"],
-      "@angular/forms": ["./node_modules/@angular/forms"],
-      "@angular/router": ["./node_modules/@angular/router"],
-      "@angular/platform-browser": ["./node_modules/@angular/platform-browser"],
-      "@angular/compiler": ["./node_modules/@angular/compiler"]
-    },
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,

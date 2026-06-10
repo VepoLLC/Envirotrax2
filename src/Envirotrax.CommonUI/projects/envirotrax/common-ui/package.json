@@ -2,10 +2,10 @@
   "name": "@envirotrax/common-ui",
   "version": "1.0.0",
   "peerDependencies": {
-    "@angular/common": "^20.1.0",
-    "@angular/core": "^20.1.0",
-    "@angular/forms": "^20.1.0",
-    "@angular/router": "^20.1.0",
+    "@angular/common": "^20.3.24",
+    "@angular/core": "^20.3.24",
+    "@angular/forms": "^20.3.24",
+    "@angular/router": "^20.3.24",
     "@developer-partners/ngx-loading-spinner": "^1.0.11",
     "@developer-partners/ngx-modal-dialog": "^1.0.6",
     "@googlemaps/js-api-loader": "^2.0.2",
@@ -16,11 +16,11 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular/core": "^20.0.0",
-    "@angular/common": "^20.0.0",
-    "@angular/forms": "^20.0.0",
-    "@angular/compiler": "^20.0.0",
-    "@angular/compiler-cli": "^20.0.0"
+    "@angular/core": "^20.3.24",
+    "@angular/common": "^20.3.24",
+    "@angular/forms": "^20.3.24",
+    "@angular/compiler": "^20.3.24",
+    "@angular/compiler-cli": "^20.3.24"
   },
   "dependencies": {
     "tslib": "^2.3.0"

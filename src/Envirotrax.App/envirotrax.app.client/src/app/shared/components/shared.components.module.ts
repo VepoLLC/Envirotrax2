@@ -5,6 +5,8 @@ import { ProfessionalUserLookupComponent } from "./lookups/professional-user-loo
 import { GisAreaLookupComponent } from "./lookups/gis-areas/gis-area-lookup.component";
 import { GisAreaSelectionModalComponent } from "./lookups/gis-areas/gis-area-selection-modal.component";
 import { DownloadManagerComponent } from "./data-components/download-manager/download-manager.component";
+import { FormsModule } from "@angular/forms";
+import { CommonModule } from "@angular/common";
 
 @NgModule({
     declarations: [
@@ -16,6 +18,8 @@ import { DownloadManagerComponent } from "./data-components/download-manager/dow
     ],
     imports: [
         EnvirotraxComponentsModule,
+        FormsModule,
+        CommonModule
     ],
     exports: [
         EnvirotraxComponentsModule,

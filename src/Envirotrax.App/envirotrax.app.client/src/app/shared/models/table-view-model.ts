@@ -1,6 +1,4 @@
-import { FreeTextSearchSettings, TableColumn, TableCustomAction } from "@envirotrax/common-ui";
-import { PagedData } from "./paged-data";
-import { Query } from "./query";
+import { FreeTextSearchSettings, PagedData, Query, TableColumn, TableCustomAction } from "@envirotrax/common-ui";
 
 export interface TableViewModel<T> {
     items?: PagedData<T>;

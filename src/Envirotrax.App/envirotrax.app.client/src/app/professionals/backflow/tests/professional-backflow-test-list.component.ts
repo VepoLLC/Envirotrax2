@@ -146,6 +146,18 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
         window.open(url, '_blank');
     }
 
+    public navigateToSite(test: BackflowTest): void {
+        if (!test.site?.id) 
+            { 
+                return; 
+            }
+
+        const url = this._router.serializeUrl(
+            this._router.createUrlTree(['/professionals/sites', test.site.id])
+        );
+        window.open(url, '_blank');
+    }
+
     public async ngOnInit(): Promise<void> {
         this.setupColumns();
         await this.loadWaterSupplierScopeOptions();

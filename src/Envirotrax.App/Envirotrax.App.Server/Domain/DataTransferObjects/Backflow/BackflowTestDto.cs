@@ -347,6 +347,13 @@ public class BackflowTestDto : IDto
     public string? BypassSerialNumberImagePath { get; set; }
     public string? AirGapImagePath { get; set; }
 
+    // Image download URLs (generated SAS URLs; not persisted)
+    public string? AssemblyImageUrl { get; set; }
+    public string? SerialNumberImageUrl { get; set; }
+    public string? BypassAssemblyImageUrl { get; set; }
+    public string? BypassSerialNumberImageUrl { get; set; }
+    public string? AirGapImageUrl { get; set; }
+
     // Audit
     public DateTime CreatedTime { get; set; }
     public DateTime? UpdatedTime { get; set; }

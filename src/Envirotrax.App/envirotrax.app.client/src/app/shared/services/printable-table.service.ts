@@ -21,10 +21,8 @@ export class PrintableTableService {
 
         const printWin = window.open('', '_blank');
         if (!printWin) return;
-        printWin.document.write(
-            `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">${base}${styles}</head>` +
-            `<body class="p-3">${clone.outerHTML}</body></html>`
-        );
-        printWin.document.close();
+        printWin.document.head.innerHTML = `<meta charset="utf-8">${base}${styles}`;
+        printWin.document.body.className = 'p-3';
+        printWin.document.body.innerHTML = clone.outerHTML;
     }
 }

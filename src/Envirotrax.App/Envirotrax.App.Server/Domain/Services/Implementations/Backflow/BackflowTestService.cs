@@ -22,6 +22,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         "assembly", "serial-number", "bypass-assembly", "bypass-serial-number", "air-gap"
     };
 
+    private readonly IBackflowTestRepository _testRepository;
     private readonly IProfessionalRepository _professionalRepository;
     private readonly IProfessionalUserRepository _professionalUserRepository;
     private readonly IFileStorageService _fileStorageService;
@@ -36,6 +37,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         IAuthService authService)
         : base(mapper, repository)
     {
+        _testRepository = repository;
         _professionalRepository = professionalRepository;
         _professionalUserRepository = professionalUserRepository;
         _fileStorageService = fileStorageService;
@@ -135,21 +137,16 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         return saved;
     }
 
-    public async Task<Uri?> GenerateImageUrlAsync(int id, string imageType, CancellationToken cancellationToken = default)
+    public override async Task<BackflowTestDto?> GetAsync(int id, CancellationToken cancellationToken)
     {
-        var dto = await GetAsync(id, cancellationToken);
-        if (dto == null)
+        var dto = await base.GetAsync(id, cancellationToken);
+
+        if (dto != null)
         {
-            return null;
+            await PopulateImageUrlsAsync(dto);
         }
 
-        var path = GetImagePath(dto, imageType);
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            return null;
-        }
-
-        return await _fileStorageService.GenerateSasUrlAsync(path);
+        return dto;
     }
 
     public async Task<BackflowTestDto?> UpdateImageAsync(int id, string imageType, Stream fileStream, string fileName, CancellationToken cancellationToken = default)
@@ -159,7 +156,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             throw new ValidationException("Invalid image type.");
         }
 
-        var dto = await GetAsync(id, cancellationToken);
+        var dto = await base.GetAsync(id, cancellationToken);
         if (dto == null)
         {
             return null;
@@ -173,7 +170,9 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         BackflowTestDto saved;
         using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            saved = await base.UpdateAsync(dto);
+            var model = MapToModel(dto)!;
+            await _testRepository.UpdateImagePathAsync(model, GetImagePathPropertyName(imageType));
+            saved = MapToDto(model)!;
             await _fileStorageService.UploadAsync(newPath, fileStream);
             scope.Complete();
         }
@@ -183,7 +182,37 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             await _fileStorageService.DeleteAsync(oldPath);
         }
 
+        await PopulateImageUrlsAsync(saved);
+
         return saved;
+    }
+
+    private async Task PopulateImageUrlsAsync(BackflowTestDto dto)
+    {
+        var images = new (string? Path, Action<string> SetUrl)[]
+        {
+            (dto.AssemblyImagePath, url => dto.AssemblyImageUrl = url),
+            (dto.SerialNumberImagePath, url => dto.SerialNumberImageUrl = url),
+            (dto.BypassAssemblyImagePath, url => dto.BypassAssemblyImageUrl = url),
+            (dto.BypassSerialNumberImagePath, url => dto.BypassSerialNumberImageUrl = url),
+            (dto.AirGapImagePath, url => dto.AirGapImageUrl = url)
+        };
+
+        if (!images.Any(i => !string.IsNullOrWhiteSpace(i.Path)))
+        {
+            return;
+        }
+
+        var delegationKey = await _fileStorageService.GetUserDelegationKeyAsync();
+
+        foreach (var (path, setUrl) in images)
+        {
+            if (!string.IsNullOrWhiteSpace(path))
+            {
+                var url = await _fileStorageService.GenerateSasUrlAsync(delegationKey, path);
+                setUrl(url.ToString());
+            }
+        }
     }
 
     private static string? GetImagePath(BackflowTestDto dto, string imageType) => imageType.ToLowerInvariant() switch
@@ -194,6 +223,16 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         "bypass-serial-number" => dto.BypassSerialNumberImagePath,
         "air-gap" => dto.AirGapImagePath,
         _ => null
+    };
+
+    private static string GetImagePathPropertyName(string imageType) => imageType.ToLowerInvariant() switch
+    {
+        "assembly" => nameof(BackflowTest.AssemblyImagePath),
+        "serial-number" => nameof(BackflowTest.SerialNumberImagePath),
+        "bypass-assembly" => nameof(BackflowTest.BypassAssemblyImagePath),
+        "bypass-serial-number" => nameof(BackflowTest.BypassSerialNumberImagePath),
+        "air-gap" => nameof(BackflowTest.AirGapImagePath),
+        _ => throw new ValidationException("Invalid image type.")
     };
 
     private static void SetImagePath(BackflowTestDto dto, string imageType, string? path)

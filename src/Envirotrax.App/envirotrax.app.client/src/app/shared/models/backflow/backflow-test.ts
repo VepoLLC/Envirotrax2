@@ -100,6 +100,11 @@ export interface BackflowTest {
     bypassAssemblyImagePath?: string;
     bypassSerialNumberImagePath?: string;
     airGapImagePath?: string;
+    assemblyImageUrl?: string;
+    serialNumberImageUrl?: string;
+    bypassAssemblyImageUrl?: string;
+    bypassSerialNumberImageUrl?: string;
+    airGapImageUrl?: string;
 
     // Initial test readings - main assembly
     initCV1HeldPSID?: number;

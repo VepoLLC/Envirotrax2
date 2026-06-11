@@ -18,12 +18,30 @@ import { AddEditBackflowTesterInsuranceComponent } from "./testers/details/licen
 import { ProfessionalModule } from "../professionals/professional.module";
 import { BackflowTesterGaugeComponent } from "./testers/details/gauge/list/backflow-tester-gauge.component";
 import { AddEditBackflowTesterGaugeComponent } from "./testers/details/gauge/edit/add-edit-backflow-tester-gauge.component";
+import { BackflowTestWaterSupplierComponent } from "./tests/details/water-supplier/backflow-test-water-supplier.component";
+import { BackflowTestBpatInfoComponent } from "./tests/details/bpat-info/backflow-test-bpat-info.component";
+import { BackflowTestRemarksComponent } from "./tests/details/remarks/backflow-test-remarks.component";
+import { BackflowTestPropertyInfoComponent } from "./tests/details/property-info/backflow-test-property-info.component";
+import { BackflowTestMailingInfoComponent } from "./tests/details/mailing-info/backflow-test-mailing-info.component";
+import { BackflowTestBackflowInfoComponent } from "./tests/details/backflow-info/backflow-test-backflow-info.component";
+import { BackflowTestInfoComponent } from "./tests/details/test-info/backflow-test-info.component";
+import { BackflowTestImagesComponent } from "./tests/details/images/backflow-test-images.component";
+import { BackflowTestHistoryComponent } from "./tests/details/history/backflow-test-history.component";
 
 @NgModule({
     declarations: [
         BackflowTesterListComponent,
         BackflowTestListComponent,
         BackflowTestDetailsComponent,
+        BackflowTestWaterSupplierComponent,
+        BackflowTestBpatInfoComponent,
+        BackflowTestRemarksComponent,
+        BackflowTestPropertyInfoComponent,
+        BackflowTestMailingInfoComponent,
+        BackflowTestBackflowInfoComponent,
+        BackflowTestInfoComponent,
+        BackflowTestImagesComponent,
+        BackflowTestHistoryComponent,
         BackflowTesterDetailsComponent,
         BackflowTesterWaterSuppliersComponent,
         EditBackflowTesterWaterSupplierComponent,

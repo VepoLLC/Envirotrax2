@@ -42,7 +42,7 @@ export class ProfessionalSupplierService {
         ];
     }
 
-    public getAllMy(hasCsiInspection = false, hasBackflowTesting = false): Promise<PagedData<ProfessionalWaterSupplier>> {
+    public getAllMy(hasCsiInspection = false, hasBackflowTesting = false, hasFogInspection = false): Promise<PagedData<ProfessionalWaterSupplier>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/water-suppliers');
         const pageInfo: PageInfo = { pageSize: MAX_PAGE_SIZE };
         const filter: QueryProperty[] = [];
@@ -52,6 +52,9 @@ export class ProfessionalSupplierService {
         }
         if (hasBackflowTesting) {
             filter.push({ columnName: 'hasBackflowTesting', comparisonOperator: 'Eq', value: 'true' });
+        }
+        if (hasFogInspection) {
+            filter.push({ columnName: 'hasFogInspection', comparisonOperator: 'Eq', value: 'true' });
         }
 
         const query: Query = filter.length > 0 ? { filter } : {};

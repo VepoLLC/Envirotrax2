@@ -8,6 +8,7 @@ import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { BackflowTest } from "../../models/backflow/backflow-test";
 import { BackflowTestImages } from "../../models/backflow/backflow-test-images";
+import { DownloadEndpoint } from "../../models/download-config";
 
 @Injectable({
     providedIn: 'root'
@@ -30,6 +31,20 @@ export class BackflowTestService {
         return await lastValueFrom(observable);
     }
 
+    public getAllEndpoint(): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/backflow/tests')
+        };
+    }
+
+    public getAllForProfessionalEndpoint(): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/professionals/backflow/tests')
+        };
+    }
+
     public async getAllForProfessional(pageInfo: PageInfo, query: Query): Promise<PagedData<BackflowTest>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/backflow/tests');
 
@@ -48,6 +63,23 @@ export class BackflowTestService {
         if (images.bypassSerialNumberImage) { formData.append('bypassSerialNumberImage', images.bypassSerialNumberImage); }
         if (images.airGapImage) { formData.append('airGapImage', images.airGapImage); }
 
+        return await lastValueFrom(this._http.post<BackflowTest>(url, formData));
+    }
+
+    public async get(id: number): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}`);
+        return await lastValueFrom(this._http.get<BackflowTest>(url));
+    }
+
+    public async update(test: BackflowTest): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${test.id}`);
+        return await lastValueFrom(this._http.put<BackflowTest>(url, test));
+    }
+
+    public async uploadImage(id: number, imageType: string, file: File): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/images/${imageType}`);
+        const formData = new FormData();
+        formData.append('file', file);
         return await lastValueFrom(this._http.post<BackflowTest>(url, formData));
     }
 

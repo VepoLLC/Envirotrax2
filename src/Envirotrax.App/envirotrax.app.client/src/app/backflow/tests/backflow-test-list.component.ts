@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BackflowTestService } from '../../shared/services/backflow/backflow-test.service';
 import { BackflowTestOptionsService } from '../../shared/services/backflow/backflow-test-options.service';
 import { GisAreaService } from '../../shared/services/gis-areas/gis-area.service';
@@ -11,13 +11,43 @@ import { TableViewModel } from '../../shared/models/table-view-model';
 import { BackflowTest } from '../../shared/models/backflow/backflow-test';
 import { GisArea } from '../../shared/models/gis-areas/gis-area';
 import { FacilityType } from '../../shared/enums/facility-type.enum';
-import { ColumnType, InputOption, MapMarker, MapPolygon, TableColumn } from '@envirotrax/common-ui';
+import { CellTemplateData, ColumnType, InputOption, MapMarker, MapPolygon } from '@envirotrax/common-ui';
+import { BackflowTestResult } from '../../shared/models/backflow/backflow-test-enums';
+import { DownloadConfig } from '../../shared/models/download-config';
+import { DownloadService } from '../../shared/services/download.service';
+import { PrintableTableService } from '../../shared/services/printable-table.service';
 
 @Component({
     standalone: false,
     templateUrl: './backflow-test-list.component.html'
 })
 export class BackflowTestListComponent implements OnInit {
+    @ViewChild('statusTemplate', { static: true })
+    public statusTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
+
+    @ViewChild('datesTemplate', { static: true })
+    public datesTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
+
+    @ViewChild('assemblyTemplate', { static: true })
+    public assemblyTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
+
+    @ViewChild('propertyTemplate', { static: true })
+    public propertyTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
+
+    @ViewChild('mailingTemplate', { static: true })
+    public mailingTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
+
+    @ViewChild('bpatTemplate', { static: true })
+    public bpatTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
+
+    @ViewChild('viewTemplate', { static: true })
+    public viewTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
+
+    @ViewChild('printableSection')
+    private _printableSection!: ElementRef;
+
+    public readonly BackflowTestResult = BackflowTestResult;
+
     public showResults: boolean = false;
     public showMapResults: boolean = false;
     public isMapLoading: boolean = false;
@@ -29,7 +59,7 @@ export class BackflowTestListComponent implements OnInit {
     public mapZoom: number = 10;
 
     public table: TableViewModel<BackflowTest> = {
-        columns: this.getColumns(),
+        columns: [],
         query: {
             sort: {},
             filter: []
@@ -102,13 +132,18 @@ export class BackflowTestListComponent implements OnInit {
 
     public deviceTypeOptions: InputOption[];
 
+    public downloadConfig: DownloadConfig<'property' | 'mailing' | 'bpat' | 'assembly' | 'testResults' | 'internal'>;
+
     constructor(
         private readonly _backflowTestService: BackflowTestService,
         private readonly _router: Router,
+        private readonly _activatedRoute: ActivatedRoute,
         private readonly _gisAreaService: GisAreaService,
         private readonly _coordinateService: GisAreaCoordinateService,
         private readonly _gisMapService: GisMapService,
-        private readonly _options: BackflowTestOptionsService
+        private readonly _options: BackflowTestOptionsService,
+        private readonly _downloadService: DownloadService,
+        private readonly _printService: PrintableTableService
     ) {
         this.testResultOptions = this._options.testResultOptions;
         this.paymentStatusOptions = this._options.paymentStatusOptions;
@@ -116,61 +151,172 @@ export class BackflowTestListComponent implements OnInit {
         this.reasonForTestOptions = this._options.reasonFilterOptions;
         this.hazardTypeOptions = this._options.hazardTypeFilterOptions;
         this.deviceTypeOptions = this._options.deviceTypeFilterOptions;
+
+        this.downloadConfig = {
+            fileName: 'Backflow Tests',
+            endpoint: this._backflowTestService.getAllEndpoint(),
+            suppoertedFormats: ['CSV', 'Excel'],
+            categories: [
+                { name: 'property', caption: 'Property Information', isSelected: true },
+                { name: 'mailing', caption: 'Mailing Information', isSelected: true },
+                { name: 'bpat', caption: 'BPAT Extended Information', isSelected: true },
+                { name: 'assembly', caption: 'Assembly Information', isSelected: true },
+                { name: 'testResults', caption: 'Test Results', isSelected: true },
+                { name: 'internal', caption: 'Internal Data - Schedule Month, Approval, Rejection Status, Transaction ID, Amount, etc.', isSelected: false }
+            ],
+            columns: [
+                { field: 'testDate', caption: 'TestDate' },
+                { field: 'expirationDate', caption: 'ExpirationDate' },
+                { field: 'accountNumber', caption: 'AccountNumber' },
+                { field: 'waterSupplier.name', caption: 'WaterSupplier' },
+                { field: 'meterNumber', caption: 'MeterNumber' },
+                { field: 'serialNumber', caption: 'SerialNumber' },
+                // Assembly
+                { field: 'manufacturer', caption: 'Manufacturer', category: 'assembly' },
+                { field: 'model', caption: 'Model', category: 'assembly' },
+                { field: 'size', caption: 'Size', category: 'assembly' },
+                { field: 'deviceType', caption: 'DeviceType', category: 'assembly' },
+                { field: 'hazardType', caption: 'HazardType', category: 'assembly' },
+                { field: 'locationDescription', caption: 'LocationDescription', category: 'assembly' },
+                // Property
+                { field: 'propertyBusinessName', caption: 'PropertyBusinessName', category: 'property' },
+                { field: 'propertyStreetNumber', caption: 'PropertyStreetNumber', category: 'property' },
+                { field: 'propertyStreetName', caption: 'PropertyStreetName', category: 'property' },
+                { field: 'propertyNumber', caption: 'PropertyNumber', category: 'property' },
+                { field: 'propertyCity', caption: 'PropertyCity', category: 'property' },
+                { field: 'propertyState.code', caption: 'PropertyState', category: 'property' },
+                { field: 'propertyZip', caption: 'PropertyZip', category: 'property' },
+                // Mailing
+                { field: 'mailingCompanyName', caption: 'MailingCompanyName', category: 'mailing' },
+                { field: 'mailingContactName', caption: 'MailingContactName', category: 'mailing' },
+                { field: 'mailingStreetNumber', caption: 'MailingStreetNumber', category: 'mailing' },
+                { field: 'mailingStreetName', caption: 'MailingStreetName', category: 'mailing' },
+                { field: 'mailingNumber', caption: 'MailingNumber', category: 'mailing' },
+                { field: 'mailingCity', caption: 'MailingCity', category: 'mailing' },
+                { field: 'mailingState.code', caption: 'MailingState', category: 'mailing' },
+                { field: 'mailingZip', caption: 'MailingZip', category: 'mailing' },
+                { field: 'mailingPhoneNumber', caption: 'MailingPhoneNumber', category: 'mailing' },
+                { field: 'mailingEmailAddress', caption: 'MailingEmailAddress', category: 'mailing' },
+                // BPAT
+                { field: 'bpatLicenseNumber', caption: 'BPATLicenseNumber', category: 'bpat' },
+                { field: 'bpatLicenseExpiration', caption: 'BPATLicenseExpiration', category: 'bpat' },
+                { field: 'bpatCompanyName', caption: 'BPATCompanyName', category: 'bpat' },
+                { field: 'bpatContactName', caption: 'BPATContactName', category: 'bpat' },
+                // Test Results
+                { field: 'testResult', caption: 'TestResult', category: 'testResults' },
+                { field: 'reasonForTest', caption: 'ReasonForTest', category: 'testResults' },
+                { field: 'properlyInstalled', caption: 'ProperlyInstalled', category: 'testResults' },
+                // Internal
+                { field: 'scheduleMonth', caption: 'ScheduleMonth', category: 'internal' },
+                { field: 'disapproved', caption: 'Disapproved', category: 'internal' },
+                { field: 'rejected', caption: 'Rejected', category: 'internal' },
+                { field: 'transactionId', caption: 'TransactionID', category: 'internal' },
+                { field: 'transactionAmount', caption: 'TransactionAmount', category: 'internal' }
+            ]
+        };
     }
 
-    public async ngOnInit(): Promise<void> { }
+    public async ngOnInit(): Promise<void> {
+        this.setupColumns();
+    }
 
-    private getColumns(): TableColumn<BackflowTest>[] {
-        return [
+    public viewDetails(test: BackflowTest): void {
+        this._router.navigate([test.id, 'view'], { relativeTo: this._activatedRoute });
+    }
+
+    public showDownloadManager(): void {
+        this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
+    }
+
+    public viewPrintableTable(): void {
+        this._printService.open(this._printableSection.nativeElement);
+    }
+
+    public viewTest(test: BackflowTest): void {
+        const url = this._router.serializeUrl(
+            this._router.createUrlTree(['/backflow/tests', test.id])
+        );
+        window.open(url, '_blank');
+    }
+
+    public isExpired(date?: string): boolean {
+        if (!date) {
+            return false;
+        }
+
+        return new Date(date) < new Date();
+    }
+
+    private setupColumns(): void {
+        this.table.columns = [
+            {
+                field: '_rowNumber',
+                caption: '#',
+                type: ColumnType.number,
+                queryColumnExcluded: true
+            },
+            {
+                field: '',
+                caption: 'status',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.statusTemplate
+            },
+            {
+                field: 'testDate',
+                caption: 'Dates',
+                type: ColumnType.date,
+                queryColumnExcluded: true,
+                cellTemplate: this.datesTemplate
+            },
             {
                 field: 'accountNumber',
                 caption: 'Account Number',
                 type: ColumnType.text
             },
             {
+                field: 'waterSupplier.name',
+                caption: 'Water Supplier',
+                type: ColumnType.text,
+                queryColumnExcluded: true
+            },
+            {
+                field: 'meterNumber',
+                caption: 'Water Meter Number',
+                type: ColumnType.text
+            },
+            {
                 field: 'serialNumber',
-                caption: 'Serial Number',
+                caption: 'Serial #',
                 type: ColumnType.text
             },
             {
-                field: 'propertyBusinessName',
-                caption: 'Business Name',
-                type: ColumnType.text
+                field: 'manufacturer',
+                caption: 'Assembly Information',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.assemblyTemplate
             },
             {
-                field: 'propertyStreetNumber',
-                caption: 'Street Number',
-                type: ColumnType.text
+                field: '',
+                caption: 'Property Information',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.propertyTemplate
             },
             {
-                field: 'propertyStreetName',
-                caption: 'Street Name',
-                type: ColumnType.text
+                field: '',
+                caption: 'Mailing Information',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.mailingTemplate
             },
             {
-                field: 'propertyCity',
-                caption: 'City',
-                type: ColumnType.text
-            },
-            {
-                field: 'testDate',
-                caption: 'Test Date',
-                type: ColumnType.date
-            },
-            {
-                field: 'testResult',
-                caption: 'Test Result',
-                type: ColumnType.text
-            },
-            {
-                field: 'bpatCompanyName',
-                caption: 'BPAT Company',
-                type: ColumnType.text
-            },
-            {
-                field: 'expirationDate',
-                caption: 'Expiration Date',
-                type: ColumnType.date
+                field: '',
+                caption: 'BPAT',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.bpatTemplate
             }
         ];
     }
@@ -178,10 +324,13 @@ export class BackflowTestListComponent implements OnInit {
     public async getTests(): Promise<void> {
         try {
             this.table.isLoading = true;
-            this.table.items = await this._backflowTestService.getAll(
+            const result = await this._backflowTestService.getAll(
                 this.table.items?.pageInfo || {},
                 this.table.query
             );
+            const startIndex = ((result.pageInfo.pageNumber ?? 1) - 1) * (result.pageInfo.pageSize ?? 10);
+            result.data.forEach((item, i) => (item as any)['_rowNumber'] = startIndex + i + 1);
+            this.table.items = result;
         } finally {
             this.table.isLoading = false;
         }
@@ -250,6 +399,28 @@ export class BackflowTestListComponent implements OnInit {
                 const icon = { path: 0, fillColor: '#e8342e', fillOpacity: 0.85, strokeWeight: 0, scale: 7 };
                 return { lat: t.site!.gisLatitude!, lng: t.site!.gisLongitude!, popupHtml, icon, data: t };
             });
+    }
+
+    public navigateToSite(test: BackflowTest): void {
+        if (!test.site?.id) {
+            return;
+        }
+
+        const url = this._router.serializeUrl(
+            this._router.createUrlTree(['sites', test.site.id, 'edit'])
+        );
+        window.open(url, '_blank');
+    }
+
+    public navigateToBpatMasterAccount(test: BackflowTest): void {
+        if (!test.professional?.id) {
+            return;
+        }
+
+        const url = this._router.serializeUrl(
+            this._router.createUrlTree(['/backflow/testers/details', test.professional.id])
+        );
+        window.open(url, '_blank');
     }
 
 }

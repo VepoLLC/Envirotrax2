@@ -1,6 +1,7 @@
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Fog;
+using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
@@ -35,5 +36,34 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
             query.Sort[nameof(FogInspection.Id)] = SortOperator.Asc;
         }
         return base.GetAllAsync(pageInfo, query, cancellationToken);
+    }
+
+    public async Task<IEnumerable<FogInspection>> SearchForProfessionalAsync(
+        int professionalId, PageInfo pageInfo, Query query,
+        List<FacilityType> facilityTypes, bool latestOnly, CancellationToken cancellationToken)
+    {
+        if (query.Sort.IsNullOrEmpty())
+            query.Sort[nameof(FogInspection.Id)] = SortOperator.Asc;
+
+        var q = GetListQuery()
+            .Where(fi => fi.ProfessionalId == professionalId);
+
+        if (facilityTypes.Count > 0)
+            q = q.Where(fi => facilityTypes.Contains(fi.FacilityType));
+
+        var filteredQ = q.Where(query.Filter);
+
+        if (latestOnly)
+        {
+            var latestIds = filteredQ.GroupBy(fi => fi.SiteId)
+                .Select(g => g.Max(fi => fi.Id));
+            filteredQ = filteredQ.Where(fi => latestIds.Contains(fi.Id));
+        }
+
+        var paginated = await filteredQ
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
     }
 }

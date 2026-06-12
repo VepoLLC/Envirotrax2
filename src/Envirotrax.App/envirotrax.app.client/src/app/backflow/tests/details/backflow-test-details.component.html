@@ -1,0 +1,71 @@
+<div>
+    <h1 class="text-center h2">Backflow Assembly Test</h1>
+
+    <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+    <div *ngIf="!isLoading && test">
+        <div class="alert alert-danger" *ngIf="validationErrors.length">
+            <ul class="mb-0">
+                <li *ngFor="let error of validationErrors">{{ error }}</li>
+            </ul>
+        </div>
+
+        <div class="row mt-3">
+            <vp-backflow-test-water-supplier [test]="test" />
+        </div>
+
+        <div class="row mt-3">
+            <vp-backflow-test-bpat-info [test]="test" />
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <vp-backflow-test-property-info
+                    [test]="test"
+                    [canModify]="canModify"
+                    [states]="states"
+                    [saving]="savingSection === 'Property information'"
+                    (save)="save($event, 'Property information')" />
+            </div>
+            <div class="col-md-6">
+                <vp-backflow-test-mailing-info
+                    [test]="test"
+                    [canModify]="canModify"
+                    [states]="states"
+                    [saving]="savingSection === 'Mailing information'"
+                    (save)="save($event, 'Mailing information')" />
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <vp-backflow-test-backflow-info
+                [test]="test"
+                [canModify]="canModify"
+                [saving]="savingSection === 'Backflow information'"
+                (save)="save($event, 'Backflow information')" />
+        </div>
+
+        <div class="row mt-3">
+            <vp-backflow-test-info
+                [test]="test"
+                [canModify]="canModify"
+                [saving]="savingSection === 'Test information'"
+                (save)="save($event, 'Test information')" />
+        </div>
+
+        <div class="row mt-3">
+            <vp-backflow-test-remarks [test]="test" />
+        </div>
+
+        <vp-backflow-test-images
+            [test]="test"
+            [canModify]="canModify"
+            (imageUrlUpdated)="onImageUrlUpdated($event)" />
+
+        <div class="row mt-3" *ngIf="test.site?.id">
+            <vp-backflow-test-history
+                [test]="test"
+                [canViewTesters]="canViewTesters" />
+        </div>
+    </div>
+</div>

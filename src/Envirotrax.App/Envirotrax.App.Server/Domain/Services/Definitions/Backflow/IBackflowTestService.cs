@@ -14,4 +14,6 @@ public interface IBackflowTestService : IService<BackflowTest, BackflowTestDto>
         Stream? bypassSerialStream, string? bypassSerialFileName,
         Stream? airGapStream, string? airGapFileName,
         CancellationToken cancellationToken = default);
+
+    Task<BackflowTestDto?> UpdateImageAsync(int id, string imageType, Stream fileStream, string fileName, CancellationToken cancellationToken = default);
 }

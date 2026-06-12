@@ -99,7 +99,7 @@
     <div class="d-flex gap-2 align-items-start">
         <i class="fa-solid fs-5 mt-1"
            [ngClass]="test.propertyType === 0 ? 'fa-home text-primary' : 'fa-building text-danger'"></i>
-        <a (click)="navigateToSite(test)" class="link-primary" style="cursor:pointer">
+        <a [routerLink]="['/sites', test.site?.id, 'edit']" target="_blank">
             @if (test.propertyBusinessName) {
                 <div class="fw-semibold">{{ test.propertyBusinessName }}</div>
             }
@@ -134,7 +134,7 @@
 
 <ng-template #bpatTemplate let-test="rowData">
     <div>
-        <a (click)="navigateToBpatMasterAccount(test)" class="link-primary" style="cursor:pointer">
+        <a [routerLink]="['/backflow/testers/details', test.professional.id]" target="_blank">
             @if (test.bpatCompanyName) {
                 <div class="fw-semibold">{{ test.bpatCompanyName }}</div>
             }

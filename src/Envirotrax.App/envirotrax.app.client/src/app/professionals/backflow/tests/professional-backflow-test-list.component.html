@@ -91,7 +91,7 @@
     <div class="d-flex gap-2 align-items-start">
         <i class="fa-solid fs-5 mt-1"
            [ngClass]="test.propertyType === 0 ? 'fa-home text-primary' : 'fa-building text-danger'"></i>
-        <a (click)="navigateToSite(test)" class="link-primary" style="cursor:pointer">
+        <a [routerLink]="['/professionals/sites', test.site.id]" target="_blank">
             @if (test.propertyBusinessName) {
                 <div class="fw-semibold">{{ test.propertyBusinessName }}</div>
             }

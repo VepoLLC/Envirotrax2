@@ -9,6 +9,7 @@ import { ColumnType } from '../../shared/components/data-components/sorting-filt
 import { InputOption } from '../../shared/components/input/input.component';
 import { BackflowTestResult, BackflowReasonForTest } from '../../shared/models/backflow/backflow-test-enums';
 import { FacilityType } from '../../shared/enums/facility-type.enum';
+import { PropertyType } from '../../shared/enums/property-type.enum';
 
 @Component({
     standalone: false,
@@ -92,8 +93,8 @@ export class BackflowTestListComponent implements OnInit {
 
     public propertyTypeOptions: InputOption[] = [
         { id: "", text: "Any Value" },
-        { id: "0", text: "Residential" },
-        { id: "1", text: "Commercial" }
+        { id: PropertyType.Residential.toString(), text: "Residential" },
+        { id: PropertyType.Commercial.toString(), text: "Commercial" }
     ];
 
     public hazardTypeOptions: InputOption[] = [

@@ -8,6 +8,7 @@ import { BackflowTest } from '../../../shared/models/backflow/backflow-test';
 import { TableColumn } from '../../../shared/components/data-components/table/table.component';
 import { ColumnType } from '../../../shared/components/data-components/sorting-filtering/query-view-model';
 import { InputOption } from '../../../shared/components/input/input.component';
+import { PropertyType } from '../../../shared/enums/property-type.enum';
 
 @Component({
     standalone: false,
@@ -41,8 +42,8 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
 
     public propertyTypeOptions: InputOption[] = [
         { id: '', text: 'Any value' },
-        { id: '0', text: 'Residential' },
-        { id: '1', text: 'Commercial' }
+        { id: PropertyType.Residential.toString(), text: 'Residential' },
+        { id: PropertyType.Commercial.toString(), text: 'Commercial' }
     ];
 
     constructor(

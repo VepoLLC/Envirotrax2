@@ -91,7 +91,7 @@
     <div class="d-flex gap-2 align-items-start">
         <i class="fa-solid fs-5 mt-1"
            [ngClass]="test.propertyType === 0 ? 'fa-home text-primary' : 'fa-building text-danger'"></i>
-        <a (click)="navigateToSite(test)" class="link-primary" style="cursor:pointer">
+        <a [routerLink]="['/professionals/sites', test.site.id]" target="_blank">
             @if (test.propertyBusinessName) {
                 <div class="fw-semibold">{{ test.propertyBusinessName }}</div>
             }
@@ -122,12 +122,6 @@
             {{ test.mailingCity }}@if (test.mailingCity) {, }{{ test.mailingState?.code }} {{ test.mailingZip }}
         </div>
     </div>
-</ng-template>
-
-<ng-template #viewTemplate let-test="rowData">
-    <button type="button" class="btn btn-primary btn-sm" (click)="viewTest(test)">
-        <i class="fa-solid fa-magnifying-glass me-1"></i>View
-    </button>
 </ng-template>
 
 <div [hidden]="showResults">
@@ -329,6 +323,8 @@
                         [(query)]="table.query"
                         (queryChange)="getTests()"
                         (queryReset)="getTests()"
+                        [canViewDetails]="true"
+                        (viewDetails)="viewDetails($event)"
                         [freeTextSearch]="table.freeTextSearch" />
             }
             @if (table.items?.data?.length === 0) {

@@ -405,26 +405,4 @@ export class BackflowTestListComponent implements OnInit {
             });
     }
 
-    public navigateToSite(test: BackflowTest): void {
-        if (!test.site?.id) {
-            return;
-        }
-
-        const url = this._router.serializeUrl(
-            this._router.createUrlTree(['sites', test.site.id, 'edit'])
-        );
-        window.open(url, '_blank');
-    }
-
-    public navigateToBpatMasterAccount(test: BackflowTest): void {
-        if (!test.professional?.id) {
-            return;
-        }
-
-        const url = this._router.serializeUrl(
-            this._router.createUrlTree(['/backflow/testers/details', test.professional.id])
-        );
-        window.open(url, '_blank');
-    }
-
 }

@@ -13,6 +13,7 @@ import { BackflowTestResult } from '../../../shared/models/backflow/backflow-tes
 import { DownloadConfig } from '../../../shared/models/download-config';
 import { DownloadService } from '../../../shared/services/download.service';
 import { PrintableTableService } from '../../../shared/services/printable-table.service';
+import { PropertyType } from '../../../shared/enums/property-type.enum';
 
 @Component({
     standalone: false,
@@ -71,8 +72,8 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
 
     public propertyTypeOptions: InputOption[] = [
         { id: '', text: 'Any value' },
-        { id: '0', text: 'Residential' },
-        { id: '1', text: 'Commercial' }
+        { id: PropertyType.Residential.toString(), text: 'Residential' },
+        { id: PropertyType.Commercial.toString(), text: 'Commercial' }
     ];
 
     constructor(
@@ -147,10 +148,9 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
     }
 
     public navigateToSite(test: BackflowTest): void {
-        if (!test.site?.id) 
-            { 
-                return; 
-            }
+        if (!test.site?.id) {
+            return;
+        }
 
         const url = this._router.serializeUrl(
             this._router.createUrlTree(['/professionals/sites', test.site.id])

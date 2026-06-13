@@ -8,6 +8,7 @@ import { InputOption } from '../../../../shared/components/input/input.component
 import { TableColumn, CellTemplateData } from '../../../../shared/components/data-components/table/table.component';
 import { ColumnType } from '../../../../shared/components/data-components/sorting-filtering/query-view-model';
 import { TableViewModel } from '../../../../shared/models/table-view-model';
+import { PropertyType } from '../../../../shared/enums/property-type.enum';
 
 
 @Component({
@@ -53,8 +54,8 @@ export class CsiInspectionListComponent implements OnInit {
 
     public propertyTypeOptions: InputOption[] = [
         { id: '', text: '' },
-        { id: '0', text: 'Residential' },
-        { id: '1', text: 'Commercial' }
+        { id: PropertyType.Residential.toString(), text: 'Residential' },
+        { id: PropertyType.Commercial.toString(), text: 'Commercial' }
     ];
 
     constructor(

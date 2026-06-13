@@ -19,6 +19,7 @@ import { BackflowTestResult } from '../../shared/models/backflow/backflow-test-e
 import { DownloadConfig } from '../../shared/models/download-config';
 import { DownloadService } from '../../shared/services/download.service';
 import { PrintableTableService } from '../../shared/services/printable-table.service';
+import { PropertyType } from '../../shared/enums/property-type.enum';
 
 @Component({
     standalone: false,
@@ -112,8 +113,8 @@ export class BackflowTestListComponent implements OnInit {
 
     public propertyTypeOptions: InputOption[] = [
         { id: "", text: "Any Value" },
-        { id: "0", text: "Residential" },
-        { id: "1", text: "Commercial" }
+        { id: PropertyType.Residential.toString(), text: "Residential" },
+        { id: PropertyType.Commercial.toString(), text: "Commercial" }
     ];
 
     public hazardTypeOptions: InputOption[];
@@ -222,7 +223,7 @@ export class BackflowTestListComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         this.setupColumns();
     }
-    
+
     public viewDetails(test: BackflowTest): void {
         this._router.navigate([test.id, 'view'], { relativeTo: this._activatedRoute });
     }
@@ -405,10 +406,9 @@ export class BackflowTestListComponent implements OnInit {
     }
 
     public navigateToSite(test: BackflowTest): void {
-        if (!test.site?.id) 
-            { 
-                return; 
-            }
+        if (!test.site?.id) {
+            return;
+        }
 
         const url = this._router.serializeUrl(
             this._router.createUrlTree(['sites', test.site.id, 'edit'])
@@ -417,10 +417,9 @@ export class BackflowTestListComponent implements OnInit {
     }
 
     public navigateToBpatMasterAccount(test: BackflowTest): void {
-        if (!test.professional?.id) 
-            { 
-                return; 
-            }
+        if (!test.professional?.id) {
+            return;
+        }
 
         const url = this._router.serializeUrl(
             this._router.createUrlTree(['/backflow/testers/details', test.professional.id])

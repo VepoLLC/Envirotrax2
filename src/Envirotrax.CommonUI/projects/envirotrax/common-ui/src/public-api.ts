@@ -45,3 +45,4 @@ export * from './lib/services/helpers/url-resolver.service';
 export * from './lib/services/helpers/helper.service';
 export * from './lib/services/helpers/query-helper.service';
 export * from './lib/services/helpers/modal-helper.service'
+export * from "./lib/services/helpers/timezone/timezone.interceptor";

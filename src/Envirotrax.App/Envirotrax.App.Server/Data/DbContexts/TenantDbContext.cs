@@ -44,6 +44,7 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
     public DbSet<State> States { get; set; }
     public DbSet<Site> Sites { get; set; }
     public DbSet<CsiInspection> CsiInspections { get; set; }
+    public DbSet<CsiInspectionImage> CsiInspectionImages { get; set; }
     public DbSet<FogInspection> FogInspections { get; set; }
     public DbSet<BackflowTest> BackflowTests { get; set; }
 

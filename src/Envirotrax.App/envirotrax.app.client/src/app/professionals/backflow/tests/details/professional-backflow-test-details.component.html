@@ -1,0 +1,52 @@
+<div>
+    <h1 class="text-center h2">Completed Test</h1>
+    <p class="text-center">The following form must be completed for each assembly tested for recordkeeping *purposes:</p>
+
+    <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+    <div *ngIf="!isLoading && test">
+        <div class="row mt-3">
+            <vp-backflow-test-water-supplier [test]="test" />
+        </div>
+
+        <div class="row mt-3">
+            <vp-professional-backflow-test-bpat-info [test]="test" />
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <vp-professional-backflow-test-property-info [test]="test" />
+            </div>
+            <div class="col-md-6">
+                <vp-professional-backflow-test-mailing-info [test]="test" />
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <vp-professional-backflow-test-backflow-info [test]="test" />
+        </div>
+
+        <div class="row mt-3">
+            <vp-backflow-test-info
+                [test]="test"
+                [canModify]="false" />
+        </div>
+
+        <div class="row mt-3">
+            <vp-backflow-test-remarks [test]="test" />
+        </div>
+
+        <vp-backflow-test-images
+            [test]="test"
+            [canModify]="false" />
+
+        <div class="d-flex justify-content-center gap-2 flex-wrap mt-3">
+            <button type="button" class="btn btn-primary vp-section-button">
+                Export Test to Printable Document
+            </button>
+            <button type="button" class="btn btn-primary vp-section-button">
+                Out of Service Request
+            </button>
+        </div>
+    </div>
+</div>

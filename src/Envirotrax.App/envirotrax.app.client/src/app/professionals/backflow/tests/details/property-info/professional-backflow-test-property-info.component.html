@@ -1,0 +1,17 @@
+<vp-section header="Location / Property Information">
+    <dl class="row mb-0">
+        <dt class="col-sm-5">Property Type:</dt>
+        <dd class="col-sm-7">{{ test.propertyType === 0 ? 'Residential' : 'Commercial' }}</dd>
+        <dt class="col-sm-5">Business Name:</dt>
+        <dd class="col-sm-7">{{ test.propertyBusinessName }}</dd>
+        <dt class="col-sm-5">Property Address:</dt>
+        <dd class="col-sm-7">
+            <div>
+                {{ test.propertyStreetNumber }} {{ test.propertyStreetName }}<span *ngIf="test.propertyNumber"> #{{ test.propertyNumber }}</span>
+            </div>
+            <div *ngIf="test.propertyCity || test.propertyState?.code || test.propertyZip">
+                {{ test.propertyCity }}<span *ngIf="test.propertyCity && (test.propertyState?.code || test.propertyZip)">, </span>{{ test.propertyState?.code }} {{ test.propertyZip }}
+            </div>
+        </dd>
+    </dl>
+</vp-section>

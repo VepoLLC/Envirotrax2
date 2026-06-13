@@ -9,6 +9,8 @@ import { ColumnType } from '../../../../shared/components/data-components/sortin
 import { InputOption } from '../../../../shared/components/input/input.component';
 import { FogInspectionResult } from '../../../../shared/models/fog/fog-inspection-enums';
 import { FacilityType } from '../../../../shared/enums/facility-type.enum';
+import { InterceptorType } from '../../../../shared/enums/interceptor-type.enum';
+import { PropertyType } from '../../../../shared/enums/property-type.enum';
 
 @Component({
     standalone: false,
@@ -20,6 +22,8 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
     public searchAttempted: boolean = false;
 
     public readonly FogInspectionResult = FogInspectionResult;
+    public readonly InterceptorType = InterceptorType;
+    public readonly PropertyType = PropertyType;
 
     public table: TableViewModel<FogInspection> = {
         columns: [],
@@ -64,17 +68,11 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
 
     public readonly interceptorTypeOptions: InputOption[] = [
         { id: '', text: 'Any type' },
-        { id: 'Grease Trap', text: 'Grease Trap' },
-        { id: 'Grit Trap', text: 'Grit Trap' },
-        { id: 'Septic Tank', text: 'Septic Tank' },
-        { id: 'Chemical Toilet', text: 'Chemical Toilet' },
-        { id: 'Other', text: 'Other' }
-    ];
-
-    public readonly totalCapacityPercentOptions: InputOption[] = [
-        { id: '', text: 'Any value' },
-        { id: 'lte25', text: '25% or less' },
-        { id: 'gt25', text: 'Greater than 25%' }
+        { id: InterceptorType.GreaseTrap, text: 'Grease Trap' },
+        { id: InterceptorType.GritTrap, text: 'Grit Trap' },
+        { id: InterceptorType.SepticTank, text: 'Septic Tank' },
+        { id: InterceptorType.ChemicalToilet, text: 'Chemical Toilet' },
+        { id: InterceptorType.Other, text: 'Other' }
     ];
 
     public readonly facilityTypeOptions: InputOption[] = [
@@ -94,8 +92,8 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
 
     public readonly propertyTypeOptions: InputOption[] = [
         { id: '', text: 'Any value' },
-        { id: '0', text: 'Residential' },
-        { id: '1', text: 'Commercial' }
+        { id: PropertyType.Residential.toString(), text: 'Residential' },
+        { id: PropertyType.Commercial.toString(), text: 'Commercial' }
     ];
 
     constructor(
@@ -151,11 +149,6 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
                 cellTemplate: this.interceptorCell
             },
             {
-                field: 'totalCapacityPercent',
-                caption: 'Total capacity %',
-                type: ColumnType.text
-            },
-            {
                 field: 'inspectionResult',
                 caption: 'Inspection result',
                 type: ColumnType.text,
@@ -182,13 +175,7 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
-        this.table.query.filter = queryProperties.map(qp => {
-            if (qp.columnName === 'totalCapacityPercent') {
-                if (qp.value === 'lte25') return { ...qp, value: '25', comparisonOperator: 'Lte' as const };
-                if (qp.value === 'gt25') return { ...qp, value: '25', comparisonOperator: 'Gt' as const };
-            }
-            return qp;
-        });
+        this.table.query.filter = queryProperties;
     }
 
     public async search(): Promise<void> {

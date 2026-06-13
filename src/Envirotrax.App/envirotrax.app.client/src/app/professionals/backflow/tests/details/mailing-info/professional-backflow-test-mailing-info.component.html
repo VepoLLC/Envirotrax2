@@ -1,0 +1,21 @@
+<vp-section header="Contact / Mailing Information">
+    <dl class="row mb-0">
+        <dt class="col-sm-5">Company Name:</dt>
+        <dd class="col-sm-7">{{ test.mailingCompanyName }}</dd>
+        <dt class="col-sm-5">Contact Name:</dt>
+        <dd class="col-sm-7">{{ test.mailingContactName }}</dd>
+        <dt class="col-sm-5">Mailing Address:</dt>
+        <dd class="col-sm-7">
+            <div>
+                {{ test.mailingStreetNumber }} {{ test.mailingStreetName }}<span *ngIf="test.mailingNumber"> #{{ test.mailingNumber }}</span>
+            </div>
+            <div *ngIf="test.mailingCity || test.mailingState?.code || test.mailingZip">
+                {{ test.mailingCity }}<span *ngIf="test.mailingCity && (test.mailingState?.code || test.mailingZip)">, </span>{{ test.mailingState?.code }} {{ test.mailingZip }}
+            </div>
+        </dd>
+        <dt class="col-sm-5">Phone Number:</dt>
+        <dd class="col-sm-7">{{ test.mailingPhoneNumber }}</dd>
+        <dt class="col-sm-5">Email Address:</dt>
+        <dd class="col-sm-7">{{ test.mailingEmailAddress }}</dd>
+    </dl>
+</vp-section>

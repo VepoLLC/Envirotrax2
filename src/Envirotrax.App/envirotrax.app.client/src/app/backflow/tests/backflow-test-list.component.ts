@@ -19,6 +19,7 @@ import { BackflowTestResult } from '../../shared/models/backflow/backflow-test-e
 import { DownloadConfig } from '../../shared/models/download-config';
 import { DownloadService } from '../../shared/services/download.service';
 import { PrintableTableService } from '../../shared/services/printable-table.service';
+import { PropertyType } from '../../shared/enums/property-type.enum';
 
 @Component({
     standalone: false,
@@ -112,8 +113,8 @@ export class BackflowTestListComponent implements OnInit {
 
     public propertyTypeOptions: InputOption[] = [
         { id: "", text: "Any Value" },
-        { id: "0", text: "Residential" },
-        { id: "1", text: "Commercial" }
+        { id: PropertyType.Residential.toString(), text: "Residential" },
+        { id: PropertyType.Commercial.toString(), text: "Commercial" }
     ];
 
     public hazardTypeOptions: InputOption[];
@@ -222,7 +223,7 @@ export class BackflowTestListComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         this.setupColumns();
     }
-    
+
     public viewDetails(test: BackflowTest): void {
         this._router.navigate([test.id, 'view'], { relativeTo: this._activatedRoute });
     }
@@ -402,30 +403,6 @@ export class BackflowTestListComponent implements OnInit {
                 const icon = { path: 0, fillColor: '#e8342e', fillOpacity: 0.85, strokeWeight: 0, scale: 7 };
                 return { lat: t.site!.gisLatitude!, lng: t.site!.gisLongitude!, popupHtml, icon, data: t };
             });
-    }
-
-    public navigateToSite(test: BackflowTest): void {
-        if (!test.site?.id) 
-            { 
-                return; 
-            }
-
-        const url = this._router.serializeUrl(
-            this._router.createUrlTree(['sites', test.site.id, 'edit'])
-        );
-        window.open(url, '_blank');
-    }
-
-    public navigateToBpatMasterAccount(test: BackflowTest): void {
-        if (!test.professional?.id) 
-            { 
-                return; 
-            }
-
-        const url = this._router.serializeUrl(
-            this._router.createUrlTree(['/backflow/testers/details', test.professional.id])
-        );
-        window.open(url, '_blank');
     }
 
 }

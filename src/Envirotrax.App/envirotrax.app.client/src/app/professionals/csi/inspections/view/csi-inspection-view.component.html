@@ -305,13 +305,14 @@
         <dp-loading-spinner *ngIf="isLoadingImages"></dp-loading-spinner>
         <div *ngIf="!isLoadingImages">
             <vp-section header="Inspection Images" class="d-block">
-                <ng-container vpSectionHeaderActions>
-                    <span class="text-white small me-1">{{ images.length }} / 24</span>
-                    <button type="button" class="btn btn-light btn-sm" [disabled]="images.length >= 24 || isLoadingImages"
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted small">{{ images.length }} / 24 images</span>
+                    <button type="button" class="btn btn-primary btn-sm"
+                            [disabled]="images.length >= 24 || isLoadingImages"
                             (click)="openAddImageModal()">
                         Add Image
                     </button>
-                </ng-container>
+                </div>
 
                 <p *ngIf="images.length === 0" class="text-muted">
                     If you would like to add images associated with this inspection, click the "Add Image" button in the upper right corner. You may insert a maximum of 24 images to each report.
@@ -340,23 +341,17 @@
                             <h5 class="modal-title h6 mb-0">Add Image to Inspection</h5>
                         </div>
                         <div class="modal-body">
-                            <p class="text-center mb-3">
-                                Please click on the Choose File button below and select the image you wish to upload.
-                            </p>
-                            <div class="mb-3 p-2 border rounded"
-                                 [class.bg-light]="!modalPreviewUrl"
-                                 [class.border-success]="!!modalPreviewUrl">
-                                <input type="file" #modalFileInput style="display:none"
-                                       accept=".jpg,.jpeg,.gif,.png,.bmp,.tiff"
-                                       (change)="onModalFileSelected($event)" />
-                                <button type="button" class="btn btn-light btn-sm border me-2"
-                                        (click)="modalFileInput.click()">Choose File</button>
-                                <span style="min-width: 150px; font-size: 1rem;">{{ modalFileName }}</span>
+                            <div class="mb-3">
+                                <vp-file-upload
+                                    [file]="modalSelectedFile"
+                                    (fileChange)="onModalFileChange($event)"
+                                    accept=".jpg,.jpeg,.gif,.png,.bmp,.tiff"
+                                    label="Choose an image or drag and drop here">
+                                </vp-file-upload>
                             </div>
-                            <div class="text-center mb-3">
-                                <img [src]="modalPreviewUrl || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'"
-                                     style="max-width: 350px; max-height: 350px; min-height: 60px;"
-                                     [class.opacity-25]="!modalPreviewUrl"
+                            <div *ngIf="modalPreviewUrl" class="text-center mb-3">
+                                <img [src]="modalPreviewUrl"
+                                     style="max-width: 350px; max-height: 350px;"
                                      class="img-fluid border rounded" />
                             </div>
                             <div>

@@ -41,11 +41,16 @@ public class CsiInspectionImageService : ICsiInspectionImageService
         var images = await _imageRepository.GetByInspectionAsync(inspectionId, cancellationToken);
 
         var dtos = new List<CsiInspectionImageDto>(images.Count);
-        foreach (var img in images)
+
+        if (images.Count > 0)
         {
-            var dto = _mapper.Map<CsiInspectionImageDto>(img);
-            dto.Url = (await _fileStorageService.GenerateSasUrlAsync(img.FilePath)).ToString();
-            dtos.Add(dto);
+            var delegationKey = await _fileStorageService.GetUserDelegationKeyAsync();
+            foreach (var img in images)
+            {
+                var dto = _mapper.Map<CsiInspectionImageDto>(img);
+                dto.Url = (await _fileStorageService.GenerateSasUrlAsync(delegationKey, img.FilePath)).ToString();
+                dtos.Add(dto);
+            }
         }
 
         return dtos;

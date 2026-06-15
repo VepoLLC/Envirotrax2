@@ -7,6 +7,7 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { CsiInspection } from "../../models/csi/csi-inspection";
+import { CsiInspectionImage } from "../../models/csi/csi-inspection-image";
 import { DownloadEndpoint } from "../../models/download-config";
 
 @Injectable({
@@ -107,5 +108,33 @@ export class CsiInspectionService {
         let params: HttpParams = this._queryHelper.buildQuery(pageInfo, query);
         params = params.append('latestOnly', String(latestOnly));
         return lastValueFrom(this._http.get<PagedData<CsiInspection>>(url, { params }));
+    }
+
+    public getImages(inspectionId: number): Promise<CsiInspectionImage[]> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${inspectionId}/images`);
+        return lastValueFrom(this._http.get<CsiInspectionImage[]>(url));
+    }
+
+    public deleteImage(inspectionId: number, imageId: number): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${inspectionId}/images/${imageId}`);
+        return lastValueFrom(this._http.delete<void>(url));
+    }
+
+    public getProfessionalImages(inspectionId: number): Promise<CsiInspectionImage[]> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${inspectionId}/images`);
+        return lastValueFrom(this._http.get<CsiInspectionImage[]>(url));
+    }
+
+    public addImage(inspectionId: number, description: string | null, file: File): Promise<CsiInspectionImage> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${inspectionId}/images`);
+        const formData = new FormData();
+        if (description) formData.append('description', description);
+        formData.append('image', file);
+        return lastValueFrom(this._http.post<CsiInspectionImage>(url, formData));
+    }
+
+    public deleteProfessionalImage(inspectionId: number, imageId: number): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${inspectionId}/images/${imageId}`);
+        return lastValueFrom(this._http.delete<void>(url));
     }
 }

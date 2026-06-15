@@ -62,13 +62,6 @@
                                                    type="daterange"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
-                            <vp-filter-panel-field fieldName="totalCapacityPercent"
-                                                   label="Total capacity %"
-                                                   type="select"
-                                                   [options]="totalCapacityPercentOptions"
-                                                   [form]="searchForm" />
-                        </div>
                     </div>
                 </div>
             </vp-section>
@@ -183,8 +176,8 @@
                         imageSrc="/images/icons/bstatus-red-on.png"
                         text="Failed"
                         [showText]="false" />
-        <i *ngIf="inspection.propertyType === 0" class="fa-solid fa-house text-primary"></i>
-        <i *ngIf="inspection.propertyType === 1" class="fa-solid fa-building text-danger"></i>
+        <i *ngIf="inspection.propertyType === PropertyType.Residential" class="fa-solid fa-house text-primary"></i>
+        <i *ngIf="inspection.propertyType === PropertyType.Commercial" class="fa-solid fa-building text-danger"></i>
     </div>
 </ng-template>
 
@@ -194,7 +187,7 @@
 </ng-template>
 
 <ng-template #interceptorCell let-inspection="rowData">
-    <div>{{inspection.interceptorType}}<span *ngIf="inspection.interceptorType === 'Other'"> - {{inspection.interceptorOtherDescription}}</span></div>
+    <div>{{inspection.interceptorType}}<span *ngIf="inspection.interceptorType === InterceptorType.Other"> - {{inspection.interceptorOtherDescription}}</span></div>
     <div *ngIf="inspection.interceptorCapacity">{{inspection.interceptorCapacity}} Gallons</div>
     <div *ngIf="inspection.interceptorLocationDescription">{{inspection.interceptorLocationDescription}}</div>
 </ng-template>

@@ -6,6 +6,7 @@ import { SiteService } from "../../shared/services/sites/site.service";
 import { QueryProperty } from "../../shared/models/query";
 import { NgForm } from "@angular/forms";
 import { ProfessionalSupplierService } from "../../shared/services/professionals/professional-supplier.service";
+import { PropertyType } from "../../shared/enums/property-type.enum";
 import { ColumnType, InputOption, TableColumn } from "@envirotrax/common-ui";
 
 @Component({
@@ -40,8 +41,8 @@ export class SiteListComponent implements OnInit {
 
     public propertyTypes: InputOption[] = [
         { id: "", text: "Any Value" },
-        { id: "0", text: "Residential" },
-        { id: "1", text: "Commercial" }
+        { id: PropertyType.Residential.toString(), text: "Residential" },
+        { id: PropertyType.Commercial.toString(), text: "Commercial" }
     ];
 
     constructor(

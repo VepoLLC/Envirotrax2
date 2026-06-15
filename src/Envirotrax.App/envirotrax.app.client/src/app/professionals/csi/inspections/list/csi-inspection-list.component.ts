@@ -5,6 +5,7 @@ import { ProfessionalSupplierService } from '../../../../shared/services/profess
 import { CsiInspection } from '../../../../shared/models/csi/csi-inspection';
 import { QueryProperty } from '../../../../shared/models/query';
 import { TableViewModel } from '../../../../shared/models/table-view-model';
+import { PropertyType } from '../../../../shared/enums/property-type.enum';
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from '@envirotrax/common-ui';
 
 
@@ -51,8 +52,8 @@ export class CsiInspectionListComponent implements OnInit {
 
     public propertyTypeOptions: InputOption[] = [
         { id: '', text: '' },
-        { id: '0', text: 'Residential' },
-        { id: '1', text: 'Commercial' }
+        { id: PropertyType.Residential.toString(), text: 'Residential' },
+        { id: PropertyType.Commercial.toString(), text: 'Commercial' }
     ];
 
     constructor(

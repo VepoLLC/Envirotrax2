@@ -6,6 +6,8 @@ import { TableViewModel } from '../../../shared/models/table-view-model';
 import { FogInspection } from '../../../shared/models/fog/fog-inspection';
 import { FogInspectionResult } from '../../../shared/models/fog/fog-inspection-enums';
 import { FacilityType } from '../../../shared/enums/facility-type.enum';
+import { InterceptorType } from '../../../shared/enums/interceptor-type.enum';
+import { PropertyType } from '../../../shared/enums/property-type.enum';
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from '@envirotrax/common-ui';
 
 @Component({
@@ -61,11 +63,11 @@ export class FogInspectionListComponent implements OnInit {
 
     public interceptorTypeOptions: InputOption[] = [
         { id: '', text: 'Any Type' },
-        { id: 'Grease Trap', text: 'Grease Trap' },
-        { id: 'Grit Trap', text: 'Grit Trap' },
-        { id: 'Septic Tank', text: 'Septic Tank' },
-        { id: 'Chemical Toilet', text: 'Chemical Toilet' },
-        { id: 'Other', text: 'Other' }
+        { id: InterceptorType.GreaseTrap, text: 'Grease Trap' },
+        { id: InterceptorType.GritTrap, text: 'Grit Trap' },
+        { id: InterceptorType.SepticTank, text: 'Septic Tank' },
+        { id: InterceptorType.ChemicalToilet, text: 'Chemical Toilet' },
+        { id: InterceptorType.Other, text: 'Other' }
     ];
 
     public totalCapacityPercentOptions: InputOption[] = [
@@ -91,8 +93,8 @@ export class FogInspectionListComponent implements OnInit {
 
     public propertyTypeOptions: InputOption[] = [
         { id: '', text: 'Any Value' },
-        { id: '0', text: 'Residential' },
-        { id: '1', text: 'Commercial' }
+        { id: PropertyType.Residential.toString(), text: 'Residential' },
+        { id: PropertyType.Commercial.toString(), text: 'Commercial' }
     ];
 
     constructor(

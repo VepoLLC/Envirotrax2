@@ -13,11 +13,13 @@ namespace Envirotrax.App.Server.Controllers.Csi;
 public class CsiInspectionController : WaterSupplierCrudController<CsiInspectionDto>
 {
     private readonly ICsiInspectionService _inspectionService;
+    private readonly ICsiInspectionImageService _imageService;
 
-    public CsiInspectionController(ICsiInspectionService service)
+    public CsiInspectionController(ICsiInspectionService service, ICsiInspectionImageService imageService)
         : base(service)
     {
         _inspectionService = service;
+        _imageService = imageService;
     }
 
     [HttpGet("pdf")]
@@ -47,5 +49,21 @@ public class CsiInspectionController : WaterSupplierCrudController<CsiInspection
 
         var pdfBytes = await _inspectionService.GeneratePdfAsync(inspection);
         return File(pdfBytes, "application/pdf");
+    }
+
+    [HttpGet("{id}/images")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetImagesAsync(int id, CancellationToken cancellationToken)
+    {
+        var result = await _imageService.GetByInspectionAsync(id, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpDelete("{id}/images/{imageId}")]
+    [HasPermission(PermissionAction.CanDelete)]
+    public async Task<IActionResult> DeleteImageAsync(int id, int imageId, CancellationToken cancellationToken)
+    {
+        var deleted = await _imageService.DeleteImageAsync(imageId, cancellationToken);
+        return deleted ? Ok() : NotFound();
     }
 }

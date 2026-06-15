@@ -64,7 +64,8 @@
     <div>
         <div>
             <span class="fw-semibold">Assembly Desc:</span>
-            <span class="ms-1 text-muted">{{ test.manufacturer }} {{ test.model }} {{ test.size }} {{ test.deviceType }}</span>
+            <span class="ms-1 text-muted">{{ test.manufacturer }} {{ test.model }} {{ test.size }}
+                {{ test.deviceType }}</span>
         </div>
         @if (test.hazardType) {
             <div>
@@ -91,7 +92,7 @@
     <div class="d-flex gap-2 align-items-start">
         <i class="fa-solid fs-5 mt-1"
            [ngClass]="test.propertyType === 0 ? 'fa-home text-primary' : 'fa-building text-danger'"></i>
-        <a (click)="navigateToSite(test)" class="link-primary" style="cursor:pointer">
+        <a [routerLink]="['/professionals/sites', test?.site?.id]" target="_blank">
             @if (test.propertyBusinessName) {
                 <div class="fw-semibold">{{ test.propertyBusinessName }}</div>
             }
@@ -122,12 +123,6 @@
             {{ test.mailingCity }}@if (test.mailingCity) {, }{{ test.mailingState?.code }} {{ test.mailingZip }}
         </div>
     </div>
-</ng-template>
-
-<ng-template #viewTemplate let-test="rowData">
-    <button type="button" class="btn btn-primary btn-sm" (click)="viewTest(test)">
-        <i class="fa-solid fa-magnifying-glass me-1"></i>View
-    </button>
 </ng-template>
 
 <div [hidden]="showResults">
@@ -288,9 +283,10 @@
         </button>
     </div>
 
-    <vp-section [noPadding]="true" header="Backflow Assembly Tests Matching the Search Filter - {{ table.items?.pageInfo?.totalItems ?? 0 }} Results">
+    <vp-section [noPadding]="true"
+                header="Backflow Assembly Tests Matching the Search Filter - {{ table.items?.pageInfo?.totalItems ?? 0 }} Results">
         <div #printableSection>
-            <div  class="row gap-2 justify-content-center mb-3">
+            <div class="row gap-2 justify-content-center mb-3">
                 <div class="col-auto mb-2">
                     <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Current Test" />
                     <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Non Current Test" />
@@ -323,13 +319,15 @@
 
             @if (table.items && table.items.data && table.items.data.length > 0) {
                 <vp-table [columns]="table.columns!"
-                        [data]="table.items.data"
-                        [(pageInfo)]="table.items.pageInfo"
-                        (pageInfoChange)="getTests()"
-                        [(query)]="table.query"
-                        (queryChange)="getTests()"
-                        (queryReset)="getTests()"
-                        [freeTextSearch]="table.freeTextSearch" />
+                          [data]="table.items.data"
+                          [(pageInfo)]="table.items.pageInfo"
+                          (pageInfoChange)="getTests()"
+                          [(query)]="table.query"
+                          (queryChange)="getTests()"
+                          (queryReset)="getTests()"
+                          [canViewDetails]="true"
+                          (viewDetails)="viewDetails($event)"
+                          [freeTextSearch]="table.freeTextSearch" />
             }
             @if (table.items?.data?.length === 0) {
                 <div class="text-center py-3 text-muted">
@@ -337,7 +335,7 @@
                 </div>
             }
         </div>
-        
+
     </vp-section>
 
 </div>

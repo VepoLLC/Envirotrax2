@@ -5,7 +5,7 @@ import { CsiInspection } from '../../../../shared/models/csi/csi-inspection';
 import { CsiInspectionImage } from '../../../../shared/models/csi/csi-inspection-image';
 import { CsiInspectionReason, csiInspectionReasonLabels } from '../../../../shared/enums/csi-inspection-reason.enum';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { ModalHelperService } from '../../../../shared/services/helpers/modal-helper.service';
+import { ModalHelperService } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,
@@ -30,7 +30,7 @@ export class CsiInspectionViewComponent implements OnInit {
         private readonly _inspectionService: CsiInspectionService,
         private readonly _toastService: ToastService,
         private readonly _modalHelper: ModalHelperService
-    ) {}
+    ) { }
 
     public async ngOnInit(): Promise<void> {
         await this.loadInspection();

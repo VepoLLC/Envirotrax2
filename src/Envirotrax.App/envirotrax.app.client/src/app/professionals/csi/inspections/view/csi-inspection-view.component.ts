@@ -5,6 +5,7 @@ import { CsiInspection } from '../../../../shared/models/csi/csi-inspection';
 import { CsiInspectionImage } from '../../../../shared/models/csi/csi-inspection-image';
 import { CsiInspectionReason, csiInspectionReasonLabels } from '../../../../shared/enums/csi-inspection-reason.enum';
 import { ToastService } from '../../../../shared/services/toast.service';
+import { ModalHelperService } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,
@@ -20,16 +21,16 @@ export class CsiInspectionViewComponent implements OnInit {
     public newImageDescription = '';
     public showAddImageModal = false;
     public modalPreviewUrl: string | null = null;
-    public modalFileName = '';
+    public modalSelectedFile: File | null = null;
 
-    private _modalSelectedFile: File | null = null;
     private imagesLoaded = false;
 
     constructor(
         private readonly _route: ActivatedRoute,
         private readonly _inspectionService: CsiInspectionService,
-        private readonly _toastService: ToastService
-    ) {}
+        private readonly _toastService: ToastService,
+        private readonly _modalHelper: ModalHelperService
+    ) { }
 
     public async ngOnInit(): Promise<void> {
         await this.loadInspection();
@@ -63,8 +64,7 @@ export class CsiInspectionViewComponent implements OnInit {
     public openAddImageModal(): void {
         this.newImageDescription = '';
         this.modalPreviewUrl = null;
-        this.modalFileName = '';
-        this._modalSelectedFile = null;
+        this.modalSelectedFile = null;
         this.showAddImageModal = true;
     }
 
@@ -72,17 +72,15 @@ export class CsiInspectionViewComponent implements OnInit {
         this.showAddImageModal = false;
         this.newImageDescription = '';
         this.modalPreviewUrl = null;
-        this.modalFileName = '';
-        this._modalSelectedFile = null;
+        this.modalSelectedFile = null;
     }
 
-    public onModalFileSelected(event: Event): void {
-        const input = event.target as HTMLInputElement;
-        if (!input.files?.length) return;
-        const file = input.files[0];
-        this._modalSelectedFile = file;
-        this.modalFileName = file.name;
-        input.value = '';
+    public onModalFileChange(file: File | null): void {
+        this.modalSelectedFile = file;
+        if (!file) {
+            this.modalPreviewUrl = null;
+            return;
+        }
         const reader = new FileReader();
         reader.onload = (e) => {
             this.modalPreviewUrl = e.target?.result as string;
@@ -91,8 +89,8 @@ export class CsiInspectionViewComponent implements OnInit {
     }
 
     public async onModalOk(): Promise<void> {
-        if (!this._modalSelectedFile || !this.inspection?.id) return; // no file selected — no-op (matches V1 server-side guard)
-        const file = this._modalSelectedFile;
+        if (!this.modalSelectedFile || !this.inspection?.id) return; // no file selected — no-op (matches V1 server-side guard)
+        const file = this.modalSelectedFile;
         const description = this.newImageDescription || null;
         this.closeAddImageModal();
         try {
@@ -107,18 +105,23 @@ export class CsiInspectionViewComponent implements OnInit {
         }
     }
 
-    public async deleteImage(imageId: number): Promise<void> {
-        if (!this.inspection?.id) return;
-        try {
-            this.isLoadingImages = true;
-            await this._inspectionService.deleteProfessionalImage(this.inspection.id, imageId);
-            this.images = this.images.filter(i => i.id !== imageId);
-            this._toastService.successfullySaved('Image');
-        } catch {
-            this._toastService.failedToSave('Image');
-        } finally {
-            this.isLoadingImages = false;
-        }
+    public deleteImage(imageId: number): void {
+        const inspectionId = this.inspection?.id;
+        if (!inspectionId) return;
+        this._modalHelper.confirm({
+            messages: ['Are you sure you want to delete this image?']
+        }).result().subscribe(async () => {
+            try {
+                this.isLoadingImages = true;
+                await this._inspectionService.deleteProfessionalImage(inspectionId, imageId);
+                this.images = this.images.filter(i => i.id !== imageId);
+                this._toastService.successfullySaved('Image');
+            } catch {
+                this._toastService.failedToSave('Image');
+            } finally {
+                this.isLoadingImages = false;
+            }
+        });
     }
 
     private async loadInspection(): Promise<void> {

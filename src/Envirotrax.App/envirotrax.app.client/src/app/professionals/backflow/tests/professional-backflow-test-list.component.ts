@@ -6,9 +6,7 @@ import { ProfessionalSupplierService } from '../../../shared/services/profession
 import { QueryProperty } from '../../../shared/models/query';
 import { TableViewModel } from '../../../shared/models/table-view-model';
 import { BackflowTest } from '../../../shared/models/backflow/backflow-test';
-import { CellTemplateData } from '../../../shared/components/data-components/table/table.component';
-import { ColumnType } from '../../../shared/components/data-components/sorting-filtering/query-view-model';
-import { InputOption } from '../../../shared/components/input/input.component';
+import { CellTemplateData, ColumnType, InputOption } from '@envirotrax/common-ui';
 import { BackflowTestResult } from '../../../shared/models/backflow/backflow-test-enums';
 import { DownloadConfig } from '../../../shared/models/download-config';
 import { DownloadService } from '../../../shared/services/download.service';

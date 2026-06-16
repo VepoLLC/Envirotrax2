@@ -1,9 +1,8 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { ProfessionalUser } from "../../../../../shared/models/professionals/professional-user";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
-import { TableColumn } from "../../../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { FogInspectorSubAccountsService } from "../../../../../shared/services/fog/fog-inspector-user.service";
+import { ColumnType, TableColumn } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'vp-fog-inspector-users',

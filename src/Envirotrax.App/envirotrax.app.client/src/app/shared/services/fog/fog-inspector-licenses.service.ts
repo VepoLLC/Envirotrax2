@@ -8,7 +8,7 @@ import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { ProfessionalUserLicense } from "../../models/professionals/licenses/professional-user-license";
 import { ProfessionalLicenseType } from "../../models/professionals/licenses/professional-license-type";
-import { InputOption } from "../../components/input/input.component";
+import { InputOption } from "@envirotrax/common-ui";
 
 @Injectable({
     providedIn: 'root'

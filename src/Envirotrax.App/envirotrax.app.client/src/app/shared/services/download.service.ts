@@ -5,8 +5,8 @@ import { lastValueFrom } from "rxjs";
 import { MAX_PAGE_SIZE } from "../models/page-info";
 import { DownloadConfig, FileFormat } from "../models/download-config";
 import { Query } from "../models/query";
-import { ModalHelperService } from "./helpers/modal-helper.service";
 import { DownloadManagerComponent } from "../components/data-components/download-manager/download-manager.component";
+import { ModalHelperService } from "@envirotrax/common-ui";
 
 @Injectable({
     providedIn: 'root'

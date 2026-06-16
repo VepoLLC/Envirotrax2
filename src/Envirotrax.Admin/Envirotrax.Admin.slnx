@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="envirotrax.admin.client/envirotrax.admin.client.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="Envirotrax.Admin.Server/Envirotrax.Admin.Server.csproj" />
+</Solution>

@@ -1,0 +1,62 @@
+{
+  "name": "envirotrax.admin.client",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "npm run common-ui:update && run-script-os",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "prestart": "node aspnetcore-https",
+    "common-ui:update": "cd ..\\..\\Envirotrax.CommonUI && npm run build-package && cd ..\\Envirotrax.Admin\\envirotrax.admin.client && npm install ..\\..\\Envirotrax.CommonUI\\dist\\envirotrax\\common-ui\\envirotrax-common-ui-1.0.0.tgz --force",
+    "start:windows": "ng serve --ssl --ssl-cert \"%APPDATA%\\ASP.NET\\https\\%npm_package_name%.pem\" --ssl-key \"%APPDATA%\\ASP.NET\\https\\%npm_package_name%.key\" --host=127.0.0.1",
+    "start:default": "ng serve --ssl --ssl-cert \"$HOME/.aspnet/https/${npm_package_name}.pem\" --ssl-key \"$HOME/.aspnet/https/${npm_package_name}.key\" --host=127.0.0.1"
+  },
+  "prettier": {
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/common": "^20.3.24",
+    "@angular/compiler": "^20.3.24",
+    "@angular/core": "^20.3.24",
+    "@angular/forms": "^20.3.24",
+    "@angular/platform-browser": "^20.3.24",
+    "@angular/router": "^20.3.24",
+    "@developer-partners/ngx-loading-spinner": "^1.0.11",
+    "@developer-partners/ngx-modal-dialog": "^1.0.6",
+    "@envirotrax/common-ui": "file:../../Envirotrax.CommonUI/dist/envirotrax/common-ui/envirotrax-common-ui-1.0.0.tgz",
+    "@fortawesome/fontawesome-free": "^7.1.0",
+    "@googlemaps/js-api-loader": "^2.0.2",
+    "@ng-select/ng-select": "^20.3.0",
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.8",
+    "flatpickr": "^4.6.13",
+    "jest-editor-support": "*",
+    "oidc-client-ts": "^3.4.1",
+    "run-script-os": "*",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.15.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^20.3.24",
+    "@angular/cli": "^20.3.24",
+    "@angular/compiler-cli": "^20.3.24",
+    "@types/jasmine": "~5.1.0",
+    "jasmine-core": "~5.8.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "typescript": "~5.8.2"
+  }
+}

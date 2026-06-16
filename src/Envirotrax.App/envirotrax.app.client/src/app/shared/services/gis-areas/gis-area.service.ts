@@ -7,7 +7,7 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { DefaultGisMapView, GisArea } from "../../models/gis-areas/gis-area";
-import { InputOption } from "../../components/input/input.component";
+import { InputOption } from "@envirotrax/common-ui";
 
 @Injectable({
     providedIn: 'root'

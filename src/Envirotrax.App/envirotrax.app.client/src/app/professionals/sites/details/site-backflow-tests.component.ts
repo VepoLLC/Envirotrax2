@@ -7,10 +7,8 @@ import { FeatureType } from '../../../shared/models/feature-type';
 import { ROLE_DEFINITIONS } from '../../../shared/models/role-definitions';
 import { Query, QueryProperty } from '../../../shared/models/query';
 import { TableViewModel } from '../../../shared/models/table-view-model';
-import { CellTemplateData, TableColumn } from '../../../shared/components/data-components/table/table.component';
-import { ColumnType } from '../../../shared/components/data-components/sorting-filtering/query-view-model';
-import { InputOption } from '../../../shared/components/input/input.component';
 import { BackflowTestResult } from '../../../shared/models/backflow/backflow-test-enums';
+import { CellTemplateData, ColumnType, InputOption, TableColumn } from '@envirotrax/common-ui';
 
 @Component({
     selector: 'vp-site-backflow-tests',
@@ -62,7 +60,7 @@ export class SiteBackflowTestsComponent implements OnInit {
         private readonly _authService: AuthService,
         private readonly _backflowTestService: BackflowTestService,
         private readonly _router: Router
-    ) {}
+    ) { }
 
     public async ngOnInit(): Promise<void> {
         const hasFeature = await this._authService.hasAnyFeatures(FeatureType.BackflowTesting);

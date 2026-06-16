@@ -3,10 +3,10 @@ import { ActivatedRoute } from "@angular/router";
 import { CsiInspection } from "../../../shared/models/csi/csi-inspection";
 import { CsiInspectionImage } from "../../../shared/models/csi/csi-inspection-image";
 import { CsiInspectionService } from "../../../shared/services/csi/csi-inspection.service";
-import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { DisapproveCsiInspectionComponent } from "./disapprove/disapprove-csi-inspection.component";
 import { DownloadService } from "../../../shared/services/download.service";
+import { ModalHelperService } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'app-csi-inspection-details',

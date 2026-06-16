@@ -4,13 +4,11 @@ import { FogInspectionService } from '../../../shared/services/fog/fog-inspectio
 import { QueryProperty } from '../../../shared/models/query';
 import { TableViewModel } from '../../../shared/models/table-view-model';
 import { FogInspection } from '../../../shared/models/fog/fog-inspection';
-import { CellTemplateData, TableColumn } from '../../../shared/components/data-components/table/table.component';
-import { ColumnType } from '../../../shared/components/data-components/sorting-filtering/query-view-model';
-import { InputOption } from '../../../shared/components/input/input.component';
 import { FogInspectionResult } from '../../../shared/models/fog/fog-inspection-enums';
 import { FacilityType } from '../../../shared/enums/facility-type.enum';
 import { InterceptorType } from '../../../shared/enums/interceptor-type.enum';
 import { PropertyType } from '../../../shared/enums/property-type.enum';
+import { CellTemplateData, ColumnType, InputOption, TableColumn } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,
@@ -101,7 +99,7 @@ export class FogInspectionListComponent implements OnInit {
 
     constructor(
         private readonly _fogInspectionService: FogInspectionService
-    ) {}
+    ) { }
 
     public async ngOnInit(): Promise<void> {
         this.table.columns = this.getColumns();

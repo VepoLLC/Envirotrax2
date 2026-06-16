@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { BackflowTest } from "../../../../shared/models/backflow/backflow-test";
 import { BackflowTestOptionsService } from "../../../../shared/services/backflow/backflow-test-options.service";
-import { InputOption } from "../../../../shared/components/input/input.component";
+import { InputOption } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'vp-backflow-test-backflow-info',

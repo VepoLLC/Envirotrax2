@@ -2,20 +2,18 @@ import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core"
 import { ExpirationType, ProfessionalUserLicense, professionalTypeLabels, ProfessionalType } from "../../../../../shared/models/professionals/licenses/professional-user-license";
 import { ProfessionalInsurance, ExpirationType as InsuranceExpirationType } from "../../../../../shared/models/professionals/professional-insurance";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
-import { CellTemplateData, TableColumn, TableCustomAction } from "../../../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { BackflowTesterLicensesService } from "../../../../../shared/services/backflow/backflow-tester-licenses.service";
 import { BackflowTesterInsurancesService } from "../../../../../shared/services/backflow/backflow-tester-insurances.service";
 import { Professional } from "../../../../../shared/models/professionals/professional";
 import { AuthService } from "../../../../../shared/services/auth/auth.service";
 import { FeatureType } from "../../../../../shared/models/feature-type";
 import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
-import { ModalHelperService } from "../../../../../shared/services/helpers/modal-helper.service";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { ToastService } from "../../../../../shared/services/toast.service";
 import { AddEditBackflowTesterInsuranceComponent } from "../edit/add-edit-backflow-tester-insurance.component";
 import { AddEditBackflowTesterLicenseComponent } from "../edit/add-edit-backflow-tester-license.component";
 import { DownloadService } from "../../../../../shared/services/download.service";
+import { CellTemplateData, ColumnType, ModalHelperService, TableColumn, TableCustomAction } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'vp-backflow-tester-license-insurances',

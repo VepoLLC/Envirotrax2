@@ -3,23 +3,19 @@ import { TableViewModel } from "../../shared/models/table-view-model";
 import { Site } from "../../shared/models/sites/site";
 import { SiteService } from "../../shared/services/sites/site.service";
 import { ActivatedRoute, Router } from "@angular/router";
-import { CellTemplateData, TableColumn } from "../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../shared/components/data-components/sorting-filtering/query-view-model";
 import { QueryProperty } from "../../shared/models/query";
 import { NgForm } from "@angular/forms";
-import { ModalHelperService } from "../../shared/services/helpers/modal-helper.service";
 import { CreateSiteComponent } from "../create/create-site-component";
-import { InputOption } from "../../shared/components/input/input.component";
 import { PropertyType } from "../../shared/enums/property-type.enum";
 import { GisAreaService } from "../../shared/services/gis-areas/gis-area.service";
 import { GisAreaCoordinateService } from "../../shared/services/gis-areas/gis-area-coordinate.service";
 import { GisMapService } from "../../shared/services/gis-areas/gis-map.service";
 import { GisArea } from "../../shared/models/gis-areas/gis-area";
-import { MapMarker, MapPolygon } from "../../shared/components/map/map.component";
 import { DownloadConfig } from "../../shared/models/download-config";
 import { AuthService } from "../../shared/services/auth/auth.service";
 import { FeatureType } from "../../shared/models/feature-type";
 import { DownloadService } from "../../shared/services/download.service";
+import { CellTemplateData, ColumnType, InputOption, MapMarker, MapPolygon, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 
 @Component({
     standalone: false,

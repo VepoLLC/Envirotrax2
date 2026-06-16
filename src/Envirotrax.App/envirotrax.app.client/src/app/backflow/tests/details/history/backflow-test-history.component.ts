@@ -4,9 +4,8 @@ import { BackflowTest } from "../../../../shared/models/backflow/backflow-test";
 import { BackflowTestService } from "../../../../shared/services/backflow/backflow-test.service";
 import { BackflowTestResult } from "../../../../shared/models/backflow/backflow-test-enums";
 import { TableViewModel } from "../../../../shared/models/table-view-model";
-import { CellTemplateData, TableColumn } from "../../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { ComparisonOperator } from "../../../../shared/models/query";
+import { CellTemplateData, ColumnType, TableColumn } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'vp-backflow-test-history',

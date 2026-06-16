@@ -2,14 +2,12 @@ import { Component, OnInit, ViewChild, TemplateRef } from "@angular/core";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { CsiInspection } from "../../../shared/models/csi/csi-inspection";
 import { CsiInspectionService } from "../../../shared/services/csi/csi-inspection.service";
-import { TableColumn, CellTemplateData } from "../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { QueryProperty } from "../../../shared/models/query";
 import { NgForm } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
-import { InputOption } from "../../../shared/components/input/input.component";
 import { DownloadConfig } from "../../../shared/models/download-config";
 import { DownloadService } from "../../../shared/services/download.service";
+import { CellTemplateData, ColumnType, InputOption, TableColumn } from "@envirotrax/common-ui";
 
 @Component({
     standalone: false,

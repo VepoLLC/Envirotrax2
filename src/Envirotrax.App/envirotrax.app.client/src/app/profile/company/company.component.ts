@@ -9,10 +9,10 @@ import { NgForm } from "@angular/forms";
 import { ProfessionalUser } from "../../shared/models/professionals/professional-user";
 import { AuthService } from "../../shared/services/auth/auth.service";
 import { ProfesionalUserService } from "../../shared/services/professionals/professional-user.service";
-import { InputOption } from "../../shared/components/input/input.component";
 import { HttpErrorResponse } from "@angular/common/http";
 import { ROLE_DEFINITIONS } from "../../shared/models/role-definitions";
 import { ToastService } from "../../shared/services/toast.service";
+import { InputOption } from "@envirotrax/common-ui";
 
 @Component({
     standalone: false,

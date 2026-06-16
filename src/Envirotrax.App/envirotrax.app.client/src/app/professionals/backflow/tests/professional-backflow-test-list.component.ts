@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BackflowTestService } from '../../../shared/services/backflow/backflow-test.service';
 import { ProfessionalSupplierService } from '../../../shared/services/professionals/professional-supplier.service';
 import { QueryProperty } from '../../../shared/models/query';
@@ -33,9 +33,6 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
 
     @ViewChild('mailingTemplate', { static: true })
     public mailingTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
-
-    @ViewChild('viewTemplate', { static: true })
-    public viewTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
 
     @ViewChild('printableSection')
     private _printableSection!: ElementRef;
@@ -79,6 +76,7 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
         private readonly _backflowTestService: BackflowTestService,
         private readonly _supplierService: ProfessionalSupplierService,
         private readonly _router: Router,
+        private readonly _activatedRoute: ActivatedRoute,
         private readonly _downloadService: DownloadService,
         private readonly _printService: PrintableTableService
     ) {
@@ -139,9 +137,12 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
         this._printService.open(this._printableSection.nativeElement);
     }
 
-    public viewTest(test: BackflowTest): void {
+    public viewDetails(test: BackflowTest): void {
+        if (test?.id == null) {
+            return;
+        }
         const url = this._router.serializeUrl(
-            this._router.createUrlTree(['/professionals/backflow/submit', test.id])
+            this._router.createUrlTree([test.id, 'view'], { relativeTo: this._activatedRoute })
         );
         window.open(url, '_blank');
     }
@@ -222,14 +223,6 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
                 type: ColumnType.other,
                 queryColumnExcluded: true,
                 cellTemplate: this.mailingTemplate
-            },
-            {
-                field: '',
-                caption: '',
-                type: ColumnType.other,
-                queryColumnExcluded: true,
-                isDownloadExcluded: true,
-                cellTemplate: this.viewTemplate
             }
         ];
     }
@@ -255,6 +248,9 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
 
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
+            // Rebuild columns fresh: vp-table appends an Actions column bound to its own instance,
+            // so reusing the array after "Search Again" leaves a stale View handler (dead until refresh).
+            this.setupColumns();
             await this.getTests();
             this.showResults = true;
         }

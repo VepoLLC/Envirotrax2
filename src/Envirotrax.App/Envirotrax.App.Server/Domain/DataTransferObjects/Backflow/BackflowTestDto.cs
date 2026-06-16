@@ -241,7 +241,7 @@ public class BackflowTestDto : IDto
     [StringLength(100)]
     public string? RepairCV2Details { get; set; }
 
-    [StringLength(200)]
+    [StringLength(250)]
     public string? RepairRV { get; set; }
 
     [StringLength(100)]
@@ -303,15 +303,30 @@ public class BackflowTestDto : IDto
     [StringLength(100)]
     public string? RepairCV2Details2 { get; set; }
 
-    [StringLength(200)]
+    [StringLength(250)]
     public string? RepairRV2 { get; set; }
 
     [StringLength(100)]
     public string? RepairRVDetails2 { get; set; }
 
+    [StringLength(200)]
+    public string? RepairPvbAirInlet { get; set; }
+
+    [StringLength(200)]
+    public string? RepairPvbCV { get; set; }
+
+    [StringLength(100)]
+    public string? RepairPvbAirInletDetails { get; set; }
+
+    [StringLength(100)]
+    public string? RepairPvbCVDetails { get; set; }
+
     [Precision(5, 2)]
     public decimal? FinalCV1HeldPSID2 { get; set; }
     public bool FinalCV1ClosedTight2 { get; set; }
+
+    [Precision(5, 2)]
+    public decimal? FinalCV2HeldPSID2 { get; set; }
     public bool FinalCV2ClosedTight2 { get; set; }
 
     [Precision(5, 2)]

@@ -25,5 +25,8 @@ namespace Envirotrax.Common.Data.Services.Definitions
         void SetProfessional(ClaimsPrincipal principal, int professionalId);
 
         void SetDomain(ClaimsPrincipal principal, string domain);
+
+        bool HasScope(string scopeToCheck);
+        bool HasScopes(params string[] scopesToCheck);
     }
 }

@@ -32,7 +32,7 @@ public class ProfessionalControler : ProfessionalProtectedController
 [Authorize]
 [ApiController]
 [Route("api/professionals")]
-public class MyProfessionalsController : ControllerBase
+public class MyProfessionalsController : EnvirotraxBaseController
 {
     private readonly IProfessionalService _professionalService;
 

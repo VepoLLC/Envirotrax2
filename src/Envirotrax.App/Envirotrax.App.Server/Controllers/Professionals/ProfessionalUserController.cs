@@ -31,7 +31,7 @@ public class ProfessionalUserContoller : ProfessionalCrudController<Professional
 [Authorize]
 [ApiController]
 [Route("api/professionals/users")]
-public class MyProfessionalUserContoller : ControllerBase
+public class MyProfessionalUserContoller : EnvirotraxBaseController
 {
     private readonly IProfessionalUserService _userService;
 

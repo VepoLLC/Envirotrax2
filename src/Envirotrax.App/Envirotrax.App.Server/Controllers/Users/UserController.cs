@@ -37,7 +37,7 @@ public class UserController : WaterSupplierCrudController<WaterSupplierUserDto>
 [Authorize]
 [ApiController]
 [Route("api/users")]
-public class MyAccessController : ControllerBase
+public class MyAccessController : EnvirotraxBaseController
 {
     private readonly IAuthService _authService;
     public MyAccessController(IAuthService authService)

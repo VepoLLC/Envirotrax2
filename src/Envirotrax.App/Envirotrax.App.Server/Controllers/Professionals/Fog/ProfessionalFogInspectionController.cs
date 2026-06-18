@@ -1,4 +1,5 @@
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -25,6 +26,25 @@ public class ProfessionalFogInspectionController : ProfessionalProtectedControll
         [FromQuery] bool latestOnly = true, CancellationToken cancellationToken = default)
     {
         var result = await _fogInspectionService.SearchForProfessionalAsync(pageInfo, query, latestOnly, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
+    {
+        var result = await _fogInspectionService.GetAsync(id, cancellationToken);
+        if (result == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(result);
+    }
+
+    [HttpPost("submit")]
+    public async Task<IActionResult> SubmitAsync([FromBody] FogInspectionDto request, CancellationToken cancellationToken)
+    {
+        var result = await _fogInspectionService.SubmitAsync(request, cancellationToken);
         return Ok(result);
     }
 }

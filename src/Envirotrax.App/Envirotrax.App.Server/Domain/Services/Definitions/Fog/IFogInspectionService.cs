@@ -6,6 +6,8 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 
 public interface IFogInspectionService : IService<FogInspection, FogInspectionDto>
 {
+    Task<FogInspectionDto> SubmitAsync(FogInspectionDto request, CancellationToken cancellationToken);
+
     Task<IPagedData<FogInspectionDto>> SearchForProfessionalAsync(
         PageInfo pageInfo, Query query, bool latestOnly, CancellationToken cancellationToken);
 }

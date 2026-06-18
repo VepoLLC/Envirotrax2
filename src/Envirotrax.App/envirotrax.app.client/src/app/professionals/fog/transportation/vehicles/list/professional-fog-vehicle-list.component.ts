@@ -1,5 +1,6 @@
 import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { NgForm } from "@angular/forms";
+import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { FogVehicle } from "../../../../../shared/models/fog/fog-vehicle";
 import { FogVehicleCapacityType, FOG_VEHICLE_CAPACITY_TYPE_LABELS } from "../../../../../shared/models/fog/fog-vehicle-enums";
 import { ProfessionalFogVehicleService } from "../../../../../shared/services/fog/professional-fog-vehicle.service";
@@ -10,6 +11,7 @@ import { InputOption } from "../../../../../shared/components/input/input.compon
 import { ToastService } from "../../../../../shared/services/toast.service";
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
 import { ModalHelperService } from "../../../../../shared/services/helpers/modal-helper.service";
+import { EditFogVehicleComponent } from "../edit/edit-fog-vehicle.component";
 
 @Component({
     standalone: false,
@@ -24,47 +26,18 @@ export class ProfessionalFogVehicleListComponent implements OnInit {
         }
     };
 
-    // Add form state
     public editingVehicle: FogVehicle = {};
     public agreementChecked: boolean = false;
     public isFormLoading: boolean = false;
     public validationErrors: string[] = [];
 
-    // Inline row edit state
-    public editingRowId: number | null = null;
-    public editingRowVehicle: FogVehicle = {};
-
-    public readonly capacityTypeLabels = FOG_VEHICLE_CAPACITY_TYPE_LABELS;
-
-    public getCapacityTypeLabel(capacityType: FogVehicleCapacityType | undefined): string {
-        if (capacityType == null) { return ''; }
-        return FOG_VEHICLE_CAPACITY_TYPE_LABELS[capacityType] ?? '';
-    }
     public readonly capacityTypeOptions: InputOption[] = [
         { id: FogVehicleCapacityType.Gallons, text: FOG_VEHICLE_CAPACITY_TYPE_LABELS[FogVehicleCapacityType.Gallons] },
         { id: FogVehicleCapacityType.CubicYards, text: FOG_VEHICLE_CAPACITY_TYPE_LABELS[FogVehicleCapacityType.CubicYards] }
     ];
 
-    @ViewChild('licensePlateCell', { static: true })
-    private licensePlateCellTemplate!: TemplateRef<CellTemplateData<FogVehicle>>;
-
-    @ViewChild('manufacturerCell', { static: true })
-    private manufacturerCellTemplate!: TemplateRef<CellTemplateData<FogVehicle>>;
-
-    @ViewChild('yearCell', { static: true })
-    private yearCellTemplate!: TemplateRef<CellTemplateData<FogVehicle>>;
-
-    @ViewChild('capacityCell', { static: true })
-    private capacityCellTemplate!: TemplateRef<CellTemplateData<FogVehicle>>;
-
     @ViewChild('capacityTypeCell', { static: true })
     private capacityTypeCellTemplate!: TemplateRef<CellTemplateData<FogVehicle>>;
-
-    @ViewChild('stickerNumberCell', { static: true })
-    private stickerNumberCellTemplate!: TemplateRef<CellTemplateData<FogVehicle>>;
-
-    @ViewChild('actionsCell', { static: true })
-    private actionsCellTemplate!: TemplateRef<CellTemplateData<FogVehicle>>;
 
     constructor(
         private readonly _vehicleService: ProfessionalFogVehicleService,
@@ -78,31 +51,32 @@ export class ProfessionalFogVehicleListComponent implements OnInit {
         this.loadVehicles();
     }
 
+    public getCapacityTypeLabel(capacityType: FogVehicleCapacityType | undefined): string {
+        if (capacityType == null) { return ''; }
+        return FOG_VEHICLE_CAPACITY_TYPE_LABELS[capacityType] ?? '';
+    }
+
     private getColumns(): TableColumn<FogVehicle>[] {
         return [
             {
                 field: 'licensePlateNumber',
                 caption: 'License Plate #',
-                type: ColumnType.text,
-                cellTemplate: this.licensePlateCellTemplate
+                type: ColumnType.text
             },
             {
                 field: 'manufacturer',
                 caption: 'Manufacturer',
-                type: ColumnType.text,
-                cellTemplate: this.manufacturerCellTemplate
+                type: ColumnType.text
             },
             {
                 field: 'manufacturedYear',
                 caption: 'Year',
-                type: ColumnType.number,
-                cellTemplate: this.yearCellTemplate
+                type: ColumnType.number
             },
             {
                 field: 'capacity',
                 caption: 'Holding Capacity',
-                type: ColumnType.number,
-                cellTemplate: this.capacityCellTemplate
+                type: ColumnType.number
             },
             {
                 field: 'capacityType',
@@ -113,16 +87,7 @@ export class ProfessionalFogVehicleListComponent implements OnInit {
             {
                 field: 'stickerNumber',
                 caption: 'Sticker #',
-                type: ColumnType.text,
-                cellTemplate: this.stickerNumberCellTemplate
-            },
-            {
-                field: '',
-                caption: '',
-                type: ColumnType.other,
-                queryColumnExcluded: true,
-                isDownloadExcluded: true,
-                cellTemplate: this.actionsCellTemplate
+                type: ColumnType.text
             }
         ];
     }
@@ -139,36 +104,29 @@ export class ProfessionalFogVehicleListComponent implements OnInit {
         }
     }
 
-    // Inline row editing
-    public startRowEdit(vehicle: FogVehicle): void {
-        this.editingRowId = vehicle.id!;
-        this.editingRowVehicle = this._helperService.copy(vehicle);
+    public edit(vehicle: FogVehicle): void {
+        this._modalHelper.show<FogVehicle>(EditFogVehicleComponent, {
+            title: 'Edit Vehicle',
+            model: vehicle,
+            size: ModalSize.large
+        }).result().subscribe(() => this.loadVehicles());
     }
 
-    public cancelRowEdit(): void {
-        this.editingRowId = null;
-        this.editingRowVehicle = {};
+    public deleteVehicle(vehicle: FogVehicle): void {
+        this._modalHelper.showDeleteConfirmation()
+            .result()
+            .subscribe(async () => {
+                try {
+                    this.table.isLoading = true;
+                    await this._vehicleService.delete(vehicle.id!);
+                    this._toastService.successFullyDeleted('Vehicle');
+                    await this.loadVehicles();
+                } finally {
+                    this.table.isLoading = false;
+                }
+            });
     }
 
-    public async saveRowEdit(): Promise<void> {
-        try {
-            this.table.isLoading = true;
-            await this._vehicleService.update(this.editingRowVehicle.id!, this.editingRowVehicle);
-            this._toastService.successfullySaved('Vehicle');
-            this.editingRowId = null;
-            this.editingRowVehicle = {};
-            await this.loadVehicles();
-        } catch (error) {
-            if (!this._helperService.parseValidationErrors(error, this.validationErrors)) {
-                throw error;
-            }
-            this._toastService.failedToSave('Vehicle');
-        } finally {
-            this.table.isLoading = false;
-        }
-    }
-
-    // Add form
     public async saveVehicle(form: NgForm): Promise<void> {
         if (form.valid) {
             try {
@@ -189,20 +147,5 @@ export class ProfessionalFogVehicleListComponent implements OnInit {
                 this.isFormLoading = false;
             }
         }
-    }
-
-    public deleteVehicle(vehicle: FogVehicle): void {
-        this._modalHelper.showDeleteConfirmation()
-            .result()
-            .subscribe(async () => {
-                try {
-                    this.table.isLoading = true;
-                    await this._vehicleService.delete(vehicle.id!);
-                    this._toastService.successFullyDeleted('Vehicle');
-                    await this.loadVehicles();
-                } finally {
-                    this.table.isLoading = false;
-                }
-            });
     }
 }

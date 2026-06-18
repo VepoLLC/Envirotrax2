@@ -10,9 +10,4 @@ public class FogVehicleRepository : Repository<FogVehicle>, IFogVehicleRepositor
         : base(dbContextSelector)
     {
     }
-
-    protected override IQueryable<FogVehicle> GetListQuery()
-    {
-        return base.GetListQuery().Where(v => v.DeletedTime == null);
-    }
 }

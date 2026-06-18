@@ -6,7 +6,7 @@ import { FogVehicleCapacityType, FOG_VEHICLE_CAPACITY_TYPE_LABELS } from "../../
 import { ProfessionalFogVehicleService } from "../../../../../shared/services/fog/professional-fog-vehicle.service";
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
 import { ToastService } from "../../../../../shared/services/toast.service";
-import { InputOption } from "../../../../../shared/components/input/input.component";
+import { InputOption } from "@envirotrax/common-ui";
 
 @Component({
     standalone: false,

@@ -240,15 +240,17 @@
 
 <div *ngIf="showResults && !inspections.isLoading">
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-        <button type="button" class="btn btn-primary vp-section-button">
+        <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0">
             <i class="fa-regular fa-file-export me-1"></i>
             Export Results
         </button>
-        <button type="button" class="btn btn-primary vp-section-button">
+        <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
+            (click)="viewPrintableTable()">
             <i class="fa-regular fa-table me-1"></i>
             View Printable Table
         </button>
-        <button type="button" class="btn btn-primary vp-section-button" (click)="searchAgain()">
+        <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0" 
+            (click)="searchAgain()">
             <i class="fa-solid fa-magnifying-glass me-1"></i>
             Search Again
         </button>
@@ -256,32 +258,34 @@
 
     <div class="results-section">
         <vp-section header="Inspection Search - {{inspections.items?.pageInfo?.totalItems || 0}} Results">
-            <div class="container mb-3">
-                <div class="row gap-2 justify-content-center mb-3">
-                    <div class="col-auto mb-2">
-                        <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Passed inspection" />
-                        <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Failed inspection" />
-                    </div>
-                    <div class="col-auto mb-2">
-                        <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Paid" />
-                        <vp-status-icon imageSrc="/images/icons/bstatus-red-off.png" text="Unpaid" />
+            <div #printableSection>
+                <div class="container mb-3">
+                    <div class="row gap-2 justify-content-center mb-3">
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Passed inspection" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Failed inspection" />
+                        </div>
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Paid" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-red-off.png" text="Unpaid" />
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <vp-table *ngIf="inspections.items && inspections.items.data && inspections.items.data.length > 0"
-                      [columns]="inspections.columns!"
-                      [data]="inspections.items.data"
-                      [(pageInfo)]="inspections.items.pageInfo"
-                      (pageInfoChange)="loadInspections()"
-                      [(query)]="inspections.query"
-                      (queryChange)="loadInspections()"
-                      (queryReset)="loadInspections()"
-                      [canViewDetails]="true"
-                      (viewDetails)="viewInspection($event)" />
+                <vp-table *ngIf="inspections.items && inspections.items.data && inspections.items.data.length > 0"
+                        [columns]="inspections.columns!"
+                        [data]="inspections.items.data"
+                        [(pageInfo)]="inspections.items.pageInfo"
+                        (pageInfoChange)="loadInspections()"
+                        [(query)]="inspections.query"
+                        (queryChange)="loadInspections()"
+                        (queryReset)="loadInspections()"
+                        [canViewDetails]="true"
+                        (viewDetails)="viewInspection($event)" />
 
-            <div *ngIf="inspections?.items?.data?.length === 0" class="text-center py-3 text-muted">
-                No records found matching the search criteria.
+                <div *ngIf="inspections?.items?.data?.length === 0" class="text-center py-3 text-muted">
+                    No records found matching the search criteria.
+                </div>
             </div>
         </vp-section>
     </div>

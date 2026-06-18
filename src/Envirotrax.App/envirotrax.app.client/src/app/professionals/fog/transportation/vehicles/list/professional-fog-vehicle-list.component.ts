@@ -5,13 +5,9 @@ import { FogVehicle } from "../../../../../shared/models/fog/fog-vehicle";
 import { FogVehicleCapacityType, FOG_VEHICLE_CAPACITY_TYPE_LABELS } from "../../../../../shared/models/fog/fog-vehicle-enums";
 import { ProfessionalFogVehicleService } from "../../../../../shared/services/fog/professional-fog-vehicle.service";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
-import { CellTemplateData, TableColumn } from "../../../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../../../shared/components/data-components/sorting-filtering/query-view-model";
-import { InputOption } from "../../../../../shared/components/input/input.component";
-import { ToastService } from "../../../../../shared/services/toast.service";
-import { HelperService } from "../../../../../shared/services/helpers/helper.service";
-import { ModalHelperService } from "../../../../../shared/services/helpers/modal-helper.service";
 import { EditFogVehicleComponent } from "../edit/edit-fog-vehicle.component";
+import { CellTemplateData, ColumnType, HelperService, InputOption, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
+import { ToastService } from "../../../../../shared/services/toast.service";
 
 @Component({
     standalone: false,
@@ -44,7 +40,7 @@ export class ProfessionalFogVehicleListComponent implements OnInit {
         private readonly _toastService: ToastService,
         private readonly _helperService: HelperService,
         private readonly _modalHelper: ModalHelperService
-    ) {}
+    ) { }
 
     public ngOnInit(): void {
         this.table.columns = this.getColumns();

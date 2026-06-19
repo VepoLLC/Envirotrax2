@@ -472,6 +472,13 @@ export class App implements OnInit {
             routerLink: ['professionals/backflow/gauges'],
             hasPermission: isBackflowTester,
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.BackflowTesting)
+          },
+          {
+            title: 'Vehicle Management',
+            iconCss: 'fa-solid fa-truck',
+            routerLink: ['professionals/fog/transportation/vehicles'],
+            hasPermission: isFogTransporter,
+            hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
           }
         ]
       },
@@ -575,13 +582,6 @@ export class App implements OnInit {
           {
             title: 'Transporter Management',
             iconCss: 'fa-regular fa-user',
-            routerLink: ['/'],
-            hasPermission: isAdmin && isFogTransporter,
-            hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
-          },
-          {
-            title: 'Vehicle Management',
-            iconCss: 'fa-solid fa-truck',
             routerLink: ['/'],
             hasPermission: isAdmin && isFogTransporter,
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)

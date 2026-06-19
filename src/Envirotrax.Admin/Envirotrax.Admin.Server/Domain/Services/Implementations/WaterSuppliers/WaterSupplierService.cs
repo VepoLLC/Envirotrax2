@@ -3,9 +3,9 @@ using DeveloperPartners.SortingFiltering;
 using Envirotrax.Admin.Server.Domain.Configuration;
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Envirotrax.Admin.Server.Domain.Services.Definitions;
-using Envirotrax.Common.Domain.Services.Defintions;
+using Envirotrax.Admin.Server.Domain.Services.Definitions.WaterSuppliers;
 
-namespace Envirotrax.Admin.Server.Domain.Services.Implementations;
+namespace Envirotrax.Admin.Server.Domain.Services.Implementations.WaterSuppliers;
 
 public class WaterSupplierService : IWaterSupplierService
 {

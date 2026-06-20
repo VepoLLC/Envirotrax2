@@ -60,7 +60,9 @@ jobs:
 
       - name: Take app offline
         shell: powershell
-        run: New-Item -Path "${{ env.IIS_SITE_PATH }}\app_offline.htm" -ItemType File -Force
+        run: |
+          New-Item -Path "${{ env.IIS_SITE_PATH }}\app_offline.htm" -ItemType File -Force
+          Start-Sleep -Seconds 10
 
       - name: Deploy files to IIS site
         shell: powershell

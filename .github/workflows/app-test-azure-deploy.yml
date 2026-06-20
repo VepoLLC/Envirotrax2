@@ -37,6 +37,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build CommonUI library
+        working-directory: src/Envirotrax.CommonUI
+        run: |
+          npm install
+          npm run build-package
+
       - name: dotnet publish
         working-directory: ${{ env.WEBAPP_PACKAGE_PATH }}
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/${{env.WEBAPP_PROJECT_NAME}} /p:AngularEnvironment=test
@@ -60,7 +71,9 @@ jobs:
 
       - name: Take app offline
         shell: powershell
-        run: New-Item -Path "${{ env.IIS_SITE_PATH }}\app_offline.htm" -ItemType File -Force
+        run: |
+          New-Item -Path "${{ env.IIS_SITE_PATH }}\app_offline.htm" -ItemType File -Force
+          Start-Sleep -Seconds 10
 
       - name: Deploy files to IIS site
         shell: powershell

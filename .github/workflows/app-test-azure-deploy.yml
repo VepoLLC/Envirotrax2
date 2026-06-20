@@ -42,15 +42,15 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Build CommonUI library
+      - name: Install CommonUI dependencies
         working-directory: src/Envirotrax.CommonUI
-        run: |
-          npm install
-          npm run build-package
+        run: npm install
 
       - name: Install app client dependencies
         working-directory: src/Envirotrax.App/envirotrax.app.client
-        run: npm install
+        run: |
+          npm run common-ui:update
+          npm install
 
       - name: dotnet publish
         working-directory: ${{ env.WEBAPP_PACKAGE_PATH }}

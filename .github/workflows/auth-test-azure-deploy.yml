@@ -5,7 +5,6 @@ env:
   WEBAPP_PROJECT_NAME: 'Envirotrax.Auth'
   DOTNET_VERSION: '10'
   ARTIFACT_PATH: './artifacts/Envirotrax.Auth'
-  IIS_APP_POOL: 'Envirotrax2-Auth-Test'
   IIS_SITE_PATH: 'C:\inetpub\wwwroot\Envirotrax2-Auth-Test'
 
 on:
@@ -63,24 +62,16 @@ jobs:
           name: .net-app
           path: ${{ env.ARTIFACT_PATH }}
 
-      - name: Stop IIS App Pool
+      - name: Take app offline
         shell: powershell
-        run: |
-          Import-Module WebAdministration
-          Stop-WebAppPool -Name "${{ env.IIS_APP_POOL }}"
-          $timeout = 30
-          while ((Get-WebAppPoolState -Name "${{ env.IIS_APP_POOL }}").Value -ne "Stopped" -and $timeout -gt 0) {
-            Start-Sleep -Seconds 1; $timeout--
-          }
+        run: New-Item -Path "${{ env.IIS_SITE_PATH }}\app_offline.htm" -ItemType File -Force
 
       - name: Deploy files to IIS site
         shell: powershell
         run: |
-          robocopy "${{ env.ARTIFACT_PATH }}" "${{ env.IIS_SITE_PATH }}" /MIR /NP /NFL /NDL
+          robocopy "${{ env.ARTIFACT_PATH }}" "${{ env.IIS_SITE_PATH }}" /MIR /NP /NFL /NDL /XF app_offline.htm
           if ($LASTEXITCODE -ge 8) { exit $LASTEXITCODE }
 
-      - name: Start IIS App Pool
+      - name: Bring app online
         shell: powershell
-        run: |
-          Import-Module WebAdministration
-          Start-WebAppPool -Name "${{ env.IIS_APP_POOL }}"
+        run: Remove-Item -Path "${{ env.IIS_SITE_PATH }}\app_offline.htm" -Force

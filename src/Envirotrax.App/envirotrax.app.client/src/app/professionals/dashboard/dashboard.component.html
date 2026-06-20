@@ -49,6 +49,55 @@
     </div>
 </ng-template>
 
+<ng-template #fogStatusTemplate let-inspection="rowData">
+    <div class="d-flex gap-1">
+        <vp-status-icon *ngIf="inspection.inspectionResult === FogInspectionResult.Passed"
+                        imageSrc="/images/icons/bstatus-green-on.png"
+                        text="Passed inspection"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="inspection.inspectionResult === FogInspectionResult.Failed"
+                        imageSrc="/images/icons/bstatus-green-off.png"
+                        text="Failed inspection"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="inspection.transactionId"
+                        imageSrc="/images/icons/bstatus-red-on.png"
+                        text="Paid"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!inspection.transactionId"
+                        imageSrc="/images/icons/bstatus-red-off.png"
+                        text="Unpaid"
+                        [showText]="false" />
+    </div>
+</ng-template>
+
+<ng-template #fogPropertyTemplate let-data="rowData">
+    <div class="d-flex gap-2 align-items-center">
+        <i class="fa-solid fs-5"
+           [ngClass]="data.propertyType == 0 ? 'fa-home text-primary' : 'fa-building text-danger'">
+        </i>
+        <a [routerLink]="['/professionals/sites', data.site?.id]" target="_blank">
+            <div *ngIf="data.propertyBusinessName" class="fw-semibold">{{ data.propertyBusinessName }}</div>
+            <div>
+                {{ data.propertyStreetNumber }} {{ data.propertyStreetName }}
+                <span *ngIf="data.propertyNumber">#{{ data.propertyNumber }}</span>
+            </div>
+            <div>{{ data.propertyCity }}<span *ngIf="data.propertyCity">, </span>{{ data.propertyZip }}</div>
+        </a>
+    </div>
+</ng-template>
+
+<ng-template #fogMailingTemplate let-data="rowData">
+    <div>
+        <div *ngIf="data.mailingCompanyName" class="fw-semibold">{{ data.mailingCompanyName }}</div>
+        <div *ngIf="data.mailingContactName">{{ data.mailingContactName }}</div>
+        <div>
+            {{ data.mailingStreetNumber }} {{ data.mailingStreetName }}
+            <span *ngIf="data.mailingNumber">#{{ data.mailingNumber }}</span>
+        </div>
+        <div>{{ data.mailingCity }}<span *ngIf="data.mailingCity">, </span>{{ data.mailingZip }}</div>
+    </div>
+</ng-template>
+
 <ng-template #licenseExpirationTemplate let-license="rowData">
     <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
          [class.text-bg-primary]="!license.expirationDate"
@@ -317,6 +366,47 @@
                     <a routerLink="/professionals/csi/inspections" class="btn btn-primary vp-section-button">
                         <i class="fa-solid fa-list me-1"></i>
                         View All CSI Inspections
+                    </a>
+                </div>
+            </div>
+        </vp-section>
+    </div>
+
+    <!-- Recent FOG Inspections (both views, at bottom) -->
+    <div *ngIf="hasFog" class="mb-4">
+        <vp-section header="Recent FOG Inspections">
+            <dp-loading-spinner *ngIf="recentFogInspections.isLoading"></dp-loading-spinner>
+
+            <div *ngIf="!recentFogInspections.isLoading">
+                <div class="container mb-3">
+                    <div class="row gap-2 justify-content-center mb-3">
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Passed inspection" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Failed inspection" />
+                        </div>
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Paid" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-red-off.png" text="Unpaid" />
+                        </div>
+                        <div class="col-auto mb-2">
+                            <div><i class="fa-solid fa-home text-primary me-1"></i>Residential</div>
+                            <div><i class="fa-solid fa-building text-danger me-1"></i>Commercial</div>
+                        </div>
+                    </div>
+                </div>
+
+                <vp-table *ngIf="recentFogInspections.items?.data?.length"
+                          [columns]="recentFogInspections.columns!"
+                          [data]="recentFogInspections.items!.data" />
+
+                <div *ngIf="!recentFogInspections.items?.data?.length" class="text-center py-3 text-muted">
+                    No recent inspections found.
+                </div>
+
+                <div class="text-end mt-3">
+                    <a routerLink="/professionals/fog/inspections" class="btn btn-primary vp-section-button">
+                        <i class="fa-solid fa-list me-1"></i>
+                        View All FOG Inspections
                     </a>
                 </div>
             </div>

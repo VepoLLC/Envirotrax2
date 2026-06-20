@@ -3,6 +3,9 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../shared/services/auth/auth.service';
 import { CsiInspectionService } from '../../shared/services/csi/csi-inspection.service';
 import { CsiInspection } from '../../shared/models/csi/csi-inspection';
+import { ProfessionalFogInspectionService } from '../../shared/services/fog/professional-fog-inspection.service';
+import { FogInspection } from '../../shared/models/fog/fog-inspection';
+import { FogInspectionResult } from '../../shared/models/fog/fog-inspection-enums';
 import { FeatureType } from '../../shared/models/feature-type';
 import { ROLE_DEFINITIONS } from '../../shared/models/role-definitions';
 import { ProfesionalUserService } from '../../shared/services/professionals/professional-user.service';
@@ -35,6 +38,16 @@ export class DashboardComponent implements OnInit {
     @ViewChild('mailingTemplate', { static: true })
     public mailingTemplate!: TemplateRef<CellTemplateData<CsiInspection>>;
 
+    
+    @ViewChild('fogStatusTemplate', { static: true })
+    public fogStatusTemplate!: TemplateRef<CellTemplateData<FogInspection>>;
+
+    @ViewChild('fogPropertyTemplate', { static: true })
+    public fogPropertyTemplate!: TemplateRef<CellTemplateData<FogInspection>>;
+
+    @ViewChild('fogMailingTemplate', { static: true })
+    public fogMailingTemplate!: TemplateRef<CellTemplateData<FogInspection>>;
+
     // License & insurance cell templates
     @ViewChild('licenseExpirationTemplate', { static: true })
     public licenseExpirationTemplate!: TemplateRef<CellTemplateData<ProfessionalUserLicense>>;
@@ -53,8 +66,11 @@ export class DashboardComponent implements OnInit {
     public gaugeTestDateTemplate!: TemplateRef<CellTemplateData<BackflowGauge>>;
 
     public hasCsi = false;
+    public hasFog = false;
     public hasBackflow = false;
     public isAdmin = false;
+
+    public readonly FogInspectionResult = FogInspectionResult;
     public isLoading = true;
     public isStatsLoading = false;
 
@@ -124,9 +140,15 @@ export class DashboardComponent implements OnInit {
         columns: []
     };
 
+    public recentFogInspections: TableViewModel<FogInspection> = {
+        query: {},
+        columns: []
+    };
+
     constructor(
         private readonly _authService: AuthService,
         private readonly _inspectionService: CsiInspectionService,
+        private readonly _fogInspectionService: ProfessionalFogInspectionService,
         private readonly _userService: ProfesionalUserService,
         private readonly _licenseService: ProfessionalUserLicenseService,
         private readonly _insuranceService: ProfessionalInsuranceService,
@@ -141,22 +163,29 @@ export class DashboardComponent implements OnInit {
         this.setupColumns();
 
         try {
-            const [hasCsi, hasBackflow, isCsiInspector, isBackflowTester, isAdmin] = await Promise.all([
+            const [hasCsi, hasFog, hasBackflow, isCsiInspector, isFogInspector, isBackflowTester, isAdmin] = await Promise.all([
                 this._authService.hasAnyFeatures(FeatureType.CsiInspection),
+                this._authService.hasAnyFeatures(FeatureType.FogInspection),
                 this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
                 this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.CSI_INSPECTOR),
+                this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.FOG_INSPECTOR),
                 this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.BACKFLOW_TESTER),
                 this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.ADMIN)
             ]);
 
             this.isAdmin = isAdmin;
             this.hasCsi = hasCsi && (isCsiInspector || isAdmin);
+            this.hasFog = hasFog && isFogInspector;
             this.hasBackflow = hasBackflow && (isBackflowTester || isAdmin);
 
             const promises: Promise<void>[] = [];
 
             if (this.hasCsi) {
                 promises.push(this.loadRecentInspections());
+            }
+
+            if (this.hasFog) {
+                promises.push(this.loadRecentFogInspections());
             }
 
             if (this.isAdmin) {
@@ -179,6 +208,7 @@ export class DashboardComponent implements OnInit {
 
     private setupColumns(): void {
         this.recentInspections.columns = this.buildInspectionColumns();
+        this.recentFogInspections.columns = this.buildFogInspectionColumns();
         this.subAccountsTable.columns = this.buildSubAccountsColumns();
         this.licensesTable.columns = this.buildLicensesColumns();
         this.insurancesTable.columns = this.buildInsurancesColumns();
@@ -206,6 +236,25 @@ export class DashboardComponent implements OnInit {
             );
         } finally {
             this.recentInspections.isLoading = false;
+        }
+    }
+
+    private async loadRecentFogInspections(): Promise<void> {
+        try {
+            this.recentFogInspections.isLoading = true;
+            const userSort = { ...this.recentFogInspections.query.sort };
+            delete userSort['inspectionDate'];
+            const queryWithSort = {
+                ...this.recentFogInspections.query,
+                sort: { inspectionDate: 'Desc' as const, ...userSort }
+            };
+            this.recentFogInspections.items = await this._fogInspectionService.getAll(
+                {},
+                queryWithSort,
+                true
+            );
+        } finally {
+            this.recentFogInspections.isLoading = false;
         }
     }
 
@@ -305,6 +354,42 @@ export class DashboardComponent implements OnInit {
                 type: ColumnType.other,
                 queryColumnExcluded: true,
                 cellTemplate: this.mailingTemplate
+            }
+        ];
+    }
+
+    private buildFogInspectionColumns(): TableColumn<FogInspection>[] {
+        return [
+            {
+                field: '',
+                caption: 'Status',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.fogStatusTemplate
+            },
+            {
+                field: 'inspectionDate',
+                caption: 'Inspection Date',
+                type: ColumnType.date
+            },
+            {
+                field: 'site.accountNumber',
+                caption: 'Account Number',
+                type: ColumnType.text
+            },
+            {
+                field: '',
+                caption: 'Property Information',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.fogPropertyTemplate
+            },
+            {
+                field: '',
+                caption: 'Mailing / Contact Information',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.fogMailingTemplate
             }
         ];
     }

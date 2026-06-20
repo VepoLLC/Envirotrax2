@@ -26,4 +26,14 @@ export class ProfessionalFogInspectionService {
 
         return lastValueFrom(this._http.get<PagedData<FogInspection>>(url, { params }));
     }
+
+    public getById(id: number): Promise<FogInspection> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/fog/inspections/${id}`);
+        return lastValueFrom(this._http.get<FogInspection>(url));
+    }
+
+    public submit(inspection: FogInspection): Promise<FogInspection> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/fog/inspections/submit');
+        return lastValueFrom(this._http.post<FogInspection>(url, inspection));
+    }
 }

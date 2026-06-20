@@ -2,6 +2,7 @@ using AutoMapper;
 using Envirotrax.App.Server.Data.Models.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
+using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.App.Server.Domain.Mapping.Fog;
 
@@ -19,6 +20,8 @@ public class FogInspectionProfile : Profile
             .AfterMap((model, dto) =>
             {
                 dto.Site ??= new ReferencedSiteDto { Id = model.SiteId };
+
+                dto.WaterSupplier ??= new ReferencedWaterSupplierDto { Id = model.WaterSupplierId };
 
                 if (model.PropertyStateId.HasValue)
                 {

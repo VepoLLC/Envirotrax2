@@ -80,6 +80,7 @@ jobs:
         run: |
           robocopy "${{ env.ARTIFACT_PATH }}" "${{ env.IIS_SITE_PATH }}" /MIR /NP /NFL /NDL /XF app_offline.htm
           if ($LASTEXITCODE -ge 8) { exit $LASTEXITCODE }
+          exit 0
 
       - name: Bring app online
         shell: powershell

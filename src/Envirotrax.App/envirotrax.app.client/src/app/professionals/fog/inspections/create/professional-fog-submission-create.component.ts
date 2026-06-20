@@ -11,6 +11,7 @@ import { ProfessionalUser } from "../../../../shared/models/professionals/profes
 import { ProfessionalWaterSupplier } from "../../../../shared/models/professionals/professional-water-supplier";
 import { Site } from "../../../../shared/models/sites/site";
 import { FogInspection } from "../../../../shared/models/fog/fog-inspection";
+import { FogInspectionImages } from "../../../../shared/models/fog/fog-inspection-images";
 import { MAX_PAGE_SIZE } from "../../../../shared/models/page-info";
 import { FogInspectionOptionsService } from "../../../../shared/services/fog/fog-inspection-options.service";
 import { InterceptorType } from "../../../../shared/enums/interceptor-type.enum";
@@ -53,6 +54,10 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
     public readonly sampledFromOptions: InputOption[];
 
     public remarksLength = 0;
+
+    public images: FogInspectionImages = {};
+    public exteriorImagePreview: string | null = null;
+    public interiorImagePreview: string | null = null;
 
     // Display-only intermediate percentages (not persisted)
     public inletGreaseLayerPercent = 0;
@@ -106,6 +111,11 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
     public onFogAccountChange(value: number): void {
         this.selectedFogUserId = value;
         this.selectedFogUser = this.fogUsers.find(u => u.id === value);
+        // FOG inspectors are currently unlicensed, so no license check is done here (matches V1, where the
+        // license validation was commented out). If licensing is required later, mirror the CSI submission
+        // flow (loadLicense / hasValidLicense / license status display, gating the form on a valid license)
+        // using ProfessionalType.FogInspector — ProfessionalUserLicenseService.getForUser already supports it.
+        // Reference: professionals/csi/inspections/create/csi-submission-create.component.ts
     }
 
     public onWaterSupplierChange(value: number): void {
@@ -116,6 +126,28 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
     public onCommentsChange(value: string | undefined): void {
         this.model.comments = value;
         this.remarksLength = value?.length ?? 0;
+    }
+
+    public onExteriorImageChange(file: File | null): void {
+        this.images.exteriorImage = file;
+        this.exteriorImagePreview = file ? URL.createObjectURL(file) : null;
+    }
+
+    public onInteriorImageChange(file: File | null): void {
+        this.images.interiorImage = file;
+        this.interiorImagePreview = file ? URL.createObjectURL(file) : null;
+    }
+
+    public onExteriorFileInputChange(event: Event): void {
+        const file = (event.target as HTMLInputElement).files?.[0] ?? null;
+        this.onExteriorImageChange(file);
+        (event.target as HTMLInputElement).value = '';
+    }
+
+    public onInteriorFileInputChange(event: Event): void {
+        const file = (event.target as HTMLInputElement).files?.[0] ?? null;
+        this.onInteriorImageChange(file);
+        (event.target as HTMLInputElement).value = '';
     }
 
     public async submit(submitForm: NgForm): Promise<void> {
@@ -134,7 +166,7 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
                 site: { id: this._siteId },
                 waterSupplier: { id: this.selectedWaterSupplierId },
                 inspector: { id: this.selectedFogUserId }
-            });
+            }, this.images);
             this.submitSuccess = true;
         } finally {
             this.isLoading = false;

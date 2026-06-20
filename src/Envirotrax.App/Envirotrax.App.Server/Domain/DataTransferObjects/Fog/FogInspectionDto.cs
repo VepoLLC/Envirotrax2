@@ -193,6 +193,18 @@ public class FogInspectionDto : IDto
 
     public string? Comments { get; set; }
 
+    // Image paths (persisted blob paths)
+    [StringLength(500)]
+    public string? ExteriorImagePath { get; set; }
+
+    [StringLength(500)]
+    public string? InteriorImagePath { get; set; }
+
+    // Image download URLs (generated SAS URLs; not persisted)
+    public string? ExteriorImageUrl { get; set; }
+
+    public string? InteriorImageUrl { get; set; }
+
     // Trip ticket fields
     public DateTime? LastTripTicketDate { get; set; }
     public int TripTicketInterval { get; set; }

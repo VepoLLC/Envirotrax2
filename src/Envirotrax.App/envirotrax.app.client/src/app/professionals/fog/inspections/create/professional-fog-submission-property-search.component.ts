@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, TemplateRef, ViewChild } from "@angular/core";
+import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { NgForm } from "@angular/forms";
 import { TableViewModel } from "../../../../shared/models/table-view-model";
@@ -12,11 +12,11 @@ import { CellTemplateData, ColumnType, TableColumn, TableCustomAction } from "@e
     standalone: false,
     templateUrl: './professional-fog-submission-property-search.component.html'
 })
-export class ProfessionalFogSubmissionPropertySearchComponent implements AfterViewInit {
+export class ProfessionalFogSubmissionPropertySearchComponent implements OnInit {
 
-    @ViewChild('propertyTypeTemplate') private propertyTypeTemplate!: TemplateRef<CellTemplateData<Site>>;
-    @ViewChild('propertyInfoTemplate') private propertyInfoTemplate!: TemplateRef<CellTemplateData<Site>>;
-    @ViewChild('contactInfoTemplate') private contactInfoTemplate!: TemplateRef<CellTemplateData<Site>>;
+    @ViewChild('propertyTypeTemplate', { static: true }) private propertyTypeTemplate!: TemplateRef<CellTemplateData<Site>>;
+    @ViewChild('propertyInfoTemplate', { static: true }) private propertyInfoTemplate!: TemplateRef<CellTemplateData<Site>>;
+    @ViewChild('contactInfoTemplate', { static: true }) private contactInfoTemplate!: TemplateRef<CellTemplateData<Site>>;
 
     public readonly PropertyType = PropertyType;
 
@@ -44,13 +44,11 @@ export class ProfessionalFogSubmissionPropertySearchComponent implements AfterVi
     constructor(
         private readonly _siteService: SiteService,
         private readonly _router: Router,
-        private readonly _activatedRoute: ActivatedRoute,
-        private readonly _cdr: ChangeDetectorRef
+        private readonly _activatedRoute: ActivatedRoute
     ) { }
 
-    public ngAfterViewInit(): void {
+    public ngOnInit(): void {
         this.table.columns = this.getColumns();
-        this._cdr.detectChanges();
     }
 
     public async search(searchForm: NgForm): Promise<void> {

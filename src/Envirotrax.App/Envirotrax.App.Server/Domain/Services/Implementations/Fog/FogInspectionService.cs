@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+using System.Transactions;
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
@@ -6,6 +8,7 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
+using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
@@ -15,26 +18,35 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Fog;
 
 public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IFogInspectionService
 {
+    private static readonly string[] AllowedFileExtensions = [".jpg", ".jpeg", ".gif", ".png", ".bmp", ".tiff"];
+
     private readonly IFogInspectionRepository _repository;
     private readonly IProfessionalService _professionalService;
     private readonly IProfessionalUserService _professionalUserService;
     private readonly ISiteService _siteService;
+    private readonly IFileStorageService _fileStorageService;
 
     public FogInspectionService(
         IMapper mapper,
         IFogInspectionRepository repository,
         IProfessionalService professionalService,
         IProfessionalUserService professionalUserService,
-        ISiteService siteService)
+        ISiteService siteService,
+        IFileStorageService fileStorageService)
         : base(mapper, repository)
     {
         _repository = repository;
         _professionalService = professionalService;
         _professionalUserService = professionalUserService;
         _siteService = siteService;
+        _fileStorageService = fileStorageService;
     }
 
-    public async Task<FogInspectionDto> SubmitAsync(FogInspectionDto request, CancellationToken cancellationToken)
+    public async Task<FogInspectionDto> SubmitAsync(
+        FogInspectionDto request,
+        Stream? exteriorStream, string? exteriorFileName,
+        Stream? interiorStream, string? interiorFileName,
+        CancellationToken cancellationToken)
     {
         var siteId = request.Site!.Id!.Value;
         var waterSupplierId = request.WaterSupplier!.Id!.Value;
@@ -100,8 +112,42 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         ApplySiteSnapshot(inspection, site);
         ApplyInspectorSnapshot(inspection, professional, inspectorUser, inspectorUserId);
 
+        // Set image paths before AddAsync so they persist with the initial insert (both optional).
+        if (exteriorStream != null && exteriorFileName != null)
+        {
+            inspection.ExteriorImagePath = $"professionals/{professional.Id}/fog-inspections/exterior/{Guid.NewGuid()}{ValidateAndGetExtension(exteriorFileName)}";
+        }
+        if (interiorStream != null && interiorFileName != null)
+        {
+            inspection.InteriorImagePath = $"professionals/{professional.Id}/fog-inspections/interior/{Guid.NewGuid()}{ValidateAndGetExtension(interiorFileName)}";
+        }
+
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         var added = await _repository.AddAsync(inspection);
+
+        if (exteriorStream != null && inspection.ExteriorImagePath != null)
+        {
+            await _fileStorageService.UploadAsync(inspection.ExteriorImagePath, exteriorStream);
+        }
+        if (interiorStream != null && inspection.InteriorImagePath != null)
+        {
+            await _fileStorageService.UploadAsync(inspection.InteriorImagePath, interiorStream);
+        }
+
+        scope.Complete();
         return Mapper.Map<FogInspectionDto>(added);
+    }
+
+    public override async Task<FogInspectionDto?> GetAsync(int id, CancellationToken cancellationToken)
+    {
+        var dto = await base.GetAsync(id, cancellationToken);
+
+        if (dto != null)
+        {
+            await PopulateImageUrlsAsync(dto);
+        }
+
+        return dto;
     }
 
     public async Task<IPagedData<FogInspectionDto>> SearchForProfessionalAsync(
@@ -113,6 +159,43 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         var inspections = await _repository.SearchForProfessionalAsync(pageInfo, query, latestOnly, cancellationToken);
 
         return inspections.Select(m => Mapper.Map<FogInspectionDto>(m)!).ToPagedData(pageInfo);
+    }
+
+    private async Task PopulateImageUrlsAsync(FogInspectionDto dto)
+    {
+        var images = new (string? Path, Action<string> SetUrl)[]
+        {
+            (dto.ExteriorImagePath, url => dto.ExteriorImageUrl = url),
+            (dto.InteriorImagePath, url => dto.InteriorImageUrl = url)
+        };
+
+        if (!images.Any(i => !string.IsNullOrWhiteSpace(i.Path)))
+        {
+            return;
+        }
+
+        var delegationKey = await _fileStorageService.GetUserDelegationKeyAsync();
+
+        foreach (var (path, setUrl) in images)
+        {
+            if (!string.IsNullOrWhiteSpace(path))
+            {
+                var url = await _fileStorageService.GenerateSasUrlAsync(delegationKey, path);
+                setUrl(url.ToString());
+            }
+        }
+    }
+
+    private static string ValidateAndGetExtension(string fileName)
+    {
+        var ext = Path.GetExtension(fileName);
+
+        if (!AllowedFileExtensions.Contains(ext, StringComparer.OrdinalIgnoreCase))
+        {
+            throw new ValidationException($"Only {string.Join(", ", AllowedFileExtensions)} files are accepted.");
+        }
+
+        return ext;
     }
 
     private static void ApplySiteSnapshot(FogInspection inspection, SiteDto site)

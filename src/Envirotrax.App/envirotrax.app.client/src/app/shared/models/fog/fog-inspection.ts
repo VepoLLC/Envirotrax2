@@ -78,6 +78,10 @@ export interface FogInspection {
     signatureContactName?: string;
     signatureDate?: string;
     comments?: string;
+    exteriorImagePath?: string;
+    interiorImagePath?: string;
+    exteriorImageUrl?: string;
+    interiorImageUrl?: string;
     lastTripTicketDate?: string;
     tripTicketInterval?: number;
     needsValidation?: boolean;

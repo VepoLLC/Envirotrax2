@@ -420,6 +420,7 @@ export class App implements OnInit {
     const isCsiInspector = await this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.CSI_INSPECTOR);
     const isBackflowTester = await this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.BACKFLOW_TESTER);
     const isFogInspector = await this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.FOG_INSPECTOR);
+    const isFogTransporter = await this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.FOG_TRANSPORTER);
 
     return [
       {

@@ -5,6 +5,7 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
+using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 
@@ -13,6 +14,8 @@ public class FogInspectionDto : IDto
     public int Id { get; set; }
 
     public ReferencedSiteDto? Site { get; set; }
+
+    public ReferencedWaterSupplierDto? WaterSupplier { get; set; }
 
     public DateTime? InspectionDate { get; set; }
 

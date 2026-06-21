@@ -27,4 +27,11 @@ public class ProfessionalFogInspectionController : ProfessionalProtectedControll
         var result = await _fogInspectionService.SearchForProfessionalAsync(pageInfo, query, latestOnly, cancellationToken);
         return Ok(result);
     }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
+    {
+        var result = await _fogInspectionService.GetAsync(id, cancellationToken);
+        return Ok(result);
+    }
 }

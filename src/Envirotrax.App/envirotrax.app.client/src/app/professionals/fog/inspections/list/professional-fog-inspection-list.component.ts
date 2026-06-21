@@ -1,4 +1,5 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProfessionalFogInspectionService } from '../../../../shared/services/fog/professional-fog-inspection.service';
 import { ProfessionalSupplierService } from '../../../../shared/services/professionals/professional-supplier.service';
 import { QueryProperty } from '../../../../shared/models/query';
@@ -97,7 +98,9 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
 
     constructor(
         private readonly _fogInspectionService: ProfessionalFogInspectionService,
-        private readonly _supplierService: ProfessionalSupplierService
+        private readonly _supplierService: ProfessionalSupplierService,
+        private readonly _router: Router,
+        private readonly _activatedRoute: ActivatedRoute
     ) { }
 
     public async ngOnInit(): Promise<void> {
@@ -189,5 +192,12 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
     public searchAgain(): void {
         this.showResults = false;
         this.searchAttempted = false;
+    }
+
+    public viewInspection(inspection: FogInspection): void {
+        const url = this._router.serializeUrl(
+            this._router.createUrlTree([inspection.id], { relativeTo: this._activatedRoute })
+        );
+        window.open(url, '_blank');
     }
 }

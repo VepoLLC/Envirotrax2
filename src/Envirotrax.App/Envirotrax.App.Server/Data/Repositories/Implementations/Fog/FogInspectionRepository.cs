@@ -24,6 +24,9 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
     {
         return base.GetDetailsQuery()
             .Include(fi => fi.Site)
+            .Include(fi => fi.WaterSupplier)
+            .ThenInclude(ws => ws!.State)
+            .Include(fi => fi.Inspector)
             .Include(fi => fi.PropertyState)
             .Include(fi => fi.MailingState);
     }

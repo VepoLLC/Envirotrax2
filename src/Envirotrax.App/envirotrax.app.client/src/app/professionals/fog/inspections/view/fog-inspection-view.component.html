@@ -435,4 +435,22 @@
         <p class="mb-0">{{ inspection.comments }}</p>
     </vp-section>
 
+    <!-- Grease Trap Images -->
+    <vp-section *ngIf="inspection.exteriorImageUrl || inspection.interiorImageUrl" header="Grease Trap Images" class="mt-3 d-block">
+        <div class="row">
+            <div class="col-md-12 col-lg-6 mb-3 mb-lg-0" *ngIf="inspection.exteriorImageUrl">
+                <div class="image-cell">
+                    <div class="cell-header">Grease Trap Exterior</div>
+                    <div class="p-2"><img [src]="inspection.exteriorImageUrl" alt="Grease Trap Exterior" class="img-fluid" style="width: 100%;" /></div>
+                </div>
+            </div>
+            <div class="col-md-12 col-lg-6" *ngIf="inspection.interiorImageUrl">
+                <div class="image-cell">
+                    <div class="cell-header">Grease Trap Interior</div>
+                    <div class="p-2"><img [src]="inspection.interiorImageUrl" alt="Grease Trap Interior" class="img-fluid" style="width: 100%;" /></div>
+                </div>
+            </div>
+        </div>
+    </vp-section>
+
 </div>

@@ -5,3 +5,17 @@
     vertical-align: top;
     padding-right: .75rem;
 }
+
+.image-cell {
+    border: 1px solid #dee2e6;
+    border-radius: .375rem;
+    overflow: hidden;
+}
+
+.cell-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: .5rem .75rem;
+    font-weight: 600;
+    text-align: center;
+}

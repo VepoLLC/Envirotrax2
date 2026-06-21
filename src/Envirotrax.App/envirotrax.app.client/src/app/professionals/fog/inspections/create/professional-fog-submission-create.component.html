@@ -1,0 +1,578 @@
+<h1 class="text-center h2">FOG Inspection Submission</h1>
+
+<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+<div *ngIf="!isLoading">
+
+    <div *ngIf="site">
+
+        <!-- Tabs -->
+        <ul class="nav vp-tabs justify-content-center mb-3">
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'main'" (click)="activeTab = 'main'" role="button">
+                    FOG Inspection Main Form
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'tripTickets'" (click)="activeTab = 'tripTickets'"
+                   role="button">
+                    Recent FOG Trip Tickets
+                </a>
+            </li>
+        </ul>
+
+        <!-- Confirmation Screen -->
+        <div *ngIf="submitSuccess">
+            <vp-section header="FOG Inspection Submission Confirmation">
+                <p class="text-center fw-bold text-danger">Completion of the checkout process is required for this
+                    inspection to be valid within the system.</p>
+                <p class="fw-bold">Please read the following information on Inspection submission and the checkout process:</p>
+                <ol>
+                    <li class="mb-2">To finalize the procedure and conclude the submission of the inspection, you must
+                        complete the checkout process on the Checkout page. Click on the Checkout button below or click
+                        on Checkout in the menu system above.</li>
+                    <li class="mb-2">The checkout process can complete payment on multiple inspections. This will allow
+                        you to continue submitting as many inspections as desired and then complete a batch payment on
+                        the unpaid inspections.</li>
+                </ol>
+                <div class="d-flex justify-content-center gap-2 mt-3">
+                    <button type="button" class="btn btn-primary vp-section-button"
+                            (click)="returnToAccountOverview()">Return to Account Overview</button>
+                    <button type="button" class="btn btn-primary vp-section-button" (click)="submitAnother()">Submit
+                        Another Inspection</button>
+                    <button type="button" class="btn btn-primary vp-section-button">Checkout</button>
+                </div>
+            </vp-section>
+        </div>
+
+        <!-- FOG Inspection Main Form Tab -->
+        <div *ngIf="activeTab === 'main' && !submitSuccess">
+            <form #submitForm="ngForm" (ngSubmit)="submit(submitForm)">
+
+                <!-- Account Selection & License Verification -->
+                <vp-section header="Account Selection &amp; License Verification">
+                    <div class="row align-items-center mb-2">
+                        <div class="col-md-6 d-flex align-items-center">
+                            <span class="fw-semibold text-nowrap account-label">FOG Account:</span>
+                            <div class="flex-grow-1">
+                                <vp-input type="select"
+                                          name="fogAccountUserId"
+                                          [ngModel]="selectedFogUserId"
+                                          (ngModelChange)="onFogAccountChange($event)"
+                                          [options]="fogAccountOptions"
+                                          [required]="true" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row align-items-center">
+                        <div class="col-md-6 d-flex align-items-center">
+                            <span class="fw-semibold text-nowrap account-label">Water Supplier:</span>
+                            <div class="flex-grow-1">
+                                <vp-input type="select"
+                                          name="waterSupplierId"
+                                          [ngModel]="selectedWaterSupplierId"
+                                          (ngModelChange)="onWaterSupplierChange($event)"
+                                          [options]="waterSupplierOptions"
+                                          [required]="true" />
+                            </div>
+                        </div>
+                    </div>
+                </vp-section>
+
+                <!-- Water Supplier Information -->
+                <vp-section *ngIf="selectedWaterSupplier" header="Water Supplier Information" class="mt-3 d-block">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <dl class="row mb-0">
+                                <dt class="col-5">Water Supplier:</dt>
+                                <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.name }}</dd>
+                                <dt class="col-5">Address:</dt>
+                                <dd class="col-7 mb-1">
+                                    {{ selectedWaterSupplier.waterSupplier?.address }}<br
+                                        *ngIf="selectedWaterSupplier.waterSupplier?.address">
+                                    {{ selectedWaterSupplier.waterSupplier?.city }}<span
+                                          *ngIf="selectedWaterSupplier.waterSupplier?.city && selectedWaterSupplier.waterSupplier?.state?.name">,
+                                    </span>{{ selectedWaterSupplier.waterSupplier?.state?.name }} {{
+                                    selectedWaterSupplier.waterSupplier?.zipCode }}
+                                </dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <dl class="row mb-0">
+                                <dt class="col-5">PWS ID:</dt>
+                                <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.pwsId }}</dd>
+                                <dt class="col-5">Contact Name:</dt>
+                                <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.contactName }}</dd>
+                                <dt class="col-5">Phone Number:</dt>
+                                <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.phoneNumber }}</dd>
+                                <dt class="col-5">Email Address:</dt>
+                                <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.emailAddress }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </vp-section>
+
+                <!-- FOG Inspector -->
+                <vp-section *ngIf="selectedFogUser" header="FOG Inspector" class="mt-3 d-block">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <dl class="row mb-0">
+                                <dt class="col-5">Company Name:</dt>
+                                <dd class="col-7 mb-1">{{ professional?.name }}</dd>
+                                <dt class="col-5">Title of Inspector:</dt>
+                                <dd class="col-7 mb-1">{{ selectedFogUser.jobTitle }}</dd>
+                                <dt class="col-5">Inspector Name:</dt>
+                                <dd class="col-7 mb-1">{{ selectedFogUser.contactName }}</dd>
+                                <dt class="col-5">Address:</dt>
+                                <dd class="col-7 mb-1">
+                                    {{ professional?.address }}<br *ngIf="professional?.address">
+                                    {{ professional?.city }}<span
+                                          *ngIf="professional?.city && professional?.state?.name">, </span>{{
+                                    professional?.state?.name }} {{ professional?.zipCode }}
+                                </dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <dl class="row mb-0">
+                                <dt class="col-5">Phone Number:</dt>
+                                <dd class="col-7 mb-1">{{ professional?.phoneNumber }}</dd>
+                                <dt class="col-5">Email Address:</dt>
+                                <dd class="col-7 mb-1">{{ selectedFogUser.emailAddress }}</dd>
+                                <dt class="col-5">License Number:</dt>
+                                <dd class="col-7 mb-1"></dd>
+                                <dt class="col-5">License Type:</dt>
+                                <dd class="col-7 mb-1"></dd>
+                            </dl>
+                        </div>
+                    </div>
+                </vp-section>
+
+                <!-- Location / Property + Contact / Mailing side by side -->
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <vp-section header="Location / Property Information">
+                            <dl class="row mb-0">
+                                <dt class="col-5">Property Type:</dt>
+                                <dd class="col-7 mb-1">{{ site.propertyType === 0 ? 'Residential' : 'Commercial' }}</dd>
+                                <dt class="col-5">Business Name:</dt>
+                                <dd class="col-7 mb-1">{{ site.businessName }}</dd>
+                                <dt class="col-5">Property Address:</dt>
+                                <dd class="col-7 mb-1">
+                                    {{ site.streetNumber }} {{ site.streetName }}<span *ngIf="site.propertyNumber"> #{{
+                                        site.propertyNumber }}</span><br>
+                                    {{ site.city }}<span *ngIf="site.city && site.state?.name">, </span>{{
+                                    site.state?.name }} {{ site.zipCode }}
+                                </dd>
+                            </dl>
+                        </vp-section>
+                    </div>
+                    <div class="col-md-6">
+                        <vp-section header="Contact / Mailing Information">
+                            <dl class="row mb-0">
+                                <dt class="col-5">Company Name:</dt>
+                                <dd class="col-7 mb-1">{{ site.mailingCompanyName }}</dd>
+                                <dt class="col-5">Contact Name:</dt>
+                                <dd class="col-7 mb-1">{{ site.mailingContactName }}</dd>
+                                <dt class="col-5">Mailing Address:</dt>
+                                <dd class="col-7 mb-1">
+                                    {{ site.mailingStreetNumber }} {{ site.mailingStreetName }}<span
+                                          *ngIf="site.mailingNumber"> #{{ site.mailingNumber }}</span><br>
+                                    {{ site.mailingCity }}<span *ngIf="site.mailingCity && site.mailingState?.name">,
+                                    </span>{{ site.mailingState?.name }} {{ site.mailingZipCode }}
+                                </dd>
+                                <dt class="col-5">Phone Number:</dt>
+                                <dd class="col-7 mb-1">{{ site.mailingPhoneNumber }}</dd>
+                                <dt class="col-5">Email Address:</dt>
+                                <dd class="col-7 mb-1">{{ site.mailingEmailAddress }}</dd>
+                            </dl>
+                        </vp-section>
+                    </div>
+                </div>
+
+                <!-- Trap Information -->
+                <vp-section header="Trap Information" class="mt-3 d-block">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <vp-input type="select"
+                                      label="Waste Trap or Tank Type"
+                                      name="interceptorType"
+                                      [(ngModel)]="model.interceptorType"
+                                      [options]="interceptorTypeOptions"
+                                      [required]="true"
+                                      [form]="submitForm"
+                                      [placeholder]="'Select Trap/Tank Type'" />
+                        </div>
+                        <div class="col-md-6 mb-2" *ngIf="model.interceptorType === InterceptorType.Other">
+                            <vp-input type="text"
+                                      label="Other Description"
+                                      name="interceptorOtherDescription"
+                                      [(ngModel)]="model.interceptorOtherDescription"
+                                      [form]="submitForm" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <vp-input type="number"
+                                      label="Waste Trap or Tank Capacity"
+                                      name="interceptorCapacity"
+                                      [(ngModel)]="model.interceptorCapacity"
+                                      [required]="true"
+                                      [form]="submitForm" />
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <vp-input type="select"
+                                      label="Capacity Type"
+                                      name="interceptorCapacityType"
+                                      [(ngModel)]="model.interceptorCapacityType"
+                                      [options]="capacityTypeOptions"
+                                      [required]="true"
+                                      [form]="submitForm"
+                                      [placeholder]="'Select Capacity Type'" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <vp-input type="text"
+                                      label="Location Description"
+                                      name="interceptorLocationDescription"
+                                      [(ngModel)]="model.interceptorLocationDescription"
+                                      [required]="true"
+                                      [form]="submitForm" />
+                        </div>
+                    </div>
+                </vp-section>
+
+                <!-- Inspection Results -->
+                <vp-section header="Inspection Results" class="mt-3 d-block">
+
+                    <!-- Date / Reason / Facility (stacked) -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <vp-input type="datetime"
+                                          label="Inspection Date"
+                                          name="inspectionDate"
+                                          [(ngModel)]="model.inspectionDate"
+                                          [required]="true"
+                                          [form]="submitForm" />
+                            </div>
+                            <div class="mb-2">
+                                <vp-input type="select"
+                                          label="Reason for Inspection"
+                                          name="reasonForInspection"
+                                          [(ngModel)]="model.reasonForInspection"
+                                          [options]="reasonOptions"
+                                          [required]="true"
+                                          [form]="submitForm"
+                                          [placeholder]="'Please select'" />
+                            </div>
+                            <div class="mb-2">
+                                <vp-input type="select"
+                                          label="Facility Type"
+                                          name="facilityType"
+                                          [(ngModel)]="model.facilityType"
+                                          [options]="facilityTypeOptions"
+                                          [required]="true"
+                                          [form]="submitForm"
+                                          [placeholder]="'Please select'" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Left: general condition + inlet chamber | Right: sampling point + outlet chamber -->
+                    <div class="row mt-3">
+
+                        <!-- LEFT COLUMN -->
+                        <div class="col-md-6">
+                            <div class="row align-items-center mb-2">
+                                <div class="col-8">Is it properly maintained?</div>
+                                <div class="col-4 text-nowrap" [class.radio-group-invalid]="submitted && model.maintained == null">
+                                    <label class="me-2"><input type="radio" name="maintained" [value]="true"
+                                               [(ngModel)]="model.maintained" class="form-check-input me-1" />Yes</label>
+                                    <label><input type="radio" name="maintained" [value]="false"
+                                               [(ngModel)]="model.maintained" class="form-check-input me-1" />No</label>
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-8">Is it accessible?</div>
+                                <div class="col-4 text-nowrap" [class.radio-group-invalid]="submitted && model.accessible == null">
+                                    <label class="me-2"><input type="radio" name="accessible" [value]="true"
+                                               [(ngModel)]="model.accessible" class="form-check-input me-1" />Yes</label>
+                                    <label><input type="radio" name="accessible" [value]="false"
+                                               [(ngModel)]="model.accessible" class="form-check-input me-1" />No</label>
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-8">Is there evidence of past overflow?</div>
+                                <div class="col-4 text-nowrap" [class.radio-group-invalid]="submitted && model.pastOverflow == null">
+                                    <label class="me-2"><input type="radio" name="pastOverflow" [value]="true"
+                                               [(ngModel)]="model.pastOverflow" class="form-check-input me-1" />Yes</label>
+                                    <label><input type="radio" name="pastOverflow" [value]="false"
+                                               [(ngModel)]="model.pastOverflow" class="form-check-input me-1" />No</label>
+                                </div>
+                            </div>
+
+                            <h6 class="mt-4">Inlet Chamber:</h6>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-8">Is the inlet tee visible?</div>
+                                <div class="col-4 text-nowrap">
+                                    <label class="me-2"><input type="radio" name="inletTeeVisible" [value]="true"
+                                               [(ngModel)]="model.inletTeeVisible" class="form-check-input me-1" />Yes</label>
+                                    <label><input type="radio" name="inletTeeVisible" [value]="false"
+                                               [(ngModel)]="model.inletTeeVisible" class="form-check-input me-1" />No</label>
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-8">Is the inlet tee intact?</div>
+                                <div class="col-4 text-nowrap">
+                                    <label class="me-2"><input type="radio" name="inletTeeIntact" [value]="true"
+                                               [(ngModel)]="model.inletTeeIntact" class="form-check-input me-1" />Yes</label>
+                                    <label><input type="radio" name="inletTeeIntact" [value]="false"
+                                               [(ngModel)]="model.inletTeeIntact" class="form-check-input me-1" />No</label>
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-8">Wetted Height in Inches:</div>
+                                <div class="col-4" [class.field-invalid]="submitted && isInvalidChamberValue(model.inletChamberWettingHeight)">
+                                    <vp-input type="text" name="inletChamberWettingHeight"
+                                              [ngModel]="model.inletChamberWettingHeight"
+                                              (ngModelChange)="model.inletChamberWettingHeight = $event; recalcCapacity()" />
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-8">Grease Blanket in Inches:</div>
+                                <div class="col-4" [class.field-invalid]="submitted && isInvalidChamberValue(model.inletChamberGreaseBlanket)">
+                                    <vp-input type="text" name="inletChamberGreaseBlanket"
+                                              [ngModel]="model.inletChamberGreaseBlanket"
+                                              (ngModelChange)="model.inletChamberGreaseBlanket = $event; recalcCapacity()" />
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-8">Sediments in Inches:</div>
+                                <div class="col-4" [class.field-invalid]="submitted && isInvalidChamberValue(model.inletChamberSediments)">
+                                    <vp-input type="text" name="inletChamberSediments"
+                                              [ngModel]="model.inletChamberSediments"
+                                              (ngModelChange)="model.inletChamberSediments = $event; recalcCapacity()" />
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-2 mt-3">
+                                <div class="col-8">Grease Layer %:</div>
+                                <div class="col-4">{{ inletGreaseLayerPercent }}%</div>
+                            </div>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-8">Sediment Layer %:</div>
+                                <div class="col-4">{{ inletSedimentLayerPercent }}%</div>
+                            </div>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-8">Total Inlet Chamber %:</div>
+                                <div class="col-4">{{ model.inletTotalCapacityPercent }}%</div>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT COLUMN -->
+                        <div class="col-md-6">
+                            <h6>Sampling Point:</h6>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-8">Is it accessible?</div>
+                                <div class="col-4 text-nowrap" [class.radio-group-invalid]="submitted && model.samplingPointAccessible == null">
+                                    <label class="me-2"><input type="radio" name="samplingPointAccessible" [value]="true"
+                                               [(ngModel)]="model.samplingPointAccessible" class="form-check-input me-1" />Yes</label>
+                                    <label><input type="radio" name="samplingPointAccessible" [value]="false"
+                                               [(ngModel)]="model.samplingPointAccessible" class="form-check-input me-1" />No</label>
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-8">Does it need to be cleaned?</div>
+                                <div class="col-4 text-nowrap" [class.radio-group-invalid]="submitted && model.samplingPointClean == null">
+                                    <label class="me-2"><input type="radio" name="samplingPointClean" [value]="true"
+                                               [(ngModel)]="model.samplingPointClean" class="form-check-input me-1" />Yes</label>
+                                    <label><input type="radio" name="samplingPointClean" [value]="false"
+                                               [(ngModel)]="model.samplingPointClean" class="form-check-input me-1" />No</label>
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-4">Sampled From:</div>
+                                <div class="col-8">
+                                    <vp-input type="select"
+                                              name="sampledFrom"
+                                              [(ngModel)]="model.sampledFrom"
+                                              [options]="sampledFromOptions"
+                                              [placeholder]="'Please select'" />
+                                </div>
+                            </div>
+
+                            <h6 class="mt-4">Outlet Chamber:</h6>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-8">Is the outfall tee visible?</div>
+                                <div class="col-4 text-nowrap">
+                                    <label class="me-2"><input type="radio" name="outletTeeVisible" [value]="true"
+                                               [(ngModel)]="model.outletTeeVisible" class="form-check-input me-1" />Yes</label>
+                                    <label><input type="radio" name="outletTeeVisible" [value]="false"
+                                               [(ngModel)]="model.outletTeeVisible" class="form-check-input me-1" />No</label>
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-8">Is the outfall tee intact?</div>
+                                <div class="col-4 text-nowrap">
+                                    <label class="me-2"><input type="radio" name="outletTeeIntact" [value]="true"
+                                               [(ngModel)]="model.outletTeeIntact" class="form-check-input me-1" />Yes</label>
+                                    <label><input type="radio" name="outletTeeIntact" [value]="false"
+                                               [(ngModel)]="model.outletTeeIntact" class="form-check-input me-1" />No</label>
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-8">Wetted Height in Inches:</div>
+                                <div class="col-4" [class.field-invalid]="submitted && isInvalidChamberValue(model.outletChamberWettingHeight)">
+                                    <vp-input type="text" name="outletChamberWettingHeight"
+                                              [ngModel]="model.outletChamberWettingHeight"
+                                              (ngModelChange)="model.outletChamberWettingHeight = $event; recalcCapacity()" />
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-8">Grease Blanket in Inches:</div>
+                                <div class="col-4" [class.field-invalid]="submitted && isInvalidChamberValue(model.outletChamberGreaseBlanket)">
+                                    <vp-input type="text" name="outletChamberGreaseBlanket"
+                                              [ngModel]="model.outletChamberGreaseBlanket"
+                                              (ngModelChange)="model.outletChamberGreaseBlanket = $event; recalcCapacity()" />
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-8">Sediments in Inches:</div>
+                                <div class="col-4" [class.field-invalid]="submitted && isInvalidChamberValue(model.outletChamberSediments)">
+                                    <vp-input type="text" name="outletChamberSediments"
+                                              [ngModel]="model.outletChamberSediments"
+                                              (ngModelChange)="model.outletChamberSediments = $event; recalcCapacity()" />
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-2 mt-3">
+                                <div class="col-8">Grease Layer %:</div>
+                                <div class="col-4">{{ outletGreaseLayerPercent }}%</div>
+                            </div>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-8">Sediment Layer %:</div>
+                                <div class="col-4">{{ outletSedimentLayerPercent }}%</div>
+                            </div>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-8">Total Outlet Chamber %:</div>
+                                <div class="col-4">{{ model.outletTotalCapacityPercent }}%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Capacity % + Inspection Result -->
+                    <div class="row justify-content-center mt-3">
+                        <div class="col-md-6">
+                            <div class="row align-items-center mb-2">
+                                <div class="col-5 fw-semibold">Total Capacity %:</div>
+                                <div class="col-7">{{ model.totalCapacityPercent }}%</div>
+                            </div>
+                            <div class="row align-items-center">
+                                <div class="col-5 fw-semibold">Inspection Result:</div>
+                                <div class="col-7 text-nowrap" [class.radio-group-invalid]="submitted && model.inspectionResult == null">
+                                    <label class="me-2"><input type="radio" name="inspectionResult"
+                                               [value]="FogInspectionResult.Passed"
+                                               [(ngModel)]="model.inspectionResult" class="form-check-input me-1" />Passed</label>
+                                    <label><input type="radio" name="inspectionResult"
+                                               [value]="FogInspectionResult.Failed"
+                                               [(ngModel)]="model.inspectionResult" class="form-check-input me-1" />Failed</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </vp-section>
+
+                <!-- Remarks -->
+                <vp-section [header]="'Remarks (' + remarksLength + '/1000 Characters)'" class="mt-3 d-block">
+                    <vp-input type="textarea"
+                              name="comments"
+                              [ngModel]="model.comments"
+                              (ngModelChange)="onCommentsChange($event)"
+                              [maxLength]="1000" />
+                </vp-section>
+
+                <!-- Trap or Tank Images (both optional) -->
+                <vp-section header="Trap or Tank Images" class="mt-3 d-block">
+                    <div class="row gy-3">
+
+                        <!-- Exterior image -->
+                        <div class="col-lg-6">
+                            <div class="image-cell border rounded p-3 h-100">
+                                <div class="text-center fw-semibold mb-2">
+                                    Upload an image of the Trap or Tank Exterior
+                                </div>
+                                <input #exteriorFileInput type="file" class="d-none"
+                                       accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
+                                       (change)="onExteriorFileInputChange($event)" />
+
+                                <vp-file-upload *ngIf="!exteriorImagePreview"
+                                                name="exteriorImage"
+                                                accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
+                                                label="Choose an image or drag and drop here"
+                                                [file]="images.exteriorImage ?? null"
+                                                (fileChange)="onExteriorImageChange($event)" />
+
+                                <div *ngIf="exteriorImagePreview" class="text-center mb-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-2 px-3 py-2 border rounded bg-success-subtle">
+                                        <button type="button" class="btn btn-sm btn-primary"
+                                                (click)="exteriorFileInput.click()">Choose File</button>
+                                        <span class="fw-semibold small">{{ images.exteriorImage?.name }}</span>
+                                        <button type="button" class="btn btn-sm btn-primary"
+                                                (click)="onExteriorImageChange(null)"><i class="fa fa-trash"></i></button>
+                                    </div>
+                                    <img [src]="exteriorImagePreview" alt="Trap or Tank Exterior"
+                                         class="rounded img-fluid image-preview" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Interior image -->
+                        <div class="col-lg-6">
+                            <div class="image-cell border rounded p-3 h-100">
+                                <div class="text-center fw-semibold mb-2">
+                                    Upload an image of the Trap or Tank Interior
+                                </div>
+                                <input #interiorFileInput type="file" class="d-none"
+                                       accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
+                                       (change)="onInteriorFileInputChange($event)" />
+
+                                <vp-file-upload *ngIf="!interiorImagePreview"
+                                                name="interiorImage"
+                                                accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
+                                                label="Choose an image or drag and drop here"
+                                                [file]="images.interiorImage ?? null"
+                                                (fileChange)="onInteriorImageChange($event)" />
+
+                                <div *ngIf="interiorImagePreview" class="text-center mb-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-2 px-3 py-2 border rounded bg-success-subtle">
+                                        <button type="button" class="btn btn-sm btn-primary"
+                                                (click)="interiorFileInput.click()">Choose File</button>
+                                        <span class="fw-semibold small">{{ images.interiorImage?.name }}</span>
+                                        <button type="button" class="btn btn-sm btn-primary"
+                                                (click)="onInteriorImageChange(null)"><i class="fa fa-trash"></i></button>
+                                    </div>
+                                    <img [src]="interiorImagePreview" alt="Trap or Tank Interior"
+                                         class="rounded img-fluid image-preview" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </vp-section>
+
+                <!-- Validation & Submit -->
+                <div class="mt-3">
+                    <vp-validation-summary [form]="submitForm" [validationErrors]="validationErrors" />
+                </div>
+
+                <div class="mt-3 d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary vp-section-button">
+                        Complete Submission
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

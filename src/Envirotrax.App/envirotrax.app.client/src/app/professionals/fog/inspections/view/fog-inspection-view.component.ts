@@ -33,7 +33,7 @@ export class FogInspectionViewComponent implements OnInit {
 
         try {
             this.isLoading = true;
-            this.inspection = await this._inspectionService.getProfessionalInspection(Number(idParam));
+            this.inspection = await this._inspectionService.getById(Number(idParam));
         } finally {
             this.isLoading = false;
         }

@@ -14,6 +14,8 @@ public class FogInspectionProfile : Profile
             .ForMember(dest => dest.Site, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())
             .ForMember(dest => dest.Professional, opt => opt.Ignore())
+            .ForMember(dest => dest.ExteriorImageUrl, opt => opt.Ignore())
+            .ForMember(dest => dest.InteriorImageUrl, opt => opt.Ignore())
             .AfterMap((model, dto) =>
             {
                 dto.Site ??= new ReferencedSiteDto { Id = model.SiteId };

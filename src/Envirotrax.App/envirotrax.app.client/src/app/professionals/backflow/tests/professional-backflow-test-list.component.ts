@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BackflowTestService } from '../../../shared/services/backflow/backflow-test.service';
+import { BackflowTestService, getBackflowExpiryRange, BackflowExpiryRangeKey } from '../../../shared/services/backflow/backflow-test.service';
 import { ProfessionalSupplierService } from '../../../shared/services/professionals/professional-supplier.service';
 import { QueryProperty } from '../../../shared/models/query';
 import { TableViewModel } from '../../../shared/models/table-view-model';
@@ -149,6 +149,22 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         this.setupColumns();
         await this.loadWaterSupplierScopeOptions();
+
+        const expiring = this._activatedRoute.snapshot.queryParamMap.get('expiring') as BackflowExpiryRangeKey | null;
+        if (expiring === 'expired' || expiring === 'thismonth' || expiring === 'nextmonth' || expiring === 'twomonths') {
+            this.applyExpiringFilter(expiring);
+            await this.getTests();
+            this.showResults = true;
+        }
+    }
+
+    private applyExpiringFilter(key: BackflowExpiryRangeKey): void {
+        const { start, end } = getBackflowExpiryRange(key);
+        this.table.query.filter = [
+            { columnName: 'isCurrent', value: 'true', comparisonOperator: 'Eq' },
+            { columnName: 'expirationDate', value: start.toISOString(), comparisonOperator: 'Gte' },
+            { columnName: 'expirationDate', value: end.toISOString(), comparisonOperator: 'Lte' }
+        ];
     }
 
     private async loadWaterSupplierScopeOptions(): Promise<void> {

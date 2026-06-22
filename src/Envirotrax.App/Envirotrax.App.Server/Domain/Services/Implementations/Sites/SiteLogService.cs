@@ -35,7 +35,10 @@ public class SiteLogService : ISiteLogService
         var results = await _repository.GetBySiteAsync(siteId, pageInfo, query, cancellationToken);
         var dtos = results.Select(m => _mapper.Map<SiteLogDto>(m)!).ToList();
 
-        // Generate SAS URLs for file attachments
+        var now = DateTime.UtcNow;
+        foreach (var dto in dtos)
+            dto.ReviewDateStatus = ComputeReviewDateStatus(dto, now);
+
         if (dtos.Any(d => d.FileAttachmentPath != null && !d.SkipFile))
         {
             var delegationKey = await _fileStorageService.GetUserDelegationKeyAsync();
@@ -48,7 +51,7 @@ public class SiteLogService : ISiteLogService
         return dtos.ToPagedData(pageInfo);
     }
 
-    public async Task<SiteLogDto> AddAsync(int siteId, SiteLogDto dto, Stream? fileStream, string? fileName, CancellationToken cancellationToken)
+    public async Task<SiteLogDto> AddAsync(int siteId, SiteLogDto dto, Stream? fileStream, string? fileName)
     {
         dto.Site = new ReferencedSiteDto { Id = siteId };
 
@@ -73,6 +76,7 @@ public class SiteLogService : ISiteLogService
         scope.Complete();
 
         var result = _mapper.Map<SiteLogDto>(saved);
+        result.ReviewDateStatus = ComputeReviewDateStatus(result, DateTime.UtcNow);
         if (result.FileAttachmentPath != null && !result.SkipFile)
         {
             result.Url = (await _fileStorageService.GenerateSasUrlAsync(result.FileAttachmentPath)).ToString();
@@ -94,13 +98,9 @@ public class SiteLogService : ISiteLogService
         string? filePath = null;
         if (fileStream != null && fileName != null)
         {
-            var ext = ValidateAndGetExtension(fileName);
-            // Delete old file if exists
-            if (existing.FileAttachmentPath != null)
-            {
-                await _fileStorageService.DeleteAsync(existing.FileAttachmentPath);
-            }
-            filePath = $"site-logs/{existing.SiteId}/{Guid.NewGuid()}{ext}";
+            ValidateAndGetExtension(fileName);
+            // Reuse the existing blob path so UploadAsync overwrites in place — no delete + new GUID needed
+            filePath = existing.FileAttachmentPath ?? $"site-logs/{existing.SiteId}/{Guid.NewGuid()}{Path.GetExtension(fileName)}";
             existing.FileAttachmentName = Path.GetFileName(fileName);
             existing.FileAttachmentPath = filePath;
         }
@@ -114,6 +114,7 @@ public class SiteLogService : ISiteLogService
         scope.Complete();
 
         var result = _mapper.Map<SiteLogDto>(updated);
+        result.ReviewDateStatus = ComputeReviewDateStatus(result, DateTime.UtcNow);
         if (result.FileAttachmentPath != null && !result.SkipFile)
         {
             result.Url = (await _fileStorageService.GenerateSasUrlAsync(result.FileAttachmentPath)).ToString();
@@ -136,6 +137,15 @@ public class SiteLogService : ISiteLogService
         }
 
         return true;
+    }
+
+    private static SiteLogReviewDateStatus ComputeReviewDateStatus(SiteLogDto dto, DateTime now)
+    {
+        if (!dto.ReviewDate.HasValue) return SiteLogReviewDateStatus.None;
+        if (dto.LogType == SiteLogType.CompletedReminder) return SiteLogReviewDateStatus.Completed;
+        if (dto.ReviewDate.Value < now) return SiteLogReviewDateStatus.Overdue;
+        if (dto.ReviewDate.Value <= now.AddDays(30)) return SiteLogReviewDateStatus.DueSoon;
+        return SiteLogReviewDateStatus.Upcoming;
     }
 
     private static string ValidateAndGetExtension(string fileName)

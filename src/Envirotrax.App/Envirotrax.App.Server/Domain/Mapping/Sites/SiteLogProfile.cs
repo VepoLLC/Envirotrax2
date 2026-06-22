@@ -33,7 +33,7 @@ public class SiteLogProfile : Profile
             })
             .ReverseMap()
             .ForMember(m => m.Site, opt => opt.Ignore())
-            .ForMember(m => m.SiteId, opt => opt.MapFrom(dto => dto.Site != null ? dto.Site.Id ?? 0 : 0))
+            .ForMember(m => m.SiteId, opt => opt.MapFrom(dto => dto.Site.Id ?? 0))
             .ForMember(m => m.Assembly, opt => opt.Ignore())
             .ForMember(m => m.AssemblyId, opt => opt.MapFrom(dto => dto.Assembly != null ? dto.Assembly.Id : (int?)null))
             .ForMember(m => m.CreatedBy, opt => opt.Ignore());

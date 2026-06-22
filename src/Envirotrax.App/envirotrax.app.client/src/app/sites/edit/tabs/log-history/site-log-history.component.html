@@ -29,26 +29,17 @@
 
 <!-- Review Date column template -->
 <ng-template #reviewDateTemplate let-log="rowData">
-    <span *ngIf="log.reviewDate" [class]="reviewDateClasses.get(log.id)">
+    <span *ngIf="log.reviewDate" [class]="reviewDateStatusClasses[log.reviewDateStatus!]">
         {{ log.reviewDate | date:'M/d/yyyy' }}
     </span>
 </ng-template>
 
-<!-- Actions column template -->
-<ng-template #actionsTemplate let-log="rowData">
-    <div *ngIf="canModify" class="d-flex gap-1">
-        <button type="button" class="btn btn-primary btn-sm" (click)="openEditModal(log)">Edit</button>
-        <button type="button" class="btn btn-danger btn-sm" (click)="deleteLog(log)">Del</button>
-    </div>
-</ng-template>
-
-<!-- Section with Add button in header -->
 <vp-section header="Property Log History">
-    <ng-container vpSectionHeaderActions *ngIf="canModify">
+    <div *ngIf="canModify" class="mb-2">
         <button type="button" class="btn btn-primary btn-sm" (click)="openAddModal()">
             Add Log Record
         </button>
-    </ng-container>
+    </div>
 
     <!-- Legend -->
     <div class="d-flex gap-3 mb-2 small">
@@ -66,6 +57,10 @@
                   (pageInfoChange)="loadLogs()"
                   [(query)]="table.query"
                   (queryChange)="loadLogs()"
-                  (queryReset)="loadLogs()" />
+                  (queryReset)="loadLogs()"
+                  [canEdit]="canModify"
+                  (edit)="openEditModal($event)"
+                  [canDelete]="canModify"
+                  (delete)="deleteLog($event)" />
     </div>
 </vp-section>

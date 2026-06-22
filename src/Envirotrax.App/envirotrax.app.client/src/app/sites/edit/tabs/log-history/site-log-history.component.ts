@@ -1,12 +1,12 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
-import { SiteLog } from '../../../shared/models/sites/site-log';
-import { SiteLogType } from '../../../shared/models/sites/site-log-type.enum';
-import { SiteLogService } from '../../../shared/services/sites/site-log.service';
-import { TableViewModel } from '../../../shared/models/table-view-model';
-import { ComparisonOperator } from '../../../shared/models/query';
-import { ToastService } from '../../../shared/services/toast.service';
-import { AuthService } from '../../../shared/services/auth/auth.service';
-import { PermissionAction, PermissionType } from '../../../shared/models/permission-type';
+import { SiteLog } from '../../../../shared/models/sites/site-log';
+import { SiteLogType } from '../../../../shared/models/sites/site-log-type.enum';
+import { SiteLogReviewDateStatus } from '../../../../shared/models/sites/site-log-review-date-status.enum';
+import { SiteLogService } from '../../../../shared/services/sites/site-log.service';
+import { TableViewModel } from '../../../../shared/models/table-view-model';
+import { ToastService } from '../../../../shared/services/toast.service';
+import { AuthService } from '../../../../shared/services/auth/auth.service';
+import { PermissionAction, PermissionType } from '../../../../shared/models/permission-type';
 import { CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
 import { SiteLogEditComponent, SiteLogEditModel } from './site-log-edit.component';
@@ -28,13 +28,16 @@ export class SiteLogHistoryComponent implements OnInit, OnChanges {
     @ViewChild('reviewDateTemplate', { static: true })
     public reviewDateTemplate!: TemplateRef<CellTemplateData<SiteLog>>;
 
-    @ViewChild('actionsTemplate', { static: true })
-    public actionsTemplate!: TemplateRef<CellTemplateData<SiteLog>>;
-
     public readonly SiteLogType = SiteLogType;
     public canModify: boolean = false;
 
-    public reviewDateClasses = new Map<number, string>();
+    public readonly reviewDateStatusClasses: { [key: number]: string } = {
+        [SiteLogReviewDateStatus.None]: '',
+        [SiteLogReviewDateStatus.Overdue]: 'badge bg-danger',
+        [SiteLogReviewDateStatus.DueSoon]: 'badge bg-warning text-dark',
+        [SiteLogReviewDateStatus.Upcoming]: 'badge bg-success',
+        [SiteLogReviewDateStatus.Completed]: 'badge bg-secondary'
+    };
 
     public table: TableViewModel<SiteLog> = {
         columns: [],
@@ -67,15 +70,11 @@ export class SiteLogHistoryComponent implements OnInit, OnChanges {
         if (!this.siteId) return;
         try {
             this.table.isLoading = true;
-            this.table.query.filter = [
-                { columnName: 'site.id', value: this.siteId!.toString(), comparisonOperator: 'Eq' as ComparisonOperator }
-            ];
             this.table.items = await this._siteLogService.getAll(
                 this.siteId,
                 this.table.items?.pageInfo || {},
                 this.table.query
             );
-            this.computeReviewDateClasses(this.table.items.data);
         } finally {
             this.table.isLoading = false;
         }
@@ -110,28 +109,6 @@ export class SiteLogHistoryComponent implements OnInit, OnChanges {
         });
     }
 
-    private computeReviewDateClasses(logs: SiteLog[]): void {
-        this.reviewDateClasses.clear();
-        for (const log of logs) {
-            if (!log.reviewDate || !log.id) continue;
-            if (log.logType === SiteLogType.CompletedReminder) {
-                this.reviewDateClasses.set(log.id, 'badge bg-secondary');
-                continue;
-            }
-            const reviewDate = new Date(log.reviewDate);
-            const now = new Date();
-            const thirtyDaysFromNow = new Date();
-            thirtyDaysFromNow.setDate(now.getDate() + 30);
-            if (reviewDate < now) {
-                this.reviewDateClasses.set(log.id, 'badge bg-danger');
-            } else if (reviewDate <= thirtyDaysFromNow) {
-                this.reviewDateClasses.set(log.id, 'badge bg-warning text-dark');
-            } else {
-                this.reviewDateClasses.set(log.id, 'badge bg-success');
-            }
-        }
-    }
-
     private getColumns(): TableColumn<SiteLog>[] {
         return [
             {
@@ -156,13 +133,6 @@ export class SiteLogHistoryComponent implements OnInit, OnChanges {
                 type: ColumnType.other,
                 queryColumnExcluded: true,
                 cellTemplate: this.reviewDateTemplate
-            },
-            {
-                field: '',
-                caption: '',
-                type: ColumnType.other,
-                queryColumnExcluded: true,
-                cellTemplate: this.actionsTemplate
             }
         ];
     }

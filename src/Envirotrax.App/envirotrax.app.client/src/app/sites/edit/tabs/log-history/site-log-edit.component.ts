@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ModalReference } from '@developer-partners/ngx-modal-dialog';
-import { SiteLog } from '../../../shared/models/sites/site-log';
-import { SiteLogType } from '../../../shared/models/sites/site-log-type.enum';
-import { SiteLogService } from '../../../shared/services/sites/site-log.service';
-import { BackflowTestService } from '../../../shared/services/backflow/backflow-test.service';
-import { BackflowTest } from '../../../shared/models/backflow/backflow-test';
-import { ComparisonOperator } from '../../../shared/models/query';
-import { ToastService } from '../../../shared/services/toast.service';
-import { HelperService } from '../../../shared/services/helpers/helper.service';
+import { SiteLog } from '../../../../shared/models/sites/site-log';
+import { SiteLogType } from '../../../../shared/models/sites/site-log-type.enum';
+import { SiteLogService } from '../../../../shared/services/sites/site-log.service';
+import { BackflowTestService } from '../../../../shared/services/backflow/backflow-test.service';
+import { BackflowTest } from '../../../../shared/models/backflow/backflow-test';
+import { ComparisonOperator } from '../../../../shared/models/query';
+import { ToastService } from '../../../../shared/services/toast.service';
+import { HelperService } from '../../../../shared/services/helpers/helper.service';
 import { InputOption } from '@envirotrax/common-ui';
 
 export interface SiteLogEditModel {
@@ -69,18 +69,30 @@ export class SiteLogEditComponent implements OnInit {
     private async loadAssemblyOptions(): Promise<void> {
         const result = await this._backflowTestService.getAll(
             { pageNumber: 1, pageSize: 999999 },
-            { filter: [{ columnName: 'site.id', value: this.siteId.toString(), comparisonOperator: 'Eq' as ComparisonOperator }], sort: {} }
+            {
+                filter: [{ columnName: 'site.id', value: this.siteId.toString(), comparisonOperator: 'Eq' as ComparisonOperator }],
+                sort: {}
+            }
         );
+
         this.assemblyOptions = [
             { id: null, text: 'N/A' },
-            ...result.data.map((t: BackflowTest) => {
-                let text = `SN: ${t.serialNumber || 'Unknown'}`;
-                const deviceInfo = [t.manufacturer, t.model, t.size].filter(Boolean).join(' ');
-                if (deviceInfo) text += ` - ${deviceInfo}`;
-                if (t.deviceType) text += ` - ${t.deviceType}`;
-                return { id: t.id, text };
-            })
+            ...result.data.map((t: BackflowTest) => ({ id: t.id, text: this.buildAssemblyLabel(t) }))
         ];
+    }
+
+    private buildAssemblyLabel(test: BackflowTest): string {
+        let label = `SN: ${test.serialNumber || 'Unknown'}`;
+
+        const deviceInfo = [test.manufacturer, test.model, test.size].filter(Boolean).join(' ');
+        if (deviceInfo) {
+            label += ` - ${deviceInfo}`;
+        }
+        if (test.deviceType) {
+            label += ` - ${test.deviceType}`;
+        }
+
+        return label;
     }
 
     public onFileChange(file: File | null): void {
@@ -89,12 +101,15 @@ export class SiteLogEditComponent implements OnInit {
 
     public async save(form: NgForm): Promise<void> {
         if (!form.valid) return;
+
         try {
             this.isLoading = true;
             this.validationErrors = [];
+
             const result = this.isEditMode
                 ? await this._siteLogService.update(this.siteId, this.editingLog, this.selectedFile)
                 : await this._siteLogService.add(this.siteId, this.editingLog, this.selectedFile);
+
             this._toastService.successfullySaved('Log Record');
             this._modalReference.closeSuccess(result);
         } catch (error) {

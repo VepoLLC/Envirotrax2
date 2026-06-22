@@ -6,7 +6,7 @@ namespace Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 public class SiteLogDto : IDto
 {
     public int Id { get; set; }
-    public ReferencedSiteDto? Site { get; set; }
+    public ReferencedSiteDto Site { get; set; } = null!;
     public SiteLogType LogType { get; set; }
     public string? NoteText { get; set; }
     public DateTime? ReviewDate { get; set; }
@@ -16,6 +16,7 @@ public class SiteLogDto : IDto
     public string? FileAttachmentPath { get; set; }
     public string? Url { get; set; }
     public bool SkipFile { get; set; }
+    public SiteLogReviewDateStatus ReviewDateStatus { get; set; }
 
     // Audit
     public DateTime CreatedTime { get; set; }

@@ -39,7 +39,7 @@ public class SiteLogController : WaterSupplierProtectedController
         }
         await using (fileStream)
         {
-            var result = await _service.AddAsync(siteId, dto, fileStream, fileName, cancellationToken);
+            var result = await _service.AddAsync(siteId, dto, fileStream, fileName);
             return Ok(result);
         }
     }

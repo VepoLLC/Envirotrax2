@@ -4,12 +4,14 @@ import { FormsModule } from "@angular/forms";
 import { SharedComponentsModule } from "../../shared/components/shared.components.module";
 import { ProfessionalsFogRoutingModule } from "./professionals-fog-routing.module";
 import { ProfessionalFogInspectionListComponent } from "./inspections/list/professional-fog-inspection-list.component";
+import { FogInspectionViewComponent } from "./inspections/view/fog-inspection-view.component";
 import { ProfessionalFogSubmissionPropertySearchComponent } from "./inspections/create/professional-fog-submission-property-search.component";
 import { ProfessionalFogSubmissionCreateComponent } from "./inspections/create/professional-fog-submission-create.component";
 
 @NgModule({
     declarations: [
         ProfessionalFogInspectionListComponent,
+        FogInspectionViewComponent,
         ProfessionalFogSubmissionPropertySearchComponent,
         ProfessionalFogSubmissionCreateComponent
     ],

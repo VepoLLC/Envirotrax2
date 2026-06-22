@@ -24,6 +24,9 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
     {
         return base.GetDetailsQuery()
             .Include(fi => fi.Site)
+            .Include(fi => fi.WaterSupplier)
+            .ThenInclude(ws => ws!.State)
+            .Include(fi => fi.Inspector)
             .Include(fi => fi.PropertyState)
             .Include(fi => fi.MailingState);
     }
@@ -49,9 +52,12 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
 
         if (latestOnly)
         {
-            var latestIds = filteredQ.GroupBy(fi => fi.SiteId)
-                .Select(g => g.Max(fi => fi.Id));
-            filteredQ = filteredQ.Where(fi => latestIds.Contains(fi.Id));
+            var filteredInspections = filteredQ;
+            filteredQ = filteredInspections.Where(fi =>
+                !filteredInspections.Any(other =>
+                    other.SiteId == fi.SiteId &&
+                    (other.InspectionDate > fi.InspectionDate ||
+                        (other.InspectionDate == fi.InspectionDate && other.Id > fi.Id))));
         }
 
         var paginated = await filteredQ

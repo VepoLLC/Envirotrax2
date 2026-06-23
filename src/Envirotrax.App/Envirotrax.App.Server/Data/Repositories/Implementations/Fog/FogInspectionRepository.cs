@@ -52,9 +52,12 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
 
         if (latestOnly)
         {
-            var latestIds = filteredQ.GroupBy(fi => fi.SiteId)
-                .Select(g => g.Max(fi => fi.Id));
-            filteredQ = filteredQ.Where(fi => latestIds.Contains(fi.Id));
+            var filteredInspections = filteredQ;
+            filteredQ = filteredInspections.Where(fi =>
+                !filteredInspections.Any(other =>
+                    other.SiteId == fi.SiteId &&
+                    (other.InspectionDate > fi.InspectionDate ||
+                        (other.InspectionDate == fi.InspectionDate && other.Id > fi.Id))));
         }
 
         var paginated = await filteredQ

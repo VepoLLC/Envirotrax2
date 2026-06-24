@@ -12,6 +12,13 @@ import { DownloadEndpoint } from "../../models/download-config";
 
 export type BackflowExpiryRangeKey = 'expired' | 'thismonth' | 'nextmonth' | 'twomonths';
 
+export interface BackflowExpiryCounts {
+    expired: number;
+    thisMonth: number;
+    nextMonth: number;
+    twoMonths: number;
+}
+
 export function getBackflowExpiryRange(key: BackflowExpiryRangeKey): { start: Date; end: Date } {
     const now = new Date();
 
@@ -68,6 +75,12 @@ export class BackflowTestService {
         return await lastValueFrom(this._http.get<PagedData<BackflowTest>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));
+    }
+
+    public async getExpiryCounts(): Promise<BackflowExpiryCounts> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/backflow/tests/expiry-counts');
+
+        return await lastValueFrom(this._http.get<BackflowExpiryCounts>(url));
     }
 
     public async submit(test: BackflowTest, images: BackflowTestImages = {}): Promise<BackflowTest> {

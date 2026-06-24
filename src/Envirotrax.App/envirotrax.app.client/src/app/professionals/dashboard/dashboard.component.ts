@@ -3,12 +3,19 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../shared/services/auth/auth.service';
 import { CsiInspectionService } from '../../shared/services/csi/csi-inspection.service';
 import { CsiInspection } from '../../shared/models/csi/csi-inspection';
+import { ProfessionalFogInspectionService } from '../../shared/services/fog/professional-fog-inspection.service';
+import { FogInspection } from '../../shared/models/fog/fog-inspection';
+import { FogInspectionResult } from '../../shared/models/fog/fog-inspection-enums';
 import { FeatureType } from '../../shared/models/feature-type';
 import { ROLE_DEFINITIONS } from '../../shared/models/role-definitions';
 import { ProfesionalUserService } from '../../shared/services/professionals/professional-user.service';
 import { ProfessionalUserLicenseService } from '../../shared/services/professionals/professional-user-license.service';
 import { ProfessionalInsuranceService } from '../../shared/services/professionals/professional-insurance.service';
 import { BackflowGaugeService } from '../../shared/services/backflow/backflow-gauge.service';
+import { BackflowTestService, getBackflowExpiryRange, BackflowExpiryRangeKey } from '../../shared/services/backflow/backflow-test.service';
+import { BackflowTest } from '../../shared/models/backflow/backflow-test';
+import { BackflowTestResult } from '../../shared/models/backflow/backflow-test-enums';
+import { Query } from '../../shared/models/query';
 import { ProfessionalDashboardService } from '../../shared/services/professionals/professional-dashboard.service';
 import { ProfessionalUser } from '../../shared/models/professionals/professional-user';
 import { ProfessionalUserLicense, ExpirationType } from '../../shared/models/professionals/licenses/professional-user-license';
@@ -35,6 +42,16 @@ export class DashboardComponent implements OnInit {
     @ViewChild('mailingTemplate', { static: true })
     public mailingTemplate!: TemplateRef<CellTemplateData<CsiInspection>>;
 
+    
+    @ViewChild('fogStatusTemplate', { static: true })
+    public fogStatusTemplate!: TemplateRef<CellTemplateData<FogInspection>>;
+
+    @ViewChild('fogPropertyTemplate', { static: true })
+    public fogPropertyTemplate!: TemplateRef<CellTemplateData<FogInspection>>;
+
+    @ViewChild('fogMailingTemplate', { static: true })
+    public fogMailingTemplate!: TemplateRef<CellTemplateData<FogInspection>>;
+
     // License & insurance cell templates
     @ViewChild('licenseExpirationTemplate', { static: true })
     public licenseExpirationTemplate!: TemplateRef<CellTemplateData<ProfessionalUserLicense>>;
@@ -52,9 +69,30 @@ export class DashboardComponent implements OnInit {
     @ViewChild('gaugeTestDateTemplate', { static: true })
     public gaugeTestDateTemplate!: TemplateRef<CellTemplateData<BackflowGauge>>;
 
+    @ViewChild('backflowStatusTemplate', { static: true })
+    public backflowStatusTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
+
+    @ViewChild('backflowDatesTemplate', { static: true })
+    public backflowDatesTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
+
+    @ViewChild('backflowSerialTemplate', { static: true })
+    public backflowSerialTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
+
+    @ViewChild('backflowAssemblyTemplate', { static: true })
+    public backflowAssemblyTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
+
+    @ViewChild('backflowPropertyTemplate', { static: true })
+    public backflowPropertyTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
+
+    @ViewChild('backflowMailingTemplate', { static: true })
+    public backflowMailingTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
+
     public hasCsi = false;
+    public hasFog = false;
     public hasBackflow = false;
     public isAdmin = false;
+    public readonly FogInspectionResult = FogInspectionResult;
+    public readonly BackflowTestResult = BackflowTestResult;
     public isLoading = true;
     public isStatsLoading = false;
 
@@ -124,13 +162,27 @@ export class DashboardComponent implements OnInit {
         columns: []
     };
 
+    public recentFogInspections: TableViewModel<FogInspection> = {
+        query: {},
+        columns: []
+    };
+
+    public recentBackflowTests: TableViewModel<BackflowTest> = {
+        query: {},
+        columns: []
+    };
+
+    public backflowExpiryButtons: { key: BackflowExpiryRangeKey; label: string; count: number; cssClass: string }[] = [];
+
     constructor(
         private readonly _authService: AuthService,
         private readonly _inspectionService: CsiInspectionService,
+        private readonly _fogInspectionService: ProfessionalFogInspectionService,
         private readonly _userService: ProfesionalUserService,
         private readonly _licenseService: ProfessionalUserLicenseService,
         private readonly _insuranceService: ProfessionalInsuranceService,
         private readonly _gaugeService: BackflowGaugeService,
+        private readonly _backflowTestService: BackflowTestService,
         private readonly _dashboardService: ProfessionalDashboardService,
         private readonly _router: Router
     ) { }
@@ -141,22 +193,29 @@ export class DashboardComponent implements OnInit {
         this.setupColumns();
 
         try {
-            const [hasCsi, hasBackflow, isCsiInspector, isBackflowTester, isAdmin] = await Promise.all([
+            const [hasCsi, hasFog, hasBackflow, isCsiInspector, isFogInspector, isBackflowTester, isAdmin] = await Promise.all([
                 this._authService.hasAnyFeatures(FeatureType.CsiInspection),
+                this._authService.hasAnyFeatures(FeatureType.FogInspection),
                 this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
                 this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.CSI_INSPECTOR),
+                this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.FOG_INSPECTOR),
                 this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.BACKFLOW_TESTER),
                 this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.ADMIN)
             ]);
 
             this.isAdmin = isAdmin;
             this.hasCsi = hasCsi && (isCsiInspector || isAdmin);
+            this.hasFog = hasFog && isFogInspector;
             this.hasBackflow = hasBackflow && (isBackflowTester || isAdmin);
 
             const promises: Promise<void>[] = [];
 
             if (this.hasCsi) {
                 promises.push(this.loadRecentInspections());
+            }
+
+            if (this.hasFog) {
+                promises.push(this.loadRecentFogInspections());
             }
 
             if (this.isAdmin) {
@@ -169,6 +228,8 @@ export class DashboardComponent implements OnInit {
             }
             if (this.hasBackflow) {
                 promises.push(this.loadGauges());
+                promises.push(this.loadRecentBackflowTests());
+                promises.push(this.loadBackflowExpiryCounts());
             }
 
             await Promise.all(promises);
@@ -179,6 +240,8 @@ export class DashboardComponent implements OnInit {
 
     private setupColumns(): void {
         this.recentInspections.columns = this.buildInspectionColumns();
+        this.recentFogInspections.columns = this.buildFogInspectionColumns();
+        this.recentBackflowTests.columns = this.buildBackflowTestColumns();
         this.subAccountsTable.columns = this.buildSubAccountsColumns();
         this.licensesTable.columns = this.buildLicensesColumns();
         this.insurancesTable.columns = this.buildInsurancesColumns();
@@ -207,6 +270,92 @@ export class DashboardComponent implements OnInit {
         } finally {
             this.recentInspections.isLoading = false;
         }
+    }
+
+    private async loadRecentFogInspections(): Promise<void> {
+        try {
+            this.recentFogInspections.isLoading = true;
+            const userSort = { ...this.recentFogInspections.query.sort };
+            delete userSort['inspectionDate'];
+            const queryWithSort = {
+                ...this.recentFogInspections.query,
+                sort: { inspectionDate: 'Desc' as const, ...userSort }
+            };
+            this.recentFogInspections.items = await this._fogInspectionService.getAll(
+                {},
+                queryWithSort,
+                true
+            );
+        } finally {
+            this.recentFogInspections.isLoading = false;
+        }
+    }
+
+    private async loadRecentBackflowTests(): Promise<void> {
+        try {
+            this.recentBackflowTests.isLoading = true;
+            const userSort = { ...this.recentBackflowTests.query.sort };
+            delete userSort['createdTime'];
+            const queryWithSort = {
+                ...this.recentBackflowTests.query,
+                sort: { createdTime: 'Desc' as const, ...userSort }
+            };
+            this.recentBackflowTests.items = await this._backflowTestService.getAllForProfessional(
+                { pageSize: 30 },
+                queryWithSort
+            );
+        } finally {
+            this.recentBackflowTests.isLoading = false;
+        }
+    }
+
+    private async loadBackflowExpiryCounts(): Promise<void> {
+        const defs: { key: BackflowExpiryRangeKey; cssClass: string }[] = [
+            { key: 'expired', cssClass: 'btn-danger' },
+            { key: 'thismonth', cssClass: 'btn-warning' },
+            { key: 'nextmonth', cssClass: 'btn-warning' },
+            { key: 'twomonths', cssClass: 'btn-warning' }
+        ];
+
+        const counts = await Promise.all(defs.map(d => this.getBackflowExpiryCount(d.key)));
+
+        this.backflowExpiryButtons = defs.map((d, i) => ({
+            key: d.key,
+            cssClass: d.cssClass,
+            count: counts[i],
+            label: this.buildBackflowExpiryLabel(d.key, counts[i])
+        }));
+    }
+
+    private async getBackflowExpiryCount(key: BackflowExpiryRangeKey): Promise<number> {
+        const { start, end } = getBackflowExpiryRange(key);
+        const query: Query = {
+            filter: [
+                { columnName: 'isCurrent', value: 'true', comparisonOperator: 'Eq' },
+                { columnName: 'expirationDate', value: start.toISOString(), comparisonOperator: 'Gte' },
+                { columnName: 'expirationDate', value: end.toISOString(), comparisonOperator: 'Lte' }
+            ]
+        };
+
+        const result = await this._backflowTestService.getAllForProfessional({ pageSize: 1 }, query);
+        return result.pageInfo?.totalItems ?? 0;
+    }
+
+    private buildBackflowExpiryLabel(key: BackflowExpiryRangeKey, count: number): string {
+        if (key === 'expired') {
+            return `View Expired Tests Within the Last 6 Months (${count})`;
+        }
+
+        const offset = key === 'thismonth' ? 0 : key === 'nextmonth' ? 1 : 2;
+        const date = new Date();
+        date.setDate(1);
+        date.setMonth(date.getMonth() + offset);
+        const month = date.toLocaleString('en-US', { month: 'short' });
+        return `View Tests Expiring in ${month} ${date.getFullYear()} (${count})`;
+    }
+
+    public viewExpiringTests(key: BackflowExpiryRangeKey): void {
+        this._router.navigate(['/professionals/backflow/tests'], { queryParams: { expiring: key } });
     }
 
     public async loadStats(): Promise<void> {
@@ -273,6 +422,24 @@ export class DashboardComponent implements OnInit {
         window.open(url, '_blank');
     }
 
+    public viewBackflowTest(test: BackflowTest): void {
+        if (test?.id == null) {
+            return;
+        }
+        const url = this._router.serializeUrl(
+            this._router.createUrlTree(['/professionals/backflow/tests', test.id, 'view'])
+        );
+        window.open(url, '_blank');
+    }
+
+    public isExpired(date?: string): boolean {
+        if (!date) {
+            return false;
+        }
+
+        return new Date(date) < new Date();
+    }
+
     private buildInspectionColumns(): TableColumn<CsiInspection>[] {
         return [
             {
@@ -305,6 +472,89 @@ export class DashboardComponent implements OnInit {
                 type: ColumnType.other,
                 queryColumnExcluded: true,
                 cellTemplate: this.mailingTemplate
+            }
+        ];
+    }
+
+    private buildFogInspectionColumns(): TableColumn<FogInspection>[] {
+        return [
+            {
+                field: '',
+                caption: 'Status',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.fogStatusTemplate
+            },
+            {
+                field: 'inspectionDate',
+                caption: 'Inspection Date',
+                type: ColumnType.date
+            },
+            {
+                field: 'site.accountNumber',
+                caption: 'Account Number',
+                type: ColumnType.text
+            },
+            {
+                field: '',
+                caption: 'Property Information',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.fogPropertyTemplate
+            },
+            {
+                field: '',
+                caption: 'Mailing / Contact Information',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.fogMailingTemplate
+            }
+        ];
+    }
+
+    private buildBackflowTestColumns(): TableColumn<BackflowTest>[] {
+        return [
+            {
+                field: '',
+                caption: 'Status',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.backflowStatusTemplate
+            },
+            {
+                field: 'testDate',
+                caption: 'Submission/Test/Exp Dates',
+                type: ColumnType.date,
+                queryColumnExcluded: true,
+                cellTemplate: this.backflowDatesTemplate
+            },
+            {
+                field: 'serialNumber',
+                caption: 'Serial Number',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.backflowSerialTemplate
+            },
+            {
+                field: 'manufacturer',
+                caption: 'Assembly Description',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.backflowAssemblyTemplate
+            },
+            {
+                field: '',
+                caption: 'Property Information',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.backflowPropertyTemplate
+            },
+            {
+                field: '',
+                caption: 'Mailing Information',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.backflowMailingTemplate
             }
         ];
     }

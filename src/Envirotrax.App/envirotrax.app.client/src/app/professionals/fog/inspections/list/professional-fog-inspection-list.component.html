@@ -231,7 +231,9 @@
                   [(query)]="table.query"
                   (queryChange)="getInspections()"
                   (queryReset)="getInspections()"
-                  [freeTextSearch]="table.freeTextSearch" />
+                  [freeTextSearch]="table.freeTextSearch"
+                  [canViewDetails]="true"
+                  (viewDetails)="viewInspection($event)" />
 
         <div *ngIf="table.items?.data?.length === 0" class="text-center py-3 text-muted">
             No records found matching the search criteria.

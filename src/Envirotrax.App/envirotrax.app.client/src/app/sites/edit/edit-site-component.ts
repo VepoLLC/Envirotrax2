@@ -17,7 +17,7 @@ import { PermissionAction, PermissionType } from '../../shared/models/permission
 import { FeatureType } from '../../shared/models/feature-type';
 import { InputOption } from '@envirotrax/common-ui';
 
-type SiteTab = 'csi' | 'backflow';
+type SiteTab = 'logHistory' | 'csi' | 'backflow';
 
 @Component({
     selector: 'app-edit-site-component',
@@ -28,8 +28,10 @@ export class EditSiteComponent implements OnInit {
     public validationErrors: string[] = [];
 
     public activeTab?: SiteTab;
+    public canViewLogHistory: boolean = false;
     public canViewCsi: boolean = false;
     public canViewBackflow: boolean = false;
+    public logHistoryInitialized: boolean = false;
     public csiInitialized: boolean = false;
     public backflowInitialized: boolean = false;
 
@@ -89,6 +91,9 @@ export class EditSiteComponent implements OnInit {
     }
 
     private async loadPermissions(): Promise<void> {
+        this.canViewLogHistory = await this._authService.hasAnyPermisison(
+            PermissionAction.CanView, PermissionType.Sites);
+
         const canViewCsiPermission = await this._authService.hasAnyPermisison(
             PermissionAction.CanView, PermissionType.CsiInspections);
         const hasCsiFeature = await this._authService.hasAnyFeatures(FeatureType.CsiInspection);
@@ -97,7 +102,9 @@ export class EditSiteComponent implements OnInit {
         this.canViewBackflow = await this._authService.hasAnyPermisison(
             PermissionAction.CanView, PermissionType.BackflowTests);
 
-        if (this.canViewCsi) {
+        if (this.canViewLogHistory) {
+            this.setActiveTab('logHistory');
+        } else if (this.canViewCsi) {
             this.setActiveTab('csi');
         } else if (this.canViewBackflow) {
             this.setActiveTab('backflow');
@@ -110,7 +117,9 @@ export class EditSiteComponent implements OnInit {
     }
 
     private markActiveTabInitialized(): void {
-        if (this.activeTab === 'csi') {
+        if (this.activeTab === 'logHistory') {
+            this.logHistoryInitialized = true;
+        } else if (this.activeTab === 'csi') {
             this.csiInitialized = true;
         } else if (this.activeTab === 'backflow') {
             this.backflowInitialized = true;

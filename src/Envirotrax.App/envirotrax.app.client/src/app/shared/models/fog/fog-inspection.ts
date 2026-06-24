@@ -2,6 +2,7 @@ import { Site } from '../sites/site';
 import { State } from '../lookup/state';
 import { Professional } from '../professionals/professional';
 import { ProfessionalUser } from '../professionals/professional-user';
+import { ReferencedWaterSupplier } from '../csi/csi-inspection';
 import { FogInspectionResult, FogReasonForInspection } from './fog-inspection-enums';
 import { PropertyType } from '../../enums/property-type.enum';
 import { FacilityType } from '../../enums/facility-type.enum';
@@ -9,6 +10,7 @@ import { FacilityType } from '../../enums/facility-type.enum';
 export interface FogInspection {
     id: number;
     site?: Site | null;
+    waterSupplier?: ReferencedWaterSupplier | null;
     inspectionDate?: string;
     submissionId?: string;
     propertyBusinessName?: string;
@@ -76,6 +78,10 @@ export interface FogInspection {
     signatureContactName?: string;
     signatureDate?: string;
     comments?: string;
+    exteriorImagePath?: string;
+    interiorImagePath?: string;
+    exteriorImageUrl?: string;
+    interiorImageUrl?: string;
     lastTripTicketDate?: string;
     tripTicketInterval?: number;
     needsValidation?: boolean;

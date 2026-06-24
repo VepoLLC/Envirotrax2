@@ -1,3 +1,4 @@
+using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Filters;
@@ -16,6 +17,22 @@ public class SiteController : WaterSupplierCrudController<SiteDto>
         : base(service)
     {
         _siteService = service;
+    }
+
+    [HttpGet("csi-compliance")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetCsiComplianceAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
+    {
+        var result = await _siteService.GetCsiComplianceAsync(pageInfo, query, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpPut("{id}/csi-assignment")]
+    [HasPermission(PermissionAction.CanModify)]
+    public async Task<IActionResult> UpdateCsiAssignmentAsync(int id, [FromBody] UpdateCsiAssignmentDto dto, CancellationToken cancellationToken)
+    {
+        await _siteService.UpdateCsiAssignmentAsync(id, dto.UserId, cancellationToken);
+        return Ok();
     }
 
     [HttpPut("{id}/gis-data")]

@@ -160,6 +160,11 @@ public class UpdateSiteGisDataDto
     public GisStatusType Status { get; set; }
 }
 
+public class UpdateCsiAssignmentDto
+{
+    public int? UserId { get; set; }
+}
+
 public class ReferencedSiteDto
 {
     [Required]

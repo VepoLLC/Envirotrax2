@@ -1,5 +1,7 @@
 using System.Net.Security;
 using AutoMapper;
+using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.GisAreas;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
@@ -108,6 +110,25 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     public async Task UpdateGisDataAsync(int siteId, UpdateSiteGisDataDto dto, CancellationToken cancellationToken)
     {
         await _siteRepository.UpdateManualGisDataAsync(siteId, dto.Latitude, dto.Longitude, dto.Status);
+    }
+
+    public async Task<IPagedData<SiteDto>> GetCsiComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<Site, SiteDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<Site, SiteDto>(Mapper);
+
+        var sites = await _siteRepository.GetCsiComplianceAsync(pageInfo, query, cancellationToken);
+
+        return sites
+            .Select(s => MapToDto(s)!)
+            .ToPagedData(pageInfo);
+    }
+
+    public async Task UpdateCsiAssignmentAsync(int siteId, int? userId, CancellationToken cancellationToken)
+    {
+        var assignmentDate = userId.HasValue ? DateTime.UtcNow : (DateTime?)null;
+
+        await _siteRepository.UpdateCsiAssignmentAsync(siteId, userId, assignmentDate, cancellationToken);
     }
 
     private async Task HadnleGeocodingErrorAsync(Exception ex, Site site)

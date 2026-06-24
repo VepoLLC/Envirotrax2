@@ -1,0 +1,205 @@
+<h1 class="text-center h2">CSI Inspection Compliance Management</h1>
+
+<ng-template #propertyTemplate let-data="rowData">
+    <div class="d-flex gap-2 align-items-center">
+        <i class="fa-solid fs-5"
+           [ngClass]="data.propertyType == 0 ? 'fa-home text-primary' : 'fa-building text-danger'">
+        </i>
+
+        <a [routerLink]="['/sites', data.id, 'edit']" target="_blank">
+            <div *ngIf="data.businessName" class="fw-semibold">{{ data.businessName }}</div>
+            <div>
+                {{ data.streetNumber }} {{ data.streetName }}
+                <span *ngIf="data.propertyNumber">#{{ data.propertyNumber }}</span>
+            </div>
+            <div>{{ data.city }}<span *ngIf="data.city">, </span>{{ data.state?.code }} {{ data.zipCode }}</div>
+        </a>
+    </div>
+</ng-template>
+
+<ng-template #mailingTemplate let-data="rowData">
+    <div>
+        <div *ngIf="data.mailingCompanyName" class="fw-semibold">{{ data.mailingCompanyName }}</div>
+        <div *ngIf="data.mailingContactName">{{ data.mailingContactName }}</div>
+        <div>
+            {{ data.mailingStreetNumber }} {{ data.mailingStreetName }}
+            <span *ngIf="data.mailingNumber">#{{ data.mailingNumber }}</span>
+        </div>
+        <div>{{ data.mailingCity }}<span *ngIf="data.mailingCity">, </span>{{ data.mailingState?.code }} {{ data.mailingZipCode }}</div>
+    </div>
+</ng-template>
+
+<ng-template #assignedToTemplate let-data="rowData">
+    <ng-container *ngIf="canModify; else assignedReadonly">
+        <select class="form-select form-select-sm"
+                [value]="data.csiAccountAssignmentId ?? ''"
+                (change)="onAssignmentChange(data, $any($event.target).value)">
+            <option value="">Unassigned</option>
+            <option *ngFor="let user of users" [value]="user.id">{{ user.contactName }}</option>
+        </select>
+    </ng-container>
+    <ng-template #assignedReadonly>
+        <span>{{ data.assignedName }}</span>
+    </ng-template>
+    <div *ngIf="data.csiAccountAssignmentDate" class="small text-muted mt-1">
+        {{ data.csiAccountAssignmentDate | date:'short' }}
+    </div>
+</ng-template>
+
+<ng-template #renewalDateTemplate let-data="rowData">
+    {{ data.csiRenewalDate | date }}
+</ng-template>
+
+<ng-template #daysOverdueTemplate let-data="rowData">
+    <span class="badge rounded-pill" [ngClass]="data.overdueClass">{{ data.daysOverdue }} days</span>
+</ng-template>
+
+<ng-template #viewSiteTemplate let-data="rowData">
+    <a class="btn btn-sm btn-success" [routerLink]="['/sites', data.id, 'edit']" target="_blank">
+        <i class="fa-regular fa-eye me-1"></i>
+        View Site
+    </a>
+</ng-template>
+
+<div [hidden]="showResults">
+    <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+        <vp-filter-panel (filterChange)="onFilterChange($event)">
+            <vp-section header="Compliance Filters">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Days Overdue</label>
+                            <select class="form-select" name="daysOverdue" [(ngModel)]="daysOverdue">
+                                <option *ngFor="let option of daysOverdueOptions" [value]="option.id">{{ option.text }}</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Sort By</label>
+                            <select class="form-select" name="sortBy" [(ngModel)]="sortBy">
+                                <option *ngFor="let option of sortOptions" [value]="option.id">{{ option.text }}</option>
+                            </select>
+                        </div>
+
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="showMailing" name="showMailing" [(ngModel)]="showMailing" />
+                            <label class="form-check-label" for="showMailing">Show mailing information</label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="emailWhenAssigned" name="emailWhenAssigned" [(ngModel)]="emailWhenAssigned" />
+                            <label class="form-check-label" for="emailWhenAssigned">Email users when assigned</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="csiAccountAssignmentId"
+                                                   label="User Account Assignment"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="userOptions" />
+                        </div>
+
+                        <div class="mb-3">
+                            <app-gis-area-lookup [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="propertyType"
+                                                   label="Property Type"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="propertyTypes" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="facilityType"
+                                                   label="Facility Type"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="facilityTypes" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Property Street Name</label>
+                            <input type="text" class="form-control" name="propertyStreet" [(ngModel)]="propertyStreet" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="hasOnSiteSewageFacility"
+                                                   label="Has On-Site Sewage Facility"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="hasAuxWaterSupply"
+                                                   label="Has Auxiliary Water Supply"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+                    </div>
+                </div>
+            </vp-section>
+        </vp-filter-panel>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="searchForm" />
+
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    <i class="fa-solid fa-rotate me-1"></i>
+                    Refresh Compliance Records
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+<div *ngIf="showResults && !table.isLoading">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
+                (click)="exportResults()">
+            <i class="fa-regular fa-file-export me-1"></i>
+            Export Results
+        </button>
+        <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
+                (click)="searchAgain()">
+            <i class="fa-solid fa-magnifying-glass me-1"></i>
+            Search Again
+        </button>
+    </div>
+
+    <div class="results-section">
+        <vp-section header="Overdue CSI Inspections - {{table.items?.pageInfo?.totalItems || 0}} Results">
+            <div class="container mb-3">
+                <div class="row gap-2 justify-content-center mb-3">
+                    <div class="col-auto mb-2">
+                        <vp-status-icon iconClass="fa-solid fa-home text-primary" text="Residential" />
+                        <vp-status-icon iconClass="fa-solid fa-building text-danger" text="Commercial" />
+                    </div>
+                </div>
+            </div>
+
+            <vp-table *ngIf="table.items && table.items.data && table.items.data.length > 0"
+                      [columns]="table.columns!"
+                      [data]="table.items.data"
+                      [(pageInfo)]="table.items.pageInfo"
+                      (pageInfoChange)="getCompliance()"
+                      [(query)]="table.query"
+                      (queryChange)="getCompliance()"
+                      (queryReset)="getCompliance()" />
+
+            <div *ngIf="table.items?.data?.length === 0" class="text-center py-3 text-muted">
+                No records found matching the search criteria.
+            </div>
+        </vp-section>
+    </div>
+</div>

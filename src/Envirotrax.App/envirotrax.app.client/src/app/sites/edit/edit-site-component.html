@@ -599,7 +599,7 @@
     </form>
 
     <div class="text-center my-3" *ngIf="canViewLogHistory || canViewCsi || canViewBackflow">
-        <ul class="vp-tabs nav nav-pills d-inline-flex">
+        <ul class="vp-tabs nav nav-pills d-inline-flex flex-wrap justify-content-center">
             <li class="nav-item" *ngIf="canViewLogHistory">
                 <a class="nav-link" role="button"
                    [class.active]="activeTab === 'logHistory'"

@@ -1,4 +1,5 @@
 import { SiteLogType } from './site-log-type.enum';
+import { SiteLogReviewDateStatus } from './site-log-review-date-status.enum';
 
 export interface SiteLogAssembly {
     id?: number;
@@ -26,6 +27,7 @@ export interface SiteLog {
     fileAttachmentPath?: string | null;
     url?: string | null;
     skipFile?: boolean;
+    reviewDateStatus?: SiteLogReviewDateStatus;
     createdTime?: string;
     createdBy?: SiteLogCreatedBy;
 }

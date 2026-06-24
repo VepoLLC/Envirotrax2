@@ -36,8 +36,11 @@ public class SiteLogService : ISiteLogService
         var dtos = results.Select(m => _mapper.Map<SiteLogDto>(m)!).ToList();
 
         var now = DateTime.UtcNow;
+
         foreach (var dto in dtos)
+        {
             dto.ReviewDateStatus = ComputeReviewDateStatus(dto, now);
+        }
 
         if (dtos.Any(d => d.FileAttachmentPath != null && !d.SkipFile))
         {
@@ -125,7 +128,11 @@ public class SiteLogService : ISiteLogService
     public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken)
     {
         var entity = await _repository.GetAsync(id, cancellationToken);
-        if (entity == null) return false;
+
+        if (entity == null)
+        {
+            return false;
+        }
 
         var filePath = entity.FileAttachmentPath;
 
@@ -141,10 +148,26 @@ public class SiteLogService : ISiteLogService
 
     private static SiteLogReviewDateStatus ComputeReviewDateStatus(SiteLogDto dto, DateTime now)
     {
-        if (!dto.ReviewDate.HasValue) return SiteLogReviewDateStatus.None;
-        if (dto.LogType == SiteLogType.CompletedReminder) return SiteLogReviewDateStatus.Completed;
-        if (dto.ReviewDate.Value < now) return SiteLogReviewDateStatus.Overdue;
-        if (dto.ReviewDate.Value <= now.AddDays(30)) return SiteLogReviewDateStatus.DueSoon;
+        if (!dto.ReviewDate.HasValue)
+        {
+            return SiteLogReviewDateStatus.None;
+        }
+
+        if (dto.LogType == SiteLogType.CompletedReminder)
+        {
+            return SiteLogReviewDateStatus.Completed;
+        }
+
+        if (dto.ReviewDate.Value < now)
+        {
+            return SiteLogReviewDateStatus.Overdue;
+        }
+
+        if (dto.ReviewDate.Value <= now.AddDays(30))
+        {
+            return SiteLogReviewDateStatus.DueSoon;
+        }
+
         return SiteLogReviewDateStatus.Upcoming;
     }
 

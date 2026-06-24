@@ -46,6 +46,7 @@ public static class ServiceRegistration
         services.AddTransient<IWaterSupplierService, WaterSupplierService>();
         services.AddTransient<IGeneralSettingsService, GeneralSettingsService>();
         services.AddTransient<ISiteService, SiteService>();
+        services.AddTransient<ISiteLogService, SiteLogService>();
         services.AddTransient<ICsiInspectionService, CsiInspectionService>();
         services.AddTransient<ICsiInspectionImageService, CsiInspectionImageService>();
         services.AddTransient<ICsiInspectorService, CsiInspectorService>();

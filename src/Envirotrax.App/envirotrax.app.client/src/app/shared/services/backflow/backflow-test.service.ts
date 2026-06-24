@@ -10,6 +10,23 @@ import { BackflowTest } from "../../models/backflow/backflow-test";
 import { BackflowTestImages } from "../../models/backflow/backflow-test-images";
 import { DownloadEndpoint } from "../../models/download-config";
 
+export type BackflowExpiryRangeKey = 'expired' | 'thismonth' | 'nextmonth' | 'twomonths';
+
+export function getBackflowExpiryRange(key: BackflowExpiryRangeKey): { start: Date; end: Date } {
+    const now = new Date();
+
+    if (key === 'expired') {
+        const start = new Date(now);
+        start.setMonth(start.getMonth() - 6);
+        return { start, end: now };
+    }
+
+    const offset = key === 'thismonth' ? 0 : key === 'nextmonth' ? 1 : 2;
+    const start = new Date(now.getFullYear(), now.getMonth() + offset, 1, 0, 0, 0, 0);
+    const end = new Date(now.getFullYear(), now.getMonth() + offset + 1, 0, 23, 59, 59, 999);
+    return { start, end };
+}
+
 @Injectable({
     providedIn: 'root'
 })

@@ -1,6 +1,7 @@
-import { Component, ElementRef, OnInit, ViewChild, TemplateRef } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { BackflowTestService, getBackflowExpiryRange, BackflowExpiryRangeKey } from '../../../shared/services/backflow/backflow-test.service';
 import { ProfessionalSupplierService } from '../../../shared/services/professionals/professional-supplier.service';
 import { QueryProperty } from '../../../shared/models/query';
@@ -17,7 +18,9 @@ import { PropertyType } from '../../../shared/enums/property-type.enum';
     standalone: false,
     templateUrl: './professional-backflow-test-list.component.html'
 })
-export class ProfessionalBackflowTestListComponent implements OnInit {
+export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy {
+    private _routeSub?: Subscription;
+
     @ViewChild('statusTemplate', { static: true })
     public statusTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
 
@@ -150,12 +153,18 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
         this.setupColumns();
         await this.loadWaterSupplierScopeOptions();
 
-        const expiring = this._activatedRoute.snapshot.queryParamMap.get('expiring') as BackflowExpiryRangeKey | null;
-        if (expiring === 'expired' || expiring === 'thismonth' || expiring === 'nextmonth' || expiring === 'twomonths') {
-            this.applyExpiringFilter(expiring);
-            await this.getTests();
-            this.showResults = true;
-        }
+        this._routeSub = this._activatedRoute.queryParamMap.subscribe(async params => {
+            const expiring = params.get('expiring') as BackflowExpiryRangeKey | null;
+            if (expiring === 'expired' || expiring === 'thismonth' || expiring === 'nextmonth' || expiring === 'twomonths') {
+                this.applyExpiringFilter(expiring);
+                await this.getTests();
+                this.showResults = true;
+            }
+        });
+    }
+
+    public ngOnDestroy(): void {
+        this._routeSub?.unsubscribe();
     }
 
     private applyExpiringFilter(key: BackflowExpiryRangeKey): void {

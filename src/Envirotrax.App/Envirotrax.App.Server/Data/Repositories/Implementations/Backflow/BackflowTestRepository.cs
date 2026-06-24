@@ -68,4 +68,35 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
 
         return model;
     }
+
+    public async Task<(int Expired, int ThisMonth, int NextMonth, int TwoMonths)> GetExpiryCountsAsync(CancellationToken cancellationToken)
+    {
+        var now = DateTime.UtcNow;
+        var expiredStart = now.AddMonths(-6);
+        var thisMonthStart = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+        var nextMonthStart = thisMonthStart.AddMonths(1);
+        var twoMonthsStart = thisMonthStart.AddMonths(2);
+        var threeMonthsStart = thisMonthStart.AddMonths(3);
+
+        var counts = await Entity
+            .Where(t => t.IsCurrent)
+            .GroupBy(t => 1)
+            .Select(g => new
+            {
+                Expired = g.Count(t => t.ExpirationDate >= expiredStart && t.ExpirationDate <= now),
+                ThisMonth = g.Count(t => t.ExpirationDate >= thisMonthStart && t.ExpirationDate < nextMonthStart),
+                NextMonth = g.Count(t => t.ExpirationDate >= nextMonthStart && t.ExpirationDate < twoMonthsStart),
+                TwoMonths = g.Count(t => t.ExpirationDate >= twoMonthsStart && t.ExpirationDate < threeMonthsStart)
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (counts == null)
+        {
+            return (0, 0, 0, 0);
+        }
+        else
+        {
+            return (counts.Expired, counts.ThisMonth, counts.NextMonth, counts.TwoMonths);
+        }
+    }
 }

@@ -119,7 +119,11 @@ export class DownloadService {
                 endpoint: {
                     ...config.endpoint,
                     query: query
-                }
+                },
+                pdfEndpoint: config.pdfEndpoint ? {
+                    ...config.pdfEndpoint,
+                    query: query
+                } : undefined
             }
         });
     }

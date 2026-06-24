@@ -16,4 +16,7 @@ public interface IBackflowTestService : IService<BackflowTest, BackflowTestDto>
         CancellationToken cancellationToken = default);
 
     Task<BackflowTestDto?> UpdateImageAsync(int id, string imageType, Stream fileStream, string fileName, CancellationToken cancellationToken = default);
+
+    Task<byte[]> GeneratePdfAsync(BackflowTestDto test);
+    Task<byte[]> GeneratePdfAsync(IEnumerable<BackflowTestDto> tests);
 }

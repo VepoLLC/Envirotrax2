@@ -16,8 +16,8 @@ public class WaterSupplierService : IWaterSupplierService
         _apiClient = apiClient;
     }
 
-    public Task<IPagedData<WaterSupplierDto>> GetAllAsync(PageInfo pageInfo, Query query)
+    public Task<IPagedData<WaterSupplierDto>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        return _apiClient.GetAsync<WaterSupplierDto>("/api/admin/water-suppliers", pageInfo, query);
+        return _apiClient.GetAsync<WaterSupplierDto>("/api/admin/water-suppliers", pageInfo, query, cancellationToken);
     }
 }

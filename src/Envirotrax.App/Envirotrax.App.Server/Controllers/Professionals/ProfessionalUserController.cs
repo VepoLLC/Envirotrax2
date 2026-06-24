@@ -21,9 +21,9 @@ public class ProfessionalUserContoller : ProfessionalCrudController<Professional
     }
 
     [HttpPost("{id}/invitations")]
-    public async Task<IActionResult> ResendInvitationAsync(int id)
+    public async Task<IActionResult> ResendInvitationAsync(int id, CancellationToken cancellationToken)
     {
-        var result = await _userService.ResendInvitationAsync(id);
+        var result = await _userService.ResendInvitationAsync(id, cancellationToken);
         return Ok(result);
     }
 }

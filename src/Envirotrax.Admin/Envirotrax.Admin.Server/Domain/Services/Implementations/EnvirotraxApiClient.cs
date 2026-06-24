@@ -23,37 +23,37 @@ public class EnvirotraxApiClient : IEnvirotraxApiClient
         _apiClient = apiClient;
     }
 
-    public Task<TResponse?> GetAsync<TResponse>(string url)
+    public Task<TResponse?> GetAsync<TResponse>(string url, CancellationToken cancellationToken)
     {
-        return _apiClient.GetAsync<TResponse>(_authService.UserId, url);
+        return _apiClient.GetAsync<TResponse>(_authService.UserId, url, cancellationToken);
     }
 
-    public async Task<IPagedData<TResponse>> GetAsync<TResponse>(string url, PageInfo pageInfo, Query query)
+    public async Task<IPagedData<TResponse>> GetAsync<TResponse>(string url, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         var queryString = _queryHelper.BuildQuery(pageInfo, query);
         var endpointUrl = $"{url}?{queryString}";
 
-        return await _apiClient.GetAsync<IPagedData<TResponse>>(_authService.UserId, endpointUrl) ?? new PagedData<TResponse>(pageInfo, []);
+        return await _apiClient.GetAsync<IPagedData<TResponse>>(_authService.UserId, endpointUrl, cancellationToken) ?? new PagedData<TResponse>(pageInfo, []);
     }
 
-    public Task<TResponse?> PostAsync<TRequest, TResponse>(string url, TRequest requestData)
+    public Task<TResponse?> PostAsync<TRequest, TResponse>(string url, TRequest requestData, CancellationToken cancellationToken)
     {
         return _apiClient.PostAsync<TRequest, TResponse>(url, new ServiceMessageDto<TRequest>(_authService.UserId)
         {
             Data = requestData
-        });
+        }, cancellationToken);
     }
 
-    public Task<TResponse?> PutAsync<TRequest, TResponse>(string url, TRequest requestData)
+    public Task<TResponse?> PutAsync<TRequest, TResponse>(string url, TRequest requestData, CancellationToken cancellationToken)
     {
         return _apiClient.PutAsync<TRequest, TResponse>(url, new ServiceMessageDto<TRequest>(_authService.UserId)
         {
             Data = requestData
-        });
+        }, cancellationToken);
     }
 
-    public Task<TResponse?> DeleteAsync<TResponse>(string url)
+    public Task<TResponse?> DeleteAsync<TResponse>(string url, CancellationToken cancellationToken)
     {
-        return _apiClient.DeleteAsync<TResponse>(_authService.UserId, url);
+        return _apiClient.DeleteAsync<TResponse>(_authService.UserId, url, cancellationToken);
     }
 }

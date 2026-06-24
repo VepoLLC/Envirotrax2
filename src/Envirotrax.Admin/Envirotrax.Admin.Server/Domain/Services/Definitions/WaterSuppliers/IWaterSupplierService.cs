@@ -6,5 +6,5 @@ namespace Envirotrax.Admin.Server.Domain.Services.Definitions.WaterSuppliers;
 
 public interface IWaterSupplierService
 {
-    Task<IPagedData<WaterSupplierDto>> GetAllAsync(PageInfo pageInfo, Query query);
+    Task<IPagedData<WaterSupplierDto>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
 }

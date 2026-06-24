@@ -31,9 +31,9 @@ namespace Envirotrax.App.Server.Controllers.Csi
         [HttpPost("{id}/users")]
         [HasFeature(FeatureType.ManageProfessionalUsers)]
         [HasPermission(PermissionAction.CanModify)]
-        public async Task<IActionResult> AddSubAccountAsync(int id, [FromBody] ProfessionalUserDto dto)
+        public async Task<IActionResult> AddSubAccountAsync(int id, [FromBody] ProfessionalUserDto dto, CancellationToken cancellationToken)
         {
-            var result = await _userService.AddForProfessionalAsync(id, dto);
+            var result = await _userService.AddForProfessionalAsync(id, dto, cancellationToken);
             return Ok(result);
         }
 

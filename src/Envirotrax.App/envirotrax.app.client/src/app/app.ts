@@ -477,6 +477,13 @@ export class App implements OnInit {
             routerLink: ['professionals/fog/transportation/vehicles'],
             hasPermission: isFogTransporter,
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
+          },
+          {
+            title: 'Disposal Site Management',
+            iconCss: 'fa-solid fa-location-dot',
+            routerLink: ['professionals/fog/transportation/disposal-sites'],
+            hasPermission: isFogTransporter,
+            hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
           }
         ]
       },

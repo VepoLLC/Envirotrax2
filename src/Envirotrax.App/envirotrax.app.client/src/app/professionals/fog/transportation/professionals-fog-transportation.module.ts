@@ -5,11 +5,13 @@ import { SharedComponentsModule } from "../../../shared/components/shared.compon
 import { ProfessionalsFogTransportationRoutingModule } from "./professionals-fog-transportation-routing.module";
 import { ProfessionalFogVehicleListComponent } from "./vehicles/list/professional-fog-vehicle-list.component";
 import { EditFogVehicleComponent } from "./vehicles/edit/edit-fog-vehicle.component";
+import { ProfessionalFogDisposalSiteListComponent } from "./disposal-sites/list/professional-fog-disposal-site-list.component";
 
 @NgModule({
     declarations: [
         ProfessionalFogVehicleListComponent,
-        EditFogVehicleComponent
+        EditFogVehicleComponent,
+        ProfessionalFogDisposalSiteListComponent
     ],
     imports: [
         CommonModule,

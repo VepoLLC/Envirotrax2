@@ -1,0 +1,49 @@
+<ng-template #wasteTypesCell let-row="rowData">
+    {{ getPhysicalTypeLabel(row.physicalType) }}
+</ng-template>
+
+<ng-template #registrationCell let-row="rowData">
+    <div class="text-center">
+        <button type="button"
+                class="btn btn-sm"
+                style="min-width: 110px"
+                [class.btn-primary]="row.isActive"
+                [class.btn-success]="!row.isActive"
+                (click)="toggle(row)">
+            {{ row.isActive ? 'Selected' : 'Unselected' }}
+        </button>
+    </div>
+</ng-template>
+
+<div class="mb-3">
+    <vp-section header="Disposal Site Management">
+
+        <ul class="mb-3">
+            <li>Select the disposal site(s) that you want available for selection on the trip ticket submission form.</li>
+            <li>To select a disposal site, click the <strong>Unselected</strong> button next to the facility name until it reads <strong>Selected</strong>.</li>
+        </ul>
+
+        <div class="d-flex justify-content-center mb-3">
+            <button type="button" class="btn btn-primary" [routerLink]="['/professionals/dashboard']">
+                Return to Account Overview
+            </button>
+        </div>
+
+        <div dp-spinner-parent>
+            <dp-loading-spinner *ngIf="table.isLoading" />
+
+            <vp-table *ngIf="table.items"
+                      [columns]="table.columns!"
+                      [data]="table.items.data"
+                      [(pageInfo)]="table.items.pageInfo"
+                      (pageInfoChange)="loadSites()"
+                      [(query)]="table.query"
+                      (queryChange)="loadSites()"
+                      (queryReset)="loadSites()" />
+
+            <p *ngIf="table.items && table.items.data.length === 0" class="text-muted">
+                No disposal facilities available.
+            </p>
+        </div>
+    </vp-section>
+</div>

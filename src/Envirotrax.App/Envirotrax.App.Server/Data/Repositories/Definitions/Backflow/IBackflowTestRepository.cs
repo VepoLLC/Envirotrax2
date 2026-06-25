@@ -6,5 +6,5 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
 {
     Task<BackflowTest> UpdateImagePathAsync(BackflowTest model, string imagePathPropertyName);
 
-    Task<(int Expired, int ThisMonth, int NextMonth, int TwoMonths)> GetExpiryCountsAsync(CancellationToken cancellationToken);
+    Task<BackflowTestExpiryCounts> GetExpiryCountsAsync(CancellationToken cancellationToken);
 }

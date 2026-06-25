@@ -396,6 +396,14 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public DateTime? DeletedTime { get; set; }
 }
 
+public class BackflowTestExpiryCounts
+{
+    public int Expired { get; set; }
+    public int ThisMonth { get; set; }
+    public int NextMonth { get; set; }
+    public int TwoMonths { get; set; }
+}
+
 public class BackflowTestConfiguration : IEntityTypeConfiguration<BackflowTest>
 {
     public void Configure(EntityTypeBuilder<BackflowTest> builder)

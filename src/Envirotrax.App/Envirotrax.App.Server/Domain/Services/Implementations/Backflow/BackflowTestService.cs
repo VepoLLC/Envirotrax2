@@ -139,14 +139,14 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
     public async Task<BackflowTestExpiryCountsDto> GetExpiryCountsAsync(CancellationToken cancellationToken = default)
     {
-        var (expired, thisMonth, nextMonth, twoMonths) = await _testRepository.GetExpiryCountsAsync(cancellationToken);
+        var counts = await _testRepository.GetExpiryCountsAsync(cancellationToken);
 
         return new BackflowTestExpiryCountsDto
         {
-            Expired = expired,
-            ThisMonth = thisMonth,
-            NextMonth = nextMonth,
-            TwoMonths = twoMonths
+            Expired = counts.Expired,
+            ThisMonth = counts.ThisMonth,
+            NextMonth = counts.NextMonth,
+            TwoMonths = counts.TwoMonths
         };
     }
 

@@ -6,18 +6,11 @@ import { QueryHelperService } from "../helpers/query-helper.service";
 import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
-import { BackflowTest } from "../../models/backflow/backflow-test";
+import { BackflowTest, BackflowExpiryCounts } from "../../models/backflow/backflow-test";
 import { BackflowTestImages } from "../../models/backflow/backflow-test-images";
 import { DownloadEndpoint } from "../../models/download-config";
 
 export type BackflowExpiryRangeKey = 'expired' | 'thismonth' | 'nextmonth' | 'twomonths';
-
-export interface BackflowExpiryCounts {
-    expired: number;
-    thisMonth: number;
-    nextMonth: number;
-    twoMonths: number;
-}
 
 export function getBackflowExpiryRange(key: BackflowExpiryRangeKey): { start: Date; end: Date } {
     const now = new Date();

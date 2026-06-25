@@ -5,12 +5,27 @@ import { PermissionAction, PermissionType } from "../shared/models/permission-ty
 import { FogInspectorListComponent } from "./inspectors/list/fog-inspector-list.component";
 import { FogInspectorDetailsComponent } from "./inspectors/details/fog-inspector-details.component";
 import { FogInspectionListComponent } from "./inspections/list/fog-inspection-list.component";
+import { FogInspectionViewComponent } from "./inspections/view/fog-inspection-view.component";
 
 const routes: Routes = [
     {
         path: 'inspections',
         title: 'FOG Inspection Search',
         component: FogInspectionListComponent,
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.FogInspections,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
+    },
+    {
+        path: 'inspections/:id',
+        title: 'View FOG Inspection',
+        component: FogInspectionViewComponent,
         canActivate: [PermissionGuard],
         data: {
             permissions: [

@@ -223,6 +223,15 @@
           class="badge bg-danger">Failed</span>
 </ng-template>
 
+<ng-template #viewCell let-inspection="rowData">
+    <a class="btn btn-sm btn-primary"
+       [routerLink]="['/fog/inspections', inspection.id]"
+       title="View">
+        <i class="fa-solid fa-magnifying-glass me-1"></i>
+        View
+    </a>
+</ng-template>
+
 <div *ngIf="showResults">
     <div class="d-flex justify-content-end mb-3">
         <button type="button"

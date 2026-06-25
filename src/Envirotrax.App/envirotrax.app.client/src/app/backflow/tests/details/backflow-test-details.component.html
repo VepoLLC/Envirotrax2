@@ -53,6 +53,8 @@
                 (save)="save($event, 'Test information')" />
         </div>
 
+        <!--implementation of Additional Information-->
+
         <div class="row mt-3">
             <vp-backflow-test-additional-info
                 [test]="test"
@@ -74,6 +76,12 @@
             <vp-backflow-test-history
                 [test]="test"
                 [canViewTesters]="canViewTesters" />
+        </div>
+
+        <div class="d-flex justify-content-center mt-3">
+            <button class="btn btn-primary vp-section-button" [disabled]="isLoading" (click)="exportPdf()">
+                Export Test to Printable Document
+            </button>
         </div>
     </div>
 </div>

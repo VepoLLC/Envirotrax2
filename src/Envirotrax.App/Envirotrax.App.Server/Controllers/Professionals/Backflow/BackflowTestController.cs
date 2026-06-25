@@ -28,11 +28,32 @@ public class BackflowTestController : ProfessionalProtectedController
         return Ok(result);
     }
 
+    [HttpGet("pdf")]
+    public async Task<IActionResult> GetAllPdfAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
+    {
+        var tests = await _backflowTestService.GetAllAsync(pageInfo, query, cancellationToken);
+        var pdf = await _backflowTestService.GeneratePdfAsync(tests.Data);
+        return File(pdf, "application/pdf");
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
     {
         var result = await _backflowTestService.GetAsync(id, cancellationToken);
         return Ok(result);
+    }
+
+    [HttpGet("{id}/pdf")]
+    public async Task<IActionResult> GetPdfAsync(int id, CancellationToken cancellationToken)
+    {
+        var test = await _backflowTestService.GetAsync(id, cancellationToken);
+        if (test == null)
+        {
+            return NotFound();
+        }
+
+        var pdf = await _backflowTestService.GeneratePdfAsync(test);
+        return File(pdf, "application/pdf");
     }
 
     [HttpPost]

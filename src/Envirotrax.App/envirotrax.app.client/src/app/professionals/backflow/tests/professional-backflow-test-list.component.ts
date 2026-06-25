@@ -82,7 +82,8 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
         this.downloadConfig = {
             fileName: 'Backflow Tests',
             endpoint: this._backflowTestService.getAllForProfessionalEndpoint(),
-            suppoertedFormats: ['CSV', 'Excel'],
+            pdfEndpoint: this._backflowTestService.getAllForProfessionalPdfEndpoint(),
+            suppoertedFormats: ['CSV', 'Excel', 'PDF'],
             categories: [
                 { name: 'property', caption: 'Property Information', isSelected: true },
                 { name: 'mailing', caption: 'Mailing Information', isSelected: true },

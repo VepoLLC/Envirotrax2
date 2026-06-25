@@ -55,10 +55,24 @@ export class BackflowTestService {
         };
     }
 
+    public getAllPdfEndpoint(): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/backflow/tests/pdf')
+        };
+    }
+
     public getAllForProfessionalEndpoint(): DownloadEndpoint {
         return {
             method: 'GET',
             url: this._urlResolver.resolveUrl('/api/professionals/backflow/tests')
+        };
+    }
+
+    public getAllForProfessionalPdfEndpoint(): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/professionals/backflow/tests/pdf')
         };
     }
 
@@ -94,6 +108,11 @@ export class BackflowTestService {
         return await lastValueFrom(this._http.get<BackflowTest>(url));
     }
 
+    public async getPdf(id: number): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/pdf`);
+        return await lastValueFrom(this._http.get(url, { responseType: 'blob' }));
+    }
+
     public async update(test: BackflowTest): Promise<BackflowTest> {
         const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${test.id}`);
         return await lastValueFrom(this._http.put<BackflowTest>(url, test));
@@ -109,6 +128,11 @@ export class BackflowTestService {
     public async getForProfessional(id: number): Promise<BackflowTest> {
         const url = this._urlResolver.resolveUrl(`/api/professionals/backflow/tests/${id}`);
         return await lastValueFrom(this._http.get<BackflowTest>(url));
+    }
+
+    public async getPdfForProfessional(id: number): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/backflow/tests/${id}/pdf`);
+        return await lastValueFrom(this._http.get(url, { responseType: 'blob' }));
     }
 }
 
@@ -203,6 +227,8 @@ function buildBackflowTestFormData(test: BackflowTest): FormData {
     // Permit
     append('permitNumber', test.permitNumber);
     append('ossf', test.ossf);
+    append('rainFreezeSensorInstalled', test.rainFreezeSensorInstalled);
+    append('rainFreezeSensorWorkingProperly', test.rainFreezeSensorWorkingProperly);
 
     // Comments
     append('comments', test.comments);

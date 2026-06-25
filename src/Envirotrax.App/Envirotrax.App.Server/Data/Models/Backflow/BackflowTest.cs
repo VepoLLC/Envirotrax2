@@ -204,6 +204,10 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 
     public bool Ossf { get; set; }
 
+    // Rain/Freeze sensor (shown when the BackflowSettings.ShowRainSensor setting is enabled)
+    public bool RainFreezeSensorInstalled { get; set; }
+    public bool RainFreezeSensorWorkingProperly { get; set; }
+
     // Status
     public string? Comments { get; set; }
     public bool IsCurrent { get; set; }

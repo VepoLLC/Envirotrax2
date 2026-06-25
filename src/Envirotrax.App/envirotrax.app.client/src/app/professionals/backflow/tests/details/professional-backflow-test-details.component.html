@@ -33,6 +33,10 @@
         </div>
 
         <div class="row mt-3">
+            <vp-backflow-test-additional-info [test]="test" [canModify]="false" />
+        </div>
+
+        <div class="row mt-3">
             <vp-backflow-test-remarks [test]="test" />
         </div>
 
@@ -41,7 +45,7 @@
             [canModify]="false" />
 
         <div class="d-flex justify-content-center gap-2 flex-wrap mt-3">
-            <button type="button" class="btn btn-primary vp-section-button">
+            <button type="button" class="btn btn-primary vp-section-button" (click)="exportPdf()">
                 Export Test to Printable Document
             </button>
             <button type="button" class="btn btn-primary vp-section-button">

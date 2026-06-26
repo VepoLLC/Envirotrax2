@@ -32,9 +32,12 @@
                 [canModify]="false" />
         </div>
 
-        <div class="row mt-3">
-            <vp-backflow-test-additional-info [test]="test" [canModify]="false" />
-        </div>
+        <vp-backflow-test-additional-info
+            [test]="test"
+            [canModify]="false"
+            [showRainSensor]="settings?.showRainSensor ?? false"
+            [showOSSF]="settings?.showOSSF ?? false"
+            [showPermitNumber]="settings?.showPermitNumber ?? false" />
 
         <div class="row mt-3">
             <vp-backflow-test-remarks [test]="test" />

@@ -2,6 +2,8 @@ import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { BackflowTest } from "../../../../shared/models/backflow/backflow-test";
 import { BackflowTestService } from "../../../../shared/services/backflow/backflow-test.service";
+import { BackflowSettingsService } from "../../../../shared/services/backflow/backflow-settings.service";
+import { BackflowTestingSettings } from "../../../../shared/models/backflow/backflow-testing-settings";
 import { DownloadService } from "../../../../shared/services/download.service";
 
 @Component({
@@ -13,10 +15,12 @@ export class ProfessionalBackflowTestDetailsComponent implements OnInit {
     public id: number = 0;
     public test: BackflowTest | null = null;
     public isLoading: boolean = false;
+    public settings: BackflowTestingSettings | null = null;
 
     constructor(
         private readonly _activatedRoute: ActivatedRoute,
         private readonly _testService: BackflowTestService,
+        private readonly _settingsService: BackflowSettingsService,
         private readonly _downloadService: DownloadService
     ) { }
 
@@ -39,6 +43,11 @@ export class ProfessionalBackflowTestDetailsComponent implements OnInit {
         try {
             this.isLoading = true;
             this.test = await this._testService.getForProfessional(this.id);
+
+            const waterSupplierId = this.test?.waterSupplier?.id;
+            if (waterSupplierId) {
+                this.settings = await this._settingsService.getTestingSettings(waterSupplierId);
+            }
         } finally {
             this.isLoading = false;
         }

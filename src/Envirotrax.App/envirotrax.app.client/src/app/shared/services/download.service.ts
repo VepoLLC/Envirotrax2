@@ -24,10 +24,11 @@ export class DownloadService {
         const link = document.createElement('a');
 
         link.href = url;
-        link.target = '_blank';
 
         if (fileName) {
             link.download = fileName;
+        } else {
+            link.target = '_blank';
         }
 
         // this is necessary as link.click() does not work on the latest firefox
@@ -40,7 +41,11 @@ export class DownloadService {
 
     public downloadFileFromBlob(blob: Blob, fileName?: string): void {
         const objectUrl = URL.createObjectURL(blob);
-        this.downloadFileFromUrl(objectUrl, fileName);
+        this.downloadFileFromUrl(objectUrl, fileName ?? 'download');
+
+        window.setTimeout(function () {
+            URL.revokeObjectURL(objectUrl);
+        }, 5000);
     }
 
     private getAcceptHeader(format: FileFormat): string {
@@ -56,6 +61,11 @@ export class DownloadService {
         }
     }
 
+    private getFileNameFromResponse(contentDisposition: string | null, fallback: string): string {
+        const match = contentDisposition?.match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/i);
+        return match ? decodeURIComponent(match[1].trim()) : fallback;
+    }
+
     private async downloadPdf(config: DownloadConfig): Promise<void> {
         const observable = this._http.request(config.pdfEndpoint!.method || 'GET', config.pdfEndpoint!.url, {
             responseType: 'blob',
@@ -64,8 +74,9 @@ export class DownloadService {
         });
 
         const response = await lastValueFrom(observable);
+        const fileName = this.getFileNameFromResponse(response.headers.get('Content-Disposition'), config.fileName ?? 'document.pdf');
 
-        this.downloadFileFromBlob(response.body!);
+        this.downloadFileFromBlob(response.body!, fileName);
     }
 
     public async download(config: DownloadConfig): Promise<void> {
@@ -105,7 +116,7 @@ export class DownloadService {
             });
 
             const response = await lastValueFrom(observable);
-            const fileName = response.headers.get('Content-Disposition')!.split('filename=')[1].replace(/^"|"$/g, '');
+            const fileName = this.getFileNameFromResponse(response.headers.get('Content-Disposition'), config.fileName ?? 'download');
 
             this.downloadFileFromBlob(response.body!, fileName);
         }

@@ -19,6 +19,7 @@ export class App implements OnInit {
   public isNavbarVisible: boolean = false;
   public companyName: string = '';
   public userEmail: string = '';
+  public isDarkMode: boolean = false;
 
   constructor(
     private readonly _authService: AuthService,
@@ -29,6 +30,12 @@ export class App implements OnInit {
   }
 
   public async ngOnInit(): Promise<void> {
+    this.isDarkMode = localStorage.getItem('vp-theme') === 'dark';
+
+    if (this.isDarkMode) {
+      document.body.classList.add('vp-dark-theme');
+    }
+
     this._authService.onLoggedIn().subscribe(async isLoggedIn => {
       this.isAuthenticated = isLoggedIn;
 
@@ -55,6 +62,18 @@ export class App implements OnInit {
 
   public signOut(): void {
     this._authService.signOut();
+  }
+
+  public toggleDarkMode(): void {
+    this.isDarkMode = !this.isDarkMode;
+
+    if (this.isDarkMode) {
+      document.body.classList.add('vp-dark-theme');
+      localStorage.setItem('vp-theme', 'dark');
+    } else {
+      document.body.classList.remove('vp-dark-theme');
+      localStorage.setItem('vp-theme', 'light');
+    }
   }
 
   private async createMenuItems(): Promise<MenuItem[]> {

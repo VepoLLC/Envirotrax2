@@ -193,6 +193,12 @@ body {
     margin: 0;
 }
 
+[data-theme="dark"] body,
+[data-theme="dark"] .bg-light {
+    background-color: var(--bs-body-bg) !important;
+    color: var(--bs-body-color) !important;
+}
+
 
 a {
     text-decoration: none;

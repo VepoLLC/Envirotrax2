@@ -1,4 +1,5 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { FogInspectionService } from '../../../shared/services/fog/fog-inspection.service';
 import { QueryProperty } from '../../../shared/models/query';
@@ -49,9 +50,6 @@ export class FogInspectionListComponent implements OnInit {
     @ViewChild('resultCell', { static: true })
     public resultCell?: TemplateRef<CellTemplateData<FogInspection>>;
 
-    @ViewChild('viewCell', { static: true })
-    public viewCell?: TemplateRef<CellTemplateData<FogInspection>>;
-
     public inspectionResultOptions: InputOption[] = [
         { id: '', text: 'All Results' },
         { id: FogInspectionResult.Passed.toString(), text: 'Passed' },
@@ -101,7 +99,9 @@ export class FogInspectionListComponent implements OnInit {
     ];
 
     constructor(
-        private readonly _fogInspectionService: FogInspectionService
+        private readonly _fogInspectionService: FogInspectionService,
+        private readonly _router: Router,
+        private readonly _activatedRoute: ActivatedRoute
     ) { }
 
     public async ngOnInit(): Promise<void> {
@@ -150,13 +150,6 @@ export class FogInspectionListComponent implements OnInit {
                 caption: 'Inspection result',
                 type: ColumnType.text,
                 cellTemplate: this.resultCell
-            },
-            {
-                field: 'id',
-                caption: '',
-                type: ColumnType.text,
-                cellTemplate: this.viewCell,
-                queryColumnExcluded: true
             }
         ];
     }
@@ -191,5 +184,9 @@ export class FogInspectionListComponent implements OnInit {
             await this.getInspections();
             this.showResults = true;
         }
+    }
+
+    public viewDetails(inspection: FogInspection): void {
+        this._router.navigate([inspection.id], { relativeTo: this._activatedRoute });
     }
 }

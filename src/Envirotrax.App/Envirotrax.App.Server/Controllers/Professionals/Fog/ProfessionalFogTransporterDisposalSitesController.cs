@@ -1,5 +1,4 @@
 using DeveloperPartners.SortingFiltering;
-using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -11,26 +10,42 @@ namespace Envirotrax.App.Server.Controllers.Professionals.Fog;
 [Route("api/professionals/fog/transportation/disposal-sites")]
 [HasFeature(FeatureType.FogTransportation)]
 [Authorize(Roles = $"{RoleDefinitions.Professionals.Admin},{RoleDefinitions.Professionals.FogTransporter}")]
-public class ProfessionalFogTransporterDisposalSitesController : ProfessionalCrudController<FogTransporterDisposalSiteDto>
+public class ProfessionalFogTransporterDisposalSitesController : ProfessionalProtectedController
 {
-    private readonly IFogTransporterDisposalSiteService _service;
+    private readonly IFogDisposalSiteService _disposalSiteService;
+    private readonly IFogTransporterDisposalSiteService _registrationService;
 
-    public ProfessionalFogTransporterDisposalSitesController(IFogTransporterDisposalSiteService service) : base(service)
+    public ProfessionalFogTransporterDisposalSitesController(
+        IFogDisposalSiteService disposalSiteService,
+        IFogTransporterDisposalSiteService registrationService)
     {
-        _service = service;
+        _disposalSiteService = disposalSiteService;
+        _registrationService = registrationService;
     }
 
-    [HttpGet("available")]
-    public async Task<IActionResult> GetAvailableAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
+    // Master list of all (non-deleted) disposal sites.
+    [HttpGet]
+    public async Task<IActionResult> GetAllAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
     {
-        var result = await _service.GetAvailableAsync(pageInfo, query, cancellationToken);
+        var result = await _disposalSiteService.GetActiveAsync(pageInfo, query, cancellationToken);
         return Ok(result);
     }
 
-    [HttpPut("available/{disposalSiteId}")]
+    // Disposal sites the current professional has registered (reused for FOG trip tickets).
+    [HttpGet("registered")]
+    public async Task<IActionResult> GetRegisteredAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
+    {
+        var result = await _registrationService.GetRegisteredDisposalSitesAsync(pageInfo, query, cancellationToken);
+        return Ok(result);
+    }
+
+    // Select (isActive=true) or unselect (isActive=false) a disposal site for the current professional.
+    // Registering is restricted to professional Admins — FOG Transporters can view but not add/remove.
+    [HttpPut("{disposalSiteId}/registration")]
+    [Authorize(Roles = RoleDefinitions.Professionals.Admin)]
     public async Task<IActionResult> SetRegistrationAsync(int disposalSiteId, [FromQuery] bool isActive, CancellationToken cancellationToken)
     {
-        var result = await _service.SetRegistrationAsync(disposalSiteId, isActive, cancellationToken);
-        return Ok(result);
+        await _registrationService.SetRegistrationAsync(disposalSiteId, isActive, cancellationToken);
+        return Ok();
     }
 }

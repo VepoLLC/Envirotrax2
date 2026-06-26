@@ -1,8 +1,9 @@
 import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { FogDisposalSiteCandidate } from "../../../../../shared/models/fog/fog-disposal-site-candidate";
+import { FogDisposalSite } from "../../../../../shared/models/fog/fog-disposal-site";
 import { PhysicalType, PHYSICAL_TYPE_LABELS } from "../../../../../shared/models/fog/fog-disposal-site-enums";
 import { ProfessionalFogDisposalSiteService } from "../../../../../shared/services/fog/professional-fog-disposal-site.service";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
+import { MAX_PAGE_SIZE } from "../../../../../shared/models/page-info";
 import { ToastService } from "../../../../../shared/services/toast.service";
 import { CellTemplateData, ColumnType, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 
@@ -11,7 +12,7 @@ import { CellTemplateData, ColumnType, ModalHelperService, TableColumn } from "@
     templateUrl: './professional-fog-disposal-site-list.component.html'
 })
 export class ProfessionalFogDisposalSiteListComponent implements OnInit {
-    public table: TableViewModel<FogDisposalSiteCandidate> = {
+    public table: TableViewModel<FogDisposalSiteVm> = {
         columns: [],
         query: {
             sort: {},
@@ -20,10 +21,10 @@ export class ProfessionalFogDisposalSiteListComponent implements OnInit {
     };
 
     @ViewChild('registrationCell', { static: true })
-    private registrationCellTemplate!: TemplateRef<CellTemplateData<FogDisposalSiteCandidate>>;
+    private registrationCellTemplate!: TemplateRef<CellTemplateData<FogDisposalSiteVm>>;
 
     @ViewChild('wasteTypesCell', { static: true })
-    private wasteTypesCellTemplate!: TemplateRef<CellTemplateData<FogDisposalSiteCandidate>>;
+    private wasteTypesCellTemplate!: TemplateRef<CellTemplateData<FogDisposalSiteVm>>;
 
     constructor(
         private readonly _siteService: ProfessionalFogDisposalSiteService,
@@ -43,7 +44,7 @@ export class ProfessionalFogDisposalSiteListComponent implements OnInit {
         return PHYSICAL_TYPE_LABELS[physicalType] ?? '';
     }
 
-    private getColumns(): TableColumn<FogDisposalSiteCandidate>[] {
+    private getColumns(): TableColumn<FogDisposalSiteVm>[] {
         return [
             {
                 field: 'name',
@@ -67,7 +68,7 @@ export class ProfessionalFogDisposalSiteListComponent implements OnInit {
                 cellTemplate: this.wasteTypesCellTemplate
             },
             {
-                field: '',
+                field: 'Registration',
                 caption: 'Registration',
                 type: ColumnType.other,
                 queryColumnExcluded: true,
@@ -80,29 +81,38 @@ export class ProfessionalFogDisposalSiteListComponent implements OnInit {
     public async loadSites(): Promise<void> {
         try {
             this.table.isLoading = true;
-            this.table.items = await this._siteService.getAvailable(
-                this.table.items?.pageInfo || {},
-                this.table.query
-            );
+
+            const [allSites, registeredSites] = await Promise.all([
+                this._siteService.getAll(this.table.items?.pageInfo || {}, this.table.query),
+                this._siteService.getRegistered({ pageSize: MAX_PAGE_SIZE }, {})
+            ]);
+
+            this.table.items = {
+                pageInfo: allSites.pageInfo,
+                data: allSites.data.map(site => ({
+                    ...site,
+                    selected: registeredSites.data.find(registered => registered.id === site.id)
+                }))
+            };
         } finally {
             this.table.isLoading = false;
         }
     }
 
-    public toggle(row: FogDisposalSiteCandidate): void {
-        if (row.isActive) {
+    public toggle(site: FogDisposalSiteVm): void {
+        if (site.selected) {
             this._modalHelper.showDeleteConfirmation()
                 .result()
-                .subscribe(() => this.setRegistration(row, false));
+                .subscribe(() => this.setRegistration(site, false));
         } else {
-            this.setRegistration(row, true);
+            this.setRegistration(site, true);
         }
     }
 
-    private async setRegistration(row: FogDisposalSiteCandidate, isActive: boolean): Promise<void> {
+    private async setRegistration(site: FogDisposalSiteVm, isActive: boolean): Promise<void> {
         try {
             this.table.isLoading = true;
-            await this._siteService.setRegistration(row.id!, isActive);
+            await this._siteService.setRegistration(site.id!, isActive);
 
             if (isActive) {
                 this._toastService.successfullySaved('Disposal site');
@@ -115,4 +125,8 @@ export class ProfessionalFogDisposalSiteListComponent implements OnInit {
             this.table.isLoading = false;
         }
     }
+}
+
+interface FogDisposalSiteVm extends FogDisposalSite {
+    selected?: FogDisposalSite;
 }

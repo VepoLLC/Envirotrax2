@@ -7,10 +7,10 @@
         <button type="button"
                 class="btn btn-sm"
                 style="min-width: 110px"
-                [class.btn-primary]="row.isActive"
-                [class.btn-success]="!row.isActive"
+                [class.btn-primary]="row.selected"
+                [class.btn-success]="!row.selected"
                 (click)="toggle(row)">
-            {{ row.isActive ? 'Selected' : 'Unselected' }}
+            {{ row.selected ? 'Selected' : 'Unselected' }}
         </button>
     </div>
 </ng-template>

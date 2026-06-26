@@ -19,7 +19,5 @@ public class FogTransporterDisposalSiteProfile : Profile
             .ForMember(m => m.Professional, opt => opt.Ignore())
             .ForMember(m => m.ProfessionalId, opt => opt.MapFrom(dto => dto.Professional != null ? dto.Professional.Id : (int?)null))
             .ForMember(m => m.CreatedBy, opt => opt.Ignore());
-
-        CreateMap<FogDisposalSiteCandidate, FogDisposalSiteCandidateDto>();
     }
 }

@@ -18,21 +18,20 @@ public class FogTransporterDisposalSiteService : Service<FogTransporterDisposalS
         _repository = repository;
     }
 
-    public async Task<IPagedData<FogDisposalSiteCandidateDto>> GetAvailableAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public async Task<IPagedData<FogDisposalSiteDto>> GetRegisteredDisposalSitesAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        query.Sort = query.ConvertSortProperties<FogDisposalSiteCandidate, FogDisposalSiteCandidateDto>(Mapper);
-        query.Filter = query.ConvertFilterProperties<FogDisposalSiteCandidate, FogDisposalSiteCandidateDto>(Mapper);
+        query.Sort = query.ConvertSortProperties<FogDisposalSite, FogDisposalSiteDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<FogDisposalSite, FogDisposalSiteDto>(Mapper);
 
-        var candidates = await _repository.GetAvailableAsync(pageInfo, query, cancellationToken);
+        var sites = await _repository.GetRegisteredDisposalSitesAsync(pageInfo, query, cancellationToken);
 
         return Mapper
-            .Map<IEnumerable<FogDisposalSiteCandidate>, IEnumerable<FogDisposalSiteCandidateDto>>(candidates)
+            .Map<IEnumerable<FogDisposalSite>, IEnumerable<FogDisposalSiteDto>>(sites)
             .ToPagedData(pageInfo);
     }
 
-    public async Task<FogDisposalSiteCandidateDto> SetRegistrationAsync(int disposalSiteId, bool isActive, CancellationToken cancellationToken)
+    public Task SetRegistrationAsync(int disposalSiteId, bool isActive, CancellationToken cancellationToken)
     {
-        var candidate = await _repository.SetRegistrationAsync(disposalSiteId, isActive, cancellationToken);
-        return Mapper.Map<FogDisposalSiteCandidate, FogDisposalSiteCandidateDto>(candidate);
+        return _repository.SetRegistrationAsync(disposalSiteId, isActive, cancellationToken);
     }
 }

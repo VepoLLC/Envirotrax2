@@ -6,7 +6,7 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 
 public interface IFogTransporterDisposalSiteService : IService<FogTransporterDisposalSiteDto>
 {
-    Task<IPagedData<FogDisposalSiteCandidateDto>> GetAvailableAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<IPagedData<FogDisposalSiteDto>> GetRegisteredDisposalSitesAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
 
-    Task<FogDisposalSiteCandidateDto> SetRegistrationAsync(int disposalSiteId, bool isActive, CancellationToken cancellationToken);
+    Task SetRegistrationAsync(int disposalSiteId, bool isActive, CancellationToken cancellationToken);
 }

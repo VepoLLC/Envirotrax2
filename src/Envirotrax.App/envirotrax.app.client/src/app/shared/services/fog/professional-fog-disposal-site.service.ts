@@ -6,12 +6,14 @@ import { QueryHelperService } from "../helpers/query-helper.service";
 import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
-import { FogDisposalSiteCandidate } from "../../models/fog/fog-disposal-site-candidate";
+import { FogDisposalSite } from "../../models/fog/fog-disposal-site";
 
 @Injectable({
     providedIn: 'root'
 })
 export class ProfessionalFogDisposalSiteService {
+    private readonly _baseUrl = '/api/professionals/fog/transportation/disposal-sites';
+
     constructor(
         private readonly _urlResolver: UrlResolverService,
         private readonly _queryHelper: QueryHelperService,
@@ -19,16 +21,23 @@ export class ProfessionalFogDisposalSiteService {
     ) {
     }
 
-    public getAvailable(pageInfo: PageInfo, query: Query): Promise<PagedData<FogDisposalSiteCandidate>> {
-        const url = this._urlResolver.resolveUrl('/api/professionals/fog/transportation/disposal-sites/available');
-        return lastValueFrom(this._http.get<PagedData<FogDisposalSiteCandidate>>(url, {
+    public getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<FogDisposalSite>> {
+        const url = this._urlResolver.resolveUrl(this._baseUrl);
+        return lastValueFrom(this._http.get<PagedData<FogDisposalSite>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));
     }
 
-    public setRegistration(disposalSiteId: number, isActive: boolean): Promise<FogDisposalSiteCandidate> {
-        const url = this._urlResolver.resolveUrl(`/api/professionals/fog/transportation/disposal-sites/available/${disposalSiteId}`);
+    public getRegistered(pageInfo: PageInfo, query: Query): Promise<PagedData<FogDisposalSite>> {
+        const url = this._urlResolver.resolveUrl(`${this._baseUrl}/registered`);
+        return lastValueFrom(this._http.get<PagedData<FogDisposalSite>>(url, {
+            params: this._queryHelper.buildQuery(pageInfo, query)
+        }));
+    }
+
+    public setRegistration(disposalSiteId: number, isActive: boolean): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`${this._baseUrl}/${disposalSiteId}/registration`);
         const params = new HttpParams().set('isActive', String(isActive));
-        return lastValueFrom(this._http.put<FogDisposalSiteCandidate>(url, null, { params }));
+        return lastValueFrom(this._http.put<void>(url, null, { params }));
     }
 }

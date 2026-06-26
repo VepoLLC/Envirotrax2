@@ -6,7 +6,6 @@ using Envirotrax.Common.Data.Models;
 
 namespace Envirotrax.App.Server.Data.Models.Fog;
 
-[Table("FogDisposalSites")]
 public class FogDisposalSite : ICreateAuditableModel<AppUser>, IDeleteAutitableModel<AppUser>
 {
     public int Id { get; set; }

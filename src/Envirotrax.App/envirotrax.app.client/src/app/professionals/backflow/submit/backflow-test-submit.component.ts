@@ -6,6 +6,8 @@ import { BackflowTestImages } from '../../../shared/models/backflow/backflow-tes
 import { BackflowTestService } from '../../../shared/services/backflow/backflow-test.service';
 import { BackflowTestOptionsService } from '../../../shared/services/backflow/backflow-test-options.service';
 import { BackflowGaugeService } from '../../../shared/services/backflow/backflow-gauge.service';
+import { BackflowSettingsService } from '../../../shared/services/backflow/backflow-settings.service';
+import { BackflowTestingSettings } from '../../../shared/models/backflow/backflow-testing-settings';
 import { ProfesisonalService } from '../../../shared/services/professionals/professional.service';
 import { ProfesionalUserService } from '../../../shared/services/professionals/professional-user.service';
 import { ProfessionalSupplierService } from '../../../shared/services/professionals/professional-supplier.service';
@@ -44,6 +46,8 @@ export class BackflowTestSubmitComponent implements OnInit {
     public selectedBpatId?: number;
     public selectedWaterSupplierId?: number;
     public selectedGaugeId?: number;
+
+    public additionalInfoSettings: BackflowTestingSettings | null = null;
 
     public readonly BackflowTestResult = BackflowTestResult;
     public readonly BackflowReasonForTest = BackflowReasonForTest;
@@ -440,7 +444,8 @@ export class BackflowTestSubmitComponent implements OnInit {
         private readonly _professionalService: ProfesisonalService,
         private readonly _userService: ProfesionalUserService,
         private readonly _supplierService: ProfessionalSupplierService,
-        private readonly _options: BackflowTestOptionsService
+        private readonly _options: BackflowTestOptionsService,
+        private readonly _settingsService: BackflowSettingsService
     ) {
         this.deviceTypeOptions = this._options.deviceTypeOptions;
         this.hazardTypeOptions = this._options.hazardTypeOptions;
@@ -509,6 +514,15 @@ export class BackflowTestSubmitComponent implements OnInit {
     public onWaterSupplierChange(value: number): void {
         this.selectedWaterSupplierId = value;
         this.selectedWaterSupplier = this._waterSuppliers.find(s => s.waterSupplier?.id === value);
+        this.loadAdditionalInfoSettings();
+    }
+
+    private async loadAdditionalInfoSettings(): Promise<void> {
+        if (this.selectedWaterSupplierId) {
+            this.additionalInfoSettings = await this._settingsService.getTestingSettings(this.selectedWaterSupplierId);
+        } else {
+            this.additionalInfoSettings = null;
+        }
     }
 
     public onGaugeChange(value: number): void {
@@ -602,6 +616,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         if (this._waterSuppliers.length === 1) {
             this.selectedWaterSupplierId = this._waterSuppliers[0].waterSupplier?.id;
             this.selectedWaterSupplier = this._waterSuppliers[0];
+            await this.loadAdditionalInfoSettings();
         }
         const validGauges = this._gauges.filter(g => g.expirationType !== GaugeExpirationType.Expired);
         if (validGauges.length === 1) {

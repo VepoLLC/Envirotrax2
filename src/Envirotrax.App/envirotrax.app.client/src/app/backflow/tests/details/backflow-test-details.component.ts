@@ -11,6 +11,9 @@ import { ToastService } from "../../../shared/services/toast.service";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { ImageUrlChange } from "./images/backflow-test-images.component";
 import { InputOption } from "@envirotrax/common-ui";
+import { DownloadService } from "../../../shared/services/download.service";
+import { BackflowTestingSettingsService } from "../../../shared/services/settings/backflow-testing-settings.service";
+import { BackflowSettings } from "../../../shared/models/settings/backflow-settings";
 
 @Component({
     selector: 'app-backflow-test-details',
@@ -26,6 +29,7 @@ export class BackflowTestDetailsComponent implements OnInit {
     public canViewTesters: boolean = false;
     public states: InputOption<State>[] = [];
     public validationErrors: string[] = [];
+    public settings: BackflowSettings | null = null;
 
     constructor(
         private readonly _activatedRoute: ActivatedRoute,
@@ -33,7 +37,9 @@ export class BackflowTestDetailsComponent implements OnInit {
         private readonly _lookupService: LookupService,
         private readonly _authService: AuthService,
         private readonly _toastService: ToastService,
-        private readonly _helper: HelperService
+        private readonly _helper: HelperService,
+        private readonly _downloadService: DownloadService,
+        private readonly _settingsService: BackflowTestingSettingsService
     ) { }
 
     public async ngOnInit(): Promise<void> {
@@ -41,15 +47,17 @@ export class BackflowTestDetailsComponent implements OnInit {
     }
 
     private async initialize(): Promise<void> {
-        const [states, canModify, canViewTesters] = await Promise.all([
+        const [states, canModify, canViewTesters, settings] = await Promise.all([
             this._lookupService.getAllStatesAsOptions(true),
             this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.BackflowTests),
-            this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowTesters)
+            this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowTesters),
+            this._settingsService.get()
         ]);
 
         this.states = states;
         this.canModify = canModify;
         this.canViewTesters = canViewTesters;
+        this.settings = settings;
 
         this._activatedRoute.paramMap.subscribe(async params => {
             const id = params.get('id');
@@ -75,6 +83,20 @@ export class BackflowTestDetailsComponent implements OnInit {
             return;
         }
         (this.test as any)[change.urlKey] = change.value;
+    }
+
+    public async exportPdf(): Promise<void> {
+        if (this.test == null) {
+            return;
+        }
+
+        try {
+            this.isLoading = true;
+            const blob = await this._testService.getPdf(this.test.id);
+            this._downloadService.downloadFileFromBlob(blob);
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public async save(form: NgForm, entityName: string): Promise<void> {

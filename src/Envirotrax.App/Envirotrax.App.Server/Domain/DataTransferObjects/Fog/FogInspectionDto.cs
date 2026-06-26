@@ -5,6 +5,7 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
+using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 
@@ -13,6 +14,8 @@ public class FogInspectionDto : IDto
     public int Id { get; set; }
 
     public ReferencedSiteDto? Site { get; set; }
+
+    public ReferencedWaterSupplierDto? WaterSupplier { get; set; }
 
     public DateTime? InspectionDate { get; set; }
 
@@ -73,7 +76,7 @@ public class FogInspectionDto : IDto
     public string? MailingEmailAddress { get; set; }
 
     // Inspector fields
-    [Required]
+    // Professional is derived server-side from the logged-in user, so it is not required on the request.
     public ReferencedProfessionalDto? Professional { get; set; }
 
     [Required]
@@ -189,6 +192,18 @@ public class FogInspectionDto : IDto
     public DateTime? SignatureDate { get; set; }
 
     public string? Comments { get; set; }
+
+    // Image paths (persisted blob paths)
+    [StringLength(500)]
+    public string? ExteriorImagePath { get; set; }
+
+    [StringLength(500)]
+    public string? InteriorImagePath { get; set; }
+
+    // Image download URLs (generated SAS URLs; not persisted)
+    public string? ExteriorImageUrl { get; set; }
+
+    public string? InteriorImageUrl { get; set; }
 
     // Trip ticket fields
     public DateTime? LastTripTicketDate { get; set; }

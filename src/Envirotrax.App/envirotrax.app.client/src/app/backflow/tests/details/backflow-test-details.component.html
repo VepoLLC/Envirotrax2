@@ -53,6 +53,17 @@
                 (save)="save($event, 'Test information')" />
         </div>
 
+        <!--implementation of Additional Information-->
+
+        <vp-backflow-test-additional-info
+            [test]="test"
+            [canModify]="canModify"
+            [showRainSensor]="settings?.showRainSensor ?? false"
+            [showOSSF]="settings?.showOSSF ?? false"
+            [showPermitNumber]="settings?.showPermitNumber ?? false"
+            [saving]="savingSection === 'Additional information'"
+            (save)="save($event, 'Additional information')" />
+
         <div class="row mt-3">
             <vp-backflow-test-remarks [test]="test" />
         </div>
@@ -66,6 +77,12 @@
             <vp-backflow-test-history
                 [test]="test"
                 [canViewTesters]="canViewTesters" />
+        </div>
+
+        <div class="d-flex justify-content-center mt-3">
+            <button class="btn btn-primary vp-section-button" [disabled]="isLoading" (click)="exportPdf()">
+                Export Test to Printable Document
+            </button>
         </div>
     </div>
 </div>

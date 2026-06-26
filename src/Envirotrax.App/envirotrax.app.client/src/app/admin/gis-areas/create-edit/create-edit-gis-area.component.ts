@@ -2,11 +2,10 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { GisArea, GisAreaCoordinate } from "../../../shared/models/gis-areas/gis-area";
 import { GisAreaService } from "../../../shared/services/gis-areas/gis-area.service";
 import { GisAreaCoordinateService } from "../../../shared/services/gis-areas/gis-area-coordinate.service";
-import { MapPolygon } from "../../../shared/components/map/map.component";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { NgForm } from "@angular/forms";
-import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
 import { ToastService } from "../../../shared/services/toast.service";
+import { MapPolygon, ModalHelperService } from "@envirotrax/common-ui";
 
 
 @Component({

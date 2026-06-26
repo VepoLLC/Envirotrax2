@@ -4,11 +4,11 @@ import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { ProfessionalUserLicense, ProfessionalType, professionalTypeLabels } from "../../../../../shared/models/professionals/licenses/professional-user-license";
 import { CsiInspectorLicensesService } from "../../../../../shared/services/csi/csi-inspector-licenses.service";
 import { CsiInspectorSubAccountsService } from "../../../../../shared/services/csi/csi-inspector-user.service";
-import { InputOption } from "../../../../../shared/components/input/input.component";
 import { ProfessionalLicenseType } from "../../../../../shared/models/professionals/licenses/professional-license-type";
 import { ProfessionalUser } from "../../../../../shared/models/professionals/professional-user";
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
 import { ToastService } from "../../../../../shared/services/toast.service";
+import { InputOption } from "@envirotrax/common-ui";
 
 export interface CsiLicenseModalData {
     inspectorId: number;

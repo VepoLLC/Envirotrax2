@@ -5,12 +5,12 @@ import { BackflowTest } from "../../../shared/models/backflow/backflow-test";
 import { BackflowTestService } from "../../../shared/services/backflow/backflow-test.service";
 import { State } from "../../../shared/models/lookup/state";
 import { LookupService } from "../../../shared/services/lookup/lookup.service";
-import { InputOption } from "../../../shared/components/input/input.component";
 import { AuthService } from "../../../shared/services/auth/auth.service";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
 import { ToastService } from "../../../shared/services/toast.service";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { ImageUrlChange } from "./images/backflow-test-images.component";
+import { InputOption } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'app-backflow-test-details',

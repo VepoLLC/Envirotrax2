@@ -1,21 +1,17 @@
 ﻿import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { TableViewModel } from "../../shared/models/table-view-model";
 import { ProfessionalSupplierService } from "../../shared/services/professionals/professional-supplier.service";
-import { CellTemplateData, TableColumn, TableCustomAction } from "../../shared/components/data-components/table/table.component";
-import { CurrencyCellComponent } from "../../shared/components/data-components/table/table-cells/currency-cell.component";
-import { ColumnType } from "../../shared/components/data-components/sorting-filtering/query-view-model";
 import { AvailableWaterSupplier, ProfessionalWaterSupplier } from "../../shared/models/professionals/professional-water-supplier";
 import { ProfesisonalService } from "../../shared/services/professionals/professional.service";
 import { QueryProperty } from "../../shared/models/query";
 import { State } from "../../shared/models/lookup/state";
 import { LookupService } from "../../shared/services/lookup/lookup.service";
 import { Professional } from "../../shared/models/professionals/professional";
-import { InputOption } from "../../shared/components/input/input.component";
-import { ModalHelperService } from "../../shared/services/helpers/modal-helper.service";
 import { WaterSupplierRegistrationComponent, WaterSupplierRegistrationVm } from "./registration/water-supplier-registration.component";
 import { ToastService } from "../../shared/services/toast.service";
 import { AuthService } from "../../shared/services/auth/auth.service";
 import { FeatureType } from "../../shared/models/feature-type";
+import { CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 
 type TabType = 'backflow' | 'csi' | 'fogInspection' | 'fogTransport';
 

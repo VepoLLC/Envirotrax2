@@ -5,8 +5,7 @@ import { BackflowTesterManagementService } from "../../../shared/services/backfl
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { Professional } from "../../../shared/models/professionals/professional";
-import { TableColumn } from "../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
+import { ColumnType, TableColumn } from '@envirotrax/common-ui';
 
 @Component({
     selector: 'app-backflow-tester-list',

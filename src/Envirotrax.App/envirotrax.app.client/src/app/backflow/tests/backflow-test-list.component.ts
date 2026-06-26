@@ -10,15 +10,13 @@ import { QueryProperty } from '../../shared/models/query';
 import { TableViewModel } from '../../shared/models/table-view-model';
 import { BackflowTest } from '../../shared/models/backflow/backflow-test';
 import { GisArea } from '../../shared/models/gis-areas/gis-area';
-import { CellTemplateData } from '../../shared/components/data-components/table/table.component';
-import { ColumnType } from '../../shared/components/data-components/sorting-filtering/query-view-model';
-import { InputOption } from '../../shared/components/input/input.component';
 import { FacilityType } from '../../shared/enums/facility-type.enum';
-import { MapMarker, MapPolygon } from '../../shared/components/map/map.component';
+import { CellTemplateData, ColumnType, InputOption, MapMarker, MapPolygon } from '@envirotrax/common-ui';
 import { BackflowTestResult } from '../../shared/models/backflow/backflow-test-enums';
 import { DownloadConfig } from '../../shared/models/download-config';
 import { DownloadService } from '../../shared/services/download.service';
 import { PrintableTableService } from '../../shared/services/printable-table.service';
+import { PropertyType } from '../../shared/enums/property-type.enum';
 
 @Component({
     standalone: false,
@@ -112,8 +110,8 @@ export class BackflowTestListComponent implements OnInit {
 
     public propertyTypeOptions: InputOption[] = [
         { id: "", text: "Any Value" },
-        { id: "0", text: "Residential" },
-        { id: "1", text: "Commercial" }
+        { id: PropertyType.Residential.toString(), text: "Residential" },
+        { id: PropertyType.Commercial.toString(), text: "Commercial" }
     ];
 
     public hazardTypeOptions: InputOption[];
@@ -222,7 +220,7 @@ export class BackflowTestListComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         this.setupColumns();
     }
-    
+
     public viewDetails(test: BackflowTest): void {
         this._router.navigate([test.id, 'view'], { relativeTo: this._activatedRoute });
     }

@@ -5,10 +5,9 @@ import { CsiInspectionService } from '../../../shared/services/csi/csi-inspectio
 import { AuthService } from '../../../shared/services/auth/auth.service';
 import { PermissionAction, PermissionType } from '../../../shared/models/permission-type';
 import { TableViewModel } from '../../../shared/models/table-view-model';
-import { CellTemplateData, TableColumn } from '../../../shared/components/data-components/table/table.component';
-import { ColumnType } from '../../../shared/components/data-components/sorting-filtering/query-view-model';
 import { ComparisonOperator, QueryProperty } from '../../../shared/models/query';
 import { CsiInspectionReason, csiInspectionReasonLabels } from '../../../shared/enums/csi-inspection-reason.enum';
+import { CellTemplateData, ColumnType, TableColumn } from '@envirotrax/common-ui';
 
 @Component({
     selector: 'app-site-csi-inspections',

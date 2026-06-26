@@ -3,7 +3,7 @@ import { HttpClient } from "@angular/common/http";
 import { State } from "../../models/lookup/state";
 import { UrlResolverService } from "../helpers/url-resolver.service";
 import { lastValueFrom, Observable } from "rxjs";
-import { InputOption } from "../../components/input/input.component";
+import { InputOption } from "@envirotrax/common-ui";
 
 @Injectable({
     providedIn: 'root'

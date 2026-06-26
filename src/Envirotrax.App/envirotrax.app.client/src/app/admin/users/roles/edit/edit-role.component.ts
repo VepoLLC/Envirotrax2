@@ -2,10 +2,10 @@ import { Component, OnInit } from "@angular/core";
 import { HelperService } from "../../../../shared/services/helpers/helper.service";
 import { ActivatedRoute } from "@angular/router";
 import { NgForm } from "@angular/forms";
-import { ModalHelperService } from "../../../../shared/services/helpers/modal-helper.service";
 import { Role } from "../../../../shared/models/users/role";
 import { RoleService } from "../../../../shared/services/users/role.service";
 import { ToastService } from "../../../../shared/services/toast.service";
+import { ModalHelperService } from "@envirotrax/common-ui";
 
 @Component({
     templateUrl: './edit-role.component.html',

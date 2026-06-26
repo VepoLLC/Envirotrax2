@@ -7,7 +7,7 @@ import { SiteService } from "../../shared/services/sites/site.service";
 import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { HelperService } from "../../shared/services/helpers/helper.service";
 import { Router } from "@angular/router";
-import { InputOption } from "../../shared/components/input/input.component";
+import { InputOption } from '@envirotrax/common-ui';
 
 @Component({
     selector: 'app-create-site-component',

@@ -3,7 +3,7 @@ import { Router } from "@angular/router";
 import { NgForm } from "@angular/forms";
 import { BackflowTest } from "../../../../shared/models/backflow/backflow-test";
 import { State } from "../../../../shared/models/lookup/state";
-import { InputOption } from "../../../../shared/components/input/input.component";
+import { InputOption } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'vp-backflow-test-property-info',

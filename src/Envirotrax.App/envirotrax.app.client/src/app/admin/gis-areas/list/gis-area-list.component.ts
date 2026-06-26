@@ -4,10 +4,10 @@ import { GisAreaCoordinateService } from "../../../shared/services/gis-areas/gis
 import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { GisArea, GisAreaCoordinate } from "../../../shared/models/gis-areas/gis-area";
-import { MapPolygon } from "../../../shared/components/map/map.component";
 import { AuthService } from "../../../shared/services/auth/auth.service";
 import { FeatureType } from "../../../shared/models/feature-type";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
+import { MapPolygon } from "@envirotrax/common-ui";
 
 @Component({
     standalone: false,

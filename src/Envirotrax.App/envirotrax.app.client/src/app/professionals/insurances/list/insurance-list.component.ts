@@ -1,16 +1,13 @@
 import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { ExpirationType, ProfessionalInsurance } from "../../../shared/models/professionals/professional-insurance";
 import { ProfessionalInsuranceService } from "../../../shared/services/professionals/professional-insurance.service";
-import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
 import { ToastService, ToastType } from "../../../shared/services/toast.service";
 import { TableViewModel } from "../../../shared/models/table-view-model";
-import { CellTemplateData, TableColumn } from "../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { ProfesisonalService } from "../../../shared/services/professionals/professional.service";
 import { NgForm } from "@angular/forms";
-import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { EditInsuranceComponent } from "../edit/edit-insurance.component";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
+import { CellTemplateData, ColumnType, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'vp-insurance-list',
@@ -46,7 +43,6 @@ export class InsuranceListComponent implements OnInit {
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService,
         private readonly _professionalService: ProfesisonalService,
-        private readonly _helperService: HelperService
     ) { }
 
     public async ngOnInit(): Promise<void> {

@@ -6,22 +6,22 @@
 
     <ul class="nav vp-tabs justify-content-center mb-3">
         <li class="nav-item">
-            <a class="nav-link" [class.active]="activeTab === 'main'" (click)="activeTab = 'main'" role="button">
+            <a class="nav-link" [class.active]="activeTab === 'main'" (click)="onTabChange('main')" role="button">
                 CSI Main Form
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" [class.active]="activeTab === 'assemblies'" (click)="activeTab = 'assemblies'" role="button">
+            <a class="nav-link" [class.active]="activeTab === 'assemblies'" (click)="onTabChange('assemblies')" role="button">
                 Assemblies at this Location
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" [class.active]="activeTab === 'additional'" (click)="activeTab = 'additional'" role="button">
+            <a class="nav-link" [class.active]="activeTab === 'additional'" (click)="onTabChange('additional')" role="button">
                 Additional Information
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" [class.active]="activeTab === 'images'" (click)="activeTab = 'images'" role="button">
+            <a class="nav-link" [class.active]="activeTab === 'images'" (click)="onTabChange('images')" role="button">
                 Images
             </a>
         </li>
@@ -302,6 +302,80 @@
     </div>
     
     <div *ngIf="activeTab === 'images'">
+        <dp-loading-spinner *ngIf="isLoadingImages"></dp-loading-spinner>
+        <div *ngIf="!isLoadingImages">
+            <vp-section header="Inspection Images" class="d-block">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted small">{{ images.length }} / 24 images</span>
+                    <button type="button" class="btn btn-primary btn-sm"
+                            [disabled]="images.length >= 24 || isLoadingImages"
+                            (click)="openAddImageModal()">
+                        Add Image
+                    </button>
+                </div>
+
+                <p *ngIf="images.length === 0" class="text-muted">
+                    If you would like to add images associated with this inspection, click the "Add Image" button in the upper right corner. You may insert a maximum of 24 images to each report.
+                </p>
+                <div class="row">
+                    <div class="col-12 col-lg-6 mb-3" *ngFor="let img of images">
+                        <div class="border rounded p-2">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-semibold small">{{ img.description || '(no description)' }}</span>
+                                <button type="button" class="btn btn-danger btn-sm"
+                                        (click)="deleteImage(img.id!)">Delete</button>
+                            </div>
+                            <img [src]="img.url" alt="{{ img.description }}" class="img-fluid rounded"
+                                 style="width: 100%; object-fit: contain;" />
+                        </div>
+                    </div>
+                </div>
+            </vp-section>
+
+            <!-- Add Image Modal -->
+            <div *ngIf="showAddImageModal" class="modal d-block" tabindex="-1"
+                 style="background: rgba(0,0,0,0.5);">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-info text-white py-2">
+                            <h5 class="modal-title h6 mb-0">Add Image to Inspection</h5>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <vp-file-upload
+                                    [file]="modalSelectedFile"
+                                    (fileChange)="onModalFileChange($event)"
+                                    accept=".jpg,.jpeg,.gif,.png,.bmp,.tiff"
+                                    label="Choose an image or drag and drop here">
+                                </vp-file-upload>
+                            </div>
+                            <div *ngIf="modalPreviewUrl" class="text-center mb-3">
+                                <img [src]="modalPreviewUrl"
+                                     style="max-width: 350px; max-height: 350px;"
+                                     class="img-fluid border rounded" />
+                            </div>
+                            <div>
+                                Image Description:<br />
+                                <textarea class="form-control form-control-sm" rows="3"
+                                          maxlength="1000"
+                                          [(ngModel)]="newImageDescription"
+                                          [ngModelOptions]="{standalone: true}"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer py-2">
+                            <div class="d-flex w-100 gap-2">
+                                <button type="button" class="btn btn-primary flex-fill"
+                                        style="width: 50%"
+                                        (click)="onModalOk()">OK</button>
+                                <button type="button" class="btn btn-primary flex-fill"
+                                        style="width: 50%"
+                                        (click)="closeAddImageModal()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>

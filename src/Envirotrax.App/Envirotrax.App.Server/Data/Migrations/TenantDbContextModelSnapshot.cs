@@ -986,6 +986,41 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.ToTable("CsiInspections");
                 });
 
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Csi.CsiInspectionImage", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("InspectionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProfessionalId")
+                        .HasColumnType("int");
+
+                    b.HasKey("WaterSupplierId", "Id");
+
+                    b.HasIndex("ProfessionalId");
+
+                    b.HasIndex("WaterSupplierId", "InspectionId");
+
+                    b.ToTable("CsiInspectionImages");
+                });
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Fog.FogInspection", b =>
                 {
                     b.Property<int>("WaterSupplierId")
@@ -2936,6 +2971,33 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("Site");
 
                     b.Navigation("UpdatedBy");
+
+                    b.Navigation("WaterSupplier");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Csi.CsiInspectionImage", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
+                        .WithMany()
+                        .HasForeignKey("ProfessionalId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Csi.CsiInspection", "Inspection")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId", "InspectionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Inspection");
+
+                    b.Navigation("Professional");
 
                     b.Navigation("WaterSupplier");
                 });

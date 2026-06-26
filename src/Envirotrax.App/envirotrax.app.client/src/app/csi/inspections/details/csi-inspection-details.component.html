@@ -15,21 +15,21 @@
             <ul class="vp-tabs nav nav-pills settings-tabs d-inline-flex">
                 <li class="nav-item">
                     <a class="nav-link" [class.active]="selectedTab === 'main'" [routerLink]="['/csi', id, 'view']"
-                       (click)="selectedTab = 'main'">Csi Main Form</a>
+                       (click)="onTabChange('main')">Csi Main Form</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" [class.active]="selectedTab === 'assemblies'"
-                       [routerLink]="['/csi', id, 'view']" (click)="selectedTab = 'assemblies'">Assemblies At This
+                       [routerLink]="['/csi', id, 'view']" (click)="onTabChange('assemblies')">Assemblies At This
                         Location</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" [class.active]="selectedTab === 'additional'"
-                       [routerLink]="['/csi', id, 'view']" (click)="selectedTab = 'additional'">Additional
+                       [routerLink]="['/csi', id, 'view']" (click)="onTabChange('additional')">Additional
                         Information</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" [class.active]="selectedTab === 'images'" [routerLink]="['/csi', id, 'view']"
-                       (click)="selectedTab = 'images'">Images</a>
+                       (click)="onTabChange('images')">Images</a>
                 </li>
             </ul>
         </div>
@@ -293,6 +293,26 @@
                 A Customer Service Inspection Certificate should be on file for each connection in a public water system
                 to document compliance with 30 TAC §290.44(h)/290.46(j).
             </div>
+        </div>
+
+        <div *ngIf="selectedTab === 'images'" class="row mt-3">
+            <vp-section header="Inspection Images">
+                <dp-loading-spinner *ngIf="isLoadingImages"></dp-loading-spinner>
+                <div *ngIf="!isLoadingImages">
+                    <p *ngIf="images.length === 0" class="text-muted">No images for this inspection.</p>
+                    <div class="row">
+                        <div class="col-md-6 mb-3" *ngFor="let img of images">
+                            <div class="border rounded p-2">
+                                <div class="mb-2">
+                                    <span class="fw-semibold small">{{ img.description || '(no description)' }}</span>
+                                </div>
+                                <img [src]="img.url" alt="{{ img.description }}" class="img-fluid rounded"
+                                     style="max-height: 200px; width: 100%; object-fit: contain;" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </vp-section>
         </div>
 
         <div class="d-flex justify-content-center mt-3">

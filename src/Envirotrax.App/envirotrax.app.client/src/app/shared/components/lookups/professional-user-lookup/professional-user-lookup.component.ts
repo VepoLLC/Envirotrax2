@@ -3,8 +3,7 @@ import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { ProfessionalUser } from "../../../models/professionals/professional-user";
 import { ProfesionalUserService } from "../../../services/professionals/professional-user.service";
 import { TableViewModel } from "../../../models/table-view-model";
-import { TableColumn } from "../../data-components/table/table.component";
-import { ColumnType } from "../../data-components/sorting-filtering/query-view-model";
+import { ColumnType, TableColumn } from "@envirotrax/common-ui";
 
 @Component({
     standalone: false,

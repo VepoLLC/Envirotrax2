@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
-import { InputOption } from "../../components/input/input.component";
 import { BackflowDeviceType, BackflowReasonForTest, BackflowTestResult } from "../../models/backflow/backflow-test-enums";
+import { InputOption } from "@envirotrax/common-ui";
 
 @Injectable({
     providedIn: 'root'

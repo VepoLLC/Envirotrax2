@@ -15,9 +15,8 @@ import { ProfessionalUserLicense, ExpirationType } from '../../shared/models/pro
 import { ProfessionalInsurance } from '../../shared/models/professionals/professional-insurance';
 import { BackflowGauge, GaugeExpirationType } from '../../shared/models/backflow/backflow-gauge';
 import { ProfessionalDashboardStats } from '../../shared/models/professionals/professional-dashboard-stats';
-import { FreeTextSearchSettings, TableColumn, CellTemplateData } from '../../shared/components/data-components/table/table.component';
-import { ColumnType } from '../../shared/components/data-components/sorting-filtering/query-view-model';
 import { TableViewModel } from '../../shared/models/table-view-model';
+import { CellTemplateData, ColumnType, FreeTextSearchSettings, TableColumn } from '@envirotrax/common-ui';
 
 const VIEW_MODE_KEY = 'dashboardViewMode';
 

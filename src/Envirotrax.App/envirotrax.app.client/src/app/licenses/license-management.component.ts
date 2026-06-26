@@ -2,16 +2,14 @@ import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { WaterSupplierLicense, LicenseCounts } from '../shared/models/professionals/licenses/water-supplier-license';
 import { WaterSupplierLicenseService } from '../shared/services/licenses/water-supplier-license.service';
 import { TableViewModel } from '../shared/models/table-view-model';
-import { CellTemplateData, TableColumn } from '../shared/components/data-components/table/table.component';
-import { ColumnType } from '../shared/components/data-components/sorting-filtering/query-view-model';
 import { ExpirationType } from '../shared/models/professionals/licenses/professional-user-license';
 import { AuthService } from '../shared/services/auth/auth.service';
 import { FeatureType } from '../shared/models/feature-type';
 import { PermissionAction, PermissionType } from '../shared/models/permission-type';
-import { ModalHelperService } from '../shared/services/helpers/modal-helper.service';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
 import { ToastService } from '../shared/services/toast.service';
 import { EditWaterSupplierLicenseComponent, WaterSupplierLicenseModalData } from './edit/edit-water-supplier-license.component';
+import { CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 
 @Component({
     templateUrl: './license-management.component.html',
@@ -60,7 +58,7 @@ export class LicenseManagementComponent implements OnInit {
         private readonly _authService: AuthService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService
-    ) {}
+    ) { }
 
     public async ngOnInit(): Promise<void> {
         this.canModify = await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalLicenses)

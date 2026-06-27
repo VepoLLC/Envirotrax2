@@ -55,13 +55,14 @@
 
         <!--implementation of Additional Information-->
 
-        <div class="row mt-3">
-            <vp-backflow-test-additional-info
-                [test]="test"
-                [canModify]="canModify"
-                [saving]="savingSection === 'Additional information'"
-                (save)="save($event, 'Additional information')" />
-        </div>
+        <vp-backflow-test-additional-info
+            [test]="test"
+            [canModify]="canModify"
+            [showRainSensor]="settings?.showRainSensor ?? false"
+            [showOSSF]="settings?.showOSSF ?? false"
+            [showPermitNumber]="settings?.showPermitNumber ?? false"
+            [saving]="savingSection === 'Additional information'"
+            (save)="save($event, 'Additional information')" />
 
         <div class="row mt-3">
             <vp-backflow-test-remarks [test]="test" />

@@ -33,7 +33,7 @@ public class EnvirotraxApiClient : IEnvirotraxApiClient
         var queryString = _queryHelper.BuildQuery(pageInfo, query);
         var endpointUrl = $"{url}?{queryString}";
 
-        return await _apiClient.GetAsync<IPagedData<TResponse>>(_authService.UserId, endpointUrl, cancellationToken) ?? new PagedData<TResponse>(pageInfo, []);
+        return await _apiClient.GetAsync<PagedData<TResponse>>(_authService.UserId, endpointUrl, cancellationToken) ?? new PagedData<TResponse>(pageInfo, []);
     }
 
     public Task<TResponse?> PostAsync<TRequest, TResponse>(string url, TRequest requestData, CancellationToken cancellationToken)

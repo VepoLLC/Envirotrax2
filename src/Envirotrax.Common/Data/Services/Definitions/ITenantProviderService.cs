@@ -27,6 +27,6 @@ namespace Envirotrax.Common.Data.Services.Definitions
         void SetDomain(ClaimsPrincipal principal, string domain);
 
         bool HasScope(string scopeToCheck);
-        bool HasScopes(params string[] scopesToCheck);
+        bool HasAnyScopes(params string[] scopesToCheck);
     }
 }

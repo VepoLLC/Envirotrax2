@@ -1,5 +1,6 @@
 
 using System.Collections.Specialized;
+using System.Web;
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.Common.Domain.Services.Defintions;
 
@@ -9,11 +10,10 @@ public class QueryHelperService : IQueryHelperService
 {
     public NameValueCollection BuildQuery(PageInfo pageInfo, Query query)
     {
-        var collection = new NameValueCollection
-        {
-            { "pageNumber", (pageInfo.PageNumber > 0 ? pageInfo.PageNumber : 1).ToString() },
-            { "pageSize", (pageInfo.PageSize > 0 ? pageInfo.PageSize : 20).ToString() }
-        };
+        var collection = HttpUtility.ParseQueryString(string.Empty);
+
+        collection.Add("pageNumber", (pageInfo.PageNumber > 0 ? pageInfo.PageNumber : 1).ToString());
+        collection.Add("pageSize", (pageInfo.PageSize > 0 ? pageInfo.PageSize : 20).ToString());
 
         if (query.Sort != null)
         {

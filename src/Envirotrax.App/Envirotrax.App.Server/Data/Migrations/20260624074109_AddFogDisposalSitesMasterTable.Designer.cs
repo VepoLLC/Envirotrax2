@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260624074109_AddFogDisposalSitesMasterTable")]
+    partial class AddFogDisposalSitesMasterTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -497,12 +500,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<string>("PropertyZip")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<bool>("RainFreezeSensorInstalled")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("RainFreezeSensorWorkingProperly")
-                        .HasColumnType("bit");
 
                     b.Property<int>("ReasonForTest")
                         .HasColumnType("int");
@@ -1453,11 +1450,11 @@ namespace Envirotrax.App.Server.Data.Migrations
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Fog.FogTransporterDisposalSite", b =>
                 {
-                    b.Property<int>("ProfessionalId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("DisposalSiteId")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
@@ -1465,14 +1462,22 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("DisposalSiteId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.HasKey("ProfessionalId", "DisposalSiteId");
+                    b.Property<int>("ProfessionalId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("DisposalSiteId");
+
+                    b.HasIndex("ProfessionalId");
 
                     b.ToTable("FogTransporterDisposalSites");
                 });

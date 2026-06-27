@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260626094238_FogTransporterDisposalSiteCompositeKey")]
+    partial class FogTransporterDisposalSiteCompositeKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -497,12 +500,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<string>("PropertyZip")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<bool>("RainFreezeSensorInstalled")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("RainFreezeSensorWorkingProperly")
-                        .HasColumnType("bit");
 
                     b.Property<int>("ReasonForTest")
                         .HasColumnType("int");

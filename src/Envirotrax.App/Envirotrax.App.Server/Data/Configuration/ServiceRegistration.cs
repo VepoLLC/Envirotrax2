@@ -84,6 +84,8 @@ public static class ServiceRegistration
         services.AddTransient<IProfessionalInsuranceRepository, ProfessionalInsuranceRepository>();
         services.AddTransient<IBackflowGaugeRepository, BackflowGaugeRepository>();
         services.AddTransient<IFogVehicleRepository, FogVehicleRepository>();
+        services.AddTransient<IFogTransporterDisposalSiteRepository, FogTransporterDisposalSiteRepository>();
+        services.AddTransient<IFogDisposalSiteRepository, FogDisposalSiteRepository>();
 
         services.AddTransient<IGisAreaRepository, GisAreaRepository>();
         services.AddTransient<IGisAreaCoordinateRepository, GisAreaCoordinateRepository>();

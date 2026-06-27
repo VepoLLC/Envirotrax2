@@ -49,6 +49,55 @@
     </div>
 </ng-template>
 
+<ng-template #fogStatusTemplate let-inspection="rowData">
+    <div class="d-flex gap-1">
+        <vp-status-icon *ngIf="inspection.inspectionResult === FogInspectionResult.Passed"
+                        imageSrc="/images/icons/bstatus-green-on.png"
+                        text="Passed inspection"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="inspection.inspectionResult === FogInspectionResult.Failed"
+                        imageSrc="/images/icons/bstatus-green-off.png"
+                        text="Failed inspection"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="inspection.transactionId"
+                        imageSrc="/images/icons/bstatus-red-on.png"
+                        text="Paid"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!inspection.transactionId"
+                        imageSrc="/images/icons/bstatus-red-off.png"
+                        text="Unpaid"
+                        [showText]="false" />
+    </div>
+</ng-template>
+
+<ng-template #fogPropertyTemplate let-data="rowData">
+    <div class="d-flex gap-2 align-items-center">
+        <i class="fa-solid fs-5"
+           [ngClass]="data.propertyType == 0 ? 'fa-home text-primary' : 'fa-building text-danger'">
+        </i>
+        <a [routerLink]="['/professionals/sites', data.site?.id]" target="_blank">
+            <div *ngIf="data.propertyBusinessName" class="fw-semibold">{{ data.propertyBusinessName }}</div>
+            <div>
+                {{ data.propertyStreetNumber }} {{ data.propertyStreetName }}
+                <span *ngIf="data.propertyNumber">#{{ data.propertyNumber }}</span>
+            </div>
+            <div>{{ data.propertyCity }}<span *ngIf="data.propertyCity">, </span>{{ data.propertyZip }}</div>
+        </a>
+    </div>
+</ng-template>
+
+<ng-template #fogMailingTemplate let-data="rowData">
+    <div>
+        <div *ngIf="data.mailingCompanyName" class="fw-semibold">{{ data.mailingCompanyName }}</div>
+        <div *ngIf="data.mailingContactName">{{ data.mailingContactName }}</div>
+        <div>
+            {{ data.mailingStreetNumber }} {{ data.mailingStreetName }}
+            <span *ngIf="data.mailingNumber">#{{ data.mailingNumber }}</span>
+        </div>
+        <div>{{ data.mailingCity }}<span *ngIf="data.mailingCity">, </span>{{ data.mailingZip }}</div>
+    </div>
+</ng-template>
+
 <ng-template #licenseExpirationTemplate let-license="rowData">
     <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
          [class.text-bg-primary]="!license.expirationDate"
@@ -84,6 +133,129 @@
          [class.text-bg-warning]="gauge.lastCalibrationDate && gauge.expirationType == GaugeExpirationType.AboutToExpire"
          [class.text-bg-danger]="gauge.lastCalibrationDate && gauge.expirationType == GaugeExpirationType.Expired">
         {{ gauge.lastCalibrationDate ? (gauge.lastCalibrationDate | date) : 'N/A' }}
+    </div>
+</ng-template>
+
+<ng-template #backflowStatusTemplate let-test="rowData">
+    <div class="d-flex flex-wrap gap-1">
+        <vp-status-icon *ngIf="test.isCurrent"
+                        imageSrc="/images/icons/bstatus-green-on.png" text="Current Test" [showText]="false" />
+        <vp-status-icon *ngIf="!test.isCurrent"
+                        imageSrc="/images/icons/bstatus-green-off.png" text="Non Current Test" [showText]="false" />
+        <vp-status-icon *ngIf="test.testResult !== BackflowTestResult.Fail"
+                        imageSrc="/images/icons/bstatus-magenta-on.png" text="Passed Test" [showText]="false" />
+        <vp-status-icon *ngIf="test.testResult === BackflowTestResult.Fail"
+                        imageSrc="/images/icons/bstatus-magenta-off.png" text="Failed Test" [showText]="false" />
+        <vp-status-icon *ngIf="!test.outOfService"
+                        imageSrc="/images/icons/bstatus-blue-on.png" text="In Service" [showText]="false" />
+        <vp-status-icon *ngIf="test.outOfService"
+                        imageSrc="/images/icons/bstatus-blue-off.png" text="Out of Service" [showText]="false" />
+        <vp-status-icon *ngIf="test.transactionId"
+                        imageSrc="/images/icons/bstatus-orange-on.png" text="Paid" [showText]="false" />
+        <vp-status-icon *ngIf="!test.transactionId"
+                        imageSrc="/images/icons/bstatus-orange-off.png" text="Unpaid" [showText]="false" />
+        <vp-status-icon *ngIf="!test.disapproved"
+                        imageSrc="/images/icons/bstatus-cyan-on.png" text="Approved" [showText]="false" />
+        <vp-status-icon *ngIf="test.disapproved"
+                        imageSrc="/images/icons/bstatus-cyan-off.png" text="Disapproved" [showText]="false" />
+        <vp-status-icon *ngIf="!test.rejected"
+                        imageSrc="/images/icons/bstatus-red-on.png" text="Accepted" [showText]="false" />
+        <vp-status-icon *ngIf="test.rejected"
+                        imageSrc="/images/icons/bstatus-red-off.png" text="Rejected" [showText]="false" />
+    </div>
+</ng-template>
+
+<ng-template #backflowDatesTemplate let-test="rowData">
+    <div class="text-nowrap">
+        <div>
+            <span class="fw-semibold">Submitted:</span>
+            <span *ngIf="test.createdTime" class="ms-1 text-muted">{{ test.createdTime | date }}</span>
+            <span *ngIf="!test.createdTime" class="ms-1 rounded-pill px-2 py-1 bg-secondary-subtle text-dark">N/A</span>
+        </div>
+        <div class="mt-1">
+            <span class="fw-semibold">Tested On:</span>
+            <span *ngIf="test.testDate" class="ms-1 text-muted">{{ test.testDate | date }}</span>
+            <span *ngIf="!test.testDate" class="ms-1 rounded-pill px-2 py-1 bg-secondary-subtle text-dark">N/A</span>
+        </div>
+        <div class="mt-1">
+            <span class="fw-semibold">Expires:</span>
+            <span *ngIf="test.expirationDate" class="badge ms-1"
+                  [class.text-bg-success]="!isExpired(test.expirationDate)"
+                  [class.text-bg-danger]="isExpired(test.expirationDate)">
+                {{ test.expirationDate | date }}
+            </span>
+            <span *ngIf="!test.expirationDate" class="ms-1 rounded-pill px-2 py-1 bg-secondary-subtle text-dark">N/A</span>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #backflowSerialTemplate let-test="rowData">
+    <ng-container *ngIf="test.deviceType === 'DCD' || test.deviceType === 'DCD2' || test.deviceType === 'RPPD' || test.deviceType === 'RPPD2'; else plainSerial">
+        <div><span class="fw-semibold">Main:</span> <span class="ms-1 text-muted">{{ test.serialNumber }}</span></div>
+        <div><span class="fw-semibold">Bypass:</span> <span class="ms-1 text-muted">{{ test.serialNumber2 }}</span></div>
+    </ng-container>
+    <ng-template #plainSerial>{{ test.serialNumber }}</ng-template>
+</ng-template>
+
+<ng-template #backflowAssemblyTemplate let-test="rowData">
+    <div>
+        <ng-container *ngIf="test.deviceType === 'DCD' || test.deviceType === 'DCD2' || test.deviceType === 'RPPD' || test.deviceType === 'RPPD2'; else singleAssembly">
+            <div>
+                <span class="fw-semibold">Main Assembly:</span>
+                <span class="ms-1 text-muted">{{ test.manufacturer }} {{ test.model }} {{ test.size }} {{ test.deviceType }}</span>
+            </div>
+            <div>
+                <span class="fw-semibold">Bypass Assembly:</span>
+                <span class="ms-1 text-muted">{{ test.manufacturer2 }} {{ test.model2 }} {{ test.size2 }} {{ test.deviceType }}</span>
+            </div>
+        </ng-container>
+        <ng-template #singleAssembly>
+            <div>
+                <span class="fw-semibold">Assembly Desc:</span>
+                <span class="ms-1 text-muted">{{ test.manufacturer }} {{ test.model }} {{ test.size }} {{ test.deviceType }}</span>
+            </div>
+        </ng-template>
+        <div>
+            <span class="fw-semibold">Hazard Type:</span>
+            <span class="ms-1 text-muted">
+                {{ !test.hazardType ? 'Unknown' : (test.hazardType === 'Other' ? 'Other - ' + (test.hazardTypeOtherDescription || '') : test.hazardType) }}
+            </span>
+        </div>
+        <div>
+            <span class="fw-semibold">Location Desc:</span>
+            <span class="ms-1 text-muted">{{ test.locationDescription }}</span>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #backflowPropertyTemplate let-test="rowData">
+    <div class="d-flex gap-2 align-items-start">
+        <i class="fa-solid fs-5 mt-1"
+           [ngClass]="test.propertyType === 0 ? 'fa-home text-primary' : 'fa-building text-danger'"></i>
+        <a [routerLink]="['/professionals/sites', test?.site?.id]" target="_blank">
+            <div *ngIf="test.propertyBusinessName" class="fw-semibold">{{ test.propertyBusinessName }}</div>
+            <div>
+                {{ test.propertyStreetNumber }} {{ test.propertyStreetName }}
+                <span *ngIf="test.propertyNumber"> #{{ test.propertyNumber }}</span>
+            </div>
+            <div>
+                {{ test.propertyCity }}<span *ngIf="test.propertyCity">, </span>{{ test.propertyState?.code }} {{ test.propertyZip }}
+            </div>
+        </a>
+    </div>
+</ng-template>
+
+<ng-template #backflowMailingTemplate let-test="rowData">
+    <div>
+        <div *ngIf="test.mailingCompanyName">{{ test.mailingCompanyName }}</div>
+        <div *ngIf="test.mailingContactName">{{ test.mailingContactName }}</div>
+        <div>
+            {{ test.mailingStreetNumber }} {{ test.mailingStreetName }}
+            <span *ngIf="test.mailingNumber"> #{{ test.mailingNumber }}</span>
+        </div>
+        <div>
+            {{ test.mailingCity }}<span *ngIf="test.mailingCity">, </span>{{ test.mailingState?.code }} {{ test.mailingZip }}
+        </div>
     </div>
 </ng-template>
 
@@ -280,7 +452,76 @@
 
     </div>
 
-    <!-- Recent CSI Inspections (both views, at bottom) -->
+    <!-- Recent Backflow Tests (both views, first section) -->
+    <div *ngIf="hasBackflow" class="mb-4">
+        <vp-section header="Recent Backflow Tests">
+            <dp-loading-spinner *ngIf="recentBackflowTests.isLoading"></dp-loading-spinner>
+
+            <div *ngIf="!recentBackflowTests.isLoading">
+                <div class="row g-2 mb-3">
+                    <div *ngFor="let btn of backflowExpiryButtons" class="col-12 col-md-6 col-xl-3">
+                        <button type="button" class="btn w-100" [ngClass]="btn.cssClass"
+                                [disabled]="btn.count === 0"
+                                (click)="viewExpiringTests(btn.key)">
+                            {{ btn.label }}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="container mb-3">
+                    <div class="row gap-2 justify-content-center mb-3">
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Current Test" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Non Current Test" />
+                        </div>
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-magenta-on.png" text="Passed Test" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-magenta-off.png" text="Failed Test" />
+                        </div>
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-blue-on.png" text="In Service" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-blue-off.png" text="Out of Service" />
+                        </div>
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-orange-on.png" text="Paid" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-orange-off.png" text="Unpaid" />
+                        </div>
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-cyan-on.png" text="Approved" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-cyan-off.png" text="Disapproved" />
+                        </div>
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Accepted" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-red-off.png" text="Rejected" />
+                        </div>
+                        <div class="col-auto mb-2">
+                            <div><i class="fa-solid fa-home text-primary me-1"></i>Residential</div>
+                            <div><i class="fa-solid fa-building text-danger me-1"></i>Commercial</div>
+                        </div>
+                    </div>
+                </div>
+
+                <vp-table *ngIf="recentBackflowTests.items?.data?.length"
+                          [columns]="recentBackflowTests.columns!"
+                          [data]="recentBackflowTests.items!.data"
+                          [canViewDetails]="true"
+                          (viewDetails)="viewBackflowTest($event)" />
+
+                <div *ngIf="!recentBackflowTests.items?.data?.length" class="text-center py-3 text-muted">
+                    No recent backflow tests found.
+                </div>
+
+                <div class="text-end mt-3">
+                    <a routerLink="/professionals/backflow/tests" class="btn btn-primary vp-section-button">
+                        <i class="fa-solid fa-droplet me-1"></i>
+                        View Backflow Tests
+                    </a>
+                </div>
+            </div>
+        </vp-section>
+    </div>
+
+    <!-- Recent CSI Inspections (both views) -->
     <div *ngIf="hasCsi" class="mb-4">
         <vp-section header="Recent CSI Inspections">
             <dp-loading-spinner *ngIf="recentInspections.isLoading"></dp-loading-spinner>
@@ -323,14 +564,43 @@
         </vp-section>
     </div>
 
-    <!-- Backflow Testing (both views, at bottom) -->
-    <div *ngIf="hasBackflow" class="mb-4">
-        <vp-section header="Backflow Testing">
-            <div class="text-center py-3">
-                <a routerLink="/professionals/backflow/tests" class="btn btn-primary vp-section-button">
-                    <i class="fa-solid fa-droplet me-1"></i>
-                    View Backflow Tests
-                </a>
+    <!-- Recent FOG Inspections (both views, at bottom) -->
+    <div *ngIf="hasFog" class="mb-4">
+        <vp-section header="Recent FOG Inspections">
+            <dp-loading-spinner *ngIf="recentFogInspections.isLoading"></dp-loading-spinner>
+
+            <div *ngIf="!recentFogInspections.isLoading">
+                <div class="container mb-3">
+                    <div class="row gap-2 justify-content-center mb-3">
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Passed inspection" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Failed inspection" />
+                        </div>
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Paid" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-red-off.png" text="Unpaid" />
+                        </div>
+                        <div class="col-auto mb-2">
+                            <div><i class="fa-solid fa-home text-primary me-1"></i>Residential</div>
+                            <div><i class="fa-solid fa-building text-danger me-1"></i>Commercial</div>
+                        </div>
+                    </div>
+                </div>
+
+                <vp-table *ngIf="recentFogInspections.items?.data?.length"
+                          [columns]="recentFogInspections.columns!"
+                          [data]="recentFogInspections.items!.data" />
+
+                <div *ngIf="!recentFogInspections.items?.data?.length" class="text-center py-3 text-muted">
+                    No recent inspections found.
+                </div>
+
+                <div class="text-end mt-3">
+                    <a routerLink="/professionals/fog/inspections" class="btn btn-primary vp-section-button">
+                        <i class="fa-solid fa-list me-1"></i>
+                        View All FOG Inspections
+                    </a>
+                </div>
             </div>
         </vp-section>
     </div>

@@ -196,6 +196,9 @@ public class BackflowTestDto : IDto
 
     public bool Ossf { get; set; }
 
+    public bool RainFreezeSensorInstalled { get; set; }
+    public bool RainFreezeSensorWorkingProperly { get; set; }
+
     // Initial test readings - main assembly
     [Precision(5, 2)]
     public decimal? InitCV1HeldPSID { get; set; }

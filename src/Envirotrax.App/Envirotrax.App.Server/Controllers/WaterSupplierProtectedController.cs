@@ -7,7 +7,7 @@ namespace Envirotrax.App.Server.Controllers;
 
 [ApiController]
 [Authorize(Roles = RoleDefinitions.WaterSupplier)]
-public class WaterSupplierProtectedController : ControllerBase
+public class WaterSupplierProtectedController : EnvirotraxBaseController
 {
 
 }

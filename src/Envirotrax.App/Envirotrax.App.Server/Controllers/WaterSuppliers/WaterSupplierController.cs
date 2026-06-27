@@ -34,7 +34,7 @@ public class WaterSupplierController : WaterSupplierCrudController<WaterSupplier
 [Authorize]
 [ApiController]
 [Route("api/water-suppliers")]
-public class MyWaterSupplierController : ControllerBase
+public class MyWaterSupplierController : EnvirotraxBaseController
 {
     private readonly IWaterSupplierService _supplierService;
 

@@ -11,6 +11,7 @@ import { ToastService } from "../../../shared/services/toast.service";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { ImageUrlChange } from "./images/backflow-test-images.component";
 import { InputOption } from "@envirotrax/common-ui";
+import { DownloadService } from "../../../shared/services/download.service";
 
 @Component({
     selector: 'app-backflow-test-details',
@@ -33,7 +34,8 @@ export class BackflowTestDetailsComponent implements OnInit {
         private readonly _lookupService: LookupService,
         private readonly _authService: AuthService,
         private readonly _toastService: ToastService,
-        private readonly _helper: HelperService
+        private readonly _helper: HelperService,
+        private readonly _downloadService: DownloadService
     ) { }
 
     public async ngOnInit(): Promise<void> {
@@ -75,6 +77,20 @@ export class BackflowTestDetailsComponent implements OnInit {
             return;
         }
         (this.test as any)[change.urlKey] = change.value;
+    }
+
+    public async exportPdf(): Promise<void> {
+        if (this.test == null) {
+            return;
+        }
+
+        try {
+            this.isLoading = true;
+            const blob = await this._testService.getPdf(this.test.id);
+            this._downloadService.downloadFileFromBlob(blob);
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public async save(form: NgForm, entityName: string): Promise<void> {

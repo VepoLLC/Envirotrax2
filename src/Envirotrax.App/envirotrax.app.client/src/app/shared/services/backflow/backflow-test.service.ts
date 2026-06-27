@@ -6,9 +6,26 @@ import { QueryHelperService } from "../helpers/query-helper.service";
 import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
-import { BackflowTest } from "../../models/backflow/backflow-test";
+import { BackflowTest, BackflowExpiryCounts } from "../../models/backflow/backflow-test";
 import { BackflowTestImages } from "../../models/backflow/backflow-test-images";
 import { DownloadEndpoint } from "../../models/download-config";
+
+export type BackflowExpiryRangeKey = 'expired' | 'thismonth' | 'nextmonth' | 'twomonths';
+
+export function getBackflowExpiryRange(key: BackflowExpiryRangeKey): { start: Date; end: Date } {
+    const now = new Date();
+
+    if (key === 'expired') {
+        const start = new Date(now);
+        start.setMonth(start.getMonth() - 6);
+        return { start, end: now };
+    }
+
+    const offset = key === 'thismonth' ? 0 : key === 'nextmonth' ? 1 : 2;
+    const start = new Date(now.getFullYear(), now.getMonth() + offset, 1, 0, 0, 0, 0);
+    const end = new Date(now.getFullYear(), now.getMonth() + offset + 1, 0, 23, 59, 59, 999);
+    return { start, end };
+}
 
 @Injectable({
     providedIn: 'root'
@@ -38,10 +55,24 @@ export class BackflowTestService {
         };
     }
 
+    public getAllPdfEndpoint(): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/backflow/tests/pdf')
+        };
+    }
+
     public getAllForProfessionalEndpoint(): DownloadEndpoint {
         return {
             method: 'GET',
             url: this._urlResolver.resolveUrl('/api/professionals/backflow/tests')
+        };
+    }
+
+    public getAllForProfessionalPdfEndpoint(): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/professionals/backflow/tests/pdf')
         };
     }
 
@@ -51,6 +82,12 @@ export class BackflowTestService {
         return await lastValueFrom(this._http.get<PagedData<BackflowTest>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));
+    }
+
+    public async getExpiryCounts(): Promise<BackflowExpiryCounts> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/backflow/tests/expiry-counts');
+
+        return await lastValueFrom(this._http.get<BackflowExpiryCounts>(url));
     }
 
     public async submit(test: BackflowTest, images: BackflowTestImages = {}): Promise<BackflowTest> {
@@ -71,6 +108,11 @@ export class BackflowTestService {
         return await lastValueFrom(this._http.get<BackflowTest>(url));
     }
 
+    public async getPdf(id: number): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/pdf`);
+        return await lastValueFrom(this._http.get(url, { responseType: 'blob' }));
+    }
+
     public async update(test: BackflowTest): Promise<BackflowTest> {
         const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${test.id}`);
         return await lastValueFrom(this._http.put<BackflowTest>(url, test));
@@ -86,6 +128,11 @@ export class BackflowTestService {
     public async getForProfessional(id: number): Promise<BackflowTest> {
         const url = this._urlResolver.resolveUrl(`/api/professionals/backflow/tests/${id}`);
         return await lastValueFrom(this._http.get<BackflowTest>(url));
+    }
+
+    public async getPdfForProfessional(id: number): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/backflow/tests/${id}/pdf`);
+        return await lastValueFrom(this._http.get(url, { responseType: 'blob' }));
     }
 }
 
@@ -180,6 +227,8 @@ function buildBackflowTestFormData(test: BackflowTest): FormData {
     // Permit
     append('permitNumber', test.permitNumber);
     append('ossf', test.ossf);
+    append('rainFreezeSensorInstalled', test.rainFreezeSensorInstalled);
+    append('rainFreezeSensorWorkingProperly', test.rainFreezeSensorWorkingProperly);
 
     // Comments
     append('comments', test.comments);

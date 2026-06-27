@@ -12,10 +12,9 @@ import { ProfesionalUserService } from '../../shared/services/professionals/prof
 import { ProfessionalUserLicenseService } from '../../shared/services/professionals/professional-user-license.service';
 import { ProfessionalInsuranceService } from '../../shared/services/professionals/professional-insurance.service';
 import { BackflowGaugeService } from '../../shared/services/backflow/backflow-gauge.service';
-import { BackflowTestService, getBackflowExpiryRange, BackflowExpiryRangeKey } from '../../shared/services/backflow/backflow-test.service';
+import { BackflowTestService, BackflowExpiryRangeKey } from '../../shared/services/backflow/backflow-test.service';
 import { BackflowTest } from '../../shared/models/backflow/backflow-test';
 import { BackflowTestResult } from '../../shared/models/backflow/backflow-test-enums';
-import { Query } from '../../shared/models/query';
 import { ProfessionalDashboardService } from '../../shared/services/professionals/professional-dashboard.service';
 import { ProfessionalUser } from '../../shared/models/professionals/professional-user';
 import { ProfessionalUserLicense, ExpirationType } from '../../shared/models/professionals/licenses/professional-user-license';
@@ -310,35 +309,21 @@ export class DashboardComponent implements OnInit {
     }
 
     private async loadBackflowExpiryCounts(): Promise<void> {
-        const defs: { key: BackflowExpiryRangeKey; cssClass: string }[] = [
-            { key: 'expired', cssClass: 'btn-danger' },
-            { key: 'thismonth', cssClass: 'btn-warning' },
-            { key: 'nextmonth', cssClass: 'btn-warning' },
-            { key: 'twomonths', cssClass: 'btn-warning' }
+        const counts = await this._backflowTestService.getExpiryCounts();
+
+        const defs: { key: BackflowExpiryRangeKey; cssClass: string; count: number }[] = [
+            { key: 'expired', cssClass: 'btn-danger', count: counts.expired },
+            { key: 'thismonth', cssClass: 'btn-warning', count: counts.thisMonth },
+            { key: 'nextmonth', cssClass: 'btn-warning', count: counts.nextMonth },
+            { key: 'twomonths', cssClass: 'btn-warning', count: counts.twoMonths }
         ];
 
-        const counts = await Promise.all(defs.map(d => this.getBackflowExpiryCount(d.key)));
-
-        this.backflowExpiryButtons = defs.map((d, i) => ({
+        this.backflowExpiryButtons = defs.map(d => ({
             key: d.key,
             cssClass: d.cssClass,
-            count: counts[i],
-            label: this.buildBackflowExpiryLabel(d.key, counts[i])
+            count: d.count,
+            label: this.buildBackflowExpiryLabel(d.key, d.count)
         }));
-    }
-
-    private async getBackflowExpiryCount(key: BackflowExpiryRangeKey): Promise<number> {
-        const { start, end } = getBackflowExpiryRange(key);
-        const query: Query = {
-            filter: [
-                { columnName: 'isCurrent', value: 'true', comparisonOperator: 'Eq' },
-                { columnName: 'expirationDate', value: start.toISOString(), comparisonOperator: 'Gte' },
-                { columnName: 'expirationDate', value: end.toISOString(), comparisonOperator: 'Lte' }
-            ]
-        };
-
-        const result = await this._backflowTestService.getAllForProfessional({ pageSize: 1 }, query);
-        return result.pageInfo?.totalItems ?? 0;
     }
 
     private buildBackflowExpiryLabel(key: BackflowExpiryRangeKey, count: number): string {

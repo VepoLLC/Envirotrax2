@@ -28,7 +28,7 @@
                       [(ngModel)]="downloadConfig.csvDelimiter" />
         </div>
 
-        <div class="mb-3" *ngIf="downloadConfig.categories?.length">
+        <div class="mb-3" *ngIf="downloadConfig.categories?.length && downloadConfig.selectedFormat !== 'PDF'">
             <h3 class="h6">
                 Columns to Include
             </h3>

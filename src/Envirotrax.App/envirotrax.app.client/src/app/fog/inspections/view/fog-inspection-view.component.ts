@@ -1,8 +1,8 @@
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import { ProfessionalFogInspectionService } from '../../../../shared/services/fog/professional-fog-inspection.service';
-import { FogInspection } from '../../../../shared/models/fog/fog-inspection';
+import { FogInspectionService } from '../../../shared/services/fog/fog-inspection.service';
+import { FogInspection } from '../../../shared/models/fog/fog-inspection';
 
 @Component({
     standalone: false,
@@ -16,7 +16,7 @@ export class FogInspectionViewComponent implements OnInit {
 
     constructor(
         private readonly _route: ActivatedRoute,
-        private readonly _inspectionService: ProfessionalFogInspectionService
+        private readonly _inspectionService: FogInspectionService
     ) {}
 
     public ngOnInit(): void {

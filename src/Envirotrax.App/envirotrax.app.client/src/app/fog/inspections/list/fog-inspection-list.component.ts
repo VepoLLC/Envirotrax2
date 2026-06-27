@@ -49,6 +49,9 @@ export class FogInspectionListComponent implements OnInit {
     @ViewChild('resultCell', { static: true })
     public resultCell?: TemplateRef<CellTemplateData<FogInspection>>;
 
+    @ViewChild('viewCell', { static: true })
+    public viewCell?: TemplateRef<CellTemplateData<FogInspection>>;
+
     public inspectionResultOptions: InputOption[] = [
         { id: '', text: 'All Results' },
         { id: FogInspectionResult.Passed.toString(), text: 'Passed' },
@@ -147,6 +150,13 @@ export class FogInspectionListComponent implements OnInit {
                 caption: 'Inspection result',
                 type: ColumnType.text,
                 cellTemplate: this.resultCell
+            },
+            {
+                field: 'id',
+                caption: '',
+                type: ColumnType.text,
+                cellTemplate: this.viewCell,
+                queryColumnExcluded: true
             }
         ];
     }

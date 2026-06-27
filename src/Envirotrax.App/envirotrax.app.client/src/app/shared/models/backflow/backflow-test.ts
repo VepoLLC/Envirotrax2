@@ -6,6 +6,13 @@ import { WaterSupplierUser } from '../users/water-supplier-user';
 import { BackflowReasonForTest, BackflowTestResult } from './backflow-test-enums';
 import { ReferencedWaterSupplier } from '../csi/csi-inspection';
 
+export interface BackflowExpiryCounts {
+    expired: number;
+    thisMonth: number;
+    nextMonth: number;
+    twoMonths: number;
+}
+
 export interface BackflowTest {
     id: number;
     waterSupplier?: ReferencedWaterSupplier | null;
@@ -81,6 +88,8 @@ export interface BackflowTest {
     meterReadingAfter?: number;
     permitNumber?: string;
     ossf?: boolean;
+    rainFreezeSensorInstalled?: boolean;
+    rainFreezeSensorWorkingProperly?: boolean;
     comments?: string;
     isCurrent?: boolean;
     disapproved?: boolean;

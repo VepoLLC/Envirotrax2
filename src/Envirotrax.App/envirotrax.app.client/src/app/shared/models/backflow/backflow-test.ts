@@ -81,6 +81,8 @@ export interface BackflowTest {
     meterReadingAfter?: number;
     permitNumber?: string;
     ossf?: boolean;
+    rainFreezeSensorInstalled?: boolean;
+    rainFreezeSensorWorkingProperly?: boolean;
     comments?: string;
     isCurrent?: boolean;
     disapproved?: boolean;

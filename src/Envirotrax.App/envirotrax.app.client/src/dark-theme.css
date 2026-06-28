@@ -215,6 +215,24 @@ body.vp-dark-theme .vp-table-header {
     color: #e0e0e0;
 }
 
+body.vp-dark-theme .table .table-primary,
+body.vp-dark-theme .table .table-primary>td,
+body.vp-dark-theme .table .table-primary>th {
+    --bs-table-bg: #1a3a5c;
+    --bs-table-color: #e0e0e0;
+    background-color: #1a3a5c !important;
+    color: #e0e0e0 !important;
+}
+
+body.vp-dark-theme .table .table-secondary,
+body.vp-dark-theme .table .table-secondary>td,
+body.vp-dark-theme .table .table-secondary>th {
+    --bs-table-bg: #2d2d50;
+    --bs-table-color: #e0e0e0;
+    background-color: #2d2d50 !important;
+    color: #e0e0e0 !important;
+}
+
 /* Modals */
 
 body.vp-dark-theme .modal-content,
@@ -391,4 +409,10 @@ body.vp-dark-theme .badge.bg-light {
 
 body.vp-dark-theme hr {
     border-color: #3a3a5c;
+}
+
+/* bg-info section headers */
+
+body.vp-dark-theme .bg-info {
+    background-color: #066d7f !important;
 }

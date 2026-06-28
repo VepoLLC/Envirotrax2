@@ -12,9 +12,12 @@
 
 <body class="d-flex flex-column flex-fill bg-light">
   <script>
-    if (localStorage.getItem('vp-theme') === 'dark') {
-      document.body.classList.add('vp-dark-theme');
-    }
+    (function () {
+      var match = document.cookie.match(/(?:^|;\s*)vp-theme=([^;]*)/);
+      if (match && match[1] === 'dark') {
+        document.body.classList.add('vp-dark-theme');
+      }
+    })();
   </script>
   <app-root class="d-flex flex-column flex-fill"></app-root>
 </body>

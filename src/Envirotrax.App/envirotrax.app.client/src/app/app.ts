@@ -2,6 +2,7 @@
 import { AuthService } from './shared/services/auth/auth.service';
 import { WaterSupplierService } from './shared/services/water-suppliers/water-supplier.service';
 import { ProfesisonalService } from './shared/services/professionals/professional.service';
+import { ThemeCookieService } from './shared/services/helpers/theme-cookie.service';
 import { createPopper, flip, preventOverflow } from '@popperjs/core';
 import { FeatureType } from './shared/models/feature-type';
 import { PermissionAction, PermissionType } from './shared/models/permission-type';
@@ -24,13 +25,14 @@ export class App implements OnInit {
   constructor(
     private readonly _authService: AuthService,
     private readonly _waterSupplierService: WaterSupplierService,
-    private readonly _professionalService: ProfesisonalService
+    private readonly _professionalService: ProfesisonalService,
+    private readonly _themeCookie: ThemeCookieService
   ) {
 
   }
 
   public async ngOnInit(): Promise<void> {
-    this.isDarkMode = localStorage.getItem('vp-theme') === 'dark';
+    this.isDarkMode = this._themeCookie.get() === 'dark';
 
     if (this.isDarkMode) {
       document.body.classList.add('vp-dark-theme');
@@ -69,10 +71,10 @@ export class App implements OnInit {
 
     if (this.isDarkMode) {
       document.body.classList.add('vp-dark-theme');
-      localStorage.setItem('vp-theme', 'dark');
+      this._themeCookie.set('dark');
     } else {
       document.body.classList.remove('vp-dark-theme');
-      localStorage.setItem('vp-theme', 'light');
+      this._themeCookie.set('light');
     }
   }
 

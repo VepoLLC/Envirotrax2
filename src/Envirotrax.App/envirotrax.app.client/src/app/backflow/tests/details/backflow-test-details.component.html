@@ -1,6 +1,23 @@
 <div>
     <h1 class="text-center h2">Backflow Assembly Test</h1>
 
+    <div>
+         <div class="d-flex flex-row justify-content-center">
+                <div class="me-3">
+                    <span>A  </span> 
+                    <input class="form-check-input" type="checkbox" [checked]="true"/>
+                    <span>  indicates Yes.</span>
+                </div>
+
+                <div class="ms-3">
+                    <span>A  </span> 
+                    <input class="form-check-input" type="checkbox" [checked]="false"/>
+                    <span>  indicates a No.</span>
+                </div>
+        </div>
+        <p class="text-center mt-1">The following form must be completed for each assembly tested for recordkeeping *purposes:</p>
+    </div>
+
     <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
 
     <div *ngIf="!isLoading && test">
@@ -84,5 +101,12 @@
                 Export Test to Printable Document
             </button>
         </div>
+
+    </div>
+        <div class="text-center mt-3"> The above is certified to be true at the time of testing.
+        <br>* TEST RECORDS MUST BE KEPT FOR AT LEAST THREE YEARS [30 TAC §290.46(B)]
+        <br>** USE ONLY MANUFACTURER'S REPLACEMENT PARTS
+        <br>*** 2nd Check: Numeric reading required for Double Check Valve only.
+        <br>**** Indicates additional information not present on the standard TCEQ report
     </div>
 </div>

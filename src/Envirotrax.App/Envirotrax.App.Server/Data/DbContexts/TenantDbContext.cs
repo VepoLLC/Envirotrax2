@@ -21,6 +21,7 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
     public DbSet<GeneralSettings> GeneralSettings { get; set; }
     public DbSet<CsiSettings> CsiSettings { get; set; }
     public DbSet<BackflowSettings> BackflowSettings { get; set; }
+    public DbSet<BackflowRenewalRequirement> BackflowRenewalRequirements { get; set; }
 
     public DbSet<WaterSupplierUser> WaterSupplierUsers { get; set; }
     public DbSet<Feature> Features { get; set; }

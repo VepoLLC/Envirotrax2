@@ -61,6 +61,7 @@ public static class ServiceRegistration
 
         services.AddTransient<ICsiSettingsService, CsiSettingsService>();
         services.AddTransient<IBackflowSettingsService, BackflowSettingsService>();
+        services.AddTransient<IBackflowRenewalRequirementService, BackflowRenewalRequirementService>();
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IUserRoleService, UserRoleService>();
         services.AddTransient<IRolePermissionService, RolePermissionService>();

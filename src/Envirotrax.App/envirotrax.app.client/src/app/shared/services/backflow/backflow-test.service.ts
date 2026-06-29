@@ -10,6 +10,30 @@ import { BackflowTest } from "../../models/backflow/backflow-test";
 import { BackflowTestImages } from "../../models/backflow/backflow-test-images";
 import { DownloadEndpoint } from "../../models/download-config";
 
+export type BackflowExpiryRangeKey = 'expired' | 'thismonth' | 'nextmonth' | 'twomonths';
+
+export interface BackflowExpiryCounts {
+    expired: number;
+    thisMonth: number;
+    nextMonth: number;
+    twoMonths: number;
+}
+
+export function getBackflowExpiryRange(key: BackflowExpiryRangeKey): { start: Date; end: Date } {
+    const now = new Date();
+
+    if (key === 'expired') {
+        const start = new Date(now);
+        start.setMonth(start.getMonth() - 6);
+        return { start, end: now };
+    }
+
+    const offset = key === 'thismonth' ? 0 : key === 'nextmonth' ? 1 : 2;
+    const start = new Date(now.getFullYear(), now.getMonth() + offset, 1, 0, 0, 0, 0);
+    const end = new Date(now.getFullYear(), now.getMonth() + offset + 1, 0, 23, 59, 59, 999);
+    return { start, end };
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -51,6 +75,12 @@ export class BackflowTestService {
         return await lastValueFrom(this._http.get<PagedData<BackflowTest>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));
+    }
+
+    public async getExpiryCounts(): Promise<BackflowExpiryCounts> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/backflow/tests/expiry-counts');
+
+        return await lastValueFrom(this._http.get<BackflowExpiryCounts>(url));
     }
 
     public async submit(test: BackflowTest, images: BackflowTestImages = {}): Promise<BackflowTest> {
@@ -212,6 +242,10 @@ function buildBackflowTestFormData(test: BackflowTest): FormData {
     append('repairRVDetails', test.repairRVDetails);
     append('repairBC', test.repairBC);
     append('repairBCDetails', test.repairBCDetails);
+    append('repairPvbAirInlet', test.repairPvbAirInlet);
+    append('repairPvbAirInletDetails', test.repairPvbAirInletDetails);
+    append('repairPvbCV', test.repairPvbCV);
+    append('repairPvbCVDetails', test.repairPvbCVDetails);
 
     // Final test readings — main assembly
     append('finalCV1HeldPSID', test.finalCV1HeldPSID);
@@ -246,6 +280,7 @@ function buildBackflowTestFormData(test: BackflowTest): FormData {
     // Final test readings — bypass assembly
     append('finalCV1HeldPSID2', test.finalCV1HeldPSID2);
     append('finalCV1ClosedTight2', test.finalCV1ClosedTight2);
+    append('finalCV2HeldPSID2', test.finalCV2HeldPSID2);
     append('finalCV2ClosedTight2', test.finalCV2ClosedTight2);
     append('finalRVOpenedPSID2', test.finalRVOpenedPSID2);
 

@@ -137,6 +137,19 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         return saved;
     }
 
+    public async Task<BackflowTestExpiryCountsDto> GetExpiryCountsAsync(CancellationToken cancellationToken = default)
+    {
+        var (expired, thisMonth, nextMonth, twoMonths) = await _testRepository.GetExpiryCountsAsync(cancellationToken);
+
+        return new BackflowTestExpiryCountsDto
+        {
+            Expired = expired,
+            ThisMonth = thisMonth,
+            NextMonth = nextMonth,
+            TwoMonths = twoMonths
+        };
+    }
+
     public override async Task<BackflowTestDto?> GetAsync(int id, CancellationToken cancellationToken)
     {
         var dto = await base.GetAsync(id, cancellationToken);

@@ -598,8 +598,13 @@
         </div>
     </form>
 
-    <div class="text-center my-3" *ngIf="canViewCsi || canViewBackflow">
-        <ul class="vp-tabs nav nav-pills d-inline-flex">
+    <div class="text-center my-3" *ngIf="canViewLogHistory || canViewCsi || canViewBackflow">
+        <ul class="vp-tabs nav nav-pills d-inline-flex flex-wrap justify-content-center">
+            <li class="nav-item" *ngIf="canViewLogHistory">
+                <a class="nav-link" role="button"
+                   [class.active]="activeTab === 'logHistory'"
+                   (click)="setActiveTab('logHistory')">Log History</a>
+            </li>
             <li class="nav-item" *ngIf="canViewCsi">
                 <a class="nav-link" role="button"
                    [class.active]="activeTab === 'csi'"
@@ -611,6 +616,10 @@
                    (click)="setActiveTab('backflow')">Backflow Tests</a>
             </li>
         </ul>
+    </div>
+
+    <div *ngIf="logHistoryInitialized && canViewLogHistory && site.id" [hidden]="activeTab !== 'logHistory'">
+        <app-site-log-history [siteId]="site.id" />
     </div>
 
     <div *ngIf="csiInitialized && canViewCsi && site.id" [hidden]="activeTab !== 'csi'">

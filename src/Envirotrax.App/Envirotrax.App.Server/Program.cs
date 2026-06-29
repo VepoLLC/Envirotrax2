@@ -1,8 +1,10 @@
+using System.Globalization;
 using Azure.Identity;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Envirotrax.App.Server.Configuration;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.App.Server.MediaTypeFormatters;
+using Microsoft.AspNetCore.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +51,13 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(CultureInfo.InvariantCulture),
+    SupportedCultures = [CultureInfo.InvariantCulture],
+    SupportedUICultures = [CultureInfo.InvariantCulture]
+});
 
 app.UseHttpsRedirection();
 

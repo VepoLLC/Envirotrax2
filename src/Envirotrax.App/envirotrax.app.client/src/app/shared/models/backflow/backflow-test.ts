@@ -162,8 +162,14 @@ export interface BackflowTest {
     repairCV2Details2?: string;
     repairRV2?: string;
     repairRVDetails2?: string;
+    repairPvbAirInlet?:string; 
+    repairPvbCV?:string; 
+    repairPvbAirInletDetails?:string; 
+    repairPvbCVDetails?:string; 
+
     finalCV1HeldPSID2?: number;
     finalCV1ClosedTight2?: boolean;
+    finalCV2HeldPSID2?: number; 
     finalCV2ClosedTight2?: boolean;
     finalRVOpenedPSID2?: number;
 }

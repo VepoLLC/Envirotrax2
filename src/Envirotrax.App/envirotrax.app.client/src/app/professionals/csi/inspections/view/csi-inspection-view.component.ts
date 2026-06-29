@@ -30,7 +30,7 @@ export class CsiInspectionViewComponent implements OnInit {
         private readonly _inspectionService: CsiInspectionService,
         private readonly _toastService: ToastService,
         private readonly _modalHelper: ModalHelperService
-    ) {}
+    ) { }
 
     public async ngOnInit(): Promise<void> {
         await this.loadInspection();

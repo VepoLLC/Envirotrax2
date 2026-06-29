@@ -28,6 +28,13 @@ public class BackflowTestController : ProfessionalProtectedController
         return Ok(result);
     }
 
+    [HttpGet("expiry-counts")]
+    public async Task<IActionResult> GetExpiryCountsAsync(CancellationToken cancellationToken)
+    {
+        var result = await _backflowTestService.GetExpiryCountsAsync(cancellationToken);
+        return Ok(result);
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
     {

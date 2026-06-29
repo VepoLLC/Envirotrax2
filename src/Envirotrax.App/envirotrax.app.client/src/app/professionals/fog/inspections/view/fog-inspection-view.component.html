@@ -215,40 +215,22 @@
                     <tr>
                         <td width="50%">Is it properly maintained?</td>
                         <td>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" disabled [checked]="inspection.maintained === true" />
-                                <label class="form-check-label">Yes</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" disabled [checked]="inspection.maintained === false" />
-                                <label class="form-check-label">No</label>
-                            </div>
+                            <label class="me-2"><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.maintained === true" />Yes</label>
+                            <label><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.maintained === false" />No</label>
                         </td>
                     </tr>
                     <tr>
                         <td>Is it accessible?</td>
                         <td>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" disabled [checked]="inspection.accessible === true" />
-                                <label class="form-check-label">Yes</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" disabled [checked]="inspection.accessible === false" />
-                                <label class="form-check-label">No</label>
-                            </div>
+                            <label class="me-2"><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.accessible === true" />Yes</label>
+                            <label><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.accessible === false" />No</label>
                         </td>
                     </tr>
                     <tr>
                         <td>Is there evidence of past overflow?</td>
                         <td>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" disabled [checked]="inspection.pastOverflow === true" />
-                                <label class="form-check-label">Yes</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" disabled [checked]="inspection.pastOverflow === false" />
-                                <label class="form-check-label">No</label>
-                            </div>
+                            <label class="me-2"><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.pastOverflow === true" />Yes</label>
+                            <label><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.pastOverflow === false" />No</label>
                         </td>
                     </tr>
                 </table>
@@ -259,27 +241,15 @@
                     <tr>
                         <td width="50%">Is it accessible?</td>
                         <td>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" disabled [checked]="inspection.samplingPointAccessible === true" />
-                                <label class="form-check-label">Yes</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" disabled [checked]="inspection.samplingPointAccessible === false" />
-                                <label class="form-check-label">No</label>
-                            </div>
+                            <label class="me-2"><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.samplingPointAccessible === true" />Yes</label>
+                            <label><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.samplingPointAccessible === false" />No</label>
                         </td>
                     </tr>
                     <tr>
                         <td>Does it need to be cleaned?</td>
                         <td>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" disabled [checked]="inspection.samplingPointClean === true" />
-                                <label class="form-check-label">Yes</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" disabled [checked]="inspection.samplingPointClean === false" />
-                                <label class="form-check-label">No</label>
-                            </div>
+                            <label class="me-2"><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.samplingPointClean === true" />Yes</label>
+                            <label><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.samplingPointClean === false" />No</label>
                         </td>
                     </tr>
                     <tr>
@@ -297,27 +267,15 @@
                     <tr>
                         <td width="50%">Is the inlet tee visible?</td>
                         <td>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" disabled [checked]="inspection.inletTeeVisible === true" />
-                                <label class="form-check-label">Yes</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" disabled [checked]="inspection.inletTeeVisible === false" />
-                                <label class="form-check-label">No</label>
-                            </div>
+                            <label class="me-2"><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.inletTeeVisible === true" />Yes</label>
+                            <label><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.inletTeeVisible === false" />No</label>
                         </td>
                     </tr>
                     <tr>
                         <td>Is the inlet tee intact?</td>
                         <td>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" disabled [checked]="inspection.inletTeeIntact === true" />
-                                <label class="form-check-label">Yes</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" disabled [checked]="inspection.inletTeeIntact === false" />
-                                <label class="form-check-label">No</label>
-                            </div>
+                            <label class="me-2"><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.inletTeeIntact === true" />Yes</label>
+                            <label><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.inletTeeIntact === false" />No</label>
                         </td>
                     </tr>
                     <tr><td colspan="2">&nbsp;</td></tr>
@@ -354,27 +312,15 @@
                     <tr>
                         <td width="50%">Is the outfall tee visible?</td>
                         <td>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" disabled [checked]="inspection.outletTeeVisible === true" />
-                                <label class="form-check-label">Yes</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" disabled [checked]="inspection.outletTeeVisible === false" />
-                                <label class="form-check-label">No</label>
-                            </div>
+                            <label class="me-2"><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.outletTeeVisible === true" />Yes</label>
+                            <label><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.outletTeeVisible === false" />No</label>
                         </td>
                     </tr>
                     <tr>
                         <td>Is the outfall tee intact?</td>
                         <td>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" disabled [checked]="inspection.outletTeeIntact === true" />
-                                <label class="form-check-label">Yes</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" disabled [checked]="inspection.outletTeeIntact === false" />
-                                <label class="form-check-label">No</label>
-                            </div>
+                            <label class="me-2"><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.outletTeeIntact === true" />Yes</label>
+                            <label><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.outletTeeIntact === false" />No</label>
                         </td>
                     </tr>
                     <tr><td colspan="2">&nbsp;</td></tr>

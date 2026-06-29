@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
-import { HttpClient, HttpParams } from "@angular/common/http";
-import { lastValueFrom } from "rxjs";
+import { HttpClient } from "@angular/common/http";
+import { Observable, lastValueFrom, catchError, shareReplay, throwError } from "rxjs";
 import { UrlResolverService } from "../helpers/url-resolver.service";
 import { BackflowTestingSettings } from "../../models/backflow/backflow-testing-settings";
 
@@ -8,8 +8,7 @@ import { BackflowTestingSettings } from "../../models/backflow/backflow-testing-
     providedIn: 'root'
 })
 export class BackflowSettingsService {
-
-    private readonly _cache = new Map<number, Promise<BackflowTestingSettings>>();
+    private readonly _cache = new Map<number, Observable<BackflowTestingSettings>>();
 
     constructor(
         private readonly _urlResolver: UrlResolverService,
@@ -18,21 +17,22 @@ export class BackflowSettingsService {
     }
 
     public getTestingSettings(waterSupplierId: number): Promise<BackflowTestingSettings> {
-        const cached = this._cache.get(waterSupplierId);
-        if (cached) {
-            return cached;
+        let cached = this._cache.get(waterSupplierId);
+
+        if (!cached) {
+            const url = this._urlResolver.resolveUrl(`/api/professionals/backflow/settings/${waterSupplierId}`);
+
+            cached = this._http.get<BackflowTestingSettings>(url).pipe(
+                shareReplay(1),
+                catchError(error => {
+                    this._cache.delete(waterSupplierId);
+                    return throwError(() => error);
+                })
+            );
+
+            this._cache.set(waterSupplierId, cached);
         }
 
-        const url = this._urlResolver.resolveUrl('/api/professionals/backflow/settings');
-        const params = new HttpParams().set('waterSupplierId', waterSupplierId);
-
-        const promise = lastValueFrom(this._http.get<BackflowTestingSettings>(url, { params }))
-            .catch(error => {
-                this._cache.delete(waterSupplierId);
-                throw error;
-            });
-
-        this._cache.set(waterSupplierId, promise);
-        return promise;
+        return lastValueFrom(cached);
     }
 }

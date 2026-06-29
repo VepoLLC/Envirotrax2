@@ -48,6 +48,7 @@ public static class ServiceRegistration
     {
         AddDbContext<TenantDbContext>(services, configuration, environment);
         AddDbContext<ProfessionalDbContext>(services, configuration, environment);
+        AddDbContext<AdminDbContext>(services, configuration, environment);
         services.AddScoped<IDbContextSelector, DbContextSelector>();
 
         services.AddTenantProvider();
@@ -83,6 +84,8 @@ public static class ServiceRegistration
         services.AddTransient<IProfessionalInsuranceRepository, ProfessionalInsuranceRepository>();
         services.AddTransient<IBackflowGaugeRepository, BackflowGaugeRepository>();
         services.AddTransient<IFogVehicleRepository, FogVehicleRepository>();
+        services.AddTransient<IFogTransporterDisposalSiteRepository, FogTransporterDisposalSiteRepository>();
+        services.AddTransient<IFogDisposalSiteRepository, FogDisposalSiteRepository>();
 
         services.AddTransient<IGisAreaRepository, GisAreaRepository>();
         services.AddTransient<IGisAreaCoordinateRepository, GisAreaCoordinateRepository>();

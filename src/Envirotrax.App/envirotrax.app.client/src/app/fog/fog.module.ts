@@ -10,6 +10,7 @@ import { FogInspectorWaterSuppliersComponent } from "./inspectors/details/water-
 import { FogInspectorUsersComponent } from "./inspectors/details/users/list/fog-inspector-users.component";
 import { FogInspectorLicenseInsuranceComponent } from "./inspectors/details/license-insurance/list/fog-inspector-license-insurance.component";
 import { FogInspectionListComponent } from "./inspections/list/fog-inspection-list.component";
+import { FogInspectionViewComponent } from "./inspections/view/fog-inspection-view.component";
 import { ProfessionalModule } from "../professionals/professional.module";
 
 @NgModule({
@@ -19,7 +20,8 @@ import { ProfessionalModule } from "../professionals/professional.module";
         FogInspectorWaterSuppliersComponent,
         FogInspectorUsersComponent,
         FogInspectorLicenseInsuranceComponent,
-        FogInspectionListComponent
+        FogInspectionListComponent,
+        FogInspectionViewComponent
     ],
     imports: [
         CommonModule,

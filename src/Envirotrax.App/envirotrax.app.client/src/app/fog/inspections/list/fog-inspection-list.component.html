@@ -258,6 +258,8 @@
                   [(query)]="table.query"
                   (queryChange)="getInspections()"
                   (queryReset)="getInspections()"
+                  [canViewDetails]="true"
+                  (viewDetails)="viewDetails($event)"
                   [freeTextSearch]="table.freeTextSearch" />
     </vp-section>
 </div>

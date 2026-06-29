@@ -6,7 +6,7 @@ import { QueryHelperService } from "../helpers/query-helper.service";
 import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
-import { BackflowTest } from "../../models/backflow/backflow-test";
+import { BackflowTest, BackflowExpiryCounts } from "../../models/backflow/backflow-test";
 import { BackflowTestImages } from "../../models/backflow/backflow-test-images";
 import { DownloadEndpoint } from "../../models/download-config";
 
@@ -82,6 +82,12 @@ export class BackflowTestService {
         return await lastValueFrom(this._http.get<PagedData<BackflowTest>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));
+    }
+
+    public async getExpiryCounts(): Promise<BackflowExpiryCounts> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/backflow/tests/expiry-counts');
+
+        return await lastValueFrom(this._http.get<BackflowExpiryCounts>(url));
     }
 
     public async submit(test: BackflowTest, images: BackflowTestImages = {}): Promise<BackflowTest> {

@@ -28,6 +28,13 @@ public class BackflowTestController : ProfessionalProtectedController
         return Ok(result);
     }
 
+    [HttpGet("expiry-counts")]
+    public async Task<IActionResult> GetExpiryCountsAsync(CancellationToken cancellationToken)
+    {
+        var result = await _backflowTestService.GetExpiryCountsAsync(cancellationToken);
+        return Ok(result);
+    }
+
     [HttpGet("pdf")]
     public async Task<IActionResult> GetAllPdfAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
     {

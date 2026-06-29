@@ -1,6 +1,7 @@
 import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { NgForm } from "@angular/forms";
-import { CellTemplateData, ColumnType, InputOption, TableColumn } from "@envirotrax/common-ui";
+import { CellTemplateData, ColumnType, InputOption, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
+import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { TableViewModel } from "../../shared/models/table-view-model";
 import { Site } from "../../shared/models/sites/site";
 import { ComparisonOperator, Query, QueryProperty } from "../../shared/models/query";
@@ -13,6 +14,7 @@ import { DownloadConfig } from "../../shared/models/download-config";
 import { MAX_PAGE_SIZE } from "../../shared/models/page-info";
 import { PermissionAction, PermissionType } from "../../shared/models/permission-type";
 import { FacilityType } from "../../shared/enums/facility-type.enum";
+import { SiteLogModalComponent, SiteLogModalModel } from "./site-log/site-log-modal.component";
 
 const DAY_MS = 86400000;
 
@@ -53,6 +55,9 @@ export class CsiComplianceManagementComponent implements OnInit {
 
     @ViewChild('mailingTemplate', { static: true })
     public mailingTemplate!: TemplateRef<CellTemplateData<Site>>;
+
+    @ViewChild('logTemplate', { static: true })
+    public logTemplate!: TemplateRef<CellTemplateData<Site>>;
 
     @ViewChild('assignedToTemplate', { static: true })
     public assignedToTemplate!: TemplateRef<CellTemplateData<Site>>;
@@ -141,7 +146,8 @@ export class CsiComplianceManagementComponent implements OnInit {
         private readonly _siteService: SiteService,
         private readonly _userService: UserService,
         private readonly _authService: AuthService,
-        private readonly _downloadService: DownloadService
+        private readonly _downloadService: DownloadService,
+        private readonly _modalHelper: ModalHelperService
     ) {
         this.downloadConfig = {
             fileName: 'CSI Inspection Compliance',
@@ -197,6 +203,17 @@ export class CsiComplianceManagementComponent implements OnInit {
         this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
     }
 
+    public openPropertyLog(site: Site): void {
+        this._modalHelper.show<SiteLogModalModel, void>(
+            SiteLogModalComponent,
+            {
+                title: 'Property Log',
+                size: ModalSize.large,
+                model: { siteId: site.id!, canModify: this.canModify }
+            }
+        );
+    }
+
     public async getCompliance(): Promise<void> {
         try {
             this.table.isLoading = true;
@@ -242,6 +259,7 @@ export class CsiComplianceManagementComponent implements OnInit {
         const columns: TableColumn<Site>[] = [
             this.templateColumn('Property Information', this.propertyTemplate),
             { field: 'accountNumber', caption: 'Account Number', type: ColumnType.text },
+            this.templateColumn('Property Log', this.logTemplate),
             this.templateColumn('Assigned To', this.assignedToTemplate),
             { field: 'csiRenewalDate', caption: 'Inspection Date', type: ColumnType.other, cellTemplate: this.renewalDateTemplate },
             this.templateColumn('Days Overdue', this.daysOverdueTemplate),

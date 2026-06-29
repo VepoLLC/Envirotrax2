@@ -29,6 +29,13 @@
     </div>
 </ng-template>
 
+<ng-template #logTemplate let-data="rowData">
+    <button type="button" class="btn btn-sm btn-outline-primary" (click)="openPropertyLog(data)">
+        <i class="fa-regular fa-clipboard-list me-1"></i>
+        Property Log
+    </button>
+</ng-template>
+
 <ng-template #assignedToTemplate let-data="rowData">
     <ng-container *ngIf="canModify; else assignedReadonly">
         <select class="form-select form-select-sm"

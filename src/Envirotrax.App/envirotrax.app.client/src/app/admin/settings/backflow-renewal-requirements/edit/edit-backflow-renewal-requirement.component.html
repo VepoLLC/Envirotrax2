@@ -1,0 +1,80 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="isLoading" />
+
+    <form #form="ngForm" (ngSubmit)="save(form)">
+        <div class="mb-3">
+            <vp-input type="select"
+                      name="propertyType"
+                      label="Property type"
+                      [(ngModel)]="requirement.propertyType"
+                      [options]="propertyTypeOptions"
+                      [required]="true"
+                      [form]="form" />
+        </div>
+
+        <div class="mb-3">
+            <vp-input type="select"
+                      name="deviceType"
+                      label="Assembly type"
+                      [(ngModel)]="requirement.deviceType"
+                      [options]="assemblyTypeOptions"
+                      [required]="true"
+                      [form]="form" />
+        </div>
+
+        <div class="mb-3">
+            <vp-input type="select"
+                      name="hazardType"
+                      label="Hazard type"
+                      [(ngModel)]="requirement.hazardType"
+                      [options]="hazardTypeOptions"
+                      [required]="true"
+                      [form]="form" />
+        </div>
+
+        <div class="form-check mb-2">
+            <input id="edit-aux-water-supply"
+                   type="checkbox"
+                   class="form-check-input"
+                   [(ngModel)]="requirement.auxWaterSupply"
+                   name="auxWaterSupply">
+            <label for="edit-aux-water-supply" class="form-check-label">
+                Has aux water supply
+            </label>
+        </div>
+
+        <div class="form-check mb-3">
+            <input id="edit-has-site-ossf"
+                   type="checkbox"
+                   class="form-check-input"
+                   [(ngModel)]="requirement.hasSiteOssf"
+                   name="hasSiteOssf">
+            <label for="edit-has-site-ossf" class="form-check-label">
+                Has OSSF
+            </label>
+        </div>
+
+        <div class="mb-3">
+            <vp-input type="select"
+                      name="renewalYears"
+                      label="Renewal years"
+                      [(ngModel)]="requirement.renewalYears"
+                      [options]="yearsOptions"
+                      [required]="true"
+                      [form]="form" />
+        </div>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="form" [validationErrors]="validationErrors" />
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-primary vp-section-button w-100" (click)="cancel()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn btn-primary vp-section-button w-100">
+                    Save
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

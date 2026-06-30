@@ -18,8 +18,8 @@ public class BackflowSettingsController : ProfessionalProtectedController
         _settingsService = settingsService;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetTestingSettingsAsync([FromQuery] int waterSupplierId, CancellationToken cancellationToken)
+    [HttpGet("{waterSupplierId}")]
+    public async Task<IActionResult> GetTestingSettingsAsync(int waterSupplierId, CancellationToken cancellationToken)
     {
         var settings = await _settingsService.GetTestingSettingsAsync(waterSupplierId, cancellationToken);
         return Ok(settings);

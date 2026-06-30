@@ -422,7 +422,7 @@ new[] { ("Closed Tight","FinalCV2ClosedTight") }),
                                                     of the containment vessel complies with the requirements of an approved air gap and has
                                                     not been bypassed, or otherwise made ineffective?
                                                 </td>
-                                                <td style="white-space:nowrap">@(test.AirGapValid ? "✓ Yes" : "○ No")</td>
+                                                <td style="white-space:nowrap">@(test.AirGapValid ? "✓ Yes" : "☐ No")</td>
                                             </tr>
                                             <tr>
                                                 <td colspan="2"><span class="label">Test Date:</span> @test.TestDate?.ToString("MM/dd/yyyy")
@@ -481,7 +481,7 @@ new[] { ("Closed Tight","FinalCV2ClosedTight") }),
                                                         }
                                                         @foreach (var chk in col.InitChecks)
                                                         {
-                                                            <div>@(getBool(chk.Field) ? "✓" : "○") @chk.Label</div>
+                                                            <div>@(getBool(chk.Field) ? "✓" : "☐") @chk.Label</div>
                                                         }
                                                     </td>
                                                 }
@@ -518,7 +518,7 @@ new[] { ("Closed Tight","FinalCV2ClosedTight") }),
                                                         }
                                                         @foreach (var chk in col.FinalChecks)
                                                         {
-                                                            <div>@(getBool(chk.Field) ? "✓" : "○") @chk.Label</div>
+                                                            <div>@(getBool(chk.Field) ? "✓" : "☐") @chk.Label</div>
                                                         }
                                                     </td>
                                                 }

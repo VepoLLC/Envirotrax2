@@ -22,8 +22,8 @@ public class BackflowSettingsRepository : Repository<BackflowSettings>, IBackflo
         var professionalId = _authService.ProfessionalId;
 
         var query =
-            from settings in Entity.IgnoreQueryFilters()
-            join registration in DbContext.ProfessionalWaterSuppliers.IgnoreQueryFilters()
+            from settings in Entity
+            join registration in DbContext.ProfessionalWaterSuppliers
                 on settings.WaterSupplierId equals registration.WaterSupplierId
             where settings.WaterSupplierId == waterSupplierId
                 && registration.ProfessionalId == professionalId

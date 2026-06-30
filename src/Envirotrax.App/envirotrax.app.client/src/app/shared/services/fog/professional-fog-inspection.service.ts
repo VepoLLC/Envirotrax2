@@ -39,6 +39,7 @@ export class ProfessionalFogInspectionService {
 
         if (images.exteriorImage) { formData.append('exteriorImage', images.exteriorImage); }
         if (images.interiorImage) { formData.append('interiorImage', images.interiorImage); }
+        if (images.signatureImage) { formData.append('signatureImage', images.signatureImage); }
 
         return lastValueFrom(this._http.post<FogInspection>(url, formData));
     }
@@ -98,6 +99,8 @@ function buildFogInspectionFormData(inspection: FogInspection): FormData {
     append('totalCapacityPercent', inspection.totalCapacityPercent);
 
     append('inspectionResult', inspection.inspectionResult);
+
+    append('signatureContactName', inspection.signatureContactName);
 
     append('comments', inspection.comments);
 

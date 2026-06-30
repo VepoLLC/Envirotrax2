@@ -46,6 +46,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         FogInspectionDto request,
         Stream? exteriorStream, string? exteriorFileName,
         Stream? interiorStream, string? interiorFileName,
+        Stream? signatureStream, string? signatureFileName,
         CancellationToken cancellationToken)
     {
         var siteId = request.Site!.Id!.Value;
@@ -121,6 +122,11 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         {
             inspection.InteriorImagePath = $"professionals/{professional.Id}/fog-inspections/interior/{Guid.NewGuid()}{ValidateAndGetExtension(interiorFileName)}";
         }
+        if (signatureStream != null && signatureFileName != null)
+        {
+            inspection.SignatureImagePath = $"professionals/{professional.Id}/fog-inspections/signature/{Guid.NewGuid()}{ValidateAndGetExtension(signatureFileName)}";
+            inspection.SignatureDate = DateTime.UtcNow;
+        }
 
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         var added = await _repository.AddAsync(inspection);
@@ -132,6 +138,10 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         if (interiorStream != null && inspection.InteriorImagePath != null)
         {
             await _fileStorageService.UploadAsync(inspection.InteriorImagePath, interiorStream);
+        }
+        if (signatureStream != null && inspection.SignatureImagePath != null)
+        {
+            await _fileStorageService.UploadAsync(inspection.SignatureImagePath, signatureStream);
         }
 
         scope.Complete();
@@ -166,7 +176,8 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         var images = new (string? Path, Action<string> SetUrl)[]
         {
             (dto.ExteriorImagePath, url => dto.ExteriorImageUrl = url),
-            (dto.InteriorImagePath, url => dto.InteriorImageUrl = url)
+            (dto.InteriorImagePath, url => dto.InteriorImageUrl = url),
+            (dto.SignatureImagePath, url => dto.SignatureImageUrl = url)
         };
 
         if (!images.Any(i => !string.IsNullOrWhiteSpace(i.Path)))

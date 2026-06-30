@@ -21,9 +21,12 @@
 
 <body class="d-flex flex-column min-vh-100 bg-light">
     <script>
-        if (localStorage.getItem('vp-theme') === 'dark') {
-            document.body.classList.add('vp-dark-theme');
-        }
+        (function () {
+            var match = document.cookie.match(/(?:^|;\s*)vp-theme=([^;]*)/);
+            if (match && match[1] === 'dark') {
+                document.body.classList.add('vp-dark-theme');
+            }
+        })();
     </script>
     <nav class="navbar navbar-expand-lg bg-primary bg-gradient" data-bs-theme="dark">
         <div class="container-fluid">

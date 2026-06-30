@@ -1505,7 +1505,7 @@ strong {
 
 input:-webkit-autofill {
     -webkit-text-fill-color: var(--bs-body-color) !important;
-    -webkit-box-shadow: 0 0 0 1rem var(--control-bg-color) inset !important;
+    -webkit-box-shadow: 0 0 0 1000px var(--control-bg-color) inset !important;
     background-clip: content-box !important;
 }
 

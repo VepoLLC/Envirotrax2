@@ -6,7 +6,7 @@ namespace Envirotrax.App.Server.Controllers
 {
     [Route("api/lookup")]
     [ApiController]
-    public class LookupController : ControllerBase
+    public class LookupController : EnvirotraxBaseController
     {
         private readonly ILookupService _lookupService;
 

@@ -7,7 +7,7 @@ namespace Envirotrax.App.Server.Controllers;
 
 [ApiController]
 [Authorize(Roles = RoleDefinitions.Professional)]
-public class ProfessionalProtectedController : ControllerBase
+public class ProfessionalProtectedController : EnvirotraxBaseController
 {
 
 }

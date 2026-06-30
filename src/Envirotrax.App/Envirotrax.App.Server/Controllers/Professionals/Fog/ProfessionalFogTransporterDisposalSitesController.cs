@@ -23,11 +23,12 @@ public class ProfessionalFogTransporterDisposalSitesController : ProfessionalPro
         _registrationService = registrationService;
     }
 
-    // Master list of all (non-deleted) disposal sites.
+    // Master list of disposal sites. Soft-deleted rows are excluded automatically by the global query
+    // filter; sorting (e.g. by County) is driven by the front-end via the query.
     [HttpGet]
     public async Task<IActionResult> GetAllAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
     {
-        var result = await _disposalSiteService.GetActiveAsync(pageInfo, query, cancellationToken);
+        var result = await _disposalSiteService.GetAllAsync(pageInfo, query, cancellationToken);
         return Ok(result);
     }
 
@@ -45,7 +46,7 @@ public class ProfessionalFogTransporterDisposalSitesController : ProfessionalPro
     [Authorize(Roles = RoleDefinitions.Professionals.Admin)]
     public async Task<IActionResult> SetRegistrationAsync(int disposalSiteId, [FromQuery] bool isActive, CancellationToken cancellationToken)
     {
-        await _registrationService.SetRegistrationAsync(disposalSiteId, isActive, cancellationToken);
-        return Ok();
+        var result = await _registrationService.SetRegistrationAsync(disposalSiteId, isActive, cancellationToken);
+        return Ok(result);
     }
 }

@@ -8,5 +8,5 @@ public interface IFogTransporterDisposalSiteService : IService<FogTransporterDis
 {
     Task<IPagedData<FogDisposalSiteDto>> GetRegisteredDisposalSitesAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
 
-    Task SetRegistrationAsync(int disposalSiteId, bool isActive, CancellationToken cancellationToken);
+    Task<FogTransporterDisposalSiteDto> SetRegistrationAsync(int disposalSiteId, bool isActive, CancellationToken cancellationToken);
 }

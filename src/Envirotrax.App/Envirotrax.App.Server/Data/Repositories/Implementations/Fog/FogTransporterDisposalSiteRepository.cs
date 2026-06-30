@@ -35,28 +35,22 @@ public class FogTransporterDisposalSiteRepository : Repository<FogTransporterDis
         return await paginated.ToListAsync(cancellationToken);
     }
 
-    public async Task SetRegistrationAsync(int disposalSiteId, bool isActive, CancellationToken cancellationToken)
+    // A professional links a disposal site at most once (composite PK), so there is a single registration
+    // row per site. Add it if it doesn't exist, otherwise update its IsActive flag.
+    public async Task<FogTransporterDisposalSite> SetRegistrationAsync(FogTransporterDisposalSite registration, CancellationToken cancellationToken)
     {
         var existing = await Entity
-            .Where(r => r.DisposalSiteId == disposalSiteId)
-            .ToListAsync(cancellationToken);
+            .SingleOrDefaultAsync(r => r.DisposalSiteId == registration.DisposalSiteId, cancellationToken);
 
-        if (isActive)
+        if (existing == null)
         {
-            if (!existing.Any(r => r.IsActive))
-            {
-                Entity.Add(new FogTransporterDisposalSite
-                {
-                    DisposalSiteId = disposalSiteId,
-                    IsActive = true
-                });
-                await DbContext.SaveChangesAsync(cancellationToken);
-            }
+            Entity.Add(registration);
+            await DbContext.SaveChangesAsync();
+            return registration;
         }
-        else if (existing.Count > 0)
-        {
-            DbContext.RemoveRange(existing);
-            await DbContext.SaveChangesAsync(cancellationToken);
-        }
+
+        existing.IsActive = registration.IsActive;
+        await DbContext.SaveChangesAsync();
+        return existing;
     }
 }

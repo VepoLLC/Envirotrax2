@@ -30,8 +30,16 @@ public class FogTransporterDisposalSiteService : Service<FogTransporterDisposalS
             .ToPagedData(pageInfo);
     }
 
-    public Task SetRegistrationAsync(int disposalSiteId, bool isActive, CancellationToken cancellationToken)
+    public async Task<FogTransporterDisposalSiteDto> SetRegistrationAsync(int disposalSiteId, bool isActive, CancellationToken cancellationToken)
     {
-        return _repository.SetRegistrationAsync(disposalSiteId, isActive, cancellationToken);
+        var registration = new FogTransporterDisposalSite
+        {
+            DisposalSiteId = disposalSiteId,
+            IsActive = isActive
+        };
+
+        var result = await _repository.SetRegistrationAsync(registration, cancellationToken);
+
+        return Mapper.Map<FogTransporterDisposalSite, FogTransporterDisposalSiteDto>(result);
     }
 }

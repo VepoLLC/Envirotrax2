@@ -15,7 +15,7 @@ export class ProfessionalFogDisposalSiteListComponent implements OnInit {
     public table: TableViewModel<FogDisposalSiteVm> = {
         columns: [],
         query: {
-            sort: {},
+            sort: { county: 'Asc' },
             filter: []
         }
     };

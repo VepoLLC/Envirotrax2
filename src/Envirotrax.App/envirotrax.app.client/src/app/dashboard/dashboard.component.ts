@@ -98,6 +98,22 @@ export class DashboardComponent implements OnInit {
         }
     }
 
+    public getPropertyLogPastDueBgClass(count: number): string {
+        return count > 0 ? 'bg-danger' : 'bg-success';
+    }
+
+    public getPropertyLogPastDueTextClass(count: number): string {
+        return count > 0 ? 'text-danger' : 'text-success';
+    }
+
+    public getPropertyLogExpiringBgClass(count: number): string {
+        return count > 0 ? 'bg-warning' : 'bg-success';
+    }
+
+    public getPropertyLogExpiringTextClass(count: number): string {
+        return count > 0 ? 'text-warning' : 'text-success';
+    }
+
     public getThresholdBgClass(count: number): string {
         if (count === 0) {
             return 'bg-success';

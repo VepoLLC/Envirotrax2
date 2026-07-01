@@ -5,7 +5,7 @@
      Background  #1a1a2e
      Surface     #252540
      Surface-alt #2d2d50
-     Border      #3a3a5c
+     Border      #4b4b67
      Text        #e0e0e0
      Text-muted  #a0a8b8
    ============================================================ */
@@ -14,6 +14,12 @@
 
 body.vp-dark-theme {
     background-color: #1a1a2e !important;
+    color: #e0e0e0;
+}
+
+body.vp-dark-theme h1,
+body.vp-dark-theme h2,
+body.vp-dark-theme h3 {
     color: #e0e0e0;
 }
 
@@ -46,30 +52,30 @@ body.vp-dark-theme .border-top,
 body.vp-dark-theme .border-bottom,
 body.vp-dark-theme .border-start,
 body.vp-dark-theme .border-end {
-    border-color: #3a3a5c !important;
+    border-color: #4b4b67 !important;
 }
 
 body.vp-dark-theme hr {
-    border-color: #3a3a5c;
+    border-color: #4b4b67;
 }
 
 /* Cards */
 
 body.vp-dark-theme .card {
     background-color: #252540;
-    border-color: #3a3a5c;
+    border-color: #4b4b67;
     color: #e0e0e0;
 }
 
 body.vp-dark-theme .card-header {
     background-color: #2d2d50;
-    border-bottom-color: #3a3a5c;
+    border-bottom-color: #4b4b67;
     color: #e0e0e0;
 }
 
 body.vp-dark-theme .card-footer {
     background-color: #2d2d50;
-    border-top-color: #3a3a5c;
+    border-top-color: #4b4b67;
     color: #e0e0e0;
 }
 
@@ -84,7 +90,7 @@ body.vp-dark-theme .form-control:focus,
 body.vp-dark-theme .form-select,
 body.vp-dark-theme .form-select:focus {
     background-color: #252540;
-    border-color: #3a3a5c;
+    border-color: #4b4b67;
     color: #e0e0e0;
 }
 
@@ -102,13 +108,13 @@ body.vp-dark-theme .form-select:disabled {
 
 body.vp-dark-theme .input-group-text {
     background-color: #2d2d50;
-    border-color: #3a3a5c;
+    border-color: #4b4b67;
     color: #e0e0e0;
 }
 
 body.vp-dark-theme .form-check-input {
     background-color: #252540;
-    border-color: #3a3a5c;
+    border-color: #4b4b67;
 }
 
 body.vp-dark-theme label,
@@ -141,17 +147,17 @@ body.vp-dark-theme .validation-summary-errors ul {
 
 body.vp-dark-theme .btn-secondary {
     background-color: #2d2d50;
-    border-color: #3a3a5c;
+    border-color: #4b4b67;
     color: #e0e0e0;
 }
 
 body.vp-dark-theme .btn-secondary:hover {
-    background-color: #3a3a5c;
+    background-color: #4b4b67;
     color: #e0e0e0;
 }
 
 body.vp-dark-theme .btn-outline-secondary {
-    border-color: #3a3a5c;
+    border-color: #4b4b67;
     color: #a0a8b8;
 }
 
@@ -180,10 +186,64 @@ body.vp-dark-theme .footer-card p {
 
 body.vp-dark-theme .list-group-item {
     background-color: #252540;
-    border-color: #3a3a5c;
+    border-color: #4b4b67;
     color: #e0e0e0;
 }
 
 body.vp-dark-theme .list-group-item:hover {
     background-color: #2d2d50;
+}
+
+/* Section headers (card-header with bg-info) */
+
+body.vp-dark-theme .bg-info {
+    background-color: #066d7f !important;
+}
+
+body.vp-dark-theme .border-info {
+    border-color: #066d7f !important;
+}
+
+/* Primary buttons and bg-primary */
+
+body.vp-dark-theme .bg-primary {
+    background-color: #008fd485 !important;
+}
+
+body.vp-dark-theme .btn-primary,
+body.vp-dark-theme button.btn-primary {
+    background-color: #008fd485 !important;
+    border-color: #008fd485 !important;
+}
+
+body.vp-dark-theme .btn-primary:hover,
+body.vp-dark-theme button.btn-primary:hover {
+    background-color: #007ab8c0 !important;
+    border-color: #007ab8c0 !important;
+}
+
+/* Eye icon toggle button in password input group */
+
+body.vp-dark-theme .input-group .btn {
+    background-color: #008fd485 !important;
+    border-color: #008fd485 !important;
+}
+
+body.vp-dark-theme .input-group .btn:hover {
+    background-color: #007ab8c0 !important;
+    border-color: #007ab8c0 !important;
+}
+
+/* link-button (Create Account) — fix border and text color bleeding from <a> override */
+
+body.vp-dark-theme a.link-button {
+    color: #fff !important;
+    background-color: #008fd485 !important;
+    border-color: #008fd485 !important;
+}
+
+body.vp-dark-theme a.link-button:hover {
+    color: #fff !important;
+    background-color: #007ab8c0 !important;
+    border-color: #007ab8c0 !important;
 }

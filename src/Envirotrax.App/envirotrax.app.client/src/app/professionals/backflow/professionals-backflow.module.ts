@@ -14,6 +14,7 @@ import { ProfessionalBackflowTestMailingInfoComponent } from "./tests/details/ma
 import { ProfessionalBackflowTestBackflowInfoComponent } from "./tests/details/backflow-info/professional-backflow-test-backflow-info.component";
 import { BackflowTestAssemblySearchComponent } from "./submit/backflow-test-assembly-search.component";
 import { BackflowTestSubmitComponent } from "./submit/backflow-test-submit.component";
+import { BackflowOutOfServiceRequestComponent } from "./tests/out-of-service/backflow-out-of-service-request.component";
 
 @NgModule({
     declarations: [
@@ -26,7 +27,8 @@ import { BackflowTestSubmitComponent } from "./submit/backflow-test-submit.compo
         ProfessionalBackflowTestMailingInfoComponent,
         ProfessionalBackflowTestBackflowInfoComponent,
         BackflowTestAssemblySearchComponent,
-        BackflowTestSubmitComponent
+        BackflowTestSubmitComponent,
+        BackflowOutOfServiceRequestComponent
     ],
     imports: [CommonModule, FormsModule, SharedComponentsModule, BackflowTestDetailsSectionsModule, ProfessionalsBackflowRoutingModule]
 })

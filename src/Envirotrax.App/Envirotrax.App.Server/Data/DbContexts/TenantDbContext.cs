@@ -50,6 +50,7 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
     public DbSet<CsiInspectionImage> CsiInspectionImages { get; set; }
     public DbSet<FogInspection> FogInspections { get; set; }
     public DbSet<BackflowTest> BackflowTests { get; set; }
+    public DbSet<BackflowOutOfServiceRequest> BackflowOutOfServiceRequests { get; set; }
     public DbSet<SiteLog> SiteLogs { get; set; }
 
     protected TenantDbContext(

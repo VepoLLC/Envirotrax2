@@ -1,6 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { NgForm } from "@angular/forms";
+import { ModalSize } from "@developer-partners/ngx-modal-dialog";
+import { FogSignaturePadModalComponent, FogSignatureModel } from "./fog-signature-pad-modal.component";
 import { ProfessionalFogInspectionService } from "../../../../shared/services/fog/professional-fog-inspection.service";
 import { ProfesisonalService } from "../../../../shared/services/professionals/professional.service";
 import { ProfesionalUserService } from "../../../../shared/services/professionals/professional-user.service";
@@ -16,7 +18,7 @@ import { MAX_PAGE_SIZE } from "../../../../shared/models/page-info";
 import { FogInspectionOptionsService } from "../../../../shared/services/fog/fog-inspection-options.service";
 import { InterceptorType } from "../../../../shared/enums/interceptor-type.enum";
 import { FogInspectionResult } from "../../../../shared/models/fog/fog-inspection-enums";
-import { InputOption } from "@envirotrax/common-ui";
+import { InputOption, ModalHelperService } from "@envirotrax/common-ui";
 
 @Component({
     standalone: false,
@@ -59,6 +61,8 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
     public exteriorImagePreview: string | null = null;
     public interiorImagePreview: string | null = null;
 
+    public signatureImagePreview: string | null = null;
+
     // Display-only intermediate percentages (not persisted)
     public inletGreaseLayerPercent = 0;
     public inletSedimentLayerPercent = 0;
@@ -88,7 +92,8 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
         private readonly _siteService: SiteService,
         private readonly _professionalSupplierService: ProfessionalSupplierService,
         private readonly _inspectionService: ProfessionalFogInspectionService,
-        private readonly _fogOptions: FogInspectionOptionsService
+        private readonly _fogOptions: FogInspectionOptionsService,
+        private readonly _modalHelper: ModalHelperService
     ) {
         this.interceptorTypeOptions = this._fogOptions.interceptorTypeOptions;
         this.capacityTypeOptions = this._fogOptions.capacityTypeOptions;
@@ -148,6 +153,40 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
         const file = (event.target as HTMLInputElement).files?.[0] ?? null;
         this.onInteriorImageChange(file);
         (event.target as HTMLInputElement).value = '';
+    }
+
+    // Opens the signature pad in a modal. Saving keeps the drawn signature in memory
+    // (preview + File); it is persisted on form submit. Cancelling leaves it unchanged.
+    public openSignaturePad(): void {
+        this._modalHelper.show<FogSignatureModel, string>(
+            FogSignaturePadModalComponent,
+            {
+                title: 'Signature',
+                size: ModalSize.extraLarge,
+                model: { existingSignature: this.signatureImagePreview }
+            }
+        ).result().subscribe((dataUrl: string) => {
+            if (dataUrl) {
+                this.signatureImagePreview = dataUrl;
+                this.images.signatureImage = this.dataUrlToFile(dataUrl, 'signature.png');
+            } else {
+                this.signatureImagePreview = null;
+                this.images.signatureImage = null;
+            }
+        });
+    }
+
+    private dataUrlToFile(dataUrl: string, fileName: string): File {
+        const [header, base64] = dataUrl.split(',');
+        const mimeType = header.match(/:(.*?);/)?.[1] ?? 'image/png';
+        const binary = atob(base64);
+
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+
+        return new File([bytes], fileName, { type: mimeType });
     }
 
     public async submit(submitForm: NgForm): Promise<void> {

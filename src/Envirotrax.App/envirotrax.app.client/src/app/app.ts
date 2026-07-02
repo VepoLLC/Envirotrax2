@@ -2,6 +2,7 @@
 import { AuthService } from './shared/services/auth/auth.service';
 import { WaterSupplierService } from './shared/services/water-suppliers/water-supplier.service';
 import { ProfesisonalService } from './shared/services/professionals/professional.service';
+import { ThemeCookieService } from './shared/services/helpers/theme-cookie.service';
 import { createPopper, flip, preventOverflow } from '@popperjs/core';
 import { FeatureType } from './shared/models/feature-type';
 import { PermissionAction, PermissionType } from './shared/models/permission-type';
@@ -19,16 +20,24 @@ export class App implements OnInit {
   public isNavbarVisible: boolean = false;
   public companyName: string = '';
   public userEmail: string = '';
+  public isDarkMode: boolean = false;
 
   constructor(
     private readonly _authService: AuthService,
     private readonly _waterSupplierService: WaterSupplierService,
-    private readonly _professionalService: ProfesisonalService
+    private readonly _professionalService: ProfesisonalService,
+    private readonly _themeCookie: ThemeCookieService
   ) {
 
   }
 
   public async ngOnInit(): Promise<void> {
+    this.isDarkMode = this._themeCookie.get() === 'dark';
+
+    if (this.isDarkMode) {
+      document.body.classList.add('vp-dark-theme');
+    }
+
     this._authService.onLoggedIn().subscribe(async isLoggedIn => {
       this.isAuthenticated = isLoggedIn;
 
@@ -55,6 +64,18 @@ export class App implements OnInit {
 
   public signOut(): void {
     this._authService.signOut();
+  }
+
+  public toggleDarkMode(): void {
+    this.isDarkMode = !this.isDarkMode;
+
+    if (this.isDarkMode) {
+      document.body.classList.add('vp-dark-theme');
+      this._themeCookie.set('dark');
+    } else {
+      document.body.classList.remove('vp-dark-theme');
+      this._themeCookie.set('light');
+    }
   }
 
   private async createMenuItems(): Promise<MenuItem[]> {
@@ -475,6 +496,13 @@ export class App implements OnInit {
             title: 'Vehicle Management',
             iconCss: 'fa-solid fa-truck',
             routerLink: ['professionals/fog/transportation/vehicles'],
+            hasPermission: isFogTransporter,
+            hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
+          },
+          {
+            title: 'Disposal Site Management',
+            iconCss: 'fa-solid fa-location-dot',
+            routerLink: ['professionals/fog/transportation/disposal-sites'],
             hasPermission: isFogTransporter,
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
           }

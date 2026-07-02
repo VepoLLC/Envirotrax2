@@ -32,4 +32,9 @@ public class AdminDbContext : TenantDbContext
     {
         // Do no filtering for admins. They can see everything.
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+    }
 }

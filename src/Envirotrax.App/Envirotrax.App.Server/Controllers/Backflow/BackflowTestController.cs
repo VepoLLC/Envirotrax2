@@ -1,3 +1,4 @@
+using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Filters;
@@ -17,6 +18,28 @@ public class BackflowTestController : WaterSupplierCrudController<BackflowTestDt
         : base(service)
     {
         _testService = service;
+    }
+
+    [HttpGet("pdf")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetAllPdfAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
+    {
+        var tests = await _testService.GetAllAsync(pageInfo, query, cancellationToken);
+        var pdf = await _testService.GeneratePdfAsync(tests.Data);
+        return File(pdf, "application/pdf");
+    }
+
+    [HttpGet("{id}/pdf")]
+    public async Task<IActionResult> GetPdfAsync(int id, CancellationToken cancellationToken)
+    {
+        var test = await _testService.GetAsync(id, cancellationToken);
+        if (test == null)
+        {
+            return NotFound();
+        }
+
+        var pdf = await _testService.GeneratePdfAsync(test);
+        return File(pdf, "application/pdf");
     }
 
     [HttpPost("{id}/images/{imageType}")]

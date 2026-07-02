@@ -13,6 +13,7 @@ public static class ServiceRegistration
 {
     public static IServiceCollection AddDomainServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddAuthService();
         services.AddSingleton<IQueryHelperService, QueryHelperService>();
         services.AddInternalApi<EnvirotraxApiOptions>(configuration.GetSection("EnvirotraxApi"));
         services.AddTransient<IEnvirotraxApiClient, EnvirotraxApiClient>();

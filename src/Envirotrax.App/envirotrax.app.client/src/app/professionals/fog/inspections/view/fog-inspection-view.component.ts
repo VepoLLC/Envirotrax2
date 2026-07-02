@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { ProfessionalFogInspectionService } from '../../../../shared/services/fog/professional-fog-inspection.service';
@@ -12,8 +12,6 @@ import { PropertyType } from '../../../../shared/enums/property-type.enum';
     templateUrl: './fog-inspection-view.component.html'
 })
 export class FogInspectionViewComponent implements OnInit {
-    private readonly _destroyRef = inject(DestroyRef);
-
     public isLoading = true;
     public inspection?: FogInspection;
 
@@ -28,6 +26,7 @@ export class FogInspectionViewComponent implements OnInit {
     public readonly PropertyType = PropertyType;
 
     constructor(
+        private readonly _destroyRef: DestroyRef,
         private readonly _route: ActivatedRoute,
         private readonly _inspectionService: ProfessionalFogInspectionService
     ) {}

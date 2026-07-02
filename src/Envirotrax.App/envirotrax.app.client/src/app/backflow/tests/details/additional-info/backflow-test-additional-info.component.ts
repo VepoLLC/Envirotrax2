@@ -5,8 +5,7 @@ import { BackflowTest } from "../../../../shared/models/backflow/backflow-test";
 @Component({
     selector: 'vp-backflow-test-additional-info',
     standalone: false,
-    templateUrl: './backflow-test-additional-info.component.html',
-    styleUrls: ['./backflow-test-additional-info.component.scss']
+    templateUrl: './backflow-test-additional-info.component.html'
 })
 export class BackflowTestAdditionalInfoComponent {
     @Input() public test!: BackflowTest;

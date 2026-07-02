@@ -138,159 +138,169 @@
 
         <div class="row mb-2">
             <div class="col-lg-6">
-                <dl class="row mb-0">
-                    <dt class="col-7 fw-normal">Is it properly maintained?</dt>
-                    <dd class="col-5 mb-1">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" disabled [checked]="inspection.maintained === true" />
-                            <label class="form-check-label ms-1">Yes</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" disabled [checked]="inspection.maintained === false" />
-                            <label class="form-check-label ms-1">No</label>
-                        </div>
-                    </dd>
-                    <dt class="col-7 fw-normal">Is it accessible?</dt>
-                    <dd class="col-5 mb-1">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" disabled [checked]="inspection.accessible === true" />
-                            <label class="form-check-label ms-1">Yes</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" disabled [checked]="inspection.accessible === false" />
-                            <label class="form-check-label ms-1">No</label>
-                        </div>
-                    </dd>
-                    <dt class="col-7 fw-normal">Is there evidence of past overflow?</dt>
-                    <dd class="col-5 mb-1">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" disabled [checked]="inspection.pastOverflow === true" />
-                            <label class="form-check-label ms-1">Yes</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" disabled [checked]="inspection.pastOverflow === false" />
-                            <label class="form-check-label ms-1">No</label>
-                        </div>
-                    </dd>
-                </dl>
+                <table class="table table-sm mb-0">
+                    <tr>
+                        <td width="50%">Is it properly maintained?</td>
+                        <td>
+                            <label class="me-2"><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.maintained === true" />Yes</label>
+                            <label><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.maintained === false" />No</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Is it accessible?</td>
+                        <td>
+                            <label class="me-2"><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.accessible === true" />Yes</label>
+                            <label><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.accessible === false" />No</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Is there evidence of past overflow?</td>
+                        <td>
+                            <label class="me-2"><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.pastOverflow === true" />Yes</label>
+                            <label><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.pastOverflow === false" />No</label>
+                        </td>
+                    </tr>
+                </table>
             </div>
             <div class="col-lg-6">
-                <p class="fw-semibold mb-1">Sampling Point:</p>
-                <dl class="row mb-0">
-                    <dt class="col-7 fw-normal">Is it accessible?</dt>
-                    <dd class="col-5 mb-1">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" disabled [checked]="inspection.samplingPointAccessible === true" />
-                            <label class="form-check-label ms-1">Yes</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" disabled [checked]="inspection.samplingPointAccessible === false" />
-                            <label class="form-check-label ms-1">No</label>
-                        </div>
-                    </dd>
-                    <dt class="col-7 fw-normal">Does it need to be cleaned?</dt>
-                    <dd class="col-5 mb-1">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" disabled [checked]="inspection.samplingPointClean === true" />
-                            <label class="form-check-label ms-1">Yes</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" disabled [checked]="inspection.samplingPointClean === false" />
-                            <label class="form-check-label ms-1">No</label>
-                        </div>
-                    </dd>
-                    <dt class="col-7 fw-normal">Sampled From:</dt>
-                    <dd class="col-5 mb-1">{{ inspection.sampledFrom }}</dd>
-                </dl>
+                <p class="mb-1"><b>Sampling Point:</b></p>
+                <table class="table table-sm mb-0">
+                    <tr>
+                        <td width="50%">Is it accessible?</td>
+                        <td>
+                            <label class="me-2"><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.samplingPointAccessible === true" />Yes</label>
+                            <label><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.samplingPointAccessible === false" />No</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Does it need to be cleaned?</td>
+                        <td>
+                            <label class="me-2"><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.samplingPointClean === true" />Yes</label>
+                            <label><input class="form-check-input readonly-checkbox me-1" type="radio" disabled [checked]="inspection.samplingPointClean === false" />No</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Sampled From:</td>
+                        <td>{{ inspection.sampledFrom }}</td>
+                    </tr>
+                </table>
             </div>
         </div>
 
         <div class="row mb-2">
             <div class="col-lg-6">
-                <p class="fw-semibold mb-1">Inlet Chamber:</p>
-                <dl class="row mb-0">
-                    <dt class="col-7 fw-normal">Is the inlet tee visible?</dt>
-                    <dd class="col-5 mb-1">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" disabled [checked]="inspection.inletTeeVisible === true" />
-                            <label class="form-check-label ms-1">Yes</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" disabled [checked]="inspection.inletTeeVisible === false" />
-                            <label class="form-check-label ms-1">No</label>
-                        </div>
-                    </dd>
-                    <dt class="col-7 fw-normal">Is the inlet tee intact?</dt>
-                    <dd class="col-5 mb-1">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" disabled [checked]="inspection.inletTeeIntact === true" />
-                            <label class="form-check-label ms-1">Yes</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" disabled [checked]="inspection.inletTeeIntact === false" />
-                            <label class="form-check-label ms-1">No</label>
-                        </div>
-                    </dd>
-                </dl>
-                <dl class="row mb-0 mt-2">
-                    <dt class="col-7 fw-normal">Wetted Height in Inches:</dt>
-                    <dd class="col-5 mb-1">{{ inspection.inletChamberWettingHeight }}</dd>
-                    <dt class="col-7 fw-normal">Grease Blanket in Inches:</dt>
-                    <dd class="col-5 mb-1">{{ inspection.inletChamberGreaseBlanket }}</dd>
-                    <dt class="col-7 fw-normal">Sediments in Inches:</dt>
-                    <dd class="col-5 mb-1">{{ inspection.inletChamberSediments }}</dd>
-                </dl>
-                <dl class="row mb-0 mt-2">
-                    <dt class="col-7 fw-normal">Grease Layer %:</dt>
-                    <dd class="col-5 mb-1">{{ inletGreaseLayerPercent }}</dd>
-                    <dt class="col-7 fw-normal">Sediment Layer %:</dt>
-                    <dd class="col-5 mb-1">{{ inletSedimentLayerPercent }}</dd>
-                    <dt class="col-7 fw-normal">Total Inlet Chamber %:</dt>
-                    <dd class="col-5 mb-1">{{ inspection.inletTotalCapacityPercent }}%</dd>
-                </dl>
+                <p class="mb-1"><b>Inlet Chamber:</b></p>
+                <table class="table table-sm mb-0">
+                    <tr>
+                        <td width="50%">Is the inlet tee visible?</td>
+                        <td>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" disabled [checked]="inspection.inletTeeVisible === true" />
+                                <label class="form-check-label">Yes</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" disabled [checked]="inspection.inletTeeVisible === false" />
+                                <label class="form-check-label">No</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Is the inlet tee intact?</td>
+                        <td>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" disabled [checked]="inspection.inletTeeIntact === true" />
+                                <label class="form-check-label">Yes</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" disabled [checked]="inspection.inletTeeIntact === false" />
+                                <label class="form-check-label">No</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr><td colspan="2">&nbsp;</td></tr>
+                    <tr>
+                        <td>Wetted Height in Inches:</td>
+                        <td>{{ inspection.inletChamberWettingHeight }}</td>
+                    </tr>
+                    <tr>
+                        <td>Grease Blanket in Inches:</td>
+                        <td>{{ inspection.inletChamberGreaseBlanket }}</td>
+                    </tr>
+                    <tr>
+                        <td>Sediments in Inches:</td>
+                        <td>{{ inspection.inletChamberSediments }}</td>
+                    </tr>
+                    <tr><td colspan="2">&nbsp;</td></tr>
+                    <tr>
+                        <td>Grease Layer %:</td>
+                        <td>{{ inletGreaseLayerPercent }}</td>
+                    </tr>
+                    <tr>
+                        <td>Sediment Layer %:</td>
+                        <td>{{ inletSedimentLayerPercent }}</td>
+                    </tr>
+                    <tr>
+                        <td>Total Inlet Chamber %:</td>
+                        <td>{{ inspection.inletTotalCapacityPercent }}%</td>
+                    </tr>
+                </table>
             </div>
             <div class="col-lg-6">
-                <p class="fw-semibold mb-1">Outlet Chamber:</p>
-                <dl class="row mb-0">
-                    <dt class="col-7 fw-normal">Is the outfall tee visible?</dt>
-                    <dd class="col-5 mb-1">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" disabled [checked]="inspection.outletTeeVisible === true" />
-                            <label class="form-check-label ms-1">Yes</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" disabled [checked]="inspection.outletTeeVisible === false" />
-                            <label class="form-check-label ms-1">No</label>
-                        </div>
-                    </dd>
-                    <dt class="col-7 fw-normal">Is the outfall tee intact?</dt>
-                    <dd class="col-5 mb-1">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" disabled [checked]="inspection.outletTeeIntact === true" />
-                            <label class="form-check-label ms-1">Yes</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" disabled [checked]="inspection.outletTeeIntact === false" />
-                            <label class="form-check-label ms-1">No</label>
-                        </div>
-                    </dd>
-                </dl>
-                <dl class="row mb-0 mt-2">
-                    <dt class="col-7 fw-normal">Wetted Height in Inches:</dt>
-                    <dd class="col-5 mb-1">{{ inspection.outletChamberWettingHeight }}</dd>
-                    <dt class="col-7 fw-normal">Grease Blanket in Inches:</dt>
-                    <dd class="col-5 mb-1">{{ inspection.outletChamberGreaseBlanket }}</dd>
-                    <dt class="col-7 fw-normal">Sediments in Inches:</dt>
-                    <dd class="col-5 mb-1">{{ inspection.outletChamberSediments }}</dd>
-                </dl>
-                <dl class="row mb-0 mt-2">
-                    <dt class="col-7 fw-normal">Grease Layer %:</dt>
-                    <dd class="col-5 mb-1">{{ outletGreaseLayerPercent }}</dd>
-                    <dt class="col-7 fw-normal">Sediment Layer %:</dt>
-                    <dd class="col-5 mb-1">{{ outletSedimentLayerPercent }}</dd>
-                    <dt class="col-7 fw-normal">Total Outlet Chamber %:</dt>
-                    <dd class="col-5 mb-1">{{ inspection.outletTotalCapacityPercent }}%</dd>
-                </dl>
+                <p class="mb-1"><b>Outlet Chamber:</b></p>
+                <table class="table table-sm mb-0">
+                    <tr>
+                        <td width="50%">Is the outfall tee visible?</td>
+                        <td>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" disabled [checked]="inspection.outletTeeVisible === true" />
+                                <label class="form-check-label">Yes</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" disabled [checked]="inspection.outletTeeVisible === false" />
+                                <label class="form-check-label">No</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Is the outfall tee intact?</td>
+                        <td>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" disabled [checked]="inspection.outletTeeIntact === true" />
+                                <label class="form-check-label">Yes</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" disabled [checked]="inspection.outletTeeIntact === false" />
+                                <label class="form-check-label">No</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr><td colspan="2">&nbsp;</td></tr>
+                    <tr>
+                        <td>Wetted Height in Inches:</td>
+                        <td>{{ inspection.outletChamberWettingHeight }}</td>
+                    </tr>
+                    <tr>
+                        <td>Grease Blanket in Inches:</td>
+                        <td>{{ inspection.outletChamberGreaseBlanket }}</td>
+                    </tr>
+                    <tr>
+                        <td>Sediments in Inches:</td>
+                        <td>{{ inspection.outletChamberSediments }}</td>
+                    </tr>
+                    <tr><td colspan="2">&nbsp;</td></tr>
+                    <tr>
+                        <td>Grease Layer %:</td>
+                        <td>{{ outletGreaseLayerPercent }}</td>
+                    </tr>
+                    <tr>
+                        <td>Sediment Layer %:</td>
+                        <td>{{ outletSedimentLayerPercent }}</td>
+                    </tr>
+                    <tr>
+                        <td>Total Outlet Chamber %:</td>
+                        <td>{{ inspection.outletTotalCapacityPercent }}%</td>
+                    </tr>
+                </table>
             </div>
         </div>
 

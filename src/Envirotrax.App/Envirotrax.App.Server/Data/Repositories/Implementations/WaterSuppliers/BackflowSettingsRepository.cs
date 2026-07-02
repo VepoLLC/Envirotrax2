@@ -2,28 +2,38 @@ using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
+using Envirotrax.Common.Domain.Services.Defintions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.WaterSuppliers;
 
 public class BackflowSettingsRepository : Repository<BackflowSettings>, IBackflowSettingsRepository
 {
-    public BackflowSettingsRepository(IDbContextSelector dbContextSelector)
+    private readonly IAuthService _authService;
+
+    public BackflowSettingsRepository(IDbContextSelector dbContextSelector, IAuthService authService)
         : base(dbContextSelector)
     {
+        _authService = authService;
     }
 
     public async Task<BackflowTestingSettingsDto?> GetTestingSettingsAsync(int waterSupplierId, CancellationToken cancellationToken)
     {
-        return await Entity
-            .IgnoreQueryFilters()
-            .Where(s => s.WaterSupplierId == waterSupplierId)
-            .Select(s => new BackflowTestingSettingsDto
+        var professionalId = _authService.ProfessionalId;
+
+        var query =
+            from settings in Entity
+            join registration in DbContext.ProfessionalWaterSuppliers
+                on settings.WaterSupplierId equals registration.WaterSupplierId
+            where settings.WaterSupplierId == waterSupplierId
+                && registration.ProfessionalId == professionalId
+            select new BackflowTestingSettingsDto
             {
-                ShowRainSensor = s.ShowRainSensor,
-                ShowOSSF = s.ShowOSSF,
-                ShowPermitNumber = s.ShowPermitNumber
-            })
-            .SingleOrDefaultAsync(cancellationToken);
+                ShowRainSensor = settings.ShowRainSensor,
+                ShowOSSF = settings.ShowOSSF,
+                ShowPermitNumber = settings.ShowPermitNumber
+            };
+
+        return await query.SingleOrDefaultAsync(cancellationToken);
     }
 }

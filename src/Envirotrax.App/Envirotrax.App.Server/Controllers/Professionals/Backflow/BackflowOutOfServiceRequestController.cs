@@ -29,11 +29,6 @@ public class BackflowOutOfServiceRequestController : ProfessionalProtectedContro
     [HttpPost]
     public async Task<IActionResult> SubmitAsync([FromBody] BackflowOutOfServiceRequestDto dto, CancellationToken cancellationToken)
     {
-        if (!ModelState.IsValid)
-        {
-            return ValidationProblem(ModelState);
-        }
-
         var result = await _service.SubmitAsync(dto, cancellationToken);
         return Ok(result);
     }

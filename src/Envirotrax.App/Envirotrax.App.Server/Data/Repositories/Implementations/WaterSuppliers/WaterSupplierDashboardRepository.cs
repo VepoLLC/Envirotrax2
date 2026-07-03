@@ -21,6 +21,10 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
 
         return new WaterSupplierDashboardStatsDto
         {
+            PastDuePropertyLogCount = await _context.SiteLogs.CountAsync(pl => pl.ReviewDate <= now, cancellationToken),
+            ExpiringPropertyLogCount = await _context.SiteLogs.CountAsync(pl => pl.ReviewDate > now && pl.ReviewDate < in30Days, cancellationToken),
+            AllPropertyLogCount = await _context.SiteLogs.CountAsync(cancellationToken),
+
             WiseGuyCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsWiseGuy, cancellationToken),
             CsiInspectorCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsCsiInspector, cancellationToken),
             BpatCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsBackflowTester, cancellationToken),

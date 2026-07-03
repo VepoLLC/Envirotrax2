@@ -10,6 +10,7 @@ public interface IFogInspectionService : IService<FogInspection, FogInspectionDt
         FogInspectionDto request,
         Stream? exteriorStream, string? exteriorFileName,
         Stream? interiorStream, string? interiorFileName,
+        Stream? signatureStream, string? signatureFileName,
         CancellationToken cancellationToken);
 
     Task<IPagedData<FogInspectionDto>> SearchForProfessionalAsync(

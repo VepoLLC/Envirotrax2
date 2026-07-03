@@ -484,6 +484,31 @@
 
                 </vp-section>
 
+                <!-- Signature -->
+                <vp-section header="Signature" class="mt-3 d-block">
+                    <div class="row mb-3">
+                        <div class="col-md-6 d-flex align-items-center">
+                            <span class="fw-semibold text-nowrap account-label">Contact Name:</span>
+                            <div class="flex-grow-1">
+                                <vp-input type="text"
+                                          name="signatureContactName"
+                                          [(ngModel)]="model.signatureContactName"
+                                          [form]="submitForm" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div *ngIf="signatureImagePreview" class="mb-2">
+                            <img [src]="signatureImagePreview" alt="Signature"
+                                 class="img-fluid image-preview" />
+                        </div>
+                        <button type="button" class="btn btn-primary vp-section-button"
+                                (click)="openSignaturePad()">
+                            Get Signature
+                        </button>
+                    </div>
+                </vp-section>
+
                 <!-- Remarks -->
                 <vp-section [header]="'Remarks (' + remarksLength + '/1000 Characters)'" class="mt-3 d-block">
                     <vp-input type="textarea"

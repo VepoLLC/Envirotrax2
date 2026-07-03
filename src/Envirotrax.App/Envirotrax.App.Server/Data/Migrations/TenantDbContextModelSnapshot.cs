@@ -1447,6 +1447,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<DateTime?>("SignatureDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("SignatureImagePath")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<int>("SiteId")
                         .HasColumnType("int");
 
@@ -2527,6 +2531,50 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("WaterSupplierUsers");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.BackflowRenewalRequirement", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("AuxWaterSupply")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeviceType")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("HasSiteOssf")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("HazardType")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("PropertyType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RenewalYears")
+                        .HasColumnType("int");
+
+                    b.HasKey("WaterSupplierId", "Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("BackflowRenewalRequirements");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.BackflowSettings", b =>
@@ -3863,6 +3911,24 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+
+                    b.Navigation("WaterSupplier");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.BackflowRenewalRequirement", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
 
                     b.Navigation("WaterSupplier");
                 });

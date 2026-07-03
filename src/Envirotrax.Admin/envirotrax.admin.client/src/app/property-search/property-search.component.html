@@ -1,0 +1,294 @@
+<div class="p-2">
+    <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center"
+             role="button"
+             (click)="criteriaExpanded = !criteriaExpanded">
+            <span class="fw-bold">Property Search Criteria</span>
+            <i class="fa-solid"
+               [class.fa-chevron-up]="criteriaExpanded"
+               [class.fa-chevron-down]="!criteriaExpanded"></i>
+        </div>
+
+        <div class="card-body" *ngIf="criteriaExpanded">
+            <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label class="form-label">Water Supplier</label>
+                    <select class="form-select" [(ngModel)]="criteria.waterSupplierId">
+                        <option [ngValue]="null"></option>
+                        <option *ngFor="let ws of waterSuppliers" [ngValue]="ws.id">{{ ws.name }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <!-- Column 1 -->
+                <div class="col-12 col-lg-4">
+                    <div class="mb-3">
+                        <label class="form-label">Site ID</label>
+                        <input type="text" class="form-control" [(ngModel)]="criteria.siteId">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Account Number</label>
+                        <input type="text" class="form-control" [(ngModel)]="criteria.accountNumber">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Active</label>
+                        <select class="form-select" [(ngModel)]="criteria.active">
+                            <option *ngFor="let o of triStateOptions" [ngValue]="o.value">{{ o.label }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Invalid Mailing Address</label>
+                        <select class="form-select" [(ngModel)]="criteria.invalidMailingAddress">
+                            <option *ngFor="let o of triStateOptions" [ngValue]="o.value">{{ o.label }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Out of Area</label>
+                        <select class="form-select" [(ngModel)]="criteria.outOfArea">
+                            <option *ngFor="let o of triStateOptions" [ngValue]="o.value">{{ o.label }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Is Fee Exempt</label>
+                        <select class="form-select" [(ngModel)]="criteria.isFeeExempt">
+                            <option *ngFor="let o of triStateOptions" [ngValue]="o.value">{{ o.label }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Column 2 -->
+                <div class="col-12 col-lg-4">
+                    <div class="mb-3">
+                        <label class="form-label">Needs CSI Inspection</label>
+                        <select class="form-select" [(ngModel)]="criteria.needsCsiInspection">
+                            <option *ngFor="let o of needsInspectionOptions" [ngValue]="o.value">{{ o.label }}</option>
+                        </select>
+
+                        <div class="ms-3 mt-2" *ngIf="criteria.needsCsiInspection === 'true-range'">
+                            <label class="form-label">From Date</label>
+                            <input type="date" class="form-control" [(ngModel)]="criteria.csiRenewalFromDate">
+                            <label class="form-label mt-2">To Date</label>
+                            <input type="date" class="form-control" [(ngModel)]="criteria.csiRenewalToDate">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">FOG Compliancy Status</label>
+                        <select class="form-select" [(ngModel)]="criteria.fogCompliancyStatus">
+                            <option *ngFor="let o of fogCompliancyStatusOptions" [ngValue]="o.value">{{ o.label }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Needs FOG Inspection</label>
+                        <select class="form-select" [(ngModel)]="criteria.needsFogInspection">
+                            <option *ngFor="let o of needsInspectionOptions" [ngValue]="o.value">{{ o.label }}</option>
+                        </select>
+
+                        <div class="ms-3 mt-2" *ngIf="criteria.needsFogInspection === 'true-range'">
+                            <label class="form-label">From Date</label>
+                            <input type="date" class="form-control" [(ngModel)]="criteria.fogInspectionFromDate">
+                            <label class="form-label mt-2">To Date</label>
+                            <input type="date" class="form-control" [(ngModel)]="criteria.fogInspectionToDate">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Needs FOG Permit</label>
+                        <select class="form-select" [(ngModel)]="criteria.needsFogPermit">
+                            <option *ngFor="let o of needsInspectionOptions" [ngValue]="o.value">{{ o.label }}</option>
+                        </select>
+
+                        <div class="ms-3 mt-2" *ngIf="criteria.needsFogPermit === 'true-range'">
+                            <label class="form-label">From Date</label>
+                            <input type="date" class="form-control" [(ngModel)]="criteria.fogPermitFromDate">
+                            <label class="form-label mt-2">To Date</label>
+                            <input type="date" class="form-control" [(ngModel)]="criteria.fogPermitToDate">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 3 -->
+                <div class="col-12 col-lg-4">
+                    <div class="mb-3">
+                        <label class="form-label">Facility Type</label>
+                        <select class="form-select" [(ngModel)]="criteria.facilityType">
+                            <option *ngFor="let o of facilityTypeOptions" [ngValue]="o.value">{{ o.label }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Grease Trap</label>
+                        <select class="form-select" [(ngModel)]="criteria.greaseTrapType">
+                            <option *ngFor="let o of greaseTrapOptions" [ngValue]="o.value">{{ o.label }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Has On Site Sewage Facility</label>
+                        <select class="form-select" [(ngModel)]="criteria.hasOnSiteSewageFacility">
+                            <option *ngFor="let o of triStateOptions" [ngValue]="o.value">{{ o.label }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Has Auxiliary Water Supply</label>
+                        <select class="form-select" [(ngModel)]="criteria.hasAuxWaterSupply">
+                            <option *ngFor="let o of triStateOptions" [ngValue]="o.value">{{ o.label }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Has Fire System</label>
+                        <select class="form-select" [(ngModel)]="criteria.hasFireSystem">
+                            <option *ngFor="let o of triStateOptions" [ngValue]="o.value">{{ o.label }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Fire System on Separate Water Supply</label>
+                        <select class="form-select" [(ngModel)]="criteria.fireSeparateWater">
+                            <option *ngFor="let o of triStateOptions" [ngValue]="o.value">{{ o.label }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Has Sand and Grit Trap</label>
+                        <select class="form-select" [(ngModel)]="criteria.hasGritTrap">
+                            <option *ngFor="let o of triStateOptions" [ngValue]="o.value">{{ o.label }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Has Irrigation System</label>
+                        <select class="form-select" [(ngModel)]="criteria.hasIrrigation">
+                            <option *ngFor="let o of triStateOptions" [ngValue]="o.value">{{ o.label }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Irrigation on Separate Water Supply</label>
+                        <select class="form-select" [(ngModel)]="criteria.irrigationSeparateWater">
+                            <option *ngFor="let o of triStateOptions" [ngValue]="o.value">{{ o.label }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Has Domestic/Premises Isolation</label>
+                        <select class="form-select" [(ngModel)]="criteria.hasDomesticPremisesIsolation">
+                            <option *ngFor="let o of triStateOptions" [ngValue]="o.value">{{ o.label }}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mt-1">
+                <!-- Property Information -->
+                <div class="col-12 col-md-6">
+                    <h6 class="fw-bold border-bottom pb-2">Property Information</h6>
+
+                    <div class="mb-3">
+                        <label class="form-label">Property Type</label>
+                        <select class="form-select" [(ngModel)]="criteria.propertyType">
+                            <option *ngFor="let o of propertyTypeOptions" [ngValue]="o.value">{{ o.label }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Business Name</label>
+                        <input type="text" class="form-control" [(ngModel)]="criteria.businessName">
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-3">
+                            <label class="form-label">Street #</label>
+                            <input type="text" class="form-control" [(ngModel)]="criteria.streetNumber">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Street Name</label>
+                            <input type="text" class="form-control" [(ngModel)]="criteria.streetName">
+                        </div>
+                        <div class="col-3">
+                            <label class="form-label">#</label>
+                            <input type="text" class="form-control" [(ngModel)]="criteria.propertyNumber">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mailing Information -->
+                <div class="col-12 col-md-6">
+                    <h6 class="fw-bold border-bottom pb-2">Mailing Information</h6>
+
+                    <div class="mb-3">
+                        <label class="form-label">Company Name</label>
+                        <input type="text" class="form-control" [(ngModel)]="criteria.mailingCompanyName">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Contact Name</label>
+                        <input type="text" class="form-control" [(ngModel)]="criteria.mailingContactName">
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-3">
+                            <label class="form-label">Street #</label>
+                            <input type="text" class="form-control" [(ngModel)]="criteria.mailingStreetNumber">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Street Name</label>
+                            <input type="text" class="form-control" [(ngModel)]="criteria.mailingStreetName">
+                        </div>
+                        <div class="col-3">
+                            <label class="form-label">#</label>
+                            <input type="text" class="form-control" [(ngModel)]="criteria.mailingNumber">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center align-items-center gap-2 mt-4">
+                <button type="button" class="btn btn-primary px-4" (click)="search()">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>
+                    Search
+                </button>
+                <select class="form-select w-auto" [(ngModel)]="maxRecords">
+                    <option [ngValue]="25">25 Max Records</option>
+                    <option [ngValue]="50">50 Max Records</option>
+                    <option [ngValue]="100">100 Max Records</option>
+                    <option [ngValue]="500">500 Max Records</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+    <div *ngIf="hasSearched && table.items">
+        <h6 class="fw-bold">Search Results</h6>
+
+        <vp-table [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getSites()"
+                  [(query)]="table.query"
+                  (queryChange)="getSites()"
+                  (queryReset)="getSites()" />
+    </div>
+</div>
+
+<ng-template #statusCell let-rowData="rowData">
+    <span class="badge bg-success me-1" *ngIf="rowData?.active">Active</span>
+    <span class="badge bg-danger me-1" *ngIf="rowData?.outOfArea">Out of Area</span>
+    <span class="badge bg-primary" *ngIf="rowData?.isFeeExempt">Fee Exempt</span>
+</ng-template>
+
+<ng-template #propertyTypeCell let-rowData="rowData">
+    <span *ngIf="rowData?.propertyType === propertyType.Residential">Residential</span>
+    <span *ngIf="rowData?.propertyType === propertyType.Commercial">Commercial</span>
+</ng-template>

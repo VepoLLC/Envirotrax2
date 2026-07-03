@@ -1,5 +1,6 @@
-using System.Net.Security;
 using AutoMapper;
+using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.GisAreas;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
@@ -29,6 +30,25 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         _geocodingService = geocodingService;
         _coordinateRepository = coordinateRepository;
         _logger = logger;
+    }
+
+    public async Task<IPagedData<SiteDto>> SearchAsync(PageInfo pageInfo, Query query, FogCompliancyStatus? fogCompliancyStatus, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<Site, SiteDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<Site, SiteDto>(Mapper);
+
+        bool? fogCompliant = fogCompliancyStatus switch
+        {
+            FogCompliancyStatus.Compliant => true,
+            FogCompliancyStatus.OutOfCompliance => false,
+            _ => null
+        };
+
+        var sites = await _siteRepository.SearchAsync(pageInfo, query, fogCompliant, cancellationToken);
+
+        return sites
+            .Select(s => MapToDto(s)!)
+            .ToPagedData(pageInfo);
     }
 
     public async Task<IEnumerable<SiteDto>> GetAllPendingGeocodingAsync(int batchSize)

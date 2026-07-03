@@ -28,9 +28,23 @@ public class EnvirotraxApiClient : IEnvirotraxApiClient
         return _apiClient.GetAsync<TResponse>(_authService.UserId, url, cancellationToken);
     }
 
-    public async Task<IPagedData<TResponse>> GetAsync<TResponse>(string url, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public Task<IPagedData<TResponse>> GetAsync<TResponse>(string url, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        return GetAsync<TResponse>(url, pageInfo, query, new Dictionary<string, string>(), cancellationToken);
+    }
+
+    public async Task<IPagedData<TResponse>> GetAsync<TResponse>(string url, PageInfo pageInfo, Query query, IDictionary<string, string> additionalParameters, CancellationToken cancellationToken)
     {
         var queryString = _queryHelper.BuildQuery(pageInfo, query);
+
+        foreach (var parameter in additionalParameters)
+        {
+            if (!string.IsNullOrEmpty(parameter.Value))
+            {
+                queryString[parameter.Key] = parameter.Value;
+            }
+        }
+
         var endpointUrl = $"{url}?{queryString}";
 
         return await _apiClient.GetAsync<PagedData<TResponse>>(_authService.UserId, endpointUrl, cancellationToken) ?? new PagedData<TResponse>(pageInfo, []);

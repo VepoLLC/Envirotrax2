@@ -1,0 +1,129 @@
+<ng-template #testDateCell let-row="rowData">{{ row.testDate | date:'MM/dd/yyyy' }}</ng-template>
+<ng-template #descriptionCell let-row="rowData">{{ buildCandidateDescription(row) }}</ng-template>
+<ng-template #addressCell let-row="rowData">{{ buildCandidateAddress(row) }}</ng-template>
+<ng-template #selectCell let-row="rowData">
+    <div class="text-center">
+        <button type="button"
+                class="btn btn-sm"
+                style="min-width: 180px"
+                [class.btn-success]="selectedCandidate?.id === row.id"
+                [class.btn-outline-primary]="selectedCandidate?.id !== row.id"
+                (click)="selectCandidate(row)">
+            {{ selectedCandidate?.id === row.id ? 'Replaced by This Assembly' : 'Select' }}
+        </button>
+    </div>
+</ng-template>
+
+<div>
+    <h1 class="text-center h2">Out of Service Request</h1>
+
+    <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+    <div dp-spinner-parent>
+        <form #oosForm="ngForm" *ngIf="test">
+            <vp-validation-summary [form]="oosForm" [validationErrors]="validationErrors" />
+
+            <vp-section header="Assembly Information">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Assembly Location:</dt>
+                    <dd class="col-sm-8">{{ test.locationDescription }}</dd>
+                    <dt class="col-sm-4">Main Assembly Description:</dt>
+                    <dd class="col-sm-8">{{ assemblyDescription }}</dd>
+                    <dt class="col-sm-4">Main Assembly Serial Number:</dt>
+                    <dd class="col-sm-8">{{ test.serialNumber }}</dd>
+                </dl>
+            </vp-section>
+
+            <div class="mt-3">
+                <vp-section header="Out of Service Reason">
+                    <vp-input type="select"
+                              label="What is the reason for the assembly being out of service?"
+                              [options]="reasonOptions"
+                              [ngModel]="selectedType"
+                              (ngModelChange)="onTypeChange($event)"
+                              [ngModelOptions]="{standalone: true}" />
+                </vp-section>
+            </div>
+
+            <div class="mt-3" *ngIf="isRemoved">
+                <vp-section header="Removal Details">
+                    <vp-input type="textarea"
+                              label="Reason for removal"
+                              [required]="true"
+                              [(ngModel)]="request.description"
+                              [ngModelOptions]="{standalone: true}" />
+                </vp-section>
+            </div>
+
+            <div class="mt-3" *ngIf="isReplaced">
+                <vp-section header="Replacement Assembly">
+                    <p>Select the assembly that replaced this assembly.</p>
+
+                    <div *ngIf="candidatesLoaded && candidates.length === 0" class="alert alert-info">
+                        No replacement assemblies were found.
+                    </div>
+
+                    <vp-table *ngIf="candidates.length > 0"
+                              [columns]="candidateColumns"
+                              [data]="candidates" />
+                </vp-section>
+            </div>
+
+            <div class="d-flex justify-content-center gap-2 flex-wrap mt-3">
+                <button type="button"
+                        class="btn btn-primary vp-section-button"
+                        [disabled]="!canContinue"
+                        (click)="openConfirmModal()">
+                    Continue to Confirmation
+                </button>
+                <button type="button"
+                        class="btn btn-secondary vp-section-button"
+                        (click)="cancel()">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div *ngIf="showConfirmModal" class="modal d-block" tabindex="-1"
+         style="background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white py-2">
+                    <h5 class="modal-title h6 mb-0">Confirm Out of Service Request</h5>
+                </div>
+                <div class="modal-body">
+                    <div *ngIf="isReplaced">
+                        <p>This assembly will be marked out of service because it was replaced by the following assembly:</p>
+                        <dl class="row mb-0" *ngIf="selectedCandidate">
+                            <dt class="col-sm-5">Test Date:</dt>
+                            <dd class="col-sm-7">{{ selectedCandidate.testDate | date:'MM/dd/yyyy' }}</dd>
+                            <dt class="col-sm-5">Serial Number:</dt>
+                            <dd class="col-sm-7">{{ selectedCandidate.serialNumber }}</dd>
+                            <dt class="col-sm-5">Device Description:</dt>
+                            <dd class="col-sm-7">{{ buildCandidateDescription(selectedCandidate) }}</dd>
+                            <dt class="col-sm-5">Property Address:</dt>
+                            <dd class="col-sm-7">{{ buildCandidateAddress(selectedCandidate) }}</dd>
+                        </dl>
+                    </div>
+
+                    <div *ngIf="isRemoved">
+                        <p>This assembly will be marked out of service because it was removed.</p>
+                        <p class="mb-0"><strong>Reason for removal:</strong></p>
+                        <p>{{ request.description }}</p>
+                    </div>
+                </div>
+                <div class="modal-footer py-2">
+                    <div class="d-flex w-100 gap-2">
+                        <button type="button" class="btn btn-primary flex-fill"
+                                style="width: 50%"
+                                (click)="completeSubmission()">Complete Submission</button>
+                        <button type="button" class="btn btn-primary flex-fill"
+                                style="width: 50%"
+                                (click)="closeConfirmModal()">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

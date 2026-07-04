@@ -4,7 +4,7 @@
 
 <div [hidden]="showResults || showMapResults">
 
-    <div class="d-flex justify-content-center  mb-3">
+    <div class="d-flex justify-content-center  mb-2">
         <button type="button"
                 class="btn btn-primary"
                 title="Create New Property Record"
@@ -21,19 +21,19 @@
                 <div class="row">
                     <div class="col-md-6">
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="accountNumber"
                                                    label="Account number"
                                                    [form]="searchForm" />
                         </div>
-                        
-                         <div class="mb-3">
+
+                        <div class="mb-2">
                             <app-gis-area-lookup fieldName="gisAreaId"
                                                  label="GIS Area"
                                                  [form]="searchForm" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="invalidMailingAddress"
                                                    label="Invalid mailing address"
                                                    type="select"
@@ -41,7 +41,7 @@
                                                    [options]="yesNoOptions" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="outOfArea"
                                                    label="Out of area"
                                                    type="select"
@@ -49,7 +49,7 @@
                                                    [options]="yesNoOptions" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="isFeeExempt"
                                                    label="Is fee exempt"
                                                    type="select"
@@ -57,7 +57,7 @@
                                                    [options]="yesNoOptions" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="needsCsiInspection"
                                                    label="Needs CSI inspection"
                                                    type="select"
@@ -65,7 +65,7 @@
                                                    [options]="yesNoOptions" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="needsBackflowLetter"
                                                    label="Needs unknown assemblies letter"
                                                    type="select"
@@ -73,7 +73,7 @@
                                                    [options]="yesNoOptions" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="needsFogInspection"
                                                    label="Needs FOG inspection"
                                                    type="select"
@@ -81,7 +81,7 @@
                                                    [options]="yesNoOptions" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="needsFogPermit"
                                                    label="Needs FOG permit"
                                                    type="select"
@@ -96,7 +96,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="facilityType"
                                                    label="Facility type"
                                                    type="select"
@@ -104,7 +104,7 @@
                                                    [options]="facilityTypes" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="greaseTrapType"
                                                    label="Grease trap"
                                                    type="select"
@@ -112,7 +112,7 @@
                                                    [options]="greaseTrapoptions" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="hasKnownBackflowAssemblies"
                                                    label="Has known backflow assemblies"
                                                    type="select"
@@ -120,7 +120,7 @@
                                                    [options]="yesNoOptions" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="hasOnSiteSewageFacility"
                                                    label="Has on-site sewage facility"
                                                    type="select"
@@ -128,7 +128,7 @@
                                                    [options]="yesNoOptions" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="hasAuxWaterSupply"
                                                    label="Has auxiliary water supply"
                                                    type="select"
@@ -136,7 +136,7 @@
                                                    [options]="yesNoOptions" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="hasFireSystem"
                                                    label="Has fire system"
                                                    type="select"
@@ -144,7 +144,7 @@
                                                    [options]="yesNoOptions" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="fireSeparateWater"
                                                    label="Fire system on separate water supply"
                                                    type="select"
@@ -152,7 +152,7 @@
                                                    [options]="yesNoOptions" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="hasGritTrap"
                                                    label="Has sand & grit trap"
                                                    type="select"
@@ -160,7 +160,7 @@
                                                    [options]="yesNoOptions" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="hasIrrigation"
                                                    label="Has irrigation system"
                                                    type="select"
@@ -168,7 +168,7 @@
                                                    [options]="yesNoOptions" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="irrigationSeparateWater"
                                                    label="Irrigation on separate water supply"
                                                    type="select"
@@ -176,7 +176,7 @@
                                                    [options]="yesNoOptions" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="hasDomesticPremisesIsolation"
                                                    label="Has domestic/premises isolation"
                                                    type="select"
@@ -197,7 +197,7 @@
                 <div class="col-md-6">
                     <vp-section header="Location / Property Criteria">
                         <div class="row">
-                            <div class="col-12 mb-3">
+                            <div class="col-12 mb-2">
                                 <vp-filter-panel-field fieldName="propertyType"
                                                        label="Property type"
                                                        type="select"
@@ -205,22 +205,33 @@
                                                        [options]="propertyTypes" />
                             </div>
 
-                            <div class="col-12 mb-3">
+                            <div class="col-12 mb-2">
                                 <vp-filter-panel-field fieldName="businessName"
                                                        label="Business name"
                                                        [form]="searchForm" />
                             </div>
 
-                            <div class="col-4 mb-3">
-                                <vp-filter-panel-field fieldName="streetNumber"
-                                                       label="Street #"
-                                                       [form]="searchForm" />
-                            </div>
+                            <div class="row">
+                                <div class="col-xl-5 d-flex align-items-center">
+                                    <div class="text-xl-end">
+                                        Address
+                                    </div>
+                                </div>
+                                <div class="col-xl row">
+                                    <div class="col-4 mb-2">
+                                        <vp-filter-panel-field fieldName="streetNumber"
+                                                               label="Street #"
+                                                               labelStyle="vertical"
+                                                               [form]="searchForm" />
+                                    </div>
 
-                            <div class="col-8 mb-3">
-                                <vp-filter-panel-field fieldName="streetName"
-                                                       label="Street name"
-                                                       [form]="searchForm" />
+                                    <div class="col-8 mb-2">
+                                        <vp-filter-panel-field fieldName="streetName"
+                                                               label="Street name"
+                                                               labelStyle="vertical"
+                                                               [form]="searchForm" />
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="col-12">
@@ -235,25 +246,25 @@
                 <div class="col-md-6 mt-3 mt-md-0">
                     <vp-section header="Contact / Mailing Criteria">
                         <div class="row">
-                            <div class="col-12 mb-3">
+                            <div class="col-12 mb-2">
                                 <vp-filter-panel-field fieldName="mailingCompanyName"
                                                        label="Company name"
                                                        [form]="searchForm" />
                             </div>
 
-                            <div class="col-12 mb-3">
+                            <div class="col-12 mb-2">
                                 <vp-filter-panel-field fieldName="mailingContactName"
                                                        label="Contact name"
                                                        [form]="searchForm" />
                             </div>
 
-                            <div class="col-4 mb-3">
+                            <div class="col-4 mb-2">
                                 <vp-filter-panel-field fieldName="mailingStreetNumber"
                                                        label="Street #"
                                                        [form]="searchForm" />
                             </div>
 
-                            <div class="col-8 mb-3">
+                            <div class="col-8 mb-2">
                                 <vp-filter-panel-field fieldName="mailingStreetName"
                                                        label="Street name"
                                                        [form]="searchForm" />

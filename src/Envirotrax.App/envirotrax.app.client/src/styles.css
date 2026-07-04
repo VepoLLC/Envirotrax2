@@ -6,6 +6,7 @@ html {
 
 body {
     font-family: "Montserrat", sans-serif;
+    font-size: 0.95rem;
 }
 
 h6,
@@ -33,12 +34,16 @@ a:hover {
     text-decoration: underline;
 }
 
+.bg-body {
+    background-color: #cccccc !important;
+}
+
 .bg-primary {
     background-color: #008fd4 !important;
 }
 
 .bg-info {
-    background-color: #05bfdf !important;
+    background-color: #008fd4a0 !important;
 }
 
 .text-info {
@@ -233,7 +238,7 @@ a:hover {
     border-color: #8a9199;
 }
 
-.form-check-input.readonly-checkbox:disabled ~ .form-check-label {
+.form-check-input.readonly-checkbox:disabled~.form-check-label {
     opacity: 1;
     color: var(--bs-body-color, #212529);
 }

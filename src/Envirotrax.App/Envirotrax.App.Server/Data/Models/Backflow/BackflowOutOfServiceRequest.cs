@@ -45,17 +45,5 @@ public class BackflowOutOfServiceRequestConfiguration : IEntityTypeConfiguration
             .HasForeignKey(r => new { r.ProfessionalId, r.BpatId })
             .HasPrincipalKey(pu => new { pu.ProfessionalId, pu.UserId })
             .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne(r => r.Test)
-            .WithMany()
-            .HasForeignKey(r => new { r.WaterSupplierId, r.TestId })
-            .HasPrincipalKey(t => new { t.WaterSupplierId, t.Id })
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne(r => r.ReplacementAssemblyTest)
-            .WithMany()
-            .HasForeignKey(r => new { r.WaterSupplierId, r.ReplacementAssemblyTestId })
-            .HasPrincipalKey(t => new { t.WaterSupplierId, t.Id })
-            .OnDelete(DeleteBehavior.Restrict);
     }
 }

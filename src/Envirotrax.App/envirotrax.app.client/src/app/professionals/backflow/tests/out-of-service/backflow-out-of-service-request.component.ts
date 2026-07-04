@@ -1,7 +1,8 @@
+import { formatDate } from "@angular/common";
 import { Component, OnDestroy, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Subscription } from "rxjs";
-import { CellTemplateData, ColumnType, InputOption, TableColumn } from "@envirotrax/common-ui";
+import { CellTemplateData, ColumnType, InputOption, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 import { BackflowTest } from "../../../../shared/models/backflow/backflow-test";
 import { BackflowOutOfServiceRequest } from "../../../../shared/models/backflow/backflow-out-of-service-request";
 import { OutOfServiceType } from "../../../../shared/models/backflow/out-of-service-type.enum";
@@ -9,6 +10,14 @@ import { BackflowTestService } from "../../../../shared/services/backflow/backfl
 import { BackflowOutOfServiceRequestService } from "../../../../shared/services/backflow/backflow-out-of-service-request.service";
 import { ToastService } from "../../../../shared/services/toast.service";
 import { HelperService } from "../../../../shared/services/helpers/helper.service";
+
+interface ReplacementCandidateVm {
+    id?: number;
+    testDate?: string;
+    serialNumber?: string;
+    deviceDescription: string;
+    propertyAddress: string;
+}
 
 @Component({
     standalone: false,
@@ -26,12 +35,11 @@ export class BackflowOutOfServiceRequestComponent implements OnInit, OnDestroy {
     public request: BackflowOutOfServiceRequest = { testId: 0 };
 
     public assemblyDescription: string = '';
-    public showConfirmModal: boolean = false;
 
-    public candidates: BackflowTest[] = [];
+    public candidates: ReplacementCandidateVm[] = [];
     public candidatesLoaded: boolean = false;
-    public selectedCandidate: BackflowTest | null = null;
-    public candidateColumns: TableColumn<BackflowTest>[] = [];
+    public selectedCandidate: ReplacementCandidateVm | null = null;
+    public candidateColumns: TableColumn<ReplacementCandidateVm>[] = [];
 
     public readonly reasonOptions: InputOption[] = [
         { id: '', text: '' },
@@ -39,17 +47,8 @@ export class BackflowOutOfServiceRequestComponent implements OnInit, OnDestroy {
         { id: OutOfServiceType.Removed.toString(), text: 'The assembly was removed' }
     ];
 
-    @ViewChild('testDateCell', { static: true })
-    private testDateCellTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
-
-    @ViewChild('descriptionCell', { static: true })
-    private descriptionCellTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
-
-    @ViewChild('addressCell', { static: true })
-    private addressCellTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
-
     @ViewChild('selectCell', { static: true })
-    private selectCellTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
+    private selectCellTemplate!: TemplateRef<CellTemplateData<ReplacementCandidateVm>>;
 
     private _routeSub?: Subscription;
 
@@ -58,6 +57,7 @@ export class BackflowOutOfServiceRequestComponent implements OnInit, OnDestroy {
         private readonly _router: Router,
         private readonly _testService: BackflowTestService,
         private readonly _requestService: BackflowOutOfServiceRequestService,
+        private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService,
         private readonly _helper: HelperService
     ) { }
@@ -119,32 +119,57 @@ export class BackflowOutOfServiceRequestComponent implements OnInit, OnDestroy {
         }
     }
 
-    public selectCandidate(candidate: BackflowTest): void {
+    public selectCandidate(candidate: ReplacementCandidateVm): void {
         this.selectedCandidate = candidate;
-        this.request.replacementAssemblyTestId = candidate.id;
+        this.request.replacementAssemblyTestId = candidate.id ?? null;
     }
 
-    public openConfirmModal(): void {
-        if (this.canContinue) {
-            this.showConfirmModal = true;
+    public submit(): void {
+        if (!this.canContinue) {
+            return;
         }
+
+        this._modalHelper.confirm({
+            title: 'Confirm Out of Service Request',
+            messages: this.buildConfirmationMessages()
+        }).result().subscribe(() => this.completeSubmission());
     }
 
-    public closeConfirmModal(): void {
-        this.showConfirmModal = false;
+    public async cancel(): Promise<void> {
+        await this._router.navigate(['/professionals/backflow/tests', this.id, 'view']);
     }
 
-    public async completeSubmission(): Promise<void> {
+    private buildConfirmationMessages(): string[] {
+        if (this.isReplaced && this.selectedCandidate) {
+            const testDate = this.selectedCandidate.testDate
+                ? formatDate(this.selectedCandidate.testDate, 'MM/dd/yyyy', 'en-US')
+                : '';
+
+            return [
+                'This assembly will be marked out of service because it was replaced by the following assembly:',
+                `Test Date: ${testDate}`,
+                `Serial Number: ${this.selectedCandidate.serialNumber ?? ''}`,
+                `Device Description: ${this.selectedCandidate.deviceDescription}`,
+                `Property Address: ${this.selectedCandidate.propertyAddress}`
+            ];
+        }
+
+        return [
+            'This assembly will be marked out of service because it was removed.',
+            `Reason for removal: ${this.request.description ?? ''}`
+        ];
+    }
+
+    private async completeSubmission(): Promise<void> {
         try {
             this.isLoading = true;
             this.validationErrors = [];
+
             await this._requestService.submit(this.request);
-            this.showConfirmModal = false;
+
             this._toastService.successfullySaved('Out of Service Request');
             await this._router.navigate(['/professionals/backflow/tests', this.id, 'view']);
         } catch (error) {
-            this.showConfirmModal = false;
-
             if (!this._helper.parseValidationErrors(error, this.validationErrors)) {
                 this._toastService.failedToSave('Out of Service Request');
                 throw error;
@@ -154,25 +179,6 @@ export class BackflowOutOfServiceRequestComponent implements OnInit, OnDestroy {
         } finally {
             this.isLoading = false;
         }
-    }
-
-    public async cancel(): Promise<void> {
-        await this._router.navigate(['/professionals/backflow/tests', this.id, 'view']);
-    }
-
-    public buildCandidateDescription(candidate: BackflowTest): string {
-        return this.buildDeviceDescription(candidate);
-    }
-
-    public buildCandidateAddress(candidate: BackflowTest): string {
-        const line1 = [candidate.propertyStreetNumber, candidate.propertyStreetName]
-            .filter(part => part)
-            .join(' ');
-        const line2 = [candidate.propertyCity, candidate.propertyState?.code, candidate.propertyZip]
-            .filter(part => part)
-            .join(' ');
-
-        return [line1, line2].filter(part => part).join(', ');
     }
 
     private async loadTest(): Promise<void> {
@@ -188,11 +194,22 @@ export class BackflowOutOfServiceRequestComponent implements OnInit, OnDestroy {
     private async loadCandidates(): Promise<void> {
         try {
             this.isLoading = true;
-            this.candidates = await this._requestService.getReplacementCandidates(this.id);
+            const results = await this._requestService.getReplacementCandidates(this.id);
+            this.candidates = results.map(test => this.toCandidateVm(test));
             this.candidatesLoaded = true;
         } finally {
             this.isLoading = false;
         }
+    }
+
+    private toCandidateVm(test: BackflowTest): ReplacementCandidateVm {
+        return {
+            id: test.id,
+            testDate: test.testDate,
+            serialNumber: test.serialNumber,
+            deviceDescription: this.buildDeviceDescription(test),
+            propertyAddress: this.buildPropertyAddress(test)
+        };
     }
 
     // Matches V1's BackflowTest.DeviceDescription: "Manufacturer Model Size - DeviceType".
@@ -204,14 +221,23 @@ export class BackflowOutOfServiceRequestComponent implements OnInit, OnDestroy {
         return test.deviceType ? `${identity} - ${test.deviceType}` : identity;
     }
 
-    private getCandidateColumns(): TableColumn<BackflowTest>[] {
+    private buildPropertyAddress(test: BackflowTest): string {
+        const line1 = [test.propertyStreetNumber, test.propertyStreetName]
+            .filter(part => part)
+            .join(' ');
+        const line2 = [test.propertyCity, test.propertyState?.code, test.propertyZip]
+            .filter(part => part)
+            .join(' ');
+
+        return [line1, line2].filter(part => part).join(', ');
+    }
+
+    private getCandidateColumns(): TableColumn<ReplacementCandidateVm>[] {
         return [
             {
                 field: 'testDate',
                 caption: 'Test Date',
-                type: ColumnType.other,
-                queryColumnExcluded: true,
-                cellTemplate: this.testDateCellTemplate
+                type: ColumnType.date
             },
             {
                 field: 'serialNumber',
@@ -219,18 +245,14 @@ export class BackflowOutOfServiceRequestComponent implements OnInit, OnDestroy {
                 type: ColumnType.text
             },
             {
-                field: '',
+                field: 'deviceDescription',
                 caption: 'Device Description',
-                type: ColumnType.other,
-                queryColumnExcluded: true,
-                cellTemplate: this.descriptionCellTemplate
+                type: ColumnType.text
             },
             {
-                field: '',
+                field: 'propertyAddress',
                 caption: 'Property Address',
-                type: ColumnType.other,
-                queryColumnExcluded: true,
-                cellTemplate: this.addressCellTemplate
+                type: ColumnType.text
             },
             {
                 field: 'Select',

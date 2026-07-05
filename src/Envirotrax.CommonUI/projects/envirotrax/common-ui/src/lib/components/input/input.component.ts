@@ -96,6 +96,9 @@ export class InputComponent implements ControlValueAccessor, Validator, OnInit, 
     @Input()
     public labelStyle: 'horizontal' | 'vertical' = 'horizontal';
 
+    @Input()
+    public isInputGroup: boolean = false;
+
     public value: any | DateRange;
 
     @ViewChild('flatpickr')

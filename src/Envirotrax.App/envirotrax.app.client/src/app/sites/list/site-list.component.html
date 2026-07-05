@@ -196,8 +196,8 @@
             <div class="row mt-3">
                 <div class="col-md-6">
                     <vp-section header="Location / Property Criteria">
-                        <div class="row">
-                            <div class="col-12 mb-2">
+                        <div>
+                            <div class="mb-2">
                                 <vp-filter-panel-field fieldName="propertyType"
                                                        label="Property type"
                                                        type="select"
@@ -205,7 +205,7 @@
                                                        [options]="propertyTypes" />
                             </div>
 
-                            <div class="col-12 mb-2">
+                            <div class="mb-2">
                                 <vp-filter-panel-field fieldName="businessName"
                                                        label="Business name"
                                                        [form]="searchForm" />
@@ -213,19 +213,19 @@
 
                             <div class="row">
                                 <div class="col-xl-5 d-flex align-items-center">
-                                    <div class="text-xl-end">
+                                    <div class="text-xl-end w-100">
                                         Address
                                     </div>
                                 </div>
-                                <div class="col-xl row">
-                                    <div class="col-4 mb-2">
+                                <div class="col-xl d-xl-flex gap-1">
+                                    <div class="mb-2">
                                         <vp-filter-panel-field fieldName="streetNumber"
                                                                label="Street #"
                                                                labelStyle="vertical"
                                                                [form]="searchForm" />
                                     </div>
 
-                                    <div class="col-8 mb-2">
+                                    <div class="mb-2">
                                         <vp-filter-panel-field fieldName="streetName"
                                                                label="Street name"
                                                                labelStyle="vertical"
@@ -234,7 +234,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-12">
+                            <div>
                                 <vp-filter-panel-field fieldName="zipCode"
                                                        label="ZIP"
                                                        [form]="searchForm" />
@@ -245,32 +245,43 @@
 
                 <div class="col-md-6 mt-3 mt-md-0">
                     <vp-section header="Contact / Mailing Criteria">
-                        <div class="row">
-                            <div class="col-12 mb-2">
+                        <div>
+                            <div class="mb-2">
                                 <vp-filter-panel-field fieldName="mailingCompanyName"
                                                        label="Company name"
                                                        [form]="searchForm" />
                             </div>
 
-                            <div class="col-12 mb-2">
+                            <div class="mb-2">
                                 <vp-filter-panel-field fieldName="mailingContactName"
                                                        label="Contact name"
                                                        [form]="searchForm" />
                             </div>
 
-                            <div class="col-4 mb-2">
-                                <vp-filter-panel-field fieldName="mailingStreetNumber"
-                                                       label="Street #"
-                                                       [form]="searchForm" />
+                            <div class="row">
+                                <div class="col-xl-5 d-flex align-items-center">
+                                    <div class="text-xl-end w-100">
+                                        Address
+                                    </div>
+                                </div>
+                                <div class="col-xl d-xl-flex gap-1">
+                                    <div class="mb-2">
+                                        <vp-filter-panel-field fieldName="mailingStreetNumber"
+                                                               label="Street #"
+                                                               labelStyle="vertical"
+                                                               [form]="searchForm" />
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <vp-filter-panel-field fieldName="mailingStreetName"
+                                                               label="Street name"
+                                                               labelStyle="vertical"
+                                                               [form]="searchForm" />
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="col-8 mb-2">
-                                <vp-filter-panel-field fieldName="mailingStreetName"
-                                                       label="Street name"
-                                                       [form]="searchForm" />
-                            </div>
-
-                            <div class="col-12">
+                            <div>
                                 <vp-filter-panel-field fieldName="mailingZipCode"
                                                        label="ZIP"
                                                        [form]="searchForm" />

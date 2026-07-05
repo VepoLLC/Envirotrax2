@@ -10,7 +10,8 @@
             </label>
         </div>
 
-        <div [class.col-xl]="labelStyle == 'horizontal'">
+        <div [class.col-xl]="labelStyle == 'horizontal'"
+             [class.input-group]="isInputGroup">
             <input *ngIf="type != 'textarea' && type != 'select' && type != 'multi-select' && type != 'date' && type != 'datetime' && type != 'daterange'"
                    [attr.id]="id"
                    [attr.name]="name"
@@ -93,11 +94,11 @@
                        [searchable]="false"
                        appendTo="body">
             </ng-select>
+
+            <ng-content select="vp-input-add-on">
+
+            </ng-content>
         </div>
-
-        <ng-content select="vp-input-add-on">
-
-        </ng-content>
     </div>
 
     <div>

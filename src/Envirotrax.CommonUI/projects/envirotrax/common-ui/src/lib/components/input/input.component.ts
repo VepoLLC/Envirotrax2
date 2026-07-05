@@ -94,7 +94,7 @@ export class InputComponent implements ControlValueAccessor, Validator, OnInit, 
     public flexFill: boolean = false;
 
     @Input()
-    public labelStyle: 'horizontal' | 'vertical' = 'horizontal';
+    public labelStyle: 'horizontal' | 'vertical' = 'vertical';
 
     @Input()
     public isInputGroup: boolean = false;

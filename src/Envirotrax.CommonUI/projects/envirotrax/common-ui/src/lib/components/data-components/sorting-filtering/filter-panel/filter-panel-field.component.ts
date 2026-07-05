@@ -41,7 +41,7 @@ export class FilterPanelFieldComponent implements OnInit {
     public borderColor?: string;
 
     @Input()
-    public labelStyle: 'horizontal' | 'vertical' = 'horizontal';
+    public labelStyle: 'horizontal' | 'vertical' = 'vertical';
 
     constructor(@Optional() private readonly _parent: FilterPanelComponent) {
 

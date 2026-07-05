@@ -174,6 +174,12 @@ a:hover {
 .ng-select.ng-select-opened>.ng-select-container,
 .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
     background-color: #f5f5f5;
+}
+
+.form-control,
+.form-control:focus,
+.ng-select.ng-select-opened>.ng-select-container,
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
     padding: 0.25rem 0.75rem;
 }
 
@@ -200,7 +206,6 @@ a:hover {
 .ng-select.form-control {
     padding: 0;
     border: none;
-    height: 33px;
 }
 
 .ng-select .ng-select-container {

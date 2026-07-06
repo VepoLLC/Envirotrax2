@@ -21,4 +21,7 @@ public interface IBackflowTestService : IService<BackflowTest, BackflowTestDto>
 
     Task<byte[]> GeneratePdfAsync(BackflowTestDto test);
     Task<byte[]> GeneratePdfAsync(IEnumerable<BackflowTestDto> tests);
+
+    Task<IEnumerable<BackflowTestDto>> GetAllPendingRenewalAsync(int batchSize, CancellationToken cancellationToken);
+    Task<BackflowTestDto?> ExtendDateAsync(int testId, CancellationToken cancellationToken);
 }

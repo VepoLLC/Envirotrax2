@@ -4,6 +4,7 @@ using Envirotrax.TaskRunner.Authentication;
 using Envirotrax.TaskRunner.Domain.DataTransferObjects;
 using Envirotrax.TaskRunner.Domain.Services.Definitions;
 using Envirotrax.TaskRunner.Domain.Services.Implementations;
+using Envirotrax.TaskRunner.Workers.Backflow;
 using Envirotrax.TaskRunner.Workers.Sites;
 
 namespace Envirotrax.TaskRunner.Configuration;
@@ -30,6 +31,12 @@ public static class ServiceRegistration
 
         services.Configure<GeocodingOptions>(configuration.GetSection("Tasks:Geocoding"));
         services.AddQueueWorker(new QueueWorkerOptions<SiteGeocoder, SiteDto>(QueueNames.Sites.Geocode)
+        {
+            MaxDequeuCount = 2
+        });
+
+        services.Configure<BackflowRenewalOptions>(configuration.GetSection("Tasks:BackflowRenewal"));
+        services.AddQueueWorker(new QueueWorkerOptions<BackflowTestRenewalWorker, BackflowTestDto>(QueueNames.BackflowTests.ExtendDate)
         {
             MaxDequeuCount = 2
         });

@@ -7,4 +7,5 @@ public interface ISiteRepository : IRepository<Site>
     Task<IEnumerable<Site>> GetAllPendingGeocodingAsync(int batchSize);
     Task UpdateGisCoordinatesAsync(Site site);
     Task UpdateManualGisDataAsync(int siteId, double? latitude, double? longitude, GisStatusType status);
+    Task ClearNeedsRenewalCheckAsync(int siteId, CancellationToken cancellationToken);
 }

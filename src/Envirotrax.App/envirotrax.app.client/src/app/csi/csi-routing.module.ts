@@ -19,7 +19,7 @@ const routes: Routes = [
         data: {
             permissions: [
                 {
-                    type: PermissionType.Sites,
+                    type: PermissionType.CsiReports,
                     action: PermissionAction.CanView
                 }
             ]

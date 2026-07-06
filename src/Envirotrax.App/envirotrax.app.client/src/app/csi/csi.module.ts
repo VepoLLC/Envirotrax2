@@ -19,12 +19,10 @@ import { AddEditCsiInspectorUserComponent } from "./inspectors/details/users/edi
 import { ProfessionalModule } from "../professionals/professional.module";
 import { CsiSystemReportComponent } from "./reports/system/csi-system-report.component";
 import { CsiComplianceManagementComponent } from "./compliance/csi-compliance-management.component";
-import { SiteLogModalComponent } from "./compliance/site-log/site-log-modal.component";
 
 @NgModule({
     declarations: [
         CsiComplianceManagementComponent,
-        SiteLogModalComponent,
         CsiInspectionListComponent,
         CsiInspectionDetailsComponent,
         DisapproveCsiInspectionComponent,

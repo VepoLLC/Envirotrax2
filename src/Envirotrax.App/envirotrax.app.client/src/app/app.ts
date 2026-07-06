@@ -186,7 +186,7 @@ export class App implements OnInit {
             title: 'Compliance Management',
             iconCss: 'fa-solid fa-list-check',
             routerLink: ['csi/compliance'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Sites),
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports),
             hasFeature: true
           },
           {

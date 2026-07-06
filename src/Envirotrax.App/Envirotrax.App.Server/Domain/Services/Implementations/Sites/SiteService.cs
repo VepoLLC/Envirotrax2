@@ -15,6 +15,7 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Sites;
 public class SiteService : Service<Site, SiteDto>, ISiteService
 {
     private readonly ISiteRepository _siteRepository;
+    private readonly ISiteLogService _siteLogService;
     private readonly IGeocodingService _geocodingService;
     private readonly IGisAreaCoordinateRepository _coordinateRepository;
     private readonly ILogger<SiteService> _logger;
@@ -22,12 +23,14 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     public SiteService(
         IMapper mapper,
         ISiteRepository repository,
+        ISiteLogService siteLogService,
         IGeocodingService geocodingService,
         IGisAreaCoordinateRepository coordinateRepository,
         ILogger<SiteService> logger)
         : base(mapper, repository)
     {
         _siteRepository = repository;
+        _siteLogService = siteLogService;
         _geocodingService = geocodingService;
         _coordinateRepository = coordinateRepository;
         _logger = logger;
@@ -112,16 +115,26 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         await _siteRepository.UpdateManualGisDataAsync(siteId, dto.Latitude, dto.Longitude, dto.Status);
     }
 
-    public async Task<IPagedData<SiteDto>> GetCsiComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public async Task<IPagedData<CsiComplianceSiteDto>> GetCsiComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         query.Sort = query.ConvertSortProperties<Site, SiteDto>(Mapper);
         query.Filter = query.ConvertFilterProperties<Site, SiteDto>(Mapper);
 
         var sites = await _siteRepository.GetCsiComplianceAsync(pageInfo, query, cancellationToken);
+        var dtos = sites.Select(s => Mapper.Map<CsiComplianceSiteDto>(s)).ToList();
 
-        return sites
-            .Select(s => MapToDto(s)!)
-            .ToPagedData(pageInfo);
+        if (dtos.Count > 0)
+        {
+            var logs = await _siteLogService.GetBySitesAsync(dtos.Select(d => d.Id), cancellationToken);
+            var logsBySite = logs.ToLookup(l => l.Site.Id ?? 0);
+
+            foreach (var dto in dtos)
+            {
+                dto.Logs = logsBySite[dto.Id].ToList();
+            }
+        }
+
+        return dtos.ToPagedData(pageInfo);
     }
 
     public async Task UpdateCsiAssignmentAsync(int siteId, int? userId, CancellationToken cancellationToken)

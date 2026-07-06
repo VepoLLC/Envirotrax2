@@ -1,20 +1,26 @@
-import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
+import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { CellTemplateData, ColumnType, InputOption, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { TableViewModel } from "../../shared/models/table-view-model";
 import { Site } from "../../shared/models/sites/site";
+import { SiteLog } from "../../shared/models/sites/site-log";
+import { SiteLogType } from "../../shared/models/sites/site-log-type.enum";
+import { SiteLogReviewDateStatus } from "../../shared/models/sites/site-log-review-date-status.enum";
 import { ComparisonOperator, Query, QueryProperty } from "../../shared/models/query";
 import { WaterSupplierUser } from "../../shared/models/users/water-supplier-user";
 import { SiteService } from "../../shared/services/sites/site.service";
+import { SiteLogService } from "../../shared/services/sites/site-log.service";
 import { UserService } from "../../shared/services/water-suppliers/user.service";
 import { AuthService } from "../../shared/services/auth/auth.service";
 import { DownloadService } from "../../shared/services/download.service";
+import { ToastService } from "../../shared/services/toast.service";
+import { PrintableTableService } from "../../shared/services/printable-table.service";
 import { DownloadConfig } from "../../shared/models/download-config";
 import { MAX_PAGE_SIZE } from "../../shared/models/page-info";
 import { PermissionAction, PermissionType } from "../../shared/models/permission-type";
 import { FacilityType } from "../../shared/enums/facility-type.enum";
-import { SiteLogModalComponent, SiteLogModalModel } from "./site-log/site-log-modal.component";
+import { SiteLogEditComponent, SiteLogEditModel } from "../../shared/components/site-log/site-log-edit.component";
 
 const DAY_MS = 86400000;
 
@@ -43,6 +49,8 @@ type SiteRow = Site & {
     daysOverdue?: number;
     overdueClass?: string;
     assignedName?: string;
+    rowNumber?: number;
+    logsExpanded?: boolean;
 };
 
 @Component({
@@ -50,6 +58,9 @@ type SiteRow = Site & {
     templateUrl: './csi-compliance-management.component.html'
 })
 export class CsiComplianceManagementComponent implements OnInit {
+    @ViewChild('numberTemplate', { static: true })
+    public numberTemplate!: TemplateRef<CellTemplateData<Site>>;
+
     @ViewChild('propertyTemplate', { static: true })
     public propertyTemplate!: TemplateRef<CellTemplateData<Site>>;
 
@@ -71,8 +82,21 @@ export class CsiComplianceManagementComponent implements OnInit {
     @ViewChild('viewSiteTemplate', { static: true })
     public viewSiteTemplate!: TemplateRef<CellTemplateData<Site>>;
 
-    public showResults: boolean = false;
+    @ViewChild('printableSection')
+    private _printableSection!: ElementRef;
+
+    public readonly SiteLogType = SiteLogType;
+
+    public readonly reviewDateStatusClasses: { [key: number]: string } = {
+        [SiteLogReviewDateStatus.None]: '',
+        [SiteLogReviewDateStatus.Overdue]: 'badge bg-danger',
+        [SiteLogReviewDateStatus.DueSoon]: 'badge bg-warning text-dark',
+        [SiteLogReviewDateStatus.Upcoming]: 'badge bg-success',
+        [SiteLogReviewDateStatus.Completed]: 'badge bg-secondary'
+    };
+
     public canModify: boolean = false;
+    public daysOverdueLabel: string = 'All overdue';
 
     public daysOverdue: string = '0';
     public sortBy: string = '0';
@@ -144,9 +168,12 @@ export class CsiComplianceManagementComponent implements OnInit {
 
     constructor(
         private readonly _siteService: SiteService,
+        private readonly _siteLogService: SiteLogService,
         private readonly _userService: UserService,
         private readonly _authService: AuthService,
         private readonly _downloadService: DownloadService,
+        private readonly _toastService: ToastService,
+        private readonly _printService: PrintableTableService,
         private readonly _modalHelper: ModalHelperService
     ) {
         this.downloadConfig = {
@@ -177,7 +204,9 @@ export class CsiComplianceManagementComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         this.canModify = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.Sites);
         this.table.columns = this.getColumns();
+
         await this.loadUsers();
+        await this.getCompliance();
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
@@ -191,27 +220,21 @@ export class CsiComplianceManagementComponent implements OnInit {
 
         this.table.columns = this.getColumns();
         this.table.query = this.buildQuery();
-        await this.getCompliance();
-        this.showResults = true;
-    }
+        this.daysOverdueLabel = this.buildDaysOverdueLabel();
 
-    public searchAgain(): void {
-        this.showResults = false;
+        if (this.table.items?.pageInfo) {
+            this.table.items.pageInfo.pageNumber = 1;
+        }
+
+        await this.getCompliance();
     }
 
     public exportResults(): void {
         this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
     }
 
-    public openPropertyLog(site: Site): void {
-        this._modalHelper.show<SiteLogModalModel, void>(
-            SiteLogModalComponent,
-            {
-                title: 'Property Log',
-                size: ModalSize.large,
-                model: { siteId: site.id!, canModify: this.canModify }
-            }
-        );
+    public viewPrintableTable(): void {
+        this._printService.open(this._printableSection.nativeElement);
     }
 
     public async getCompliance(): Promise<void> {
@@ -222,9 +245,13 @@ export class CsiComplianceManagementComponent implements OnInit {
                 this.table.query
             );
 
-            for (const site of this.table.items?.data ?? []) {
+            const pageInfo = this.table.items?.pageInfo;
+            const offset = ((pageInfo?.pageNumber || 1) - 1) * (pageInfo?.pageSize || 0);
+
+            (this.table.items?.data ?? []).forEach((site, index) => {
+                (site as SiteRow).rowNumber = offset + index + 1;
                 this.decorate(site);
-            }
+            });
         } finally {
             this.table.isLoading = false;
         }
@@ -235,11 +262,46 @@ export class CsiComplianceManagementComponent implements OnInit {
 
         await this._siteService.updateCsiAssignment(site.id!, userId);
         site.csiAccountAssignmentId = userId ?? undefined;
+        site.csiAccountAssignmentDate = userId ? new Date().toISOString() : undefined;
         this.decorate(site);
 
         if (this.emailWhenAssigned && userId) {
             this.sendAssignmentEmail(site, userId);
         }
+    }
+
+    public addLog(site: Site): void {
+        this._modalHelper.show<SiteLogEditModel, SiteLog>(SiteLogEditComponent, {
+            title: 'Add Log Record',
+            model: { siteId: site.id!, log: { logType: SiteLogType.Note } },
+            size: ModalSize.large
+        }).result().subscribe(() => this.reloadLogs(site));
+    }
+
+    public editLog(site: Site, log: SiteLog): void {
+        this._modalHelper.show<SiteLogEditModel, SiteLog>(SiteLogEditComponent, {
+            title: 'Edit Log Record',
+            model: { siteId: site.id!, log },
+            size: ModalSize.large
+        }).result().subscribe(() => this.reloadLogs(site));
+    }
+
+    public deleteLog(site: Site, log: SiteLog): void {
+        this._modalHelper.showDeleteConfirmation().result().subscribe(async () => {
+            await this._siteLogService.delete(site.id!, log.id!);
+            this._toastService.successfullySaved('Log Record');
+            await this.reloadLogs(site);
+        });
+    }
+
+    private async reloadLogs(site: Site): Promise<void> {
+        const result = await this._siteLogService.getAll(
+            site.id!,
+            { pageNumber: 1, pageSize: MAX_PAGE_SIZE },
+            { sort: { id: 'Desc' }, filter: [] }
+        );
+
+        site.logs = result.data;
     }
 
     private async loadUsers(): Promise<void> {
@@ -257,29 +319,40 @@ export class CsiComplianceManagementComponent implements OnInit {
 
     private getColumns(): TableColumn<Site>[] {
         const columns: TableColumn<Site>[] = [
+            { field: '', caption: '', type: ColumnType.other, queryColumnExcluded: true, cellTemplate: this.numberTemplate, rowCssClass: 'align-top' },
             this.templateColumn('Property Information', this.propertyTemplate),
-            { field: 'accountNumber', caption: 'Account Number', type: ColumnType.text },
+            { field: 'accountNumber', caption: 'Account Number', type: ColumnType.text, rowCssClass: 'align-top' },
             this.templateColumn('Property Log', this.logTemplate),
             this.templateColumn('Assigned To', this.assignedToTemplate),
-            { field: 'csiRenewalDate', caption: 'Inspection Date', type: ColumnType.other, cellTemplate: this.renewalDateTemplate },
+            { field: 'csiRenewalDate', caption: 'Inspection Date', type: ColumnType.other, cellTemplate: this.renewalDateTemplate, rowCssClass: 'align-top' },
             this.templateColumn('Days Overdue', this.daysOverdueTemplate),
             this.templateColumn('', this.viewSiteTemplate)
         ];
 
         if (this.showMailing) {
-            columns.splice(1, 0, this.templateColumn('Mailing Information', this.mailingTemplate));
+            columns.splice(2, 0, this.templateColumn('Mailing Information', this.mailingTemplate));
         }
 
         return columns;
     }
 
     private templateColumn(caption: string, template: TemplateRef<CellTemplateData<Site>>): TableColumn<Site> {
-        return { field: '', caption, type: ColumnType.other, queryColumnExcluded: true, cellTemplate: template };
+        return { field: '', caption, type: ColumnType.other, queryColumnExcluded: true, cellTemplate: template, rowCssClass: 'align-top' };
     }
 
     private buildQuery(): Query {
         const filter = [...this.panelFilters, ...this.buildDaysOverdueFilter(), ...this.buildStreetFilter()];
         return { sort: { csiRenewalDate: this.sortBy === '0' ? 'Asc' : 'Desc' }, filter };
+    }
+
+    private buildDaysOverdueLabel(): string {
+        const label = this.daysOverdueOptions.find(o => o.id === this.daysOverdue)?.text;
+
+        if (!label) {
+            return 'All overdue';
+        }
+
+        return this.daysOverdue === '0' ? label : `${label} overdue`;
     }
 
     private buildDaysOverdueFilter(): QueryProperty[] {
@@ -339,17 +412,19 @@ export class CsiComplianceManagementComponent implements OnInit {
     private decorate(site: Site): void {
         const row = site as SiteRow;
         row.daysOverdue = this.getDaysOverdue(site);
-        row.overdueClass = this.overdueBadgeClass(row.daysOverdue);
+        row.overdueClass = row.daysOverdue != null ? this.overdueBadgeClass(row.daysOverdue) : '';
         row.assignedName = this.assignedUserName(site);
     }
 
-    private getDaysOverdue(site: Site): number {
+    private getDaysOverdue(site: Site): number | undefined {
         if (!site.csiRenewalDate) {
-            return 0;
+            return undefined;
         }
 
         const renewal = new Date(site.csiRenewalDate).setHours(0, 0, 0, 0);
-        return Math.floor((this.today - renewal) / DAY_MS);
+        const days = Math.floor((this.today - renewal) / DAY_MS);
+
+        return days < 0 ? undefined : days;
     }
 
     private overdueBadgeClass(days: number): string {
@@ -361,7 +436,11 @@ export class CsiComplianceManagementComponent implements OnInit {
             return 'bg-warning text-dark';
         }
 
-        return 'bg-warning-subtle text-dark border';
+        if (days > 0) {
+            return 'bg-warning-subtle text-dark border';
+        }
+
+        return 'bg-secondary';
     }
 
     private assignedUserName(site: Site): string {
@@ -380,19 +459,18 @@ export class CsiComplianceManagementComponent implements OnInit {
             return;
         }
 
-        const nl = '%0D%0A';
         const cityStateZip = [site.city, site.state?.code, site.zipCode].filter(Boolean).join(' ');
         const link = `${window.location.origin}/sites/${site.id}/edit`;
 
-        const body = `Your Envirotrax account has been assigned to the following property record:${nl}${nl}` +
-            `Account #:  ${site.accountNumber ?? ''}${nl}${nl}` +
-            `${site.businessName ?? ''}${nl}` +
-            `${site.streetNumber ?? ''} ${site.streetName ?? ''}${nl}` +
-            `${cityStateZip}${nl}${nl}` +
-            `Open the property record:${nl}${link}`;
+        const body = `Your Envirotrax account has been assigned to the following property record:\r\n\r\n` +
+            `Account #:  ${site.accountNumber ?? ''}\r\n\r\n` +
+            `${site.businessName ?? ''}\r\n` +
+            `${site.streetNumber ?? ''} ${site.streetName ?? ''}\r\n` +
+            `${cityStateZip}\r\n\r\n` +
+            `Open the property record:\r\n${link}`;
 
         const subject = encodeURIComponent(`CSI Account Assignment - ${site.businessName || site.accountNumber || ''}`);
-        window.open(`mailto:${user.emailAddress}?subject=${subject}&body=${body}`);
+        window.open(`mailto:${user.emailAddress}?subject=${subject}&body=${encodeURIComponent(body)}`);
     }
 
     private subtractFromToday(amount: number, unit: 'month' | 'year'): string {

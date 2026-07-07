@@ -402,7 +402,11 @@ input:-webkit-autofill:active {
 .vp-table-header {
     background-color: #ddd !important;
     font-weight: 600;
-    font-size: 0.95rem;
+}
+
+.table th,
+.table td {
+    font-size: 0.75rem;
 }
 
 .overview-box {

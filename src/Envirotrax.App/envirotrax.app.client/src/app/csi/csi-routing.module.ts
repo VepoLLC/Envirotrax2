@@ -7,7 +7,7 @@ import { CsiInspectorListComponent } from "./inspectors/list/csi-inspector-list.
 import { CsiInspectorDetailsComponent } from "./inspectors/details/csi-inspector-details.component";
 import { CsiInspectionDetailsComponent } from "./inspections/details/csi-inspection-details.component";
 import { CsiSystemReportComponent } from "./reports/system/csi-system-report.component";
-import { CsiComplianceManagementComponent } from "./compliance/csi-compliance-management.component";
+import { CsiComplianceManagementComponent } from "./reports/compliance/csi-compliance-management.component";
 
 const routes: Routes = [
 

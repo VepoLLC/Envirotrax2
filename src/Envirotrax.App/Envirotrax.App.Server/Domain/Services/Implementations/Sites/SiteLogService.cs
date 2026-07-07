@@ -108,9 +108,9 @@ public class SiteLogService : ISiteLogService
         return result;
     }
 
-    public async Task<SiteLogDto?> UpdateAsync(SiteLogDto dto, Stream? fileStream, string? fileName, CancellationToken cancellationToken)
+    public async Task<SiteLogDto?> UpdateAsync(SiteLogDto dto, Stream? fileStream, string? fileName)
     {
-        var existing = await _repository.GetAsync(dto.Id, cancellationToken);
+        var existing = await _repository.GetAsync(dto.Id, CancellationToken.None);
         if (existing == null) return null;
 
         existing.LogType = dto.LogType;
@@ -146,9 +146,9 @@ public class SiteLogService : ISiteLogService
         return result;
     }
 
-    public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken)
+    public async Task<bool> DeleteAsync(int id)
     {
-        var entity = await _repository.GetAsync(id, cancellationToken);
+        var entity = await _repository.GetAsync(id, CancellationToken.None);
 
         if (entity == null)
         {

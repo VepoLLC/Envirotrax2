@@ -20,9 +20,9 @@ public class SiteController : WaterSupplierCrudController<SiteDto>
 
     [HttpPut("{id}/csi-assignment")]
     [HasPermission(PermissionAction.CanModify)]
-    public async Task<IActionResult> UpdateCsiAssignmentAsync(int id, [FromBody] UpdateCsiAssignmentDto dto, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateCsiAssignmentAsync(int id, [FromBody] UpdateCsiAssignmentDto dto)
     {
-        await _siteService.UpdateCsiAssignmentAsync(id, dto.UserId, cancellationToken);
+        await _siteService.UpdateCsiAssignmentAsync(id, dto.UserId);
         return Ok();
     }
 

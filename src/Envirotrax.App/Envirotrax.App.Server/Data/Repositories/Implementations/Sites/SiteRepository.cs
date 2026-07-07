@@ -98,13 +98,13 @@ public class SiteRepository : Repository<Site>, ISiteRepository
         return await paginated.ToListAsync(cancellationToken);
     }
 
-    public async Task UpdateCsiAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate, CancellationToken cancellationToken)
+    public async Task UpdateCsiAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate)
     {
         await DbContext
             .Sites
             .Where(s => s.Id == siteId)
             .ExecuteUpdateAsync(setter => setter
                 .SetProperty(s => s.CsiAccountAssignmentId, userId)
-                .SetProperty(s => s.CsiAccountAssignmentDate, assignmentDate), cancellationToken);
+                .SetProperty(s => s.CsiAccountAssignmentDate, assignmentDate));
     }
 }

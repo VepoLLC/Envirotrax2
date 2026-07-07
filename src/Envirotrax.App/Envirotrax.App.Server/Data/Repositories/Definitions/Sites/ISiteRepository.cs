@@ -9,5 +9,5 @@ public interface ISiteRepository : IRepository<Site>
     Task UpdateGisCoordinatesAsync(Site site);
     Task UpdateManualGisDataAsync(int siteId, double? latitude, double? longitude, GisStatusType status);
     Task<IEnumerable<Site>> GetCsiComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
-    Task UpdateCsiAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate, CancellationToken cancellationToken);
+    Task UpdateCsiAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate);
 }

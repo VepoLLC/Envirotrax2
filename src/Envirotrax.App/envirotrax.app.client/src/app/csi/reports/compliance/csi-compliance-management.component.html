@@ -142,17 +142,19 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="mb-3">
-                            <label class="form-label">Days Overdue</label>
-                            <select class="form-select" name="daysOverdue" [(ngModel)]="daysOverdue">
-                                <option *ngFor="let option of daysOverdueOptions" [value]="option.id">{{ option.text }}</option>
-                            </select>
+                            <vp-input type="select"
+                                      label="Days Overdue"
+                                      name="daysOverdue"
+                                      [(ngModel)]="daysOverdue"
+                                      [options]="daysOverdueOptions" />
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Sort By</label>
-                            <select class="form-select" name="sortBy" [(ngModel)]="sortBy">
-                                <option *ngFor="let option of sortOptions" [value]="option.id">{{ option.text }}</option>
-                            </select>
+                            <vp-input type="select"
+                                      label="Sort By"
+                                      name="sortBy"
+                                      [(ngModel)]="sortBy"
+                                      [options]="sortOptions" />
                         </div>
 
                         <div class="form-check mb-2">

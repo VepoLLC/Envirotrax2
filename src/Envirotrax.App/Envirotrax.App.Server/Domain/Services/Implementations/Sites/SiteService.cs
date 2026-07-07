@@ -137,11 +137,11 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         return dtos.ToPagedData(pageInfo);
     }
 
-    public async Task UpdateCsiAssignmentAsync(int siteId, int? userId, CancellationToken cancellationToken)
+    public async Task UpdateCsiAssignmentAsync(int siteId, int? userId)
     {
         var assignmentDate = userId.HasValue ? DateTime.UtcNow : (DateTime?)null;
 
-        await _siteRepository.UpdateCsiAssignmentAsync(siteId, userId, assignmentDate, cancellationToken);
+        await _siteRepository.UpdateCsiAssignmentAsync(siteId, userId, assignmentDate);
     }
 
     private async Task HadnleGeocodingErrorAsync(Exception ex, Site site)

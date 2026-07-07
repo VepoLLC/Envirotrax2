@@ -16,12 +16,12 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
 const routes: Routes = [
     {
         path: '',
-        redirectTo: 'dashboard',
+        redirectTo: 'account-overview',
         pathMatch: 'full'
     },
     {
-        path: 'dashboard',
-        title: 'Dashboard',
+        path: 'account-overview',
+        title: 'Account Overview',
         component: DashboardComponent,
         canActivate: [RoleGuard],
         data: {

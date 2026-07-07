@@ -72,7 +72,7 @@ export class App implements OnInit {
       {
         title: 'Account Overview',
         iconCss: 'fa-regular fa-house',
-        routerLink: ['/dashboard'],
+        routerLink: ['/account-overview'],
         hasFeature: true,
         hasPermission: true
       },
@@ -428,7 +428,7 @@ export class App implements OnInit {
       {
         title: 'Account Overview',
         iconCss: 'fa-regular fa-house',
-        routerLink: ['/professionals/dashboard'],
+        routerLink: ['/professionals/account-overview'],
         hasFeature: true,
         hasPermission: true
       },

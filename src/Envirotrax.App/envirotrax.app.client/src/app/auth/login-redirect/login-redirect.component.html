@@ -1,29 +1,46 @@
 <div>
     <dp-loading-spinner *ngIf="isLoading" message="Logging you in..."></dp-loading-spinner>
 
-    <ng-container *ngIf="professionals && professionals.data && professionals.data.length > 1">
-        <p>
-            It seems like you have access to multiple systems. Please select the system you want to login.
+    <vp-section *ngIf="showAccountTypeChoice" header="Select Account Type">
+        <p class="text-center">
+            Your account has access to both a Professional account and a Water Supplier account.
+            Select which one you want to log into.
         </p>
 
-        <div>
-            <ul class="list-group">
-                <li *ngFor="let professional of professionals.data"
-                    class="list-group-item list-group-item-action"
-                    (click)="selectProfessional(professional)">
-                    {{professional.name}}
-                </li>
-            </ul>
-        </div>
-    </ng-container>
+        <div class="row justify-content-center g-3">
+            <div class="col-md-4">
+                <button type="button"
+                        class="btn btn-outline-primary w-100 py-4"
+                        (click)="selectAccountType('professional')">
+                    <i class="fa-solid fa-building-user d-block mb-2 fs-3"></i>
+                    Professional
+                </button>
+            </div>
 
-    <ng-container *ngIf="suppliers && (suppliers.adminAccount || suppliers.hierarchy.length > 0)">
-        <div>
-            <h1 class="h2 text-center mb-4">
-                Water Supplier Login
-            </h1>
+            <div class="col-md-4">
+                <button type="button"
+                        class="btn btn-outline-primary w-100 py-4"
+                        (click)="selectAccountType('waterSupplier')">
+                    <i class="fa-solid fa-droplet d-block mb-2 fs-3"></i>
+                    Water Supplier
+                </button>
+            </div>
         </div>
+    </vp-section>
 
-        <vp-water-supplier-hierarchy [mySuppliers]="suppliers" />
-    </ng-container>
+    <vp-section *ngIf="showProfessionalSelection" header="Professional Login">
+        <p class="text-center">
+            Your account may access the following Professional accounts. Select one below to access.
+        </p>
+
+        <ul class="list-group">
+            <li *ngFor="let professional of professionals?.data"
+                class="list-group-item list-group-item-action"
+                (click)="selectProfessional(professional)">
+                {{ professional.name }}
+            </li>
+        </ul>
+    </vp-section>
+
+    <vp-water-supplier-hierarchy *ngIf="showWaterSupplierSelection" [mySuppliers]="suppliers" />
 </div>

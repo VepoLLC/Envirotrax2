@@ -3,7 +3,7 @@ import { AuthService } from './shared/services/auth/auth.service';
 import { createPopper } from '@popperjs/core';
 import { WindowService } from './shared/services/window.service';
 import { WaterSupplierListComponent } from './water-suppliers/list/water-supplier-list.component';
-import { PropertySearchComponent } from './property-search/property-search.component';
+import { SiteListComponent } from './sites/list/site-list.component';
 
 @Component({
   selector: 'app-root',
@@ -88,7 +88,7 @@ export class App implements OnInit {
   }
 
   public showPropertySearch(): void {
-    this._windowService.addWindow(PropertySearchComponent, {
+    this._windowService.addWindow(SiteListComponent, {
       title: 'Property Search'
     });
   }

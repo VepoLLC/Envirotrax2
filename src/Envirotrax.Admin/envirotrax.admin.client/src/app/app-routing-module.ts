@@ -22,9 +22,9 @@ const routes: Routes = [
     loadChildren: () => import('./water-suppliers/water-supplier.module').then(m => m.WaterSupplierModule)
   },
   {
-    path: 'property-search',
+    path: 'sites',
     title: 'Property Search',
-    loadChildren: () => import('./property-search/property-search.module').then(m => m.PropertySearchModule)
+    loadChildren: () => import('./sites/site.module').then(m => m.SiteModule)
   },
 ];
 

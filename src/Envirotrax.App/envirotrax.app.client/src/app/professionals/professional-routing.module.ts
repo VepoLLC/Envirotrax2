@@ -110,6 +110,15 @@ const routes: Routes = [
         }
     },
     {
+        path: 'fog/transportation',
+        loadChildren: () => import('./fog/transportation/professionals-fog-transportation.module').then(m => m.ProfessionalsFogTransportationModule),
+        canActivate: [FeatureGuard, RoleGuard],
+        data: {
+            features: [FeatureType.FogTransportation],
+            roles: [ROLE_DEFINITIONS.PROFESSIONAL, ROLE_DEFINITIONS.PROFESSIONALS.FOG_TRANSPORTER]
+        }
+    },
+    {
         path: 'fog',
         loadChildren: () => import('./fog/professionals-fog.module').then(m => m.ProfessionalsFogModule),
         canActivate: [FeatureGuard, RoleGuard],

@@ -1,0 +1,37 @@
+<ng-template #propertyTypeCell let-row="rowData">
+    {{ row.propertyType === propertyType.Commercial ? 'Commercial' : 'Residential' }}
+</ng-template>
+
+<ng-template #otherCell let-row="rowData">
+    <div *ngIf="row.auxWaterSupply">Aux Water Supply</div>
+    <div *ngIf="row.hasSiteOssf">Site OSSF</div>
+</ng-template>
+
+<vp-section header="Backflow Renewal Requirements">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading" message="Loading renewal requirements" />
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [canEdit]="true"
+                  (edit)="edit($event)"
+                  [canDelete]="true"
+                  (delete)="delete($event)"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getRequirements()"
+                  [(query)]="table.query"
+                  (queryChange)="getRequirements()"
+                  (queryReset)="getRequirements()" />
+
+        <p *ngIf="table.items && table.items.data.length === 0" class="text-muted">
+            No renewal requirements.
+        </p>
+    </div>
+
+    <div class="text-center mt-3">
+        <button type="button" class="btn btn-primary" (click)="add()">
+            Add Renewal Requirement
+        </button>
+    </div>
+</vp-section>

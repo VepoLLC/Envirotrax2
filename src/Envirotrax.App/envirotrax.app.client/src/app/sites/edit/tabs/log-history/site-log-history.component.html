@@ -1,0 +1,70 @@
+<!-- Log type icon column template -->
+<ng-template #logTypeTemplate let-log="rowData">
+    <i *ngIf="log.logType === SiteLogType.Note" class="fa fa-file-text-o" title="Informational Note"></i>
+    <i *ngIf="log.logType === SiteLogType.Reminder" class="fa fa-clock-o text-warning" title="Scheduled Review"></i>
+    <i *ngIf="log.logType === SiteLogType.CompletedReminder" class="fa fa-clock-o text-muted"
+       title="Completed Review"></i>
+</ng-template>
+
+<!-- Description column template -->
+<ng-template #descriptionTemplate let-log="rowData">
+    <div>
+        <div *ngIf="log.noteText">{{ log.noteText }}</div>
+        <div *ngIf="log.assembly?.id">
+            <strong>Tagged Assembly:</strong>
+            SN: {{ log.assembly?.serialNumber }}
+            <span *ngIf="log.assembly?.manufacturer || log.assembly?.model || log.assembly?.size">
+                - {{ log.assembly?.manufacturer }} {{ log.assembly?.model }} {{ log.assembly?.size }}
+            </span>
+            <span *ngIf="log.assembly?.deviceType"> - {{ log.assembly?.deviceType }}</span>
+        </div>
+        <div *ngIf="log.fileAttachmentName && log.url">
+            <i class="fa fa-paperclip"></i>
+            <a [href]="log.url" target="_blank">{{ log.fileAttachmentName }}</a>
+        </div>
+        <div *ngIf="log.fileAttachmentName && !log.url && log.skipFile">
+            <i class="fa fa-paperclip"></i> {{ log.fileAttachmentName }}
+        </div>
+    </div>
+</ng-template>
+
+<!-- Review Date column template -->
+<ng-template #reviewDateTemplate let-log="rowData">
+    <span *ngIf="log.reviewDate" [class]="reviewDateStatusClasses[log.reviewDateStatus!]">
+        {{ log.reviewDate | date:'M/d/yyyy' }}
+    </span>
+</ng-template>
+
+<vp-section header="Property Log History">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+        <div *ngIf="canModify" class="mb-2 d-flex justify-content-end">
+            <button type="button" class="btn btn-primary vp-section-button" (click)="openAddModal()">
+                Add Log Record
+            </button>
+        </div>
+
+        <!-- Legend -->
+        <div class="d-flex gap-3 mb-2 small">
+            <div><i class="fa fa-file-text-o me-1"></i>Informational Note</div>
+            <div><i class="fa fa-clock-o text-warning me-1"></i>Scheduled Review</div>
+            <div><i class="fa fa-clock-o text-muted me-1"></i>Completed Review</div>
+        </div>
+
+        <div>
+            <vp-table *ngIf="table.items"
+                      [columns]="table.columns!"
+                      [data]="table.items.data"
+                      [(pageInfo)]="table.items.pageInfo"
+                      (pageInfoChange)="loadLogs()"
+                      [(query)]="table.query"
+                      (queryChange)="loadLogs()"
+                      (queryReset)="loadLogs()"
+                      [canEdit]="canModify"
+                      (edit)="openEditModal($event)"
+                      [canDelete]="canModify"
+                      (delete)="deleteLog($event)" />
+        </div>
+    </div>
+</vp-section>

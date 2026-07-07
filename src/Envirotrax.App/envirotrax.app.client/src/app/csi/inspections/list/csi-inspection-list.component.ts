@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, TemplateRef } from "@angular/core";
+import { Component, OnInit, ViewChild, TemplateRef, ElementRef } from "@angular/core";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { CsiInspection } from "../../../shared/models/csi/csi-inspection";
 import { CsiInspectionService } from "../../../shared/services/csi/csi-inspection.service";
@@ -8,6 +8,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { DownloadConfig } from "../../../shared/models/download-config";
 import { DownloadService } from "../../../shared/services/download.service";
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from "@envirotrax/common-ui";
+import { PrintableTableService } from "../../../shared/services/printable-table.service";
 
 @Component({
     standalone: false,
@@ -25,6 +26,9 @@ export class CsiInspectionListComponent implements OnInit {
 
     @ViewChild('inspectorTemplate', { static: true })
     public inspectorTemplate!: TemplateRef<CellTemplateData<CsiInspection>>;
+    
+    @ViewChild('printableSection')
+    private _printableSection!: ElementRef;
 
     public showResults: boolean = false;
 
@@ -73,7 +77,8 @@ export class CsiInspectionListComponent implements OnInit {
         private readonly _csiInspectionService: CsiInspectionService,
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
-        private readonly _downloadService: DownloadService
+        private readonly _downloadService: DownloadService,
+        private readonly _printService: PrintableTableService
     ) {
         this.downloadConfig = {
             fileName: 'CSI Inspections',
@@ -207,5 +212,9 @@ export class CsiInspectionListComponent implements OnInit {
 
     public showDownlaodManager(): void {
         this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
+    }
+
+    public viewPrintableTable(): void {
+        this._printService.open(this._printableSection.nativeElement);
     }
 }

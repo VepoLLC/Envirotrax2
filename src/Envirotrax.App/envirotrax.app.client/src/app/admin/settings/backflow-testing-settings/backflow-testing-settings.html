@@ -28,10 +28,15 @@
     <dp-loading-spinner *ngIf="isLoading" />
 
     <div dp-spinner-parent>
-        <form #settingsForm="ngForm" (ngSubmit)="save(settingsForm)">
-            <div class="row">
+        <!-- Backflow Renewal Requirements (independent CRUD) sits beside Letter Settings, outside the settings form -->
+        <div class="row">
+            <!-- Backflow Renewal Requirements Section -->
+            <div class="col-md-6 mb-3">
+                <app-backflow-renewal-requirements />
+            </div>
+
                 <!-- Backflow Letter Settings Section -->
-                <div class="col-md-12 mb-3">
+                <div class="col-md-6 mb-3">
                     <vp-section header="Backflow Letter Settings">
                         <div class="row">
                             <div class="col-md-6 mb-2">
@@ -90,7 +95,10 @@
                         </div>
                     </vp-section>
                 </div>
+            </div>
 
+        <form #settingsForm="ngForm" (ngSubmit)="save(settingsForm)">
+            <div class="row">
                 <!-- Backflow Testing Settings Section -->
                 <div class="col-md-6 mb-3">
                     <vp-section header="Backflow Testing Settings">

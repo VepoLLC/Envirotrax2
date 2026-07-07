@@ -27,6 +27,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     private readonly IProfessionalUserRepository _professionalUserRepository;
     private readonly IFileStorageService _fileStorageService;
     private readonly IAuthService _authService;
+    private readonly IPdfTemplateService _pdfTemplateService;
 
     public BackflowTestService(
         IMapper mapper,
@@ -34,7 +35,8 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         IProfessionalRepository professionalRepository,
         IProfessionalUserRepository professionalUserRepository,
         IFileStorageService fileStorageService,
-        IAuthService authService)
+        IAuthService authService,
+        IPdfTemplateService pdfTemplateService)
         : base(mapper, repository)
     {
         _testRepository = repository;
@@ -42,6 +44,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         _professionalUserRepository = professionalUserRepository;
         _fileStorageService = fileStorageService;
         _authService = authService;
+        _pdfTemplateService = pdfTemplateService;
     }
 
     private async Task PopulateBpatSnapshotAsync(BackflowTestDto dto)
@@ -270,5 +273,15 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         }
 
         return ext;
+    }
+
+    public Task<byte[]> GeneratePdfAsync(BackflowTestDto test)
+    {
+        return GeneratePdfAsync(new[] { test });
+    }
+
+    public Task<byte[]> GeneratePdfAsync(IEnumerable<BackflowTestDto> tests)
+    {
+        return _pdfTemplateService.GenerateAsync("Backflow.BackflowTest", tests);
     }
 }

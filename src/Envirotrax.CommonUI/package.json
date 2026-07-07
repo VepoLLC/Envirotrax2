@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "build-package": "ng build && cd dist\\envirotrax\\common-ui && npm pack"
+    "build-package": "ng build && cd dist/envirotrax/common-ui && npm pack"
   },
   "prettier": {
     "overrides": [

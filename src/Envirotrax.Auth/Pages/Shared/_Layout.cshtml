@@ -14,11 +14,20 @@
     <link rel="stylesheet" href="~/css/footer.css" asp-append-version="true" /> *@
 
     <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/dark-theme.css" />
     <link rel="stylesheet" href="~/font-awesome/css/all.min.css" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
 
 <body class="d-flex flex-column min-vh-100 bg-light">
+    <script>
+        (function () {
+            var match = document.cookie.match(/(?:^|;\s*)vp-theme=([^;]*)/);
+            if (match && match[1] === 'dark') {
+                document.body.classList.add('vp-dark-theme');
+            }
+        })();
+    </script>
     <nav class="navbar navbar-expand-lg bg-primary bg-gradient" data-bs-theme="dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">

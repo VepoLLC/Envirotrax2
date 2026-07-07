@@ -42,7 +42,7 @@ public class InternalApiClientService<TOptions> : IInternalApiClientService<TOpt
         _httpClient.BaseAddress = new(_apiOptions.BaseUrl);
     }
 
-    private async Task SetTokenAsync()
+    private async Task SetTokenAsync(CancellationToken cancellationToken)
     {
         if (_tokenResponse is null || (_tokenIssuedTime.HasValue && DateTime.UtcNow > _tokenIssuedTime.Value.AddSeconds(_tokenResponse.ExpiresIn - 60)))
         {
@@ -52,15 +52,15 @@ public class InternalApiClientService<TOptions> : IInternalApiClientService<TOpt
                 new("client_id", _apiOptions.ClientId),
                 new("client_secret", _apiOptions.ClientSecret),
                 new("scope", _apiOptions.Scope.Trim()),
-            ]));
+            ]), cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
-                var content = await response.Content.ReadAsStringAsync();
+                var content = await response.Content.ReadAsStringAsync(cancellationToken);
                 throw new InvalidOperationException(content);
             }
 
-            var token = await response.Content.ReadFromJsonAsync<TokenResponse>() ?? throw new InvalidOperationException();
+            var token = await response.Content.ReadFromJsonAsync<TokenResponse>(cancellationToken) ?? throw new InvalidOperationException();
 
             _tokenResponse = token;
             _tokenIssuedTime = DateTime.UtcNow;
@@ -86,19 +86,19 @@ public class InternalApiClientService<TOptions> : IInternalApiClientService<TOpt
         return request;
     }
 
-    private async Task<T?> ProcessRequestAsync<T>(Func<Task<HttpResponseMessage>> requestCallback)
+    private async Task<T?> ProcessRequestAsync<T>(CancellationToken cancellationToken, Func<Task<HttpResponseMessage>> requestCallback)
     {
-        await SetTokenAsync();
+        await SetTokenAsync(cancellationToken);
 
         var response = await requestCallback();
 
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
-            await SetTokenAsync();
+            await SetTokenAsync(cancellationToken);
             response = await requestCallback();
         }
 
-        var content = await response.Content.ReadAsStringAsync();
+        var content = await response.Content.ReadAsStringAsync(cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -113,28 +113,28 @@ public class InternalApiClientService<TOptions> : IInternalApiClientService<TOpt
         return default;
     }
 
-    public Task<T?> GetAsync<T>(int? loggedInUserId, string url)
+    public Task<T?> GetAsync<T>(int? loggedInUserId, string url, CancellationToken cancellationToken)
     {
-        return GetAsync<T>(waterSupplierId: null, loggedInUserId: loggedInUserId, url: url);
+        return GetAsync<T>(waterSupplierId: null, loggedInUserId: loggedInUserId, url: url, cancellationToken: cancellationToken);
     }
 
-    public Task<T?> GetAsync<T>(int waterSupplierId, int? loggedInUserId, string url)
+    public Task<T?> GetAsync<T>(int waterSupplierId, int? loggedInUserId, string url, CancellationToken cancellationToken)
     {
-        return GetAsync<T>(waterSupplierId: waterSupplierId, loggedInUserId: loggedInUserId, url: url);
+        return GetAsync<T>(waterSupplierId: waterSupplierId, loggedInUserId: loggedInUserId, url: url, cancellationToken: cancellationToken);
     }
 
-    private Task<T?> GetAsync<T>(int? waterSupplierId, int? loggedInUserId, string url)
+    private Task<T?> GetAsync<T>(int? waterSupplierId, int? loggedInUserId, string url, CancellationToken cancellationToken)
     {
-        return ProcessRequestAsync<T>(() =>
+        return ProcessRequestAsync<T>(cancellationToken, () =>
         {
             var request = CreateRequestMessage(HttpMethod.Get, waterSupplierId, loggedInUserId, url);
-            return _httpClient.SendAsync(request);
+            return _httpClient.SendAsync(request, cancellationToken);
         });
     }
 
-    public Task<TResponse?> PostAsync<TRequest, TResponse>(string url, ServiceMessageDto<TRequest> requestData)
+    public Task<TResponse?> PostAsync<TRequest, TResponse>(string url, ServiceMessageDto<TRequest> requestData, CancellationToken cancellationToken)
     {
-        return ProcessRequestAsync<TResponse>(() =>
+        return ProcessRequestAsync<TResponse>(cancellationToken, () =>
         {
             var request = CreateRequestMessage(HttpMethod.Post, requestData.WaterSupplierId, requestData.LoggedInUserId, url);
 
@@ -148,9 +148,9 @@ public class InternalApiClientService<TOptions> : IInternalApiClientService<TOpt
         });
     }
 
-    public Task<TResponse?> PutAsync<TRequest, TResponse>(string url, ServiceMessageDto<TRequest> requestData)
+    public Task<TResponse?> PutAsync<TRequest, TResponse>(string url, ServiceMessageDto<TRequest> requestData, CancellationToken cancellationToken)
     {
-        return ProcessRequestAsync<TResponse>(() =>
+        return ProcessRequestAsync<TResponse>(cancellationToken, () =>
         {
             var request = CreateRequestMessage(HttpMethod.Put, requestData.WaterSupplierId, requestData.LoggedInUserId, url);
 
@@ -164,19 +164,19 @@ public class InternalApiClientService<TOptions> : IInternalApiClientService<TOpt
         });
     }
 
-    public Task<T?> DeleteAsync<T>(int? loggedInUserId, string url)
+    public Task<T?> DeleteAsync<T>(int? loggedInUserId, string url, CancellationToken cancellationToken)
     {
-        return DeleteAsync<T>(waterSupplierId: null, loggedInUserId: loggedInUserId, url: url);
+        return DeleteAsync<T>(waterSupplierId: null, loggedInUserId: loggedInUserId, url: url, cancellationToken: cancellationToken);
     }
 
-    public Task<T?> DeleteAsync<T>(int waterSupplierId, int? loggedInUserId, string url)
+    public Task<T?> DeleteAsync<T>(int waterSupplierId, int? loggedInUserId, string url, CancellationToken cancellationToken)
     {
-        return DeleteAsync<T>(waterSupplierId: waterSupplierId, loggedInUserId: loggedInUserId, url: url);
+        return DeleteAsync<T>(waterSupplierId: waterSupplierId, loggedInUserId: loggedInUserId, url: url, cancellationToken: cancellationToken);
     }
 
-    private Task<T?> DeleteAsync<T>(int? waterSupplierId, int? loggedInUserId, string url)
+    private Task<T?> DeleteAsync<T>(int? waterSupplierId, int? loggedInUserId, string url, CancellationToken cancellationToken)
     {
-        return ProcessRequestAsync<T>(() =>
+        return ProcessRequestAsync<T>(cancellationToken, () =>
         {
             var request = CreateRequestMessage(HttpMethod.Delete, waterSupplierId, loggedInUserId, url);
 

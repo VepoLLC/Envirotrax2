@@ -8,3 +8,9 @@ export enum FogReasonForInspection {
     Unscheduled = 1,
     Complaint = 2
 }
+
+export const fogReasonForInspectionLabels: Record<FogReasonForInspection, string> = {
+    [FogReasonForInspection.Scheduled]: 'Scheduled',
+    [FogReasonForInspection.Unscheduled]: 'Unscheduled',
+    [FogReasonForInspection.Complaint]: 'Complaint'
+};

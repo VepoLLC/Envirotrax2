@@ -222,6 +222,22 @@ a:hover {
     border-color: #b9b9b9;
 }
 
+/* Read-only checkbox: keeps a disabled checkbox readable (normal colors) on view-only pages.
+   Opt-in by adding `readonly-checkbox` — checkboxes disabled as a "locked" cue elsewhere keep their grey-out. */
+.form-check-input.readonly-checkbox:disabled {
+    opacity: 1;
+}
+
+.form-check-input.readonly-checkbox:disabled:not(:checked) {
+    background-color: #fff;
+    border-color: #8a9199;
+}
+
+.form-check-input.readonly-checkbox:disabled ~ .form-check-label {
+    opacity: 1;
+    color: var(--bs-body-color, #212529);
+}
+
 .text-bg-success {
     background-color: rgb(41 163 106) !important;
 }

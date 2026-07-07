@@ -2,6 +2,7 @@
 import { AuthService } from './shared/services/auth/auth.service';
 import { WaterSupplierService } from './shared/services/water-suppliers/water-supplier.service';
 import { ProfesisonalService } from './shared/services/professionals/professional.service';
+import { ThemeCookieService } from './shared/services/helpers/theme-cookie.service';
 import { createPopper, flip, preventOverflow } from '@popperjs/core';
 import { FeatureType } from './shared/models/feature-type';
 import { PermissionAction, PermissionType } from './shared/models/permission-type';
@@ -19,16 +20,24 @@ export class App implements OnInit {
   public isNavbarVisible: boolean = false;
   public companyName: string = '';
   public userEmail: string = '';
+  public isDarkMode: boolean = false;
 
   constructor(
     private readonly _authService: AuthService,
     private readonly _waterSupplierService: WaterSupplierService,
-    private readonly _professionalService: ProfesisonalService
+    private readonly _professionalService: ProfesisonalService,
+    private readonly _themeCookie: ThemeCookieService
   ) {
 
   }
 
   public async ngOnInit(): Promise<void> {
+    this.isDarkMode = this._themeCookie.get() === 'dark';
+
+    if (this.isDarkMode) {
+      document.body.classList.add('vp-dark-theme');
+    }
+
     this._authService.onLoggedIn().subscribe(async isLoggedIn => {
       this.isAuthenticated = isLoggedIn;
 
@@ -55,6 +64,18 @@ export class App implements OnInit {
 
   public signOut(): void {
     this._authService.signOut();
+  }
+
+  public toggleDarkMode(): void {
+    this.isDarkMode = !this.isDarkMode;
+
+    if (this.isDarkMode) {
+      document.body.classList.add('vp-dark-theme');
+      this._themeCookie.set('dark');
+    } else {
+      document.body.classList.remove('vp-dark-theme');
+      this._themeCookie.set('light');
+    }
   }
 
   private async createMenuItems(): Promise<MenuItem[]> {
@@ -422,8 +443,6 @@ export class App implements OnInit {
     const isFogInspector = await this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.FOG_INSPECTOR);
     const isFogTransporter = await this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.FOG_TRANSPORTER);
 
-    const hasFogAccess = isFogInspector || isFogTransporter;
-
     return [
       {
         title: 'Account Overview',
@@ -472,6 +491,20 @@ export class App implements OnInit {
             routerLink: ['professionals/backflow/gauges'],
             hasPermission: isBackflowTester,
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.BackflowTesting)
+          },
+          {
+            title: 'Vehicle Management',
+            iconCss: 'fa-solid fa-truck',
+            routerLink: ['professionals/fog/transportation/vehicles'],
+            hasPermission: isFogTransporter,
+            hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
+          },
+          {
+            title: 'Disposal Site Management',
+            iconCss: 'fa-solid fa-location-dot',
+            routerLink: ['professionals/fog/transportation/disposal-sites'],
+            hasPermission: isFogTransporter,
+            hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
           }
         ]
       },
@@ -536,106 +569,28 @@ export class App implements OnInit {
       {
         title: 'FOG Management',
         iconCss: 'fa-regular fa-tank-water',
-        hasPermission: hasFogAccess,
-        hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection, FeatureType.FogTransportation),
+        hasPermission: isFogInspector,
+        hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection),
         children: [
           {
             title: 'Property Record Search',
             iconCss: 'fa-regular fa-building-magnifying-glass',
             routerLink: ['professionals/sites'],
-            hasPermission: hasFogAccess,
+            hasPermission: isFogInspector,
             hasFeature: true
           },
           {
             title: 'Inspection Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['/professionals/fog/inspections'],
+            routerLink: ['professionals/fog/inspections'],
             hasPermission: isFogInspector,
-            hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
-          },
-          {
-            title: 'Trip Ticket Search',
-            iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['/'],
-            hasPermission: isFogTransporter,
-            hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
-          },
-          {
-            type: 'separator',
-            hasPermission: hasFogAccess,
             hasFeature: true
           },
           {
-            title: 'Inspector Management',
-            iconCss: 'fa-regular fa-user',
-            routerLink: ['/fog/inspectors'],
-            hasPermission: isAdmin && isFogInspector,
-            hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
-          },
-          {
-            title: 'Transporter Management',
-            iconCss: 'fa-regular fa-user',
-            routerLink: ['/'],
-            hasPermission: isAdmin && isFogTransporter,
-            hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
-          },
-          {
-            title: 'Vehicle Management',
-            iconCss: 'fa-solid fa-truck',
-            routerLink: ['/'],
-            hasPermission: isAdmin && isFogTransporter,
-            hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
-          },
-          {
-            title: 'License Management',
-            iconCss: 'fa-regular fa-id-card',
-            routerLink: ['/'],
-            hasPermission: hasFogAccess,
-            hasFeature: true
-          },
-          {
-            type: 'separator',
-            hasPermission: hasFogAccess,
-            hasFeature: true
-          },
-          {
-            title: 'System Reports',
-            iconCss: 'fa-regular fa-chart-simple-horizontal',
-            routerLink: ['/'],
-            hasPermission: hasFogAccess,
-            hasFeature: true
-          },
-          {
-            type: 'separator',
-            hasPermission: hasFogAccess,
-            hasFeature: true
-          },
-          {
-            title: 'Inspection Compliance Management',
-            iconCss: 'fa-solid fa-list-check',
-            routerLink: ['/'],
+            title: 'Submit Inspection',
+            iconCss: 'fa-regular fa-file-plus',
+            routerLink: ['professionals/fog/inspections/create'],
             hasPermission: isFogInspector,
-            hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
-          },
-          {
-            title: 'Permit Compliance Management',
-            iconCss: 'fa-solid fa-list-check',
-            routerLink: ['/'],
-            hasPermission: hasFogAccess,
-            hasFeature: true
-          },
-          {
-            title: 'Trip Ticket Compliance Management',
-            iconCss: 'fa-solid fa-list-check',
-            routerLink: ['/'],
-            hasPermission: isFogTransporter,
-            hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
-          },
-          {
-            title: 'Property Log Management',
-            iconCss: 'fa-light fa-building-memo',
-            routerLink: ['/'],
-            hasPermission: hasFogAccess,
             hasFeature: true
           }
         ]

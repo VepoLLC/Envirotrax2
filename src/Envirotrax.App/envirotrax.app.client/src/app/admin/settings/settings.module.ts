@@ -9,6 +9,8 @@ import { CsiSettingsComponent } from "./csi-settings/csi-settings.component";
 import { BackflowTestingSettings } from './backflow-testing-settings/backflow-testing-settings';
 import { CsiLetterMessageSettingsComponent } from './csi-letter-message-settings/csi-letter-message-settings.component';
 import { BackflowLetterMessageSettingsComponent } from './backflow-letter-message-settings/backflow-letter-message-settings.component';
+import { BackflowRenewalRequirementsComponent } from './backflow-renewal-requirements/backflow-renewal-requirements.component';
+import { EditBackflowRenewalRequirementComponent } from './backflow-renewal-requirements/edit/edit-backflow-renewal-requirement.component';
 
 @NgModule({
     declarations: [
@@ -16,7 +18,9 @@ import { BackflowLetterMessageSettingsComponent } from './backflow-letter-messag
         CsiSettingsComponent,
         BackflowTestingSettings,
         CsiLetterMessageSettingsComponent,
-        BackflowLetterMessageSettingsComponent
+        BackflowLetterMessageSettingsComponent,
+        BackflowRenewalRequirementsComponent,
+        EditBackflowRenewalRequirementComponent
     ],
     imports: [
         CommonModule,

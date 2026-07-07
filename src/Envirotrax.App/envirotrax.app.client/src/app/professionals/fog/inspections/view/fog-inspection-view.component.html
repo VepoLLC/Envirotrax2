@@ -1,0 +1,378 @@
+<h1 class="text-center h2">FOG Inspection</h1>
+
+<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+<div *ngIf="!isLoading && inspection">
+
+    <!-- Water Supplier -->
+    <vp-section header="Water Supplier" class="d-block">
+        <div class="row">
+            <div class="col-lg-6">
+                <dl class="row mb-0">
+                    <dt class="col-5">Water Supplier:</dt>
+                    <dd class="col-7 mb-1">{{ inspection.waterSupplier?.name }}</dd>
+                    <dt class="col-5">Address:</dt>
+                    <dd class="col-7 mb-1">
+                        {{ inspection.waterSupplier?.address }}<br *ngIf="inspection.waterSupplier?.address">
+                        {{ inspection.waterSupplier?.city }}<span
+                              *ngIf="inspection.waterSupplier?.city && inspection.waterSupplier?.state?.name">,
+                        </span>{{ inspection.waterSupplier?.state?.name }} {{ inspection.waterSupplier?.zipCode }}
+                    </dd>
+                </dl>
+            </div>
+            <div class="col-lg-6">
+                <dl class="row mb-0">
+                    <dt class="col-5">PWS ID:</dt>
+                    <dd class="col-7 mb-1">{{ inspection.waterSupplier?.pwsId }}</dd>
+                    <dt class="col-5">Contact Name:</dt>
+                    <dd class="col-7 mb-1">{{ inspection.waterSupplier?.contactName }}</dd>
+                    <dt class="col-5">Phone Number:</dt>
+                    <dd class="col-7 mb-1">{{ inspection.waterSupplier?.phoneNumber }}</dd>
+                    <dt class="col-5">Email Address:</dt>
+                    <dd class="col-7 mb-1">{{ inspection.waterSupplier?.emailAddress }}</dd>
+                </dl>
+            </div>
+        </div>
+    </vp-section>
+
+    <!-- CSI Inspector -->
+    <vp-section header="CSI Inspector" class="mt-3 d-block">
+        <div class="row">
+            <div class="col-lg-6">
+                <dl class="row mb-0">
+                    <dt class="col-5">Company Name:</dt>
+                    <dd class="col-7 mb-1">{{ inspection.inspectorCompanyName }}</dd>
+                    <dt class="col-5">Title of Inspector:</dt>
+                    <dd class="col-7 mb-1">{{ inspection.inspectorJobTitle }}</dd>
+                    <dt class="col-5">Inspector Name:</dt>
+                    <dd class="col-7 mb-1">{{ inspection.inspectorContactName }}</dd>
+                    <dt class="col-5">Address:</dt>
+                    <dd class="col-7 mb-1">{{ inspection.inspectorAddress }} {{ inspection.inspectorCity }}
+                        {{ inspection.inspectorState }} {{ inspection.inspectorZip }}
+                    </dd>
+                </dl>
+            </div>
+            <div class="col-lg-6">
+                <dl class="row mb-0">
+                    <dt class="col-5">Phone Number:</dt>
+                    <dd class="col-7 mb-1">{{ inspection.inspectorWorkNumber }}</dd>
+                    <dt class="col-5">Email Address:</dt>
+                    <dd class="col-7 mb-1">{{ inspection.inspector?.emailAddress }}</dd>
+                    <dt class="col-5">License Number:</dt>
+                    <dd class="col-7 mb-1"></dd>
+                    <dt class="col-5">License Type:</dt>
+                    <dd class="col-7 mb-1"></dd>
+                </dl>
+            </div>
+        </div>
+    </vp-section>
+
+    <!-- Location / Property + Contact / Mailing -->
+    <div class="row mt-3">
+        <div class="col-md-12 col-lg-6">
+            <vp-section header="Location / Property Information" class="h-100 d-block">
+                <dl class="row mb-0">
+                    <dt class="col-5">Property Type:</dt>
+                    <dd class="col-7 mb-1">
+                        {{ inspection.propertyType === PropertyType.Residential ? 'Residential' : 'Commercial' }}
+                    </dd>
+                    <dt class="col-5">Business Name:</dt>
+                    <dd class="col-7 mb-1">{{ inspection.propertyBusinessName }}</dd>
+                    <dt class="col-5">Property Address:</dt>
+                    <dd class="col-7 mb-1">
+                        {{ inspection.propertyStreetNumber }} {{ inspection.propertyStreetName }}<span
+                              *ngIf="inspection.propertyNumber"> #{{ inspection.propertyNumber }}</span><br>
+                        {{ inspection.propertyCity }}<span
+                              *ngIf="inspection.propertyCity && inspection.propertyState?.code">,
+                        </span>{{ inspection.propertyState?.code }} {{ inspection.propertyZip }}
+                    </dd>
+                </dl>
+            </vp-section>
+        </div>
+        <div class="col-md-12 col-lg-6 mt-3 mt-lg-0">
+            <vp-section header="Contact / Mailing Information" class="h-100 d-block">
+                <dl class="row mb-0">
+                    <dt class="col-5">Company Name:</dt>
+                    <dd class="col-7 mb-1">{{ inspection.mailingCompanyName }}</dd>
+                    <dt class="col-5">Contact Name:</dt>
+                    <dd class="col-7 mb-1">{{ inspection.mailingContactName }}</dd>
+                    <dt class="col-5">Mailing Address:</dt>
+                    <dd class="col-7 mb-1">
+                        {{ inspection.mailingStreetNumber }} {{ inspection.mailingStreetName }}<span
+                              *ngIf="inspection.mailingNumber"> #{{ inspection.mailingNumber }}</span><br>
+                        {{ inspection.mailingCity }}<span
+                              *ngIf="inspection.mailingCity && inspection.mailingState?.code">,
+                        </span>{{ inspection.mailingState?.code }} {{ inspection.mailingZip }}
+                    </dd>
+                    <dt class="col-5">Phone Number:</dt>
+                    <dd class="col-7 mb-1">{{ inspection.mailingPhoneNumber }}</dd>
+                    <dt class="col-5">Email Address:</dt>
+                    <dd class="col-7 mb-1">{{ inspection.mailingEmailAddress }}</dd>
+                </dl>
+            </vp-section>
+        </div>
+    </div>
+
+    <!-- Trap Information -->
+    <vp-section header="Trap Information" class="mt-3 d-block">
+        <dl class="row mb-0">
+            <dt class="col-sm-4">This Waste was Removed From:</dt>
+            <dd class="col-sm-8 mb-1">{{ inspection.interceptorType }} {{ inspection.interceptorOtherDescription }}</dd>
+            <dt class="col-sm-4">Waste Trap or Tank Capacity:</dt>
+            <dd class="col-sm-8 mb-1">{{ inspection.interceptorCapacity }} Gallons</dd>
+            <dt class="col-sm-4">Location Description:</dt>
+            <dd class="col-sm-8 mb-1">{{ inspection.interceptorLocationDescription }}</dd>
+        </dl>
+    </vp-section>
+
+    <!-- Inspection Results -->
+    <vp-section header="Inspection Results" class="mt-3 d-block">
+
+        <dl class="row mb-2">
+            <dt class="col-sm-3 col-lg-2">Inspection Date:</dt>
+            <dd class="col-sm-9 col-lg-10 mb-0">{{ inspection.inspectionDate | date:'M/d/yyyy h:mm a' }}</dd>
+        </dl>
+
+        <div class="row mb-2">
+            <div class="col-lg-6">
+                <dl class="row mb-0">
+                    <dt class="col-6">Reason for Inspection</dt>
+                    <dd class="col-6 mb-0">{{ reasonLabel }}</dd>
+                </dl>
+            </div>
+            <div class="col-lg-6">
+                <dl class="row mb-0">
+                    <dt class="col-6">Facility Type</dt>
+                    <dd class="col-6 mb-0">{{ facilityTypeLabel }}</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="row mb-2">
+            <div class="col-lg-6">
+                <dl class="row mb-0">
+                    <dt class="col-7 fw-normal">Is it properly maintained?</dt>
+                    <dd class="col-5 mb-1">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input readonly-checkbox" type="radio" disabled
+                                   [checked]="inspection.maintained === true" />
+                            <label class="form-check-label ms-1">Yes</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input readonly-checkbox" type="radio" disabled
+                                   [checked]="inspection.maintained === false" />
+                            <label class="form-check-label ms-1">No</label>
+                        </div>
+                    </dd>
+                    <dt class="col-7 fw-normal">Is it accessible?</dt>
+                    <dd class="col-5 mb-1">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input readonly-checkbox" type="radio" disabled
+                                   [checked]="inspection.accessible === true" />
+                            <label class="form-check-label ms-1">Yes</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input readonly-checkbox" type="radio" disabled
+                                   [checked]="inspection.accessible === false" />
+                            <label class="form-check-label ms-1">No</label>
+                        </div>
+                    </dd>
+                    <dt class="col-7 fw-normal">Is there evidence of past overflow?</dt>
+                    <dd class="col-5 mb-1">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-inpu readonly-checkboxt" type="radio" disabled
+                                   [checked]="inspection.pastOverflow === true" />
+                            <label class="form-check-label ms-1">Yes</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input readonly-checkbox" type="radio" disabled
+                                   [checked]="inspection.pastOverflow === false" />
+                            <label class="form-check-label ms-1">No</label>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+            <div class="col-lg-6">
+                <p class="fw-semibold mb-1">Sampling Point:</p>
+                <dl class="row mb-0">
+                    <dt class="col-7 fw-normal">Is it accessible?</dt>
+                    <dd class="col-5 mb-1">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input readonly-checkbox" type="radio" disabled
+                                   [checked]="inspection.samplingPointAccessible === true" />
+                            <label class="form-check-label ms-1">Yes</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input readonly-checkbox" type="radio" disabled
+                                   [checked]="inspection.samplingPointAccessible === false" />
+                            <label class="form-check-label ms-1">No</label>
+                        </div>
+                    </dd>
+                    <dt class="col-7 fw-normal">Does it need to be cleaned?</dt>
+                    <dd class="col-5 mb-1">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input readonly-checkbox" type="radio" disabled
+                                   [checked]="inspection.samplingPointClean === true" />
+                            <label class="form-check-label ms-1">Yes</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input readonly-checkbox" type="radio" disabled
+                                   [checked]="inspection.samplingPointClean === false" />
+                            <label class="form-check-label ms-1">No</label>
+                        </div>
+                    </dd>
+                    <dt class="col-7 fw-normal">Sampled From:</dt>
+                    <dd class="col-5 mb-1">{{ inspection.sampledFrom }}</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="row mb-2">
+            <div class="col-lg-6">
+                <p class="fw-semibold mb-1">Inlet Chamber:</p>
+                <dl class="row mb-0">
+                    <dt class="col-7 fw-normal">Is the inlet tee visible?</dt>
+                    <dd class="col-5 mb-1">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input readonly-checkbox" type="radio" disabled
+                                   [checked]="inspection.inletTeeVisible === true" />
+                            <label class="form-check-label ms-1">Yes</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input readonly-checkbox" type="radio" disabled
+                                   [checked]="inspection.inletTeeVisible === false" />
+                            <label class="form-check-label ms-1">No</label>
+                        </div>
+                    </dd>
+                    <dt class="col-7 fw-normal">Is the inlet tee intact?</dt>
+                    <dd class="col-5 mb-1">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input readonly-checkbox" type="radio" disabled
+                                   [checked]="inspection.inletTeeIntact === true" />
+                            <label class="form-check-label ms-1">Yes</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input readonly-checkbox" type="radio" disabled
+                                   [checked]="inspection.inletTeeIntact === false" />
+                            <label class="form-check-label ms-1">No</label>
+                        </div>
+                    </dd>
+                </dl>
+                <dl class="row mb-0 mt-2">
+                    <dt class="col-7 fw-normal">Wetted Height in Inches:</dt>
+                    <dd class="col-5 mb-1">{{ inspection.inletChamberWettingHeight }}</dd>
+                    <dt class="col-7 fw-normal">Grease Blanket in Inches:</dt>
+                    <dd class="col-5 mb-1">{{ inspection.inletChamberGreaseBlanket }}</dd>
+                    <dt class="col-7 fw-normal">Sediments in Inches:</dt>
+                    <dd class="col-5 mb-1">{{ inspection.inletChamberSediments }}</dd>
+                </dl>
+                <dl class="row mb-0 mt-2">
+                    <dt class="col-7 fw-normal">Grease Layer %:</dt>
+                    <dd class="col-5 mb-1">{{ inletGreaseLayerPercent }}</dd>
+                    <dt class="col-7 fw-normal">Sediment Layer %:</dt>
+                    <dd class="col-5 mb-1">{{ inletSedimentLayerPercent }}</dd>
+                    <dt class="col-7 fw-normal">Total Inlet Chamber %:</dt>
+                    <dd class="col-5 mb-1">{{ inspection.inletTotalCapacityPercent }}%</dd>
+                </dl>
+            </div>
+            <div class="col-lg-6">
+                <p class="fw-semibold mb-1">Outlet Chamber:</p>
+                <dl class="row mb-0">
+                    <dt class="col-7 fw-normal">Is the outfall tee visible?</dt>
+                    <dd class="col-5 mb-1">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input readonly-checkbox" type="radio" disabled
+                                   [checked]="inspection.outletTeeVisible === true" />
+                            <label class="form-check-label ms-1">Yes</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input readonly-checkbox" type="radio" disabled
+                                   [checked]="inspection.outletTeeVisible === false" />
+                            <label class="form-check-label ms-1">No</label>
+                        </div>
+                    </dd>
+                    <dt class="col-7 fw-normal">Is the outfall tee intact?</dt>
+                    <dd class="col-5 mb-1">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input readonly-checkbox" type="radio" disabled
+                                   [checked]="inspection.outletTeeIntact === true" />
+                            <label class="form-check-label ms-1">Yes</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input readonly-checkbox" type="radio" disabled
+                                   [checked]="inspection.outletTeeIntact === false" />
+                            <label class="form-check-label ms-1">No</label>
+                        </div>
+                    </dd>
+                </dl>
+                <dl class="row mb-0 mt-2">
+                    <dt class="col-7 fw-normal">Wetted Height in Inches:</dt>
+                    <dd class="col-5 mb-1">{{ inspection.outletChamberWettingHeight }}</dd>
+                    <dt class="col-7 fw-normal">Grease Blanket in Inches:</dt>
+                    <dd class="col-5 mb-1">{{ inspection.outletChamberGreaseBlanket }}</dd>
+                    <dt class="col-7 fw-normal">Sediments in Inches:</dt>
+                    <dd class="col-5 mb-1">{{ inspection.outletChamberSediments }}</dd>
+                </dl>
+                <dl class="row mb-0 mt-2">
+                    <dt class="col-7 fw-normal">Grease Layer %:</dt>
+                    <dd class="col-5 mb-1">{{ outletGreaseLayerPercent }}</dd>
+                    <dt class="col-7 fw-normal">Sediment Layer %:</dt>
+                    <dd class="col-5 mb-1">{{ outletSedimentLayerPercent }}</dd>
+                    <dt class="col-7 fw-normal">Total Outlet Chamber %:</dt>
+                    <dd class="col-5 mb-1">{{ inspection.outletTotalCapacityPercent }}%</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-lg-6">
+                <dl class="row mb-0">
+                    <dt class="col-6">Total Capacity %:</dt>
+                    <dd class="col-6 mb-1">{{ inspection.totalCapacityPercent }}%</dd>
+                    <dt class="col-6">Inspection Result:</dt>
+                    <dd class="col-6 mb-1">
+                        {{ inspection.inspectionResult === FogInspectionResult.Passed ? 'Passed' : 'Failed' }}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+    </vp-section>
+
+    <!-- Signature -->
+    <vp-section header="Signature" class="mt-3 d-block">
+        <div *ngIf="inspection.signatureContactName">
+            Contact Name:&nbsp;&nbsp;{{ inspection.signatureContactName }}
+        </div>
+        <div *ngIf="inspection.signatureImageUrl" class="text-center mt-2">
+            <img [src]="inspection.signatureImageUrl" alt="Signature" class="img-fluid" />
+        </div>
+    </vp-section>
+
+    <!-- Remarks -->
+    <vp-section header="Remarks" class="mt-3 d-block">
+        <p class="mb-0">{{ inspection.comments }}</p>
+    </vp-section>
+
+    <!-- Grease Trap Images -->
+    <vp-section *ngIf="inspection.exteriorImageUrl || inspection.interiorImageUrl" header="Grease Trap Images"
+                class="mt-3 d-block">
+        <div class="row">
+            <div class="col-md-12 col-lg-6 mb-3 mb-lg-0" *ngIf="inspection.exteriorImageUrl">
+                <div class="border rounded overflow-hidden">
+                    <div class="bg-light border-bottom fw-semibold text-center p-2">Grease Trap Exterior</div>
+                    <div class="p-2"><img [src]="inspection.exteriorImageUrl" alt="Grease Trap Exterior"
+                             class="img-fluid w-100" /></div>
+                </div>
+            </div>
+            <div class="col-md-12 col-lg-6" *ngIf="inspection.interiorImageUrl">
+                <div class="border rounded overflow-hidden">
+                    <div class="bg-light border-bottom fw-semibold text-center p-2">Grease Trap Interior</div>
+                    <div class="p-2"><img [src]="inspection.interiorImageUrl" alt="Grease Trap Interior"
+                             class="img-fluid w-100" /></div>
+                </div>
+            </div>
+        </div>
+    </vp-section>
+
+</div>

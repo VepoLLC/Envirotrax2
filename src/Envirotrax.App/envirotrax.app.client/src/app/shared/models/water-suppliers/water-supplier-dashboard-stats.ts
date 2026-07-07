@@ -1,4 +1,9 @@
 export interface WaterSupplierDashboardStats {
+    //Property Logs
+    pastDuePropertyLogCount: number;
+    expiringPropertyLogCount: number;
+    allPropertyLogCount: number;
+
     // Accounts
     wiseGuyCount: number;
     csiInspectorCount: number;

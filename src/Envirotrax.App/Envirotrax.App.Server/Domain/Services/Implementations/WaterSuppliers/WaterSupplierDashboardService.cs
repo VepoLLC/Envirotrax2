@@ -26,4 +26,18 @@ public class WaterSupplierDashboardService : IWaterSupplierDashboardService
 
         return stats;
     }
+
+    public Task<BackflowSubmissionStatsDto> GetBackflowSubmissionStatsAsync(CancellationToken cancellationToken)
+    {
+        var stats = _repository.GetBackflowSubmissionStatsAsync(cancellationToken);
+
+        return stats;
+    }
+
+    public Task<FogInspectionSubmissionStatsDto> GetFogInspectionSubmissionStatsAsync(CancellationToken cancellationToken)
+    {
+        var stats = _repository.GetFogInspectionSubmissionStatsAsync(cancellationToken);
+
+        return stats;
+    }
 }

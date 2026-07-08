@@ -118,4 +118,160 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
 
         return new CsiSubmissionStatsDto { DailyStats = dailyStats, SubAccountStats = subAccountStats };
     }
+
+    public async Task<BackflowSubmissionStatsDto> GetBackflowSubmissionStatsAsync(CancellationToken cancellationToken)
+    {
+        var wsId = _tenantProvider.WaterSupplierId;
+        var userTz = _timeZoneHelper.GetUserTimeZone();
+        var localToday = _timeZoneHelper.GetUserLocalTime().Date;
+        var localStart = localToday.AddDays(-9);
+
+        var utcStart = TimeZoneInfo.ConvertTimeToUtc(localStart, userTz);
+        var utcEnd = TimeZoneInfo.ConvertTimeToUtc(localToday.AddDays(1), userTz);
+
+        var allDates = Enumerable.Range(0, 10)
+            .Select(i => DateOnly.FromDateTime(localStart.AddDays(i)))
+            .ToList();
+
+        var rawMain = await _context.BackflowTests
+            .Where(b => b.WaterSupplierId == wsId && b.TestDate >= utcStart && b.TestDate < utcEnd)
+            .Select(b => new { b.TestDate, b.TransactionId })
+            .ToListAsync(cancellationToken);
+
+        var groupedMain = rawMain
+            .GroupBy(b => DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(b.TestDate!.Value, userTz)))
+            .Select(g => new
+            {
+                Date = g.Key,
+                Total = g.Count(),
+                Paid = g.Count(b => !string.IsNullOrEmpty(b.TransactionId))
+            })
+            .ToList();
+
+        var dailyStats = allDates.Select(d => new BackflowDailyStatsDto
+        {
+            Date = d,
+            IsWeekend = d.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday,
+            TotalTests = groupedMain.FirstOrDefault(r => r.Date == d)?.Total ?? 0,
+            TotalPaidTests = groupedMain.FirstOrDefault(r => r.Date == d)?.Paid ?? 0
+        }).ToList();
+
+        var childWaterSuppliers = await _context.WaterSuppliers
+            .Where(ws => ws.ParentId == wsId)
+            .Select(ws => new { ws.Id, ws.Name })
+            .ToListAsync(cancellationToken);
+
+        List<BackflowSubAccountStatsDto>? subAccountStats = null;
+        if (childWaterSuppliers.Count > 0)
+        {
+            var childIds = childWaterSuppliers.Select(ws => ws.Id).ToList();
+            var rawSub = await _context.BackflowTests
+                .Where(b => childIds.Contains(b.WaterSupplierId) && b.TestDate >= utcStart && b.TestDate < utcEnd)
+                .Select(b => new { b.WaterSupplierId, b.TestDate, b.TransactionId })
+                .ToListAsync(cancellationToken);
+
+            var groupedSub = rawSub
+                .GroupBy(b => new { b.WaterSupplierId, Date = DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(b.TestDate!.Value, userTz)) })
+                .Select(g => new
+                {
+                    g.Key.WaterSupplierId,
+                    g.Key.Date,
+                    Total = g.Count(),
+                    Paid = g.Count(b => !string.IsNullOrEmpty(b.TransactionId))
+                })
+                .ToList();
+
+            subAccountStats = [..childWaterSuppliers.Select(ws => new BackflowSubAccountStatsDto
+            {
+                WaterSupplierName = ws.Name,
+                DailyStats = [..allDates.Select(d => new BackflowDailyStatsDto
+                {
+                    Date = d,
+                    IsWeekend = d.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday,
+                    TotalTests = groupedSub.FirstOrDefault(r => r.WaterSupplierId == ws.Id && r.Date == d)?.Total ?? 0,
+                    TotalPaidTests = groupedSub.FirstOrDefault(r => r.WaterSupplierId == ws.Id && r.Date == d)?.Paid ?? 0
+                })]
+            })];
+        }
+
+        return new BackflowSubmissionStatsDto { DailyStats = dailyStats, SubAccountStats = subAccountStats };
+    }
+
+    public async Task<FogInspectionSubmissionStatsDto> GetFogInspectionSubmissionStatsAsync(CancellationToken cancellationToken)
+    {
+        var wsId = _tenantProvider.WaterSupplierId;
+        var userTz = _timeZoneHelper.GetUserTimeZone();
+        var localToday = _timeZoneHelper.GetUserLocalTime().Date;
+        var localStart = localToday.AddDays(-9);
+
+        var utcStart = TimeZoneInfo.ConvertTimeToUtc(localStart, userTz);
+        var utcEnd = TimeZoneInfo.ConvertTimeToUtc(localToday.AddDays(1), userTz);
+
+        var allDates = Enumerable.Range(0, 10)
+            .Select(i => DateOnly.FromDateTime(localStart.AddDays(i)))
+            .ToList();
+
+        var rawMain = await _context.FogInspections
+            .Where(f => f.WaterSupplierId == wsId && f.CreatedTime >= utcStart && f.CreatedTime < utcEnd)
+            .Select(f => new { f.CreatedTime, f.TransactionId })
+            .ToListAsync(cancellationToken);
+
+        var groupedMain = rawMain
+            .GroupBy(f => DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(f.CreatedTime, userTz)))
+            .Select(g => new
+            {
+                Date = g.Key,
+                Total = g.Count(),
+                Paid = g.Count(f => !string.IsNullOrEmpty(f.TransactionId))
+            })
+            .ToList();
+
+        var dailyStats = allDates.Select(d => new FogInspectionDailyStatsDto
+        {
+            Date = d,
+            IsWeekend = d.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday,
+            TotalInspections = groupedMain.FirstOrDefault(r => r.Date == d)?.Total ?? 0,
+            TotalPaidInspections = groupedMain.FirstOrDefault(r => r.Date == d)?.Paid ?? 0
+        }).ToList();
+
+        var childWaterSuppliers = await _context.WaterSuppliers
+            .Where(ws => ws.ParentId == wsId)
+            .Select(ws => new { ws.Id, ws.Name })
+            .ToListAsync(cancellationToken);
+
+        List<FogInspectionSubAccountStatsDto>? subAccountStats = null;
+        if (childWaterSuppliers.Count > 0)
+        {
+            var childIds = childWaterSuppliers.Select(ws => ws.Id).ToList();
+            var rawSub = await _context.FogInspections
+                .Where(f => childIds.Contains(f.WaterSupplierId) && f.CreatedTime >= utcStart && f.CreatedTime < utcEnd)
+                .Select(f => new { f.WaterSupplierId, f.CreatedTime, f.TransactionId })
+                .ToListAsync(cancellationToken);
+
+            var groupedSub = rawSub
+                .GroupBy(f => new { f.WaterSupplierId, Date = DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(f.CreatedTime, userTz)) })
+                .Select(g => new
+                {
+                    g.Key.WaterSupplierId,
+                    g.Key.Date,
+                    Total = g.Count(),
+                    Paid = g.Count(f => !string.IsNullOrEmpty(f.TransactionId))
+                })
+                .ToList();
+
+            subAccountStats = [..childWaterSuppliers.Select(ws => new FogInspectionSubAccountStatsDto
+            {
+                WaterSupplierName = ws.Name,
+                DailyStats = [..allDates.Select(d => new FogInspectionDailyStatsDto
+                {
+                    Date = d,
+                    IsWeekend = d.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday,
+                    TotalInspections = groupedSub.FirstOrDefault(r => r.WaterSupplierId == ws.Id && r.Date == d)?.Total ?? 0,
+                    TotalPaidInspections = groupedSub.FirstOrDefault(r => r.WaterSupplierId == ws.Id && r.Date == d)?.Paid ?? 0
+                })]
+            })];
+        }
+
+        return new FogInspectionSubmissionStatsDto { DailyStats = dailyStats, SubAccountStats = subAccountStats };
+    }
 }

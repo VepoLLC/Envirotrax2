@@ -106,6 +106,19 @@ export class FogInspectionListComponent implements OnInit {
 
     public async ngOnInit(): Promise<void> {
         this.table.columns = this.getColumns();
+
+        const dateParam = this._activatedRoute.snapshot.queryParamMap.get('date');
+        if (dateParam) {
+            this.table.query.filter = [{
+                columnName: 'inspectionDate',
+                children: [
+                    { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                    { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Lte', logicalOperator: 'And' }
+                ]
+            }];
+            await this.getInspections();
+            this.showResults = (this.table.items?.pageInfo?.totalItems ?? 0) > 0;
+        }
     }
 
     private getColumns(): TableColumn<FogInspection>[] {

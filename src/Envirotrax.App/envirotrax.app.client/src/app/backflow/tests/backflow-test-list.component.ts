@@ -220,6 +220,19 @@ export class BackflowTestListComponent implements OnInit {
 
     public async ngOnInit(): Promise<void> {
         this.setupColumns();
+
+        const dateParam = this._activatedRoute.snapshot.queryParamMap.get('date');
+        if (dateParam) {
+            this.table.query.filter = [{
+                columnName: 'testDate',
+                children: [
+                    { columnName: 'testDate', value: dateParam, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                    { columnName: 'testDate', value: dateParam, comparisonOperator: 'Lte', logicalOperator: 'And' }
+                ]
+            }];
+            await this.getTests();
+            this.showResults = (this.table.items?.pageInfo?.totalItems ?? 0) > 0;
+        }
     }
 
     public viewDetails(test: BackflowTest): void {

@@ -52,4 +52,14 @@ public class SiteLogRepository : Repository<SiteLog>, ISiteLogRepository
 
         return await paginated.ToListAsync(cancellationToken);
     }
+
+    public async Task<IEnumerable<SiteLog>> GetBySiteIdsAsync(IEnumerable<int> siteIds, CancellationToken cancellationToken)
+    {
+        var cutoff = DateTime.UtcNow.AddDays(-365);
+
+        return await GetListQuery()
+            .Where(sl => siteIds.Contains(sl.SiteId) && sl.CreatedTime > cutoff)
+            .OrderByDescending(sl => sl.Id)
+            .ToListAsync(cancellationToken);
+    }
 }

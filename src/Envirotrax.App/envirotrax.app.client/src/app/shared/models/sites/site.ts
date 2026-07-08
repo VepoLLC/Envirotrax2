@@ -3,9 +3,11 @@ import { GreaseTrapType } from "../../enums/grease-trap-type.enum";
 import { PropertyType } from "../../enums/property-type.enum";
 import { State } from "../lookup/state";
 import { WaterSupplier } from "../water-suppliers/water-supplier";
+import { SiteLog } from "./site-log";
 
 export interface Site {
     id?: number;
+    logs?: SiteLog[];
     waterSupplier?: WaterSupplier;
     subArea?: string;
     accountNumber?: string;

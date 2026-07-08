@@ -16,6 +16,7 @@ import { AuthService } from "../../shared/services/auth/auth.service";
 import { FeatureType } from "../../shared/models/feature-type";
 import { DownloadService } from "../../shared/services/download.service";
 import { CellTemplateData, ColumnType, InputOption, MapMarker, MapPolygon, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
+import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
 
 @Component({
     standalone: false,
@@ -105,7 +106,8 @@ export class SiteListComponent implements OnInit {
         private readonly _coordinateService: GisAreaCoordinateService,
         private readonly _gisMapService: GisMapService,
         private readonly _authService: AuthService,
-        private readonly _downloadService: DownloadService
+        private readonly _downloadService: DownloadService,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
 
     }
@@ -243,11 +245,16 @@ export class SiteListComponent implements OnInit {
         this.table.query.filter = queryProperties
     }
 
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
+    }
+
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
             this.showMapResults = false;
             await this.getSites();
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 
@@ -258,7 +265,7 @@ export class SiteListComponent implements OnInit {
 
         try {
             this.isMapLoading = true;
-            this.showResults = false;
+            this.setShowResults(false);
             this.showMapResults = false;
 
             const [sitesPage, areas, coordinates, defaultView] = await Promise.all([

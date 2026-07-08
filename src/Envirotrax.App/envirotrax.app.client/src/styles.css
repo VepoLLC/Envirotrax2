@@ -81,12 +81,24 @@ a:hover {
 }
 
 .dp-modal-header:not(.dp-error):not(.dp-success):not(.dp-warning) {
-    background-color: #05bfdf !important;
+    background-color: #008fd4a0 !important;
     color: #ffffff;
 }
 
 .dp-modal-header button {
     color: #ffffff !important;
+}
+
+.dp-modal-header .dp-title {
+    font-size: 18px !important;
+    margin: 0.4rem 0 !important;
+}
+
+.dp-modal-header button {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    display: flex;
+    align-items: center;
 }
 
 .vp-section-button {

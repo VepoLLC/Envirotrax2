@@ -9,6 +9,7 @@ import { DownloadConfig } from "../../../shared/models/download-config";
 import { DownloadService } from "../../../shared/services/download.service";
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from "@envirotrax/common-ui";
 import { PrintableTableService } from "../../../shared/services/printable-table.service";
+import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 
 @Component({
     standalone: false,
@@ -78,7 +79,8 @@ export class CsiInspectionListComponent implements OnInit {
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
         private readonly _downloadService: DownloadService,
-        private readonly _printService: PrintableTableService
+        private readonly _printService: PrintableTableService,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
         this.downloadConfig = {
             fileName: 'CSI Inspections',
@@ -130,7 +132,7 @@ export class CsiInspectionListComponent implements OnInit {
                 ]
             }];
             await this.getInspections();
-            this.showResults = (this.table.items?.pageInfo?.totalItems ?? 0) > 0;
+            this.setShowResults((this.table.items?.pageInfo?.totalItems ?? 0) > 0);
         }
     }
 
@@ -177,6 +179,11 @@ export class CsiInspectionListComponent implements OnInit {
         ];
     }
 
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
+    }
+
     public onFilterChange(queryProperties: QueryProperty[]): void {
         this.table.query.filter = queryProperties;
     }
@@ -184,7 +191,7 @@ export class CsiInspectionListComponent implements OnInit {
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
             await this.getInspections();
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 
@@ -201,7 +208,7 @@ export class CsiInspectionListComponent implements OnInit {
     }
 
     public searchAgain(): void {
-        this.showResults = false;
+        this.setShowResults(false);
     }
 
     public viewDetails(inspection: CsiInspection): void {

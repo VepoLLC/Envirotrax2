@@ -11,6 +11,7 @@ import { FogInspectionResult } from '../../../../shared/models/fog/fog-inspectio
 import { InterceptorType } from '../../../../shared/enums/interceptor-type.enum';
 import { PropertyType } from '../../../../shared/enums/property-type.enum';
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from '@envirotrax/common-ui';
+import { AppContainerHelperService } from '../../../../shared/services/helpers/app-contaner-helper.service';
 
 @Component({
     standalone: false,
@@ -70,7 +71,8 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
         private readonly _supplierService: ProfessionalSupplierService,
         private readonly _fogOptions: FogInspectionOptionsService,
         private readonly _router: Router,
-        private readonly _activatedRoute: ActivatedRoute
+        private readonly _activatedRoute: ActivatedRoute,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
         this.inspectionResultOptions = this._fogOptions.inspectionResultFilterOptions;
         this.interceptorTypeOptions = this._fogOptions.interceptorTypeFilterOptions;
@@ -155,17 +157,22 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
         this.table.query.filter = queryProperties;
     }
 
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
+    }
+
     public async search(): Promise<void> {
         this.searchAttempted = true;
         await this.getInspections();
 
         if (this.table.items?.data.length! > 0) {
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 
     public searchAgain(): void {
-        this.showResults = false;
+        this.setShowResults(false);
         this.searchAttempted = false;
     }
 

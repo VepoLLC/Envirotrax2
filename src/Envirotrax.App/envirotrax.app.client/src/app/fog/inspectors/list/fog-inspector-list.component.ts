@@ -6,6 +6,7 @@ import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { Professional } from "../../../shared/models/professionals/professional";
 import { CellTemplateData, ColumnType, TableColumn } from '@envirotrax/common-ui';
+import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 
 @Component({
     selector: 'app-fog-inspector-list',
@@ -35,7 +36,8 @@ export class FogInspectorListComponent implements OnInit {
     constructor(
         private readonly _fogInspectorService: FogInspectorService,
         private readonly _router: Router,
-        private readonly _activatedRoute: ActivatedRoute
+        private readonly _activatedRoute: ActivatedRoute,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
     }
 
@@ -78,6 +80,11 @@ export class FogInspectorListComponent implements OnInit {
         }
     }
 
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
+    }
+
     public onFilterChange(queryProperties: QueryProperty[]): void {
         this.table.query.filter = queryProperties;
     }
@@ -91,7 +98,7 @@ export class FogInspectorListComponent implements OnInit {
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
             await this.getInspectors();
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 }

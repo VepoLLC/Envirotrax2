@@ -165,10 +165,10 @@
                                     Commission regulations.
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance1 === true" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance1 === true" disabled />
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance1 === false" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance1 === false" disabled />
                                 </td>
                             </tr>
                             <tr>
@@ -180,10 +180,10 @@
                                     properly installed.
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance2 === true" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance2 === true" disabled />
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance2 === false" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance2 === false" disabled />
                                 </td>
                             </tr>
                             <tr>
@@ -193,10 +193,10 @@
                                     condensing, cooling or industrial processes back to the public water supply.
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance3 === true" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance3 === true" disabled />
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance3 === false" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance3 === false" disabled />
                                 </td>
                             </tr>
                             <tr>
@@ -207,10 +207,10 @@
                                     January 4, 2014.
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance4 === true" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance4 === true" disabled />
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance4 === false" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance4 === false" disabled />
                                 </td>
                             </tr>
                             <tr>
@@ -220,10 +220,10 @@
                                     written comment.
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance5 === true" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance5 === true" disabled />
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance5 === false" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance5 === false" disabled />
                                 </td>
                             </tr>
                             <tr>
@@ -232,10 +232,10 @@
                                     private water distribution facilities installed on or after July 1, 1988.
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance6 === true" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance6 === true" disabled />
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance6 === false" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance6 === false" disabled />
                                 </td>
                             </tr>
                         </table>
@@ -247,34 +247,28 @@
                         </tr>
                         <tr>
                             <td class="fw-bold">Service Lines:</td>
-                            <td><input type="checkbox" [checked]="inspection.materialServiceLineLead"
-                                       disabled />&nbsp;Lead</td>
-                            <td><input type="checkbox" [checked]="inspection.materialServiceLineCopper"
-                                       disabled />&nbsp;Copper</td>
-                            <td><input type="checkbox" [checked]="inspection.materialServiceLinePVC"
-                                       disabled />&nbsp;PVC</td>
-                            <td><input type="checkbox" [checked]="inspection.materialServiceLineOther"
-                                       disabled />&nbsp;Other</td>
+                            <td><label class="d-inline-flex align-items-center"><input class="form-check-input readonly-checkbox me-1" type="checkbox" [checked]="inspection.materialServiceLineLead" disabled />Lead</label></td>
+                            <td><label class="d-inline-flex align-items-center"><input class="form-check-input readonly-checkbox me-1" type="checkbox" [checked]="inspection.materialServiceLineCopper" disabled />Copper</label></td>
+                            <td><label class="d-inline-flex align-items-center"><input class="form-check-input readonly-checkbox me-1" type="checkbox" [checked]="inspection.materialServiceLinePVC" disabled />PVC</label></td>
+                            <td><label class="d-inline-flex align-items-center"><input class="form-check-input readonly-checkbox me-1" type="checkbox" [checked]="inspection.materialServiceLineOther" disabled />Other</label></td>
                         </tr>
                         <tr>
                             <td class="fw-bold">Solder:</td>
-                            <td><input type="checkbox" [checked]="inspection.materialSolderLead" disabled />&nbsp;Lead
-                            </td>
-                            <td><input type="checkbox" [checked]="inspection.materialSolderLeadFree"
-                                       disabled />&nbsp;Lead Free</td>
-                            <td><input type="checkbox" [checked]="inspection.materialSolderSolventWeld"
-                                       disabled />&nbsp;Solvent Weld</td>
-                            <td><input type="checkbox" [checked]="inspection.materialSolderOther" disabled />&nbsp;Other
-                            </td>
+                            <td><label class="d-inline-flex align-items-center"><input class="form-check-input readonly-checkbox me-1" type="checkbox" [checked]="inspection.materialSolderLead" disabled />Lead</label></td>
+                            <td><label class="d-inline-flex align-items-center"><input class="form-check-input readonly-checkbox me-1" type="checkbox" [checked]="inspection.materialSolderLeadFree" disabled />Lead Free</label></td>
+                            <td><label class="d-inline-flex align-items-center"><input class="form-check-input readonly-checkbox me-1" type="checkbox" [checked]="inspection.materialSolderSolventWeld" disabled />Solvent Weld</label></td>
+                            <td><label class="d-inline-flex align-items-center"><input class="form-check-input readonly-checkbox me-1" type="checkbox" [checked]="inspection.materialSolderOther" disabled />Other</label></td>
                         </tr>
                     </table>
                     <table class="table table-sm table-borderless">
                         <tr>
                             <td>
-                                <input type="checkbox" [checked]="true" disabled />
-                                I recognize that this document shall be retained by the aforementioned Public Water
-                                System for a minimum of ten years and that I am legally responsible for the validity of
-                                the information I have provided.
+                                <label class="d-inline-flex align-items-start">
+                                    <input class="form-check-input readonly-checkbox me-1 flex-shrink-0" type="checkbox" [checked]="true" disabled />
+                                    I recognize that this document shall be retained by the aforementioned Public Water
+                                    System for a minimum of ten years and that I am legally responsible for the validity of
+                                    the information I have provided.
+                                </label>
                             </td>
                         </tr>
                     </table>

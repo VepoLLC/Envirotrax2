@@ -9,7 +9,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "prestart": "node aspnetcore-https",
-    "common-ui:update": "cd ..\\..\\Envirotrax.CommonUI && npm run build-package && cd ..\\Envirotrax.App\\envirotrax.app.client && npm install ..\\..\\Envirotrax.CommonUI\\dist\\envirotrax\\common-ui\\envirotrax-common-ui-1.0.0.tgz --force",
+    "common-ui:update": "cd ../../Envirotrax.CommonUI && npm run build-package && cd ../Envirotrax.App/envirotrax.app.client && npm install ../../Envirotrax.CommonUI/dist/envirotrax/common-ui/envirotrax-common-ui-1.0.0.tgz --force",
     "start:windows": "ng serve --ssl --ssl-cert \"%APPDATA%\\ASP.NET\\https\\%npm_package_name%.pem\" --ssl-key \"%APPDATA%\\ASP.NET\\https\\%npm_package_name%.key\" --host=127.0.0.1",
     "start:default": "ng serve --ssl --ssl-cert \"$HOME/.aspnet/https/${npm_package_name}.pem\" --ssl-key \"$HOME/.aspnet/https/${npm_package_name}.key\" --host=127.0.0.1"
   },
@@ -25,6 +25,7 @@
   },
   "private": true,
   "dependencies": {
+    "@almothafar/angular-signature-pad": "9.0.0",
     "@angular/common": "^20.3.24",
     "@angular/compiler": "^20.3.24",
     "@angular/core": "^20.3.24",

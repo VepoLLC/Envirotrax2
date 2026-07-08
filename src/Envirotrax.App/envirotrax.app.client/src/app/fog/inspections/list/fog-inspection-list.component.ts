@@ -1,4 +1,5 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { FogInspectionService } from '../../../shared/services/fog/fog-inspection.service';
 import { QueryProperty } from '../../../shared/models/query';
@@ -98,11 +99,26 @@ export class FogInspectionListComponent implements OnInit {
     ];
 
     constructor(
-        private readonly _fogInspectionService: FogInspectionService
+        private readonly _fogInspectionService: FogInspectionService,
+        private readonly _router: Router,
+        private readonly _activatedRoute: ActivatedRoute
     ) { }
 
     public async ngOnInit(): Promise<void> {
         this.table.columns = this.getColumns();
+
+        const dateParam = this._activatedRoute.snapshot.queryParamMap.get('date');
+        if (dateParam) {
+            this.table.query.filter = [{
+                columnName: 'inspectionDate',
+                children: [
+                    { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                    { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Lte', logicalOperator: 'And' }
+                ]
+            }];
+            await this.getInspections();
+            this.showResults = (this.table.items?.pageInfo?.totalItems ?? 0) > 0;
+        }
     }
 
     private getColumns(): TableColumn<FogInspection>[] {
@@ -181,5 +197,9 @@ export class FogInspectionListComponent implements OnInit {
             await this.getInspections();
             this.showResults = true;
         }
+    }
+
+    public viewDetails(inspection: FogInspection): void {
+        this._router.navigate([inspection.id], { relativeTo: this._activatedRoute });
     }
 }

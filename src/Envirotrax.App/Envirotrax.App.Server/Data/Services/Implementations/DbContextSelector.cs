@@ -1,6 +1,7 @@
 
 using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Services.Definitions;
+using Envirotrax.Common;
 using Envirotrax.Common.Data.Services.Definitions;
 
 namespace Envirotrax.App.Server.Data.Services.Implementations;
@@ -22,6 +23,11 @@ public class DbContextSelector : IDbContextSelector
 
     private TenantDbContext GetCurrentContext()
     {
+        if (_tenantProvider.HasScope(ScopeDefinitions.AdminInternal))
+        {
+            return _serviceProvider.GetRequiredService<AdminDbContext>();
+        }
+
         if (_tenantProvider.ProfessionalId > 0 || _tenantProvider.ParentProfessionalId > 0)
         {
             return _serviceProvider.GetRequiredService<ProfessionalDbContext>();

@@ -1,0 +1,15 @@
+<div #canvasWrapper class="signature-canvas-wrapper border rounded">
+    <signature-pad #signaturePad [options]="signaturePadOptions"></signature-pad>
+</div>
+
+<div class="d-flex justify-content-center gap-2 mt-3">
+    <button type="button" class="btn btn-primary vp-section-button" (click)="clear()">
+        Clear
+    </button>
+    <button type="button" class="btn btn-primary vp-section-button" (click)="cancel()">
+        Cancel
+    </button>
+    <button type="button" class="btn btn-primary vp-section-button" (click)="save()">
+        Save
+    </button>
+</div>

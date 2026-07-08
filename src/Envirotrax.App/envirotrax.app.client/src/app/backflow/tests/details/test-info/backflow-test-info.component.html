@@ -76,7 +76,7 @@
                             </div>
                             <div *ngFor="let c of col.initialChecks" class="mt-1">
                                 <div class="form-check form-check-inline mb-0">
-                                    <input type="checkbox" class="form-check-input"
+                                    <input type="checkbox" class="form-check-input readonly-checkbox"
                                            [name]="'init_chk_' + col.index + '_' + c.field"
                                            [(ngModel)]="$any(test)[c.field]"
                                            [disabled]="!canModify" />
@@ -105,7 +105,7 @@
                             </div>
                             <div *ngFor="let c of col.finalChecks" class="mt-1">
                                 <div class="form-check form-check-inline mb-0">
-                                    <input type="checkbox" class="form-check-input"
+                                    <input type="checkbox" class="form-check-input readonly-checkbox"
                                            [name]="'final_chk_' + col.index + '_' + c.field"
                                            [(ngModel)]="$any(test)[c.field]"
                                            [disabled]="!canModify" />
@@ -122,7 +122,7 @@
                                 <div class="col-lg">Meter reading prior to test: {{ test.meterReadingBefore }}</div>
                                 <div class="col-lg">
                                     <div class="form-check mb-0">
-                                        <input type="checkbox" class="form-check-input"
+                                        <input type="checkbox" class="form-check-input readonly-checkbox"
                                                id="meterRegisters" name="meterRegisters"
                                                [(ngModel)]="test.meterRegisters"
                                                [disabled]="!canModify" />
@@ -153,7 +153,7 @@
                         </td>
                         <td class="text-nowrap">
                             <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="airGapValid"
+                                <input type="checkbox" class="form-check-input readonly-checkbox" id="airGapValid"
                                        name="airGapValid" [(ngModel)]="test.airGapValid"
                                        [disabled]="!canModify" />
                                 <label class="form-check-label" for="airGapValid">Yes</label>

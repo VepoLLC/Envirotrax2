@@ -48,6 +48,7 @@ public static class ServiceRegistration
     {
         AddDbContext<TenantDbContext>(services, configuration, environment);
         AddDbContext<ProfessionalDbContext>(services, configuration, environment);
+        AddDbContext<AdminDbContext>(services, configuration, environment);
         services.AddScoped<IDbContextSelector, DbContextSelector>();
 
         services.AddTenantProvider();
@@ -57,6 +58,7 @@ public static class ServiceRegistration
         services.AddTransient<IWaterSupplierRepository, WaterSupplierRepository>();
         services.AddTransient<IGeneralSettingsRepository, GeneralSettingsRepository>();
         services.AddTransient<ISiteRepository, SiteRepository>();
+        services.AddTransient<ISiteLogRepository, SiteLogRepository>();
         services.AddTransient<ICsiInspectionRepository, CsiInspectionRepository>();
         services.AddTransient<ICsiInspectionImageRepository, CsiInspectionImageRepository>();
         services.AddTransient<ICsiInspectorRepository, CsiInspectorRepository>();
@@ -65,10 +67,12 @@ public static class ServiceRegistration
         services.AddTransient<IFogInspectionRepository, FogInspectionRepository>();
         services.AddTransient<IBackflowTesterRepository, BackflowTesterRepository>();
         services.AddTransient<IBackflowTestRepository, BackflowTestRepository>();
+        services.AddTransient<IBackflowOutOfServiceRequestRepository, BackflowOutOfServiceRequestRepository>();
         services.AddTransient<LookupRepository>();
 
         services.AddTransient<ICsiSettingsRepository, CsiSettingsRepository>();
         services.AddTransient<IBackflowSettingsRepository, BackflowSettingsRepository>();
+        services.AddTransient<IBackflowRenewalRequirementRepository, BackflowRenewalRequirementRepository>();
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IRoleRepository, RoleRepository>();
         services.AddTransient<IRolePermissionRepository, RolePermissionRepository>();
@@ -81,6 +85,9 @@ public static class ServiceRegistration
         services.AddTransient<IProfessionalLicenseTypeRepository, ProfessionalLicenseTypeRepository>();
         services.AddTransient<IProfessionalInsuranceRepository, ProfessionalInsuranceRepository>();
         services.AddTransient<IBackflowGaugeRepository, BackflowGaugeRepository>();
+        services.AddTransient<IFogVehicleRepository, FogVehicleRepository>();
+        services.AddTransient<IFogTransporterDisposalSiteRepository, FogTransporterDisposalSiteRepository>();
+        services.AddTransient<IFogDisposalSiteRepository, FogDisposalSiteRepository>();
 
         services.AddTransient<IGisAreaRepository, GisAreaRepository>();
         services.AddTransient<IGisAreaCoordinateRepository, GisAreaCoordinateRepository>();

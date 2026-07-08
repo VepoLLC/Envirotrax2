@@ -16,6 +16,11 @@ const routes: Routes = [
     title: '',
     loadChildren: () => import('./auth/auth.module').then(m => m.AppAuthModule)
   },
+  {
+    path: 'water-suppliers',
+    title: 'Water Suppliers',
+    loadChildren: () => import('./water-suppliers/water-supplier.module').then(m => m.WaterSupplierModule)
+  },
 ];
 
 @NgModule({

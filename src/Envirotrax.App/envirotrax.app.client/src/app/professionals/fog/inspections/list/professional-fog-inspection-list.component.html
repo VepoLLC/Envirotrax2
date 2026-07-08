@@ -1,4 +1,4 @@
-<h1 class="text-center h2">FOG Inspection Search</h1>
+﻿<h1 class="text-center h2">FOG Inspection Search</h1>
 
 <div [hidden]="showResults">
     <form #searchForm="ngForm" (ngSubmit)="search()">
@@ -7,58 +7,66 @@
             <vp-section header="General Search Criteria">
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="waterSupplier.id"
                                                    label="Record search scope"
+                                                   labelStyle="horizontal"
                                                    type="select"
                                                    [options]="waterSupplierScopeOptions"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="facilityType"
                                                    label="Facility type"
+                                                   labelStyle="horizontal"
                                                    type="multi-select"
                                                    [options]="facilityTypeOptions"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="interceptorType"
                                                    label="Interceptor type"
+                                                   labelStyle="horizontal"
                                                    type="select"
                                                    [options]="interceptorTypeOptions"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="inspectionResult"
                                                    label="Inspection result"
+                                                   labelStyle="horizontal"
                                                    type="select"
                                                    [options]="inspectionResultOptions"
                                                    [form]="searchForm" />
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="site.accountNumber"
                                                    label="Account number"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Inspection history:</label>
+                        <div class="mb-2">
                             <vp-input type="select"
+                                      label="Inspection History"
+                                      labelStyle="horizontal"
                                       [options]="inspectionHistoryOptions"
                                       [ngModel]="latestOnly ? 'true' : 'false'"
                                       (ngModelChange)="onLatestOnlyChange($event)"
                                       [ngModelOptions]="{standalone: true}" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="inspectionDate"
                                                    label="Inspection date"
+                                                   labelStyle="horizontal"
                                                    type="daterange"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="createdTime"
                                                    label="Submission date"
+                                                   labelStyle="horizontal"
                                                    type="daterange"
                                                    [form]="searchForm" />
                         </div>
@@ -69,37 +77,53 @@
             <div class="row mt-3">
                 <div class="col-md-6">
                     <vp-section header="Location / Property Criteria">
-                        <div class="row">
-                            <div class="col-12 mb-3">
+                        <div>
+                            <div class="mb-2">
                                 <vp-filter-panel-field fieldName="propertyType"
                                                        label="Property type"
+                                                       labelStyle="horizontal"
                                                        type="select"
                                                        [options]="propertyTypeOptions"
                                                        [form]="searchForm" />
                             </div>
-                            <div class="col-12 mb-3">
+                            <div class="mb-2">
                                 <vp-filter-panel-field fieldName="propertyBusinessName"
                                                        label="Business name"
+                                                       labelStyle="horizontal"
                                                        [form]="searchForm" />
                             </div>
-                            <div class="col-4 mb-3">
-                                <vp-filter-panel-field fieldName="propertyStreetNumber"
-                                                       label="Street #"
-                                                       [form]="searchForm" />
+
+                            <div class="row">
+                                <div class="col-xl-5 d-flex align-items-center">
+                                    <div class="text-xl-end w-100">
+                                        Address
+                                    </div>
+                                </div>
+                                <div class="col-xl d-xl-flex gap-1">
+                                    <div class="mb-2">
+                                        <vp-filter-panel-field fieldName="propertyStreetNumber"
+                                                               label="Street #"
+                                                               [form]="searchForm" />
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <vp-filter-panel-field fieldName="propertyStreetName"
+                                                               label="Street name"
+                                                               [form]="searchForm" />
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <vp-filter-panel-field fieldName="propertyNumber"
+                                                               label="Suite/Apt #"
+                                                               [form]="searchForm" />
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-5 mb-3">
-                                <vp-filter-panel-field fieldName="propertyStreetName"
-                                                       label="Street name"
-                                                       [form]="searchForm" />
-                            </div>
-                            <div class="col-3 mb-3">
-                                <vp-filter-panel-field fieldName="propertyNumber"
-                                                       label="Suite/apt #"
-                                                       [form]="searchForm" />
-                            </div>
-                            <div class="col-4">
+
+                            <div>
                                 <vp-filter-panel-field fieldName="propertyZip"
                                                        label="ZIP"
+                                                       labelStyle="horizontal"
                                                        [form]="searchForm" />
                             </div>
                         </div>
@@ -108,35 +132,51 @@
 
                 <div class="col-md-6 mt-3 mt-md-0">
                     <vp-section header="Contact / Mailing Criteria">
-                        <div class="row">
-                            <div class="col-12 mb-3">
+                        <div>
+                            <div class="mb-2">
                                 <vp-filter-panel-field fieldName="mailingCompanyName"
                                                        label="Company name"
+                                                       labelStyle="horizontal"
                                                        [form]="searchForm" />
                             </div>
-                            <div class="col-12 mb-3">
+                            <div class="mb-2">
                                 <vp-filter-panel-field fieldName="mailingContactName"
                                                        label="Contact name"
+                                                       labelStyle="horizontal"
                                                        [form]="searchForm" />
                             </div>
-                            <div class="col-4 mb-3">
-                                <vp-filter-panel-field fieldName="mailingStreetNumber"
-                                                       label="Street #"
-                                                       [form]="searchForm" />
+
+                            <div class="row">
+                                <div class="col-xl-5 d-flex align-items-center">
+                                    <div class="text-xl-end w-100">
+                                        Address
+                                    </div>
+                                </div>
+                                <div class="col-xl d-xl-flex gap-1">
+                                    <div class="mb-2">
+                                        <vp-filter-panel-field fieldName="mailingStreetNumber"
+                                                               label="Street #"
+                                                               [form]="searchForm" />
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <vp-filter-panel-field fieldName="mailingStreetName"
+                                                               label="Street name"
+                                                               [form]="searchForm" />
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <vp-filter-panel-field fieldName="mailingNumber"
+                                                               label="Suite/Apt #"
+                                                               [form]="searchForm" />
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-5 mb-3">
-                                <vp-filter-panel-field fieldName="mailingStreetName"
-                                                       label="Street name"
-                                                       [form]="searchForm" />
-                            </div>
-                            <div class="col-3 mb-3">
-                                <vp-filter-panel-field fieldName="mailingNumber"
-                                                       label="Suite/apt #"
-                                                       [form]="searchForm" />
-                            </div>
-                            <div class="col-4">
+
+                            <div>
                                 <vp-filter-panel-field fieldName="mailingZip"
                                                        label="ZIP"
+                                                       labelStyle="horizontal"
                                                        [form]="searchForm" />
                             </div>
                         </div>
@@ -183,11 +223,14 @@
 
 <ng-template #generatorCell let-inspection="rowData">
     <div>{{inspection.propertyBusinessName}}</div>
-    <div>{{inspection.propertyStreetNumber}} {{inspection.propertyStreetName}} {{inspection.propertyNumber}} {{inspection.propertyCity}}</div>
+    <div>{{inspection.propertyStreetNumber}} {{inspection.propertyStreetName}} {{inspection.propertyNumber}}
+        {{inspection.propertyCity}}
+    </div>
 </ng-template>
 
 <ng-template #interceptorCell let-inspection="rowData">
-    <div>{{inspection.interceptorType}}<span *ngIf="inspection.interceptorType === InterceptorType.Other"> - {{inspection.interceptorOtherDescription}}</span></div>
+    <div>{{inspection.interceptorType}}<span *ngIf="inspection.interceptorType === InterceptorType.Other"> -
+            {{inspection.interceptorOtherDescription}}</span></div>
     <div *ngIf="inspection.interceptorCapacity">{{inspection.interceptorCapacity}} Gallons</div>
     <div *ngIf="inspection.interceptorLocationDescription">{{inspection.interceptorLocationDescription}}</div>
 </ng-template>
@@ -231,7 +274,9 @@
                   [(query)]="table.query"
                   (queryChange)="getInspections()"
                   (queryReset)="getInspections()"
-                  [freeTextSearch]="table.freeTextSearch" />
+                  [freeTextSearch]="table.freeTextSearch"
+                  [canViewDetails]="true"
+                  (viewDetails)="viewInspection($event)" />
 
         <div *ngIf="table.items?.data?.length === 0" class="text-center py-3 text-muted">
             No records found matching the search criteria.

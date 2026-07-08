@@ -1,7 +1,9 @@
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 
 namespace Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
 
 public interface IBackflowSettingsRepository : IRepository<BackflowSettings>
 {
+    Task<BackflowTestingSettingsDto?> GetTestingSettingsAsync(int waterSupplierId, CancellationToken cancellationToken);
 }

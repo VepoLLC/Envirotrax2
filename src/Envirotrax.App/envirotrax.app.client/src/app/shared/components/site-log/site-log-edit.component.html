@@ -1,0 +1,60 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="isLoading" />
+    <form #logForm="ngForm" (ngSubmit)="save(logForm)">
+        <div class="mb-3">
+            <vp-input name="logType"
+                      label="Log record type"
+                      type="select"
+                      [(ngModel)]="editingLog.logType"
+                      [options]="logTypeOptions"
+                      [required]="true"
+                      [form]="logForm" />
+        </div>
+
+        <div class="mb-3" *ngIf="showReviewDate">
+            <vp-input name="reviewDate"
+                      label="Review date"
+                      type="date"
+                      [(ngModel)]="editingLog.reviewDate"
+                      [form]="logForm" />
+        </div>
+
+        <div class="mb-3">
+            <vp-input name="assemblyId"
+                      label="Assembly Tag"
+                      type="select"
+                      placeholder="N/A"
+                      [(ngModel)]="editingLog.assemblyId"
+                      [options]="assemblyOptions"
+                      [form]="logForm" />
+        </div>
+
+        <div class="mb-3">
+            <vp-input name="noteText"
+                      label="Note"
+                      type="textarea"
+                      [(ngModel)]="editingLog.noteText"
+                      [form]="logForm" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">File attachment</label>
+            <vp-file-upload
+                [file]="selectedFile"
+                (fileChange)="onFileChange($event)"
+                accept=".jpg,.jpeg,.png,.bmp,.tif,.tiff,.gif,.pdf,.xlsx,.xls,.txt,.doc,.docx"
+                label="Choose a file or drag and drop here">
+            </vp-file-upload>
+            <div *ngIf="editingLog.fileAttachmentName && !selectedFile" class="mt-1 small text-muted">
+                Current file: {{ editingLog.fileAttachmentName }}
+            </div>
+        </div>
+
+        <vp-validation-summary [form]="logForm" [validationErrors]="validationErrors" />
+
+        <div class="d-flex justify-content-center gap-2 mt-3">
+            <button type="button" class="btn btn-primary flex-fill" (click)="cancel()">Cancel</button>
+            <button type="submit" class="btn btn-primary flex-fill" [disabled]="isLoading">Save</button>
+        </div>
+    </form>
+</div>

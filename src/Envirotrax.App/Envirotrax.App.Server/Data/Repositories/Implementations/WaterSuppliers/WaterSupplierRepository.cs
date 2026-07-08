@@ -5,6 +5,7 @@ using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
 using Envirotrax.App.Server.Data.Services.Definitions;
+using Envirotrax.Common;
 using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,7 +25,7 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
     {
         return base.GetListQuery()
             .Include(supplier => supplier.Parent)
-            .Where(supplier => supplier.ParentId == _tenantProvider.WaterSupplierId)
+            .WhereIf(!_tenantProvider.HasScope(ScopeDefinitions.AdminInternal), supplier => supplier.ParentId == _tenantProvider.WaterSupplierId)
             .AsNoTracking();
     }
 
@@ -32,7 +33,7 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
     {
         return base.GetDetailsQuery()
             .Include(supplier => supplier.Parent)
-            .Where(supplier => supplier.ParentId == _tenantProvider.WaterSupplierId);
+            .WhereIf(!_tenantProvider.HasScope(ScopeDefinitions.AdminInternal), supplier => supplier.ParentId == _tenantProvider.WaterSupplierId);
     }
 
     public override Task<WaterSupplier> AddAsync(WaterSupplier supplier)

@@ -1,0 +1,84 @@
+<ng-template #selectCell let-row="rowData">
+    <div class="text-center">
+        <button type="button"
+                class="btn btn-sm"
+                style="min-width: 180px"
+                [class.btn-success]="selectedCandidate?.id === row.id"
+                [class.btn-outline-primary]="selectedCandidate?.id !== row.id"
+                (click)="selectCandidate(row)">
+            {{ selectedCandidate?.id === row.id ? 'Replaced by This Assembly' : 'Select' }}
+        </button>
+    </div>
+</ng-template>
+
+<div>
+    <h1 class="text-center h2">Out of Service Request</h1>
+
+    <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+    <div dp-spinner-parent>
+        <form #oosForm="ngForm" *ngIf="test">
+            <vp-validation-summary [form]="oosForm" [validationErrors]="validationErrors" />
+
+            <vp-section header="Assembly Information">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Assembly Location:</dt>
+                    <dd class="col-sm-8">{{ test.locationDescription }}</dd>
+                    <dt class="col-sm-4">Main Assembly Description:</dt>
+                    <dd class="col-sm-8">{{ assemblyDescription }}</dd>
+                    <dt class="col-sm-4">Main Assembly Serial Number:</dt>
+                    <dd class="col-sm-8">{{ test.serialNumber }}</dd>
+                </dl>
+            </vp-section>
+
+            <div class="mt-3">
+                <vp-section header="Out of Service Reason">
+                    <vp-input type="select"
+                              label="What is the reason for the assembly being out of service?"
+                              [options]="reasonOptions"
+                              [ngModel]="selectedType"
+                              (ngModelChange)="onTypeChange($event)"
+                              [ngModelOptions]="{standalone: true}" />
+                </vp-section>
+            </div>
+
+            <div class="mt-3" *ngIf="isRemoved">
+                <vp-section header="Removal Details">
+                    <vp-input type="textarea"
+                              label="Reason for removal"
+                              [required]="true"
+                              [(ngModel)]="request.description"
+                              [ngModelOptions]="{standalone: true}" />
+                </vp-section>
+            </div>
+
+            <div class="mt-3" *ngIf="isReplaced">
+                <vp-section header="Replacement Assembly">
+                    <p>Select the assembly that replaced this assembly.</p>
+
+                    <div *ngIf="candidatesLoaded && candidates.length === 0" class="alert alert-info">
+                        No replacement assemblies were found.
+                    </div>
+
+                    <vp-table *ngIf="candidates.length > 0"
+                              [columns]="candidateColumns"
+                              [data]="candidates" />
+                </vp-section>
+            </div>
+
+            <div class="d-flex justify-content-center gap-2 flex-wrap mt-3">
+                <button type="button"
+                        class="btn btn-primary vp-section-button"
+                        [disabled]="!canContinue"
+                        (click)="submit()">
+                    Continue to Confirmation
+                </button>
+                <button type="button"
+                        class="btn btn-secondary vp-section-button"
+                        (click)="cancel()">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

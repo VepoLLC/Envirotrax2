@@ -26,9 +26,9 @@ public class UserController : WaterSupplierCrudController<WaterSupplierUserDto>
 
     [HttpPost("{id}/invitations")]
     [HasPermission(PermissionAction.CanModify, PermissionType.Users)]
-    public async Task<IActionResult> ResendInvitationAsync(int id)
+    public async Task<IActionResult> ResendInvitationAsync(int id, CancellationToken cancellationToken)
     {
-        var result = await _userService.ResendInvitationAsync(id);
+        var result = await _userService.ResendInvitationAsync(id, cancellationToken);
         return Ok(result);
     }
 }
@@ -37,7 +37,7 @@ public class UserController : WaterSupplierCrudController<WaterSupplierUserDto>
 [Authorize]
 [ApiController]
 [Route("api/users")]
-public class MyAccessController : ControllerBase
+public class MyAccessController : EnvirotraxBaseController
 {
     private readonly IAuthService _authService;
     public MyAccessController(IAuthService authService)

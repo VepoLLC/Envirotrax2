@@ -6,20 +6,23 @@ import { BackflowTestWaterSupplierComponent } from "./water-supplier/backflow-te
 import { BackflowTestRemarksComponent } from "./remarks/backflow-test-remarks.component";
 import { BackflowTestImagesComponent } from "./images/backflow-test-images.component";
 import { BackflowTestInfoComponent } from "./test-info/backflow-test-info.component";
+import { BackflowTestAdditionalInfoComponent } from "./additional-info/backflow-test-additional-info.component";
 
 @NgModule({
     declarations: [
         BackflowTestWaterSupplierComponent,
         BackflowTestRemarksComponent,
         BackflowTestImagesComponent,
-        BackflowTestInfoComponent
+        BackflowTestInfoComponent,
+        BackflowTestAdditionalInfoComponent
     ],
     imports: [CommonModule, FormsModule, SharedComponentsModule],
     exports: [
         BackflowTestWaterSupplierComponent,
         BackflowTestRemarksComponent,
         BackflowTestImagesComponent,
-        BackflowTestInfoComponent
+        BackflowTestInfoComponent,
+        BackflowTestAdditionalInfoComponent
     ]
 })
 export class BackflowTestDetailsSectionsModule {}

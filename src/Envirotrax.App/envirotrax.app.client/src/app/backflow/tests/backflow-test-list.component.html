@@ -480,8 +480,7 @@
         </button>
     </div>
 
-    <vp-section [noPadding]="true"
-                header="Backflow Test Search Results - {{ table.items?.pageInfo?.totalItems ?? 0 }} Results">
+    <vp-section header="Backflow Test Search Results - {{ table.items?.pageInfo?.totalItems ?? 0 }} Results">
         <div #printableSection>
             <div class="row gap-2 justify-content-center mb-2 mt-2">
                 <div class="col-auto mb-2">
@@ -536,7 +535,7 @@
     </vp-section>
 </div>
 
-<div *ngIf="showMapResults && !isMapLoading">
+<div *ngIf="showMapResults && !isMapLoading" class="border bg-white p-3">
     <div class="d-flex justify-content-between align-items-center mb-2">
         <button type="button" class="btn btn-primary vp-section-button">
             <i class="fa-solid fa-file-export me-1"></i>Export Results

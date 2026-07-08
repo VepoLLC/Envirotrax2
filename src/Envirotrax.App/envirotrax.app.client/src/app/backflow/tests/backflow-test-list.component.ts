@@ -17,6 +17,7 @@ import { DownloadConfig } from '../../shared/models/download-config';
 import { DownloadService } from '../../shared/services/download.service';
 import { PrintableTableService } from '../../shared/services/printable-table.service';
 import { PropertyType } from '../../shared/enums/property-type.enum';
+import { AppContainerHelperService } from '../../shared/services/helpers/app-contaner-helper.service';
 
 @Component({
     standalone: false,
@@ -144,7 +145,8 @@ export class BackflowTestListComponent implements OnInit {
         private readonly _gisMapService: GisMapService,
         private readonly _options: BackflowTestOptionsService,
         private readonly _downloadService: DownloadService,
-        private readonly _printService: PrintableTableService
+        private readonly _printService: PrintableTableService,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
         this.testResultOptions = this._options.testResultOptions;
         this.paymentStatusOptions = this._options.paymentStatusOptions;
@@ -231,7 +233,7 @@ export class BackflowTestListComponent implements OnInit {
                 ]
             }];
             await this.getTests();
-            this.showResults = (this.table.items?.pageInfo?.totalItems ?? 0) > 0;
+            this.setShowResults((this.table.items?.pageInfo?.totalItems ?? 0) > 0);
         }
     }
 
@@ -351,6 +353,11 @@ export class BackflowTestListComponent implements OnInit {
         }
     }
 
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
+    }
+
     public onFilterChange(queryProperties: QueryProperty[]): void {
         this.table.query.filter = queryProperties;
     }
@@ -359,7 +366,7 @@ export class BackflowTestListComponent implements OnInit {
         if (searchForm.valid) {
             this.showMapResults = false;
             await this.getTests();
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 
@@ -369,7 +376,7 @@ export class BackflowTestListComponent implements OnInit {
         }
         try {
             this.isMapLoading = true;
-            this.showResults = false;
+            this.setShowResults(false);
             this.showMapResults = false;
 
             const [testsPage, areas, coordinates, defaultView] = await Promise.all([

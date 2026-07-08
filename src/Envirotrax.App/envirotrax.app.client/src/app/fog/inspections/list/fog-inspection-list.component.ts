@@ -10,6 +10,7 @@ import { FacilityType } from '../../../shared/enums/facility-type.enum';
 import { InterceptorType } from '../../../shared/enums/interceptor-type.enum';
 import { PropertyType } from '../../../shared/enums/property-type.enum';
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from '@envirotrax/common-ui';
+import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 
 @Component({
     standalone: false,
@@ -101,7 +102,8 @@ export class FogInspectionListComponent implements OnInit {
     constructor(
         private readonly _fogInspectionService: FogInspectionService,
         private readonly _router: Router,
-        private readonly _activatedRoute: ActivatedRoute
+        private readonly _activatedRoute: ActivatedRoute,
+        private readonly _containerHelper: AppContainerHelperService
     ) { }
 
     public async ngOnInit(): Promise<void> {
@@ -117,7 +119,7 @@ export class FogInspectionListComponent implements OnInit {
                 ]
             }];
             await this.getInspections();
-            this.showResults = (this.table.items?.pageInfo?.totalItems ?? 0) > 0;
+            this.setShowResults((this.table.items?.pageInfo?.totalItems ?? 0) > 0);
         }
     }
 
@@ -192,10 +194,15 @@ export class FogInspectionListComponent implements OnInit {
         });
     }
 
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
+    }
+
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
             await this.getInspections();
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 

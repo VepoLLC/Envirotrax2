@@ -9,7 +9,7 @@ import { AuthService } from '../../../../shared/services/auth/auth.service';
 import { PermissionAction, PermissionType } from '../../../../shared/models/permission-type';
 import { CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
-import { SiteLogEditComponent, SiteLogEditModel } from './site-log-edit.component';
+import { SiteLogEditComponent, SiteLogEditModel } from '../../../../shared/components/site-log/site-log-edit.component';
 
 @Component({
     selector: 'app-site-log-history',

@@ -1,0 +1,256 @@
+<h1 class="text-center h2">CSI Inspection Compliance Management</h1>
+
+<ng-template #numberTemplate let-data="rowData">
+    {{ data.rowNumber }}
+</ng-template>
+
+<ng-template #propertyTemplate let-data="rowData">
+    <div class="d-flex gap-2 align-items-center">
+        <i class="fa-solid fs-5"
+           [ngClass]="data.propertyType == 0 ? 'fa-home text-primary' : 'fa-building text-danger'">
+        </i>
+
+        <a [routerLink]="['/sites', data.id, 'edit']" target="_blank">
+            <div *ngIf="data.businessName" class="fw-semibold">{{ data.businessName }}</div>
+            <div>
+                {{ data.streetNumber }} {{ data.streetName }}
+                <span *ngIf="data.propertyNumber">#{{ data.propertyNumber }}</span>
+            </div>
+            <div>{{ data.city }}<span *ngIf="data.city">, </span>{{ data.state?.code }} {{ data.zipCode }}</div>
+        </a>
+    </div>
+</ng-template>
+
+<ng-template #mailingTemplate let-data="rowData">
+    <div>
+        <div *ngIf="data.mailingCompanyName" class="fw-semibold">{{ data.mailingCompanyName }}</div>
+        <div *ngIf="data.mailingContactName">{{ data.mailingContactName }}</div>
+        <div>
+            {{ data.mailingStreetNumber }} {{ data.mailingStreetName }}
+            <span *ngIf="data.mailingNumber">#{{ data.mailingNumber }}</span>
+        </div>
+        <div>{{ data.mailingCity }}<span *ngIf="data.mailingCity">, </span>{{ data.mailingState?.code }} {{ data.mailingZipCode }}</div>
+    </div>
+</ng-template>
+
+<ng-template #logTemplate let-data="rowData">
+    <div *ngIf="!data.logs?.length" class="d-flex justify-content-end">
+        <a *ngIf="canModify" href="javascript:void(0)" class="text-success fs-5" (click)="addLog(data)" title="Add">
+            <i class="fa-solid fa-file-circle-plus"></i>
+        </a>
+    </div>
+
+    <ng-container *ngFor="let log of data.logs; first as isFirst">
+        <div *ngIf="isFirst || data.logsExpanded" class="border rounded p-2 mb-2">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+                <div class="flex-grow-1">
+                    <i class="fa-regular"
+                       [ngClass]="log.logType === SiteLogType.Note ? 'fa-file-lines' : (log.logType === SiteLogType.CompletedReminder ? 'fa-clock text-secondary' : 'fa-clock')"></i>
+                    <span class="fw-semibold ms-1">{{ log.createdTime | date }}</span>
+                    <span class="ms-3" *ngIf="log.createdBy?.email">
+                        <span class="fw-semibold">User:</span> {{ log.createdBy?.email }}
+                    </span>
+                </div>
+                <div class="d-flex gap-2 align-items-center flex-shrink-0 fs-5" *ngIf="canModify">
+                    <a href="javascript:void(0)" class="text-primary" (click)="editLog(data, log)" title="Edit">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
+                    <a href="javascript:void(0)" class="text-danger" (click)="deleteLog(data, log)" title="Delete">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </a>
+                    <a *ngIf="isFirst" href="javascript:void(0)" class="text-success" (click)="addLog(data)" title="Add">
+                        <i class="fa-solid fa-file-circle-plus"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="mt-1" *ngIf="log.logType !== SiteLogType.Note && log.reviewDate">
+                <span class="fw-semibold">Review Date:</span>
+                <span class="badge rounded-pill ms-1" [ngClass]="reviewDateStatusClasses[log.reviewDateStatus || 0]">{{ log.reviewDate | date }}</span>
+            </div>
+
+            <hr class="my-1" />
+
+            <p class="mb-0 ps-2" *ngIf="log.noteText">{{ log.noteText }}</p>
+
+            <p class="mb-0 mt-1 ps-2" *ngIf="log.url">
+                <a [href]="log.url" target="_blank">
+                    <i class="fa-solid fa-paperclip me-1"></i>{{ log.fileAttachmentName }}
+                </a>
+            </p>
+        </div>
+    </ng-container>
+
+    <div *ngIf="(data.logs?.length || 0) > 1" class="text-center">
+        <a href="javascript:void(0)" (click)="data.logsExpanded = !data.logsExpanded">
+            {{ data.logsExpanded ? 'Show less...' : 'Show more...' }}
+        </a>
+    </div>
+</ng-template>
+
+<ng-template #assignedToTemplate let-data="rowData">
+    <ng-container *ngIf="canModify; else assignedReadonly">
+        <select class="form-select form-select-sm"
+                [value]="data.csiAccountAssignmentId ?? ''"
+                (change)="onAssignmentChange(data, $any($event.target).value)">
+            <option value="">Unassigned</option>
+            <option *ngFor="let user of users" [value]="user.id">{{ user.contactName }}</option>
+        </select>
+    </ng-container>
+    <ng-template #assignedReadonly>
+        <span>{{ data.assignedName }}</span>
+    </ng-template>
+    <div *ngIf="data.csiAccountAssignmentDate" class="small text-muted mt-1">
+        {{ data.csiAccountAssignmentDate | date:'short' }}
+    </div>
+</ng-template>
+
+<ng-template #renewalDateTemplate let-data="rowData">
+    {{ data.csiRenewalDate | date }}
+</ng-template>
+
+<ng-template #daysOverdueTemplate let-data="rowData">
+    <span *ngIf="data.daysOverdue != null" class="badge rounded-pill" [ngClass]="data.overdueClass">{{ data.daysOverdue }} days</span>
+</ng-template>
+
+<ng-template #viewSiteTemplate let-data="rowData">
+    <a class="btn btn-sm btn-success" [routerLink]="['/sites', data.id, 'edit']" target="_blank">
+        <i class="fa-regular fa-eye me-1"></i>
+        View Site
+    </a>
+</ng-template>
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
+            (click)="exportResults()">
+        <i class="fa-regular fa-file-export me-1"></i>
+        Export Results
+    </button>
+    <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
+            (click)="viewPrintableTable()">
+        <i class="fa-regular fa-table me-1"></i>
+        View Printable Table
+    </button>
+</div>
+
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+<div class="results-section">
+    <vp-section header="Overdue CSI Inspections ({{ daysOverdueLabel }}) - {{ table.items?.pageInfo?.totalItems || 0 }} Results">
+        <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+            <vp-filter-panel (filterChange)="onFilterChange($event)">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <vp-input type="select"
+                                      label="Days Overdue"
+                                      name="daysOverdue"
+                                      [(ngModel)]="daysOverdue"
+                                      [options]="daysOverdueOptions" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-input type="select"
+                                      label="Sort By"
+                                      name="sortBy"
+                                      [(ngModel)]="sortBy"
+                                      [options]="sortOptions" />
+                        </div>
+
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="showMailing" name="showMailing" [(ngModel)]="showMailing" />
+                            <label class="form-check-label" for="showMailing">Show mailing information</label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="emailWhenAssigned" name="emailWhenAssigned" [(ngModel)]="emailWhenAssigned" />
+                            <label class="form-check-label" for="emailWhenAssigned">Email users when assigned</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="csiAccountAssignmentId"
+                                                   label="User Account Assignment"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="userOptions" />
+                        </div>
+
+                        <div class="mb-3">
+                            <app-gis-area-lookup [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="propertyType"
+                                                   label="Property Type"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="propertyTypes" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="facilityType"
+                                                   label="Facility Type"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="facilityTypes" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Property Street Name</label>
+                            <input type="text" class="form-control" name="propertyStreet" [(ngModel)]="propertyStreet" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="hasOnSiteSewageFacility"
+                                                   label="Has On-Site Sewage Facility"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="hasAuxWaterSupply"
+                                                   label="Has Auxiliary Water Supply"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+                    </div>
+                </div>
+            </vp-filter-panel>
+
+            <vp-validation-summary [form]="searchForm" />
+
+            <div class="d-flex justify-content-center mb-3">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    <i class="fa-solid fa-rotate me-1"></i>
+                    Refresh Compliance Records
+                </button>
+            </div>
+        </form>
+
+        <div #printableSection>
+            <div class="d-flex justify-content-center gap-4 mb-3">
+                <vp-status-icon iconClass="fa-solid fa-home text-primary" text="Residential" />
+                <vp-status-icon iconClass="fa-solid fa-building text-danger" text="Commercial" />
+            </div>
+
+            <vp-table *ngIf="table.items && table.items.data && table.items.data.length > 0"
+                      [columns]="table.columns!"
+                      [data]="table.items.data"
+                      [(pageInfo)]="table.items.pageInfo"
+                      (pageInfoChange)="getCompliance()"
+                      [(query)]="table.query"
+                      (queryChange)="getCompliance()"
+                      (queryReset)="getCompliance()" />
+
+            <div *ngIf="table.items?.data?.length === 0" class="text-center py-3 text-muted">
+                No records found matching the search criteria.
+            </div>
+        </div>
+    </vp-section>
+</div>

@@ -2,9 +2,9 @@ import { Component, OnInit } from "@angular/core";
 import { AuthService } from "../shared/services/auth/auth.service";
 import { WaterSupplierDashboardService } from "../shared/services/water-suppliers/water-supplier-dashboard.service";
 import { WaterSupplierDashboardStats } from "../shared/models/water-suppliers/water-supplier-dashboard-stats";
-import { CsiSubmissionStats, CsiSubAccountStats } from "../shared/models/water-suppliers/csi-submission-stats";
-import { BackflowSubmissionStats, BackflowSubAccountStats } from "../shared/models/water-suppliers/backflow-submission-stats";
-import { FogInspectionSubmissionStats, FogInspectionSubAccountStats } from "../shared/models/water-suppliers/fog-inspection-submission-stats";
+import { CsiSubmissionStats } from "../shared/models/water-suppliers/csi-submission-stats";
+import { BackflowSubmissionStats } from "../shared/models/water-suppliers/backflow-submission-stats";
+import { FogInspectionSubmissionStats } from "../shared/models/water-suppliers/fog-inspection-submission-stats";
 import { FeatureType } from "../shared/models/feature-type";
 
 @Component({
@@ -15,9 +15,9 @@ import { FeatureType } from "../shared/models/feature-type";
 export class DashboardComponent implements OnInit {
     public waterSupplierId?: number;
     public stats?: WaterSupplierDashboardStats;
-    public csiStats?: CsiSubmissionStats;
-    public backflowStats?: BackflowSubmissionStats;
-    public fogInspectionStats?: FogInspectionSubmissionStats;
+    public csiVm?: CsiStatsVm;
+    public backflowVm?: BackflowStatsVm;
+    public fogInspectionVm?: FogInspectionStatsVm;
     public isLoading: boolean = false;
 
     public hasWiseGuys: boolean = false;
@@ -28,102 +28,6 @@ export class DashboardComponent implements OnInit {
 
     public get hasAnyProgram(): boolean {
         return this.hasWiseGuys || this.hasCsi || this.hasBackflow || this.hasFogInspection || this.hasFogTransportation;
-    }
-
-    public get csiTotalInspections(): number {
-        if (this.csiStats) {
-            return this.csiStats.dailyStats.reduce((s, d) => s + d.totalInspections, 0);
-        } else {
-            return 0;
-        }
-    }
-
-    public get csiTotalPaidInspections(): number {
-        if (this.csiStats) {
-            return this.csiStats.dailyStats.reduce((s, d) => s + d.totalPaidInspections, 0);
-        } else {
-            return 0;
-        }
-    }
-
-    public get csiSubAccountTotalInspections(): number {
-        if (this.csiStats?.subAccountStats) {
-            return this.csiStats.subAccountStats.reduce((s, sub) => s + this.getSubAccountTotal(sub, 'totalInspections'), 0);
-        } else {
-            return 0;
-        }
-    }
-
-    public get csiSubAccountTotalPaidInspections(): number {
-        if (this.csiStats?.subAccountStats) {
-            return this.csiStats.subAccountStats.reduce((s, sub) => s + this.getSubAccountTotal(sub, 'totalPaidInspections'), 0);
-        } else {
-            return 0;
-        }
-    }
-
-    public get backflowTotalTests(): number {
-        if (this.backflowStats) {
-            return this.backflowStats.dailyStats.reduce((s, d) => s + d.totalTests, 0);
-        } else {
-            return 0;
-        }
-    }
-
-    public get backflowTotalPaidTests(): number {
-        if (this.backflowStats) {
-            return this.backflowStats.dailyStats.reduce((s, d) => s + d.totalPaidTests, 0);
-        } else {
-            return 0;
-        }
-    }
-
-    public get backflowSubAccountTotalTests(): number {
-        if (this.backflowStats?.subAccountStats) {
-            return this.backflowStats.subAccountStats.reduce((s, sub) => s + this.getBackflowSubAccountTotal(sub, 'totalTests'), 0);
-        } else {
-            return 0;
-        }
-    }
-
-    public get backflowSubAccountTotalPaidTests(): number {
-        if (this.backflowStats?.subAccountStats) {
-            return this.backflowStats.subAccountStats.reduce((s, sub) => s + this.getBackflowSubAccountTotal(sub, 'totalPaidTests'), 0);
-        } else {
-            return 0;
-        }
-    }
-
-    public get fogTotalInspections(): number {
-        if (this.fogInspectionStats) {
-            return this.fogInspectionStats.dailyStats.reduce((s, d) => s + d.totalInspections, 0);
-        } else {
-            return 0;
-        }
-    }
-
-    public get fogTotalPaidInspections(): number {
-        if (this.fogInspectionStats) {
-            return this.fogInspectionStats.dailyStats.reduce((s, d) => s + d.totalPaidInspections, 0);
-        } else {
-            return 0;
-        }
-    }
-
-    public get fogSubAccountTotalInspections(): number {
-        if (this.fogInspectionStats?.subAccountStats) {
-            return this.fogInspectionStats.subAccountStats.reduce((s, sub) => s + this.getFogSubAccountTotal(sub, 'totalInspections'), 0);
-        } else {
-            return 0;
-        }
-    }
-
-    public get fogSubAccountTotalPaidInspections(): number {
-        if (this.fogInspectionStats?.subAccountStats) {
-            return this.fogInspectionStats.subAccountStats.reduce((s, sub) => s + this.getFogSubAccountTotal(sub, 'totalPaidInspections'), 0);
-        } else {
-            return 0;
-        }
     }
 
     constructor(
@@ -159,15 +63,15 @@ export class DashboardComponent implements OnInit {
             const requests: Promise<unknown>[] = [this._dashboardService.getStats().then(s => this.stats = s)];
 
             if (this.hasCsi) {
-                requests.push(this._dashboardService.getCsiSubmissionStats().then(s => this.csiStats = s));
+                requests.push(this._dashboardService.getCsiSubmissionStats().then(s => this.csiVm = this.buildCsiVm(s)));
             }
 
             if (this.hasBackflow) {
-                requests.push(this._dashboardService.getBackflowSubmissionStats().then(s => this.backflowStats = s));
+                requests.push(this._dashboardService.getBackflowSubmissionStats().then(s => this.backflowVm = this.buildBackflowVm(s)));
             }
 
             if (this.hasFogInspection) {
-                requests.push(this._dashboardService.getFogInspectionSubmissionStats().then(s => this.fogInspectionStats = s));
+                requests.push(this._dashboardService.getFogInspectionSubmissionStats().then(s => this.fogInspectionVm = this.buildFogInspectionVm(s)));
             }
 
             await Promise.all(requests);
@@ -212,35 +116,176 @@ export class DashboardComponent implements OnInit {
         }
     }
 
-    public getBarPercent(value: number): number {
-        return this.csiTotalInspections > 0 ? Math.round((value / this.csiTotalInspections) * 100) : 0;
+    private buildCsiVm(stats: CsiSubmissionStats): CsiStatsVm {
+        const totalInspections = stats.dailyStats.reduce((s, d) => s + d.totalInspections, 0);
+        const totalPaidInspections = stats.dailyStats.reduce((s, d) => s + d.totalPaidInspections, 0);
+
+        const dailyStats = stats.dailyStats.map(d => ({
+            date: d.date,
+            dayName: this.formatDayName(d.date),
+            formattedDate: this.formatDate(d.date),
+            isWeekend: d.isWeekend,
+            totalInspections: d.totalInspections,
+            totalPaidInspections: d.totalPaidInspections,
+            barPercent: totalInspections > 0 ? Math.round((d.totalInspections / totalInspections) * 100) : 0
+        }));
+
+        const subAccountStats = (stats.subAccountStats ?? []).map(sub => ({
+            waterSupplierName: sub.waterSupplierName,
+            totalInspections: sub.dailyStats.reduce((s, d) => s + d.totalInspections, 0),
+            totalPaidInspections: sub.dailyStats.reduce((s, d) => s + d.totalPaidInspections, 0)
+        }));
+
+        return {
+            dailyStats,
+            totalInspections,
+            totalPaidInspections,
+            subAccountStats,
+            subAccountTotalInspections: subAccountStats.reduce((s, sub) => s + sub.totalInspections, 0),
+            subAccountTotalPaidInspections: subAccountStats.reduce((s, sub) => s + sub.totalPaidInspections, 0)
+        };
     }
 
-    public getBackflowBarPercent(value: number): number {
-        return this.backflowTotalTests > 0 ? Math.round((value / this.backflowTotalTests) * 100) : 0;
+    private buildBackflowVm(stats: BackflowSubmissionStats): BackflowStatsVm {
+        const totalTests = stats.dailyStats.reduce((s, d) => s + d.totalTests, 0);
+        const totalPaidTests = stats.dailyStats.reduce((s, d) => s + d.totalPaidTests, 0);
+
+        const dailyStats = stats.dailyStats.map(d => ({
+            date: d.date,
+            dayName: this.formatDayName(d.date),
+            formattedDate: this.formatDate(d.date),
+            isWeekend: d.isWeekend,
+            totalTests: d.totalTests,
+            totalPaidTests: d.totalPaidTests,
+            barPercent: totalTests > 0 ? Math.round((d.totalTests / totalTests) * 100) : 0
+        }));
+
+        const subAccountStats = (stats.subAccountStats ?? []).map(sub => ({
+            waterSupplierName: sub.waterSupplierName,
+            totalTests: sub.dailyStats.reduce((s, d) => s + d.totalTests, 0),
+            totalPaidTests: sub.dailyStats.reduce((s, d) => s + d.totalPaidTests, 0)
+        }));
+
+        return {
+            dailyStats,
+            totalTests,
+            totalPaidTests,
+            subAccountStats,
+            subAccountTotalTests: subAccountStats.reduce((s, sub) => s + sub.totalTests, 0),
+            subAccountTotalPaidTests: subAccountStats.reduce((s, sub) => s + sub.totalPaidTests, 0)
+        };
     }
 
-    public getFogBarPercent(value: number): number {
-        return this.fogTotalInspections > 0 ? Math.round((value / this.fogTotalInspections) * 100) : 0;
+    private buildFogInspectionVm(stats: FogInspectionSubmissionStats): FogInspectionStatsVm {
+        const totalInspections = stats.dailyStats.reduce((s, d) => s + d.totalInspections, 0);
+        const totalPaidInspections = stats.dailyStats.reduce((s, d) => s + d.totalPaidInspections, 0);
+
+        const dailyStats = stats.dailyStats.map(d => ({
+            date: d.date,
+            dayName: this.formatDayName(d.date),
+            formattedDate: this.formatDate(d.date),
+            isWeekend: d.isWeekend,
+            totalInspections: d.totalInspections,
+            totalPaidInspections: d.totalPaidInspections,
+            barPercent: totalInspections > 0 ? Math.round((d.totalInspections / totalInspections) * 100) : 0
+        }));
+
+        const subAccountStats = (stats.subAccountStats ?? []).map(sub => ({
+            waterSupplierName: sub.waterSupplierName,
+            totalInspections: sub.dailyStats.reduce((s, d) => s + d.totalInspections, 0),
+            totalPaidInspections: sub.dailyStats.reduce((s, d) => s + d.totalPaidInspections, 0)
+        }));
+
+        return {
+            dailyStats,
+            totalInspections,
+            totalPaidInspections,
+            subAccountStats,
+            subAccountTotalInspections: subAccountStats.reduce((s, sub) => s + sub.totalInspections, 0),
+            subAccountTotalPaidInspections: subAccountStats.reduce((s, sub) => s + sub.totalPaidInspections, 0)
+        };
     }
 
-    public getDayName(date: string): string {
+    private formatDayName(date: string): string {
         return new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short' });
     }
 
-    public getFormattedDate(date: string): string {
+    private formatDate(date: string): string {
         return new Date(date + 'T00:00:00').toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' });
     }
+}
 
-    public getSubAccountTotal(sub: CsiSubAccountStats, field: 'totalInspections' | 'totalPaidInspections'): number {
-        return sub.dailyStats.reduce((sum, d) => sum + d[field], 0);
-    }
+interface CsiDailyStatsVm {
+    date: string;
+    dayName: string;
+    formattedDate: string;
+    isWeekend: boolean;
+    totalInspections: number;
+    totalPaidInspections: number;
+    barPercent: number;
+}
 
-    public getBackflowSubAccountTotal(sub: BackflowSubAccountStats, field: 'totalTests' | 'totalPaidTests'): number {
-        return sub.dailyStats.reduce((sum, d) => sum + d[field], 0);
-    }
+interface CsiSubAccountVm {
+    waterSupplierName: string;
+    totalInspections: number;
+    totalPaidInspections: number;
+}
 
-    public getFogSubAccountTotal(sub: FogInspectionSubAccountStats, field: 'totalInspections' | 'totalPaidInspections'): number {
-        return sub.dailyStats.reduce((sum, d) => sum + d[field], 0);
-    }
+interface CsiStatsVm {
+    dailyStats: CsiDailyStatsVm[];
+    totalInspections: number;
+    totalPaidInspections: number;
+    subAccountStats: CsiSubAccountVm[];
+    subAccountTotalInspections: number;
+    subAccountTotalPaidInspections: number;
+}
+
+interface BackflowDailyStatsVm {
+    date: string;
+    dayName: string;
+    formattedDate: string;
+    isWeekend: boolean;
+    totalTests: number;
+    totalPaidTests: number;
+    barPercent: number;
+}
+
+interface BackflowSubAccountVm {
+    waterSupplierName: string;
+    totalTests: number;
+    totalPaidTests: number;
+}
+
+interface BackflowStatsVm {
+    dailyStats: BackflowDailyStatsVm[];
+    totalTests: number;
+    totalPaidTests: number;
+    subAccountStats: BackflowSubAccountVm[];
+    subAccountTotalTests: number;
+    subAccountTotalPaidTests: number;
+}
+
+interface FogInspectionDailyStatsVm {
+    date: string;
+    dayName: string;
+    formattedDate: string;
+    isWeekend: boolean;
+    totalInspections: number;
+    totalPaidInspections: number;
+    barPercent: number;
+}
+
+interface FogInspectionSubAccountVm {
+    waterSupplierName: string;
+    totalInspections: number;
+    totalPaidInspections: number;
+}
+
+interface FogInspectionStatsVm {
+    dailyStats: FogInspectionDailyStatsVm[];
+    totalInspections: number;
+    totalPaidInspections: number;
+    subAccountStats: FogInspectionSubAccountVm[];
+    subAccountTotalInspections: number;
+    subAccountTotalPaidInspections: number;
 }

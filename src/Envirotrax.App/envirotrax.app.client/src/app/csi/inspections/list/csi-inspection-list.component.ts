@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild, TemplateRef, ElementRef } from "@angular/core";
+import { Component, OnInit, OnDestroy, ViewChild, TemplateRef, ElementRef } from "@angular/core";
+import { Subscription } from "rxjs";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { CsiInspection } from "../../../shared/models/csi/csi-inspection";
 import { CsiInspectionService } from "../../../shared/services/csi/csi-inspection.service";
@@ -14,7 +15,8 @@ import { PrintableTableService } from "../../../shared/services/printable-table.
     standalone: false,
     templateUrl: './csi-inspection-list.component.html'
 })
-export class CsiInspectionListComponent implements OnInit {
+export class CsiInspectionListComponent implements OnInit, OnDestroy {
+    private _queryParamSub?: Subscription;
     @ViewChild('statusTemplate', { static: true })
     public statusTemplate!: TemplateRef<CellTemplateData<CsiInspection>>;
 
@@ -117,21 +119,27 @@ export class CsiInspectionListComponent implements OnInit {
         };
     }
 
-    public async ngOnInit(): Promise<void> {
+    public ngOnInit(): void {
         this.table.columns = this.getColumns();
 
-        const dateParam = this._activatedRoute.snapshot.queryParamMap.get('date');
-        if (dateParam) {
-            this.table.query.filter = [{
-                columnName: 'inspectionDate',
-                children: [
-                    { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Gte', logicalOperator: 'And' },
-                    { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Lte', logicalOperator: 'And' }
-                ]
-            }];
-            await this.getInspections();
-            this.showResults = (this.table.items?.pageInfo?.totalItems ?? 0) > 0;
-        }
+        this._queryParamSub = this._activatedRoute.queryParamMap.subscribe(async params => {
+            const dateParam = params.get('date');
+            if (dateParam) {
+                this.table.query.filter = [{
+                    columnName: 'inspectionDate',
+                    children: [
+                        { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                        { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Lte', logicalOperator: 'And' }
+                    ]
+                }];
+                await this.getInspections();
+                this.showResults = (this.table.items?.pageInfo?.totalItems ?? 0) > 0;
+            }
+        });
+    }
+
+    public ngOnDestroy(): void {
+        this._queryParamSub?.unsubscribe();
     }
 
     private getColumns(): TableColumn<CsiInspection>[] {

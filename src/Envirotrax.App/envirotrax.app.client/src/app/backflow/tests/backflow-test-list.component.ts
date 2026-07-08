@@ -1,4 +1,5 @@
-import { Component, ElementRef, OnInit, ViewChild, TemplateRef } from '@angular/core';
+import { Component, ElementRef, OnInit, OnDestroy, ViewChild, TemplateRef } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BackflowTestService } from '../../shared/services/backflow/backflow-test.service';
@@ -17,12 +18,14 @@ import { DownloadConfig } from '../../shared/models/download-config';
 import { DownloadService } from '../../shared/services/download.service';
 import { PrintableTableService } from '../../shared/services/printable-table.service';
 import { PropertyType } from '../../shared/enums/property-type.enum';
+import { AppContainerHelperService } from '../../shared/services/helpers/app-contaner-helper.service';
 
 @Component({
     standalone: false,
     templateUrl: './backflow-test-list.component.html'
 })
-export class BackflowTestListComponent implements OnInit {
+export class BackflowTestListComponent implements OnInit, OnDestroy {
+    private _queryParamSub?: Subscription;
     @ViewChild('statusTemplate', { static: true })
     public statusTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
 
@@ -144,7 +147,8 @@ export class BackflowTestListComponent implements OnInit {
         private readonly _gisMapService: GisMapService,
         private readonly _options: BackflowTestOptionsService,
         private readonly _downloadService: DownloadService,
-        private readonly _printService: PrintableTableService
+        private readonly _printService: PrintableTableService,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
         this.testResultOptions = this._options.testResultOptions;
         this.paymentStatusOptions = this._options.paymentStatusOptions;
@@ -218,8 +222,27 @@ export class BackflowTestListComponent implements OnInit {
         };
     }
 
-    public async ngOnInit(): Promise<void> {
+    public ngOnInit(): void {
         this.setupColumns();
+
+        this._queryParamSub = this._activatedRoute.queryParamMap.subscribe(async params => {
+            const dateParam = params.get('date');
+            if (dateParam) {
+                this.table.query.filter = [{
+                    columnName: 'testDate',
+                    children: [
+                        { columnName: 'testDate', value: dateParam, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                        { columnName: 'testDate', value: dateParam, comparisonOperator: 'Lte', logicalOperator: 'And' }
+                    ]
+                }];
+                await this.getTests();
+                this.setShowResults((this.table.items?.pageInfo?.totalItems ?? 0) > 0);
+            }
+        });
+    }
+
+    public ngOnDestroy(): void {
+        this._queryParamSub?.unsubscribe();
     }
 
     public viewDetails(test: BackflowTest): void {
@@ -338,6 +361,11 @@ export class BackflowTestListComponent implements OnInit {
         }
     }
 
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
+    }
+
     public onFilterChange(queryProperties: QueryProperty[]): void {
         this.table.query.filter = queryProperties;
     }
@@ -346,7 +374,7 @@ export class BackflowTestListComponent implements OnInit {
         if (searchForm.valid) {
             this.showMapResults = false;
             await this.getTests();
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 
@@ -356,7 +384,7 @@ export class BackflowTestListComponent implements OnInit {
         }
         try {
             this.isMapLoading = true;
-            this.showResults = false;
+            this.setShowResults(false);
             this.showMapResults = false;
 
             const [testsPage, areas, coordinates, defaultView] = await Promise.all([

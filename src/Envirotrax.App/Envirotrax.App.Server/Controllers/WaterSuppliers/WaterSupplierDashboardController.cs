@@ -29,4 +29,20 @@ public class WaterSupplierDashboardController : WaterSupplierProtectedController
 
         return Ok(stats);
     }
+
+    [HttpGet("backflow-submission-stats")]
+    public async Task<IActionResult> GetBackflowSubmissionStatsAsync(CancellationToken cancellationToken)
+    {
+        var stats = await _dashboardService.GetBackflowSubmissionStatsAsync(cancellationToken);
+
+        return Ok(stats);
+    }
+
+    [HttpGet("fog-inspection-submission-stats")]
+    public async Task<IActionResult> GetFogInspectionSubmissionStatsAsync(CancellationToken cancellationToken)
+    {
+        var stats = await _dashboardService.GetFogInspectionSubmissionStatsAsync(cancellationToken);
+
+        return Ok(stats);
+    }
 }

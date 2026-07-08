@@ -6,7 +6,8 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 public interface ISiteLogService
 {
     Task<IPagedData<SiteLogDto>> GetBySiteAsync(int siteId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<IEnumerable<SiteLogDto>> GetBySitesAsync(IEnumerable<int> siteIds, CancellationToken cancellationToken);
     Task<SiteLogDto> AddAsync(int siteId, SiteLogDto dto, Stream? fileStream, string? fileName);
-    Task<SiteLogDto?> UpdateAsync(SiteLogDto dto, Stream? fileStream, string? fileName, CancellationToken cancellationToken);
-    Task<bool> DeleteAsync(int id, CancellationToken cancellationToken);
+    Task<SiteLogDto?> UpdateAsync(SiteLogDto dto, Stream? fileStream, string? fileName);
+    Task<bool> DeleteAsync(int id);
 }

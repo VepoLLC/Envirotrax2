@@ -10,4 +10,6 @@ public interface ISiteService : IService<Site, SiteDto>
     Task<IEnumerable<SiteDto>> GetAllPendingGeocodingAsync(int batchSize);
     Task<SiteDto?> GeocodeAsync(int siteId, bool assignGisArea, CancellationToken cancellationToken);
     Task UpdateGisDataAsync(int siteId, UpdateSiteGisDataDto dto, CancellationToken cancellationToken);
+    Task<IPagedData<CsiComplianceSiteDto>> GetCsiComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task UpdateCsiAssignmentAsync(int siteId, int? userId);
 }

@@ -18,7 +18,6 @@ import { DropdownComponent } from "./components/dropdown/dropdown.component";
 import { DropdownOptionComponent } from "./components/dropdown/dropdown-option.component";
 import { InputComponent } from "./components/input/input.component";
 import { InputOptionComponent } from "./components/input/input-option.component";
-import { OptionDirective } from "./components/input/option.directive";
 import { ConfirmModalComponent } from "./components/modals/confirm-modal.component";
 import { MessageModalComponent } from "./components/modals/message-modal.component";
 import { ValidationFieldComponent } from "./components/validation/validation-field/validation-field.component";
@@ -31,6 +30,7 @@ import { LookupFieldComponent } from "./components/lookup-field/lookup-field.com
 import { MapComponent } from "./components/map/map.component";
 import { MapResultsComponent } from "./components/map/map-results.component";
 import { AppLoadingSpinnerModule } from "./components/loading-spinner/app-loading-spinner.module";
+import { InputAddOnComponent } from "./components/input/input-add-on.component";
 
 @NgModule({
     declarations: [
@@ -48,7 +48,7 @@ import { AppLoadingSpinnerModule } from "./components/loading-spinner/app-loadin
         DropdownOptionComponent,
         InputComponent,
         InputOptionComponent,
-        OptionDirective,
+        InputAddOnComponent,
         ConfirmModalComponent,
         MessageModalComponent,
         ValidationFieldComponent,
@@ -80,6 +80,7 @@ import { AppLoadingSpinnerModule } from "./components/loading-spinner/app-loadin
         DropdownOptionComponent,
         InputComponent,
         InputOptionComponent,
+        InputAddOnComponent,
         ValidationFieldComponent,
         ValidationSummaryComponent,
         SectionComponent,

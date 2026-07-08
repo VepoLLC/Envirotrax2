@@ -112,4 +112,25 @@ public class SiteRepository : Repository<Site>, ISiteRepository
                 .SetProperty(s => s.GisLongitude, longitude)
                 .SetProperty(s => s.GisStatus, status));
     }
+
+    public async Task<IEnumerable<Site>> GetCsiComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var paginated = await GetListQuery()
+            .Where(s => s.NeedsCsiInspection && !s.OutOfArea)
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public async Task UpdateCsiAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate)
+    {
+        await DbContext
+            .Sites
+            .Where(s => s.Id == siteId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(s => s.CsiAccountAssignmentId, userId)
+                .SetProperty(s => s.CsiAccountAssignmentDate, assignmentDate));
+    }
 }

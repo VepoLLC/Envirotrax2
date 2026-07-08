@@ -23,6 +23,7 @@ import { BackflowGauge, GaugeExpirationType } from '../../shared/models/backflow
 import { ProfessionalDashboardStats } from '../../shared/models/professionals/professional-dashboard-stats';
 import { TableViewModel } from '../../shared/models/table-view-model';
 import { CellTemplateData, ColumnType, FreeTextSearchSettings, TableColumn } from '@envirotrax/common-ui';
+import { AppContainerHelperService } from '../../shared/services/helpers/app-contaner-helper.service';
 
 const VIEW_MODE_KEY = 'dashboardViewMode';
 
@@ -41,7 +42,7 @@ export class DashboardComponent implements OnInit {
     @ViewChild('mailingTemplate', { static: true })
     public mailingTemplate!: TemplateRef<CellTemplateData<CsiInspection>>;
 
-    
+
     @ViewChild('fogStatusTemplate', { static: true })
     public fogStatusTemplate!: TemplateRef<CellTemplateData<FogInspection>>;
 
@@ -183,10 +184,12 @@ export class DashboardComponent implements OnInit {
         private readonly _gaugeService: BackflowGaugeService,
         private readonly _backflowTestService: BackflowTestService,
         private readonly _dashboardService: ProfessionalDashboardService,
-        private readonly _router: Router
+        private readonly _router: Router,
+        private readonly _containerHelper: AppContainerHelperService
     ) { }
 
     public async ngOnInit(): Promise<void> {
+        this._containerHelper.setContainerVisibility(false);
         this.viewMode = (localStorage.getItem(VIEW_MODE_KEY) as 'quick' | 'full') ?? 'full';
 
         this.setupColumns();

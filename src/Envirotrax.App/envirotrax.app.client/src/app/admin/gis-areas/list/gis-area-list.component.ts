@@ -8,6 +8,7 @@ import { AuthService } from "../../../shared/services/auth/auth.service";
 import { FeatureType } from "../../../shared/models/feature-type";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
 import { MapPolygon } from "@envirotrax/common-ui";
+import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 
 @Component({
     standalone: false,
@@ -32,7 +33,8 @@ export class GisAreaListComponent implements OnInit {
         private readonly _helper: HelperService,
         private readonly _gisAreaService: GisAreaService,
         private readonly _gisAreaCoordinateService: GisAreaCoordinateService,
-        private readonly _authService: AuthService
+        private readonly _authService: AuthService,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
 
     }
@@ -85,6 +87,8 @@ export class GisAreaListComponent implements OnInit {
     }
 
     public async ngOnInit(): Promise<void> {
+        this._containerHelper.setContainerVisibility(false);
+
         await Promise.all([
             this.getAreas(),
             this.getDefaultView(),

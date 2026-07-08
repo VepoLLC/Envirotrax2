@@ -21,6 +21,7 @@ import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
 import { FacilityType } from "../../../shared/enums/facility-type.enum";
 import { SiteLogEditComponent, SiteLogEditModel } from "../../../shared/components/site-log/site-log-edit.component";
+import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 
 const DAY_MS = 86400000;
 
@@ -174,7 +175,8 @@ export class CsiComplianceManagementComponent implements OnInit {
         private readonly _downloadService: DownloadService,
         private readonly _toastService: ToastService,
         private readonly _printService: PrintableTableService,
-        private readonly _modalHelper: ModalHelperService
+        private readonly _modalHelper: ModalHelperService,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
         this.downloadConfig = {
             fileName: 'CSI Inspection Compliance',
@@ -202,6 +204,7 @@ export class CsiComplianceManagementComponent implements OnInit {
     }
 
     public async ngOnInit(): Promise<void> {
+        this._containerHelper.setContainerVisibility(false);
         this.canModify = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.Sites);
         this.table.columns = this.getColumns();
 

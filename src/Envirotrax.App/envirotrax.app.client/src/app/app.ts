@@ -1,12 +1,13 @@
-﻿import { Component, signal, OnInit } from '@angular/core';
+﻿import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AuthService } from './shared/services/auth/auth.service';
 import { WaterSupplierService } from './shared/services/water-suppliers/water-supplier.service';
 import { ProfesisonalService } from './shared/services/professionals/professional.service';
 import { ThemeCookieService } from './shared/services/helpers/theme-cookie.service';
-import { createPopper, flip, preventOverflow } from '@popperjs/core';
+import { createPopper } from '@popperjs/core';
 import { FeatureType } from './shared/models/feature-type';
 import { PermissionAction, PermissionType } from './shared/models/permission-type';
 import { ROLE_DEFINITIONS } from './shared/models/role-definitions';
+import { AppContainerHelperService } from './shared/services/helpers/app-contaner-helper.service';
 
 @Component({
   selector: 'app-root',
@@ -21,14 +22,20 @@ export class App implements OnInit {
   public companyName: string = '';
   public userEmail: string = '';
   public isDarkMode: boolean = false;
+  public useContainer: boolean = false;
 
   constructor(
     private readonly _authService: AuthService,
     private readonly _waterSupplierService: WaterSupplierService,
     private readonly _professionalService: ProfesisonalService,
-    private readonly _themeCookie: ThemeCookieService
+    private readonly _themeCookie: ThemeCookieService,
+    private readonly _changeDetector: ChangeDetectorRef,
+    appContainerHelper: AppContainerHelperService
   ) {
-
+    appContainerHelper.usContainer().subscribe(value => {
+      this.useContainer = value;
+      this._changeDetector.detectChanges();
+    });
   }
 
   public async ngOnInit(): Promise<void> {

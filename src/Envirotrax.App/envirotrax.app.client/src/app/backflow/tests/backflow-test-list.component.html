@@ -1,4 +1,4 @@
-<h1 class="text-center h2">Backflow Test Search</h1>
+﻿<h1 class="text-center h2">Backflow Test Search</h1>
 
 <ng-template #statusTemplate let-test="rowData">
     <div class="d-flex flex-wrap gap-1">
@@ -72,7 +72,8 @@
     <div>
         <div>
             <span class="fw-semibold">Assembly Desc:</span>
-            <span class="ms-1 text-muted">{{ test.manufacturer }} {{ test.model }} {{ test.size }} {{ test.deviceType }}</span>
+            <span class="ms-1 text-muted">{{ test.manufacturer }} {{ test.model }} {{ test.size }}
+                {{ test.deviceType }}</span>
         </div>
         @if (test.hazardType) {
             <div>
@@ -150,129 +151,152 @@
             <!-- Main Search Criteria -->
             <vp-section header="Search criteria">
                 <div class="row">
-                    <div class="col-md-4">
-                        <div class="mb-3">
-                            <vp-filter-panel-field fieldName="accountNumber"
-                                                   label="Account number"
-                                                   [form]="searchForm" />
+                    <div class="col-md-8 d-flex flex-column">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <vp-filter-panel-field fieldName="accountNumber"
+                                                           label="Account number"
+                                                           labelStyle="horizontal"
+                                                           [form]="searchForm" />
+                                </div>
+                                <div class="mb-2">
+                                    <vp-filter-panel-field fieldName="serialNumber"
+                                                           label="Serial number"
+                                                           labelStyle="horizontal"
+                                                           [form]="searchForm" />
+                                </div>
+                                <div class="mb-2">
+                                    <vp-filter-panel-field fieldName="reasonForTest"
+                                                           label="Reason for test"
+                                                           labelStyle="horizontal"
+                                                           type="select"
+                                                           [options]="reasonForTestOptions"
+                                                           [form]="searchForm" />
+                                </div>
+                                <div class="mb-2">
+                                    <vp-filter-panel-field fieldName="hazardType"
+                                                           label="Hazard type"
+                                                           labelStyle="horizontal"
+                                                           type="select"
+                                                           [options]="hazardTypeOptions"
+                                                           [form]="searchForm" />
+                                </div>
+                                <div class="mb-2">
+                                    <vp-filter-panel-field fieldName="deviceType"
+                                                           label="Device type"
+                                                           labelStyle="horizontal"
+                                                           type="select"
+                                                           [options]="deviceTypeOptions"
+                                                           [form]="searchForm" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <vp-filter-panel-field fieldName="isCurrent"
+                                                           label="Test history"
+                                                           labelStyle="horizontal"
+                                                           type="select"
+                                                           [options]="testHistoryOptions"
+                                                           [form]="searchForm"
+                                                           borderColor="#00a000" />
+                                </div>
+                                <div class="mb-2">
+                                    <vp-filter-panel-field fieldName="testResult"
+                                                           label="Test result"
+                                                           labelStyle="horizontal"
+                                                           type="select"
+                                                           [options]="testResultOptions"
+                                                           [form]="searchForm"
+                                                           borderColor="#00a000" />
+                                </div>
+                                <div class="mb-2">
+                                    <vp-filter-panel-field fieldName="outOfService"
+                                                           label="Service status"
+                                                           labelStyle="horizontal"
+                                                           type="select"
+                                                           [options]="serviceStatusOptions"
+                                                           [form]="searchForm"
+                                                           borderColor="orange" />
+                                </div>
+                                <div class="mb-2">
+                                    <vp-filter-panel-field fieldName="disapproved"
+                                                           label="Approval status"
+                                                           labelStyle="horizontal"
+                                                           type="select"
+                                                           [options]="approvalStatusOptions"
+                                                           [form]="searchForm"
+                                                           borderColor="cyan" />
+                                </div>
+                                <div class="mb-2">
+                                    <vp-filter-panel-field fieldName="rejected"
+                                                           label="Rejected status"
+                                                           labelStyle="horizontal"
+                                                           type="select"
+                                                           [options]="rejectedStatusOptions"
+                                                           [form]="searchForm"
+                                                           borderColor="red" />
+                                </div>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <vp-filter-panel-field fieldName="serialNumber"
-                                                   label="Serial number"
-                                                   [form]="searchForm" />
-                        </div>
-                        <div class="mb-3">
-                            <vp-filter-panel-field fieldName="reasonForTest"
-                                                   label="Reason for test"
-                                                   type="select"
-                                                   [options]="reasonForTestOptions"
-                                                   [form]="searchForm" />
-                        </div>
-                        <div class="mb-3">
-                            <vp-filter-panel-field fieldName="hazardType"
-                                                   label="Hazard type"
-                                                   type="select"
-                                                   [options]="hazardTypeOptions"
-                                                   [form]="searchForm" />
-                        </div>
-                        <div class="mb-3">
-                            <vp-filter-panel-field fieldName="deviceType"
-                                                   label="Device type"
-                                                   type="select"
-                                                   [options]="deviceTypeOptions"
-                                                   [form]="searchForm" />
-                        </div>
-                        <div class="mb-3">
+
+                        <div class="d-md-flex flex-column flex-fill justify-content-end mb-2">
                             <app-gis-area-lookup fieldName="site.gisAreaId"
                                                  label="GIS Area"
+                                                 labelStyle="horizontal"
                                                  [form]="searchForm" />
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="mb-3">
-                            <vp-filter-panel-field fieldName="isCurrent"
-                                                   label="Test history"
-                                                   type="select"
-                                                   [options]="testHistoryOptions"
-                                                   [form]="searchForm"
-                                                   borderColor="#00a000" />
-                        </div>
-                        <div class="mb-3">
-                            <vp-filter-panel-field fieldName="testResult"
-                                                   label="Test result"
-                                                   type="select"
-                                                   [options]="testResultOptions"
-                                                   [form]="searchForm"
-                                                   borderColor="#00a000" />
-                        </div>
-                        <div class="mb-3">
-                            <vp-filter-panel-field fieldName="outOfService"
-                                                   label="Service status"
-                                                   type="select"
-                                                   [options]="serviceStatusOptions"
-                                                   [form]="searchForm"
-                                                   borderColor="orange" />
-                        </div>
-                        <div class="mb-3">
-                            <vp-filter-panel-field fieldName="disapproved"
-                                                   label="Approval status"
-                                                   type="select"
-                                                   [options]="approvalStatusOptions"
-                                                   [form]="searchForm"
-                                                   borderColor="cyan" />
-                        </div>
-                        <div class="mb-3">
-                            <vp-filter-panel-field fieldName="rejected"
-                                                   label="Rejected status"
-                                                   type="select"
-                                                   [options]="rejectedStatusOptions"
-                                                   [form]="searchForm"
-                                                   borderColor="red" />
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="ossf"
                                                    label="OSSF"
+                                                   labelStyle="horizontal"
                                                    type="select"
                                                    [options]="yesNoOptions"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="meterNumber"
                                                    label="Water meter number"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="testDate"
                                                    label="Test date range"
+                                                   labelStyle="horizontal"
                                                    type="daterange"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="properlyInstalled"
                                                    label="Installed per recommendations and/or local codes"
+                                                   labelStyle="horizontal"
                                                    type="select"
                                                    [options]="yesNoOptions"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="nonPotable"
                                                    label="Installed on a non-potable water supply (auxiliary)"
+                                                   labelStyle="horizontal"
                                                    type="select"
                                                    [options]="yesNoOptions"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="gaugeNonPotable"
                                                    label="Test gauge"
+                                                   labelStyle="horizontal"
                                                    type="select"
                                                    [options]="gaugeOptions"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="site.facilityType"
                                                    label="Facility type"
+                                                   labelStyle="horizontal"
                                                    type="multi-select"
                                                    [options]="facilityTypeOptions"
                                                    [form]="searchForm" />
@@ -285,19 +309,22 @@
             <div class="mt-3">
                 <vp-section header="BPAT criteria">
                     <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 mb-2">
                             <vp-filter-panel-field fieldName="bpatLicenseNumber"
                                                    label="BPAT license number"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 mb-2">
                             <vp-filter-panel-field fieldName="bpatCompanyName"
                                                    label="BPAT company name"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 mb-2">
                             <vp-filter-panel-field fieldName="bpatContactName"
                                                    label="BPAT contact name"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                     </div>
@@ -308,32 +335,53 @@
             <div class="row mt-3">
                 <div class="col-md-6">
                     <vp-section header="Location / property criteria">
-                        <div class="row">
-                            <div class="col-12 mb-3">
+                        <div>
+                            <div class="mb-2">
                                 <vp-filter-panel-field fieldName="propertyType"
                                                        label="Property type"
+                                                       labelStyle="horizontal"
                                                        type="select"
                                                        [options]="propertyTypeOptions"
                                                        [form]="searchForm" />
                             </div>
-                            <div class="col-12 mb-3">
+                            <div class="mb-2">
                                 <vp-filter-panel-field fieldName="propertyBusinessName"
                                                        label="Business name"
+                                                       labelStyle="horizontal"
                                                        [form]="searchForm" />
                             </div>
-                            <div class="col-4 mb-3">
-                                <vp-filter-panel-field fieldName="propertyStreetNumber"
-                                                       label="Street #"
-                                                       [form]="searchForm" />
+
+                            <div class="row">
+                                <div class="col-xl-5 d-flex align-items-center">
+                                    <div class="text-xl-end w-100">
+                                        Address
+                                    </div>
+                                </div>
+                                <div class="col-xl d-xl-flex gap-1">
+                                    <div class="mb-2">
+                                        <vp-filter-panel-field fieldName="propertyStreetNumber"
+                                                               label="Street #"
+                                                               [form]="searchForm" />
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <vp-filter-panel-field fieldName="propertyStreetName"
+                                                               label="Street name"
+                                                               [form]="searchForm" />
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <vp-filter-panel-field fieldName="propertyNumber"
+                                                               label="Suite/Apt #"
+                                                               [form]="searchForm" />
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-5 mb-3">
-                                <vp-filter-panel-field fieldName="propertyStreetName"
-                                                       label="Street name"
-                                                       [form]="searchForm" />
-                            </div>
-                            <div class="col-3 mb-3">
-                                <vp-filter-panel-field fieldName="propertyNumber"
-                                                       label="Suite/Apt #"
+
+                            <div>
+                                <vp-filter-panel-field fieldName="propertyZip"
+                                                       label="ZIP"
+                                                       labelStyle="horizontal"
                                                        [form]="searchForm" />
                             </div>
                         </div>
@@ -342,30 +390,51 @@
 
                 <div class="col-md-6 mt-3 mt-md-0">
                     <vp-section header="Contact / mailing criteria">
-                        <div class="row">
-                            <div class="col-12 mb-3">
+                        <div>
+                            <div class="mb-2">
                                 <vp-filter-panel-field fieldName="mailingCompanyName"
                                                        label="Company name"
+                                                       labelStyle="horizontal"
                                                        [form]="searchForm" />
                             </div>
-                            <div class="col-12 mb-3">
+                            <div class="mb-2">
                                 <vp-filter-panel-field fieldName="mailingContactName"
                                                        label="Contact name"
+                                                       labelStyle="horizontal"
                                                        [form]="searchForm" />
                             </div>
-                            <div class="col-4 mb-3">
-                                <vp-filter-panel-field fieldName="mailingStreetNumber"
-                                                       label="Street #"
-                                                       [form]="searchForm" />
+
+                            <div class="row">
+                                <div class="col-xl-5 d-flex align-items-center">
+                                    <div class="text-xl-end w-100">
+                                        Address
+                                    </div>
+                                </div>
+                                <div class="col-xl d-xl-flex gap-1">
+                                    <div class="mb-2">
+                                        <vp-filter-panel-field fieldName="mailingStreetNumber"
+                                                               label="Street #"
+                                                               [form]="searchForm" />
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <vp-filter-panel-field fieldName="mailingStreetName"
+                                                               label="Street name"
+                                                               [form]="searchForm" />
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <vp-filter-panel-field fieldName="mailingNumber"
+                                                               label="Suite/Apt #"
+                                                               [form]="searchForm" />
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-5 mb-3">
-                                <vp-filter-panel-field fieldName="mailingStreetName"
-                                                       label="Street name"
-                                                       [form]="searchForm" />
-                            </div>
-                            <div class="col-3 mb-3">
-                                <vp-filter-panel-field fieldName="mailingNumber"
-                                                       label="Suite/Apt #"
+
+                            <div>
+                                <vp-filter-panel-field fieldName="mailingZip"
+                                                       label="ZIP"
+                                                       labelStyle="horizontal"
                                                        [form]="searchForm" />
                             </div>
                         </div>
@@ -411,7 +480,8 @@
         </button>
     </div>
 
-    <vp-section [noPadding]="true" header="Backflow Test Search Results - {{ table.items?.pageInfo?.totalItems ?? 0 }} Results">
+    <vp-section [noPadding]="true"
+                header="Backflow Test Search Results - {{ table.items?.pageInfo?.totalItems ?? 0 }} Results">
         <div #printableSection>
             <div class="row gap-2 justify-content-center mb-2 mt-2">
                 <div class="col-auto mb-2">
@@ -446,15 +516,15 @@
 
             @if (table.items && table.items.data && table.items.data.length > 0) {
                 <vp-table [columns]="table.columns!"
-                        [data]="table.items.data"
-                        [(pageInfo)]="table.items.pageInfo"
-                        (pageInfoChange)="getTests()"
-                        [(query)]="table.query"
-                        (queryChange)="getTests()"
-                        (queryReset)="getTests()"
-                        [canViewDetails]="true"
-                        (viewDetails)="viewDetails($event)"
-                        [freeTextSearch]="table.freeTextSearch" />
+                          [data]="table.items.data"
+                          [(pageInfo)]="table.items.pageInfo"
+                          (pageInfoChange)="getTests()"
+                          [(query)]="table.query"
+                          (queryChange)="getTests()"
+                          (queryReset)="getTests()"
+                          [canViewDetails]="true"
+                          (viewDetails)="viewDetails($event)"
+                          [freeTextSearch]="table.freeTextSearch" />
             }
             @if (table.items?.data?.length === 0) {
                 <div class="text-center py-3 text-muted">
@@ -462,7 +532,7 @@
                 </div>
             }
         </div>
-        
+
     </vp-section>
 </div>
 

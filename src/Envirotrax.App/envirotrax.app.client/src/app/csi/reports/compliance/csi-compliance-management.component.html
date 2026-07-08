@@ -29,7 +29,9 @@
             {{ data.mailingStreetNumber }} {{ data.mailingStreetName }}
             <span *ngIf="data.mailingNumber">#{{ data.mailingNumber }}</span>
         </div>
-        <div>{{ data.mailingCity }}<span *ngIf="data.mailingCity">, </span>{{ data.mailingState?.code }} {{ data.mailingZipCode }}</div>
+        <div>{{ data.mailingCity }}<span *ngIf="data.mailingCity">, </span>{{ data.mailingState?.code }}
+            {{ data.mailingZipCode }}
+        </div>
     </div>
 </ng-template>
 
@@ -58,7 +60,8 @@
                     <a href="javascript:void(0)" class="text-danger" (click)="deleteLog(data, log)" title="Delete">
                         <i class="fa-solid fa-trash-can"></i>
                     </a>
-                    <a *ngIf="isFirst" href="javascript:void(0)" class="text-success" (click)="addLog(data)" title="Add">
+                    <a *ngIf="isFirst" href="javascript:void(0)" class="text-success" (click)="addLog(data)"
+                       title="Add">
                         <i class="fa-solid fa-file-circle-plus"></i>
                     </a>
                 </div>
@@ -66,7 +69,8 @@
 
             <div class="mt-1" *ngIf="log.logType !== SiteLogType.Note && log.reviewDate">
                 <span class="fw-semibold">Review Date:</span>
-                <span class="badge rounded-pill ms-1" [ngClass]="reviewDateStatusClasses[log.reviewDateStatus || 0]">{{ log.reviewDate | date }}</span>
+                <span class="badge rounded-pill ms-1"
+                      [ngClass]="reviewDateStatusClasses[log.reviewDateStatus || 0]">{{ log.reviewDate | date }}</span>
             </div>
 
             <hr class="my-1" />
@@ -110,7 +114,8 @@
 </ng-template>
 
 <ng-template #daysOverdueTemplate let-data="rowData">
-    <span *ngIf="data.daysOverdue != null" class="badge rounded-pill" [ngClass]="data.overdueClass">{{ data.daysOverdue }} days</span>
+    <span *ngIf="data.daysOverdue != null" class="badge rounded-pill"
+          [ngClass]="data.overdueClass">{{ data.daysOverdue }} days</span>
 </ng-template>
 
 <ng-template #viewSiteTemplate let-data="rowData">
@@ -136,7 +141,8 @@
 <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
 
 <div class="results-section">
-    <vp-section header="Overdue CSI Inspections ({{ daysOverdueLabel }}) - {{ table.items?.pageInfo?.totalItems || 0 }} Results">
+    <vp-section
+                header="Overdue CSI Inspections ({{ daysOverdueLabel }}) - {{ table.items?.pageInfo?.totalItems || 0 }} Results">
         <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
             <vp-filter-panel (filterChange)="onFilterChange($event)">
                 <div class="row">
@@ -145,6 +151,7 @@
                             <vp-input type="select"
                                       label="Days Overdue"
                                       name="daysOverdue"
+                                      labelStyle="horizontal"
                                       [(ngModel)]="daysOverdue"
                                       [options]="daysOverdueOptions" />
                         </div>
@@ -153,18 +160,32 @@
                             <vp-input type="select"
                                       label="Sort By"
                                       name="sortBy"
+                                      labelStyle="horizontal"
                                       [(ngModel)]="sortBy"
                                       [options]="sortOptions" />
                         </div>
 
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="showMailing" name="showMailing" [(ngModel)]="showMailing" />
-                            <label class="form-check-label" for="showMailing">Show mailing information</label>
-                        </div>
+                        <div class="d-xl-flex justify-content-end">
+                            <div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           id="showMailing"
+                                           name="showMailing"
+                                           [(ngModel)]="showMailing" />
+                                    <label class="form-check-label" for="showMailing">Show mailing information</label>
+                                </div>
 
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="emailWhenAssigned" name="emailWhenAssigned" [(ngModel)]="emailWhenAssigned" />
-                            <label class="form-check-label" for="emailWhenAssigned">Email users when assigned</label>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           id="emailWhenAssigned"
+                                           name="emailWhenAssigned"
+                                           [(ngModel)]="emailWhenAssigned" />
+                                    <label class="form-check-label" for="emailWhenAssigned">Email users when
+                                        assigned</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -173,18 +194,20 @@
                             <vp-filter-panel-field fieldName="csiAccountAssignmentId"
                                                    label="User Account Assignment"
                                                    type="select"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="userOptions" />
                         </div>
 
                         <div class="mb-3">
-                            <app-gis-area-lookup [form]="searchForm" />
+                            <app-gis-area-lookup [form]="searchForm" labelStyle="horizontal" />
                         </div>
 
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="propertyType"
                                                    label="Property Type"
                                                    type="select"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="propertyTypes" />
                         </div>
@@ -192,7 +215,7 @@
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="facilityType"
                                                    label="Facility Type"
-                                                   type="select"
+                                                   type="select" labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="facilityTypes" />
                         </div>
@@ -200,14 +223,17 @@
 
                     <div class="col-md-4">
                         <div class="mb-3">
-                            <label class="form-label">Property Street Name</label>
-                            <input type="text" class="form-control" name="propertyStreet" [(ngModel)]="propertyStreet" />
+                            <vp-input label="Property Street Name"
+                                      name="propertyStreetName"
+                                      labelStyle="horizontal"
+                                      [(ngModel)]="propertyStreet" />
                         </div>
 
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="hasOnSiteSewageFacility"
                                                    label="Has On-Site Sewage Facility"
                                                    type="select"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="yesNoOptions" />
                         </div>
@@ -216,6 +242,7 @@
                             <vp-filter-panel-field fieldName="hasAuxWaterSupply"
                                                    label="Has Auxiliary Water Supply"
                                                    type="select"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="yesNoOptions" />
                         </div>

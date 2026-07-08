@@ -6,6 +6,7 @@ html {
 
 body {
     font-family: "Montserrat", sans-serif;
+    font-size: 0.95rem;
 }
 
 h6,
@@ -33,12 +34,16 @@ a:hover {
     text-decoration: underline;
 }
 
+.bg-body {
+    background-color: #cccccc !important;
+}
+
 .bg-primary {
     background-color: #008fd4 !important;
 }
 
 .bg-info {
-    background-color: #05bfdf !important;
+    background-color: #008fd4a0 !important;
 }
 
 .text-info {
@@ -171,6 +176,13 @@ a:hover {
     background-color: #f5f5f5;
 }
 
+.form-control,
+.form-control:focus,
+.ng-select.ng-select-opened>.ng-select-container,
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+    padding: 0.25rem 0.75rem;
+}
+
 .ng-select .ng-arrow-wrapper .ng-arrow {
     border-color: none !important;
     border-style: none !important;
@@ -194,15 +206,18 @@ a:hover {
 .ng-select.form-control {
     padding: 0;
     border: none;
-    height: auto;
 }
 
 .ng-select .ng-select-container {
     border: 1px solid #ced4da;
     border-radius: 0.375rem;
     /* Bootstrap 5 */
-    min-height: 38px;
+    min-height: 33px;
     box-shadow: none;
+}
+
+.ng-select.ng-select-single .ng-select-container {
+    height: 33px;
 }
 
 .ng-select.ng-select-focused .ng-select-container {
@@ -233,7 +248,7 @@ a:hover {
     border-color: #8a9199;
 }
 
-.form-check-input.readonly-checkbox:disabled ~ .form-check-label {
+.form-check-input.readonly-checkbox:disabled~.form-check-label {
     opacity: 1;
     color: var(--bs-body-color, #212529);
 }
@@ -387,7 +402,11 @@ input:-webkit-autofill:active {
 .vp-table-header {
     background-color: #ddd !important;
     font-weight: 600;
-    font-size: 0.95rem;
+}
+
+.table th,
+.table td {
+    font-size: 0.75rem;
 }
 
 .overview-box {

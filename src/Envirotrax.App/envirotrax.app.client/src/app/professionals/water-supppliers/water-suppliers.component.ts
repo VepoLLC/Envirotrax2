@@ -12,6 +12,7 @@ import { ToastService } from "../../shared/services/toast.service";
 import { AuthService } from "../../shared/services/auth/auth.service";
 import { FeatureType } from "../../shared/models/feature-type";
 import { CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
+import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
 
 type TabType = 'backflow' | 'csi' | 'fogInspection' | 'fogTransport';
 
@@ -89,12 +90,15 @@ export class WaterSuppliersComponent implements OnInit {
         private readonly _lookupService: LookupService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService,
-        private readonly _authService: AuthService
+        private readonly _authService: AuthService,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
 
     }
 
     public async ngOnInit(): Promise<void> {
+        this._containerHelper.setContainerVisibility(false);
+
         [this.hasBackflowTesting, this.hasCsiInspection, this.hasFogInspection, this.hasFogTransportation] = await Promise.all([
             this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
             this._authService.hasAnyFeatures(FeatureType.CsiInspection),

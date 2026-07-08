@@ -1,4 +1,4 @@
-<h1 class="text-center h2">BPAT Management</h1>
+﻿<h1 class="text-center h2">BPAT Management</h1>
 
 <div [hidden]="showResults">
     <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
@@ -6,31 +6,36 @@
             <vp-section header="BPAT Account Search Criteria">
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="companyEmail"
                                                    label="Company Email"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="name"
                                                    label="Company Name"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="address"
                                                    label="Address"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="phoneNumber"
                                                    label="Company Phone"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="insurancePolicyNumber"
                                                    label="Insurance Policy Number"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                     </div>
@@ -52,7 +57,7 @@
 
 <div *ngIf="showResults">
 
-    <div class="d-flex justify-content-between mb-3">
+    <div class="d-flex justify-content-between mb-2">
         <button type="button"
                 class="btn btn-primary"
                 title="Export excel"

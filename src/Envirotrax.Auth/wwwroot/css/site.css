@@ -1925,14 +1925,23 @@ span.evalzone.yellow {
 }
 
 .bg-info {
-    background-color: #05bfdf !important;
+    background-color: #008fd4a0 !important;
 }
 
 .border-info {
-    border-color: #05bfdf !important;
+    border-color: #008fd4a0 !important;
 }
 
 .vp-login-form {
     width: 100%;
     max-width: 600px;
+}
+
+.bg-body {
+    background-color: #cccccc !important;
+}
+
+.card-header {
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
 }

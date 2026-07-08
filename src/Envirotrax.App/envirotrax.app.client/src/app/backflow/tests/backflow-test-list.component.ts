@@ -1,4 +1,5 @@
-import { Component, ElementRef, OnInit, ViewChild, TemplateRef } from '@angular/core';
+import { Component, ElementRef, OnInit, OnDestroy, ViewChild, TemplateRef } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BackflowTestService } from '../../shared/services/backflow/backflow-test.service';
@@ -23,7 +24,8 @@ import { AppContainerHelperService } from '../../shared/services/helpers/app-con
     standalone: false,
     templateUrl: './backflow-test-list.component.html'
 })
-export class BackflowTestListComponent implements OnInit {
+export class BackflowTestListComponent implements OnInit, OnDestroy {
+    private _queryParamSub?: Subscription;
     @ViewChild('statusTemplate', { static: true })
     public statusTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
 
@@ -220,21 +222,27 @@ export class BackflowTestListComponent implements OnInit {
         };
     }
 
-    public async ngOnInit(): Promise<void> {
+    public ngOnInit(): void {
         this.setupColumns();
 
-        const dateParam = this._activatedRoute.snapshot.queryParamMap.get('date');
-        if (dateParam) {
-            this.table.query.filter = [{
-                columnName: 'testDate',
-                children: [
-                    { columnName: 'testDate', value: dateParam, comparisonOperator: 'Gte', logicalOperator: 'And' },
-                    { columnName: 'testDate', value: dateParam, comparisonOperator: 'Lte', logicalOperator: 'And' }
-                ]
-            }];
-            await this.getTests();
-            this.setShowResults((this.table.items?.pageInfo?.totalItems ?? 0) > 0);
-        }
+        this._queryParamSub = this._activatedRoute.queryParamMap.subscribe(async params => {
+            const dateParam = params.get('date');
+            if (dateParam) {
+                this.table.query.filter = [{
+                    columnName: 'testDate',
+                    children: [
+                        { columnName: 'testDate', value: dateParam, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                        { columnName: 'testDate', value: dateParam, comparisonOperator: 'Lte', logicalOperator: 'And' }
+                    ]
+                }];
+                await this.getTests();
+                this.setShowResults((this.table.items?.pageInfo?.totalItems ?? 0) > 0);
+            }
+        });
+    }
+
+    public ngOnDestroy(): void {
+        this._queryParamSub?.unsubscribe();
     }
 
     public viewDetails(test: BackflowTest): void {

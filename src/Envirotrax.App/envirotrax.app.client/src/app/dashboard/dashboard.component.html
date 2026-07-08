@@ -184,12 +184,12 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @for (day of csiStats?.dailyStats ?? []; track day.date) {
+                                            @for (day of csiVm?.dailyStats ?? []; track day.date) {
                                                 <tr [class.table-secondary]="day.isWeekend">
-                                                    <td class="ps-3">{{getDayName(day.date)}}</td>
-                                                    <td>{{getFormattedDate(day.date)}}</td>
+                                                    <td class="ps-3">{{day.dayName}}</td>
+                                                    <td>{{day.formattedDate}}</td>
                                                     <td>
-                                                        <div class="reportbar blue" [style.width.%]="getBarPercent(day.totalInspections)">&nbsp;</div>
+                                                        <div class="reportbar blue" [style.width.%]="day.barPercent">&nbsp;</div>
                                                     </td>
                                                     <td>{{day.totalInspections}}</td>
                                                     <td>{{day.totalPaidInspections}}</td>
@@ -204,15 +204,15 @@
                                         <tfoot>
                                             <tr class="fw-semibold border-top">
                                                 <td class="ps-3" colspan="3">Totals</td>
-                                                <td>{{csiTotalInspections}}</td>
-                                                <td>{{csiTotalPaidInspections}}</td>
+                                                <td>{{csiVm?.totalInspections}}</td>
+                                                <td>{{csiVm?.totalPaidInspections}}</td>
                                                 <td></td>
                                             </tr>
                                         </tfoot>
                                     </table>
                                 </div>
 
-                            @if (csiStats?.subAccountStats?.length) {
+                            @if (csiVm?.subAccountStats?.length) {
                                 <div class="mt-3">
                                     <div class="fw-semibold text-center py-2">Inspection Submissions by Sub Account</div>
                                     <div class="table-responsive">
@@ -227,12 +227,12 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @for (sub of csiStats!.subAccountStats!; track sub.waterSupplierName) {
+                                                @for (sub of csiVm!.subAccountStats!; track sub.waterSupplierName) {
                                                     <tr>
                                                         <td class="ps-3">{{sub.waterSupplierName}}</td>
                                                         <td></td>
-                                                        <td>{{getSubAccountTotal(sub, 'totalInspections')}}</td>
-                                                        <td>{{getSubAccountTotal(sub, 'totalPaidInspections')}}</td>
+                                                        <td>{{sub.totalInspections}}</td>
+                                                        <td>{{sub.totalPaidInspections}}</td>
                                                         <td>
                                                             <button type="button" class="btn btn-sm btn-primary py-0">View</button>
                                                         </td>
@@ -242,8 +242,8 @@
                                             <tfoot>
                                                 <tr class="fw-semibold border-top">
                                                     <td class="ps-3" colspan="2">Totals</td>
-                                                    <td>{{csiSubAccountTotalInspections}}</td>
-                                                    <td>{{csiSubAccountTotalPaidInspections}}</td>
+                                                    <td>{{csiVm!.subAccountTotalInspections}}</td>
+                                                    <td>{{csiVm!.subAccountTotalPaidInspections}}</td>
                                                     <td></td>
                                                 </tr>
                                             </tfoot>
@@ -273,12 +273,12 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @for (day of backflowStats?.dailyStats ?? []; track day.date) {
+                                        @for (day of backflowVm?.dailyStats ?? []; track day.date) {
                                             <tr [class.table-secondary]="day.isWeekend">
-                                                <td class="ps-3">{{getDayName(day.date)}}</td>
-                                                <td>{{getFormattedDate(day.date)}}</td>
+                                                <td class="ps-3">{{day.dayName}}</td>
+                                                <td>{{day.formattedDate}}</td>
                                                 <td>
-                                                    <div class="reportbar blue" [style.width.%]="getBackflowBarPercent(day.totalTests)">&nbsp;</div>
+                                                    <div class="reportbar blue" [style.width.%]="day.barPercent">&nbsp;</div>
                                                 </td>
                                                 <td>{{day.totalTests}}</td>
                                                 <td>{{day.totalPaidTests}}</td>
@@ -293,15 +293,15 @@
                                     <tfoot>
                                         <tr class="fw-semibold border-top">
                                             <td class="ps-3" colspan="3">Totals</td>
-                                            <td>{{backflowTotalTests}}</td>
-                                            <td>{{backflowTotalPaidTests}}</td>
+                                            <td>{{backflowVm?.totalTests}}</td>
+                                            <td>{{backflowVm?.totalPaidTests}}</td>
                                             <td></td>
                                         </tr>
                                     </tfoot>
                                 </table>
                             </div>
 
-                            @if (backflowStats?.subAccountStats?.length) {
+                            @if (backflowVm?.subAccountStats?.length) {
                                 <div class="mt-3">
                                     <div class="fw-semibold text-center py-2">Test Submissions by Sub Account</div>
                                     <div class="table-responsive">
@@ -316,12 +316,12 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @for (sub of backflowStats!.subAccountStats!; track sub.waterSupplierName) {
+                                                @for (sub of backflowVm!.subAccountStats; track sub.waterSupplierName) {
                                                     <tr>
                                                         <td class="ps-3">{{sub.waterSupplierName}}</td>
                                                         <td></td>
-                                                        <td>{{getBackflowSubAccountTotal(sub, 'totalTests')}}</td>
-                                                        <td>{{getBackflowSubAccountTotal(sub, 'totalPaidTests')}}</td>
+                                                        <td>{{sub.totalTests}}</td>
+                                                        <td>{{sub.totalPaidTests}}</td>
                                                         <td>
                                                             <button type="button" class="btn btn-sm btn-primary py-0">View</button>
                                                         </td>
@@ -331,8 +331,8 @@
                                             <tfoot>
                                                 <tr class="fw-semibold border-top">
                                                     <td class="ps-3" colspan="2">Totals</td>
-                                                    <td>{{backflowSubAccountTotalTests}}</td>
-                                                    <td>{{backflowSubAccountTotalPaidTests}}</td>
+                                                    <td>{{backflowVm!.subAccountTotalTests}}</td>
+                                                    <td>{{backflowVm!.subAccountTotalPaidTests}}</td>
                                                     <td></td>
                                                 </tr>
                                             </tfoot>
@@ -362,12 +362,12 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @for (day of fogInspectionStats?.dailyStats ?? []; track day.date) {
+                                        @for (day of fogInspectionVm?.dailyStats ?? []; track day.date) {
                                             <tr [class.table-secondary]="day.isWeekend">
-                                                <td class="ps-3">{{getDayName(day.date)}}</td>
-                                                <td>{{getFormattedDate(day.date)}}</td>
+                                                <td class="ps-3">{{day.dayName}}</td>
+                                                <td>{{day.formattedDate}}</td>
                                                 <td>
-                                                    <div class="reportbar blue" [style.width.%]="getFogBarPercent(day.totalInspections)">&nbsp;</div>
+                                                    <div class="reportbar blue" [style.width.%]="day.barPercent">&nbsp;</div>
                                                 </td>
                                                 <td>{{day.totalInspections}}</td>
                                                 <td>{{day.totalPaidInspections}}</td>
@@ -382,15 +382,15 @@
                                     <tfoot>
                                         <tr class="fw-semibold border-top">
                                             <td class="ps-3" colspan="3">Totals</td>
-                                            <td>{{fogTotalInspections}}</td>
-                                            <td>{{fogTotalPaidInspections}}</td>
+                                            <td>{{fogInspectionVm?.totalInspections}}</td>
+                                            <td>{{fogInspectionVm?.totalPaidInspections}}</td>
                                             <td></td>
                                         </tr>
                                     </tfoot>
                                 </table>
                             </div>
 
-                            @if (fogInspectionStats?.subAccountStats?.length) {
+                            @if (fogInspectionVm?.subAccountStats?.length) {
                                 <div class="mt-3">
                                     <div class="fw-semibold text-center py-2">Inspection Submissions by Sub Account</div>
                                     <div class="table-responsive">
@@ -405,12 +405,12 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @for (sub of fogInspectionStats!.subAccountStats!; track sub.waterSupplierName) {
+                                                @for (sub of fogInspectionVm!.subAccountStats; track sub.waterSupplierName) {
                                                     <tr>
                                                         <td class="ps-3">{{sub.waterSupplierName}}</td>
                                                         <td></td>
-                                                        <td>{{getFogSubAccountTotal(sub, 'totalInspections')}}</td>
-                                                        <td>{{getFogSubAccountTotal(sub, 'totalPaidInspections')}}</td>
+                                                        <td>{{sub.totalInspections}}</td>
+                                                        <td>{{sub.totalPaidInspections}}</td>
                                                         <td>
                                                             <button type="button" class="btn btn-sm btn-primary py-0">View</button>
                                                         </td>
@@ -420,8 +420,8 @@
                                             <tfoot>
                                                 <tr class="fw-semibold border-top">
                                                     <td class="ps-3" colspan="2">Totals</td>
-                                                    <td>{{fogSubAccountTotalInspections}}</td>
-                                                    <td>{{fogSubAccountTotalPaidInspections}}</td>
+                                                    <td>{{fogInspectionVm!.subAccountTotalInspections}}</td>
+                                                    <td>{{fogInspectionVm!.subAccountTotalPaidInspections}}</td>
                                                     <td></td>
                                                 </tr>
                                             </tfoot>

@@ -1,4 +1,5 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, TemplateRef, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { FogInspectionService } from '../../../shared/services/fog/fog-inspection.service';
@@ -16,7 +17,8 @@ import { AppContainerHelperService } from "../../../shared/services/helpers/app-
     standalone: false,
     templateUrl: './fog-inspection-list.component.html'
 })
-export class FogInspectionListComponent implements OnInit {
+export class FogInspectionListComponent implements OnInit, OnDestroy {
+    private _queryParamSub?: Subscription;
     public showResults: boolean = false;
 
     public readonly FogInspectionResult = FogInspectionResult;
@@ -106,21 +108,27 @@ export class FogInspectionListComponent implements OnInit {
         private readonly _containerHelper: AppContainerHelperService
     ) { }
 
-    public async ngOnInit(): Promise<void> {
+    public ngOnInit(): void {
         this.table.columns = this.getColumns();
 
-        const dateParam = this._activatedRoute.snapshot.queryParamMap.get('date');
-        if (dateParam) {
-            this.table.query.filter = [{
-                columnName: 'inspectionDate',
-                children: [
-                    { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Gte', logicalOperator: 'And' },
-                    { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Lte', logicalOperator: 'And' }
-                ]
-            }];
-            await this.getInspections();
-            this.setShowResults((this.table.items?.pageInfo?.totalItems ?? 0) > 0);
-        }
+        this._queryParamSub = this._activatedRoute.queryParamMap.subscribe(async params => {
+            const dateParam = params.get('date');
+            if (dateParam) {
+                this.table.query.filter = [{
+                    columnName: 'inspectionDate',
+                    children: [
+                        { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                        { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Lte', logicalOperator: 'And' }
+                    ]
+                }];
+                await this.getInspections();
+                this.setShowResults((this.table.items?.pageInfo?.totalItems ?? 0) > 0);
+            }
+        });
+    }
+
+    public ngOnDestroy(): void {
+        this._queryParamSub?.unsubscribe();
     }
 
     private getColumns(): TableColumn<FogInspection>[] {

@@ -4,6 +4,8 @@ import { AuthGuard } from './shared/guards/auth.guard';
 import { FeatureGuard } from './shared/guards/feature.guard';
 import { FeatureType } from './shared/models/feature-type';
 import { RoleGuard } from './shared/guards/role.guard';
+import { PermissionGuard } from './shared/guards/permission.guard';
+import { PermissionAction, PermissionType } from './shared/models/permission-type';
 import { ROLE_DEFINITIONS } from './shared/models/role-definitions';
 import { HomeComponent } from './home/home.component';
 
@@ -80,9 +82,11 @@ const routes: Routes = [
       {
         path: 'licenses',
         loadChildren: () => import('./licenses/licenses.module').then(m => m.LicensesModule),
-        canActivate: [RoleGuard],
+        canActivate: [FeatureGuard, RoleGuard, PermissionGuard],
         data: {
-          roles: [ROLE_DEFINITIONS.WATER_SUPPLIER]
+          features: [FeatureType.ManageProfessionalLicenses],
+          roles: [ROLE_DEFINITIONS.WATER_SUPPLIER],
+          permissions: [{ type: PermissionType.Licenses, action: PermissionAction.CanView }]
         }
       }
     ]

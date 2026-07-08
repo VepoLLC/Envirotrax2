@@ -62,7 +62,7 @@ export class LicenseManagementComponent implements OnInit {
 
     public async ngOnInit(): Promise<void> {
         this.canModify = await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalLicenses)
-            || await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.Licenses);
+            && await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.Licenses);
         this.table.columns = this.getColumns();
         await Promise.all([this.loadLicenses(), this.loadCounts()]);
     }

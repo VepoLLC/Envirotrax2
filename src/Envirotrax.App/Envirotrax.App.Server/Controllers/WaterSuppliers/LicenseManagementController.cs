@@ -65,13 +65,13 @@ public class LicenseManagementController : WaterSupplierProtectedController
 
     private bool HasLicenseAccess()
     {
-        return _authService.HasAnyFeatures(FeatureType.ManageProfessionalLicenses) ||
+        return _authService.HasAnyFeatures(FeatureType.ManageProfessionalLicenses) &&
                _authService.HasAnyPermission(PermissionAction.CanView, PermissionType.Licenses);
     }
 
     private bool HasModifyAccess()
     {
-        return _authService.HasAnyFeatures(FeatureType.ManageProfessionalLicenses) ||
+        return _authService.HasAnyFeatures(FeatureType.ManageProfessionalLicenses) &&
                _authService.HasAnyPermission(PermissionAction.CanModify, PermissionType.Licenses);
     }
 }

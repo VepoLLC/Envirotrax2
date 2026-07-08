@@ -1,4 +1,4 @@
-<h1 class="text-center h2">FOG Inspection Search</h1>
+﻿<h1 class="text-center h2">FOG Inspection Search</h1>
 
 <div [hidden]="showResults">
     <form #searchForm="ngForm" (ngSubmit)="search()">
@@ -7,7 +7,7 @@
             <vp-section header="General Search Criteria">
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="waterSupplier.id"
                                                    label="Record search scope"
                                                    labelStyle="horizontal"
@@ -15,7 +15,7 @@
                                                    [options]="waterSupplierScopeOptions"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="facilityType"
                                                    label="Facility type"
                                                    labelStyle="horizontal"
@@ -23,7 +23,7 @@
                                                    [options]="facilityTypeOptions"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="interceptorType"
                                                    label="Interceptor type"
                                                    labelStyle="horizontal"
@@ -31,7 +31,7 @@
                                                    [options]="interceptorTypeOptions"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="inspectionResult"
                                                    label="Inspection result"
                                                    labelStyle="horizontal"
@@ -41,13 +41,13 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="site.accountNumber"
                                                    label="Account number"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-input type="select"
                                       label="Inspection History"
                                       labelStyle="horizontal"
@@ -56,14 +56,14 @@
                                       (ngModelChange)="onLatestOnlyChange($event)"
                                       [ngModelOptions]="{standalone: true}" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="inspectionDate"
                                                    label="Inspection date"
                                                    labelStyle="horizontal"
                                                    type="daterange"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="createdTime"
                                                    label="Submission date"
                                                    labelStyle="horizontal"
@@ -86,7 +86,7 @@
                                                        [options]="propertyTypeOptions"
                                                        [form]="searchForm" />
                             </div>
-                            <div class="mb-3">
+                            <div class="mb-2">
                                 <vp-filter-panel-field fieldName="propertyBusinessName"
                                                        label="Business name"
                                                        labelStyle="horizontal"

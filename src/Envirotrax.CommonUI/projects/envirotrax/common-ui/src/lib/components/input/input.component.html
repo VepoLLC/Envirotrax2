@@ -101,7 +101,7 @@
         </div>
     </div>
 
-    <div>
+    <div [class.d-xl-flex]="labelStyle == 'horizontal'" class="justify-content-end">
         <vp-validation-field *ngIf="form" [form]="form" [fieldName]="name" [fieldLabel]="label" />
     </div>
 </div>

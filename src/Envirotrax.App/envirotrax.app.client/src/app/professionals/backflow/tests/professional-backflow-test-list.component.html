@@ -1,4 +1,4 @@
-<h1 class="text-center h2">Backflow Test History</h1>
+﻿<h1 class="text-center h2">Backflow Test History</h1>
 
 <ng-template #statusTemplate let-test="rowData">
     <div class="d-flex flex-wrap gap-1">
@@ -133,7 +133,7 @@
             <vp-section header="Search Criteria">
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="waterSupplierId"
                                                    label="Record search scope"
                                                    labelStyle="horizontal"
@@ -141,7 +141,7 @@
                                                    [options]="waterSupplierScopeOptions"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="isCurrent"
                                                    label="Test history"
                                                    labelStyle="horizontal"
@@ -149,13 +149,13 @@
                                                    [options]="testHistoryOptions"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="accountNumber"
                                                    label="Account number"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="serialNumber"
                                                    label="Assembly serial number"
                                                    labelStyle="horizontal"
@@ -163,20 +163,20 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="jobNumber"
                                                    label="Job number"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="testDate"
                                                    label="Inspection date"
                                                    labelStyle="horizontal"
                                                    type="daterange"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="createdTime"
                                                    label="Submission date"
                                                    labelStyle="horizontal"

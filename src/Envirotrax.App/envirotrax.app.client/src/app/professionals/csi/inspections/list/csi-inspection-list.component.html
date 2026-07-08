@@ -1,4 +1,4 @@
-<h1 class="text-center h2">CSI Search</h1>
+﻿<h1 class="text-center h2">CSI Search</h1>
 
 <ng-template #statusTemplate let-inspection="rowData">
     <div class="d-flex gap-1">
@@ -65,7 +65,7 @@
             <vp-section header="General Search Criteria">
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="waterSupplier.id"
                                                    label="Record search scope"
                                                    labelStyle="horizontal"
@@ -74,14 +74,14 @@
                                                    [options]="waterSupplierScopeOptions" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="site.accountNumber"
                                                    label="Account number"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
 
                             <vp-input type="select"
                                       label="Inspection History"
@@ -92,7 +92,7 @@
                                       [ngModelOptions]="{standalone: true}" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="inspectionResult"
                                                    label="Inspection pass/fail:"
                                                    labelStyle="horizontal"
@@ -103,7 +103,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="inspectionDate"
                                                    label="Inspection date"
                                                    labelStyle="horizontal"
@@ -111,7 +111,7 @@
                                                    [form]="searchForm" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="createdTime"
                                                    label="Submission date"
                                                    labelStyle="horizontal"

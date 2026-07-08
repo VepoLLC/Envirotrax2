@@ -1,4 +1,4 @@
-<h1 class="text-center h2">CSI Search</h1>
+﻿<h1 class="text-center h2">CSI Search</h1>
 
 <ng-template #statusTemplate let-inspection="rowData">
     <div class="d-flex gap-1">
@@ -72,14 +72,14 @@
             <vp-section header="General Search Criteria">
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="site.accountNumber"
                                                    label="Account number"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="inspectionDate"
                                                    label="Inspection date"
                                                    labelStyle="horizontal"
@@ -87,7 +87,7 @@
                                                    [form]="searchForm" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="disapproved"
                                                    label="Approval status"
                                                    labelStyle="horizontal"
@@ -97,7 +97,7 @@
                                                    borderColor="cyan" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="needsValidation"
                                                    label="Needs validation"
                                                    labelStyle="horizontal"
@@ -108,7 +108,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="inspectionResult"
                                                    label="Inspection pass/fail"
                                                    labelStyle="horizontal"
@@ -118,7 +118,7 @@
                                                    borderColor="#00a000" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="transactionId"
                                                    label="Has payment"
                                                    labelStyle="horizontal"
@@ -128,7 +128,7 @@
                                                    borderColor="orange" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="aiOssf"
                                                    label="Has on-site sewage facility"
                                                    labelStyle="horizontal"
@@ -137,7 +137,7 @@
                                                    [options]="yesNoOptions" />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="aiWaterWell"
                                                    label="Has water well"
                                                    labelStyle="horizontal"
@@ -152,21 +152,21 @@
             <div class="mt-3">
                 <vp-section header="Inspector Criteria">
                     <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 mb-2">
                             <vp-filter-panel-field fieldName="inspectorLicenseNumber"
                                                    label="Inspector license number"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 mb-2">
                             <vp-filter-panel-field fieldName="inspectorCompanyName"
                                                    label="Inspector company name"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 mb-2">
                             <vp-filter-panel-field fieldName="inspectorContactName"
                                                    label="Inspector contact name"
                                                    labelStyle="horizontal"
@@ -180,7 +180,7 @@
                 <div class="col-md-6">
                     <vp-section header="Location / Property Criteria">
                         <div>
-                            <div class="mb-3">
+                            <div class="mb-2">
                                 <vp-filter-panel-field fieldName="propertyType"
                                                        label="Property type"
                                                        labelStyle="horizontal"
@@ -189,7 +189,7 @@
                                                        [options]="propertyTypes" />
                             </div>
 
-                            <div class="mb-3">
+                            <div class="mb-2">
                                 <vp-filter-panel-field fieldName="propertyBusinessName"
                                                        label="Business name"
                                                        labelStyle="horizontal"
@@ -203,19 +203,19 @@
                                     </div>
                                 </div>
                                 <div class="col-xl d-xl-flex gap-1">
-                                    <div class="mb-3">
+                                    <div class="mb-2">
                                         <vp-filter-panel-field fieldName="propertyStreetNumber"
                                                                label="Street #"
                                                                [form]="searchForm" />
                                     </div>
 
-                                    <div class="mb-3">
+                                    <div class="mb-2">
                                         <vp-filter-panel-field fieldName="propertyStreetName"
                                                                label="Street name"
                                                                [form]="searchForm" />
                                     </div>
 
-                                    <div class="mb-3">
+                                    <div class="mb-2">
                                         <vp-filter-panel-field fieldName="propertyNumber"
                                                                label="Suite/Apt #"
                                                                [form]="searchForm" />
@@ -236,14 +236,14 @@
                 <div class="col-md-6 mt-3 mt-md-0">
                     <vp-section header="Contact / Mailing Criteria">
                         <div>
-                            <div class="mb-3">
+                            <div class="mb-2">
                                 <vp-filter-panel-field fieldName="mailingCompanyName"
                                                        label="Company name"
                                                        labelStyle="horizontal"
                                                        [form]="searchForm" />
                             </div>
 
-                            <div class="mb-3">
+                            <div class="mb-2">
                                 <vp-filter-panel-field fieldName="mailingContactName"
                                                        label="Contact name"
                                                        labelStyle="horizontal"
@@ -257,19 +257,19 @@
                                     </div>
                                 </div>
                                 <div class="col-xl d-xl-flex gap-1">
-                                    <div class="mb-3">
+                                    <div class="mb-2">
                                         <vp-filter-panel-field fieldName="mailingStreetNumber"
                                                                label="Street #"
                                                                [form]="searchForm" />
                                     </div>
 
-                                    <div class="mb-3">
+                                    <div class="mb-2">
                                         <vp-filter-panel-field fieldName="mailingStreetName"
                                                                label="Street name"
                                                                [form]="searchForm" />
                                     </div>
 
-                                    <div class="mb-3">
+                                    <div class="mb-2">
                                         <vp-filter-panel-field fieldName="mailingNumber"
                                                                label="Suite/Apt #"
                                                                [form]="searchForm" />

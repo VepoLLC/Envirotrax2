@@ -242,7 +242,7 @@ export class App implements OnInit {
           {
             title: 'Out of Service Requests',
             iconCss: 'fa-regular fa-file-minus',
-            routerLink: ['/'],
+            routerLink: ['backflow', 'out-of-service'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowOutOfService),
             hasFeature: true
           },

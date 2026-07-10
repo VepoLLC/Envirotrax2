@@ -8,6 +8,7 @@ import { BackflowTesterListComponent } from "./testers/list/backflow-tester-list
 import { BackflowTestListComponent } from "./tests/backflow-test-list.component";
 import { BackflowTestDetailsComponent } from "./tests/details/backflow-test-details.component";
 import { BackflowTesterDetailsComponent } from "./testers/details/backflow-tester-details.component";
+import { BackflowOutOfServiceListComponent } from "./out-of-service/backflow-out-of-service-list.component";
 import { BackflowTesterWaterSuppliersComponent } from "./testers/details/water-suppliers/list/backflow-tester-water-suppliers.component";
 import { EditBackflowTesterWaterSupplierComponent } from "./testers/details/water-suppliers/edit/edit-backflow-tester-water-supplier.component";
 import { BackflowTesterUsersComponent } from "./testers/details/users/list/backflow-tester-users.component";
@@ -29,6 +30,7 @@ import { BackflowTestDetailsSectionsModule } from "./tests/details/backflow-test
     declarations: [
         BackflowTesterListComponent,
         BackflowTestListComponent,
+        BackflowOutOfServiceListComponent,
         BackflowTestDetailsComponent,
         BackflowTestBpatInfoComponent,
         BackflowTestPropertyInfoComponent,

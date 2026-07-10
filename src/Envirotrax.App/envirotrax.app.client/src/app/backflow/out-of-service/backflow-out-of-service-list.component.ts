@@ -8,6 +8,7 @@ import { OutOfServiceType } from '../../shared/models/backflow/out-of-service-ty
 import { OutOfServiceRequestStatusFilter } from '../../shared/models/backflow/out-of-service-request-status-filter.enum';
 import { BackflowOutOfServiceRequestService } from '../../shared/services/backflow/backflow-out-of-service-request.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { AppContainerHelperService } from '../../shared/services/helpers/app-contaner-helper.service';
 
 // One assembly block (submitted or replacement) inside a request card. All display
 // values are pre-computed; `test` is kept only for the status-icon field reads + View.
@@ -65,10 +66,12 @@ export class BackflowOutOfServiceListComponent implements OnInit {
         private readonly _service: BackflowOutOfServiceRequestService,
         private readonly _router: Router,
         private readonly _modalHelper: ModalHelperService,
-        private readonly _toastService: ToastService
+        private readonly _toastService: ToastService,
+        private readonly _containerHelper: AppContainerHelperService
     ) { }
 
     public async ngOnInit(): Promise<void> {
+        this._containerHelper.setContainerVisibility(false);
         await this.load();
     }
 

@@ -66,7 +66,7 @@ export class App implements OnInit {
 
   private async createWaterSupplierMenuItems(): Promise<MenuItem[]> {
     const hasLicenseAccess = await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Licenses)
-      && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalLicenses);
+      || await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalLicenses);
 
     return [
       {

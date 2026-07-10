@@ -28,7 +28,7 @@ public class SiteController : ControllerBase
     [HttpPost("geocode")]
     public async Task<IActionResult> GeocodeAsync(CancellationToken cancellationToken)
     {
-        var sites = await _internalApi.GetAsync<ICollection<SiteDto>>(null, $"api/task-runner/sites/geocode/pending?batchSize={_geocodingOptions.BatchSize}");
+        var sites = await _internalApi.GetAsync<ICollection<SiteDto>>(null, $"api/task-runner/sites/geocode/pending?batchSize={_geocodingOptions.BatchSize}", cancellationToken);
 
         await _queueService.EnsureQueueExistsAsync(QueueNames.Sites.Geocode, cancellationToken);
 

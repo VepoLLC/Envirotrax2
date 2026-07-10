@@ -8,10 +8,14 @@ import { API_BASE_URL, TimeZoneInterceptor } from '@envirotrax/common-ui';
 import { environment } from '../environments/environment';
 import { SharedComponentsModule } from './shared/components/shared.components.module';
 import { AuthInterceptor } from './shared/services/auth/auth.iterceptor';
+import { WindowContainerComponent } from './window/window-container.component';
+import { WindowComponent } from './window/window.component';
 
 @NgModule({
   declarations: [
-    App
+    App,
+    WindowContainerComponent,
+    WindowComponent
   ],
   imports: [
     BrowserModule,

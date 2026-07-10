@@ -75,6 +75,53 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.ToTable("BackflowGauges");
                 });
 
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Backflow.BackflowOutOfServiceRequest", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("BpatId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ClearedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("OutOfServiceDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProfessionalId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReplacementAssemblyTestId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TestId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("WaterSupplierId", "Id");
+
+                    b.HasIndex("ProfessionalId", "BpatId");
+
+                    b.HasIndex("WaterSupplierId", "ReplacementAssemblyTestId");
+
+                    b.HasIndex("WaterSupplierId", "TestId");
+
+                    b.ToTable("BackflowOutOfServiceRequests");
+                });
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Backflow.BackflowTest", b =>
                 {
                     b.Property<int>("WaterSupplierId")
@@ -497,6 +544,12 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<string>("PropertyZip")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
+
+                    b.Property<bool>("RainFreezeSensorInstalled")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("RainFreezeSensorWorkingProperly")
+                        .HasColumnType("bit");
 
                     b.Property<int>("ReasonForTest")
                         .HasColumnType("int");
@@ -1021,6 +1074,98 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.ToTable("CsiInspectionImages");
                 });
 
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Fog.FogDisposalSite", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("City")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("County")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("DeletedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DeletedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EmailAddress")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<string>("LocationDescription")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("PermitNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("PhysicalType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RegistrationNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("StateId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TceqRegion")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ZipCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeletedById");
+
+                    b.HasIndex("StateId");
+
+                    b.ToTable("FogDisposalSites");
+                });
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Fog.FogInspection", b =>
                 {
                     b.Property<int>("WaterSupplierId")
@@ -1302,6 +1447,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<DateTime?>("SignatureDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("SignatureImagePath")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<int>("SiteId")
                         .HasColumnType("int");
 
@@ -1351,6 +1500,32 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("WaterSupplierId", "SiteId");
 
                     b.ToTable("FogInspections");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Fog.FogTransporterDisposalSite", b =>
+                {
+                    b.Property<int>("ProfessionalId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DisposalSiteId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.HasKey("ProfessionalId", "DisposalSiteId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DisposalSiteId");
+
+                    b.ToTable("FogTransporterDisposalSites");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Fog.FogVehicle", b =>
@@ -2186,7 +2361,7 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                     b.Property<string>("Code")
+                    b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
@@ -2988,6 +3163,47 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("Professional");
                 });
 
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Backflow.BackflowOutOfServiceRequest", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
+                        .WithMany()
+                        .HasForeignKey("ProfessionalId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalUser", "Bpat")
+                        .WithMany()
+                        .HasForeignKey("ProfessionalId", "BpatId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Backflow.BackflowTest", "ReplacementAssemblyTest")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId", "ReplacementAssemblyTestId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Backflow.BackflowTest", "Test")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId", "TestId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Bpat");
+
+                    b.Navigation("Professional");
+
+                    b.Navigation("ReplacementAssemblyTest");
+
+                    b.Navigation("Test");
+
+                    b.Navigation("WaterSupplier");
+                });
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Backflow.BackflowTest", b =>
                 {
                     b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "BpatState")
@@ -3166,6 +3382,30 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("WaterSupplier");
                 });
 
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Fog.FogDisposalSite", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "DeletedBy")
+                        .WithMany()
+                        .HasForeignKey("DeletedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "State")
+                        .WithMany()
+                        .HasForeignKey("StateId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("DeletedBy");
+
+                    b.Navigation("State");
+                });
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Fog.FogInspection", b =>
                 {
                     b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "CreatedBy")
@@ -3234,6 +3474,32 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("UpdatedBy");
 
                     b.Navigation("WaterSupplier");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Fog.FogTransporterDisposalSite", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Fog.FogDisposalSite", "DisposalSite")
+                        .WithMany()
+                        .HasForeignKey("DisposalSiteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
+                        .WithMany()
+                        .HasForeignKey("ProfessionalId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("DisposalSite");
+
+                    b.Navigation("Professional");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Fog.FogVehicle", b =>

@@ -1,11 +1,13 @@
-﻿import { Component, signal, OnInit } from '@angular/core';
+﻿import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AuthService } from './shared/services/auth/auth.service';
 import { WaterSupplierService } from './shared/services/water-suppliers/water-supplier.service';
 import { ProfesisonalService } from './shared/services/professionals/professional.service';
-import { createPopper, flip, preventOverflow } from '@popperjs/core';
+import { ThemeCookieService } from './shared/services/helpers/theme-cookie.service';
+import { createPopper } from '@popperjs/core';
 import { FeatureType } from './shared/models/feature-type';
 import { PermissionAction, PermissionType } from './shared/models/permission-type';
 import { ROLE_DEFINITIONS } from './shared/models/role-definitions';
+import { AppContainerHelperService } from './shared/services/helpers/app-contaner-helper.service';
 
 @Component({
   selector: 'app-root',
@@ -19,16 +21,30 @@ export class App implements OnInit {
   public isNavbarVisible: boolean = false;
   public companyName: string = '';
   public userEmail: string = '';
+  public isDarkMode: boolean = false;
+  public useContainer: boolean = false;
 
   constructor(
     private readonly _authService: AuthService,
     private readonly _waterSupplierService: WaterSupplierService,
-    private readonly _professionalService: ProfesisonalService
+    private readonly _professionalService: ProfesisonalService,
+    private readonly _themeCookie: ThemeCookieService,
+    private readonly _changeDetector: ChangeDetectorRef,
+    appContainerHelper: AppContainerHelperService
   ) {
-
+    appContainerHelper.usContainer().subscribe(value => {
+      this.useContainer = value;
+      this._changeDetector.detectChanges();
+    });
   }
 
   public async ngOnInit(): Promise<void> {
+    this.isDarkMode = this._themeCookie.get() === 'dark';
+
+    if (this.isDarkMode) {
+      document.body.classList.add('vp-dark-theme');
+    }
+
     this._authService.onLoggedIn().subscribe(async isLoggedIn => {
       this.isAuthenticated = isLoggedIn;
 
@@ -57,6 +73,18 @@ export class App implements OnInit {
     this._authService.signOut();
   }
 
+  public toggleDarkMode(): void {
+    this.isDarkMode = !this.isDarkMode;
+
+    if (this.isDarkMode) {
+      document.body.classList.add('vp-dark-theme');
+      this._themeCookie.set('dark');
+    } else {
+      document.body.classList.remove('vp-dark-theme');
+      this._themeCookie.set('light');
+    }
+  }
+
   private async createMenuItems(): Promise<MenuItem[]> {
     const professionalId = await this._authService.getProfessionalId();
     return professionalId
@@ -72,7 +100,7 @@ export class App implements OnInit {
       {
         title: 'Account Overview',
         iconCss: 'fa-regular fa-house',
-        routerLink: ['/dashboard'],
+        routerLink: ['/account-overview'],
         hasFeature: true,
         hasPermission: true
       },
@@ -185,8 +213,8 @@ export class App implements OnInit {
           {
             title: 'Compliance Management',
             iconCss: 'fa-solid fa-list-check',
-            routerLink: ['/'],
-            hasPermission: true,
+            routerLink: ['csi/compliance'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports),
             hasFeature: true
           },
           {
@@ -426,7 +454,7 @@ export class App implements OnInit {
       {
         title: 'Account Overview',
         iconCss: 'fa-regular fa-house',
-        routerLink: ['/professionals/dashboard'],
+        routerLink: ['/professionals/account-overview'],
         hasFeature: true,
         hasPermission: true
       },
@@ -475,6 +503,13 @@ export class App implements OnInit {
             title: 'Vehicle Management',
             iconCss: 'fa-solid fa-truck',
             routerLink: ['professionals/fog/transportation/vehicles'],
+            hasPermission: isFogTransporter,
+            hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
+          },
+          {
+            title: 'Disposal Site Management',
+            iconCss: 'fa-solid fa-location-dot',
+            routerLink: ['professionals/fog/transportation/disposal-sites'],
             hasPermission: isFogTransporter,
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
           }

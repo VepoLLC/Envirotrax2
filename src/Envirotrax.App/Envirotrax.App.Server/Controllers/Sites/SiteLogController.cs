@@ -28,7 +28,7 @@ public class SiteLogController : WaterSupplierProtectedController
 
     [HttpPost]
     [HasPermission(PermissionAction.CanModify)]
-    public async Task<IActionResult> AddAsync(int siteId, [FromForm] SiteLogDto dto, [FromForm] IFormFile? file, CancellationToken cancellationToken)
+    public async Task<IActionResult> AddAsync(int siteId, [FromForm] SiteLogDto dto, [FromForm] IFormFile? file)
     {
         Stream? fileStream = null;
         string? fileName = null;
@@ -46,7 +46,7 @@ public class SiteLogController : WaterSupplierProtectedController
 
     [HttpPut("{id}")]
     [HasPermission(PermissionAction.CanModify)]
-    public async Task<IActionResult> UpdateAsync(int siteId, int id, [FromForm] SiteLogDto dto, [FromForm] IFormFile? file, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateAsync(int siteId, int id, [FromForm] SiteLogDto dto, [FromForm] IFormFile? file)
     {
         dto.Id = id;
         Stream? fileStream = null;
@@ -58,7 +58,7 @@ public class SiteLogController : WaterSupplierProtectedController
         }
         await using (fileStream)
         {
-            var result = await _service.UpdateAsync(dto, fileStream, fileName, cancellationToken);
+            var result = await _service.UpdateAsync(dto, fileStream, fileName);
             if (result == null) return NotFound();
             return Ok(result);
         }
@@ -66,9 +66,9 @@ public class SiteLogController : WaterSupplierProtectedController
 
     [HttpDelete("{id}")]
     [HasPermission(PermissionAction.CanModify)]
-    public async Task<IActionResult> DeleteAsync(int siteId, int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> DeleteAsync(int siteId, int id)
     {
-        var deleted = await _service.DeleteAsync(id, cancellationToken);
+        var deleted = await _service.DeleteAsync(id);
         return deleted ? Ok() : NotFound();
     }
 }

@@ -204,6 +204,10 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 
     public bool Ossf { get; set; }
 
+    // Rain/Freeze sensor (shown when the BackflowSettings.ShowRainSensor setting is enabled)
+    public bool RainFreezeSensorInstalled { get; set; }
+    public bool RainFreezeSensorWorkingProperly { get; set; }
+
     // Status
     public string? Comments { get; set; }
     public bool IsCurrent { get; set; }
@@ -409,6 +413,14 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public int? DeletedById { get; set; }
     public AppUser? DeletedBy { get; set; }
     public DateTime? DeletedTime { get; set; }
+}
+
+public class BackflowTestExpiryCounts
+{
+    public int Expired { get; set; }
+    public int ThisMonth { get; set; }
+    public int NextMonth { get; set; }
+    public int TwoMonths { get; set; }
 }
 
 public class BackflowTestConfiguration : IEntityTypeConfiguration<BackflowTest>

@@ -5,6 +5,7 @@ import { ProfessionalUserLookupComponent } from "./lookups/professional-user-loo
 import { GisAreaLookupComponent } from "./lookups/gis-areas/gis-area-lookup.component";
 import { GisAreaSelectionModalComponent } from "./lookups/gis-areas/gis-area-selection-modal.component";
 import { DownloadManagerComponent } from "./data-components/download-manager/download-manager.component";
+import { SiteLogEditComponent } from "./site-log/site-log-edit.component";
 import { FormsModule } from "@angular/forms";
 import { CommonModule } from "@angular/common";
 
@@ -14,7 +15,8 @@ import { CommonModule } from "@angular/common";
         ProfessionalUserLookupComponent,
         GisAreaLookupComponent,
         GisAreaSelectionModalComponent,
-        DownloadManagerComponent
+        DownloadManagerComponent,
+        SiteLogEditComponent
     ],
     imports: [
         EnvirotraxComponentsModule,

@@ -1,4 +1,4 @@
-<h1 class="text-center h2">FOG Management</h1>
+﻿<h1 class="text-center h2">FOG Management</h1>
 
 <div [hidden]="showResults">
     <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
@@ -6,36 +6,42 @@
             <vp-section header="Inspector Account Search Criteria">
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="companyEmail"
                                                    label="Company email"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="name"
                                                    label="Company name"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="address"
                                                    label="Address"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="phoneNumber"
                                                    label="Company phone"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="inspectorLicenseNumber"
                                                    label="Inspector license number"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="insurancePolicyNumber"
                                                    label="Insurance policy number"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                     </div>
@@ -66,7 +72,7 @@
 
     <div class="d-flex justify-content-between mb-3">
         <button type="button"
-                class="btn btn-primary"
+                class="btn btn-primary vp-section-button"
                 title="Export excel"
                 aria-label="Export excel">
             <i class="fa-solid fa-circle-plus me-1"></i>
@@ -82,16 +88,16 @@
 
     <vp-section header="Inspector Search Results">
         <vp-table *ngIf="table.items"
-                    [columns]="table.columns!"
-                    [data]="table.items.data"
-                    [(pageInfo)]="table.items.pageInfo"
-                    (pageInfoChange)="getInspectors()"
-                    [(query)]="table.query"
-                    (queryChange)="getInspectors()"
-                    (queryReset)="getInspectors()"
-                    [freeTextSearch]="table.freeTextSearch"
-                    [canSelect]="true"
-                    (select)="openDetails($event)"/>
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getInspectors()"
+                  [(query)]="table.query"
+                  (queryChange)="getInspectors()"
+                  (queryReset)="getInspectors()"
+                  [freeTextSearch]="table.freeTextSearch"
+                  [canSelect]="true"
+                  (select)="openDetails($event)" />
     </vp-section>
 
 </div>

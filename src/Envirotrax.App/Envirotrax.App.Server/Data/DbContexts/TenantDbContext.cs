@@ -42,6 +42,8 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
     public DbSet<ProfessionalInsurance> ProfessionalInsurances { get; set; }
     public DbSet<BackflowGauge> BackflowGauges { get; set; }
     public DbSet<FogVehicle> FogVehicles { get; set; }
+    public DbSet<FogTransporterDisposalSite> FogTransporterDisposalSites { get; set; }
+    public DbSet<FogDisposalSite> FogDisposalSites { get; set; }
 
     public DbSet<State> States { get; set; }
     public DbSet<Site> Sites { get; set; }
@@ -49,6 +51,7 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
     public DbSet<CsiInspectionImage> CsiInspectionImages { get; set; }
     public DbSet<FogInspection> FogInspections { get; set; }
     public DbSet<BackflowTest> BackflowTests { get; set; }
+    public DbSet<BackflowOutOfServiceRequest> BackflowOutOfServiceRequests { get; set; }
     public DbSet<SiteLog> SiteLogs { get; set; }
 
     protected TenantDbContext(

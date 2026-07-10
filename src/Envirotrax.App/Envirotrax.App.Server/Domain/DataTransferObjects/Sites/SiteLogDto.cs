@@ -6,7 +6,7 @@ namespace Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 public class SiteLogDto : IDto
 {
     public int Id { get; set; }
-    public ReferencedSiteDto Site { get; set; } = null!;
+    public ReferencedSiteDto? Site { get; set; }
     public SiteLogType LogType { get; set; }
     public string? NoteText { get; set; }
     public DateTime? ReviewDate { get; set; }

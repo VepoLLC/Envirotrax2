@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "npm run common-ui:update && run-script-os",
-    "build": "ng build",
+    "build": "npm run common-ui:update && ng build",
+    "build:test": "npm run common-ui:update && ng build --configuration test",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "prestart": "node aspnetcore-https",

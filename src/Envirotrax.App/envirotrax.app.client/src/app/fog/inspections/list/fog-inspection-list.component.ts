@@ -1,4 +1,6 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, TemplateRef, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { FogInspectionService } from '../../../shared/services/fog/fog-inspection.service';
 import { QueryProperty } from '../../../shared/models/query';
@@ -9,12 +11,14 @@ import { FacilityType } from '../../../shared/enums/facility-type.enum';
 import { InterceptorType } from '../../../shared/enums/interceptor-type.enum';
 import { PropertyType } from '../../../shared/enums/property-type.enum';
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from '@envirotrax/common-ui';
+import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 
 @Component({
     standalone: false,
     templateUrl: './fog-inspection-list.component.html'
 })
-export class FogInspectionListComponent implements OnInit {
+export class FogInspectionListComponent implements OnInit, OnDestroy {
+    private _queryParamSub?: Subscription;
     public showResults: boolean = false;
 
     public readonly FogInspectionResult = FogInspectionResult;
@@ -98,11 +102,33 @@ export class FogInspectionListComponent implements OnInit {
     ];
 
     constructor(
-        private readonly _fogInspectionService: FogInspectionService
+        private readonly _fogInspectionService: FogInspectionService,
+        private readonly _router: Router,
+        private readonly _activatedRoute: ActivatedRoute,
+        private readonly _containerHelper: AppContainerHelperService
     ) { }
 
-    public async ngOnInit(): Promise<void> {
+    public ngOnInit(): void {
         this.table.columns = this.getColumns();
+
+        this._queryParamSub = this._activatedRoute.queryParamMap.subscribe(async params => {
+            const dateParam = params.get('date');
+            if (dateParam) {
+                this.table.query.filter = [{
+                    columnName: 'inspectionDate',
+                    children: [
+                        { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                        { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Lte', logicalOperator: 'And' }
+                    ]
+                }];
+                await this.getInspections();
+                this.setShowResults((this.table.items?.pageInfo?.totalItems ?? 0) > 0);
+            }
+        });
+    }
+
+    public ngOnDestroy(): void {
+        this._queryParamSub?.unsubscribe();
     }
 
     private getColumns(): TableColumn<FogInspection>[] {
@@ -176,10 +202,19 @@ export class FogInspectionListComponent implements OnInit {
         });
     }
 
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
+    }
+
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
             await this.getInspections();
-            this.showResults = true;
+            this.setShowResults(true);
         }
+    }
+
+    public viewDetails(inspection: FogInspection): void {
+        this._router.navigate([inspection.id], { relativeTo: this._activatedRoute });
     }
 }

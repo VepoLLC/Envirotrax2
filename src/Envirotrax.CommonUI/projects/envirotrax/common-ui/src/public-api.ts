@@ -24,6 +24,7 @@ export * from './lib/components/dropdown/dropdown.component';
 export * from './lib/components/dropdown/dropdown-option.component';
 export * from './lib/components/input/input.component';
 export * from './lib/components/input/input-option.component';
+export * from './lib/components/input/input-add-on.component';
 export * from './lib/components/validation/validation-field/validation-field.component';
 export * from './lib/components/validation/validation-summary/validation-summary.component';
 export * from './lib/components/section/section.component';

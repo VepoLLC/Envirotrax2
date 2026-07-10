@@ -16,9 +16,9 @@ export class HomeComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         const isProfessional = await this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONAL);
         if (isProfessional) {
-            await this._router.navigate(['/professionals/dashboard'], { replaceUrl: true });
+            await this._router.navigate(['/professionals/account-overview'], { replaceUrl: true });
         } else {
-            await this._router.navigate(['/dashboard'], { replaceUrl: true });
+            await this._router.navigate(['/account-overview'], { replaceUrl: true });
         }
     }
 }

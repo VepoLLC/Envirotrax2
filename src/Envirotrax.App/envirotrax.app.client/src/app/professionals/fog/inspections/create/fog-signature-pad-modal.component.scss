@@ -1,0 +1,14 @@
+.signature-canvas-wrapper {
+    overflow: hidden;
+
+    // The signature-pad host has a default antique-white background (and the canvas a
+    // gray border) that show through when the canvas doesn't perfectly fill the modal
+    // width. Force a clean white drawing surface.
+    ::ng-deep signature-pad {
+        background: #fff;
+    }
+
+    ::ng-deep .signature-pad-canvas {
+        border: none;
+    }
+}

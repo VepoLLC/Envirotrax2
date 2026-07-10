@@ -200,10 +200,15 @@ public class FogInspectionDto : IDto
     [StringLength(500)]
     public string? InteriorImagePath { get; set; }
 
+    [StringLength(500)]
+    public string? SignatureImagePath { get; set; }
+
     // Image download URLs (generated SAS URLs; not persisted)
     public string? ExteriorImageUrl { get; set; }
 
     public string? InteriorImageUrl { get; set; }
+
+    public string? SignatureImageUrl { get; set; }
 
     // Trip ticket fields
     public DateTime? LastTripTicketDate { get; set; }

@@ -13,6 +13,7 @@ import { DownloadConfig } from '../../../shared/models/download-config';
 import { DownloadService } from '../../../shared/services/download.service';
 import { PrintableTableService } from '../../../shared/services/printable-table.service';
 import { PropertyType } from '../../../shared/enums/property-type.enum';
+import { AppContainerHelperService } from '../../../shared/services/helpers/app-contaner-helper.service';
 
 @Component({
     standalone: false,
@@ -80,12 +81,14 @@ export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy 
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
         private readonly _downloadService: DownloadService,
-        private readonly _printService: PrintableTableService
+        private readonly _printService: PrintableTableService,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
         this.downloadConfig = {
             fileName: 'Backflow Tests',
             endpoint: this._backflowTestService.getAllForProfessionalEndpoint(),
-            suppoertedFormats: ['CSV', 'Excel'],
+            pdfEndpoint: this._backflowTestService.getAllForProfessionalPdfEndpoint(),
+            suppoertedFormats: ['CSV', 'Excel', 'PDF'],
             categories: [
                 { name: 'property', caption: 'Property Information', isSelected: true },
                 { name: 'mailing', caption: 'Mailing Information', isSelected: true },
@@ -158,7 +161,7 @@ export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy 
             if (expiring === 'expired' || expiring === 'thismonth' || expiring === 'nextmonth' || expiring === 'twomonths') {
                 this.applyExpiringFilter(expiring);
                 await this.getTests();
-                this.showResults = true;
+                this.setShowResults(true);
             }
         });
     }
@@ -266,6 +269,11 @@ export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy 
         }
     }
 
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
+    }
+
     public onFilterChange(queryProperties: QueryProperty[]): void {
         this.table.query.filter = queryProperties;
     }
@@ -276,7 +284,7 @@ export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy 
             // so reusing the array after "Search Again" leaves a stale View handler (dead until refresh).
             this.setupColumns();
             await this.getTests();
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 }

@@ -18,6 +18,14 @@ public class SiteController : WaterSupplierCrudController<SiteDto>
         _siteService = service;
     }
 
+    [HttpPut("{id}/csi-assignment")]
+    [HasPermission(PermissionAction.CanModify)]
+    public async Task<IActionResult> UpdateCsiAssignmentAsync(int id, [FromBody] UpdateCsiAssignmentDto dto)
+    {
+        await _siteService.UpdateCsiAssignmentAsync(id, dto.UserId);
+        return Ok();
+    }
+
     [HttpPut("{id}/gis-data")]
     [HasPermission(PermissionAction.CanModify)]
     public async Task<IActionResult> UpdateGisDataAsync(int id, [FromBody] UpdateSiteGisDataDto dto, CancellationToken cancellationToken)

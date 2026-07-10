@@ -8,6 +8,7 @@ import { TableViewModel } from '../../../../shared/models/table-view-model';
 import { PropertyType } from '../../../../shared/enums/property-type.enum';
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from '@envirotrax/common-ui';
 import { PrintableTableService } from '../../../../shared/services/printable-table.service';
+import { AppContainerHelperService } from '../../../../shared/services/helpers/app-contaner-helper.service';
 
 
 @Component({
@@ -65,12 +66,18 @@ export class CsiInspectionListComponent implements OnInit {
         private readonly _supplierService: ProfessionalSupplierService,
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
-        private readonly _printService: PrintableTableService
+        private readonly _printService: PrintableTableService,
+        private readonly _containerHelper: AppContainerHelperService
     ) { }
 
     public async ngOnInit(): Promise<void> {
         this.inspections.columns = this.buildColumns();
         await this.loadWaterSupplierScopeOptions();
+    }
+
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
@@ -82,7 +89,7 @@ export class CsiInspectionListComponent implements OnInit {
         await this.loadInspections();
 
         if (this.inspections.items?.data.length! > 0) {
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 
@@ -101,7 +108,7 @@ export class CsiInspectionListComponent implements OnInit {
     }
 
     public searchAgain(): void {
-        this.showResults = false;
+        this.setShowResults(false);
         this.searchAttempted = false;
     }
 

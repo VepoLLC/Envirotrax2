@@ -1,14 +1,37 @@
-﻿:host {
-    max-width: 1280px;
-    padding: 2rem;
-    text-align: center;
+﻿.vp-logo {
+    max-width: 200px;
 }
 
-th, td {
-    padding-left: 1rem;
-    padding-right: 1rem;
+.vp-navbar {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
 }
 
-table {
-    margin: 0 auto;
+.vp-navbar.show {
+    position: fixed;
+}
+
+@media (min-width: 992px) {
+    .vp-navbar {
+        position: relative;
+    }
+}
+
+/* Header */
+.vp-header {
+    width: 100%;
+}
+
+/* Login panel boxes */
+.login-box.left {
+    border-radius: 0px 4px 4px 15px;
+    padding-left: 15px;
+}
+
+.login-box.right {
+    border-radius: 4px 0px 15px 4px;
+    padding-right: 15px;
 }

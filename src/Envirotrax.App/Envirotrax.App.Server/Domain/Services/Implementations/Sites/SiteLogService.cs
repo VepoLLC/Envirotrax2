@@ -35,6 +35,29 @@ public class SiteLogService : ISiteLogService
         var results = await _repository.GetBySiteAsync(siteId, pageInfo, query, cancellationToken);
         var dtos = results.Select(m => _mapper.Map<SiteLogDto>(m)!).ToList();
 
+        await EnrichAsync(dtos);
+
+        return dtos.ToPagedData(pageInfo);
+    }
+
+    public async Task<IEnumerable<SiteLogDto>> GetBySitesAsync(IEnumerable<int> siteIds, CancellationToken cancellationToken)
+    {
+        var results = await _repository.GetBySiteIdsAsync(siteIds, cancellationToken);
+
+        var trimmed = results
+            .GroupBy(sl => sl.SiteId)
+            .SelectMany(group => group.Take(5))
+            .ToList();
+
+        var dtos = trimmed.Select(m => _mapper.Map<SiteLogDto>(m)!).ToList();
+
+        await EnrichAsync(dtos);
+
+        return dtos;
+    }
+
+    private async Task EnrichAsync(IReadOnlyCollection<SiteLogDto> dtos)
+    {
         var now = DateTime.UtcNow;
 
         foreach (var dto in dtos)
@@ -50,8 +73,6 @@ public class SiteLogService : ISiteLogService
                 dto.Url = (await _fileStorageService.GenerateSasUrlAsync(delegationKey, dto.FileAttachmentPath!)).ToString();
             }
         }
-
-        return dtos.ToPagedData(pageInfo);
     }
 
     public async Task<SiteLogDto> AddAsync(int siteId, SiteLogDto dto, Stream? fileStream, string? fileName)
@@ -87,9 +108,9 @@ public class SiteLogService : ISiteLogService
         return result;
     }
 
-    public async Task<SiteLogDto?> UpdateAsync(SiteLogDto dto, Stream? fileStream, string? fileName, CancellationToken cancellationToken)
+    public async Task<SiteLogDto?> UpdateAsync(SiteLogDto dto, Stream? fileStream, string? fileName)
     {
-        var existing = await _repository.GetAsync(dto.Id, cancellationToken);
+        var existing = await _repository.GetAsync(dto.Id, CancellationToken.None);
         if (existing == null) return null;
 
         existing.LogType = dto.LogType;
@@ -125,9 +146,9 @@ public class SiteLogService : ISiteLogService
         return result;
     }
 
-    public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken)
+    public async Task<bool> DeleteAsync(int id)
     {
-        var entity = await _repository.GetAsync(id, cancellationToken);
+        var entity = await _repository.GetAsync(id, CancellationToken.None);
 
         if (entity == null)
         {

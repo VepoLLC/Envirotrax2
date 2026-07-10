@@ -184,12 +184,12 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @for (day of csiStats?.dailyStats ?? []; track day.date) {
+                                            @for (day of csiVm?.dailyStats ?? []; track day.date) {
                                                 <tr [class.table-secondary]="day.isWeekend">
-                                                    <td class="ps-3">{{getDayName(day.date)}}</td>
-                                                    <td>{{getFormattedDate(day.date)}}</td>
+                                                    <td class="ps-3">{{day.dayName}}</td>
+                                                    <td>{{day.formattedDate}}</td>
                                                     <td>
-                                                        <div class="reportbar blue" [style.width.%]="getBarPercent(day.totalInspections)">&nbsp;</div>
+                                                        <div class="reportbar blue" [style.width.%]="day.barPercent">&nbsp;</div>
                                                     </td>
                                                     <td>{{day.totalInspections}}</td>
                                                     <td>{{day.totalPaidInspections}}</td>
@@ -204,15 +204,15 @@
                                         <tfoot>
                                             <tr class="fw-semibold border-top">
                                                 <td class="ps-3" colspan="3">Totals</td>
-                                                <td>{{csiTotalInspections}}</td>
-                                                <td>{{csiTotalPaidInspections}}</td>
+                                                <td>{{csiVm?.totalInspections}}</td>
+                                                <td>{{csiVm?.totalPaidInspections}}</td>
                                                 <td></td>
                                             </tr>
                                         </tfoot>
                                     </table>
                                 </div>
 
-                            @if (csiStats?.subAccountStats?.length) {
+                            @if (csiVm?.subAccountStats?.length) {
                                 <div class="mt-3">
                                     <div class="fw-semibold text-center py-2">Inspection Submissions by Sub Account</div>
                                     <div class="table-responsive">
@@ -227,12 +227,12 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @for (sub of csiStats!.subAccountStats!; track sub.waterSupplierName) {
+                                                @for (sub of csiVm!.subAccountStats!; track sub.waterSupplierName) {
                                                     <tr>
                                                         <td class="ps-3">{{sub.waterSupplierName}}</td>
                                                         <td></td>
-                                                        <td>{{getSubAccountTotal(sub, 'totalInspections')}}</td>
-                                                        <td>{{getSubAccountTotal(sub, 'totalPaidInspections')}}</td>
+                                                        <td>{{sub.totalInspections}}</td>
+                                                        <td>{{sub.totalPaidInspections}}</td>
                                                         <td>
                                                             <button type="button" class="btn btn-sm btn-primary py-0">View</button>
                                                         </td>
@@ -242,8 +242,8 @@
                                             <tfoot>
                                                 <tr class="fw-semibold border-top">
                                                     <td class="ps-3" colspan="2">Totals</td>
-                                                    <td>{{csiSubAccountTotalInspections}}</td>
-                                                    <td>{{csiSubAccountTotalPaidInspections}}</td>
+                                                    <td>{{csiVm!.subAccountTotalInspections}}</td>
+                                                    <td>{{csiVm!.subAccountTotalPaidInspections}}</td>
                                                     <td></td>
                                                 </tr>
                                             </tfoot>
@@ -256,15 +256,181 @@
                     </div>
                 }
                 
-                @if(hasBackflow){
+                @if (hasBackflow) {
                     <div class="mt-3">
-                        <vp-section header="Recent Backflow Submission Stats"></vp-section>
-                    </div>
-                }  
+                        <vp-section header="Recent Backflow Submission Stats" [noPadding]="true">
 
-                @if(hasFogInspection){
+                            <div class="table-responsive">
+                                <table class="table table-sm mb-0">
+                                    <thead>
+                                        <tr class="table-primary">
+                                            <th class="ps-3" style="width:9%">Day</th>
+                                            <th style="width:9%">Date</th>
+                                            <th></th>
+                                            <th style="width:8%"># Tests</th>
+                                            <th style="width:8%"># Paid</th>
+                                            <th style="width:8%"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (day of backflowVm?.dailyStats ?? []; track day.date) {
+                                            <tr [class.table-secondary]="day.isWeekend">
+                                                <td class="ps-3">{{day.dayName}}</td>
+                                                <td>{{day.formattedDate}}</td>
+                                                <td>
+                                                    <div class="reportbar blue" [style.width.%]="day.barPercent">&nbsp;</div>
+                                                </td>
+                                                <td>{{day.totalTests}}</td>
+                                                <td>{{day.totalPaidTests}}</td>
+                                                <td>
+                                                    <a class="btn btn-sm btn-primary py-0"
+                                                       [routerLink]="['/backflow/tests']"
+                                                       [queryParams]="{date: day.date}">View</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="fw-semibold border-top">
+                                            <td class="ps-3" colspan="3">Totals</td>
+                                            <td>{{backflowVm?.totalTests}}</td>
+                                            <td>{{backflowVm?.totalPaidTests}}</td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+                            @if (backflowVm?.subAccountStats?.length) {
+                                <div class="mt-3">
+                                    <div class="fw-semibold text-center py-2">Test Submissions by Sub Account</div>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-sm mb-0">
+                                            <thead>
+                                                <tr class="table-primary">
+                                                    <th class="ps-3" style="width:26%">Water Supplier</th>
+                                                    <th></th>
+                                                    <th style="width:8%"># Tests</th>
+                                                    <th style="width:8%"># Paid</th>
+                                                    <th style="width:8%"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @for (sub of backflowVm!.subAccountStats; track sub.waterSupplierName) {
+                                                    <tr>
+                                                        <td class="ps-3">{{sub.waterSupplierName}}</td>
+                                                        <td></td>
+                                                        <td>{{sub.totalTests}}</td>
+                                                        <td>{{sub.totalPaidTests}}</td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-sm btn-primary py-0">View</button>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                            <tfoot>
+                                                <tr class="fw-semibold border-top">
+                                                    <td class="ps-3" colspan="2">Totals</td>
+                                                    <td>{{backflowVm!.subAccountTotalTests}}</td>
+                                                    <td>{{backflowVm!.subAccountTotalPaidTests}}</td>
+                                                    <td></td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            }
+
+                        </vp-section>
+                    </div>
+                }
+
+                @if (hasFogInspection) {
                     <div class="mt-3">
-                        <vp-section header="Recent FOG Inspection Submission Stats"></vp-section>
+                        <vp-section header="Recent FOG Inspection Submission Stats" [noPadding]="true">
+
+                            <div class="table-responsive">
+                                <table class="table table-sm mb-0">
+                                    <thead>
+                                        <tr class="table-primary">
+                                            <th class="ps-3" style="width:9%">Day</th>
+                                            <th style="width:9%">Date</th>
+                                            <th></th>
+                                            <th style="width:8%"># Ins</th>
+                                            <th style="width:8%"># Paid</th>
+                                            <th style="width:8%"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (day of fogInspectionVm?.dailyStats ?? []; track day.date) {
+                                            <tr [class.table-secondary]="day.isWeekend">
+                                                <td class="ps-3">{{day.dayName}}</td>
+                                                <td>{{day.formattedDate}}</td>
+                                                <td>
+                                                    <div class="reportbar blue" [style.width.%]="day.barPercent">&nbsp;</div>
+                                                </td>
+                                                <td>{{day.totalInspections}}</td>
+                                                <td>{{day.totalPaidInspections}}</td>
+                                                <td>
+                                                    <a class="btn btn-sm btn-primary py-0"
+                                                       [routerLink]="['/fog/inspections']"
+                                                       [queryParams]="{date: day.date}">View</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="fw-semibold border-top">
+                                            <td class="ps-3" colspan="3">Totals</td>
+                                            <td>{{fogInspectionVm?.totalInspections}}</td>
+                                            <td>{{fogInspectionVm?.totalPaidInspections}}</td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+                            @if (fogInspectionVm?.subAccountStats?.length) {
+                                <div class="mt-3">
+                                    <div class="fw-semibold text-center py-2">Inspection Submissions by Sub Account</div>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-sm mb-0">
+                                            <thead>
+                                                <tr class="table-primary">
+                                                    <th class="ps-3" style="width:26%">Water Supplier</th>
+                                                    <th></th>
+                                                    <th style="width:8%"># Ins</th>
+                                                    <th style="width:8%"># Paid</th>
+                                                    <th style="width:8%"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @for (sub of fogInspectionVm!.subAccountStats; track sub.waterSupplierName) {
+                                                    <tr>
+                                                        <td class="ps-3">{{sub.waterSupplierName}}</td>
+                                                        <td></td>
+                                                        <td>{{sub.totalInspections}}</td>
+                                                        <td>{{sub.totalPaidInspections}}</td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-sm btn-primary py-0">View</button>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                            <tfoot>
+                                                <tr class="fw-semibold border-top">
+                                                    <td class="ps-3" colspan="2">Totals</td>
+                                                    <td>{{fogInspectionVm!.subAccountTotalInspections}}</td>
+                                                    <td>{{fogInspectionVm!.subAccountTotalPaidInspections}}</td>
+                                                    <td></td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            }
+
+                        </vp-section>
                     </div>
                 }
 

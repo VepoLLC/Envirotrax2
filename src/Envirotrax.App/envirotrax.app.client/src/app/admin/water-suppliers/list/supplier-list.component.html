@@ -1,18 +1,26 @@
 <div>
-    <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+    <div class="text-center">
+        <h1 class="h2">
+            Manage Water Suppliers
+        </h1>
+    </div>
 
-    <vp-table *ngIf="table.items"
-              [columns]="table.columns!"
-              [data]="table.items.data"
-              [canAdd]="canAdd"
-              (add)="add()"
-              [canEdit]="canEdit"
-              (edit)="edit($event)"
-              [canDelete]="canDelete"
-              [(pageInfo)]="table.items.pageInfo"
-              (pageInfoChange)="getSuppliers()"
-              [(query)]="table.query"
-              (queryChange)="getSuppliers()"
-              (queryReset)="getSuppliers()"
-              [freeTextSearch]="table.freeTextSearch" />
+    <vp-section header="Water Suppliers">
+        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [canAdd]="canAdd"
+                  (add)="add()"
+                  [canEdit]="canEdit"
+                  (edit)="edit($event)"
+                  [canDelete]="canDelete"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getSuppliers()"
+                  [(query)]="table.query"
+                  (queryChange)="getSuppliers()"
+                  (queryReset)="getSuppliers()"
+                  [freeTextSearch]="table.freeTextSearch" />
+    </vp-section>
 </div>

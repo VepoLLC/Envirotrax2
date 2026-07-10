@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ModalReference } from '@developer-partners/ngx-modal-dialog';
-import { SiteLog } from '../../../../shared/models/sites/site-log';
-import { SiteLogType } from '../../../../shared/models/sites/site-log-type.enum';
-import { SiteLogService } from '../../../../shared/services/sites/site-log.service';
-import { BackflowTestService } from '../../../../shared/services/backflow/backflow-test.service';
-import { BackflowTest } from '../../../../shared/models/backflow/backflow-test';
-import { ComparisonOperator } from '../../../../shared/models/query';
-import { ToastService } from '../../../../shared/services/toast.service';
-import { HelperService } from '../../../../shared/services/helpers/helper.service';
+import { SiteLog } from '../../models/sites/site-log';
+import { SiteLogType } from '../../models/sites/site-log-type.enum';
+import { SiteLogService } from '../../services/sites/site-log.service';
+import { BackflowTestService } from '../../services/backflow/backflow-test.service';
+import { BackflowTest } from '../../models/backflow/backflow-test';
+import { ComparisonOperator } from '../../models/query';
+import { ToastService } from '../../services/toast.service';
+import { HelperService } from '../../services/helpers/helper.service';
 import { InputOption } from '@envirotrax/common-ui';
 
 export interface SiteLogEditModel {

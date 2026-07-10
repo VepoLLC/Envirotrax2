@@ -4,7 +4,7 @@
     ViewData["Title"] = "Register Confirmation";
 }
 
-<div class="d-flex align-items-center justify-content-center bg-light">
+<div class="d-flex align-items-center justify-content-center">
     <div class="card shadow-sm vp-login-form">
         <div class="card-header text-center text-white bg-info fw-semibold fs-5 rounded-top">
             <h1 class="h4 mb-0">@ViewData["Title"]</h1>
@@ -14,11 +14,11 @@
             {
                 <p>
                     This app does not currently have a real email sender registered, see <a
-                       href="https://aka.ms/aspaccountconf">these
-                        docs</a> for how to configure a real email sender.
+                    href="https://aka.ms/aspaccountconf">these
+                    docs</a> for how to configure a real email sender.
                     Normally this would be emailed: <a id="confirm-link" href="@Model.EmailConfirmationUrl">Click here to
-                        confirm your
-                        account</a>
+                    confirm your
+                    account</a>
                 </p>
             }
             else

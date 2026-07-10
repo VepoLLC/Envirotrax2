@@ -19,6 +19,13 @@ public static class ServiceRegistrations
             .AddTransient<IAuthService, AuthService>();
     }
 
+    public static IServiceCollection AddAuthService(this IServiceCollection services)
+    {
+        return services
+            .AddHttpContextAccessor()
+            .AddTransient<IAuthService, AuthService>();
+    }
+
     public static IServiceCollection AddHtmlTemplateService(this IServiceCollection services, Action<HtmlTemplateOptions> templateConfigAction)
     {
         services

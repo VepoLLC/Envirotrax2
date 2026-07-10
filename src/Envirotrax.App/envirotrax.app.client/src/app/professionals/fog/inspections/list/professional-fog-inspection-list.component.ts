@@ -1,15 +1,17 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProfessionalFogInspectionService } from '../../../../shared/services/fog/professional-fog-inspection.service';
 import { ProfessionalSupplierService } from '../../../../shared/services/professionals/professional-supplier.service';
+import { FogInspectionOptionsService } from '../../../../shared/services/fog/fog-inspection-options.service';
 import { QueryProperty } from '../../../../shared/models/query';
 import { TableViewModel } from '../../../../shared/models/table-view-model';
 import { FogInspection } from '../../../../shared/models/fog/fog-inspection';
 
 import { FogInspectionResult } from '../../../../shared/models/fog/fog-inspection-enums';
-import { FacilityType } from '../../../../shared/enums/facility-type.enum';
 import { InterceptorType } from '../../../../shared/enums/interceptor-type.enum';
 import { PropertyType } from '../../../../shared/enums/property-type.enum';
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from '@envirotrax/common-ui';
+import { AppContainerHelperService } from '../../../../shared/services/helpers/app-contaner-helper.service';
 
 @Component({
     standalone: false,
@@ -59,46 +61,24 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
         { id: 'false', text: 'Complete inspection history' }
     ];
 
-    public readonly inspectionResultOptions: InputOption[] = [
-        { id: '', text: 'All results' },
-        { id: FogInspectionResult.Passed.toString(), text: 'Passed' },
-        { id: FogInspectionResult.Failed.toString(), text: 'Failed' }
-    ];
-
-    public readonly interceptorTypeOptions: InputOption[] = [
-        { id: '', text: 'Any type' },
-        { id: InterceptorType.GreaseTrap, text: 'Grease Trap' },
-        { id: InterceptorType.GritTrap, text: 'Grit Trap' },
-        { id: InterceptorType.SepticTank, text: 'Septic Tank' },
-        { id: InterceptorType.ChemicalToilet, text: 'Chemical Toilet' },
-        { id: InterceptorType.Other, text: 'Other' }
-    ];
-
-    public readonly facilityTypeOptions: InputOption[] = [
-        { id: FacilityType.Other.toString(), text: 'Other' },
-        { id: FacilityType.Restaurant.toString(), text: 'Restaurant' },
-        { id: FacilityType.FastFoodEstablishment.toString(), text: 'Fast food establishment' },
-        { id: FacilityType.HotelMotel.toString(), text: 'Hotel/motel' },
-        { id: FacilityType.CarWash.toString(), text: 'Car wash' },
-        { id: FacilityType.SchoolUniversity.toString(), text: 'School/university' },
-        { id: FacilityType.GroceryStore.toString(), text: 'Grocery store' },
-        { id: FacilityType.ConvenienceStore.toString(), text: 'Convenience store' },
-        { id: FacilityType.AssistedLivingFacility.toString(), text: 'Assisted living facility' },
-        { id: FacilityType.MedicalFacility.toString(), text: 'Medical facility' },
-        { id: FacilityType.Industrial.toString(), text: 'Industrial' },
-        { id: FacilityType.CityOwnedFacility.toString(), text: 'City-owned facility' }
-    ];
-
-    public readonly propertyTypeOptions: InputOption[] = [
-        { id: '', text: 'Any value' },
-        { id: PropertyType.Residential.toString(), text: 'Residential' },
-        { id: PropertyType.Commercial.toString(), text: 'Commercial' }
-    ];
+    public readonly inspectionResultOptions: InputOption[];
+    public readonly interceptorTypeOptions: InputOption[];
+    public readonly facilityTypeOptions: InputOption[];
+    public readonly propertyTypeOptions: InputOption[];
 
     constructor(
         private readonly _fogInspectionService: ProfessionalFogInspectionService,
-        private readonly _supplierService: ProfessionalSupplierService
-    ) { }
+        private readonly _supplierService: ProfessionalSupplierService,
+        private readonly _fogOptions: FogInspectionOptionsService,
+        private readonly _router: Router,
+        private readonly _activatedRoute: ActivatedRoute,
+        private readonly _containerHelper: AppContainerHelperService
+    ) {
+        this.inspectionResultOptions = this._fogOptions.inspectionResultFilterOptions;
+        this.interceptorTypeOptions = this._fogOptions.interceptorTypeFilterOptions;
+        this.facilityTypeOptions = this._fogOptions.facilityTypeFilterOptions;
+        this.propertyTypeOptions = this._fogOptions.propertyTypeFilterOptions;
+    }
 
     public async ngOnInit(): Promise<void> {
         this.table.columns = this.getColumns();
@@ -177,17 +157,29 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
         this.table.query.filter = queryProperties;
     }
 
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
+    }
+
     public async search(): Promise<void> {
         this.searchAttempted = true;
         await this.getInspections();
 
         if (this.table.items?.data.length! > 0) {
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 
     public searchAgain(): void {
-        this.showResults = false;
+        this.setShowResults(false);
         this.searchAttempted = false;
+    }
+
+    public viewInspection(inspection: FogInspection): void {
+        const url = this._router.serializeUrl(
+            this._router.createUrlTree([inspection.id], { relativeTo: this._activatedRoute })
+        );
+        window.open(url, '_blank');
     }
 }

@@ -5,4 +5,6 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 public interface IBackflowTestRepository : IRepository<BackflowTest>
 {
     Task<BackflowTest> UpdateImagePathAsync(BackflowTest model, string imagePathPropertyName);
+
+    Task<BackflowTestExpiryCounts> GetExpiryCountsAsync(CancellationToken cancellationToken);
 }

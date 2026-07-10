@@ -1,0 +1,31 @@
+<div class="d-flex">
+    <ng-container *ngFor="let window of windows">
+        <div *ngIf="window.isMinimized" class="mb-2">
+            <div
+                 class="align-items-center bg-info d-flex gap-3 justify-content-between py-1 px-2 rounded text-nowrap text-white">
+                <div>
+                    {{window.config.title}}
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="border btn text-white px-2 py-1" (click)="maximizeWindow(window)">
+                        <i class="fa-solid fa-window-maximize"></i>
+                    </button>
+
+                    <button type="button" class="border btn text-white px-2 py-1" (click)="removeWindow(window)">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</div>
+
+<div class="d-flex overflow-x-auto gap-2 w-100 flex-fill" #container>
+    <div *ngFor="let window of windows" style="min-width: 50%;" [hidden]="window.isMinimized">
+        <vp-window [config]="window.config"
+                   [componentType]="window.componentType"
+                   (close)="removeWindow(window)"
+                   (minimize)="minimizeWindow(window)" />
+    </div>
+</div>

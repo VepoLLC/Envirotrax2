@@ -199,6 +199,15 @@ public class FogInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser
 
     public string? Comments { get; set; }
 
+    [StringLength(500)]
+    public string? ExteriorImagePath { get; set; }
+
+    [StringLength(500)]
+    public string? InteriorImagePath { get; set; }
+
+    [StringLength(500)]
+    public string? SignatureImagePath { get; set; }
+
     // Trip ticket fields
     public DateTime? LastTripTicketDate { get; set; }
     public int TripTicketInterval { get; set; }

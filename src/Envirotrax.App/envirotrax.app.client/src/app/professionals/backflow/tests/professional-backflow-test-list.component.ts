@@ -1,7 +1,8 @@
-import { Component, ElementRef, OnInit, ViewChild, TemplateRef } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BackflowTestService } from '../../../shared/services/backflow/backflow-test.service';
+import { Subscription } from 'rxjs';
+import { BackflowTestService, getBackflowExpiryRange, BackflowExpiryRangeKey } from '../../../shared/services/backflow/backflow-test.service';
 import { ProfessionalSupplierService } from '../../../shared/services/professionals/professional-supplier.service';
 import { QueryProperty } from '../../../shared/models/query';
 import { TableViewModel } from '../../../shared/models/table-view-model';
@@ -12,12 +13,15 @@ import { DownloadConfig } from '../../../shared/models/download-config';
 import { DownloadService } from '../../../shared/services/download.service';
 import { PrintableTableService } from '../../../shared/services/printable-table.service';
 import { PropertyType } from '../../../shared/enums/property-type.enum';
+import { AppContainerHelperService } from '../../../shared/services/helpers/app-contaner-helper.service';
 
 @Component({
     standalone: false,
     templateUrl: './professional-backflow-test-list.component.html'
 })
-export class ProfessionalBackflowTestListComponent implements OnInit {
+export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy {
+    private _routeSub?: Subscription;
+
     @ViewChild('statusTemplate', { static: true })
     public statusTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
 
@@ -77,12 +81,14 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
         private readonly _downloadService: DownloadService,
-        private readonly _printService: PrintableTableService
+        private readonly _printService: PrintableTableService,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
         this.downloadConfig = {
             fileName: 'Backflow Tests',
             endpoint: this._backflowTestService.getAllForProfessionalEndpoint(),
-            suppoertedFormats: ['CSV', 'Excel'],
+            pdfEndpoint: this._backflowTestService.getAllForProfessionalPdfEndpoint(),
+            suppoertedFormats: ['CSV', 'Excel', 'PDF'],
             categories: [
                 { name: 'property', caption: 'Property Information', isSelected: true },
                 { name: 'mailing', caption: 'Mailing Information', isSelected: true },
@@ -149,6 +155,28 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         this.setupColumns();
         await this.loadWaterSupplierScopeOptions();
+
+        this._routeSub = this._activatedRoute.queryParamMap.subscribe(async params => {
+            const expiring = params.get('expiring') as BackflowExpiryRangeKey | null;
+            if (expiring === 'expired' || expiring === 'thismonth' || expiring === 'nextmonth' || expiring === 'twomonths') {
+                this.applyExpiringFilter(expiring);
+                await this.getTests();
+                this.setShowResults(true);
+            }
+        });
+    }
+
+    public ngOnDestroy(): void {
+        this._routeSub?.unsubscribe();
+    }
+
+    private applyExpiringFilter(key: BackflowExpiryRangeKey): void {
+        const { start, end } = getBackflowExpiryRange(key);
+        this.table.query.filter = [
+            { columnName: 'isCurrent', value: 'true', comparisonOperator: 'Eq' },
+            { columnName: 'expirationDate', value: start.toISOString(), comparisonOperator: 'Gte' },
+            { columnName: 'expirationDate', value: end.toISOString(), comparisonOperator: 'Lte' }
+        ];
     }
 
     private async loadWaterSupplierScopeOptions(): Promise<void> {
@@ -241,6 +269,11 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
         }
     }
 
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
+    }
+
     public onFilterChange(queryProperties: QueryProperty[]): void {
         this.table.query.filter = queryProperties;
     }
@@ -251,7 +284,7 @@ export class ProfessionalBackflowTestListComponent implements OnInit {
             // so reusing the array after "Search Again" leaves a stale View handler (dead until refresh).
             this.setupColumns();
             await this.getTests();
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 }

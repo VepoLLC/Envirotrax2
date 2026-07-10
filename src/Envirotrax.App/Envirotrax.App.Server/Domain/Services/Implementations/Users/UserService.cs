@@ -44,7 +44,7 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
         var addedInvitation = await _authApiClient.PostAsync<UserInvitationDto, UserInvitationDto>("/api/users/invitations", new(_authService.WaterSupplierId, _authService.UserId)
         {
             Data = invitation
-        });
+        }, CancellationToken.None);
 
         if (addedInvitation == null)
         {
@@ -58,14 +58,14 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
 
     public override async Task<WaterSupplierUserDto?> DeleteAsync(int id)
     {
-        await _authApiClient.DeleteAsync<object>(_authService.WaterSupplierId, _authService.UserId, $"/api/users/{id}/invitations");
+        await _authApiClient.DeleteAsync<object>(_authService.WaterSupplierId, _authService.UserId, $"/api/users/{id}/invitations", CancellationToken.None);
         return await base.DeleteAsync(id);
     }
 
-    public async Task<WaterSupplierUserDto?> ResendInvitationAsync(int id)
+    public async Task<WaterSupplierUserDto?> ResendInvitationAsync(int id, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.GetAsync(id, CancellationToken.None) ?? throw new InvalidOperationException();
-        var supplier = await _waterSupplierService.GetLoggedInSupplierAsync();
+        var user = await _userRepository.GetAsync(id, cancellationToken) ?? throw new InvalidOperationException();
+        var supplier = await _waterSupplierService.GetLoggedInSupplierAsync(cancellationToken);
 
         var invitation = new UserInvitationDto
         {
@@ -76,7 +76,7 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
         var addedInvitation = await _authApiClient.PostAsync<UserInvitationDto, UserInvitationDto>("/api/users/invitations", new(_authService.WaterSupplierId, _authService.UserId)
         {
             Data = invitation
-        });
+        }, cancellationToken);
 
         if (addedInvitation == null)
         {

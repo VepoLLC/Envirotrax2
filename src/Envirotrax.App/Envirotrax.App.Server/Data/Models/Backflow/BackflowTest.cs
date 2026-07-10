@@ -204,6 +204,10 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 
     public bool Ossf { get; set; }
 
+    // Rain/Freeze sensor (shown when the BackflowSettings.ShowRainSensor setting is enabled)
+    public bool RainFreezeSensorInstalled { get; set; }
+    public bool RainFreezeSensorWorkingProperly { get; set; }
+
     // Status
     public string? Comments { get; set; }
     public bool IsCurrent { get; set; }
@@ -292,7 +296,7 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     [StringLength(100)]
     public string? RepairCV2Details { get; set; }
 
-    [StringLength(200)]
+    [StringLength(250)]
     public string? RepairRV { get; set; }
 
     [StringLength(100)]
@@ -354,15 +358,30 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     [StringLength(100)]
     public string? RepairCV2Details2 { get; set; }
 
-    [StringLength(200)]
+    [StringLength(250)]
     public string? RepairRV2 { get; set; }
 
     [StringLength(100)]
     public string? RepairRVDetails2 { get; set; }
 
+    [StringLength(200)]
+    public string? RepairPvbAirInlet { get; set; }
+
+    [StringLength(200)]
+    public string? RepairPvbCV { get; set; }
+
+    [StringLength(100)]
+    public string? RepairPvbAirInletDetails { get; set; }
+
+    [StringLength(100)]
+    public string? RepairPvbCVDetails { get; set; }
+
     [Precision(5, 2)]
     public decimal? FinalCV1HeldPSID2 { get; set; }
     public bool FinalCV1ClosedTight2 { get; set; }
+
+    [Precision(5, 2)]
+    public decimal? FinalCV2HeldPSID2 { get; set; }
     public bool FinalCV2ClosedTight2 { get; set; }
 
     [Precision(5, 2)]
@@ -394,6 +413,14 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public int? DeletedById { get; set; }
     public AppUser? DeletedBy { get; set; }
     public DateTime? DeletedTime { get; set; }
+}
+
+public class BackflowTestExpiryCounts
+{
+    public int Expired { get; set; }
+    public int ThisMonth { get; set; }
+    public int NextMonth { get; set; }
+    public int TwoMonths { get; set; }
 }
 
 public class BackflowTestConfiguration : IEntityTypeConfiguration<BackflowTest>

@@ -1,5 +1,6 @@
 
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.Admin.Server.Domain.Configuration;
 using OpenIddict.Validation.AspNetCore;
 
 namespace Envirotrax.Admin.Server.Configuration;
@@ -34,6 +35,7 @@ public static class ServiceRegistration
                 options.UseAspNetCore();
             });
 
-        return services;
+        return services
+            .AddDomainServices(configuration);
     }
 }

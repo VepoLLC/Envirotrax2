@@ -8,6 +8,7 @@ import { NgForm } from "@angular/forms";
 import { ProfessionalSupplierService } from "../../shared/services/professionals/professional-supplier.service";
 import { PropertyType } from "../../shared/enums/property-type.enum";
 import { ColumnType, InputOption, TableColumn } from "@envirotrax/common-ui";
+import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
 
 @Component({
     standalone: false,
@@ -49,7 +50,8 @@ export class SiteListComponent implements OnInit {
         private readonly _siteService: SiteService,
         private readonly _proSupplierService: ProfessionalSupplierService,
         private readonly _router: Router,
-        private readonly _activatedRoute: ActivatedRoute
+        private readonly _activatedRoute: ActivatedRoute,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
     }
 
@@ -104,6 +106,11 @@ export class SiteListComponent implements OnInit {
         }
     }
 
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
+    }
+
     public onFilterChange(queryProperties: QueryProperty[]): void {
         this.table.query.filter = queryProperties;
     }
@@ -111,7 +118,7 @@ export class SiteListComponent implements OnInit {
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
             await this.getSites();
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 

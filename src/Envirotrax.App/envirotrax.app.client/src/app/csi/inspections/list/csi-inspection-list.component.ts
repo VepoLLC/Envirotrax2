@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild, TemplateRef } from "@angular/core";
+import { Component, OnInit, OnDestroy, ViewChild, TemplateRef, ElementRef } from "@angular/core";
+import { Subscription } from "rxjs";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { CsiInspection } from "../../../shared/models/csi/csi-inspection";
 import { CsiInspectionService } from "../../../shared/services/csi/csi-inspection.service";
@@ -8,12 +9,15 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { DownloadConfig } from "../../../shared/models/download-config";
 import { DownloadService } from "../../../shared/services/download.service";
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from "@envirotrax/common-ui";
+import { PrintableTableService } from "../../../shared/services/printable-table.service";
+import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 
 @Component({
     standalone: false,
     templateUrl: './csi-inspection-list.component.html'
 })
-export class CsiInspectionListComponent implements OnInit {
+export class CsiInspectionListComponent implements OnInit, OnDestroy {
+    private _queryParamSub?: Subscription;
     @ViewChild('statusTemplate', { static: true })
     public statusTemplate!: TemplateRef<CellTemplateData<CsiInspection>>;
 
@@ -25,6 +29,9 @@ export class CsiInspectionListComponent implements OnInit {
 
     @ViewChild('inspectorTemplate', { static: true })
     public inspectorTemplate!: TemplateRef<CellTemplateData<CsiInspection>>;
+
+    @ViewChild('printableSection')
+    private _printableSection!: ElementRef;
 
     public showResults: boolean = false;
 
@@ -73,7 +80,9 @@ export class CsiInspectionListComponent implements OnInit {
         private readonly _csiInspectionService: CsiInspectionService,
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
-        private readonly _downloadService: DownloadService
+        private readonly _downloadService: DownloadService,
+        private readonly _printService: PrintableTableService,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
         this.downloadConfig = {
             fileName: 'CSI Inspections',
@@ -112,21 +121,27 @@ export class CsiInspectionListComponent implements OnInit {
         };
     }
 
-    public async ngOnInit(): Promise<void> {
+    public ngOnInit(): void {
         this.table.columns = this.getColumns();
 
-        const dateParam = this._activatedRoute.snapshot.queryParamMap.get('date');
-        if (dateParam) {
-            this.table.query.filter = [{
-                columnName: 'inspectionDate',
-                children: [
-                    { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Gte', logicalOperator: 'And' },
-                    { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Lte', logicalOperator: 'And' }
-                ]
-            }];
-            await this.getInspections();
-            this.showResults = (this.table.items?.pageInfo?.totalItems ?? 0) > 0;
-        }
+        this._queryParamSub = this._activatedRoute.queryParamMap.subscribe(async params => {
+            const dateParam = params.get('date');
+            if (dateParam) {
+                this.table.query.filter = [{
+                    columnName: 'inspectionDate',
+                    children: [
+                        { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                        { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Lte', logicalOperator: 'And' }
+                    ]
+                }];
+                await this.getInspections();
+                this.setShowResults((this.table.items?.pageInfo?.totalItems ?? 0) > 0);
+            }
+        });
+    }
+
+    public ngOnDestroy(): void {
+        this._queryParamSub?.unsubscribe();
     }
 
     private getColumns(): TableColumn<CsiInspection>[] {
@@ -172,6 +187,11 @@ export class CsiInspectionListComponent implements OnInit {
         ];
     }
 
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
+    }
+
     public onFilterChange(queryProperties: QueryProperty[]): void {
         this.table.query.filter = queryProperties;
     }
@@ -179,7 +199,7 @@ export class CsiInspectionListComponent implements OnInit {
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
             await this.getInspections();
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 
@@ -196,7 +216,7 @@ export class CsiInspectionListComponent implements OnInit {
     }
 
     public searchAgain(): void {
-        this.showResults = false;
+        this.setShowResults(false);
     }
 
     public viewDetails(inspection: CsiInspection): void {
@@ -207,5 +227,9 @@ export class CsiInspectionListComponent implements OnInit {
 
     public showDownlaodManager(): void {
         this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
+    }
+
+    public viewPrintableTable(): void {
+        this._printService.open(this._printableSection.nativeElement);
     }
 }

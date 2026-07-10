@@ -9,6 +9,7 @@ import { CreateSiteComponent } from './create/create-site-component';
 import { EditSiteComponent } from './edit/edit-site-component';
 import { SiteCsiInspectionsComponent } from './edit/tabs/site-csi-inspections.component';
 import { SiteBackflowTestsComponent } from './edit/tabs/site-backflow-tests.component';
+import { SiteLogHistoryComponent } from './edit/tabs/log-history/site-log-history.component';
 
 @NgModule({
     declarations: [
@@ -16,7 +17,8 @@ import { SiteBackflowTestsComponent } from './edit/tabs/site-backflow-tests.comp
         CreateSiteComponent,
         EditSiteComponent,
         SiteCsiInspectionsComponent,
-        SiteBackflowTestsComponent
+        SiteBackflowTestsComponent,
+        SiteLogHistoryComponent
     ],
     imports: [
         CommonModule,

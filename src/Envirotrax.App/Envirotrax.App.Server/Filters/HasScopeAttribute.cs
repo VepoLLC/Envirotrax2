@@ -1,5 +1,6 @@
 
 using System.Security.Claims;
+using Envirotrax.Common.Domain.Services.Defintions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -15,26 +16,15 @@ namespace Envirotrax.App.Server.Filters
             AllowedScopes = allowedScopes;
         }
 
-        private bool HasAnyScopes(ClaimsIdentity identity, string[] scopes)
-        {
-            foreach (var scope in scopes)
-            {
-                if (identity.HasClaim("scope", scope))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             if (context.HttpContext.User.Identity is ClaimsIdentity identity)
             {
                 if (identity.IsAuthenticated)
                 {
-                    if (!HasAnyScopes(identity, AllowedScopes))
+                    var authService = context.HttpContext.RequestServices.GetRequiredService<IAuthService>();
+
+                    if (!authService.HasAnyScopes(AllowedScopes))
                     {
                         context.Result = new ForbidResult();
                     }

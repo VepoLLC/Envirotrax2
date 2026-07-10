@@ -213,25 +213,25 @@
                         <td class="fw-bold pe-3 text-end text-nowrap align-middle col-material-label">Service Lines:</td>
                         <td class="pe-4 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="slLead" disabled [checked]="inspection.materialServiceLineLead" />
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="slLead" disabled [checked]="inspection.materialServiceLineLead" />
                                 <label class="form-check-label" for="slLead">Lead</label>
                             </div>
                         </td>
                         <td class="pe-4 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="slCopper" disabled [checked]="inspection.materialServiceLineCopper" />
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="slCopper" disabled [checked]="inspection.materialServiceLineCopper" />
                                 <label class="form-check-label" for="slCopper">Copper</label>
                             </div>
                         </td>
                         <td class="pe-4 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="slPVC" disabled [checked]="inspection.materialServiceLinePVC" />
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="slPVC" disabled [checked]="inspection.materialServiceLinePVC" />
                                 <label class="form-check-label" for="slPVC">PVC</label>
                             </div>
                         </td>
                         <td class="pe-3 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="slOther" disabled [checked]="inspection.materialServiceLineOther" />
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="slOther" disabled [checked]="inspection.materialServiceLineOther" />
                                 <label class="form-check-label" for="slOther">Other</label>
                             </div>
                         </td>
@@ -245,25 +245,25 @@
                         <td class="fw-bold pe-3 text-end text-nowrap align-middle">Solder:</td>
                         <td class="pe-4 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="soldLead" disabled [checked]="inspection.materialSolderLead" />
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="soldLead" disabled [checked]="inspection.materialSolderLead" />
                                 <label class="form-check-label" for="soldLead">Lead</label>
                             </div>
                         </td>
                         <td class="pe-4 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="soldLeadFree" disabled [checked]="inspection.materialSolderLeadFree" />
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="soldLeadFree" disabled [checked]="inspection.materialSolderLeadFree" />
                                 <label class="form-check-label" for="soldLeadFree">Lead Free</label>
                             </div>
                         </td>
                         <td class="pe-4 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="soldSolvent" disabled [checked]="inspection.materialSolderSolventWeld" />
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="soldSolvent" disabled [checked]="inspection.materialSolderSolventWeld" />
                                 <label class="form-check-label" for="soldSolvent">Solvent Weld</label>
                             </div>
                         </td>
                         <td class="pe-3 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="soldOther" disabled [checked]="inspection.materialSolderOther" />
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="soldOther" disabled [checked]="inspection.materialSolderOther" />
                                 <label class="form-check-label" for="soldOther">Other</label>
                             </div>
                         </td>
@@ -277,7 +277,7 @@
             </table>
 
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="legalAck" disabled [checked]="true" />
+                <input class="form-check-input readonly-checkbox" type="checkbox" id="legalAck" disabled [checked]="true" />
                 <label class="form-check-label" for="legalAck">
                     "I recognize that this document shall be retained by the aforementioned Public Water System for a minimum of ten years and that I am legally responsible for the validity of the information I have provided."
                 </label>

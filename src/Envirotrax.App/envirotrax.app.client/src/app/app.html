@@ -1,5 +1,5 @@
 <header class="vp-header">
-    <nav class="vp-navbar align-items-start bg-gradient bg-primary d-flex navbar navbar-expand-lg"
+    <nav class="vp-navbar align-items-start bg-gradient bg-primary d-flex navbar navbar-expand-lg py-0"
          [class.show]="isNavbarVisible">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
@@ -73,14 +73,14 @@
             <button *ngIf="companyName"
                     type="button"
                     [routerLink]="['auth/water-suppliers']"
-                    class="login-box left border shadow-sm bg-body text-body py-1 px-2 ms-1">
+                    class="login-box left border shadow bg-white text-body px-2 ms-1">
                 <i class="text-primary fa-solid fa-building me-1"></i>{{companyName}}
             </button>
             <button *ngIf="userEmail" type="button"
-                    class="login-box border shadow-sm bg-body text-body py-1 px-2 ms-1 rounded">
+                    class="login-box border shadow bg-white text-body px-2 ms-1 rounded">
                 <i class="text-primary fa-solid fa-user me-1"></i>{{userEmail}}
             </button>
-            <button type="button" class="login-box right border shadow-sm bg-body text-body py-1 px-2 ms-1"
+            <button type="button" class="login-box right border shadow bg-white text-body px-2 ms-1"
                     (click)="signOut()">
                 <i class="text-primary fa-solid fa-right-from-bracket me-1"></i>Logout
             </button>
@@ -91,8 +91,10 @@
 <div class="d-flex w-100 h-100 flex-fill position-relative">
     <vp-toast-container />
 
-    <main id="main-content" class="w-100">
-        <div class="p-3 flex-fill d-flex flex-column">
+    <main id="main-content"
+          class="w-100"
+          [class.container-lg]="useContainer">
+        <div class="p-3 pt-1 flex-fill d-flex flex-column">
             <router-outlet></router-outlet>
         </div>
     </main>
@@ -106,7 +108,9 @@
                 <div class="theme-toggle">
                     <em>Light Theme</em>
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="chkDarkMode">
+                        <input class="form-check-input" type="checkbox" id="checkDarkMode"
+                               [checked]="isDarkMode"
+                               (change)="toggleDarkMode()">
                     </div>
                     <em>Dark Theme</em>
                 </div>

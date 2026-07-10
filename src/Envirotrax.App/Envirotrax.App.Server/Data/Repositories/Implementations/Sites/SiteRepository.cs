@@ -31,9 +31,35 @@ public class SiteRepository : Repository<Site>, ISiteRepository
     {
         return base.GetListQuery()
             .Include(s => s.UpdatedBy)
+            .Include(s => s.WaterSupplier)
             .Include(s => s.State)
             .Include(s => s.MailingState)
             .AsNoTracking();
+    }
+
+    public async Task<IEnumerable<Site>> SearchAsync(PageInfo pageInfo, Query query, bool? fogCompliant, CancellationToken cancellationToken)
+    {
+        var sites = GetListQuery().Where(query.Filter);
+
+        if (fogCompliant.HasValue)
+        {
+            var now = DateTime.UtcNow;
+
+            if (fogCompliant.Value)
+            {
+                sites = sites.Where(s => s.TripTicketInterval > 0 && s.LastTripTicketDate != null && s.LastTripTicketDate.Value.AddDays(s.TripTicketInterval) >= now);
+            }
+            else
+            {
+                sites = sites.Where(s => s.TripTicketInterval > 0 && s.LastTripTicketDate != null && s.LastTripTicketDate.Value.AddDays(s.TripTicketInterval) < now);
+            }
+        }
+
+        var paginated = await sites
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
     }
 
     protected override IQueryable<Site> GetDetailsQuery()

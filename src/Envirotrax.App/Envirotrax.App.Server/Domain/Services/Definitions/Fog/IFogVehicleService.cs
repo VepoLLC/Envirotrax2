@@ -4,4 +4,5 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 
 public interface IFogVehicleService : IService<FogVehicleDto>
 {
+    Task<IReadOnlyList<FogLookupItemDto>> GetAsOptionsAsync(CancellationToken ct);
 }

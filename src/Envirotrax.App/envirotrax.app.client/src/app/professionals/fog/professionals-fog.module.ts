@@ -9,6 +9,7 @@ import { FogInspectionViewComponent } from "./inspections/view/fog-inspection-vi
 import { ProfessionalFogSubmissionPropertySearchComponent } from "./inspections/create/professional-fog-submission-property-search.component";
 import { ProfessionalFogSubmissionCreateComponent } from "./inspections/create/professional-fog-submission-create.component";
 import { FogSignaturePadModalComponent } from "./inspections/create/fog-signature-pad-modal.component";
+import { ProfessionalFogTripTicketListComponent } from "./trip-tickets/list/professional-fog-trip-ticket-list.component";
 
 @NgModule({
     declarations: [
@@ -16,7 +17,8 @@ import { FogSignaturePadModalComponent } from "./inspections/create/fog-signatur
         FogInspectionViewComponent,
         ProfessionalFogSubmissionPropertySearchComponent,
         ProfessionalFogSubmissionCreateComponent,
-        FogSignaturePadModalComponent
+        FogSignaturePadModalComponent,
+        ProfessionalFogTripTicketListComponent
     ],
     imports: [
         CommonModule,

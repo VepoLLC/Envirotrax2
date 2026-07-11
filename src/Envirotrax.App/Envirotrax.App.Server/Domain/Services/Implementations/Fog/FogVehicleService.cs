@@ -8,8 +8,16 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Fog;
 
 public class FogVehicleService : Service<FogVehicle, FogVehicleDto>, IFogVehicleService
 {
+    private readonly IFogVehicleRepository _repository;
+
     public FogVehicleService(IMapper mapper, IFogVehicleRepository repository)
         : base(mapper, repository)
     {
+        _repository = repository;
+    }
+
+    public Task<IReadOnlyList<FogLookupItemDto>> GetAsOptionsAsync(CancellationToken ct)
+    {
+        return _repository.GetAsOptionsAsync(ct);
     }
 }

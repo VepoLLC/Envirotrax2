@@ -133,4 +133,13 @@ public class SiteRepository : Repository<Site>, ISiteRepository
                 .SetProperty(s => s.CsiAccountAssignmentId, userId)
                 .SetProperty(s => s.CsiAccountAssignmentDate, assignmentDate));
     }
+
+    public async Task ClearNeedsRenewalCheckAsync(int siteId, CancellationToken cancellationToken)
+    {
+        await DbContext
+            .Sites
+            .Where(s => s.Id == siteId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(s => s.NeedsRenewalCheck, false), cancellationToken);
+    }
 }

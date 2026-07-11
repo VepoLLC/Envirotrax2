@@ -17,7 +17,16 @@ const routes: Routes = [
     },
     {
         path: 'settings',
-        loadChildren: () => import('./settings/settings.module').then(m => m.SettingsModule)
+        loadChildren: () => import('./settings/settings.module').then(m => m.SettingsModule),
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.Settings,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
     },
     {
         path: 'users',

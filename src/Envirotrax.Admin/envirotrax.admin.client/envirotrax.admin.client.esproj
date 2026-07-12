@@ -1,4 +1,12 @@
 <Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.4902498">
+ <PropertyGroup>
+    <!-- Default Angular environment -->
+    <BuildCommand>development</BuildCommand>
+  </PropertyGroup>
+  <PropertyGroup>
+    <BuildCommand>npm run start</BuildCommand>
+    <BuildCommand Condition="'$(AngularEnvironment)' == 'test'">npm run build:test</BuildCommand>
+  </PropertyGroup>
   <PropertyGroup>
     <StartupCommand>npm start</StartupCommand>
     <JavaScriptTestFramework>Jasmine</JavaScriptTestFramework>

@@ -33,7 +33,11 @@ public class QueueService<TOptions> : IQueueService<TOptions>
     public QueueService(IOptions<TOptions> options)
     {
         var uri = new Uri($"https://{options.Value.AccountName}.queue.core.windows.net");
-        _queueServiceClient = new QueueServiceClient(uri, new DefaultAzureCredential());
+        var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+        {
+            TenantId = options.Value.TenantId
+        });
+        _queueServiceClient = new QueueServiceClient(uri, credential);
     }
 
     public async Task EnsureQueueExistsAsync(string queueName, CancellationToken cancellationToken = default)

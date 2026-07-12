@@ -26,6 +26,6 @@ public class SiteGeocoder : IQueueWorker<SiteDto>
             Data = site
         };
 
-        await _internalApi.PostAsync<SiteDto, SiteDto>($"/api/task-runner/sites/{site!.Id}/geocode?assignGisArea={_geocodingOptions.AssignGisAreas}", apiRequest);
+        await _internalApi.PostAsync<SiteDto, SiteDto>($"/api/task-runner/sites/{site!.Id}/geocode?assignGisArea={_geocodingOptions.AssignGisAreas}", apiRequest, cancellationToken);
     }
 }

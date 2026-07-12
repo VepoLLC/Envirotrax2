@@ -6,7 +6,12 @@ import { Subscription } from "rxjs";
 @Component({
     standalone: false,
     selector: 'vp-window-container',
-    templateUrl: './window-container.component.html'
+    templateUrl: './window-container.component.html',
+    styles: `
+    .vp-window-wrapper {
+        min-width: calc(50% - 0.5rem);
+    }
+    `
 })
 export class WindowContainerComponent implements OnInit, OnDestroy {
     private _subsription$!: Subscription;

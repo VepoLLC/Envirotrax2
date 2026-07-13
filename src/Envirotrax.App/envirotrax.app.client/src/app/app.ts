@@ -220,8 +220,8 @@ export class App implements OnInit {
           {
             title: 'Property Log Management',
             iconCss: 'fa-light fa-building-memo',
-            routerLink: ['/'],
-            hasPermission: true,
+            routerLink: ['sites/reports/property-log-management'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports, PermissionType.BackflowReports, PermissionType.FogReports),
             hasFeature: true
           }
         ]
@@ -327,8 +327,8 @@ export class App implements OnInit {
           {
             title: 'Property Log Management',
             iconCss: 'fa-light fa-building-memo',
-            routerLink: ['/'],
-            hasPermission: true,
+            routerLink: ['sites/reports/property-log-management'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports, PermissionType.BackflowReports, PermissionType.FogReports),
             hasFeature: true
           }
         ]
@@ -434,8 +434,8 @@ export class App implements OnInit {
           {
             title: 'Property Log Management',
             iconCss: 'fa-light fa-building-memo',
-            routerLink: ['/'],
-            hasPermission: true,
+            routerLink: ['sites/reports/property-log-management'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports, PermissionType.BackflowReports, PermissionType.FogReports),
             hasFeature: true
           }
         ]

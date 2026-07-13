@@ -53,6 +53,23 @@ public class SiteLogRepository : Repository<SiteLog>, ISiteLogRepository
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<SiteLog>> GetForManagementAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        if (query.Sort.IsNullOrEmpty())
+        {
+            query.Sort[nameof(SiteLog.CreatedTime)] = SortOperator.Desc;
+        }
+
+        var paginated = await GetListQuery()
+            .Include(sl => sl.Site).ThenInclude(s => s!.State)
+            .Include(sl => sl.Site).ThenInclude(s => s!.MailingState)
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
     public async Task<IEnumerable<SiteLog>> GetBySiteIdsAsync(IEnumerable<int> siteIds, CancellationToken cancellationToken)
     {
         var cutoff = DateTime.UtcNow.AddDays(-365);

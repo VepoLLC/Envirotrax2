@@ -220,8 +220,8 @@ export class App implements OnInit {
           {
             title: 'Property Log Management',
             iconCss: 'fa-light fa-building-memo',
-            routerLink: ['/'],
-            hasPermission: true,
+            routerLink: ['sites/reports/property-log-management'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports, PermissionType.BackflowReports, PermissionType.FogReports),
             hasFeature: true
           }
         ]
@@ -327,8 +327,8 @@ export class App implements OnInit {
           {
             title: 'Property Log Management',
             iconCss: 'fa-light fa-building-memo',
-            routerLink: ['/'],
-            hasPermission: true,
+            routerLink: ['sites/reports/property-log-management'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports, PermissionType.BackflowReports, PermissionType.FogReports),
             hasFeature: true
           }
         ]
@@ -356,7 +356,7 @@ export class App implements OnInit {
           {
             title: 'Trip Ticket Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['/'],
+            routerLink: ['/fog/trip-tickets'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogTripTickets),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
           },
@@ -434,8 +434,8 @@ export class App implements OnInit {
           {
             title: 'Property Log Management',
             iconCss: 'fa-light fa-building-memo',
-            routerLink: ['/'],
-            hasPermission: true,
+            routerLink: ['sites/reports/property-log-management'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports, PermissionType.BackflowReports, PermissionType.FogReports),
             hasFeature: true
           }
         ]
@@ -591,6 +591,13 @@ export class App implements OnInit {
             iconCss: 'fa-regular fa-file-magnifying-glass',
             routerLink: ['professionals/fog/inspections'],
             hasPermission: isFogInspector,
+            hasFeature: true
+          },
+          {
+            title: 'Trip Ticket Search',
+            iconCss: 'fa-regular fa-file-magnifying-glass',
+            routerLink: ['professionals/fog/trip-tickets'],
+            hasPermission: isFogTransporter,
             hasFeature: true
           },
           {

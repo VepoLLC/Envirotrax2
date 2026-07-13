@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { FogTripTicketService } from '../../../shared/services/fog/fog-trip-ticket.service';
@@ -11,6 +11,7 @@ import { InterceptorType } from '../../../shared/enums/interceptor-type.enum';
 import { PropertyType } from '../../../shared/enums/property-type.enum';
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from '@envirotrax/common-ui';
 import { AppContainerHelperService } from '../../../shared/services/helpers/app-contaner-helper.service';
+import { PrintableTableService } from '../../../shared/services/printable-table.service';
 
 @Component({
     standalone: false,
@@ -53,6 +54,9 @@ export class FogTripTicketListComponent implements OnInit {
 
     @ViewChild('wasteCell', { static: true })
     public wasteCell?: TemplateRef<CellTemplateData<FogTripTicket>>;
+
+    @ViewChild('printableSection')
+    private _printableSection!: ElementRef;
 
     public interceptorTypeOptions: InputOption[] = [
         { id: '', text: 'Any Type' },
@@ -101,7 +105,8 @@ export class FogTripTicketListComponent implements OnInit {
         private readonly _fogTripTicketService: FogTripTicketService,
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
-        private readonly _containerHelper: AppContainerHelperService
+        private readonly _containerHelper: AppContainerHelperService,
+        private readonly _printService: PrintableTableService
     ) { }
 
     public ngOnInit(): void {
@@ -181,5 +186,9 @@ export class FogTripTicketListComponent implements OnInit {
 
     public viewDetails(ticket: FogTripTicket): void {
         this._router.navigate([ticket.id], { relativeTo: this._activatedRoute });
+    }
+
+    public viewPrintableTable(): void {
+        this._printService.open(this._printableSection.nativeElement);
     }
 }

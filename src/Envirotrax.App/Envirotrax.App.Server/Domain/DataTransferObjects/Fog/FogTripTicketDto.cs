@@ -56,6 +56,8 @@ public class FogTripTicketDto : IDto
     // Transporter
     public ReferencedProfessionalDto? Professional { get; set; }
 
+    public ReferencedProfessionalUserDto? Transporter { get; set; }
+
     [StringLength(100)]
     public string? TransporterLicenseNumber { get; set; }
 

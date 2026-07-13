@@ -7,7 +7,7 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { FogTripTicket } from "../../models/fog/fog-trip-ticket";
-import { InputOption } from "@envirotrax/common-ui";
+import { ProfessionalUser } from "../../models/professionals/professional-user";
 
 @Injectable({
     providedIn: 'root'
@@ -35,7 +35,6 @@ export class FogTripTicketService {
         return lastValueFrom(this._http.get<FogTripTicket>(url));
     }
 
-    //for professional-fog-trip-ticket-list calls
     public async searchForProfessional(pageInfo: PageInfo, query: Query, waterSupplierId?: number): Promise<PagedData<FogTripTicket>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/fog/trip-tickets');
         let params = this._queryHelper.buildQuery(pageInfo, query);
@@ -47,18 +46,8 @@ export class FogTripTicketService {
         return await lastValueFrom(this._http.get<PagedData<FogTripTicket>>(url, { params }));
     }
 
-    public getProfessionalTransporters(): Promise<InputOption[]> {
+    public getProfessionalTransporters(): Promise<ProfessionalUser[]> {
         const url = this._urlResolver.resolveUrl('/api/professionals/fog/trip-tickets/lookup/transporters');
-        return lastValueFrom(this._http.get<InputOption[]>(url));
-    }
-
-    public getProfessionalVehicles(): Promise<InputOption[]> {
-        const url = this._urlResolver.resolveUrl('/api/professionals/fog/trip-tickets/lookup/vehicles');
-        return lastValueFrom(this._http.get<InputOption[]>(url));
-    }
-
-    public getProfessionalDisposalSites(): Promise<InputOption[]> {
-        const url = this._urlResolver.resolveUrl('/api/professionals/fog/trip-tickets/lookup/disposal-sites');
-        return lastValueFrom(this._http.get<InputOption[]>(url));
+        return lastValueFrom(this._http.get<ProfessionalUser[]>(url));
     }
 }

@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Models.States;
@@ -60,6 +61,9 @@ public class FogTripTicket : TenantModel<WaterSupplier>, IProfessionalModel, IAu
     // Transporter — ProfessionalId/Professional satisfy IProfessionalModel
     public int ProfessionalId { get; set; }
     public Professional? Professional { get; set; }
+
+    public int? TransporterId { get; set; }
+    public ProfessionalUser? Transporter { get; set; }
 
     [StringLength(100)]
     public string? TransporterLicenseNumber { get; set; }
@@ -258,4 +262,15 @@ public class FogTripTicket : TenantModel<WaterSupplier>, IProfessionalModel, IAu
     public int? DeletedById { get; set; }
     public AppUser? DeletedBy { get; set; }
     public DateTime? DeletedTime { get; set; }
+}
+
+public class FogTripTicketConfiguration : IEntityTypeConfiguration<FogTripTicket>
+{
+    public void Configure(EntityTypeBuilder<FogTripTicket> builder)
+    {
+        builder.HasOne(t => t.Transporter)
+            .WithMany()
+            .HasForeignKey(t => new { t.ProfessionalId, t.TransporterId })
+            .HasPrincipalKey(pu => new { pu.ProfessionalId, pu.UserId });
+    }
 }

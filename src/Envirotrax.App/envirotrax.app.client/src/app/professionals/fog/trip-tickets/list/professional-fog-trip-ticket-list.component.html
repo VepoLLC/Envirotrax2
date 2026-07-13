@@ -128,7 +128,7 @@
                                     </div>
                                 </div>
                                 <div class="col-xl d-xl-flex gap-1">
-                                    <div class="mb-2">
+                                    <div class="mb-2 ms-auto">
                                         <vp-filter-panel-field fieldName="propertyStreetNumber"
                                                                label="Street #"
                                                                [form]="searchForm" />
@@ -251,19 +251,19 @@
             Export Results
         </button>
         <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
-                >
+                (click)="viewPrintableTable()">
             <i class="fa-regular fa-table me-1"></i>
             View Printable Table
         </button>
         <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
-                >
+                (click)="showResults = false;">
             <i class="fa-solid fa-magnifying-glass me-1"></i>
             Search Again
         </button>
     </div>
 
     <vp-section header="Trip Ticket Matching the Search Filter — {{table.items?.pageInfo?.totalItems || 0}} Results">
-        <div class="container mb-3">
+        <div class="container mb-3" #printableSection>
             <div class="row gap-2 justify-content-center mb-3">
                 <div class="col-auto mb-2">
                     <vp-status-icon imageSrc="/images/icons/bstatus-green-half.png" text="Completed Pickup" />

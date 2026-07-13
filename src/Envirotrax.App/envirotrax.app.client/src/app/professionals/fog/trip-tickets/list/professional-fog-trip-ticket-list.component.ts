@@ -1,7 +1,9 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { FogTripTicketService } from '../../../../shared/services/fog/fog-trip-ticket.service';
+import { ProfessionalFogVehicleService } from '../../../../shared/services/fog/professional-fog-vehicle.service';
+import { ProfessionalFogDisposalSiteService } from '../../../../shared/services/fog/professional-fog-disposal-site.service';
 import { ProfessionalSupplierService } from '../../../../shared/services/professionals/professional-supplier.service';
 import { QueryProperty } from '../../../../shared/models/query';
 import { TableViewModel } from '../../../../shared/models/table-view-model';
@@ -12,6 +14,8 @@ import { InterceptorType } from '../../../../shared/enums/interceptor-type.enum'
 import { PropertyType } from '../../../../shared/enums/property-type.enum';
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from '@envirotrax/common-ui';
 import { AppContainerHelperService } from '../../../../shared/services/helpers/app-contaner-helper.service';
+import { MAX_PAGE_SIZE } from '../../../../shared/models/page-info';
+import { PrintableTableService } from '../../../../shared/services/printable-table.service';
 
 @Component({
     standalone: false,
@@ -54,6 +58,9 @@ export class ProfessionalFogTripTicketListComponent implements OnInit {
 
     @ViewChild('wasteCell', { static: true })
     public wasteCell?: TemplateRef<CellTemplateData<FogTripTicket>>;
+
+    @ViewChild('printableSection')
+    private _printableSection!: ElementRef;
 
     public interceptorTypeOptions: InputOption[] = [
         { id: '', text: 'Any Type' },
@@ -99,10 +106,13 @@ export class ProfessionalFogTripTicketListComponent implements OnInit {
 
     constructor(
         private readonly _fogTripTicketService: FogTripTicketService,
+        private readonly _vehicleService: ProfessionalFogVehicleService,
+        private readonly _disposalSiteService: ProfessionalFogDisposalSiteService,
         private readonly _professionalSupplierService: ProfessionalSupplierService,
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
-        private readonly _containerHelper: AppContainerHelperService
+        private readonly _containerHelper: AppContainerHelperService,
+        private readonly _printService: PrintableTableService,
     ) { }
 
     public async ngOnInit(): Promise<void> {
@@ -111,18 +121,27 @@ export class ProfessionalFogTripTicketListComponent implements OnInit {
     }
 
     private async loadLookups(): Promise<void> {
-        const [transporters, vehicles, disposalSites, waterSuppliers] = await Promise.all([
+        const [transporters, vehiclesResult, disposalSitesResult, waterSuppliers] = await Promise.all([
             this._fogTripTicketService.getProfessionalTransporters(),
-            this._fogTripTicketService.getProfessionalVehicles(),
-            this._fogTripTicketService.getProfessionalDisposalSites(),
+            this._vehicleService.getAll({ pageSize: MAX_PAGE_SIZE }, {}),
+            this._disposalSiteService.getRegistered({ pageSize: MAX_PAGE_SIZE }, {}),
             this._professionalSupplierService.getMyAsOptions()
         ]);
 
-        this.transporterOptions = transporters.length > 1
-            ? [{ id: '', text: 'Any transporter' }, ...transporters]
-            : transporters;
-        this.vehicleOptions = [{ id: '', text: 'Any vehicle' }, ...vehicles];
-        this.disposalSiteOptions = [{ id: '', text: 'Any disposal site' }, ...disposalSites];
+        const mappedTransporters = transporters.map(t => ({ id: String(t.id), text: t.contactName ?? '' }));
+        this.transporterOptions = mappedTransporters.length > 1
+            ? [{ id: '', text: 'Any transporter' }, ...mappedTransporters]
+            : mappedTransporters;
+
+        const mappedVehicles = vehiclesResult.data.map(v => ({
+            id: String(v.id),
+            text: `${v.manufacturedYear ?? ''} ${v.manufacturer ?? ''} ${v.licensePlateNumber ?? ''}`.trim()
+        }));
+        this.vehicleOptions = [{ id: '', text: 'Any vehicle' }, ...mappedVehicles];
+
+        const mappedDisposalSites = disposalSitesResult.data.map(s => ({ id: String(s.id), text: s.name ?? '' }));
+        this.disposalSiteOptions = [{ id: '', text: 'Any disposal site' }, ...mappedDisposalSites];
+
         this.waterSupplierOptions = [...waterSuppliers];
     }
 
@@ -199,5 +218,9 @@ export class ProfessionalFogTripTicketListComponent implements OnInit {
             this._router.createUrlTree([ticket.id], { relativeTo: this._activatedRoute })
         );
         window.open(url, '_blank');
+    }
+
+    public viewPrintableTable(): void {
+        this._printService.open(this._printableSection.nativeElement);
     }
 }

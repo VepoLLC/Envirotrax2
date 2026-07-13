@@ -1,5 +1,5 @@
 using DeveloperPartners.SortingFiltering;
-using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Filters;
@@ -15,20 +15,17 @@ namespace Envirotrax.App.Server.Controllers.Professionals.Fog;
 public class ProfessionalFogTripTicketController : ProfessionalProtectedController
 {
     private readonly IFogTripTicketService _fogService;
-    private readonly IFogVehicleService _vehicleService;
-    private readonly IFogTransporterDisposalSiteService _disposalSiteService;
     private readonly IProfessionalService _professionalService;
+    private readonly IProfessionalUserService _professionalUserService;
 
     public ProfessionalFogTripTicketController(
         IFogTripTicketService fogService,
-        IFogVehicleService vehicleService,
-        IFogTransporterDisposalSiteService disposalSiteService,
-        IProfessionalService professionalService)
+        IProfessionalService professionalService,
+        IProfessionalUserService professionalUserService)
     {
         _fogService = fogService;
-        _vehicleService = vehicleService;
-        _disposalSiteService = disposalSiteService;
         _professionalService = professionalService;
+        _professionalUserService = professionalUserService;
     }
 
     [HttpGet]
@@ -62,38 +59,12 @@ public class ProfessionalFogTripTicketController : ProfessionalProtectedControll
 
         if (current == null)
         {
-            return Ok(Array.Empty<FogLookupItemDto>());
+            return Ok(Array.Empty<ProfessionalUserDto>());
         }
 
-        var options = new List<FogLookupItemDto> { new(current.Id, current.Name) };
+        var result = await _professionalUserService.GetAllByProfessionalAsync(
+            current.Id, new PageInfo { PageSize = 1000 }, new Query(), ct, pu => pu.IsFogTransporter);
 
-        if (current.ParentId == null)
-        {
-            var subAccounts = await _professionalService.GetSubAccountsAsync(ct);
-            options.AddRange(subAccounts.Select(p => new FogLookupItemDto(p.Id, p.Name)));
-        }
-
-        return Ok(options);
-    }
-
-    [HttpGet("lookup/vehicles")]
-    public async Task<IActionResult> GetVehicles(CancellationToken ct)
-    {
-        var result = await _vehicleService.GetAsOptionsAsync(ct);
-        return Ok(result);
-    }
-
-    [HttpGet("lookup/disposal-sites")]
-    public async Task<IActionResult> GetDisposalSites(CancellationToken ct)
-    {
-        var result = await _disposalSiteService.GetRegisteredDisposalSitesAsync(
-            new PageInfo { PageSize = 1000 }, new Query(), ct);
-
-        var options = result.Data
-            .Select(s => new FogLookupItemDto(s.Id, s.Name))
-            .OrderBy(x => x.Text)
-            .ToList();
-
-        return Ok(options);
+        return Ok(result.Data);
     }
 }

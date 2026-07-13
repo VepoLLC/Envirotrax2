@@ -34,6 +34,7 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
         return base.GetDetailsQuery()
             .Include(t => t.Site)
             .Include(t => t.Professional)
+            .Include(t => t.Transporter)
             .Include(t => t.Vehicle)
             .Include(t => t.ReceiverDisposalSite)
             .Include(t => t.PropertyState)
@@ -61,7 +62,6 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
 
         IQueryable<FogTripTicket> dbQuery = _context.FogTripTickets
             .IgnoreQueryFilters()
-            .Where(t => t.ProfessionalId == _tenantProvider.ProfessionalId && t.DeletedTime == null)
             .Include(t => t.WaterSupplier)
             .Include(t => t.Site)
             .Include(t => t.Professional);

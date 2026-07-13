@@ -39,5 +39,33 @@ public class SiteLogProfile : Profile
             .ForMember(m => m.CreatedBy, opt => opt.Ignore());
 
         CreateMap<BackflowTest, ReferencedBackflowTestDto>();
+
+        CreateMap<SiteLog, PropertyLogDto>()
+            .ForMember(dto => dto.Assembly, opt => opt.Ignore())
+            .ForMember(dto => dto.Url, opt => opt.Ignore())
+            .ForMember(dto => dto.ReviewDateStatus, opt => opt.Ignore())
+            .AfterMap((model, dto) =>
+            {
+                if (model.Assembly != null)
+                {
+                    dto.Assembly = new ReferencedBackflowTestDto
+                    {
+                        Id = model.Assembly.Id,
+                        SerialNumber = model.Assembly.SerialNumber,
+                        Manufacturer = model.Assembly.Manufacturer,
+                        Model = model.Assembly.Model,
+                        Size = model.Assembly.Size,
+                        DeviceType = model.Assembly.DeviceType
+                    };
+                }
+                else if (model.AssemblyId.HasValue)
+                {
+                    dto.Assembly = new ReferencedBackflowTestDto { Id = model.AssemblyId.Value };
+                }
+            })
+            .ReverseMap()
+            .ForMember(m => m.Site, opt => opt.Ignore())
+            .ForMember(m => m.Assembly, opt => opt.Ignore())
+            .ForMember(m => m.CreatedBy, opt => opt.Ignore());
     }
 }

@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
+using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
@@ -79,5 +81,31 @@ public class BackflowOutOfServiceRequestService : Service<BackflowOutOfServiceRe
     {
         var candidates = await _repository.GetReplacementCandidatesAsync(testId, cancellationToken);
         return candidates.Select(c => Mapper.Map<BackflowTestDto>(c)!);
+    }
+
+    public async Task<IPagedData<BackflowOutOfServiceRequestDto>> GetForWaterSupplierAsync(
+        PageInfo pageInfo, Query query, OutOfServiceRequestStatusFilter status,
+        OutOfServiceType? type, CancellationToken cancellationToken)
+    {
+        query.Filter = query.ConvertFilterProperties<BackflowOutOfServiceRequest, BackflowOutOfServiceRequestDto>(Mapper);
+        query.Sort = query.ConvertSortProperties<BackflowOutOfServiceRequest, BackflowOutOfServiceRequestDto>(Mapper);
+
+        if (query.Sort.IsNullOrEmpty())
+        {
+            // Newest first (the entity has no CreationDate).
+            query.Sort[nameof(BackflowOutOfServiceRequest.Id)] = SortOperator.Desc;
+        }
+
+        var results = await _repository.GetForWaterSupplierAsync(pageInfo, query, status, type, cancellationToken);
+
+        return results.Select(r => Mapper.Map<BackflowOutOfServiceRequestDto>(r)!).ToPagedData(pageInfo);
+    }
+
+    public async Task ClearAsync(int id, CancellationToken cancellationToken)
+    {
+        if (!await _repository.ClearAsync(id, cancellationToken))
+        {
+            throw new ValidationException("Out of service request not found.");
+        }
     }
 }

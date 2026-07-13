@@ -69,6 +69,22 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return model;
     }
 
+    public async Task<IEnumerable<BackflowTest>> GetAllPendingRenewalAsync(int batchSize, CancellationToken cancellationToken)
+    {
+        return await DbContext.BackflowTests
+            .IgnoreQueryFilters()
+            .Where(t => t.DeletedTime == null && t.IsCurrent && t.Site != null && t.Site.NeedsRenewalCheck)
+            .OrderBy(t => t.Id)
+            .Take(batchSize)
+            .Select(t => new BackflowTest
+            {
+                Id = t.Id,
+                WaterSupplierId = t.WaterSupplierId
+            })
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<BackflowTestExpiryCounts> GetExpiryCountsAsync(CancellationToken cancellationToken)
     {
         var now = DateTime.UtcNow;

@@ -1,10 +1,18 @@
 <vp-input [label]="label"
           type="select"
           [name]="fieldName"
-
+          [isInputGroup]="true"
+          [labelStyle]="labelStyle"
           [(ngModel)]="value"
           [form]="form"
           [options]="options"
           (ngModelChange)="onChange()">
-
+    <vp-input-add-on>
+        <button type="button"
+                class="btn btn-primary ms-1 py-1"
+                (click)="selectArea()">
+            <i class="far fa-hand-pointer me-1"></i>
+            Select Area
+        </button>
+    </vp-input-add-on>
 </vp-input>

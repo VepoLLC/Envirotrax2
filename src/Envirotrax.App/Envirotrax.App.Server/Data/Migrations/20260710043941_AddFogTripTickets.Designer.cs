@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260710043941_AddFogTripTickets")]
+    partial class AddFogTripTickets
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1774,9 +1777,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("TransporterId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("TransporterLicenseExpiration")
                         .HasColumnType("datetime2");
 
@@ -1865,6 +1865,8 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.HasIndex("DeletedById");
 
+                    b.HasIndex("ProfessionalId");
+
                     b.HasIndex("PropertyStateId");
 
                     b.HasIndex("ReceiverDisposalSiteId");
@@ -1872,8 +1874,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("UpdatedById");
 
                     b.HasIndex("VehicleId");
-
-                    b.HasIndex("ProfessionalId", "TransporterId");
 
                     b.HasIndex("WaterSupplierId", "SiteId");
 
@@ -3898,11 +3898,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalUser", "Transporter")
-                        .WithMany()
-                        .HasForeignKey("ProfessionalId", "TransporterId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Envirotrax.App.Server.Data.Models.Sites.Site", "Site")
                         .WithMany()
                         .HasForeignKey("WaterSupplierId", "SiteId")
@@ -3920,8 +3915,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("ReceiverDisposalSite");
 
                     b.Navigation("Site");
-
-                    b.Navigation("Transporter");
 
                     b.Navigation("UpdatedBy");
 

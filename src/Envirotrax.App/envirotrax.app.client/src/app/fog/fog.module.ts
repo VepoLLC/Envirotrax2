@@ -11,6 +11,7 @@ import { FogInspectorUsersComponent } from "./inspectors/details/users/list/fog-
 import { FogInspectorLicenseInsuranceComponent } from "./inspectors/details/license-insurance/list/fog-inspector-license-insurance.component";
 import { FogInspectionListComponent } from "./inspections/list/fog-inspection-list.component";
 import { FogInspectionViewComponent } from "./inspections/view/fog-inspection-view.component";
+import { FogTripTicketListComponent } from "./trip-tickets/list/fog-trip-ticket-list.component";
 import { ProfessionalModule } from "../professionals/professional.module";
 
 @NgModule({
@@ -21,7 +22,8 @@ import { ProfessionalModule } from "../professionals/professional.module";
         FogInspectorUsersComponent,
         FogInspectorLicenseInsuranceComponent,
         FogInspectionListComponent,
-        FogInspectionViewComponent
+        FogInspectionViewComponent,
+        FogTripTicketListComponent
     ],
     imports: [
         CommonModule,

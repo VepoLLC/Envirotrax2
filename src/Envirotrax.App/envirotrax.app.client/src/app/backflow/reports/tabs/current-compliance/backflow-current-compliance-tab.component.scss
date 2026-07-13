@@ -1,0 +1,67 @@
+
+.col-num { width: 7%; }
+
+.col-bar { width: 11%; min-width: 80px; }
+
+.reportbar {
+    height: 16px;
+    border-radius: 0 8px 8px 0;
+    min-width: 2px;
+
+    &.green {
+        background: linear-gradient(to right, #b5e8c0, #20a845);
+    }
+}
+
+/* Doughnut chart sizing (Compliant vs Non-Compliant, % drawn in the center). */
+.bf-pie-wrap {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    flex: 0 0 auto;
+}
+
+.bf-legend {
+    min-width: 320px;
+}
+
+.bf-legend-row {
+    display: flex;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid #e9ecef;
+
+    &:last-child {
+        border-bottom: 0;
+    }
+}
+
+.bf-swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    margin-right: 10px;
+    flex: 0 0 auto;
+
+    &.total {
+        background: #adb5bd;
+    }
+
+    &.compliant {
+        background: #20a845;
+    }
+
+    &.noncompliant {
+        background: #dc3545;
+    }
+}
+
+.bf-legend-text {
+    flex: 1 1 auto;
+}
+
+.bf-legend-num {
+    font-weight: 600;
+    margin-left: 12px;
+    white-space: nowrap;
+}

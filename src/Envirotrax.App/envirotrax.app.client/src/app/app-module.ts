@@ -12,6 +12,7 @@ import { ToastContainerComponent } from './toast-container/toast-container.compo
 import { HomeComponent } from './home/home.component';
 import { API_BASE_URL, TimeZoneInterceptor } from '@envirotrax/common-ui';
 import { environment } from '../environments/environment';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 @NgModule({
   declarations: [
@@ -42,6 +43,7 @@ import { environment } from '../environments/environment';
       useClass: TimeZoneInterceptor,
       multi: true
     },
+    provideCharts(withDefaultRegisterables()),
   ],
   bootstrap: [App]
 })

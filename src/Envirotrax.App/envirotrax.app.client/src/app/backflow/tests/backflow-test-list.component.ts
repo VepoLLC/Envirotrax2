@@ -1,6 +1,7 @@
-import { Component, ElementRef, OnInit, ViewChild, TemplateRef } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { BackflowTestService } from '../../shared/services/backflow/backflow-test.service';
 import { BackflowTestOptionsService } from '../../shared/services/backflow/backflow-test-options.service';
 import { GisAreaService } from '../../shared/services/gis-areas/gis-area.service';
@@ -17,12 +18,15 @@ import { DownloadConfig } from '../../shared/models/download-config';
 import { DownloadService } from '../../shared/services/download.service';
 import { PrintableTableService } from '../../shared/services/printable-table.service';
 import { PropertyType } from '../../shared/enums/property-type.enum';
+import { BackflowComplianceParams } from '../../shared/models/backflow/backflow-compliance-params';
 
 @Component({
     standalone: false,
     templateUrl: './backflow-test-list.component.html'
 })
-export class BackflowTestListComponent implements OnInit {
+export class BackflowTestListComponent implements OnInit, OnDestroy {
+    private _routeSub?: Subscription;
+
     @ViewChild('statusTemplate', { static: true })
     public statusTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
 
@@ -220,6 +224,23 @@ export class BackflowTestListComponent implements OnInit {
 
     public async ngOnInit(): Promise<void> {
         this.setupColumns();
+        this.subscribeToComplianceDrilldown();
+    }
+
+    public ngOnDestroy(): void {
+        this._routeSub?.unsubscribe();
+    }
+
+    // When arriving from a Tab 2 (Current Compliance Status) View link, apply the compliance preset
+    // filter from the query params and run the search automatically.
+    private subscribeToComplianceDrilldown(): void {
+        this._routeSub = this._activatedRoute.queryParamMap.subscribe(async params => {
+            if (params.get(BackflowComplianceParams.mode)) {
+                this.applyComplianceFilter(params);
+                await this.getTests();
+                this.showResults = true;
+            }
+        });
     }
 
     public viewDetails(test: BackflowTest): void {
@@ -340,6 +361,48 @@ export class BackflowTestListComponent implements OnInit {
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
         this.table.query.filter = queryProperties;
+    }
+
+    // Builds the preset filter for a Tab 2 (Current Compliance Status) View drill-down: the non-compliant
+    // assemblies behind a requirement row — current, in-service assemblies whose expiration has passed the
+    // cutoff, matching the site property/hazard/OSSF/aux-water filters of the compliance report row.
+    private applyComplianceFilter(params: ParamMap): void {
+        const filter: QueryProperty[] = [
+            { columnName: 'isCurrent', value: 'true', comparisonOperator: 'Eq' },
+            { columnName: 'outOfService', value: 'false', comparisonOperator: 'Eq' }
+        ];
+
+        const propertyType = params.get(BackflowComplianceParams.propertyType);
+        if (propertyType) {
+            filter.push({ columnName: 'propertyType', value: propertyType, comparisonOperator: 'Eq' });
+        }
+
+        const deviceType = params.get(BackflowComplianceParams.deviceType);
+        if (deviceType) {
+            filter.push({ columnName: 'deviceType', value: deviceType, comparisonOperator: 'Eq' });
+        }
+
+        const hazardType = params.get(BackflowComplianceParams.hazardType);
+        if (hazardType) {
+            filter.push({ columnName: 'hazardType', value: hazardType, comparisonOperator: 'Eq' });
+        }
+
+        if (params.get(BackflowComplianceParams.ossf) === 'true') {
+            filter.push({ columnName: 'site.hasOnSiteSewageFacility', value: 'true', comparisonOperator: 'Eq' });
+        }
+
+        if (params.get(BackflowComplianceParams.auxWater) === 'true') {
+            filter.push({ columnName: 'site.hasAuxWaterSupply', value: 'true', comparisonOperator: 'Eq' });
+        }
+
+        // Non-compliant = expired as of the cutoff (today, or 30 days earlier when ignoring the last 30 days).
+        const cutoff = new Date();
+        if (params.get(BackflowComplianceParams.ignoreLast30Days) === 'true') {
+            cutoff.setDate(cutoff.getDate() - 30);
+        }
+        filter.push({ columnName: 'expirationDate', value: cutoff.toISOString(), comparisonOperator: 'Lte' });
+
+        this.table.query.filter = filter;
     }
 
     public async search(searchForm: NgForm): Promise<void> {

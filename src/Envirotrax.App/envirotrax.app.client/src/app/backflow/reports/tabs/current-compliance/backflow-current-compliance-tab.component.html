@@ -1,0 +1,94 @@
+@if (isLoading) {
+    <dp-loading-spinner />
+}
+
+@if (!isLoading) {
+    <div class="mb-3">
+        <vp-section header="Assembly Compliance Status" [noPadding]="true">
+
+            <div class="d-flex justify-content-center align-items-center gap-3 py-2 flex-wrap">
+                <div class="form-check mb-0">
+                    <input class="form-check-input" type="checkbox" id="ignoreLast30Days" [(ngModel)]="ignoreLast30Days" />
+                    <label class="form-check-label" for="ignoreLast30Days">Ignore Last 30 Days</label>
+                </div>
+                <button type="button" class="btn btn-primary" (click)="refresh()">Refresh</button>
+                <button type="button" class="btn btn-primary" (click)="viewPrintableReport()">View Printable Report</button>
+            </div>
+
+            @if (report) {
+                <div class="d-flex flex-wrap justify-content-center align-items-center gap-5 py-4">
+                    <div class="bf-pie-wrap">
+                        <canvas baseChart
+                                [data]="doughnutData"
+                                [options]="doughnutOptions"
+                                [type]="doughnutType"
+                                [plugins]="doughnutPlugins">
+                        </canvas>
+                    </div>
+
+                    <div class="bf-legend">
+                        <div class="bf-legend-row">
+                            <span class="bf-swatch total"></span>
+                            <span class="bf-legend-text">Total Active Assemblies</span>
+                            <span class="bf-legend-num">{{ report.totalActive }}</span>
+                        </div>
+                        <div class="bf-legend-row">
+                            <span class="bf-swatch compliant"></span>
+                            <span class="bf-legend-text">Compliant Assemblies</span>
+                            <span class="bf-legend-num">{{ report.compliant }} ({{ report.compliantPercentage }}%)</span>
+                        </div>
+                        <div class="bf-legend-row">
+                            <span class="bf-swatch noncompliant"></span>
+                            <span class="bf-legend-text">Non-Compliant Assemblies</span>
+                            <span class="bf-legend-num">{{ report.nonCompliant }} ({{ report.nonCompliantPercentage }}%)</span>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (report && report.requirements.length > 0) {
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm mb-0">
+                        <thead>
+                            <tr class="table-primary">
+                                <th class="ps-3">Property Type</th>
+                                <th>Assembly Type</th>
+                                <th>Hazard Type</th>
+                                <th>OSSF</th>
+                                <th>Aux Water</th>
+                                <th class="col-num">Renewal Years</th>
+                                <th class="col-bar"></th>
+                                <th class="col-num">Active Assemblies</th>
+                                <th class="col-num">Compliant Assemblies</th>
+                                <th class="col-num">%</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (requirement of report.requirements; track $index) {
+                                <tr>
+                                    <td class="ps-3">{{ requirement.propertyType }}</td>
+                                    <td>{{ requirement.assemblyType }}</td>
+                                    <td>{{ requirement.hazardType }}</td>
+                                    <td>{{ requirement.hasSiteOssf ? '1' : '0' }}</td>
+                                    <td>{{ requirement.auxWaterSupply ? '1' : '0' }}</td>
+                                    <td>{{ requirement.renewalYears }}</td>
+                                    <td class="align-middle col-bar">
+                                        <div class="reportbar green" [style.width.%]="requirement.percentage">&nbsp;</div>
+                                    </td>
+                                    <td>{{ requirement.active }}</td>
+                                    <td>{{ requirement.compliant }}</td>
+                                    <td>{{ requirement.percentage }}%</td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary" (click)="viewRequirement(requirement)">View</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+        </vp-section>
+    </div>
+}

@@ -1,0 +1,12 @@
+.col-stat   { width: 20%; }
+.col-num    { width: 4%; }
+
+.reportbar {
+    height: 16px;
+    border-radius: 0 8px 8px 0;
+    min-width: 2px;
+
+    &.green {
+        background: linear-gradient(to right, #b5e8c0, #20a845);
+    }
+}

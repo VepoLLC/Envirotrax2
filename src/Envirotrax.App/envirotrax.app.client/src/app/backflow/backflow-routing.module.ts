@@ -6,8 +6,23 @@ import { BackflowTesterListComponent } from "./testers/list/backflow-tester-list
 import { BackflowTestListComponent } from "./tests/backflow-test-list.component";
 import { BackflowTestDetailsComponent } from "./tests/details/backflow-test-details.component";
 import { BackflowTesterDetailsComponent } from "./testers/details/backflow-tester-details.component";
+import { BackflowReportComponent } from "./reports/backflow-report.component";
 
 const routes: Routes = [
+    {
+        path: 'reports',
+        title: 'Water Supplier Backflow Test Reports',
+        component: BackflowReportComponent,
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.BackflowReports,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
+    },
     {
         path: 'tests',
         title: 'Backflow Test Search',

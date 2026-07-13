@@ -280,28 +280,32 @@ export class App implements OnInit {
           {
             title: 'Backflow Report',
             iconCss: 'fa-regular fa-chart-simple-horizontal',
-            routerLink: ['/'],
+            routerLink: ['backflow/reports'],
+            queryParams: { tab: 'test-reports' },
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
             hasFeature: true
           },
           {
             title: 'Current Compliance Report',
             iconCss: 'fa-regular fa-chart-pie-simple',
-            routerLink: ['/'],
+            routerLink: ['backflow/reports'],
+            queryParams: { tab: 'current-compliance' },
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
             hasFeature: true
           },
           {
             title: 'Compliance History Report',
             iconCss: 'fa-solid fa-chart-line-up',
-            routerLink: ['/'],
+            routerLink: ['backflow/reports'],
+            queryParams: { tab: 'compliance-history' },
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
             hasFeature: true
           },
           {
             title: 'New/Removed Assemblies Report',
             iconCss: 'fa-solid fa-chart-column',
-            routerLink: ['/'],
+            routerLink: ['backflow/reports'],
+            queryParams: { tab: 'new-removed' },
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
             hasFeature: true
           },
@@ -628,6 +632,7 @@ export class App implements OnInit {
 interface MenuItem {
   title?: string;
   routerLink?: string[];
+  queryParams?: { [key: string]: string };
   iconCss?: string;
   hasPermission: boolean;
   hasFeature: boolean;

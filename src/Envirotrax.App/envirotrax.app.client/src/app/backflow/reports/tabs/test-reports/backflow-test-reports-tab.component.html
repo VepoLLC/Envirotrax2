@@ -77,7 +77,7 @@
                                     <tr>
                                         <td class="ps-3">{{ item.label }}</td>
                                         <td class="align-middle">
-                                            <div class="reportbar green" [style.width.%]="item.percentage">&nbsp;</div>
+                                            <div class="reportbar" [ngClass]="barColor(category.title)" [style.width.%]="item.percentage">&nbsp;</div>
                                         </td>
                                         <td>{{ item.count }}</td>
                                         <td>{{ item.percentage }}%</td>

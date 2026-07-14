@@ -50,7 +50,7 @@
                                             </li>
                                             <li *ngIf="child.type !== 'separator' && child.hasFeature && child.hasPermission"
                                                 class="m-2">
-                                                <a class="dropdown-item rounded" [routerLink]="child.routerLink" [queryParams]="child.queryParams">
+                                                <a class="dropdown-item rounded" [routerLink]="child.routerLink">
                                                     <i [class]="child.iconCss" class="me-1"></i>
                                                     {{child.title}}
                                                 </a>

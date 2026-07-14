@@ -28,6 +28,19 @@ export class BackflowTestReportsTabComponent implements OnInit {
     private readonly chartHeightPerBar = 44;      // px of vertical space each bar needs
     private readonly chartHeightPadding = 48;     // px for the axis labels / legend
 
+    // Per-section bar color, matching V1's backflow report. Uses the shared global .reportbar
+    // variants (green / steelblue / blue); any unmapped section falls back to green.
+    private readonly sectionBarColors: Record<string, string> = {
+        'Added By': 'steelblue',
+        'Property Type': 'green',
+        'Test Result': 'blue',
+        'Reason for Test': 'steelblue',
+        'Hazard Type': 'blue',
+        'Assembly Type': 'steelblue',
+        'Rain / Freeze Sensor': 'green',
+        'On-site Sewage Facility': 'green'
+    };
+
     constructor(
         private readonly _reportService: BackflowReportService,
         private readonly _zone: NgZone
@@ -36,6 +49,11 @@ export class BackflowTestReportsTabComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         await this.setDefaultDateRange();
         await this.search();
+    }
+
+    // The shared .reportbar color variant for a statistics section (matches V1).
+    public barColor(title: string): string {
+        return this.sectionBarColors[title] ?? 'green';
     }
 
     // Default range follows V1: from the first day of the earliest test record's month

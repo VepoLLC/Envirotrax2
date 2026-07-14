@@ -7,12 +7,17 @@ import { BackflowTestListComponent } from "./tests/backflow-test-list.component"
 import { BackflowTestDetailsComponent } from "./tests/details/backflow-test-details.component";
 import { BackflowTesterDetailsComponent } from "./testers/details/backflow-tester-details.component";
 import { BackflowReportComponent } from "./reports/backflow-report.component";
+import { BackflowTestReportsTabComponent } from "./reports/tabs/test-reports/backflow-test-reports-tab.component";
+import { BackflowCurrentComplianceTabComponent } from "./reports/tabs/current-compliance/backflow-current-compliance-tab.component";
+import { BackflowComplianceHistoryTabComponent } from "./reports/tabs/compliance-history/backflow-compliance-history-tab.component";
+import { BackflowNewRemovedTabComponent } from "./reports/tabs/new-removed/backflow-new-removed-tab.component";
 import { BackflowOutOfServiceListComponent } from "./out-of-service/backflow-out-of-service-list.component";
 
 const routes: Routes = [
     {
+        // Shell hosting the report pill navigation + <router-outlet>. Each report is its own routed
+        // child page below; the permission guard on the parent covers every child.
         path: 'reports',
-        title: 'Water Supplier Backflow Test Reports',
         component: BackflowReportComponent,
         canActivate: [PermissionGuard],
         data: {
@@ -22,7 +27,14 @@ const routes: Routes = [
                     action: PermissionAction.CanView
                 }
             ]
-        }
+        },
+        children: [
+            { path: '', pathMatch: 'full', redirectTo: 'test-reports' },
+            { path: 'test-reports', title: 'Backflow Test Reports', component: BackflowTestReportsTabComponent },
+            { path: 'current-compliance', title: 'Current Compliance Report', component: BackflowCurrentComplianceTabComponent },
+            { path: 'compliance-history', title: 'Compliance History Report', component: BackflowComplianceHistoryTabComponent },
+            { path: 'new-removed', title: 'New/Removed Assemblies Report', component: BackflowNewRemovedTabComponent }
+        ]
     },
     {
         path: 'tests',

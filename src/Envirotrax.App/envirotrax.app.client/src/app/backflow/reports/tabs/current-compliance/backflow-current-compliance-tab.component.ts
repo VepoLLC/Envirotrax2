@@ -25,10 +25,12 @@ export class BackflowCurrentComplianceTabComponent implements OnInit {
     private readonly centerPercentOffsetY = -8;                   // nudge the % slightly above the middle
     private readonly centerLabelOffsetY = 16;                     // place the caption below the %
 
-    // Doughnut slice colors. These must stay in sync with the legend swatch colors in the SCSS
-    // (.bf-swatch.compliant / .noncompliant) — the canvas can't read CSS, so they're duplicated.
-    private readonly compliantColor = '#20a845';
-    private readonly nonCompliantColor = '#dc3545';
+    // Compliance colors — the single source of truth for both the doughnut canvas (which can't read
+    // CSS) and the legend swatches, which bind to these same values in the template. Keeping them here
+    // guarantees the legend always matches the chart, in any theme.
+    public readonly totalColor = '#adb5bd';          // legend "Total" swatch only (not a doughnut slice)
+    public readonly compliantColor = '#20a845';
+    public readonly nonCompliantColor = '#dc3545';
     private readonly compliantHoverColor = '#1c9540';
     private readonly nonCompliantHoverColor = '#c82333';
 

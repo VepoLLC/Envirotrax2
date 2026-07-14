@@ -3,12 +3,12 @@
         <h1 class="h3">Water Supplier Backflow Test Reports</h1>
     </header>
 
-    <div class="text-center mb-3">
-        <ul class="vp-tabs nav nav-pills d-inline-flex flex-wrap">
+    <div class="mb-3">
+        <ul class="vp-tabs nav nav-pills flex-column flex-xl-row justify-content-xl-center">
             @for (tab of tabs; track tab.key) {
                 <li class="nav-item">
-                    <a class="nav-link" [class.active]="selectedTab === tab.key"
-                       [routerLink]="['/backflow/reports']" [queryParams]="{ tab: tab.key }">
+                    <a class="nav-link" routerLinkActive="active"
+                       [routerLink]="['/backflow/reports', tab.key]">
                         <i [class]="tab.iconCss" class="me-1"></i>{{ tab.title }}
                     </a>
                 </li>
@@ -16,18 +16,5 @@
         </ul>
     </div>
 
-    @switch (selectedTab) {
-        @case ('test-reports') {
-            <backflow-test-reports-tab />
-        }
-        @case ('current-compliance') {
-            <backflow-current-compliance-tab />
-        }
-        @case ('compliance-history') {
-            <backflow-compliance-history-tab />
-        }
-        @case ('new-removed') {
-            <backflow-new-removed-tab />
-        }
-    }
+    <router-outlet></router-outlet>
 </div>

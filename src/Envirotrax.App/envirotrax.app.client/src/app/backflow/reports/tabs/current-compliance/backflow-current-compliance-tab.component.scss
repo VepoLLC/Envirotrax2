@@ -3,16 +3,6 @@
 
 .col-bar { width: 11%; min-width: 80px; }
 
-.reportbar {
-    height: 16px;
-    border-radius: 0 8px 8px 0;
-    min-width: 2px;
-
-    &.green {
-        background: linear-gradient(to right, #b5e8c0, #20a845);
-    }
-}
-
 /* Doughnut chart sizing (Compliant vs Non-Compliant, % drawn in the center). */
 .bf-pie-wrap {
     position: relative;
@@ -29,31 +19,21 @@
     display: flex;
     align-items: center;
     padding: 6px 0;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid var(--bs-border-color);
 
     &:last-child {
         border-bottom: 0;
     }
 }
 
+/* Swatch size/layout only — the colors are bound in the template from the TS chart-color constants
+   (totalColor / compliantColor / nonCompliantColor) so the legend always matches the doughnut canvas. */
 .bf-swatch {
     width: 16px;
     height: 16px;
     border-radius: 3px;
     margin-right: 10px;
     flex: 0 0 auto;
-
-    &.total {
-        background: #adb5bd;
-    }
-
-    &.compliant {
-        background: #20a845;
-    }
-
-    &.noncompliant {
-        background: #dc3545;
-    }
 }
 
 .bf-legend-text {

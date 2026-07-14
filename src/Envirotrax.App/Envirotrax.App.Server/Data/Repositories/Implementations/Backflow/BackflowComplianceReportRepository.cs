@@ -5,13 +5,15 @@ using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
+using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow;
 
-public class BackflowComplianceReportRepository(IDbContextSelector dbContextSelector) : Repository<BackflowTest>(dbContextSelector), IBackflowComplianceReportRepository
+public class BackflowComplianceReportRepository(IDbContextSelector dbContextSelector, ITimeZoneHelperService timeZoneHelper) : Repository<BackflowTest>(dbContextSelector), IBackflowComplianceReportRepository
 {
     private readonly TenantDbContext _tenantContext = dbContextSelector.Current;
+    private readonly ITimeZoneHelperService _timeZoneHelper = timeZoneHelper;
 
     private const string AllValue = "All";
 
@@ -38,7 +40,7 @@ public class BackflowComplianceReportRepository(IDbContextSelector dbContextSele
 
     public async Task<BackflowComplianceReportDto> GetComplianceReportAsync(bool ignoreLast30Days, CancellationToken cancellationToken)
     {
-        var now = DateTime.Now;
+        var now = _timeZoneHelper.GetUserLocalTime();
         var cutoff = ignoreLast30Days ? now.AddDays(-30) : now;
 
         var requirements = await LoadRenewalRequirementsAsync(cancellationToken);
@@ -174,7 +176,7 @@ public class BackflowComplianceReportRepository(IDbContextSelector dbContextSele
 
         var assemblies = BuildAssemblyHistories(tests);
 
-        var now = DateTime.Now;
+        var now = _timeZoneHelper.GetUserLocalTime();
         var currentMonth = new DateTime(now.Year, now.Month, 1);
         var startMonth = GetHistoryStartMonth(tests, currentMonth);
 

@@ -28,17 +28,17 @@
 
                     <div class="bf-legend">
                         <div class="bf-legend-row">
-                            <span class="bf-swatch total"></span>
+                            <span class="bf-swatch" [style.background]="totalColor"></span>
                             <span class="bf-legend-text">Total Active Assemblies</span>
                             <span class="bf-legend-num">{{ report.totalActive }}</span>
                         </div>
                         <div class="bf-legend-row">
-                            <span class="bf-swatch compliant"></span>
+                            <span class="bf-swatch" [style.background]="compliantColor"></span>
                             <span class="bf-legend-text">Compliant Assemblies</span>
                             <span class="bf-legend-num">{{ report.compliant }} ({{ report.compliantPercentage }}%)</span>
                         </div>
                         <div class="bf-legend-row">
-                            <span class="bf-swatch noncompliant"></span>
+                            <span class="bf-swatch" [style.background]="nonCompliantColor"></span>
                             <span class="bf-legend-text">Non-Compliant Assemblies</span>
                             <span class="bf-legend-num">{{ report.nonCompliant }} ({{ report.nonCompliantPercentage }}%)</span>
                         </div>

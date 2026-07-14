@@ -287,32 +287,28 @@ export class App implements OnInit {
           {
             title: 'Backflow Report',
             iconCss: 'fa-regular fa-chart-simple-horizontal',
-            routerLink: ['backflow/reports'],
-            queryParams: { tab: 'test-reports' },
+            routerLink: ['backflow/reports', 'test-reports'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
             hasFeature: true
           },
           {
             title: 'Current Compliance Report',
             iconCss: 'fa-regular fa-chart-pie-simple',
-            routerLink: ['backflow/reports'],
-            queryParams: { tab: 'current-compliance' },
+            routerLink: ['backflow/reports', 'current-compliance'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
             hasFeature: true
           },
           {
             title: 'Compliance History Report',
             iconCss: 'fa-solid fa-chart-line-up',
-            routerLink: ['backflow/reports'],
-            queryParams: { tab: 'compliance-history' },
+            routerLink: ['backflow/reports', 'compliance-history'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
             hasFeature: true
           },
           {
             title: 'New/Removed Assemblies Report',
             iconCss: 'fa-solid fa-chart-column',
-            routerLink: ['backflow/reports'],
-            queryParams: { tab: 'new-removed' },
+            routerLink: ['backflow/reports', 'new-removed'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
             hasFeature: true
           },
@@ -646,7 +642,6 @@ export class App implements OnInit {
 interface MenuItem {
   title?: string;
   routerLink?: string[];
-  queryParams?: { [key: string]: string };
   iconCss?: string;
   hasPermission: boolean;
   hasFeature: boolean;

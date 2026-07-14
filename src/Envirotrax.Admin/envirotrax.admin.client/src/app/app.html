@@ -1,5 +1,5 @@
 ﻿<header class="vp-header">
-    <nav class="vp-navbar align-items-start bg-gradient bg-primary d-flex navbar navbar-expand-lg"
+    <nav class="vp-navbar align-items-start bg-gradient bg-primary d-flex navbar navbar-expand-lg py-0"
          [class.show]="isNavbarVisible">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
@@ -67,7 +67,7 @@
     </nav>
 </header>
 
-<div class="container-fluid d-flex flex-fill py-2">
-    <vp-window-container class="d-flex flex-fill flex-column" />
+<div class="container-fluid d-flex flex-fill py-2 min-h-0">
+    <vp-window-container class="d-flex flex-fill flex-column min-h-0" />
     <router-outlet></router-outlet>
 </div>

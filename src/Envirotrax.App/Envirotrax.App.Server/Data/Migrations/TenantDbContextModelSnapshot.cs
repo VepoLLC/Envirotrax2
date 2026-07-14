@@ -1528,6 +1528,358 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.ToTable("FogTransporterDisposalSites");
                 });
 
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Fog.FogTripTicket", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("decimal(19,4)");
+
+                    b.Property<decimal>("AmountShare")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("decimal(19,4)");
+
+                    b.Property<DateTime?>("ApprovalDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ApprovedBy")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Comments")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<bool>("Completed")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("DeletedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DeletedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Disapproved")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EmailPdf")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("EmailStatus")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FogGeneratorContactName")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("FogGeneratorEmailAddress")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("FogGeneratorPhoneNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("GeneratorContactName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("GeneratorSignatureDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("GeneratorSignaturePath")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<double>("InterceptorCapacity")
+                        .HasColumnType("float");
+
+                    b.Property<int>("InterceptorCapacityType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("InterceptorOtherDescription")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("InterceptorType")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<double>("InterceptorWasteRemovedAmount")
+                        .HasColumnType("float");
+
+                    b.Property<double>("InterceptorWasteRemovedAmountCubicFeet")
+                        .HasColumnType("float");
+
+                    b.Property<double>("InterceptorWasteRemovedAmountGallons")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime?>("InterceptorWasteRemovedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("InterceptorWasteRemovedType")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("NeedsValidation")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("PickupCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ProfessionalId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PropertyBusinessName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PropertyCity")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("PropertyNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("PropertyStateId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PropertyStreetName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PropertyStreetNumber")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<int>("PropertyType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PropertyZip")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ReceiverAddress")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("ReceiverCity")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ReceiverCompanyName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("ReceiverContactName")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("ReceiverDisposalSiteId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReceiverEmailAddress")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("ReceiverPermitNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ReceiverPhoneNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ReceiverRegistrationNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("ReceiverSignatureDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReceiverSignaturePath")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("ReceiverSiteId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReceiverState")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("ReceiverWasteDeliveredDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReceiverZip")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("SalesRepPaidDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SiteId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SubmissionId")
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
+
+                    b.Property<DateTime?>("TransactionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TransactionId")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("TransporterAddress")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("TransporterCellNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("TransporterCity")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("TransporterCompanyName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("TransporterContactName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("TransporterEmailAddress")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("TransporterFaxNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("TransporterId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("TransporterLicenseExpiration")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TransporterLicenseNumber")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("TransporterState")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("TransporterWorkNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("TransporterZip")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ValidatedBy")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("ValidationClearedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ValidationLockedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("ValidationNewSite")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ValidationNotes")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool>("ValidationOnHold")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ValidationReceiverInformationChanged")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ValidationSiteInformationChanged")
+                        .HasColumnType("bit");
+
+                    b.Property<double>("VehicleCapacity")
+                        .HasColumnType("float");
+
+                    b.Property<int>("VehicleCapacityType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("VehicleId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("VehicleLicensePlateNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("VehicleManufacturer")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("VehiclePermitNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("VehicleStickerNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("VehicleYear")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("WsPaidDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("WaterSupplierId", "Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeletedById");
+
+                    b.HasIndex("PropertyStateId");
+
+                    b.HasIndex("ReceiverDisposalSiteId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.HasIndex("VehicleId");
+
+                    b.HasIndex("ProfessionalId", "TransporterId");
+
+                    b.HasIndex("WaterSupplierId", "SiteId");
+
+                    b.ToTable("FogTripTickets");
+                });
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Fog.FogVehicle", b =>
                 {
                     b.Property<int>("Id")
@@ -3500,6 +3852,82 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("DisposalSite");
 
                     b.Navigation("Professional");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Fog.FogTripTicket", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "DeletedBy")
+                        .WithMany()
+                        .HasForeignKey("DeletedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
+                        .WithMany()
+                        .HasForeignKey("ProfessionalId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "PropertyState")
+                        .WithMany()
+                        .HasForeignKey("PropertyStateId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Fog.FogDisposalSite", "ReceiverDisposalSite")
+                        .WithMany()
+                        .HasForeignKey("ReceiverDisposalSiteId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Fog.FogVehicle", "Vehicle")
+                        .WithMany()
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalUser", "Transporter")
+                        .WithMany()
+                        .HasForeignKey("ProfessionalId", "TransporterId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Sites.Site", "Site")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId", "SiteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("DeletedBy");
+
+                    b.Navigation("Professional");
+
+                    b.Navigation("PropertyState");
+
+                    b.Navigation("ReceiverDisposalSite");
+
+                    b.Navigation("Site");
+
+                    b.Navigation("Transporter");
+
+                    b.Navigation("UpdatedBy");
+
+                    b.Navigation("Vehicle");
+
+                    b.Navigation("WaterSupplier");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Fog.FogVehicle", b =>

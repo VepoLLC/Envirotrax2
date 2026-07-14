@@ -8,6 +8,8 @@ public class ProfessionalDto : IDto
 {
     public int Id { get; set; }
 
+    public int? ParentId { get; set; }
+
     [Required]
     [StringLength(255)]
     public string Name { get; set; } = null!;

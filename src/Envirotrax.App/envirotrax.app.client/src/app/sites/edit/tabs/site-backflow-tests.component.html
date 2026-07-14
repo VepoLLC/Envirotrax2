@@ -71,6 +71,7 @@
                     <div class="mb-3">
                         <vp-filter-panel-field fieldName="isCurrent"
                                                label="View type"
+                                               labelStyle="horizontal"
                                                type="select"
                                                [value]="defaultIsCurrent"
                                                [options]="testHistoryOptions"
@@ -80,6 +81,7 @@
                     <div class="mb-3">
                         <vp-filter-panel-field fieldName="testResult"
                                                label="Test result"
+                                               labelStyle="horizontal"
                                                type="select"
                                                [options]="testResultOptions"
                                                [form]="searchForm"
@@ -88,6 +90,7 @@
                     <div class="mb-3">
                         <vp-filter-panel-field fieldName="outOfService"
                                                label="Service status"
+                                               labelStyle="horizontal"
                                                type="select"
                                                [value]="defaultServiceStatus"
                                                [options]="serviceStatusOptions"
@@ -99,6 +102,7 @@
                     <div class="mb-3">
                         <vp-filter-panel-field fieldName="disapproved"
                                                label="Approval status"
+                                               labelStyle="horizontal"
                                                type="select"
                                                [options]="approvalStatusOptions"
                                                [form]="searchForm"
@@ -107,6 +111,7 @@
                     <div class="mb-3">
                         <vp-filter-panel-field fieldName="rejected"
                                                label="Rejected status"
+                                               labelStyle="horizontal"
                                                type="select"
                                                [options]="rejectedStatusOptions"
                                                [form]="searchForm"
@@ -117,11 +122,13 @@
                     <div class="mb-3">
                         <vp-filter-panel-field fieldName="serialNumber"
                                                label="Serial #"
+                                               labelStyle="horizontal"
                                                [form]="searchForm" />
                     </div>
                     <div class="mb-3">
                         <vp-filter-panel-field fieldName="hazardType"
                                                label="Hazard type"
+                                               labelStyle="horizontal"
                                                type="select"
                                                [options]="hazardTypeOptions"
                                                [form]="searchForm" />

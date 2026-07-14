@@ -2,15 +2,19 @@ using System.ComponentModel.DataAnnotations;
 using System.Transactions;
 using AutoMapper;
 using Envirotrax.App.Server.Data.Models.Backflow;
+using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
+using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
+using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Backflow;
@@ -31,6 +35,9 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     private readonly IAuthService _authService;
     private readonly IPdfTemplateService _pdfTemplateService;
     private readonly ISiteService _siteService;
+    private readonly ISiteRepository _siteRepository;
+    private readonly IBackflowRenewalRequirementService _renewalRequirementService;
+    private readonly ILogger<BackflowTestService> _logger;
 
     public BackflowTestService(
         IMapper mapper,
@@ -40,7 +47,10 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         IFileStorageService fileStorageService,
         IAuthService authService,
         IPdfTemplateService pdfTemplateService,
-        ISiteService siteService)
+        ISiteService siteService,
+        ISiteRepository siteRepository,
+        IBackflowRenewalRequirementService renewalRequirementService,
+        ILogger<BackflowTestService> logger)
         : base(mapper, repository)
     {
         _testRepository = repository;
@@ -50,6 +60,9 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         _authService = authService;
         _pdfTemplateService = pdfTemplateService;
         _siteService = siteService;
+        _siteRepository = siteRepository;
+        _renewalRequirementService = renewalRequirementService;
+        _logger = logger;
     }
 
     private async Task PopulateBpatSnapshotAsync(BackflowTestDto dto)
@@ -337,5 +350,64 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     public Task<byte[]> GeneratePdfAsync(IEnumerable<BackflowTestDto> tests)
     {
         return _pdfTemplateService.GenerateAsync("Backflow.BackflowTest", tests);
+    }
+
+    public async Task<IEnumerable<BackflowTestDto>> GetAllPendingRenewalAsync(int batchSize, CancellationToken cancellationToken)
+    {
+        var tests = await _testRepository.GetAllPendingRenewalAsync(batchSize, cancellationToken);
+        return Mapper.Map<IEnumerable<BackflowTest>, IEnumerable<BackflowTestDto>>(tests);
+    }
+
+    public async Task<BackflowTestDto?> ExtendDateAsync(int testId, CancellationToken cancellationToken)
+    {
+        var test = await _testRepository.GetAsync(testId, cancellationToken);
+
+        if (test == null || test.DeletedTime.HasValue)
+        {
+            return null;
+        }
+
+        try
+        {
+            var requirements = await _renewalRequirementService.GetAllAsync(cancellationToken);
+            var matched = requirements.FirstOrDefault(r => DoesTestMatchRequirement(test, r));
+
+            if (matched != null)
+            {
+                test.ExpirationDate = (test.ExpirationDate ?? DateTime.UtcNow).AddYears(matched.RenewalYears);
+                await _testRepository.UpdateAsync(test);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error extending expiration date for BackflowTest {TestId}.", testId);
+        }
+
+        if (test.SiteId.HasValue)
+        {
+            await _siteRepository.ClearNeedsRenewalCheckAsync(test.SiteId.Value, cancellationToken);
+        }
+
+        return MapToDto(test);
+    }
+
+    private static bool DoesTestMatchRequirement(BackflowTest test, BackflowRenewalRequirementDto requirement)
+    {
+        if ((PropertyType)test.PropertyType != requirement.PropertyType)
+            return false;
+
+        if (requirement.DeviceType != null && !string.Equals(test.DeviceType, requirement.DeviceType, StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        if (requirement.HazardType != null && !string.Equals(test.HazardType, requirement.HazardType, StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        if (test.Ossf != requirement.HasSiteOssf)
+            return false;
+
+        if (test.Site?.HasAuxWaterSupply != requirement.AuxWaterSupply)
+            return false;
+
+        return true;
     }
 }

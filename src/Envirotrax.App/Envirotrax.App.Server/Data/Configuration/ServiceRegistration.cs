@@ -70,6 +70,7 @@ public static class ServiceRegistration
         services.AddTransient<IBackflowTestReportRepository, BackflowTestReportRepository>();
         services.AddTransient<IBackflowComplianceReportRepository, BackflowComplianceReportRepository>();
         services.AddTransient<IBackflowNewRemovedReportRepository, BackflowNewRemovedReportRepository>();
+        services.AddTransient<IBackflowOutOfServiceRequestRepository, BackflowOutOfServiceRequestRepository>();
         services.AddTransient<LookupRepository>();
 
         services.AddTransient<ICsiSettingsRepository, CsiSettingsRepository>();
@@ -90,6 +91,7 @@ public static class ServiceRegistration
         services.AddTransient<IFogVehicleRepository, FogVehicleRepository>();
         services.AddTransient<IFogTransporterDisposalSiteRepository, FogTransporterDisposalSiteRepository>();
         services.AddTransient<IFogDisposalSiteRepository, FogDisposalSiteRepository>();
+        services.AddTransient<IFogTripTicketRepository, FogTripTicketRepository>();
 
         services.AddTransient<IGisAreaRepository, GisAreaRepository>();
         services.AddTransient<IGisAreaCoordinateRepository, GisAreaCoordinateRepository>();

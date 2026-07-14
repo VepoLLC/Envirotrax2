@@ -28,6 +28,10 @@ public class SiteProfile : Profile
             .ForMember(s => s.MailingState, opt => opt.Ignore())
             .ForMember(s => s.MailingStateId, opt => opt.MapFrom(dto => dto.MailingState != null ? dto.MailingState.Id : (int?)null));
 
+        CreateMap<Site, CsiComplianceSiteDto>()
+            .IncludeBase<Site, SiteDto>()
+            .ForMember(dto => dto.Logs, opt => opt.Ignore());
+
         CreateMap<Site, ReferencedSiteDto>().ReverseMap();
     }
 }

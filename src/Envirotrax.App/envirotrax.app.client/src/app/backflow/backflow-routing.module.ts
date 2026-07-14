@@ -7,6 +7,7 @@ import { BackflowTestListComponent } from "./tests/backflow-test-list.component"
 import { BackflowTestDetailsComponent } from "./tests/details/backflow-test-details.component";
 import { BackflowTesterDetailsComponent } from "./testers/details/backflow-tester-details.component";
 import { BackflowReportComponent } from "./reports/backflow-report.component";
+import { BackflowOutOfServiceListComponent } from "./out-of-service/backflow-out-of-service-list.component";
 
 const routes: Routes = [
     {
@@ -46,6 +47,20 @@ const routes: Routes = [
             permissions: [
                 {
                     type: PermissionType.BackflowTests,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
+    },
+    {
+        path: 'out-of-service',
+        title: 'Out of Service Requests',
+        component: BackflowOutOfServiceListComponent,
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.BackflowOutOfService,
                     action: PermissionAction.CanView
                 }
             ]

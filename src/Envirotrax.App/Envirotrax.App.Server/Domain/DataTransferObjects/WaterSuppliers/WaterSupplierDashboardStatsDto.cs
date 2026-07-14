@@ -2,6 +2,11 @@ namespace Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 public class WaterSupplierDashboardStatsDto
 {
+    //Property Logs
+    public int PastDuePropertyLogCount { get; set; }
+    public int ExpiringPropertyLogCount { get; set; }
+    public int AllPropertyLogCount { get; set; }
+
     // Accounts
     public int WiseGuyCount { get; set; }
     public int CsiInspectorCount { get; set; }

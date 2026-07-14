@@ -3,6 +3,7 @@ import { AuthService } from './shared/services/auth/auth.service';
 import { createPopper } from '@popperjs/core';
 import { WindowService } from './shared/services/window.service';
 import { WaterSupplierListComponent } from './water-suppliers/list/water-supplier-list.component';
+import { SiteListComponent } from './sites/list/site-list.component';
 
 @Component({
   selector: 'app-root',
@@ -34,6 +35,11 @@ export class App implements OnInit {
 
   private createMenuItems(): MenuItem[] {
     return [
+      {
+        title: 'Property Search',
+        iconCss: 'fa-solid fa-house',
+        onClick: this.showPropertySearch.bind(this)
+      },
       {
         title: 'Water Suppliers',
         iconCss: 'fa-solid fa-droplet',
@@ -78,6 +84,12 @@ export class App implements OnInit {
       model: {
         name: 'Test'
       }
+    });
+  }
+
+  public showPropertySearch(): void {
+    this._windowService.addWindow(SiteListComponent, {
+      title: 'Property Search'
     });
   }
 }

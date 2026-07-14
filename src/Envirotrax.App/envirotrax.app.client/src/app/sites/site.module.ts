@@ -10,7 +10,7 @@ import { EditSiteComponent } from './edit/edit-site-component';
 import { SiteCsiInspectionsComponent } from './edit/tabs/site-csi-inspections.component';
 import { SiteBackflowTestsComponent } from './edit/tabs/site-backflow-tests.component';
 import { SiteLogHistoryComponent } from './edit/tabs/log-history/site-log-history.component';
-import { SiteLogEditComponent } from './edit/tabs/log-history/site-log-edit.component';
+import { PropertyLogManagementComponent } from './reports/property-log-management/property-log-management.component';
 
 @NgModule({
     declarations: [
@@ -20,7 +20,7 @@ import { SiteLogEditComponent } from './edit/tabs/log-history/site-log-edit.comp
         SiteCsiInspectionsComponent,
         SiteBackflowTestsComponent,
         SiteLogHistoryComponent,
-        SiteLogEditComponent
+        PropertyLogManagementComponent
     ],
     imports: [
         CommonModule,

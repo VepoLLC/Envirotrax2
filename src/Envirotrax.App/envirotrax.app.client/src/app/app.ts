@@ -1,12 +1,13 @@
-﻿import { Component, signal, OnInit } from '@angular/core';
+﻿import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AuthService } from './shared/services/auth/auth.service';
 import { WaterSupplierService } from './shared/services/water-suppliers/water-supplier.service';
 import { ProfesisonalService } from './shared/services/professionals/professional.service';
 import { ThemeCookieService } from './shared/services/helpers/theme-cookie.service';
-import { createPopper, flip, preventOverflow } from '@popperjs/core';
+import { createPopper } from '@popperjs/core';
 import { FeatureType } from './shared/models/feature-type';
 import { PermissionAction, PermissionType } from './shared/models/permission-type';
 import { ROLE_DEFINITIONS } from './shared/models/role-definitions';
+import { AppContainerHelperService } from './shared/services/helpers/app-contaner-helper.service';
 
 @Component({
   selector: 'app-root',
@@ -21,14 +22,20 @@ export class App implements OnInit {
   public companyName: string = '';
   public userEmail: string = '';
   public isDarkMode: boolean = false;
+  public useContainer: boolean = false;
 
   constructor(
     private readonly _authService: AuthService,
     private readonly _waterSupplierService: WaterSupplierService,
     private readonly _professionalService: ProfesisonalService,
-    private readonly _themeCookie: ThemeCookieService
+    private readonly _themeCookie: ThemeCookieService,
+    private readonly _changeDetector: ChangeDetectorRef,
+    appContainerHelper: AppContainerHelperService
   ) {
-
+    appContainerHelper.usContainer().subscribe(value => {
+      this.useContainer = value;
+      this._changeDetector.detectChanges();
+    });
   }
 
   public async ngOnInit(): Promise<void> {
@@ -93,7 +100,7 @@ export class App implements OnInit {
       {
         title: 'Account Overview',
         iconCss: 'fa-regular fa-house',
-        routerLink: ['/dashboard'],
+        routerLink: ['/account-overview'],
         hasFeature: true,
         hasPermission: true
       },
@@ -206,15 +213,15 @@ export class App implements OnInit {
           {
             title: 'Compliance Management',
             iconCss: 'fa-solid fa-list-check',
-            routerLink: ['/'],
-            hasPermission: true,
+            routerLink: ['csi/compliance'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports),
             hasFeature: true
           },
           {
             title: 'Property Log Management',
             iconCss: 'fa-light fa-building-memo',
-            routerLink: ['/'],
-            hasPermission: true,
+            routerLink: ['sites/reports/property-log-management'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports, PermissionType.BackflowReports, PermissionType.FogReports),
             hasFeature: true
           }
         ]
@@ -242,7 +249,7 @@ export class App implements OnInit {
           {
             title: 'Out of Service Requests',
             iconCss: 'fa-regular fa-file-minus',
-            routerLink: ['/'],
+            routerLink: ['backflow', 'out-of-service'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowOutOfService),
             hasFeature: true
           },
@@ -324,8 +331,8 @@ export class App implements OnInit {
           {
             title: 'Property Log Management',
             iconCss: 'fa-light fa-building-memo',
-            routerLink: ['/'],
-            hasPermission: true,
+            routerLink: ['sites/reports/property-log-management'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports, PermissionType.BackflowReports, PermissionType.FogReports),
             hasFeature: true
           }
         ]
@@ -353,7 +360,7 @@ export class App implements OnInit {
           {
             title: 'Trip Ticket Search',
             iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['/'],
+            routerLink: ['/fog/trip-tickets'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogTripTickets),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
           },
@@ -431,8 +438,8 @@ export class App implements OnInit {
           {
             title: 'Property Log Management',
             iconCss: 'fa-light fa-building-memo',
-            routerLink: ['/'],
-            hasPermission: true,
+            routerLink: ['sites/reports/property-log-management'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports, PermissionType.BackflowReports, PermissionType.FogReports),
             hasFeature: true
           }
         ]
@@ -451,7 +458,7 @@ export class App implements OnInit {
       {
         title: 'Account Overview',
         iconCss: 'fa-regular fa-house',
-        routerLink: ['/professionals/dashboard'],
+        routerLink: ['/professionals/account-overview'],
         hasFeature: true,
         hasPermission: true
       },
@@ -588,6 +595,13 @@ export class App implements OnInit {
             iconCss: 'fa-regular fa-file-magnifying-glass',
             routerLink: ['professionals/fog/inspections'],
             hasPermission: isFogInspector,
+            hasFeature: true
+          },
+          {
+            title: 'Trip Ticket Search',
+            iconCss: 'fa-regular fa-file-magnifying-glass',
+            routerLink: ['professionals/fog/trip-tickets'],
+            hasPermission: isFogTransporter,
             hasFeature: true
           },
           {

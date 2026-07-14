@@ -2,7 +2,7 @@
     <div class="d-flex gap-1" (click)="$event.stopPropagation()">
         <button *ngIf="canViewDetails"
                 type="button"
-                class="btn btn-primary"
+                class="btn btn-primary btn-sm text-nowrap"
                 (click)="onViewDetails(rowData)"
                 aria-label="View">
             <i class="fa-solid fa-magnifying-glass"></i>
@@ -10,14 +10,14 @@
         </button>
         <button *ngIf="canEdit"
                 type="button"
-                class="btn btn-primary"
+                class="btn btn-primary btn-sm text-nowrap"
                 (click)="onEdit(rowData)"
                 aria-label="Edit">
             <i class="fa-solid fa-pencil"></i>
             <span class="ms-1" *ngIf="showActionLabels">Edit</span>
         </button>
         <button *ngIf="canDelete"
-                type="button" class="btn btn-primary"
+                type="button" class="btn btn-primary btn-sm text-nowrap"
                 (click)="onDelete(rowData)"
                 aria-label="Delete">
             <i class="fa-solid fa-trash"></i>
@@ -26,7 +26,7 @@
         <ng-container *ngIf="customActions">
             <button *ngFor="let action of customActions"
                     type="button"
-                    class="btn btn-primary"
+                    class="btn btn-primary btn-sm text-nowrap"
                     (click)="customActionClicked(action, rowData)"
                     [attr.aria-label]="action.text">
                 <i [attr.class]="action.iconClass"></i>
@@ -37,7 +37,7 @@
 </ng-template>
 
 <div>
-    <div class="align-items-center border-bottom d-md-flex flex-row-reverse pb-2 ms-2">
+    <div class="align-items-center border-bottom d-md-flex flex-row-reverse pb-2">
         <div class="d-flex justify-content-end">
             <div *ngIf="canFilterAdvanced" class="me-2">
                 <vp-sorting-filtering *ngIf="query" [(query)]="query" (queryChange)="onQueryChange($event)"
@@ -62,7 +62,7 @@
             </button>
         </div>
 
-        <div *ngIf="freeTextSearch" class="flex-fill me-md-2 mt-2 mt-md-0">
+        <div *ngIf="freeTextSearch" class="flex-fill mt-2 mt-md-0">
             <form (ngSubmit)="performSearch()">
                 <div class="input-group">
                     <input type="text" class="form-control" name="freeTextSearch" [(ngModel)]="freeTextSearch.text"

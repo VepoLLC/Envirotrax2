@@ -4,11 +4,12 @@
   "scripts": {
     "ng": "ng",
     "start": "npm run common-ui:update && run-script-os",
-    "build": "ng build",
+    "build": "npm run common-ui:update && ng build",
+    "build:test": "npm run common-ui:update && ng build --configuration test",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "prestart": "node aspnetcore-https",
-    "common-ui:update": "cd ..\\..\\Envirotrax.CommonUI && npm run build-package && cd ..\\Envirotrax.Admin\\envirotrax.admin.client && npm install ..\\..\\Envirotrax.CommonUI\\dist\\envirotrax\\common-ui\\envirotrax-common-ui-1.0.0.tgz --force",
+    "common-ui:update": "cd ../../Envirotrax.CommonUI && npm run build-package && cd ../Envirotrax.Admin/envirotrax.admin.client && npm install ../../Envirotrax.CommonUI/dist/envirotrax/common-ui/envirotrax-common-ui-1.0.0.tgz --force",
     "start:windows": "ng serve --ssl --ssl-cert \"%APPDATA%\\ASP.NET\\https\\%npm_package_name%.pem\" --ssl-key \"%APPDATA%\\ASP.NET\\https\\%npm_package_name%.key\" --host=127.0.0.1",
     "start:default": "ng serve --ssl --ssl-cert \"$HOME/.aspnet/https/${npm_package_name}.pem\" --ssl-key \"$HOME/.aspnet/https/${npm_package_name}.key\" --host=127.0.0.1"
   },

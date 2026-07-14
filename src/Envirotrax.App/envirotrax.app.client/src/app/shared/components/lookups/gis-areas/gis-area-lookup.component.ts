@@ -21,9 +21,16 @@ import { FilterPanelComponent, FilterPanelFieldComponent, InputOption, ModalHelp
     ]
 })
 export class GisAreaLookupComponent implements OnInit {
-    @Input() public fieldName: string = 'gisAreaId';
-    @Input() public label: string = 'GIS Area';
-    @Input() public form?: NgForm;
+    @Input()
+    public fieldName: string = 'gisAreaId';
+
+    @Input()
+    public label: string = 'GIS Area';
+
+    @Input()
+    public form?: NgForm;
+    @Input()
+    public labelStyle: 'horizontal' | 'vertical' = 'vertical';
 
     public readonly type: 'select' = 'select';
     public value: string = '';

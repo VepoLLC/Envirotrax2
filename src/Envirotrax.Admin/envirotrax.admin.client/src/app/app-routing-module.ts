@@ -21,6 +21,11 @@ const routes: Routes = [
     title: 'Water Suppliers',
     loadChildren: () => import('./water-suppliers/water-supplier.module').then(m => m.WaterSupplierModule)
   },
+  {
+    path: 'sites',
+    title: 'Property Search',
+    loadChildren: () => import('./sites/site.module').then(m => m.SiteModule)
+  },
 ];
 
 @NgModule({

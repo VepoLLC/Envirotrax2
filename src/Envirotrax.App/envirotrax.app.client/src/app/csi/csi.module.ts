@@ -18,9 +18,11 @@ import { EditCsiInspectorWaterSupplierComponent } from "./inspectors/details/wat
 import { AddEditCsiInspectorUserComponent } from "./inspectors/details/users/edit/add-edit-csi-inspector-user.component";
 import { ProfessionalModule } from "../professionals/professional.module";
 import { CsiSystemReportComponent } from "./reports/system/csi-system-report.component";
+import { CsiComplianceManagementComponent } from "./reports/compliance/csi-compliance-management.component";
 
 @NgModule({
     declarations: [
+        CsiComplianceManagementComponent,
         CsiInspectionListComponent,
         CsiInspectionDetailsComponent,
         DisapproveCsiInspectionComponent,

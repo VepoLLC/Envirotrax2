@@ -123,30 +123,17 @@ export class ProfessionalFogTripTicketListComponent implements OnInit {
     }
 
     private async loadLookups(): Promise<void> {
-        const [usersResult, vehiclesResult, disposalSitesResult, waterSuppliers] = await Promise.all([
-            this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, {}),
-            this._vehicleService.getAll({ pageSize: MAX_PAGE_SIZE }, {}),
-            this._disposalSiteService.getRegistered({ pageSize: MAX_PAGE_SIZE }, {}),
+        const [transporterResult, vehiclesResult, disposalSitesResult, waterSuppliers] = await Promise.all([
+            this._userService.getAllAsOptions(true, 'Any transporter', { filter: [{ columnName: 'isFogTransporter', value: 'true' }] }),
+            this._vehicleService.getAllAsOptions(true, 'Any vehicle'),
+            this._disposalSiteService.getAllRegisteredAsOptions(true, 'Any disposal site'),
             this._professionalSupplierService.getMyAsOptions()
         ]);
 
-        const mappedTransporters = usersResult.data
-            .filter(u => u.isFogTransporter)
-            .map(u => ({ id: String(u.id), text: u.contactName ?? '' }));
-        this.transporterOptions = mappedTransporters.length > 1
-            ? [{ id: '', text: 'Any transporter' }, ...mappedTransporters]
-            : mappedTransporters;
-
-        const mappedVehicles = vehiclesResult.data.map(v => ({
-            id: String(v.id),
-            text: `${v.manufacturedYear ?? ''} ${v.manufacturer ?? ''} ${v.licensePlateNumber ?? ''}`.trim()
-        }));
-        this.vehicleOptions = [{ id: '', text: 'Any vehicle' }, ...mappedVehicles];
-
-        const mappedDisposalSites = disposalSitesResult.data.map(s => ({ id: String(s.id), text: s.name ?? '' }));
-        this.disposalSiteOptions = [{ id: '', text: 'Any disposal site' }, ...mappedDisposalSites];
-
-        this.waterSupplierOptions = [...waterSuppliers];
+        this.transporterOptions = transporterResult;
+        this.vehicleOptions = vehiclesResult;
+        this.disposalSiteOptions = disposalSitesResult;
+        this.waterSupplierOptions = waterSuppliers;
     }
 
     private getColumns(): TableColumn<FogTripTicket>[] {

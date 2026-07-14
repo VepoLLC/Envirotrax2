@@ -8,6 +8,7 @@ import { ProfesisonalService } from "./professional.service";
 import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
+import { InputOption, MAX_PAGE_SIZE } from "@envirotrax/common-ui";
 
 @Injectable({
     providedIn: 'root'
@@ -53,6 +54,22 @@ export class ProfesionalUserService {
                 params: this._queryHelper.buildQuery(pageInfo, query)
             })
         );
+    }
+
+    public async getAllAsOptions(includeEmpty: boolean, emptyOptionText: string, query: Query): Promise<InputOption<ProfessionalUser>[]> {
+        const users = await this.getAll({ pageSize: MAX_PAGE_SIZE }, query);
+
+        const options: InputOption<ProfessionalUser>[] = users.data.map(u => ({
+            id: u.id,
+            text: u.contactName ?? '',
+            data: u
+        }));
+
+        if (includeEmpty) {
+            options.splice(0, 0, { id: '', text: emptyOptionText ?? '' });
+        }
+
+        return options;
     }
 
     public get(id: number): Promise<ProfessionalUser> {

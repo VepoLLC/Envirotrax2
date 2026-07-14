@@ -45,7 +45,7 @@
                                                    label="Receiver contact name"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
-                        </div>                      
+                        </div>
 
                     </div>
                     <div class="col-md-6">
@@ -60,13 +60,13 @@
                                                    [form]="searchForm" />
                         </div>
                         @if (selectedDateType) {
-                        <div class="mb-2">
-                            <vp-filter-panel-field fieldName="dateRange"
-                                                   label="Date range"
-                                                   labelStyle="horizontal"
-                                                   type="daterange"
-                                                   [form]="searchForm" />
-                        </div>
+                            <div class="mb-2">
+                                <vp-filter-panel-field fieldName="dateRange"
+                                                       label="Date range"
+                                                       labelStyle="horizontal"
+                                                       type="daterange"
+                                                       [form]="searchForm" />
+                            </div>
                         }
 
                         <div class="mb-2">
@@ -114,56 +114,56 @@
 
             <!-- Generator Criteria -->
             <div class="row mt-3">
-                    <vp-section header="Generator Criteria">
-                        <div>
-                            <div class="mb-2">
-                                <vp-filter-panel-field fieldName="propertyType"
-                                                       label="Property type"
-                                                       labelStyle="horizontal"
-                                                       type="select"
-                                                       [options]="propertyTypeOptions"
-                                                       [form]="searchForm" />
-                            </div>
-                            <div class="mb-2">
-                                <vp-filter-panel-field fieldName="propertyBusinessName"
-                                                       label="Business name"
-                                                       labelStyle="horizontal"
-                                                       [form]="searchForm" />
-                            </div>
+                <vp-section header="Generator Criteria">
+                    <div>
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="propertyType"
+                                                   label="Property type"
+                                                   labelStyle="horizontal"
+                                                   type="select"
+                                                   [options]="propertyTypeOptions"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="propertyBusinessName"
+                                                   label="Business name"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm" />
+                        </div>
 
-                            <div class="row">
-                                <div class="col-xl-5 d-flex align-items-center">
-                                    <div class="text-xl-end w-100">
-                                        Address
-                                    </div>
-                                </div>
-                                <div class="col-xl d-xl-flex gap-1">
-                                    <div class="mb-2 ms-auto">
-                                        <vp-filter-panel-field fieldName="propertyStreetNumber"
-                                                               label="Street #"
-                                                               [form]="searchForm" />
-                                    </div>
-                                    <div class="mb-2">
-                                        <vp-filter-panel-field fieldName="propertyStreetName"
-                                                               label="Street name"
-                                                               [form]="searchForm" />
-                                    </div>
-                                    <div class="mb-2">
-                                        <vp-filter-panel-field fieldName="propertyNumber"
-                                                               label="Suite/Apt #"
-                                                               [form]="searchForm" />
-                                    </div>
+                        <div class="row">
+                            <div class="col-xl-5 d-flex align-items-center">
+                                <div class="text-xl-end w-100">
+                                    Address
                                 </div>
                             </div>
-
-                            <div>
-                                <vp-filter-panel-field fieldName="propertyZip"
-                                                       label="ZIP"
-                                                       labelStyle="horizontal"
-                                                       [form]="searchForm" />
+                            <div class="col-xl d-xl-flex gap-1">
+                                <div class="mb-2 flex-fill">
+                                    <vp-filter-panel-field fieldName="propertyStreetNumber"
+                                                           label="Street #"
+                                                           [form]="searchForm" />
+                                </div>
+                                <div class="mb-2 flex-fill">
+                                    <vp-filter-panel-field fieldName="propertyStreetName"
+                                                           label="Street name"
+                                                           [form]="searchForm" />
+                                </div>
+                                <div class="mb-2 flex-fill">
+                                    <vp-filter-panel-field fieldName="propertyNumber"
+                                                           label="Suite/Apt #"
+                                                           [form]="searchForm" />
+                                </div>
                             </div>
                         </div>
-                    </vp-section>
+
+                        <div>
+                            <vp-filter-panel-field fieldName="propertyZip"
+                                                   label="ZIP"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm" />
+                        </div>
+                    </div>
+                </vp-section>
             </div>
 
         </vp-filter-panel>
@@ -180,34 +180,35 @@
 </div>
 
 @if (table.isLoading) {
-<dp-loading-spinner></dp-loading-spinner>
+    <dp-loading-spinner></dp-loading-spinner>
 }
 
 <!-- Cell Templates -->
 <ng-template #iconsCell let-ticket="rowData">
     <div class="d-flex gap-1 align-items-center flex-wrap">
         @if (ticket.pickupCompleted && !ticket.completed) {
-        <vp-status-icon imageSrc="/images/icons/bstatus-green-half.png" text="Completed Pickup" [showText]="false" />
+            <vp-status-icon imageSrc="/images/icons/bstatus-green-half.png" text="Completed Pickup"
+                            [showText]="false" />
         }
         @if (ticket.completed) {
-        <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Completed Ticket" [showText]="false" />
+            <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Completed Ticket" [showText]="false" />
         }
         @if (ticket.transactionId) {
-        <vp-status-icon imageSrc="/images/icons/bstatus-orange-on.png" text="Paid" [showText]="false" />
+            <vp-status-icon imageSrc="/images/icons/bstatus-orange-on.png" text="Paid" [showText]="false" />
         } @else {
-        <vp-status-icon imageSrc="/images/icons/bstatus-orange-off.png" text="Unpaid" [showText]="false" />
+            <vp-status-icon imageSrc="/images/icons/bstatus-orange-off.png" text="Unpaid" [showText]="false" />
         }
         @if (ticket.approvalDate && !ticket.disapproved) {
-        <vp-status-icon imageSrc="/images/icons/bstatus-cyan-on.png" text="Approved" [showText]="false" />
+            <vp-status-icon imageSrc="/images/icons/bstatus-cyan-on.png" text="Approved" [showText]="false" />
         }
         @if (ticket.disapproved) {
-        <vp-status-icon imageSrc="/images/icons/bstatus-cyan-off.png" text="Disapproved" [showText]="false" />
+            <vp-status-icon imageSrc="/images/icons/bstatus-cyan-off.png" text="Disapproved" [showText]="false" />
         }
         @if (ticket.propertyType === PropertyType.Residential) {
-        <vp-status-icon iconClass="fa-solid fa-house text-primary" text="Residential" [showText]="false" />
+            <vp-status-icon iconClass="fa-solid fa-house text-primary" text="Residential" [showText]="false" />
         }
         @if (ticket.propertyType === PropertyType.Commercial) {
-        <vp-status-icon iconClass="fa-solid fa-building text-danger" text="Commercial" [showText]="false" />
+            <vp-status-icon iconClass="fa-solid fa-building text-danger" text="Commercial" [showText]="false" />
         }
     </div>
 </ng-template>
@@ -224,10 +225,10 @@
 <ng-template #generatorCell let-ticket="rowData">
     <div>
         @if (ticket.propertyType === PropertyType.Residential) {
-        <i class="fas fa-home me-1" style="font-size: 1rem; color: blue"></i>
+            <i class="fas fa-home me-1" style="font-size: 1rem; color: blue"></i>
         }
         @if (ticket.propertyType === PropertyType.Commercial) {
-        <i class="fas fa-building me-1" style="font-size: 1rem; color: red"></i>
+            <i class="fas fa-building me-1" style="font-size: 1rem; color: red"></i>
         }
         <a [routerLink]="['/sites', ticket.site?.id, 'edit']">{{ticket.propertyBusinessName}}</a>
     </div>
@@ -239,10 +240,12 @@
     <div>{{ticket.receiverCompanyName}}</div>
     <div>{{ticket.receiverAddress}}</div>
     @if (ticket.receiverCity || ticket.receiverState || ticket.receiverZip) {
-    <div>{{ticket.receiverCity}}@if (ticket.receiverCity && ticket.receiverState) {, }{{ticket.receiverState}} {{ticket.receiverZip}}</div>
+        <div>{{ticket.receiverCity}}@if (ticket.receiverCity && ticket.receiverState) {, }{{ticket.receiverState}}
+            {{ticket.receiverZip}}
+        </div>
     }
     @if (ticket.receiverRegistrationNumber) {
-    <div>Registration #: {{ticket.receiverRegistrationNumber}}</div>
+        <div>Registration #: {{ticket.receiverRegistrationNumber}}</div>
     }
 </ng-template>
 
@@ -253,65 +256,65 @@
 </ng-template>
 
 @if (showResults) {
-<div>
-    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-        <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
-                >
-            <i class="fa-regular fa-file-export me-1"></i>
-            Export Results
-        </button>
-        <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
-            (click)="viewPrintableTable()"   >
-            <i class="fa-regular fa-table me-1"></i>
-            View Printable Table
-        </button>
-        <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
-                (click)="showResults = false;">
-            <i class="fa-solid fa-magnifying-glass me-1"></i>
-            Search Again
-        </button>
-    </div>
+    <div>
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0">
+                <i class="fa-regular fa-file-export me-1"></i>
+                Export Results
+            </button>
+            <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
+                    (click)="viewPrintableTable()">
+                <i class="fa-regular fa-table me-1"></i>
+                View Printable Table
+            </button>
+            <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
+                    (click)="showResults = false;">
+                <i class="fa-solid fa-magnifying-glass me-1"></i>
+                Search Again
+            </button>
+        </div>
 
-    <vp-section header="Trip Ticket Matching the Search Filter — {{table.items?.pageInfo?.totalItems || 0}} Results">
-        <div class="container mb-3" #printableSection>
-            <div class="row gap-2 justify-content-center mb-3">
-                <div class="col-auto mb-2">
-                    <vp-status-icon imageSrc="/images/icons/bstatus-green-half.png" text="Completed Pickup" />
-                    <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Completed Ticket" />
-                </div>
-                <div class="col-auto mb-2">
-                    <vp-status-icon imageSrc="/images/icons/bstatus-orange-on.png" text="Paid" />
-                    <vp-status-icon imageSrc="/images/icons/bstatus-orange-off.png" text="Unpaid" />
-                </div>
-                <div class="col-auto mb-2">
-                    <vp-status-icon imageSrc="/images/icons/bstatus-cyan-on.png" text="Approved" />
-                    <vp-status-icon imageSrc="/images/icons/bstatus-cyan-off.png" text="Disapproved" />
-                </div>
-                <div class="col-auto mb-2">
-                    <vp-status-icon iconClass="fa-solid fa-house text-primary" text="Residential" />
-                    <vp-status-icon iconClass="fa-solid fa-building text-danger" text="Commercial" />
+        <vp-section
+                    header="Trip Ticket Matching the Search Filter — {{table.items?.pageInfo?.totalItems || 0}} Results">
+            <div class="container mb-3" #printableSection>
+                <div class="row gap-2 justify-content-center mb-3">
+                    <div class="col-auto mb-2">
+                        <vp-status-icon imageSrc="/images/icons/bstatus-green-half.png" text="Completed Pickup" />
+                        <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Completed Ticket" />
+                    </div>
+                    <div class="col-auto mb-2">
+                        <vp-status-icon imageSrc="/images/icons/bstatus-orange-on.png" text="Paid" />
+                        <vp-status-icon imageSrc="/images/icons/bstatus-orange-off.png" text="Unpaid" />
+                    </div>
+                    <div class="col-auto mb-2">
+                        <vp-status-icon imageSrc="/images/icons/bstatus-cyan-on.png" text="Approved" />
+                        <vp-status-icon imageSrc="/images/icons/bstatus-cyan-off.png" text="Disapproved" />
+                    </div>
+                    <div class="col-auto mb-2">
+                        <vp-status-icon iconClass="fa-solid fa-house text-primary" text="Residential" />
+                        <vp-status-icon iconClass="fa-solid fa-building text-danger" text="Commercial" />
+                    </div>
                 </div>
             </div>
-        </div>
 
-        @if (table.items && table.items.data && table.items.data.length > 0) {
-        <vp-table [columns]="table.columns!"
-                  [data]="table.items.data"
-                  [(pageInfo)]="table.items.pageInfo"
-                  (pageInfoChange)="getTripTickets()"
-                  [(query)]="table.query"
-                  (queryChange)="getTripTickets()"
-                  (queryReset)="getTripTickets()"
-                  [canViewDetails]="true"
-                  (viewDetails)="viewDetails($event)"
-                  [freeTextSearch]="table.freeTextSearch" />
-        }
+            @if (table.items && table.items.data && table.items.data.length > 0) {
+                <vp-table [columns]="table.columns!"
+                          [data]="table.items.data"
+                          [(pageInfo)]="table.items.pageInfo"
+                          (pageInfoChange)="getTripTickets()"
+                          [(query)]="table.query"
+                          (queryChange)="getTripTickets()"
+                          (queryReset)="getTripTickets()"
+                          [canViewDetails]="true"
+                          (viewDetails)="viewDetails($event)"
+                          [freeTextSearch]="table.freeTextSearch" />
+            }
 
-        @if (table.items?.data?.length === 0) {
-        <div class="text-center py-3 text-muted">
-            No records found matching the search criteria.
-        </div>
-        }
-    </vp-section>
-</div>
+            @if (table.items?.data?.length === 0) {
+                <div class="text-center py-3 text-muted">
+                    No records found matching the search criteria.
+                </div>
+            }
+        </vp-section>
+    </div>
 }

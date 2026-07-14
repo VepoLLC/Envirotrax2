@@ -39,6 +39,13 @@ export class SiteLogService {
         return lastValueFrom(this._http.delete<void>(url));
     }
 
+    public async getAttachmentUrl(siteId: number, logId: number): Promise<string | null> {
+        const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}/logs/${logId}/attachment`);
+        const result = await lastValueFrom(this._http.get<{ url: string | null }>(url));
+
+        return result.url;
+    }
+
     private buildFormData(siteId: number, log: SiteLog, file: File | null): FormData {
         const formData = new FormData();
         formData.append('logType', (log.logType ?? SiteLogType.Note).toString());

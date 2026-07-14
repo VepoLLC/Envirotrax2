@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers.Sites;
 
-[Route("api/sites/property-log-management")]
+[Route("api/sites/logs")]
 [PermissionResource(PermissionType.CsiReports, PermissionType.BackflowReports, PermissionType.FogReports)]
 public class PropertyLogManagementController : WaterSupplierProtectedController
 {

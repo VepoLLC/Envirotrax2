@@ -1,13 +1,9 @@
 <h1 class="text-center h2">Property Log Management</h1>
 
-<ng-template #numberTemplate let-data="rowData">
-    {{ data.rowNumber }}
-</ng-template>
-
 <ng-template #propertyTemplate let-data="rowData">
     <div class="d-flex gap-2 align-items-center">
         <i class="fa-solid fs-5"
-           [ngClass]="data.site?.propertyType == 0 ? 'fa-home text-primary' : 'fa-building text-danger'">
+           [ngClass]="data.site?.propertyType === PropertyType.Residential ? 'fa-home text-primary' : 'fa-building text-danger'">
         </i>
 
         <a [routerLink]="['/sites', data.site?.id, 'edit']" target="_blank">
@@ -37,10 +33,6 @@
     </div>
 </ng-template>
 
-<ng-template #accountNumberTemplate let-data="rowData">
-    {{ data.site?.accountNumber }}
-</ng-template>
-
 <ng-template #logTemplate let-data="rowData">
     <div>
         <i class="fa-regular"
@@ -57,10 +49,13 @@
             <a class="ms-1" [routerLink]="['/backflow/tests', data.assemblyId, 'view']" target="_blank">Tagged Assembly</a>
         </p>
 
-        <p class="mb-0 mt-1 ps-3" *ngIf="data.url">
-            <a [href]="data.url" target="_blank">
+        <p class="mb-0 mt-1 ps-3" *ngIf="data.fileAttachmentName">
+            <a *ngIf="!data.skipFile" href="javascript:void(0)" (click)="openAttachment(data)">
                 <i class="fa-solid fa-paperclip me-1"></i>{{ data.fileAttachmentName }}
             </a>
+            <span *ngIf="data.skipFile">
+                <i class="fa-solid fa-paperclip me-1"></i>{{ data.fileAttachmentName }}
+            </span>
         </p>
     </div>
 </ng-template>

@@ -8,10 +8,12 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
+using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 using Envirotrax.Common.Domain.Services.Defintions;
 
@@ -32,6 +34,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     private readonly IFileStorageService _fileStorageService;
     private readonly IAuthService _authService;
     private readonly IPdfTemplateService _pdfTemplateService;
+    private readonly ISiteService _siteService;
     private readonly ISiteRepository _siteRepository;
     private readonly IBackflowRenewalRequirementService _renewalRequirementService;
     private readonly ILogger<BackflowTestService> _logger;
@@ -44,6 +47,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         IFileStorageService fileStorageService,
         IAuthService authService,
         IPdfTemplateService pdfTemplateService,
+        ISiteService siteService,
         ISiteRepository siteRepository,
         IBackflowRenewalRequirementService renewalRequirementService,
         ILogger<BackflowTestService> logger)
@@ -55,6 +59,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         _fileStorageService = fileStorageService;
         _authService = authService;
         _pdfTemplateService = pdfTemplateService;
+        _siteService = siteService;
         _siteRepository = siteRepository;
         _renewalRequirementService = renewalRequirementService;
         _logger = logger;
@@ -89,6 +94,44 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         }
     }
 
+    // TestDate is the derived "overall test date" (mirrors V1's submit behavior): air-gap tests store
+    // their date in InitialTestDate; otherwise the final (after-repairs) date wins over the initial one.
+    private static void DeriveTestDate(BackflowTestDto dto)
+    {
+        if (dto.DeviceType == nameof(BackflowDeviceType.AG))
+        {
+            dto.TestDate = dto.InitialTestDate;
+        }
+        else
+        {
+            dto.TestDate = dto.FinalTestDate ?? dto.InitialTestDate;
+        }
+    }
+
+    private static void ApplySiteSnapshot(BackflowTestDto dto, SiteDto site)
+    {
+        dto.AccountNumber = site.AccountNumber;
+        dto.PropertyBusinessName = site.BusinessName;
+        dto.PropertyType = (int)site.PropertyType;
+        dto.PropertyStreetNumber = site.StreetNumber;
+        dto.PropertyStreetName = site.StreetName;
+        dto.PropertyNumber = site.PropertyNumber;
+        dto.PropertyCity = site.City;
+        dto.PropertyState = site.State;
+        dto.PropertyZip = site.ZipCode;
+
+        dto.MailingCompanyName = site.MailingCompanyName;
+        dto.MailingContactName = site.MailingContactName;
+        dto.MailingStreetNumber = site.MailingStreetNumber;
+        dto.MailingStreetName = site.MailingStreetName;
+        dto.MailingNumber = site.MailingNumber;
+        dto.MailingCity = site.MailingCity;
+        dto.MailingState = site.MailingState;
+        dto.MailingZip = site.MailingZipCode;
+        dto.MailingPhoneNumber = site.MailingPhoneNumber;
+        dto.MailingEmailAddress = site.MailingEmailAddress;
+    }
+
     public async Task<BackflowTestDto> SubmitWithImagesAsync(
         BackflowTestDto dto,
         Stream? assemblyStream, string? assemblyFileName,
@@ -102,6 +145,17 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         dto.Professional = new ReferencedProfessionalDto { Id = professionalId };
 
         await PopulateBpatSnapshotAsync(dto);
+        DeriveTestDate(dto);
+
+        if (dto.Site?.Id != null)
+        {
+            var site = await _siteService.GetAsync(dto.Site.Id.Value, cancellationToken);
+
+            if (site != null)
+            {
+                ApplySiteSnapshot(dto, site);
+            }
+        }
 
         // Set paths before AddAsync to avoid a second EF update (double-tracking conflict)
         if (assemblyStream != null && assemblyFileName != null)

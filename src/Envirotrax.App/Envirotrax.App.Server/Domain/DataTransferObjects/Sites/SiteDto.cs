@@ -181,6 +181,12 @@ public class ReferencedSiteDto
 
     public FacilityType FacilityType { get; set; }
 
+    // Site renewal-requirement flags — exposed so Backflow reports (Tab 2 View drill-down) can filter
+    // tests by their site's OSSF / auxiliary water supply, matching the compliance-report row filters.
+    public bool HasOnSiteSewageFacility { get; set; }
+
+    public bool HasAuxWaterSupply { get; set; }
+
     public double? GisLatitude { get; set; }
 
     public double? GisLongitude { get; set; }

@@ -287,28 +287,28 @@ export class App implements OnInit {
           {
             title: 'Backflow Report',
             iconCss: 'fa-regular fa-chart-simple-horizontal',
-            routerLink: ['/'],
+            routerLink: ['backflow/reports', 'test-reports'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
             hasFeature: true
           },
           {
             title: 'Current Compliance Report',
             iconCss: 'fa-regular fa-chart-pie-simple',
-            routerLink: ['/'],
+            routerLink: ['backflow/reports', 'current-compliance'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
             hasFeature: true
           },
           {
             title: 'Compliance History Report',
             iconCss: 'fa-solid fa-chart-line-up',
-            routerLink: ['/'],
+            routerLink: ['backflow/reports', 'compliance-history'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
             hasFeature: true
           },
           {
             title: 'New/Removed Assemblies Report',
             iconCss: 'fa-solid fa-chart-column',
-            routerLink: ['/'],
+            routerLink: ['backflow/reports', 'new-removed'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
             hasFeature: true
           },

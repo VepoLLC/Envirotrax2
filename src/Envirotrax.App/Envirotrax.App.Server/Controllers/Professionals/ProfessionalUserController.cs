@@ -1,4 +1,5 @@
 
+using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.Common;
@@ -9,7 +10,6 @@ namespace Envirotrax.App.Server.Controllers.Professionals;
 
 
 [Route("api/professionals/users")]
-[Authorize(Roles = RoleDefinitions.Professionals.Admin)]
 public class ProfessionalUserContoller : ProfessionalCrudController<ProfessionalUserDto>
 {
     private readonly IProfessionalUserService _userService;
@@ -20,7 +20,49 @@ public class ProfessionalUserContoller : ProfessionalCrudController<Professional
         _userService = userService;
     }
 
+    [HttpGet]
+    public override Task<IActionResult> GetAllAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
+    {
+        return base.GetAllAsync(pageInfo, query, cancellationToken);
+    }
+
+    [HttpGet("{id}")]
+    [Authorize(Roles = RoleDefinitions.Professionals.Admin)]
+    public override Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
+    {
+        return base.GetAsync(id, cancellationToken);
+    }
+
+    [HttpPost]
+    [Authorize(Roles = RoleDefinitions.Professionals.Admin)]
+    public override Task<IActionResult> AddAsync(ProfessionalUserDto dto)
+    {
+        return base.AddAsync(dto);
+    }
+
+    [HttpPut("{id}")]
+    [Authorize(Roles = RoleDefinitions.Professionals.Admin)]
+    public override Task<IActionResult> UpdateAsync(int id, ProfessionalUserDto dto)
+    {
+        return base.UpdateAsync(id, dto);
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = RoleDefinitions.Professionals.Admin)]
+    public override Task<IActionResult> DeleteAsync(int id)
+    {
+        return base.DeleteAsync(id);
+    }
+
+    [HttpDelete("{id}/reactivate")]
+    [Authorize(Roles = RoleDefinitions.Professionals.Admin)]
+    public override Task<IActionResult> ReactivateAsync(int id)
+    {
+        return base.ReactivateAsync(id);
+    }
+
     [HttpPost("{id}/invitations")]
+    [Authorize(Roles = RoleDefinitions.Professionals.Admin)]
     public async Task<IActionResult> ResendInvitationAsync(int id, CancellationToken cancellationToken)
     {
         var result = await _userService.ResendInvitationAsync(id, cancellationToken);

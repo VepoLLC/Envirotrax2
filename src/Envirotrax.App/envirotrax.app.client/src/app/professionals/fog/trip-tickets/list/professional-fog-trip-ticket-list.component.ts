@@ -5,6 +5,7 @@ import { FogTripTicketService } from '../../../../shared/services/fog/fog-trip-t
 import { ProfessionalFogVehicleService } from '../../../../shared/services/fog/professional-fog-vehicle.service';
 import { ProfessionalFogDisposalSiteService } from '../../../../shared/services/fog/professional-fog-disposal-site.service';
 import { ProfessionalSupplierService } from '../../../../shared/services/professionals/professional-supplier.service';
+import { ProfesionalUserService } from '../../../../shared/services/professionals/professional-user.service';
 import { QueryProperty } from '../../../../shared/models/query';
 import { TableViewModel } from '../../../../shared/models/table-view-model';
 import { FogTripTicket } from '../../../../shared/models/fog/fog-trip-ticket';
@@ -109,6 +110,7 @@ export class ProfessionalFogTripTicketListComponent implements OnInit {
         private readonly _vehicleService: ProfessionalFogVehicleService,
         private readonly _disposalSiteService: ProfessionalFogDisposalSiteService,
         private readonly _professionalSupplierService: ProfessionalSupplierService,
+        private readonly _userService: ProfesionalUserService,
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
         private readonly _containerHelper: AppContainerHelperService,
@@ -121,28 +123,17 @@ export class ProfessionalFogTripTicketListComponent implements OnInit {
     }
 
     private async loadLookups(): Promise<void> {
-        const [transporters, vehiclesResult, disposalSitesResult, waterSuppliers] = await Promise.all([
-            this._fogTripTicketService.getProfessionalTransporters(),
-            this._vehicleService.getAll({ pageSize: MAX_PAGE_SIZE }, {}),
-            this._disposalSiteService.getRegistered({ pageSize: MAX_PAGE_SIZE }, {}),
+        const [transporterResult, vehiclesResult, disposalSitesResult, waterSuppliers] = await Promise.all([
+            this._userService.getAllAsOptions(true, 'Any transporter', { filter: [{ columnName: 'isFogTransporter', value: 'true' }] }),
+            this._vehicleService.getAllAsOptions(true, 'Any vehicle'),
+            this._disposalSiteService.getAllRegisteredAsOptions(true, 'Any disposal site'),
             this._professionalSupplierService.getMyAsOptions()
         ]);
 
-        const mappedTransporters = transporters.map(t => ({ id: String(t.id), text: t.contactName ?? '' }));
-        this.transporterOptions = mappedTransporters.length > 1
-            ? [{ id: '', text: 'Any transporter' }, ...mappedTransporters]
-            : mappedTransporters;
-
-        const mappedVehicles = vehiclesResult.data.map(v => ({
-            id: String(v.id),
-            text: `${v.manufacturedYear ?? ''} ${v.manufacturer ?? ''} ${v.licensePlateNumber ?? ''}`.trim()
-        }));
-        this.vehicleOptions = [{ id: '', text: 'Any vehicle' }, ...mappedVehicles];
-
-        const mappedDisposalSites = disposalSitesResult.data.map(s => ({ id: String(s.id), text: s.name ?? '' }));
-        this.disposalSiteOptions = [{ id: '', text: 'Any disposal site' }, ...mappedDisposalSites];
-
-        this.waterSupplierOptions = [...waterSuppliers];
+        this.transporterOptions = transporterResult;
+        this.vehicleOptions = vehiclesResult;
+        this.disposalSiteOptions = disposalSitesResult;
+        this.waterSupplierOptions = waterSuppliers;
     }
 
     private getColumns(): TableColumn<FogTripTicket>[] {

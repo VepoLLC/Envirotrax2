@@ -5,15 +5,37 @@ import { TableViewModel } from "../../../shared/models/table-view-model";
 import { PropertyLog } from "../../../shared/models/sites/property-log";
 import { SiteLogType } from "../../../shared/models/sites/site-log-type.enum";
 import { SiteLogReviewDateStatus } from "../../../shared/models/sites/site-log-review-date-status.enum";
+import { PropertyType } from "../../../shared/enums/property-type.enum";
 import { ComparisonOperator, Query, QueryProperty } from "../../../shared/models/query";
 import { WaterSupplierUser } from "../../../shared/models/users/water-supplier-user";
 import { PropertyLogService } from "../../../shared/services/sites/property-log.service";
+import { SiteLogService } from "../../../shared/services/sites/site-log.service";
 import { UserService } from "../../../shared/services/water-suppliers/user.service";
 import { DownloadService } from "../../../shared/services/download.service";
 import { PrintableTableService } from "../../../shared/services/printable-table.service";
 import { DownloadColumn, DownloadConfig } from "../../../shared/models/download-config";
 import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
+
+const EXPIRING_WINDOW_DAYS = 30;
+
+export enum PropertyLogFilterType {
+    AnyLogType = 0,
+    ExpiredReviews = 1,
+    ExpiringReviews = 2
+}
+
+export enum PropertyLogSortOrder {
+    DateDescending = 0,
+    DateAscending = 1
+}
+
+export enum PropertyLogUserAccountType {
+    LogCreator = 0,
+    CsiComplianceAssignment = 1,
+    BackflowComplianceAssignment = 2,
+    FogComplianceAssignment = 3
+}
 
 type PropertyLogRow = PropertyLog & {
     rowNumber?: number;
@@ -24,17 +46,11 @@ type PropertyLogRow = PropertyLog & {
     templateUrl: './property-log-management.component.html'
 })
 export class PropertyLogManagementComponent implements OnInit {
-    @ViewChild('numberTemplate', { static: true })
-    public numberTemplate!: TemplateRef<CellTemplateData<PropertyLog>>;
-
     @ViewChild('propertyTemplate', { static: true })
     public propertyTemplate!: TemplateRef<CellTemplateData<PropertyLog>>;
 
     @ViewChild('mailingTemplate', { static: true })
     public mailingTemplate!: TemplateRef<CellTemplateData<PropertyLog>>;
-
-    @ViewChild('accountNumberTemplate', { static: true })
-    public accountNumberTemplate!: TemplateRef<CellTemplateData<PropertyLog>>;
 
     @ViewChild('logTemplate', { static: true })
     public logTemplate!: TemplateRef<CellTemplateData<PropertyLog>>;
@@ -49,6 +65,7 @@ export class PropertyLogManagementComponent implements OnInit {
     private _printableSection!: ElementRef;
 
     public readonly SiteLogType = SiteLogType;
+    public readonly PropertyType = PropertyType;
 
     public readonly reviewDateStatusClasses: { [key: number]: string } = {
         [SiteLogReviewDateStatus.None]: '',
@@ -58,10 +75,10 @@ export class PropertyLogManagementComponent implements OnInit {
         [SiteLogReviewDateStatus.Completed]: 'bg-secondary'
     };
 
-    public logType: string = '0';
-    public sortBy: string = '0';
+    public logType: string = String(PropertyLogFilterType.AnyLogType);
+    public sortBy: string = String(PropertyLogSortOrder.DateDescending);
     public showMailing: boolean = false;
-    public userAccountType: string = '0';
+    public userAccountType: string = String(PropertyLogUserAccountType.LogCreator);
     public accountId: string = '';
     public accountNumber: string = '';
     public propertyStreet: string = '';
@@ -69,29 +86,29 @@ export class PropertyLogManagementComponent implements OnInit {
     public resultsHeaderPrefix: string = 'Property Logs';
 
     public logTypeOptions: InputOption[] = [
-        { id: '0', text: 'Any log type' },
-        { id: '1', text: 'Expired reviews' },
-        { id: '2', text: 'Expiring reviews' }
+        { id: String(PropertyLogFilterType.AnyLogType), text: 'Any log type' },
+        { id: String(PropertyLogFilterType.ExpiredReviews), text: 'Expired reviews' },
+        { id: String(PropertyLogFilterType.ExpiringReviews), text: 'Expiring reviews' }
     ];
 
     public sortOptions: InputOption[] = [
-        { id: '0', text: 'Date Descending' },
-        { id: '1', text: 'Date Ascending' }
+        { id: String(PropertyLogSortOrder.DateDescending), text: 'Date Descending' },
+        { id: String(PropertyLogSortOrder.DateAscending), text: 'Date Ascending' }
     ];
 
     public userAccountTypeOptions: InputOption[] = [
-        { id: '0', text: 'Log creator' },
-        { id: '1', text: 'CSI compliance assignment' },
-        { id: '2', text: 'Backflow compliance assignment' },
-        { id: '3', text: 'FOG compliance assignment' }
+        { id: String(PropertyLogUserAccountType.LogCreator), text: 'Log creator' },
+        { id: String(PropertyLogUserAccountType.CsiComplianceAssignment), text: 'CSI compliance assignment' },
+        { id: String(PropertyLogUserAccountType.BackflowComplianceAssignment), text: 'Backflow compliance assignment' },
+        { id: String(PropertyLogUserAccountType.FogComplianceAssignment), text: 'FOG compliance assignment' }
     ];
 
     public accountOptions: InputOption[] = [{ id: '', text: 'Any account' }];
 
     public propertyTypes: InputOption[] = [
         { id: '', text: 'Any property type' },
-        { id: '0', text: 'Residential' },
-        { id: '1', text: 'Commercial' }
+        { id: String(PropertyType.Residential), text: 'Residential' },
+        { id: String(PropertyType.Commercial), text: 'Commercial' }
     ];
 
     public table: TableViewModel<PropertyLog> = {
@@ -105,6 +122,7 @@ export class PropertyLogManagementComponent implements OnInit {
 
     constructor(
         private readonly _propertyLogService: PropertyLogService,
+        private readonly _siteLogService: SiteLogService,
         private readonly _userService: UserService,
         private readonly _downloadService: DownloadService,
         private readonly _printService: PrintableTableService,
@@ -180,6 +198,18 @@ export class PropertyLogManagementComponent implements OnInit {
         }
     }
 
+    public async openAttachment(log: PropertyLog): Promise<void> {
+        if (log.site?.id == null || log.id == null) {
+            return;
+        }
+
+        const url = await this._siteLogService.getAttachmentUrl(log.site.id, log.id);
+
+        if (url) {
+            window.open(url, '_blank');
+        }
+    }
+
     private async loadUsers(): Promise<void> {
         const users = await this._userService.getAll(
             { pageSize: MAX_PAGE_SIZE },
@@ -188,17 +218,20 @@ export class PropertyLogManagementComponent implements OnInit {
 
         const accounts = (users.data ?? []).filter((user: WaterSupplierUser) => user.id != null);
 
-        this.accountOptions.push(...accounts.map((user: WaterSupplierUser) => ({
-            id: String(user.id),
-            text: user.contactName ?? user.emailAddress ?? String(user.id)
-        })));
+        this.accountOptions = [
+            { id: '', text: 'Any account' },
+            ...accounts.map((user: WaterSupplierUser) => ({
+                id: String(user.id),
+                text: user.contactName ?? user.emailAddress ?? String(user.id)
+            }))
+        ];
     }
 
     private getColumns(): TableColumn<PropertyLog>[] {
         const columns: TableColumn<PropertyLog>[] = [
-            this.templateColumn('', this.numberTemplate),
+            { field: 'rowNumber', caption: '', type: ColumnType.number, queryColumnExcluded: true, rowCssClass: 'align-top' },
             this.templateColumn('Property Information', this.propertyTemplate),
-            this.templateColumn('Account Number', this.accountNumberTemplate),
+            { field: 'site.accountNumber', caption: 'Account Number', type: ColumnType.text, queryColumnExcluded: true, rowCssClass: 'align-top' },
             this.templateColumn('Property Log', this.logTemplate),
             this.templateColumn('', this.reviewDateTemplate),
             this.templateColumn('', this.viewSiteTemplate)
@@ -235,18 +268,18 @@ export class PropertyLogManagementComponent implements OnInit {
     }
 
     private buildSort(): { [key: string]: 'Asc' | 'Desc' } {
-        const direction: 'Asc' | 'Desc' = this.sortBy === '0' ? 'Desc' : 'Asc';
-        const field = this.logType === '0' ? 'createdTime' : 'reviewDate';
+        const direction: 'Asc' | 'Desc' = this.sortBy === String(PropertyLogSortOrder.DateDescending) ? 'Desc' : 'Asc';
+        const field = this.logType === String(PropertyLogFilterType.AnyLogType) ? 'createdTime' : 'reviewDate';
 
         return { [field]: direction };
     }
 
     private buildResultsHeaderPrefix(): string {
-        if (this.logType === '1') {
+        if (this.logType === String(PropertyLogFilterType.ExpiredReviews)) {
             return 'Expired Property Logs';
         }
 
-        if (this.logType === '2') {
+        if (this.logType === String(PropertyLogFilterType.ExpiringReviews)) {
             return 'Expiring Property Logs';
         }
 
@@ -254,19 +287,19 @@ export class PropertyLogManagementComponent implements OnInit {
     }
 
     private buildLogTypeFilter(): QueryProperty[] {
-        if (this.logType === '1') {
+        if (this.logType === String(PropertyLogFilterType.ExpiredReviews)) {
             return [
                 this.eqFilter('logType', String(SiteLogType.Reminder)),
                 this.rangeFilter('reviewDate', [{ value: this.nowIso(), op: 'Lt' }])
             ];
         }
 
-        if (this.logType === '2') {
+        if (this.logType === String(PropertyLogFilterType.ExpiringReviews)) {
             return [
                 this.eqFilter('logType', String(SiteLogType.Reminder)),
                 this.rangeFilter('reviewDate', [
                     { value: this.nowIso(), op: 'Gte' },
-                    { value: this.plusDaysIso(30), op: 'Lte' }
+                    { value: this.plusDaysIso(EXPIRING_WINDOW_DAYS), op: 'Lte' }
                 ])
             ];
         }
@@ -283,16 +316,19 @@ export class PropertyLogManagementComponent implements OnInit {
     }
 
     private accountColumn(): string {
-        switch (this.userAccountType) {
-            case '1':
-                return 'site.csiAccountAssignmentId';
-            case '2':
-                return 'site.backflowAccountAssignmentId';
-            case '3':
-                return 'site.fogAccountAssignmentId';
-            default:
-                return 'createdById';
+        if (this.userAccountType === String(PropertyLogUserAccountType.CsiComplianceAssignment)) {
+            return 'site.csiAccountAssignmentId';
         }
+
+        if (this.userAccountType === String(PropertyLogUserAccountType.BackflowComplianceAssignment)) {
+            return 'site.backflowAccountAssignmentId';
+        }
+
+        if (this.userAccountType === String(PropertyLogUserAccountType.FogComplianceAssignment)) {
+            return 'site.fogAccountAssignmentId';
+        }
+
+        return 'createdById';
     }
 
     private buildAccountNumberFilter(): QueryProperty[] {
@@ -363,7 +399,7 @@ export class PropertyLogManagementComponent implements OnInit {
             { field: 'noteText', caption: 'LogNote' },
             { field: 'reviewDate', caption: 'LogReviewDate' },
             { field: 'assembly.serialNumber', caption: 'LogTaggedAssembly' },
-            { field: 'url', caption: 'LogFileAttachment' }
+            { field: 'fileAttachmentName', caption: 'LogFileAttachment' }
         );
 
         return columns;

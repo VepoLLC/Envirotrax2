@@ -26,7 +26,7 @@ export interface PropertyLog {
     assemblyId?: number | null;
     assembly?: PropertyLogAssembly | null;
     fileAttachmentName?: string | null;
-    url?: string | null;
+    skipFile?: boolean;
     createdById?: number | null;
     createdTime?: string;
     createdBy?: PropertyLogCreatedBy;

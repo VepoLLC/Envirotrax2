@@ -7,7 +7,6 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { FogTripTicket } from "../../models/fog/fog-trip-ticket";
-import { ProfessionalUser } from "../../models/professionals/professional-user";
 
 @Injectable({
     providedIn: 'root'
@@ -44,10 +43,5 @@ export class FogTripTicketService {
         }
 
         return await lastValueFrom(this._http.get<PagedData<FogTripTicket>>(url, { params }));
-    }
-
-    public getProfessionalTransporters(): Promise<ProfessionalUser[]> {
-        const url = this._urlResolver.resolveUrl('/api/professionals/fog/trip-tickets/lookup/transporters');
-        return lastValueFrom(this._http.get<ProfessionalUser[]>(url));
     }
 }

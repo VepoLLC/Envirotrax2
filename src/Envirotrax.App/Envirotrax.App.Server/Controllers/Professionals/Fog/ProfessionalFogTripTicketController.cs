@@ -1,7 +1,5 @@
 using DeveloperPartners.SortingFiltering;
-using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
-using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -15,17 +13,10 @@ namespace Envirotrax.App.Server.Controllers.Professionals.Fog;
 public class ProfessionalFogTripTicketController : ProfessionalProtectedController
 {
     private readonly IFogTripTicketService _fogService;
-    private readonly IProfessionalService _professionalService;
-    private readonly IProfessionalUserService _professionalUserService;
 
-    public ProfessionalFogTripTicketController(
-        IFogTripTicketService fogService,
-        IProfessionalService professionalService,
-        IProfessionalUserService professionalUserService)
+    public ProfessionalFogTripTicketController(IFogTripTicketService fogService)
     {
         _fogService = fogService;
-        _professionalService = professionalService;
-        _professionalUserService = professionalUserService;
     }
 
     [HttpGet]
@@ -50,21 +41,5 @@ public class ProfessionalFogTripTicketController : ProfessionalProtectedControll
         }
 
         return Ok(result);
-    }
-
-    [HttpGet("lookup/transporters")]
-    public async Task<IActionResult> GetTransporters(CancellationToken ct)
-    {
-        var current = await _professionalService.GetLoggedInProfessionalAsync(ct);
-
-        if (current == null)
-        {
-            return Ok(Array.Empty<ProfessionalUserDto>());
-        }
-
-        var result = await _professionalUserService.GetAllByProfessionalAsync(
-            current.Id, new PageInfo { PageSize = 1000 }, new Query(), ct, pu => pu.IsFogTransporter);
-
-        return Ok(result.Data);
     }
 }

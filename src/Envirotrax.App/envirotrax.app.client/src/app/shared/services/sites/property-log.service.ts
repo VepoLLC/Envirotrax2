@@ -23,12 +23,12 @@ export class PropertyLogService {
     public getEndpoint(): DownloadEndpoint {
         return {
             method: 'GET',
-            url: this._urlResolver.resolveUrl('/api/sites/property-log-management')
+            url: this._urlResolver.resolveUrl('/api/sites/logs')
         };
     }
 
     public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<PropertyLog>> {
-        const url = this._urlResolver.resolveUrl('/api/sites/property-log-management');
+        const url = this._urlResolver.resolveUrl('/api/sites/logs');
 
         const observable = this._http.get<PagedData<PropertyLog>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)

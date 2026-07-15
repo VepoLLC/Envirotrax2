@@ -18,12 +18,10 @@
             </span>
             <span *ngIf="log.assembly?.deviceType"> - {{ log.assembly?.deviceType }}</span>
         </div>
-        <div *ngIf="log.fileAttachmentName && log.url">
+        <div *ngIf="log.fileAttachmentName">
             <i class="fa fa-paperclip"></i>
-            <a [href]="log.url" target="_blank">{{ log.fileAttachmentName }}</a>
-        </div>
-        <div *ngIf="log.fileAttachmentName && !log.url && log.skipFile">
-            <i class="fa fa-paperclip"></i> {{ log.fileAttachmentName }}
+            <a *ngIf="!log.skipFile" href="javascript:void(0)" (click)="openAttachment(log)">{{ log.fileAttachmentName }}</a>
+            <span *ngIf="log.skipFile"> {{ log.fileAttachmentName }}</span>
         </div>
     </div>
 </ng-template>

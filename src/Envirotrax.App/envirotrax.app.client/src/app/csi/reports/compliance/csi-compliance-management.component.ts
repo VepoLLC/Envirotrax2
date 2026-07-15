@@ -273,6 +273,18 @@ export class CsiComplianceManagementComponent implements OnInit {
         }
     }
 
+    public async openAttachment(site: Site, log: SiteLog): Promise<void> {
+        if (site.id == null || log.id == null) {
+            return;
+        }
+
+        const url = await this._siteLogService.getAttachmentUrl(site.id, log.id);
+
+        if (url) {
+            window.open(url, '_blank');
+        }
+    }
+
     public addLog(site: Site): void {
         this._modalHelper.show<SiteLogEditModel, SiteLog>(SiteLogEditComponent, {
             title: 'Add Log Record',

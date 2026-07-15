@@ -1,0 +1,73 @@
+@if (isLoading) {
+    <dp-loading-spinner />
+}
+
+@if (!isLoading) {
+    @if (report && report.points.length > 0) {
+
+        <div class="mb-3">
+            <vp-section header="Compliance History By Number of Assemblies" [noPadding]="true">
+                <div class="d-flex justify-content-center pt-2 pb-0">
+                    <button type="button" class="btn btn-primary" (click)="viewPrintableReport()">View Printable Report</button>
+                </div>
+                <div class="bf-chart-scroll">
+                    <div class="bf-chart-canvas" [style.minWidth.px]="chartPixelWidth">
+                        <canvas baseChart
+                                [data]="countChartData"
+                                [options]="countChartOptions"
+                                [type]="countChartType"
+                                [plugins]="countChartPlugins">
+                        </canvas>
+                    </div>
+                </div>
+            </vp-section>
+        </div>
+
+        <div class="mb-3">
+            <vp-section header="Percent of Compliant Assemblies" [noPadding]="true">
+                <div class="bf-chart-scroll">
+                    <div class="bf-chart-canvas" [style.minWidth.px]="chartPixelWidth">
+                        <canvas baseChart
+                                [data]="percentChartData"
+                                [options]="percentChartOptions"
+                                [type]="percentChartType">
+                        </canvas>
+                    </div>
+                </div>
+            </vp-section>
+        </div>
+
+        <div class="mb-3">
+            <vp-section header="Compliance History Report" [noPadding]="true">
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm mb-0">
+                        <thead>
+                            <tr class="table-primary">
+                                <th class="ps-3">Month</th>
+                                <th>Year</th>
+                                <th></th>
+                                <th class="col-num">Total Assemblies</th>
+                                <th class="col-num">Compliant Assemblies</th>
+                                <th class="col-num">%</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (point of reversedPoints; track point.label) {
+                                <tr>
+                                    <td class="ps-3">{{ point.label.split(' ')[0] }}</td>
+                                    <td>{{ point.year }}</td>
+                                    <td class="align-middle">
+                                        <div class="reportbar green" [style.width.%]="point.percentage">&nbsp;</div>
+                                    </td>
+                                    <td>{{ point.total }}</td>
+                                    <td>{{ point.compliant }}</td>
+                                    <td>{{ point.percentage }}%</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </vp-section>
+        </div>
+    }
+}

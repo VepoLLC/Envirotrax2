@@ -7,6 +7,17 @@ html {
 body {
     font-family: "Montserrat", sans-serif;
     font-size: 0.95rem;
+
+    /* Backflow compliance doughnut center-text colors — read from the canvas in JS (canvas can't
+       consume CSS directly) and overridden for dark mode in dark-theme.css. */
+    --bf-doughnut-percent-color: #212529;
+    --bf-doughnut-label-color: #6c757d;
+
+    /* Backflow report chart canvas colors (axis ticks / legend / grid) — likewise read in JS and
+       overridden for dark mode in dark-theme.css so the charts stay readable in both themes. */
+    --bf-chart-tick-color: #495057;
+    --bf-chart-grid-color: #dee2e6;
+    --bf-chart-muted-color: #adb5bd;
 }
 
 h6,

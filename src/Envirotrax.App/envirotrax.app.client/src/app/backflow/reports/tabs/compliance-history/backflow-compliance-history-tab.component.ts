@@ -1,7 +1,9 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit, QueryList, ViewChildren } from "@angular/core";
+import { BaseChartDirective } from "ng2-charts";
 import { BackflowComplianceHistory, BackflowComplianceHistoryPoint } from "../../../../shared/models/backflow/backflow-compliance-history";
 import { BackflowReportService } from "../../../../shared/services/backflow/backflow-report.service";
-import { Chart, ChartConfiguration, ChartData, Plugin } from "chart.js";
+import { chartGridColor, chartTickColor, onThemeChange, themeLegendLabels } from "../../../../shared/utils/chart-theme.util";
+import { ChartConfiguration, ChartData, Plugin } from "chart.js";
 
 @Component({
     standalone: false,
@@ -9,7 +11,11 @@ import { Chart, ChartConfiguration, ChartData, Plugin } from "chart.js";
     templateUrl: './backflow-compliance-history-tab.component.html',
     styleUrls: ['./backflow-compliance-history-tab.component.scss']
 })
-export class BackflowComplianceHistoryTabComponent implements OnInit {
+export class BackflowComplianceHistoryTabComponent implements OnInit, OnDestroy {
+    @ViewChildren(BaseChartDirective) private _charts?: QueryList<BaseChartDirective>;
+
+    private _disposeThemeObserver?: () => void;
+
     public report: BackflowComplianceHistory | null = null;
     public isLoading = false;
 
@@ -38,8 +44,8 @@ export class BackflowComplianceHistoryTabComponent implements OnInit {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-            x: { ticks: { maxRotation: 45, minRotation: 45 }, grid: { display: false } },
-            y: { beginAtZero: true, ticks: { precision: 0 } }
+            x: { ticks: { color: () => chartTickColor(), maxRotation: 45, minRotation: 45 }, grid: { display: false } },
+            y: { beginAtZero: true, ticks: { color: () => chartTickColor(), precision: 0 }, grid: { color: () => chartGridColor() } }
         },
         plugins: {
             legend: {
@@ -59,20 +65,9 @@ export class BackflowComplianceHistoryTabComponent implements OnInit {
                         target.style.cursor = 'default';
                     }
                 },
-                // Grey out a toggled-off series' label so it reads as disabled.
+                // Theme-aware labels; toggled-off series read as disabled (see themeLegendLabels).
                 labels: {
-                    generateLabels: chart => {
-                        const items = Chart.defaults.plugins.legend.labels.generateLabels(chart);
-                        items.forEach(item => {
-                            if (item.hidden) {
-                                // Grey the label to show it's disabled, but clear `hidden` so Chart.js
-                                // doesn't draw the strike-through line over it.
-                                item.fontColor = '#adb5bd';
-                                item.hidden = false;
-                            }
-                        });
-                        return items;
-                    }
+                    generateLabels: themeLegendLabels
                 }
             }
         }
@@ -104,8 +99,8 @@ export class BackflowComplianceHistoryTabComponent implements OnInit {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-            x: { ticks: { maxRotation: 45, minRotation: 45 }, grid: { display: false } },
-            y: { min: 0, max: 100, ticks: { callback: value => `${value}%` } }
+            x: { ticks: { color: () => chartTickColor(), maxRotation: 45, minRotation: 45 }, grid: { display: false } },
+            y: { min: 0, max: 100, ticks: { color: () => chartTickColor(), callback: value => `${value}%` }, grid: { color: () => chartGridColor() } }
         },
         plugins: {
             legend: { display: false },
@@ -120,7 +115,13 @@ export class BackflowComplianceHistoryTabComponent implements OnInit {
     constructor(private readonly _reportService: BackflowReportService) {}
 
     public async ngOnInit(): Promise<void> {
+        // Axis/legend/grid colors are drawn from theme CSS variables, so repaint both charts on toggle.
+        this._disposeThemeObserver = onThemeChange(() => this._charts?.forEach(chart => chart.update()));
         await this.load();
+    }
+
+    public ngOnDestroy(): void {
+        this._disposeThemeObserver?.();
     }
 
     public async load(): Promise<void> {

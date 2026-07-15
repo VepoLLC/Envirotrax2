@@ -138,8 +138,21 @@ public class SiteRepository : Repository<Site>, ISiteRepository
     {
         await DbContext
             .Sites
+            .IgnoreQueryFilters()
             .Where(s => s.Id == siteId)
             .ExecuteUpdateAsync(setter => setter
                 .SetProperty(s => s.NeedsRenewalCheck, false), cancellationToken);
+    }
+
+    public async Task<IEnumerable<Site>> GetAllPendingRenewalAsync(int batchSize, CancellationToken cancellationToken)
+    {
+        return await DbContext.Sites
+            .IgnoreQueryFilters()
+            .Where(s => s.DeletedTime == null && s.NeedsRenewalCheck)
+            .OrderBy(s => s.Id)
+            .Take(batchSize)
+            .Select(s => new Site { Id = s.Id, WaterSupplierId = s.WaterSupplierId })
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
     }
 }

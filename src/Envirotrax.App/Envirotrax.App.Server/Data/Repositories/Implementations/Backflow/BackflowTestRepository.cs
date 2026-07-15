@@ -1,6 +1,7 @@
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Backflow;
+using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
@@ -69,22 +70,6 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return model;
     }
 
-    public async Task<IEnumerable<BackflowTest>> GetAllPendingRenewalAsync(int batchSize, CancellationToken cancellationToken)
-    {
-        return await DbContext.BackflowTests
-            .IgnoreQueryFilters()
-            .Where(t => t.DeletedTime == null && t.IsCurrent && t.Site != null && t.Site.NeedsRenewalCheck)
-            .OrderBy(t => t.Id)
-            .Take(batchSize)
-            .Select(t => new BackflowTest
-            {
-                Id = t.Id,
-                WaterSupplierId = t.WaterSupplierId
-            })
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
-    }
-
     public async Task<BackflowTestExpiryCounts> GetExpiryCountsAsync(CancellationToken cancellationToken)
     {
         var now = DateTime.UtcNow;
@@ -107,5 +92,85 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             .FirstOrDefaultAsync(cancellationToken);
 
         return counts ?? new BackflowTestExpiryCounts();
+    }
+
+    public async Task<IEnumerable<BackflowTest>> GetAllCurrentBySiteIdAsync(int siteId, CancellationToken cancellationToken)
+    {
+        return await DbContext.BackflowTests
+            .IgnoreQueryFilters()
+            .Where(t => t.DeletedTime == null && t.IsCurrent && t.SiteId == siteId)
+            .Select(t => new BackflowTest
+            {
+                Id = t.Id,
+                PropertyType = t.PropertyType,
+                DeviceType = t.DeviceType,
+                HazardType = t.HazardType,
+                Ossf = t.Ossf,
+                TestDate = t.TestDate,
+                TestResult = t.TestResult,
+                OutOfService = t.OutOfService,
+                Site = t.Site == null ? null : new Site { HasAuxWaterSupply = t.Site.HasAuxWaterSupply }
+            })
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task UpdateTestRenewalAsync(int testId, bool renewalRequired, DateTime? expirationDate, CancellationToken cancellationToken)
+    {
+        if (expirationDate.HasValue)
+            await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(x => x.RenewalRequired, renewalRequired)
+                    .SetProperty(x => x.ExpirationDate, expirationDate.Value), cancellationToken);
+        else
+            await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(x => x.RenewalRequired, renewalRequired), cancellationToken);
+    }
+
+    public async Task<IEnumerable<BackflowTest>> GetAllPendingRenewalByTestFlagAsync(int batchSize, CancellationToken cancellationToken)
+    {
+        return await DbContext.BackflowTests
+            .IgnoreQueryFilters()
+            .Where(t => t.DeletedTime == null && t.NeedsRenewalCheck && t.IsCurrent)
+            .OrderBy(t => t.Id)
+            .Take(batchSize)
+            .Select(t => new BackflowTest
+            {
+                Id = t.Id,
+                WaterSupplierId = t.WaterSupplierId,
+                PropertyType = t.PropertyType,
+                DeviceType = t.DeviceType,
+                HazardType = t.HazardType,
+                Ossf = t.Ossf,
+                TestDate = t.TestDate,
+                TestResult = t.TestResult,
+                OutOfService = t.OutOfService,
+                Site = t.Site == null ? null : new Site { HasAuxWaterSupply = t.Site.HasAuxWaterSupply }
+            })
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task UpdateTestRenewalAndClearFlagAsync(int testId, bool renewalRequired, DateTime? expirationDate, CancellationToken cancellationToken)
+    {
+        if (expirationDate.HasValue)
+            await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(x => x.RenewalRequired, renewalRequired)
+                    .SetProperty(x => x.ExpirationDate, expirationDate.Value)
+                    .SetProperty(x => x.NeedsRenewalCheck, false), cancellationToken);
+        else
+            await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(x => x.RenewalRequired, renewalRequired)
+                    .SetProperty(x => x.NeedsRenewalCheck, false), cancellationToken);
+    }
+
+    public async Task ClearTestNeedsRenewalCheckAsync(int testId, CancellationToken cancellationToken)
+    {
+        await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(x => x.NeedsRenewalCheck, false), cancellationToken);
     }
 }

@@ -376,4 +376,6 @@ public class BackflowTestDto : IDto
     public DateTime CreatedTime { get; set; }
     public DateTime? UpdatedTime { get; set; }
     public AppUserDto? UpdatedBy { get; set; }
+    public bool NeedsRenewalCheck { get; set; }
+    public bool RenewalRequired { get; set; }
 }

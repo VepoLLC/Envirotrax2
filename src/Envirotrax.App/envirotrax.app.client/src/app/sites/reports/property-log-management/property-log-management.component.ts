@@ -203,10 +203,16 @@ export class PropertyLogManagementComponent implements OnInit {
             return;
         }
 
-        const url = await this._siteLogService.getAttachmentUrl(log.site.id, log.id);
+        try {
+            this.table.isLoading = true;
 
-        if (url) {
-            window.open(url, '_blank');
+            const url = await this._siteLogService.getAttachmentUrl(log.site.id, log.id);
+
+            if (url) {
+                this._downloadService.downloadFileFromUrl(url);
+            }
+        } finally {
+            this.table.isLoading = false;
         }
     }
 

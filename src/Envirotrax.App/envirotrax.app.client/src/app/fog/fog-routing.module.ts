@@ -5,6 +5,7 @@ import { PermissionAction, PermissionType } from "../shared/models/permission-ty
 import { FogInspectorListComponent } from "./inspectors/list/fog-inspector-list.component";
 import { FogInspectorDetailsComponent } from "./inspectors/details/fog-inspector-details.component";
 import { FogInspectionListComponent } from "./inspections/list/fog-inspection-list.component";
+import { FogTransporterListComponent } from "./transporters/list/fog-transporter-list.component";
 
 const routes: Routes = [
     {
@@ -44,6 +45,20 @@ const routes: Routes = [
             permissions: [
                 {
                     type: PermissionType.FogInspectors,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
+    },
+    {
+        path: 'transporters',
+        title: 'Transporter Management',
+        component: FogTransporterListComponent,
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.FogTransporters,
                     action: PermissionAction.CanView
                 }
             ]

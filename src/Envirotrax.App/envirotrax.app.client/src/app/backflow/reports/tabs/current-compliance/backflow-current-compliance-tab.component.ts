@@ -1,9 +1,11 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { Router } from "@angular/router";
+import { BaseChartDirective } from "ng2-charts";
 import { BackflowComplianceReport, BackflowComplianceRequirement } from "../../../../shared/models/backflow/backflow-compliance-report";
 import { BackflowReportService } from "../../../../shared/services/backflow/backflow-report.service";
 import { PropertyType } from "../../../../shared/enums/property-type.enum";
 import { BackflowComplianceParams } from "../../../../shared/models/backflow/backflow-compliance-params";
+import { readCssVar, onThemeChange } from "../../../../shared/utils/chart-theme.util";
 import { ChartConfiguration, ChartData, Plugin } from "chart.js";
 
 @Component({
@@ -12,14 +14,18 @@ import { ChartConfiguration, ChartData, Plugin } from "chart.js";
     templateUrl: './backflow-current-compliance-tab.component.html',
     styleUrls: ['./backflow-current-compliance-tab.component.scss']
 })
-export class BackflowCurrentComplianceTabComponent implements OnInit {
+export class BackflowCurrentComplianceTabComponent implements OnInit, OnDestroy {
+    @ViewChild(BaseChartDirective) private _chart?: BaseChartDirective;
+
+    private _disposeThemeObserver?: () => void;
+
     public report: BackflowComplianceReport | null = null;
     public isLoading = false;
     public ignoreLast30Days = false;
 
-    // Doughnut center-text styling (drawn on the canvas, so it can't live in SCSS).
-    private readonly centerPercentColor = '#212529';              // near-black for the big % number
-    private readonly centerLabelColor = '#6c757d';                // muted grey for the "Compliant" caption
+    // Doughnut center-text layout. The text colors are theme-driven CSS custom properties
+    // (--bf-doughnut-percent-color / --bf-doughnut-label-color, defined in styles.css and overridden
+    // in dark-theme.css) read from the canvas in the plugin below, since canvas can't consume CSS.
     private readonly centerPercentFont = '700 1.75rem sans-serif';
     private readonly centerLabelFont = '400 0.8rem sans-serif';
     private readonly centerPercentOffsetY = -8;                   // nudge the % slightly above the middle
@@ -74,15 +80,20 @@ export class BackflowCurrentComplianceTabComponent implements OnInit {
             const pct = this.report?.compliantPercentage ?? 0;
             const ctx = chart.ctx;
 
+            // Canvas can't consume CSS, so read the theme-driven center-text colors from the
+            // CSS custom properties (they resolve to the light or dark value via the cascade).
+            const percentColor = readCssVar('--bf-doughnut-percent-color', '#212529');
+            const labelColor = readCssVar('--bf-doughnut-label-color', '#6c757d');
+
             ctx.save();
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
 
-            ctx.fillStyle = this.centerPercentColor;
+            ctx.fillStyle = percentColor;
             ctx.font = this.centerPercentFont;
             ctx.fillText(`${pct}%`, arc.x, arc.y + this.centerPercentOffsetY);
 
-            ctx.fillStyle = this.centerLabelColor;
+            ctx.fillStyle = labelColor;
             ctx.font = this.centerLabelFont;
             ctx.fillText('Compliant', arc.x, arc.y + this.centerLabelOffsetY);
 
@@ -96,7 +107,13 @@ export class BackflowCurrentComplianceTabComponent implements OnInit {
     ) {}
 
     public async ngOnInit(): Promise<void> {
+        // The doughnut center text is drawn from theme CSS variables, so repaint it when the theme toggles.
+        this._disposeThemeObserver = onThemeChange(() => this._chart?.update());
         await this.refresh();
+    }
+
+    public ngOnDestroy(): void {
+        this._disposeThemeObserver?.();
     }
 
     public async refresh(): Promise<void> {

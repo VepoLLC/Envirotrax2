@@ -25,24 +25,46 @@ public class BackflowTestController : ControllerBase
         _options = options.Value;
     }
 
-    [HttpPost("extend-date")]
-    public async Task<IActionResult> ExtendDateAsync(CancellationToken cancellationToken)
+    [HttpPost("process-sites-renewal")]
+    public async Task<IActionResult> ProcessSitesRenewalAsync(CancellationToken cancellationToken)
     {
-        var tests = await _internalApi.GetAsync<ICollection<BackflowTestDto>>(null, $"api/task-runner/backflow-tests/renewal/pending?batchSize={_options.BatchSize}", cancellationToken);
+        var sites = await _internalApi.GetAsync<ICollection<SiteDto>>(
+            null,
+            $"api/task-runner/backflow-tests/renewal/pending-sites?batchSize={_options.BatchSize}",
+            cancellationToken);
 
-        await _queueService.EnsureQueueExistsAsync(QueueNames.BackflowTests.ExtendDate, cancellationToken);
+        await _queueService.EnsureQueueExistsAsync(QueueNames.BackflowTests.ProcessSiteRenewal, cancellationToken);
 
-        var parallelOptions = new ParallelOptions
+        var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = 10, CancellationToken = cancellationToken };
+
+        await Parallel.ForEachAsync(sites!, parallelOptions, async (site, ct) =>
         {
-            MaxDegreeOfParallelism = 10,
-            CancellationToken = cancellationToken
-        };
+            if (!ct.IsCancellationRequested)
+            {
+                await _queueService.SendMessageAsync(QueueNames.BackflowTests.ProcessSiteRenewal, site, ct);
+            }
+        });
+
+        return Accepted(sites!.Count);
+    }
+
+    [HttpPost("process-tests-renewal")]
+    public async Task<IActionResult> ProcessTestsRenewalAsync(CancellationToken cancellationToken)
+    {
+        var tests = await _internalApi.GetAsync<ICollection<BackflowTestDto>>(
+            null,
+            $"api/task-runner/backflow-tests/renewal/pending-tests?batchSize={_options.BatchSize}",
+            cancellationToken);
+
+        await _queueService.EnsureQueueExistsAsync(QueueNames.BackflowTests.ProcessTestRenewal, cancellationToken);
+
+        var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = 10, CancellationToken = cancellationToken };
 
         await Parallel.ForEachAsync(tests!, parallelOptions, async (test, cancellationToken) =>
         {
             if (!cancellationToken.IsCancellationRequested)
             {
-                await _queueService.SendMessageAsync(QueueNames.BackflowTests.ExtendDate, test, cancellationToken);
+                await _queueService.SendMessageAsync(QueueNames.BackflowTests.ProcessTestRenewal, test, cancellationToken);
             }
         });
 

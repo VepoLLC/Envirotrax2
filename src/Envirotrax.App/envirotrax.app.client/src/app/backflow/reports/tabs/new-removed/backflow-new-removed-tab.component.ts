@@ -1,7 +1,9 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { BaseChartDirective } from "ng2-charts";
 import { BackflowNewRemovedReport, BackflowNewRemovedPoint } from "../../../../shared/models/backflow/backflow-new-removed-report";
 import { BackflowReportService } from "../../../../shared/services/backflow/backflow-report.service";
-import { Chart, ChartConfiguration, ChartData, Plugin } from "chart.js";
+import { chartGridColor, chartTickColor, onThemeChange, themeLegendLabels } from "../../../../shared/utils/chart-theme.util";
+import { ChartConfiguration, ChartData, Plugin } from "chart.js";
 
 @Component({
     standalone: false,
@@ -9,7 +11,11 @@ import { Chart, ChartConfiguration, ChartData, Plugin } from "chart.js";
     templateUrl: './backflow-new-removed-tab.component.html',
     styleUrls: ['./backflow-new-removed-tab.component.scss']
 })
-export class BackflowNewRemovedTabComponent implements OnInit {
+export class BackflowNewRemovedTabComponent implements OnInit, OnDestroy {
+    @ViewChild(BaseChartDirective) private _chart?: BaseChartDirective;
+
+    private _disposeThemeObserver?: () => void;
+
     public report: BackflowNewRemovedReport | null = null;
     public isLoading = false;
 
@@ -29,8 +35,8 @@ export class BackflowNewRemovedTabComponent implements OnInit {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-            x: { ticks: { maxRotation: 45, minRotation: 45 }, grid: { display: false } },
-            y: { beginAtZero: true, ticks: { precision: 0 } }
+            x: { ticks: { color: () => chartTickColor(), maxRotation: 45, minRotation: 45 }, grid: { display: false } },
+            y: { beginAtZero: true, ticks: { color: () => chartTickColor(), precision: 0 }, grid: { color: () => chartGridColor() } }
         },
         plugins: {
             legend: {
@@ -50,20 +56,9 @@ export class BackflowNewRemovedTabComponent implements OnInit {
                         target.style.cursor = 'default';
                     }
                 },
-                // Grey out a toggled-off series' label so it reads as disabled.
+                // Theme-aware labels; toggled-off series read as disabled (see themeLegendLabels).
                 labels: {
-                    generateLabels: chart => {
-                        const items = Chart.defaults.plugins.legend.labels.generateLabels(chart);
-                        items.forEach(item => {
-                            if (item.hidden) {
-                                // Grey the label to show it's disabled, but clear `hidden` so Chart.js
-                                // doesn't draw the strike-through line over it.
-                                item.fontColor = '#adb5bd';
-                                item.hidden = false;
-                            }
-                        });
-                        return items;
-                    }
+                    generateLabels: themeLegendLabels
                 }
             }
         }
@@ -91,7 +86,13 @@ export class BackflowNewRemovedTabComponent implements OnInit {
     constructor(private readonly _reportService: BackflowReportService) {}
 
     public async ngOnInit(): Promise<void> {
+        // Axis/legend/grid colors are drawn from theme CSS variables, so repaint on theme toggle.
+        this._disposeThemeObserver = onThemeChange(() => this._chart?.update());
         await this.load();
+    }
+
+    public ngOnDestroy(): void {
+        this._disposeThemeObserver?.();
     }
 
     public async load(): Promise<void> {

@@ -6,11 +6,11 @@ using Envirotrax.TaskRunner.Domain.Services.Definitions;
 
 namespace Envirotrax.TaskRunner.Workers.Backflow;
 
-public class BackflowTestRenewalWorker : IQueueWorker<BackflowTestDto>
+public class BackflowTestTestRenewalWorker : IQueueWorker<BackflowTestDto>
 {
     private readonly IInternalApiClientService _internalApi;
 
-    public BackflowTestRenewalWorker(IInternalApiClientService internalApi)
+    public BackflowTestTestRenewalWorker(IInternalApiClientService internalApi)
     {
         _internalApi = internalApi;
     }
@@ -22,6 +22,7 @@ public class BackflowTestRenewalWorker : IQueueWorker<BackflowTestDto>
             Data = test
         };
 
-        await _internalApi.PostAsync<BackflowTestDto, BackflowTestDto>($"/api/task-runner/backflow-tests/{test!.Id}/extend-date", apiRequest, cancellationToken);
+        await _internalApi.PostAsync<BackflowTestDto, object>(
+            $"/api/task-runner/backflow-tests/{test!.Id}/process-test-renewal", apiRequest, cancellationToken);
     }
 }

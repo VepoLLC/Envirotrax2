@@ -20,4 +20,7 @@ export class SectionComponent {
 
     @Input()
     public noPadding: boolean = false;
+
+    @Input()
+    public collapsible: boolean = true;
 }

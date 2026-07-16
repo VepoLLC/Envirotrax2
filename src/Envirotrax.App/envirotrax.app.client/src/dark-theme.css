@@ -15,6 +15,15 @@
 body.vp-dark-theme {
     background-color: #1a1a2e !important;
     color: #e0e0e0;
+
+    /* Backflow compliance doughnut center-text (canvas) — readable on the dark background. */
+    --bf-doughnut-percent-color: #e0e0e0;
+    --bf-doughnut-label-color: #a0a8b8;
+
+    /* Backflow report chart canvas colors (axis ticks / legend / grid) — readable on dark. */
+    --bf-chart-tick-color: #c7ccd6;
+    --bf-chart-grid-color: #343456;
+    --bf-chart-muted-color: #6c757d;
 }
 
 body.vp-dark-theme .bg-light,

@@ -25,20 +25,9 @@ import { BackflowTestMailingInfoComponent } from "./tests/details/mailing-info/b
 import { BackflowTestBackflowInfoComponent } from "./tests/details/backflow-info/backflow-test-backflow-info.component";
 import { BackflowTestHistoryComponent } from "./tests/details/history/backflow-test-history.component";
 import { BackflowTestDetailsSectionsModule } from "./tests/details/backflow-test-details-sections.module";
-import { BackflowReportComponent } from "./reports/backflow-report.component";
-import { BackflowTestReportsTabComponent } from "./reports/tabs/test-reports/backflow-test-reports-tab.component";
-import { BackflowCurrentComplianceTabComponent } from "./reports/tabs/current-compliance/backflow-current-compliance-tab.component";
-import { BackflowComplianceHistoryTabComponent } from "./reports/tabs/compliance-history/backflow-compliance-history-tab.component";
-import { BackflowNewRemovedTabComponent } from "./reports/tabs/new-removed/backflow-new-removed-tab.component";
-import { BaseChartDirective } from "ng2-charts";
 
 @NgModule({
     declarations: [
-        BackflowReportComponent,
-        BackflowTestReportsTabComponent,
-        BackflowCurrentComplianceTabComponent,
-        BackflowComplianceHistoryTabComponent,
-        BackflowNewRemovedTabComponent,
         BackflowTesterListComponent,
         BackflowTestListComponent,
         BackflowOutOfServiceListComponent,
@@ -66,8 +55,7 @@ import { BaseChartDirective } from "ng2-charts";
         SharedComponentsModule,
         BackflowRoutingModule,
         ProfessionalModule,
-        BackflowTestDetailsSectionsModule,
-        BaseChartDirective
+        BackflowTestDetailsSectionsModule
     ]
 })
 export class BackflowModule {}

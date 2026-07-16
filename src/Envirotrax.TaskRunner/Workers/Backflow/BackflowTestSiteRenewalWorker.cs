@@ -22,7 +22,6 @@ public class BackflowTestSiteRenewalWorker : IQueueWorker<SiteDto>
             Data = site
         };
 
-        await _internalApi.PostAsync<SiteDto, object>(
-            $"/api/task-runner/backflow-tests/sites/{site!.Id}/process-renewal", apiRequest, cancellationToken);
+        await _internalApi.PostAsync<SiteDto, object>($"/api/task-runner/backflow-tests/sites/{site!.Id}/process-renewal", apiRequest, cancellationToken);
     }
 }

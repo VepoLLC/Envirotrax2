@@ -151,36 +151,40 @@
                     <vp-section [header]="request.header" [collapsible]="false" [noPadding]="true">
                         <vp-section-actions>
                             @if (!request.cleared) {
-                                <button type="button" class="btn btn-danger btn-sm" (click)="clear(request)">Clear</button>
+                                <button type="button"
+                                        class="btn btn-danger btn-sm"
+                                        (click)="clear(request)">
+                                    Clear
+                                </button>
                             }
                         </vp-section-actions>
                         <div class="table-responsive">
                             <table class="table table-sm table-striped mb-0 align-middle">
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>Submission/Test/Exp Dates</th>
-                                    <th>Serial Number</th>
-                                    <th>Assembly Information</th>
-                                    <th>Property Information</th>
-                                    <th>BPAT Information</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <ng-container [ngTemplateOutlet]="assemblyRow"
-                                              [ngTemplateOutletContext]="{ $implicit: request.submitted }" />
-                                @if (request.replacement) {
-                                    <ng-container [ngTemplateOutlet]="assemblyRow"
-                                                  [ngTemplateOutletContext]="{ $implicit: request.replacement }" />
-                                } @else if (request.description) {
+                                <thead>
                                     <tr>
-                                        <td></td>
-                                        <td colspan="6" class="text-muted">{{ request.description }}</td>
+                                        <th></th>
+                                        <th>Submission/Test/Exp Dates</th>
+                                        <th>Serial Number</th>
+                                        <th>Assembly Information</th>
+                                        <th>Property Information</th>
+                                        <th>BPAT Information</th>
+                                        <th></th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <ng-container [ngTemplateOutlet]="assemblyRow"
+                                                  [ngTemplateOutletContext]="{ $implicit: request.submitted }" />
+                                    @if (request.replacement) {
+                                        <ng-container [ngTemplateOutlet]="assemblyRow"
+                                                      [ngTemplateOutletContext]="{ $implicit: request.replacement }" />
+                                    } @else if (request.description) {
+                                        <tr>
+                                            <td></td>
+                                            <td colspan="6" class="text-muted">{{ request.description }}</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
                         </div>
                     </vp-section>
                 </div>

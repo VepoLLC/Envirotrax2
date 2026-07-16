@@ -118,14 +118,18 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
     public async Task UpdateTestRenewalAsync(int testId, bool renewalRequired, DateTime? expirationDate, CancellationToken cancellationToken)
     {
         if (expirationDate.HasValue)
+        {
             await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
                 .ExecuteUpdateAsync(s => s
                     .SetProperty(x => x.RenewalRequired, renewalRequired)
                     .SetProperty(x => x.ExpirationDate, expirationDate.Value), cancellationToken);
+        }
         else
+        {
             await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
                 .ExecuteUpdateAsync(s => s
                     .SetProperty(x => x.RenewalRequired, renewalRequired), cancellationToken);
+        }
     }
 
     public async Task<IEnumerable<BackflowTest>> GetAllPendingRenewalByTestFlagAsync(int batchSize, CancellationToken cancellationToken)
@@ -155,16 +159,20 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
     public async Task UpdateTestRenewalAndClearFlagAsync(int testId, bool renewalRequired, DateTime? expirationDate, CancellationToken cancellationToken)
     {
         if (expirationDate.HasValue)
+        {
             await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
                 .ExecuteUpdateAsync(s => s
                     .SetProperty(x => x.RenewalRequired, renewalRequired)
                     .SetProperty(x => x.ExpirationDate, expirationDate.Value)
                     .SetProperty(x => x.NeedsRenewalCheck, false), cancellationToken);
+        }
         else
+        {
             await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
                 .ExecuteUpdateAsync(s => s
                     .SetProperty(x => x.RenewalRequired, renewalRequired)
                     .SetProperty(x => x.NeedsRenewalCheck, false), cancellationToken);
+        }
     }
 
     public async Task ClearTestNeedsRenewalCheckAsync(int testId, CancellationToken cancellationToken)

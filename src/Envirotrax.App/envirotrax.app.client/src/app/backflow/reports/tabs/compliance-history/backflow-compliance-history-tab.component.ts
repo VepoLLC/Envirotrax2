@@ -4,6 +4,7 @@ import { BackflowComplianceHistory, BackflowComplianceHistoryPoint } from "../..
 import { BackflowReportService } from "../../../../shared/services/backflow/backflow-report.service";
 import { chartGridColor, chartTickColor, onThemeChange, themeLegendLabels } from "../../../../shared/utils/chart-theme.util";
 import { ChartConfiguration, ChartData, Plugin } from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
 @Component({
     standalone: false,
@@ -22,9 +23,16 @@ export class BackflowComplianceHistoryTabComponent implements OnInit, OnDestroy 
     public points: BackflowComplianceHistoryPoint[] = [];
     public reversedPoints: BackflowComplianceHistoryPoint[] = [];
 
+    // Table bar color per year — alternates green/blue as the year changes (matches V1), grouping the
+    // rows visually by year. Uses the shared global .reportbar variants.
+    private _yearBarColors = new Map<number, string>();
+
     // Charts scale with the number of months so labels stay readable; they scroll horizontally when wide.
     private readonly minimumChartWidth = 640;   // px floor so a few months aren't cramped
     private readonly chartWidthPerMonth = 46;   // px of width each month column needs
+
+    // Semibold weight for the % value labels drawn on the percent chart's points.
+    private readonly percentLabelFontWeight = 600;
 
     public chartPixelWidth = this.minimumChartWidth;
 
@@ -108,9 +116,23 @@ export class BackflowComplianceHistoryTabComponent implements OnInit, OnDestroy 
                 callbacks: {
                     label: ctx => `${ctx.parsed.y}%`
                 }
+            },
+            // Show each month's % value above its point (matches V1, and keeps values visible when the
+            // report is printed, where tooltips don't exist). Color follows the theme; clamped so labels
+            // near 100% stay inside the plot area.
+            datalabels: {
+                anchor: 'end',
+                align: 'top',
+                clamp: true,
+                color: () => chartTickColor(),
+                font: { weight: this.percentLabelFontWeight },
+                formatter: (value: number) => `${value}%`
             }
         }
     };
+
+    // Registered only on this chart (not globally) so labels appear on the percent line, not the other charts.
+    public readonly percentChartPlugins: Plugin<'line'>[] = [ChartDataLabels];
 
     constructor(private readonly _reportService: BackflowReportService) {}
 
@@ -124,12 +146,27 @@ export class BackflowComplianceHistoryTabComponent implements OnInit, OnDestroy 
         this._disposeThemeObserver?.();
     }
 
+    // Assign each year an alternating bar color (oldest year green, then blue, …) so the table groups
+    // rows by year visually, matching V1.
+    private buildYearBarColors(): void {
+        const colors = ['green', 'blue'];
+        const years = [...new Set(this.points.map(p => p.year))].sort((a, b) => a - b);
+
+        this._yearBarColors = new Map(years.map((year, index) => [year, colors[index % colors.length]]));
+    }
+
+    // The shared .reportbar color variant for a table row, by its year.
+    public barColor(point: BackflowComplianceHistoryPoint): string {
+        return this._yearBarColors.get(point.year) ?? 'green';
+    }
+
     public async load(): Promise<void> {
         try {
             this.isLoading = true;
             this.report = await this._reportService.getComplianceHistory();
             this.points = this.report?.points ?? [];
             this.reversedPoints = [...this.points].reverse();
+            this.buildYearBarColors();
             this.chartPixelWidth = Math.max(this.minimumChartWidth, this.points.length * this.chartWidthPerMonth);
             this.buildCharts();
         } finally {

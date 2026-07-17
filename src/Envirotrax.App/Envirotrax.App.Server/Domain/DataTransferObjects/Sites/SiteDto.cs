@@ -179,6 +179,40 @@ public class ReferencedSiteDto
 
     public string? BusinessName { get; set; }
 
+    public PropertyType PropertyType { get; set; }
+
+    public string? StreetNumber { get; set; }
+
+    public string? StreetName { get; set; }
+
+    public string? PropertyNumber { get; set; }
+
+    public string? City { get; set; }
+
+    public ReferencedStateDto? State { get; set; }
+
+    public string? ZipCode { get; set; }
+
+    public string? MailingCompanyName { get; set; }
+
+    public string? MailingContactName { get; set; }
+
+    public string? MailingStreetNumber { get; set; }
+
+    public string? MailingStreetName { get; set; }
+
+    public string? MailingNumber { get; set; }
+
+    public string? MailingCity { get; set; }
+
+    public ReferencedStateDto? MailingState { get; set; }
+
+    public string? MailingZipCode { get; set; }
+
+    public string? MailingPhoneNumber { get; set; }
+
+    public string? MailingEmailAddress { get; set; }
+
     public FacilityType FacilityType { get; set; }
 
     public double? GisLatitude { get; set; }
@@ -186,4 +220,10 @@ public class ReferencedSiteDto
     public double? GisLongitude { get; set; }
 
     public int? GisAreaId { get; set; }
+
+    public int? CsiAccountAssignmentId { get; set; }
+
+    public int? BackflowAccountAssignmentId { get; set; }
+
+    public int? FogAccountAssignmentId { get; set; }
 }

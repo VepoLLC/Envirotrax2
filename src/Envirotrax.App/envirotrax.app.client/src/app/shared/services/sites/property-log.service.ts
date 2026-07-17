@@ -6,7 +6,7 @@ import { QueryHelperService } from "../helpers/query-helper.service";
 import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
-import { PropertyLog } from "../../models/sites/property-log";
+import { SiteLog } from "../../models/sites/site-log";
 import { DownloadEndpoint } from "../../models/download-config";
 
 @Injectable({
@@ -27,10 +27,10 @@ export class PropertyLogService {
         };
     }
 
-    public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<PropertyLog>> {
+    public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<SiteLog>> {
         const url = this._urlResolver.resolveUrl('/api/sites/logs');
 
-        const observable = this._http.get<PagedData<PropertyLog>>(url, {
+        const observable = this._http.get<PagedData<SiteLog>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)
         });
 

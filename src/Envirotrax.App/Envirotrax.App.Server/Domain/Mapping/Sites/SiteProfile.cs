@@ -32,6 +32,12 @@ public class SiteProfile : Profile
             .IncludeBase<Site, SiteDto>()
             .ForMember(dto => dto.Logs, opt => opt.Ignore());
 
-        CreateMap<Site, ReferencedSiteDto>().ReverseMap();
+        CreateMap<Site, ReferencedSiteDto>()
+            .AfterMap((model, dto) =>
+            {
+                dto.State ??= model.StateId.HasValue ? new ReferencedStateDto { Id = model.StateId } : null;
+                dto.MailingState ??= model.MailingStateId.HasValue ? new ReferencedStateDto { Id = model.MailingStateId } : null;
+            })
+            .ReverseMap();
     }
 }

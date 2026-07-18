@@ -7,6 +7,7 @@ import { FogInspectorDetailsComponent } from "./inspectors/details/fog-inspector
 import { FogInspectionListComponent } from "./inspections/list/fog-inspection-list.component";
 import { FogInspectionViewComponent } from "./inspections/view/fog-inspection-view.component";
 import { FogTripTicketListComponent } from "./trip-tickets/list/fog-trip-ticket-list.component";
+import { FogTransporterListComponent } from "./transporters/list/fog-transporter-list.component";
 
 const routes: Routes = [
     {
@@ -92,6 +93,20 @@ const routes: Routes = [
                 }
             ]
         }
+    },
+    {
+        path: 'transporters',
+        title: 'Transporter Management',
+        component: FogTransporterListComponent,
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.FogTransporters,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
     }
 ];
 
@@ -103,4 +118,4 @@ const routes: Routes = [
         RouterModule
     ]
 })
-export class FogRoutingModule {}
+export class FogRoutingModule { }

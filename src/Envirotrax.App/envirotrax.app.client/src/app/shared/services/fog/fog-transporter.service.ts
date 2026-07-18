@@ -6,13 +6,12 @@ import { QueryHelperService } from "../helpers/query-helper.service";
 import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
-import { SiteLog } from "../../models/sites/site-log";
-import { DownloadEndpoint } from "../../models/download-config";
+import { Professional } from "../../models/professionals/professional";
 
 @Injectable({
     providedIn: 'root'
 })
-export class PropertyLogService {
+export class FogTransporterService {
     constructor(
         private readonly _urlResolver: UrlResolverService,
         private readonly _queryHelper: QueryHelperService,
@@ -20,17 +19,10 @@ export class PropertyLogService {
     ) {
     }
 
-    public getEndpoint(): DownloadEndpoint {
-        return {
-            method: 'GET',
-            url: this._urlResolver.resolveUrl('/api/sites/logs')
-        };
-    }
+    public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<Professional>> {
+        const url = this._urlResolver.resolveUrl('/api/fog/transporters');
 
-    public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<SiteLog>> {
-        const url = this._urlResolver.resolveUrl('/api/sites/logs');
-
-        const observable = this._http.get<PagedData<SiteLog>>(url, {
+        const observable = this._http.get<PagedData<Professional>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)
         });
 

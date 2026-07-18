@@ -375,7 +375,7 @@ export class App implements OnInit {
           {
             title: 'Transporter Management',
             iconCss: 'fa-regular fa-user',
-            routerLink: ['/'],
+            routerLink: ['/fog/transporters'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogTransporters),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
           },

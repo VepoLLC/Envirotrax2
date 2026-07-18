@@ -2,7 +2,7 @@ import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/
 import { NgForm } from "@angular/forms";
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from "@envirotrax/common-ui";
 import { TableViewModel } from "../../../shared/models/table-view-model";
-import { PropertyLog } from "../../../shared/models/sites/property-log";
+import { SiteLog } from "../../../shared/models/sites/site-log";
 import { SiteLogType } from "../../../shared/models/sites/site-log-type.enum";
 import { SiteLogReviewDateStatus } from "../../../shared/models/sites/site-log-review-date-status.enum";
 import { PropertyType } from "../../../shared/enums/property-type.enum";
@@ -37,7 +37,7 @@ export enum PropertyLogUserAccountType {
     FogComplianceAssignment = 3
 }
 
-type PropertyLogRow = PropertyLog & {
+type PropertyLogRow = SiteLog & {
     rowNumber?: number;
 };
 
@@ -47,19 +47,19 @@ type PropertyLogRow = PropertyLog & {
 })
 export class PropertyLogManagementComponent implements OnInit {
     @ViewChild('propertyTemplate', { static: true })
-    public propertyTemplate!: TemplateRef<CellTemplateData<PropertyLog>>;
+    public propertyTemplate!: TemplateRef<CellTemplateData<SiteLog>>;
 
     @ViewChild('mailingTemplate', { static: true })
-    public mailingTemplate!: TemplateRef<CellTemplateData<PropertyLog>>;
+    public mailingTemplate!: TemplateRef<CellTemplateData<SiteLog>>;
 
     @ViewChild('logTemplate', { static: true })
-    public logTemplate!: TemplateRef<CellTemplateData<PropertyLog>>;
+    public logTemplate!: TemplateRef<CellTemplateData<SiteLog>>;
 
     @ViewChild('reviewDateTemplate', { static: true })
-    public reviewDateTemplate!: TemplateRef<CellTemplateData<PropertyLog>>;
+    public reviewDateTemplate!: TemplateRef<CellTemplateData<SiteLog>>;
 
     @ViewChild('viewSiteTemplate', { static: true })
-    public viewSiteTemplate!: TemplateRef<CellTemplateData<PropertyLog>>;
+    public viewSiteTemplate!: TemplateRef<CellTemplateData<SiteLog>>;
 
     @ViewChild('printableSection')
     private _printableSection!: ElementRef;
@@ -111,7 +111,7 @@ export class PropertyLogManagementComponent implements OnInit {
         { id: String(PropertyType.Commercial), text: 'Commercial' }
     ];
 
-    public table: TableViewModel<PropertyLog> = {
+    public table: TableViewModel<SiteLog> = {
         columns: [],
         query: { sort: { createdTime: 'Desc' }, filter: [] }
     };
@@ -198,15 +198,21 @@ export class PropertyLogManagementComponent implements OnInit {
         }
     }
 
-    public async openAttachment(log: PropertyLog): Promise<void> {
+    public async openAttachment(log: SiteLog): Promise<void> {
         if (log.site?.id == null || log.id == null) {
             return;
         }
 
-        const url = await this._siteLogService.getAttachmentUrl(log.site.id, log.id);
+        try {
+            this.table.isLoading = true;
 
-        if (url) {
-            window.open(url, '_blank');
+            const url = await this._siteLogService.getAttachmentUrl(log.site.id, log.id);
+
+            if (url) {
+                this._downloadService.downloadFileFromUrl(url);
+            }
+        } finally {
+            this.table.isLoading = false;
         }
     }
 
@@ -227,8 +233,8 @@ export class PropertyLogManagementComponent implements OnInit {
         ];
     }
 
-    private getColumns(): TableColumn<PropertyLog>[] {
-        const columns: TableColumn<PropertyLog>[] = [
+    private getColumns(): TableColumn<SiteLog>[] {
+        const columns: TableColumn<SiteLog>[] = [
             { field: 'rowNumber', caption: '', type: ColumnType.number, queryColumnExcluded: true, rowCssClass: 'align-top' },
             this.templateColumn('Property Information', this.propertyTemplate),
             { field: 'site.accountNumber', caption: 'Account Number', type: ColumnType.text, queryColumnExcluded: true, rowCssClass: 'align-top' },
@@ -244,7 +250,7 @@ export class PropertyLogManagementComponent implements OnInit {
         return columns;
     }
 
-    private templateColumn(caption: string, template: TemplateRef<CellTemplateData<PropertyLog>>): TableColumn<PropertyLog> {
+    private templateColumn(caption: string, template: TemplateRef<CellTemplateData<SiteLog>>): TableColumn<SiteLog> {
         return {
             field: '',
             caption,

@@ -123,13 +123,13 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
                 .ExecuteUpdateAsync(s => s
                     .SetProperty(x => x.RenewalRequired, renewalRequired)
-                    .SetProperty(x => x.ExpirationDate, expirationDate.Value), CancellationToken.None);
+                    .SetProperty(x => x.ExpirationDate, expirationDate.Value), cancellationToken);
         }
         else
         {
             await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
                 .ExecuteUpdateAsync(s => s
-                    .SetProperty(x => x.RenewalRequired, renewalRequired), CancellationToken.None);
+                    .SetProperty(x => x.RenewalRequired, renewalRequired), cancellationToken);
         }
     }
 
@@ -165,14 +165,14 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
                 .ExecuteUpdateAsync(s => s
                     .SetProperty(x => x.RenewalRequired, renewalRequired)
                     .SetProperty(x => x.ExpirationDate, expirationDate.Value)
-                    .SetProperty(x => x.NeedsRenewalCheck, false), CancellationToken.None);
+                    .SetProperty(x => x.NeedsRenewalCheck, false), cancellationToken);
         }
         else
         {
             await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
                 .ExecuteUpdateAsync(s => s
                     .SetProperty(x => x.RenewalRequired, renewalRequired)
-                    .SetProperty(x => x.NeedsRenewalCheck, false), CancellationToken.None);
+                    .SetProperty(x => x.NeedsRenewalCheck, false), cancellationToken);
         }
     }
 

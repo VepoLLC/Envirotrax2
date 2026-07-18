@@ -36,10 +36,13 @@ public class BackflowTestController : ControllerBase
         await _queueService.EnsureQueueExistsAsync(QueueNames.BackflowTests.ProcessSiteRenewal, cancellationToken);
 
         var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = 10, CancellationToken = cancellationToken };
+
         await Parallel.ForEachAsync(sites!, parallelOptions, async (site, ct) =>
         {
             if (!ct.IsCancellationRequested)
+            {
                 await _queueService.SendMessageAsync(QueueNames.BackflowTests.ProcessSiteRenewal, site, ct);
+            }
         });
 
         return Accepted(sites!.Count);
@@ -56,10 +59,13 @@ public class BackflowTestController : ControllerBase
         await _queueService.EnsureQueueExistsAsync(QueueNames.BackflowTests.ProcessTestRenewal, cancellationToken);
 
         var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = 10, CancellationToken = cancellationToken };
-        await Parallel.ForEachAsync(tests!, parallelOptions, async (test, ct) =>
+
+        await Parallel.ForEachAsync(tests!, parallelOptions, async (test, cancellationToken) =>
         {
-            if (!ct.IsCancellationRequested)
-                await _queueService.SendMessageAsync(QueueNames.BackflowTests.ProcessTestRenewal, test, ct);
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                await _queueService.SendMessageAsync(QueueNames.BackflowTests.ProcessTestRenewal, test, cancellationToken);
+            }
         });
 
         return Accepted(tests!.Count);

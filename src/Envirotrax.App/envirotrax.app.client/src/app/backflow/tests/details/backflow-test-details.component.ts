@@ -10,10 +10,13 @@ import { PermissionAction, PermissionType } from "../../../shared/models/permiss
 import { ToastService } from "../../../shared/services/toast.service";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { ImageUrlChange } from "./images/backflow-test-images.component";
-import { InputOption } from "@envirotrax/common-ui";
+import { InputOption, ModalHelperService } from "@envirotrax/common-ui";
 import { DownloadService } from "../../../shared/services/download.service";
 import { BackflowTestingSettingsService } from "../../../shared/services/settings/backflow-testing-settings.service";
 import { BackflowSettings } from "../../../shared/models/settings/backflow-settings";
+import { ModalSize } from "@developer-partners/ngx-modal-dialog";
+import { BackflowTestRejectComponent } from "./reject/backflow-test-reject.component";
+import { BackflowTestForceRenewalComponent } from "./force-renewal/backflow-test-force-renewal.component";
 
 @Component({
     selector: 'app-backflow-test-details',
@@ -39,8 +42,17 @@ export class BackflowTestDetailsComponent implements OnInit {
         private readonly _toastService: ToastService,
         private readonly _helper: HelperService,
         private readonly _downloadService: DownloadService,
-        private readonly _settingsService: BackflowTestingSettingsService
+        private readonly _settingsService: BackflowTestingSettingsService,
+        private readonly _modalHelper: ModalHelperService
     ) { }
+
+    public get isExpired(): boolean {
+        if (!this.test?.expirationDate) {
+            return false;
+        }
+
+        return new Date(this.test.expirationDate) < new Date();
+    }
 
     public async ngOnInit(): Promise<void> {
         await this.initialize();
@@ -118,5 +130,111 @@ export class BackflowTestDetailsComponent implements OnInit {
         } finally {
             this.savingSection = null;
         }
+    }
+
+    public async toggleRenewalRequired(): Promise<void> {
+        if (this.test == null) {
+            return;
+        }
+
+        try {
+            this.isLoading = true;
+            this.test = await this._testService.updateRenewalRequired(this.test.id, !this.test.renewalRequired);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    public async updateScheduleMonth(): Promise<void> {
+        if (this.test == null) {
+            return;
+        }
+
+        try {
+            this.isLoading = true;
+            this.test = await this._testService.updateScheduleMonth(this.test.id, this.test.backflowScheduleMonth ?? 0);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    public async toggleIsCurrent(): Promise<void> {
+        if (this.test == null) {
+            return;
+        }
+
+        try {
+            this.isLoading = true;
+            this.test = await this._testService.updateIsCurrent(this.test.id, !this.test.isCurrent);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    public async toggleOutOfService(): Promise<void> {
+        if (this.test == null) {
+            return;
+        }
+
+        try {
+            this.isLoading = true;
+            this.test = await this._testService.updateOutOfService(this.test.id, !this.test.outOfService);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    public async toggleDisapproval(): Promise<void> {
+        if (this.test == null) {
+            return;
+        }
+
+        try {
+            this.isLoading = true;
+            this.test = await this._testService.updateDisapproval(this.test.id, !this.test.disapproved);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    public toggleRejection(): void {
+        if (this.test == null) {
+            return;
+        }
+
+        if (this.test.rejected) {
+            this.unrejectTest();
+        } else {
+            this._modalHelper.show<BackflowTest>(BackflowTestRejectComponent, {
+                title: 'Reject Test',
+                size: ModalSize.large,
+                model: this.test
+            }).result().subscribe(updated => {
+                this.test = updated;
+            });
+        }
+    }
+
+    private async unrejectTest(): Promise<void> {
+        try {
+            this.isLoading = true;
+            this.test = await this._testService.updateRejection(this.test!.id, { rejected: false });
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    public toggleForceRenewal(): void {
+        if (this.test == null) {
+            return;
+        }
+
+        this._modalHelper.show<BackflowTest>(BackflowTestForceRenewalComponent, {
+            title: 'Force Renewal',
+            size: ModalSize.large,
+            model: this.test
+        }).result().subscribe(updated => {
+            this.test = updated;
+        });
     }
 }

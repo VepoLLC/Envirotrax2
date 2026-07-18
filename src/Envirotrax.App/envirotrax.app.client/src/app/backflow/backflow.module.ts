@@ -19,6 +19,8 @@ import { AddEditBackflowTesterInsuranceComponent } from "./testers/details/licen
 import { ProfessionalModule } from "../professionals/professional.module";
 import { BackflowTesterGaugeComponent } from "./testers/details/gauge/list/backflow-tester-gauge.component";
 import { AddEditBackflowTesterGaugeComponent } from "./testers/details/gauge/edit/add-edit-backflow-tester-gauge.component";
+import { BackflowTestRejectComponent } from "./tests/details/reject/backflow-test-reject.component";
+import { BackflowTestForceRenewalComponent } from "./tests/details/force-renewal/backflow-test-force-renewal.component";
 import { BackflowTestBpatInfoComponent } from "./tests/details/bpat-info/backflow-test-bpat-info.component";
 import { BackflowTestPropertyInfoComponent } from "./tests/details/property-info/backflow-test-property-info.component";
 import { BackflowTestMailingInfoComponent } from "./tests/details/mailing-info/backflow-test-mailing-info.component";
@@ -57,7 +59,9 @@ import { BaseChartDirective } from "ng2-charts";
         AddEditBackflowTesterLicenseComponent,
         AddEditBackflowTesterInsuranceComponent,
         BackflowTesterGaugeComponent,
-        AddEditBackflowTesterGaugeComponent
+        AddEditBackflowTesterGaugeComponent,
+        BackflowTestRejectComponent,
+        BackflowTestForceRenewalComponent
     ],
     imports: [
         CommonModule,

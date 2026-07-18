@@ -7,6 +7,7 @@ import { State } from "../../../shared/models/lookup/state";
 import { LookupService } from "../../../shared/services/lookup/lookup.service";
 import { AuthService } from "../../../shared/services/auth/auth.service";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
+import { FeatureType } from "../../../shared/models/feature-type";
 import { ToastService } from "../../../shared/services/toast.service";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { ImageUrlChange } from "./images/backflow-test-images.component";
@@ -30,6 +31,7 @@ export class BackflowTestDetailsComponent implements OnInit {
     public savingSection: string | null = null;
     public canModify: boolean = false;
     public canViewTesters: boolean = false;
+    public canForceRenewal: boolean = false;
     public states: InputOption<State>[] = [];
     public validationErrors: string[] = [];
     public settings: BackflowSettings | null = null;
@@ -59,16 +61,18 @@ export class BackflowTestDetailsComponent implements OnInit {
     }
 
     private async initialize(): Promise<void> {
-        const [states, canModify, canViewTesters, settings] = await Promise.all([
+        const [states, canModify, canViewTesters, canForceRenewal, settings] = await Promise.all([
             this._lookupService.getAllStatesAsOptions(true),
             this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.BackflowTests),
             this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowTesters),
+            this._authService.hasAnyFeatures(FeatureType.BackflowTestForceRenewal),
             this._settingsService.get()
         ]);
 
         this.states = states;
         this.canModify = canModify;
         this.canViewTesters = canViewTesters;
+        this.canForceRenewal = canForceRenewal;
         this.settings = settings;
 
         this._activatedRoute.paramMap.subscribe(async params => {

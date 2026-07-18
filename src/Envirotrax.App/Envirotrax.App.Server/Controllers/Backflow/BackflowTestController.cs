@@ -3,7 +3,6 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
-using Envirotrax.Common.Domain.Services.Defintions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,13 +13,11 @@ namespace Envirotrax.App.Server.Controllers.Backflow;
 public class BackflowTestController : WaterSupplierCrudController<BackflowTestDto>
 {
     private readonly IBackflowTestService _testService;
-    private readonly IAuthService _authService;
 
-    public BackflowTestController(IBackflowTestService service, IAuthService authService)
+    public BackflowTestController(IBackflowTestService service)
         : base(service)
     {
         _testService = service;
-        _authService = authService;
     }
 
     [HttpGet("pdf")]
@@ -101,6 +98,7 @@ public class BackflowTestController : WaterSupplierCrudController<BackflowTestDt
 
     [HttpPut("{id}/force-renewal")]
     [HasPermission(PermissionAction.CanModify)]
+    [HasFeature(FeatureType.BackflowTestForceRenewal)]
     public async Task<IActionResult> UpdateForceRenewalAsync(int id, [FromBody] BackflowTestForceRenewalRequest request, CancellationToken cancellationToken)
     {
 

@@ -106,7 +106,7 @@
                 <button class="btn btn-sm"
                         [class.btn-success]="test.forceRenewal"
                         [class.btn-danger]="!test.forceRenewal"
-                        [disabled]="isLoading || !canModify"
+                        [disabled]="isLoading || !canForceRenewal"
                         (click)="toggleForceRenewal()">
                     Force Renewal [{{ test.forceRenewal ? 'On' : 'Off' }}]
                 </button>

@@ -1,7 +1,9 @@
-import { Component, NgZone, OnInit } from "@angular/core";
+import { Component, NgZone, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { BaseChartDirective } from "ng2-charts";
 import { BackflowTestReport, BackflowReportPeriod } from "../../../../shared/models/backflow/backflow-test-report";
 import { BackflowReportService } from "../../../../shared/services/backflow/backflow-report.service";
-import { Chart, ChartConfiguration, ChartData } from "chart.js";
+import { chartGridColor, chartTickColor, onThemeChange, themeLegendLabels } from "../../../../shared/utils/chart-theme.util";
+import { ChartConfiguration, ChartData } from "chart.js";
 
 @Component({
     standalone: false,
@@ -9,7 +11,11 @@ import { Chart, ChartConfiguration, ChartData } from "chart.js";
     templateUrl: './backflow-test-reports-tab.component.html',
     styleUrls: ['./backflow-test-reports-tab.component.scss']
 })
-export class BackflowTestReportsTabComponent implements OnInit {
+export class BackflowTestReportsTabComponent implements OnInit, OnDestroy {
+    @ViewChild(BaseChartDirective) private _chart?: BaseChartDirective;
+
+    private _disposeThemeObserver?: () => void;
+
     public report: BackflowTestReport | null = null;
     public isLoading = false;
     public fromDate: string = '';
@@ -47,8 +53,14 @@ export class BackflowTestReportsTabComponent implements OnInit {
     ) {}
 
     public async ngOnInit(): Promise<void> {
+        // Axis/legend/grid colors are drawn from theme CSS variables, so repaint on theme toggle.
+        this._disposeThemeObserver = onThemeChange(() => this._chart?.update());
         await this.setDefaultDateRange();
         await this.search();
+    }
+
+    public ngOnDestroy(): void {
+        this._disposeThemeObserver?.();
     }
 
     // The shared .reportbar color variant for a statistics section (matches V1).
@@ -127,9 +139,11 @@ export class BackflowTestReportsTabComponent implements OnInit {
                 x: {
                     min: 0,
                     max: 100,
-                    ticks: { callback: value => `${value}%` }
+                    ticks: { color: () => chartTickColor(), callback: value => `${value}%` },
+                    grid: { color: () => chartGridColor() }
                 },
                 y: {
+                    ticks: { color: () => chartTickColor() },
                     grid: { display: false }
                 }
             },
@@ -152,18 +166,7 @@ export class BackflowTestReportsTabComponent implements OnInit {
                     },
                     // Grey out the series' label when toggled off so it reads as disabled.
                     labels: {
-                        generateLabels: chart => {
-                            const items = Chart.defaults.plugins.legend.labels.generateLabels(chart);
-                            items.forEach(item => {
-                                if (item.hidden) {
-                                    // Grey the label to show it's disabled, but clear `hidden` so Chart.js
-                                    // doesn't draw the strike-through line over it.
-                                    item.fontColor = '#adb5bd';
-                                    item.hidden = false;
-                                }
-                            });
-                            return items;
-                        }
+                        generateLabels: themeLegendLabels
                     }
                 },
                 tooltip: {

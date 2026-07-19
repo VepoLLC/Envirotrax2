@@ -11,9 +11,9 @@
                 <input type="date" class="form-control w-auto" [(ngModel)]="fromDate" />
                 <span class="fw-semibold">To Date:</span>
                 <input type="date" class="form-control w-auto" [(ngModel)]="toDate" />
-                <button type="button" class="btn btn-primary" (click)="search()">Search</button>
-                <button type="button" class="btn btn-primary" (click)="viewPrintableReport()">View Printable Report</button>
-                <button type="button" class="btn btn-primary" (click)="reset()">Reset</button>
+                <button type="button" class="btn btn-primary btn-sm" (click)="search()">Search</button>
+                <button type="button" class="btn btn-primary btn-sm" (click)="viewPrintableReport()">View Printable Report</button>
+                <button type="button" class="btn btn-primary btn-sm" (click)="reset()">Reset</button>
             </div>
             @if (dateRangeError) {
                 <div class="text-danger text-center pb-2">{{ dateRangeError }}</div>

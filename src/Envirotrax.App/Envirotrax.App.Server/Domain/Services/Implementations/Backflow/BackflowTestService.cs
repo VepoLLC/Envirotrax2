@@ -407,6 +407,57 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         "Rain", "Freeze", "RainFreeze"
     };
 
+    public async Task<BackflowTestDto?> UpdateRenewalRequiredAsync(int id, bool renewalRequired, CancellationToken cancellationToken = default)
+    {
+        var test = await _testRepository.UpdateRenewalRequiredAsync(id, renewalRequired, _authService.UserId, cancellationToken);
+
+        return test == null ? null : MapToDto(test);
+    }
+
+    public async Task<BackflowTestDto?> UpdateScheduleMonthAsync(int id, int month, CancellationToken cancellationToken = default)
+    {
+        var test = await _testRepository.UpdateScheduleMonthAsync(id, month, _authService.UserId, cancellationToken);
+
+        return test == null ? null : MapToDto(test);
+    }
+
+    public async Task<BackflowTestDto?> UpdateIsCurrentAsync(int id, bool isCurrent, CancellationToken cancellationToken = default)
+    {
+        var test = await _testRepository.UpdateIsCurrentAsync(id, isCurrent, _authService.UserId, cancellationToken);
+
+        return test == null ? null : MapToDto(test);
+    }
+
+    public async Task<BackflowTestDto?> UpdateOutOfServiceAsync(int id, bool outOfService, CancellationToken cancellationToken = default)
+    {
+        var test = await _testRepository.UpdateOutOfServiceAsync(id, outOfService, _authService.UserId, cancellationToken);
+
+        return test == null ? null : MapToDto(test);
+    }
+
+    public async Task<BackflowTestDto?> UpdateDisapprovalAsync(int id, bool disapproved, CancellationToken cancellationToken = default)
+    {
+        var test = await _testRepository.UpdateDisapprovalAsync(id, disapproved, _authService.UserId, cancellationToken);
+
+        return test == null ? null : MapToDto(test);
+    }
+
+    public async Task<BackflowTestDto?> UpdateForceRenewalAsync(int id, BackflowTestForceRenewalRequest request, CancellationToken cancellationToken = default)
+    {
+        var forceRenewalYears = request.ForceRenewalYears ?? 0;
+
+        var test = await _testRepository.UpdateForceRenewalAsync(id, request.ForceRenewal, forceRenewalYears, _authService.UserId, cancellationToken);
+
+        return test == null ? null : MapToDto(test);
+    }
+
+    public async Task<BackflowTestDto?> UpdateRejectionAsync(int id, BackflowTestRejectionRequest request, CancellationToken cancellationToken = default)
+    {
+        var test = await _testRepository.UpdateRejectionAsync(id, request.Rejected, request.RejectedReason, _authService.UserId, cancellationToken);
+
+        return test == null ? null : MapToDto(test);
+    }
+
     private static bool DoesTestMatchRequirement(BackflowTest test, BackflowRenewalRequirementDto requirement)
     {
         if (!string.IsNullOrEmpty(test.DeviceType) && SkippedDeviceTypes.Contains(test.DeviceType))

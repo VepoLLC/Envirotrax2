@@ -103,6 +103,10 @@ export interface BackflowTest {
     rejectedBy?: WaterSupplierUser | null;
     rejectedDate?: string;
     rejectedReason?: string;
+    renewalRequired?: boolean;
+    backflowScheduleMonth?: number;
+    forceRenewal?: boolean;
+    forceRenewalYears?: number;
     needsValidation?: boolean;
     assemblyImagePath?: string;
     serialNumberImagePath?: string;

@@ -13,5 +13,6 @@ public enum FeatureType
     ManageProfessionalInsurances = 8,
     ManageProfessionalRegistrationFees = 9,
     ManageGisAreas = 10,
-    ManageProfessionalUsers = 11
+    ManageProfessionalUsers = 11,
+    BackflowTestForceRenewal = 12,
 }

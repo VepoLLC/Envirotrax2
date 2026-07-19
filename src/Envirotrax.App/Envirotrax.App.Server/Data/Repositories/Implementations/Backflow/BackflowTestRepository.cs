@@ -185,88 +185,67 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
 
     public async Task<BackflowTest?> UpdateRenewalRequiredAsync(int id, bool renewalRequired, int updatedById, CancellationToken cancellationToken)
     {
-        var test = await GetAsync(id, cancellationToken);
+        var test = await GetNoIncludesAsync(id, cancellationToken);
 
         if (test == null)
         {
             return null;
         }
 
+        DbContext.Attach(test);
         test.RenewalRequired = renewalRequired;
-        test.UpdatedById = updatedById;
-        test.UpdatedTime = DateTime.UtcNow;
 
-        DbContext.Entry(test).Property(x => x.RenewalRequired).IsModified = true;
-        DbContext.Entry(test).Property(x => x.UpdatedById).IsModified = true;
-        DbContext.Entry(test).Property(x => x.UpdatedTime).IsModified = true;
-
-        await DbContext.SaveChangesAsync(CancellationToken.None);
+        await DbContext.SaveChangesAsync();
 
         return test;
     }
 
     public async Task<BackflowTest?> UpdateScheduleMonthAsync(int id, int month, int updatedById, CancellationToken cancellationToken)
     {
-        var test = await GetAsync(id, cancellationToken);
+        var test = await GetNoIncludesAsync(id, cancellationToken);
 
         if (test == null)
         {
             return null;
         }
 
+        DbContext.Attach(test);
         test.BackflowScheduleMonth = month;
-        test.UpdatedById = updatedById;
-        test.UpdatedTime = DateTime.UtcNow;
 
-        DbContext.Entry(test).Property(x => x.BackflowScheduleMonth).IsModified = true;
-        DbContext.Entry(test).Property(x => x.UpdatedById).IsModified = true;
-        DbContext.Entry(test).Property(x => x.UpdatedTime).IsModified = true;
-
-        await DbContext.SaveChangesAsync(CancellationToken.None);
+        await DbContext.SaveChangesAsync();
 
         return test;
     }
 
     public async Task<BackflowTest?> UpdateIsCurrentAsync(int id, bool isCurrent, int updatedById, CancellationToken cancellationToken)
     {
-        var test = await GetAsync(id, cancellationToken);
+        var test = await GetNoIncludesAsync(id, cancellationToken);
 
         if (test == null)
         {
             return null;
         }
 
+        DbContext.Attach(test);
         test.IsCurrent = isCurrent;
-        test.UpdatedById = updatedById;
-        test.UpdatedTime = DateTime.UtcNow;
 
-        DbContext.Entry(test).Property(x => x.IsCurrent).IsModified = true;
-        DbContext.Entry(test).Property(x => x.UpdatedById).IsModified = true;
-        DbContext.Entry(test).Property(x => x.UpdatedTime).IsModified = true;
-
-        await DbContext.SaveChangesAsync(CancellationToken.None);
+        await DbContext.SaveChangesAsync();
 
         return test;
     }
 
     public async Task<BackflowTest?> UpdateOutOfServiceAsync(int id, bool outOfService, int updatedById, CancellationToken cancellationToken)
     {
-        var test = await GetAsync(id, cancellationToken);
+        var test = await GetNoIncludesAsync(id, cancellationToken);
 
         if (test == null)
         {
             return null;
         }
 
+        DbContext.Attach(test);
         test.OutOfService = outOfService;
         test.OutOfServiceDate = outOfService ? DateTime.UtcNow : null;
-        test.UpdatedById = updatedById;
-        test.UpdatedTime = DateTime.UtcNow;
-
-        DbContext.Entry(test).Property(x => x.OutOfService).IsModified = true;
-        DbContext.Entry(test).Property(x => x.OutOfServiceDate).IsModified = true;
-        DbContext.Entry(test).Property(x => x.UpdatedById).IsModified = true;
-        DbContext.Entry(test).Property(x => x.UpdatedTime).IsModified = true;
 
         if (outOfService)
         {
@@ -275,70 +254,54 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             if (settings?.OutOfServiceRequiresApproval == true)
             {
                 test.Disapproved = true;
-                DbContext.Entry(test).Property(x => x.Disapproved).IsModified = true;
             }
         }
 
-        await DbContext.SaveChangesAsync(CancellationToken.None);
+        await DbContext.SaveChangesAsync();
 
         return test;
     }
 
     public async Task<BackflowTest?> UpdateDisapprovalAsync(int id, bool disapproved, int updatedById, CancellationToken cancellationToken)
     {
-        var test = await GetAsync(id, cancellationToken);
+        var test = await GetNoIncludesAsync(id, cancellationToken);
 
         if (test == null)
         {
             return null;
         }
 
+        DbContext.Attach(test);
         test.Disapproved = disapproved;
-        test.UpdatedById = updatedById;
-        test.UpdatedTime = DateTime.UtcNow;
-
-        DbContext.Entry(test).Property(x => x.Disapproved).IsModified = true;
-        DbContext.Entry(test).Property(x => x.UpdatedById).IsModified = true;
-        DbContext.Entry(test).Property(x => x.UpdatedTime).IsModified = true;
 
         if (!disapproved)
         {
             test.ApprovalDate = DateTime.UtcNow;
             test.ApprovedById = updatedById;
 
-            DbContext.Entry(test).Property(x => x.ApprovalDate).IsModified = true;
-            DbContext.Entry(test).Property(x => x.ApprovedById).IsModified = true;
-
             if (test.OutOfServiceDate == null)
             {
                 test.OutOfServiceDate = DateTime.UtcNow;
-                DbContext.Entry(test).Property(x => x.OutOfServiceDate).IsModified = true;
             }
         }
 
-        await DbContext.SaveChangesAsync(CancellationToken.None);
+        await DbContext.SaveChangesAsync();
 
         return test;
     }
 
     public async Task<BackflowTest?> UpdateForceRenewalAsync(int id, bool forceRenewal, int forceRenewalYears, int updatedById, CancellationToken cancellationToken)
     {
-        var test = await GetAsync(id, cancellationToken);
+        var test = await GetNoIncludesAsync(id, cancellationToken);
 
         if (test == null)
         {
             return null;
         }
 
+        DbContext.Attach(test);
         test.ForceRenewal = forceRenewal;
         test.ForceRenewalYears = forceRenewalYears;
-        test.UpdatedById = updatedById;
-        test.UpdatedTime = DateTime.UtcNow;
-
-        DbContext.Entry(test).Property(x => x.ForceRenewal).IsModified = true;
-        DbContext.Entry(test).Property(x => x.ForceRenewalYears).IsModified = true;
-        DbContext.Entry(test).Property(x => x.UpdatedById).IsModified = true;
-        DbContext.Entry(test).Property(x => x.UpdatedTime).IsModified = true;
 
         if (forceRenewal && test.IsCurrent && !test.OutOfService && test.TestResult == BackflowTestResult.Pass)
         {
@@ -348,30 +311,24 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
                 : baseDate.AddYears(forceRenewalYears);
 
             test.ExpirationDate = newExpiration;
-            DbContext.Entry(test).Property(x => x.ExpirationDate).IsModified = true;
         }
 
-        await DbContext.SaveChangesAsync(CancellationToken.None);
+        await DbContext.SaveChangesAsync();
 
         return test;
     }
 
     public async Task<BackflowTest?> UpdateRejectionAsync(int id, bool rejected, string? rejectedReason, int updatedById, CancellationToken cancellationToken)
     {
-        var test = await GetAsync(id, cancellationToken);
+        var test = await GetNoIncludesAsync(id, cancellationToken);
 
         if (test == null)
         {
             return null;
         }
 
+        DbContext.Attach(test);
         test.Rejected = rejected;
-        test.UpdatedById = updatedById;
-        test.UpdatedTime = DateTime.UtcNow;
-
-        DbContext.Entry(test).Property(x => x.Rejected).IsModified = true;
-        DbContext.Entry(test).Property(x => x.UpdatedById).IsModified = true;
-        DbContext.Entry(test).Property(x => x.UpdatedTime).IsModified = true;
 
         if (rejected)
         {
@@ -380,49 +337,62 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             test.RejectedDate = DateTime.UtcNow;
             test.RejectedReason = rejectedReason;
 
-            DbContext.Entry(test).Property(x => x.IsCurrent).IsModified = true;
-            DbContext.Entry(test).Property(x => x.RejectedById).IsModified = true;
-            DbContext.Entry(test).Property(x => x.RejectedDate).IsModified = true;
-            DbContext.Entry(test).Property(x => x.RejectedReason).IsModified = true;
+            await DbContext.SaveChangesAsync();
 
-            await DbContext.SaveChangesAsync(CancellationToken.None);
-
-            var previousId = await FindPreviousTestIdAsync(test, cancellationToken);
+            var previousId = await FindPreviousTestIdAsync(test);
 
             if (previousId.HasValue)
             {
                 await DbContext.BackflowTests
                     .IgnoreQueryFilters()
                     .Where(t => t.Id == previousId.Value)
-                    .ExecuteUpdateAsync(s => s.SetProperty(x => x.IsCurrent, true), CancellationToken.None);
+                    .ExecuteUpdateAsync(s => s.SetProperty(x => x.IsCurrent, true));
             }
         }
         else
         {
-            await DbContext.SaveChangesAsync(CancellationToken.None);
+            await DbContext.SaveChangesAsync();
 
-            await ReassignIsCurrentForDeviceAsync(test, updatedById, cancellationToken);
+            await ReassignIsCurrentForDeviceAsync(test, cancellationToken);
         }
 
         return test;
     }
 
-    private async Task ReassignIsCurrentForDeviceAsync(BackflowTest fromTest, int updatedById, CancellationToken cancellationToken)
+    private async Task ReassignIsCurrentForDeviceAsync(BackflowTest fromTest, CancellationToken cancellationToken)
     {
         if (fromTest.SiteId == null || string.IsNullOrWhiteSpace(fromTest.SerialNumber))
         {
             return;
         }
 
-        var siteCandidates = await DbContext.BackflowTests
+        var serialLower = fromTest.SerialNumber.Trim().ToLower();
+
+        var matchingTests = await DbContext.BackflowTests
             .IgnoreQueryFilters()
-            .Where(t => t.SiteId == fromTest.SiteId && t.DeletedTime == null && !t.Rejected)
-            .Select(t => new { t.Id, t.SerialNumber, t.TestDate, t.IsCurrent })
+            .Where(t => t.SiteId == fromTest.SiteId
+                     && t.Id != fromTest.Id
+                     && t.DeletedTime == null
+                     && !t.Rejected
+                     && t.SerialNumber != null
+                     && t.SerialNumber.Trim().ToLower() == serialLower)
+            .Select(t => new { t.Id, t.TestDate, t.IsCurrent })
             .ToListAsync(cancellationToken);
 
-        var matchingTests = siteCandidates
-            .Where(t => AreSerialNumbersMatching(t.SerialNumber, fromTest.SerialNumber))
-            .ToList();
+        if (matchingTests.Count == 0)
+        {
+            var normalizedSerial = NormalizeSerialNumber(fromTest.SerialNumber);
+
+            var siteCandidates = await DbContext.BackflowTests
+                .IgnoreQueryFilters()
+                .Where(t => t.SiteId == fromTest.SiteId && t.Id != fromTest.Id && t.DeletedTime == null && !t.Rejected && t.SerialNumber != null)
+                .Select(t => new { t.Id, t.SerialNumber, t.TestDate, t.IsCurrent })
+                .ToListAsync(cancellationToken);
+
+            matchingTests = [.. siteCandidates
+                .Where(t => !string.IsNullOrWhiteSpace(t.SerialNumber) && NormalizeSerialNumber(t.SerialNumber) == normalizedSerial)
+                .Select(t => new { t.Id, t.TestDate, t.IsCurrent })];
+        }
 
         if (matchingTests.Count == 0)
         {
@@ -431,42 +401,28 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
 
         var latestId = matchingTests.OrderByDescending(t => t.TestDate).First().Id;
 
-        foreach (var match in matchingTests)
-        {
-            if (match.Id == latestId && !match.IsCurrent)
-            {
-                await DbContext.BackflowTests.IgnoreQueryFilters()
-                    .Where(t => t.Id == match.Id)
-                    .ExecuteUpdateAsync(s => s
-                        .SetProperty(x => x.IsCurrent, true)
-                        .SetProperty(x => x.UpdatedById, updatedById)
-                        .SetProperty(x => x.UpdatedTime, DateTime.UtcNow), CancellationToken.None);
-            }
-            else if (match.Id != latestId && match.IsCurrent)
-            {
-                await DbContext.BackflowTests.IgnoreQueryFilters()
-                    .Where(t => t.Id == match.Id)
-                    .ExecuteUpdateAsync(s => s
-                        .SetProperty(x => x.IsCurrent, false)
-                        .SetProperty(x => x.UpdatedById, updatedById)
-                        .SetProperty(x => x.UpdatedTime, DateTime.UtcNow), CancellationToken.None);
-            }
-        }
-    }
+        var idsToDeactivate = matchingTests
+            .Where(t => t.Id != latestId && t.IsCurrent)
+            .Select(t => t.Id)
+            .ToList();
 
-    private static bool AreSerialNumbersMatching(string? a, string? b)
-    {
-        if (string.IsNullOrWhiteSpace(a) || string.IsNullOrWhiteSpace(b))
+        if (idsToDeactivate.Count > 0)
         {
-            return false;
+            await DbContext.BackflowTests.IgnoreQueryFilters()
+                .Where(t => idsToDeactivate.Contains(t.Id))
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(x => x.IsCurrent, false));
         }
 
-        if (string.Equals(a.Trim(), b.Trim(), StringComparison.OrdinalIgnoreCase))
-        {
-            return true;
-        }
+        var latest = matchingTests.First(t => t.Id == latestId);
 
-        return NormalizeSerialNumber(a) == NormalizeSerialNumber(b);
+        if (!latest.IsCurrent)
+        {
+            await DbContext.BackflowTests.IgnoreQueryFilters()
+                .Where(t => t.Id == latestId)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(x => x.IsCurrent, true));
+        }
     }
 
     private static string NormalizeSerialNumber(string serial)
@@ -474,12 +430,16 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return string.Concat(serial.Where(char.IsDigit)).TrimStart('0');
     }
 
-    private async Task<int?> FindPreviousTestIdAsync(BackflowTest fromTest, CancellationToken cancellationToken)
+    private async Task<int?> FindPreviousTestIdAsync(BackflowTest fromTest)
     {
         if (string.IsNullOrWhiteSpace(fromTest.SerialNumber))
         {
             return null;
         }
+
+        var siteId = fromTest.SiteId;
+        var createdTimeCutoff = fromTest.CreatedTime;
+        var streetLower = fromTest.PropertyStreetNumber?.Trim().ToLower();
 
         var query = DbContext.BackflowTests
             .Where(t =>
@@ -487,43 +447,20 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
                 t.Id != fromTest.Id &&
                 t.DeletedTime == null &&
                 !t.Rejected &&
-                t.CreatedTime < fromTest.CreatedTime);
+                t.CreatedTime < createdTimeCutoff &&
+                (t.SiteId == siteId ||
+                 (streetLower != null && t.PropertyStreetNumber != null &&
+                  t.PropertyStreetNumber.Trim().ToLower() == streetLower)));
 
         if (!string.IsNullOrWhiteSpace(fromTest.Manufacturer))
         {
             query = query.Where(t => t.Manufacturer == fromTest.Manufacturer);
         }
 
-        var candidates = await query
-            .OrderByDescending(t => t.CreatedTime)
-            .Select(t => new { t.Id, t.SiteId, t.PropertyStreetNumber })
-            .ToListAsync(cancellationToken);
-
-        if (candidates.Count == 0)
-        {
-            return null;
-        }
-
-        if (candidates.Count == 1)
-        {
-            var only = candidates[0];
-            var streetMatch = string.Equals(
-                only.PropertyStreetNumber?.Trim(),
-                fromTest.PropertyStreetNumber?.Trim(),
-                StringComparison.OrdinalIgnoreCase);
-
-            return (only.SiteId == fromTest.SiteId || streetMatch) ? only.Id : null;
-        }
-
-        // Multiple candidates — prefer SiteId match, then PropertyStreetNumber match.
-        var bySite = candidates.Where(t => t.SiteId == fromTest.SiteId).ToList();
-        var pool = bySite.Count > 0 ? bySite : candidates
-            .Where(t => string.Equals(
-                t.PropertyStreetNumber?.Trim(),
-                fromTest.PropertyStreetNumber?.Trim(),
-                StringComparison.OrdinalIgnoreCase))
-            .ToList();
-
-        return pool.Count > 0 ? pool[0].Id : null;
+        return await query
+            .OrderByDescending(t => t.SiteId == siteId ? 1 : 0)
+            .ThenByDescending(t => t.CreatedTime)
+            .Select(t => (int?)t.Id)
+            .FirstOrDefaultAsync();
     }
 }

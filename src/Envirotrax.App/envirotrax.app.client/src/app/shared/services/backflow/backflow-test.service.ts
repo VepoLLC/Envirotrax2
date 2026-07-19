@@ -134,6 +134,41 @@ export class BackflowTestService {
         const url = this._urlResolver.resolveUrl(`/api/professionals/backflow/tests/${id}/pdf`);
         return await lastValueFrom(this._http.get(url, { responseType: 'blob' }));
     }
+
+    public async updateRenewalRequired(id: number, renewalRequired: boolean): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/renewal-required`);
+        return await lastValueFrom(this._http.put<BackflowTest>(url, renewalRequired));
+    }
+
+    public async updateScheduleMonth(id: number, month: number): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/schedule-month`);
+        return await lastValueFrom(this._http.put<BackflowTest>(url, { month }));
+    }
+
+    public async updateIsCurrent(id: number, isCurrent: boolean): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/is-current`);
+        return await lastValueFrom(this._http.put<BackflowTest>(url, isCurrent));
+    }
+
+    public async updateOutOfService(id: number, outOfService: boolean): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/out-of-service`);
+        return await lastValueFrom(this._http.put<BackflowTest>(url, outOfService));
+    }
+
+    public async updateDisapproval(id: number, disapproved: boolean): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/disapproval`);
+        return await lastValueFrom(this._http.put<BackflowTest>(url, disapproved));
+    }
+
+    public async updateRejection(id: number, request: { rejected: boolean; rejectedReason?: string | null }): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/rejection`);
+        return await lastValueFrom(this._http.put<BackflowTest>(url, request));
+    }
+
+    public async updateForceRenewal(id: number, request: { forceRenewal: boolean; forceRenewalYears?: number | null }): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/force-renewal`);
+        return await lastValueFrom(this._http.put<BackflowTest>(url, request));
+    }
 }
 
 function buildBackflowTestFormData(test: BackflowTest): FormData {

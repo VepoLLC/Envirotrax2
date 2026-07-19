@@ -415,6 +415,9 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public DateTime? DeletedTime { get; set; }
     public bool NeedsRenewalCheck { get; set; }
     public bool RenewalRequired { get; set; }
+    public int BackflowScheduleMonth { get; set; }
+    public bool ForceRenewal { get; set; }
+    public int ForceRenewalYears { get; set; }
 }
 
 public class BackflowTestExpiryCounts

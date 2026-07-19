@@ -4,6 +4,8 @@ import { FogTransporterService } from "../../../shared/services/fog/fog-transpor
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { Professional } from "../../../shared/models/professionals/professional";
+import { DownloadConfig } from "../../../shared/models/download-config";
+import { DownloadService } from "../../../shared/services/download.service";
 import { CellTemplateData, ColumnType, TableColumn } from '@envirotrax/common-ui';
 
 @Component({
@@ -31,9 +33,26 @@ export class FogTransporterListComponent implements OnInit {
     @ViewChild('addressCell', { static: true })
     public addressCell?: TemplateRef<CellTemplateData<Professional>>;
 
+    public downloadConfig: DownloadConfig;
+
     constructor(
-        private readonly _fogTransporterService: FogTransporterService
+        private readonly _fogTransporterService: FogTransporterService,
+        private readonly _downloadService: DownloadService
     ) {
+        this.downloadConfig = {
+            fileName: 'FOG Transporters',
+            endpoint: this._fogTransporterService.getAllEndpoint(),
+            suppoertedFormats: ['CSV', 'Excel'],
+            columns: [
+                { field: 'name', caption: 'Company Name' },
+                { field: 'companyEmail', caption: 'Company Email' },
+                { field: 'phoneNumber', caption: 'Company Phone' },
+                { field: 'address', caption: 'Address' },
+                { field: 'city', caption: 'City' },
+                { field: 'state.code', caption: 'State' },
+                { field: 'zipCode', caption: 'ZIP' }
+            ]
+        };
     }
 
     public async ngOnInit(): Promise<void> {
@@ -84,5 +103,9 @@ export class FogTransporterListComponent implements OnInit {
             await this.getTransporters();
             this.showResults = true;
         }
+    }
+
+    public showDownloadManager(): void {
+        this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
     }
 }

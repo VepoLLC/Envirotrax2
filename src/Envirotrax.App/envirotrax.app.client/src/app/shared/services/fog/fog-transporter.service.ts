@@ -7,6 +7,7 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { Professional } from "../../models/professionals/professional";
+import { DownloadEndpoint } from "../../models/download-config";
 
 @Injectable({
     providedIn: 'root'
@@ -27,5 +28,14 @@ export class FogTransporterService {
         });
 
         return await lastValueFrom(observable);
+    }
+
+    public getAllEndpoint(): DownloadEndpoint {
+        const url = this._urlResolver.resolveUrl('/api/fog/transporters');
+
+        return {
+            method: 'GET',
+            url: url
+        };
     }
 }

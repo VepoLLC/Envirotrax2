@@ -365,19 +365,34 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
         foreach (var test in tests)
         {
-            if (test.OutOfService) continue;
+            if (test.ExpirationDate == null)
+            {
+                return;
+            }
 
-            var matched = requirements.FirstOrDefault(r => DoesTestMatchRequirement(test, r));
-            bool renewalRequired = matched != null;
-            DateTime? newExpirationDate = null;
+            try
+            {
+                var matched = requirements.FirstOrDefault(r => DoesTestMatchRequirement(test, r));
+                bool renewalRequired = matched != null;
+                DateTime? newExpirationDate = null;
 
-            if (matched != null && test.TestResult == BackflowTestResult.Pass)
-                newExpirationDate = (test.TestDate ?? DateTime.UtcNow).AddYears(matched.RenewalYears);
+                if (matched != null && test.TestResult == BackflowTestResult.Pass)
+                {
+                    newExpirationDate = (test.TestDate ?? DateTime.UtcNow).AddYears(matched.RenewalYears);
+                }
 
-            await _testRepository.UpdateTestRenewalAsync(test.Id, renewalRequired, newExpirationDate, cancellationToken);
+                await _testRepository.UpdateTestRenewalAsync(test.Id, renewalRequired, newExpirationDate, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "Stopping renewal processing for site {SiteId} - failed to update test {TestId}",
+                    siteId, test.Id);
+                return;
+            }
         }
 
-        await _siteRepository.ClearNeedsRenewalCheckAsync(siteId, cancellationToken);
+        await _siteRepository.ClearNeedsRenewalCheckAsync(siteId);
     }
 
     public async Task ProcessTestRenewalAsync(int testId, CancellationToken cancellationToken)

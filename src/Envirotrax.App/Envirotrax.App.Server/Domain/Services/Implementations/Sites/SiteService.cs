@@ -164,7 +164,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
     public async Task<IEnumerable<SiteDto>> GetAllPendingRenewalAsync(int batchSize, CancellationToken cancellationToken)
     {
-        var sites = await _siteRepository.GetAllPendingRenewalAsync(batchSize, cancellationToken);
+        var sites = await _siteRepository.GetAllPendingRenewalAsync(batchSize);
         return Mapper.Map<IEnumerable<Site>, IEnumerable<SiteDto>>(sites);
     }
 

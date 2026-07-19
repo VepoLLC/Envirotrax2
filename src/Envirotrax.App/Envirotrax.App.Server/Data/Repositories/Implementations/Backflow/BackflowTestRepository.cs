@@ -110,6 +110,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
                 TestDate = t.TestDate,
                 TestResult = t.TestResult,
                 OutOfService = t.OutOfService,
+                ExpirationDate = t.ExpirationDate,
                 Site = t.Site == null ? null : new Site { HasAuxWaterSupply = t.Site.HasAuxWaterSupply }
             })
             .AsNoTracking()

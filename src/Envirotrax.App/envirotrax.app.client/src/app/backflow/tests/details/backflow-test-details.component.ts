@@ -36,6 +36,22 @@ export class BackflowTestDetailsComponent implements OnInit {
     public validationErrors: string[] = [];
     public settings: BackflowSettings | null = null;
 
+    public readonly scheduleMonthOptions = [
+        { id: 0, text: 'Not Applicable' },
+        { id: 1, text: '(1) January' },
+        { id: 2, text: '(2) February' },
+        { id: 3, text: '(3) March' },
+        { id: 4, text: '(4) April' },
+        { id: 5, text: '(5) May' },
+        { id: 6, text: '(6) June' },
+        { id: 7, text: '(7) July' },
+        { id: 8, text: '(8) August' },
+        { id: 9, text: '(9) September' },
+        { id: 10, text: '(10) October' },
+        { id: 11, text: '(11) November' },
+        { id: 12, text: '(12) December' }
+    ];
+
     constructor(
         private readonly _activatedRoute: ActivatedRoute,
         private readonly _testService: BackflowTestService,

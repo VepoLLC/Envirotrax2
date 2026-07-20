@@ -117,20 +117,20 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             .ToListAsync(cancellationToken);
     }
 
-    public async Task UpdateTestRenewalAsync(int testId, bool renewalRequired, DateTime? expirationDate, CancellationToken cancellationToken)
+    public async Task UpdateTestRenewalAsync(int testId, bool renewalRequired, DateTime? expirationDate)
     {
         if (expirationDate.HasValue)
         {
             await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
                 .ExecuteUpdateAsync(s => s
                     .SetProperty(x => x.RenewalRequired, renewalRequired)
-                    .SetProperty(x => x.ExpirationDate, expirationDate.Value), cancellationToken);
+                    .SetProperty(x => x.ExpirationDate, expirationDate.Value));
         }
         else
         {
             await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
                 .ExecuteUpdateAsync(s => s
-                    .SetProperty(x => x.RenewalRequired, renewalRequired), cancellationToken);
+                    .SetProperty(x => x.RenewalRequired, renewalRequired));
         }
     }
 

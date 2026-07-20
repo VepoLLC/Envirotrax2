@@ -420,7 +420,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
                     newExpirationDate = (test.TestDate ?? DateTime.UtcNow).AddYears(matched.RenewalYears);
                 }
 
-                await _testRepository.UpdateTestRenewalAsync(test.Id, renewalRequired, newExpirationDate, cancellationToken);
+                await _testRepository.UpdateTestRenewalAsync(test.Id, renewalRequired, newExpirationDate);
             }
             catch (Exception ex)
             {
@@ -437,7 +437,11 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     public async Task ProcessTestRenewalAsync(int testId, CancellationToken cancellationToken)
     {
         var test = await _testRepository.GetAsync(testId, cancellationToken);
-        if (test == null || test.DeletedTime.HasValue) return;
+
+        if (test == null || test.DeletedTime.HasValue)
+        {
+            return;
+        }
 
         if (test.OutOfService || (!string.IsNullOrEmpty(test.DeviceType) && SkippedDeviceTypes.Contains(test.DeviceType)))
         {

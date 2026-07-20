@@ -17,8 +17,8 @@ BEGIN TRY
     WHERE EXISTS (SELECT 1 FROM Envirotrax2Dev.dbo.AspNetUsers WHERE UserName = SaveBpats.UserID)
 
     INSERT INTO Envirotrax2Dev.dbo.AspNetUsers
-        ([UserName], [NormalizedUserName], [Email], [NormalizedEmail], [LegacyPasswordHash], [EmailConfirmed], [PhoneNumber], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEnabled], [AccessFailedCount], [IsSuperUser], [SecurityStamp])
-    SELECT SaveBpats.UserID, UPPER(SaveBpats.UserID), SaveBpats.UserID, UPPER(SaveBpats.UserID), SaveBpats.[Password], 1, CASE WHEN ISNULL(SaveBpats.CellNumber, '') = '' THEN NULL ELSE SaveBpats.CellNumber END, CASE WHEN ISNULL(SaveBpats.CellNumber, '') = '' THEN 0 ELSE 1 END, CASE WHEN SaveBpats.DisableTwoFactorAuthentication = 1 THEN 0 ELSE 1 END, 1, 0, 0, NEWID()
+        ([UserName], [NormalizedUserName], [Email], [NormalizedEmail], [PasswordHash], [IsMigratedLegacyPasswordHashed], [PasswordExpirationDate], [EmailConfirmed], [PhoneNumber], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEnabled], [AccessFailedCount], [IsSuperUser], [SecurityStamp])
+    SELECT SaveBpats.UserID, UPPER(SaveBpats.UserID), SaveBpats.UserID, UPPER(SaveBpats.UserID), SaveBpats.[Password], 0, GETUTCDATE(), 1, CASE WHEN ISNULL(SaveBpats.CellNumber, '') = '' THEN NULL ELSE SaveBpats.CellNumber END, CASE WHEN ISNULL(SaveBpats.CellNumber, '') = '' THEN 0 ELSE 1 END, CASE WHEN SaveBpats.DisableTwoFactorAuthentication = 1 THEN 0 ELSE 1 END, 1, 0, 0, NEWID()
     FROM SaveBpats
     LEFT JOIN Envirotrax2Dev.dbo.MigrationSkippedUsers skipped
         ON skipped.UserID = SaveBpats.UserID AND skipped.SourceTable = 'SaveBpats'

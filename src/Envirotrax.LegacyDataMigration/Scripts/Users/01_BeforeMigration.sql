@@ -2,10 +2,16 @@
 USE Envirotrax2Dev
 GO
 
-IF COL_LENGTH('AspNetUsers', 'LegacyPasswordHash') IS NULL
+IF COL_LENGTH('AspNetUsers', 'IsMigratedLegacyPasswordHashed') IS NULL
 BEGIN
     ALTER TABLE AspNetUsers
-    ADD LegacyPasswordHash NVARCHAR(MAX) NULL;
+    ADD IsMigratedLegacyPasswordHashed BIT NOT NULL DEFAULT 0;
+END
+
+IF COL_LENGTH('AspNetUsers', 'PasswordExpirationDate') IS NULL
+BEGIN
+    ALTER TABLE AspNetUsers
+    ADD PasswordExpirationDate DATETIME2 NULL;
 END
 
 IF OBJECT_ID('MigrationSkippedUsers', 'U') IS NULL

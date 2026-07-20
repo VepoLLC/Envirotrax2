@@ -17,8 +17,8 @@ BEGIN TRY
     WHERE EXISTS (SELECT 1 FROM Envirotrax2Dev.dbo.AspNetUsers WHERE UserName = CsiInspectors.UserID)
 
     INSERT INTO Envirotrax2Dev.dbo.AspNetUsers
-        ([UserName], [NormalizedUserName], [Email], [NormalizedEmail], [LegacyPasswordHash], [EmailConfirmed], [PhoneNumber], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEnabled], [AccessFailedCount], [IsSuperUser], [SecurityStamp])
-    SELECT CsiInspectors.UserID, UPPER(CsiInspectors.UserID), CsiInspectors.UserID, UPPER(CsiInspectors.UserID), CsiInspectors.[Password], 1, CASE WHEN ISNULL(CsiInspectors.CellNumber, '') = '' THEN NULL ELSE CsiInspectors.CellNumber END, CASE WHEN ISNULL(CsiInspectors.CellNumber, '') = '' THEN 0 ELSE 1 END, CASE WHEN CsiInspectors.DisableTwoFactorAuthentication = 1 THEN 0 ELSE 1 END, 1, 0, 0, NEWID()
+        ([UserName], [NormalizedUserName], [Email], [NormalizedEmail], [PasswordHash], [IsMigratedLegacyPasswordHashed], [PasswordExpirationDate], [EmailConfirmed], [PhoneNumber], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEnabled], [AccessFailedCount], [IsSuperUser], [SecurityStamp])
+    SELECT CsiInspectors.UserID, UPPER(CsiInspectors.UserID), CsiInspectors.UserID, UPPER(CsiInspectors.UserID), CsiInspectors.[Password], 0, GETUTCDATE(), 1, CASE WHEN ISNULL(CsiInspectors.CellNumber, '') = '' THEN NULL ELSE CsiInspectors.CellNumber END, CASE WHEN ISNULL(CsiInspectors.CellNumber, '') = '' THEN 0 ELSE 1 END, CASE WHEN CsiInspectors.DisableTwoFactorAuthentication = 1 THEN 0 ELSE 1 END, 1, 0, 0, NEWID()
     FROM CsiInspectors
     LEFT JOIN Envirotrax2Dev.dbo.MigrationSkippedUsers skipped
         ON skipped.UserID = CsiInspectors.UserID AND skipped.SourceTable = 'CsiInspectors'

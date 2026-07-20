@@ -108,6 +108,40 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         }
     }
 
+    private async Task ApplyRenewalAsync(BackflowTestDto dto, bool hasAuxWaterSupply, CancellationToken cancellationToken)
+    {
+        dto.RenewalRequired = false;
+        dto.ExpirationDate = null;
+
+        if (dto.WaterSupplier?.Id is not int waterSupplierId)
+        {
+            return;
+        }
+
+        if (dto.OutOfService || (!string.IsNullOrEmpty(dto.DeviceType) && SkippedDeviceTypes.Contains(dto.DeviceType)))
+        {
+            return;
+        }
+
+        var requirements = await _renewalRequirementService.GetAllByWaterSupplierIdAsync(waterSupplierId, cancellationToken);
+
+        var test = new BackflowTest
+        {
+            DeviceType = dto.DeviceType,
+            PropertyType = dto.PropertyType,
+            HazardType = dto.HazardType,
+            Ossf = dto.Ossf,
+            TestResult = dto.TestResult,
+            TestDate = dto.TestDate,
+            Site = new Site { HasAuxWaterSupply = hasAuxWaterSupply }
+        };
+
+        var (renewalRequired, expirationDate) = ComputeRenewal(test, requirements);
+
+        dto.RenewalRequired = renewalRequired;
+        dto.ExpirationDate = expirationDate;
+    }
+
     private static void ApplySiteSnapshot(BackflowTestDto dto, SiteDto site)
     {
         dto.AccountNumber = site.AccountNumber;
@@ -147,6 +181,8 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         await PopulateBpatSnapshotAsync(dto);
         DeriveTestDate(dto);
 
+        bool hasAuxWaterSupply = false;
+
         if (dto.Site?.Id != null)
         {
             var site = await _siteService.GetAsync(dto.Site.Id.Value, cancellationToken);
@@ -154,8 +190,11 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             if (site != null)
             {
                 ApplySiteSnapshot(dto, site);
+                hasAuxWaterSupply = site.HasAuxWaterSupply;
             }
         }
+
+        await ApplyRenewalAsync(dto, hasAuxWaterSupply, cancellationToken);
 
         // Set paths before AddAsync to avoid a second EF update (double-tracking conflict)
         if (assemblyStream != null && assemblyFileName != null)
@@ -365,25 +404,44 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
         foreach (var test in tests)
         {
-            if (test.OutOfService) continue;
+            if (test.ExpirationDate == null)
+            {
+                return;
+            }
 
-            var matched = requirements.FirstOrDefault(r => DoesTestMatchRequirement(test, r));
-            bool renewalRequired = matched != null;
-            DateTime? newExpirationDate = null;
+            try
+            {
+                var matched = requirements.FirstOrDefault(r => DoesTestMatchRequirement(test, r));
+                bool renewalRequired = matched != null;
+                DateTime? newExpirationDate = null;
 
-            if (matched != null && test.TestResult == BackflowTestResult.Pass)
-                newExpirationDate = (test.TestDate ?? DateTime.UtcNow).AddYears(matched.RenewalYears);
+                if (matched != null && test.TestResult == BackflowTestResult.Pass)
+                {
+                    newExpirationDate = (test.TestDate ?? DateTime.UtcNow).AddYears(matched.RenewalYears);
+                }
 
-            await _testRepository.UpdateTestRenewalAsync(test.Id, renewalRequired, newExpirationDate, cancellationToken);
+                await _testRepository.UpdateTestRenewalAsync(test.Id, renewalRequired, newExpirationDate);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "Stopping renewal processing for site {SiteId} - failed to update test {TestId}",
+                    siteId, test.Id);
+                return;
+            }
         }
 
-        await _siteRepository.ClearNeedsRenewalCheckAsync(siteId, cancellationToken);
+        await _siteRepository.ClearNeedsRenewalCheckAsync(siteId);
     }
 
     public async Task ProcessTestRenewalAsync(int testId, CancellationToken cancellationToken)
     {
         var test = await _testRepository.GetAsync(testId, cancellationToken);
-        if (test == null || test.DeletedTime.HasValue) return;
+
+        if (test == null || test.DeletedTime.HasValue)
+        {
+            return;
+        }
 
         if (test.OutOfService || (!string.IsNullOrEmpty(test.DeviceType) && SkippedDeviceTypes.Contains(test.DeviceType)))
         {
@@ -392,12 +450,8 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         }
 
         var requirements = (await _renewalRequirementService.GetAllAsync(cancellationToken)).ToList();
-        var matched = requirements.FirstOrDefault(r => DoesTestMatchRequirement(test, r));
 
-        bool renewalRequired = matched != null;
-        DateTime? newExpirationDate = null;
-        if (matched != null && test.TestResult == BackflowTestResult.Pass)
-            newExpirationDate = (test.TestDate ?? DateTime.UtcNow).AddYears(matched.RenewalYears);
+        var (renewalRequired, newExpirationDate) = ComputeRenewal(test, requirements);
 
         await _testRepository.UpdateTestRenewalAndClearFlagAsync(testId, renewalRequired, newExpirationDate, cancellationToken);
     }
@@ -456,6 +510,23 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         var test = await _testRepository.UpdateRejectionAsync(id, request.Rejected, request.RejectedReason, _authService.UserId, cancellationToken);
 
         return test == null ? null : MapToDto(test);
+    }
+
+    private static (bool RenewalRequired, DateTime? ExpirationDate) ComputeRenewal(
+        BackflowTest test,
+        IEnumerable<BackflowRenewalRequirementDto> requirements)
+    {
+        var matched = requirements.FirstOrDefault(r => DoesTestMatchRequirement(test, r));
+
+        bool renewalRequired = matched != null;
+        DateTime? expirationDate = null;
+
+        if (matched != null && test.TestResult == BackflowTestResult.Pass)
+        {
+            expirationDate = (test.TestDate ?? DateTime.UtcNow).AddYears(matched.RenewalYears);
+        }
+
+        return (renewalRequired, expirationDate);
     }
 
     private static bool DoesTestMatchRequirement(BackflowTest test, BackflowRenewalRequirementDto requirement)

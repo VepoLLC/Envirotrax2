@@ -1,6 +1,5 @@
 
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
-using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers.TaskRunner;
@@ -9,19 +8,10 @@ namespace Envirotrax.App.Server.Controllers.TaskRunner;
 public class BackflowTestController : TaskRunnerBaseContoller
 {
     private readonly IBackflowTestService _backflowTestService;
-    private readonly ISiteService _siteService;
 
-    public BackflowTestController(IBackflowTestService backflowTestService, ISiteService siteService)
+    public BackflowTestController(IBackflowTestService backflowTestService)
     {
         _backflowTestService = backflowTestService;
-        _siteService = siteService;
-    }
-
-    [HttpGet("renewal/pending-sites")]
-    public async Task<IActionResult> GetAllPendingSitesRenewalAsync([FromQuery] int batchSize, CancellationToken cancellationToken)
-    {
-        var sites = await _siteService.GetAllPendingRenewalAsync(batchSize, cancellationToken);
-        return Ok(sites);
     }
 
     [HttpGet("renewal/pending-tests")]

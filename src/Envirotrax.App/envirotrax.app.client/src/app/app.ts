@@ -606,6 +606,13 @@ export class App implements OnInit {
             routerLink: ['professionals/fog/inspections/create'],
             hasPermission: isFogInspector,
             hasFeature: true
+          },
+          {
+            title: 'Submit Trip Ticket',
+            iconCss: 'fa-regular fa-file-plus',
+            routerLink: ['professionals/fog/trip-tickets/create'],
+            hasPermission: isFogTransporter,
+            hasFeature: true
           }
         ]
       }

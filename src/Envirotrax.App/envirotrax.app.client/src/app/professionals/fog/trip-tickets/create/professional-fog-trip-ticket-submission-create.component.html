@@ -1,0 +1,80 @@
+<h1 class="text-center h2">FOG Trip Ticket Submission</h1>
+
+<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+<div *ngIf="!isLoading">
+
+    <vp-section header="Verification">
+
+        <p class="text-center">Please complete the following fields to continue with your trip ticket submission.</p>
+
+        <div class="row">
+
+            <div class="col-lg-6">
+                <div class="row align-items-center mb-3">
+                    <div class="col-5 text-end fw-semibold">Transporter Account:</div>
+                    <div class="col-7">
+                        <vp-input type="select"
+                                  name="transporterAccount"
+                                  [ngModel]="selectedTransporterUserId"
+                                  (ngModelChange)="onTransporterChange($event)"
+                                  [options]="transporterOptions" />
+                    </div>
+                </div>
+                <div class="row align-items-center mb-3">
+                    <div class="col-5 text-end fw-semibold">Water Supplier:</div>
+                    <div class="col-7">
+                        <vp-input type="select"
+                                  name="waterSupplier"
+                                  [ngModel]="selectedWaterSupplierId"
+                                  (ngModelChange)="onWaterSupplierChange($event)"
+                                  [options]="waterSupplierOptions" />
+                    </div>
+                </div>
+                <div class="row align-items-center mb-3">
+                    <div class="col-5 text-end fw-semibold">Disposal Location:</div>
+                    <div class="col-7">
+                        <vp-input type="select"
+                                  name="disposalLocation"
+                                  [ngModel]="selectedDisposalSiteId"
+                                  (ngModelChange)="onDisposalSiteChange($event)"
+                                  [options]="disposalSiteOptions" />
+                    </div>
+                </div>
+                <div class="row align-items-center mb-3">
+                    <div class="col-5 text-end fw-semibold">Transporter Vehicle:</div>
+                    <div class="col-7">
+                        <vp-input type="select"
+                                  name="transporterVehicle"
+                                  [ngModel]="selectedVehicleId"
+                                  (ngModelChange)="onVehicleChange($event)"
+                                  [options]="vehicleOptions" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="row align-items-center mb-3" *ngFor="let check of checks">
+                    <div class="col-6 text-end fw-semibold">{{ check.label }}:</div>
+                    <div class="col-6" [class.text-success]="check.valid" [class.text-danger]="!check.valid">
+                        {{ check.message }}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </vp-section>
+
+    <div *ngIf="verificationPassed" class="alert alert-success mt-3">
+        Verification complete. The trip ticket form will be available here.
+    </div>
+
+    <div class="mt-3 d-flex justify-content-center">
+        <button type="button" class="btn btn-primary vp-section-button" (click)="returnToSearch()">
+            <i class="fa-solid fa-magnifying-glass me-1"></i>
+            Back to Search
+        </button>
+    </div>
+
+</div>

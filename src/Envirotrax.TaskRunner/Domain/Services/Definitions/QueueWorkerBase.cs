@@ -38,7 +38,6 @@ public class QueueWorkerBase<TWorker, TMessage> : BackgroundService
             try
             {
                 var messages = await _queueClient.ReceiveMessagesAsync(_options.MaxMessages, _options.VisibilityTimeout, stoppingToken);
-                _logger.LogInformation("Received queue messages for {QueueName}. Message Count: {MessageCount}.", _options.QueueName, messages.Length);
 
                 if (messages.Length == 0)
                 {
@@ -46,6 +45,7 @@ public class QueueWorkerBase<TWorker, TMessage> : BackgroundService
                     continue;
                 }
 
+                _logger.LogInformation("Received queue messages for {QueueName}. Message Count: {MessageCount}.", _options.QueueName, messages.Length);
                 await Task.WhenAll(messages.Select(msg => ProcessMessageAsync(msg, stoppingToken)));
             }
             catch (OperationCanceledException) { break; }

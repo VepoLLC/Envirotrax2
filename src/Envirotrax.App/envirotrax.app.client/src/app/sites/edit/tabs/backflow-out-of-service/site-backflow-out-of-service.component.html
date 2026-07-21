@@ -1,0 +1,98 @@
+<ng-template #statusTemplate let-request="rowData">
+    <div class="d-flex gap-1 flex-wrap">
+        <vp-status-icon [imageSrc]="request.test?.isCurrent ? '/images/icons/bstatus-green-on.png' : '/images/icons/bstatus-green-off.png'"
+                        [text]="request.test?.isCurrent ? 'Current Test' : 'Previous Test History'"
+                        [showText]="false" />
+        <vp-status-icon [imageSrc]="request.test?.testResult === BackflowTestResult.Fail ? '/images/icons/bstatus-magenta-off.png' : '/images/icons/bstatus-magenta-on.png'"
+                        [text]="request.test?.testResult === BackflowTestResult.Fail ? 'Failed Test' : 'Passed Test'"
+                        [showText]="false" />
+        <vp-status-icon [imageSrc]="request.test?.outOfService ? '/images/icons/bstatus-blue-off.png' : '/images/icons/bstatus-blue-on.png'"
+                        [text]="request.test?.outOfService ? 'Out of Service' : 'In Service'"
+                        [showText]="false" />
+    </div>
+</ng-template>
+
+<ng-template #bpatTemplate let-request="rowData">
+    <a *ngIf="canViewTesters && request.test?.professional?.id; else plainBpat"
+       [routerLink]="['/backflow', 'testers', 'details', request.test?.professional?.id]">
+        <div *ngIf="request.test?.bpatCompanyName" class="fw-semibold">{{ request.test?.bpatCompanyName }}</div>
+        <div *ngIf="request.test?.bpatContactName">{{ request.test?.bpatContactName }}</div>
+        <div *ngIf="request.test?.bpatAddress">{{ request.test?.bpatAddress }}</div>
+        <div *ngIf="request.test?.bpatCity || request.test?.bpatState?.name || request.test?.bpatZip">
+            {{ request.test?.bpatCity }}<span *ngIf="request.test?.bpatCity && (request.test?.bpatState?.name || request.test?.bpatZip)">, </span>{{ request.test?.bpatState?.name }} {{ request.test?.bpatZip }}
+        </div>
+    </a>
+    <ng-template #plainBpat>
+        <div *ngIf="request.test?.bpatCompanyName" class="fw-semibold">{{ request.test?.bpatCompanyName }}</div>
+        <div *ngIf="request.test?.bpatContactName">{{ request.test?.bpatContactName }}</div>
+        <div *ngIf="request.test?.bpatAddress">{{ request.test?.bpatAddress }}</div>
+        <div *ngIf="request.test?.bpatCity || request.test?.bpatState?.name || request.test?.bpatZip">
+            {{ request.test?.bpatCity }}<span *ngIf="request.test?.bpatCity && (request.test?.bpatState?.name || request.test?.bpatZip)">, </span>{{ request.test?.bpatState?.name }} {{ request.test?.bpatZip }}
+        </div>
+    </ng-template>
+</ng-template>
+
+<ng-template #serialTemplate let-request="rowData">
+    <div *ngIf="isBypassDevice(request.test?.deviceType); else plainSerial">
+        <div><strong>Main:</strong> {{ request.test?.serialNumber }}</div>
+        <div><strong>Bypass:</strong> {{ request.test?.serialNumber2 }}</div>
+    </div>
+    <ng-template #plainSerial>
+        {{ request.test?.serialNumber }}
+    </ng-template>
+</ng-template>
+
+<ng-template #assemblyTemplate let-request="rowData">
+    <div *ngIf="isBypassDevice(request.test?.deviceType); else plainAssembly">
+        <div><strong>Main Assembly:</strong> {{ deviceDescription(request.test?.manufacturer, request.test?.model, request.test?.size) }}</div>
+        <div><strong>Bypass Assembly:</strong> {{ deviceDescription(request.test?.manufacturer2, request.test?.model2, request.test?.size2) }}</div>
+        <div><strong>Hazard Type:</strong> {{ hazardLabel(request.test) }}</div>
+        <div><strong>Location Desc:</strong> {{ request.test?.locationDescription }}</div>
+    </div>
+    <ng-template #plainAssembly>
+        <div>
+            <strong>Assembly Desc:</strong>
+            {{ deviceDescription(request.test?.manufacturer, request.test?.model, request.test?.size, request.test?.deviceType) }}
+        </div>
+        <div><strong>Hazard Type:</strong> {{ hazardLabel(request.test) }}</div>
+        <div><strong>Location Desc:</strong> {{ request.test?.locationDescription }}</div>
+    </ng-template>
+</ng-template>
+
+<ng-template #deviceDescriptionTemplate let-request="rowData">
+    {{ deviceDescription(request.test?.manufacturer, request.test?.model, request.test?.size, request.test?.deviceType) }}
+</ng-template>
+
+<vp-section header="Out of Service Requests">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+        <div class="container mb-3">
+            <div class="row gap-2 justify-content-center mb-3">
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Current Test" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Previous Test History" />
+                </div>
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-magenta-on.png" text="Passed Test" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-magenta-off.png" text="Failed Test" />
+                </div>
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-blue-on.png" text="In Service" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-blue-off.png" text="Out of Service" />
+                </div>
+            </div>
+        </div>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getRequests()"
+                  [(query)]="table.query"
+                  (queryChange)="getRequests()"
+                  (queryReset)="getRequests()"
+                  [canViewDetails]="true"
+                  (viewDetails)="viewTest($event)" />
+    </div>
+</vp-section>

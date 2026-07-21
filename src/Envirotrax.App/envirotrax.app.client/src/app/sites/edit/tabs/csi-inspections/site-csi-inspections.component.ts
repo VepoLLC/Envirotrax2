@@ -1,12 +1,12 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { CsiInspection } from '../../../shared/models/csi/csi-inspection';
-import { CsiInspectionService } from '../../../shared/services/csi/csi-inspection.service';
-import { AuthService } from '../../../shared/services/auth/auth.service';
-import { PermissionAction, PermissionType } from '../../../shared/models/permission-type';
-import { TableViewModel } from '../../../shared/models/table-view-model';
-import { ComparisonOperator, QueryProperty } from '../../../shared/models/query';
-import { CsiInspectionReason, csiInspectionReasonLabels } from '../../../shared/enums/csi-inspection-reason.enum';
+import { CsiInspection } from '../../../../shared/models/csi/csi-inspection';
+import { CsiInspectionService } from '../../../../shared/services/csi/csi-inspection.service';
+import { AuthService } from '../../../../shared/services/auth/auth.service';
+import { PermissionAction, PermissionType } from '../../../../shared/models/permission-type';
+import { TableViewModel } from '../../../../shared/models/table-view-model';
+import { ComparisonOperator, QueryProperty } from '../../../../shared/models/query';
+import { CsiInspectionReason, csiInspectionReasonLabels } from '../../../../shared/enums/csi-inspection-reason.enum';
 import { CellTemplateData, ColumnType, TableColumn } from '@envirotrax/common-ui';
 
 @Component({

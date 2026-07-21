@@ -6,9 +6,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Serilog;
 
-var legacyV1DatabasConnection = "Your V1 connection string here.";
-var newV2DatabaseConnection = "Your V2 connectiong string here.";
+var legacyV1DatabasConnection = @"Server=(localdb)\mssqllocaldb;Database=Vepo;Trusted_Connection=True;MultipleActiveResultSets=true";
+var newV2DatabaseConnection = @"Server=(localdb)\mssqllocaldb;Database=Envirotrax2Dev;Trusted_Connection=True;MultipleActiveResultSets=true";
 
 var services = new ServiceCollection();
 
@@ -29,11 +30,24 @@ services
     .AddRoles<IdentityRole<int>>()
     .AddEntityFrameworkStores<AppDbContext>();
 
-services.AddLogging(builder => builder.AddConsole());
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.Map(
+        Serilog.Core.Constants.SourceContextPropertyName,
+        "General",
+        (sourceContext, writeTo) => writeTo.File($"Logs/{sourceContext.Split('.').Last()}.log"))
+    .CreateLogger();
+
+services.AddLogging(builder => builder.AddSerilog(Log.Logger, dispose: true));
 
 services.AddTransient<UserService>();
 
 var provider = services.BuildServiceProvider();
 
+/***********************************************************************************************************************************************/
+/* Migration code starts from here. The code above was for configruation. Everything below this line is the main business logic of this app.   */
+/***********************************************************************************************************************************************/
 var userService = provider.GetRequiredService<UserService>();
 await userService.MigrateAsync();

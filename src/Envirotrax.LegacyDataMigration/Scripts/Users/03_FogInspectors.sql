@@ -1,6 +1,3 @@
-USE Vepo
-GO
-
 BEGIN TRAN
 
 BEGIN TRY

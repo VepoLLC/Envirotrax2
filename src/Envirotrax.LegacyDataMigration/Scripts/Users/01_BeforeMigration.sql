@@ -1,7 +1,4 @@
 
-USE Envirotrax2Dev
-GO
-
 IF COL_LENGTH('AspNetUsers', 'IsMigratedLegacyPasswordHashed') IS NULL
 BEGIN
     ALTER TABLE AspNetUsers

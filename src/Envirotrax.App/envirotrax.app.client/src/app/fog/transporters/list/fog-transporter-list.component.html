@@ -90,7 +90,9 @@
                     [(query)]="table.query"
                     (queryChange)="getTransporters()"
                     (queryReset)="getTransporters()"
-                    [freeTextSearch]="table.freeTextSearch" />
+                    [freeTextSearch]="table.freeTextSearch"
+                    [canViewDetails]="true"
+                    (viewDetails)="openDetails($event)" />
     </vp-section>
 
 </div>

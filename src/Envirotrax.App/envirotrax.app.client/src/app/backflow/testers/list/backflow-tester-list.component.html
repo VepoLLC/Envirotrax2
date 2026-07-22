@@ -83,8 +83,8 @@
                     (queryChange)="getTesters()"
                     (queryReset)="getTesters()"
                     [freeTextSearch]="table.freeTextSearch"
-                    [canSelect]="true"
-                    (select)="openDetails($event)" />
+                    [canViewDetails]="true"
+                    (viewDetails)="openDetails($event)" />
     </vp-section>
 
 </div>

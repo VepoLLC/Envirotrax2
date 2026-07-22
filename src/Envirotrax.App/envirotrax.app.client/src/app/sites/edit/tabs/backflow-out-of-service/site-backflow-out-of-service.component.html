@@ -1,66 +1,62 @@
 <ng-template #statusTemplate let-request="rowData">
     <div class="d-flex gap-1 flex-wrap">
-        <vp-status-icon [imageSrc]="request.test?.isCurrent ? '/images/icons/bstatus-green-on.png' : '/images/icons/bstatus-green-off.png'"
-                        [text]="request.test?.isCurrent ? 'Current Test' : 'Previous Test History'"
+        <vp-status-icon [imageSrc]="request.isCurrent ? '/images/icons/bstatus-green-on.png' : '/images/icons/bstatus-green-off.png'"
+                        [text]="request.isCurrent ? 'Current Test' : 'Previous Test History'"
                         [showText]="false" />
-        <vp-status-icon [imageSrc]="request.test?.testResult === BackflowTestResult.Fail ? '/images/icons/bstatus-magenta-off.png' : '/images/icons/bstatus-magenta-on.png'"
-                        [text]="request.test?.testResult === BackflowTestResult.Fail ? 'Failed Test' : 'Passed Test'"
+        <vp-status-icon [imageSrc]="request.passed ? '/images/icons/bstatus-magenta-on.png' : '/images/icons/bstatus-magenta-off.png'"
+                        [text]="request.passed ? 'Passed Test' : 'Failed Test'"
                         [showText]="false" />
-        <vp-status-icon [imageSrc]="request.test?.outOfService ? '/images/icons/bstatus-blue-off.png' : '/images/icons/bstatus-blue-on.png'"
-                        [text]="request.test?.outOfService ? 'Out of Service' : 'In Service'"
+        <vp-status-icon [imageSrc]="request.outOfService ? '/images/icons/bstatus-blue-off.png' : '/images/icons/bstatus-blue-on.png'"
+                        [text]="request.outOfService ? 'Out of Service' : 'In Service'"
                         [showText]="false" />
     </div>
 </ng-template>
 
 <ng-template #bpatTemplate let-request="rowData">
-    <a *ngIf="canViewTesters && request.test?.professional?.id; else plainBpat"
-       [routerLink]="['/backflow', 'testers', 'details', request.test?.professional?.id]">
-        <div *ngIf="request.test?.bpatCompanyName" class="fw-semibold">{{ request.test?.bpatCompanyName }}</div>
-        <div *ngIf="request.test?.bpatContactName">{{ request.test?.bpatContactName }}</div>
-        <div *ngIf="request.test?.bpatAddress">{{ request.test?.bpatAddress }}</div>
-        <div *ngIf="request.test?.bpatCity || request.test?.bpatState?.name || request.test?.bpatZip">
-            {{ request.test?.bpatCity }}<span *ngIf="request.test?.bpatCity && (request.test?.bpatState?.name || request.test?.bpatZip)">, </span>{{ request.test?.bpatState?.name }} {{ request.test?.bpatZip }}
-        </div>
+    <a *ngIf="request.showBpatLink; else plainBpat"
+       [routerLink]="['/backflow', 'testers', 'details', request.professionalId]">
+        <div *ngIf="request.bpatCompanyName" class="fw-semibold">{{ request.bpatCompanyName }}</div>
+        <div *ngIf="request.bpatContactName">{{ request.bpatContactName }}</div>
+        <div *ngIf="request.bpatAddress">{{ request.bpatAddress }}</div>
+        <div *ngIf="request.bpatCityStateZip">{{ request.bpatCityStateZip }}</div>
     </a>
     <ng-template #plainBpat>
-        <div *ngIf="request.test?.bpatCompanyName" class="fw-semibold">{{ request.test?.bpatCompanyName }}</div>
-        <div *ngIf="request.test?.bpatContactName">{{ request.test?.bpatContactName }}</div>
-        <div *ngIf="request.test?.bpatAddress">{{ request.test?.bpatAddress }}</div>
-        <div *ngIf="request.test?.bpatCity || request.test?.bpatState?.name || request.test?.bpatZip">
-            {{ request.test?.bpatCity }}<span *ngIf="request.test?.bpatCity && (request.test?.bpatState?.name || request.test?.bpatZip)">, </span>{{ request.test?.bpatState?.name }} {{ request.test?.bpatZip }}
-        </div>
+        <div *ngIf="request.bpatCompanyName" class="fw-semibold">{{ request.bpatCompanyName }}</div>
+        <div *ngIf="request.bpatContactName">{{ request.bpatContactName }}</div>
+        <div *ngIf="request.bpatAddress">{{ request.bpatAddress }}</div>
+        <div *ngIf="request.bpatCityStateZip">{{ request.bpatCityStateZip }}</div>
     </ng-template>
 </ng-template>
 
 <ng-template #serialTemplate let-request="rowData">
-    <div *ngIf="isBypassDevice(request.test?.deviceType); else plainSerial">
-        <div><strong>Main:</strong> {{ request.test?.serialNumber }}</div>
-        <div><strong>Bypass:</strong> {{ request.test?.serialNumber2 }}</div>
+    <div *ngIf="request.isBypassDevice; else plainSerial">
+        <div><strong>Main:</strong> {{ request.serialNumber }}</div>
+        <div><strong>Bypass:</strong> {{ request.bypassSerialNumber }}</div>
     </div>
     <ng-template #plainSerial>
-        {{ request.test?.serialNumber }}
+        {{ request.serialNumber }}
     </ng-template>
 </ng-template>
 
 <ng-template #assemblyTemplate let-request="rowData">
-    <div *ngIf="isBypassDevice(request.test?.deviceType); else plainAssembly">
-        <div><strong>Main Assembly:</strong> {{ deviceDescription(request.test?.manufacturer, request.test?.model, request.test?.size) }}</div>
-        <div><strong>Bypass Assembly:</strong> {{ deviceDescription(request.test?.manufacturer2, request.test?.model2, request.test?.size2) }}</div>
-        <div><strong>Hazard Type:</strong> {{ hazardLabel(request.test) }}</div>
-        <div><strong>Location Desc:</strong> {{ request.test?.locationDescription }}</div>
+    <div *ngIf="request.isBypassDevice; else plainAssembly">
+        <div><strong>Main Assembly:</strong> {{ request.assemblyDescription }}</div>
+        <div><strong>Bypass Assembly:</strong> {{ request.bypassAssemblyDescription }}</div>
+        <div><strong>Hazard Type:</strong> {{ request.hazardLabel }}</div>
+        <div><strong>Location Desc:</strong> {{ request.locationDescription }}</div>
     </div>
     <ng-template #plainAssembly>
         <div>
             <strong>Assembly Desc:</strong>
-            {{ deviceDescription(request.test?.manufacturer, request.test?.model, request.test?.size, request.test?.deviceType) }}
+            {{ request.assemblyDescription }}
         </div>
-        <div><strong>Hazard Type:</strong> {{ hazardLabel(request.test) }}</div>
-        <div><strong>Location Desc:</strong> {{ request.test?.locationDescription }}</div>
+        <div><strong>Hazard Type:</strong> {{ request.hazardLabel }}</div>
+        <div><strong>Location Desc:</strong> {{ request.locationDescription }}</div>
     </ng-template>
 </ng-template>
 
 <ng-template #deviceDescriptionTemplate let-request="rowData">
-    {{ deviceDescription(request.test?.manufacturer, request.test?.model, request.test?.size, request.test?.deviceType) }}
+    {{ request.assemblyDescription }}
 </ng-template>
 
 <vp-section header="Out of Service Requests">

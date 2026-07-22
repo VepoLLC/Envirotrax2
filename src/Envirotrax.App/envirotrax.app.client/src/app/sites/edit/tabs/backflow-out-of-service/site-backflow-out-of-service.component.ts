@@ -13,6 +13,28 @@ import { CellTemplateData, ColumnType, TableColumn } from '@envirotrax/common-ui
 
 const BYPASS_DEVICE_TYPES = ['DCD', 'DCD2', 'RPPD', 'RPPD2'];
 
+interface BackflowOutOfServiceRowVm {
+    id: number;
+    testId?: number;
+    date?: string;
+    isCurrent: boolean;
+    passed: boolean;
+    outOfService: boolean;
+    showBpatLink: boolean;
+    professionalId?: number;
+    bpatCompanyName?: string;
+    bpatContactName?: string;
+    bpatAddress?: string;
+    bpatCityStateZip?: string;
+    isBypassDevice: boolean;
+    serialNumber?: string;
+    bypassSerialNumber?: string;
+    assemblyDescription: string;
+    bypassAssemblyDescription?: string;
+    hazardLabel: string;
+    locationDescription?: string;
+}
+
 @Component({
     selector: 'app-site-backflow-out-of-service',
     standalone: false,
@@ -23,25 +45,23 @@ export class SiteBackflowOutOfServiceComponent implements OnInit {
     public siteId?: number;
 
     @ViewChild('statusTemplate', { static: true })
-    public statusTemplate!: TemplateRef<CellTemplateData<BackflowOutOfServiceRequest>>;
+    public statusTemplate!: TemplateRef<CellTemplateData<BackflowOutOfServiceRowVm>>;
 
     @ViewChild('bpatTemplate', { static: true })
-    public bpatTemplate!: TemplateRef<CellTemplateData<BackflowOutOfServiceRequest>>;
+    public bpatTemplate!: TemplateRef<CellTemplateData<BackflowOutOfServiceRowVm>>;
 
     @ViewChild('serialTemplate', { static: true })
-    public serialTemplate!: TemplateRef<CellTemplateData<BackflowOutOfServiceRequest>>;
+    public serialTemplate!: TemplateRef<CellTemplateData<BackflowOutOfServiceRowVm>>;
 
     @ViewChild('assemblyTemplate', { static: true })
-    public assemblyTemplate!: TemplateRef<CellTemplateData<BackflowOutOfServiceRequest>>;
+    public assemblyTemplate!: TemplateRef<CellTemplateData<BackflowOutOfServiceRowVm>>;
 
     @ViewChild('deviceDescriptionTemplate', { static: true })
-    public deviceDescriptionTemplate!: TemplateRef<CellTemplateData<BackflowOutOfServiceRequest>>;
-
-    public readonly BackflowTestResult = BackflowTestResult;
+    public deviceDescriptionTemplate!: TemplateRef<CellTemplateData<BackflowOutOfServiceRowVm>>;
 
     public canViewTesters: boolean = false;
 
-    public table: TableViewModel<BackflowOutOfServiceRequest> = {
+    public table: TableViewModel<BackflowOutOfServiceRowVm> = {
         columns: [],
         query: {
             sort: {},
@@ -62,33 +82,14 @@ export class SiteBackflowOutOfServiceComponent implements OnInit {
         await this.getRequests();
     }
 
-    public viewTest(request: BackflowOutOfServiceRequest): void {
-        if (!request.testId) {
+    public viewTest(row: BackflowOutOfServiceRowVm): void {
+        if (!row.testId) {
             return;
         }
         const url = this._router.serializeUrl(
-            this._router.createUrlTree(['/backflow', 'tests', request.testId, 'view'])
+            this._router.createUrlTree(['/backflow', 'tests', row.testId, 'view'])
         );
         window.open(url, '_blank');
-    }
-
-    public isBypassDevice(deviceType?: string): boolean {
-        return !!deviceType && BYPASS_DEVICE_TYPES.includes(deviceType);
-    }
-
-    public hazardLabel(test?: BackflowTest): string {
-        if (!test?.hazardType) {
-            return 'Unknown';
-        }
-        if (test.hazardType === 'Other' && test.hazardTypeOtherDescription) {
-            return `Other - ${test.hazardTypeOtherDescription}`;
-        }
-        return test.hazardType;
-    }
-
-    public deviceDescription(manufacturer?: string, model?: string, size?: string, deviceType?: string): string {
-        const identity = [manufacturer, model, size].filter(part => part).join(' ');
-        return deviceType ? `${identity} - ${deviceType}` : identity;
     }
 
     public async getRequests(): Promise<void> {
@@ -98,14 +99,77 @@ export class SiteBackflowOutOfServiceComponent implements OnInit {
         try {
             this.table.isLoading = true;
             this.table.query.filter = [this.siteFilter()];
-            this.table.items = await this._backflowOutOfServiceRequestService.getAllForWaterSupplier(
+            const result = await this._backflowOutOfServiceRequestService.getAllForWaterSupplier(
                 this.table.items?.pageInfo || {},
                 this.table.query,
                 OutOfServiceRequestStatusFilter.All
             );
+            this.table.items = {
+                pageInfo: result.pageInfo,
+                data: result.data.map(request => this.toRowVm(request))
+            };
         } finally {
             this.table.isLoading = false;
         }
+    }
+
+    private toRowVm(request: BackflowOutOfServiceRequest): BackflowOutOfServiceRowVm {
+        const test = request.test;
+        const isBypass = this.isBypassDeviceType(test?.deviceType);
+
+        return {
+            id: request.id!,
+            testId: request.testId,
+            date: test?.createdTime,
+            isCurrent: !!test?.isCurrent,
+            passed: test?.testResult !== BackflowTestResult.Fail,
+            outOfService: !!test?.outOfService,
+            showBpatLink: this.canViewTesters && !!test?.professional?.id,
+            professionalId: test?.professional?.id,
+            bpatCompanyName: test?.bpatCompanyName,
+            bpatContactName: test?.bpatContactName,
+            bpatAddress: test?.bpatAddress,
+            bpatCityStateZip: this.buildCityStateZip(test?.bpatCity, test?.bpatState?.name, test?.bpatZip),
+            isBypassDevice: isBypass,
+            serialNumber: test?.serialNumber,
+            bypassSerialNumber: isBypass ? test?.serialNumber2 : undefined,
+            assemblyDescription: this.buildDeviceDescription(test?.manufacturer, test?.model, test?.size, test?.deviceType),
+            bypassAssemblyDescription: isBypass
+                ? this.buildDeviceDescription(test?.manufacturer2, test?.model2, test?.size2)
+                : undefined,
+            hazardLabel: this.buildHazardLabel(test),
+            locationDescription: test?.locationDescription
+        };
+    }
+
+    private isBypassDeviceType(deviceType?: string): boolean {
+        return !!deviceType && BYPASS_DEVICE_TYPES.includes(deviceType);
+    }
+
+    private buildHazardLabel(test?: BackflowTest): string {
+        if (!test?.hazardType) {
+            return 'Unknown';
+        }
+        if (test.hazardType === 'Other' && test.hazardTypeOtherDescription) {
+            return `Other - ${test.hazardTypeOtherDescription}`;
+        }
+        return test.hazardType;
+    }
+
+    private buildDeviceDescription(manufacturer?: string, model?: string, size?: string, deviceType?: string): string {
+        const identity = [manufacturer, model, size].filter(part => part).join(' ');
+        return deviceType ? `${identity} - ${deviceType}` : identity;
+    }
+
+    private buildCityStateZip(city?: string, stateName?: string, zip?: string): string {
+        const cityPart = city ?? '';
+        const stateZipPart = [stateName, zip].filter(part => part).join(' ');
+
+        if (cityPart && stateZipPart) {
+            return `${cityPart}, ${stateZipPart}`;
+        }
+
+        return cityPart || stateZipPart;
     }
 
     private siteFilter(): QueryProperty {
@@ -116,7 +180,7 @@ export class SiteBackflowOutOfServiceComponent implements OnInit {
         };
     }
 
-    private getColumns(): TableColumn<BackflowOutOfServiceRequest>[] {
+    private getColumns(): TableColumn<BackflowOutOfServiceRowVm>[] {
         return [
             {
                 field: '',
@@ -126,7 +190,7 @@ export class SiteBackflowOutOfServiceComponent implements OnInit {
                 cellTemplate: this.statusTemplate
             },
             {
-                field: 'test.createdTime',
+                field: 'date',
                 caption: 'Date',
                 type: ColumnType.date
             },

@@ -10,6 +10,21 @@ import { BackflowOutOfServiceListComponent } from "./out-of-service/backflow-out
 
 const routes: Routes = [
     {
+        // Reports are their own lazy-loaded module (charts + report components), fetched only when a
+        // user actually opens the reports. The permission guard stays here on the parent route.
+        path: 'reports',
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.BackflowReports,
+                    action: PermissionAction.CanView
+                }
+            ]
+        },
+        loadChildren: () => import('./reports/backflow-reports.module').then(m => m.BackflowReportsModule)
+    },
+    {
         path: 'tests',
         title: 'Backflow Test Search',
         component: BackflowTestListComponent,

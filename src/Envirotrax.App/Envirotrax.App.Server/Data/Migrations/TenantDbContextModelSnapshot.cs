@@ -162,6 +162,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<int>("BackflowScheduleMonth")
+                        .HasColumnType("int");
+
                     b.Property<string>("BpatAddress")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -295,6 +298,12 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.Property<DateTime?>("FinalTestDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("ForceRenewal")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ForceRenewalYears")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("GaugeLastCalibrationDate")
                         .HasColumnType("datetime2");
@@ -490,6 +499,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<bool>("NeedsRenewalCheck")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("NeedsValidation")
                         .HasColumnType("bit");
 
@@ -565,6 +577,9 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.Property<string>("RejectedReason")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("RenewalRequired")
+                        .HasColumnType("bit");
 
                     b.Property<string>("RepairBC")
                         .HasMaxLength(200)

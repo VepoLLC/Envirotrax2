@@ -162,6 +162,12 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         await _siteRepository.UpdateCsiAssignmentAsync(siteId, userId, assignmentDate);
     }
 
+    public async Task<IEnumerable<SiteDto>> GetAllPendingRenewalAsync(int batchSize, CancellationToken cancellationToken)
+    {
+        var sites = await _siteRepository.GetAllPendingRenewalAsync(batchSize);
+        return Mapper.Map<IEnumerable<Site>, IEnumerable<SiteDto>>(sites);
+    }
+
     private async Task HadnleGeocodingErrorAsync(Exception ex, Site site)
     {
         _logger.LogError(ex, "Error goecoding site.");

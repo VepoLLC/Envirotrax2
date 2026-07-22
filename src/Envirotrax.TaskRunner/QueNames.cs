@@ -10,6 +10,7 @@ public class QueueNames
 
     public class BackflowTests
     {
-        public const string ExtendDate = "backflow-tests-extend-date";
+        public const string ProcessSiteRenewal = "backflow-tests-process-site-renewal";
+        public const string ProcessTestRenewal = "backflow-tests-process-test-renewal";
     }
 }

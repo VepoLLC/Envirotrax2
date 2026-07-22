@@ -24,13 +24,14 @@ interface AssemblyLineVm {
     assemblyDescription: string;
     hazard: string;
     location: string;
+    comments: string;
     property: string;
     bpat: string;
 }
 
 interface OutOfServiceRequestVm {
     id: number;
-    submittedBy: string;
+    header: string;
     cleared: boolean;
     description?: string;
     submitted: AssemblyLineVm;
@@ -124,10 +125,11 @@ export class BackflowOutOfServiceListComponent implements OnInit {
 
     private toViewModel(request: BackflowOutOfServiceRequest): OutOfServiceRequestVm {
         const isReplaced = request.type === OutOfServiceType.Replaced;
+        const submittedBy = this.buildSubmittedBy(request.test);
 
         return {
             id: request.id!,
-            submittedBy: this.buildSubmittedBy(request.test),
+            header: submittedBy ? `Submitted By: ${submittedBy}` : 'Submitted By:',
             cleared: !!request.clearedDate,
             description: request.description,
             submitted: this.buildAssemblyLine(request.test, 'Submitted Assembly'),
@@ -150,6 +152,7 @@ export class BackflowOutOfServiceListComponent implements OnInit {
             assemblyDescription: this.buildAssemblyDescription(test),
             hazard: this.buildHazard(test),
             location: test?.locationDescription ?? '',
+            comments: test?.comments ?? '',
             property: this.buildPropertyDescription(test),
             bpat: this.buildBpatDescription(test)
         };

@@ -23,6 +23,7 @@ import { MessageModalComponent } from "./components/modals/message-modal.compone
 import { ValidationFieldComponent } from "./components/validation/validation-field/validation-field.component";
 import { ValidationSummaryComponent } from "./components/validation/validation-summary/validation-summary.component";
 import { SectionComponent } from "./components/section/section.component";
+import { SectionActionsComponent } from "./components/section/section-actions.component";
 import { InfoIconComponent } from "./components/info-icon/info-icon.component";
 import { StatusIconComponent } from "./components/status-icon/status-icon.component";
 import { FileUploadComponent } from "./components/file-upload/file-upload.component";
@@ -54,6 +55,7 @@ import { InputAddOnComponent } from "./components/input/input-add-on.component";
         ValidationFieldComponent,
         ValidationSummaryComponent,
         SectionComponent,
+        SectionActionsComponent,
         InfoIconComponent,
         StatusIconComponent,
         FileUploadComponent,
@@ -84,6 +86,7 @@ import { InputAddOnComponent } from "./components/input/input-add-on.component";
         ValidationFieldComponent,
         ValidationSummaryComponent,
         SectionComponent,
+        SectionActionsComponent,
         InfoIconComponent,
         StatusIconComponent,
         FileUploadComponent,

@@ -17,6 +17,8 @@ import { ProfessionalWaterSupplier } from '../../../shared/models/professionals/
 import { BackflowGauge, GaugeExpirationType } from '../../../shared/models/backflow/backflow-gauge';
 import { BackflowTestResult, BackflowReasonForTest, BackflowDeviceType } from '../../../shared/models/backflow/backflow-test-enums';
 import { MAX_PAGE_SIZE } from '../../../shared/models/page-info';
+import { Site } from '../../../shared/models/sites/site';
+import { SiteService } from '../../../shared/services/sites/site.service';
 import { InputOption } from '@envirotrax/common-ui';
 
 @Component({
@@ -34,6 +36,9 @@ export class BackflowTestSubmitComponent implements OnInit {
     public selectedWaterSupplier?: ProfessionalWaterSupplier;
     public selectedGauge?: BackflowGauge;
     public previousTest?: BackflowTest;
+
+    public site: Site | null = null;
+    private _siteId = 0;
 
     private _bpats: ProfessionalUser[] = [];
     private _waterSuppliers: ProfessionalWaterSupplier[] = [];
@@ -445,7 +450,8 @@ export class BackflowTestSubmitComponent implements OnInit {
         private readonly _userService: ProfesionalUserService,
         private readonly _supplierService: ProfessionalSupplierService,
         private readonly _options: BackflowTestOptionsService,
-        private readonly _settingsService: BackflowSettingsService
+        private readonly _settingsService: BackflowSettingsService,
+        private readonly _siteService: SiteService
     ) {
         this.deviceTypeOptions = this._options.deviceTypeOptions;
         this.hazardTypeOptions = this._options.hazardTypeOptions;
@@ -455,6 +461,10 @@ export class BackflowTestSubmitComponent implements OnInit {
     public ngOnInit(): void {
         this._activatedRoute.paramMap.subscribe(async params => {
             const testId = params.get('testId');
+
+            const siteIdParam = this._activatedRoute.snapshot.queryParamMap.get('siteId');
+            this._siteId = siteIdParam ? Number(siteIdParam) : 0;
+
             await this.loadData(testId && testId !== 'new' ? Number(testId) : null);
         });
     }
@@ -543,7 +553,7 @@ export class BackflowTestSubmitComponent implements OnInit {
             ...this.model,
             waterSupplier: this.selectedWaterSupplierId ? { id: this.selectedWaterSupplierId } : undefined,
             bpat: this.selectedBpatId ? { id: this.selectedBpatId } : undefined,
-            site: this.previousTest?.site ? { id: this.previousTest.site.id } : undefined,
+            site: this.previousTest?.site ? { id: this.previousTest.site.id } : (this._siteId > 0 ? { id: this._siteId } : undefined),
             gaugeManufacturer: this.selectedGauge?.manufacturer,
             gaugeModel: this.selectedGauge?.model,
             gaugeSerialNumber: this.selectedGauge?.serialNumber,
@@ -585,12 +595,26 @@ export class BackflowTestSubmitComponent implements OnInit {
 
             this.buildOptions();
 
+            let siteId: number | undefined;
+
             if (fromTestId) {
                 this.previousTest = await this._backflowTestService.getForProfessional(fromTestId);
                 this.populateFromPreviousTest(this.previousTest);
+
+                siteId = this.previousTest.site?.id;
+            } else if (this._siteId > 0) {
+                siteId = this._siteId;
+            }
+
+            if (siteId) {
+                this.site = await this._siteService.getForProfessional(siteId);
             }
 
             await this.setDefaults();
+
+            if (this.site) {
+                this.applySiteWaterSupplier(this.site);
+            }
         } finally {
             this.isLoading = false;
         }
@@ -660,6 +684,16 @@ export class BackflowTestSubmitComponent implements OnInit {
         this.model.model2 = test.model2;
         this.model.size2 = test.size2;
         this.model.serialNumber2 = test.serialNumber2;
+    }
+
+    private applySiteWaterSupplier(site: Site): void {
+        const siteWsId = site.waterSupplier?.id;
+
+        if (siteWsId && this._waterSuppliers.some(ws => ws.waterSupplier?.id === siteWsId)) {
+            this.selectedWaterSupplierId = siteWsId;
+            this.selectedWaterSupplier = this._waterSuppliers.find(s => s.waterSupplier?.id === siteWsId);
+            this.loadAdditionalInfoSettings();
+        }
     }
 
     private serializeRepairs(): void {

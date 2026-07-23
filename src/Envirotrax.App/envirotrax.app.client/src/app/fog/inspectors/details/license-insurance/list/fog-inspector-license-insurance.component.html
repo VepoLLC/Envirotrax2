@@ -62,7 +62,9 @@
                       (queryChange)="loadInsurances()"
                       (queryReset)="loadInsurances()"
                       [showActionLabels]="false"
-                      [customActions]="insuranceCustomActions" />
+                      [customActions]="insuranceCustomActions"
+                      [canEdit]="canManageInsurances"
+                      (edit)="editInsurance($event)" />
         </div>
     </div>
 
@@ -78,7 +80,9 @@
                       [(query)]="licensesTable.query"
                       (queryChange)="loadLicenses()"
                       (queryReset)="loadLicenses()"
-                      [showActionLabels]="false" />
+                      [showActionLabels]="false"
+                      [canEdit]="canManageLicenses"
+                      (edit)="editLicense($event)" />
         </div>
     </div>
 </vp-section>

@@ -35,4 +35,9 @@ export class FogInspectorLicensesService {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));
     }
+
+    public update(inspectorId: number, license: ProfessionalUserLicense): Promise<ProfessionalUserLicense> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/inspectors/${inspectorId}/licenses/${license.id}`);
+        return lastValueFrom(this._http.put<ProfessionalUserLicense>(url, license));
+    }
 }

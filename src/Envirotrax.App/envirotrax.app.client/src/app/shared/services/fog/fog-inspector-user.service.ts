@@ -25,4 +25,9 @@ export class FogInspectorSubAccountsService {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));
     }
+
+    public update(inspectorId: number, user: ProfessionalUser): Promise<ProfessionalUser> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/inspectors/${inspectorId}/users/${user.id}`);
+        return lastValueFrom(this._http.put<ProfessionalUser>(url, user));
+    }
 }

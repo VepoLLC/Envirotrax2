@@ -26,6 +26,11 @@ export class FogInspectorInsurancesService {
         }));
     }
 
+    public update(inspectorId: number, insurance: ProfessionalInsurance): Promise<ProfessionalInsurance> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/inspectors/${inspectorId}/insurances/${insurance.id}`);
+        return lastValueFrom(this._http.put<ProfessionalInsurance>(url, insurance));
+    }
+
     public async getFileUrl(inspectorId: number, insuranceId: number): Promise<string> {
         const url = this._urlResolver.resolveUrl(`/api/fog/inspectors/${inspectorId}/insurances/${insuranceId}/file-url`);
         return await lastValueFrom(this._http.get<string>(url));

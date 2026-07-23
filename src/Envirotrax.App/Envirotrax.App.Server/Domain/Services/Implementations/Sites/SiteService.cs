@@ -162,6 +162,13 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         await _siteRepository.UpdateCsiAssignmentAsync(siteId, userId, assignmentDate);
     }
 
+    public async Task UpdateBackflowAssignmentAsync(int siteId, int? userId)
+    {
+        var assignmentDate = userId.HasValue ? DateTime.UtcNow : (DateTime?)null;
+
+        await _siteRepository.UpdateBackflowAssignmentAsync(siteId, userId, assignmentDate);
+    }
+
     public async Task<IEnumerable<SiteDto>> GetAllPendingRenewalAsync(int batchSize, CancellationToken cancellationToken)
     {
         var sites = await _siteRepository.GetAllPendingRenewalAsync(batchSize);

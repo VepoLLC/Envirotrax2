@@ -26,6 +26,14 @@ public class SiteController : WaterSupplierCrudController<SiteDto>
         return Ok();
     }
 
+    [HttpPut("{id}/backflow-assignment")]
+    [HasPermission(PermissionAction.CanModify)]
+    public async Task<IActionResult> UpdateBackflowAssignmentAsync(int id, [FromBody] UpdateBackflowAssignmentDto dto)
+    {
+        await _siteService.UpdateBackflowAssignmentAsync(id, dto.UserId);
+        return Ok();
+    }
+
     [HttpPut("{id}/gis-data")]
     [HasPermission(PermissionAction.CanModify)]
     public async Task<IActionResult> UpdateGisDataAsync(int id, [FromBody] UpdateSiteGisDataDto dto, CancellationToken cancellationToken)

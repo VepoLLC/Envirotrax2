@@ -6,6 +6,7 @@ import { SharedComponentsModule } from "../shared/components/shared.components.m
 import { BackflowRoutingModule } from "./backflow-routing.module";
 import { BackflowTesterListComponent } from "./testers/list/backflow-tester-list.component";
 import { BackflowTestListComponent } from "./tests/backflow-test-list.component";
+import { BackflowComplianceManagementComponent } from "./compliance/backflow-compliance-management.component";
 import { BackflowTestDetailsComponent } from "./tests/details/backflow-test-details.component";
 import { BackflowTesterDetailsComponent } from "./testers/details/backflow-tester-details.component";
 import { BackflowOutOfServiceListComponent } from "./out-of-service/backflow-out-of-service-list.component";
@@ -32,6 +33,7 @@ import { BackflowTestDetailsSectionsModule } from "./tests/details/backflow-test
     declarations: [
         BackflowTesterListComponent,
         BackflowTestListComponent,
+        BackflowComplianceManagementComponent,
         BackflowOutOfServiceListComponent,
         BackflowTestDetailsComponent,
         BackflowTestBpatInfoComponent,

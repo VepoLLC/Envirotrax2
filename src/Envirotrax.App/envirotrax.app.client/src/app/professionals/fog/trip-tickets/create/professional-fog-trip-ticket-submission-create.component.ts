@@ -1,5 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
+import { NgForm } from "@angular/forms";
+import { ModalSize } from "@developer-partners/ngx-modal-dialog";
+import { FogSignaturePadModalComponent, FogSignatureModel } from "../../inspections/create/fog-signature-pad-modal.component";
 import { SiteService } from "../../../../shared/services/sites/site.service";
 import { Site } from "../../../../shared/models/sites/site";
 import { ProfesisonalService } from "../../../../shared/services/professionals/professional.service";
@@ -8,12 +11,18 @@ import { ProfessionalSupplierService } from "../../../../shared/services/profess
 import { ProfessionalFogVehicleService } from "../../../../shared/services/fog/professional-fog-vehicle.service";
 import { ProfessionalFogDisposalSiteService } from "../../../../shared/services/fog/professional-fog-disposal-site.service";
 import { ProfessionalUserLicenseService } from "../../../../shared/services/professionals/professional-user-license.service";
+import { FogTripTicketService } from "../../../../shared/services/fog/fog-trip-ticket.service";
 import { Professional } from "../../../../shared/models/professionals/professional";
-import { ExpirationType } from "../../../../shared/models/professionals/professional-user";
+import { ProfessionalUser, ExpirationType } from "../../../../shared/models/professionals/professional-user";
 import { AvailableWaterSupplier } from "../../../../shared/models/professionals/professional-water-supplier";
-import { ProfessionalType, ExpirationType as LicenseExpirationType } from "../../../../shared/models/professionals/licenses/professional-user-license";
+import { ProfessionalType, ExpirationType as LicenseExpirationType, ProfessionalUserLicense } from "../../../../shared/models/professionals/licenses/professional-user-license";
+import { FogVehicle } from "../../../../shared/models/fog/fog-vehicle";
+import { FogDisposalSite } from "../../../../shared/models/fog/fog-disposal-site";
+import { FogVehicleCapacityType } from "../../../../shared/models/fog/fog-vehicle-enums";
+import { FogTripTicket } from "../../../../shared/models/fog/fog-trip-ticket";
+import { FogTripTicketImages } from "../../../../shared/models/fog/fog-trip-ticket-images";
 import { MAX_PAGE_SIZE } from "../../../../shared/models/page-info";
-import { InputOption } from "@envirotrax/common-ui";
+import { InputOption, ModalHelperService } from "@envirotrax/common-ui";
 
 interface VerificationCheck {
     label: string;
@@ -27,24 +36,60 @@ interface VerificationCheck {
 })
 export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnInit {
     public isLoading = false;
+    public submitted = false;
+    public submitSuccess = false;
+    public validationErrors: string[] = [];
 
     public site?: Site;
     public professional?: Professional;
 
-    public transporterOptions: InputOption[] = [];
+    public transporterOptions: InputOption<ProfessionalUser>[] = [];
     public waterSupplierOptions: InputOption[] = [];
-    public disposalSiteOptions: InputOption[] = [];
-    public vehicleOptions: InputOption[] = [];
+    public disposalSiteOptions: InputOption<FogDisposalSite>[] = [];
+    public vehicleOptions: InputOption<FogVehicle>[] = [];
 
     public selectedTransporterUserId?: number;
     public selectedWaterSupplierId?: number;
     public selectedDisposalSiteId?: number;
     public selectedVehicleId?: number;
 
+    public selectedTransporter?: ProfessionalUser;
+    public selectedVehicle?: FogVehicle;
+    public selectedDisposalSite?: FogDisposalSite;
+
     public checks: VerificationCheck[] = [];
     public verificationPassed = false;
 
+    public readonly FogVehicleCapacityType = FogVehicleCapacityType;
+
+    public readonly interceptorTypeOptions: InputOption[] = [
+        { id: '', text: 'Select Trap/Tank Type' },
+        { id: 'Grease Trap', text: 'Grease Trap' },
+        { id: 'Grit Trap', text: 'Grit Trap' },
+        { id: 'Septic Tank', text: 'Septic Tank' },
+        { id: 'Chemical Toilet', text: 'Chemical Toilet' },
+        { id: 'Other', text: 'Other' }
+    ];
+
+    public readonly capacityTypeOptions: InputOption[] = [
+        { id: FogVehicleCapacityType.Gallons, text: 'Gallons' },
+        { id: FogVehicleCapacityType.CubicYards, text: 'Cubic Yards' }
+    ];
+
+    public remarksLength = 0;
+
+    public model: Partial<FogTripTicket> = {
+        interceptorCapacityType: FogVehicleCapacityType.Gallons,
+        interceptorWasteRemovedType: FogVehicleCapacityType.Gallons
+    };
+
+    public images: FogTripTicketImages = {};
+    public generatorSignaturePreview: string | null = null;
+    public transporterSignaturePreview: string | null = null;
+    public receiverSignaturePreview: string | null = null;
+
     private _siteId = 0;
+    private _transporterLicense?: ProfessionalUserLicense;
     private readonly _availableSuppliers = new Map<number, AvailableWaterSupplier>();
 
     constructor(
@@ -56,7 +101,9 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         private readonly _supplierService: ProfessionalSupplierService,
         private readonly _vehicleService: ProfessionalFogVehicleService,
         private readonly _disposalSiteService: ProfessionalFogDisposalSiteService,
-        private readonly _licenseService: ProfessionalUserLicenseService
+        private readonly _licenseService: ProfessionalUserLicenseService,
+        private readonly _tripTicketService: FogTripTicketService,
+        private readonly _modalHelper: ModalHelperService
     ) { }
 
     public ngOnInit(): void {
@@ -70,6 +117,8 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
 
     public async onTransporterChange(value: number): Promise<void> {
         this.selectedTransporterUserId = value;
+        this.selectedTransporter = this.transporterOptions.find(o => o.id === value)?.data;
+
         await this.computeVerification();
     }
 
@@ -80,16 +129,150 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
 
     public async onDisposalSiteChange(value: number): Promise<void> {
         this.selectedDisposalSiteId = value;
+        this.selectedDisposalSite = this.disposalSiteOptions.find(o => o.id === value)?.data;
+
         await this.computeVerification();
     }
 
     public async onVehicleChange(value: number): Promise<void> {
         this.selectedVehicleId = value;
+        this.selectedVehicle = this.vehicleOptions.find(o => o.id === value)?.data;
+
         await this.computeVerification();
+    }
+
+    public onCommentsChange(value: string | undefined): void {
+        this.model.comments = value;
+        this.remarksLength = value?.length ?? 0;
+    }
+
+    public openGeneratorSignature(): void {
+        this.openSignaturePad(this.generatorSignaturePreview, (preview, file) => {
+            this.generatorSignaturePreview = preview;
+            this.images.generatorSignature = file;
+        }, 'generator-signature.png');
+    }
+
+    public openTransporterSignature(): void {
+        this.openSignaturePad(this.transporterSignaturePreview, (preview, file) => {
+            this.transporterSignaturePreview = preview;
+            this.images.transporterSignature = file;
+        }, 'transporter-signature.png');
+    }
+
+    public openReceiverSignature(): void {
+        this.openSignaturePad(this.receiverSignaturePreview, (preview, file) => {
+            this.receiverSignaturePreview = preview;
+            this.images.receiverSignature = file;
+        }, 'receiver-signature.png');
+    }
+
+    public async submit(submitForm: NgForm): Promise<void> {
+        this.submitted = true;
+        this.validationErrors = [];
+        this.collectValidationErrors();
+
+        if (!submitForm.valid || this.validationErrors.length > 0) {
+            return;
+        }
+
+        try {
+            this.isLoading = true;
+
+            const ticket: FogTripTicket = {
+                ...this.model,
+                id: 0,
+                site: { id: this._siteId },
+                waterSupplier: { id: this.selectedWaterSupplierId },
+                transporter: { id: this.selectedTransporterUserId },
+                vehicleId: this.selectedVehicleId,
+                receiverDisposalSiteId: this.selectedDisposalSiteId,
+                transporterLicenseNumber: this._transporterLicense?.licenseNumber,
+                transporterLicenseExpiration: this._transporterLicense?.expirationDate
+            };
+
+            await this._tripTicketService.submit(ticket, this.images);
+
+            this.submitSuccess = true;
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public returnToSearch(): void {
         this._router.navigate(['..'], { relativeTo: this._activatedRoute });
+    }
+
+    public submitAnother(): void {
+        this._router.navigate(['..'], { relativeTo: this._activatedRoute });
+    }
+
+    public returnToAccountOverview(): void {
+        this._router.navigate(['/']);
+    }
+
+    private openSignaturePad(existing: string | null, apply: (preview: string | null, file: File | null) => void, fileName: string): void {
+        this._modalHelper.show<FogSignatureModel, string>(
+            FogSignaturePadModalComponent,
+            {
+                title: 'Signature',
+                size: ModalSize.extraLarge,
+                model: { existingSignature: existing }
+            }
+        ).result().subscribe((dataUrl: string) => {
+            if (dataUrl) {
+                apply(dataUrl, this.dataUrlToFile(dataUrl, fileName));
+            } else {
+                apply(null, null);
+            }
+        });
+    }
+
+    private dataUrlToFile(dataUrl: string, fileName: string): File {
+        const [header, base64] = dataUrl.split(',');
+        const mimeType = header.match(/:(.*?);/)?.[1] ?? 'image/png';
+        const binary = atob(base64);
+
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+
+        return new File([bytes], fileName, { type: mimeType });
+    }
+
+    private collectValidationErrors(): void {
+        if (!this.model.interceptorType) {
+            this.validationErrors.push('Please select a Waste Trap or Tank Type.');
+        }
+
+        if (this.model.interceptorType === 'Other' && !this.model.interceptorOtherDescription) {
+            this.validationErrors.push('Please describe the "Other" trap or tank type.');
+        }
+
+        if (this.model.interceptorWasteRemovedAmount == null || Number(this.model.interceptorWasteRemovedAmount) <= 0) {
+            this.validationErrors.push('Please enter the amount of waste removed.');
+        }
+
+        if (!this.model.interceptorWasteRemovedDate) {
+            this.validationErrors.push('Please enter the date the waste was removed.');
+        }
+
+        if (!this.model.receiverWasteDeliveredDate) {
+            this.validationErrors.push('Please enter the date the waste was delivered.');
+        }
+
+        if (!this.images.generatorSignature) {
+            this.validationErrors.push('A generator signature is required.');
+        }
+
+        if (!this.images.transporterSignature) {
+            this.validationErrors.push('A transporter signature is required.');
+        }
+
+        if (!this.images.receiverSignature) {
+            this.validationErrors.push('A receiver signature is required.');
+        }
     }
 
     private async loadData(): Promise<void> {
@@ -126,6 +309,9 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
 
             if (this._siteId > 0) {
                 this.site = await this._siteService.getForProfessional(this._siteId);
+                this.model.fogGeneratorPhoneNumber = this.site.fogGeneratorPhoneNumber;
+                this.model.fogGeneratorEmailAddress = this.site.fogGeneratorEmailAddress;
+                this.model.generatorContactName = this.site.mailingContactName ?? undefined;
             }
 
             await this.setDefaults();
@@ -139,6 +325,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         const myUser = await this._userService.getMyData();
         const defaultTransporter = this.transporterOptions.find(o => o.id === myUser.id) ?? this.transporterOptions[0];
         this.selectedTransporterUserId = defaultTransporter?.id;
+        this.selectedTransporter = defaultTransporter?.data;
 
         const registeredIds = this.waterSupplierOptions.filter(o => o.id).map(o => Number(o.id));
         const siteWsId = this.site?.waterSupplier?.id;
@@ -166,6 +353,8 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
     private async buildRegistrationCheck(): Promise<VerificationCheck> {
         const label = 'TCEQ - Registration Number';
 
+        this._transporterLicense = undefined;
+
         if (!this.selectedTransporterUserId) {
             return { label, message: 'Select a transporter account', valid: false };
         }
@@ -176,6 +365,8 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         if (!license) {
             return { label, message: 'No registration number found', valid: false };
         }
+
+        this._transporterLicense = license;
 
         if (license.expirationType === LicenseExpirationType.Expired) {
             return { label, message: 'Registration number expired', valid: false };

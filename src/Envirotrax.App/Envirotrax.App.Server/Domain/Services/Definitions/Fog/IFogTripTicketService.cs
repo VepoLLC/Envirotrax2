@@ -7,4 +7,11 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 public interface IFogTripTicketService : IService<FogTripTicket, FogTripTicketDto>
 {
     Task<IPagedData<FogTripTicketDto>> SearchForProfessionalAsync(PageInfo pageInfo, Query query, int? waterSupplierId, CancellationToken cancelationToken);
+
+    Task<FogTripTicketDto> SubmitAsync(
+        FogTripTicketDto request,
+        Stream? generatorSignatureStream, string? generatorSignatureFileName,
+        Stream? transporterSignatureStream, string? transporterSignatureFileName,
+        Stream? receiverSignatureStream, string? receiverSignatureFileName,
+        CancellationToken cancellationToken);
 }

@@ -62,12 +62,6 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         }
 
         return await base.DeleteAsync(id);
-        _professionalService = professionalService;
-        _professionalUserService = professionalUserService;
-        _siteService = siteService;
-        _vehicleService = vehicleService;
-        _disposalSiteService = disposalSiteService;
-        _fileStorageService = fileStorageService;
     }
 
     public async Task<IPagedData<FogTripTicketDto>> SearchForProfessionalAsync(

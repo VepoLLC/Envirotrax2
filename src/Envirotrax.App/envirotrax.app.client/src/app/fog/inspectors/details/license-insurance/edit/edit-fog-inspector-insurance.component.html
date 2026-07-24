@@ -11,6 +11,15 @@
                       [form]="form" />
         </div>
 
+        <div *ngIf="!isEditMode" class="mb-3">
+            <vp-file-upload name="coiFile"
+                            validationLabel="Certificate of insurance (COI)"
+                            accept=".jpg, .jpeg, .gif, .png, .bmp, .pdf"
+                            [(ngModel)]="certificateFile"
+                            [required]="true"
+                            [form]="form" />
+        </div>
+
         <div class="mb-3">
             <vp-input name="expirationDate"
                       label="Expiration date"

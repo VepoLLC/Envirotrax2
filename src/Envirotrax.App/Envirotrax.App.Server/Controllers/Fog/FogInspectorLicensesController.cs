@@ -38,6 +38,15 @@ namespace Envirotrax.App.Server.Controllers.Fog
             return Ok(result);
         }
 
+        [HttpPost("{id}/licenses")]
+        [HasFeature(FeatureType.ManageProfessionalLicenses)]
+        [HasPermission(PermissionAction.CanModify)]
+        public async Task<IActionResult> AddLicenseAsync(int id, [FromBody] ProfessionalUserLicenseDto dto)
+        {
+            var result = await _licenseService.AddForProfessionalAsync(id, dto);
+            return Ok(result);
+        }
+
         [HttpPut("{id}/licenses/{licenseId}")]
         [HasFeature(FeatureType.ManageProfessionalLicenses)]
         [HasPermission(PermissionAction.CanModify)]

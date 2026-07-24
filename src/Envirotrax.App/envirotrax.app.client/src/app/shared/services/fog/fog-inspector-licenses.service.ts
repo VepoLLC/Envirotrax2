@@ -36,6 +36,11 @@ export class FogInspectorLicensesService {
         }));
     }
 
+    public add(inspectorId: number, license: ProfessionalUserLicense): Promise<ProfessionalUserLicense> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/inspectors/${inspectorId}/licenses`);
+        return lastValueFrom(this._http.post<ProfessionalUserLicense>(url, license));
+    }
+
     public update(inspectorId: number, license: ProfessionalUserLicense): Promise<ProfessionalUserLicense> {
         const url = this._urlResolver.resolveUrl(`/api/fog/inspectors/${inspectorId}/licenses/${license.id}`);
         return lastValueFrom(this._http.put<ProfessionalUserLicense>(url, license));

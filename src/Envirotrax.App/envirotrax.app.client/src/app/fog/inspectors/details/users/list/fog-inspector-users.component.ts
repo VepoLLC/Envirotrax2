@@ -65,6 +65,14 @@ export class FogInspectorUsersComponent implements OnInit {
         ];
     }
 
+    public addUser(): void {
+        this._modalHelper.show<FogUserModalData, ProfessionalUser>(EditFogInspectorUserComponent, {
+            title: 'Add Sub Account',
+            model: { inspectorId: this.inspectorId, user: {} },
+            size: ModalSize.large
+        }).result().subscribe(() => this.loadSubAccounts());
+    }
+
     public editUser(user: ProfessionalUser): void {
         this._modalHelper.show<FogUserModalData, ProfessionalUser>(EditFogInspectorUserComponent, {
             title: 'Edit Sub Account',

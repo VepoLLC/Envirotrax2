@@ -11,6 +11,16 @@
                               [form]="form" />
             </div>
 
+            <div *ngIf="!isEditMode" class="mb-3 w-100">
+                <vp-input [(ngModel)]="user.emailAddress"
+                              [required]="true"
+                              type="email"
+                              name="emailAddress"
+                              label="Email"
+                              [maxLength]="100"
+                              [form]="form" />
+            </div>
+
             <div class="mb-3 w-100">
                 <vp-input [(ngModel)]="user.jobTitle"
                               name="jobTitle"

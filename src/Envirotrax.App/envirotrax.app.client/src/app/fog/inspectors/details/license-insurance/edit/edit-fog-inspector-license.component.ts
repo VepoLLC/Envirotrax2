@@ -36,6 +36,8 @@ export class EditFogInspectorLicenseComponent implements OnInit {
             data: v as ProfessionalType
         }));
 
+    public isEditMode: boolean = false;
+
     constructor(
         private readonly _modalReference: ModalReference<FogLicenseModalData, ProfessionalUserLicense>,
         private readonly _licensesService: FogInspectorLicensesService,
@@ -44,6 +46,7 @@ export class EditFogInspectorLicenseComponent implements OnInit {
         private readonly _toastService: ToastService
     ) {
         this.license = { ...this._modalReference.config.model!.license };
+        this.isEditMode = !!this.license.id;
     }
 
     public async ngOnInit(): Promise<void> {
@@ -87,7 +90,10 @@ export class EditFogInspectorLicenseComponent implements OnInit {
 
                 const { inspectorId } = this._modalReference.config.model!;
 
-                const result = await this._licensesService.update(inspectorId, this.license);
+                const result = this.isEditMode
+                    ? await this._licensesService.update(inspectorId, this.license)
+                    : await this._licensesService.add(inspectorId, this.license);
+
                 this._toastService.successfullySaved('License');
                 this._modalReference.closeSuccess(result);
             } catch (error) {

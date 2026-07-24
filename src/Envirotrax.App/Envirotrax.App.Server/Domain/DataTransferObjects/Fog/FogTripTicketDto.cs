@@ -96,6 +96,8 @@ public class FogTripTicketDto : IDto
     [StringLength(500)]
     public string? TransporterSignaturePath { get; set; }
 
+    public DateTime? TransporterSignatureDate { get; set; }
+
     [StringLength(255)]
     public string? GeneratorContactName { get; set; }
 

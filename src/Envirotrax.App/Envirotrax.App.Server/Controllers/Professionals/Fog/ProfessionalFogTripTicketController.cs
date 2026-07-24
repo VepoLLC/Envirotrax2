@@ -1,4 +1,5 @@
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -48,5 +49,31 @@ public class ProfessionalFogTripTicketController : ProfessionalProtectedControll
     {
         var result = await _fogService.DeleteAsync(id);
         return result == null ? NotFound() : Ok(result);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> SubmitAsync(
+        [FromForm] FogTripTicketDto dto,
+        [FromForm] IFormFile? generatorSignature,
+        [FromForm] IFormFile? receiverSignature,
+        CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
+
+        dto.Id = 0;
+
+        await using var generatorStream = generatorSignature?.OpenReadStream();
+        await using var receiverStream = receiverSignature?.OpenReadStream();
+
+        var result = await _fogService.SubmitAsync(
+            dto,
+            generatorStream, generatorSignature?.FileName,
+            receiverStream, receiverSignature?.FileName,
+            ct);
+
+        return Ok(result);
     }
 }

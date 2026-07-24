@@ -22,6 +22,9 @@ public class ProfessionalUser : IProfessionalModel
     [StringLength(150)]
     public string? JobTitle { get; set; }
 
+    [StringLength(500)]
+    public string? SignaturePath { get; set; }
+
     public bool IsAdmin { get; set; }
 
     public bool IsWiseGuy { get; set; }

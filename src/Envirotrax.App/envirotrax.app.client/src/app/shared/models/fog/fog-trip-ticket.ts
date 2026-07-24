@@ -27,6 +27,7 @@ export interface FogTripTicket {
     fogGeneratorContactName?: string;
 
     professional?: Professional | null;
+    transporter?: ProfessionalUser | null;
     transporterLicenseNumber?: string;
     transporterLicenseExpiration?: string;
     transporterCompanyName?: string;

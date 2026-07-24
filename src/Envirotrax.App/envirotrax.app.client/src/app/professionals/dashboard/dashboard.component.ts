@@ -22,7 +22,9 @@ import { ProfessionalInsurance } from '../../shared/models/professionals/profess
 import { BackflowGauge, GaugeExpirationType } from '../../shared/models/backflow/backflow-gauge';
 import { ProfessionalDashboardStats } from '../../shared/models/professionals/professional-dashboard-stats';
 import { TableViewModel } from '../../shared/models/table-view-model';
-import { CellTemplateData, ColumnType, FreeTextSearchSettings, TableColumn } from '@envirotrax/common-ui';
+import { CellTemplateData, ColumnType, FreeTextSearchSettings, TableColumn, ModalHelperService } from '@envirotrax/common-ui';
+import { ModalSize } from '@developer-partners/ngx-modal-dialog';
+import { FogSignaturePadModalComponent, FogSignatureModel } from '../fog/inspections/create/fog-signature-pad-modal.component';
 import { AppContainerHelperService } from '../../shared/services/helpers/app-contaner-helper.service';
 
 const VIEW_MODE_KEY = 'dashboardViewMode';
@@ -90,7 +92,9 @@ export class DashboardComponent implements OnInit {
     public hasCsi = false;
     public hasFog = false;
     public hasBackflow = false;
+    public hasFogTransportation = false;
     public isAdmin = false;
+    public signatureUrl: string | null = null;
     public readonly FogInspectionResult = FogInspectionResult;
     public readonly BackflowTestResult = BackflowTestResult;
     public isLoading = true;
@@ -185,7 +189,8 @@ export class DashboardComponent implements OnInit {
         private readonly _backflowTestService: BackflowTestService,
         private readonly _dashboardService: ProfessionalDashboardService,
         private readonly _router: Router,
-        private readonly _containerHelper: AppContainerHelperService
+        private readonly _containerHelper: AppContainerHelperService,
+        private readonly _modalHelper: ModalHelperService
     ) { }
 
     public async ngOnInit(): Promise<void> {
@@ -195,13 +200,15 @@ export class DashboardComponent implements OnInit {
         this.setupColumns();
 
         try {
-            const [hasCsi, hasFog, hasBackflow, isCsiInspector, isFogInspector, isBackflowTester, isAdmin] = await Promise.all([
+            const [hasCsi, hasFog, hasBackflow, hasFogTransportation, isCsiInspector, isFogInspector, isBackflowTester, isFogTransporter, isAdmin] = await Promise.all([
                 this._authService.hasAnyFeatures(FeatureType.CsiInspection),
                 this._authService.hasAnyFeatures(FeatureType.FogInspection),
                 this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
+                this._authService.hasAnyFeatures(FeatureType.FogTransportation),
                 this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.CSI_INSPECTOR),
                 this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.FOG_INSPECTOR),
                 this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.BACKFLOW_TESTER),
+                this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.FOG_TRANSPORTER),
                 this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.ADMIN)
             ]);
 
@@ -209,6 +216,7 @@ export class DashboardComponent implements OnInit {
             this.hasCsi = hasCsi && (isCsiInspector || isAdmin);
             this.hasFog = hasFog && isFogInspector;
             this.hasBackflow = hasBackflow && (isBackflowTester || isAdmin);
+            this.hasFogTransportation = hasFogTransportation && isFogTransporter;
 
             const promises: Promise<void>[] = [];
 
@@ -218,6 +226,10 @@ export class DashboardComponent implements OnInit {
 
             if (this.hasFog) {
                 promises.push(this.loadRecentFogInspections());
+            }
+
+            if (this.hasFogTransportation) {
+                promises.push(this.loadSignature());
             }
 
             if (this.isAdmin) {
@@ -238,6 +250,44 @@ export class DashboardComponent implements OnInit {
         } finally {
             this.isLoading = false;
         }
+    }
+
+    public openSignaturePad(): void {
+        this._modalHelper.show<FogSignatureModel, string>(
+            FogSignaturePadModalComponent,
+            {
+                title: 'Signature',
+                size: ModalSize.extraLarge,
+                model: { existingSignature: null }
+            }
+        ).result().subscribe((dataUrl: string) => {
+            if (dataUrl) {
+                this.saveSignature(dataUrl);
+            }
+        });
+    }
+
+    private async loadSignature(): Promise<void> {
+        const user = await this._userService.getMyData();
+        this.signatureUrl = user.signatureUrl ?? null;
+    }
+
+    private async saveSignature(dataUrl: string): Promise<void> {
+        const file = this.dataUrlToFile(dataUrl, 'transporter-signature.png');
+        this.signatureUrl = await this._userService.saveMySignature(file);
+    }
+
+    private dataUrlToFile(dataUrl: string, fileName: string): File {
+        const [header, base64] = dataUrl.split(',');
+        const mimeType = header.match(/:(.*?);/)?.[1] ?? 'image/png';
+        const binary = atob(base64);
+
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+
+        return new File([bytes], fileName, { type: mimeType });
     }
 
     private setupColumns(): void {

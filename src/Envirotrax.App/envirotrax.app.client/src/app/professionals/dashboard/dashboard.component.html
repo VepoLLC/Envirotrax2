@@ -305,11 +305,40 @@
                     <div class="number-box">{{ dashboardStats.gaugeCount ?? 0 }}</div>
                 </a>
             </div>
+            <div *ngIf="hasFogTransportation" class="col-sm-12 col-md-6 col-xl-3">
+                <a (click)="openSignaturePad()" class="overview-box bordered" style="cursor: pointer">
+                    <i class="fa-solid fa-signature overview-icon"></i>
+                    <span class="overview-label">{{ signatureUrl ? "Update Transporter Signature" : "Add Transporter Signature" }}</span>
+                    <div class="number-box">
+                        <i [class]="signatureUrl ? 'fa-solid fa-check' : 'fa-solid fa-xmark'"></i>
+                    </div>
+                </a>
+            </div>
         </div>
     </div>
 
     <!-- Full view: side-by-side sections -->
     <div *ngIf="viewMode === 'full'">
+
+        <!-- Transporter Signature (FOG transporters) -->
+        <div *ngIf="hasFogTransportation" class="mb-4">
+            <vp-section header="Transporter Signature">
+                <p *ngIf="!signatureUrl" class="text-danger fw-semibold text-center">
+                    You must have your signature on file in order to submit trip tickets. Click on the Add Transporter's Signature button below to save your signature.
+                </p>
+
+                <div class="text-center">
+                    <div *ngIf="signatureUrl" class="mb-2">
+                        <img [src]="signatureUrl" alt="Transporter Signature" class="img-fluid border rounded" style="max-width: 400px" />
+                    </div>
+
+                    <button type="button" class="btn btn-primary vp-section-button" (click)="openSignaturePad()">
+                        <i class="fa-solid fa-signature me-1"></i>
+                        {{ signatureUrl ? "Update Transporter Signature" : "Add Transporter's Signature" }}
+                    </button>
+                </div>
+            </vp-section>
+        </div>
 
         <!-- Row 1: Water Suppliers + Sub Accounts (admin only) -->
         <div *ngIf="isAdmin" class="row mb-4">

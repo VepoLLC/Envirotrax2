@@ -61,7 +61,6 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
     public async Task<FogTripTicketDto> SubmitAsync(
         FogTripTicketDto request,
         Stream? generatorSignatureStream, string? generatorSignatureFileName,
-        Stream? transporterSignatureStream, string? transporterSignatureFileName,
         Stream? receiverSignatureStream, string? receiverSignatureFileName,
         CancellationToken cancellationToken)
     {
@@ -122,11 +121,6 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
             ticket.GeneratorSignaturePath = $"professionals/{professional!.Id}/fog-trip-tickets/generator/{Guid.NewGuid()}{ValidateAndGetExtension(generatorSignatureFileName)}";
             ticket.GeneratorSignatureDate = DateTime.UtcNow;
         }
-        if (transporterSignatureStream != null && transporterSignatureFileName != null)
-        {
-            ticket.TransporterSignaturePath = $"professionals/{professional!.Id}/fog-trip-tickets/transporter/{Guid.NewGuid()}{ValidateAndGetExtension(transporterSignatureFileName)}";
-            ticket.TransporterSignatureDate = DateTime.UtcNow;
-        }
         if (receiverSignatureStream != null && receiverSignatureFileName != null)
         {
             ticket.ReceiverSignaturePath = $"professionals/{professional!.Id}/fog-trip-tickets/receiver/{Guid.NewGuid()}{ValidateAndGetExtension(receiverSignatureFileName)}";
@@ -139,10 +133,6 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         if (generatorSignatureStream != null && ticket.GeneratorSignaturePath != null)
         {
             await _fileStorageService.UploadAsync(ticket.GeneratorSignaturePath, generatorSignatureStream);
-        }
-        if (transporterSignatureStream != null && ticket.TransporterSignaturePath != null)
-        {
-            await _fileStorageService.UploadAsync(ticket.TransporterSignaturePath, transporterSignatureStream);
         }
         if (receiverSignatureStream != null && ticket.ReceiverSignaturePath != null)
         {
@@ -199,6 +189,9 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         ticket.TransporterWorkNumber = professional.PhoneNumber;
         ticket.TransporterFaxNumber = professional.FaxNumber;
         ticket.TransporterEmailAddress = transporterUser?.EmailAddress ?? professional.CompanyEmail;
+
+        ticket.TransporterSignaturePath = transporterUser?.SignaturePath;
+        ticket.TransporterSignatureDate = transporterUser?.SignaturePath != null ? DateTime.UtcNow : null;
     }
 
     private static void ApplyVehicleSnapshot(FogTripTicket ticket, FogVehicleDto? vehicle)

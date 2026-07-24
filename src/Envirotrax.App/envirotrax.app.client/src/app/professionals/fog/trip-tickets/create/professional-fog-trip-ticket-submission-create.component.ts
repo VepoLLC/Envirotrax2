@@ -85,8 +85,8 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
 
     public images: FogTripTicketImages = {};
     public generatorSignaturePreview: string | null = null;
-    public transporterSignaturePreview: string | null = null;
     public receiverSignaturePreview: string | null = null;
+    public transporterSignatureUrl: string | null = null;
 
     private _siteId = 0;
     private _transporterLicense?: ProfessionalUserLicense;
@@ -119,6 +119,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         this.selectedTransporterUserId = value;
         this.selectedTransporter = this.transporterOptions.find(o => o.id === value)?.data;
 
+        await this.loadTransporterSignatureUrl();
         await this.computeVerification();
     }
 
@@ -151,13 +152,6 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
             this.generatorSignaturePreview = preview;
             this.images.generatorSignature = file;
         }, 'generator-signature.png');
-    }
-
-    public openTransporterSignature(): void {
-        this.openSignaturePad(this.transporterSignaturePreview, (preview, file) => {
-            this.transporterSignaturePreview = preview;
-            this.images.transporterSignature = file;
-        }, 'transporter-signature.png');
     }
 
     public openReceiverSignature(): void {
@@ -266,10 +260,6 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
             this.validationErrors.push('A generator signature is required.');
         }
 
-        if (!this.images.transporterSignature) {
-            this.validationErrors.push('A transporter signature is required.');
-        }
-
         if (!this.images.receiverSignature) {
             this.validationErrors.push('A receiver signature is required.');
         }
@@ -326,6 +316,8 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         const defaultTransporter = this.transporterOptions.find(o => o.id === myUser.id) ?? this.transporterOptions[0];
         this.selectedTransporterUserId = defaultTransporter?.id;
         this.selectedTransporter = defaultTransporter?.data;
+
+        await this.loadTransporterSignatureUrl();
 
         const registeredIds = this.waterSupplierOptions.filter(o => o.id).map(o => Number(o.id));
         const siteWsId = this.site?.waterSupplier?.id;
@@ -422,9 +414,19 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
     }
 
     private buildSignatureCheck(): VerificationCheck {
-        // V1 checks for a transporter signature stored on the account (FogTransporters.TransporterSignature).
-        // V2 has no per-user signature storage yet, so this is not ported and reports as signed for now.
-        return { label: 'Transporter Signature', message: 'Signed', valid: true };
+        const label = 'Transporter Signature';
+
+        if (!this.selectedTransporter?.signaturePath) {
+            return { label, message: 'No signature on record', valid: false };
+        }
+
+        return { label, message: 'Signed', valid: true };
+    }
+
+    private async loadTransporterSignatureUrl(): Promise<void> {
+        this.transporterSignatureUrl = this.selectedTransporter?.signaturePath && this.selectedTransporterUserId
+            ? await this._userService.getSignatureUrl(this.selectedTransporterUserId)
+            : null;
     }
 
     private requiresInsurance(): boolean {

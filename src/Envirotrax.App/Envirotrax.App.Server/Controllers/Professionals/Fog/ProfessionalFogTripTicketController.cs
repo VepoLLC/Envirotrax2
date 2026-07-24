@@ -48,7 +48,6 @@ public class ProfessionalFogTripTicketController : ProfessionalProtectedControll
     public async Task<IActionResult> SubmitAsync(
         [FromForm] FogTripTicketDto dto,
         [FromForm] IFormFile? generatorSignature,
-        [FromForm] IFormFile? transporterSignature,
         [FromForm] IFormFile? receiverSignature,
         CancellationToken ct)
     {
@@ -60,13 +59,11 @@ public class ProfessionalFogTripTicketController : ProfessionalProtectedControll
         dto.Id = 0;
 
         await using var generatorStream = generatorSignature?.OpenReadStream();
-        await using var transporterStream = transporterSignature?.OpenReadStream();
         await using var receiverStream = receiverSignature?.OpenReadStream();
 
         var result = await _fogService.SubmitAsync(
             dto,
             generatorStream, generatorSignature?.FileName,
-            transporterStream, transporterSignature?.FileName,
             receiverStream, receiverSignature?.FileName,
             ct);
 

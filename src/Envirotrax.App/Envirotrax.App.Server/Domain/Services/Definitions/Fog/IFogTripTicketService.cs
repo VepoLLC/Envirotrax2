@@ -11,7 +11,6 @@ public interface IFogTripTicketService : IService<FogTripTicket, FogTripTicketDt
     Task<FogTripTicketDto> SubmitAsync(
         FogTripTicketDto request,
         Stream? generatorSignatureStream, string? generatorSignatureFileName,
-        Stream? transporterSignatureStream, string? transporterSignatureFileName,
         Stream? receiverSignatureStream, string? receiverSignatureFileName,
         CancellationToken cancellationToken);
 }

@@ -51,7 +51,6 @@ export class FogTripTicketService {
         const formData = buildFogTripTicketFormData(ticket);
 
         if (images.generatorSignature) { formData.append('generatorSignature', images.generatorSignature); }
-        if (images.transporterSignature) { formData.append('transporterSignature', images.transporterSignature); }
         if (images.receiverSignature) { formData.append('receiverSignature', images.receiverSignature); }
 
         return lastValueFrom(this._http.post<FogTripTicket>(url, formData));

@@ -2288,6 +2288,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
+                    b.Property<string>("SignaturePath")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.HasKey("ProfessionalId", "UserId");
 
                     b.HasIndex("UserId");

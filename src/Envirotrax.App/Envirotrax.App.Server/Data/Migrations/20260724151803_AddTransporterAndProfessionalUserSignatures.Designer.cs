@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    [Migration("20260723212728_AddFogTripTicketTransporterSignature")]
-    partial class AddFogTripTicketTransporterSignature
+    [Migration("20260724151803_AddTransporterAndProfessionalUserSignatures")]
+    partial class AddTransporterAndProfessionalUserSignatures
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -2290,6 +2290,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<string>("JobTitle")
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("SignaturePath")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.HasKey("ProfessionalId", "UserId");
 

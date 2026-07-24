@@ -19,7 +19,6 @@ import { ProfessionalFogTripTicketSubmissionCreateComponent } from "./trip-ticke
         FogInspectionViewComponent,
         ProfessionalFogSubmissionPropertySearchComponent,
         ProfessionalFogSubmissionCreateComponent,
-        FogSignaturePadModalComponent,
         ProfessionalFogTripTicketListComponent,
         ProfessionalFogTripTicketSubmissionPropertySearchComponent,
         ProfessionalFogTripTicketSubmissionCreateComponent
@@ -28,6 +27,7 @@ import { ProfessionalFogTripTicketSubmissionCreateComponent } from "./trip-ticke
         CommonModule,
         FormsModule,
         SignaturePadComponent,
+        FogSignaturePadModalComponent,
         SharedComponentsModule,
         ProfessionalsFogRoutingModule
     ]

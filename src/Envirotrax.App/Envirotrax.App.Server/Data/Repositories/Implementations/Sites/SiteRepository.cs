@@ -134,6 +134,16 @@ public class SiteRepository : Repository<Site>, ISiteRepository
                 .SetProperty(s => s.CsiAccountAssignmentDate, assignmentDate));
     }
 
+    public async Task UpdateBackflowAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate)
+    {
+        await DbContext
+            .Sites
+            .Where(s => s.Id == siteId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(s => s.BackflowAccountAssignmentId, userId)
+                .SetProperty(s => s.BackflowAccountAssignmentDate, assignmentDate));
+    }
+
     public async Task ClearNeedsRenewalCheckAsync(int siteId)
     {
         await DbContext

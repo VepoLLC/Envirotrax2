@@ -608,6 +608,13 @@ export class App implements OnInit {
             hasFeature: true
           }
         ]
+      },
+      {
+        title: '',
+        iconCss: 'fa-regular fa-solid fa-cart-shopping',
+        routerLink: ['/professionals/checkout'],
+        hasPermission: true,
+        hasFeature: true
       }
     ];
   }

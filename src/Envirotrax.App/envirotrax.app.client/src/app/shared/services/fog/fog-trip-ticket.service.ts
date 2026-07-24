@@ -44,4 +44,9 @@ export class FogTripTicketService {
 
         return await lastValueFrom(this._http.get<PagedData<FogTripTicket>>(url, { params }));
     }
+
+    public deleteForProfessional(id: number): Promise<FogTripTicket> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/fog/trip-tickets/${id}`);
+        return lastValueFrom(this._http.delete<FogTripTicket>(url));
+    }
 }

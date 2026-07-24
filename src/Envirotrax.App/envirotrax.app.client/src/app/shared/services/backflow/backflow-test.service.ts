@@ -135,6 +135,11 @@ export class BackflowTestService {
         return await lastValueFrom(this._http.get(url, { responseType: 'blob' }));
     }
 
+    public async deleteForProfessional(id: number): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/backflow/tests/${id}`);
+        return await lastValueFrom(this._http.delete<BackflowTest>(url));
+    }
+
     public async updateRenewalRequired(id: number, renewalRequired: boolean): Promise<BackflowTest> {
         const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/renewal-required`);
         return await lastValueFrom(this._http.put<BackflowTest>(url, renewalRequired));

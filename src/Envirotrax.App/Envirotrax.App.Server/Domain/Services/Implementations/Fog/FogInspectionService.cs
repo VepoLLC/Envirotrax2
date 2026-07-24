@@ -25,6 +25,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
     private readonly IProfessionalUserService _professionalUserService;
     private readonly ISiteService _siteService;
     private readonly IFileStorageService _fileStorageService;
+    private readonly IAuthService _authService;
 
     public FogInspectionService(
         IMapper mapper,
@@ -32,7 +33,8 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         IProfessionalService professionalService,
         IProfessionalUserService professionalUserService,
         ISiteService siteService,
-        IFileStorageService fileStorageService)
+        IFileStorageService fileStorageService,
+        IAuthService authService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -40,6 +42,19 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         _professionalUserService = professionalUserService;
         _siteService = siteService;
         _fileStorageService = fileStorageService;
+        _authService = authService;
+    }
+
+    public override async Task<FogInspectionDto?> DeleteAsync(int id)
+    {
+        var inspection = await _repository.GetNoIncludesAsync(id, CancellationToken.None);
+
+        if (inspection == null || inspection.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(inspection.TransactionId))
+        {
+            return null;
+        }
+
+        return await base.DeleteAsync(id);
     }
 
     public async Task<FogInspectionDto> SubmitAsync(

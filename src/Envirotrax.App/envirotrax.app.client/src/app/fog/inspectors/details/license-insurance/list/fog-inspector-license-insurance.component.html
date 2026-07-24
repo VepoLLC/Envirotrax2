@@ -34,17 +34,8 @@
 
 
 <vp-section header="License &amp; Insurance Management">
-    <vp-section-actions>
-        <button *ngIf="activeTab === 'insurances' ? canManageInsurances : canManageLicenses"
-                type="button"
-                class="btn btn-primary"
-                (click)="activeTab === 'insurances' ? addInsurance() : addLicense()">
-            <i class="fa-solid fa-circle-plus me-1"></i>Add New
-        </button>
-    </vp-section-actions>
-
     <div class="text-center mb-3">
-        <ul class="vp-tabs nav nav-pills d-inline-flex">
+        <ul class="vp-tabs nav nav-pills d-inline-flex flex-wrap justify-content-center">
             <li class="nav-item">
                 <a class="nav-link" [class.active]="activeTab === 'insurances'" (click)="setActiveTab('insurances')">
                     Insurance Policies
@@ -72,6 +63,8 @@
                       (queryReset)="loadInsurances()"
                       [showActionLabels]="false"
                       [customActions]="insuranceCustomActions"
+                      [canAdd]="canManageInsurances"
+                      (add)="addInsurance()"
                       [canEdit]="canManageInsurances"
                       (edit)="editInsurance($event)" />
         </div>
@@ -90,6 +83,8 @@
                       (queryChange)="loadLicenses()"
                       (queryReset)="loadLicenses()"
                       [showActionLabels]="false"
+                      [canAdd]="canManageLicenses"
+                      (add)="addLicense()"
                       [canEdit]="canManageLicenses"
                       (edit)="editLicense($event)" />
         </div>

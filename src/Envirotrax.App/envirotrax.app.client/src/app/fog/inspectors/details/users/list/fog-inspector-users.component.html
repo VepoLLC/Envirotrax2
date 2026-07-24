@@ -1,14 +1,5 @@
 
 <vp-section header="Licensed Personnel Sub Accounts">
-    <vp-section-actions>
-        <button *ngIf="canManage"
-                type="button"
-                class="btn btn-primary"
-                (click)="addUser()">
-            <i class="fa-solid fa-circle-plus me-1"></i>Add New
-        </button>
-    </vp-section-actions>
-
     <div dp-spinner-parent>
         <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
 
@@ -21,6 +12,8 @@
                   (queryChange)="loadSubAccounts()"
                   (queryReset)="loadSubAccounts()"
                   [showActionLabels]="false"
+                  [canAdd]="canManage"
+                  (add)="addUser()"
                   [canEdit]="canManage"
                   (edit)="editUser($event)" />
     </div>

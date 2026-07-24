@@ -19,10 +19,7 @@ export class EditFogInspectorUserComponent {
     public user: ProfessionalUser;
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
-
-    public get isEditMode(): boolean {
-        return !!this._modalReference.config.model?.user?.id;
-    }
+    public isEditMode: boolean = false;
 
     constructor(
         private readonly _modalReference: ModalReference<FogUserModalData, ProfessionalUser>,
@@ -31,6 +28,7 @@ export class EditFogInspectorUserComponent {
         private readonly _toastService: ToastService
     ) {
         this.user = { ...this._modalReference.config.model!.user };
+        this.isEditMode = !!this.user.id;
     }
 
     public async save(form: NgForm): Promise<void> {

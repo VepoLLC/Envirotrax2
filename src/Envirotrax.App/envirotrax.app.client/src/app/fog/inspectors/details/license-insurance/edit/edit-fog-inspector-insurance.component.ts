@@ -20,10 +20,7 @@ export class EditFogInspectorInsuranceComponent {
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
     public certificateFile: File | null = null;
-
-    public get isEditMode(): boolean {
-        return !!this._modalReference.config.model?.insurance?.id;
-    }
+    public isEditMode: boolean = false;
 
     constructor(
         private readonly _modalReference: ModalReference<FogInsuranceModalData, ProfessionalInsurance>,
@@ -32,6 +29,7 @@ export class EditFogInspectorInsuranceComponent {
         private readonly _toastService: ToastService
     ) {
         this.insurance = { ...this._modalReference.config.model!.insurance };
+        this.isEditMode = !!this.insurance.id;
     }
 
     public async save(form: NgForm): Promise<void> {

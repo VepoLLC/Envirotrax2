@@ -107,4 +107,27 @@ public class MyProfessionalUserContoller : EnvirotraxBaseController
 
         return Ok(updated);
     }
+
+    [HttpPost("my/signature")]
+    public async Task<IActionResult> SaveMySignatureAsync([FromForm] IFormFile? signature)
+    {
+        if (signature == null)
+        {
+            return BadRequest();
+        }
+
+        await using var signatureStream = signature.OpenReadStream();
+
+        var signatureUrl = await _userService.SaveMySignatureAsync(signatureStream, signature.FileName);
+
+        return Ok(new { signatureUrl });
+    }
+
+    [HttpGet("{id}/signature-url")]
+    public async Task<IActionResult> GetSignatureUrlAsync(int id, CancellationToken cancellationToken)
+    {
+        var signatureUrl = await _userService.GetSignatureUrlAsync(id, cancellationToken);
+
+        return Ok(new { signatureUrl });
+    }
 }

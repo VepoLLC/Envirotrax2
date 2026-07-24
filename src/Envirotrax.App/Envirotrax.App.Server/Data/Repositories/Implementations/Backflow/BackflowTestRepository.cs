@@ -95,6 +95,27 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return counts ?? new BackflowTestExpiryCounts();
     }
 
+    public async Task<IEnumerable<BackflowTest>> GetComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        if (query.Sort.IsNullOrEmpty())
+        {
+            query.Sort[nameof(BackflowTest.ExpirationDate)] = SortOperator.Asc;
+        }
+
+        var paginated = await GetListQuery()
+            .Where(t => t.IsCurrent
+                && !t.OutOfService
+                && t.RenewalRequired
+                && t.Site != null
+                && t.Site.Active
+                && !t.Site.OutOfArea)
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
     public async Task<IEnumerable<BackflowTest>> GetAllCurrentBySiteIdAsync(int siteId, CancellationToken cancellationToken)
     {
         return await DbContext.BackflowTests

@@ -10,6 +10,8 @@ import { ProfessionalFogSubmissionPropertySearchComponent } from "./inspections/
 import { ProfessionalFogSubmissionCreateComponent } from "./inspections/create/professional-fog-submission-create.component";
 import { FogSignaturePadModalComponent } from "./inspections/create/fog-signature-pad-modal.component";
 import { ProfessionalFogTripTicketListComponent } from "./trip-tickets/list/professional-fog-trip-ticket-list.component";
+import { ProfessionalFogTripTicketSubmissionPropertySearchComponent } from "./trip-tickets/create/professional-fog-trip-ticket-submission-property-search.component";
+import { ProfessionalFogTripTicketSubmissionCreateComponent } from "./trip-tickets/create/professional-fog-trip-ticket-submission-create.component";
 
 @NgModule({
     declarations: [
@@ -17,13 +19,15 @@ import { ProfessionalFogTripTicketListComponent } from "./trip-tickets/list/prof
         FogInspectionViewComponent,
         ProfessionalFogSubmissionPropertySearchComponent,
         ProfessionalFogSubmissionCreateComponent,
-        FogSignaturePadModalComponent,
-        ProfessionalFogTripTicketListComponent
+        ProfessionalFogTripTicketListComponent,
+        ProfessionalFogTripTicketSubmissionPropertySearchComponent,
+        ProfessionalFogTripTicketSubmissionCreateComponent
     ],
     imports: [
         CommonModule,
         FormsModule,
         SignaturePadComponent,
+        FogSignaturePadModalComponent,
         SharedComponentsModule,
         ProfessionalsFogRoutingModule
     ]

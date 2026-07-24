@@ -1,13 +1,107 @@
-<div>
-    <dp-loading-spinner [hidden]="!table.isLoading"></dp-loading-spinner>
+<dp-loading-spinner [hidden]="!isInitializing"></dp-loading-spinner>
 
-    <vp-table *ngIf="table.items"
-              [columns]="table.columns!"
-              [data]="table.items.data"
-              [(pageInfo)]="table.items.pageInfo"
-              (pageInfoChange)="getSuppliers()"
-              [(query)]="table.query"
-              (queryChange)="getSuppliers()"
-              (queryReset)="getSuppliers()"
-              [freeTextSearch]="table.freeTextSearch" />
+<div [hidden]="showResults" *ngIf="!isInitializing">
+    <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+        <vp-filter-panel (filterChange)="onFilterChange($event)">
+            <vp-section header="Water Supplier Search Criteria">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="id"
+                                                   label="Water Supplier ID"
+                                                   type="number"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="name"
+                                                   label="Name"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="contactName"
+                                                   label="Contact Name"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="pwsId"
+                                                   label="PWS ID"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="address"
+                                                   label="Address"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="city"
+                                                   label="City"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="state.id"
+                                                   label="State"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="stateOptions" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="zipCode"
+                                                   label="ZIP"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm" />
+                        </div>
+                    </div>
+                </div>
+            </vp-section>
+        </vp-filter-panel>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="searchForm" />
+
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>
+                    Search
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<dp-loading-spinner [hidden]="!table.isLoading"></dp-loading-spinner>
+
+<div *ngIf="showResults">
+    <div class="d-flex justify-content-end mb-3">
+        <button type="button" class="btn btn-primary vp-section-button" (click)="showResults = false">
+            <i class="fa-solid fa-magnifying-glass me-1"></i>
+            Search Again
+        </button>
+    </div>
+
+    <vp-section header="Search Results ({{ table.items?.pageInfo?.totalItems }})">
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getSuppliers()"
+                  [(query)]="table.query"
+                  (queryChange)="getSuppliers()"
+                  (queryReset)="getSuppliers()" />
+    </vp-section>
 </div>

@@ -320,8 +320,8 @@ export class App implements OnInit {
           {
             title: 'Compliance Management',
             iconCss: 'fa-solid fa-list-check',
-            routerLink: ['/'],
-            hasPermission: true,
+            routerLink: ['backflow/compliance'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
             hasFeature: true
           },
           {
@@ -606,8 +606,22 @@ export class App implements OnInit {
             routerLink: ['professionals/fog/inspections/create'],
             hasPermission: isFogInspector,
             hasFeature: true
+          },
+          {
+            title: 'Submit Trip Ticket',
+            iconCss: 'fa-regular fa-file-plus',
+            routerLink: ['professionals/fog/trip-tickets/create'],
+            hasPermission: isFogTransporter,
+            hasFeature: true
           }
         ]
+      },
+      {
+        title: '',
+        iconCss: 'fa-regular fa-solid fa-cart-shopping',
+        routerLink: ['/professionals/checkout'],
+        hasPermission: true,
+        hasFeature: true
       }
     ];
   }

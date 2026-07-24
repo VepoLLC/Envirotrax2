@@ -1,4 +1,5 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, ViewChild } from "@angular/core";
+import { CommonModule } from "@angular/common";
 import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { SignaturePadComponent, NgSignaturePadOptions } from "@almothafar/angular-signature-pad";
 
@@ -7,7 +8,8 @@ export interface FogSignatureModel {
 }
 
 @Component({
-    standalone: false,
+    standalone: true,
+    imports: [CommonModule, SignaturePadComponent],
     templateUrl: './fog-signature-pad-modal.component.html',
     styleUrl: './fog-signature-pad-modal.component.scss'
 })

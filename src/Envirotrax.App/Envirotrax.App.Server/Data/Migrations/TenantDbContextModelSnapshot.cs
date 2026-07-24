@@ -1799,6 +1799,13 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<DateTime?>("TransporterSignatureDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TransporterSignaturePath")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<string>("TransporterState")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -2280,6 +2287,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<string>("JobTitle")
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("SignaturePath")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.HasKey("ProfessionalId", "UserId");
 

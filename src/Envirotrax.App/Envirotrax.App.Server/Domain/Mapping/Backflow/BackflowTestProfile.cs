@@ -79,5 +79,10 @@ public class BackflowTestProfile : Profile
             .ForMember(m => m.UpdatedBy, opt => opt.Ignore())
             .ForMember(m => m.CreatedBy, opt => opt.Ignore())
             .ForMember(m => m.DeletedBy, opt => opt.Ignore());
+
+        // Compliance Management row = base test DTO + the site's logs (stitched in the service).
+        CreateMap<BackflowTest, BackflowComplianceDto>()
+            .IncludeBase<BackflowTest, BackflowTestDto>()
+            .ForMember(dto => dto.Logs, opt => opt.Ignore());
     }
 }

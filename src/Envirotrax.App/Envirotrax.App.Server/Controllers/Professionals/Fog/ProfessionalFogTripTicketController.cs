@@ -42,4 +42,11 @@ public class ProfessionalFogTripTicketController : ProfessionalProtectedControll
 
         return Ok(result);
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync(int id)
+    {
+        var result = await _fogService.DeleteAsync(id);
+        return result == null ? NotFound() : Ok(result);
+    }
 }

@@ -15,8 +15,6 @@ public class FogTripTicketProfile : Profile
         CreateMap<FogTripTicket, FogTripTicketDto>()
             .ForMember(dest => dest.WaterSupplier, opt => opt.Ignore())
             .ForMember(dest => dest.Site, opt => opt.Ignore())
-            .ForMember(dest => dest.Professional, opt => opt.Ignore())
-            .ForMember(dest => dest.Transporter, opt => opt.Ignore())
             .ForMember(dest => dest.PropertyState, opt => opt.Ignore())
             .AfterMap((model, dto) =>
             {

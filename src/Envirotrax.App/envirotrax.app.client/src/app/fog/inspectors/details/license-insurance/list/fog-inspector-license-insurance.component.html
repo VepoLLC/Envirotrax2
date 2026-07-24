@@ -34,6 +34,15 @@
 
 
 <vp-section header="License &amp; Insurance Management">
+    <vp-section-actions>
+        <button *ngIf="activeTab === 'insurances' ? canManageInsurances : canManageLicenses"
+                type="button"
+                class="btn btn-primary"
+                (click)="activeTab === 'insurances' ? addInsurance() : addLicense()">
+            <i class="fa-solid fa-circle-plus me-1"></i>Add New
+        </button>
+    </vp-section-actions>
+
     <div class="text-center mb-3">
         <ul class="vp-tabs nav nav-pills d-inline-flex">
             <li class="nav-item">

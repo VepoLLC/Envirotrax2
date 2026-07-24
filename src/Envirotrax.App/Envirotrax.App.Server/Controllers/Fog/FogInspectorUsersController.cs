@@ -27,6 +27,15 @@ namespace Envirotrax.App.Server.Controllers.Fog
             return Ok(result);
         }
 
+        [HttpPost("{id}/users")]
+        [HasFeature(FeatureType.ManageProfessionalUsers)]
+        [HasPermission(PermissionAction.CanModify)]
+        public async Task<IActionResult> AddSubAccountAsync(int id, [FromBody] ProfessionalUserDto dto)
+        {
+            var result = await _userService.AddForProfessionalAsync(id, dto, default);
+            return Ok(result);
+        }
+
         [HttpPut("{id}/users/{userId}")]
         [HasFeature(FeatureType.ManageProfessionalUsers)]
         [HasPermission(PermissionAction.CanModify)]

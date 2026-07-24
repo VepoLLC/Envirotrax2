@@ -26,6 +26,24 @@ export class FogInspectorInsurancesService {
         }));
     }
 
+    public add(inspectorId: number, insurance: ProfessionalInsurance, file: File | null): Promise<ProfessionalInsurance> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/inspectors/${inspectorId}/insurances`);
+        const formData = new FormData();
+
+        formData.append('professional.id', inspectorId.toString());
+        formData.append('insuranceNumber', insurance.insuranceNumber ?? '');
+
+        if (insurance.expirationDate) {
+            formData.append('expirationDate', insurance.expirationDate.toString());
+        }
+
+        if (file) {
+            formData.append('file', file);
+        }
+
+        return lastValueFrom(this._http.post<ProfessionalInsurance>(url, formData));
+    }
+
     public update(inspectorId: number, insurance: ProfessionalInsurance): Promise<ProfessionalInsurance> {
         const url = this._urlResolver.resolveUrl(`/api/fog/inspectors/${inspectorId}/insurances/${insurance.id}`);
         return lastValueFrom(this._http.put<ProfessionalInsurance>(url, insurance));

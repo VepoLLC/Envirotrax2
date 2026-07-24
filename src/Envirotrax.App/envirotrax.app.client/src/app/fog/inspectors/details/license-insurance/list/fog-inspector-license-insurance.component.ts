@@ -150,12 +150,28 @@ export class FogInspectorLicenseInsuranceComponent implements OnInit {
         ];
     }
 
+    public addLicense(): void {
+        this._modalHelper.show<FogLicenseModalData, ProfessionalUserLicense>(EditFogInspectorLicenseComponent, {
+            title: 'Add License',
+            model: { inspectorId: this.inspectorId, license: {} },
+            size: ModalSize.large
+        }).result().subscribe(() => this.loadLicenses());
+    }
+
     public editLicense(license: ProfessionalUserLicense): void {
         this._modalHelper.show<FogLicenseModalData, ProfessionalUserLicense>(EditFogInspectorLicenseComponent, {
             title: 'Edit License',
             model: { inspectorId: this.inspectorId, license },
             size: ModalSize.large
         }).result().subscribe(() => this.loadLicenses());
+    }
+
+    public addInsurance(): void {
+        this._modalHelper.show<FogInsuranceModalData, ProfessionalInsurance>(EditFogInspectorInsuranceComponent, {
+            title: 'Add Insurance Policy',
+            model: { inspectorId: this.inspectorId, insurance: {} },
+            size: ModalSize.large
+        }).result().subscribe(() => this.loadInsurances());
     }
 
     public editInsurance(insurance: ProfessionalInsurance): void {

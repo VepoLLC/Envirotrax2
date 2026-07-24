@@ -19,6 +19,11 @@ export class EditFogInspectorInsuranceComponent {
     public insurance: ProfessionalInsurance;
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
+    public certificateFile: File | null = null;
+
+    public get isEditMode(): boolean {
+        return !!this._modalReference.config.model?.insurance?.id;
+    }
 
     constructor(
         private readonly _modalReference: ModalReference<FogInsuranceModalData, ProfessionalInsurance>,
@@ -40,7 +45,10 @@ export class EditFogInspectorInsuranceComponent {
 
             const { inspectorId } = this._modalReference.config.model!;
 
-            const result = await this._insurancesService.update(inspectorId, this.insurance);
+            const result = this.isEditMode
+                ? await this._insurancesService.update(inspectorId, this.insurance)
+                : await this._insurancesService.add(inspectorId, this.insurance, this.certificateFile);
+
             this._toastService.successfullySaved('Insurance');
             this._modalReference.closeSuccess(result);
         } catch (error) {

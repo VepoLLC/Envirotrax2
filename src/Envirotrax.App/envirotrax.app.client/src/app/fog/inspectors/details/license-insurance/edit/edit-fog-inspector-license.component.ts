@@ -36,6 +36,10 @@ export class EditFogInspectorLicenseComponent implements OnInit {
             data: v as ProfessionalType
         }));
 
+    public get isEditMode(): boolean {
+        return !!this._modalReference.config.model?.license?.id;
+    }
+
     constructor(
         private readonly _modalReference: ModalReference<FogLicenseModalData, ProfessionalUserLicense>,
         private readonly _licensesService: FogInspectorLicensesService,
@@ -87,7 +91,10 @@ export class EditFogInspectorLicenseComponent implements OnInit {
 
                 const { inspectorId } = this._modalReference.config.model!;
 
-                const result = await this._licensesService.update(inspectorId, this.license);
+                const result = this.isEditMode
+                    ? await this._licensesService.update(inspectorId, this.license)
+                    : await this._licensesService.add(inspectorId, this.license);
+
                 this._toastService.successfullySaved('License');
                 this._modalReference.closeSuccess(result);
             } catch (error) {

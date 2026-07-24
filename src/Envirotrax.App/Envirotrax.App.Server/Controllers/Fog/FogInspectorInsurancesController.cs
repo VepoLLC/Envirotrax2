@@ -27,6 +27,16 @@ namespace Envirotrax.App.Server.Controllers.Fog
             return Ok(result);
         }
 
+        [HttpPost("{id}/insurances")]
+        [HasFeature(FeatureType.ManageProfessionalInsurances)]
+        [HasPermission(PermissionAction.CanModify)]
+        public async Task<IActionResult> AddInsuranceAsync([FromForm] CreateInsuranceDto dto)
+        {
+            using var stream = dto.File.OpenReadStream();
+
+            return Ok(await _insuranceService.AddAsync(stream, dto.File.FileName, dto));
+        }
+
         [HttpPut("{id}/insurances/{insuranceId}")]
         [HasFeature(FeatureType.ManageProfessionalInsurances)]
         [HasPermission(PermissionAction.CanModify)]

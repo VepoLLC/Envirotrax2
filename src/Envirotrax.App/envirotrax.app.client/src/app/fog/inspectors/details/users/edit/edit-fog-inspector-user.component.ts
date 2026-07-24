@@ -20,6 +20,10 @@ export class EditFogInspectorUserComponent {
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
 
+    public get isEditMode(): boolean {
+        return !!this._modalReference.config.model?.user?.id;
+    }
+
     constructor(
         private readonly _modalReference: ModalReference<FogUserModalData, ProfessionalUser>,
         private readonly _service: FogInspectorSubAccountsService,
@@ -37,7 +41,10 @@ export class EditFogInspectorUserComponent {
                 this.isLoading = true;
                 const { inspectorId } = this._modalReference.config.model!;
 
-                const result = await this._service.update(inspectorId, this.user);
+                const result = this.isEditMode
+                    ? await this._service.update(inspectorId, this.user)
+                    : await this._service.add(inspectorId, this.user);
+
                 this._toastService.successfullySaved('User');
                 this._modalReference.closeSuccess(result);
             } catch (error) {

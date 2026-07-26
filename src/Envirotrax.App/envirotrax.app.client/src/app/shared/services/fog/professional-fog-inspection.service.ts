@@ -33,6 +33,11 @@ export class ProfessionalFogInspectionService {
         return lastValueFrom(this._http.get<FogInspection>(url));
     }
 
+    public deleteForProfessional(id: number): Promise<FogInspection> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/fog/inspections/${id}`);
+        return lastValueFrom(this._http.delete<FogInspection>(url));
+    }
+
     public submit(inspection: FogInspection, images: FogInspectionImages = {}): Promise<FogInspection> {
         const url = this._urlResolver.resolveUrl('/api/professionals/fog/inspections');
         const formData = buildFogInspectionFormData(inspection);

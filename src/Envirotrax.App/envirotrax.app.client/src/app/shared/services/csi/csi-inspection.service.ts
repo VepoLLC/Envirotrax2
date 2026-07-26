@@ -110,6 +110,11 @@ export class CsiInspectionService {
         return lastValueFrom(this._http.get<PagedData<CsiInspection>>(url, { params }));
     }
 
+    public deleteForProfessional(id: number): Promise<CsiInspection> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${id}`);
+        return lastValueFrom(this._http.delete<CsiInspection>(url));
+    }
+
     public getImages(inspectionId: number): Promise<CsiInspectionImage[]> {
         const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${inspectionId}/images`);
         return lastValueFrom(this._http.get<CsiInspectionImage[]>(url));

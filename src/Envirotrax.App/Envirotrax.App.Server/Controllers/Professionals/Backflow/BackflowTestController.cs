@@ -96,4 +96,11 @@ public class BackflowTestController : ProfessionalProtectedController
 
         return Ok(result);
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync(int id)
+    {
+        var result = await _backflowTestService.DeleteAsync(id);
+        return result == null ? NotFound() : Ok(result);
+    }
 }

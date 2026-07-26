@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
@@ -6,6 +7,7 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Licenses;
+using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
@@ -22,6 +24,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
     private readonly IProfessionalUserLicenseService _licenseService;
     private readonly ISiteService _siteService;
     private readonly IPdfTemplateService _pdfTemplateService;
+    private readonly IAuthService _authService;
 
     public CsiInspectionService(
         IMapper mapper,
@@ -30,7 +33,8 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         IProfessionalUserService professionalUserService,
         IProfessionalUserLicenseService licenseService,
         ISiteService siteService,
-        IPdfTemplateService pdfTemplateService)
+        IPdfTemplateService pdfTemplateService,
+        IAuthService authService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -39,6 +43,19 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         _licenseService = licenseService;
         _siteService = siteService;
         _pdfTemplateService = pdfTemplateService;
+        _authService = authService;
+    }
+
+    public override async Task<CsiInspectionDto?> DeleteAsync(int id)
+    {
+        var inspection = await _repository.GetNoIncludesAsync(id, CancellationToken.None);
+
+        if (inspection == null || inspection.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(inspection.TransactionId))
+        {
+            return null;
+        }
+
+        return await base.DeleteAsync(id);
     }
 
     public async Task<CsiInspectionDto> SubmitAsync(CsiInspectionDto request, CancellationToken cancellationToken)

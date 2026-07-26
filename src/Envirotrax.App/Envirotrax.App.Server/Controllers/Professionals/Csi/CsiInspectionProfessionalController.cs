@@ -45,4 +45,11 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
         var result = await _inspectionService.SubmitAsync(request, cancellationToken);
         return Ok(result);
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync(int id)
+    {
+        var result = await _inspectionService.DeleteAsync(id);
+        return result == null ? NotFound() : Ok(result);
+    }
 }

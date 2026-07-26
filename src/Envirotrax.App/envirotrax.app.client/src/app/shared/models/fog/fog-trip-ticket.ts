@@ -1,5 +1,6 @@
 import { Site } from '../sites/site';
 import { Professional } from '../professionals/professional';
+import { ProfessionalUser } from '../professionals/professional-user';
 import { State } from '../lookup/state';
 import { WaterSupplier } from '../water-suppliers/water-supplier';
 import { PropertyType } from '../../enums/property-type.enum';
@@ -25,6 +26,7 @@ export interface FogTripTicket {
     fogGeneratorContactName?: string;
 
     professional?: Professional | null;
+    transporter?: ProfessionalUser | null;
     transporterLicenseNumber?: string;
     transporterLicenseExpiration?: string;
     transporterCompanyName?: string;

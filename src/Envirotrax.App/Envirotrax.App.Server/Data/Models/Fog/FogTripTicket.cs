@@ -100,6 +100,11 @@ public class FogTripTicket : TenantModel<WaterSupplier>, IProfessionalModel, IAu
     [StringLength(255)]
     public string? TransporterEmailAddress { get; set; }
 
+    [StringLength(500)]
+    public string? TransporterSignaturePath { get; set; }
+
+    public DateTime? TransporterSignatureDate { get; set; }
+
     [StringLength(255)]
     public string? GeneratorContactName { get; set; }
 

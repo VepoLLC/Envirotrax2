@@ -52,6 +52,14 @@ export class SiteService {
         );
     }
 
+    public updateBackflowAssignment(siteId: number, userId: number | null): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}/backflow-assignment`);
+
+        return lastValueFrom(
+            this._http.put<void>(url, { userId })
+        );
+    }
+
     public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<Site>> {
         const url = this._urlResolver.resolveUrl('/api/sites');
 

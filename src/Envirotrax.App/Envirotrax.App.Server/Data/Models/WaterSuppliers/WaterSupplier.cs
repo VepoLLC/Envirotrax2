@@ -92,6 +92,10 @@ public class WaterSupplier : TenantBase, IAuditableModel<AppUser>
     [ForeignKey(nameof(ParentId))]
     public WaterSupplier? Parent { get; set; }
 
+    public bool IsActive { get; set; }
+
+    public GeneralSettings? GeneralSettings { get; set; }
+
     public int? CreatedById { get; set; }
     public AppUser? CreatedBy { get; set; }
     public DateTime CreatedTime { get; set; }

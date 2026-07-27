@@ -7,16 +7,19 @@ using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Data.Services.Definitions;
+using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 
 public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSupplier>, IProfessionalSupplierRepository
 {
+    private readonly ITenantProvidersService _tenantProvider;
 
-    public ProfessionalSupplierRepository(IDbContextSelector dbContextSelector)
+    public ProfessionalSupplierRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider)
         : base(dbContextSelector)
     {
+        _tenantProvider = tenantProvider;
     }
 
     protected override string GetPrimaryColumnName()
@@ -26,12 +29,18 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
 
     protected override IQueryable<ProfessionalWaterSupplier> GetListQuery()
     {
-        return base.GetListQuery().Include(pws => pws.WaterSupplier);
+        return base.GetListQuery()
+            .Include(pws => pws.WaterSupplier)
+            .WhereIf(_tenantProvider.ProfessionalId > 0, pws => !pws.IsBanned && !pws.WaterSupplier!.GeneralSettings!.AdministrativeOnly)
+            .AsNoTracking();
     }
 
     protected override IQueryable<ProfessionalWaterSupplier> GetDetailsQuery()
     {
-        return base.GetDetailsQuery().Include(pws => pws.WaterSupplier);
+        return base.GetDetailsQuery()
+            .Include(pws => pws.WaterSupplier)
+            .WhereIf(_tenantProvider.ProfessionalId > 0, pws => !pws.IsBanned && !pws.WaterSupplier!.GeneralSettings!.AdministrativeOnly)
+            .AsNoTracking();
     }
 
     public override Task<IEnumerable<ProfessionalWaterSupplier>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
@@ -68,11 +77,13 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
                              join settings in DbContext.GeneralSettings
                              on supplier.Id equals settings.WaterSupplierId into settingsJoin
                              from settings in settingsJoin.DefaultIfEmpty()
+                             where !settings.AdministrativeOnly
                              select new AvailableWaterSupplier
                              {
                                  Id = supplier.Id,
                                  Name = supplier.Name,
                                  StateId = supplier.StateId,
+                                 IsActive = supplier.IsActive,
 
                                  HasBackflowTesting = (bool?)settings.BackflowTesting ?? false,
                                  HasCsiInspection = (bool?)settings.CsiInspections ?? false,

@@ -14,7 +14,6 @@ import { ProfessionalUserLicenseService } from "../../../../shared/services/prof
 import { FogTripTicketService } from "../../../../shared/services/fog/fog-trip-ticket.service";
 import { Professional } from "../../../../shared/models/professionals/professional";
 import { ProfessionalUser, ExpirationType } from "../../../../shared/models/professionals/professional-user";
-import { AvailableWaterSupplier } from "../../../../shared/models/professionals/professional-water-supplier";
 import { ProfessionalType, ExpirationType as LicenseExpirationType, ProfessionalUserLicense } from "../../../../shared/models/professionals/licenses/professional-user-license";
 import { FogVehicle } from "../../../../shared/models/fog/fog-vehicle";
 import { FogDisposalSite } from "../../../../shared/models/fog/fog-disposal-site";
@@ -23,6 +22,7 @@ import { FogTripTicket } from "../../../../shared/models/fog/fog-trip-ticket";
 import { FogTripTicketImages } from "../../../../shared/models/fog/fog-trip-ticket-images";
 import { MAX_PAGE_SIZE } from "../../../../shared/models/page-info";
 import { InputOption, ModalHelperService } from "@envirotrax/common-ui";
+import { WaterSupplier } from "../../../../shared/models/water-suppliers/water-supplier";
 
 interface VerificationCheck {
     label: string;
@@ -90,7 +90,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
 
     private _siteId = 0;
     private _transporterLicense?: ProfessionalUserLicense;
-    private readonly _availableSuppliers = new Map<number, AvailableWaterSupplier>();
+    private readonly _availableSuppliers = new Map<number, WaterSupplier>();
 
     constructor(
         private readonly _activatedRoute: ActivatedRoute,
@@ -269,11 +269,10 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         try {
             this.isLoading = true;
 
-            const [professional, transporterOptions, suppliersPage, availableSuppliers, disposalSiteOptions, vehicleOptions] = await Promise.all([
+            const [professional, transporterOptions, suppliersPage, disposalSiteOptions, vehicleOptions] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAllAsOptions(false, '', { filter: [{ columnName: 'isFogTransporter', comparisonOperator: 'Eq', value: 'true' }] }),
-                this._supplierService.getAllMy(),
-                this._supplierService.getAllAvailableSuppliers({ pageSize: MAX_PAGE_SIZE }, {}),
+                this._supplierService.getAllMy({ hasFogTransportation: true }),
                 this._disposalSiteService.getAllRegisteredAsOptions(true, 'Select a disposal site'),
                 this._vehicleService.getAllAsOptions(true, 'Select a transporter vehicle')
             ]);
@@ -291,9 +290,9 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
             ];
 
             this._availableSuppliers.clear();
-            for (const supplier of availableSuppliers.data) {
-                if (supplier.id != null) {
-                    this._availableSuppliers.set(supplier.id, supplier);
+            for (const supplier of suppliersPage.data) {
+                if (supplier.waterSupplier?.id) {
+                    this._availableSuppliers.set(supplier.waterSupplier!.id!, supplier.waterSupplier);
                 }
             }
 

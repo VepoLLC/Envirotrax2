@@ -32,8 +32,8 @@ export class ProfessionalSupplierService {
         return lastValueFrom(obsertvable);
     }
 
-    public async getMyAsOptions(hasCsiInspection = false): Promise<InputOption[]> {
-        const suppliers = await this.getAllMy(hasCsiInspection);
+    public async getMyAsOptions(options?: MySupplierFilterOptions): Promise<InputOption[]> {
+        const suppliers = await this.getAllMy(options);
         return [
             { id: '', text: 'Select a water supplier' },
             ...suppliers.data
@@ -42,18 +42,18 @@ export class ProfessionalSupplierService {
         ];
     }
 
-    public getAllMy(hasCsiInspection = false, hasBackflowTesting = false, hasFogInspection = false): Promise<PagedData<ProfessionalWaterSupplier>> {
+    public getAllMy(options?: MySupplierFilterOptions): Promise<PagedData<ProfessionalWaterSupplier>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/water-suppliers');
         const pageInfo: PageInfo = { pageSize: MAX_PAGE_SIZE };
         const filter: QueryProperty[] = [];
 
-        if (hasCsiInspection) {
+        if (options?.hasCsiInspection) {
             filter.push({ columnName: 'hasCsiInspection', comparisonOperator: 'Eq', value: 'true' });
         }
-        if (hasBackflowTesting) {
+        if (options?.hasBackflowTesting) {
             filter.push({ columnName: 'hasBackflowTesting', comparisonOperator: 'Eq', value: 'true' });
         }
-        if (hasFogInspection) {
+        if (options?.hasFogInspection) {
             filter.push({ columnName: 'hasFogInspection', comparisonOperator: 'Eq', value: 'true' });
         }
 
@@ -92,4 +92,11 @@ export class ProfessionalSupplierService {
 
         return lastValueFrom(observable);
     }
+}
+
+export interface MySupplierFilterOptions {
+    hasCsiInspection?: boolean;
+    hasBackflowTesting?: boolean;
+    hasFogInspection?: boolean;
+    hasFogTransportation: boolean;
 }

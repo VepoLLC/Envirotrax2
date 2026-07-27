@@ -26,6 +26,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
     private readonly ISiteService _siteService;
     private readonly IFileStorageService _fileStorageService;
     private readonly IAuthService _authService;
+    private readonly IPdfTemplateService _pdfTemplateService;
 
     public FogInspectionService(
         IMapper mapper,
@@ -34,7 +35,8 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         IProfessionalUserService professionalUserService,
         ISiteService siteService,
         IFileStorageService fileStorageService,
-        IAuthService authService)
+        IAuthService authService,
+        IPdfTemplateService pdfTemplateService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -43,6 +45,17 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         _siteService = siteService;
         _fileStorageService = fileStorageService;
         _authService = authService;
+        _pdfTemplateService = pdfTemplateService;
+    }
+
+    public Task<byte[]> GeneratePdfAsync(FogInspectionDto inspection)
+    {
+        return GeneratePdfAsync([inspection]);
+    }
+
+    public Task<byte[]> GeneratePdfAsync(IEnumerable<FogInspectionDto> inspections)
+    {
+        return _pdfTemplateService.GenerateAsync("Fog.FogInspection", inspections);
     }
 
     public override async Task<FogInspectionDto?> DeleteAsync(int id)

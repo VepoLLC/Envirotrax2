@@ -243,43 +243,55 @@
 </ng-template>
 
 <div *ngIf="showResults && !table.isLoading">
-    <div class="d-flex justify-content-end mb-3">
-        <button type="button"
-                class="btn btn-primary vp-section-button"
-                (click)="searchAgain()">
+
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
+                (click)="showDownloadManager()">
+            <i class="fa-regular fa-file-export me-1"></i>
+            Export Results
+        </button>
+        <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
+              (click)="viewPrintableTable()">
+            <i class="fa-regular fa-table me-1"></i>
+            View Printable Table
+        </button>
+        <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
+                (click)="showResults = false;">
             <i class="fa-solid fa-magnifying-glass me-1"></i>
             Search Again
         </button>
     </div>
 
     <vp-section header="FOG Inspection Search - {{table.items?.pageInfo?.totalItems || 0}} Results">
-        <div class="container mb-3">
-            <div class="row gap-2 justify-content-center mb-3">
-                <div class="col-auto mb-2">
-                    <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Passed" />
-                    <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Failed" />
-                </div>
-                <div class="col-auto mb-2">
-                    <vp-status-icon iconClass="fa-solid fa-house text-primary" text="Residential" />
-                    <vp-status-icon iconClass="fa-solid fa-building text-danger" text="Commercial" />
+        <div #printableSection>
+            <div class="container mb-3" >
+                <div class="row gap-2 justify-content-center mb-3">
+                    <div class="col-auto mb-2">
+                        <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Passed" />
+                        <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Failed" />
+                    </div>
+                    <div class="col-auto mb-2">
+                        <vp-status-icon iconClass="fa-solid fa-house text-primary" text="Residential" />
+                        <vp-status-icon iconClass="fa-solid fa-building text-danger" text="Commercial" />
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <vp-table *ngIf="table.items && table.items.data && table.items.data.length > 0"
-                  [columns]="table.columns!"
-                  [data]="table.items.data"
-                  [(pageInfo)]="table.items.pageInfo"
-                  (pageInfoChange)="getInspections()"
-                  [(query)]="table.query"
-                  (queryChange)="getInspections()"
-                  (queryReset)="getInspections()"
-                  [freeTextSearch]="table.freeTextSearch"
-                  [canViewDetails]="true"
-                  (viewDetails)="viewInspection($event)" />
+            <vp-table *ngIf="table.items && table.items.data && table.items.data.length > 0"
+                    [columns]="table.columns!"
+                    [data]="table.items.data"
+                    [(pageInfo)]="table.items.pageInfo"
+                    (pageInfoChange)="getInspections()"
+                    [(query)]="table.query"
+                    (queryChange)="getInspections()"
+                    (queryReset)="getInspections()"
+                    [freeTextSearch]="table.freeTextSearch"
+                    [canViewDetails]="true"
+                    (viewDetails)="viewInspection($event)" />
 
-        <div *ngIf="table.items?.data?.length === 0" class="text-center py-3 text-muted">
-            No records found matching the search criteria.
+            <div *ngIf="table.items?.data?.length === 0" class="text-center py-3 text-muted">
+                No records found matching the search criteria.
+            </div>
         </div>
     </vp-section>
 </div>

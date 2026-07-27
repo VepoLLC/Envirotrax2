@@ -32,6 +32,8 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
     protected override IQueryable<FogTripTicket> GetDetailsQuery()
     {
         return base.GetDetailsQuery()
+            .Include(t => t.WaterSupplier)
+            .ThenInclude(ws => ws!.State)
             .Include(t => t.Site)
             .Include(t => t.Professional)
             .Include(t => t.Transporter)

@@ -64,6 +64,18 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         return await base.DeleteAsync(id);
     }
 
+    public override async Task<FogTripTicketDto?> GetAsync(int id, CancellationToken cancellationToken)
+    {
+        var dto = await base.GetAsync(id, cancellationToken);
+
+        if (dto != null)
+        {
+            await PopulateSignatureUrlsAsync(dto);
+        }
+
+        return dto;
+    }
+
     public async Task<IPagedData<FogTripTicketDto>> SearchForProfessionalAsync(
         PageInfo pageInfo, Query query, int? waterSupplierId, CancellationToken cancelationToken)
     {
@@ -158,6 +170,32 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
 
         scope.Complete();
         return Mapper.Map<FogTripTicketDto>(added);
+    }
+
+    private async Task PopulateSignatureUrlsAsync(FogTripTicketDto dto)
+    {
+        var signatures = new (string? Path, Action<string> SetUrl)[]
+        {
+            (dto.GeneratorSignaturePath, url => dto.GeneratorSignatureUrl = url),
+            (dto.ReceiverSignaturePath, url => dto.ReceiverSignatureUrl = url),
+            (dto.TransporterSignaturePath, url => dto.TransporterSignatureUrl = url)
+        };
+
+        if (!signatures.Any(s => !string.IsNullOrWhiteSpace(s.Path)))
+        {
+            return;
+        }
+
+        var delegationKey = await _fileStorageService.GetUserDelegationKeyAsync();
+
+        foreach (var (path, setUrl) in signatures)
+        {
+            if (!string.IsNullOrWhiteSpace(path))
+            {
+                var url = await _fileStorageService.GenerateSasUrlAsync(delegationKey, path);
+                setUrl(url.ToString());
+            }
+        }
     }
 
     private static string ValidateAndGetExtension(string fileName)

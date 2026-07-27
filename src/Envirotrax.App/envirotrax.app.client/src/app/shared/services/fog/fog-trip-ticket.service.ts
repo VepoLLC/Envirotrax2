@@ -35,6 +35,11 @@ export class FogTripTicketService {
         return lastValueFrom(this._http.get<FogTripTicket>(url));
     }
 
+    public getByIdForProfessional(id: number): Promise<FogTripTicket> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/fog/trip-tickets/${id}`);
+        return lastValueFrom(this._http.get<FogTripTicket>(url));
+    }
+
     public async searchForProfessional(pageInfo: PageInfo, query: Query, waterSupplierId?: number): Promise<PagedData<FogTripTicket>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/fog/trip-tickets');
         let params = this._queryHelper.buildQuery(pageInfo, query);

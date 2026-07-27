@@ -9,7 +9,9 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions;
+
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
+using Envirotrax.Common.Domain.Services.Defintions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 
@@ -20,6 +22,7 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
     private static readonly string[] AllowedFileExtensions = [".jpg", ".jpeg", ".gif", ".png", ".bmp", ".tiff"];
 
     private readonly IFogTripTicketRepository _repository;
+    private readonly IAuthService _authService;
     private readonly IProfessionalService _professionalService;
     private readonly IProfessionalUserService _professionalUserService;
     private readonly ISiteService _siteService;
@@ -30,6 +33,7 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
     public FogTripTicketService(
         IMapper mapper,
         IFogTripTicketRepository repository,
+        IAuthService authService,
         IProfessionalService professionalService,
         IProfessionalUserService professionalUserService,
         ISiteService siteService,
@@ -39,12 +43,25 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         : base(mapper, repository)
     {
         _repository = repository;
+        _authService = authService;
         _professionalService = professionalService;
         _professionalUserService = professionalUserService;
         _siteService = siteService;
         _vehicleService = vehicleService;
         _disposalSiteService = disposalSiteService;
         _fileStorageService = fileStorageService;
+    }
+
+    public override async Task<FogTripTicketDto?> DeleteAsync(int id)
+    {
+        var ticket = await _repository.GetNoIncludesAsync(id, CancellationToken.None);
+
+        if (ticket == null || ticket.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(ticket.TransactionId))
+        {
+            return null;
+        }
+
+        return await base.DeleteAsync(id);
     }
 
     public async Task<IPagedData<FogTripTicketDto>> SearchForProfessionalAsync(

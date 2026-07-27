@@ -17,7 +17,7 @@ import { PermissionAction, PermissionType } from '../../shared/models/permission
 import { FeatureType } from '../../shared/models/feature-type';
 import { InputOption } from '@envirotrax/common-ui';
 
-type SiteTab = 'logHistory' | 'csi' | 'backflow';
+type SiteTab = 'logHistory' | 'csi' | 'backflow' | 'outOfService' | 'fog';
 
 @Component({
     selector: 'app-edit-site-component',
@@ -31,9 +31,13 @@ export class EditSiteComponent implements OnInit {
     public canViewLogHistory: boolean = false;
     public canViewCsi: boolean = false;
     public canViewBackflow: boolean = false;
+    public canViewOutOfService: boolean = false;
+    public canViewFog: boolean = false;
     public logHistoryInitialized: boolean = false;
     public csiInitialized: boolean = false;
     public backflowInitialized: boolean = false;
+    public outOfServiceInitialized: boolean = false;
+    public fogInitialized: boolean = false;
 
     public site: Site = {
         backflowScheduleMonth: 0,
@@ -102,12 +106,24 @@ export class EditSiteComponent implements OnInit {
         this.canViewBackflow = await this._authService.hasAnyPermisison(
             PermissionAction.CanView, PermissionType.BackflowTests);
 
+        this.canViewOutOfService = await this._authService.hasAnyPermisison(
+            PermissionAction.CanView, PermissionType.BackflowOutOfService);
+
+        const canViewFogPermission = await this._authService.hasAnyPermisison(
+            PermissionAction.CanView, PermissionType.FogInspections);
+        const hasFogFeature = await this._authService.hasAnyFeatures(FeatureType.FogInspection);
+        this.canViewFog = canViewFogPermission && hasFogFeature;
+
         if (this.canViewLogHistory) {
             this.setActiveTab('logHistory');
         } else if (this.canViewCsi) {
             this.setActiveTab('csi');
         } else if (this.canViewBackflow) {
             this.setActiveTab('backflow');
+        } else if (this.canViewOutOfService) {
+            this.setActiveTab('outOfService');
+        } else if (this.canViewFog) {
+            this.setActiveTab('fog');
         }
     }
 
@@ -123,6 +139,10 @@ export class EditSiteComponent implements OnInit {
             this.csiInitialized = true;
         } else if (this.activeTab === 'backflow') {
             this.backflowInitialized = true;
+        } else if (this.activeTab === 'outOfService') {
+            this.outOfServiceInitialized = true;
+        } else if (this.activeTab === 'fog') {
+            this.fogInitialized = true;
         }
     }
 

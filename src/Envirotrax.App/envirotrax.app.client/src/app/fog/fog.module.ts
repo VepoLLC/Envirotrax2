@@ -7,12 +7,17 @@ import { FogRoutingModule } from "./fog-routing.module";
 import { FogInspectorListComponent } from "./inspectors/list/fog-inspector-list.component";
 import { FogInspectorDetailsComponent } from "./inspectors/details/fog-inspector-details.component";
 import { FogInspectorWaterSuppliersComponent } from "./inspectors/details/water-suppliers/list/fog-inspector-water-suppliers.component";
+import { EditFogInspectorWaterSupplierComponent } from "./inspectors/details/water-suppliers/edit/edit-fog-inspector-water-supplier.component";
 import { FogInspectorUsersComponent } from "./inspectors/details/users/list/fog-inspector-users.component";
+import { EditFogInspectorUserComponent } from "./inspectors/details/users/edit/edit-fog-inspector-user.component";
 import { FogInspectorLicenseInsuranceComponent } from "./inspectors/details/license-insurance/list/fog-inspector-license-insurance.component";
+import { EditFogInspectorLicenseComponent } from "./inspectors/details/license-insurance/edit/edit-fog-inspector-license.component";
+import { EditFogInspectorInsuranceComponent } from "./inspectors/details/license-insurance/edit/edit-fog-inspector-insurance.component";
 import { FogInspectionListComponent } from "./inspections/list/fog-inspection-list.component";
 import { FogInspectionViewComponent } from "./inspections/view/fog-inspection-view.component";
 import { FogTripTicketListComponent } from "./trip-tickets/list/fog-trip-ticket-list.component";
 import { FogTransporterListComponent } from "./transporters/list/fog-transporter-list.component";
+import { FogTransporterDetailsComponent } from "./transporters/details/fog-transporter-details.component";
 import { ProfessionalModule } from "../professionals/professional.module";
 
 @NgModule({
@@ -20,12 +25,17 @@ import { ProfessionalModule } from "../professionals/professional.module";
         FogInspectorListComponent,
         FogInspectorDetailsComponent,
         FogInspectorWaterSuppliersComponent,
+        EditFogInspectorWaterSupplierComponent,
         FogInspectorUsersComponent,
+        EditFogInspectorUserComponent,
         FogInspectorLicenseInsuranceComponent,
+        EditFogInspectorLicenseComponent,
+        EditFogInspectorInsuranceComponent,
         FogInspectionListComponent,
         FogInspectionViewComponent,
         FogTripTicketListComponent,
-        FogTransporterListComponent
+        FogTransporterListComponent,
+        FogTransporterDetailsComponent
     ],
     imports: [
         CommonModule,

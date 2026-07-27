@@ -273,14 +273,17 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
     public override async Task<BackflowTestDto?> DeleteAsync(int id)
     {
-        var test = await _testRepository.GetNoIncludesAsync(id, CancellationToken.None);
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        if (test == null || test.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(test.TransactionId))
+        var deleted = await _testRepository.DeleteAsync(id);
+
+        if (deleted == null || !string.IsNullOrEmpty(deleted.TransactionId))
         {
             return null;
         }
 
-        return await base.DeleteAsync(id);
+        scope.Complete();
+        return MapToDto(deleted);
     }
 
     public async Task<BackflowTestDto?> UpdateImageAsync(int id, string imageType, Stream fileStream, string fileName, CancellationToken cancellationToken = default)

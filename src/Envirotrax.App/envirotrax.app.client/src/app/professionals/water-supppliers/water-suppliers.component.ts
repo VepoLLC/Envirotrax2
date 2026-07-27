@@ -16,6 +16,20 @@ import { AppContainerHelperService } from "../../shared/services/helpers/app-con
 
 type TabType = 'backflow' | 'csi' | 'fogInspection' | 'fogTransport';
 
+const TAB_LABELS: Record<TabType, string> = {
+    backflow: 'Backflow Tester',
+    csi: 'CSI Inspector',
+    fogInspection: 'FOG Inspector',
+    fogTransport: 'FOG Transporter'
+};
+
+const TAB_ICONS: Record<TabType, string> = {
+    backflow: 'fa-regular fa-gauge',
+    csi: 'fa-solid fa-building-magnifying-glass',
+    fogInspection: 'fa-regular fa-tank-water',
+    fogTransport: 'fa-regular fa-tank-water'
+};
+
 @Component({
     standalone: false,
     templateUrl: './water-suppliers.component.html',
@@ -34,6 +48,20 @@ type TabType = 'backflow' | 'csi' | 'fogInspection' | 'fogTransport';
 
         :host ::ng-deep .vp-registration-actions-column {
             min-width: 150px;
+        }
+
+        .vp-tabs-mobile {
+            display: none;
+        }
+
+        @media (max-width: 840px) {
+            .vp-tabs-desktop {
+                display: none !important;
+            }
+
+            .vp-tabs-mobile {
+                display: inline-block;
+            }
         }
     `
 })
@@ -166,6 +194,14 @@ export class WaterSuppliersComponent implements OnInit {
         this._tabQuery.columnName = this._getTabColumnName();
         this.suppliers.columns = this.getColumns();
         this.getSuppliers();
+    }
+
+    public getTabLabel(tab: TabType): string {
+        return TAB_LABELS[tab];
+    }
+
+    public getTabIcon(tab: TabType): string {
+        return TAB_ICONS[tab];
     }
 
     public openRegistration(supplier: ProfessionalSupplierVm): void {

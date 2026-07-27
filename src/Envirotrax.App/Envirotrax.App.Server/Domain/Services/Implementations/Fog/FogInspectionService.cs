@@ -47,14 +47,17 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
 
     public override async Task<FogInspectionDto?> DeleteAsync(int id)
     {
-        var inspection = await _repository.GetNoIncludesAsync(id, CancellationToken.None);
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        if (inspection == null || inspection.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(inspection.TransactionId))
+        var deleted = await _repository.DeleteAsync(id);
+
+        if (deleted == null || deleted.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(deleted.TransactionId))
         {
             return null;
         }
 
-        return await base.DeleteAsync(id);
+        scope.Complete();
+        return MapToDto(deleted);
     }
 
     public async Task<FogInspectionDto> SubmitAsync(

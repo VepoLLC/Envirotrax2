@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+using System.Transactions;
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
@@ -25,14 +25,17 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
 
     public override async Task<FogTripTicketDto?> DeleteAsync(int id)
     {
-        var ticket = await _repository.GetNoIncludesAsync(id, CancellationToken.None);
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        if (ticket == null || ticket.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(ticket.TransactionId))
+        var deleted = await _repository.DeleteAsync(id);
+
+        if (deleted == null || deleted.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(deleted.TransactionId))
         {
             return null;
         }
 
-        return await base.DeleteAsync(id);
+        scope.Complete();
+        return MapToDto(deleted);
     }
 
     public async Task<IPagedData<FogTripTicketDto>> SearchForProfessionalAsync(

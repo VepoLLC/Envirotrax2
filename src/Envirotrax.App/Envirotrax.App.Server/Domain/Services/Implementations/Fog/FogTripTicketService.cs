@@ -14,6 +14,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.Common.Domain.Services.Defintions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
+using Envirotrax.App.Server.Domain.Services.Definitions.Users;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Fog;
 
@@ -29,6 +30,8 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
     private readonly IFogVehicleService _vehicleService;
     private readonly IFogDisposalSiteService _disposalSiteService;
     private readonly IFileStorageService _fileStorageService;
+    private readonly IUserService _userService;
+    private readonly IPdfTemplateService _pdfTemplateService;
 
     public FogTripTicketService(
         IMapper mapper,
@@ -39,7 +42,9 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         ISiteService siteService,
         IFogVehicleService vehicleService,
         IFogDisposalSiteService disposalSiteService,
-        IFileStorageService fileStorageService)
+        IFileStorageService fileStorageService,
+        IUserService userService,
+        IPdfTemplateService pdfTemplateService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -50,6 +55,8 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         _vehicleService = vehicleService;
         _disposalSiteService = disposalSiteService;
         _fileStorageService = fileStorageService;
+        _pdfTemplateService = pdfTemplateService;
+        _userService = userService;
     }
 
     public override async Task<FogTripTicketDto?> DeleteAsync(int id)
@@ -74,6 +81,39 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         }
 
         return dto;
+    }
+
+    public async Task<FogTripTicketDto?> UpdateApprovalAsync(int id, bool disapproved, CancellationToken cancellationToken)
+    {
+        string? approvedBy = null;
+
+        if (!disapproved)
+        {
+            var user = await _userService.GetAsync(_authService.UserId, cancellationToken);
+            approvedBy = user?.ContactName ?? user?.EmailAddress;
+        }
+
+        var ticket = await _repository.UpdateApprovalAsync(id, disapproved, approvedBy, cancellationToken);
+
+        if (ticket == null)
+        {
+            return null;
+        }
+
+        var dto = Mapper.Map<FogTripTicketDto>(ticket);
+        await PopulateSignatureUrlsAsync(dto);
+
+        return dto;
+    }
+
+    public Task<byte[]> GeneratePdfAsync(FogTripTicketDto ticket)
+    {
+        return GeneratePdfAsync([ticket]);
+    }
+
+    public Task<byte[]> GeneratePdfAsync(IEnumerable<FogTripTicketDto> tickets)
+    {
+        return _pdfTemplateService.GenerateAsync("Fog.FogTripTicket", tickets);
     }
 
     public async Task<IPagedData<FogTripTicketDto>> SearchForProfessionalAsync(

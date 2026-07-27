@@ -51,6 +51,20 @@ public class ProfessionalFogTripTicketController : ProfessionalProtectedControll
         return result == null ? NotFound() : Ok(result);
     }
 
+    [HttpGet("{id}/pdf")]
+    public async Task<IActionResult> GetPdfAsync(int id, CancellationToken cancellationToken)
+    {
+        var ticket = await _fogService.GetAsync(id, cancellationToken);
+
+        if (ticket == null)
+        {
+            return NotFound();
+        }
+
+        var pdfBytes = await _fogService.GeneratePdfAsync(ticket);
+        return File(pdfBytes, "application/pdf");
+    }
+
     [HttpPost]
     public async Task<IActionResult> SubmitAsync(
         [FromForm] FogTripTicketDto dto,

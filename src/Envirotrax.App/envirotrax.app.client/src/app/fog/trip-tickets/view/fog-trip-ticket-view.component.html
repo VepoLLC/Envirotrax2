@@ -4,6 +4,16 @@
 
 <div *ngIf="!isLoading && ticket">
 
+    <div class="d-flex mb-3">
+        <button type="button" class="btn me-auto"
+                [class.btn-success]="!ticket.disapproved"
+                [class.btn-danger]="ticket.disapproved"
+                [disabled]="isLoading"
+                (click)="toggleApproval()">
+            {{ ticket.disapproved ? 'Disapproved' : 'Approved' }}
+        </button>
+    </div>
+
     <!-- Water Supplier -->
     <vp-section header="Water Supplier" class="d-block">
         <div class="row">
@@ -143,7 +153,7 @@
 
         <p class="mt-3 mb-3">
             On {{ ticket.interceptorWasteRemovedDate | date:'M/d/yyyy' }} at
-            {{ ticket.interceptorWasteRemovedDate | date:'h:mm a' }}, I collected and began the transport of 
+            {{ ticket.interceptorWasteRemovedDate | date:'h:mm a' }}, I collected and began the transport of
             <span class="fw-bold">{{ ticket.interceptorWasteRemovedAmount }} {{ wasteRemovedLabel }}</span>
              of the waste described under
             "Generator Information" above to:

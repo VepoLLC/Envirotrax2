@@ -12,7 +12,6 @@ export interface FogTripTicket {
 
     waterSupplier?: WaterSupplier | null;
     site?: Site | null;
-    transporter?: ProfessionalUser | null;
 
     propertyBusinessName?: string;
     propertyType?: PropertyType;
@@ -27,6 +26,7 @@ export interface FogTripTicket {
     fogGeneratorContactName?: string;
 
     professional?: Professional | null;
+    transporter?: ProfessionalUser | null;
     transporterLicenseNumber?: string;
     transporterLicenseExpiration?: string;
     transporterCompanyName?: string;

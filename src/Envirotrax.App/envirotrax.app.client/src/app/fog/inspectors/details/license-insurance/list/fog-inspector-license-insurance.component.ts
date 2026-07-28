@@ -5,7 +5,13 @@ import { TableViewModel } from "../../../../../shared/models/table-view-model";
 import { FogInspectorLicensesService } from "../../../../../shared/services/fog/fog-inspector-licenses.service";
 import { FogInspectorInsurancesService } from "../../../../../shared/services/fog/fog-inspector-insurances.service";
 import { DownloadService } from "../../../../../shared/services/download.service";
-import { CellTemplateData, ColumnType, TableColumn, TableCustomAction } from "@envirotrax/common-ui";
+import { AuthService } from "../../../../../shared/services/auth/auth.service";
+import { FeatureType } from "../../../../../shared/models/feature-type";
+import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
+import { ModalSize } from "@developer-partners/ngx-modal-dialog";
+import { EditFogInspectorLicenseComponent, FogLicenseModalData } from "../edit/edit-fog-inspector-license.component";
+import { EditFogInspectorInsuranceComponent, FogInsuranceModalData } from "../edit/edit-fog-inspector-insurance.component";
+import { CellTemplateData, ColumnType, ModalHelperService, TableColumn, TableCustomAction } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'vp-fog-inspector-license-insurances',
@@ -19,6 +25,9 @@ export class FogInspectorLicenseInsuranceComponent implements OnInit {
 
     public expirationType = ExpirationType;
     public insuranceExpirationType = InsuranceExpirationType;
+
+    public canManageLicenses: boolean = false;
+    public canManageInsurances: boolean = false;
 
     public licensesTable: TableViewModel<ProfessionalUserLicense> = {
         columns: [],
@@ -50,10 +59,14 @@ export class FogInspectorLicenseInsuranceComponent implements OnInit {
     constructor(
         private readonly _licensesService: FogInspectorLicensesService,
         private readonly _insurancesService: FogInspectorInsurancesService,
+        private readonly _authService: AuthService,
+        private readonly _modalHelper: ModalHelperService,
         private readonly _downloadService: DownloadService
     ) { }
 
     public async ngOnInit(): Promise<void> {
+        await this.setPermissions();
+
         this.insuranceCustomActions = [
             {
                 text: 'View',
@@ -64,6 +77,13 @@ export class FogInspectorLicenseInsuranceComponent implements OnInit {
 
         this.setupColumns();
         await this.loadInsurances();
+    }
+
+    private async setPermissions(): Promise<void> {
+        const canEditFogInspectors = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.FogInspectors);
+
+        this.canManageLicenses = canEditFogInspectors && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalLicenses);
+        this.canManageInsurances = canEditFogInspectors && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalInsurances);
     }
 
     public async setActiveTab(tab: 'insurances' | 'licenses'): Promise<void> {
@@ -128,6 +148,38 @@ export class FogInspectorLicenseInsuranceComponent implements OnInit {
                 type: ColumnType.date
             }
         ];
+    }
+
+    public addLicense(): void {
+        this._modalHelper.show<FogLicenseModalData, ProfessionalUserLicense>(EditFogInspectorLicenseComponent, {
+            title: 'Add License',
+            model: { inspectorId: this.inspectorId, license: {} },
+            size: ModalSize.large
+        }).result().subscribe(() => this.loadLicenses());
+    }
+
+    public editLicense(license: ProfessionalUserLicense): void {
+        this._modalHelper.show<FogLicenseModalData, ProfessionalUserLicense>(EditFogInspectorLicenseComponent, {
+            title: 'Edit License',
+            model: { inspectorId: this.inspectorId, license },
+            size: ModalSize.large
+        }).result().subscribe(() => this.loadLicenses());
+    }
+
+    public addInsurance(): void {
+        this._modalHelper.show<FogInsuranceModalData, ProfessionalInsurance>(EditFogInspectorInsuranceComponent, {
+            title: 'Add Insurance Policy',
+            model: { inspectorId: this.inspectorId, insurance: {} },
+            size: ModalSize.large
+        }).result().subscribe(() => this.loadInsurances());
+    }
+
+    public editInsurance(insurance: ProfessionalInsurance): void {
+        this._modalHelper.show<FogInsuranceModalData, ProfessionalInsurance>(EditFogInspectorInsuranceComponent, {
+            title: 'Edit Insurance Policy',
+            model: { inspectorId: this.inspectorId, insurance },
+            size: ModalSize.large
+        }).result().subscribe(() => this.loadInsurances());
     }
 
     public async viewInsuranceFile(insurance: ProfessionalInsurance): Promise<void> {

@@ -96,8 +96,8 @@
                   (queryChange)="getInspectors()"
                   (queryReset)="getInspectors()"
                   [freeTextSearch]="table.freeTextSearch"
-                  [canSelect]="true"
-                  (select)="openDetails($event)" />
+                  [canViewDetails]="true"
+                  (viewDetails)="openDetails($event)" />
     </vp-section>
 
 </div>

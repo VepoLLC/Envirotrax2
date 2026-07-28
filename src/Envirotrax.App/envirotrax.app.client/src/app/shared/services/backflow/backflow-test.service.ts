@@ -7,6 +7,7 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { BackflowTest, BackflowExpiryCounts } from "../../models/backflow/backflow-test";
+import { BackflowCompliance } from "../../models/backflow/backflow-compliance";
 import { BackflowTestImages } from "../../models/backflow/backflow-test-images";
 import { DownloadEndpoint } from "../../models/download-config";
 
@@ -59,6 +60,23 @@ export class BackflowTestService {
         return {
             method: 'GET',
             url: this._urlResolver.resolveUrl('/api/backflow/tests/pdf')
+        };
+    }
+
+    public async getBackflowCompliance(pageInfo: PageInfo, query: Query): Promise<PagedData<BackflowCompliance>> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/compliance');
+
+        const observable = this._http.get<PagedData<BackflowCompliance>>(url, {
+            params: this._queryHelper.buildQuery(pageInfo, query)
+        });
+
+        return await lastValueFrom(observable);
+    }
+
+    public getBackflowComplianceEndpoint(): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/backflow/compliance')
         };
     }
 

@@ -1,13 +1,13 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { BackflowTest } from '../../../shared/models/backflow/backflow-test';
-import { BackflowTestService } from '../../../shared/services/backflow/backflow-test.service';
-import { BackflowTestOptionsService } from '../../../shared/services/backflow/backflow-test-options.service';
-import { TableViewModel } from '../../../shared/models/table-view-model';
-import { ComparisonOperator, QueryProperty } from '../../../shared/models/query';
-import { BackflowTestResult } from '../../../shared/models/backflow/backflow-test-enums';
-import { AuthService } from '../../../shared/services/auth/auth.service';
-import { PermissionAction, PermissionType } from '../../../shared/models/permission-type';
+import { BackflowTest } from '../../../../shared/models/backflow/backflow-test';
+import { BackflowTestService } from '../../../../shared/services/backflow/backflow-test.service';
+import { BackflowTestOptionsService } from '../../../../shared/services/backflow/backflow-test-options.service';
+import { TableViewModel } from '../../../../shared/models/table-view-model';
+import { ComparisonOperator, QueryProperty } from '../../../../shared/models/query';
+import { BackflowTestResult } from '../../../../shared/models/backflow/backflow-test-enums';
+import { AuthService } from '../../../../shared/services/auth/auth.service';
+import { PermissionAction, PermissionType } from '../../../../shared/models/permission-type';
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from '@envirotrax/common-ui';
 
 @Component({

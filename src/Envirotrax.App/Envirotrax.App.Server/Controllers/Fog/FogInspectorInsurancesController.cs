@@ -1,4 +1,5 @@
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -24,6 +25,25 @@ namespace Envirotrax.App.Server.Controllers.Fog
         {
             var result = await _insuranceService.GetAllByProfessionalAsync(id, pageInfo, query, cancellationToken);
             return Ok(result);
+        }
+
+        [HttpPost("{id}/insurances")]
+        [HasFeature(FeatureType.ManageProfessionalInsurances)]
+        [HasPermission(PermissionAction.CanModify)]
+        public async Task<IActionResult> AddInsuranceAsync([FromForm] CreateInsuranceDto dto)
+        {
+            using var stream = dto.File.OpenReadStream();
+
+            return Ok(await _insuranceService.AddAsync(stream, dto.File.FileName, dto));
+        }
+
+        [HttpPut("{id}/insurances/{insuranceId}")]
+        [HasFeature(FeatureType.ManageProfessionalInsurances)]
+        [HasPermission(PermissionAction.CanModify)]
+        public async Task<IActionResult> UpdateInsuranceAsync(int insuranceId, [FromBody] ProfessionalInsuranceDto dto)
+        {
+            dto.Id = insuranceId;
+            return Ok(await _insuranceService.UpdateAsync(dto));
         }
 
         [HttpGet("{id}/insurances/{insuranceId}/file-url")]

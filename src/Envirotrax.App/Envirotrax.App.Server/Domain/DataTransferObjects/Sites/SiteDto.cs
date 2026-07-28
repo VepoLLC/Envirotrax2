@@ -165,6 +165,11 @@ public class UpdateCsiAssignmentDto
     public int? UserId { get; set; }
 }
 
+public class UpdateBackflowAssignmentDto
+{
+    public int? UserId { get; set; }
+}
+
 public class CsiComplianceSiteDto : SiteDto
 {
     public List<SiteLogDto> Logs { get; set; } = [];
@@ -230,6 +235,10 @@ public class ReferencedSiteDto
     public int? CsiAccountAssignmentId { get; set; }
 
     public int? BackflowAccountAssignmentId { get; set; }
+
+    // Assignment timestamp — exposed alongside the id so the Backflow Compliance Management grid can
+    // show when the current backflow account assignment was made (parity with the CSI page).
+    public DateTime? BackflowAccountAssignmentDate { get; set; }
 
     public int? FogAccountAssignmentId { get; set; }
 }

@@ -10,6 +10,8 @@ public interface IProfessionalUserService : IService<ProfessionalUser, Professio
 {
     Task<ProfessionalUserDto?> GetMyDataAsync(CancellationToken cancellationToken);
     Task<ProfessionalUserDto?> UpdateMyDataAsync(ProfessionalUserDto user);
+    Task<string?> GetSignatureUrlAsync(int userId, CancellationToken cancellationToken);
+    Task<string?> SaveMySignatureAsync(Stream signatureStream, string signatureFileName);
 
     Task<ProfessionalUserDto?> ResendInvitationAsync(int id, CancellationToken cancellationToken);
     Task<IPagedData<ProfessionalUserDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null);

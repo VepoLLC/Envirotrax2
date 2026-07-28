@@ -25,6 +25,7 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
     {
         return base.GetListQuery()
             .Include(supplier => supplier.Parent)
+            .Include(supplier => supplier.State)
             .WhereIf(!_tenantProvider.HasScope(ScopeDefinitions.AdminInternal), supplier => supplier.ParentId == _tenantProvider.WaterSupplierId)
             .AsNoTracking();
     }

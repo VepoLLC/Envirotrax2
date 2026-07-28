@@ -18,6 +18,10 @@ public class ProfessionalUserDto : IDto
     [StringLength(150)]
     public string? JobTitle { get; set; }
 
+    public string? SignaturePath { get; set; }
+
+    public string? SignatureUrl { get; set; }
+
     public bool IsAdmin { get; set; }
 
     public bool IsWiseGuy { get; set; }

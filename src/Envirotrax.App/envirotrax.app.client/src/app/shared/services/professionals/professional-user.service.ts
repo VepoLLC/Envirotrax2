@@ -46,6 +46,26 @@ export class ProfesionalUserService {
         return lastValueFrom(observable);
     }
 
+    public async saveMySignature(signature: File): Promise<string | null> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/users/my/signature');
+
+        const formData = new FormData();
+        formData.append('signature', signature);
+
+        const result = await lastValueFrom(this._http.post<{ signatureUrl: string | null }>(url, formData));
+        this._currentUser$ = undefined;
+
+        return result.signatureUrl;
+    }
+
+    public async getSignatureUrl(id: number): Promise<string | null> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/users/${id}/signature-url`);
+
+        const result = await lastValueFrom(this._http.get<{ signatureUrl: string | null }>(url));
+
+        return result.signatureUrl;
+    }
+
     public getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<ProfessionalUser>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/users');
 

@@ -1,5 +1,6 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { ActivatedRoute, Router } from "@angular/router";
 import { FogTransporterService } from "../../../shared/services/fog/fog-transporter.service";
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
@@ -37,7 +38,9 @@ export class FogTransporterListComponent implements OnInit {
 
     constructor(
         private readonly _fogTransporterService: FogTransporterService,
-        private readonly _downloadService: DownloadService
+        private readonly _downloadService: DownloadService,
+        private readonly _router: Router,
+        private readonly _activatedRoute: ActivatedRoute
     ) {
         this.downloadConfig = {
             fileName: 'FOG Transporters',
@@ -96,6 +99,12 @@ export class FogTransporterListComponent implements OnInit {
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
         this.table.query.filter = queryProperties;
+    }
+
+    public openDetails(row: any): void {
+        this._router.navigate(['details', row.id], {
+            relativeTo: this._activatedRoute
+        });
     }
 
     public async search(searchForm: NgForm): Promise<void> {

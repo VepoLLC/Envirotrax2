@@ -11,6 +11,7 @@ import { BackflowTestingSettings } from '../../../shared/models/backflow/backflo
 import { ProfesisonalService } from '../../../shared/services/professionals/professional.service';
 import { ProfesionalUserService } from '../../../shared/services/professionals/professional-user.service';
 import { ProfessionalSupplierService } from '../../../shared/services/professionals/professional-supplier.service';
+import { CheckoutService } from '../../../shared/services/professionals/checkout.service';
 import { Professional } from '../../../shared/models/professionals/professional';
 import { ExpirationType, ProfessionalUser } from '../../../shared/models/professionals/professional-user';
 import { ProfessionalWaterSupplier } from '../../../shared/models/professionals/professional-water-supplier';
@@ -451,7 +452,8 @@ export class BackflowTestSubmitComponent implements OnInit {
         private readonly _supplierService: ProfessionalSupplierService,
         private readonly _options: BackflowTestOptionsService,
         private readonly _settingsService: BackflowSettingsService,
-        private readonly _siteService: SiteService
+        private readonly _siteService: SiteService,
+        private readonly _checkoutService: CheckoutService
     ) {
         this.deviceTypeOptions = this._options.deviceTypeOptions;
         this.hazardTypeOptions = this._options.hazardTypeOptions;
@@ -564,6 +566,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         try {
             await this._backflowTestService.submit(submission, this.images);
             this.submitSuccess = true;
+            this._checkoutService.refresh();
         } finally {
             this.isLoading = false;
         }

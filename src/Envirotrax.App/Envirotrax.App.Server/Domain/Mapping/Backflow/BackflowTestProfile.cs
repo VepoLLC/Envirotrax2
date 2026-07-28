@@ -23,10 +23,7 @@ public class BackflowTestProfile : Profile
                     dto.Site ??= new() { Id = model.SiteId.Value };
                 }
 
-                if (model.ProfessionalId.HasValue)
-                {
-                    dto.Professional ??= new() { Id = model.ProfessionalId.Value };
-                }
+                dto.Professional ??= new() { Id = model.ProfessionalId };
 
                 if (model.BpatId.HasValue)
                 {

@@ -1,7 +1,9 @@
 ﻿import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
 import { AuthService } from './shared/services/auth/auth.service';
 import { WaterSupplierService } from './shared/services/water-suppliers/water-supplier.service';
 import { ProfesisonalService } from './shared/services/professionals/professional.service';
+import { CheckoutService } from './shared/services/professionals/checkout.service';
 import { ThemeCookieService } from './shared/services/helpers/theme-cookie.service';
 import { createPopper } from '@popperjs/core';
 import { FeatureType } from './shared/models/feature-type';
@@ -23,15 +25,19 @@ export class App implements OnInit {
   public userEmail: string = '';
   public isDarkMode: boolean = false;
   public useContainer: boolean = false;
+  public cartCount$: Observable<number>;
 
   constructor(
     private readonly _authService: AuthService,
     private readonly _waterSupplierService: WaterSupplierService,
     private readonly _professionalService: ProfesisonalService,
+    private readonly _checkoutService: CheckoutService,
     private readonly _themeCookie: ThemeCookieService,
     private readonly _changeDetector: ChangeDetectorRef,
     appContainerHelper: AppContainerHelperService
   ) {
+    this.cartCount$ = this._checkoutService.cartCount$;
+
     appContainerHelper.usContainer().subscribe(value => {
       this.useContainer = value;
       this._changeDetector.detectChanges();
@@ -621,7 +627,8 @@ export class App implements OnInit {
         iconCss: 'fa-regular fa-solid fa-cart-shopping',
         routerLink: ['/professionals/checkout'],
         hasPermission: true,
-        hasFeature: true
+        hasFeature: true,
+        type: 'cart'
       }
     ];
   }
@@ -661,5 +668,5 @@ interface MenuItem {
   hasFeature: boolean;
   isExpanded?: boolean;
   children?: MenuItem[];
-  type?: 'separator';
+  type?: 'separator' | 'cart';
 }

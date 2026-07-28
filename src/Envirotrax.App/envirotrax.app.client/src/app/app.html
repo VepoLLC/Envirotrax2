@@ -30,6 +30,7 @@
                                    #dropdownButton
                                    (click)="toggleExpanded($event, dropdownButton, dropdownContent, item)">
                                     <i [class]="item.iconCss"></i>
+                                    <span *ngIf="item.type === 'cart'" class="ms-1">({{(cartCount$ | async) || 0}})</span>
                                     {{item.title}}
 
                                     <i *ngIf="item.children && item.children.length"

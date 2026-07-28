@@ -60,24 +60,30 @@ export class CheckoutFogTransportComponent implements OnInit {
     }
 
     public async ngOnInit(): Promise<void> {
-        this.items.columns = this.getColumns();
+        try{
+            this.isLoading = true;
 
-        const currentUser = await this._professionalUserService.getMyData();
-        this._currentUserId = currentUser.id;
-        this.reportFor = this.isAdmin ? '' : String(this._currentUserId);
+            this.items.columns = this.getColumns();
 
-        if (this.isAdmin) {
-            const professional = await this._professionalService.getLoggedInProfessional();
-            this._professionalName = professional.name;
+            const currentUser = await this._professionalUserService.getMyData();
+            this._currentUserId = currentUser.id;
+            this.reportFor = this.isAdmin ? '' : String(this._currentUserId);
 
-            const users = await this._professionalUserService.getAll(
-                { pageSize: MAX_PAGE_SIZE },
-                { sort: {}, filter: [{ columnName: 'isFogTransporter', comparisonOperator: 'Eq', value: 'true' }] }
-            );
-            this.reportForOptions = this.buildReportForOptions(users.data);
+            if (this.isAdmin) {
+                const professional = await this._professionalService.getLoggedInProfessional();
+                this._professionalName = professional.name;
+
+                const users = await this._professionalUserService.getAll(
+                    { pageSize: MAX_PAGE_SIZE },
+                    { sort: {}, filter: [{ columnName: 'isFogTransporter', comparisonOperator: 'Eq', value: 'true' }] }
+                );
+                this.reportForOptions = this.buildReportForOptions(users.data);
+            }
+
+            await this.getFogTripTickets();
+        }finally{
+            this.isLoading = false;
         }
-
-        await this.getFogTripTickets();
     }
 
     private buildReportForOptions(otherUsers: { id?: number; contactName?: string }[]): InputOption[] {

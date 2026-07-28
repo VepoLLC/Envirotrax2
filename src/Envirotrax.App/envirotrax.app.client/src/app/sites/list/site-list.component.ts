@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/core";
+import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { TableViewModel } from "../../shared/models/table-view-model";
 import { Site } from "../../shared/models/sites/site";
 import { SiteService } from "../../shared/services/sites/site.service";
@@ -15,7 +15,6 @@ import { DownloadConfig } from "../../shared/models/download-config";
 import { AuthService } from "../../shared/services/auth/auth.service";
 import { FeatureType } from "../../shared/models/feature-type";
 import { DownloadService } from "../../shared/services/download.service";
-import { PrintableTableService } from "../../shared/services/printable-table.service";
 import { CellTemplateData, ColumnType, InputOption, MapMarker, MapPolygon, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
 
@@ -98,9 +97,6 @@ export class SiteListComponent implements OnInit {
     @ViewChild('keyIndicators', { static: true })
     public keyIndicators?: TemplateRef<CellTemplateData<Site>>;
 
-    @ViewChild('printableSection')
-    private _printableSection!: ElementRef;
-
     constructor(
         private readonly _siteService: SiteService,
         private readonly _router: Router,
@@ -111,8 +107,7 @@ export class SiteListComponent implements OnInit {
         private readonly _gisMapService: GisMapService,
         private readonly _authService: AuthService,
         private readonly _downloadService: DownloadService,
-        private readonly _containerHelper: AppContainerHelperService,
-        private readonly _printService: PrintableTableService
+        private readonly _containerHelper: AppContainerHelperService
     ) {
 
     }
@@ -316,10 +311,6 @@ export class SiteListComponent implements OnInit {
 
     public showDownloadManager(): void {
         this._downloadService.showDownloadManager(this.downloadConfig!, this.table.query);
-    }
-
-    public viewPrintableTable(): void {
-        this._printService.open(this._printableSection.nativeElement);
     }
 
     private buildMapMarkers(sites: Site[]): MapMarker<Site>[] {

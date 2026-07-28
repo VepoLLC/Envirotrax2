@@ -16,6 +16,7 @@ import { EditFogInspectorInsuranceComponent } from "./inspectors/details/license
 import { FogInspectionListComponent } from "./inspections/list/fog-inspection-list.component";
 import { FogInspectionViewComponent } from "./inspections/view/fog-inspection-view.component";
 import { FogTripTicketListComponent } from "./trip-tickets/list/fog-trip-ticket-list.component";
+import { FogTripTicketViewComponent } from "./trip-tickets/view/fog-trip-ticket-view.component";
 import { FogTransporterListComponent } from "./transporters/list/fog-transporter-list.component";
 import { FogTransporterDetailsComponent } from "./transporters/details/fog-transporter-details.component";
 import { ProfessionalModule } from "../professionals/professional.module";
@@ -34,6 +35,7 @@ import { ProfessionalModule } from "../professionals/professional.module";
         FogInspectionListComponent,
         FogInspectionViewComponent,
         FogTripTicketListComponent,
+        FogTripTicketViewComponent,
         FogTransporterListComponent,
         FogTransporterDetailsComponent
     ],

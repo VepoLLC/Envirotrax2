@@ -12,7 +12,6 @@ import { LicenseListComponent } from "./licenses/license-list.component";
 import { FeatureGuard } from "../shared/guards/feature.guard";
 import { FeatureType } from "../shared/models/feature-type";
 import { DashboardComponent } from "./dashboard/dashboard.component";
-import { CheckoutComponent } from "./checkout/checkout.component";
 
 const routes: Routes = [
     {
@@ -94,8 +93,7 @@ const routes: Routes = [
     },
     {
         path: 'checkout',
-        title: 'Checkout',
-        component: CheckoutComponent,
+        loadChildren: () => import('./checkout/professionals-checkout.module').then(m => m.ProfessionalsCheckoutModule),
         canActivate: [RoleGuard],
         data: {
             roles: [ROLE_DEFINITIONS.PROFESSIONAL]

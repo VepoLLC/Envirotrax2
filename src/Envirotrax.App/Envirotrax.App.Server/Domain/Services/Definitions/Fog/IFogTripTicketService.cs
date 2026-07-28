@@ -13,4 +13,10 @@ public interface IFogTripTicketService : IService<FogTripTicket, FogTripTicketDt
         Stream? generatorSignatureStream, string? generatorSignatureFileName,
         Stream? receiverSignatureStream, string? receiverSignatureFileName,
         CancellationToken cancellationToken);
+
+    Task<FogTripTicketDto?> UpdateApprovalAsync(int id, bool disapproved, CancellationToken cancellationToken);
+
+    Task<byte[]> GeneratePdfAsync(FogTripTicketDto ticket);
+
+    Task<byte[]> GeneratePdfAsync(IEnumerable<FogTripTicketDto> tickets);
 }

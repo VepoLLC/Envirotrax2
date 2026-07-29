@@ -143,8 +143,8 @@ export class BackflowTestSubmitComponent implements OnInit {
     public repairRV = { cleaned: false, discUpper: false, discLower: false, spring: false, diaphragmUpper: false, diaphragmLower: false, diaphragmSmall: false, seatUpper: false, seatLower: false, spacerLower: false };
     public repairRV2 = { cleaned: false, discUpper: false, discLower: false, spring: false, diaphragmUpper: false, diaphragmLower: false, diaphragmSmall: false, seatUpper: false, seatLower: false, spacerLower: false };
     public repairBC = { cleaned: false, disc: false, spring: false, guide: false, pinRetainer: false, hingePin: false, seat: false, diaphragm: false };
-    public repairPvbAirInlet = { cleaned: false, disc: false, spring: false};
-    public repairPvbCV = { cleaned: false, disc: false, spring: false};
+    public repairPvbAirInlet = { cleaned: false, disc: false, spring: false };
+    public repairPvbCV = { cleaned: false, disc: false, spring: false };
 
 
     public get verificationComplete(): boolean {
@@ -170,7 +170,7 @@ export class BackflowTestSubmitComponent implements OnInit {
     public get isPVB(): boolean { return [BackflowDeviceType.PVB, BackflowDeviceType.SVB].includes(this.model.deviceType as BackflowDeviceType); }
     public get hasBypassCV(): boolean { return [BackflowDeviceType.DCD, BackflowDeviceType.RPPD].includes(this.model.deviceType as BackflowDeviceType); }
     public get hasBypassBC(): boolean { return [BackflowDeviceType.DCD2, BackflowDeviceType.RPPD2].includes(this.model.deviceType as BackflowDeviceType); }
-    
+
     //Initial Test Validation
     public get initialTestFailedDc(): boolean {
         if (this.initialTestDateError !== null
@@ -178,7 +178,7 @@ export class BackflowTestSubmitComponent implements OnInit {
             || !this.isCVCellValid(this.model.initCV2HeldPSID, this.model.initCV2ClosedTight, this.model.initCV2Leaked)
         ) {
             return true;
-        }      
+        }
         return false;
     }
 
@@ -190,21 +190,21 @@ export class BackflowTestSubmitComponent implements OnInit {
             || !this.isCVCellValid(this.model.initCV2HeldPSID2, this.model.initCV2ClosedTight2, this.model.initCV2Leaked2)
         ) {
             return true;
-        }      
+        }
         return false;
     }
 
     public get initialTestFailedDcd2(): boolean {
         if (this.initialTestDateError !== null
             || !this.isCVCellValid(this.model.initCV1HeldPSID, this.model.initCV1ClosedTight, this.model.initCV1Leaked)
-            || !this.isCVCellValid(this.model.initCV2HeldPSID, this.model.initCV2ClosedTight, this.model.initCV2Leaked) 
-            || !this.isCVCellValid(this.model.initBCHeldPSID, this.model.initBCClosedTight, this.model.initBCLeaked)   
+            || !this.isCVCellValid(this.model.initCV2HeldPSID, this.model.initCV2ClosedTight, this.model.initCV2Leaked)
+            || !this.isCVCellValid(this.model.initBCHeldPSID, this.model.initBCClosedTight, this.model.initBCLeaked)
         ) {
             return true;
-        }      
+        }
         return false;
     }
-    
+
     public get initialTestFailedRp(): boolean {
         if (this.initialTestDateError !== null
             || !this.isRPCV1CellValid(this.model.initCV1HeldPSID, this.model.initCV1ClosedTight, this.model.initCV1Leaked, this.model.initRVOpenedPSID)
@@ -212,9 +212,9 @@ export class BackflowTestSubmitComponent implements OnInit {
             || !this.isRVCellValid(this.model.initRVOpenedPSID, this.model.initRVDidNotOpen)
         ) {
             return true;
-        }      
+        }
         return false;
-    }    
+    }
 
     public get initialTestFailedRppd(): boolean {
         if (this.initialTestDateError !== null
@@ -223,10 +223,10 @@ export class BackflowTestSubmitComponent implements OnInit {
             || !this.isRVCellValid(this.model.initRVOpenedPSID, this.model.initRVDidNotOpen)
             || !this.isCVCellValid(this.model.initCV1HeldPSID2, this.model.initCV1ClosedTight2, this.model.initCV1Leaked2)
             || !this.model.initCV2ClosedTight2
-            || !this.isRVCellValid(this.model.initRVOpenedPSID2, this.model.initRVDidNotOpen2)       
+            || !this.isRVCellValid(this.model.initRVOpenedPSID2, this.model.initRVDidNotOpen2)
         ) {
             return true;
-        }      
+        }
         return false;
     }
 
@@ -235,20 +235,20 @@ export class BackflowTestSubmitComponent implements OnInit {
             || !this.isRPCV1CellValid(this.model.initCV1HeldPSID, this.model.initCV1ClosedTight, this.model.initCV1Leaked, this.model.initRVOpenedPSID)
             || !this.model.initCV2ClosedTight
             || !this.isRVCellValid(this.model.initRVOpenedPSID, this.model.initRVDidNotOpen)
-            || !this.isCVCellValid(this.model.initBCHeldPSID, this.model.initBCClosedTight, this.model.initBCLeaked)  
+            || !this.isCVCellValid(this.model.initBCHeldPSID, this.model.initBCClosedTight, this.model.initBCLeaked)
         ) {
             return true;
-        }      
+        }
         return false;
     }
 
     public get initialTestFailedPvb(): boolean {
         if (this.initialTestDateError !== null
             || !this.isAirInletCellValid(this.model.initPvbAirInletOpenedPSID, this.model.initPvbAirInletDidNotOpen, this.model.initPvbAirInletFullyOpened)
-            || !this.isPvbCVCellValid(this.model.initPvbCVHeldPSID, this.model.initPvbCVLeaked)  
+            || !this.isPvbCVCellValid(this.model.initPvbCVHeldPSID, this.model.initPvbCVLeaked)
         ) {
             return true;
-        }      
+        }
         return false;
     }
 
@@ -264,104 +264,104 @@ export class BackflowTestSubmitComponent implements OnInit {
     }
 
     //Final Test Validation
-    public get finalTestFailedDc(): boolean{
-        if(!this.initialTestFailedDc){
+    public get finalTestFailedDc(): boolean {
+        if (!this.initialTestFailedDc) {
             return false;
         }
-        if(this.finalTestDateError !== null
+        if (this.finalTestDateError !== null
             || !this.isCVCellValid(this.model.finalCV1HeldPSID, this.model.finalCV1ClosedTight, undefined)
             || !this.isCVCellValid(this.model.finalCV2HeldPSID, this.model.finalCV2ClosedTight, undefined)
-        ){
+        ) {
             return true;
         }
         return false;
     }
 
-    public get finalTestFailedDcd(): boolean{
-        if(!this.initialTestFailedDcd){
+    public get finalTestFailedDcd(): boolean {
+        if (!this.initialTestFailedDcd) {
             return false;
         }
-        if(this.finalTestDateError !== null
+        if (this.finalTestDateError !== null
             || !this.isCVCellValid(this.model.finalCV1HeldPSID, this.model.finalCV1ClosedTight, undefined)
             || !this.isCVCellValid(this.model.finalCV2HeldPSID, this.model.finalCV2ClosedTight, undefined)
             || !this.isCVCellValid(this.model.finalCV1HeldPSID2, this.model.finalCV1ClosedTight2, undefined)
-            || !this.isCVCellValid(this.model.finalCV2HeldPSID2, this.model.finalCV2ClosedTight2, undefined)         
-        ){
+            || !this.isCVCellValid(this.model.finalCV2HeldPSID2, this.model.finalCV2ClosedTight2, undefined)
+        ) {
             return true;
         }
         return false;
     }
 
-    public get finalTestFailedDcd2(): boolean{
-        if(!this.initialTestFailedDcd2){
+    public get finalTestFailedDcd2(): boolean {
+        if (!this.initialTestFailedDcd2) {
             return false;
         }
-        if(this.finalTestDateError !== null
+        if (this.finalTestDateError !== null
             || !this.isCVCellValid(this.model.finalCV1HeldPSID, this.model.finalCV1ClosedTight, undefined)
             || !this.isCVCellValid(this.model.finalCV2HeldPSID, this.model.finalCV2ClosedTight, undefined)
             || !this.isCVCellValid(this.model.finalBCHeldPSID, this.model.finalBCClosedTight, undefined)
-        ){
+        ) {
             return true;
         }
         return false;
     }
 
-    public get finalTestFailedRp(): boolean{
-        if(!this.initialTestFailedRp){
+    public get finalTestFailedRp(): boolean {
+        if (!this.initialTestFailedRp) {
             return false;
         }
-        if(this.finalTestDateError !== null
+        if (this.finalTestDateError !== null
             || !this.isRPCV1CellValid(this.model.finalCV1HeldPSID, this.model.finalCV1ClosedTight, undefined, this.model.finalRVOpenedPSID)
             || !this.isRPCV2CellValid(this.model.finalCV2ClosedTight, undefined)
             || !this.isRVCellValid(this.model.finalRVOpenedPSID, undefined)
-        ){
+        ) {
             return true;
         }
         return false;
     }
 
-    public get finalTestFailedRppd(): boolean{
-        if(!this.initialTestFailedRppd
-        ){
+    public get finalTestFailedRppd(): boolean {
+        if (!this.initialTestFailedRppd
+        ) {
             return false;
         }
-        if(this.finalTestDateError !== null
+        if (this.finalTestDateError !== null
             || !this.isRPCV1CellValid(this.model.finalCV1HeldPSID, this.model.finalCV1ClosedTight, undefined, this.model.finalRVOpenedPSID)
             || !this.model.finalCV2ClosedTight
             || !this.isRVCellValid(this.model.finalRVOpenedPSID, undefined)
             || !this.isRPCV1CellValid(this.model.finalCV1HeldPSID2, this.model.finalCV1ClosedTight2, undefined, this.model.finalRVOpenedPSID2)
             || !this.model.finalCV2ClosedTight2
             || !this.isRVCellValid(this.model.finalRVOpenedPSID2, undefined)
-        
-        ){
+
+        ) {
             return true;
         }
         return false;
     }
 
-    public get finalTestFailedRppd2(): boolean{
-        if(!this.initialTestFailedRppd2){
+    public get finalTestFailedRppd2(): boolean {
+        if (!this.initialTestFailedRppd2) {
             return false;
         }
-        if(this.finalTestDateError !== null
+        if (this.finalTestDateError !== null
             || !this.isRPCV1CellValid(this.model.finalCV1HeldPSID, this.model.finalCV1ClosedTight, undefined, this.model.finalRVOpenedPSID)
             || !this.model.finalCV2ClosedTight
             || !this.isRVCellValid(this.model.finalRVOpenedPSID, undefined)
-            || !this.isCVCellValid(this.model.finalBCHeldPSID, this.model.finalBCClosedTight, undefined)           
-        ){
+            || !this.isCVCellValid(this.model.finalBCHeldPSID, this.model.finalBCClosedTight, undefined)
+        ) {
             return true;
         }
         return false;
     }
 
-    public get finalTestFailedPvb(): boolean{
-        if(!this.initialTestFailedPvb){
+    public get finalTestFailedPvb(): boolean {
+        if (!this.initialTestFailedPvb) {
             return false;
         }
-        if(this.finalTestDateError !== null
+        if (this.finalTestDateError !== null
             || !this.isAirInletCellValid(this.model.finalPvbAirInletOpenedPSID, undefined, this.model.finalPvbAirInletFullyOpened)
-            || !this.isPvbCVCellValid(this.model.finalPvbCVHeldPSID, undefined)  
-        ){
+            || !this.isPvbCVCellValid(this.model.finalPvbCVHeldPSID, undefined)
+        ) {
             return true;
         }
         return false;
@@ -593,7 +593,7 @@ export class BackflowTestSubmitComponent implements OnInit {
             this._bpats = usersPage.data ?? [];
             this._gauges = gaugesPage.data ?? [];
 
-            const suppliersPage = await this._supplierService.getAllMy(false, true);
+            const suppliersPage = await this._supplierService.getAllMy({ hasBackflowTesting: true });
             this._waterSuppliers = suppliersPage.data ?? [];
 
             this.buildOptions();
@@ -774,6 +774,6 @@ export class BackflowTestSubmitComponent implements OnInit {
                 this.validationErrors.push('When Test Result is Pass, Air Gap Valid must be set to Yes.');
             }
             return;
-        }       
+        }
     }
 }

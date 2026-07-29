@@ -86,10 +86,14 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
     }
 
     private async loadWaterSupplierScopeOptions(): Promise<void> {
-        const suppliers = await this._supplierService.getAllMy(false, false, true);
+        const suppliers = await this._supplierService.getAllMy({
+            hasFogInspection: true
+        });
+
         const supplierOptions: InputOption[] = suppliers.data
             .filter(s => s.waterSupplier?.id)
             .map(s => ({ id: String(s.waterSupplier!.id!), text: s.waterSupplier!.name ?? '' }));
+
         this.waterSupplierScopeOptions = [
             { id: '', text: 'My inspection history only' },
             ...supplierOptions

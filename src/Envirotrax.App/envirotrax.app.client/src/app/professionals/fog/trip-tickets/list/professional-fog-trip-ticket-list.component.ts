@@ -127,7 +127,7 @@ export class ProfessionalFogTripTicketListComponent implements OnInit {
             this._userService.getAllAsOptions(true, 'Any transporter', { filter: [{ columnName: 'isFogTransporter', value: 'true' }] }),
             this._vehicleService.getAllAsOptions(true, 'Any vehicle'),
             this._disposalSiteService.getAllRegisteredAsOptions(true, 'Any disposal site'),
-            this._professionalSupplierService.getMyAsOptions()
+            this._professionalSupplierService.getMyAsOptions({ hasFogTransportation: true })
         ]);
 
         this.transporterOptions = transporterResult;

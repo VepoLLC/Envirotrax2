@@ -8,6 +8,7 @@ import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { FogInspection } from "../../models/fog/fog-inspection";
 import { FogInspectionImages } from "../../models/fog/fog-inspection-images";
+import { DownloadEndpoint } from "../../models/download-config";
 
 @Injectable({
     providedIn: 'root'
@@ -28,9 +29,28 @@ export class ProfessionalFogInspectionService {
         return lastValueFrom(this._http.get<PagedData<FogInspection>>(url, { params }));
     }
 
+    public getAllEndpoint(latestOnly: boolean): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl(`/api/professionals/fog/inspections?latestOnly=${latestOnly}`)
+        };
+    }
+
+    public getAllPdfEndpoint(latestOnly: boolean): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl(`/api/professionals/fog/inspections/pdf?latestOnly=${latestOnly}`)
+        };
+    }
+
     public getById(id: number): Promise<FogInspection> {
         const url = this._urlResolver.resolveUrl(`/api/professionals/fog/inspections/${id}`);
         return lastValueFrom(this._http.get<FogInspection>(url));
+    }
+
+    public async getPdfForProfessional(id: number): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/fog/inspections/${id}/pdf`);
+        return await lastValueFrom(this._http.get(url, { responseType: 'blob' }));
     }
 
     public deleteForProfessional(id: number): Promise<FogInspection> {

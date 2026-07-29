@@ -27,6 +27,13 @@ export class SiteService {
         };
     }
 
+    public getAllForProfessionalEndpoint(): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/professionals/sites'),
+        };
+    }
+
     public getCsiComplianceEndpoint(): DownloadEndpoint {
         return {
             method: 'GET',

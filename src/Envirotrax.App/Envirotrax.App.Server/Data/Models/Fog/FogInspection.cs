@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Envirotrax.App.Server.Data.Models.Fog;
 
 [Table("FogInspections")]
-public class FogInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
+public class FogInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IProfessionalModel
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }

@@ -10,7 +10,8 @@ namespace Envirotrax.LegacyDataMigration.Services;
 
 public class UserService
 {
-    private const string BeforeMigrationScriptPath = "Scripts/Users/01_BeforeMigration.sql";
+    private const string V1ScriptsFolder = "Scripts/Users/V1";
+    private const string V2ScriptsFolder = "Scripts/Users/V2";
 
     private readonly UserManager<AppUser> _userManager;
     private readonly ILogger<UserService> _logger;
@@ -41,33 +42,43 @@ public class UserService
 
     private async Task ExecuteSqlScriptsAsync()
     {
-        await ExecuteBeforeMigrationScriptAsync();
+        await ExecuteV2ScriptsAsync();
+        await ExecuteV1ScriptsAsync();
+    }
 
-        var folderName = "Scripts/Users";
-        _logger.LogInformation("Executing database scripts from {folderName}.", folderName);
+    private async Task ExecuteV2ScriptsAsync()
+    {
+        _logger.LogInformation("Executing database scripts from {folderName}.", V2ScriptsFolder);
 
-        var legacyDataScripts = Directory
-            .GetFiles(folderName, "*.sql")
-            .Where(file => Path.GetFullPath(file) != Path.GetFullPath(BeforeMigrationScriptPath));
+        var scripts = Directory.GetFiles(V2ScriptsFolder, "*.sql");
 
-        foreach (var file in legacyDataScripts)
+        foreach (var file in scripts)
         {
             _logger.LogInformation("Executing script {file}", file);
             var sql = await File.ReadAllTextAsync(file);
 
-            var addedRpws = await _legacyDb.ExecuteNonQueryAsync(sql);
-            _logger.LogInformation("Imported users. Count: {count}", addedRpws);
+            await _appDbContext.Database.ExecuteSqlRawAsync(sql);
         }
 
-        _logger.LogInformation("Completed executing database scripts.");
+        _logger.LogInformation("Completed executing database scripts from {folderName}.", V2ScriptsFolder);
     }
 
-    private async Task ExecuteBeforeMigrationScriptAsync()
+    private async Task ExecuteV1ScriptsAsync()
     {
-        _logger.LogInformation("Executing V2 schema setup script {file}", BeforeMigrationScriptPath);
+        _logger.LogInformation("Executing database scripts from {folderName}.", V1ScriptsFolder);
 
-        var sql = await File.ReadAllTextAsync(BeforeMigrationScriptPath);
-        await _appDbContext.Database.ExecuteSqlRawAsync(sql);
+        var scripts = Directory.GetFiles(V1ScriptsFolder, "*.sql");
+
+        foreach (var file in scripts)
+        {
+            _logger.LogInformation("Executing script {file}", file);
+            var sql = await File.ReadAllTextAsync(file);
+
+            var addedRows = await _legacyDb.ExecuteNonQueryAsync(sql);
+            _logger.LogInformation("Imported users. Count: {count}", addedRows);
+        }
+
+        _logger.LogInformation("Completed executing database scripts from {folderName}.", V1ScriptsFolder);
     }
 
     private async Task HashLegacyPasswordsAsync()

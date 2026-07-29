@@ -26,6 +26,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
     private readonly ISiteService _siteService;
     private readonly IFileStorageService _fileStorageService;
     private readonly IAuthService _authService;
+    private readonly IPdfTemplateService _pdfTemplateService;
 
     public FogInspectionService(
         IMapper mapper,
@@ -34,7 +35,8 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         IProfessionalUserService professionalUserService,
         ISiteService siteService,
         IFileStorageService fileStorageService,
-        IAuthService authService)
+        IAuthService authService,
+        IPdfTemplateService pdfTemplateService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -43,18 +45,32 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         _siteService = siteService;
         _fileStorageService = fileStorageService;
         _authService = authService;
+        _pdfTemplateService = pdfTemplateService;
+    }
+
+    public Task<byte[]> GeneratePdfAsync(FogInspectionDto inspection)
+    {
+        return GeneratePdfAsync([inspection]);
+    }
+
+    public Task<byte[]> GeneratePdfAsync(IEnumerable<FogInspectionDto> inspections)
+    {
+        return _pdfTemplateService.GenerateAsync("Fog.FogInspection", inspections);
     }
 
     public override async Task<FogInspectionDto?> DeleteAsync(int id)
     {
-        var inspection = await _repository.GetNoIncludesAsync(id, CancellationToken.None);
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        if (inspection == null || inspection.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(inspection.TransactionId))
+        var deleted = await _repository.DeleteAsync(id);
+
+        if (deleted == null || deleted.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(deleted.TransactionId))
         {
             return null;
         }
 
-        return await base.DeleteAsync(id);
+        scope.Complete();
+        return MapToDto(deleted);
     }
 
     public async Task<FogInspectionDto> SubmitAsync(

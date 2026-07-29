@@ -521,7 +521,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("ProfessionalId")
+                    b.Property<int>("ProfessionalId")
                         .HasColumnType("int");
 
                     b.Property<bool>("ProperlyInstalled")
@@ -3418,6 +3418,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<double?>("GisCenterZoom")
                         .HasColumnType("float");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("LetterAddress")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -3605,6 +3608,12 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasForeignKey("MailingStateId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
+                        .WithMany()
+                        .HasForeignKey("ProfessionalId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "PropertyState")
                         .WithMany()
                         .HasForeignKey("PropertyStateId")
@@ -3652,6 +3661,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("DeletedBy");
 
                     b.Navigation("MailingState");
+
+                    b.Navigation("Professional");
 
                     b.Navigation("PropertyState");
 
@@ -4439,8 +4450,8 @@ namespace Envirotrax.App.Server.Data.Migrations
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.GeneralSettings", b =>
                 {
                     b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
-                        .WithMany()
-                        .HasForeignKey("WaterSupplierId")
+                        .WithOne("GeneralSettings")
+                        .HasForeignKey("Envirotrax.App.Server.Data.Models.WaterSuppliers.GeneralSettings", "WaterSupplierId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -4497,6 +4508,11 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("State");
 
                     b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", b =>
+                {
+                    b.Navigation("GeneralSettings");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+using System.Transactions;
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
@@ -48,14 +48,17 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
 
     public override async Task<CsiInspectionDto?> DeleteAsync(int id)
     {
-        var inspection = await _repository.GetNoIncludesAsync(id, CancellationToken.None);
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        if (inspection == null || inspection.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(inspection.TransactionId))
+        var deleted = await _repository.DeleteAsync(id);
+
+        if (deleted == null || deleted.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(deleted.TransactionId))
         {
             return null;
         }
 
-        return await base.DeleteAsync(id);
+        scope.Complete();
+        return MapToDto(deleted);
     }
 
     public async Task<CsiInspectionDto> SubmitAsync(CsiInspectionDto request, CancellationToken cancellationToken)

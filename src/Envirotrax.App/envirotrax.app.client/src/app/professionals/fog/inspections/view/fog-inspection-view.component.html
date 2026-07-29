@@ -180,7 +180,7 @@
                     <dt class="col-7 fw-normal">Is there evidence of past overflow?</dt>
                     <dd class="col-5 mb-1">
                         <div class="form-check form-check-inline">
-                            <input class="form-check-inpu readonly-checkboxt" type="radio" disabled
+                            <input class="form-check-input readonly-checkbox" type="radio" disabled
                                    [checked]="inspection.pastOverflow === true" />
                             <label class="form-check-label ms-1">Yes</label>
                         </div>
@@ -374,5 +374,11 @@
             </div>
         </div>
     </vp-section>
+
+    <div class="d-flex justify-content-center gap-2 flex-wrap mt-3">
+        <button type="button" class="btn btn-primary vp-section-button" (click)="exportPdf()">
+            Export Inspection to Printable Document
+        </button>
+    </div>
 
 </div>

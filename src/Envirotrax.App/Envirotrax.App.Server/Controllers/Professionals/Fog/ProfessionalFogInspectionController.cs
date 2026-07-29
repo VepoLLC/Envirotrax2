@@ -29,6 +29,16 @@ public class ProfessionalFogInspectionController : ProfessionalProtectedControll
         return Ok(result);
     }
 
+    [HttpGet("pdf")]
+    public async Task<IActionResult> GetAllPdfAsync(
+        [FromQuery] PageInfo pageInfo, [FromQuery] Query query,
+        [FromQuery] bool latestOnly = true, CancellationToken cancellationToken = default)
+    {
+        var inspections = await _fogInspectionService.SearchForProfessionalAsync(pageInfo, query, latestOnly, cancellationToken);
+        var pdf = await _fogInspectionService.GeneratePdfAsync(inspections.Data);
+        return File(pdf, "application/pdf");
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
     {
@@ -39,6 +49,19 @@ public class ProfessionalFogInspectionController : ProfessionalProtectedControll
         }
 
         return Ok(result);
+    }
+
+    [HttpGet("{id}/pdf")]
+    public async Task<IActionResult> GetPdfAsync(int id, CancellationToken cancellationToken)
+    {
+        var inspection = await _fogInspectionService.GetAsync(id, cancellationToken);
+        if (inspection == null)
+        {
+            return NotFound();
+        }
+
+        var pdf = await _fogInspectionService.GeneratePdfAsync(inspection);
+        return File(pdf, "application/pdf");
     }
 
     [HttpPost]

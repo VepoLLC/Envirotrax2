@@ -115,6 +115,11 @@ export class CsiInspectionService {
         return lastValueFrom(this._http.delete<CsiInspection>(url));
     }
 
+    public getPdfForProfessional(id: number): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${id}/pdf`);
+        return lastValueFrom(this._http.get(url, { responseType: 'blob' }));
+    }
+
     public getImages(inspectionId: number): Promise<CsiInspectionImage[]> {
         const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${inspectionId}/images`);
         return lastValueFrom(this._http.get<CsiInspectionImage[]>(url));

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
@@ -61,7 +62,16 @@ public class ProfessionalFogTripTicketController : ProfessionalProtectedControll
             return NotFound();
         }
 
-        var pdfBytes = await _fogService.GeneratePdfAsync(ticket);
+        byte[] pdfBytes;
+        try
+        {
+            pdfBytes = await _fogService.GeneratePdfForProfessionalAsync(ticket);
+        }
+        catch (ValidationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+
         return File(pdfBytes, "application/pdf");
     }
 

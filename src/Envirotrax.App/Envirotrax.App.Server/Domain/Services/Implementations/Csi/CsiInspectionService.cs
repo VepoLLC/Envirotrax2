@@ -150,6 +150,16 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         return _pdfTemplateService.GenerateAsync("Csi.CsiInspection", inspections);
     }
 
+    public Task<byte[]> GeneratePdfForProfessionalAsync(CsiInspectionDto inspection)
+    {
+        if (inspection.TransactionId == null)
+        {
+            throw new ValidationException("Report can't be downloaded until it's paid. Please go to checkout and pay for this transaction, then try downloading again.");
+        }
+
+        return GeneratePdfAsync(inspection);
+    }
+
     private static void ApplyInspectorSnapshot(
         CsiInspection inspection,
         ProfessionalDto professional,

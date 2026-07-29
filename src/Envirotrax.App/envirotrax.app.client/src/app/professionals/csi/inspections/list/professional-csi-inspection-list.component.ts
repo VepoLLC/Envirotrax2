@@ -13,7 +13,7 @@ import { AppContainerHelperService } from '../../../../shared/services/helpers/a
 
 @Component({
     standalone: false,
-    templateUrl: './csi-inspection-list.component.html'
+    templateUrl: './professional-csi-inspection-list.component.html'
 })
 export class CsiInspectionListComponent implements OnInit {
     @ViewChild('statusTemplate', { static: true })
@@ -32,7 +32,7 @@ export class CsiInspectionListComponent implements OnInit {
     private _printableSection!: ElementRef;
 
     public inspections: TableViewModel<CsiInspection> = {
-        query: {},
+        query: { filter: [] },
         columns: []
     };
 
@@ -68,7 +68,9 @@ export class CsiInspectionListComponent implements OnInit {
         private readonly _activatedRoute: ActivatedRoute,
         private readonly _printService: PrintableTableService,
         private readonly _containerHelper: AppContainerHelperService
-    ) { }
+    ) {
+        this.inspections.query.filter = [this.paidFilter()];
+     }
 
     public async ngOnInit(): Promise<void> {
         this.inspections.columns = this.buildColumns();
@@ -81,7 +83,11 @@ export class CsiInspectionListComponent implements OnInit {
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
-        this.inspections.query.filter = queryProperties;
+        this.inspections.query.filter = [...queryProperties, this.paidFilter()];
+    }
+
+    private paidFilter(): QueryProperty {
+        return { columnName: 'transactionId', isValueNull: true, comparisonOperator: 'NotEq', logicalOperator: 'And' };
     }
 
     public async search(): Promise<void> {

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
@@ -30,6 +31,28 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
         }
         
         return Ok(result);
+    }
+
+    [HttpGet("{id}/pdf")]
+    public async Task<IActionResult> GetPdfAsync(int id, CancellationToken cancellationToken)
+    {
+        var inspection = await _inspectionService.GetAsync(id, cancellationToken);
+        if (inspection == null)
+        {
+            return NotFound();
+        }
+
+        byte[] pdf;
+        try
+        {
+            pdf = await _inspectionService.GeneratePdfForProfessionalAsync(inspection);
+        }
+        catch (ValidationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+
+        return File(pdf, "application/pdf");
     }
 
     [HttpGet]

@@ -14,7 +14,6 @@ using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.Common.Domain.Services.Defintions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
-using Envirotrax.App.Server.Domain.Services.Definitions.Users;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Fog;
 
@@ -30,7 +29,6 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
     private readonly IFogVehicleService _vehicleService;
     private readonly IFogDisposalSiteService _disposalSiteService;
     private readonly IFileStorageService _fileStorageService;
-    private readonly IUserService _userService;
     private readonly IPdfTemplateService _pdfTemplateService;
 
     public FogTripTicketService(
@@ -43,7 +41,6 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         IFogVehicleService vehicleService,
         IFogDisposalSiteService disposalSiteService,
         IFileStorageService fileStorageService,
-        IUserService userService,
         IPdfTemplateService pdfTemplateService)
         : base(mapper, repository)
     {
@@ -56,7 +53,6 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         _disposalSiteService = disposalSiteService;
         _fileStorageService = fileStorageService;
         _pdfTemplateService = pdfTemplateService;
-        _userService = userService;
     }
 
     public override async Task<FogTripTicketDto?> DeleteAsync(int id)
@@ -85,15 +81,7 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
 
     public async Task<FogTripTicketDto?> UpdateApprovalAsync(int id, bool disapproved, CancellationToken cancellationToken)
     {
-        string? approvedBy = null;
-
-        if (!disapproved)
-        {
-            var user = await _userService.GetAsync(_authService.UserId, cancellationToken);
-            approvedBy = user?.ContactName ?? user?.EmailAddress;
-        }
-
-        var ticket = await _repository.UpdateApprovalAsync(id, disapproved, approvedBy, cancellationToken);
+        var ticket = await _repository.UpdateApprovalAsync(id, disapproved, _authService.UserId, cancellationToken);
 
         if (ticket == null)
         {
@@ -114,6 +102,16 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
     public Task<byte[]> GeneratePdfAsync(IEnumerable<FogTripTicketDto> tickets)
     {
         return _pdfTemplateService.GenerateAsync("Fog.FogTripTicket", tickets);
+    }
+
+    public Task<byte[]> GeneratePdfForProfessionalAsync(FogTripTicketDto ticket)
+    {
+        if (ticket.TransactionId == null)
+        {
+            throw new ValidationException("Report can't be downloaded until it's paid. Please go to checkout and pay for this transaction, then try downloading again.");
+        }
+
+        return GeneratePdfAsync(ticket);
     }
 
     public async Task<IPagedData<FogTripTicketDto>> SearchForProfessionalAsync(

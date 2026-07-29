@@ -444,6 +444,16 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         return _pdfTemplateService.GenerateAsync("Backflow.BackflowTest", tests);
     }
 
+    public Task<byte[]> GeneratePdfForProfessionalAsync(BackflowTestDto test)
+    {
+        if (test.TransactionId == null)
+        {
+            throw new ValidationException("Report can't be downloaded until it's paid. Please go to checkout and pay for this transaction, then try downloading again.");
+        }
+
+        return GeneratePdfAsync(test);
+    }
+
     public async Task<IEnumerable<BackflowTestDto>> GetAllPendingTestsForRenewalAsync(int batchSize, CancellationToken cancellationToken)
     {
         var tests = await _testRepository.GetAllPendingRenewalByTestFlagAsync(batchSize, cancellationToken);

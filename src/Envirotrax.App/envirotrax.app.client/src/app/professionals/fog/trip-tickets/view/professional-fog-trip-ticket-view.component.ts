@@ -6,6 +6,8 @@ import { FogTripTicket } from '../../../../shared/models/fog/fog-trip-ticket';
 import { FOG_VEHICLE_CAPACITY_TYPE_LABELS, FogVehicleCapacityType } from '../../../../shared/models/fog/fog-vehicle-enums';
 import { PropertyType } from '../../../../shared/enums/property-type.enum';
 import { DownloadService } from '../../../../shared/services/download.service';
+import { HelperService } from '../../../../shared/services/helpers/helper.service';
+import { ToastService, ToastType } from '../../../../shared/services/toast.service';
 
 @Component({
     standalone: false,
@@ -25,7 +27,9 @@ export class ProfessionalFogTripTicketViewComponent implements OnInit {
         private readonly _destroyRef: DestroyRef,
         private readonly _route: ActivatedRoute,
         private readonly _tripTicketService: FogTripTicketService,
-        private readonly _downloadService: DownloadService
+        private readonly _downloadService: DownloadService,
+        private readonly _helper: HelperService,
+        private readonly _toastService: ToastService
     ) {}
 
     public ngOnInit(): void {
@@ -50,7 +54,7 @@ export class ProfessionalFogTripTicketViewComponent implements OnInit {
     }
 
     public async exportPdf(): Promise<void> {
-        if (!this.ticket) {
+        if (!this.ticket || !this.ticket.transactionId) {
             return;
         }
 
@@ -58,6 +62,13 @@ export class ProfessionalFogTripTicketViewComponent implements OnInit {
             this.isLoading = true;
             const blob = await this._tripTicketService.getPdfForProfessional(this.ticket.id);
             this._downloadService.downloadFileFromBlob(blob);
+        } catch (e) {
+            const validationErrors: string[] = [];
+            if (this._helper.parseValidationErrors(e, validationErrors)) {
+                this._toastService.show({ text: validationErrors[0], type: ToastType.Error });
+            } else {
+                throw e;
+            }
         } finally {
             this.isLoading = false;
         }

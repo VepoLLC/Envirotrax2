@@ -10,6 +10,7 @@ import { ProfesionalUserService } from "../../../../shared/services/professional
 import { ProfessionalSupplierService } from "../../../../shared/services/professionals/professional-supplier.service";
 import { ProfessionalFogVehicleService } from "../../../../shared/services/fog/professional-fog-vehicle.service";
 import { ProfessionalFogDisposalSiteService } from "../../../../shared/services/fog/professional-fog-disposal-site.service";
+import { FogSettingsService } from "../../../../shared/services/fog/fog-settings.service";
 import { ProfessionalUserLicenseService } from "../../../../shared/services/professionals/professional-user-license.service";
 import { FogTripTicketService } from "../../../../shared/services/fog/fog-trip-ticket.service";
 import { Professional } from "../../../../shared/models/professionals/professional";
@@ -24,7 +25,7 @@ import { WaterSupplier } from "../../../../shared/models/water-suppliers/water-s
 import { LookupService } from "../../../../shared/services/lookup/lookup.service";
 import { MAX_PAGE_SIZE } from "../../../../shared/models/page-info";
 import { InputOption, ModalHelperService } from "@envirotrax/common-ui";
-import { WaterSupplier } from "../../../../shared/models/water-suppliers/water-supplier";
+import { ProfessionalFogSettings } from "../../../../shared/models/fog/professional-fog-settings";
 
 interface VerificationCheck {
     label: string;
@@ -95,7 +96,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
 
     private _siteId = 0;
     private _transporterLicense?: ProfessionalUserLicense;
-    private readonly _availableSuppliers = new Map<number, AvailableWaterSupplier>();
+    private _selectedSupplierSettings?: ProfessionalFogSettings;
     private readonly _myWaterSuppliers = new Map<number, WaterSupplier>();
     private readonly _stateNamesById = new Map<number, string>();
 
@@ -106,6 +107,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         private readonly _professionalService: ProfesisonalService,
         private readonly _userService: ProfesionalUserService,
         private readonly _supplierService: ProfessionalSupplierService,
+        private readonly _fogSettingsService: FogSettingsService,
         private readonly _vehicleService: ProfessionalFogVehicleService,
         private readonly _disposalSiteService: ProfessionalFogDisposalSiteService,
         private readonly _licenseService: ProfessionalUserLicenseService,
@@ -133,7 +135,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
 
     public async onWaterSupplierChange(value: number): Promise<void> {
         this.selectedWaterSupplierId = value;
-        this.applySelectedWaterSupplier(value);
+        await this.applySelectedWaterSupplier(value);
 
         await this.computeVerification();
     }
@@ -301,11 +303,10 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         try {
             this.isLoading = true;
 
-            const [professional, transporterOptions, suppliersPage, availableSuppliers, disposalSiteOptions, vehicleOptions, states] = await Promise.all([
+            const [professional, transporterOptions, suppliersPage, disposalSiteOptions, vehicleOptions, states] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAllAsOptions(false, '', { filter: [{ columnName: 'isFogTransporter', comparisonOperator: 'Eq', value: 'true' }] }),
                 this._supplierService.getAllMy(),
-                this._supplierService.getAllAvailableSuppliers({ pageSize: MAX_PAGE_SIZE }, {}),
                 this._disposalSiteService.getAllRegisteredAsOptions(true, 'Select a disposal site'),
                 this._vehicleService.getAllAsOptions(true, 'Select a transporter vehicle'),
                 this._lookupService.getAllStates()
@@ -327,13 +328,6 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
             for (const supplier of suppliersPage.data) {
                 if (supplier.waterSupplier?.id != null) {
                     this._myWaterSuppliers.set(supplier.waterSupplier.id, supplier.waterSupplier);
-                }
-            }
-
-            this._availableSuppliers.clear();
-            for (const supplier of availableSuppliers.data) {
-                if (supplier.id != null) {
-                    this._availableSuppliers.set(supplier.id, supplier);
                 }
             }
 
@@ -374,10 +368,10 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
             this.selectedWaterSupplierId = registeredIds[0];
         }
 
-        this.applySelectedWaterSupplier(this.selectedWaterSupplierId);
+        await this.applySelectedWaterSupplier(this.selectedWaterSupplierId);
     }
 
-    private applySelectedWaterSupplier(waterSupplierId?: number): void {
+    private async applySelectedWaterSupplier(waterSupplierId?: number): Promise<void> {
         this.selectedWaterSupplier = waterSupplierId != null
             ? this._myWaterSuppliers.get(waterSupplierId)
             : undefined;
@@ -385,6 +379,10 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         const stateId = this.selectedWaterSupplier?.state?.id;
         this.selectedWaterSupplierStateName = stateId != null
             ? this._stateNamesById.get(stateId)
+            : undefined;
+
+        this._selectedSupplierSettings = waterSupplierId != null
+            ? await this._fogSettingsService.getSettings(waterSupplierId)
             : undefined;
     }
 
@@ -489,10 +487,6 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
     }
 
     private requiresInsurance(): boolean {
-        if (!this.selectedWaterSupplierId) {
-            return false;
-        }
-
-        return this._availableSuppliers.get(this.selectedWaterSupplierId)?.fogTransportersRequireInsurance ?? false;
+        return this._selectedSupplierSettings?.fogTransportersRequireInsurance ?? false;
     }
 }

@@ -218,7 +218,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
             this.csiUsers = usersPage.data ?? [];
             this.site = site;
 
-            const waterSuppliersPage = await this._professionalSupplierService.getAllMy(true);
+            const waterSuppliersPage = await this._professionalSupplierService.getAllMy({ hasCsiInspection: true });
             this.waterSuppliers = waterSuppliersPage.data ?? [];
 
             this.buildDropdownOptions();

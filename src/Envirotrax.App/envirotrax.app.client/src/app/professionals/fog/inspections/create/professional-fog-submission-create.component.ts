@@ -333,7 +333,7 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
             this.fogUsers = usersPage.data ?? [];
             this.site = site;
 
-            const waterSuppliersPage = await this._professionalSupplierService.getAllMy(false, false, true);
+            const waterSuppliersPage = await this._professionalSupplierService.getAllMy({ hasFogInspection: true });
             this.waterSuppliers = waterSuppliersPage.data ?? [];
 
             this.buildDropdownOptions();

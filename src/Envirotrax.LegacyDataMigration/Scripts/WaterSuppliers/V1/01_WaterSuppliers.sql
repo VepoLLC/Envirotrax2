@@ -9,7 +9,7 @@ BEGIN TRY
          LetterCompanyName, LetterContactName, LetterAddress, LetterCity, LetterStateId, LetterZipCode,
          LetterContactCompanyName, LetterContactContactName, LetterContactAddress, LetterContactCity,
          LetterContactStateId, LetterContactZipCode, LetterContactPhoneNumber, LetterContactFaxNumber, LetterContactEmailAddress,
-         GisCenterLatitude, GisCenterLongitude, GisCenterZoom)
+         GisCenterLatitude, GisCenterLongitude, GisCenterZoom, IsActive)
     SELECT
         WaterSuppliers.[Name], WaterSuppliers.Subdomain, WaterSuppliers.ID, NULL,
         WaterSuppliers.PwsID, WaterSuppliers.ContactName, WaterSuppliers.Address, WaterSuppliers.City, states.Id, WaterSuppliers.ZIP,
@@ -19,7 +19,7 @@ BEGIN TRY
         WaterSuppliers.LetterContactCompanyName, WaterSuppliers.LetterContactContactName, WaterSuppliers.LetterContactAddress,
         WaterSuppliers.LetterContactCity, letterContactStates.Id, WaterSuppliers.LetterContactZIP,
         WaterSuppliers.LetterContactPhoneNumber, WaterSuppliers.LetterContactFaxNumber, WaterSuppliers.LetterContactEmailAddress,
-        WaterSuppliers.GISCenterLatitude, WaterSuppliers.GISCenterLongitude, WaterSuppliers.GISCenterZoom
+        WaterSuppliers.GISCenterLatitude, WaterSuppliers.GISCenterLongitude, WaterSuppliers.GISCenterZoom, WaterSuppliers.Active
     FROM WaterSuppliers
     LEFT JOIN Envirotrax2Dev.dbo.States AS states
         ON states.Code = WaterSuppliers.State
@@ -39,7 +39,7 @@ BEGIN TRY
              LetterCompanyName, LetterContactName, LetterAddress, LetterCity, LetterStateId, LetterZipCode,
              LetterContactCompanyName, LetterContactContactName, LetterContactAddress, LetterContactCity,
              LetterContactStateId, LetterContactZipCode, LetterContactPhoneNumber, LetterContactFaxNumber, LetterContactEmailAddress,
-             GisCenterLatitude, GisCenterLongitude, GisCenterZoom)
+             GisCenterLatitude, GisCenterLongitude, GisCenterZoom, IsActive)
         SELECT
             WaterSuppliers.[Name], WaterSuppliers.Subdomain, WaterSuppliers.ID, parents.Id,
             WaterSuppliers.PwsID, WaterSuppliers.ContactName, WaterSuppliers.Address, WaterSuppliers.City, states.Id, WaterSuppliers.ZIP,
@@ -49,7 +49,7 @@ BEGIN TRY
             WaterSuppliers.LetterContactCompanyName, WaterSuppliers.LetterContactContactName, WaterSuppliers.LetterContactAddress,
             WaterSuppliers.LetterContactCity, letterContactStates.Id, WaterSuppliers.LetterContactZIP,
             WaterSuppliers.LetterContactPhoneNumber, WaterSuppliers.LetterContactFaxNumber, WaterSuppliers.LetterContactEmailAddress,
-            WaterSuppliers.GISCenterLatitude, WaterSuppliers.GISCenterLongitude, WaterSuppliers.GISCenterZoom
+            WaterSuppliers.GISCenterLatitude, WaterSuppliers.GISCenterLongitude, WaterSuppliers.GISCenterZoom, WaterSuppliers.Active
         FROM WaterSuppliers
         INNER JOIN Envirotrax2Dev.dbo.WaterSuppliers AS parents
             ON parents.LegacyRecordId = WaterSuppliers.MasterWaterSupplierID

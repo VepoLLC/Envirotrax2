@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Envirotrax.App.Server.Data.Models.States;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.Common.Data.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Envirotrax.App.Server.Data.Models.WaterSuppliers;
 
@@ -108,4 +110,14 @@ public class WaterSupplier : TenantBase, IAuditableModel<AppUser>
 
     [NotMapped]
     public const string EnvirotraxAdminDomain = "vepollc";
+}
+
+public class WaterSupplierConfiguration : IEntityTypeConfiguration<WaterSupplier>
+{
+    public void Configure(EntityTypeBuilder<WaterSupplier> builder)
+    {
+        builder.HasOne(ws => ws.GeneralSettings)
+            .WithOne(gs => gs.WaterSupplier)
+            .HasForeignKey<GeneralSettings>(gs => gs.WaterSupplierId);
+    }
 }

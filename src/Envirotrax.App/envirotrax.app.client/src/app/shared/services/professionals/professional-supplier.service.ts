@@ -32,13 +32,17 @@ export class ProfessionalSupplierService {
         return lastValueFrom(obsertvable);
     }
 
-    public async getMyAsOptions(options?: MySupplierFilterOptions): Promise<InputOption[]> {
+    public async getMyAsOptions(options?: MySupplierFilterOptions): Promise<InputOption<ProfessionalWaterSupplier>[]> {
         const suppliers = await this.getAllMy(options);
         return [
             { id: '', text: 'Select a water supplier' },
             ...suppliers.data
                 .filter(s => s.waterSupplier?.id)
-                .map(s => ({ id: String(s.waterSupplier!.id!), text: s.waterSupplier!.name ?? '' }))
+                .map(s => ({
+                    id: s.waterSupplier!.id!,
+                    text: s.waterSupplier!.name ?? '',
+                    data: s
+                }))
         ];
     }
 
@@ -98,5 +102,5 @@ export interface MySupplierFilterOptions {
     hasCsiInspection?: boolean;
     hasBackflowTesting?: boolean;
     hasFogInspection?: boolean;
-    hasFogTransportation: boolean;
+    hasFogTransportation?: boolean;
 }

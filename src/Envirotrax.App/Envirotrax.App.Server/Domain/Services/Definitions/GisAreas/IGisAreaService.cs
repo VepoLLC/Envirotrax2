@@ -6,6 +6,8 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.GisAreas;
 public interface IGisAreaService : IService<GisArea, GisAreaDto>
 {
     Task<IEnumerable<GisAreaDto>> GetAllActiveAsync(CancellationToken cancellationToken);
+    Task<IEnumerable<GisAreaDto>> GetAllActiveBySupplierAsync(int waterSupplierId, CancellationToken cancellationToken);
     Task<DefaultGiisMapViewDto> GetDefaultMapViewAsync(CancellationToken cancellationToken);
+    Task<DefaultGiisMapViewDto> GetDefaultMapViewBySupplierAsync(int waterSupplierId, CancellationToken cancellationToken);
     Task<DefaultGiisMapViewDto> UpdateDefaultMapViewAsync(DefaultGiisMapViewDto mapView);
 }

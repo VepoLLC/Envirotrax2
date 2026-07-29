@@ -6,6 +6,7 @@ import { FogInspection } from '../../../../shared/models/fog/fog-inspection';
 import { FogInspectionResult, FogReasonForInspection, fogReasonForInspectionLabels } from '../../../../shared/models/fog/fog-inspection-enums';
 import { FacilityType, facilityTypeLabels } from '../../../../shared/enums/facility-type.enum';
 import { PropertyType } from '../../../../shared/enums/property-type.enum';
+import { DownloadService } from '../../../../shared/services/download.service';
 
 @Component({
     standalone: false,
@@ -28,13 +29,28 @@ export class FogInspectionViewComponent implements OnInit {
     constructor(
         private readonly _destroyRef: DestroyRef,
         private readonly _route: ActivatedRoute,
-        private readonly _inspectionService: ProfessionalFogInspectionService
+        private readonly _inspectionService: ProfessionalFogInspectionService,
+        private readonly _downloadService: DownloadService
     ) {}
 
     public ngOnInit(): void {
         this._route.paramMap
             .pipe(takeUntilDestroyed(this._destroyRef))
             .subscribe((params: ParamMap) => this.loadInspection(params.get('id')));
+    }
+
+    public async exportPdf(): Promise<void> {
+        if (this.inspection?.id == null) {
+            return;
+        }
+
+        try {
+            this.isLoading = true;
+            const blob = await this._inspectionService.getPdfForProfessional(this.inspection.id);
+            this._downloadService.downloadFileFromBlob(blob);
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     private async loadInspection(idParam: string | null): Promise<void> {

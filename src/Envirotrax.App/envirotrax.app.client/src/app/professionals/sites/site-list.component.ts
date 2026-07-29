@@ -204,8 +204,9 @@ export class SiteListComponent implements OnInit {
     }
 
     public async searchMap(searchForm: NgForm): Promise<void> {
+        searchForm.form.markAllAsTouched();
+
         if (!searchForm.valid) {
-            (searchForm as { submitted: boolean }).submitted = true;
             return;
         }
 

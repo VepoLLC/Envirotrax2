@@ -107,16 +107,6 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         return dto;
     }
 
-    public Task<byte[]> GeneratePdfAsync(FogTripTicketDto ticket)
-    {
-        return GeneratePdfAsync([ticket]);
-    }
-
-    public Task<byte[]> GeneratePdfAsync(IEnumerable<FogTripTicketDto> tickets)
-    {
-        return _pdfTemplateService.GenerateAsync("Fog.FogTripTicket", tickets);
-    }
-
     public Task<byte[]> GeneratePdfForProfessionalAsync(FogTripTicketDto ticket)
     {
         if (ticket.TransactionId == null)

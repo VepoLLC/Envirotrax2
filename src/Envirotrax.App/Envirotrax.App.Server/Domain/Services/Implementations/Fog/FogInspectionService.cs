@@ -58,6 +58,16 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         return _pdfTemplateService.GenerateAsync("Fog.FogInspection", inspections);
     }
 
+    public Task<byte[]> GeneratePdfForProfessionalAsync(FogInspectionDto inspection)
+    {
+        if (inspection.TransactionId == null)
+        {
+            throw new ValidationException("Report can't be downloaded until it's paid. Please go to checkout and pay for this transaction, then try downloading again.");
+        }
+
+        return GeneratePdfAsync(inspection);
+    }
+
     public override async Task<FogInspectionDto?> DeleteAsync(int id)
     {
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);

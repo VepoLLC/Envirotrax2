@@ -40,10 +40,12 @@ export interface FogTripTicket {
     transporterFaxNumber?: string;
     transporterEmailAddress?: string;
     transporterSignaturePath?: string;
+    transporterSignatureUrl?: string;
 
     generatorContactName?: string;
     generatorSignaturePath?: string;
     generatorSignatureDate?: string;
+    generatorSignatureUrl?: string;
 
     interceptorType?: string;
     interceptorOtherDescription?: string;
@@ -78,6 +80,7 @@ export interface FogTripTicket {
     receiverWasteDeliveredDate?: string;
     receiverSignaturePath?: string;
     receiverSignatureDate?: string;
+    receiverSignatureUrl?: string;
 
     pickupCompleted?: boolean;
     completed?: boolean;

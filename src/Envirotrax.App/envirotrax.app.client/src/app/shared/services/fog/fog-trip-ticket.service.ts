@@ -35,6 +35,21 @@ export class FogTripTicketService {
         return lastValueFrom(this._http.get<FogTripTicket>(url));
     }
 
+    public getByIdForProfessional(id: number): Promise<FogTripTicket> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/fog/trip-tickets/${id}`);
+        return lastValueFrom(this._http.get<FogTripTicket>(url));
+    }
+
+    public updateApproval(id: number, disapproved: boolean): Promise<FogTripTicket> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/trip-tickets/${id}/approval`);
+        return lastValueFrom(this._http.put<FogTripTicket>(url, disapproved));
+    }
+
+    public getPdf(id: number): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/trip-tickets/${id}/pdf`);
+        return lastValueFrom(this._http.get(url, { responseType: 'blob' }));
+    }
+
     public async searchForProfessional(pageInfo: PageInfo, query: Query, waterSupplierId?: number): Promise<PagedData<FogTripTicket>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/fog/trip-tickets');
         let params = this._queryHelper.buildQuery(pageInfo, query);
@@ -49,6 +64,11 @@ export class FogTripTicketService {
     public deleteForProfessional(id: number): Promise<FogTripTicket> {
         const url = this._urlResolver.resolveUrl(`/api/professionals/fog/trip-tickets/${id}`);
         return lastValueFrom(this._http.delete<FogTripTicket>(url));
+    }
+
+    public getPdfForProfessional(id: number): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/fog/trip-tickets/${id}/pdf`);
+        return lastValueFrom(this._http.get(url, { responseType: 'blob' }));
     }
 
     public submit(ticket: FogTripTicket, images: FogTripTicketImages = {}): Promise<FogTripTicket> {

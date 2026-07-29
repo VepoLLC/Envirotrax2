@@ -1,0 +1,248 @@
+<h1 class="text-center h2">FOG Trip Ticket</h1>
+
+<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+<div *ngIf="!isLoading && ticket">
+
+    <!-- Water Supplier -->
+    <vp-section header="Water Supplier" class="d-block">
+        <div class="row">
+            <div class="col-lg-6">
+                <dl class="row mb-0">
+                    <dt class="col-5">Water Supplier:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.waterSupplier?.name }}</dd>
+                    <dt class="col-5">Address:</dt>
+                    <dd class="col-7 mb-1">
+                        {{ ticket.waterSupplier?.address }}<br *ngIf="ticket.waterSupplier?.address">
+                        {{ ticket.waterSupplier?.city }}<span
+                              *ngIf="ticket.waterSupplier?.city && ticket.waterSupplier?.state?.name">,
+                        </span>{{ ticket.waterSupplier?.state?.name }} {{ ticket.waterSupplier?.zipCode }}
+                    </dd>
+                </dl>
+            </div>
+            <div class="col-lg-6">
+                <dl class="row mb-0">
+                    <dt class="col-5">PWS ID:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.waterSupplier?.pwsId }}</dd>
+                    <dt class="col-5">Contact Name:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.waterSupplier?.contactName }}</dd>
+                    <dt class="col-5">Phone Number:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.waterSupplier?.phoneNumber }}</dd>
+                    <dt class="col-5">Email Address:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.waterSupplier?.emailAddress }}</dd>
+                </dl>
+            </div>
+        </div>
+    </vp-section>
+
+    <!-- Generator Information -->
+    <vp-section header="Generator Information" class="mt-3 d-block">
+        <div class="row">
+            <div class="col-lg-6">
+                <dl class="row mb-0">
+                    <dt class="col-5">Property Type:</dt>
+                    <dd class="col-7 mb-1">
+                        {{ ticket.propertyType === PropertyType.Residential ? 'Residential' : 'Commercial' }}
+                    </dd>
+                    <dt class="col-5">Business Name:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.propertyBusinessName }}</dd>
+                    <dt class="col-5">Property Address:</dt>
+                    <dd class="col-7 mb-1">
+                        {{ ticket.propertyStreetNumber }} {{ ticket.propertyStreetName }}<span
+                              *ngIf="ticket.propertyNumber"> #{{ ticket.propertyNumber }}</span><br>
+                        {{ ticket.propertyCity }}<span
+                              *ngIf="ticket.propertyCity && ticket.propertyState?.code">,
+                        </span>{{ ticket.propertyState?.code }} {{ ticket.propertyZip }}
+                    </dd>
+                </dl>
+            </div>
+            <div class="col-lg-6">
+                <dl class="row mb-0">
+                    <dt class="col-5">This Waste was Removed From:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.interceptorType }} {{ ticket.interceptorOtherDescription }}</dd>
+                    <dt class="col-5">Waste Trap or Tank Capacity:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.interceptorCapacity }} {{ interceptorCapacityLabel }}</dd>
+                    <dt class="col-5">Amount of Waste Removed:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.interceptorWasteRemovedAmount }} {{ wasteRemovedLabel }}</dd>
+                </dl>
+            </div>
+        </div>
+
+        <p class="mt-3 mb-3">
+            As the generator or generator's authorized representative, I certify that the above information is
+            correct. I further certify that this trap or tank contains no chemical or hazardous waste material and
+            is being transported to a facility that is authorized to receive this waste. I am aware that
+            falsification of this trip ticket may result in fines levied by water purveyor, city, state or federal
+            authorities.
+        </p>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <p class="fw-semibold mb-1">Generator Name:</p>
+                <p class="mb-0">{{ ticket.generatorContactName }}</p>
+            </div>
+            <div class="col-lg-6">
+                <p class="fw-semibold mb-1">Generator Signature:</p>
+                <img *ngIf="ticket.generatorSignatureUrl" [src]="ticket.generatorSignatureUrl"
+                     alt="Generator Signature" class="img-fluid" style="max-height: 100px;">
+            </div>
+        </div>
+    </vp-section>
+
+    <!-- Remark -->
+    <vp-section header="Remark" class="mt-3 d-block">
+        <p class="mb-0">{{ ticket.comments }}</p>
+    </vp-section>
+
+    <!-- Transporter Information -->
+    <vp-section header="Transporter Information" class="mt-3 d-block">
+        <div class="row mb-2">
+            <div class="col-lg-6">
+                <dl class="row mb-0">
+                    <dt class="col-5">Company Name:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.transporterCompanyName }}</dd>
+                    <dt class="col-5">Address:</dt>
+                    <dd class="col-7 mb-1">
+                        {{ ticket.transporterAddress }}<br *ngIf="ticket.transporterAddress">
+                        {{ ticket.transporterCity }}<span
+                              *ngIf="ticket.transporterCity && ticket.transporterState">,
+                        </span>{{ ticket.transporterState }} {{ ticket.transporterZip }}
+                    </dd>
+                </dl>
+            </div>
+            <div class="col-lg-6">
+                <dl class="row mb-0">
+                    <dt class="col-5">Registration Number:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.transporterLicenseNumber }}</dd>
+                    <dt class="col-5">Email Address:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.transporterEmailAddress }}</dd>
+                    <dt class="col-5">Phone Number:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.transporterWorkNumber }}</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-3 d-flex">
+                <div class="fw-bold">Vehicle: </div>
+                <span class="ms-2"> {{ ticket.vehicleYear }} {{ ticket.vehicleManufacturer }}</span>
+            </div>
+            <div class="col-md-3 d-flex">
+                <div class="fw-bold">License Plate #: </div>
+                <span class="ms-2"> {{ ticket.vehicleYear }} {{ ticket.vehicleManufacturer }}</span>
+            </div>
+            <div class="col-md-3 d-flex">
+                <div class="fw-bold">Sticker #: </div>
+                <span class="ms-2">{{ ticket.vehicleStickerNumber }} </span>
+            </div>
+            <div class="col-md-3 d-flex">
+                <div class="fw-bold">Capacity: </div>
+                <span class="ms-2">{{ ticket.vehicleCapacity }} {{ vehicleCapacityLabel }} </span>
+            </div>
+        </div>
+
+        <p class="mt-3 mb-3">
+            On {{ ticket.interceptorWasteRemovedDate | date:'M/d/yyyy' }} at
+            {{ ticket.interceptorWasteRemovedDate | date:'h:mm a' }}, I collected and began the transport of 
+            <span class="fw-bold">{{ ticket.interceptorWasteRemovedAmount }} {{ wasteRemovedLabel }}</span>
+             of the waste described under
+            "Generator Information" above to:
+        </p>
+
+        <div class="row mt-3">
+            <div class="col-md-6 d-flex">
+                <div class="fw-bold">Waste Receiver: </div>
+                <span class="ms-2"> {{ ticket.receiverCompanyName }}</span>
+            </div>
+            <div class="col-md-6 d-flex">
+                <div class="fw-bold">Registration Number: </div>
+                <span class="ms-2"> {{ ticket.receiverRegistrationNumber }}</span>
+            </div>
+        </div>
+
+        <p class="mt-3 mb-3">
+            I certify that the information provided above is correct and that only the waste certified for removal
+            by the generator is contained in this waste transport vehicle. I am aware that falsification of this
+            trip ticket may result in revocation of my waste transportation permit, criminal prosecution, and/or
+            civil penalties.
+        </p>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <p class="fw-semibold mb-1">Driver Name:</p>
+                <p class="mb-0">{{ ticket.transporterContactName }}</p>
+            </div>
+            <div class="col-lg-6">
+                <p class="fw-semibold mb-1">Driver Signature:</p>
+                <img *ngIf="ticket.transporterSignatureUrl" [src]="ticket.transporterSignatureUrl"
+                     alt="Driver Signature" class="img-fluid" style="max-height: 100px;">
+            </div>
+        </div>
+    </vp-section>
+
+    <!-- Receiver Information -->
+    <vp-section header="Receiver Information" class="mt-3 d-block">
+        <div class="row">
+            <div class="col-lg-6">
+                <dl class="row mb-0">
+                    <dt class="col-5">Waste Receiver:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.receiverCompanyName }}</dd>
+                    <dt class="col-5">Address:</dt>
+                    <dd class="col-7 mb-1">
+                        {{ ticket.receiverAddress }}<br *ngIf="ticket.receiverAddress">
+                        {{ ticket.receiverCity }}<span
+                              *ngIf="ticket.receiverCity && ticket.receiverState">,
+                        </span>{{ ticket.receiverState }} {{ ticket.receiverZip }}
+                    </dd>
+                </dl>
+            </div>
+            <div class="col-lg-6">
+                <dl class="row mb-0">
+                    <dt class="col-5">Registration Number:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.receiverRegistrationNumber }}</dd>
+                    <dt class="col-5">Email Address:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.receiverEmailAddress }}</dd>
+                    <dt class="col-5">Phone Number:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.receiverPhoneNumber }}</dd>
+                </dl>
+            </div>
+        </div>
+
+        <p class="mt-3 mb-1">
+            As the representative of this business, I certify that each of the following statements are true:
+        </p>
+        <ul class="mb-3">
+            <li>
+                The Texas Commission on Environmental Quality has authorized this business to accept the waste
+                specified under "Generator Information" above.
+            </li>
+            <li>
+                The transporter named above delivered of <span class="fw-bold">{{ ticket.interceptorWasteRemovedAmount }} {{ wasteRemovedLabel }}</span> to this business on
+                {{ ticket.receiverWasteDeliveredDate | date:'M/d/yyyy' }} at
+                {{ ticket.receiverWasteDeliveredDate | date:'h:mm a' }}.
+            </li>
+            <li>
+                The waste has been recycled or disposed of as required by the TCEQ authorization for this business.
+            </li>
+        </ul>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <p class="fw-semibold mb-1">Receiver Name:</p>
+                <p class="mb-0">{{ ticket.receiverContactName }}</p>
+            </div>
+            <div class="col-lg-6">
+                <p class="fw-semibold mb-1">Receiver Signature:</p>
+                <img *ngIf="ticket.receiverSignatureUrl" [src]="ticket.receiverSignatureUrl"
+                     alt="Receiver Signature" class="img-fluid" style="max-height: 100px;">
+            </div>
+        </div>
+    </vp-section>
+
+    <div class="d-flex justify-content-center mt-3">
+        <button class="btn btn-primary vp-section-button" [disabled]="isLoading" (click)="exportPdf()">
+            Export to Printable Document
+        </button>
+    </div>
+
+</div>

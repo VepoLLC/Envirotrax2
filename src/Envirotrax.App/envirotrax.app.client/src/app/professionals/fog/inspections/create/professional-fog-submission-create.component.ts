@@ -8,6 +8,7 @@ import { ProfesisonalService } from "../../../../shared/services/professionals/p
 import { ProfesionalUserService } from "../../../../shared/services/professionals/professional-user.service";
 import { SiteService } from "../../../../shared/services/sites/site.service";
 import { ProfessionalSupplierService } from "../../../../shared/services/professionals/professional-supplier.service";
+import { CheckoutService } from "../../../../shared/services/professionals/checkout.service";
 import { Professional } from "../../../../shared/models/professionals/professional";
 import { ProfessionalUser } from "../../../../shared/models/professionals/professional-user";
 import { ProfessionalWaterSupplier } from "../../../../shared/models/professionals/professional-water-supplier";
@@ -93,7 +94,8 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
         private readonly _professionalSupplierService: ProfessionalSupplierService,
         private readonly _inspectionService: ProfessionalFogInspectionService,
         private readonly _fogOptions: FogInspectionOptionsService,
-        private readonly _modalHelper: ModalHelperService
+        private readonly _modalHelper: ModalHelperService,
+        private readonly _checkoutService: CheckoutService
     ) {
         this.interceptorTypeOptions = this._fogOptions.interceptorTypeOptions;
         this.capacityTypeOptions = this._fogOptions.capacityTypeOptions;
@@ -207,6 +209,7 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
                 inspector: { id: this.selectedFogUserId }
             }, this.images);
             this.submitSuccess = true;
+            this._checkoutService.refresh();
         } finally {
             this.isLoading = false;
         }

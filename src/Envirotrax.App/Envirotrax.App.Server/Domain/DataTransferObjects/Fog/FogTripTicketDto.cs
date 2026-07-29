@@ -106,6 +106,13 @@ public class FogTripTicketDto : IDto
 
     public DateTime? GeneratorSignatureDate { get; set; }
 
+    // Signature download URLs (generated SAS URLs; not persisted)
+    public string? GeneratorSignatureUrl { get; set; }
+
+    public string? ReceiverSignatureUrl { get; set; }
+
+    public string? TransporterSignatureUrl { get; set; }
+
     // Interceptor
     [StringLength(50)]
     public string? InterceptorType { get; set; }

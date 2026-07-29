@@ -5,6 +5,7 @@ import { FogInspectionViewComponent } from "./inspections/view/fog-inspection-vi
 import { ProfessionalFogSubmissionPropertySearchComponent } from "./inspections/create/professional-fog-submission-property-search.component";
 import { ProfessionalFogSubmissionCreateComponent } from "./inspections/create/professional-fog-submission-create.component";
 import { ProfessionalFogTripTicketListComponent } from "./trip-tickets/list/professional-fog-trip-ticket-list.component";
+import { ProfessionalFogTripTicketViewComponent } from "./trip-tickets/view/professional-fog-trip-ticket-view.component";
 import { ProfessionalFogTripTicketSubmissionPropertySearchComponent } from "./trip-tickets/create/professional-fog-trip-ticket-submission-property-search.component";
 import { ProfessionalFogTripTicketSubmissionCreateComponent } from "./trip-tickets/create/professional-fog-trip-ticket-submission-create.component";
 
@@ -47,7 +48,7 @@ const routes: Routes = [
     {
         path: 'trip-tickets/:id',
         title: 'View FOG Trip Ticket',
-        component: ProfessionalFogTripTicketListComponent
+        component: ProfessionalFogTripTicketViewComponent
     }
 ];
 

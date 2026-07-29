@@ -6,7 +6,7 @@
     </header>
 
     <div class="text-center mb-3">
-        <ul class="vp-tabs nav nav-pills settings-tabs d-inline-flex">
+        <ul class="vp-tabs nav nav-pills settings-tabs d-inline-flex vp-tabs-desktop">
             <li *ngIf="hasBackflowTesting" class="nav-item">
                 <a class="nav-link" [class.active]="activeTab === 'backflow'" (click)="setActiveTab('backflow')">
                     <i class="fa-regular fa-gauge me-2"></i>Backflow Tester
@@ -28,6 +28,26 @@
                 </a>
             </li>
         </ul>
+
+        <vp-dropdown class="vp-tabs-mobile"
+                     [label]="getTabLabel(activeTab)"
+                     [iconCss]="getTabIcon(activeTab) + ' me-2'"
+                     [showCaret]="true"
+                     placement="top"
+                     buttonClass="btn-primary">
+            <vp-dropdown-option *ngIf="hasBackflowTesting && activeTab !== 'backflow'" (click)="setActiveTab('backflow')">
+                <i class="fa-regular fa-gauge me-2"></i>Backflow Tester
+            </vp-dropdown-option>
+            <vp-dropdown-option *ngIf="hasCsiInspection && activeTab !== 'csi'" (click)="setActiveTab('csi')">
+                <i class="fa-solid fa-building-magnifying-glass me-2"></i>CSI Inspector
+            </vp-dropdown-option>
+            <vp-dropdown-option *ngIf="hasFogInspection && activeTab !== 'fogInspection'" (click)="setActiveTab('fogInspection')">
+                <i class="fa-regular fa-tank-water me-2"></i>FOG Inspector
+            </vp-dropdown-option>
+            <vp-dropdown-option *ngIf="hasFogTransportation && activeTab !== 'fogTransport'" (click)="setActiveTab('fogTransport')">
+                <i class="fa-regular fa-tank-water me-2"></i>FOG Transporter
+            </vp-dropdown-option>
+        </vp-dropdown>
     </div>
 
     <vp-section header="Water Suppliers">

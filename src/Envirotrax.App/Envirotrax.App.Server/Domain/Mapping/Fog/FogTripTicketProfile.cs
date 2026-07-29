@@ -13,14 +13,14 @@ public class FogTripTicketProfile : Profile
     public FogTripTicketProfile()
     {
         CreateMap<FogTripTicket, FogTripTicketDto>()
-            .ForMember(dest => dest.WaterSupplier, opt => opt.Ignore())
             .ForMember(dest => dest.Site, opt => opt.Ignore())
             .ForMember(dest => dest.PropertyState, opt => opt.Ignore())
+            .ForMember(dest => dest.GeneratorSignatureUrl, opt => opt.Ignore())
+            .ForMember(dest => dest.ReceiverSignatureUrl, opt => opt.Ignore())
+            .ForMember(dest => dest.TransporterSignatureUrl, opt => opt.Ignore())
             .AfterMap((model, dto) =>
             {
-                dto.WaterSupplier ??= model.WaterSupplier != null
-                    ? new ReferencedWaterSupplierDto { Id = model.WaterSupplierId, Name = model.WaterSupplier.Name }
-                    : new ReferencedWaterSupplierDto { Id = model.WaterSupplierId };
+                dto.WaterSupplier ??= new ReferencedWaterSupplierDto { Id = model.WaterSupplierId };
 
                 dto.Site ??= new ReferencedSiteDto { Id = model.SiteId };
                 dto.Professional ??= new ReferencedProfessionalDto { Id = model.ProfessionalId };

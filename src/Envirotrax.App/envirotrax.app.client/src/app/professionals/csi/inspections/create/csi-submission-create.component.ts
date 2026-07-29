@@ -15,6 +15,7 @@ import { Site } from '../../../../shared/models/sites/site';
 import { CsiInspectionReason, csiInspectionReasonLabels } from '../../../../shared/enums/csi-inspection-reason.enum';
 import { MAX_PAGE_SIZE } from '../../../../shared/models/page-info';
 import { ProfessionalSupplierService } from '../../../../shared/services/professionals/professional-supplier.service';
+import { CheckoutService } from '../../../../shared/services/professionals/checkout.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { InputOption } from '@envirotrax/common-ui';
 
@@ -88,7 +89,8 @@ export class CsiSubmissionCreateComponent implements OnInit {
         private readonly _siteService: SiteService,
         private readonly _inspectionService: CsiInspectionService,
         private readonly _professionalSupplierService: ProfessionalSupplierService,
-        private readonly _toastService: ToastService
+        private readonly _toastService: ToastService,
+        private readonly _checkoutService: CheckoutService
     ) { }
 
     public ngOnInit(): void {
@@ -177,6 +179,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
                 this._toastService.failedToSave('One or more images');
             }
             this.submitSuccess = true;
+            this._checkoutService.refresh();
         } finally {
             this.isLoading = false;
         }

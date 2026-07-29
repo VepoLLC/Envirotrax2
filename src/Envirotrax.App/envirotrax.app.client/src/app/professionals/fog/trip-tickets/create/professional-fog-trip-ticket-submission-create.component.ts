@@ -20,6 +20,8 @@ import { FogDisposalSite } from "../../../../shared/models/fog/fog-disposal-site
 import { FogVehicleCapacityType } from "../../../../shared/models/fog/fog-vehicle-enums";
 import { FogTripTicket } from "../../../../shared/models/fog/fog-trip-ticket";
 import { FogTripTicketImages } from "../../../../shared/models/fog/fog-trip-ticket-images";
+import { WaterSupplier } from "../../../../shared/models/water-suppliers/water-supplier";
+import { LookupService } from "../../../../shared/services/lookup/lookup.service";
 import { MAX_PAGE_SIZE } from "../../../../shared/models/page-info";
 import { InputOption, ModalHelperService } from "@envirotrax/common-ui";
 import { WaterSupplier } from "../../../../shared/models/water-suppliers/water-supplier";
@@ -56,6 +58,8 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
     public selectedTransporter?: ProfessionalUser;
     public selectedVehicle?: FogVehicle;
     public selectedDisposalSite?: FogDisposalSite;
+    public selectedWaterSupplier?: WaterSupplier;
+    public selectedWaterSupplierStateName?: string;
 
     public checks: VerificationCheck[] = [];
     public verificationPassed = false;
@@ -63,11 +67,12 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
     public readonly FogVehicleCapacityType = FogVehicleCapacityType;
 
     public readonly interceptorTypeOptions: InputOption[] = [
-        { id: '', text: 'Select Trap/Tank Type' },
+        { id: '', text: 'Select Tank/Trap Type' },
         { id: 'Grease Trap', text: 'Grease Trap' },
         { id: 'Grit Trap', text: 'Grit Trap' },
         { id: 'Septic Tank', text: 'Septic Tank' },
         { id: 'Chemical Toilet', text: 'Chemical Toilet' },
+        { id: 'Lint Trap', text: 'Lint Trap' },
         { id: 'Other', text: 'Other' }
     ];
 
@@ -90,7 +95,9 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
 
     private _siteId = 0;
     private _transporterLicense?: ProfessionalUserLicense;
-    private readonly _availableSuppliers = new Map<number, WaterSupplier>();
+    private readonly _availableSuppliers = new Map<number, AvailableWaterSupplier>();
+    private readonly _myWaterSuppliers = new Map<number, WaterSupplier>();
+    private readonly _stateNamesById = new Map<number, string>();
 
     constructor(
         private readonly _activatedRoute: ActivatedRoute,
@@ -103,6 +110,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         private readonly _disposalSiteService: ProfessionalFogDisposalSiteService,
         private readonly _licenseService: ProfessionalUserLicenseService,
         private readonly _tripTicketService: FogTripTicketService,
+        private readonly _lookupService: LookupService,
         private readonly _modalHelper: ModalHelperService
     ) { }
 
@@ -125,6 +133,8 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
 
     public async onWaterSupplierChange(value: number): Promise<void> {
         this.selectedWaterSupplierId = value;
+        this.applySelectedWaterSupplier(value);
+
         await this.computeVerification();
     }
 
@@ -145,6 +155,14 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
     public onCommentsChange(value: string | undefined): void {
         this.model.comments = value;
         this.remarksLength = value?.length ?? 0;
+    }
+
+    public onRemovedAmountChange(value: string | number | undefined): void {
+        this.model.interceptorWasteRemovedAmount = this.toNonNegative(value);
+    }
+
+    public onCapacityChange(value: string | number | undefined): void {
+        this.model.interceptorCapacity = this.toNonNegative(value);
     }
 
     public openGeneratorSignature(): void {
@@ -235,9 +253,23 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         return new File([bytes], fileName, { type: mimeType });
     }
 
+    private toNonNegative(value: string | number | undefined): number | undefined {
+        if (value == null || value === '') {
+            return undefined;
+        }
+
+        const num = Number(value);
+
+        if (isNaN(num)) {
+            return undefined;
+        }
+
+        return num < 0 ? 0 : num;
+    }
+
     private collectValidationErrors(): void {
         if (!this.model.interceptorType) {
-            this.validationErrors.push('Please select a Waste Trap or Tank Type.');
+            this.validationErrors.push('Please select what the waste was removed from.');
         }
 
         if (this.model.interceptorType === 'Other' && !this.model.interceptorOtherDescription) {
@@ -269,12 +301,14 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         try {
             this.isLoading = true;
 
-            const [professional, transporterOptions, suppliersPage, disposalSiteOptions, vehicleOptions] = await Promise.all([
+            const [professional, transporterOptions, suppliersPage, availableSuppliers, disposalSiteOptions, vehicleOptions, states] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAllAsOptions(false, '', { filter: [{ columnName: 'isFogTransporter', comparisonOperator: 'Eq', value: 'true' }] }),
-                this._supplierService.getAllMy({ hasFogTransportation: true }),
+                this._supplierService.getAllMy(),
+                this._supplierService.getAllAvailableSuppliers({ pageSize: MAX_PAGE_SIZE }, {}),
                 this._disposalSiteService.getAllRegisteredAsOptions(true, 'Select a disposal site'),
-                this._vehicleService.getAllAsOptions(true, 'Select a transporter vehicle')
+                this._vehicleService.getAllAsOptions(true, 'Select a transporter vehicle'),
+                this._lookupService.getAllStates()
             ]);
 
             this.professional = professional;
@@ -289,10 +323,24 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
                     .map(s => ({ id: s.waterSupplier!.id, text: s.waterSupplier!.name ?? '' }))
             ];
 
-            this._availableSuppliers.clear();
+            this._myWaterSuppliers.clear();
             for (const supplier of suppliersPage.data) {
-                if (supplier.waterSupplier?.id) {
-                    this._availableSuppliers.set(supplier.waterSupplier!.id!, supplier.waterSupplier);
+                if (supplier.waterSupplier?.id != null) {
+                    this._myWaterSuppliers.set(supplier.waterSupplier.id, supplier.waterSupplier);
+                }
+            }
+
+            this._availableSuppliers.clear();
+            for (const supplier of availableSuppliers.data) {
+                if (supplier.id != null) {
+                    this._availableSuppliers.set(supplier.id, supplier);
+                }
+            }
+
+            this._stateNamesById.clear();
+            for (const state of states) {
+                if (state.id != null && state.name) {
+                    this._stateNamesById.set(state.id, state.name);
                 }
             }
 
@@ -300,7 +348,6 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
                 this.site = await this._siteService.getForProfessional(this._siteId);
                 this.model.fogGeneratorPhoneNumber = this.site.fogGeneratorPhoneNumber;
                 this.model.fogGeneratorEmailAddress = this.site.fogGeneratorEmailAddress;
-                this.model.generatorContactName = this.site.mailingContactName ?? undefined;
             }
 
             await this.setDefaults();
@@ -326,6 +373,19 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         } else if (registeredIds.length === 1) {
             this.selectedWaterSupplierId = registeredIds[0];
         }
+
+        this.applySelectedWaterSupplier(this.selectedWaterSupplierId);
+    }
+
+    private applySelectedWaterSupplier(waterSupplierId?: number): void {
+        this.selectedWaterSupplier = waterSupplierId != null
+            ? this._myWaterSuppliers.get(waterSupplierId)
+            : undefined;
+
+        const stateId = this.selectedWaterSupplier?.state?.id;
+        this.selectedWaterSupplierStateName = stateId != null
+            ? this._stateNamesById.get(stateId)
+            : undefined;
     }
 
     private async computeVerification(): Promise<void> {

@@ -60,24 +60,29 @@ export class CheckoutBackflowComponent implements OnInit {
     }
 
     public async ngOnInit(): Promise<void> {
-        this.items.columns = this.getColumns();
+        try{
+            this.isLoading = true;
+            this.items.columns = this.getColumns();
 
-        const currentUser = await this._professionalUserService.getMyData();
-        this._currentUserId = currentUser.id;
-        this.reportFor = this.isAdmin ? '' : String(this._currentUserId);
+            const currentUser = await this._professionalUserService.getMyData();
+            this._currentUserId = currentUser.id;
+            this.reportFor = this.isAdmin ? '' : String(this._currentUserId);
 
-        if (this.isAdmin) {
-            const professional = await this._professionalService.getLoggedInProfessional();
-            this._professionalName = professional.name;
+            if (this.isAdmin) {
+                const professional = await this._professionalService.getLoggedInProfessional();
+                this._professionalName = professional.name;
 
-            const users = await this._professionalUserService.getAll(
-                { pageSize: MAX_PAGE_SIZE },
-                { sort: {}, filter: [{ columnName: 'isBackflowTester', comparisonOperator: 'Eq', value: 'true' }] }
-            );
-            this.reportForOptions = this.buildReportForOptions(users.data);
-        }
+                const users = await this._professionalUserService.getAll(
+                    { pageSize: MAX_PAGE_SIZE },
+                    { sort: {}, filter: [{ columnName: 'isBackflowTester', comparisonOperator: 'Eq', value: 'true' }] }
+                );
+                this.reportForOptions = this.buildReportForOptions(users.data);
+            }
 
-        await this.getBackflowTests();
+            await this.getBackflowTests();
+        }finally {
+            this.isLoading = false;
+        }       
     }
 
     private buildReportForOptions(otherUsers: { id?: number; contactName?: string }[]): InputOption[] {

@@ -19,7 +19,7 @@ import { AuthService } from "../../../shared/services/auth/auth.service";
 import { DownloadService } from "../../../shared/services/download.service";
 import { PrintableTableService } from "../../../shared/services/printable-table.service";
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
-import { PropertyLogCellComponent } from "./property-log-cell.component";
+import { PropertyLogCellComponent } from "../../../shared/components/data-components/table-cells/property-log-cell.component";
 
 const DAY_MS = 86400000;
 
@@ -211,15 +211,24 @@ export class BackflowComplianceManagementComponent implements OnInit {
 
     public async ngOnInit(): Promise<void> {
         this._containerHelper.setContainerVisibility(false);
-        this.canModify = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.Sites);
-        this.table.columns = this.getColumns();
 
-        await this.loadUsers();
+        // Show the spinner for the whole initial load — the permission check and user lookup run before
+        // getCompliance() would otherwise turn it on, which left the page blank until the data call started.
+        try {
+            this.table.isLoading = true;
 
-        this.table.query = this.buildQuery();
-        this.resultsHeaderPrefix = this.buildResultsHeaderPrefix();
+            this.canModify = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.Sites);
+            this.table.columns = this.getColumns();
 
-        await this.getCompliance();
+            await this.loadUsers();
+
+            this.table.query = this.buildQuery();
+            this.resultsHeaderPrefix = this.buildResultsHeaderPrefix();
+
+            await this.getCompliance();
+        } finally {
+            this.table.isLoading = false;
+        }
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {

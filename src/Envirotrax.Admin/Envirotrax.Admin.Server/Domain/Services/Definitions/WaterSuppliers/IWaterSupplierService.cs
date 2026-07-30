@@ -7,4 +7,10 @@ namespace Envirotrax.Admin.Server.Domain.Services.Definitions.WaterSuppliers;
 public interface IWaterSupplierService
 {
     Task<IPagedData<WaterSupplierDto>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+
+    Task<WaterSupplierDetailsDto?> GetDetailsAsync(int id, CancellationToken cancellationToken);
+
+    Task<IEnumerable<WaterSupplierUserAccountDto>> GetUserAccountsAsync(int id, CancellationToken cancellationToken);
+
+    Task<WaterSupplierDetailsDto?> UpdateDetailsAsync(int id, WaterSupplierDetailsDto details);
 }

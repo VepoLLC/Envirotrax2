@@ -102,6 +102,8 @@
                   (pageInfoChange)="getSuppliers()"
                   [(query)]="table.query"
                   (queryChange)="getSuppliers()"
-                  (queryReset)="getSuppliers()" />
+                  (queryReset)="getSuppliers()"
+                  [canViewDetails]="true"
+                  (viewDetails)="viewDetails($event)" />
     </vp-section>
 </div>

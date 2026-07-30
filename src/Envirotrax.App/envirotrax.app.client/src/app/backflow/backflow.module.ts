@@ -7,7 +7,6 @@ import { BackflowRoutingModule } from "./backflow-routing.module";
 import { BackflowTesterListComponent } from "./testers/list/backflow-tester-list.component";
 import { BackflowTestListComponent } from "./tests/backflow-test-list.component";
 import { BackflowComplianceManagementComponent } from "./reports/compliance/backflow-compliance-management.component";
-import { PropertyLogCellComponent } from "./reports/compliance/property-log-cell.component";
 import { BackflowTestDetailsComponent } from "./tests/details/backflow-test-details.component";
 import { BackflowTesterDetailsComponent } from "./testers/details/backflow-tester-details.component";
 import { BackflowOutOfServiceListComponent } from "./out-of-service/backflow-out-of-service-list.component";
@@ -35,7 +34,6 @@ import { BackflowTestDetailsSectionsModule } from "./tests/details/backflow-test
         BackflowTesterListComponent,
         BackflowTestListComponent,
         BackflowComplianceManagementComponent,
-        PropertyLogCellComponent,
         BackflowOutOfServiceListComponent,
         BackflowTestDetailsComponent,
         BackflowTestBpatInfoComponent,

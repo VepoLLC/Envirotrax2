@@ -28,6 +28,11 @@ public class AdminDbContext : TenantDbContext
         // Set no automatic tenant IDs. Admins can edit records from all tenants.
     }
 
+    protected override void SetSecurityProperties(object entity)
+    {
+        // Set no automatic tenant IDs. Admins can edit records from all tenants.
+    }
+
     protected override void SetupGlobalFiltering(ModelBuilder builder, IMutableEntityType entity)
     {
         // Do no filtering for admins. They can see everything.

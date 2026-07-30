@@ -20,4 +20,7 @@ public class WaterSupplierUser : TenantModel<WaterSupplier>
     [Required]
     [StringLength(100)]
     public string EmailAddress { get; set; } = null!;
+
+    [StringLength(25)]
+    public string? CellNumber { get; set; }
 }

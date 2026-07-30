@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.WaterSuppliers;
 
-public class BackflowSettingsRepository : Repository<BackflowSettings>, IBackflowSettingsRepository
+public class BackflowSettingsRepository : TenantSettingsRepository<BackflowSettings>, IBackflowSettingsRepository
 {
     private readonly IAuthService _authService;
 

@@ -85,6 +85,11 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
 
         return MapToDto(user);
     }
+
+    public Task<IEnumerable<AdminWaterSupplierUserAccountDto>> GetAccountsForWaterSupplierAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        return _userRepository.GetAccountsWithPermissionsAsync(waterSupplierId, cancellationToken);
+    }
 }
 class UserInvitationDto
 {

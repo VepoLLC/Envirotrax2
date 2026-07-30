@@ -20,4 +20,21 @@ public class WaterSupplierService : IWaterSupplierService
     {
         return _apiClient.GetAsync<WaterSupplierDto>("/api/admin/water-suppliers", pageInfo, query, cancellationToken);
     }
+
+    public Task<WaterSupplierDetailsDto?> GetDetailsAsync(int id, CancellationToken cancellationToken)
+    {
+        return _apiClient.GetAsync<WaterSupplierDetailsDto>($"/api/admin/water-suppliers/{id}/details", cancellationToken);
+    }
+
+    public async Task<IEnumerable<WaterSupplierUserAccountDto>> GetUserAccountsAsync(int id, CancellationToken cancellationToken)
+    {
+        var accounts = await _apiClient.GetAsync<IEnumerable<WaterSupplierUserAccountDto>>($"/api/admin/water-suppliers/{id}/user-accounts", cancellationToken);
+
+        return accounts ?? [];
+    }
+
+    public Task<WaterSupplierDetailsDto?> UpdateDetailsAsync(int id, WaterSupplierDetailsDto details)
+    {
+        return _apiClient.PutAsync<WaterSupplierDetailsDto, WaterSupplierDetailsDto>($"/api/admin/water-suppliers/{id}/details", details, CancellationToken.None);
+    }
 }

@@ -34,6 +34,7 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
     {
         return base.GetDetailsQuery()
             .Include(supplier => supplier.Parent)
+            .Include(supplier => supplier.State)
             .WhereIf(!_tenantProvider.HasScope(ScopeDefinitions.AdminInternal), supplier => supplier.ParentId == _tenantProvider.WaterSupplierId);
     }
 
@@ -45,17 +46,25 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
 
     public override async Task<WaterSupplier?> UpdateAsync(WaterSupplier supplier)
     {
+        var isAdmin = _tenantProvider.HasScope(ScopeDefinitions.AdminInternal);
+
         var dbSupplier = await DbContext.WaterSuppliers
-            .SingleOrDefaultAsync(x =>
-                x.ParentId == _tenantProvider.WaterSupplierId &&
-                x.Id == supplier.Id);
+            .WhereIf(!isAdmin, x => x.ParentId == _tenantProvider.WaterSupplierId)
+            .SingleOrDefaultAsync(x => x.Id == supplier.Id);
 
         if (dbSupplier == null)
+        {
             return null;
+        }
 
-        dbSupplier.ParentId = _tenantProvider.WaterSupplierId;
+        if (!isAdmin)
+        {
+            dbSupplier.ParentId = _tenantProvider.WaterSupplierId;
+        }
+
         dbSupplier.Name = supplier.Name;
         dbSupplier.Domain = supplier.Domain;
+        dbSupplier.IsActive = supplier.IsActive;
         dbSupplier.UpdatedTime = DateTime.UtcNow;
         dbSupplier.ContactName = supplier.ContactName;
         dbSupplier.PwsId = supplier.PwsId;
@@ -68,7 +77,7 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
         dbSupplier.EmailAddress = supplier.EmailAddress;
 
         dbSupplier.LetterCompanyName = supplier.LetterCompanyName;
-        dbSupplier.LetterContactName = supplier.LetterContactContactName;
+        dbSupplier.LetterContactName = supplier.LetterContactName;
         dbSupplier.LetterAddress = supplier.LetterAddress;
         dbSupplier.LetterCity = supplier.LetterCity;
         dbSupplier.LetterStateId = supplier.LetterStateId;

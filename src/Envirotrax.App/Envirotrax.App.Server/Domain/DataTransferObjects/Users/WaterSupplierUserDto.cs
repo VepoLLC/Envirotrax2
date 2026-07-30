@@ -14,6 +14,9 @@ public class WaterSupplierUserDto : IDto
     [Required]
     [StringLength(100)]
     public string EmailAddress { get; set; } = null!;
+
+    [StringLength(25)]
+    public string? CellNumber { get; set; }
 }
 
 public class ReferencedWaterSupplierUserDto

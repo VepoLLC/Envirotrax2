@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
@@ -60,16 +59,7 @@ public class BackflowTestController : ProfessionalProtectedController
             return NotFound();
         }
 
-        byte[] pdf;
-        try
-        {
-            pdf = await _backflowTestService.GeneratePdfForProfessionalAsync(test);
-        }
-        catch (ValidationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
-
+        var pdf = await _backflowTestService.GeneratePdfForProfessionalAsync(test);
         return File(pdf, "application/pdf");
     }
 

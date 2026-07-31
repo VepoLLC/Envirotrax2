@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
@@ -42,16 +41,7 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
             return NotFound();
         }
 
-        byte[] pdf;
-        try
-        {
-            pdf = await _inspectionService.GeneratePdfForProfessionalAsync(inspection);
-        }
-        catch (ValidationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
-
+        var pdf = await _inspectionService.GeneratePdfForProfessionalAsync(inspection);
         return File(pdf, "application/pdf");
     }
 

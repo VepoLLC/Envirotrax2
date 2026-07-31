@@ -286,7 +286,7 @@ export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy 
     }
 
     private paidFilter(): QueryProperty {
-        return { columnName: 'transactionId', isValueNull: true, comparisonOperator: 'NotEq' };
+        return { columnName: 'transactionId', isValueNull: true, comparisonOperator: 'NotEq', logicalOperator: 'And' };
     }
 
     public async search(searchForm: NgForm): Promise<void> {

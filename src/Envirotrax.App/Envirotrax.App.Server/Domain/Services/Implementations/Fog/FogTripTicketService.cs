@@ -11,6 +11,7 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
+using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
@@ -111,7 +112,7 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
     {
         if (ticket.TransactionId == null)
         {
-            throw new ValidationException("Report can't be downloaded until it's paid. Please go to checkout and pay for this transaction, then try downloading again.");
+            throw new AppValidationException("Report can't be downloaded until it's paid. Please go to checkout and pay for this transaction, then try downloading again.");
         }
 
         return GeneratePdfAsync(ticket);

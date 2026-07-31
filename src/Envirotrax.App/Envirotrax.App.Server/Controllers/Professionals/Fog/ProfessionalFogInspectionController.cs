@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
@@ -61,16 +60,7 @@ public class ProfessionalFogInspectionController : ProfessionalProtectedControll
             return NotFound();
         }
 
-        byte[] pdf;
-        try
-        {
-            pdf = await _fogInspectionService.GeneratePdfForProfessionalAsync(inspection);
-        }
-        catch (ValidationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
-
+        var pdf = await _fogInspectionService.GeneratePdfForProfessionalAsync(inspection);
         return File(pdf, "application/pdf");
     }
 

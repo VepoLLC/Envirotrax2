@@ -3,7 +3,6 @@ import { Injectable } from "@angular/core";
 import { PagedData, PageInfo, Query, QueryHelperService, UrlResolverService } from "@envirotrax/common-ui";
 import { WaterSupplier } from "../../models/water-suppliers/water-supplier";
 import { WaterSupplierDetails } from "../../models/water-suppliers/water-supplier-details";
-import { WaterSupplierUserAccount } from "../../models/water-suppliers/water-supplier-user-account";
 import { lastValueFrom } from "rxjs";
 
 @Injectable({
@@ -29,19 +28,13 @@ export class WaterSupplierService {
     }
 
     public async getDetails(id: number): Promise<WaterSupplierDetails> {
-        const url = this._urlResolver.resolveUrl(`/api/water-suppliers/${id}/details`);
+        const url = this._urlResolver.resolveUrl(`/api/water-suppliers/${id}`);
 
         return await lastValueFrom(this._http.get<WaterSupplierDetails>(url));
     }
 
-    public async getUserAccounts(id: number): Promise<WaterSupplierUserAccount[]> {
-        const url = this._urlResolver.resolveUrl(`/api/water-suppliers/${id}/user-accounts`);
-
-        return await lastValueFrom(this._http.get<WaterSupplierUserAccount[]>(url));
-    }
-
     public async updateDetails(id: number, details: WaterSupplierDetails): Promise<WaterSupplierDetails> {
-        const url = this._urlResolver.resolveUrl(`/api/water-suppliers/${id}/details`);
+        const url = this._urlResolver.resolveUrl(`/api/water-suppliers/${id}`);
 
         return await lastValueFrom(this._http.put<WaterSupplierDetails>(url, details));
     }

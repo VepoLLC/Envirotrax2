@@ -58,7 +58,8 @@ public class SeedDataService : IHostedService
             _defaultTenant = new WaterSupplier
             {
                 Name = "Vepo LLC",
-                Domain = WaterSupplier.EnvirotraxAdminDomain
+                Domain = WaterSupplier.EnvirotraxAdminDomain,
+                ContactName = "John DeCell"
             };
 
             dbContext.WaterSuppliers.Add(_defaultTenant);
@@ -79,7 +80,8 @@ public class SeedDataService : IHostedService
             {
                 WaterSupplierId = _defaultTenant!.Id,
                 UserId = user.Id,
-                EmailAddress = _adminUserOptions.EmailAddress
+                EmailAddress = _adminUserOptions.EmailAddress,
+                ContactName = _adminUserOptions.EmailAddress.Split('@')[0]
             });
 
             await dbContext.SaveChangesAsync();

@@ -51,3 +51,6 @@ var provider = services.BuildServiceProvider();
 /***********************************************************************************************************************************************/
 var userService = provider.GetRequiredService<UserService>();
 await userService.MigrateAsync();
+
+var waterSupplierService = provider.GetRequiredService<WaterSupplierService>();
+await waterSupplierService.MigrateAsync();

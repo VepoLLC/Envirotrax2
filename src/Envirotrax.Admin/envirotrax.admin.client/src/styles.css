@@ -254,6 +254,14 @@ a:hover {
     margin-top: 9px;
 }
 
+/* While a dp-loading-spinner overlay is visible, lock scrolling on its scroll container so the content
+   underneath can't be scrolled behind the overlay. The shared spinner otherwise just repositions itself
+   on scroll (SpinnerParentDirective) and leaves the page scrollable. !important overrides Bootstrap's
+   overflow utilities (e.g. .overflow-y-auto), which are themselves !important. */
+[dp-spinner-parent]:has(dp-loading-spinner:not([hidden])) {
+    overflow: hidden !important;
+}
+
 .input-group .vp-input-container .form-control {
     margin-left: calc(-1 * var(--bs-border-width));
     border-top-left-radius: 0px;

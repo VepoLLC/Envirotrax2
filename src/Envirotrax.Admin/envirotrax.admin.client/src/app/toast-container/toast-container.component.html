@@ -1,0 +1,16 @@
+<div class="bottom-0 mt-2 position-fixed vp-toast-container">
+    <div *ngFor="let toast of toasts"
+         class="border p-3 rounded-2 rounded-start-0 shadow vp-toast mb-2"
+         role="alert"
+         aria-live="assertive"
+         aria-atomic="true"
+         [class.vp-active]="toast.isVisible"
+         [class.border-success]="toast.entity.type == toastType.Success"
+         [class.border-warning]="toast.entity.type == toastType.Warning"
+         [class.border-danger]="toast.entity.type == toastType.Error"
+         [class.text-bg-success]="toast.entity.type == toastType.Success"
+         [class.text-bg-warning]="toast.entity.type == toastType.Warning"
+         [class.text-bg-danger]="toast.entity.type == toastType.Error">
+        {{toast.entity.text}}
+    </div>
+</div>

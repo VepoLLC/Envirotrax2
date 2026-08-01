@@ -19,4 +19,6 @@ public interface IFogInspectionService : IService<FogInspection, FogInspectionDt
     Task<byte[]> GeneratePdfAsync(FogInspectionDto inspection);
 
     Task<byte[]> GeneratePdfAsync(IEnumerable<FogInspectionDto> inspections);
+
+    Task<byte[]> GeneratePdfForProfessionalAsync(FogInspectionDto inspection);
 }

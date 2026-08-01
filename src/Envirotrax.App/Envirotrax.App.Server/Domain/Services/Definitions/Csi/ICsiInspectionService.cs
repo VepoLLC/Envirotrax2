@@ -11,4 +11,5 @@ public interface ICsiInspectionService : IService<CsiInspection, CsiInspectionDt
     Task<CsiInspectionDto?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken);
     Task<byte[]> GeneratePdfAsync(CsiInspectionDto inspection);
     Task<byte[]> GeneratePdfAsync(IEnumerable<CsiInspectionDto> inspections);
+    Task<byte[]> GeneratePdfForProfessionalAsync(CsiInspectionDto inspection);
 }

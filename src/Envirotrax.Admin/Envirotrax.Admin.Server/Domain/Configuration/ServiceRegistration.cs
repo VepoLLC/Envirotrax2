@@ -24,6 +24,7 @@ public static class ServiceRegistration
 
         // Register services here:
         services.AddTransient<IWaterSupplierService, WaterSupplierService>();
+        services.AddTransient<IWaterSupplierUserService, WaterSupplierUserService>();
         services.AddTransient<ISiteService, SiteService>();
         services.AddTransient<ILookupService, LookupService>();
 

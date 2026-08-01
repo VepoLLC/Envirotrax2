@@ -2,6 +2,7 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
+using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
 using Envirotrax.Common;
@@ -17,19 +18,25 @@ public class ProfessionalDashboardController : ProfessionalProtectedController
     private readonly IProfessionalUserLicenseService _licenseService;
     private readonly IProfessionalInsuranceService _insuranceService;
     private readonly IBackflowGaugeService _gaugeService;
+    private readonly IFogVehicleService _vehicleService;
+    private readonly IFogTransporterDisposalSiteService _disposalSiteService;
 
     public ProfessionalDashboardController(
         IProfessionalSupplierService supplierService,
         IProfessionalUserService userService,
         IProfessionalUserLicenseService licenseService,
         IProfessionalInsuranceService insuranceService,
-        IBackflowGaugeService gaugeService)
+        IBackflowGaugeService gaugeService,
+        IFogVehicleService vehicleService,
+        IFogTransporterDisposalSiteService disposalSiteService)
     {
         _supplierService = supplierService;
         _userService = userService;
         _licenseService = licenseService;
         _insuranceService = insuranceService;
         _gaugeService = gaugeService;
+        _vehicleService = vehicleService;
+        _disposalSiteService = disposalSiteService;
     }
 
     [HttpGet("stats")]
@@ -37,6 +44,7 @@ public class ProfessionalDashboardController : ProfessionalProtectedController
     {
         var isAdmin        = User.IsInRole(RoleDefinitions.Professionals.Admin);
         var canAccessGauges = isAdmin || User.IsInRole(RoleDefinitions.Professionals.BackflowTester);
+        var canAccessTransportation = isAdmin || User.IsInRole(RoleDefinitions.Professionals.FogTransporter);
 
         var dto = new ProfessionalDashboardStatsDto();
 
@@ -57,6 +65,15 @@ public class ProfessionalDashboardController : ProfessionalProtectedController
         {
             var gaugeResult  = await _gaugeService.GetAllAsync(new PageInfo { PageSize = 1 }, new Query(), cancellationToken);
             dto.GaugeCount   = (int)(gaugeResult.PageInfo?.TotalItems ?? 0);
+        }
+
+        if (canAccessTransportation)
+        {
+            var vehicleResult     = await _vehicleService.GetAllAsync(new PageInfo { PageSize = 1 }, new Query(), cancellationToken);
+            var disposalSiteResult = await _disposalSiteService.GetRegisteredDisposalSitesAsync(new PageInfo { PageSize = 1 }, new Query(), cancellationToken);
+
+            dto.VehicleCount      = (int)(vehicleResult.PageInfo?.TotalItems      ?? 0);
+            dto.DisposalSiteCount = (int)(disposalSiteResult.PageInfo?.TotalItems ?? 0);
         }
 
         return Ok(dto);

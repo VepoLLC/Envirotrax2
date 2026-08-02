@@ -326,9 +326,24 @@
     </div>
 
     <vp-section header="Search Results ({{ table.items?.pageInfo?.totalItems }})">
+        <!-- Status legend (V1 Vepo parity): Active / Out of Area / Is Fee Exempt. -->
+        <div class="row gap-2 justify-content-center mb-3">
+            <div class="col-auto">
+                <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Active" />
+            </div>
+            <div class="col-auto">
+                <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Out of Area" />
+            </div>
+            <div class="col-auto">
+                <vp-status-icon imageSrc="/images/icons/bstatus-blue-on.png" text="Is Fee Exempt" />
+            </div>
+        </div>
+
         <vp-table *ngIf="table.items"
                   [columns]="table.columns!"
                   [data]="table.items.data"
+                  [canSelect]="true"
+                  (select)="openSite($event)"
                   [(pageInfo)]="table.items.pageInfo"
                   (pageInfoChange)="getSites()"
                   [(query)]="table.query"
@@ -338,12 +353,28 @@
 </div>
 
 <ng-template #statusCell let-rowData="rowData">
-    <span class="badge bg-success me-1" *ngIf="rowData?.active">Active</span>
-    <span class="badge bg-danger me-1" *ngIf="rowData?.outOfArea">Out of Area</span>
-    <span class="badge bg-primary" *ngIf="rowData?.isFeeExempt">Fee Exempt</span>
+    <!-- V1 (Vepo) Property Search status squares: always shown, filled (on) when true, outline (off) when false. -->
+    <div class="d-flex gap-1">
+        <vp-status-icon [imageSrc]="rowData?.active ? '/images/icons/bstatus-green-on.png' : '/images/icons/bstatus-green-off.png'"
+                        [text]="rowData?.active ? 'Active' : 'Inactive'"
+                        [showText]="false" />
+        <vp-status-icon [imageSrc]="rowData?.outOfArea ? '/images/icons/bstatus-red-on.png' : '/images/icons/bstatus-red-off.png'"
+                        [text]="rowData?.outOfArea ? 'Out of Area' : 'In Area'"
+                        [showText]="false" />
+        <vp-status-icon [imageSrc]="rowData?.isFeeExempt ? '/images/icons/bstatus-blue-on.png' : '/images/icons/bstatus-blue-off.png'"
+                        [text]="rowData?.isFeeExempt ? 'Is Fee Exempt' : 'Not Fee Exempt'"
+                        [showText]="false" />
+    </div>
 </ng-template>
 
 <ng-template #propertyTypeCell let-rowData="rowData">
-    <span *ngIf="rowData?.propertyType === propertyType.Residential">Residential</span>
-    <span *ngIf="rowData?.propertyType === propertyType.Commercial">Commercial</span>
+    <!-- Property-type icon (V1 Vepo / App parity): house = Residential, building = Commercial. -->
+    <i *ngIf="rowData?.propertyType === propertyType.Residential"
+       class="fa-solid fa-house text-primary"
+       title="Residential"
+       aria-label="Residential"></i>
+    <i *ngIf="rowData?.propertyType === propertyType.Commercial"
+       class="fa-solid fa-building text-danger"
+       title="Commercial"
+       aria-label="Commercial"></i>
 </ng-template>

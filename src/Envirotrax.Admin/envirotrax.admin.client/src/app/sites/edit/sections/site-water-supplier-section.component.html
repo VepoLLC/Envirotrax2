@@ -1,0 +1,41 @@
+<vp-section [header]="'Water Supplier - ' + (site.waterSupplier?.name || '')">
+    <div class="mb-3">
+        <label class="form-label mb-1">Water Supplier</label>
+        <input type="text" class="form-control" [value]="site.waterSupplier?.name || ''" readonly />
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <dl class="row mb-0">
+                <dt class="col-sm-4">Name</dt>
+                <dd class="col-sm-8">{{ site.waterSupplier?.name || '—' }}</dd>
+
+                <dt class="col-sm-4">Contact Name</dt>
+                <dd class="col-sm-8">{{ site.waterSupplier?.contactName || '—' }}</dd>
+
+                <dt class="col-sm-4">Address</dt>
+                <dd class="col-sm-8">
+                    <div>{{ site.waterSupplier?.address || '—' }}</div>
+                    @if (site.waterSupplier?.city || site.waterSupplier?.state?.name || site.waterSupplier?.zipCode) {
+                        <div>
+                            {{ site.waterSupplier?.city }}@if (site.waterSupplier?.city && (site.waterSupplier?.state?.name || site.waterSupplier?.zipCode)) {<span>, </span>}{{ site.waterSupplier?.state?.name }} {{ site.waterSupplier?.zipCode }}
+                        </div>
+                    }
+                </dd>
+            </dl>
+        </div>
+
+        <div class="col-md-6 mt-3 mt-md-0">
+            <dl class="row mb-0">
+                <dt class="col-sm-4">PWS ID</dt>
+                <dd class="col-sm-8">{{ site.waterSupplier?.pwsId || '—' }}</dd>
+
+                <dt class="col-sm-4">Phone Number</dt>
+                <dd class="col-sm-8">{{ site.waterSupplier?.phoneNumber || '—' }}</dd>
+
+                <dt class="col-sm-4">Email Address</dt>
+                <dd class="col-sm-8">{{ site.waterSupplier?.emailAddress || '—' }}</dd>
+            </dl>
+        </div>
+    </div>
+</vp-section>

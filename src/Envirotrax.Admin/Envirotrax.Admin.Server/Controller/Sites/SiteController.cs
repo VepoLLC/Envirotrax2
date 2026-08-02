@@ -24,4 +24,33 @@ public class SiteController : AdminBaseController
 
         return Ok(sites);
     }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetByIdAsync(int id, CancellationToken cancellationToken)
+    {
+        var site = await _siteService.GetByIdAsync(id, cancellationToken);
+
+        if (site == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(site);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAsync(int id, [FromBody] SiteUpdateDto dto, CancellationToken cancellationToken)
+    {
+        await _siteService.UpdateAsync(id, dto, cancellationToken);
+
+        return Ok();
+    }
+
+    [HttpPut("{id}/gis-data")]
+    public async Task<IActionResult> UpdateGisAsync(int id, [FromBody] SiteGisUpdateDto dto, CancellationToken cancellationToken)
+    {
+        await _siteService.UpdateGisAsync(id, dto, cancellationToken);
+
+        return Ok();
+    }
 }

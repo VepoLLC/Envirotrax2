@@ -12,6 +12,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
+using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Fog;
@@ -56,6 +57,16 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
     public Task<byte[]> GeneratePdfAsync(IEnumerable<FogInspectionDto> inspections)
     {
         return _pdfTemplateService.GenerateAsync("Fog.FogInspection", inspections);
+    }
+
+    public Task<byte[]> GeneratePdfForProfessionalAsync(FogInspectionDto inspection)
+    {
+        if (inspection.TransactionId == null)
+        {
+            throw new AppValidationException("Report can't be downloaded until it's paid. Please go to checkout and pay for this transaction, then try downloading again.");
+        }
+
+        return GeneratePdfAsync(inspection);
     }
 
     public override async Task<FogInspectionDto?> DeleteAsync(int id)

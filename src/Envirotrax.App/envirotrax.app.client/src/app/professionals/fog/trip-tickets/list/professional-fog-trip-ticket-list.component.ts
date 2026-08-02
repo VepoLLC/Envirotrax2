@@ -115,7 +115,9 @@ export class ProfessionalFogTripTicketListComponent implements OnInit {
         private readonly _activatedRoute: ActivatedRoute,
         private readonly _containerHelper: AppContainerHelperService,
         private readonly _printService: PrintableTableService,
-    ) { }
+    ) { 
+        this.table.query.filter = [this.paidFilter()];
+    }
 
     public async ngOnInit(): Promise<void> {
         this.table.columns = this.getColumns();
@@ -189,7 +191,11 @@ export class ProfessionalFogTripTicketListComponent implements OnInit {
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
-        this.table.query.filter = queryProperties;
+        this.table.query.filter = [...queryProperties, this.paidFilter()];
+    }
+
+     private paidFilter(): QueryProperty {
+        return { columnName: 'transactionId', isValueNull: true, comparisonOperator: 'NotEq', logicalOperator: 'And' };
     }
 
     public setShowResults(visible: boolean): void {

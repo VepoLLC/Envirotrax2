@@ -3,6 +3,7 @@ import { Professional } from '../professionals/professional';
 import { ProfessionalUser } from '../professionals/professional-user';
 import { State } from '../lookup/state';
 import { WaterSupplier } from '../water-suppliers/water-supplier';
+import { WaterSupplierUser } from '../users/water-supplier-user';
 import { PropertyType } from '../../enums/property-type.enum';
 import { FogVehicleCapacityType } from './fog-vehicle-enums';
 
@@ -86,7 +87,7 @@ export interface FogTripTicket {
     completed?: boolean;
     disapproved?: boolean;
     approvalDate?: string;
-    approvedBy?: string;
+    approvedBy?: WaterSupplierUser | null;
 
     needsValidation?: boolean;
     validationOnHold?: boolean;

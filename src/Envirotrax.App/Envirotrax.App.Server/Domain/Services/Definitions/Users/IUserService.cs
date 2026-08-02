@@ -8,5 +8,5 @@ public interface IUserService : IService<WaterSupplierUser, WaterSupplierUserDto
 {
     Task<WaterSupplierUserDto?> ResendInvitationAsync(int id, CancellationToken cancellationToken);
 
-    Task<IEnumerable<AdminWaterSupplierUserAccountDto>> GetAccountsForWaterSupplierAsync(int waterSupplierId, CancellationToken cancellationToken);
+    Task<IEnumerable<WaterSupplierUserDto>> GetAllForWaterSupplierAsync(int waterSupplierId, CancellationToken cancellationToken);
 }

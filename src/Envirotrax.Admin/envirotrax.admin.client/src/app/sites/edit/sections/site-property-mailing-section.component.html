@@ -1,0 +1,126 @@
+<div class="row g-2 align-items-stretch">
+    <!-- Property Information -->
+    <div class="col-lg">
+        <vp-section header="Property Information" class="d-block h-100">
+            <div class="mb-2">
+                <vp-input name="propertyType"
+                          label="Property Type"
+                          type="select"
+                          [(ngModel)]="site.propertyType"
+                          [options]="propertyTypeOptions"
+                          [form]="form">
+                </vp-input>
+            </div>
+
+            <div class="mb-2">
+                <vp-input name="businessName"
+                          label="Business Name"
+                          [(ngModel)]="site.businessName"
+                          [maxLength]="100"
+                          [form]="form">
+                </vp-input>
+            </div>
+
+            <div class="row g-2">
+                <div class="col-3">
+                    <vp-input name="streetNumber" label="Street #" [(ngModel)]="site.streetNumber" [maxLength]="50" [form]="form"></vp-input>
+                </div>
+                <div class="col-6">
+                    <vp-input name="streetName" label="Street Name" [(ngModel)]="site.streetName" [maxLength]="100" [form]="form"></vp-input>
+                </div>
+                <div class="col-3">
+                    <vp-input name="propertyNumber" label="#" [(ngModel)]="site.propertyNumber" [maxLength]="50" [form]="form"></vp-input>
+                </div>
+            </div>
+
+            <div class="row g-2">
+                <div class="col-6">
+                    <vp-input name="city" label="City" [(ngModel)]="site.city" [maxLength]="50" [form]="form"></vp-input>
+                </div>
+                <div class="col-6">
+                    <vp-input name="propertyStateId"
+                              label="State"
+                              type="select"
+                              [ngModel]="site.state?.id"
+                              (ngModelChange)="site.state = $event ? { id: $event } : undefined"
+                              [options]="stateOptions"
+                              [form]="form">
+                    </vp-input>
+                </div>
+                <div class="col-6">
+                    <vp-input name="zipCode" label="ZIP" [(ngModel)]="site.zipCode" [maxLength]="50" [form]="form"></vp-input>
+                </div>
+            </div>
+        </vp-section>
+    </div>
+
+    <!-- Copy address actions -->
+    <div class="col-lg-auto d-flex flex-lg-column flex-row justify-content-center align-items-center gap-2 py-2">
+        <button type="button"
+                class="btn btn-outline-primary btn-sm"
+                (click)="copyPropertyToMailing()"
+                title="Copy property address to mailing"
+                aria-label="Copy property address to mailing">
+            <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <button type="button"
+                class="btn btn-outline-primary btn-sm"
+                (click)="copyMailingToProperty()"
+                title="Copy mailing address to property"
+                aria-label="Copy mailing address to property">
+            <i class="fa-solid fa-arrow-left"></i>
+        </button>
+    </div>
+
+    <!-- Mailing Information -->
+    <div class="col-lg">
+        <vp-section header="Mailing Information" class="d-block h-100">
+            <div class="mb-2">
+                <vp-input name="mailingCompanyName" label="Company Name" [(ngModel)]="site.mailingCompanyName" [maxLength]="100" [form]="form"></vp-input>
+            </div>
+
+            <div class="mb-2">
+                <vp-input name="mailingContactName" label="Contact Name" [(ngModel)]="site.mailingContactName" [maxLength]="100" [form]="form"></vp-input>
+            </div>
+
+            <div class="row g-2">
+                <div class="col-3">
+                    <vp-input name="mailingStreetNumber" label="Street #" [(ngModel)]="site.mailingStreetNumber" [maxLength]="50" [form]="form"></vp-input>
+                </div>
+                <div class="col-6">
+                    <vp-input name="mailingStreetName" label="Street Name" [(ngModel)]="site.mailingStreetName" [maxLength]="100" [form]="form"></vp-input>
+                </div>
+                <div class="col-3">
+                    <vp-input name="mailingNumber" label="#" [(ngModel)]="site.mailingNumber" [maxLength]="50" [form]="form"></vp-input>
+                </div>
+            </div>
+
+            <div class="row g-2">
+                <div class="col-6">
+                    <vp-input name="mailingCity" label="City" [(ngModel)]="site.mailingCity" [maxLength]="50" [form]="form"></vp-input>
+                </div>
+                <div class="col-6">
+                    <vp-input name="mailingStateId"
+                              label="State"
+                              type="select"
+                              [ngModel]="site.mailingState?.id"
+                              (ngModelChange)="site.mailingState = $event ? { id: $event } : undefined"
+                              [options]="stateOptions"
+                              [form]="form">
+                    </vp-input>
+                </div>
+                <div class="col-6">
+                    <vp-input name="mailingZipCode" label="ZIP" [(ngModel)]="site.mailingZipCode" [maxLength]="50" [form]="form"></vp-input>
+                </div>
+            </div>
+
+            <div class="mb-2">
+                <vp-input name="mailingPhoneNumber" label="Phone Number" [(ngModel)]="site.mailingPhoneNumber" [maxLength]="50" [form]="form"></vp-input>
+            </div>
+
+            <div class="mb-2">
+                <vp-input name="mailingEmailAddress" label="Email Address" [(ngModel)]="site.mailingEmailAddress" [maxLength]="100" [form]="form"></vp-input>
+            </div>
+        </vp-section>
+    </div>
+</div>

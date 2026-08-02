@@ -60,7 +60,7 @@ public class ProfessionalFogInspectionController : ProfessionalProtectedControll
             return NotFound();
         }
 
-        var pdf = await _fogInspectionService.GeneratePdfAsync(inspection);
+        var pdf = await _fogInspectionService.GeneratePdfForProfessionalAsync(inspection);
         return File(pdf, "application/pdf");
     }
 

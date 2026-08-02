@@ -81,7 +81,7 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
         return await paginated.ToListAsync(ct);
     }
 
-    public async Task<FogTripTicket?> UpdateApprovalAsync(int id, bool disapproved, string? approvedBy, CancellationToken cancellationToken)
+    public async Task<FogTripTicket?> UpdateApprovalAsync(int id, bool disapproved, int? approvedById, CancellationToken cancellationToken)
     {
         var ticket = await GetNoIncludesAsync(id, cancellationToken);
 
@@ -96,7 +96,7 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
         if (!disapproved)
         {
             ticket.ApprovalDate = DateTime.UtcNow;
-            ticket.ApprovedBy = approvedBy;
+            ticket.ApprovedById = approvedById;
         }
 
         await DbContext.SaveChangesAsync();

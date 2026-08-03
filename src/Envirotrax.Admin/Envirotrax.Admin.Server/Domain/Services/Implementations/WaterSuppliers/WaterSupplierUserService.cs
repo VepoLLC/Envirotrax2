@@ -1,4 +1,4 @@
-
+using DeveloperPartners.SortingFiltering;
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Envirotrax.Admin.Server.Domain.Services.Definitions;
 using Envirotrax.Admin.Server.Domain.Services.Definitions.WaterSuppliers;
@@ -14,10 +14,8 @@ public class WaterSupplierUserService : IWaterSupplierUserService
         _apiClient = apiClient;
     }
 
-    public async Task<IEnumerable<WaterSupplierUserDto>> GetAllAsync(int waterSupplierId, CancellationToken cancellationToken)
+    public Task<IPagedData<WaterSupplierUserDto>> GetAllAsync(int waterSupplierId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        var users = await _apiClient.GetAsync<IEnumerable<WaterSupplierUserDto>>($"/api/admin/water-suppliers/{waterSupplierId}/users", cancellationToken);
-
-        return users ?? [];
+        return _apiClient.GetAsync<WaterSupplierUserDto>($"/api/admin/water-suppliers/{waterSupplierId}/users", pageInfo, query, cancellationToken);
     }
 }

@@ -475,37 +475,6 @@
 
     <!-- ******************************** User Accounts ******************************** -->
     <div *ngIf="usersInitialized" [hidden]="activeTab !== 'users'">
-        <dp-loading-spinner *ngIf="isLoadingUsers"></dp-loading-spinner>
-
-        <vp-section header="User Accounts ({{ users.length }})" *ngIf="!isLoadingUsers">
-            <div *ngIf="users.length === 0" class="text-muted">No user accounts.</div>
-
-            <div class="table-responsive" *ngIf="users.length > 0">
-                <table class="table table-sm align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th>Full Name</th>
-                            <th>User ID</th>
-                            <th>Cell Number</th>
-                            <th>Roles</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let user of users">
-                            <td>{{ user.contactName || '—' }}</td>
-                            <td class="text-break">{{ user.emailAddress || '—' }}</td>
-                            <td>{{ user.cellNumber || '—' }}</td>
-                            <td>
-                                <span *ngIf="!user.roles?.length" class="text-muted">No roles assigned</span>
-
-                                <span *ngFor="let role of user.roles" class="badge text-bg-info me-1">
-                                    {{ role.name }}
-                                </span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </vp-section>
+        <vp-water-supplier-users [waterSupplierId]="supplierId" />
     </div>
 </div>

@@ -1,4 +1,5 @@
-
+using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Users;
 using Envirotrax.App.Server.Data.Services.Definitions;
@@ -20,11 +21,14 @@ public class UserRepository : Repository<WaterSupplierUser>, IUserRepository
             .ThenInclude(userRole => userRole.Role);
     }
 
-    public async Task<IEnumerable<WaterSupplierUser>> GetAllForWaterSupplierAsync(int waterSupplierId, CancellationToken cancellationToken)
+    public async Task<IEnumerable<WaterSupplierUser>> GetAllForWaterSupplierAsync(int waterSupplierId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        return await GetListQuery()
+        var paginated = await GetListQuery()
             .Where(user => user.WaterSupplierId == waterSupplierId)
-            .OrderBy(user => user.ContactName)
-            .ToListAsync(cancellationToken);
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
     }
 }

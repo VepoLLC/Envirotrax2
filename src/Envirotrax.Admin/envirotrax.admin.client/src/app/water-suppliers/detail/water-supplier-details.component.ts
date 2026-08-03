@@ -7,10 +7,9 @@ import { WindowReference } from '../../window/window-config';
 import { WaterSupplier } from '../../shared/models/water-suppliers/water-supplier';
 import { GeneralSettings } from '../../shared/models/water-suppliers/general-settings';
 import { BackflowOutOfServiceType, BackflowSettings, BackflowTestingMethodType } from '../../shared/models/water-suppliers/backflow-settings';
-import { WaterSupplierUser } from '../../shared/models/water-suppliers/water-supplier-user';
 import { WaterSupplierService } from '../../shared/services/water-suppliers/water-supplier.service';
-import { WaterSupplierUserService } from '../../shared/services/water-suppliers/water-supplier-user.service';
 import { LookupService } from '../../shared/services/lookup/lookup.service';
+import { WaterSupplierUserListComponent } from './users/water-supplier-user-list.component';
 
 type DetailTab = 'general' | 'users';
 
@@ -18,7 +17,8 @@ type DetailTab = 'general' | 'users';
     imports: [
         CommonModule,
         FormsModule,
-        SharedComponentsModule
+        SharedComponentsModule,
+        WaterSupplierUserListComponent
     ],
     templateUrl: './water-supplier-details.component.html'
 })
@@ -26,7 +26,6 @@ export class WaterSupplierDetailsComponent implements OnInit {
     public supplier: WaterSupplier = {};
     public generalSettings: GeneralSettings = {};
     public backflowSettings: BackflowSettings = {};
-    public users: WaterSupplierUser[] = [];
 
     public states: InputOption[] = [];
 
@@ -45,17 +44,15 @@ export class WaterSupplierDetailsComponent implements OnInit {
     public usersInitialized: boolean = false;
 
     public isLoading: boolean = false;
-    public isLoadingUsers: boolean = false;
     public isSaving: boolean = false;
     public isSaved: boolean = false;
     public saveFailed: boolean = false;
     public validationErrors: string[] = [];
 
-    private supplierId: number = 0;
+    public supplierId: number = 0;
 
     constructor(
         private readonly _waterSupplierService: WaterSupplierService,
-        private readonly _waterSupplierUserService: WaterSupplierUserService,
         private readonly _lookupService: LookupService,
         private readonly _helper: HelperService,
         private readonly _windowRef: WindowReference<{ id?: number }>
@@ -75,9 +72,8 @@ export class WaterSupplierDetailsComponent implements OnInit {
     public setActiveTab(tab: DetailTab): void {
         this.activeTab = tab;
 
-        if (tab === 'users' && !this.usersInitialized) {
+        if (tab === 'users') {
             this.usersInitialized = true;
-            this.loadUsers();
         }
     }
 
@@ -130,16 +126,6 @@ export class WaterSupplierDetailsComponent implements OnInit {
             this.validationErrors = validationErrors;
         } finally {
             this.isSaving = false;
-        }
-    }
-
-    private async loadUsers(): Promise<void> {
-        try {
-            this.isLoadingUsers = true;
-
-            this.users = await this._waterSupplierUserService.getAll(this.supplierId);
-        } finally {
-            this.isLoadingUsers = false;
         }
     }
 }

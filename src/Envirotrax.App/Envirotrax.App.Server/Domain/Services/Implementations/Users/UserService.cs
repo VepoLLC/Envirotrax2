@@ -1,5 +1,6 @@
-
 using AutoMapper;
+using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Users;
 using Envirotrax.App.Server.Domain.Configuration;
@@ -92,11 +93,16 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
         return MapToDto(user);
     }
 
-    public async Task<IEnumerable<WaterSupplierUserDto>> GetAllForWaterSupplierAsync(int waterSupplierId, CancellationToken cancellationToken)
+    public async Task<IPagedData<WaterSupplierUserDto>> GetAllForWaterSupplierAsync(int waterSupplierId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        var users = await _userRepository.GetAllForWaterSupplierAsync(waterSupplierId, cancellationToken);
+        query.Sort = query.ConvertSortProperties<WaterSupplierUser, WaterSupplierUserDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<WaterSupplierUser, WaterSupplierUserDto>(Mapper);
 
-        return users.Select(user => MapToDto(user)!);
+        var users = await _userRepository.GetAllForWaterSupplierAsync(waterSupplierId, pageInfo, query, cancellationToken);
+
+        return users
+            .Select(user => MapToDto(user)!)
+            .ToPagedData(pageInfo);
     }
 }
 class UserInvitationDto

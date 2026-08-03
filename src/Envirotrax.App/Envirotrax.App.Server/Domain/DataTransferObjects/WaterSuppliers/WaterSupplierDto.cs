@@ -52,6 +52,8 @@ namespace Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers
         public double? GisCenterZoom { get; set; }
 
         public ReferencedWaterSupplierDto? Parent { get; set; }
+
+        public ReferencedGeneralSettingsDto? GeneralSettings { get; set; }
     }
 
     public class ReferencedWaterSupplierDto

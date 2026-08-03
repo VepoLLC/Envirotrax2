@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { ColumnType, InputOption, QueryProperty, TableColumn, TableViewModel } from '@envirotrax/common-ui';
+import { CellTemplateData, ColumnType, ComparisonOperator, InputOption, QueryProperty, TableColumn, TableViewModel } from '@envirotrax/common-ui';
 import { WaterSupplier } from '../../shared/models/water-suppliers/water-supplier';
 import { WaterSupplierService } from '../../shared/services/water-suppliers/water-supplier.service';
 import { LookupService } from '../../shared/services/lookup/lookup.service';
@@ -12,6 +12,9 @@ import { WaterSupplierDetailsComponent } from '../detail/water-supplier-details.
     standalone: false,
 })
 export class WaterSupplierListComponent implements OnInit {
+    @ViewChild('programCell', { static: true })
+    private programCell!: TemplateRef<CellTemplateData<WaterSupplier>>;
+
     public showResults: boolean = false;
 
     public isInitializing: boolean = true;
@@ -24,6 +27,16 @@ export class WaterSupplierListComponent implements OnInit {
     };
 
     public stateOptions: InputOption[] = [{ id: '', text: 'Any Value' }];
+
+    public programFilters = {
+        administrativeOnly: false,
+        backflowTesting: false,
+        csiInspections: false,
+        fogProgram: false,
+        wiseGuys: false
+    };
+
+    private panelFilters: QueryProperty[] = [];
 
     constructor(
         private readonly _waterSupplierService: WaterSupplierService,
@@ -52,7 +65,29 @@ export class WaterSupplierListComponent implements OnInit {
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
-        this.table.query.filter = queryProperties;
+        this.panelFilters = queryProperties;
+
+        this.applyFilters();
+    }
+
+    public onProgramFilterChange(): void {
+        this.applyFilters();
+    }
+
+    private applyFilters(): void {
+        this.table.query.filter = [...this.panelFilters, ...this.getProgramFilters()];
+    }
+
+    private getProgramFilters(): QueryProperty[] {
+        const fields = Object.keys(this.programFilters) as (keyof typeof this.programFilters)[];
+
+        return fields
+            .filter(field => this.programFilters[field])
+            .map(field => ({
+                columnName: `generalSettings.${field}`,
+                value: 'true',
+                comparisonOperator: 'Eq' as ComparisonOperator
+            }));
     }
 
     public async search(searchForm: NgForm): Promise<void> {
@@ -83,6 +118,14 @@ export class WaterSupplierListComponent implements OnInit {
 
     private getColumns(): TableColumn<WaterSupplier>[] {
         return [
+            { field: 'id', caption: 'ID', type: ColumnType.number },
+            {
+                field: '',
+                caption: 'Program',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.programCell
+            },
             { field: 'name', caption: 'Name', type: ColumnType.text },
             { field: 'contactName', caption: 'Contact Name', type: ColumnType.text },
             { field: 'pwsId', caption: 'PWS ID', type: ColumnType.text },

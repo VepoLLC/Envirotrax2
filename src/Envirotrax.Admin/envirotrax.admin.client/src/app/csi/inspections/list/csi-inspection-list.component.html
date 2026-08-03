@@ -188,13 +188,16 @@
     </div>
 
     <vp-section header="Search Results ({{ table.items?.pageInfo?.totalItems }})">
-        <div class="d-flex flex-wrap gap-3 justify-content-center mb-3">
-            <span><span class="badge bg-success me-1">Pass</span> Passed Inspection</span>
-            <span><span class="badge bg-danger me-1">Fail</span> Failed Inspection</span>
-            <span><span class="badge bg-warning text-dark me-1">Paid</span> Payment Received</span>
-            <span><span class="badge bg-secondary me-1">Unpaid</span> No Payment</span>
-            <span><i class="fa-solid fa-house text-primary me-1"></i> Residential</span>
-            <span><i class="fa-solid fa-building text-danger me-1"></i> Commercial</span>
+        <div class="d-flex flex-wrap gap-4 justify-content-center mb-3">
+            <span>
+                <i class="fa-solid fa-square text-success me-1"></i>
+                Passed Inspection
+            </span>
+
+            <span>
+                <i class="fa-solid fa-square text-warning me-1"></i>
+                Paid
+            </span>
         </div>
 
         <vp-table *ngIf="table.items"
@@ -210,17 +213,30 @@
 
 <ng-template #statusCell let-rowData="rowData">
     <div class="d-flex gap-1">
-        <span class="badge bg-success" *ngIf="rowData?.inspectionResult">Pass</span>
-        <span class="badge bg-danger" *ngIf="!rowData?.inspectionResult">Fail</span>
-        <span class="badge bg-warning text-dark" *ngIf="rowData?.transactionId">Paid</span>
-        <span class="badge bg-secondary" *ngIf="!rowData?.transactionId">Unpaid</span>
+        <i class="fa-solid fa-square text-success"
+           title="Passed Inspection"
+           *ngIf="rowData?.inspectionResult"></i>
+        <i class="fa-regular fa-square text-success"
+           title="Failed Inspection"
+           *ngIf="!rowData?.inspectionResult"></i>
+
+        <i class="fa-solid fa-square text-warning"
+           title="Paid"
+           *ngIf="rowData?.transactionId"></i>
+        <i class="fa-regular fa-square text-warning"
+           title="No Payment"
+           *ngIf="!rowData?.transactionId"></i>
     </div>
 </ng-template>
 
 <ng-template #propertyCell let-rowData="rowData">
     <div class="d-flex gap-2">
-        <i class="fa-solid fa-house text-primary" *ngIf="rowData?.propertyType === propertyType.Residential"></i>
-        <i class="fa-solid fa-building text-danger" *ngIf="rowData?.propertyType === propertyType.Commercial"></i>
+        <i class="fa-solid fa-house text-primary"
+           title="Residential"
+           *ngIf="rowData?.propertyType === propertyType.Residential"></i>
+        <i class="fa-solid fa-building text-danger"
+           title="Commercial"
+           *ngIf="rowData?.propertyType === propertyType.Commercial"></i>
 
         <div>
             <div class="fw-semibold"

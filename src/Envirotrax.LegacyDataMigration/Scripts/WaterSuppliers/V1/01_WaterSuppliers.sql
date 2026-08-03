@@ -27,9 +27,14 @@ BEGIN TRY
         ON letterStates.Code = WaterSuppliers.LetterState
     LEFT JOIN Envirotrax2Dev.dbo.States AS letterContactStates
         ON letterContactStates.Code = WaterSuppliers.LetterContactState
-    WHERE MasterWaterSupplierID2 > 0 
+    WHERE (MasterWaterSupplierID2 > 0
         -- Supplier IDs up to 3 don't actually exist in the system, but there are records with those parent IDs
-        OR (MasterWaterSupplierID < 4 AND MasterWaterSupplierID2 = 0)
+        OR (MasterWaterSupplierID < 4 AND MasterWaterSupplierID2 = 0))
+        AND NOT EXISTS (
+            SELECT 1
+            FROM Envirotrax2Dev.dbo.WaterSuppliers AS alreadyInserted
+            WHERE alreadyInserted.LegacyRecordId = WaterSuppliers.ID
+        )
 
     -- Insert remaining water suppliers one generation at a time, once their parent has already been migrated
     WHILE @@ROWCOUNT > 0
@@ -71,6 +76,6 @@ BEGIN TRY
 
 END TRY
 BEGIN CATCH
-    ROLLBACK TRAN
-    THROW
+    ROLLBACK TRAN;
+    THROW;
 END CATCH

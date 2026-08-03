@@ -43,6 +43,7 @@ Log.Logger = new LoggerConfiguration()
 services.AddLogging(builder => builder.AddSerilog(Log.Logger, dispose: true));
 
 services.AddTransient<UserService>();
+services.AddTransient<WaterSupplierService>();
 
 var provider = services.BuildServiceProvider();
 

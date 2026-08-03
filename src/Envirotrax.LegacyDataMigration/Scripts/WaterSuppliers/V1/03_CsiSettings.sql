@@ -4,7 +4,7 @@ BEGIN TRY
 
     -- Assumes color/notice set 1 = Impending, set 2 = PastDue, set 3 = NonCompliant
     INSERT INTO Envirotrax2Dev.dbo.CsiSettings
-        (WaterSupplierId, ModificationGracePeriodDays, NewlyCreatedBackflowTestExpirationDays,
+        (WaterSupplierId, ModificationGracePeriodDays, NewlyCreatedBackflowTestExpirationDays, RequireInspectionImages,
          ImpendingNotice1, ImpendingNotice2, PastDueNotice1, PastDueNotice2, NonCompliant1, NonCompliant2,
          ImpendingLettersBackgroundColor, ImpendingLettersForegroundColor, ImpendingLettersBorderColor,
          PastDueLettersBackgroundColor, PastDueLettersForegroundColor, PastDueLettersBorderColor,
@@ -12,7 +12,7 @@ BEGIN TRY
          NoticeBodyFont, NoticeBodyFontSize,
          ImpendingTitle, ImpendingMessage, PastDueTitle, PastDueMessage, NonCompliantTitle, NonCompliantMessage)
     SELECT
-        newWaterSuppliers.Id, WaterSuppliers.CsiModificationDays, WaterSuppliers.CsiBackflowExpirationDays,
+        newWaterSuppliers.Id, WaterSuppliers.CsiModificationDays, WaterSuppliers.CsiBackflowExpirationDays, WaterSuppliers.RequireCsiInspectionImages,
         WaterSuppliers.CsiNoticeImpending1, WaterSuppliers.CsiNoticeImpending2,
         WaterSuppliers.CsiNoticePastDue1, WaterSuppliers.CsiNoticePastDue2,
         WaterSuppliers.CsiNonCompliant, WaterSuppliers.CsiNonCompliant2,
@@ -26,11 +26,16 @@ BEGIN TRY
     FROM WaterSuppliers
     INNER JOIN Envirotrax2Dev.dbo.WaterSuppliers AS newWaterSuppliers
         ON newWaterSuppliers.LegacyRecordId = WaterSuppliers.ID
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM Envirotrax2Dev.dbo.CsiSettings AS alreadyInserted
+        WHERE alreadyInserted.WaterSupplierId = newWaterSuppliers.Id
+    )
 
-    --COMMIT TRAN
+    COMMIT TRAN
 
 END TRY
 BEGIN CATCH
-    ROLLBACK TRAN
-    THROW
+    ROLLBACK TRAN;
+    THROW;
 END CATCH

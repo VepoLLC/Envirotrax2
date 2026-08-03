@@ -24,6 +24,13 @@ export class GisAreaService {
         return lastValueFrom(this._http.get<GisArea[]>(url));
     }
 
+    public getAllAreasForProfessional(waterSupplierId: number): Promise<GisArea[]> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/gis-areas/all');
+        return lastValueFrom(this._http.get<GisArea[]>(url, {
+            params: { waterSupplierId }
+        }));
+    }
+
     public async getAllAsOptions(): Promise<InputOption[]> {
         const areas = await this.getAllAreas();
         const options: InputOption[] = areas.map(a => ({ id: String(a.id), text: a.name }));
@@ -67,6 +74,13 @@ export class GisAreaService {
     public getDefaultView(): Promise<DefaultGisMapView> {
         const url = this._urlResolver.resolveUrl('/api/gis-areas/default-view');
         return lastValueFrom(this._http.get<DefaultGisMapView>(url));
+    }
+
+    public getDefaultViewForProfessional(waterSupplierId: number): Promise<DefaultGisMapView> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/gis-areas/default-view');
+        return lastValueFrom(this._http.get<DefaultGisMapView>(url, {
+            params: { waterSupplierId }
+        }));
     }
 
     public updateDefaultView(dto: DefaultGisMapView): Promise<DefaultGisMapView> {

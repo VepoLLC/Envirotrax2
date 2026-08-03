@@ -12,6 +12,8 @@ public interface ISiteRepository : IRepository<Site>
     Task<IEnumerable<Site>> GetCsiComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task UpdateCsiAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate);
     Task UpdateBackflowAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate);
+    Task<Site?> GetTrackedForUpdateAsync(int siteId, CancellationToken cancellationToken);
+    Task SaveChangesAsync(CancellationToken cancellationToken);
     Task ClearNeedsRenewalCheckAsync(int siteId);
     Task<IEnumerable<Site>> GetAllPendingRenewalAsync(int batchSize);
 }

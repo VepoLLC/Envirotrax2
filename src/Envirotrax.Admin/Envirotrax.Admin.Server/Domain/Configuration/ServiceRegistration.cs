@@ -10,6 +10,8 @@ using Envirotrax.Admin.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.Admin.Server.Domain.Services.Implementations.Sites;
 using Envirotrax.Admin.Server.Domain.Services.Definitions.Lookup;
 using Envirotrax.Admin.Server.Domain.Services.Implementations.Lookup;
+using Envirotrax.Admin.Server.Domain.Services.Definitions.GoogleMaps;
+using Envirotrax.Admin.Server.Domain.Services.Implementations.GoogleMaps;
 
 namespace Envirotrax.Admin.Server.Domain.Configuration;
 
@@ -24,8 +26,10 @@ public static class ServiceRegistration
 
         // Register services here:
         services.AddTransient<IWaterSupplierService, WaterSupplierService>();
+        services.AddTransient<IWaterSupplierUserService, WaterSupplierUserService>();
         services.AddTransient<ISiteService, SiteService>();
         services.AddTransient<ILookupService, LookupService>();
+        services.AddTransient<IGoogleMapsService, GoogleMapsService>();
 
         return services;
     }

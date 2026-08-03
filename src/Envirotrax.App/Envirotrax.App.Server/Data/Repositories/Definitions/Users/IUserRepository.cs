@@ -5,5 +5,5 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Users;
 
 public interface IUserRepository : IRepository<WaterSupplierUser>
 {
-
+    Task<IEnumerable<WaterSupplierUser>> GetAllForWaterSupplierAsync(int waterSupplierId, CancellationToken cancellationToken);
 }

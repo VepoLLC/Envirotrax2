@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProfessionalFogInspectionService } from '../../../../shared/services/fog/professional-fog-inspection.service';
 import { ProfessionalSupplierService } from '../../../../shared/services/professionals/professional-supplier.service';
@@ -12,6 +12,11 @@ import { InterceptorType } from '../../../../shared/enums/interceptor-type.enum'
 import { PropertyType } from '../../../../shared/enums/property-type.enum';
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from '@envirotrax/common-ui';
 import { AppContainerHelperService } from '../../../../shared/services/helpers/app-contaner-helper.service';
+import { PrintableTableService } from '../../../../shared/services/printable-table.service';
+import { DownloadConfig } from '../../../../shared/models/download-config';
+import { DownloadService } from '../../../../shared/services/download.service';
+
+type DownloadCategory = 'property' | 'interceptor' | 'inspector' | 'mailing';
 
 @Component({
     standalone: false,
@@ -52,6 +57,9 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
     @ViewChild('resultCell', { static: true })
     public resultCell?: TemplateRef<CellTemplateData<FogInspection>>;
 
+    @ViewChild('printableSection')
+    private _printableSection!: ElementRef;
+
     public waterSupplierScopeOptions: InputOption[] = [
         { id: '', text: 'My inspection history only' }
     ];
@@ -66,18 +74,78 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
     public readonly facilityTypeOptions: InputOption[];
     public readonly propertyTypeOptions: InputOption[];
 
+    public downloadConfig: DownloadConfig<DownloadCategory>;
+
     constructor(
         private readonly _fogInspectionService: ProfessionalFogInspectionService,
         private readonly _supplierService: ProfessionalSupplierService,
         private readonly _fogOptions: FogInspectionOptionsService,
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
-        private readonly _containerHelper: AppContainerHelperService
+        private readonly _containerHelper: AppContainerHelperService,
+        private readonly _printService: PrintableTableService,
+        private readonly _downloadService: DownloadService
     ) {
+        this.table.query.filter = [this.paidFilter()];
         this.inspectionResultOptions = this._fogOptions.inspectionResultFilterOptions;
         this.interceptorTypeOptions = this._fogOptions.interceptorTypeFilterOptions;
         this.facilityTypeOptions = this._fogOptions.facilityTypeFilterOptions;
         this.propertyTypeOptions = this._fogOptions.propertyTypeFilterOptions;
+
+        this.downloadConfig = {
+            fileName: 'FOG Inspections',
+            endpoint: this._fogInspectionService.getAllEndpoint(this.latestOnly),
+            pdfEndpoint: this._fogInspectionService.getAllPdfEndpoint(this.latestOnly),
+            suppoertedFormats: ['CSV', 'Excel', 'PDF'],
+            categories: [
+                { name: 'property', caption: 'Property Information', isSelected: true },
+                { name: 'interceptor', caption: 'Interceptor Information', isSelected: true },
+                { name: 'inspector', caption: 'Inspector Information', isSelected: true },
+                { name: 'mailing', caption: 'Mailing Information', isSelected: true }
+            ],
+            columns: [
+                { field: 'inspectionDate', caption: 'InspectionDate' },
+                { field: 'site.accountNumber', caption: 'AccountNumber' },
+                { field: 'inspectionResult', caption: 'InspectionResult' },
+                // Property
+                { field: 'propertyBusinessName', caption: 'PropertyBusinessName', category: 'property' },
+                { field: 'propertyStreetNumber', caption: 'PropertyStreetNumber', category: 'property' },
+                { field: 'propertyStreetName', caption: 'PropertyStreetName', category: 'property' },
+                { field: 'propertyNumber', caption: 'PropertyNumber', category: 'property' },
+                { field: 'propertyCity', caption: 'PropertyCity', category: 'property' },
+                { field: 'propertyState.code', caption: 'PropertyState', category: 'property' },
+                { field: 'propertyZip', caption: 'PropertyZip', category: 'property' },
+                // Interceptor
+                { field: 'interceptorType', caption: 'InterceptorType', category: 'interceptor' },
+                { field: 'interceptorCapacity', caption: 'InterceptorCapacity', category: 'interceptor' },
+                { field: 'interceptorLocationDescription', caption: 'InterceptorLocationDescription', category: 'interceptor' },
+                { field: 'totalCapacityPercent', caption: 'TotalCapacityPercent', category: 'interceptor' },
+                // Inspector
+                { field: 'inspectorCompanyName', caption: 'InspectorCompanyName', category: 'inspector' },
+                { field: 'inspectorContactName', caption: 'InspectorContactName', category: 'inspector' },
+                { field: 'inspectorAddress', caption: 'InspectorAddress', category: 'inspector' },
+                { field: 'inspectorCity', caption: 'InspectorCity', category: 'inspector' },
+                { field: 'inspectorState', caption: 'InspectorState', category: 'inspector' },
+                { field: 'inspectorZip', caption: 'InspectorZip', category: 'inspector' },
+                // Mailing
+                { field: 'mailingCompanyName', caption: 'MailingCompanyName', category: 'mailing' },
+                { field: 'mailingContactName', caption: 'MailingContactName', category: 'mailing' },
+                { field: 'mailingStreetNumber', caption: 'MailingStreetNumber', category: 'mailing' },
+                { field: 'mailingStreetName', caption: 'MailingStreetName', category: 'mailing' },
+                { field: 'mailingNumber', caption: 'MailingNumber', category: 'mailing' },
+                { field: 'mailingCity', caption: 'MailingCity', category: 'mailing' },
+                { field: 'mailingState.code', caption: 'MailingState', category: 'mailing' },
+                { field: 'mailingZip', caption: 'MailingZip', category: 'mailing' },
+                { field: 'mailingPhoneNumber', caption: 'MailingPhoneNumber', category: 'mailing' },
+                { field: 'mailingEmailAddress', caption: 'MailingEmailAddress', category: 'mailing' }
+            ]
+        };
+    }
+
+    public showDownloadManager(): void {
+        this.downloadConfig.endpoint = this._fogInspectionService.getAllEndpoint(this.latestOnly);
+        this.downloadConfig.pdfEndpoint = this._fogInspectionService.getAllPdfEndpoint(this.latestOnly);
+        this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
     }
 
     public async ngOnInit(): Promise<void> {
@@ -158,7 +226,11 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
-        this.table.query.filter = queryProperties;
+        this.table.query.filter = [...queryProperties, this.paidFilter()];
+    }
+
+    private paidFilter(): QueryProperty {
+        return { columnName: 'transactionId', isValueNull: true, comparisonOperator: 'NotEq', logicalOperator: 'And' };
     }
 
     public setShowResults(visible: boolean): void {
@@ -175,15 +247,14 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
         }
     }
 
-    public searchAgain(): void {
-        this.setShowResults(false);
-        this.searchAttempted = false;
-    }
-
     public viewInspection(inspection: FogInspection): void {
         const url = this._router.serializeUrl(
             this._router.createUrlTree([inspection.id], { relativeTo: this._activatedRoute })
         );
         window.open(url, '_blank');
+    }
+
+    public viewPrintableTable(): void {
+        this._printService.open(this._printableSection.nativeElement);
     }
 }

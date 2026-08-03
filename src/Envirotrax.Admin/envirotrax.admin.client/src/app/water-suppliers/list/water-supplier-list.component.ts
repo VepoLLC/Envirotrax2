@@ -4,6 +4,8 @@ import { ColumnType, InputOption, QueryProperty, TableColumn, TableViewModel } f
 import { WaterSupplier } from '../../shared/models/water-suppliers/water-supplier';
 import { WaterSupplierService } from '../../shared/services/water-suppliers/water-supplier.service';
 import { LookupService } from '../../shared/services/lookup/lookup.service';
+import { WindowService } from '../../shared/services/window.service';
+import { WaterSupplierDetailsComponent } from '../detail/water-supplier-details.component';
 
 @Component({
     templateUrl: './water-supplier-list.component.html',
@@ -25,7 +27,8 @@ export class WaterSupplierListComponent implements OnInit {
 
     constructor(
         private readonly _waterSupplierService: WaterSupplierService,
-        private readonly _lookupService: LookupService
+        private readonly _lookupService: LookupService,
+        private readonly _windowService: WindowService
     ) {
 
     }
@@ -60,6 +63,13 @@ export class WaterSupplierListComponent implements OnInit {
         await this.getSuppliers();
 
         this.showResults = true;
+    }
+
+    public viewDetails(supplier: WaterSupplier): void {
+        this._windowService.addWindow(WaterSupplierDetailsComponent, {
+            title: supplier.name ?? 'Water Supplier',
+            model: { id: supplier.id }
+        });
     }
 
     public async getSuppliers(): Promise<void> {

@@ -3,6 +3,7 @@ export class WaterSupplier {
     id?: number;
     name?: string;
     domain?: string;
+    isActive?: boolean;
     parent?: WaterSupplier;
 
     contactName?: string;

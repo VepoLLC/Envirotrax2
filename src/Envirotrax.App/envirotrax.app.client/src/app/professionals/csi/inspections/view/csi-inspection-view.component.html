@@ -293,6 +293,18 @@
             A Customer Service Inspection Certificate should be on file for each connection in a public water system to document compliance with 30 TAC &sect;290.44(h)/290.46(j).
         </p>
 
+        <div class="d-flex flex-column align-items-center gap-2 mt-3">
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <button type="button" class="btn btn-primary vp-section-button" (click)="exportPdf()"
+                        [disabled]="!inspection.transactionId">
+                    Export Inspection to Printable Document
+                </button>
+            </div>
+            <div *ngIf="!inspection.transactionId" class="text-danger text-center small">
+                Report can't be downloaded until it's paid. Please go to checkout and pay for this transaction, then try downloading again.
+            </div>
+        </div>
+
     </div>
 
     <div *ngIf="activeTab === 'assemblies'">

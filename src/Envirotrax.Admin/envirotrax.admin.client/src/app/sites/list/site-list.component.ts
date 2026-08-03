@@ -2,8 +2,11 @@ import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { CellTemplateData, ColumnType, InputOption, MAX_PAGE_SIZE, QueryProperty, TableColumn, TableViewModel } from '@envirotrax/common-ui';
 import { FogCompliancyStatus, PropertyType, Site } from '../../shared/models/sites/site';
+import { SiteEditWindowModel } from '../../shared/models/sites/site-detail';
 import { SiteService } from '../../shared/services/sites/site.service';
 import { WaterSupplierService } from '../../shared/services/water-suppliers/water-supplier.service';
+import { WindowService } from '../../shared/services/window.service';
+import { SiteEditComponent } from '../edit/site-edit.component';
 
 @Component({
     templateUrl: './site-list.component.html',
@@ -75,9 +78,36 @@ export class SiteListComponent implements OnInit {
 
     constructor(
         private readonly _siteService: SiteService,
-        private readonly _waterSupplierService: WaterSupplierService
+        private readonly _waterSupplierService: WaterSupplierService,
+        private readonly _windowService: WindowService
     ) {
 
+    }
+
+    public openSite(site: Site): void {
+        if (site.id == null) {
+            return;
+        }
+
+        const model: SiteEditWindowModel = {
+            siteId: site.id,
+            waterSupplierId: site.waterSupplier?.id
+        };
+
+        this._windowService.addWindow(SiteEditComponent, {
+            title: this.buildSiteWindowTitle(site),
+            model
+        });
+    }
+
+    // Window title matches the legacy Vepo Manager Edit Site window: "{Site ID} - {Street #} {Street Name}"
+    // (e.g. "464886 - 229 County Rd 2871"). Falls back to just the id when the property street is blank.
+    private buildSiteWindowTitle(site: Site): string {
+        const address = [site.streetNumber, site.streetName]
+            .filter(part => !!part && part.trim().length > 0)
+            .join(' ');
+
+        return address ? `${site.id} - ${address}` : `${site.id}`;
     }
 
     public async ngOnInit(): Promise<void> {

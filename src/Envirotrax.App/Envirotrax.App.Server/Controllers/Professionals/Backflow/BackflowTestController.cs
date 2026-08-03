@@ -59,7 +59,7 @@ public class BackflowTestController : ProfessionalProtectedController
             return NotFound();
         }
 
-        var pdf = await _backflowTestService.GeneratePdfAsync(test);
+        var pdf = await _backflowTestService.GeneratePdfForProfessionalAsync(test);
         return File(pdf, "application/pdf");
     }
 

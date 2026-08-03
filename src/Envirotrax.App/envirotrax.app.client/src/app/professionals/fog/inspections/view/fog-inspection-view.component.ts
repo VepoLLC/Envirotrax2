@@ -7,6 +7,8 @@ import { FogInspectionResult, FogReasonForInspection, fogReasonForInspectionLabe
 import { FacilityType, facilityTypeLabels } from '../../../../shared/enums/facility-type.enum';
 import { PropertyType } from '../../../../shared/enums/property-type.enum';
 import { DownloadService } from '../../../../shared/services/download.service';
+import { HelperService } from '../../../../shared/services/helpers/helper.service';
+import { ToastService, ToastType } from '../../../../shared/services/toast.service';
 
 @Component({
     standalone: false,
@@ -30,7 +32,9 @@ export class FogInspectionViewComponent implements OnInit {
         private readonly _destroyRef: DestroyRef,
         private readonly _route: ActivatedRoute,
         private readonly _inspectionService: ProfessionalFogInspectionService,
-        private readonly _downloadService: DownloadService
+        private readonly _downloadService: DownloadService,
+        private readonly _helper: HelperService,
+        private readonly _toastService: ToastService
     ) {}
 
     public ngOnInit(): void {
@@ -40,7 +44,7 @@ export class FogInspectionViewComponent implements OnInit {
     }
 
     public async exportPdf(): Promise<void> {
-        if (this.inspection?.id == null) {
+        if (this.inspection?.id == null || !this.inspection.transactionId) {
             return;
         }
 
@@ -48,6 +52,13 @@ export class FogInspectionViewComponent implements OnInit {
             this.isLoading = true;
             const blob = await this._inspectionService.getPdfForProfessional(this.inspection.id);
             this._downloadService.downloadFileFromBlob(blob);
+        } catch (e) {
+            const validationErrors: string[] = [];
+            if (this._helper.parseValidationErrors(e, validationErrors)) {
+                this._toastService.show({ text: validationErrors[0], type: ToastType.Error });
+            } else {
+                throw e;
+            }
         } finally {
             this.isLoading = false;
         }

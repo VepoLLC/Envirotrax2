@@ -1,31 +1,25 @@
 import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { NgForm } from "@angular/forms";
-import { CellTemplateData, ColumnType, InputOption, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
-import { ModalSize } from "@developer-partners/ngx-modal-dialog";
-import { TableViewModel } from "../../shared/models/table-view-model";
-import { BackflowCompliance } from "../../shared/models/backflow/backflow-compliance";
-import { BackflowTestResult } from "../../shared/models/backflow/backflow-test-enums";
-import { SiteLog } from "../../shared/models/sites/site-log";
-import { SiteLogType } from "../../shared/models/sites/site-log-type.enum";
-import { SiteLogReviewDateStatus } from "../../shared/models/sites/site-log-review-date-status.enum";
-import { ComparisonOperator, Query, QueryProperty } from "../../shared/models/query";
-import { WaterSupplierUser } from "../../shared/models/users/water-supplier-user";
-import { DownloadConfig } from "../../shared/models/download-config";
-import { MAX_PAGE_SIZE } from "../../shared/models/page-info";
-import { PermissionAction, PermissionType } from "../../shared/models/permission-type";
-import { FacilityType } from "../../shared/enums/facility-type.enum";
-import { PropertyType } from "../../shared/enums/property-type.enum";
-import { BackflowTestService } from "../../shared/services/backflow/backflow-test.service";
-import { BackflowTestOptionsService } from "../../shared/services/backflow/backflow-test-options.service";
-import { SiteService } from "../../shared/services/sites/site.service";
-import { SiteLogService } from "../../shared/services/sites/site-log.service";
-import { UserService } from "../../shared/services/water-suppliers/user.service";
-import { AuthService } from "../../shared/services/auth/auth.service";
-import { DownloadService } from "../../shared/services/download.service";
-import { ToastService } from "../../shared/services/toast.service";
-import { PrintableTableService } from "../../shared/services/printable-table.service";
-import { SiteLogEditComponent, SiteLogEditModel } from "../../shared/components/site-log/site-log-edit.component";
-import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
+import { CellTemplateData, ColumnType, InputOption, TableColumn } from "@envirotrax/common-ui";
+import { TableViewModel } from "../../../shared/models/table-view-model";
+import { BackflowCompliance } from "../../../shared/models/backflow/backflow-compliance";
+import { BackflowTestResult } from "../../../shared/models/backflow/backflow-test-enums";
+import { ComparisonOperator, Query, QueryProperty } from "../../../shared/models/query";
+import { WaterSupplierUser } from "../../../shared/models/users/water-supplier-user";
+import { DownloadConfig } from "../../../shared/models/download-config";
+import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
+import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
+import { FacilityType } from "../../../shared/enums/facility-type.enum";
+import { PropertyType } from "../../../shared/enums/property-type.enum";
+import { BackflowTestService } from "../../../shared/services/backflow/backflow-test.service";
+import { BackflowTestOptionsService } from "../../../shared/services/backflow/backflow-test-options.service";
+import { SiteService } from "../../../shared/services/sites/site.service";
+import { UserService } from "../../../shared/services/water-suppliers/user.service";
+import { AuthService } from "../../../shared/services/auth/auth.service";
+import { DownloadService } from "../../../shared/services/download.service";
+import { PrintableTableService } from "../../../shared/services/printable-table.service";
+import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
+import { PropertyLogCellComponent } from "../../../shared/components/data-components/table-cells/property-log-cell.component";
 
 const DAY_MS = 86400000;
 
@@ -33,10 +27,10 @@ const DAY_MS = 86400000;
 type ComplianceRow = BackflowCompliance & {
     rowNumber?: number;
     isFirstOfGroup?: boolean;   // first row of a contiguous same-site group — site columns render here only
+    canModify?: boolean;        // page-level Sites-modify permission, surfaced to the property-log cell
     daysExpired?: number;
     expiredClass?: string;
     assignedName?: string;
-    logsExpanded?: boolean;
 };
 
 @Component({
@@ -52,9 +46,6 @@ export class BackflowComplianceManagementComponent implements OnInit {
 
     @ViewChild('mailingTemplate', { static: true })
     public mailingTemplate!: TemplateRef<CellTemplateData<BackflowCompliance>>;
-
-    @ViewChild('logTemplate', { static: true })
-    public logTemplate!: TemplateRef<CellTemplateData<BackflowCompliance>>;
 
     @ViewChild('assignedToTemplate', { static: true })
     public assignedToTemplate!: TemplateRef<CellTemplateData<BackflowCompliance>>;
@@ -80,17 +71,8 @@ export class BackflowComplianceManagementComponent implements OnInit {
     @ViewChild('printableSection')
     private _printableSection!: ElementRef;
 
-    public readonly SiteLogType = SiteLogType;
     public readonly BackflowTestResult = BackflowTestResult;
     public readonly PropertyType = PropertyType;
-
-    public readonly reviewDateStatusClasses: { [key: number]: string } = {
-        [SiteLogReviewDateStatus.None]: '',
-        [SiteLogReviewDateStatus.Overdue]: 'badge bg-danger',
-        [SiteLogReviewDateStatus.DueSoon]: 'badge bg-warning text-dark',
-        [SiteLogReviewDateStatus.Upcoming]: 'badge bg-success',
-        [SiteLogReviewDateStatus.Completed]: 'badge bg-secondary'
-    };
 
     public canModify: boolean = false;
     public resultsHeaderPrefix: string = 'Expired Assemblies';
@@ -184,13 +166,10 @@ export class BackflowComplianceManagementComponent implements OnInit {
         private readonly _backflowTestService: BackflowTestService,
         private readonly _options: BackflowTestOptionsService,
         private readonly _siteService: SiteService,
-        private readonly _siteLogService: SiteLogService,
         private readonly _userService: UserService,
         private readonly _authService: AuthService,
         private readonly _downloadService: DownloadService,
-        private readonly _toastService: ToastService,
         private readonly _printService: PrintableTableService,
-        private readonly _modalHelper: ModalHelperService,
         private readonly _containerHelper: AppContainerHelperService
     ) {
         this.deviceTypeOptions = this._options.deviceTypeFilterOptions;
@@ -232,15 +211,24 @@ export class BackflowComplianceManagementComponent implements OnInit {
 
     public async ngOnInit(): Promise<void> {
         this._containerHelper.setContainerVisibility(false);
-        this.canModify = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.Sites);
-        this.table.columns = this.getColumns();
 
-        await this.loadUsers();
+        // Show the spinner for the whole initial load — the permission check and user lookup run before
+        // getCompliance() would otherwise turn it on, which left the page blank until the data call started.
+        try {
+            this.table.isLoading = true;
 
-        this.table.query = this.buildQuery();
-        this.resultsHeaderPrefix = this.buildResultsHeaderPrefix();
+            this.canModify = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.Sites);
+            this.table.columns = this.getColumns();
 
-        await this.getCompliance();
+            await this.loadUsers();
+
+            this.table.query = this.buildQuery();
+            this.resultsHeaderPrefix = this.buildResultsHeaderPrefix();
+
+            await this.getCompliance();
+        } finally {
+            this.table.isLoading = false;
+        }
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
@@ -287,6 +275,7 @@ export class BackflowComplianceManagementComponent implements OnInit {
 
             rows.forEach((row, index) => {
                 row.rowNumber = offset + index + 1;
+                row.canModify = this.canModify;
 
                 if (this.groupBySite) {
                     // Site columns render once per contiguous same-site run. A site's assemblies stay
@@ -334,76 +323,6 @@ export class BackflowComplianceManagementComponent implements OnInit {
         }
     }
 
-    public async openAttachment(row: BackflowCompliance, log: SiteLog): Promise<void> {
-        if (row.site?.id == null || log.id == null) {
-            return;
-        }
-
-        try {
-            this.table.isLoading = true;
-
-            const url = await this._siteLogService.getAttachmentUrl(row.site.id, log.id);
-
-            if (url) {
-                this._downloadService.downloadFileFromUrl(url);
-            }
-        } finally {
-            this.table.isLoading = false;
-        }
-    }
-
-    public addLog(row: BackflowCompliance): void {
-        if (row.site?.id == null) {
-            return;
-        }
-
-        this._modalHelper.show<SiteLogEditModel, SiteLog>(SiteLogEditComponent, {
-            title: 'Add Log Record',
-            model: { siteId: row.site.id, log: { logType: SiteLogType.Note } },
-            size: ModalSize.large
-        }).result().subscribe(() => this.reloadLogs(row.site!.id!));
-    }
-
-    public editLog(row: BackflowCompliance, log: SiteLog): void {
-        if (row.site?.id == null) {
-            return;
-        }
-
-        this._modalHelper.show<SiteLogEditModel, SiteLog>(SiteLogEditComponent, {
-            title: 'Edit Log Record',
-            model: { siteId: row.site.id, log },
-            size: ModalSize.large
-        }).result().subscribe(() => this.reloadLogs(row.site!.id!));
-    }
-
-    public deleteLog(row: BackflowCompliance, log: SiteLog): void {
-        if (row.site?.id == null) {
-            return;
-        }
-
-        const siteId = row.site.id;
-
-        this._modalHelper.showDeleteConfirmation().result().subscribe(async () => {
-            await this._siteLogService.delete(siteId, log.id!);
-            this._toastService.successfullySaved('Log Record');
-            await this.reloadLogs(siteId);
-        });
-    }
-
-    private async reloadLogs(siteId: number): Promise<void> {
-        const result = await this._siteLogService.getAll(
-            siteId,
-            { pageNumber: 1, pageSize: MAX_PAGE_SIZE },
-            { sort: { id: 'Desc' }, filter: [] }
-        );
-
-        (this.table.items?.data ?? []).forEach(row => {
-            if (row.site?.id === siteId) {
-                (row as ComplianceRow).logs = result.data;
-            }
-        });
-    }
-
     private async loadUsers(): Promise<void> {
         const users = await this._userService.getAll(
             { pageSize: MAX_PAGE_SIZE },
@@ -422,7 +341,7 @@ export class BackflowComplianceManagementComponent implements OnInit {
             this.templateColumn('', this.numberTemplate),
             this.templateColumn('Property Information', this.propertyTemplate),
             this.templateColumn('Account Number', this.accountTemplate),
-            this.templateColumn('Property Log', this.logTemplate),
+            this.logColumn(),
             this.templateColumn('Assigned To', this.assignedToTemplate),
             this.templateColumn('Status', this.statusTemplate),
             this.templateColumn('Test / Exp Dates', this.datesTemplate),
@@ -440,6 +359,19 @@ export class BackflowComplianceManagementComponent implements OnInit {
 
     private templateColumn(caption: string, template: TemplateRef<CellTemplateData<BackflowCompliance>>): TableColumn<BackflowCompliance> {
         return { field: '', caption, type: ColumnType.other, queryColumnExcluded: true, cellTemplate: template, rowCssClass: 'align-top' };
+    }
+
+    // Property Log cell rendered by a dedicated app cell component (via cellComponent, not cellTemplate).
+    // The cell reads canModify off the row (set in getCompliance) since it is instantiated dynamically.
+    private logColumn(): TableColumn<BackflowCompliance> {
+        return {
+            field: '',
+            caption: 'Property Log',
+            type: ColumnType.other,
+            queryColumnExcluded: true,
+            cellComponent: PropertyLogCellComponent,
+            rowCssClass: 'align-top'
+        };
     }
 
     private buildQuery(): Query {

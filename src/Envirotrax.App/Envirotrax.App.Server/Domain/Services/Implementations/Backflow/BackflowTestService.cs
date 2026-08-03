@@ -17,6 +17,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
+using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Backflow;
@@ -445,6 +446,16 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     public Task<byte[]> GeneratePdfAsync(IEnumerable<BackflowTestDto> tests)
     {
         return _pdfTemplateService.GenerateAsync("Backflow.BackflowTest", tests);
+    }
+
+    public Task<byte[]> GeneratePdfForProfessionalAsync(BackflowTestDto test)
+    {
+        if (test.TransactionId == null)
+        {
+            throw new AppValidationException("Report can't be downloaded until it's paid. Please go to checkout and pay for this transaction, then try downloading again.");
+        }
+
+        return GeneratePdfAsync(test);
     }
 
     public async Task<IEnumerable<BackflowTestDto>> GetAllPendingTestsForRenewalAsync(int batchSize, CancellationToken cancellationToken)

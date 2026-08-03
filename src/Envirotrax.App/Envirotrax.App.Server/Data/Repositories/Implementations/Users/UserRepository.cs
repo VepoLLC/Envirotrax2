@@ -17,7 +17,7 @@ public class UserRepository : Repository<WaterSupplierUser>, IUserRepository
     protected override IQueryable<WaterSupplierUser> GetListQuery()
     {
         return base.GetListQuery()
-            .Include(user => user.UserRoles)
+            .Include(user => user.UserRoles!)
             .ThenInclude(userRole => userRole.Role);
     }
 

@@ -61,7 +61,7 @@ public class ProfessionalFogTripTicketController : ProfessionalProtectedControll
             return NotFound();
         }
 
-        var pdfBytes = await _fogService.GeneratePdfAsync(ticket);
+        var pdfBytes = await _fogService.GeneratePdfForProfessionalAsync(ticket);
         return File(pdfBytes, "application/pdf");
     }
 

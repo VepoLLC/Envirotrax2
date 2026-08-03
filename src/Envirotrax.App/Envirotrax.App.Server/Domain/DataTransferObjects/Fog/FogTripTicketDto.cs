@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Microsoft.EntityFrameworkCore;
 
@@ -204,8 +205,7 @@ public class FogTripTicketDto : IDto
 
     public DateTime? ApprovalDate { get; set; }
 
-    [StringLength(50)]
-    public string? ApprovedBy { get; set; }
+    public ReferencedWaterSupplierUserDto? ApprovedBy { get; set; }
 
     // Validation
     public bool NeedsValidation { get; set; }

@@ -4,7 +4,7 @@ import { PermissionGuard } from "../shared/guards/permission.guard";
 import { PermissionAction, PermissionType } from "../shared/models/permission-type";
 import { BackflowTesterListComponent } from "./testers/list/backflow-tester-list.component";
 import { BackflowTestListComponent } from "./tests/backflow-test-list.component";
-import { BackflowComplianceManagementComponent } from "./compliance/backflow-compliance-management.component";
+import { BackflowComplianceManagementComponent } from "./reports/compliance/backflow-compliance-management.component";
 import { BackflowTestDetailsComponent } from "./tests/details/backflow-test-details.component";
 import { BackflowTesterDetailsComponent } from "./testers/details/backflow-tester-details.component";
 import { BackflowOutOfServiceListComponent } from "./out-of-service/backflow-out-of-service-list.component";

@@ -4,6 +4,7 @@ import { createPopper } from '@popperjs/core';
 import { WindowService } from './shared/services/window.service';
 import { WaterSupplierListComponent } from './water-suppliers/list/water-supplier-list.component';
 import { SiteListComponent } from './sites/list/site-list.component';
+import { CsiInspectionListComponent } from './csi/inspections/list/csi-inspection-list.component';
 
 @Component({
   selector: 'app-root',
@@ -44,6 +45,17 @@ export class App implements OnInit {
         title: 'Water Suppliers',
         iconCss: 'fa-solid fa-droplet',
         onClick: this.showWaterSuppliers.bind(this)
+      },
+      {
+        title: 'CSI Management',
+        iconCss: 'fa-solid fa-clipboard-check',
+        children: [
+          {
+            title: 'Inspection Search',
+            iconCss: 'fa-solid fa-magnifying-glass',
+            onClick: this.showCsiInspectionSearch.bind(this)
+          }
+        ]
       }
     ];
   }
@@ -90,6 +102,12 @@ export class App implements OnInit {
   public showPropertySearch(): void {
     this._windowService.addWindow(SiteListComponent, {
       title: 'Property Search'
+    });
+  }
+
+  public showCsiInspectionSearch(): void {
+    this._windowService.addWindow(CsiInspectionListComponent, {
+      title: 'CSI Search'
     });
   }
 }

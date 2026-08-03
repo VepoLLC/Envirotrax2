@@ -8,6 +8,8 @@ using Envirotrax.Admin.Server.Domain.Services.Definitions.WaterSuppliers;
 using Envirotrax.Admin.Server.Domain.Services.Implementations.WaterSuppliers;
 using Envirotrax.Admin.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.Admin.Server.Domain.Services.Implementations.Sites;
+using Envirotrax.Admin.Server.Domain.Services.Definitions.Csi;
+using Envirotrax.Admin.Server.Domain.Services.Implementations.Csi;
 
 namespace Envirotrax.Admin.Server.Domain.Configuration;
 
@@ -23,6 +25,7 @@ public static class ServiceRegistration
         // Register services here:
         services.AddTransient<IWaterSupplierService, WaterSupplierService>();
         services.AddTransient<ISiteService, SiteService>();
+        services.AddTransient<ICsiInspectionService, CsiInspectionService>();
 
         return services;
     }

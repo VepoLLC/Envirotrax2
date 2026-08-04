@@ -26,6 +26,11 @@ const routes: Routes = [
     title: 'Property Search',
     loadChildren: () => import('./sites/site.module').then(m => m.SiteModule)
   },
+  {
+    path: 'csi',
+    title: 'CSI Management',
+    loadChildren: () => import('./csi/csi.module').then(m => m.CsiModule)
+  },
 ];
 
 @NgModule({

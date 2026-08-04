@@ -15,18 +15,13 @@ public class CsiInspectionService : ICsiInspectionService
         _apiClient = apiClient;
     }
 
-    public Task<IPagedData<CsiInspectionDto>> SearchAsync(PageInfo pageInfo, Query query, CsiPaymentStatus? paymentStatus, int? inspectorId, CancellationToken cancellationToken)
+    public Task<IPagedData<CsiInspectionDto>> SearchAsync(PageInfo pageInfo, Query query, CsiPaymentStatus? paymentStatus, CancellationToken cancellationToken)
     {
         var additionalParameters = new Dictionary<string, string>();
 
         if (paymentStatus.HasValue)
         {
             additionalParameters["paymentStatus"] = ((int)paymentStatus.Value).ToString();
-        }
-
-        if (inspectorId.HasValue)
-        {
-            additionalParameters["inspectorId"] = inspectorId.Value.ToString();
         }
 
         return _apiClient.GetAsync<CsiInspectionDto>("/api/admin/csi/inspections", pageInfo, query, additionalParameters, cancellationToken);

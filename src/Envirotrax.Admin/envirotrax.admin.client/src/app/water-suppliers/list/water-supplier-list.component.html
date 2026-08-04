@@ -185,7 +185,7 @@
 
 <dp-loading-spinner [hidden]="!table.isLoading"></dp-loading-spinner>
 
-<div *ngIf="showResults">
+<div [hidden]="!showResults">
     <div class="d-flex justify-content-end mb-3">
         <button type="button" class="btn btn-primary vp-section-button" (click)="showResults = false">
             <i class="fa-solid fa-magnifying-glass me-1"></i>

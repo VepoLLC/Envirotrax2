@@ -50,30 +50,21 @@ public class ProfessionalDashboardController : ProfessionalProtectedController
 
         if (isAdmin)
         {
-            var supplierResult  = await _supplierService.GetAllAsync(new PageInfo { PageSize = 1 }, new Query(), cancellationToken);
-            var userResult      = await _userService.GetAllAsync(new PageInfo { PageSize = 1 }, new Query(), cancellationToken);
-            var licenseResult   = await _licenseService.GetAllAsync(new PageInfo { PageSize = 1 }, new Query(), cancellationToken);
-            var insuranceResult = await _insuranceService.GetAllAsync(new PageInfo { PageSize = 1 }, new Query(), cancellationToken);
-
-            dto.SupplierCount   = (int)(supplierResult.PageInfo?.TotalItems  ?? 0);
-            dto.SubAccountCount = (int)(userResult.PageInfo?.TotalItems      ?? 0);
-            dto.LicenseCount    = (int)(licenseResult.PageInfo?.TotalItems   ?? 0);
-            dto.InsuranceCount  = (int)(insuranceResult.PageInfo?.TotalItems ?? 0);
+            dto.SupplierCount   = await _supplierService.CountAsync(cancellationToken);
+            dto.SubAccountCount = await _userService.CountAsync(cancellationToken);
+            dto.LicenseCount    = await _licenseService.CountAsync(cancellationToken);
+            dto.InsuranceCount  = await _insuranceService.CountAsync(cancellationToken);
         }
 
         if (canAccessGauges)
         {
-            var gaugeResult  = await _gaugeService.GetAllAsync(new PageInfo { PageSize = 1 }, new Query(), cancellationToken);
-            dto.GaugeCount   = (int)(gaugeResult.PageInfo?.TotalItems ?? 0);
+            dto.GaugeCount = await _gaugeService.CountAsync(cancellationToken);
         }
 
         if (canAccessTransportation)
         {
-            var vehicleResult     = await _vehicleService.GetAllAsync(new PageInfo { PageSize = 1 }, new Query(), cancellationToken);
-            var disposalSiteResult = await _disposalSiteService.GetRegisteredDisposalSitesAsync(new PageInfo { PageSize = 1 }, new Query(), cancellationToken);
-
-            dto.VehicleCount      = (int)(vehicleResult.PageInfo?.TotalItems      ?? 0);
-            dto.DisposalSiteCount = (int)(disposalSiteResult.PageInfo?.TotalItems ?? 0);
+            dto.VehicleCount      = await _vehicleService.CountAsync(cancellationToken);
+            dto.DisposalSiteCount = await _disposalSiteService.CountRegisteredDisposalSitesAsync(cancellationToken);
         }
 
         return Ok(dto);

@@ -7,5 +7,7 @@ public interface IFogTransporterDisposalSiteRepository : IRepository<FogTranspor
 {
     Task<IEnumerable<FogDisposalSite>> GetRegisteredDisposalSitesAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
 
+    Task<int> CountRegisteredDisposalSitesAsync(Query query, CancellationToken cancellationToken);
+
     Task<FogTransporterDisposalSite> SetRegistrationAsync(FogTransporterDisposalSite registration, CancellationToken cancellationToken);
 }

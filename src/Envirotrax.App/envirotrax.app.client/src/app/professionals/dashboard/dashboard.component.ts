@@ -20,6 +20,12 @@ import { ProfessionalUser } from '../../shared/models/professionals/professional
 import { ProfessionalUserLicense, ExpirationType } from '../../shared/models/professionals/licenses/professional-user-license';
 import { ProfessionalInsurance } from '../../shared/models/professionals/professional-insurance';
 import { BackflowGauge, GaugeExpirationType } from '../../shared/models/backflow/backflow-gauge';
+import { ProfessionalFogVehicleService } from '../../shared/services/fog/professional-fog-vehicle.service';
+import { ProfessionalFogDisposalSiteService } from '../../shared/services/fog/professional-fog-disposal-site.service';
+import { FogVehicle } from '../../shared/models/fog/fog-vehicle';
+import { FogDisposalSite } from '../../shared/models/fog/fog-disposal-site';
+import { FOG_VEHICLE_CAPACITY_TYPE_LABELS } from '../../shared/models/fog/fog-vehicle-enums';
+import { PHYSICAL_TYPE_LABELS } from '../../shared/models/fog/fog-disposal-site-enums';
 import { ProfessionalDashboardStats } from '../../shared/models/professionals/professional-dashboard-stats';
 import { TableViewModel } from '../../shared/models/table-view-model';
 import { CellTemplateData, ColumnType, FreeTextSearchSettings, TableColumn, ModalHelperService } from '@envirotrax/common-ui';
@@ -148,6 +154,18 @@ export class DashboardComponent implements OnInit {
         } as FreeTextSearchSettings
     };
 
+    // Sorted by id so paging is deterministic (Skip/Take with no ORDER BY can repeat or drop rows).
+    // V1's Account Overview orders these the same way — main.aspx.vb:444 "ORDER BY ID ASC".
+    public vehiclesTable: TableViewModel<FogVehicleRow> = {
+        query: { sort: { id: 'Asc' }, filter: [] },
+        columns: []
+    };
+
+    public disposalSitesTable: TableViewModel<FogDisposalSiteRow> = {
+        query: { sort: { county: 'Asc' }, filter: [] },
+        columns: []
+    };
+
     public readonly ExpirationType = ExpirationType;
     public readonly GaugeExpirationType = GaugeExpirationType;
 
@@ -188,6 +206,8 @@ export class DashboardComponent implements OnInit {
         private readonly _gaugeService: BackflowGaugeService,
         private readonly _backflowTestService: BackflowTestService,
         private readonly _dashboardService: ProfessionalDashboardService,
+        private readonly _vehicleService: ProfessionalFogVehicleService,
+        private readonly _disposalSiteService: ProfessionalFogDisposalSiteService,
         private readonly _router: Router,
         private readonly _containerHelper: AppContainerHelperService,
         private readonly _modalHelper: ModalHelperService
@@ -230,11 +250,18 @@ export class DashboardComponent implements OnInit {
 
             if (this.hasFogTransportation) {
                 promises.push(this.loadSignature());
+                promises.push(this.loadVehicles());
+                promises.push(this.loadDisposalSites());
+            }
+
+            // The quick-view tiles read every count, so the stats are needed by any
+            // role that has at least one tile — not just admins.
+            if (this.isAdmin || this.hasBackflow || this.hasFogTransportation) {
+                promises.push(this.loadStats());
             }
 
             if (this.isAdmin) {
                 promises.push(
-                    this.loadStats(),
                     this.loadSubAccounts(),
                     this.loadLicenses(),
                     this.loadInsurances()
@@ -298,6 +325,8 @@ export class DashboardComponent implements OnInit {
         this.licensesTable.columns = this.buildLicensesColumns();
         this.insurancesTable.columns = this.buildInsurancesColumns();
         this.gaugesTable.columns = this.buildGaugesColumns();
+        this.vehiclesTable.columns = this.buildVehiclesColumns();
+        this.disposalSitesTable.columns = this.buildDisposalSitesColumns();
     }
 
     public setViewMode(mode: 'quick' | 'full'): void {
@@ -451,6 +480,62 @@ export class DashboardComponent implements OnInit {
         } finally {
             this.gaugesTable.isLoading = false;
         }
+    }
+
+    public async loadVehicles(): Promise<void> {
+        try {
+            this.vehiclesTable.isLoading = true;
+
+            const vehicles = await this._vehicleService.getAll(
+                this.vehiclesTable.items?.pageInfo || {},
+                this.vehiclesTable.query
+            );
+
+            this.vehiclesTable.items = {
+                pageInfo: vehicles.pageInfo,
+                data: vehicles.data.map(vehicle => ({
+                    ...vehicle,
+                    capacityDescription: this.buildCapacityDescription(vehicle)
+                }))
+            };
+        } finally {
+            this.vehiclesTable.isLoading = false;
+        }
+    }
+
+    public async loadDisposalSites(): Promise<void> {
+        try {
+            this.disposalSitesTable.isLoading = true;
+
+            const sites = await this._disposalSiteService.getRegistered(
+                this.disposalSitesTable.items?.pageInfo || {},
+                this.disposalSitesTable.query
+            );
+
+            this.disposalSitesTable.items = {
+                pageInfo: sites.pageInfo,
+                data: sites.data.map(site => ({
+                    ...site,
+                    wasteTypeDescription: site.physicalType == null
+                        ? ''
+                        : PHYSICAL_TYPE_LABELS[site.physicalType] ?? ''
+                }))
+            };
+        } finally {
+            this.disposalSitesTable.isLoading = false;
+        }
+    }
+
+    private buildCapacityDescription(vehicle: FogVehicle): string {
+        if (vehicle.capacity == null) {
+            return '';
+        }
+
+        const capacityType = vehicle.capacityType == null
+            ? ''
+            : FOG_VEHICLE_CAPACITY_TYPE_LABELS[vehicle.capacityType] ?? '';
+
+        return `${vehicle.capacity} ${capacityType}`.trim();
     }
 
     public viewInspection(inspection: CsiInspection): void {
@@ -653,4 +738,43 @@ export class DashboardComponent implements OnInit {
             }
         ];
     }
+
+    private buildVehiclesColumns(): TableColumn<FogVehicleRow>[] {
+        return [
+            { field: 'licensePlateNumber', caption: 'License Plate #', type: ColumnType.text },
+            { field: 'manufacturer', caption: 'Manufacturer', type: ColumnType.text },
+            { field: 'manufacturedYear', caption: 'Year', type: ColumnType.number },
+            {
+                field: 'capacityDescription',
+                caption: 'Capacity',
+                type: ColumnType.text,
+                queryColumnExcluded: true
+            },
+            { field: 'stickerNumber', caption: 'Sticker #', type: ColumnType.text }
+        ];
+    }
+
+    private buildDisposalSitesColumns(): TableColumn<FogDisposalSiteRow>[] {
+        return [
+            { field: 'name', caption: 'Disposal Facility', type: ColumnType.text },
+            { field: 'registrationNumber', caption: 'Registration Number', type: ColumnType.text },
+            { field: 'county', caption: 'County', type: ColumnType.text },
+            {
+                field: 'wasteTypeDescription',
+                caption: 'Waste Types',
+                type: ColumnType.text,
+                queryColumnExcluded: true
+            }
+        ];
+    }
+}
+
+// Display-only view models: the capacity and waste-type labels are pre-computed once
+// per load so the templates never call a component method per row.
+interface FogVehicleRow extends FogVehicle {
+    capacityDescription: string;
+}
+
+interface FogDisposalSiteRow extends FogDisposalSite {
+    wasteTypeDescription: string;
 }

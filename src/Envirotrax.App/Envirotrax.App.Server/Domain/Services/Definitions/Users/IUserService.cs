@@ -1,4 +1,4 @@
-
+using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 
@@ -8,5 +8,5 @@ public interface IUserService : IService<WaterSupplierUser, WaterSupplierUserDto
 {
     Task<WaterSupplierUserDto?> ResendInvitationAsync(int id, CancellationToken cancellationToken);
 
-    Task<IEnumerable<WaterSupplierUserDto>> GetAllForWaterSupplierAsync(int waterSupplierId, CancellationToken cancellationToken);
+    Task<IPagedData<WaterSupplierUserDto>> GetAllForWaterSupplierAsync(int waterSupplierId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
 }

@@ -27,6 +27,7 @@ public class WaterSupplierProfile : Profile
             .ReverseMap()
             .ForMember(supplier => supplier.Parent, opt => opt.Ignore())
             .ForMember(supplier => supplier.ParentId, opt => opt.MapFrom(supplier => supplier.Parent!.Id))
+            .ForMember(supplier => supplier.GeneralSettings, opt => opt.Ignore())
             .ForMember(supplier => supplier.State, opt => opt.Ignore())
             .ForMember(supplier => supplier.StateId, opt => opt.MapFrom(dto => dto.State != null ? dto.State.Id : (int?)null))
             .ForMember(supplier => supplier.LetterState, opt => opt.Ignore())

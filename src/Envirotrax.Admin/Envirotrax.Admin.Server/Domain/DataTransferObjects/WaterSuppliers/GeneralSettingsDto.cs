@@ -49,3 +49,12 @@ public class GeneralSettingsDto
     public bool RequireBackflowTestImages { get; set; }
     public bool RequireCsiInspectionImages { get; set; }
 }
+
+public class ReferencedGeneralSettingsDto
+{
+    public bool AdministrativeOnly { get; set; }
+    public bool WiseGuys { get; set; }
+    public bool BackflowTesting { get; set; }
+    public bool CsiInspections { get; set; }
+    public bool FogProgram { get; set; }
+}

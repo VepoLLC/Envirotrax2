@@ -49,6 +49,39 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<CsiInspection>> SearchForAdminAsync(
+        PageInfo pageInfo,
+        Query query,
+        CsiPaymentStatus? paymentStatus,
+        int? inspectorId,
+        CancellationToken cancellationToken)
+    {
+        var dbQuery = GetListQuery()
+            .Include(c => c.PropertyState)
+            .Where(query.Filter);
+
+        if (paymentStatus == CsiPaymentStatus.Paid)
+        {
+            dbQuery = dbQuery.Where(c => c.TransactionId != null && c.TransactionId != string.Empty);
+        }
+
+        if (paymentStatus == CsiPaymentStatus.Unpaid)
+        {
+            dbQuery = dbQuery.Where(c => c.TransactionId == null || c.TransactionId == string.Empty);
+        }
+
+        if (inspectorId.HasValue)
+        {
+            dbQuery = dbQuery.Where(c => c.ProfessionalId == inspectorId.Value || c.InspectorId == inspectorId.Value);
+        }
+
+        var paginated = await dbQuery
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
     public async Task<CsiInspection?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken)
     {
         var inspection = await GetAsync(id, cancellationToken);

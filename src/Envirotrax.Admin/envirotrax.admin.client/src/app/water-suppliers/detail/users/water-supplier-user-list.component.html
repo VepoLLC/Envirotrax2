@@ -1,0 +1,21 @@
+<ng-template #rolesCell let-user="rowData">
+    <span *ngIf="!user.roles?.length" class="text-muted">No roles assigned</span>
+
+    <span *ngFor="let role of user.roles" class="badge text-bg-info me-1">
+        {{ role.name }}
+    </span>
+</ng-template>
+
+<vp-section header="User Accounts ({{ table.items?.pageInfo?.totalItems }})">
+    <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+    <vp-table *ngIf="table.items"
+              [columns]="table.columns!"
+              [data]="table.items.data"
+              [(pageInfo)]="table.items.pageInfo"
+              (pageInfoChange)="getUsers()"
+              [(query)]="table.query"
+              (queryChange)="getUsers()"
+              (queryReset)="getUsers()"
+              [freeTextSearch]="table.freeTextSearch" />
+</vp-section>

@@ -3,7 +3,7 @@ BEGIN TRAN
 BEGIN TRY
 
     INSERT INTO Envirotrax2Dev.dbo.GeneralSettings
-        (WaterSupplierId, PrivacyRequired, WiseGuys, BackflowTesting, CsiInspections, FogProgram, AdministrativeOnly,
+        (WaterSupplierId, PrivacyRequired, NewSitesLocked, WiseGuys, BackflowTesting, CsiInspections, FogProgram, AdministrativeOnly,
          BpatsRequireInsurance, BpatsRequireInsuranceAmount, BpatsRequireIrrigationLicense,
          CsiInspectorsRequireInsurance, CsiInspectorsRequireInsuranceAmount,
          FogTransportersRequireInsurance, FogTransportersRequireInsuranceAmount,
@@ -14,7 +14,7 @@ BEGIN TRY
          FogTransportFee, FogTransportFeeWsShare,
          RequireBackflowTestImages, RequireCsiInspectionImages)
     SELECT
-        newWaterSuppliers.Id, WaterSuppliers.PrivacyRequired, WaterSuppliers.ProgramTypeWISE, WaterSuppliers.ProgramTypeBackflow,
+        newWaterSuppliers.Id, WaterSuppliers.PrivacyRequired, WaterSuppliers.UseSiteForWaterSupplierAssignment, WaterSuppliers.ProgramTypeWISE, WaterSuppliers.ProgramTypeBackflow,
         WaterSuppliers.ProgramTypeCSI, WaterSuppliers.ProgramTypeFOG, WaterSuppliers.ProgramTypeAdministrativeOnly,
         WaterSuppliers.SaveBPATRequiresInsurance, WaterSuppliers.SaveBPATInsuranceCoverage, WaterSuppliers.SaveBPATRequiresIrrigationLicense,
         WaterSuppliers.CsiRequiresInsurance, WaterSuppliers.CsiInsuranceCoverage,
@@ -31,11 +31,16 @@ BEGIN TRY
     FROM WaterSuppliers
     INNER JOIN Envirotrax2Dev.dbo.WaterSuppliers AS newWaterSuppliers
         ON newWaterSuppliers.LegacyRecordId = WaterSuppliers.ID
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM Envirotrax2Dev.dbo.GeneralSettings AS alreadyInserted
+        WHERE alreadyInserted.WaterSupplierId = newWaterSuppliers.Id
+    )
 
-    --COMMIT TRAN
+    COMMIT TRAN
 
 END TRY
 BEGIN CATCH
-    ROLLBACK TRAN
-    THROW
+    ROLLBACK TRAN;
+    THROW;
 END CATCH

@@ -43,6 +43,7 @@ Log.Logger = new LoggerConfiguration()
 services.AddLogging(builder => builder.AddSerilog(Log.Logger, dispose: true));
 
 services.AddTransient<UserService>();
+services.AddTransient<WaterSupplierService>();
 
 var provider = services.BuildServiceProvider();
 
@@ -51,3 +52,6 @@ var provider = services.BuildServiceProvider();
 /***********************************************************************************************************************************************/
 var userService = provider.GetRequiredService<UserService>();
 await userService.MigrateAsync();
+
+var waterSupplierService = provider.GetRequiredService<WaterSupplierService>();
+await waterSupplierService.MigrateAsync();

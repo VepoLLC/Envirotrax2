@@ -34,4 +34,12 @@ export class WaterSupplier {
     letterContactPhoneNumber?: string;
     letterContactFaxNumber?: string;
     letterContactEmailAddress?: string;
+
+    generalSettings?: {
+        administrativeOnly?: boolean;
+        wiseGuys?: boolean;
+        backflowTesting?: boolean;
+        csiInspections?: boolean;
+        fogProgram?: boolean;
+    };
 }

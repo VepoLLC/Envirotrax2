@@ -1,4 +1,4 @@
-<h1 class="text-center h2">FOG Management</h1>
+<h1 class="text-center h2">Transporter Management</h1>
 
 <div [hidden]="showResults">
     <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
@@ -9,33 +9,40 @@
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="companyEmail"
                                                    label="Company email"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="name"
-                                                   label="Company name"
+                                                   label="Company name:"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
-                        </div>
+                        </div>                   
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="address"
-                                                   label="Address"
+                                                   label="Address:"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="phoneNumber"
-                                                   label="Company phone"
+                                                   label="Phone #:"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                     </div>
-                    <div class="col-md-6">
+
+                    <div class="col-md-6 ">
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="registrationNumber"
-                                                   label="Registration number"
+                                                   label="Registration number:"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="insurancePolicyNumber"
-                                                   label="Insurance policy number"
+                                                   label="Insurance policy number:"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                     </div>
@@ -76,7 +83,7 @@
 
         <button type="button"
                 class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
-                (click)="showResults = false;">
+                (click)="setShowResults(false)">
             Search Again
         </button>
     </div>

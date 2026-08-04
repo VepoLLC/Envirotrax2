@@ -19,6 +19,15 @@ import { FogTripTicketListComponent } from "./trip-tickets/list/fog-trip-ticket-
 import { FogTripTicketViewComponent } from "./trip-tickets/view/fog-trip-ticket-view.component";
 import { FogTransporterListComponent } from "./transporters/list/fog-transporter-list.component";
 import { FogTransporterDetailsComponent } from "./transporters/details/fog-transporter-details.component";
+import { FogTransporterWaterSuppliersComponent } from "./transporters/details/water-suppliers/list/fog-transporter-water-suppliers.component";
+import { EditFogTransporterWaterSupplierComponent } from "./transporters/details/water-suppliers/edit/edit-fog-transporter-water-supplier.component";
+import { FogTransporterUsersComponent } from "./transporters/details/users/list/fog-transporter-users.component";
+import { EditFogTransporterUserComponent } from "./transporters/details/users/edit/edit-fog-transporter-user.component";
+import { FogTransporterLicenseInsuranceComponent } from "./transporters/details/license-insurance/list/fog-transporter-license-insurance.component";
+import { EditFogTransporterLicenseComponent } from "./transporters/details/license-insurance/edit/edit-fog-transporter-license.component";
+import { EditFogTransporterInsuranceComponent } from "./transporters/details/license-insurance/edit/edit-fog-transporter-insurance.component";
+import { FogTransporterVehiclesComponent } from "./transporters/details/vehicles/list/fog-transporter-vehicles.component";
+import { EditFogTransporterVehicleComponent } from "./transporters/details/vehicles/edit/edit-fog-transporter-vehicle.component";
 import { ProfessionalModule } from "../professionals/professional.module";
 
 @NgModule({
@@ -37,7 +46,16 @@ import { ProfessionalModule } from "../professionals/professional.module";
         FogTripTicketListComponent,
         FogTripTicketViewComponent,
         FogTransporterListComponent,
-        FogTransporterDetailsComponent
+        FogTransporterDetailsComponent,
+        FogTransporterWaterSuppliersComponent,
+        EditFogTransporterWaterSupplierComponent,
+        FogTransporterUsersComponent,
+        EditFogTransporterUserComponent,
+        FogTransporterLicenseInsuranceComponent,
+        EditFogTransporterLicenseComponent,
+        EditFogTransporterInsuranceComponent,
+        FogTransporterVehiclesComponent,
+        EditFogTransporterVehicleComponent
     ],
     imports: [
         CommonModule,

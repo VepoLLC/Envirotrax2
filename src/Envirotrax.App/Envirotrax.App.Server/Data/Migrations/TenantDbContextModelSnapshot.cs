@@ -1565,9 +1565,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<DateTime?>("ApprovalDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ApprovedBy")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int?>("ApprovedById")
+                        .HasColumnType("int");
 
                     b.Property<string>("Comments")
                         .HasMaxLength(1000)
@@ -1896,6 +1895,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("VehicleId");
 
                     b.HasIndex("ProfessionalId", "TransporterId");
+
+                    b.HasIndex("WaterSupplierId", "ApprovedById");
 
                     b.HasIndex("WaterSupplierId", "SiteId");
 
@@ -3944,11 +3945,18 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasForeignKey("ProfessionalId", "TransporterId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.WaterSupplierUser", "ApprovedBy")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId", "ApprovedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Envirotrax.App.Server.Data.Models.Sites.Site", "Site")
                         .WithMany()
                         .HasForeignKey("WaterSupplierId", "SiteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("ApprovedBy");
 
                     b.Navigation("CreatedBy");
 
@@ -4358,6 +4366,12 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.WaterSupplierUser", null)
+                        .WithMany("UserRoles")
+                        .HasForeignKey("WaterSupplierId", "UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Role");
 
                     b.Navigation("User");
@@ -4504,6 +4518,11 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("State");
 
                     b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Users.WaterSupplierUser", b =>
+                {
+                    b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", b =>

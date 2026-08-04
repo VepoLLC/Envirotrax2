@@ -36,6 +36,11 @@ public class FogTripTicketProfile : Profile
                 {
                     dto.PropertyState ??= new ReferencedStateDto { Id = model.PropertyStateId.Value };
                 }
+
+                if (model.ApprovedById.HasValue)
+                {
+                    dto.ApprovedBy ??= new() { Id = model.ApprovedById.Value };
+                }
             })
             .ReverseMap()
             .ForMember(m => m.Site, opt => opt.Ignore())
@@ -49,6 +54,8 @@ public class FogTripTicketProfile : Profile
             .ForMember(m => m.Vehicle, opt => opt.Ignore())
             .ForMember(m => m.ReceiverDisposalSite, opt => opt.Ignore())
             .ForMember(m => m.WaterSupplier, opt => opt.Ignore())
+            .ForMember(m => m.ApprovedBy, opt => opt.Ignore())
+            .ForMember(m => m.ApprovedById, opt => opt.MapFrom(dto => dto.ApprovedBy != null ? dto.ApprovedBy.Id : (int?)null))
             .ForMember(m => m.CreatedBy, opt => opt.Ignore())
             .ForMember(m => m.UpdatedBy, opt => opt.Ignore())
             .ForMember(m => m.DeletedBy, opt => opt.Ignore());

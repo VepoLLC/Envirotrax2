@@ -10,7 +10,5 @@ public interface IWaterSupplierService
 
     Task<WaterSupplierDetailsDto?> GetDetailsAsync(int id, CancellationToken cancellationToken);
 
-    Task<IEnumerable<WaterSupplierUserAccountDto>> GetUserAccountsAsync(int id, CancellationToken cancellationToken);
-
     Task<WaterSupplierDetailsDto?> UpdateDetailsAsync(int id, WaterSupplierDetailsDto details);
 }

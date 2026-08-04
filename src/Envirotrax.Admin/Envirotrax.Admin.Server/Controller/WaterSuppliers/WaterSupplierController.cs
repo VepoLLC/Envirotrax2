@@ -24,8 +24,8 @@ public class WaterSupplierController : AdminBaseController
         return Ok(suppliers);
     }
 
-    [HttpGet("{id}/details")]
-    public async Task<IActionResult> GetDetailsAsync(int id, CancellationToken cancellationToken)
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
     {
         var details = await _waterSupplierService.GetDetailsAsync(id, cancellationToken);
 
@@ -37,15 +37,8 @@ public class WaterSupplierController : AdminBaseController
         return Ok(details);
     }
 
-    [HttpGet("{id}/user-accounts")]
-    public async Task<IActionResult> GetUserAccountsAsync(int id, CancellationToken cancellationToken)
-    {
-        var accounts = await _waterSupplierService.GetUserAccountsAsync(id, cancellationToken);
-        return Ok(accounts);
-    }
-
-    [HttpPut("{id}/details")]
-    public async Task<IActionResult> UpdateDetailsAsync(int id, WaterSupplierDetailsDto details)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAsync(int id, WaterSupplierDetailsDto details)
     {
         var updated = await _waterSupplierService.UpdateDetailsAsync(id, details);
 

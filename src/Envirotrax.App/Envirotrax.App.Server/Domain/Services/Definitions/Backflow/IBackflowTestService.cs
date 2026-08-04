@@ -23,6 +23,7 @@ public interface IBackflowTestService : IService<BackflowTest, BackflowTestDto>
 
     Task<byte[]> GeneratePdfAsync(BackflowTestDto test);
     Task<byte[]> GeneratePdfAsync(IEnumerable<BackflowTestDto> tests);
+    Task<byte[]> GeneratePdfForProfessionalAsync(BackflowTestDto test);
 
     Task ProcessSiteRenewalAsync(int siteId, CancellationToken cancellationToken);
     Task ProcessTestRenewalAsync(int testId, CancellationToken cancellationToken);

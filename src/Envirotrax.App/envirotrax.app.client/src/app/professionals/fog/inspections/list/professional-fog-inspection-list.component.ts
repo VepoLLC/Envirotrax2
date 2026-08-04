@@ -86,6 +86,7 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
         private readonly _printService: PrintableTableService,
         private readonly _downloadService: DownloadService
     ) {
+        this.table.query.filter = [this.paidFilter()];
         this.inspectionResultOptions = this._fogOptions.inspectionResultFilterOptions;
         this.interceptorTypeOptions = this._fogOptions.interceptorTypeFilterOptions;
         this.facilityTypeOptions = this._fogOptions.facilityTypeFilterOptions;
@@ -225,7 +226,11 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
-        this.table.query.filter = queryProperties;
+        this.table.query.filter = [...queryProperties, this.paidFilter()];
+    }
+
+    private paidFilter(): QueryProperty {
+        return { columnName: 'transactionId', isValueNull: true, comparisonOperator: 'NotEq', logicalOperator: 'And' };
     }
 
     public setShowResults(visible: boolean): void {

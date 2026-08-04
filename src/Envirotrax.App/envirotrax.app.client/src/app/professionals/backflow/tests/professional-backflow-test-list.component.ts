@@ -59,6 +59,7 @@ export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy 
             ]
         }
     };
+    
 
     public waterSupplierScopeOptions: InputOption[] = [
         { id: '', text: 'My test history only' }
@@ -84,6 +85,8 @@ export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy 
         private readonly _printService: PrintableTableService,
         private readonly _containerHelper: AppContainerHelperService
     ) {
+        this.table.query.filter = [this.paidFilter()];          
+
         this.downloadConfig = {
             fileName: 'Backflow Tests',
             endpoint: this._backflowTestService.getAllForProfessionalEndpoint(),
@@ -279,7 +282,11 @@ export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy 
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
-        this.table.query.filter = queryProperties;
+        this.table.query.filter = [...queryProperties, this.paidFilter()];
+    }
+
+    private paidFilter(): QueryProperty {
+        return { columnName: 'transactionId', isValueNull: true, comparisonOperator: 'NotEq', logicalOperator: 'And' };
     }
 
     public async search(searchForm: NgForm): Promise<void> {

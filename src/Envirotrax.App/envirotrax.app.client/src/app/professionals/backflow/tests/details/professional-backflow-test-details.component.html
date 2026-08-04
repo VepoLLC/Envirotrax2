@@ -62,14 +62,20 @@
             [test]="test"
             [canModify]="false" />
 
-        <div class="d-flex justify-content-center gap-2 flex-wrap mt-3">
-            <button type="button" class="btn btn-primary vp-section-button" (click)="exportPdf()">
-                Export Test to Printable Document
-            </button>
-            <button type="button" class="btn btn-primary vp-section-button"
-                    [routerLink]="['/professionals/backflow/tests', id, 'out-of-service']">
-                Out of Service Request
-            </button>
+        <div class="d-flex flex-column align-items-center gap-2 mt-3">
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <button type="button" class="btn btn-primary vp-section-button" (click)="exportPdf()"
+                        [disabled]="!test.transactionId">
+                    Export Test to Printable Document
+                </button>
+                <button type="button" class="btn btn-primary vp-section-button"
+                        [routerLink]="['/professionals/backflow/tests', id, 'out-of-service']">
+                    Out of Service Request
+                </button>
+            </div>
+            <div *ngIf="!test.transactionId" class="text-danger text-center small">
+                Report can't be downloaded until it's paid. Please go to checkout and pay for this transaction, then try downloading again.
+            </div>
         </div>
     </div>
 

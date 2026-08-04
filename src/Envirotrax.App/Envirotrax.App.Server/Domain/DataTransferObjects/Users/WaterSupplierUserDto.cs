@@ -17,6 +17,8 @@ public class WaterSupplierUserDto : IDto
 
     [StringLength(25)]
     public string? CellNumber { get; set; }
+
+    public IEnumerable<ReferencedRoleDto> Roles { get; set; } = [];
 }
 
 public class ReferencedWaterSupplierUserDto

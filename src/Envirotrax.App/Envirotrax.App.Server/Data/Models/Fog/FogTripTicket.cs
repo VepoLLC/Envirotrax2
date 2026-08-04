@@ -207,8 +207,8 @@ public class FogTripTicket : TenantModel<WaterSupplier>, IProfessionalModel, IAu
 
     public DateTime? ApprovalDate { get; set; }
 
-    [StringLength(50)]
-    public string? ApprovedBy { get; set; }
+    public int? ApprovedById { get; set; }
+    public WaterSupplierUser? ApprovedBy { get; set; }
 
     // Validation
     public bool NeedsValidation { get; set; }

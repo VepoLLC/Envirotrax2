@@ -1,10 +1,9 @@
-
+using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Models.Users;
-using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 
 namespace Envirotrax.App.Server.Data.Repositories.Definitions.Users;
 
 public interface IUserRepository : IRepository<WaterSupplierUser>
 {
-    Task<IEnumerable<AdminWaterSupplierUserAccountDto>> GetAccountsWithPermissionsAsync(int waterSupplierId, CancellationToken cancellationToken);
+    Task<IEnumerable<WaterSupplierUser>> GetAllForWaterSupplierAsync(int waterSupplierId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
 }

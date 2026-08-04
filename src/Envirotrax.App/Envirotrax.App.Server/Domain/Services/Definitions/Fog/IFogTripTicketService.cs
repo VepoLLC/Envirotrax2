@@ -19,4 +19,6 @@ public interface IFogTripTicketService : IService<FogTripTicket, FogTripTicketDt
     Task<byte[]> GeneratePdfAsync(FogTripTicketDto ticket);
 
     Task<byte[]> GeneratePdfAsync(IEnumerable<FogTripTicketDto> tickets);
+
+    Task<byte[]> GeneratePdfForProfessionalAsync(FogTripTicketDto ticket);
 }

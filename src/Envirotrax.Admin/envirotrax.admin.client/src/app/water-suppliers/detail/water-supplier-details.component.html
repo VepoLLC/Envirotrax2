@@ -9,8 +9,8 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" role="button"
-               [class.active]="activeTab === 'userAccounts'"
-               (click)="setActiveTab('userAccounts')">User Accounts</a>
+               [class.active]="activeTab === 'users'"
+               (click)="setActiveTab('users')">User Accounts</a>
         </li>
     </ul>
 
@@ -474,46 +474,7 @@
     </div>
 
     <!-- ******************************** User Accounts ******************************** -->
-    <div *ngIf="userAccountsInitialized" [hidden]="activeTab !== 'userAccounts'">
-        <dp-loading-spinner *ngIf="isLoadingUserAccounts"></dp-loading-spinner>
-
-        <vp-section header="User Accounts ({{ userAccounts.length }})" *ngIf="!isLoadingUserAccounts">
-            <div *ngIf="userAccounts.length === 0" class="text-muted">No user accounts.</div>
-
-            <div class="overflow-x-auto" *ngIf="userAccounts.length > 0">
-                <div class="vp-permission-grid">
-                    <div class="row g-3 fw-semibold border-bottom pb-2">
-                        <div class="col">Account Name &amp; Login</div>
-                        <div class="col border-start ps-4" *ngFor="let header of permissionGroupHeaders">{{ header }}</div>
-                    </div>
-
-                    <div *ngFor="let user of userAccounts; let last = last" class="py-3" [class.border-bottom]="!last">
-                        <div class="row g-3">
-                            <div class="col">
-                                <dl class="vp-label-value vp-label-value-fill mb-0">
-                                    <dt class="fw-normal">Full Name</dt>
-                                    <dd class="mb-0">{{ user.contactName || '—' }}</dd>
-
-                                    <dt class="fw-normal">User ID</dt>
-                                    <dd class="mb-0 text-break">{{ user.emailAddress || '—' }}</dd>
-
-                                    <dt class="fw-normal">Cell Number</dt>
-                                    <dd class="mb-0">{{ user.cellNumber || '—' }}</dd>
-                                </dl>
-                            </div>
-
-                            <div class="col border-start ps-4" *ngFor="let group of user.groups">
-                                <dl class="vp-label-value mb-0">
-                                    <ng-container *ngFor="let cell of group.cells">
-                                        <dt class="fw-normal">{{ cell.label }}</dt>
-                                        <dd class="mb-0" [ngClass]="cell.cssClass">{{ cell.text }}</dd>
-                                    </ng-container>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </vp-section>
+    <div *ngIf="usersInitialized" [hidden]="activeTab !== 'users'">
+        <vp-water-supplier-users [waterSupplierId]="supplierId" />
     </div>
 </div>

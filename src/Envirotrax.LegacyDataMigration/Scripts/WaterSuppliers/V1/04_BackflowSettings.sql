@@ -7,7 +7,7 @@ BEGIN TRY
         (WaterSupplierId, TestingMethod, GracePeriodDays, AdjustBackflowCreepingDates,
          NewInstallationsRequireApproval, ReplacementsRequireApproval, DetectorAssembliesRequireMeterReading,
          OutOfServiceRequiresApproval, OutOfServiceType, RequireBackflowTestImages,
-         ExpiringNotice1, ExpiringNotice2, ExpiredNotice1, ExpiredNotice2,
+         ExpiringNotice1, ExpiringNotice2, ExpiredNotice1, ExpiredNotice2, BackflowNonCompliant1, BackflowNonCompliant2,
          ShowWaterMeterNumber, ShowRainSensor, ShowOSSF, ShowPermitNumber,
          ExpiringLettersBackgroundColor, ExpiringLettersForegroundColor, ExpiringLettersBorderColor,
          ExpiredLettersBackgroundColor, ExpiredLettersForegroundColor, ExpiredLettersBorderColor,
@@ -20,6 +20,7 @@ BEGIN TRY
         WaterSuppliers.OutOfServiceRequireApproval, WaterSuppliers.OutOfServiceManagementType, WaterSuppliers.RequireBackflowTestImages,
         WaterSuppliers.SaveBackflowNoticeRenewal1, WaterSuppliers.SaveBackflowNoticeRenewal2,
         WaterSuppliers.SaveBackflowNoticeExpired1, WaterSuppliers.SaveBackflowNoticeExpired2,
+        WaterSuppliers.SaveBackflowCutoffDays, WaterSuppliers.SaveBackflowCutoffDays2,
         WaterSuppliers.SaveBackflowTestingShowWaterMeterNumber, WaterSuppliers.SaveBackflowTestingShowRainSensor,
         WaterSuppliers.SaveBackflowTestingShowOssf, WaterSuppliers.BackflowTestingShowPermitNumber,
         WaterSuppliers.BackflowNoticeHeaderBackgroundColor1, WaterSuppliers.BackflowNoticeHeaderForegroundColor1, WaterSuppliers.BackflowNoticeHeaderBorderColor1,
@@ -32,11 +33,16 @@ BEGIN TRY
     FROM WaterSuppliers
     INNER JOIN Envirotrax2Dev.dbo.WaterSuppliers AS newWaterSuppliers
         ON newWaterSuppliers.LegacyRecordId = WaterSuppliers.ID
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM Envirotrax2Dev.dbo.BackflowSettings AS alreadyInserted
+        WHERE alreadyInserted.WaterSupplierId = newWaterSuppliers.Id
+    )
 
-    --COMMIT TRAN
+    COMMIT TRAN
 
 END TRY
 BEGIN CATCH
-    ROLLBACK TRAN
-    THROW
+    ROLLBACK TRAN;
+    THROW;
 END CATCH

@@ -11,6 +11,19 @@ import { FogTransporterListComponent } from "./transporters/list/fog-transporter
 
 const routes: Routes = [
     {
+        path: 'reports',
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.FogReports,
+                    action: PermissionAction.CanView
+                }
+            ]
+        },
+        loadChildren: () => import('./reports/fog-reports.module').then(m => m.FogReportsModule)
+    },
+    {
         path: 'inspections',
         title: 'FOG Inspection Search',
         component: FogInspectionListComponent,

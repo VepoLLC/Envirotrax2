@@ -401,7 +401,7 @@ export class App implements OnInit {
           {
             title: 'System Reports',
             iconCss: 'fa-regular fa-chart-simple-horizontal',
-            routerLink: ['/'],
+            routerLink: ['/fog/reports'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogReports),
             hasFeature: true
           },

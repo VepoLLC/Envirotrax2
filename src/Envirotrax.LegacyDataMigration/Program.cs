@@ -8,12 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
-var legacyV1DatabasConnection = @"Server=(localdb)\mssqllocaldb;Database=Vepo;Trusted_Connection=True;MultipleActiveResultSets=true";
 var newV2DatabaseConnection = @"Server=(localdb)\mssqllocaldb;Database=Envirotrax2Dev;Trusted_Connection=True;MultipleActiveResultSets=true";
 
 var services = new ServiceCollection();
-
-services.AddTransient(_ => new LegacyDbService(legacyV1DatabasConnection));
 
 services
     .AddDbContext<AppDbContext>(options =>

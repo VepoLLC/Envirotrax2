@@ -2,7 +2,7 @@ BEGIN TRAN
 
 BEGIN TRY
 
-    INSERT INTO Envirotrax2Dev.dbo.GeneralSettings
+    INSERT INTO GeneralSettings
         (WaterSupplierId, PrivacyRequired, NewSitesLocked, WiseGuys, BackflowTesting, CsiInspections, FogProgram, AdministrativeOnly,
          BpatsRequireInsurance, BpatsRequireInsuranceAmount, BpatsRequireIrrigationLicense,
          CsiInspectorsRequireInsurance, CsiInspectorsRequireInsuranceAmount,
@@ -28,12 +28,12 @@ BEGIN TRY
         WaterSuppliers.CsiResidentialInspectionFee, WaterSuppliers.CsiResidentialInspectionFeeShare,
         WaterSuppliers.FogTransporterFee, WaterSuppliers.FogTransporterFeeShare,
         WaterSuppliers.RequireBackflowTestImages, WaterSuppliers.RequireCsiInspectionImages
-    FROM WaterSuppliers
-    INNER JOIN Envirotrax2Dev.dbo.WaterSuppliers AS newWaterSuppliers
+    FROM Vepo.dbo.WaterSuppliers
+    INNER JOIN WaterSuppliers AS newWaterSuppliers
         ON newWaterSuppliers.LegacyRecordId = WaterSuppliers.ID
     WHERE NOT EXISTS (
         SELECT 1
-        FROM Envirotrax2Dev.dbo.GeneralSettings AS alreadyInserted
+        FROM GeneralSettings AS alreadyInserted
         WHERE alreadyInserted.WaterSupplierId = newWaterSuppliers.Id
     )
 

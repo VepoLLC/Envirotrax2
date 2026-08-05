@@ -13,16 +13,16 @@ BEGIN TRY
         SELECT Users.* FROM Vepo.dbo.WaterSupplierUserAccounts AS Users
         LEFT JOIN Vepo.dbo.WaterSuppliers AS Suppliers
             ON Suppliers.Id = Users.WaterSupplierID
-        LEFT JOIN MigrationSkippedUsers AS SkippedUsers
-            ON SkippedUsers.UserID = Users.UserID
+        LEFT JOIN AspNetUsers AS ExistingUsers
+            ON ExistingUsers.Email = Users.UserID
         -- Water supplier of the user exists and user record migration is not skipped due to errors.
-        WHERE Suppliers.Id IS NOT NULL AND SkippedUsers.UserID IS NULL
+        WHERE Suppliers.Id IS NOT NULL AND ExistingUsers.Id IS NOT NULL
     ) AS LegacyUsers
     WHERE NOT EXISTS
     (
         SELECT 1 FROM WaterSupplierUsers
         WHERE LegacyRecordId = LegacyUsers.ID
-    );
+    )
 
     COMMIT TRAN;
 END TRY

@@ -53,7 +53,6 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         PageInfo pageInfo,
         Query query,
         CsiPaymentStatus? paymentStatus,
-        int? inspectorId,
         CancellationToken cancellationToken)
     {
         var dbQuery = GetListQuery()
@@ -68,11 +67,6 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         if (paymentStatus == CsiPaymentStatus.Unpaid)
         {
             dbQuery = dbQuery.Where(c => c.TransactionId == null || c.TransactionId == string.Empty);
-        }
-
-        if (inspectorId.HasValue)
-        {
-            dbQuery = dbQuery.Where(c => c.ProfessionalId == inspectorId.Value || c.InspectorId == inspectorId.Value);
         }
 
         var paginated = await dbQuery

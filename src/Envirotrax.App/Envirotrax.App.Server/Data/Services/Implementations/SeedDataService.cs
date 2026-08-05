@@ -155,11 +155,21 @@ public class SeedDataService : IHostedService
 
     private async Task AddLicenseTypesAsync(TenantDbContext dbContext)
     {
-        if (!await dbContext.ProfessionalLicenseTypes.AnyAsync())
+        var existingTypes = await dbContext.ProfessionalLicenseTypes
+            .Select(t => new { t.Name, t.ProfessionalType })
+            .ToListAsync();
+
+        var newTypes = ProfessionalLicenseTypeSeedData.GetTypes(_states!)
+            .Where(t => !existingTypes.Any(e => e.Name == t.Name && e.ProfessionalType == t.ProfessionalType))
+            .ToList();
+
+        if (newTypes.Count == 0)
         {
-            dbContext.ProfessionalLicenseTypes.AddRange(ProfessionalLicenseTypeSeedData.GetTypes(_states!));
-            await dbContext.SaveChangesAsync();
+            return;
         }
+
+        dbContext.ProfessionalLicenseTypes.AddRange(newTypes);
+        await dbContext.SaveChangesAsync();
     }
 
     private async Task AddFeaturesAsync(TenantDbContext dbContext)

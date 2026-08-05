@@ -28,4 +28,18 @@ export class CsiInspectoreManagementService {
 
         return await lastValueFrom(observable);
     }
+
+    public async search(inspectorLicenseNumber: string | undefined, insurancePolicyNumber: string | undefined, pageInfo: PageInfo): Promise<PagedData<Professional>> {
+        const url = this._urlResolver.resolveUrl('/api/csi/inspectors/search');
+        let params = this._queryHelper.pageInfoToQueryString(pageInfo);
+
+        if (inspectorLicenseNumber) {
+            params = params.append('inspectorLicenseNumber', inspectorLicenseNumber);
+        }
+        if (insurancePolicyNumber) {
+            params = params.append('insurancePolicyNumber', insurancePolicyNumber);
+        }
+
+        return await lastValueFrom(this._http.get<PagedData<Professional>>(url, { params }));
+    }
 }

@@ -5,10 +5,16 @@ import { FogTransporterService } from "../../../shared/services/fog/fog-transpor
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { Professional } from "../../../shared/models/professionals/professional";
+import { ExpirationType } from "../../../shared/models/professionals/professional-user";
 import { DownloadConfig } from "../../../shared/models/download-config";
 import { DownloadService } from "../../../shared/services/download.service";
 import { CellTemplateData, ColumnType, TableColumn } from '@envirotrax/common-ui';
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
+
+interface FogTransporterLicenseSearchVm {
+    registrationNumber?: string;
+    insurancePolicyNumber?: string;
+}
 
 @Component({
     selector: 'app-fog-transporter-list',
@@ -35,7 +41,14 @@ export class FogTransporterListComponent implements OnInit {
     @ViewChild('addressCell', { static: true })
     public addressCell?: TemplateRef<CellTemplateData<Professional>>;
 
+    @ViewChild('licensesCell', { static: true })
+    public licensesCell?: TemplateRef<CellTemplateData<Professional>>;
+
+    public readonly expirationType = ExpirationType;
+
     public downloadConfig: DownloadConfig;
+
+    private _licenseSearch: FogTransporterLicenseSearchVm = {};
 
     constructor(
         private readonly _fogTransporterService: FogTransporterService,
@@ -86,6 +99,13 @@ export class FogTransporterListComponent implements OnInit {
                 caption: 'Address',
                 type: ColumnType.text,
                 cellTemplate: this.addressCell
+            },
+            {
+                field: 'licensesAndInsurances',
+                caption: 'Licenses & Insurance Policies',
+                type: ColumnType.text,
+                cellTemplate: this.licensesCell,
+                queryColumnExcluded: true
             }
         ];
     }
@@ -93,10 +113,25 @@ export class FogTransporterListComponent implements OnInit {
     public async getTransporters(): Promise<void> {
         try {
             this.table.isLoading = true;
-            this.table.items = await this._fogTransporterService.getAll(this.table.items?.pageInfo || {}, this.table.query);
+            const pageInfo = this.table.items?.pageInfo || {};
+            const { registrationNumber, insurancePolicyNumber } = this._licenseSearch;
+
+            this.table.items = (registrationNumber || insurancePolicyNumber)
+                ? await this._fogTransporterService.search(registrationNumber, insurancePolicyNumber, pageInfo)
+                : await this._fogTransporterService.getAll(pageInfo, this.table.query);
         } finally {
             this.table.isLoading = false;
         }
+    }
+
+    private extractLicenseSearchVm(): FogTransporterLicenseSearchVm {
+        const getValue = (columnName: string) =>
+            this.table.query.filter?.find(f => f.columnName === columnName)?.value as string | undefined;
+
+        return {
+            registrationNumber: getValue('registrationNumber'),
+            insurancePolicyNumber: getValue('insurancePolicyNumber')
+        };
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
@@ -116,6 +151,8 @@ export class FogTransporterListComponent implements OnInit {
 
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
+            this._licenseSearch = this.extractLicenseSearchVm();
+
             await this.getTransporters();
             this.setShowResults(true);
         }

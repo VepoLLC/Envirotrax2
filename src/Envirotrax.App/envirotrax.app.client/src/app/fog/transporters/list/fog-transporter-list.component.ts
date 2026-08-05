@@ -8,6 +8,7 @@ import { Professional } from "../../../shared/models/professionals/professional"
 import { DownloadConfig } from "../../../shared/models/download-config";
 import { DownloadService } from "../../../shared/services/download.service";
 import { CellTemplateData, ColumnType, TableColumn } from '@envirotrax/common-ui';
+import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 
 @Component({
     selector: 'app-fog-transporter-list',
@@ -40,7 +41,8 @@ export class FogTransporterListComponent implements OnInit {
         private readonly _fogTransporterService: FogTransporterService,
         private readonly _downloadService: DownloadService,
         private readonly _router: Router,
-        private readonly _activatedRoute: ActivatedRoute
+        private readonly _activatedRoute: ActivatedRoute,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
         this.downloadConfig = {
             fileName: 'FOG Transporters',
@@ -107,10 +109,15 @@ export class FogTransporterListComponent implements OnInit {
         });
     }
 
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
+    }
+
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
             await this.getTransporters();
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 

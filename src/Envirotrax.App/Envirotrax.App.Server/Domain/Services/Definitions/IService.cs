@@ -28,6 +28,9 @@ public interface IServiceBase<TDto, TKey>
     Task<IPagedData<TDto>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<IPagedData<TDto>> GetAllAsync(PageInfo pageInfo, Query query, int maxPageSize, CancellationToken cancellationToken);
 
+    Task<int> CountAsync(CancellationToken cancellationToken);
+    Task<int> CountAsync(Query query, CancellationToken cancellationToken);
+
     Task<TDto?> GetAsync(TKey id, CancellationToken cancellationToken);
     Task<TDto> AddAsync(TDto dto);
     Task<TDto> UpdateAsync(TDto dto);

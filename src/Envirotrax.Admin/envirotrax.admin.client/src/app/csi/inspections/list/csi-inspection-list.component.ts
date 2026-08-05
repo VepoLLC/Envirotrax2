@@ -5,7 +5,6 @@ import {
     ColumnType,
     DateRange,
     InputOption,
-    MAX_PAGE_SIZE,
     QueryProperty,
     SortOperator,
     TableColumn,
@@ -41,8 +40,6 @@ export class CsiInspectionListComponent implements OnInit {
     private panelFilter: QueryProperty[] = [];
 
     private paymentStatus: CsiPaymentStatus | null = null;
-
-    private inspectorId: number | null = null;
 
     public table: TableViewModel<CsiInspection> = {
         query: {
@@ -92,12 +89,10 @@ export class CsiInspectionListComponent implements OnInit {
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
         const payment = queryProperties.find(p => p.columnName === 'paymentStatus');
-        const inspector = queryProperties.find(p => p.columnName === 'masterOrInspectorId');
 
         this.paymentStatus = payment?.value ? Number(payment.value) as CsiPaymentStatus : null;
-        this.inspectorId = inspector?.value ? Number(inspector.value) : null;
 
-        this.panelFilter = queryProperties.filter(p => p.columnName !== 'paymentStatus' && p.columnName !== 'masterOrInspectorId');
+        this.panelFilter = queryProperties.filter(p => p.columnName !== 'paymentStatus');
 
         this.table.query.filter = this.buildFilter();
     }
@@ -121,8 +116,7 @@ export class CsiInspectionListComponent implements OnInit {
             this.table.items = await this._csiInspectionService.getAll(
                 this.table.items?.pageInfo || {},
                 this.table.query,
-                this.paymentStatus,
-                this.inspectorId
+                this.paymentStatus
             );
         } finally {
             this.table.isLoading = false;
@@ -176,12 +170,7 @@ export class CsiInspectionListComponent implements OnInit {
     }
 
     private async loadWaterSuppliers(): Promise<void> {
-        const result = await this._waterSupplierService.getAll(
-            { pageSize: MAX_PAGE_SIZE },
-            { sort: { name: 'Asc' }, filter: [] }
-        );
-
-        const options: InputOption[] = (result.data ?? []).map(ws => ({ id: String(ws.id), text: ws.name }));
+        const options = await this._waterSupplierService.getAllAsOptions();
 
         this.waterSupplierOptions = [{ id: '', text: 'Any Value' }, ...options];
     }

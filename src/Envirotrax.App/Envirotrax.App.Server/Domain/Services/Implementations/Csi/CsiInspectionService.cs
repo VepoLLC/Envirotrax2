@@ -123,12 +123,12 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         return inspections.Select(m => Mapper.Map<CsiInspectionDto>(m)!).ToPagedData(pageInfo);
     }
 
-    public async Task<IPagedData<CsiInspectionDto>> SearchForAdminAsync(PageInfo pageInfo, Query query, CsiPaymentStatus? paymentStatus, int? inspectorId, CancellationToken cancellationToken)
+    public async Task<IPagedData<CsiInspectionDto>> SearchForAdminAsync(PageInfo pageInfo, Query query, CsiPaymentStatus? paymentStatus, CancellationToken cancellationToken)
     {
         query.Filter = query.ConvertFilterProperties<CsiInspection, CsiInspectionDto>(Mapper);
         query.Sort = query.ConvertSortProperties<CsiInspection, CsiInspectionDto>(Mapper);
 
-        var inspections = await _repository.SearchForAdminAsync(pageInfo, query, paymentStatus, inspectorId, cancellationToken);
+        var inspections = await _repository.SearchForAdminAsync(pageInfo, query, paymentStatus, cancellationToken);
 
         return inspections.Select(m => Mapper.Map<CsiInspectionDto>(m)!).ToPagedData(pageInfo);
     }

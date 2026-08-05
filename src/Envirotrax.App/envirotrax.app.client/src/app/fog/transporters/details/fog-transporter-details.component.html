@@ -6,7 +6,7 @@
     <div class="row g-4">
 
         <div class="col-lg-6">
-            <vp-section header="FOG Account Information">
+            <vp-section header="Transporter Account Information">
                 <table class="table table-borderless mb-0">
                     <tbody>
                         <tr>
@@ -36,6 +36,22 @@
                     </tbody>
                 </table>
             </vp-section>
+        </div>
+
+        <div class="col-lg-6">
+            <vp-fog-transporter-water-suppliers [transporterId]="id!" />
+        </div>
+
+        <div class="col-12">
+            <vp-fog-transporter-users [transporterId]="id!" />
+        </div>
+
+        <div class="col-12">
+            <vp-fog-transporter-license-insurances [transporterId]="id!" />
+        </div>
+
+        <div class="col-12">
+            <vp-fog-transporter-vehicles [transporterId]="id!" />
         </div>
 
     </div>

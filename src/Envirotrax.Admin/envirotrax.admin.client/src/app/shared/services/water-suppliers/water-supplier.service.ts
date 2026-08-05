@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { PagedData, PageInfo, Query, QueryHelperService, UrlResolverService } from "@envirotrax/common-ui";
+import { InputOption, MAX_PAGE_SIZE, PagedData, PageInfo, Query, QueryHelperService, UrlResolverService } from "@envirotrax/common-ui";
 import { WaterSupplier } from "../../models/water-suppliers/water-supplier";
 import { WaterSupplierDetails } from "../../models/water-suppliers/water-supplier-details";
 import { lastValueFrom } from "rxjs";
@@ -25,6 +25,15 @@ export class WaterSupplierService {
         });
 
         return await lastValueFrom(observable);
+    }
+
+    public async getAllAsOptions(): Promise<InputOption<WaterSupplier>[]> {
+        const result = await this.getAll(
+            { pageSize: MAX_PAGE_SIZE },
+            { sort: { name: 'Asc' }, filter: [] }
+        );
+
+        return (result.data ?? []).map(supplier => ({ id: String(supplier.id), text: supplier.name, data: supplier }));
     }
 
     public async getDetails(id: number): Promise<WaterSupplierDetails> {

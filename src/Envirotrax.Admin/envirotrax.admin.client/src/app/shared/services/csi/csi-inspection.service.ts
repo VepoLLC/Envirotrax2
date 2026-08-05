@@ -19,8 +19,7 @@ export class CsiInspectionService {
     public async getAll(
         pageInfo: PageInfo,
         query: Query,
-        paymentStatus?: CsiPaymentStatus | null,
-        inspectorId?: number | null
+        paymentStatus?: CsiPaymentStatus | null
     ): Promise<PagedData<CsiInspection>> {
         const url = this._urlResolver.resolveUrl('/api/csi/inspections');
 
@@ -28,10 +27,6 @@ export class CsiInspectionService {
 
         if (paymentStatus != null) {
             params = params.append('paymentStatus', String(paymentStatus));
-        }
-
-        if (inspectorId != null) {
-            params = params.append('inspectorId', String(inspectorId));
         }
 
         const observable = this._http.get<PagedData<CsiInspection>>(url, { params });

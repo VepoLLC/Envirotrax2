@@ -21,10 +21,9 @@ public class CsiInspectionController : AdminBaseController
         [FromQuery] PageInfo pageInfo,
         [FromQuery] Query query,
         [FromQuery] CsiPaymentStatus? paymentStatus,
-        [FromQuery] int? inspectorId,
         CancellationToken cancellationToken)
     {
-        var inspections = await _inspectionService.SearchForAdminAsync(pageInfo, query, paymentStatus, inspectorId, cancellationToken);
+        var inspections = await _inspectionService.SearchForAdminAsync(pageInfo, query, paymentStatus, cancellationToken);
 
         return Ok(inspections);
     }

@@ -148,6 +148,27 @@ public class InternalApiClientService<TOptions> : IInternalApiClientService<TOpt
         });
     }
 
+    public Task<TResponse?> PostFileAsync<TResponse>(int? loggedInUserId, string url, Stream fileStream, string fileName, string fileFieldName, IDictionary<string, string> formFields, CancellationToken cancellationToken)
+    {
+        return ProcessRequestAsync<TResponse>(cancellationToken, () =>
+        {
+            var request = CreateRequestMessage(HttpMethod.Post, waterSupplierId: null, loggedInUserId, url);
+
+            var content = new MultipartFormDataContent();
+
+            foreach (var field in formFields)
+            {
+                content.Add(new StringContent(field.Value), field.Key);
+            }
+
+            content.Add(new StreamContent(fileStream), fileFieldName, fileName);
+
+            request.Content = content;
+
+            return _httpClient.SendAsync(request, cancellationToken);
+        });
+    }
+
     public Task<TResponse?> PutAsync<TRequest, TResponse>(string url, ServiceMessageDto<TRequest> requestData, CancellationToken cancellationToken)
     {
         return ProcessRequestAsync<TResponse>(cancellationToken, () =>

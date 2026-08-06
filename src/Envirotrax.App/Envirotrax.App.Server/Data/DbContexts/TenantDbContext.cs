@@ -1,6 +1,7 @@
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Csi;
 using Envirotrax.App.Server.Data.Models.Fog;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Models.Users;
@@ -49,6 +50,8 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
     public DbSet<Site> Sites { get; set; }
     public DbSet<CsiInspection> CsiInspections { get; set; }
     public DbSet<CsiInspectionImage> CsiInspectionImages { get; set; }
+    public DbSet<CsiInspectionVisuallyIdentifiedAssembly> CsiInspectionVisuallyIdentifiedAssemblies { get; set; }
+    public DbSet<RecordLog> RecordLogs { get; set; }
     public DbSet<FogInspection> FogInspections { get; set; }
     public DbSet<BackflowTest> BackflowTests { get; set; }
     public DbSet<BackflowOutOfServiceRequest> BackflowOutOfServiceRequests { get; set; }

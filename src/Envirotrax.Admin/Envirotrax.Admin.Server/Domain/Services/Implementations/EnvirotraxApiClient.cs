@@ -58,6 +58,16 @@ public class EnvirotraxApiClient : IEnvirotraxApiClient
         }, cancellationToken);
     }
 
+    public Task<TResponse?> PostFileAsync<TResponse>(string url, Stream fileStream, string fileName, string? description, CancellationToken cancellationToken)
+    {
+        var formFields = new Dictionary<string, string>
+        {
+            ["description"] = description ?? string.Empty
+        };
+
+        return _apiClient.PostFileAsync<TResponse>(_authService.UserId, url, fileStream, fileName, "image", formFields, cancellationToken);
+    }
+
     public Task<TResponse?> PutAsync<TRequest, TResponse>(string url, TRequest requestData, CancellationToken cancellationToken)
     {
         return _apiClient.PutAsync<TRequest, TResponse>(url, new ServiceMessageDto<TRequest>(_authService.UserId)

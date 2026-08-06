@@ -73,8 +73,8 @@ export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
     public waterSupplierCityStateZip: string = '';
     public inspectorCityStateZip: string = '';
 
-    public assembliesTabTitle: string = 'Assemblies at Location (0)';
-    public recordLogTabTitle: string = 'Record Log (0)';
+    public assembliesTabTitle: string = 'Assemblies at Location';
+    public recordLogTabTitle: string = 'Record Log';
 
     public assemblies: CsiInspectionAssembly[] = [];
     public images: CsiInspectionImage[] = [];
@@ -141,9 +141,11 @@ export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
         this.assemblyColumns = this.getAssemblyColumns();
         this.logColumns = this.getLogColumns();
 
-        await this.loadStates();
-        await this.loadInspection();
-        await this.loadCounts();
+        await Promise.all([
+            this.loadStates(),
+            this.loadInspection(),
+            this.loadCounts()
+        ]);
     }
 
     public ngOnDestroy(): void {

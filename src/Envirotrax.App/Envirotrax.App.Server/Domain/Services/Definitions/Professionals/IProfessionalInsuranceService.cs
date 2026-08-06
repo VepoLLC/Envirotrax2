@@ -8,6 +8,7 @@ public interface IProfessionalInsuranceService : IService<ProfessionalInsuranceD
 {
     Task<ProfessionalInsuranceDto> AddAsync(Stream fileStream, string originalFileName, ProfessionalInsuranceDto insurance);
     Task<IPagedData<ProfessionalInsuranceDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<ILookup<int, ProfessionalInsuranceDto>> GetAllByProfessionalIdsAsync(IEnumerable<int> professionalIds, CancellationToken cancellationToken);
 
     Task<Uri?> GenerateFileUrlAsync(int id, CancellationToken cancellationToken);
 }

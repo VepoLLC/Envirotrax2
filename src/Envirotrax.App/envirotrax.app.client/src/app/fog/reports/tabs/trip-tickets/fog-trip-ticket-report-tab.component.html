@@ -1,0 +1,143 @@
+@if (isLoading) {
+    <dp-loading-spinner />
+}
+
+@if (!isLoading) {
+    <div class="mb-3">
+        <vp-section [header]="(fromDate | date:'shortDate') + ' - ' + (toDate | date:'shortDate') + ' Totals'" [noPadding]="true">
+
+            <div class="row justify-content-evenly g-3 p-3">
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-semibold text-nowrap">Date Type:</span>
+                        <vp-input type="select"
+                                  class="flex-fill"
+                                  name="tripTicketDateType"
+                                  [options]="dateTypeOptions"
+                                  [(ngModel)]="dateType" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-semibold text-nowrap">From Date:</span>
+                        <vp-input type="date" class="flex-fill" name="tripTicketFromDate" [(ngModel)]="fromDate" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-semibold text-nowrap">To Date:</span>
+                        <vp-input type="date" class="flex-fill" name="tripTicketToDate" [(ngModel)]="toDate" />
+                        <button type="button" class="btn btn-primary btn-sm" (click)="search()">Search</button>
+                    </div>
+                </div>
+            </div>
+
+            @if (dateRangeError) {
+                <div class="text-danger text-center pb-2">{{ dateRangeError }}</div>
+            }
+
+            @if (report) {
+                <div class="fw-semibold text-center py-2">Total Trip Tickets: {{ report.totalCount }}</div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm mb-0">
+                        <thead>
+                            <tr class="table-primary">
+                                <th class="ps-3 text-center text-nowrap">Year</th>
+                                <th class="w-100"></th>
+                                <th class="text-nowrap">#</th>
+                                <th class="text-nowrap">%</th>
+                                <th class="text-nowrap">Gallons</th>
+                                <th class="text-nowrap">Cubic Ft.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (period of report.periods; track period.label) {
+                                <tr>
+                                    <td class="text-start ps-3 pe-3">
+                                        <a class="btn btn-primary btn-sm py-0 w-100 text-nowrap" (click)="selectPeriod(period)">
+                                            {{ period.label }}
+                                        </a>
+                                    </td>
+                                    <td class="align-middle">
+                                        <div class="reportbar orange" [style.width.%]="period.percentage">&nbsp;</div>
+                                    </td>
+                                    <td>{{ period.count }}</td>
+                                    <td>{{ period.percentage }}%</td>
+                                    <td>{{ period.gallons | number:'1.0-0' }}</td>
+                                    <td>{{ period.cubicFeet | number:'1.0-0' }}</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+        </vp-section>
+    </div>
+
+    @if (report) {
+        <div class="mb-3">
+            <vp-section [header]="(fromDate | date:'shortDate') + ' - ' + (toDate | date:'shortDate') + ' Statistics'" [noPadding]="true">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr class="table-primary">
+                                <th class="ps-3 text-center text-nowrap">Statistic</th>
+                                <th class="w-100"></th>
+                                <th class="text-nowrap">#</th>
+                                <th class="text-nowrap">%</th>
+                                <th class="text-nowrap">Gallons</th>
+                                <th class="text-nowrap">Cubic Ft.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="ps-3 fw-semibold text-nowrap">Total Tickets</td>
+                                <td></td>
+                                <td>{{ report.totalCount }}</td>
+                                <td></td>
+                                <td>{{ report.totalGallons | number:'1.0-0' }}</td>
+                                <td>{{ report.totalCubicFeet | number:'1.0-0' }}</td>
+                            </tr>
+                            @if (report.subAccounts.length) {
+                                <tr class="table-secondary">
+                                    <td class="ps-3 fw-semibold" colspan="6">Sub Account</td>
+                                </tr>
+                                @for (subAccount of report.subAccounts; track subAccount.name) {
+                                    <tr>
+                                        <td class="ps-3">{{ subAccount.name }}</td>
+                                        <td class="align-middle">
+                                            <div class="reportbar green" [style.width.%]="subAccount.percentage">&nbsp;</div>
+                                        </td>
+                                        <td>{{ subAccount.count }}</td>
+                                        <td>{{ subAccount.percentage }}%</td>
+                                        <td>{{ subAccount.gallons | number:'1.0-0' }}</td>
+                                        <td>{{ subAccount.cubicFeet | number:'1.0-0' }}</td>
+                                    </tr>
+                                }
+                            }
+                            @for (category of statCategories; track category.title) {
+                                <tr class="table-secondary">
+                                    <td class="ps-3 fw-semibold" colspan="6">{{ category.title }}</td>
+                                </tr>
+                                @for (item of category.items; track item.label) {
+                                    <tr>
+                                        <td class="ps-3">{{ item.label }}</td>
+                                        <td class="align-middle">
+                                            <div class="reportbar" [ngClass]="category.barColor" [style.width.%]="item.percentage">&nbsp;</div>
+                                        </td>
+                                        <td>{{ item.count }}</td>
+                                        <td>{{ item.percentage }}%</td>
+                                        <td>{{ item.gallons | number:'1.0-0' }}</td>
+                                        <td>{{ item.cubicFeet | number:'1.0-0' }}</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </vp-section>
+        </div>
+    }
+}

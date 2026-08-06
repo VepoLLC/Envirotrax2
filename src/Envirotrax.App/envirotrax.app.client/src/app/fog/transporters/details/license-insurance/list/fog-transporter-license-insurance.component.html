@@ -66,7 +66,9 @@
                       [canAdd]="canManageInsurances"
                       (add)="addInsurance()"
                       [canEdit]="canManageInsurances"
-                      (edit)="editInsurance($event)" />
+                      (edit)="editInsurance($event)"
+                      [canDelete]="canManageInsurances"
+                      (delete)="deleteInsurance($event)" />
         </div>
     </div>
 

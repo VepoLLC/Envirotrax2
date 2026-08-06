@@ -58,6 +58,12 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
         return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
     }
 
+    public async Task<ILookup<int, ProfessionalUserLicenseDto>> GetAllByProfessionalIdsAsync(IEnumerable<int> professionalIds, ProfessionalType professionalType, CancellationToken cancellationToken)
+    {
+        var items = await _licenseRepository.GetAllByProfessionalIdsAsync(professionalIds, professionalType, cancellationToken);
+        return items.ToLookup(l => l.ProfessionalId, l => MapToDto(l)!);
+    }
+
     public async Task<ProfessionalUserLicenseDto> AddForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto)
     {
         var model = MapToModel(dto)!;

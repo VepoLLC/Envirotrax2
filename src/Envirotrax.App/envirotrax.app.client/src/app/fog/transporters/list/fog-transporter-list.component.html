@@ -5,10 +5,10 @@
         <vp-filter-panel (filterChange)="onFilterChange($event)">
             <vp-section header="Transporter Account Search Criteria">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-5">
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="companyEmail"
-                                                   label="Company email"
+                                                   label="Company email:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
@@ -32,7 +32,10 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6 ">
+                    <div class="col-md-2 d-flex justify-content-center align-items-center">
+                        Or
+                    </div>
+                    <div class="col-md-5">
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="registrationNumber"
                                                    label="Registration number:"
@@ -66,6 +69,22 @@
                   *ngIf="(transporter.address || transporter.city) && (transporter.state || transporter.zipCode)">, </span>
         </div>
         <div>{{transporter.state?.code}} {{transporter.zipCode}}</div>
+    </div>
+</ng-template>
+
+<ng-template #licensesCell let-transporter="rowData">
+    <div *ngFor="let entry of transporter.licensesAndInsurances" class="mb-1 d-flex align-items-center gap-4">
+        <div class="">
+            <strong>{{ entry.licenseType }}</strong> &mdash; {{ entry.number }}
+        </div>
+
+        <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
+             [class.text-bg-primary]="!entry.expirationDate"
+             [class.text-bg-success]="entry.expirationDate && entry.expirationType == expirationType.Valid"
+             [class.text-bg-warning]="entry.expirationDate && entry.expirationType == expirationType.AboutToExpire"
+             [class.text-bg-danger]="entry.expirationDate && entry.expirationType == expirationType.Expired">
+            {{ entry.expirationDate ? (entry.expirationDate | date) : 'Validating...' }}
+        </div>
     </div>
 </ng-template>
 

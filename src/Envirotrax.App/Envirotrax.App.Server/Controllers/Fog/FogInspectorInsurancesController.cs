@@ -59,5 +59,14 @@ namespace Envirotrax.App.Server.Controllers.Fog
 
             return NotFound();
         }
+
+        [HttpDelete("{id}/insurances/{insuranceId}")]
+        [HasFeature(FeatureType.ManageProfessionalInsurances)]
+        [HasPermission(PermissionAction.CanModify)]
+        public async Task<IActionResult> DeleteInsuranceAsync(int insuranceId)
+        {
+            await _insuranceService.DeleteAsync(insuranceId);
+            return Ok();
+        }
     }
 }

@@ -66,6 +66,7 @@ public static class ServiceRegistration
         services.AddTransient<IFogDisposalSiteService, FogDisposalSiteService>();
         services.AddTransient<IFogTripTicketService, FogTripTicketService>();
         services.AddTransient<IFogSettingsService, FogSettingsService>();
+        services.AddTransient<IFogSystemReportService, FogSystemReportService>();
         services.AddTransient<ILookupService, LookupService>();
 
         services.AddTransient<ICsiSettingsService, CsiSettingsService>();

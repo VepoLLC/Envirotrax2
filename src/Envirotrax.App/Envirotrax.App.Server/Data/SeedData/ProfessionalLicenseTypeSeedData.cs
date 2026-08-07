@@ -75,6 +75,34 @@ public static class ProfessionalLicenseTypeSeedData
         });
         types.Add(new()
         {
+            Name = "TCEQ - CSI License",
+            Description = "Texas CSI/Plumbing Inspector/WSPS",
+            ProfessionalType = ProfessionalType.FogInspector,
+            StateId = texas.Id
+        });
+        types.Add(new()
+        {
+            Name = "TSBPE - Plumbing Inspector",
+            Description = "Texas CSI/Plumbing Inspector/WSPS",
+            ProfessionalType = ProfessionalType.FogInspector,
+            StateId = texas.Id
+        });
+        types.Add(new()
+        {
+            Name = "TSBPE - Journeyman WSPS",
+            Description = "Texas CSI/Plumbing Inspector/WSPS",
+            ProfessionalType = ProfessionalType.FogInspector,
+            StateId = texas.Id
+        });
+        types.Add(new()
+        {
+            Name = "TSBPE - Master WSPS",
+            Description = "Texas CSI/Plumbing Inspector/WSPS",
+            ProfessionalType = ProfessionalType.FogInspector,
+            StateId = texas.Id
+        });
+        types.Add(new()
+        {
             Name = "TCEQ - Registration Number",
             Description = "TCEQ - Registration Number",
             ProfessionalType = ProfessionalType.FogTransporter,
@@ -95,6 +123,13 @@ public static class ProfessionalLicenseTypeSeedData
             Name = "WCS - CSI License",
             Description = "WCS - CSI License",
             ProfessionalType = ProfessionalType.CsiInspector,
+            StateId = washington.Id
+        });
+        types.Add(new()
+        {
+            Name = "WCS - CSI License",
+            Description = "WCS - CSI License",
+            ProfessionalType = ProfessionalType.FogInspector,
             StateId = washington.Id
         });
         types.Add(new()

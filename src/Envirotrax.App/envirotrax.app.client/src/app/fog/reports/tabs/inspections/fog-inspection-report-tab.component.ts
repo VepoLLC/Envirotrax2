@@ -23,7 +23,7 @@ export class FogInspectionReportTabComponent implements OnInit {
 
     public report: FogSystemReport | null = null;
     public statCategories: FogReportStatCategoryView[] = [];
-    public isLoading = false;
+    public isLoading = true;
     public dateType: string = 'inspectionDate';
     public fromDate: string = '';
     public toDate: string = '';
@@ -37,8 +37,12 @@ export class FogInspectionReportTabComponent implements OnInit {
     }
 
     public async ngOnInit(): Promise<void> {
-        await this.setDefaultDateRange();
-        await this.search();
+        try {
+            await this.setDefaultDateRange();
+            await this.search();
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public async search(): Promise<void> {

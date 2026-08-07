@@ -4,8 +4,7 @@ import { GisAreaService } from "../../../shared/services/gis-areas/gis-area.serv
 import { GisAreaCoordinateService } from "../../../shared/services/gis-areas/gis-area-coordinate.service";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { NgForm } from "@angular/forms";
-import { ToastService } from "../../../shared/services/toast.service";
-import { MapPolygon, ModalHelperService } from "@envirotrax/common-ui";
+import { ToastService, MapPolygon, ModalHelperService } from '@envirotrax/common-ui';
 
 
 @Component({

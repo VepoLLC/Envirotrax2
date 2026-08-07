@@ -4,7 +4,7 @@ import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { ProfessionalUser } from "../../../../../shared/models/professionals/professional-user";
 import { FogInspectorSubAccountsService } from "../../../../../shared/services/fog/fog-inspector-user.service";
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
-import { ToastService } from "../../../../../shared/services/toast.service";
+import { ToastService } from '@envirotrax/common-ui';
 
 export interface FogUserModalData {
     inspectorId: number;

@@ -4,8 +4,7 @@ import { CsiInspectionService } from '../../../../shared/services/csi/csi-inspec
 import { CsiInspection } from '../../../../shared/models/csi/csi-inspection';
 import { CsiInspectionImage } from '../../../../shared/models/csi/csi-inspection-image';
 import { CsiInspectionReason, csiInspectionReasonLabels } from '../../../../shared/enums/csi-inspection-reason.enum';
-import { ToastService, ToastType } from '../../../../shared/services/toast.service';
-import { ModalHelperService } from '@envirotrax/common-ui';
+import { ToastService, ToastType, ModalHelperService } from '@envirotrax/common-ui';
 import { DownloadService } from '../../../../shared/services/download.service';
 import { HelperService } from '../../../../shared/services/helpers/helper.service';
 

@@ -11,11 +11,10 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { UserService } from "../../shared/services/water-suppliers/user.service";
 import { FacilityType } from '../../shared/enums/facility-type.enum';
 import { GreaseTrapType } from '../../shared/enums/grease-trap-type.enum';
-import { ToastService, ToastType } from '../../shared/services/toast.service';
+import { ToastService, ToastType, InputOption } from '@envirotrax/common-ui';
 import { AuthService } from '../../shared/services/auth/auth.service';
 import { PermissionAction, PermissionType } from '../../shared/models/permission-type';
 import { FeatureType } from '../../shared/models/feature-type';
-import { InputOption } from '@envirotrax/common-ui';
 
 type SiteTab = 'logHistory' | 'csi' | 'backflow' | 'outOfService' | 'fog';
 

@@ -2,7 +2,7 @@ import { BackflowExpiredType, BackflowExpiringType, BackflowNonCompliantType, Ba
 import { BackflowSettings } from '../../../shared/models/settings/backflow-settings';
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { ToastService } from '../../../shared/services/toast.service';
+import { ToastService } from '@envirotrax/common-ui';
 import { HelperService } from '../../../shared/services/helpers/helper.service';
 import { BackflowTestingSettingsService } from '../../../shared/services/settings/backflow-testing-settings.service';
 

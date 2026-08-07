@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Toast, ToastService, ToastType } from "../../services/toast/toast.service";
 import { Subscription } from "rxjs";
-import { Toast, ToastService, ToastType } from "../shared/services/toast.service";
-
 
 @Component({
     selector: 'vp-toast-container',

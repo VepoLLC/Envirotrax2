@@ -337,7 +337,7 @@ export class SiteEditComponent implements OnInit {
             streetName: site.streetName ?? null,
             propertyNumber: site.propertyNumber ?? null,
             city: site.city ?? null,
-            stateId: site.state?.id ?? null,
+            state: site.state?.id != null ? { id: site.state.id } : null,
             zipCode: site.zipCode ?? null,
 
             // Mailing Information
@@ -347,7 +347,7 @@ export class SiteEditComponent implements OnInit {
             mailingStreetName: site.mailingStreetName ?? null,
             mailingNumber: site.mailingNumber ?? null,
             mailingCity: site.mailingCity ?? null,
-            mailingStateId: site.mailingState?.id ?? null,
+            mailingState: site.mailingState?.id != null ? { id: site.mailingState.id } : null,
             mailingZipCode: site.mailingZipCode ?? null,
             mailingPhoneNumber: site.mailingPhoneNumber ?? null,
             mailingEmailAddress: site.mailingEmailAddress ?? null,

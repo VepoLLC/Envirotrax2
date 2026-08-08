@@ -31,6 +31,7 @@ builder.Services.AddControllers(options =>
     options.Filters.Add(typeof(CheckFeaturesFilter));
     options.Filters.Add(typeof(CheckPermissionFilter));
     options.Filters.Add(typeof(QueryFilter));
+    options.Filters.Add(typeof(ApiExceptionFilter));
 
     options.OutputFormatters.Add(new CsvMediaTypeFormatter());
     options.OutputFormatters.Add(new ExcelMediaTypeFormatter());

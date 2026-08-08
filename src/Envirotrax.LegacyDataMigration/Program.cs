@@ -1,4 +1,5 @@
 ﻿
+using Envirotrax.Common.Data.Services.Definitions;
 using Envirotrax.LegacyDataMigration.Data;
 using Envirotrax.LegacyDataMigration.Data.Users;
 using Envirotrax.LegacyDataMigration.Services;
@@ -12,20 +13,24 @@ var newV2DatabaseConnection = @"Server=(localdb)\mssqllocaldb;Database=Envirotra
 
 var services = new ServiceCollection();
 
-services
-    .AddDbContext<AppDbContext>(options =>
-    {
-        options.UseSqlServer(newV2DatabaseConnection);
+void ConfigureDbContext(DbContextOptionsBuilder options)
+{
+    options.UseSqlServer(newV2DatabaseConnection);
 
-        options.EnableDetailedErrors();
-        options.EnableSensitiveDataLogging();
-        options.LogTo(Console.WriteLine, LogLevel.Information);
-    });
+    options.EnableDetailedErrors();
+    options.EnableSensitiveDataLogging();
+    options.LogTo(Console.WriteLine, LogLevel.Information);
+}
+
+services.AddDbContext<AppIdentityDbContext>(options => ConfigureDbContext(options));
+services.AddDbContext<AppDbContext>(options => ConfigureDbContext(options));
+
+services.AddSingleton<ITenantProvidersService, MigrationTenantProvidersService>();
 
 services
     .AddIdentityCore<AppUser>()
     .AddRoles<IdentityRole<int>>()
-    .AddEntityFrameworkStores<AppDbContext>();
+    .AddEntityFrameworkStores<AppIdentityDbContext>();
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()

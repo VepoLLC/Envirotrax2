@@ -13,16 +13,16 @@ public class UserService
 
     private readonly UserManager<AppUser> _userManager;
     private readonly ILogger<UserService> _logger;
-    private readonly AppDbContext _appDbContext;
+    private readonly AppIdentityDbContext _identityDbContext;
 
     public UserService(
         UserManager<AppUser> userManager,
         ILogger<UserService> logger,
-        AppDbContext appDbContext)
+        AppIdentityDbContext identityDbContext)
     {
         _userManager = userManager;
         _logger = logger;
-        _appDbContext = appDbContext;
+        _identityDbContext = identityDbContext;
     }
 
     public async Task MigrateAsync()
@@ -46,7 +46,7 @@ public class UserService
             _logger.LogInformation("Executing script {file}", file);
             var sql = await File.ReadAllTextAsync(file);
 
-            var addedRows = await _appDbContext.Database.ExecuteSqlRawAsync(sql);
+            var addedRows = await _identityDbContext.Database.ExecuteSqlRawAsync(sql);
             _logger.LogInformation("Imported users. Count: {count}", addedRows);
         }
 
@@ -88,6 +88,6 @@ public class UserService
         _logger.LogInformation("Hashed {HashedCount} records and failed {FailedCount} records.", hashedCount, failedCount);
         _logger.LogInformation("Executing database updates of password hashes.");
 
-        await _appDbContext.SaveChangesAsync();
+        await _identityDbContext.SaveChangesAsync();
     }
 }

@@ -20,37 +20,39 @@
                     </div>
                 </div>
 
-                <div *ngFor="let item of mySuppliers.hierarchy" class="col-md-3">
-                    <div class="fw-bold mb-2 mt-3">
-                        {{item.groupLetter}}
-                    </div>
-                    <div *ngFor="let supplier of item.waterSuppliers" class="mb-1">
-                        <div class="d-flex gap-2 align-items-center">
-                            <button (click)="selectSupplier(supplier.waterSupplier)"
-                                    class="btn btn-link text-decoration-none p-0">
-                                {{supplier.waterSupplier.name}}
-                            </button>
-                            <button *ngIf="supplier.children && supplier.children.length > 0"
-                                    class="btn btn-outline-secondary py-0 px-1"
-                                    [attr.aria-label]="supplier.isExpanded ? 'Click to collapse children' : 'Click to expand children'"
-                                    [attr.title]="supplier.isExpanded ? 'Click to collapse children' : 'Click to expand children'"
-                                    (click)="supplier.isExpanded = !supplier.isExpanded">
-
-                                <i *ngIf="!supplier.isExpanded" class="fa-solid fa-chevron-down"></i>
-                                <i *ngIf="supplier.isExpanded" class="fa-solid fa-chevron-up"></i>
-                            </button>
+                <div *ngFor="let column of columns" class="col-md-3">
+                    <ng-container *ngFor="let item of column">
+                        <div class="fw-bold mb-2 mt-3">
+                            {{item.groupLetter}}
                         </div>
-
-                        <ng-container *ngIf="supplier.isExpanded">
-                            <ng-container *ngFor="let child of supplier.children">
-                                <button *ngFor="let childSupplier of child.waterSuppliers"
-                                        class="btn btn-link text-decoration-none p-0 ms-2 my-2"
-                                        (click)="selectSupplier(childSupplier.waterSupplier)">
-                                    {{childSupplier.waterSupplier.name}}
+                        <div *ngFor="let supplier of item.waterSuppliers" class="mb-1">
+                            <div class="d-flex gap-2 align-items-center">
+                                <button (click)="selectSupplier(supplier.waterSupplier)"
+                                        class="btn btn-link text-decoration-none p-0">
+                                    {{supplier.waterSupplier.name}}
                                 </button>
+                                <button *ngIf="supplier.children && supplier.children.length > 0"
+                                        class="btn btn-outline-secondary py-0 px-1"
+                                        [attr.aria-label]="supplier.isExpanded ? 'Click to collapse children' : 'Click to expand children'"
+                                        [attr.title]="supplier.isExpanded ? 'Click to collapse children' : 'Click to expand children'"
+                                        (click)="supplier.isExpanded = !supplier.isExpanded">
+
+                                    <i *ngIf="!supplier.isExpanded" class="fa-solid fa-chevron-down"></i>
+                                    <i *ngIf="supplier.isExpanded" class="fa-solid fa-chevron-up"></i>
+                                </button>
+                            </div>
+
+                            <ng-container *ngIf="supplier.isExpanded">
+                                <ng-container *ngFor="let child of supplier.children">
+                                    <button *ngFor="let childSupplier of child.waterSuppliers"
+                                            class="btn btn-link text-decoration-none p-0 ms-2 my-2"
+                                            (click)="selectSupplier(childSupplier.waterSupplier)">
+                                        {{childSupplier.waterSupplier.name}}
+                                    </button>
+                                </ng-container>
                             </ng-container>
-                        </ng-container>
-                    </div>
+                        </div>
+                    </ng-container>
                 </div>
             </div>
         </ng-container>

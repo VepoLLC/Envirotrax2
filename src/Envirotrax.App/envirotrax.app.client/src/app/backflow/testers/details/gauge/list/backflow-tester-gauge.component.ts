@@ -4,12 +4,11 @@ import { BackflowTesterGaugeService } from "../../../../../shared/services/backf
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
 import { AuthService } from "../../../../../shared/services/auth/auth.service";
 import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
-import { ToastService } from "../../../../../shared/services/toast.service";
+import { ToastService, CellTemplateData, ColumnType, ModalHelperService, TableColumn, TableCustomAction } from '@envirotrax/common-ui';
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { AddEditBackflowTesterGaugeComponent, BackflowGaugeModalData } from "../edit/add-edit-backflow-tester-gauge.component";
 import { Professional } from "../../../../../shared/models/professionals/professional";
 import { DownloadService } from "../../../../../shared/services/download.service";
-import { CellTemplateData, ColumnType, ModalHelperService, TableColumn, TableCustomAction } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'vp-backflow-tester-gauge',

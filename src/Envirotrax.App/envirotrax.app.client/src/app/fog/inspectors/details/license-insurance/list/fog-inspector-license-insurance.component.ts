@@ -10,10 +10,9 @@ import { AuthService } from "../../../../../shared/services/auth/auth.service";
 import { FeatureType } from "../../../../../shared/models/feature-type";
 import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
-import { ToastService } from "../../../../../shared/services/toast.service";
 import { EditFogInspectorLicenseComponent, FogLicenseModalData } from "../edit/edit-fog-inspector-license.component";
 import { EditFogInspectorInsuranceComponent, FogInsuranceModalData } from "../edit/edit-fog-inspector-insurance.component";
-import { CellTemplateData, ColumnType, ModalHelperService, TableColumn, TableCustomAction } from "@envirotrax/common-ui";
+import { CellTemplateData, ColumnType, ModalHelperService, TableColumn, TableCustomAction, ToastService } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'vp-fog-inspector-license-insurances',

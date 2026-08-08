@@ -6,8 +6,7 @@ import { ProfessionalUserLicenseService } from "../../../../../shared/services/p
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
 import { ProfessionalLicenseType } from "../../../../../shared/models/professionals/licenses/professional-license-type";
 import { ProfesisonalService } from "../../../../../shared/services/professionals/professional.service";
-import { ToastService, ToastType } from "../../../../../shared/services/toast.service";
-import { InputOption } from "@envirotrax/common-ui";
+import { ToastService, ToastType, InputOption } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,

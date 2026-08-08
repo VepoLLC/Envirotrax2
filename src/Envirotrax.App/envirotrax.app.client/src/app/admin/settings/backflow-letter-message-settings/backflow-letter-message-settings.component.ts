@@ -4,7 +4,7 @@ import { BackflowSettings } from "../../../shared/models/settings/backflow-setti
 import { BackflowExpiredType, BackflowExpiringType, BackflowNonCompliantType, BackflowOutOfServiceType, BackflowTestingMethodType } from "../../../shared/models/settings/backflow-testing-settings-enum";
 import { BackflowTestingSettingsService } from "../../../shared/services/settings/backflow-testing-settings.service";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
-import { ToastService } from "../../../shared/services/toast.service";
+import { ToastService } from '@envirotrax/common-ui';
 
 @Component({
     templateUrl: './backflow-letter-message-settings.component.html',

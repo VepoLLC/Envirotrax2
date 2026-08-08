@@ -6,8 +6,7 @@ import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { NgForm } from "@angular/forms";
 import { LookupService } from "../../../shared/services/lookup/lookup.service";
 import { State } from "../../../shared/models/lookup/state";
-import { ToastService } from "../../../shared/services/toast.service";
-import { InputOption } from "@envirotrax/common-ui";
+import { ToastService, InputOption } from '@envirotrax/common-ui';
 
 
 @Component({

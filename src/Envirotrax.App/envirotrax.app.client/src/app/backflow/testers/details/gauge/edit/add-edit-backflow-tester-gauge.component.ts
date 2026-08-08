@@ -4,7 +4,7 @@ import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { BackflowGauge } from "../../../../../shared/models/backflow/backflow-gauge";
 import { BackflowTesterGaugeService } from "../../../../../shared/services/backflow/backflow-tester-gauge.service";
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
-import { ToastService } from "../../../../../shared/services/toast.service";
+import { ToastService } from '@envirotrax/common-ui';
 
 export interface BackflowGaugeModalData {
     testerId: number;

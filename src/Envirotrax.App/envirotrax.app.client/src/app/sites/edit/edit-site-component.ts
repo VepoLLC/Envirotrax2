@@ -11,11 +11,10 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { UserService } from "../../shared/services/water-suppliers/user.service";
 import { FacilityType } from '../../shared/enums/facility-type.enum';
 import { GreaseTrapType } from '../../shared/enums/grease-trap-type.enum';
-import { ToastService, ToastType } from '../../shared/services/toast.service';
+import { ToastService, ToastType, InputOption } from '@envirotrax/common-ui';
 import { AuthService } from '../../shared/services/auth/auth.service';
 import { PermissionAction, PermissionType } from '../../shared/models/permission-type';
 import { FeatureType } from '../../shared/models/feature-type';
-import { InputOption } from '@envirotrax/common-ui';
 
 type SiteTab = 'logHistory' | 'csi' | 'backflow' | 'outOfService' | 'fog';
 
@@ -264,6 +263,8 @@ export class EditSiteComponent implements OnInit {
     }
 
     public async updateSiteSettings(form: NgForm): Promise<void> {
+        this.applyTripTicketIntervalValidation(form);
+
         if (form.valid) {
             try {
                 this.sectionLoading.siteSettings = true;
@@ -273,7 +274,8 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.id = this.site.id;
                     this.currentSite.backflowScheduleMonth = this.site.backflowScheduleMonth;
                     this.currentSite.lastTripTicketDate = this.site.lastTripTicketDate;
-                    this.currentSite.tripTicketInterval = this.site.tripTicketInterval;
+                    // Blank → 0; negative/decimal is blocked above.
+                    this.currentSite.tripTicketInterval = this.toNumberOrNull(this.site.tripTicketInterval) ?? 0;
                     this.currentSite.active = this.site.active;
                     this.currentSite.invalidMailingAddress = this.site.invalidMailingAddress;
                     this.currentSite.outOfArea = this.site.outOfArea;
@@ -298,6 +300,8 @@ export class EditSiteComponent implements OnInit {
             } finally {
                 this.sectionLoading.siteSettings = false;
             }
+        } else {
+            form.controls['tripTicketInterval']?.markAsTouched();
         }
     }
 
@@ -378,8 +382,9 @@ export class EditSiteComponent implements OnInit {
 
                 if (this.site.id) {
                     await this._siteService.updateGisData(this.site.id, {
-                        gisLatitude: this.site.gisLatitude,
-                        gisLongitude: this.site.gisLongitude,
+                        // Blank → null so a cleared coordinate clears instead of failing the server bind.
+                        gisLatitude: this.toNumberOrNull(this.site.gisLatitude),
+                        gisLongitude: this.toNumberOrNull(this.site.gisLongitude),
                         gisStatus: this.site.gisStatus
                     });
 
@@ -394,6 +399,38 @@ export class EditSiteComponent implements OnInit {
             } finally {
                 this.sectionLoading.gisData = false;
             }
+        }
+    }
+
+    // Coerces a vp-input number (a string once edited, '' once cleared) to a number; blank → null.
+    private toNumberOrNull(value: unknown): number | null {
+        if (value === null || value === undefined || value === '') {
+            return null;
+        }
+
+        const parsed = Number(value);
+
+        return Number.isNaN(parsed) ? null : parsed;
+    }
+
+    // Blocks Save on a negative/decimal Trip Ticket Interval via an `interval` error; blank is valid (→ 0).
+    private applyTripTicketIntervalValidation(form: NgForm): void {
+        const control = form.controls['tripTicketInterval'];
+
+        if (!control) {
+            return;
+        }
+
+        const value: unknown = this.site.tripTicketInterval;
+        const isBlank = value === null || value === undefined || value === '';
+        const isNonNegativeWholeNumber = /^\d+$/.test(String(value).trim());
+
+        if (!isBlank && !isNonNegativeWholeNumber) {
+            control.setErrors({ ...(control.errors ?? {}), interval: true });
+        } else if (control.hasError('interval')) {
+            const errors = { ...control.errors };
+            delete errors['interval'];
+            control.setErrors(Object.keys(errors).length ? errors : null);
         }
     }
 

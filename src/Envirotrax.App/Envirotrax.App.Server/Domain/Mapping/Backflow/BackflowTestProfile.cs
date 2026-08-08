@@ -61,6 +61,7 @@ public class BackflowTestProfile : Profile
             .ForMember(m => m.Site, opt => opt.Ignore())
             .ForMember(m => m.SiteId, opt => opt.MapFrom(dto => dto.Site != null ? dto.Site.Id : (int?)null))
             .ForMember(m => m.Bpat, opt => opt.Ignore())
+            .ForMember(m => m.Professional, opt => opt.Ignore())
             .ForMember(m => m.ProfessionalId, opt => opt.MapFrom(dto => dto.Professional != null ? dto.Professional.Id : (int?)null))
             .ForMember(m => m.BpatId, opt => opt.MapFrom(dto => dto.Bpat != null ? dto.Bpat.Id : (int?)null))
             .ForMember(m => m.BpatState, opt => opt.Ignore())

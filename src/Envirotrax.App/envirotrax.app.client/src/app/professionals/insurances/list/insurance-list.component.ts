@@ -1,13 +1,12 @@
 import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { ExpirationType, ProfessionalInsurance } from "../../../shared/models/professionals/professional-insurance";
 import { ProfessionalInsuranceService } from "../../../shared/services/professionals/professional-insurance.service";
-import { ToastService, ToastType } from "../../../shared/services/toast.service";
+import { ToastService, ToastType, CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { ProfesisonalService } from "../../../shared/services/professionals/professional.service";
 import { NgForm } from "@angular/forms";
 import { EditInsuranceComponent } from "../edit/edit-insurance.component";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
-import { CellTemplateData, ColumnType, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'vp-insurance-list',

@@ -133,7 +133,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         await _siteRepository.UpdateManualGisDataAsync(siteId, dto.Latitude, dto.Longitude, dto.Status);
     }
 
-    public async Task<bool> UpdateFromAdminAsync(int siteId, AdminUpdateSiteDto dto, CancellationToken cancellationToken)
+    public async Task<bool> UpdateFromAdminAsync(int siteId, SiteDto dto, CancellationToken cancellationToken)
     {
         var site = await _siteRepository.GetTrackedForUpdateAsync(siteId, cancellationToken);
 
@@ -150,16 +150,12 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     }
 
     /// <summary>
-    /// Copies the approved editable fields from an Admin Edit Site update onto the loaded (tracked) Site.
-    /// Called with the freshly-loaded entity, so <paramref name="site"/> still holds the persisted values
-    /// when the NeedsRenewalCheck comparison below executes (before those fields are overwritten).
+    /// Copies the approved editable fields from a SiteDto onto the loaded (tracked) Site — a deliberate
+    /// ALLOWLIST, so protected DTO columns (WaterSupplier, GIS, audit, NeedsRenewalCheck, …) are ignored.
+    /// Runs on the freshly-loaded entity so the NeedsRenewalCheck compare below sees the pre-overwrite values.
     /// </summary>
-    private static void ApplyAdminUpdate(Site site, AdminUpdateSiteDto dto)
+    private static void ApplyAdminUpdate(Site site, SiteDto dto)
     {
-        // Derive NeedsRenewalCheck the way the legacy Vepo Manager Edit Site did: flag the site for a
-        // renewal check when any of PropertyType / HasOnSiteSewageFacility / HasAuxWaterSupply changes.
-        // Evaluated against the loaded (original) values BEFORE they are overwritten below. We only ever
-        // set it true here (never clear it) — clearing stays the batch job's responsibility.
         var renewalTriggerChanged =
             site.PropertyType != dto.PropertyType
             || site.HasOnSiteSewageFacility != dto.HasOnSiteSewageFacility
@@ -177,7 +173,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         site.StreetName = dto.StreetName;
         site.PropertyNumber = dto.PropertyNumber;
         site.City = dto.City;
-        site.StateId = dto.StateId;
+        site.StateId = dto.State?.Id;
         site.ZipCode = dto.ZipCode;
 
         // Mailing Information
@@ -187,7 +183,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         site.MailingStreetName = dto.MailingStreetName;
         site.MailingNumber = dto.MailingNumber;
         site.MailingCity = dto.MailingCity;
-        site.MailingStateId = dto.MailingStateId;
+        site.MailingStateId = dto.MailingState?.Id;
         site.MailingZipCode = dto.MailingZipCode;
         site.MailingPhoneNumber = dto.MailingPhoneNumber;
         site.MailingEmailAddress = dto.MailingEmailAddress;

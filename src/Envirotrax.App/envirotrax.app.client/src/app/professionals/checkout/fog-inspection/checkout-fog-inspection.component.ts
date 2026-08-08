@@ -1,12 +1,11 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, MAX_PAGE_SIZE, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
+import { CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, MAX_PAGE_SIZE, ModalHelperService, TableColumn, ToastService } from '@envirotrax/common-ui';
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { FogInspection } from "../../../shared/models/fog/fog-inspection";
 import { ProfessionalFogInspectionService } from "../../../shared/services/fog/professional-fog-inspection.service";
 import { ProfesionalUserService } from "../../../shared/services/professionals/professional-user.service";
 import { ProfesisonalService } from "../../../shared/services/professionals/professional.service";
-import { ToastService } from "../../../shared/services/toast.service";
 import { CheckoutService } from "../../../shared/services/professionals/checkout.service";
 import { Router } from "@angular/router";
 

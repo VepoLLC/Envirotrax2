@@ -1,12 +1,11 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, MAX_PAGE_SIZE, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
+import { CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, MAX_PAGE_SIZE, ModalHelperService, TableColumn, ToastService } from '@envirotrax/common-ui';
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { BackflowTest } from "../../../shared/models/backflow/backflow-test";
 import { BackflowTestService } from "../../../shared/services/backflow/backflow-test.service";
 import { ProfesionalUserService } from "../../../shared/services/professionals/professional-user.service";
 import { ProfesisonalService } from "../../../shared/services/professionals/professional.service";
-import { ToastService } from "../../../shared/services/toast.service";
 import { CheckoutService } from "../../../shared/services/professionals/checkout.service";
 import { Router } from "@angular/router";
 

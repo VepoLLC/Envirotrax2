@@ -2,9 +2,9 @@ import { Injectable } from "@angular/core";
 import { Observable, Subject } from "rxjs";
 
 /**
- * Lightweight transient notification service (ported from Envirotrax.App). Components call show()/the
- * helpers to raise a toast; the vp-toast-container renders and auto-dismisses it. Preferred over modal
- * dialogs for non-blocking success/failure feedback (e.g. Save).
+ * Transient notification service shared by both apps. Components call show() (or a helper) to raise a
+ * toast; the vp-toast-container renders and auto-dismisses it. Preferred over modal dialogs for
+ * non-blocking success/failure feedback.
  */
 @Injectable({
     providedIn: 'root'
@@ -31,6 +31,17 @@ export class ToastService {
         });
     }
 
+    public successFullyDeleted(entityName?: string): void {
+        const message = entityName
+            ? `Successfully deleted ${entityName}!`
+            : 'Successfully deleted!';
+
+        this.show({
+            text: message,
+            type: ToastType.Success
+        });
+    }
+
     public failedToSave(entityName?: string): void {
         const message = entityName
             ? `Failed to save ${entityName}`
@@ -39,6 +50,17 @@ export class ToastService {
         this.show({
             text: message,
             type: ToastType.Error
+        });
+    }
+
+    public successfullyReactivated(entityName?: string): void {
+        const message = entityName
+            ? `Successfully reactivated ${entityName}!`
+            : 'Successfully reactivated';
+
+        this.show({
+            text: message,
+            type: ToastType.Success
         });
     }
 }

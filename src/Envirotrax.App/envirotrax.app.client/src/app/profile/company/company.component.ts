@@ -11,8 +11,7 @@ import { AuthService } from "../../shared/services/auth/auth.service";
 import { ProfesionalUserService } from "../../shared/services/professionals/professional-user.service";
 import { HttpErrorResponse } from "@angular/common/http";
 import { ROLE_DEFINITIONS } from "../../shared/models/role-definitions";
-import { ToastService } from "../../shared/services/toast.service";
-import { InputOption } from "@envirotrax/common-ui";
+import { ToastService, InputOption } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,

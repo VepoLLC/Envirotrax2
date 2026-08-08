@@ -8,7 +8,7 @@ import { FacilityType, facilityTypeLabels } from '../../../../shared/enums/facil
 import { PropertyType } from '../../../../shared/enums/property-type.enum';
 import { DownloadService } from '../../../../shared/services/download.service';
 import { HelperService } from '../../../../shared/services/helpers/helper.service';
-import { ToastService, ToastType } from '../../../../shared/services/toast.service';
+import { ToastService, ToastType } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,

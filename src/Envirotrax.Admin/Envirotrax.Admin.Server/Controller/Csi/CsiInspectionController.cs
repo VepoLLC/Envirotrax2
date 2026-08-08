@@ -17,9 +17,9 @@ public class CsiInspectionController : AdminBaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> SearchAsync([FromQuery] PageInfo pageInfo,[FromQuery] Query query,[FromQuery] CsiPaymentStatus? paymentStatus,[FromQuery] int? inspectorId, CancellationToken cancellationToken)  
+    public async Task<IActionResult> SearchAsync([FromQuery] PageInfo pageInfo,[FromQuery] Query query,[FromQuery] CsiPaymentStatus? paymentStatus, CancellationToken cancellationToken)
     {
-        var inspections = await _inspectionService.SearchAsync(pageInfo, query, paymentStatus, inspectorId, cancellationToken);
+        var inspections = await _inspectionService.SearchAsync(pageInfo, query, paymentStatus, cancellationToken);
 
         return Ok(inspections);
     }

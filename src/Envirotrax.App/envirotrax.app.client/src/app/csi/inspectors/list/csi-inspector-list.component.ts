@@ -8,6 +8,11 @@ import { Professional } from "../../../shared/models/professionals/professional"
 import { CellTemplateData, ColumnType, TableColumn } from '@envirotrax/common-ui';
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 
+interface CsiInspectorLicenseSearchVm {
+    inspectorLicenseNumber?: string;
+    insurancePolicyNumber?: string;
+}
+
 @Component({
     selector: 'app-csi-inspector-list',
     standalone: false,
@@ -32,6 +37,8 @@ export class CsiInspectorListComponent implements OnInit {
 
     @ViewChild('addressCell', { static: true })
     public addressCell?: TemplateRef<CellTemplateData<Professional>>;
+
+    private _licenseSearch: CsiInspectorLicenseSearchVm = {};
 
     constructor(
         private readonly _csiInspectoreManagementService: CsiInspectoreManagementService,
@@ -74,10 +81,25 @@ export class CsiInspectorListComponent implements OnInit {
     public async getInspectors(): Promise<void> {
         try {
             this.table.isLoading = true;
-            this.table.items = await this._csiInspectoreManagementService.getAll(this.table.items?.pageInfo || {}, this.table.query);
+            const pageInfo = this.table.items?.pageInfo || {};
+            const { inspectorLicenseNumber, insurancePolicyNumber } = this._licenseSearch;
+
+            this.table.items = (inspectorLicenseNumber || insurancePolicyNumber)
+                ? await this._csiInspectoreManagementService.search(inspectorLicenseNumber, insurancePolicyNumber, pageInfo)
+                : await this._csiInspectoreManagementService.getAll(pageInfo, this.table.query);
         } finally {
             this.table.isLoading = false;
         }
+    }
+
+    private extractLicenseSearchVm(): CsiInspectorLicenseSearchVm {
+        const getValue = (columnName: string) =>
+            this.table.query.filter?.find(f => f.columnName === columnName)?.value as string | undefined;
+
+        return {
+            inspectorLicenseNumber: getValue('inspectorLicenseNumber'),
+            insurancePolicyNumber: getValue('insurancePolicyNumber')
+        };
     }
 
     public setShowResults(visible: boolean): void {
@@ -97,6 +119,8 @@ export class CsiInspectorListComponent implements OnInit {
 
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
+            this._licenseSearch = this.extractLicenseSearchVm();
+
             await this.getInspectors();
             this.setShowResults(true);
         }

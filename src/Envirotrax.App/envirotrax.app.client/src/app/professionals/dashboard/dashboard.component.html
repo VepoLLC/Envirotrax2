@@ -306,6 +306,20 @@
                 </a>
             </div>
             <div *ngIf="hasFogTransportation" class="col-sm-12 col-md-6 col-xl-3">
+                <a routerLink="/professionals/fog/transportation/vehicles" class="overview-box bordered">
+                    <i class="fa-solid fa-truck overview-icon"></i>
+                    <span class="overview-label">Registered Transporter Vehicles</span>
+                    <div class="number-box">{{ dashboardStats.vehicleCount ?? 0 }}</div>
+                </a>
+            </div>
+            <div *ngIf="hasFogTransportation" class="col-sm-12 col-md-6 col-xl-3">
+                <a routerLink="/professionals/fog/transportation/disposal-sites" class="overview-box bordered">
+                    <i class="fa-solid fa-location-dot overview-icon"></i>
+                    <span class="overview-label">Disposal Sites</span>
+                    <div class="number-box">{{ dashboardStats.disposalSiteCount ?? 0 }}</div>
+                </a>
+            </div>
+            <div *ngIf="hasFogTransportation" class="col-sm-12 col-md-6 col-xl-3">
                 <a (click)="openSignaturePad()" class="overview-box bordered" style="cursor: pointer">
                     <i class="fa-solid fa-signature overview-icon"></i>
                     <span class="overview-label">{{ signatureUrl ? "Update Transporter Signature" : "Add Transporter Signature" }}</span>
@@ -319,26 +333,6 @@
 
     <!-- Full view: side-by-side sections -->
     <div *ngIf="viewMode === 'full'">
-
-        <!-- Transporter Signature (FOG transporters) -->
-        <div *ngIf="hasFogTransportation" class="mb-4">
-            <vp-section header="Transporter Signature">
-                <p *ngIf="!signatureUrl" class="text-danger fw-semibold text-center">
-                    You must have your signature on file in order to submit trip tickets. Click on the Add Transporter's Signature button below to save your signature.
-                </p>
-
-                <div class="text-center">
-                    <div *ngIf="signatureUrl" class="mb-2">
-                        <img [src]="signatureUrl" alt="Transporter Signature" class="img-fluid border rounded" style="max-width: 400px" />
-                    </div>
-
-                    <button type="button" class="btn btn-primary vp-section-button" (click)="openSignaturePad()">
-                        <i class="fa-solid fa-signature me-1"></i>
-                        {{ signatureUrl ? "Update Transporter Signature" : "Add Transporter's Signature" }}
-                    </button>
-                </div>
-            </vp-section>
-        </div>
 
         <!-- Row 1: Water Suppliers + Sub Accounts (admin only) -->
         <div *ngIf="isAdmin" class="row mb-4">
@@ -474,6 +468,89 @@
                             <i class="fa-solid fa-gauge me-1"></i>
                             Manage Gauges
                         </a>
+                    </div>
+                </vp-section>
+            </div>
+        </div>
+
+        <!-- Row 3: Vehicles, Disposal Sites and Transporter Signature (FOG transporters) -->
+        <div *ngIf="hasFogTransportation" class="row gy-4 mb-4">
+            <div class="col-md-6">
+                <vp-section header="Registered Transporter Vehicles">
+                    <div dp-spinner-parent>
+                        <dp-loading-spinner *ngIf="vehiclesTable.isLoading"></dp-loading-spinner>
+
+                        <vp-table *ngIf="vehiclesTable.items"
+                                  [columns]="vehiclesTable.columns!"
+                                  [data]="vehiclesTable.items.data"
+                                  [(pageInfo)]="vehiclesTable.items.pageInfo"
+                                  (pageInfoChange)="loadVehicles()"
+                                  [(query)]="vehiclesTable.query"
+                                  (queryChange)="loadVehicles()"
+                                  (queryReset)="loadVehicles()" />
+
+                        <p *ngIf="vehiclesTable.items && !vehiclesTable.items.data.length"
+                           class="text-danger fw-semibold text-center">
+                            You must register your transporter vehicle(s) prior to entering a trip ticket. Any
+                            vehicle(s) registered in the master account will be available for use by any sub account.
+                            Click on the Vehicle Management button below to view more information on how to submit and
+                            manage your transporter vehicle(s).
+                        </p>
+                    </div>
+                    <div class="text-end mt-3">
+                        <a routerLink="/professionals/fog/transportation/vehicles" class="btn btn-primary vp-section-button">
+                            <i class="fa-solid fa-truck me-1"></i>
+                            Vehicle Management
+                        </a>
+                    </div>
+                </vp-section>
+            </div>
+
+            <div class="col-md-6">
+                <vp-section header="Disposal Sites">
+                    <div dp-spinner-parent>
+                        <dp-loading-spinner *ngIf="disposalSitesTable.isLoading"></dp-loading-spinner>
+
+                        <vp-table *ngIf="disposalSitesTable.items"
+                                  [columns]="disposalSitesTable.columns!"
+                                  [data]="disposalSitesTable.items.data"
+                                  [(pageInfo)]="disposalSitesTable.items.pageInfo"
+                                  (pageInfoChange)="loadDisposalSites()"
+                                  [(query)]="disposalSitesTable.query"
+                                  (queryChange)="loadDisposalSites()"
+                                  (queryReset)="loadDisposalSites()" />
+
+                        <p *ngIf="disposalSitesTable.items && !disposalSitesTable.items.data.length"
+                           class="text-danger fw-semibold text-center">
+                            You must select the locations where the company is authorized to haul the regulated sludge
+                            for disposal. Click on the Disposal Site Management button below to view more information on
+                            how to select and manage your disposal sites.
+                        </p>
+                    </div>
+                    <div class="text-end mt-3">
+                        <a routerLink="/professionals/fog/transportation/disposal-sites" class="btn btn-primary vp-section-button">
+                            <i class="fa-solid fa-location-dot me-1"></i>
+                            Disposal Site Management
+                        </a>
+                    </div>
+                </vp-section>
+            </div>
+
+            <div class="col-md-6">
+                <vp-section header="Transporter Signature">
+                    <p *ngIf="!signatureUrl" class="text-danger fw-semibold text-center">
+                        You must have your signature on file in order to submit trip tickets. Click on the Add Transporter's Signature button below to save your signature.
+                    </p>
+
+                    <div *ngIf="signatureUrl" class="text-center">
+                        <img [src]="signatureUrl" alt="Transporter Signature" class="img-fluid border rounded" style="max-width: 400px" />
+                    </div>
+
+                    <div class="text-end mt-3">
+                        <button type="button" class="btn btn-primary vp-section-button" (click)="openSignaturePad()">
+                            <i class="fa-solid fa-signature me-1"></i>
+                            {{ signatureUrl ? "Update Transporter Signature" : "Add Transporter's Signature" }}
+                        </button>
                     </div>
                 </vp-section>
             </div>

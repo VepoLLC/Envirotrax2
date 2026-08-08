@@ -1,41 +1,51 @@
-<h1 class="text-center h2">FOG Management</h1>
+<h1 class="text-center h2">Transporter Management</h1>
 
 <div [hidden]="showResults">
     <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
         <vp-filter-panel (filterChange)="onFilterChange($event)">
             <vp-section header="Transporter Account Search Criteria">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-5">
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="companyEmail"
-                                                   label="Company email"
+                                                   label="Company email:"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="name"
-                                                   label="Company name"
+                                                   label="Company name:"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
-                        </div>
+                        </div>                   
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="address"
-                                                   label="Address"
+                                                   label="Address:"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="phoneNumber"
-                                                   label="Company phone"
+                                                   label="Phone #:"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                     </div>
-                    <div class="col-md-6">
+
+                    <div class="col-md-2 d-flex justify-content-center align-items-center">
+                        Or
+                    </div>
+                    <div class="col-md-5">
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="registrationNumber"
-                                                   label="Registration number"
+                                                   label="Registration number:"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="insurancePolicyNumber"
-                                                   label="Insurance policy number"
+                                                   label="Insurance policy number:"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                     </div>
@@ -62,6 +72,22 @@
     </div>
 </ng-template>
 
+<ng-template #licensesCell let-transporter="rowData">
+    <div *ngFor="let entry of transporter.licensesAndInsurances" class="mb-1 d-flex align-items-center gap-4">
+        <div class="">
+            <strong>{{ entry.licenseType }}</strong> &mdash; {{ entry.number }}
+        </div>
+
+        <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
+             [class.text-bg-primary]="!entry.expirationDate"
+             [class.text-bg-success]="entry.expirationDate && entry.expirationType == expirationType.Valid"
+             [class.text-bg-warning]="entry.expirationDate && entry.expirationType == expirationType.AboutToExpire"
+             [class.text-bg-danger]="entry.expirationDate && entry.expirationType == expirationType.Expired">
+            {{ entry.expirationDate ? (entry.expirationDate | date) : 'Validating...' }}
+        </div>
+    </div>
+</ng-template>
+
 <div *ngIf="showResults">
 
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
@@ -76,7 +102,7 @@
 
         <button type="button"
                 class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
-                (click)="showResults = false;">
+                (click)="setShowResults(false)">
             Search Again
         </button>
     </div>

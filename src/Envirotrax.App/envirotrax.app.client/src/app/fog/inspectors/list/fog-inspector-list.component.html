@@ -5,33 +5,36 @@
         <vp-filter-panel (filterChange)="onFilterChange($event)">
             <vp-section header="Inspector Account Search Criteria">
                 <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-2">
+                    <div class="col-md-5">
+                        <div class="mb-3">
                             <vp-filter-panel-field fieldName="companyEmail"
-                                                   label="Company email"
+                                                   label="Company email:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <vp-filter-panel-field fieldName="name"
-                                                   label="Company name"
+                                                   label="Company name:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
-                        </div>
-                        <div class="mb-2">
+                        </div>                   
+                        <div class="mb-3">
                             <vp-filter-panel-field fieldName="address"
-                                                   label="Address"
+                                                   label="Address:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <vp-filter-panel-field fieldName="phoneNumber"
-                                                   label="Company phone"
+                                                   label="Phone #:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-2 d-flex justify-content-center align-items-center">
+                        Or
+                    </div>
+                    <div class="col-md-5">
                         <div class="mb-2">
                             <vp-filter-panel-field fieldName="inspectorLicenseNumber"
                                                    label="Inspector license number"

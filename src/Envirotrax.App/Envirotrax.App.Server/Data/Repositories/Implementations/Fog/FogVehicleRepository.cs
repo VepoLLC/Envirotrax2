@@ -14,6 +14,15 @@ public class FogVehicleRepository : Repository<FogVehicle>, IFogVehicleRepositor
     {
     }
 
+    // Deleting a vehicle is a soft delete (TenantDbContextBase turns EntityState.Deleted into a
+    // DeletedTime stamp) and there is no global soft-delete query filter, so exclude them here —
+    // otherwise deleted vehicles keep showing up in the list and in the Account Overview count.
+    protected override IQueryable<FogVehicle> GetListQuery()
+    {
+        return base.GetListQuery()
+            .Where(v => v.DeletedTime == null);
+    }
+
     public async Task<IEnumerable<FogVehicle>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         var paginated = await DbContext.FogVehicles

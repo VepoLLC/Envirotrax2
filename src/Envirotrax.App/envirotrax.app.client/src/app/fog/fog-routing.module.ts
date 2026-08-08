@@ -10,8 +10,22 @@ import { FogTripTicketListComponent } from "./trip-tickets/list/fog-trip-ticket-
 import { FogTripTicketViewComponent } from "./trip-tickets/view/fog-trip-ticket-view.component";
 import { FogTransporterListComponent } from "./transporters/list/fog-transporter-list.component";
 import { FogTransporterDetailsComponent } from "./transporters/details/fog-transporter-details.component";
+import { FogVehiclePermitListComponent } from "./transporters/vehicles/list/fog-vehicle-permit-list.component";
 
 const routes: Routes = [
+    {
+        path: 'reports',
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.FogReports,
+                    action: PermissionAction.CanView
+                }
+            ]
+        },
+        loadChildren: () => import('./reports/fog-reports.module').then(m => m.FogReportsModule)
+    },
     {
         path: 'inspections',
         title: 'FOG Inspection Search',
@@ -91,6 +105,20 @@ const routes: Routes = [
             permissions: [
                 {
                     type: PermissionType.FogInspectors,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
+    },
+    {
+        path: 'transporters/vehicles',
+        title: 'Vehicle Permit Management',
+        component: FogVehiclePermitListComponent,
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.FogVehicles,
                     action: PermissionAction.CanView
                 }
             ]

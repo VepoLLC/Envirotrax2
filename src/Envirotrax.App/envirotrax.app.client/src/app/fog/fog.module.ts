@@ -28,6 +28,8 @@ import { EditFogTransporterLicenseComponent } from "./transporters/details/licen
 import { EditFogTransporterInsuranceComponent } from "./transporters/details/license-insurance/edit/edit-fog-transporter-insurance.component";
 import { FogTransporterVehiclesComponent } from "./transporters/details/vehicles/list/fog-transporter-vehicles.component";
 import { EditFogTransporterVehicleComponent } from "./transporters/details/vehicles/edit/edit-fog-transporter-vehicle.component";
+import { FogVehiclePermitListComponent } from "./transporters/vehicles/list/fog-vehicle-permit-list.component";
+import { EditFogVehiclePermitComponent } from "./transporters/vehicles/edit/edit-fog-vehicle-permit.component";
 import { ProfessionalModule } from "../professionals/professional.module";
 
 @NgModule({
@@ -55,7 +57,9 @@ import { ProfessionalModule } from "../professionals/professional.module";
         EditFogTransporterLicenseComponent,
         EditFogTransporterInsuranceComponent,
         FogTransporterVehiclesComponent,
-        EditFogTransporterVehicleComponent
+        EditFogTransporterVehicleComponent,
+        FogVehiclePermitListComponent,
+        EditFogVehiclePermitComponent
     ],
     imports: [
         CommonModule,

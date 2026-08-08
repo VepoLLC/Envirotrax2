@@ -1961,6 +1961,56 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.ToTable("FogVehicles");
                 });
 
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Fog.FogVehiclePermit", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VehicleId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("DeletedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DeletedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("InspectionDueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PermitNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("WaterSupplierId", "VehicleId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeletedById");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.HasIndex("VehicleId");
+
+                    b.ToTable("FogVehiclePermits");
+                });
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.GisAreas.GisArea", b =>
                 {
                     b.Property<int>("WaterSupplierId")
@@ -4005,6 +4055,46 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("DeletedBy");
 
                     b.Navigation("Professional");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Fog.FogVehiclePermit", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "DeletedBy")
+                        .WithMany()
+                        .HasForeignKey("DeletedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Fog.FogVehicle", "Vehicle")
+                        .WithMany()
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("DeletedBy");
+
+                    b.Navigation("UpdatedBy");
+
+                    b.Navigation("Vehicle");
+
+                    b.Navigation("WaterSupplier");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.GisAreas.GisArea", b =>

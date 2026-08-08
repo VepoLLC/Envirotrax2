@@ -15,8 +15,8 @@ import { Site } from '../../../../shared/models/sites/site';
 import { CsiInspectionReason, csiInspectionReasonLabels } from '../../../../shared/enums/csi-inspection-reason.enum';
 import { MAX_PAGE_SIZE } from '../../../../shared/models/page-info';
 import { ProfessionalSupplierService } from '../../../../shared/services/professionals/professional-supplier.service';
-import { ToastService } from '../../../../shared/services/toast.service';
-import { InputOption } from '@envirotrax/common-ui';
+import { CheckoutService } from '../../../../shared/services/professionals/checkout.service';
+import { ToastService, InputOption } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,
@@ -88,7 +88,8 @@ export class CsiSubmissionCreateComponent implements OnInit {
         private readonly _siteService: SiteService,
         private readonly _inspectionService: CsiInspectionService,
         private readonly _professionalSupplierService: ProfessionalSupplierService,
-        private readonly _toastService: ToastService
+        private readonly _toastService: ToastService,
+        private readonly _checkoutService: CheckoutService
     ) { }
 
     public ngOnInit(): void {
@@ -177,6 +178,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
                 this._toastService.failedToSave('One or more images');
             }
             this.submitSuccess = true;
+            this._checkoutService.refresh();
         } finally {
             this.isLoading = false;
         }
@@ -215,7 +217,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
             this.csiUsers = usersPage.data ?? [];
             this.site = site;
 
-            const waterSuppliersPage = await this._professionalSupplierService.getAllMy(true);
+            const waterSuppliersPage = await this._professionalSupplierService.getAllMy({ hasCsiInspection: true });
             this.waterSuppliers = waterSuppliersPage.data ?? [];
 
             this.buildDropdownOptions();

@@ -5,5 +5,5 @@ namespace Envirotrax.Admin.Server.Domain.Services.Definitions.Lookup;
 
 public interface ILookupService
 {
-    Task<List<StateDto>?> GetStatesAsync(CancellationToken cancellationToken);
+    Task<List<StateDto>> GetStatesAsync(CancellationToken cancellationToken);
 }

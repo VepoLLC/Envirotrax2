@@ -42,9 +42,11 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install CommonUI dependencies
+      - name: Build CommonUI package
         working-directory: src/Envirotrax.CommonUI
-        run: npm install
+        run: |
+          npm install
+          npm run build-package
 
       - name: Install admin client dependencies
         working-directory: src/Envirotrax.Admin/envirotrax.admin.client

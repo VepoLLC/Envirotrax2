@@ -1,0 +1,20 @@
+<div class="container-fluid">
+    <header class="text-center mb-3">
+        <h1 class="h3">Water Supplier Backflow Test Reports</h1>
+    </header>
+
+    <div class="mb-3">
+        <ul class="vp-tabs nav nav-pills flex-column flex-xl-row justify-content-xl-center">
+            @for (tab of tabs; track tab.key) {
+                <li class="nav-item">
+                    <a class="nav-link" routerLinkActive="active"
+                       [routerLink]="['/backflow/reports', tab.key]">
+                        <i [class]="tab.iconCss" class="me-1"></i>{{ tab.title }}
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+
+    <router-outlet></router-outlet>
+</div>

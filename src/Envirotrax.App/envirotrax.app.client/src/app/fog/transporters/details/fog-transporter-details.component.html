@@ -1,0 +1,62 @@
+<h1 class="h2 mb-4 text-center">FOG Transporter Details</h1>
+
+<dp-loading-spinner *ngIf="isAccountLoading"></dp-loading-spinner>
+
+<div *ngIf="!isAccountLoading && accountInfo">
+    <div class="row g-4">
+
+        <div class="col-lg-6">
+            <vp-section header="Transporter Account Information">
+                <table class="table table-borderless mb-0">
+                    <tbody>
+                        <tr>
+                            <th class="w-40">Creation Date:</th>
+                            <td>{{ accountInfo.createdTime | date:'M/d/yy h:mm a' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Company Email:</th>
+                            <td>{{ accountInfo.companyEmail }}</td>
+                        </tr>
+                        <tr>
+                            <th>Company Name:</th>
+                            <td>{{ accountInfo.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Address:</th>
+                            <td>{{ formattedAddress }}</td>
+                        </tr>
+                        <tr>
+                            <th>Phone Number:</th>
+                            <td>{{ accountInfo.phoneNumber }}</td>
+                        </tr>
+                        <tr>
+                            <th>Fax Number:</th>
+                            <td>{{ accountInfo.faxNumber }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </vp-section>
+        </div>
+
+        <div class="col-lg-6">
+            <vp-fog-transporter-water-suppliers [transporterId]="id!" />
+        </div>
+
+        <div class="col-12">
+            <vp-fog-transporter-users [transporterId]="id!" />
+        </div>
+
+        <div class="col-12">
+            <vp-fog-transporter-license-insurances [transporterId]="id!" [transporter]="accountInfo" />
+        </div>
+
+        <div class="col-12">
+            <vp-fog-transporter-vehicles [transporterId]="id!" />
+        </div>
+
+    </div>
+</div>
+
+<div *ngIf="!isAccountLoading && !accountInfo" class="alert alert-warning">
+    Transporter not found.
+</div>

@@ -26,6 +26,8 @@ public class CsiInspectionProfile : Profile
 
                 dto.Professional ??= new ReferencedProfessionalDto { Id = model.ProfessionalId };
 
+                dto.InspectorUser ??= new ReferencedProfessionalUserDto { Id = model.InspectorId };
+
                 dto.WaterSupplier ??= new ReferencedWaterSupplierDto { Id = model.WaterSupplierId };
 
                 if (model.PropertyStateId.HasValue)

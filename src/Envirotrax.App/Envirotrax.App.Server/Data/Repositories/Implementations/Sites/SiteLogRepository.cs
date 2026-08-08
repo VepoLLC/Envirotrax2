@@ -18,7 +18,9 @@ public class SiteLogRepository : Repository<SiteLog>, ISiteLogRepository
     {
         return base.GetListQuery()
             .Include(sl => sl.CreatedBy)
-            .Include(sl => sl.Assembly);
+            .Include(sl => sl.Assembly)
+            .Include(sl => sl.Site).ThenInclude(s => s!.State)
+            .Include(sl => sl.Site).ThenInclude(s => s!.MailingState);
     }
 
     protected override IQueryable<SiteLog> GetDetailsQuery()

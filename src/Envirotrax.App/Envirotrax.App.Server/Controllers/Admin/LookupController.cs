@@ -15,10 +15,9 @@ public class LookupController : AdminBaseController
     }
 
     [HttpGet("states")]
-    public async Task<IActionResult> GetStatesAsync()
+    public async Task<IActionResult> GetStates()
     {
         var states = await _lookupService.GetStatesAsync();
-
         return Ok(states);
     }
 }

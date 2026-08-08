@@ -32,6 +32,19 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
         return Ok(result);
     }
 
+    [HttpGet("{id}/pdf")]
+    public async Task<IActionResult> GetPdfAsync(int id, CancellationToken cancellationToken)
+    {
+        var inspection = await _inspectionService.GetAsync(id, cancellationToken);
+        if (inspection == null)
+        {
+            return NotFound();
+        }
+
+        var pdf = await _inspectionService.GeneratePdfForProfessionalAsync(inspection);
+        return File(pdf, "application/pdf");
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetProfessionalInspectionsAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, [FromQuery] bool latestOnly, CancellationToken cancellationToken)
     {
@@ -44,5 +57,12 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
     {
         var result = await _inspectionService.SubmitAsync(request, cancellationToken);
         return Ok(result);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync(int id)
+    {
+        var result = await _inspectionService.DeleteAsync(id);
+        return result == null ? NotFound() : Ok(result);
     }
 }

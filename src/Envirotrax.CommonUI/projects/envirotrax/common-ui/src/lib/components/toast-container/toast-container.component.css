@@ -1,0 +1,16 @@
+.vp-toast {
+    min-width: 300px;
+    background-color: #fff;
+    transition: transform 0.3s ease;
+    opacity: 0;
+    transform: translateX(-100%);
+}
+
+.vp-toast.vp-active {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.vp-toast-container {
+    z-index: 5;
+}

@@ -1,27 +1,21 @@
 import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { NgForm } from "@angular/forms";
-import { CellTemplateData, ColumnType, InputOption, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
-import { ModalSize } from "@developer-partners/ngx-modal-dialog";
+import { CellTemplateData, ColumnType, InputOption, TableColumn } from "@envirotrax/common-ui";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { Site } from "../../../shared/models/sites/site";
-import { SiteLog } from "../../../shared/models/sites/site-log";
-import { SiteLogType } from "../../../shared/models/sites/site-log-type.enum";
-import { SiteLogReviewDateStatus } from "../../../shared/models/sites/site-log-review-date-status.enum";
 import { ComparisonOperator, Query, QueryProperty } from "../../../shared/models/query";
 import { WaterSupplierUser } from "../../../shared/models/users/water-supplier-user";
 import { SiteService } from "../../../shared/services/sites/site.service";
-import { SiteLogService } from "../../../shared/services/sites/site-log.service";
 import { UserService } from "../../../shared/services/water-suppliers/user.service";
 import { AuthService } from "../../../shared/services/auth/auth.service";
 import { DownloadService } from "../../../shared/services/download.service";
-import { ToastService } from "../../../shared/services/toast.service";
 import { PrintableTableService } from "../../../shared/services/printable-table.service";
 import { DownloadConfig } from "../../../shared/models/download-config";
 import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
 import { FacilityType } from "../../../shared/enums/facility-type.enum";
-import { SiteLogEditComponent, SiteLogEditModel } from "../../../shared/components/site-log/site-log-edit.component";
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
+import { PropertyLogCellComponent } from "../../../shared/components/data-components/table-cells/property-log-cell.component";
 
 const DAY_MS = 86400000;
 
@@ -51,7 +45,7 @@ type SiteRow = Site & {
     overdueClass?: string;
     assignedName?: string;
     rowNumber?: number;
-    logsExpanded?: boolean;
+    canModify?: boolean;   // surfaced to the shared property-log cell
 };
 
 @Component({
@@ -68,9 +62,6 @@ export class CsiComplianceManagementComponent implements OnInit {
     @ViewChild('mailingTemplate', { static: true })
     public mailingTemplate!: TemplateRef<CellTemplateData<Site>>;
 
-    @ViewChild('logTemplate', { static: true })
-    public logTemplate!: TemplateRef<CellTemplateData<Site>>;
-
     @ViewChild('assignedToTemplate', { static: true })
     public assignedToTemplate!: TemplateRef<CellTemplateData<Site>>;
 
@@ -85,16 +76,6 @@ export class CsiComplianceManagementComponent implements OnInit {
 
     @ViewChild('printableSection')
     private _printableSection!: ElementRef;
-
-    public readonly SiteLogType = SiteLogType;
-
-    public readonly reviewDateStatusClasses: { [key: number]: string } = {
-        [SiteLogReviewDateStatus.None]: '',
-        [SiteLogReviewDateStatus.Overdue]: 'badge bg-danger',
-        [SiteLogReviewDateStatus.DueSoon]: 'badge bg-warning text-dark',
-        [SiteLogReviewDateStatus.Upcoming]: 'badge bg-success',
-        [SiteLogReviewDateStatus.Completed]: 'badge bg-secondary'
-    };
 
     public canModify: boolean = false;
     public daysOverdueLabel: string = 'All overdue';
@@ -169,13 +150,10 @@ export class CsiComplianceManagementComponent implements OnInit {
 
     constructor(
         private readonly _siteService: SiteService,
-        private readonly _siteLogService: SiteLogService,
         private readonly _userService: UserService,
         private readonly _authService: AuthService,
         private readonly _downloadService: DownloadService,
-        private readonly _toastService: ToastService,
         private readonly _printService: PrintableTableService,
-        private readonly _modalHelper: ModalHelperService,
         private readonly _containerHelper: AppContainerHelperService
     ) {
         this.downloadConfig = {
@@ -205,11 +183,20 @@ export class CsiComplianceManagementComponent implements OnInit {
 
     public async ngOnInit(): Promise<void> {
         this._containerHelper.setContainerVisibility(false);
-        this.canModify = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.Sites);
-        this.table.columns = this.getColumns();
 
-        await this.loadUsers();
-        await this.getCompliance();
+        // Show the spinner for the whole initial load — the permission check and user lookup run before
+        // getCompliance() would otherwise turn it on, which left the page blank until the data call started.
+        try {
+            this.table.isLoading = true;
+
+            this.canModify = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.Sites);
+            this.table.columns = this.getColumns();
+
+            await this.loadUsers();
+            await this.getCompliance();
+        } finally {
+            this.table.isLoading = false;
+        }
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
@@ -273,40 +260,6 @@ export class CsiComplianceManagementComponent implements OnInit {
         }
     }
 
-    public addLog(site: Site): void {
-        this._modalHelper.show<SiteLogEditModel, SiteLog>(SiteLogEditComponent, {
-            title: 'Add Log Record',
-            model: { siteId: site.id!, log: { logType: SiteLogType.Note } },
-            size: ModalSize.large
-        }).result().subscribe(() => this.reloadLogs(site));
-    }
-
-    public editLog(site: Site, log: SiteLog): void {
-        this._modalHelper.show<SiteLogEditModel, SiteLog>(SiteLogEditComponent, {
-            title: 'Edit Log Record',
-            model: { siteId: site.id!, log },
-            size: ModalSize.large
-        }).result().subscribe(() => this.reloadLogs(site));
-    }
-
-    public deleteLog(site: Site, log: SiteLog): void {
-        this._modalHelper.showDeleteConfirmation().result().subscribe(async () => {
-            await this._siteLogService.delete(site.id!, log.id!);
-            this._toastService.successfullySaved('Log Record');
-            await this.reloadLogs(site);
-        });
-    }
-
-    private async reloadLogs(site: Site): Promise<void> {
-        const result = await this._siteLogService.getAll(
-            site.id!,
-            { pageNumber: 1, pageSize: MAX_PAGE_SIZE },
-            { sort: { id: 'Desc' }, filter: [] }
-        );
-
-        site.logs = result.data;
-    }
-
     private async loadUsers(): Promise<void> {
         const users = await this._userService.getAll(
             { pageSize: MAX_PAGE_SIZE },
@@ -325,7 +278,7 @@ export class CsiComplianceManagementComponent implements OnInit {
             { field: '', caption: '', type: ColumnType.other, queryColumnExcluded: true, cellTemplate: this.numberTemplate, rowCssClass: 'align-top' },
             this.templateColumn('Property Information', this.propertyTemplate),
             { field: 'accountNumber', caption: 'Account Number', type: ColumnType.text, rowCssClass: 'align-top' },
-            this.templateColumn('Property Log', this.logTemplate),
+            this.logColumn(),
             this.templateColumn('Assigned To', this.assignedToTemplate),
             { field: 'csiRenewalDate', caption: 'Inspection Date', type: ColumnType.other, cellTemplate: this.renewalDateTemplate, rowCssClass: 'align-top' },
             this.templateColumn('Days Overdue', this.daysOverdueTemplate),
@@ -341,6 +294,12 @@ export class CsiComplianceManagementComponent implements OnInit {
 
     private templateColumn(caption: string, template: TemplateRef<CellTemplateData<Site>>): TableColumn<Site> {
         return { field: '', caption, type: ColumnType.other, queryColumnExcluded: true, cellTemplate: template, rowCssClass: 'align-top' };
+    }
+
+    // Property Log rendered by the shared app cell component (via cellComponent, not cellTemplate). The cell
+    // reads canModify + the site's logs off the row (decorated in getCompliance / decorate).
+    private logColumn(): TableColumn<Site> {
+        return { field: '', caption: 'Property Log', type: ColumnType.other, queryColumnExcluded: true, cellComponent: PropertyLogCellComponent, rowCssClass: 'align-top' };
     }
 
     private buildQuery(): Query {
@@ -417,6 +376,7 @@ export class CsiComplianceManagementComponent implements OnInit {
         row.daysOverdue = this.getDaysOverdue(site);
         row.overdueClass = row.daysOverdue != null ? this.overdueBadgeClass(row.daysOverdue) : '';
         row.assignedName = this.assignedUserName(site);
+        row.canModify = this.canModify;
     }
 
     private getDaysOverdue(site: Site): number | undefined {

@@ -165,6 +165,11 @@ public class UpdateCsiAssignmentDto
     public int? UserId { get; set; }
 }
 
+public class UpdateBackflowAssignmentDto
+{
+    public int? UserId { get; set; }
+}
+
 public class CsiComplianceSiteDto : SiteDto
 {
     public List<SiteLogDto> Logs { get; set; } = [];
@@ -179,11 +184,61 @@ public class ReferencedSiteDto
 
     public string? BusinessName { get; set; }
 
+    public PropertyType PropertyType { get; set; }
+
+    public string? StreetNumber { get; set; }
+
+    public string? StreetName { get; set; }
+
+    public string? PropertyNumber { get; set; }
+
+    public string? City { get; set; }
+
+    public ReferencedStateDto? State { get; set; }
+
+    public string? ZipCode { get; set; }
+
+    public string? MailingCompanyName { get; set; }
+
+    public string? MailingContactName { get; set; }
+
+    public string? MailingStreetNumber { get; set; }
+
+    public string? MailingStreetName { get; set; }
+
+    public string? MailingNumber { get; set; }
+
+    public string? MailingCity { get; set; }
+
+    public ReferencedStateDto? MailingState { get; set; }
+
+    public string? MailingZipCode { get; set; }
+
+    public string? MailingPhoneNumber { get; set; }
+
+    public string? MailingEmailAddress { get; set; }
+
     public FacilityType FacilityType { get; set; }
+
+    // Site renewal-requirement flags — exposed so Backflow reports (Tab 2 View drill-down) can filter
+    // tests by their site's OSSF / auxiliary water supply, matching the compliance-report row filters.
+    public bool HasOnSiteSewageFacility { get; set; }
+
+    public bool HasAuxWaterSupply { get; set; }
 
     public double? GisLatitude { get; set; }
 
     public double? GisLongitude { get; set; }
 
     public int? GisAreaId { get; set; }
+
+    public int? CsiAccountAssignmentId { get; set; }
+
+    public int? BackflowAccountAssignmentId { get; set; }
+
+    // Assignment timestamp — exposed alongside the id so the Backflow Compliance Management grid can
+    // show when the current backflow account assignment was made (parity with the CSI page).
+    public DateTime? BackflowAccountAssignmentDate { get; set; }
+
+    public int? FogAccountAssignmentId { get; set; }
 }

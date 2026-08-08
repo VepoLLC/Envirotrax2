@@ -10,7 +10,6 @@ public class SiteLogProfile : Profile
     public SiteLogProfile()
     {
         CreateMap<SiteLog, SiteLogDto>()
-            .ForMember(dto => dto.Site, opt => opt.Ignore())
             .ForMember(dto => dto.Assembly, opt => opt.Ignore())
             .AfterMap((model, dto) =>
             {

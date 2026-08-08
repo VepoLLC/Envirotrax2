@@ -6,6 +6,7 @@ import { SharedComponentsModule } from "../shared/components/shared.components.m
 import { BackflowRoutingModule } from "./backflow-routing.module";
 import { BackflowTesterListComponent } from "./testers/list/backflow-tester-list.component";
 import { BackflowTestListComponent } from "./tests/backflow-test-list.component";
+import { BackflowComplianceManagementComponent } from "./reports/compliance/backflow-compliance-management.component";
 import { BackflowTestDetailsComponent } from "./tests/details/backflow-test-details.component";
 import { BackflowTesterDetailsComponent } from "./testers/details/backflow-tester-details.component";
 import { BackflowOutOfServiceListComponent } from "./out-of-service/backflow-out-of-service-list.component";
@@ -19,6 +20,8 @@ import { AddEditBackflowTesterInsuranceComponent } from "./testers/details/licen
 import { ProfessionalModule } from "../professionals/professional.module";
 import { BackflowTesterGaugeComponent } from "./testers/details/gauge/list/backflow-tester-gauge.component";
 import { AddEditBackflowTesterGaugeComponent } from "./testers/details/gauge/edit/add-edit-backflow-tester-gauge.component";
+import { BackflowTestRejectComponent } from "./tests/details/reject/backflow-test-reject.component";
+import { BackflowTestForceRenewalComponent } from "./tests/details/force-renewal/backflow-test-force-renewal.component";
 import { BackflowTestBpatInfoComponent } from "./tests/details/bpat-info/backflow-test-bpat-info.component";
 import { BackflowTestPropertyInfoComponent } from "./tests/details/property-info/backflow-test-property-info.component";
 import { BackflowTestMailingInfoComponent } from "./tests/details/mailing-info/backflow-test-mailing-info.component";
@@ -30,6 +33,7 @@ import { BackflowTestDetailsSectionsModule } from "./tests/details/backflow-test
     declarations: [
         BackflowTesterListComponent,
         BackflowTestListComponent,
+        BackflowComplianceManagementComponent,
         BackflowOutOfServiceListComponent,
         BackflowTestDetailsComponent,
         BackflowTestBpatInfoComponent,
@@ -46,7 +50,9 @@ import { BackflowTestDetailsSectionsModule } from "./tests/details/backflow-test
         AddEditBackflowTesterLicenseComponent,
         AddEditBackflowTesterInsuranceComponent,
         BackflowTesterGaugeComponent,
-        AddEditBackflowTesterGaugeComponent
+        AddEditBackflowTesterGaugeComponent,
+        BackflowTestRejectComponent,
+        BackflowTestForceRenewalComponent
     ],
     imports: [
         CommonModule,

@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Envirotrax.App.Server.Data.Models.Backflow;
 
 [Table("BackflowTests")]
-public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
+public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IProfessionalModel
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }
@@ -28,7 +28,8 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public string? JobNumber { get; set; }
 
     // BPAT (Backflow Prevention Assembly Tester)
-    public int? ProfessionalId { get; set; }
+    public int ProfessionalId { get; set; }
+    public Professional? Professional { get; set; }
     public int? BpatId { get; set; }
     public ProfessionalUser? Bpat { get; set; }
 
@@ -413,6 +414,11 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public int? DeletedById { get; set; }
     public AppUser? DeletedBy { get; set; }
     public DateTime? DeletedTime { get; set; }
+    public bool NeedsRenewalCheck { get; set; }
+    public bool RenewalRequired { get; set; }
+    public int BackflowScheduleMonth { get; set; }
+    public bool ForceRenewal { get; set; }
+    public int ForceRenewalYears { get; set; }
 }
 
 public class BackflowTestExpiryCounts

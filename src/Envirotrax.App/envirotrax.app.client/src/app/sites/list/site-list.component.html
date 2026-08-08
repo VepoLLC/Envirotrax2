@@ -486,7 +486,7 @@
 
 <div *ngIf="showMapResults && !isMapLoading" class="border bg-white p-3">
     <div class="d-flex justify-content-between align-items-center mb-2">
-        <button type="button" class="btn btn-primary vp-section-button">
+        <button type="button" class="btn btn-primary vp-section-button" (click)="showDownloadManager()">
             <i class="fa-solid fa-file-export me-1"></i>Export Results
         </button>
         <span class="fw-bold fs-5">Property Search ({{ mapResultCount }} Results)</span>

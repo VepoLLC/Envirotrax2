@@ -53,14 +53,42 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 
                 break;
 
-            case 500:
+            case 500: {
+                const messages = ['An unexpected error occurred. Please try again.'];
+                const traceId = error.error?.traceId;
+
+                if (traceId) {
+                    messages.push(`If the problem continues, contact support and include this reference ID: ${traceId}`);
+                }
+
                 this._modalHelper.showMessage({
                     title: 'Something Went Wrong',
                     type: 'error',
-                    messages: ['An unexpected error occurred. Please try again, and contact support if the problem continues.']
+                    messages
                 });
 
                 break;
+            }
+
+            case 400: {
+                const messages: string[] = [];
+
+                if (typeof error.error === 'string') {
+                    messages.push(error.error);
+                } else if (error.error?.errors) {
+                    messages.push(...Object.values<string[]>(error.error.errors).flat());
+                }
+
+                if (messages.length) {
+                    this._modalHelper.showMessage({
+                        title: 'Validation Error',
+                        type: 'error',
+                        messages
+                    });
+                }
+
+                break;
+            }
         }
     }
 }

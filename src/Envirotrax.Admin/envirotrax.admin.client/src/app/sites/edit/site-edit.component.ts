@@ -1,12 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { InputOption } from '@envirotrax/common-ui';
+import { InputOption, ToastService, ToastType } from '@envirotrax/common-ui';
 import { FacilityType, GreaseTrapType, PropertyType } from '../../shared/models/sites/site';
 import { SiteDetail, SiteEditWindowModel } from '../../shared/models/sites/site-detail';
 import { SiteGisUpdate, SiteUpdate } from '../../shared/models/sites/site-update';
 import { SiteService } from '../../shared/services/sites/site.service';
-import { ToastService, ToastType } from '../../shared/services/toast.service';
 import { LookupService } from '../../shared/services/lookup/lookup.service';
 import { SharedComponentsModule } from '../../shared/components/shared.components.module';
 import { WindowReference } from '../../window/window-config';
@@ -337,7 +336,7 @@ export class SiteEditComponent implements OnInit {
             streetName: site.streetName ?? null,
             propertyNumber: site.propertyNumber ?? null,
             city: site.city ?? null,
-            stateId: site.state?.id ?? null,
+            state: site.state?.id != null ? { id: site.state.id } : null,
             zipCode: site.zipCode ?? null,
 
             // Mailing Information
@@ -347,7 +346,7 @@ export class SiteEditComponent implements OnInit {
             mailingStreetName: site.mailingStreetName ?? null,
             mailingNumber: site.mailingNumber ?? null,
             mailingCity: site.mailingCity ?? null,
-            mailingStateId: site.mailingState?.id ?? null,
+            mailingState: site.mailingState?.id != null ? { id: site.mailingState.id } : null,
             mailingZipCode: site.mailingZipCode ?? null,
             mailingPhoneNumber: site.mailingPhoneNumber ?? null,
             mailingEmailAddress: site.mailingEmailAddress ?? null,

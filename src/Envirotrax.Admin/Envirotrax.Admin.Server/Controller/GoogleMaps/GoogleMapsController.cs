@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Envirotrax.Admin.Server.Controllers.GoogleMaps;
 
 /// <summary>
-/// Proxies the public Google Maps API key request to the App admin endpoint so the shared vp-map
-/// component can load the Maps SDK from the Admin client (which resolves /api/google-maps/api-key).
+/// Serves the public Google Maps API key (from Admin's own configuration / Key Vault) so the shared
+/// vp-map component can load the Maps SDK from the Admin client (which resolves /api/google-maps/api-key).
 /// </summary>
 [Route("api/google-maps")]
 public class GoogleMapsController : AdminBaseController

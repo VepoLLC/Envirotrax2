@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { ModalHelperService, TableRowData } from "@envirotrax/common-ui";
+import { ModalHelperService, TableRowData, ToastService } from '@envirotrax/common-ui';
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { SiteLog } from "../../../models/sites/site-log";
 import { SiteLogType } from "../../../models/sites/site-log-type.enum";
@@ -7,7 +7,6 @@ import { SiteLogReviewDateStatus } from "../../../models/sites/site-log-review-d
 import { MAX_PAGE_SIZE } from "../../../models/page-info";
 import { SiteLogService } from "../../../services/sites/site-log.service";
 import { DownloadService } from "../../../services/download.service";
-import { ToastService } from "../../../services/toast.service";
 import { SiteLogEditComponent, SiteLogEditModel } from "../../site-log/site-log-edit.component";
 
 // Contract the hosting grid's row must satisfy (read off rowData; every field is optional/decorated):

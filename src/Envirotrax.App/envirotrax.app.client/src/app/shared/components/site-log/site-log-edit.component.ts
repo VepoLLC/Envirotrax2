@@ -7,9 +7,8 @@ import { SiteLogService } from '../../services/sites/site-log.service';
 import { BackflowTestService } from '../../services/backflow/backflow-test.service';
 import { BackflowTest } from '../../models/backflow/backflow-test';
 import { ComparisonOperator } from '../../models/query';
-import { ToastService } from '../../services/toast.service';
+import { ToastService, InputOption } from '@envirotrax/common-ui';
 import { HelperService } from '../../services/helpers/helper.service';
-import { InputOption } from '@envirotrax/common-ui';
 
 export interface SiteLogEditModel {
     siteId: number;

@@ -2,13 +2,12 @@ import { formatDate } from "@angular/common";
 import { Component, OnDestroy, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Subscription } from "rxjs";
-import { CellTemplateData, ColumnType, InputOption, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
+import { CellTemplateData, ColumnType, InputOption, ModalHelperService, TableColumn, ToastService } from '@envirotrax/common-ui';
 import { BackflowTest } from "../../../../shared/models/backflow/backflow-test";
 import { BackflowOutOfServiceRequest } from "../../../../shared/models/backflow/backflow-out-of-service-request";
 import { OutOfServiceType } from "../../../../shared/models/backflow/out-of-service-type.enum";
 import { BackflowTestService } from "../../../../shared/services/backflow/backflow-test.service";
 import { BackflowOutOfServiceRequestService } from "../../../../shared/services/backflow/backflow-out-of-service-request.service";
-import { ToastService } from "../../../../shared/services/toast.service";
 import { HelperService } from "../../../../shared/services/helpers/helper.service";
 
 interface ReplacementCandidateVm {

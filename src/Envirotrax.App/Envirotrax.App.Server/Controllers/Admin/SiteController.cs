@@ -38,7 +38,7 @@ public class SiteController : AdminBaseController
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync(int id, [FromBody] AdminUpdateSiteDto dto, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateAsync(int id, [FromBody] SiteDto dto, CancellationToken cancellationToken)
     {
         var updated = await _siteService.UpdateFromAdminAsync(id, dto, cancellationToken);
 

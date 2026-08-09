@@ -25,6 +25,10 @@ public class SiteRepository : Repository<Site>, ISiteRepository
         entry.Property(site => site.GisLatitude).IsModified = false;
         entry.Property(site => site.GisLongitude).IsModified = false;
         entry.Property(site => site.GisStatus).IsModified = false;
+
+        // WaterSupplierId is a normal writable column now that it is no longer part of the primary
+        // key. Normal Site editing must never reassign a Site; that is a separate, dedicated flow.
+        entry.Property(site => site.WaterSupplierId).IsModified = false;
     }
 
     protected override IQueryable<Site> GetListQuery()

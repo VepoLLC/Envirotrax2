@@ -44,6 +44,7 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
     public DbSet<BackflowGauge> BackflowGauges { get; set; }
     public DbSet<FogTripTicket> FogTripTickets { get; set; }
     public DbSet<FogVehicle> FogVehicles { get; set; }
+    public DbSet<FogVehiclePermit> FogVehiclePermits { get; set; }
     public DbSet<FogTransporterDisposalSite> FogTransporterDisposalSites { get; set; }
     public DbSet<FogDisposalSite> FogDisposalSites { get; set; }
 

@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { UrlResolverService } from "@envirotrax/common-ui";
+import { InputOption, UrlResolverService } from "@envirotrax/common-ui";
 import { lastValueFrom, Observable, shareReplay } from "rxjs";
 import { State } from "../../models/lookup/state";
 

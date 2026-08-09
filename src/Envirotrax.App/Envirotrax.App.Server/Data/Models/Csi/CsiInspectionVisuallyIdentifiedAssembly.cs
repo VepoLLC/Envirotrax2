@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.Common.Data.Attributes;
@@ -7,7 +6,6 @@ using Envirotrax.Common.Data.Models;
 
 namespace Envirotrax.App.Server.Data.Models.Csi;
 
-[Table("CsiInspectionVisuallyIdentifiedAssemblies")]
 public class CsiInspectionVisuallyIdentifiedAssembly : TenantModel<WaterSupplier>
 {
     [AppPrimaryKey(true)]

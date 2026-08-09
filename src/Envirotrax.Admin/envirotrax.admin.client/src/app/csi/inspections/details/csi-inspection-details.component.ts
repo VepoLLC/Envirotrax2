@@ -1,56 +1,44 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CellTemplateData, ColumnType, InputOption, TableColumn } from '@envirotrax/common-ui';
+import { InputOption } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import {
     CsiInspection,
-    CsiInspectionAssembly,
     CsiInspectionDetails,
-    CsiInspectionImage,
-    CsiInspectionReason,
-    csiInspectionReasonLabels
+    CsiInspectionReason
 } from '../../../shared/models/csi/csi-inspection';
-import { RecordLog, recordLogTypeLabels } from '../../../shared/models/logs/record-log';
 import { State } from '../../../shared/models/lookup/state';
 import { PropertyType } from '../../../shared/models/sites/site';
 import { CsiInspectionService } from '../../../shared/services/csi/csi-inspection.service';
 import { LookupService } from '../../../shared/services/lookup/lookup.service';
 import { WindowReference } from '../../../window/window-config';
+import { CsiInspectionAdditionalInformationComponent } from './additional-information/csi-inspection-additional-information.component';
+import { CsiInspectionAssembliesComponent } from './assemblies/csi-inspection-assemblies.component';
+import { CsiInspectionImagesComponent } from './images/csi-inspection-images.component';
+import { CsiInspectionRecordLogComponent } from './record-log/csi-inspection-record-log.component';
+import { ComplianceItem, CsiInspectionResultsComponent } from './results/csi-inspection-results.component';
 
 type CsiInspectionTab = 'results' | 'assemblies' | 'additional' | 'images' | 'logs';
-
-interface ComplianceItem {
-    number: number;
-    text: string;
-    isCompliant: boolean;
-}
-
-interface RecordLogRow extends RecordLog {
-    logTypeLabel: string;
-}
 
 const SaveMessageDurationMs = 5000;
 
 @Component({
     templateUrl: './csi-inspection-details.component.html',
-    imports: [CommonModule, FormsModule, SharedComponentsModule],
+    imports: [
+        CommonModule,
+        FormsModule,
+        SharedComponentsModule,
+        CsiInspectionResultsComponent,
+        CsiInspectionAssembliesComponent,
+        CsiInspectionAdditionalInformationComponent,
+        CsiInspectionImagesComponent,
+        CsiInspectionRecordLogComponent
+    ],
 })
 export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
-    @ViewChild('assemblyStatusCell', { static: true })
-    public assemblyStatusCell?: TemplateRef<CellTemplateData<CsiInspectionAssembly>>;
-
-    @ViewChild('assemblyDatesCell', { static: true })
-    public assemblyDatesCell?: TemplateRef<CellTemplateData<CsiInspectionAssembly>>;
-
-    @ViewChild('assemblyInfoCell', { static: true })
-    public assemblyInfoCell?: TemplateRef<CellTemplateData<CsiInspectionAssembly>>;
-
-    @ViewChild('assemblyIdentifiedCell', { static: true })
-    public assemblyIdentifiedCell?: TemplateRef<CellTemplateData<CsiInspectionAssembly>>;
-
-    @ViewChild('logDescriptionCell', { static: true })
-    public logDescriptionCell?: TemplateRef<CellTemplateData<RecordLogRow>>;
+    @ViewChild(CsiInspectionRecordLogComponent)
+    public recordLog?: CsiInspectionRecordLogComponent;
 
     public id: number = 0;
     public idPrefix: string = 'csi';
@@ -60,9 +48,6 @@ export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
     public saveSuccessMessage: string = '';
 
     private _saveMessageTimeoutId?: ReturnType<typeof setTimeout>;
-    public isLoadingAssemblies: boolean = false;
-    public isLoadingImages: boolean = false;
-    public isLoadingLogs: boolean = false;
 
     public inspection: CsiInspectionDetails = {};
 
@@ -75,13 +60,6 @@ export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
 
     public assembliesTabTitle: string = 'Assemblies at Location';
     public recordLogTabTitle: string = 'Record Log';
-
-    public assemblies: CsiInspectionAssembly[] = [];
-    public images: CsiInspectionImage[] = [];
-    public logs: RecordLogRow[] = [];
-
-    public assemblyColumns: TableColumn<CsiInspectionAssembly>[] = [];
-    public logColumns: TableColumn<RecordLogRow>[] = [];
 
     public complianceItems: ComplianceItem[] = [];
 
@@ -98,21 +76,6 @@ export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
         { id: String(PropertyType.Commercial), text: 'Commercial' }
     ];
 
-    public readonly reasonOptions: InputOption[] = [
-        {
-            id: String(CsiInspectionReason.NewConstruction),
-            text: csiInspectionReasonLabels[CsiInspectionReason.NewConstruction]
-        },
-        {
-            id: String(CsiInspectionReason.ExistingServiceContaminantHazardsSuspected),
-            text: csiInspectionReasonLabels[CsiInspectionReason.ExistingServiceContaminantHazardsSuspected]
-        },
-        {
-            id: String(CsiInspectionReason.MajorRenovationOrExpansion),
-            text: csiInspectionReasonLabels[CsiInspectionReason.MajorRenovationOrExpansion]
-        }
-    ];
-
     private readonly _complianceTexts: string[] = [
         'No direct or indirect connection between the public drinking water supply and a potential source of contamination exists. Potential sources of contamination are isolated from the public water system by an air gap or an appropriate backflow prevention assembly in accordance with Commission regulations.',
         'No cross-connection between the public drinking water supply and a private water system exists. Where an actual air gap is not maintained between the public water supply and a private water supply, an approved reduced pressure principle backflow prevention assembly is properly installed.',
@@ -121,10 +84,6 @@ export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
         'Plumbing installed on or after January 4, 2014 bears the expected labeling indicating ≤0.25% lead content. If not properly labeled, please provide written comment.',
         'No solder or flux which contains more than 0.2% lead exists in private water distribution facilities installed on or after July 1, 1988.'
     ];
-
-    private assembliesLoaded: boolean = false;
-    private imagesLoaded: boolean = false;
-    private logsLoaded: boolean = false;
 
     constructor(
         private readonly _windowReference: WindowReference<CsiInspection>,
@@ -138,9 +97,6 @@ export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
         this.id = this._windowReference.config.model?.id ?? 0;
         this.idPrefix = `csi-${this.id}`;
 
-        this.assemblyColumns = this.getAssemblyColumns();
-        this.logColumns = this.getLogColumns();
-
         await Promise.all([
             this.loadStates(),
             this.loadInspection(),
@@ -152,20 +108,8 @@ export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
         this.dismissSaveMessage();
     }
 
-    public async onTabChange(tab: CsiInspectionTab): Promise<void> {
+    public onTabChange(tab: CsiInspectionTab): void {
         this.selectedTab = tab;
-
-        if (tab === 'assemblies' && !this.assembliesLoaded) {
-            await this.loadAssemblies();
-        }
-
-        if (tab === 'images' && !this.imagesLoaded) {
-            await this.loadImages();
-        }
-
-        if (tab === 'logs' && !this.logsLoaded) {
-            await this.loadLogs();
-        }
     }
 
     public async save(): Promise<void> {
@@ -181,13 +125,8 @@ export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
 
         this.applyInspectionToEditors();
 
-        this.logsLoaded = false;
-
         await this.loadCounts();
-
-        if (this.selectedTab === 'logs') {
-            await this.loadLogs();
-        }
+        await this.reloadRecordLog();
 
         this.showSaveMessage();
     }
@@ -207,36 +146,12 @@ export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
         this._saveMessageTimeoutId = setTimeout(() => this.dismissSaveMessage(), SaveMessageDurationMs);
     }
 
-    public async onImageSelected(event: Event): Promise<void> {
-        const input = event.target as HTMLInputElement;
-        const file = input.files?.item(0);
-
-        if (!file) {
+    private async reloadRecordLog(): Promise<void> {
+        if (this.recordLog == null) {
             return;
         }
 
-        try {
-            this.isLoadingImages = true;
-            const image = await this._inspectionService.addImage(this.id, file, '');
-            this.images = [...this.images, image];
-        } finally {
-            this.isLoadingImages = false;
-            input.value = '';
-        }
-    }
-
-    public async deleteImage(image: CsiInspectionImage): Promise<void> {
-        if (image.id == null) {
-            return;
-        }
-
-        try {
-            this.isLoadingImages = true;
-            await this._inspectionService.deleteImage(this.id, image.id);
-            this.images = this.images.filter(existing => existing.id !== image.id);
-        } finally {
-            this.isLoadingImages = false;
-        }
+        await this.recordLog.reload();
     }
 
     private async loadStates(): Promise<void> {
@@ -260,42 +175,6 @@ export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
 
         this.assembliesTabTitle = `Assemblies at Location (${counts.assemblyCount ?? 0})`;
         this.recordLogTabTitle = `Record Log (${counts.recordLogCount ?? 0})`;
-    }
-
-    private async loadAssemblies(): Promise<void> {
-        try {
-            this.isLoadingAssemblies = true;
-            this.assemblies = await this._inspectionService.getAssemblies(this.id);
-        } finally {
-            this.assembliesLoaded = true;
-            this.isLoadingAssemblies = false;
-        }
-    }
-
-    private async loadImages(): Promise<void> {
-        try {
-            this.isLoadingImages = true;
-            this.images = await this._inspectionService.getImages(this.id);
-        } finally {
-            this.imagesLoaded = true;
-            this.isLoadingImages = false;
-        }
-    }
-
-    private async loadLogs(): Promise<void> {
-        try {
-            this.isLoadingLogs = true;
-
-            const logs = await this._inspectionService.getLogs(this.id);
-
-            this.logs = logs.map(log => ({
-                ...log,
-                logTypeLabel: log.logType == null ? '' : recordLogTypeLabels[log.logType]
-            }));
-        } finally {
-            this.logsLoaded = true;
-            this.isLoadingLogs = false;
-        }
     }
 
     private applyInspectionToEditors(): void {
@@ -380,25 +259,5 @@ export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
         }
 
         return result;
-    }
-
-    private getAssemblyColumns(): TableColumn<CsiInspectionAssembly>[] {
-        return [
-            { field: 'id', caption: 'ID', type: ColumnType.number },
-            { field: 'isCurrent', caption: 'Status', type: ColumnType.other, cellTemplate: this.assemblyStatusCell, queryColumnExcluded: true },
-            { field: 'testDate', caption: 'Dates', type: ColumnType.other, cellTemplate: this.assemblyDatesCell, queryColumnExcluded: true },
-            { field: 'serialNumber', caption: 'Serial #', type: ColumnType.text },
-            { field: 'assemblyDescription', caption: 'Assembly Information', type: ColumnType.other, cellTemplate: this.assemblyInfoCell, queryColumnExcluded: true },
-            { field: 'visuallyIdentified', caption: '', type: ColumnType.other, cellTemplate: this.assemblyIdentifiedCell, queryColumnExcluded: true }
-        ];
-    }
-
-    private getLogColumns(): TableColumn<RecordLogRow>[] {
-        return [
-            { field: 'logDate', caption: 'Log Date', type: ColumnType.date },
-            { field: 'user.email', caption: 'User ID', type: ColumnType.text },
-            { field: 'logTypeLabel', caption: 'Type', type: ColumnType.text },
-            { field: 'description', caption: 'Description', type: ColumnType.other, cellTemplate: this.logDescriptionCell, queryColumnExcluded: true }
-        ];
     }
 }

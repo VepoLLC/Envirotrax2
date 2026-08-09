@@ -2,6 +2,8 @@ using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.GisAreas;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
+using Envirotrax.App.Server.Domain.Services.Implementations.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
@@ -49,6 +51,8 @@ public static class ServiceRegistration
         services.AddTransient<ISiteLogService, SiteLogService>();
         services.AddTransient<ICsiInspectionService, CsiInspectionService>();
         services.AddTransient<ICsiInspectionImageService, CsiInspectionImageService>();
+        services.AddTransient<ICsiInspectionAssemblyService, CsiInspectionAssemblyService>();
+        services.AddTransient<IRecordLogService, RecordLogService>();
         services.AddTransient<ICsiInspectorService, CsiInspectorService>();
         services.AddTransient<ICsiSystemReportService, CsiSystemReportService>();
         services.AddTransient<IFogInspectorService, FogInspectorService>();
@@ -62,6 +66,7 @@ public static class ServiceRegistration
         services.AddTransient<IBackflowGaugeService, BackflowGaugeService>();
         services.AddTransient<IBackflowOutOfServiceRequestService, BackflowOutOfServiceRequestService>();
         services.AddTransient<IFogVehicleService, FogVehicleService>();
+        services.AddTransient<IFogVehiclePermitService, FogVehiclePermitService>();
         services.AddTransient<IFogTransporterDisposalSiteService, FogTransporterDisposalSiteService>();
         services.AddTransient<IFogDisposalSiteService, FogDisposalSiteService>();
         services.AddTransient<IFogTripTicketService, FogTripTicketService>();

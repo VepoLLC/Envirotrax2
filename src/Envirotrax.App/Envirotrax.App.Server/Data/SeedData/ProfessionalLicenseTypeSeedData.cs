@@ -25,6 +25,7 @@ public static class ProfessionalLicenseTypeSeedData
             Name = "ASSE - Fire BP Tester",
             Description = "ASSE License",
             ProfessionalType = ProfessionalType.Bpat,
+            IsFireLicense = true,
             StateId = kansas.Id
         });
 
@@ -43,6 +44,7 @@ public static class ProfessionalLicenseTypeSeedData
             Name = "TX Fire Marshal Office - SCR",
             Description = "TCEQ - BPAT License",
             ProfessionalType = ProfessionalType.Bpat,
+            IsFireLicense = true,
             StateId = texas.Id
         });
         types.Add(new()

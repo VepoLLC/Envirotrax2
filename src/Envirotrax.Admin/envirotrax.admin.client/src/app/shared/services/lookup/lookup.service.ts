@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { UrlResolverService } from "@envirotrax/common-ui";
+import { InputOption, UrlResolverService } from "@envirotrax/common-ui";
 import { lastValueFrom, Observable, shareReplay } from "rxjs";
 import { State } from "../../models/lookup/state";
 
@@ -24,5 +24,11 @@ export class LookupService {
         }
 
         return await lastValueFrom(this._states$);
+    }
+
+    public async getStatesAsOptions(): Promise<InputOption<State>[]> {
+        const states = await this.getAllStates();
+
+        return states.map(state => ({ id: String(state.id), text: state.code ?? '', data: state }));
     }
 }

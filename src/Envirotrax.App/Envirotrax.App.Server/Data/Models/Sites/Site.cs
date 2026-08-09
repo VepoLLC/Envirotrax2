@@ -9,10 +9,13 @@ using Envirotrax.Common.Data.Models;
 namespace Envirotrax.App.Server.Data.Models.Sites;
 
 [Table("Sites")]
-public class Site : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
+public class Site : IAuditableModel<AppUser>
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }
+
+    public int WaterSupplierId { get; set; }
+    public WaterSupplier? WaterSupplier { get; set; }
 
     [StringLength(10)]
     public string? SubArea { get; set; }

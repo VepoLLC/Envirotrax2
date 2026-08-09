@@ -1,0 +1,123 @@
+<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+<div class="d-flex flex-wrap gap-4 justify-content-center mb-3">
+    <span>
+        <i class="fa-solid fa-square text-success me-1"></i>
+        Current Test
+    </span>
+    <span>
+        <i class="fa-regular fa-square text-success me-1"></i>
+        Non Current Test
+    </span>
+    <span>
+        <i class="fa-solid fa-square text-primary me-1"></i>
+        Passing Test
+    </span>
+    <span>
+        <i class="fa-regular fa-square text-primary me-1"></i>
+        Failed Test
+    </span>
+    <span>
+        <i class="fa-solid fa-square text-info me-1"></i>
+        In Service
+    </span>
+    <span>
+        <i class="fa-regular fa-square text-info me-1"></i>
+        Out of Service
+    </span>
+    <span>
+        <i class="fa-solid fa-square text-warning me-1"></i>
+        Paid
+    </span>
+    <span>
+        <i class="fa-solid fa-square text-danger me-1"></i>
+        Disapproved
+    </span>
+    <span>
+        <i class="fa-solid fa-square text-secondary me-1"></i>
+        Rejected
+    </span>
+</div>
+
+<p class="text-muted text-center" *ngIf="!isLoading && assemblies.length === 0">
+    No assemblies were identified for this inspection.
+</p>
+
+<vp-table *ngIf="assemblies.length > 0"
+          [columns]="columns"
+          [data]="assemblies" />
+
+<ng-template #statusCell let-rowData="rowData">
+    <div class="d-flex flex-column align-items-center gap-1">
+        <div class="d-flex gap-1">
+            <i class="fa-square text-success"
+               [class.fa-solid]="rowData?.isCurrent"
+               [class.fa-regular]="!rowData?.isCurrent"
+               [attr.title]="rowData?.isCurrent ? 'Current Test' : 'Non Current Test'"></i>
+
+            <i class="fa-square text-primary"
+               [class.fa-solid]="rowData?.testResult === 0"
+               [class.fa-regular]="rowData?.testResult !== 0"
+               [attr.title]="rowData?.testResult === 0 ? 'Passing Test' : 'Failed Test'"></i>
+
+            <i class="fa-square text-info"
+               [class.fa-solid]="!rowData?.outOfService"
+               [class.fa-regular]="rowData?.outOfService"
+               [attr.title]="rowData?.outOfService ? 'Out of Service' : 'In Service'"></i>
+        </div>
+
+        <div class="d-flex gap-1">
+            <i class="fa-square text-warning"
+               [class.fa-solid]="rowData?.transactionId"
+               [class.fa-regular]="!rowData?.transactionId"
+               title="Paid"></i>
+
+            <i class="fa-square text-danger"
+               [class.fa-solid]="rowData?.disapproved"
+               [class.fa-regular]="!rowData?.disapproved"
+               title="Disapproved"></i>
+
+            <i class="fa-square text-secondary"
+               [class.fa-solid]="rowData?.rejected"
+               [class.fa-regular]="!rowData?.rejected"
+               title="Rejected"></i>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #datesCell let-rowData="rowData">
+    <div>
+        <div>
+            <span class="fw-semibold me-1">Tested:</span>
+            {{ rowData?.testDate | date:'MM/dd/yyyy' }}
+        </div>
+        <div>
+            <span class="fw-semibold me-1">Expires:</span>
+            {{ rowData?.expirationDate | date:'MM/dd/yyyy' }}
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #infoCell let-rowData="rowData">
+    <div>
+        <div>
+            <span class="fw-semibold me-1">Assembly:</span>
+            {{ rowData?.assemblyDescription }}
+        </div>
+        <div>
+            <span class="fw-semibold me-1">Hazard:</span>
+            {{ rowData?.hazardType }}
+        </div>
+        <div>
+            <span class="fw-semibold me-1">Location:</span>
+            {{ rowData?.locationDescription }}
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #identifiedCell let-rowData="rowData">
+    <i class="fa-solid"
+       [class.fa-square-check]="rowData?.visuallyIdentified"
+       [class.fa-square]="!rowData?.visuallyIdentified"
+       [attr.title]="rowData?.visuallyIdentified ? 'Visually identified' : 'Not visually identified'"></i>
+</ng-template>

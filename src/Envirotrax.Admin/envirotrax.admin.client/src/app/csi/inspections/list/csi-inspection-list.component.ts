@@ -14,6 +14,8 @@ import { CsiInspection, CsiPaymentStatus } from '../../../shared/models/csi/csi-
 import { PropertyType } from '../../../shared/models/sites/site';
 import { CsiInspectionService } from '../../../shared/services/csi/csi-inspection.service';
 import { WaterSupplierService } from '../../../shared/services/water-suppliers/water-supplier.service';
+import { WindowService } from '../../../shared/services/window.service';
+import { CsiInspectionDetailsComponent } from '../details/csi-inspection-details.component';
 
 @Component({
     templateUrl: './csi-inspection-list.component.html',
@@ -76,9 +78,27 @@ export class CsiInspectionListComponent implements OnInit {
 
     constructor(
         private readonly _csiInspectionService: CsiInspectionService,
-        private readonly _waterSupplierService: WaterSupplierService
+        private readonly _waterSupplierService: WaterSupplierService,
+        private readonly _windowService: WindowService
     ) {
 
+    }
+
+    public openDetails(inspection: CsiInspection): void {
+        this._windowService.addWindow(CsiInspectionDetailsComponent, {
+            title: `${inspection.id} - ${this.buildPropertyAddress(inspection)}`,
+            model: inspection
+        });
+    }
+
+    private buildPropertyAddress(inspection: CsiInspection): string {
+        let address = `${inspection.propertyStreetNumber ?? ''} ${inspection.propertyStreetName ?? ''}`.trim();
+
+        if (inspection.propertyNumber) {
+            address = `${address} #${inspection.propertyNumber}`;
+        }
+
+        return address;
     }
 
     public async ngOnInit(): Promise<void> {

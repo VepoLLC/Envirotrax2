@@ -31,7 +31,7 @@
     "@angular/forms": "^20.3.24",
     "@angular/platform-browser": "^20.3.24",
     "@angular/router": "^20.3.24",
-    "@developer-partners/ngx-loading-spinner": "^1.0.11",
+    "@developer-partners/ngx-loading-spinner": "^1.0.13",
     "@developer-partners/ngx-modal-dialog": "^1.0.6",
     "@envirotrax/common-ui": "file:../../Envirotrax.CommonUI/dist/envirotrax/common-ui/envirotrax-common-ui-1.0.0.tgz",
     "@fortawesome/fontawesome-free": "^7.1.0",

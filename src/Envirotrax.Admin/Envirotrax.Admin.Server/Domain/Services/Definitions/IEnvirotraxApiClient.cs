@@ -11,6 +11,8 @@ public interface IEnvirotraxApiClient
 
     Task<TResponse?> PostAsync<TRequest, TResponse>(string url, TRequest requestData, CancellationToken cancellationToken);
 
+    Task<TResponse?> PostFileAsync<TResponse>(string url, Stream fileStream, string fileName, string? description, CancellationToken cancellationToken);
+
     Task<TResponse?> PutAsync<TRequest, TResponse>(string url, TRequest requestData, CancellationToken cancellationToken);
 
     Task<TResponse?> DeleteAsync<TResponse>(string url, CancellationToken cancellationToken);

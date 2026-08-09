@@ -13,6 +13,7 @@ public class CsiInspectionProfile : Profile
     {
         CreateMap<CsiInspection, CsiInspectionDto>()
             .ForMember(dto => dto.Site, opt => opt.Ignore())
+            .ForMember(dto => dto.Professional, opt => opt.Ignore())
             .ForMember(dto => dto.InspectorUser, opt => opt.MapFrom(model => model.Inspector))
             .AfterMap((model, dto, context) =>
             {

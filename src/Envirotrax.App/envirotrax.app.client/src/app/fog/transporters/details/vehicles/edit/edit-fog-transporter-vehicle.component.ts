@@ -5,8 +5,7 @@ import { FogVehicle } from "../../../../../shared/models/fog/fog-vehicle";
 import { FogVehicleCapacityType, FOG_VEHICLE_CAPACITY_TYPE_LABELS } from "../../../../../shared/models/fog/fog-vehicle-enums";
 import { FogTransporterVehiclesService } from "../../../../../shared/services/fog/fog-transporter-vehicles.service";
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
-import { ToastService } from "../../../../../shared/services/toast.service";
-import { InputOption } from "@envirotrax/common-ui";
+import { InputOption, ToastService } from "@envirotrax/common-ui";
 
 export interface FogVehicleModalData {
     transporterId: number;

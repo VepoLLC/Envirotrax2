@@ -7,8 +7,7 @@ import { NgForm } from "@angular/forms";
 import { RoleService } from "../../../shared/services/users/role.service";
 import { UserRoleService } from "../../../shared/services/users/user-role.service";
 import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
-import { ToastService } from "../../../shared/services/toast.service";
-import { InputOption, ModalHelperService } from "@envirotrax/common-ui";
+import { ToastService, InputOption, ModalHelperService } from '@envirotrax/common-ui';
 
 
 @Component({

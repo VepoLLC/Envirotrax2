@@ -7,8 +7,7 @@ import { BackflowTesterUserService } from "../../../../../shared/services/backfl
 import { ProfessionalLicenseType } from "../../../../../shared/models/professionals/licenses/professional-license-type";
 import { ProfessionalUser } from "../../../../../shared/models/professionals/professional-user";
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
-import { ToastService } from "../../../../../shared/services/toast.service";
-import { InputOption } from "@envirotrax/common-ui";
+import { ToastService, InputOption } from '@envirotrax/common-ui';
 
 export interface BackflowLicenseModalData {
     testerId: number;

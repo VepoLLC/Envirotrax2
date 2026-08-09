@@ -4,7 +4,7 @@ import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { ProfessionalWaterSupplier } from "../../../../../shared/models/professionals/professional-water-supplier";
 import { FogTransporterWaterSuppliersService } from "../../../../../shared/services/fog/fog-transporter-water-suppliers.service";
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
-import { ToastService } from "../../../../../shared/services/toast.service";
+import { ToastService } from "@envirotrax/common-ui";
 
 export interface EditWaterSupplierModalData {
     transporterId: number;

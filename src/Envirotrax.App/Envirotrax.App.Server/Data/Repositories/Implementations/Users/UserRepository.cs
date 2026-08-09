@@ -21,6 +21,16 @@ public class UserRepository : Repository<WaterSupplierUser>, IUserRepository
             .ThenInclude(userRole => userRole.Role);
     }
 
+    public override Task<IEnumerable<WaterSupplierUser>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        if (query.Sort.IsNullOrEmpty())
+        {
+            query.Sort[nameof(WaterSupplierUser.UserId)] = SortOperator.Asc;
+        }
+
+        return base.GetAllAsync(pageInfo, query, cancellationToken);
+    }
+
     public async Task<IEnumerable<WaterSupplierUser>> GetAllForWaterSupplierAsync(int waterSupplierId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         var paginated = await GetListQuery()

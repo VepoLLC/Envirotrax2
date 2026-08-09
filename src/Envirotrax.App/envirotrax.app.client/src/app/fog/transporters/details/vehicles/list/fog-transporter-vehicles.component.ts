@@ -5,10 +5,9 @@ import { FogTransporterVehiclesService } from "../../../../../shared/services/fo
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
 import { AuthService } from "../../../../../shared/services/auth/auth.service";
 import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
-import { ToastService } from "../../../../../shared/services/toast.service";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { EditFogTransporterVehicleComponent, FogVehicleModalData } from "../edit/edit-fog-transporter-vehicle.component";
-import { CellTemplateData, ColumnType, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
+import { CellTemplateData, ColumnType, ModalHelperService, TableColumn, ToastService } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'vp-fog-transporter-vehicles',

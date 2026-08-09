@@ -1,11 +1,13 @@
 using System.ComponentModel.DataAnnotations;
+using Envirotrax.Admin.Server.Domain.DataTransferObjects.Lookup;
 
 namespace Envirotrax.Admin.Server.Domain.DataTransferObjects.Sites;
 
 /// <summary>
 /// Admin Edit Site update payload, proxied as-is to PUT /api/admin/sites/{id}. Only the approved editable
 /// fields (Property Info, Mailing Info, Property Settings) — no GIS (its own endpoint) or protected columns
-/// (Id/WaterSupplierId/audit/assignments/import/NeedsRenewalCheck). Enum fields are int, like SiteDetailDto.
+/// (Id/WaterSupplierId/audit/assignments/import/NeedsRenewalCheck). Its JSON shape is a subset of the App
+/// SiteDto (which the endpoint now binds), so State/MailingState are nested {id} objects, not flat ids.
 /// </summary>
 public class SiteUpdateDto
 {
@@ -27,7 +29,7 @@ public class SiteUpdateDto
     [StringLength(50)]
     public string? City { get; set; }
 
-    public int? StateId { get; set; }
+    public StateDto? State { get; set; }
 
     [StringLength(50)]
     public string? ZipCode { get; set; }
@@ -51,7 +53,7 @@ public class SiteUpdateDto
     [StringLength(50)]
     public string? MailingCity { get; set; }
 
-    public int? MailingStateId { get; set; }
+    public StateDto? MailingState { get; set; }
 
     [StringLength(50)]
     public string? MailingZipCode { get; set; }

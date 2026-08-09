@@ -16,8 +16,7 @@ import { CsiInspectionReason, csiInspectionReasonLabels } from '../../../../shar
 import { MAX_PAGE_SIZE } from '../../../../shared/models/page-info';
 import { ProfessionalSupplierService } from '../../../../shared/services/professionals/professional-supplier.service';
 import { CheckoutService } from '../../../../shared/services/professionals/checkout.service';
-import { ToastService } from '../../../../shared/services/toast.service';
-import { InputOption } from '@envirotrax/common-ui';
+import { ToastService, InputOption } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,

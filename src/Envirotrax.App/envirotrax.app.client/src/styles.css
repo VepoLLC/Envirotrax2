@@ -65,6 +65,10 @@ a:hover {
     color: #008fd4 !important;
 }
 
+.btn-link {
+    --bs-btn-color: #0084c3;
+}
+
 .btn-primary {
     background-color: #008fd4 !important;
     border-color: #ccc;

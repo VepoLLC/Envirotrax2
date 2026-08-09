@@ -20,4 +20,8 @@
   <ItemGroup>
     <None Include="Scripts\**\*.sql" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Envirotrax.Common/Envirotrax.Common.csproj" />
+  </ItemGroup>
 </Project>

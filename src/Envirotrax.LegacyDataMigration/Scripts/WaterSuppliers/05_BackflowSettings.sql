@@ -3,7 +3,7 @@ BEGIN TRAN
 BEGIN TRY
 
     -- Assumes "Renewal" = Expiring, "Expired" = Expired, "Cutoff" = NonCompliant, and color set 1 = Expiring, 2 = Expired, 3 = NonCompliant
-    INSERT INTO Envirotrax2Dev.dbo.BackflowSettings
+    INSERT INTO BackflowSettings
         (WaterSupplierId, TestingMethod, GracePeriodDays, AdjustBackflowCreepingDates,
          NewInstallationsRequireApproval, ReplacementsRequireApproval, DetectorAssembliesRequireMeterReading,
          OutOfServiceRequiresApproval, OutOfServiceType, RequireBackflowTestImages,
@@ -30,12 +30,12 @@ BEGIN TRY
         WaterSuppliers.SaveBackflowRenewalTitle, WaterSuppliers.SaveBackflowRenewalMessage,
         WaterSuppliers.SaveBackflowExpirationTitle, WaterSuppliers.SaveBackflowExpirationMessage,
         WaterSuppliers.SaveBackflowCutoffTitle, WaterSuppliers.SaveBackflowCutoffMessage
-    FROM WaterSuppliers
-    INNER JOIN Envirotrax2Dev.dbo.WaterSuppliers AS newWaterSuppliers
+    FROM Vepo.dbo.WaterSuppliers
+    INNER JOIN WaterSuppliers AS newWaterSuppliers
         ON newWaterSuppliers.LegacyRecordId = WaterSuppliers.ID
     WHERE NOT EXISTS (
         SELECT 1
-        FROM Envirotrax2Dev.dbo.BackflowSettings AS alreadyInserted
+        FROM BackflowSettings AS alreadyInserted
         WHERE alreadyInserted.WaterSupplierId = newWaterSuppliers.Id
     )
 

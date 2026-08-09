@@ -3,7 +3,7 @@ BEGIN TRAN
 BEGIN TRY
 
     -- Assumes color/notice set 1 = Impending, set 2 = PastDue, set 3 = NonCompliant
-    INSERT INTO Envirotrax2Dev.dbo.CsiSettings
+    INSERT INTO CsiSettings
         (WaterSupplierId, ModificationGracePeriodDays, NewlyCreatedBackflowTestExpirationDays, RequireInspectionImages,
          ImpendingNotice1, ImpendingNotice2, PastDueNotice1, PastDueNotice2, NonCompliant1, NonCompliant2,
          ImpendingLettersBackgroundColor, ImpendingLettersForegroundColor, ImpendingLettersBorderColor,
@@ -23,12 +23,12 @@ BEGIN TRY
         WaterSuppliers.CsiImpendingTitle, WaterSuppliers.CsiImpendingMessage,
         WaterSuppliers.CsiPastDueTitle, WaterSuppliers.CsiPastDueMessage,
         WaterSuppliers.CsiNonCompliantTitle, WaterSuppliers.CsiNonCompliantMessage
-    FROM WaterSuppliers
-    INNER JOIN Envirotrax2Dev.dbo.WaterSuppliers AS newWaterSuppliers
+    FROM Vepo.dbo.WaterSuppliers
+    INNER JOIN WaterSuppliers AS newWaterSuppliers
         ON newWaterSuppliers.LegacyRecordId = WaterSuppliers.ID
     WHERE NOT EXISTS (
         SELECT 1
-        FROM Envirotrax2Dev.dbo.CsiSettings AS alreadyInserted
+        FROM CsiSettings AS alreadyInserted
         WHERE alreadyInserted.WaterSupplierId = newWaterSuppliers.Id
     )
 

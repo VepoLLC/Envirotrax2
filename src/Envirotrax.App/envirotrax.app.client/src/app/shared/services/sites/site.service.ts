@@ -117,7 +117,7 @@ export class SiteService {
         );
     }
 
-    public updateGisData(siteId: number, data: { gisLatitude?: number, gisLongitude?: number, gisStatus?: number }): Promise<void> {
+    public updateGisData(siteId: number, data: { gisLatitude?: number | null, gisLongitude?: number | null, gisStatus?: number }): Promise<void> {
         const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}/gis-data`);
         return lastValueFrom(
             this._http.put<void>(url, {

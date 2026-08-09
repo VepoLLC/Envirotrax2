@@ -6,7 +6,7 @@ import { BackflowSettingsService } from "../../../../shared/services/backflow/ba
 import { BackflowTestingSettings } from "../../../../shared/models/backflow/backflow-testing-settings";
 import { DownloadService } from "../../../../shared/services/download.service";
 import { HelperService } from "../../../../shared/services/helpers/helper.service";
-import { ToastService, ToastType } from "../../../../shared/services/toast.service";
+import { ToastService, ToastType } from '@envirotrax/common-ui';
 
 @Component({
     selector: 'app-professional-backflow-test-details',

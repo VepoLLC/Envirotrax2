@@ -5,7 +5,7 @@ import { FogVehiclePermit, FogVehiclePermitSearch } from "../../../../shared/mod
 import { FOG_VEHICLE_CAPACITY_TYPE_LABELS } from "../../../../shared/models/fog/fog-vehicle-enums";
 import { FogVehiclePermitService } from "../../../../shared/services/fog/fog-vehicle-permit.service";
 import { HelperService } from "../../../../shared/services/helpers/helper.service";
-import { ToastService } from "../../../../shared/services/toast.service";
+import { ToastService } from "@envirotrax/common-ui";
 
 export interface FogVehiclePermitModalData {
     vehicle: FogVehiclePermitSearch;

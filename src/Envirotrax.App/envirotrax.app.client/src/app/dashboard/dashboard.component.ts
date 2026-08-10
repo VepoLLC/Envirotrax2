@@ -5,6 +5,7 @@ import { WaterSupplierDashboardStats } from "../shared/models/water-suppliers/wa
 import { CsiSubmissionStats } from "../shared/models/water-suppliers/csi-submission-stats";
 import { BackflowSubmissionStats } from "../shared/models/water-suppliers/backflow-submission-stats";
 import { FogInspectionSubmissionStats } from "../shared/models/water-suppliers/fog-inspection-submission-stats";
+import { FogTripTicketSubmissionStats } from "../shared/models/water-suppliers/fog-trip-ticket-submission-stats";
 import { FeatureType } from "../shared/models/feature-type";
 
 @Component({
@@ -18,6 +19,7 @@ export class DashboardComponent implements OnInit {
     public csiVm?: CsiStatsVm;
     public backflowVm?: BackflowStatsVm;
     public fogInspectionVm?: FogInspectionStatsVm;
+    public fogTripTicketVm?: FogTripTicketStatsVm;
     public isLoading: boolean = false;
 
     public hasWiseGuys: boolean = false;
@@ -72,6 +74,10 @@ export class DashboardComponent implements OnInit {
 
             if (this.hasFogInspection) {
                 requests.push(this._dashboardService.getFogInspectionSubmissionStats().then(s => this.fogInspectionVm = this.buildFogInspectionVm(s)));
+            }
+
+            if (this.hasFogTransportation) {
+                requests.push(this._dashboardService.getFogTripTicketSubmissionStats().then(s => this.fogTripTicketVm = this.buildFogTripTicketVm(s)));
             }
 
             await Promise.all(requests);
@@ -206,6 +212,36 @@ export class DashboardComponent implements OnInit {
         };
     }
 
+    private buildFogTripTicketVm(stats: FogTripTicketSubmissionStats): FogTripTicketStatsVm {
+        const totalTripTickets = stats.dailyStats.reduce((s, d) => s + d.totalTripTickets, 0);
+        const totalPaidTripTickets = stats.dailyStats.reduce((s, d) => s + d.totalPaidTripTickets, 0);
+
+        const dailyStats = stats.dailyStats.map(d => ({
+            date: d.date,
+            dayName: this.formatDayName(d.date),
+            formattedDate: this.formatDate(d.date),
+            isWeekend: d.isWeekend,
+            totalTripTickets: d.totalTripTickets,
+            totalPaidTripTickets: d.totalPaidTripTickets,
+            barPercent: totalTripTickets > 0 ? Math.round((d.totalTripTickets / totalTripTickets) * 100) : 0
+        }));
+
+        const subAccountStats = (stats.subAccountStats ?? []).map(sub => ({
+            waterSupplierName: sub.waterSupplierName,
+            totalTripTickets: sub.dailyStats.reduce((s, d) => s + d.totalTripTickets, 0),
+            totalPaidTripTickets: sub.dailyStats.reduce((s, d) => s + d.totalPaidTripTickets, 0)
+        }));
+
+        return {
+            dailyStats,
+            totalTripTickets,
+            totalPaidTripTickets,
+            subAccountStats,
+            subAccountTotalTripTickets: subAccountStats.reduce((s, sub) => s + sub.totalTripTickets, 0),
+            subAccountTotalPaidTripTickets: subAccountStats.reduce((s, sub) => s + sub.totalPaidTripTickets, 0)
+        };
+    }
+
     private formatDayName(date: string): string {
         return new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short' });
     }
@@ -288,4 +324,29 @@ interface FogInspectionStatsVm {
     subAccountStats: FogInspectionSubAccountVm[];
     subAccountTotalInspections: number;
     subAccountTotalPaidInspections: number;
+}
+
+interface FogTripTicketDailyStatsVm {
+    date: string;
+    dayName: string;
+    formattedDate: string;
+    isWeekend: boolean;
+    totalTripTickets: number;
+    totalPaidTripTickets: number;
+    barPercent: number;
+}
+
+interface FogTripTicketSubAccountVm {
+    waterSupplierName: string;
+    totalTripTickets: number;
+    totalPaidTripTickets: number;
+}
+
+interface FogTripTicketStatsVm {
+    dailyStats: FogTripTicketDailyStatsVm[];
+    totalTripTickets: number;
+    totalPaidTripTickets: number;
+    subAccountStats: FogTripTicketSubAccountVm[];
+    subAccountTotalTripTickets: number;
+    subAccountTotalPaidTripTickets: number;
 }

@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Professionals;
+using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.Common;
@@ -102,6 +103,48 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
 
         var paginated = await q
             .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<ProfessionalUser>> SearchCsiInspectorsAsync(PageInfo pageInfo, Query query, string? licenseNumber, string? insuranceNumber, CancellationToken cancellationToken)
+    {
+        var dbQuery = DbContext.ProfessionalUsers
+            .AsNoTracking()
+            .Include(proUser => proUser.User)
+            .Include(proUser => proUser.Professional)
+                .ThenInclude(professional => professional!.State)
+            .Where(proUser => proUser.IsCsiInspector)
+            .Where(query.Filter);
+
+        if (!string.IsNullOrWhiteSpace(licenseNumber))
+        {
+            string license = licenseNumber;
+
+            dbQuery = dbQuery.Where(proUser => DbContext.ProfessionalUserLicenses.Any(l =>
+                l.ProfessionalId == proUser.ProfessionalId &&
+                l.UserId == proUser.UserId &&
+                l.ProfessionalType == ProfessionalType.CsiInspector &&
+                l.LicenseNumber.Contains(license)));
+        }
+
+        if (!string.IsNullOrWhiteSpace(insuranceNumber))
+        {
+            string insurance = insuranceNumber;
+
+            dbQuery = dbQuery.Where(proUser => DbContext.ProfessionalInsurances.Any(i =>
+                i.ProfessionalId == proUser.ProfessionalId &&
+                i.InsuranceNumber.Contains(insurance)));
+        }
+
+        if (query.Sort.IsNullOrEmpty())
+        {
+            query.Sort["Professional.Name"] = SortOperator.Asc;
+        }
+
+        var paginated = await dbQuery
             .OrderBy(query.Sort)
             .PaginateAsync(pageInfo, cancellationToken);
 

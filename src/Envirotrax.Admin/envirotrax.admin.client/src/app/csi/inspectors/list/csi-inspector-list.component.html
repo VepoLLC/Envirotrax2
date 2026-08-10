@@ -1,0 +1,129 @@
+<div [hidden]="showResults">
+    <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+        <vp-filter-panel (filterChange)="onFilterChange($event)">
+            <vp-section header="CSI Inspector Search Criteria">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="emailAddress"
+                                                   label="User ID/Email"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="companyName"
+                                                   label="Company Name"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="contactName"
+                                                   label="Contact Name"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="workNumber"
+                                                   label="Work #"
+                                                   [form]="searchForm" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="licenseNumber"
+                                                   label="License #"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="insuranceNumber"
+                                                   label="Insurance Policy #"
+                                                   [form]="searchForm" />
+                        </div>
+                    </div>
+                </div>
+            </vp-section>
+        </vp-filter-panel>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="searchForm" />
+
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>
+                    Search
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+<div *ngIf="showResults">
+    <div class="d-flex justify-content-end mb-3">
+        <button type="button" class="btn btn-primary vp-section-button" (click)="showResults = false">
+            <i class="fa-solid fa-magnifying-glass me-1"></i>
+            Search Again
+        </button>
+    </div>
+
+    <vp-section header="Search Results ({{ table.items?.pageInfo?.totalItems }})">
+        <div class="d-flex flex-wrap gap-4 justify-content-center mb-3">
+            <span>
+                <i class="fa-solid fa-user text-primary me-1"></i>
+                Master Account
+            </span>
+
+            <span>
+                <i class="fa-solid fa-users text-primary me-1"></i>
+                Sub Account
+            </span>
+        </div>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getInspectors()"
+                  [(query)]="table.query"
+                  (queryChange)="getInspectors()"
+                  (queryReset)="getInspectors()" />
+    </vp-section>
+</div>
+
+<ng-template #accountTypeCell let-rowData="rowData">
+    <i class="fa-solid fa-user text-primary"
+       title="Master Account"
+       *ngIf="rowData?.isMasterAccount"></i>
+
+    <i class="fa-solid fa-users text-primary"
+       title="Sub Account"
+       *ngIf="!rowData?.isMasterAccount"></i>
+</ng-template>
+
+<ng-template #companyCell let-rowData="rowData">
+    <div>
+        <div *ngIf="rowData?.companyName">{{ rowData.companyName }}</div>
+        <div *ngIf="rowData?.contactName">{{ rowData.contactName }}</div>
+    </div>
+</ng-template>
+
+<ng-template #addressCell let-rowData="rowData">
+    <div>
+        <div *ngIf="rowData?.address">{{ rowData.address }}</div>
+
+        <div>
+            {{ rowData?.city }}<span *ngIf="rowData?.city">,</span>
+            {{ rowData?.state?.code }} {{ rowData?.zipCode }}
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #contactCell let-rowData="rowData">
+    <div>
+        <div>Email: {{ rowData?.emailAddress }}</div>
+        <div>Work #: {{ rowData?.workNumber }}</div>
+    </div>
+</ng-template>

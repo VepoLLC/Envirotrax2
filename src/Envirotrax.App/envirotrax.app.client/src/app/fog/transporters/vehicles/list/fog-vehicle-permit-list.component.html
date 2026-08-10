@@ -82,9 +82,10 @@
 </ng-template>
 
 <ng-template #inspectionDueDateCell let-vehicle="rowData">
-    <span *ngIf="vehicle.permit?.inspectionDueDate"
-          class="badge rounded-pill fs-6 fw-normal text-nowrap"
-          [ngClass]="vehicle.inspectionDueStatusClass">{{vehicle.permit?.inspectionDueDate | date:'M/d/yyyy'}}</span>
+    <div *ngIf="vehicle.permit?.inspectionDueDate"
+         class="rounded p-1 text-nowrap text-center"
+         [ngClass]="vehicle.inspectionDueStatusClass">{{vehicle.permit?.inspectionDueDate | date:'M/d/yyyy'}}
+    </div>
 </ng-template>
 
 <ng-template #activeCell let-vehicle="rowData">

@@ -71,8 +71,8 @@ export class FogVehiclePermitListComponent implements OnInit {
 
     public readonly inspectionDueStatusClasses: { [key: number]: string } = {
         [FogVehicleInspectionDueStatus.None]: '',
-        [FogVehicleInspectionDueStatus.Current]: 'bg-primary',
-        [FogVehicleInspectionDueStatus.PastDue]: 'bg-danger'
+        [FogVehicleInspectionDueStatus.Current]: 'text-bg-primary',
+        [FogVehicleInspectionDueStatus.PastDue]: 'text-bg-danger'
     };
 
     public downloadConfig: DownloadConfig;

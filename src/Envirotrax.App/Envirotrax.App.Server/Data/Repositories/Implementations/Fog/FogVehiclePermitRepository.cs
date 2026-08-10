@@ -14,11 +14,11 @@ public class FogVehiclePermitRepository : Repository<FogVehiclePermit>, IFogVehi
     {
     }
 
-    public async Task<IEnumerable<FogVehiclePermitSearchResult>> SearchAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public async Task<IEnumerable<FogVehicle>> SearchAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         if (query.Sort.IsNullOrEmpty())
         {
-            query.Sort[nameof(FogVehiclePermitSearchResult.VehicleId)] = SortOperator.Asc;
+            query.Sort[nameof(FogVehicle.Id)] = SortOperator.Asc;
         }
 
         var paginated = await GetSearchQuery()
@@ -29,22 +29,22 @@ public class FogVehiclePermitRepository : Repository<FogVehiclePermit>, IFogVehi
         return await paginated.ToListAsync(cancellationToken);
     }
 
-    public Task<FogVehiclePermitSearchResult?> GetSearchResultByVehicleIdAsync(int vehicleId, CancellationToken cancellationToken)
+    public Task<FogVehicle?> GetSearchResultByVehicleIdAsync(int vehicleId, CancellationToken cancellationToken)
     {
         return GetSearchQuery()
-            .SingleOrDefaultAsync(r => r.VehicleId == vehicleId, cancellationToken);
+            .SingleOrDefaultAsync(vehicle => vehicle.Id == vehicleId, cancellationToken);
     }
 
     public Task<bool> HasVehicleInScopeAsync(int vehicleId, CancellationToken cancellationToken)
     {
         return GetSearchQuery()
-            .AnyAsync(r => r.VehicleId == vehicleId, cancellationToken);
+            .AnyAsync(vehicle => vehicle.Id == vehicleId, cancellationToken);
     }
 
     public async Task<FogVehiclePermit> SetPermitAsync(FogVehiclePermit permit, CancellationToken cancellationToken)
     {
         var existing = await Entity
-            .SingleOrDefaultAsync(p => p.VehicleId == permit.VehicleId && p.DeletedTime == null, cancellationToken);
+            .SingleOrDefaultAsync(p => p.VehicleId == permit.VehicleId, cancellationToken);
 
         if (existing == null)
         {
@@ -70,45 +70,17 @@ public class FogVehiclePermitRepository : Repository<FogVehiclePermit>, IFogVehi
             .Select(pws => pws.ProfessionalId);
     }
 
-    private IQueryable<FogVehiclePermitSearchResult> GetSearchQuery()
+    private IQueryable<FogVehicle> GetSearchQuery()
     {
         var registeredTransporterIds = GetRegisteredTransporterIdsQuery();
 
-        var query = from vehicle in DbContext.FogVehicles
-                    join transporter in DbContext.Professionals on vehicle.ProfessionalId equals transporter.Id
-                    join permitRow in DbContext.FogVehiclePermits.Where(p => p.DeletedTime == null)
-                        on vehicle.Id equals permitRow.VehicleId into permitJoin
-                    from permit in permitJoin.DefaultIfEmpty()
-                    where vehicle.DeletedTime == null
-                        && transporter.DeletedTime == null
-                        && (registeredTransporterIds.Contains(vehicle.ProfessionalId) || permit != null)
-                    select new FogVehiclePermitSearchResult
-                    {
-                        VehicleId = vehicle.Id,
-
-                        TransporterId = transporter.Id,
-                        TransporterCompanyName = transporter.Name,
-                        TransporterAddress = transporter.Address,
-                        TransporterCity = transporter.City,
-                        TransporterState = transporter.State != null ? transporter.State.Code : null,
-                        TransporterZip = transporter.ZipCode,
-                        TransporterPhoneNumber = transporter.PhoneNumber,
-                        TransporterFaxNumber = transporter.FaxNumber,
-                        TransporterEmailAddress = transporter.CompanyEmail,
-
-                        LicensePlateNumber = vehicle.LicensePlateNumber,
-                        Manufacturer = vehicle.Manufacturer,
-                        ManufacturedYear = vehicle.ManufacturedYear,
-                        Capacity = vehicle.Capacity,
-                        CapacityType = vehicle.CapacityType,
-                        StickerNumber = vehicle.StickerNumber,
-
-                        HasPermit = permit != null,
-                        PermitNumber = permit != null ? permit.PermitNumber : null,
-                        InspectionDueDate = permit != null ? permit.InspectionDueDate : null,
-                        IsActive = permit != null ? (bool?)permit.IsActive : null
-                    };
-
-        return query;
+        return DbContext.FogVehicles
+            .AsNoTracking()
+            .Include(vehicle => vehicle.Professional!)
+                .ThenInclude(professional => professional.State)
+            .Include(vehicle => vehicle.Permit)
+            .Where(vehicle => vehicle.DeletedTime == null
+                && vehicle.Professional!.DeletedTime == null
+                && registeredTransporterIds.Contains(vehicle.ProfessionalId));
     }
 }

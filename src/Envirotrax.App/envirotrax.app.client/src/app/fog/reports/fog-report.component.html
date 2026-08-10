@@ -1,0 +1,19 @@
+<div class="container-fluid">
+    <header class="text-center mb-3">
+        <h1 class="h3">{{ pageTitle }}</h1>
+    </header>
+
+    <div class="mb-3">
+        <ul class="vp-tabs nav nav-pills justify-content-center">
+            @for (tab of tabs; track tab.key) {
+                <li class="nav-item">
+                    <a class="nav-link text-center" routerLinkActive="active" [routerLink]="['/fog/reports', tab.key]">
+                        {{ tab.title }}
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+
+    <router-outlet></router-outlet>
+</div>

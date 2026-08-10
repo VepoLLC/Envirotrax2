@@ -5,6 +5,8 @@ import { BackflowTestService } from "../../../../shared/services/backflow/backfl
 import { BackflowSettingsService } from "../../../../shared/services/backflow/backflow-settings.service";
 import { BackflowTestingSettings } from "../../../../shared/models/backflow/backflow-testing-settings";
 import { DownloadService } from "../../../../shared/services/download.service";
+import { HelperService } from "../../../../shared/services/helpers/helper.service";
+import { ToastService, ToastType } from '@envirotrax/common-ui';
 
 @Component({
     selector: 'app-professional-backflow-test-details',
@@ -21,7 +23,9 @@ export class ProfessionalBackflowTestDetailsComponent implements OnInit {
         private readonly _activatedRoute: ActivatedRoute,
         private readonly _testService: BackflowTestService,
         private readonly _settingsService: BackflowSettingsService,
-        private readonly _downloadService: DownloadService
+        private readonly _downloadService: DownloadService,
+        private readonly _helper: HelperService,
+        private readonly _toastService: ToastService
     ) { }
 
     public ngOnInit(): void {
@@ -54,7 +58,7 @@ export class ProfessionalBackflowTestDetailsComponent implements OnInit {
     }
 
     public async exportPdf(): Promise<void> {
-        if (this.test == null) {
+        if (this.test == null || !this.test.transactionId) {
             return;
         }
 
@@ -62,6 +66,13 @@ export class ProfessionalBackflowTestDetailsComponent implements OnInit {
             this.isLoading = true;
             const blob = await this._testService.getPdfForProfessional(this.test.id);
             this._downloadService.downloadFileFromBlob(blob);
+        } catch (e) {
+            const validationErrors: string[] = [];
+            if (this._helper.parseValidationErrors(e, validationErrors)) {
+                this._toastService.show({ text: validationErrors[0], type: ToastType.Error });
+            } else {
+                throw e;
+            }
         } finally {
             this.isLoading = false;
         }

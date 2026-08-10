@@ -1,7 +1,9 @@
 ﻿import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
 import { AuthService } from './shared/services/auth/auth.service';
 import { WaterSupplierService } from './shared/services/water-suppliers/water-supplier.service';
 import { ProfesisonalService } from './shared/services/professionals/professional.service';
+import { CheckoutService } from './shared/services/professionals/checkout.service';
 import { ThemeCookieService } from './shared/services/helpers/theme-cookie.service';
 import { createPopper } from '@popperjs/core';
 import { FeatureType } from './shared/models/feature-type';
@@ -23,15 +25,19 @@ export class App implements OnInit {
   public userEmail: string = '';
   public isDarkMode: boolean = false;
   public useContainer: boolean = false;
+  public cartCount$: Observable<number>;
 
   constructor(
     private readonly _authService: AuthService,
     private readonly _waterSupplierService: WaterSupplierService,
     private readonly _professionalService: ProfesisonalService,
+    private readonly _checkoutService: CheckoutService,
     private readonly _themeCookie: ThemeCookieService,
     private readonly _changeDetector: ChangeDetectorRef,
     appContainerHelper: AppContainerHelperService
   ) {
+    this.cartCount$ = this._checkoutService.cartCount$;
+
     appContainerHelper.usContainer().subscribe(value => {
       this.useContainer = value;
       this._changeDetector.detectChanges();
@@ -320,8 +326,8 @@ export class App implements OnInit {
           {
             title: 'Compliance Management',
             iconCss: 'fa-solid fa-list-check',
-            routerLink: ['/'],
-            hasPermission: true,
+            routerLink: ['backflow/compliance'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
             hasFeature: true
           },
           {
@@ -375,14 +381,14 @@ export class App implements OnInit {
           {
             title: 'Transporter Management',
             iconCss: 'fa-regular fa-user',
-            routerLink: ['/'],
+            routerLink: ['/fog/transporters'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogTransporters),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
           },
           {
             title: 'Vehicle Management',
             iconCss: 'fa-solid fa-truck',
-            routerLink: ['/'],
+            routerLink: ['/fog/transporters/vehicles'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogVehicles),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
           },
@@ -401,7 +407,7 @@ export class App implements OnInit {
           {
             title: 'System Reports',
             iconCss: 'fa-regular fa-chart-simple-horizontal',
-            routerLink: ['/'],
+            routerLink: ['/fog/reports'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogReports),
             hasFeature: true
           },
@@ -606,8 +612,23 @@ export class App implements OnInit {
             routerLink: ['professionals/fog/inspections/create'],
             hasPermission: isFogInspector,
             hasFeature: true
+          },
+          {
+            title: 'Submit Trip Ticket',
+            iconCss: 'fa-regular fa-file-plus',
+            routerLink: ['professionals/fog/trip-tickets/create'],
+            hasPermission: isFogTransporter,
+            hasFeature: true
           }
         ]
+      },
+      {
+        title: '',
+        iconCss: 'fa-regular fa-solid fa-cart-shopping',
+        routerLink: ['/professionals/checkout'],
+        hasPermission: true,
+        hasFeature: true,
+        type: 'cart'
       }
     ];
   }
@@ -647,5 +668,5 @@ interface MenuItem {
   hasFeature: boolean;
   isExpanded?: boolean;
   children?: MenuItem[];
-  type?: 'separator';
+  type?: 'separator' | 'cart';
 }

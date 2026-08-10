@@ -7,4 +7,6 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 public interface IFogTripTicketRepository : IRepository<FogTripTicket>
 {
     Task<IEnumerable<FogTripTicket>> SearchForProfessionalAsync(PageInfo pageInfo, Query query, int? waterSupplierId, CancellationToken ct);
+
+    Task<FogTripTicket?> UpdateApprovalAsync(int id, bool disapproved, int? approvedById, CancellationToken cancellationToken);
 }

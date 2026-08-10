@@ -1,7 +1,9 @@
 import { Site } from '../sites/site';
 import { Professional } from '../professionals/professional';
+import { ProfessionalUser } from '../professionals/professional-user';
 import { State } from '../lookup/state';
 import { WaterSupplier } from '../water-suppliers/water-supplier';
+import { WaterSupplierUser } from '../users/water-supplier-user';
 import { PropertyType } from '../../enums/property-type.enum';
 import { FogVehicleCapacityType } from './fog-vehicle-enums';
 
@@ -25,6 +27,7 @@ export interface FogTripTicket {
     fogGeneratorContactName?: string;
 
     professional?: Professional | null;
+    transporter?: ProfessionalUser | null;
     transporterLicenseNumber?: string;
     transporterLicenseExpiration?: string;
     transporterCompanyName?: string;
@@ -38,10 +41,12 @@ export interface FogTripTicket {
     transporterFaxNumber?: string;
     transporterEmailAddress?: string;
     transporterSignaturePath?: string;
+    transporterSignatureUrl?: string;
 
     generatorContactName?: string;
     generatorSignaturePath?: string;
     generatorSignatureDate?: string;
+    generatorSignatureUrl?: string;
 
     interceptorType?: string;
     interceptorOtherDescription?: string;
@@ -76,12 +81,13 @@ export interface FogTripTicket {
     receiverWasteDeliveredDate?: string;
     receiverSignaturePath?: string;
     receiverSignatureDate?: string;
+    receiverSignatureUrl?: string;
 
     pickupCompleted?: boolean;
     completed?: boolean;
     disapproved?: boolean;
     approvalDate?: string;
-    approvedBy?: string;
+    approvedBy?: WaterSupplierUser | null;
 
     needsValidation?: boolean;
     validationOnHold?: boolean;

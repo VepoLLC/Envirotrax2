@@ -29,6 +29,16 @@
 
                     <div class="col-md-6">
                         <div class="mb-3">
+                            <vp-input [(ngModel)]="user.cellNumber"
+                                      [maxLength]="25"
+                                      name="cellNumber"
+                                      label="Cell number"
+                                      [form]="userForm" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
                             <vp-input type="multi-select"
                                       [(ngModel)]="selectedRoleIds"
                                       name="roles"

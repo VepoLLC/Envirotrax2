@@ -100,6 +100,11 @@ public class FogTripTicket : TenantModel<WaterSupplier>, IProfessionalModel, IAu
     [StringLength(255)]
     public string? TransporterEmailAddress { get; set; }
 
+    [StringLength(500)]
+    public string? TransporterSignaturePath { get; set; }
+
+    public DateTime? TransporterSignatureDate { get; set; }
+
     [StringLength(255)]
     public string? GeneratorContactName { get; set; }
 
@@ -202,8 +207,8 @@ public class FogTripTicket : TenantModel<WaterSupplier>, IProfessionalModel, IAu
 
     public DateTime? ApprovalDate { get; set; }
 
-    [StringLength(50)]
-    public string? ApprovedBy { get; set; }
+    public int? ApprovedById { get; set; }
+    public WaterSupplierUser? ApprovedBy { get; set; }
 
     // Validation
     public bool NeedsValidation { get; set; }

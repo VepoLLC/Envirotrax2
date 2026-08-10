@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Microsoft.EntityFrameworkCore;
 
@@ -96,6 +97,8 @@ public class FogTripTicketDto : IDto
     [StringLength(500)]
     public string? TransporterSignaturePath { get; set; }
 
+    public DateTime? TransporterSignatureDate { get; set; }
+
     [StringLength(255)]
     public string? GeneratorContactName { get; set; }
 
@@ -103,6 +106,13 @@ public class FogTripTicketDto : IDto
     public string? GeneratorSignaturePath { get; set; }
 
     public DateTime? GeneratorSignatureDate { get; set; }
+
+    // Signature download URLs (generated SAS URLs; not persisted)
+    public string? GeneratorSignatureUrl { get; set; }
+
+    public string? ReceiverSignatureUrl { get; set; }
+
+    public string? TransporterSignatureUrl { get; set; }
 
     // Interceptor
     [StringLength(50)]
@@ -195,8 +205,7 @@ public class FogTripTicketDto : IDto
 
     public DateTime? ApprovalDate { get; set; }
 
-    [StringLength(50)]
-    public string? ApprovedBy { get; set; }
+    public ReferencedWaterSupplierUserDto? ApprovedBy { get; set; }
 
     // Validation
     public bool NeedsValidation { get; set; }

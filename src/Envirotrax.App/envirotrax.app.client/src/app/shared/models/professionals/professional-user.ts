@@ -4,6 +4,8 @@ export interface ProfessionalUser {
     emailAddress?: string;
     contactName?: string;
     jobTitle?: string;
+    signaturePath?: string;
+    signatureUrl?: string;
     isAdmin?: boolean;
     isWiseGuy?: boolean;
     isCsiInspector?: boolean;

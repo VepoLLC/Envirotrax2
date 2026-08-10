@@ -92,6 +92,14 @@ const routes: Routes = [
         }
     },
     {
+        path: 'checkout',
+        loadChildren: () => import('./checkout/professionals-checkout.module').then(m => m.ProfessionalsCheckoutModule),
+        canActivate: [RoleGuard],
+        data: {
+            roles: [ROLE_DEFINITIONS.PROFESSIONAL]
+        }
+    },
+    {
         path: 'csi',
         loadChildren: () => import('./csi/professionals-csi.module').then(m => m.ProfessionalsCsiModule),
         canActivate: [FeatureGuard, RoleGuard],

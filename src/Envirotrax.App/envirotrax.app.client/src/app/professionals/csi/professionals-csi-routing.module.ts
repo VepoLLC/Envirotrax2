@@ -2,7 +2,7 @@ import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
 import { CsiSubmissionPropertySearchComponent } from "./inspections/create/csi-submission-property-search.component";
 import { CsiSubmissionCreateComponent } from "./inspections/create/csi-submission-create.component";
-import { CsiInspectionListComponent } from "./inspections/list/csi-inspection-list.component";
+import { CsiInspectionListComponent } from "./inspections/list/professional-csi-inspection-list.component";
 import { CsiInspectionViewComponent } from "./inspections/view/csi-inspection-view.component";
 
 const routes: Routes = [

@@ -32,6 +32,7 @@ import { MapComponent } from "./components/map/map.component";
 import { MapResultsComponent } from "./components/map/map-results.component";
 import { AppLoadingSpinnerModule } from "./components/loading-spinner/app-loading-spinner.module";
 import { InputAddOnComponent } from "./components/input/input-add-on.component";
+import { ToastContainerComponent } from "./components/toast-container/toast-container.component";
 
 @NgModule({
     declarations: [
@@ -62,6 +63,7 @@ import { InputAddOnComponent } from "./components/input/input-add-on.component";
         LookupFieldComponent,
         MapComponent,
         MapResultsComponent,
+        ToastContainerComponent,
     ],
     imports: [
         CommonModule,
@@ -93,6 +95,7 @@ import { InputAddOnComponent } from "./components/input/input-add-on.component";
         LookupFieldComponent,
         MapComponent,
         MapResultsComponent,
+        ToastContainerComponent,
         ModalModule,
         AppLoadingSpinnerModule
     ]

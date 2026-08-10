@@ -32,6 +32,8 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
     protected override IQueryable<FogTripTicket> GetDetailsQuery()
     {
         return base.GetDetailsQuery()
+            .Include(t => t.WaterSupplier)
+            .ThenInclude(ws => ws!.State)
             .Include(t => t.Site)
             .Include(t => t.Professional)
             .Include(t => t.Transporter)
@@ -77,5 +79,28 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
             .PaginateAsync(pageInfo, ct);
 
         return await paginated.ToListAsync(ct);
+    }
+
+    public async Task<FogTripTicket?> UpdateApprovalAsync(int id, bool disapproved, int? approvedById, CancellationToken cancellationToken)
+    {
+        var ticket = await GetNoIncludesAsync(id, cancellationToken);
+
+        if (ticket == null)
+        {
+            return null;
+        }
+
+        DbContext.Attach(ticket);
+        ticket.Disapproved = disapproved;
+
+        if (!disapproved)
+        {
+            ticket.ApprovalDate = DateTime.UtcNow;
+            ticket.ApprovedById = approvedById;
+        }
+
+        await DbContext.SaveChangesAsync();
+
+        return ticket;
     }
 }

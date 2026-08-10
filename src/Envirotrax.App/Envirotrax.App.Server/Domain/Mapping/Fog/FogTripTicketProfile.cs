@@ -13,16 +13,14 @@ public class FogTripTicketProfile : Profile
     public FogTripTicketProfile()
     {
         CreateMap<FogTripTicket, FogTripTicketDto>()
-            .ForMember(dest => dest.WaterSupplier, opt => opt.Ignore())
             .ForMember(dest => dest.Site, opt => opt.Ignore())
-            .ForMember(dest => dest.Professional, opt => opt.Ignore())
-            .ForMember(dest => dest.Transporter, opt => opt.Ignore())
             .ForMember(dest => dest.PropertyState, opt => opt.Ignore())
+            .ForMember(dest => dest.GeneratorSignatureUrl, opt => opt.Ignore())
+            .ForMember(dest => dest.ReceiverSignatureUrl, opt => opt.Ignore())
+            .ForMember(dest => dest.TransporterSignatureUrl, opt => opt.Ignore())
             .AfterMap((model, dto) =>
             {
-                dto.WaterSupplier ??= model.WaterSupplier != null
-                    ? new ReferencedWaterSupplierDto { Id = model.WaterSupplierId, Name = model.WaterSupplier.Name }
-                    : new ReferencedWaterSupplierDto { Id = model.WaterSupplierId };
+                dto.WaterSupplier ??= new ReferencedWaterSupplierDto { Id = model.WaterSupplierId };
 
                 dto.Site ??= new ReferencedSiteDto { Id = model.SiteId };
                 dto.Professional ??= new ReferencedProfessionalDto { Id = model.ProfessionalId };
@@ -38,6 +36,11 @@ public class FogTripTicketProfile : Profile
                 {
                     dto.PropertyState ??= new ReferencedStateDto { Id = model.PropertyStateId.Value };
                 }
+
+                if (model.ApprovedById.HasValue)
+                {
+                    dto.ApprovedBy ??= new() { Id = model.ApprovedById.Value };
+                }
             })
             .ReverseMap()
             .ForMember(m => m.Site, opt => opt.Ignore())
@@ -51,6 +54,8 @@ public class FogTripTicketProfile : Profile
             .ForMember(m => m.Vehicle, opt => opt.Ignore())
             .ForMember(m => m.ReceiverDisposalSite, opt => opt.Ignore())
             .ForMember(m => m.WaterSupplier, opt => opt.Ignore())
+            .ForMember(m => m.ApprovedBy, opt => opt.Ignore())
+            .ForMember(m => m.ApprovedById, opt => opt.MapFrom(dto => dto.ApprovedBy != null ? dto.ApprovedBy.Id : (int?)null))
             .ForMember(m => m.CreatedBy, opt => opt.Ignore())
             .ForMember(m => m.UpdatedBy, opt => opt.Ignore())
             .ForMember(m => m.DeletedBy, opt => opt.Ignore());

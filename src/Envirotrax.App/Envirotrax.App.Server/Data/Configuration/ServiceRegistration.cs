@@ -3,6 +3,8 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Data.Repositories.Definitions.GisAreas;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Logs;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Logs;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Users;
 using Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
@@ -61,9 +63,12 @@ public static class ServiceRegistration
         services.AddTransient<ISiteLogRepository, SiteLogRepository>();
         services.AddTransient<ICsiInspectionRepository, CsiInspectionRepository>();
         services.AddTransient<ICsiInspectionImageRepository, CsiInspectionImageRepository>();
+        services.AddTransient<ICsiInspectionAssemblyRepository, CsiInspectionAssemblyRepository>();
+        services.AddTransient<IRecordLogRepository, RecordLogRepository>();
         services.AddTransient<ICsiInspectorRepository, CsiInspectorRepository>();
         services.AddTransient<ICsiSystemReportRepository, CsiSystemReportRepository>();
         services.AddTransient<IFogInspectorRepository, FogInspectorRepository>();
+        services.AddTransient<IFogTransporterRepository, FogTransporterRepository>();
         services.AddTransient<IFogInspectionRepository, FogInspectionRepository>();
         services.AddTransient<IBackflowTesterRepository, BackflowTesterRepository>();
         services.AddTransient<IBackflowTestRepository, BackflowTestRepository>();
@@ -89,9 +94,13 @@ public static class ServiceRegistration
         services.AddTransient<IProfessionalInsuranceRepository, ProfessionalInsuranceRepository>();
         services.AddTransient<IBackflowGaugeRepository, BackflowGaugeRepository>();
         services.AddTransient<IFogVehicleRepository, FogVehicleRepository>();
+        services.AddTransient<IFogVehiclePermitRepository, FogVehiclePermitRepository>();
         services.AddTransient<IFogTransporterDisposalSiteRepository, FogTransporterDisposalSiteRepository>();
         services.AddTransient<IFogDisposalSiteRepository, FogDisposalSiteRepository>();
         services.AddTransient<IFogTripTicketRepository, FogTripTicketRepository>();
+        services.AddTransient<IFogSettingsRepository, FogSettingsRepository>();
+        services.AddTransient<IFogTripTicketReportRepository, FogTripTicketReportRepository>();
+        services.AddTransient<IFogInspectionReportRepository, FogInspectionReportRepository>();
 
         services.AddTransient<IGisAreaRepository, GisAreaRepository>();
         services.AddTransient<IGisAreaCoordinateRepository, GisAreaCoordinateRepository>();

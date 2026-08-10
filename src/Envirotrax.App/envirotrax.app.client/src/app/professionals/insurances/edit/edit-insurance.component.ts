@@ -4,7 +4,7 @@ import { ProfessionalInsuranceService } from "../../../shared/services/professio
 import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { NgForm } from "@angular/forms";
-import { ToastService } from "../../../shared/services/toast.service";
+import { ToastService } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,

@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Transactions;
 using AutoMapper;
+using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
@@ -15,6 +17,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
+using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Backflow;
@@ -36,6 +39,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     private readonly IPdfTemplateService _pdfTemplateService;
     private readonly ISiteService _siteService;
     private readonly ISiteRepository _siteRepository;
+    private readonly ISiteLogService _siteLogService;
     private readonly IBackflowRenewalRequirementService _renewalRequirementService;
     private readonly ILogger<BackflowTestService> _logger;
 
@@ -49,6 +53,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         IPdfTemplateService pdfTemplateService,
         ISiteService siteService,
         ISiteRepository siteRepository,
+        ISiteLogService siteLogService,
         IBackflowRenewalRequirementService renewalRequirementService,
         ILogger<BackflowTestService> logger)
         : base(mapper, repository)
@@ -61,8 +66,45 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         _pdfTemplateService = pdfTemplateService;
         _siteService = siteService;
         _siteRepository = siteRepository;
+        _siteLogService = siteLogService;
         _renewalRequirementService = renewalRequirementService;
         _logger = logger;
+    }
+
+    public async Task<IPagedData<BackflowComplianceDto>> GetComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        // Client filters/sort are keyed on DTO property names (incl. nested site.* paths); translate them to
+        // the entity model, mirroring the base test-search path and SiteService.GetCsiComplianceAsync.
+        query.Sort = query.ConvertSortProperties<BackflowTest, BackflowTestDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<BackflowTest, BackflowTestDto>(Mapper);
+
+        var tests = await _testRepository.GetComplianceAsync(pageInfo, query, cancellationToken);
+        var dtos = tests.Select(t => Mapper.Map<BackflowComplianceDto>(t)).ToList();
+
+        // Attach each row's site logs (top 5 per site) in a single round-trip, then stitch by site id — the
+        // same approach the CSI compliance page uses. A site's logs repeat across its assembly rows; the grid
+        // renders them once per site group.
+        var siteIds = dtos
+            .Where(d => d.Site?.Id != null)
+            .Select(d => d.Site!.Id!.Value)
+            .Distinct()
+            .ToList();
+
+        if (siteIds.Count > 0)
+        {
+            var logs = await _siteLogService.GetBySitesAsync(siteIds, cancellationToken);
+            var logsBySite = logs.ToLookup(l => l.Site?.Id ?? 0);
+
+            foreach (var dto in dtos)
+            {
+                if (dto.Site?.Id != null)
+                {
+                    dto.Logs = logsBySite[dto.Site.Id.Value].ToList();
+                }
+            }
+        }
+
+        return dtos.ToPagedData(pageInfo);
     }
 
     private async Task PopulateBpatSnapshotAsync(BackflowTestDto dto)
@@ -271,6 +313,21 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         return dto;
     }
 
+    public override async Task<BackflowTestDto?> DeleteAsync(int id)
+    {
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+        var deleted = await _testRepository.DeleteAsync(id);
+
+        if (deleted == null || !string.IsNullOrEmpty(deleted.TransactionId))
+        {
+            return null;
+        }
+
+        scope.Complete();
+        return MapToDto(deleted);
+    }
+
     public async Task<BackflowTestDto?> UpdateImageAsync(int id, string imageType, Stream fileStream, string fileName, CancellationToken cancellationToken = default)
     {
         if (!ValidImageTypes.Contains(imageType))
@@ -389,6 +446,16 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     public Task<byte[]> GeneratePdfAsync(IEnumerable<BackflowTestDto> tests)
     {
         return _pdfTemplateService.GenerateAsync("Backflow.BackflowTest", tests);
+    }
+
+    public Task<byte[]> GeneratePdfForProfessionalAsync(BackflowTestDto test)
+    {
+        if (test.TransactionId == null)
+        {
+            throw new AppValidationException("Report can't be downloaded until it's paid. Please go to checkout and pay for this transaction, then try downloading again.");
+        }
+
+        return GeneratePdfAsync(test);
     }
 
     public async Task<IEnumerable<BackflowTestDto>> GetAllPendingTestsForRenewalAsync(int batchSize, CancellationToken cancellationToken)

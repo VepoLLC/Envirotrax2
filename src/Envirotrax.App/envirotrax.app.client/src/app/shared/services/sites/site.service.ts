@@ -27,6 +27,13 @@ export class SiteService {
         };
     }
 
+    public getAllForProfessionalEndpoint(): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/professionals/sites'),
+        };
+    }
+
     public getCsiComplianceEndpoint(): DownloadEndpoint {
         return {
             method: 'GET',
@@ -46,6 +53,14 @@ export class SiteService {
 
     public updateCsiAssignment(siteId: number, userId: number | null): Promise<void> {
         const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}/csi-assignment`);
+
+        return lastValueFrom(
+            this._http.put<void>(url, { userId })
+        );
+    }
+
+    public updateBackflowAssignment(siteId: number, userId: number | null): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}/backflow-assignment`);
 
         return lastValueFrom(
             this._http.put<void>(url, { userId })
@@ -102,7 +117,7 @@ export class SiteService {
         );
     }
 
-    public updateGisData(siteId: number, data: { gisLatitude?: number, gisLongitude?: number, gisStatus?: number }): Promise<void> {
+    public updateGisData(siteId: number, data: { gisLatitude?: number | null, gisLongitude?: number | null, gisStatus?: number }): Promise<void> {
         const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}/gis-data`);
         return lastValueFrom(
             this._http.put<void>(url, {

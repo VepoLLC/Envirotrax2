@@ -13,5 +13,7 @@ public class GeneralSettingsProfile : Profile
 
         CreateMap<GeneralSettingsDto, GeneralSettings>()
             .ForMember(dest => dest.WaterSupplierId, opt => opt.MapFrom(src => src.Id));
+
+        CreateMap<GeneralSettings, ReferencedGeneralSettingsDto>();
     }
 }

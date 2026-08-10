@@ -1,5 +1,6 @@
 
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,5 +21,31 @@ public class WaterSupplierController : AdminBaseController
     {
         var suppliers = await _waterSupplierService.GetAllAsync(pageInfo, query, cancellationToken);
         return Ok(suppliers);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
+    {
+        var details = await _waterSupplierService.GetDetailsAsync(id, cancellationToken);
+
+        if (details == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(details);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAsync(int id, WaterSupplierDetailsDto details)
+    {
+        var updated = await _waterSupplierService.UpdateDetailsAsync(id, details);
+
+        if (updated == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(updated);
     }
 }

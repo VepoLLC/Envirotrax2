@@ -19,8 +19,11 @@ public interface IBackflowTestService : IService<BackflowTest, BackflowTestDto>
 
     Task<BackflowTestExpiryCountsDto> GetExpiryCountsAsync(CancellationToken cancellationToken = default);
 
+    Task<IPagedData<BackflowComplianceDto>> GetComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+
     Task<byte[]> GeneratePdfAsync(BackflowTestDto test);
     Task<byte[]> GeneratePdfAsync(IEnumerable<BackflowTestDto> tests);
+    Task<byte[]> GeneratePdfForProfessionalAsync(BackflowTestDto test);
 
     Task ProcessSiteRenewalAsync(int siteId, CancellationToken cancellationToken);
     Task ProcessTestRenewalAsync(int testId, CancellationToken cancellationToken);

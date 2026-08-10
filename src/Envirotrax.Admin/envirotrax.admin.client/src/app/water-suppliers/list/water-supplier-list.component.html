@@ -1,13 +1,208 @@
-<div>
-    <dp-loading-spinner [hidden]="!table.isLoading"></dp-loading-spinner>
+<dp-loading-spinner [hidden]="!isInitializing"></dp-loading-spinner>
 
-    <vp-table *ngIf="table.items"
-              [columns]="table.columns!"
-              [data]="table.items.data"
-              [(pageInfo)]="table.items.pageInfo"
-              (pageInfoChange)="getSuppliers()"
-              [(query)]="table.query"
-              (queryChange)="getSuppliers()"
-              (queryReset)="getSuppliers()"
-              [freeTextSearch]="table.freeTextSearch" />
+<ng-template #programCell let-rowData="rowData">
+    <div class="d-flex gap-1">
+        <span class="d-inline-block"
+              style="width: 16px; height: 16px; border: 1px solid #0000ff;"
+              [style.background-color]="rowData.generalSettings?.csiInspections ? '#9696ff' : '#ffffff'"
+              title="CSI Program"></span>
+
+        <span class="d-inline-block"
+              style="width: 16px; height: 16px; border: 1px solid #008080;"
+              [style.background-color]="rowData.generalSettings?.backflowTesting ? '#64ffdc' : '#ffffff'"
+              title="Backflow Program"></span>
+
+        <span class="d-inline-block"
+              style="width: 16px; height: 16px; border: 1px solid #800080;"
+              [style.background-color]="rowData.generalSettings?.fogProgram ? '#ff64dc' : '#ffffff'"
+              title="FOG Program"></span>
+    </div>
+</ng-template>
+
+<div [hidden]="showResults" *ngIf="!isInitializing">
+    <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+        <vp-filter-panel (filterChange)="onFilterChange($event)">
+            <vp-section header="Water Supplier Search Criteria">
+                <div class="d-flex flex-wrap justify-content-evenly mb-3">
+                    <div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   [(ngModel)]="programFilters.administrativeOnly"
+                                   (ngModelChange)="onProgramFilterChange()"
+                                   name="administrativeOnly" id="searchAdministrativeOnly">
+                            <label class="form-check-label" for="searchAdministrativeOnly">Administrative Only</label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   [(ngModel)]="programFilters.backflowTesting"
+                                   (ngModelChange)="onProgramFilterChange()"
+                                   name="backflowTesting" id="searchBackflowTesting">
+                            <label class="form-check-label" for="searchBackflowTesting">Backflow Program</label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   [(ngModel)]="programFilters.csiInspections"
+                                   (ngModelChange)="onProgramFilterChange()"
+                                   name="csiInspections" id="searchCsiInspections">
+                            <label class="form-check-label" for="searchCsiInspections">CSI Program</label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   [(ngModel)]="programFilters.fogProgram"
+                                   (ngModelChange)="onProgramFilterChange()"
+                                   name="fogProgram" id="searchFogProgram">
+                            <label class="form-check-label" for="searchFogProgram">FOG Program</label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   [(ngModel)]="programFilters.wiseGuys"
+                                   (ngModelChange)="onProgramFilterChange()"
+                                   name="wiseGuys" id="searchWiseGuys">
+                            <label class="form-check-label" for="searchWiseGuys">WISE Guys Program</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="row mb-2">
+                            <div class="col-xl-3 text-xl-end">
+                                <label class="col-form-label">Water Supplier ID</label>
+                            </div>
+
+                            <div class="col-xl-7">
+                                <vp-filter-panel-field fieldName="id"
+                                                       type="number"
+                                                       [form]="searchForm" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-xl-3 text-xl-end">
+                                <label class="col-form-label">Name</label>
+                            </div>
+
+                            <div class="col-xl-7">
+                                <vp-filter-panel-field fieldName="name"
+                                                       [form]="searchForm" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-xl-3 text-xl-end">
+                                <label class="col-form-label">Contact Name</label>
+                            </div>
+
+                            <div class="col-xl-7">
+                                <vp-filter-panel-field fieldName="contactName"
+                                                       [form]="searchForm" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-xl-3 text-xl-end">
+                                <label class="col-form-label">PWS ID</label>
+                            </div>
+
+                            <div class="col-xl-7">
+                                <vp-filter-panel-field fieldName="pwsId"
+                                                       [form]="searchForm" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="row mb-2">
+                            <div class="col-xl-3 text-xl-end">
+                                <label class="col-form-label">Address</label>
+                            </div>
+
+                            <div class="col-xl-7">
+                                <vp-filter-panel-field fieldName="address"
+                                                       [form]="searchForm" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-xl-3 text-xl-end">
+                                <label class="col-form-label">City</label>
+                            </div>
+
+                            <div class="col-xl-7">
+                                <vp-filter-panel-field fieldName="city"
+                                                       [form]="searchForm" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-xl-3 text-xl-end">
+                                <label class="col-form-label">State</label>
+                            </div>
+
+                            <div class="col-xl-7">
+                                <vp-filter-panel-field fieldName="state.id"
+                                                       type="select"
+                                                       [form]="searchForm"
+                                                       [options]="stateOptions" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-xl-3 text-xl-end">
+                                <label class="col-form-label">ZIP</label>
+                            </div>
+
+                            <div class="col-xl-7">
+                                <vp-filter-panel-field fieldName="zipCode"
+                                                       [form]="searchForm" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </vp-section>
+        </vp-filter-panel>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="searchForm" />
+
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>
+                    Search
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<dp-loading-spinner [hidden]="!table.isLoading"></dp-loading-spinner>
+
+<div [hidden]="!showResults">
+    <div class="d-flex justify-content-end mb-3">
+        <button type="button" class="btn btn-primary vp-section-button" (click)="showResults = false">
+            <i class="fa-solid fa-magnifying-glass me-1"></i>
+            Search Again
+        </button>
+    </div>
+
+    <vp-section header="Search Results ({{ table.items?.pageInfo?.totalItems }})">
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getSuppliers()"
+                  [(query)]="table.query"
+                  (queryChange)="getSuppliers()"
+                  (queryReset)="getSuppliers()"
+                  [canViewDetails]="true"
+                  (viewDetails)="viewDetails($event)" />
+    </vp-section>
 </div>

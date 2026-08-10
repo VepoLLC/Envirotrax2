@@ -1,0 +1,344 @@
+<h1 class="text-center h2">Backflow Compliance Management</h1>
+
+<!-- ===================== Cell templates ===================== -->
+<ng-template #numberTemplate let-data="rowData">
+    {{ data.rowNumber }}
+</ng-template>
+
+<ng-template #accountTemplate let-data="rowData">
+    <div *ngIf="data.isFirstOfGroup">{{ data.accountNumber }}</div>
+</ng-template>
+
+<ng-template #propertyTemplate let-data="rowData">
+    <div *ngIf="data.isFirstOfGroup" class="d-flex gap-2 align-items-start">
+        <i class="fa-solid fs-5 mt-1"
+           [ngClass]="data.propertyType === PropertyType.Residential ? 'fa-home text-primary' : 'fa-building text-danger'"></i>
+        <a [routerLink]="['/sites', data.site?.id, 'edit']" target="_blank">
+            <div *ngIf="data.propertyBusinessName" class="fw-semibold">{{ data.propertyBusinessName }}</div>
+            <div>
+                {{ data.propertyStreetNumber }} {{ data.propertyStreetName }}
+                <span *ngIf="data.propertyNumber">#{{ data.propertyNumber }}</span>
+            </div>
+            <div>
+                {{ data.propertyCity }}<span *ngIf="data.propertyCity">, </span>{{ data.propertyState?.code }}
+                {{ data.propertyZip }}
+            </div>
+        </a>
+    </div>
+</ng-template>
+
+<ng-template #mailingTemplate let-data="rowData">
+    <div *ngIf="data.isFirstOfGroup">
+        <div *ngIf="data.mailingCompanyName" class="fw-semibold">{{ data.mailingCompanyName }}</div>
+        <div *ngIf="data.mailingContactName">{{ data.mailingContactName }}</div>
+        <div>
+            {{ data.mailingStreetNumber }} {{ data.mailingStreetName }}
+            <span *ngIf="data.mailingNumber">#{{ data.mailingNumber }}</span>
+        </div>
+        <div>{{ data.mailingCity }}<span *ngIf="data.mailingCity">, </span>{{ data.mailingState?.code }}
+            {{ data.mailingZip }}
+        </div>
+        <div *ngIf="data.mailingPhoneNumber">{{ data.mailingPhoneNumber }}</div>
+        <div *ngIf="data.mailingEmailAddress">{{ data.mailingEmailAddress }}</div>
+    </div>
+</ng-template>
+
+<ng-template #assignedToTemplate let-data="rowData">
+    <ng-container *ngIf="data.isFirstOfGroup">
+        <ng-container *ngIf="canModify; else assignedReadonly">
+            <select class="form-select form-select-sm"
+                    [value]="data.site?.backflowAccountAssignmentId ?? ''"
+                    (change)="onAssignmentChange(data, $any($event.target).value)">
+                <option value="">Unassigned</option>
+                <option *ngFor="let user of users" [value]="user.id">{{ user.contactName }}</option>
+            </select>
+        </ng-container>
+        <ng-template #assignedReadonly>
+            <span>{{ data.assignedName }}</span>
+        </ng-template>
+        <div *ngIf="data.site?.backflowAccountAssignmentDate" class="small text-muted mt-1">
+            {{ data.site?.backflowAccountAssignmentDate | date:'short' }}
+        </div>
+    </ng-container>
+</ng-template>
+
+<ng-template #statusTemplate let-data="rowData">
+    <div class="d-flex flex-column align-items-center gap-1">
+        <vp-status-icon *ngIf="data.testResult !== BackflowTestResult.Fail"
+                        imageSrc="/images/icons/bstatus-magenta-on.png" text="Passed Test" [showText]="false" />
+        <vp-status-icon *ngIf="data.testResult === BackflowTestResult.Fail"
+                        imageSrc="/images/icons/bstatus-magenta-off.png" text="Failed Test" [showText]="false" />
+        <span *ngIf="data.outOfService" class="badge rounded-pill border border-primary text-primary">Out of
+            Service</span>
+        <span *ngIf="data.rejected" class="badge rounded-pill border border-danger text-danger">Rejected</span>
+    </div>
+</ng-template>
+
+<ng-template #datesTemplate let-data="rowData">
+    <div class="text-center text-nowrap">
+        <div>{{ data.testDate | date }}</div>
+        <div class="mt-1">
+            <span *ngIf="data.expirationDate" class="badge text-bg-danger">{{ data.expirationDate | date }}</span>
+            <span *ngIf="!data.expirationDate" class="text-muted">—</span>
+        </div>
+        <div class="mt-1" *ngIf="data.daysExpired != null">
+            <span class="badge rounded-pill" [ngClass]="data.expiredClass">{{ data.daysExpired }} Days</span>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #serialTemplate let-data="rowData">
+    <ng-container
+        *ngIf="data.deviceType === 'DCD' || data.deviceType === 'DCD2' || data.deviceType === 'RPPD' || data.deviceType === 'RPPD2'; else singleSerial">
+        <div><span class="fw-semibold">Main:</span> {{ data.serialNumber }}</div>
+        <div><span class="fw-semibold">Bypass:</span> {{ data.serialNumber2 }}</div>
+    </ng-container>
+    <ng-template #singleSerial>{{ data.serialNumber }}</ng-template>
+</ng-template>
+
+<ng-template #assemblyTemplate let-data="rowData">
+    <div>
+        <div>
+            <span class="fw-semibold">Assembly Desc:</span>
+            <span class="ms-1 text-muted">{{ data.manufacturer }} {{ data.model }} {{ data.size }}
+                {{ data.deviceType }}</span>
+        </div>
+        <div *ngIf="data.hazardType">
+            <span class="fw-semibold">Hazard Type:</span>
+            <span class="ms-1 text-muted">{{ data.hazardType }}</span>
+        </div>
+        <div *ngIf="data.locationDescription">
+            <span class="fw-semibold">Location Desc:</span>
+            <span class="ms-1 text-muted">{{ data.locationDescription }}</span>
+        </div>
+        <div
+            *ngIf="data.deviceType === 'DCD' || data.deviceType === 'DCD2' || data.deviceType === 'RPPD' || data.deviceType === 'RPPD2'">
+            <span class="fw-semibold">Bypass:</span>
+            <span class="ms-1 text-muted">{{ data.manufacturer2 }} {{ data.model2 }} {{ data.size2 }}</span>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #viewTemplate let-data="rowData">
+    <div class="d-flex flex-column gap-1">
+        <a class="btn btn-sm btn-primary text-nowrap" [routerLink]="['/backflow/tests', data.id, 'view']"
+           target="_blank">
+            <i class="fa-regular fa-file-magnifying-glass me-1"></i>View Test
+        </a>
+        <a *ngIf="data.isFirstOfGroup" class="btn btn-sm btn-success text-nowrap"
+           [routerLink]="['/sites', data.site?.id, 'edit']" target="_blank">
+            <i class="fa-regular fa-eye me-1"></i>View Site
+        </a>
+    </div>
+</ng-template>
+
+<!-- ===================== Toolbar ===================== -->
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
+            (click)="exportResults()">
+        <i class="fa-regular fa-file-export me-1"></i>
+        Export Results
+    </button>
+    <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
+            (click)="viewPrintableTable()">
+        <i class="fa-regular fa-table me-1"></i>
+        View Printable Table
+    </button>
+</div>
+
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+<div class="results-section">
+    <vp-section header="{{ resultsHeaderPrefix }} - {{ table.items?.pageInfo?.totalItems || 0 }} Results">
+        <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+            <vp-filter-panel (filterChange)="onFilterChange($event)">
+                <div class="row">
+                    <!-- Column 1: dates, sort, options -->
+                    <div class="col-md-4">
+                        <!-- Expired from [ ... ] To [ ... ] — inline on one row (V1 layout) -->
+                        <div class="row g-2 align-items-center mb-3">
+                            <label class="col-4 col-form-label text-end">Expired from</label>
+                            <div class="col">
+                                <vp-input type="select"
+                                          name="expiredFrom"
+                                          [(ngModel)]="expiredFrom"
+                                          [options]="expiredFromOptions" />
+                            </div>
+                            <label class="col-auto col-form-label px-1">To</label>
+                            <div class="col">
+                                <vp-input type="select"
+                                          name="expiredTo"
+                                          [(ngModel)]="expiredTo"
+                                          [options]="expiredToOptions" />
+                            </div>
+                        </div>
+
+                        <!-- Custom date inputs, aligned under their dropdown -->
+                        <div class="row g-2 align-items-center mb-3"
+                             *ngIf="expiredFrom === 'custom' || expiredTo === 'custom'">
+                            <div class="col-4"></div>
+                            <div class="col">
+                                <vp-input *ngIf="expiredFrom === 'custom'" type="date"
+                                          name="customFromDate"
+                                          [(ngModel)]="customFromDate" />
+                            </div>
+                            <div class="col-auto invisible px-1">To</div>
+                            <div class="col">
+                                <vp-input *ngIf="expiredTo === 'custom'" type="date"
+                                          name="customToDate"
+                                          [(ngModel)]="customToDate" />
+                            </div>
+                        </div>
+
+                        <div class="row g-2 align-items-center mb-3">
+                            <label class="col-4 col-form-label text-end">Sort by</label>
+                            <div class="col">
+                                <vp-input type="select"
+                                          name="sortBy"
+                                          [(ngModel)]="sortBy"
+                                          [options]="sortOptions" />
+                            </div>
+                        </div>
+
+                        <!-- Checkboxes indented under the control column (V1 layout) -->
+                        <div class="row g-2">
+                            <div class="col-4 d-none d-sm-block"></div>
+                            <div class="col">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="groupBySite"
+                                           name="groupBySite" [(ngModel)]="groupBySite" />
+                                    <label class="form-check-label" for="groupBySite">Group by site record</label>
+                                </div>
+
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="showMailing"
+                                           name="showMailing" [(ngModel)]="showMailing" />
+                                    <label class="form-check-label" for="showMailing">Show mailing information</label>
+                                </div>
+
+                                <div class="form-check mb-2 mt-3">
+                                    <input class="form-check-input" type="checkbox" id="emailWhenAssigned"
+                                           name="emailWhenAssigned" [(ngModel)]="emailWhenAssigned" />
+                                    <label class="form-check-label" for="emailWhenAssigned">Email users when
+                                        assigned</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: assignment, area, property -->
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="site.backflowAccountAssignmentId"
+                                                   label="User account assignment"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="userOptions" />
+                        </div>
+
+                        <div class="mb-3">
+                            <app-gis-area-lookup fieldName="site.gisAreaId" label="GIS Area" labelStyle="horizontal"
+                                                 [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="propertyType"
+                                                   label="Property type"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="propertyTypes" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-input label="Property street name"
+                                      name="propertyStreet"
+                                      labelStyle="horizontal"
+                                      [(ngModel)]="propertyStreet" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="site.facilityType"
+                                                   label="Facility type"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="facilityTypes" />
+                        </div>
+                    </div>
+
+                    <!-- Column 3: assembly / hazard / site attributes -->
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="deviceType"
+                                                   label="Assembly type"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="deviceTypeOptions" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="hazardType"
+                                                   label="Hazard type"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="hazardTypeOptions" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="site.hasOnSiteSewageFacility"
+                                                   label="Has on-site sewage facility"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="site.hasAuxWaterSupply"
+                                                   label="Has auxiliary water supply"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+                    </div>
+                </div>
+            </vp-filter-panel>
+
+            <vp-validation-summary [form]="searchForm" />
+
+            <div class="d-flex justify-content-center mb-3">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    <i class="fa-solid fa-rotate me-1"></i>
+                    Refresh Compliance Records
+                </button>
+            </div>
+        </form>
+
+        <div #printableSection>
+            <div class="d-flex flex-wrap justify-content-center gap-3 mb-3">
+                <vp-status-icon iconClass="fa-solid fa-home text-primary" text="Residential" />
+                <vp-status-icon iconClass="fa-solid fa-building text-danger" text="Commercial" />
+                <vp-status-icon imageSrc="/images/icons/bstatus-magenta-on.png" text="Passed Test" />
+                <vp-status-icon imageSrc="/images/icons/bstatus-magenta-off.png" text="Failed Test" />
+            </div>
+
+            <vp-table *ngIf="table.items && table.items.data && table.items.data.length > 0"
+                      [columns]="table.columns!"
+                      [data]="table.items.data"
+                      [(pageInfo)]="table.items.pageInfo"
+                      (pageInfoChange)="getCompliance()"
+                      [(query)]="table.query"
+                      (queryChange)="getCompliance()"
+                      (queryReset)="getCompliance()" />
+
+            <div *ngIf="table.items?.data?.length === 0" class="text-center py-3 text-muted">
+                No records found matching the search criteria.
+            </div>
+        </div>
+    </vp-section>
+</div>

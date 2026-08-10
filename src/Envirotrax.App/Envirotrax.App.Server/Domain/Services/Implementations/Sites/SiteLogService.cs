@@ -38,13 +38,13 @@ public class SiteLogService : ISiteLogService
         return dtos.ToPagedData(pageInfo);
     }
 
-    public async Task<IPagedData<PropertyLogDto>> GetForManagementAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public async Task<IPagedData<SiteLogDto>> GetForManagementAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        query.Filter = query.ConvertFilterProperties<SiteLog, PropertyLogDto>(_mapper);
-        query.Sort = query.ConvertSortProperties<SiteLog, PropertyLogDto>(_mapper);
+        query.Filter = query.ConvertFilterProperties<SiteLog, SiteLogDto>(_mapper);
+        query.Sort = query.ConvertSortProperties<SiteLog, SiteLogDto>(_mapper);
 
         var results = await _repository.GetAllAsync(pageInfo, query, cancellationToken);
-        var dtos = results.Select(MapToPropertyLogDto).ToList();
+        var dtos = results.Select(MapToDto).ToList();
 
         return dtos.ToPagedData(pageInfo);
     }
@@ -75,14 +75,6 @@ public class SiteLogService : ISiteLogService
     private SiteLogDto MapToDto(SiteLog model)
     {
         var dto = _mapper.Map<SiteLogDto>(model)!;
-        dto.ReviewDateStatus = ComputeReviewDateStatus(dto.LogType, dto.ReviewDate, DateTime.UtcNow);
-
-        return dto;
-    }
-
-    private PropertyLogDto MapToPropertyLogDto(SiteLog model)
-    {
-        var dto = _mapper.Map<PropertyLogDto>(model)!;
         dto.ReviewDateStatus = ComputeReviewDateStatus(dto.LogType, dto.ReviewDate, DateTime.UtcNow);
 
         return dto;

@@ -1,29 +1,21 @@
+import { Professional } from '../professionals/professional';
 import { FogVehicleCapacityType, FogVehicleInspectionDueStatus } from './fog-vehicle-enums';
 
-// A water supplier's permit for a vehicle. Its identity within a supplier is the vehicle it covers.
+// A water supplier's permit for a vehicle. Its identity is the vehicle it covers.
 export interface FogVehiclePermit {
     id?: number;
     permitNumber?: string;
     inspectionDueDate?: string | null;
     isActive?: boolean;
     createdTime?: string;
-    updatedTime?: string;
 }
 
-// A row of the Vehicle Permit Management search: one per vehicle in the water supplier's scope, with
-// the permit fields left null when no permit has been issued for it yet.
+// A row of the Vehicle Permit Management search: a vehicle of a registered transporter, with permit
+// left null when this water supplier has not issued one for it yet.
 export interface FogVehiclePermitSearch {
     id?: number;
 
-    transporterId?: number;
-    transporterCompanyName?: string;
-    transporterAddress?: string;
-    transporterCity?: string;
-    transporterState?: string;
-    transporterZip?: string;
-    transporterPhoneNumber?: string;
-    transporterFaxNumber?: string;
-    transporterEmailAddress?: string;
+    professional?: Professional | null;
 
     licensePlateNumber?: string;
     manufacturer?: string;
@@ -32,10 +24,7 @@ export interface FogVehiclePermitSearch {
     capacityType?: FogVehicleCapacityType;
     stickerNumber?: string;
 
-    hasPermit?: boolean;
-    permitNumber?: string | null;
-    inspectionDueDate?: string | null;
-    isActive?: boolean | null;
+    permit?: FogVehiclePermit | null;
 
     inspectionDueStatus?: FogVehicleInspectionDueStatus;
 }

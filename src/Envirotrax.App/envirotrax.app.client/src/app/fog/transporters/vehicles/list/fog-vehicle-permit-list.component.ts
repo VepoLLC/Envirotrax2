@@ -15,9 +15,12 @@ import { AppContainerHelperService } from '../../../../shared/services/helpers/a
 import { EditFogVehiclePermitComponent, FogVehiclePermitModalData } from '../edit/edit-fog-vehicle-permit.component';
 
 interface FogVehiclePermitRowVm extends FogVehiclePermitSearch {
+    transporterName: string;
+    transporterAddress: string;
     transporterCityStateZip: string;
     vehicleDescription: string;
     capacityDescription: string;
+    hasPermit: boolean;
     inspectionDueStatusClass: string;
 }
 
@@ -37,10 +40,10 @@ export class FogVehiclePermitListComponent implements OnInit {
         },
         freeTextSearch: {
             searchQuery: [
-                { field: 'transporterCompanyName', operator: 'Ct', multiWordSearch: true },
+                { field: 'professional.name', operator: 'Ct', multiWordSearch: true, placeholder: 'Transporter Information' },
                 { field: 'licensePlateNumber', operator: 'Ct' },
                 { field: 'stickerNumber', operator: 'Ct' },
-                { field: 'permitNumber', operator: 'Ct' }
+                { field: 'permit.permitNumber', operator: 'Ct', placeholder: 'Permit #' }
             ]
         }
     };
@@ -68,8 +71,8 @@ export class FogVehiclePermitListComponent implements OnInit {
 
     public readonly inspectionDueStatusClasses: { [key: number]: string } = {
         [FogVehicleInspectionDueStatus.None]: '',
-        [FogVehicleInspectionDueStatus.Current]: 'badge bg-primary',
-        [FogVehicleInspectionDueStatus.PastDue]: 'badge bg-danger'
+        [FogVehicleInspectionDueStatus.Current]: 'text-bg-primary',
+        [FogVehicleInspectionDueStatus.PastDue]: 'text-bg-danger'
     };
 
     public downloadConfig: DownloadConfig;
@@ -86,24 +89,24 @@ export class FogVehiclePermitListComponent implements OnInit {
             endpoint: this._permitService.getAllEndpoint(),
             suppoertedFormats: ['CSV', 'Excel'],
             columns: [
-                { field: 'transporterId', caption: 'Transporter ID' },
-                { field: 'transporterCompanyName', caption: 'Transporter Company Name' },
-                { field: 'transporterAddress', caption: 'Transporter Address' },
-                { field: 'transporterCity', caption: 'Transporter City' },
-                { field: 'transporterState', caption: 'Transporter State' },
-                { field: 'transporterZip', caption: 'Transporter ZIP' },
-                { field: 'transporterPhoneNumber', caption: 'Transporter Phone Number' },
-                { field: 'transporterFaxNumber', caption: 'Transporter Fax Number' },
-                { field: 'transporterEmailAddress', caption: 'Transporter Email Address' },
+                { field: 'professional.id', caption: 'Transporter ID' },
+                { field: 'professional.name', caption: 'Transporter Company Name' },
+                { field: 'professional.address', caption: 'Transporter Address' },
+                { field: 'professional.city', caption: 'Transporter City' },
+                { field: 'professional.state.code', caption: 'Transporter State' },
+                { field: 'professional.zipCode', caption: 'Transporter ZIP' },
+                { field: 'professional.phoneNumber', caption: 'Transporter Phone Number' },
+                { field: 'professional.faxNumber', caption: 'Transporter Fax Number' },
+                { field: 'professional.companyEmail', caption: 'Transporter Email Address' },
                 { field: 'licensePlateNumber', caption: 'Vehicle License Plate #' },
                 { field: 'manufacturer', caption: 'Vehicle Manufacturer' },
                 { field: 'manufacturedYear', caption: 'Vehicle Year' },
                 { field: 'capacity', caption: 'Vehicle Capacity' },
                 { field: 'capacityType', caption: 'Vehicle Capacity Type' },
                 { field: 'stickerNumber', caption: 'Vehicle Sticker #' },
-                { field: 'permitNumber', caption: 'Permit #' },
-                { field: 'inspectionDueDate', caption: 'Inspection Due Date' },
-                { field: 'isActive', caption: 'Active' }
+                { field: 'permit.permitNumber', caption: 'Permit #' },
+                { field: 'permit.inspectionDueDate', caption: 'Inspection Due Date' },
+                { field: 'permit.isActive', caption: 'Active' }
             ]
         };
     }
@@ -116,7 +119,7 @@ export class FogVehiclePermitListComponent implements OnInit {
     private getColumns(): TableColumn<FogVehiclePermitRowVm>[] {
         return [
             {
-                field: 'transporterCompanyName',
+                field: 'professional.name',
                 caption: 'Transporter Information',
                 type: ColumnType.text,
                 cellTemplate: this.transporterCellTemplate
@@ -141,18 +144,18 @@ export class FogVehiclePermitListComponent implements OnInit {
                 cellTemplate: this.numbersCellTemplate
             },
             {
-                field: 'permitNumber',
+                field: 'permit.permitNumber',
                 caption: 'Permit #',
                 type: ColumnType.text
             },
             {
-                field: 'inspectionDueDate',
+                field: 'permit.inspectionDueDate',
                 caption: 'Inspection Due Date',
                 type: ColumnType.date,
                 cellTemplate: this.inspectionDueDateCellTemplate
             },
             {
-                field: 'isActive',
+                field: 'permit.isActive',
                 caption: 'Active',
                 type: ColumnType.other,
                 cellTemplate: this.activeCellTemplate
@@ -173,15 +176,18 @@ export class FogVehiclePermitListComponent implements OnInit {
             ? FOG_VEHICLE_CAPACITY_TYPE_LABELS[result.capacityType]
             : '';
 
-        const cityState = [result.transporterCity, result.transporterState]
+        const cityState = [result.professional?.city, result.professional?.state?.code]
             .filter(part => !!part)
             .join(', ');
 
         return {
             ...result,
-            transporterCityStateZip: [cityState, result.transporterZip].filter(part => !!part).join(' '),
+            transporterName: result.professional?.name ?? '',
+            transporterAddress: result.professional?.address ?? '',
+            transporterCityStateZip: [cityState, result.professional?.zipCode].filter(part => !!part).join(' '),
             vehicleDescription: [result.manufacturedYear, result.manufacturer].filter(part => !!part).join(' '),
             capacityDescription: [result.capacity, capacityTypeLabel].filter(part => !!part).join(' '),
+            hasPermit: !!result.permit,
             inspectionDueStatusClass: this.inspectionDueStatusClasses[
                 result.inspectionDueStatus ?? FogVehicleInspectionDueStatus.None
             ]
@@ -209,7 +215,7 @@ export class FogVehiclePermitListComponent implements OnInit {
     public onFilterChange(queryProperties: QueryProperty[]): void {
         this.table.query.filter = queryProperties.map(qp => {
             // V1 matched the permit number exactly while every other input on the page used LIKE.
-            if (qp.columnName === 'permitNumber') {
+            if (qp.columnName === 'permit.permitNumber') {
                 return { ...qp, comparisonOperator: 'Eq' as const };
             }
             return qp;

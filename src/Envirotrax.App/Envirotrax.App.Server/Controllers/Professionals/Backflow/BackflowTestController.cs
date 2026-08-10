@@ -59,7 +59,7 @@ public class BackflowTestController : ProfessionalProtectedController
             return NotFound();
         }
 
-        var pdf = await _backflowTestService.GeneratePdfAsync(test);
+        var pdf = await _backflowTestService.GeneratePdfForProfessionalAsync(test);
         return File(pdf, "application/pdf");
     }
 
@@ -95,5 +95,12 @@ public class BackflowTestController : ProfessionalProtectedController
             cancellationToken);
 
         return Ok(result);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync(int id)
+    {
+        var result = await _backflowTestService.DeleteAsync(id);
+        return result == null ? NotFound() : Ok(result);
     }
 }

@@ -12,5 +12,7 @@ public interface IProfessionalService : IService<Professional, ProfessionalDto>
     Task<ProfessionalDto?> GetLoggedInProfessionalAsync();
     Task<ProfessionalDto?> GetLoggedInProfessionalAsync(CancellationToken cancellationToken);
 
+    Task<IReadOnlyList<ProfessionalDto>> GetSubAccountsAsync(CancellationToken cancellationToken);
+
     Task<ProfessionalDto> AddMyAsync(CreateProfessionalDto createProfessional);
 }

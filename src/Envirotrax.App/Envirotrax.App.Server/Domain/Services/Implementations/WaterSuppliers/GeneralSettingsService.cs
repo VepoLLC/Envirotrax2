@@ -17,4 +17,12 @@ public class GeneralSettingsService : Service<GeneralSettings, GeneralSettingsDt
     {
         _repository = repository;
     }
+
+    public async Task<GeneralSettingsDto> AddOrUpdateAsync(int waterSupplierId, GeneralSettingsDto settings)
+    {
+        var model = MapToModel(settings)!;
+        var saved = await _repository.AddOrUpdateAsync(waterSupplierId, model);
+
+        return MapToDto(saved)!;
+    }
 }

@@ -12,6 +12,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
+using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Fog;
@@ -25,6 +26,8 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
     private readonly IProfessionalUserService _professionalUserService;
     private readonly ISiteService _siteService;
     private readonly IFileStorageService _fileStorageService;
+    private readonly IAuthService _authService;
+    private readonly IPdfTemplateService _pdfTemplateService;
 
     public FogInspectionService(
         IMapper mapper,
@@ -32,7 +35,9 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         IProfessionalService professionalService,
         IProfessionalUserService professionalUserService,
         ISiteService siteService,
-        IFileStorageService fileStorageService)
+        IFileStorageService fileStorageService,
+        IAuthService authService,
+        IPdfTemplateService pdfTemplateService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -40,6 +45,43 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         _professionalUserService = professionalUserService;
         _siteService = siteService;
         _fileStorageService = fileStorageService;
+        _authService = authService;
+        _pdfTemplateService = pdfTemplateService;
+    }
+
+    public Task<byte[]> GeneratePdfAsync(FogInspectionDto inspection)
+    {
+        return GeneratePdfAsync([inspection]);
+    }
+
+    public Task<byte[]> GeneratePdfAsync(IEnumerable<FogInspectionDto> inspections)
+    {
+        return _pdfTemplateService.GenerateAsync("Fog.FogInspection", inspections);
+    }
+
+    public Task<byte[]> GeneratePdfForProfessionalAsync(FogInspectionDto inspection)
+    {
+        if (inspection.TransactionId == null)
+        {
+            throw new AppValidationException("Report can't be downloaded until it's paid. Please go to checkout and pay for this transaction, then try downloading again.");
+        }
+
+        return GeneratePdfAsync(inspection);
+    }
+
+    public override async Task<FogInspectionDto?> DeleteAsync(int id)
+    {
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+        var deleted = await _repository.DeleteAsync(id);
+
+        if (deleted == null || deleted.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(deleted.TransactionId))
+        {
+            return null;
+        }
+
+        scope.Complete();
+        return MapToDto(deleted);
     }
 
     public async Task<FogInspectionDto> SubmitAsync(

@@ -4,8 +4,9 @@ import { CsiInspectionService } from '../../../../shared/services/csi/csi-inspec
 import { CsiInspection } from '../../../../shared/models/csi/csi-inspection';
 import { CsiInspectionImage } from '../../../../shared/models/csi/csi-inspection-image';
 import { CsiInspectionReason, csiInspectionReasonLabels } from '../../../../shared/enums/csi-inspection-reason.enum';
-import { ToastService } from '../../../../shared/services/toast.service';
-import { ModalHelperService } from '@envirotrax/common-ui';
+import { ToastService, ToastType, ModalHelperService } from '@envirotrax/common-ui';
+import { DownloadService } from '../../../../shared/services/download.service';
+import { HelperService } from '../../../../shared/services/helpers/helper.service';
 
 @Component({
     standalone: false,
@@ -29,11 +30,34 @@ export class CsiInspectionViewComponent implements OnInit {
         private readonly _route: ActivatedRoute,
         private readonly _inspectionService: CsiInspectionService,
         private readonly _toastService: ToastService,
-        private readonly _modalHelper: ModalHelperService
+        private readonly _modalHelper: ModalHelperService,
+        private readonly _downloadService: DownloadService,
+        private readonly _helper: HelperService
     ) { }
 
     public async ngOnInit(): Promise<void> {
         await this.loadInspection();
+    }
+
+    public async exportPdf(): Promise<void> {
+        if (this.inspection == null || !this.inspection.transactionId) {
+            return;
+        }
+
+        try {
+            this.isLoading = true;
+            const blob = await this._inspectionService.getPdfForProfessional(this.inspection.id!);
+            this._downloadService.downloadFileFromBlob(blob);
+        } catch (e) {
+            const validationErrors: string[] = [];
+            if (this._helper.parseValidationErrors(e, validationErrors)) {
+                this._toastService.show({ text: validationErrors[0], type: ToastType.Error });
+            } else {
+                throw e;
+            }
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public getReasonLabel(reason?: number): string {

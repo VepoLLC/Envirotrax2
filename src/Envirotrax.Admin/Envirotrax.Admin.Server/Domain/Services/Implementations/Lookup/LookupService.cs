@@ -14,8 +14,9 @@ public class LookupService : ILookupService
         _apiClient = apiClient;
     }
 
-    public Task<List<StateDto>?> GetStatesAsync(CancellationToken cancellationToken)
+    public async Task<List<StateDto>> GetStatesAsync(CancellationToken cancellationToken)
     {
-        return _apiClient.GetAsync<List<StateDto>>("/api/admin/lookup/states", cancellationToken);
+        var states = await _apiClient.GetAsync<List<StateDto>>("/api/admin/lookup/states", cancellationToken);
+        return states ?? [];
     }
 }

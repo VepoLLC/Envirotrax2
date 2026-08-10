@@ -26,4 +26,19 @@ public class SiteService : ISiteService
 
         return _apiClient.GetAsync<SiteDto>("/api/admin/sites", pageInfo, query, additionalParameters, cancellationToken);
     }
+
+    public Task<SiteDetailDto?> GetByIdAsync(int siteId, CancellationToken cancellationToken)
+    {
+        return _apiClient.GetAsync<SiteDetailDto>($"/api/admin/sites/{siteId}", cancellationToken);
+    }
+
+    public Task UpdateAsync(int siteId, SiteUpdateDto dto, CancellationToken cancellationToken)
+    {
+        return _apiClient.PutAsync<SiteUpdateDto, object>($"/api/admin/sites/{siteId}", dto, cancellationToken);
+    }
+
+    public Task UpdateGisAsync(int siteId, SiteGisUpdateDto dto, CancellationToken cancellationToken)
+    {
+        return _apiClient.PutAsync<SiteGisUpdateDto, object>($"/api/admin/sites/{siteId}/gis-data", dto, cancellationToken);
+    }
 }

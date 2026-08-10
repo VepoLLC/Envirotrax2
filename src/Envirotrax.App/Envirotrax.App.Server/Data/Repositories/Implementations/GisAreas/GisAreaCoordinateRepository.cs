@@ -22,6 +22,14 @@ public class GisAreaCoordinateRepository : Repository<GisAreaCoordinate, long>, 
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<GisAreaCoordinate>> GetAllBySupplierAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        return await DbContext.GisAreaCoordinates
+            .AsNoTracking()
+            .Where(c => c.WaterSupplierId == waterSupplierId)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<IEnumerable<GisAreaCoordinate>> AddOrUpdateAsync(int areaId, IEnumerable<GisAreaCoordinate> coordinates)
     {
         using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))

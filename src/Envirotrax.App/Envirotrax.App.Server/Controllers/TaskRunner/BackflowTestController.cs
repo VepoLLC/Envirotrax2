@@ -14,23 +14,24 @@ public class BackflowTestController : TaskRunnerBaseContoller
         _backflowTestService = backflowTestService;
     }
 
-    [HttpGet("renewal/pending")]
-    public async Task<IActionResult> GetAllPendingRenewalAsync([FromQuery] int batchSize, CancellationToken cancellationToken)
+    [HttpGet("renewal/pending-tests")]
+    public async Task<IActionResult> GetAllPendingTestsRenewalAsync([FromQuery] int batchSize, CancellationToken cancellationToken)
     {
-        var tests = await _backflowTestService.GetAllPendingRenewalAsync(batchSize, cancellationToken);
+        var tests = await _backflowTestService.GetAllPendingTestsForRenewalAsync(batchSize, cancellationToken);
         return Ok(tests);
     }
 
-    [HttpPost("{testId}/extend-date")]
-    public async Task<IActionResult> ExtendDateAsync(int testId, CancellationToken cancellationToken)
+    [HttpPost("sites/{siteId}/process-renewal")]
+    public async Task<IActionResult> ProcessSiteRenewalAsync(int siteId, CancellationToken cancellationToken)
     {
-        var test = await _backflowTestService.ExtendDateAsync(testId, cancellationToken);
+        await _backflowTestService.ProcessSiteRenewalAsync(siteId, cancellationToken);
+        return NoContent();
+    }
 
-        if (test == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(test);
+    [HttpPost("{testId}/process-test-renewal")]
+    public async Task<IActionResult> ProcessTestRenewalAsync(int testId, CancellationToken cancellationToken)
+    {
+        await _backflowTestService.ProcessTestRenewalAsync(testId, cancellationToken);
+        return NoContent();
     }
 }

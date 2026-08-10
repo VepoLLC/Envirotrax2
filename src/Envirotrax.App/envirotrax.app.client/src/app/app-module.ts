@@ -8,7 +8,7 @@ import { SharedComponentsModule } from './shared/components/shared.components.mo
 import { TitleStrategy } from '@angular/router';
 import { AppTitleStrategy } from './shared/services/helpers/title/app-title-strategy.service';
 import { AuthInterceptor } from './shared/services/auth/auth.iterceptor';
-import { ToastContainerComponent } from './toast-container/toast-container.component';
+import { HttpErrorInterceptor } from './shared/services/http/http-error.interceptor';
 import { HomeComponent } from './home/home.component';
 import { API_BASE_URL, TimeZoneInterceptor } from '@envirotrax/common-ui';
 import { environment } from '../environments/environment';
@@ -16,7 +16,6 @@ import { environment } from '../environments/environment';
 @NgModule({
   declarations: [
     App,
-    ToastContainerComponent,
     HomeComponent
   ],
   imports: [
@@ -40,6 +39,11 @@ import { environment } from '../environments/environment';
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TimeZoneInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpErrorInterceptor,
       multi: true
     },
   ],

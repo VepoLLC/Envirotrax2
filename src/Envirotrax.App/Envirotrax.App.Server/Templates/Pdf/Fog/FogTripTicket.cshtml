@@ -1,0 +1,300 @@
+@model System.Collections.Generic.IEnumerable<Envirotrax.App.Server.Domain.DataTransferObjects.Fog.FogTripTicketDto>
+@{
+    Layout = null;
+    var capacityLabels = new[] { "Gallons", "Cubic Yards" };
+    string CapacityLabel(Envirotrax.App.Server.Data.Models.Fog.FogVehicleCapacityType type)
+    {
+        var index = (int)type;
+        return index >= 0 && index < capacityLabels.Length ? capacityLabels[index] : "";
+    }
+}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <style>
+            body {
+                font-size: 9.1px;
+                font-family: Arial, sans-serif;
+            }
+
+            .page-title {
+                background-color: #323232;
+                color: #ffffff;
+                font-size: 10.6px;
+                font-weight: bold;
+                text-align: center;
+                padding: 5px 3px;
+                margin-bottom: 5px;
+            }
+
+            .section-header {
+                background-color: #a0a0a0;
+                color: #ffffff;
+                font-weight: bold;
+                padding: 2.5px 5px;
+                margin-top: 5px;
+                text-align: center;
+                border: 1px solid #323232;
+            }
+
+            .label {
+                font-weight: bold;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            td {
+                border: none;
+                padding: 2.5px 5px;
+                vertical-align: top;
+            }
+
+            .signature-img {
+                max-height: 50px;
+                max-width: 100%;
+            }
+
+            .footer-note {
+                font-size: 9px;
+                font-style: italic;
+                text-align: center;
+                margin-top: 16px;
+                color: #555;
+            }
+
+            .ticket-wrapper:not(:last-child) {
+                break-after: page;
+            }
+    </style>
+</head>
+
+<body>
+    @foreach (var ticket in Model)
+    {
+        <div class="ticket-wrapper">
+            <div class="page-title">@ticket.WaterSupplier?.Name &ndash; FOG Trip Ticket</div>
+
+            <div class="section-header">Water Supplier</div>
+            <table>
+                <tr>
+                    <td class="label" style="width:120px">Water Supplier:</td>
+                    <td>@ticket.WaterSupplier?.Name</td>
+                    <td class="label" style="width:110px">PWS ID:</td>
+                    <td>@ticket.WaterSupplier?.PwsId</td>
+                </tr>
+                <tr>
+                    <td class="label">Address:</td>
+                    <td>@ticket.WaterSupplier?.Address, @ticket.WaterSupplier?.City @ticket.WaterSupplier?.State?.Name
+                        @ticket.WaterSupplier?.ZipCode</td>
+                        <td class="label">Contact Name:</td>
+                        <td>@ticket.WaterSupplier?.ContactName</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Phone Number:</td>
+                        <td>@ticket.WaterSupplier?.PhoneNumber</td>
+                        <td class="label">Email Address:</td>
+                        <td>@ticket.WaterSupplier?.EmailAddress</td>
+                    </tr>
+                </table>
+
+                <div class="section-header">Generator Information</div>
+                <table>
+                    <tr>
+                        <td class="label" style="width:150px">Property Type:</td>
+                        <td>@(ticket.PropertyType == Envirotrax.App.Server.Data.Models.Sites.PropertyType.Commercial ?
+                                                                                                                                                                                                                                                                   "Commercial" : "Residential")</td>
+                            <td class="label" style="width:190px">This Waste was Removed From:</td>
+                            <td>@ticket.InterceptorType @ticket.InterceptorOtherDescription</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Business Name:</td>
+                            <td>@ticket.PropertyBusinessName</td>
+                            <td class="label">Waste Trap or Tank Capacity:</td>
+                            <td>@ticket.InterceptorCapacity @CapacityLabel(ticket.InterceptorCapacityType)</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Property Address:</td>
+                            <td>@ticket.PropertyStreetNumber @ticket.PropertyStreetName @ticket.PropertyNumber, @ticket.PropertyCity
+                                @ticket.PropertyState?.Code @ticket.PropertyZip</td>
+                                <td class="label">Amount of Waste Removed:</td>
+                                <td>@ticket.InterceptorWasteRemovedAmount @CapacityLabel(ticket.InterceptorWasteRemovedType)</td>
+                            </tr>
+                        </table>
+
+                        <div class="p-2 mb-2">
+                            <p style="margin:3px 0; font-size:9.1px;">
+                                As the generator or generator's authorized representative, I certify that the above information is
+                                correct. I further certify that this trap or tank contains no chemical or hazardous waste material
+                                and is being transported to a facility that is authorized to receive this waste. I am aware that
+                                falsification of this trip ticket may result in fines levied by water purveyor, city, state or
+                                federal authorities.
+                            </p>
+                        </div>
+
+                        <table>
+                            <tr>
+                                <td class="label" style="width:100px">Generator Name:</td>
+                                <td style="margin-right:200px">@ticket.GeneratorContactName</td>
+                                <td class="label" style="width:120px">Generator Signature:</td>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(ticket.GeneratorSignatureUrl))
+                                    {
+                                        <img class="signature-img" src="@ticket.GeneratorSignatureUrl" alt="Generator Signature" />
+                                    }
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div class="section-header">Remark</div>
+                        <table>
+                            <tr>
+                                <td style="min-height:40px">@ticket.Comments</td>
+                            </tr>
+                        </table>
+
+                        <div class="section-header">Transporter Information</div>
+                        <table>
+                            <tr>
+                                <td class="label" style="width:150px">Company Name:</td>
+                                <td>@ticket.TransporterCompanyName</td>
+                                <td class="label" style="width:150px">Registration Number:</td>
+                                <td>@ticket.TransporterLicenseNumber</td>
+                            </tr>
+                            <tr>
+                                <td class="label">Address:</td>
+                                <td>@ticket.TransporterAddress, @ticket.TransporterCity @ticket.TransporterState @ticket.TransporterZip
+                                </td>
+                                <td class="label">Email Address:</td>
+                                <td>@ticket.TransporterEmailAddress</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td class="label">Phone Number:</td>
+                                <td>@ticket.TransporterWorkNumber</td>
+                            </tr>
+                        </table>
+
+                        <table>
+                            <tr>
+                                <td class="label" style="width:100px">Vehicle:</td>
+                                <td>@ticket.VehicleYear @ticket.VehicleManufacturer</td>
+                                <td class="label" style="width:110px">License Plate #:</td>
+                                <td>@ticket.VehicleLicensePlateNumber</td>
+                                <td class="label" style="width:80px">Sticker #:</td>
+                                <td>@ticket.VehicleStickerNumber</td>
+                                <td class="label" style="width:80px">Capacity:</td>
+                                <td>@ticket.VehicleCapacity @CapacityLabel(ticket.VehicleCapacityType)</td>
+                            </tr>
+                        </table>
+
+                        <div class="p-2 mb-2">
+                            <p style="margin:3px 0; font-size:9.1px;">
+                                On @ticket.InterceptorWasteRemovedDate?.ToString("M/d/yyyy") at
+                                @ticket.InterceptorWasteRemovedDate?.ToString("h:mm tt"),
+                                I collected and began the transport of @ticket.InterceptorWasteRemovedAmount
+                                @CapacityLabel(ticket.InterceptorWasteRemovedType)
+                                of the waste described under "Generator Information" above to:
+                            </p>
+                        </div>
+
+                        <table>
+                            <tr>
+                                <td class="label" style="width:150px">Waste Receiver:</td>
+                                <td>@ticket.ReceiverCompanyName</td>
+                                <td class="label" style="width:150px">Registration Number:</td>
+                                <td>@ticket.ReceiverRegistrationNumber</td>
+                            </tr>
+                        </table>
+
+                        <div class="p-2 mb-2">
+                            <p style="margin:3px 0; font-size:9.1px;">
+                                I certify that the information provided above is correct and that only the waste certified for
+                                removal by the generator is contained in this waste transport vehicle. I am aware that
+                                falsification of this trip ticket may result in revocation of my waste transportation permit,
+                                criminal prosecution, and/or civil penalties.
+                            </p>
+                        </div>
+
+                        <table>
+                            <tr>
+                                <td class="label" style="width:100px">Driver Name:</td>
+                                <td>@ticket.TransporterContactName</td>
+                                <td class="label" style="width:120px">Driver Signature:</td>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(ticket.TransporterSignatureUrl))
+                                    {
+                                        <img class="signature-img" src="@ticket.TransporterSignatureUrl" alt="Driver Signature" />
+                                    }
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div class="section-header">Receiver Information</div>
+                        <table>
+                            <tr>
+                                <td class="label" style="width:150px">Waste Receiver:</td>
+                                <td>@ticket.ReceiverCompanyName</td>
+                                <td class="label" style="width:150px">Registration Number:</td>
+                                <td>@ticket.ReceiverRegistrationNumber</td>
+                            </tr>
+                            <tr>
+                                <td class="label">Address:</td>
+                                <td>@ticket.ReceiverAddress, @ticket.ReceiverCity @ticket.ReceiverState @ticket.ReceiverZip</td>
+                                <td class="label">Email Address:</td>
+                                <td>@ticket.ReceiverEmailAddress</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td class="label">Phone Number:</td>
+                                <td>@ticket.ReceiverPhoneNumber</td>
+                            </tr>
+                        </table>
+
+                        <div class="p-2 mb-2">
+                            <p style="margin:3px 0; font-size:9.1px;">
+                                As the representative of this business, I certify that each of the following statements are true:
+                            </p>
+                            <ul style="margin:3px 0; font-size:9.1px;">
+                                <li>
+                                    The Texas Commission on Environmental Quality has authorized this business to accept the waste
+                                    specified under "Generator Information" above.
+                                </li>
+                                <li>
+                                    The transporter named above delivered @ticket.InterceptorWasteRemovedAmount
+                                    @CapacityLabel(ticket.InterceptorWasteRemovedType)
+                                    of waste to this business on @ticket.ReceiverWasteDeliveredDate?.ToString("M/d/yyyy") at
+                                    @ticket.ReceiverWasteDeliveredDate?.ToString("h:mm tt").
+                                </li>
+                                <li>
+                                    The waste has been recycled or disposed of as required by the TCEQ authorization for this
+                                    business.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <table>
+                            <tr>
+                                <td class="label" style="width:100px">Receiver Name:</td>
+                                <td>@ticket.ReceiverContactName</td>
+                                <td class="label" style="width:120px">Receiver Signature:</td>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(ticket.ReceiverSignatureUrl))
+                                    {
+                                        <img class="signature-img" src="@ticket.ReceiverSignatureUrl" alt="Receiver Signature" />
+                                    }
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                }
+            </body>
+
+        </html>

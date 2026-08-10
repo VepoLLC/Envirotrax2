@@ -5,7 +5,7 @@ import { AuthGuard } from './shared/guards/auth.guard';
 const routes: Routes = [
   {
     path: '',
-    title: '',
+    title: 'Envirotrax Admin',
     canActivate: [AuthGuard],
     children: [
       // regular routes go here.

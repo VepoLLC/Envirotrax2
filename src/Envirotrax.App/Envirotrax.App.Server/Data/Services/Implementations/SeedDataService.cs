@@ -58,7 +58,8 @@ public class SeedDataService : IHostedService
             _defaultTenant = new WaterSupplier
             {
                 Name = "Vepo LLC",
-                Domain = WaterSupplier.EnvirotraxAdminDomain
+                Domain = WaterSupplier.EnvirotraxAdminDomain,
+                ContactName = "John DeCell"
             };
 
             dbContext.WaterSuppliers.Add(_defaultTenant);
@@ -79,7 +80,8 @@ public class SeedDataService : IHostedService
             {
                 WaterSupplierId = _defaultTenant!.Id,
                 UserId = user.Id,
-                EmailAddress = _adminUserOptions.EmailAddress
+                EmailAddress = _adminUserOptions.EmailAddress,
+                ContactName = _adminUserOptions.EmailAddress.Split('@')[0]
             });
 
             await dbContext.SaveChangesAsync();
@@ -153,11 +155,21 @@ public class SeedDataService : IHostedService
 
     private async Task AddLicenseTypesAsync(TenantDbContext dbContext)
     {
-        if (!await dbContext.ProfessionalLicenseTypes.AnyAsync())
+        var existingTypes = await dbContext.ProfessionalLicenseTypes
+            .Select(t => new { t.Name, t.ProfessionalType })
+            .ToListAsync();
+
+        var newTypes = ProfessionalLicenseTypeSeedData.GetTypes(_states!)
+            .Where(t => !existingTypes.Any(e => e.Name == t.Name && e.ProfessionalType == t.ProfessionalType))
+            .ToList();
+
+        if (newTypes.Count == 0)
         {
-            dbContext.ProfessionalLicenseTypes.AddRange(ProfessionalLicenseTypeSeedData.GetTypes(_states!));
-            await dbContext.SaveChangesAsync();
+            return;
         }
+
+        dbContext.ProfessionalLicenseTypes.AddRange(newTypes);
+        await dbContext.SaveChangesAsync();
     }
 
     private async Task AddFeaturesAsync(TenantDbContext dbContext)

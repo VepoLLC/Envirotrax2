@@ -6,6 +6,9 @@ import { FogInspection } from '../../../../shared/models/fog/fog-inspection';
 import { FogInspectionResult, FogReasonForInspection, fogReasonForInspectionLabels } from '../../../../shared/models/fog/fog-inspection-enums';
 import { FacilityType, facilityTypeLabels } from '../../../../shared/enums/facility-type.enum';
 import { PropertyType } from '../../../../shared/enums/property-type.enum';
+import { DownloadService } from '../../../../shared/services/download.service';
+import { HelperService } from '../../../../shared/services/helpers/helper.service';
+import { ToastService, ToastType } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,
@@ -28,13 +31,37 @@ export class FogInspectionViewComponent implements OnInit {
     constructor(
         private readonly _destroyRef: DestroyRef,
         private readonly _route: ActivatedRoute,
-        private readonly _inspectionService: ProfessionalFogInspectionService
+        private readonly _inspectionService: ProfessionalFogInspectionService,
+        private readonly _downloadService: DownloadService,
+        private readonly _helper: HelperService,
+        private readonly _toastService: ToastService
     ) {}
 
     public ngOnInit(): void {
         this._route.paramMap
             .pipe(takeUntilDestroyed(this._destroyRef))
             .subscribe((params: ParamMap) => this.loadInspection(params.get('id')));
+    }
+
+    public async exportPdf(): Promise<void> {
+        if (this.inspection?.id == null || !this.inspection.transactionId) {
+            return;
+        }
+
+        try {
+            this.isLoading = true;
+            const blob = await this._inspectionService.getPdfForProfessional(this.inspection.id);
+            this._downloadService.downloadFileFromBlob(blob);
+        } catch (e) {
+            const validationErrors: string[] = [];
+            if (this._helper.parseValidationErrors(e, validationErrors)) {
+                this._toastService.show({ text: validationErrors[0], type: ToastType.Error });
+            } else {
+                throw e;
+            }
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     private async loadInspection(idParam: string | null): Promise<void> {

@@ -172,17 +172,23 @@
         <!-- Main test form — only visible after BPAT + water supplier are selected (matches V1 divTest reveal) -->
         <ng-container *ngIf="verificationComplete">
 
-        <!-- Location / Property + Assembly Owner side by side -->
+        <!-- Location / Property + Assembly Owner side by side.
+             Shown from the site's current record (CSI/FOG pattern; the server saves the same values);
+             falls back to the model for legacy retests whose previous test has no linked site. -->
         <div class="row mt-3">
             <div class="col-md-6">
                 <vp-section header="Location / Property Information">
                     <dl class="row mb-0">
                         <dt class="col-5">Property Type:</dt>
-                        <dd class="col-7 mb-1">{{ model.propertyType === 0 ? 'Residential' : 'Commercial' }}</dd>
+                        <dd class="col-7 mb-1">{{ (site ? site.propertyType : model.propertyType) === 0 ? 'Residential' : 'Commercial' }}</dd>
                         <dt class="col-5">Business Name:</dt>
-                        <dd class="col-7 mb-1">{{ model.propertyBusinessName }}</dd>
+                        <dd class="col-7 mb-1">{{ site ? site.businessName : model.propertyBusinessName }}</dd>
                         <dt class="col-5">Property Address:</dt>
-                        <dd class="col-7 mb-1">
+                        <dd class="col-7 mb-1" *ngIf="site">
+                            {{ site.streetNumber }} {{ site.streetName }}<span *ngIf="site.propertyNumber"> #{{ site.propertyNumber }}</span><br>
+                            {{ site.city }}<span *ngIf="site.city && site.state?.name">, </span>{{ site.state?.name }} {{ site.zipCode }}
+                        </dd>
+                        <dd class="col-7 mb-1" *ngIf="!site">
                             {{ model.propertyStreetNumber }} {{ model.propertyStreetName }}<span *ngIf="model.propertyNumber"> #{{ model.propertyNumber }}</span><br>
                             {{ model.propertyCity }}<span *ngIf="model.propertyCity && model.propertyState?.name">, </span>{{ model.propertyState?.name }} {{ model.propertyZip }}
                         </dd>
@@ -193,18 +199,22 @@
                 <vp-section header="Assembly Owner's Contact Information">
                     <dl class="row mb-0">
                         <dt class="col-5">Company Name:</dt>
-                        <dd class="col-7 mb-1">{{ model.mailingCompanyName }}</dd>
+                        <dd class="col-7 mb-1">{{ site ? site.mailingCompanyName : model.mailingCompanyName }}</dd>
                         <dt class="col-5">Contact Name:</dt>
-                        <dd class="col-7 mb-1">{{ model.mailingContactName }}</dd>
+                        <dd class="col-7 mb-1">{{ site ? site.mailingContactName : model.mailingContactName }}</dd>
                         <dt class="col-5">Mailing Address:</dt>
-                        <dd class="col-7 mb-1">
+                        <dd class="col-7 mb-1" *ngIf="site">
+                            {{ site.mailingStreetNumber }} {{ site.mailingStreetName }}<span *ngIf="site.mailingNumber"> #{{ site.mailingNumber }}</span><br>
+                            {{ site.mailingCity }}<span *ngIf="site.mailingCity && site.mailingState?.name">, </span>{{ site.mailingState?.name }} {{ site.mailingZipCode }}
+                        </dd>
+                        <dd class="col-7 mb-1" *ngIf="!site">
                             {{ model.mailingStreetNumber }} {{ model.mailingStreetName }}<span *ngIf="model.mailingNumber"> #{{ model.mailingNumber }}</span><br>
                             {{ model.mailingCity }}<span *ngIf="model.mailingCity && model.mailingState?.name">, </span>{{ model.mailingState?.name }} {{ model.mailingZip }}
                         </dd>
                         <dt class="col-5">Phone Number:</dt>
-                        <dd class="col-7 mb-1">{{ model.mailingPhoneNumber }}</dd>
+                        <dd class="col-7 mb-1">{{ site ? site.mailingPhoneNumber : model.mailingPhoneNumber }}</dd>
                         <dt class="col-5">Email Address:</dt>
-                        <dd class="col-7 mb-1">{{ model.mailingEmailAddress }}</dd>
+                        <dd class="col-7 mb-1">{{ site ? site.mailingEmailAddress : model.mailingEmailAddress }}</dd>
                     </dl>
                 </vp-section>
             </div>

@@ -18,7 +18,8 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
     protected override IQueryable<CsiInspection> GetListQuery()
     {
         return base.GetListQuery()
-            .Include(c => c.Site);
+            .Include(c => c.Site)
+            .Include(c => c.WaterSupplier);
     }
 
     protected override IQueryable<CsiInspection> GetDetailsQuery()

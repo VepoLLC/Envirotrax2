@@ -9,5 +9,7 @@ namespace Envirotrax.Auth.Data.Models
         /// This property tells if the user is a Vepo admin and can access Envirotrax.Admin app
         /// </summary>
         public bool IsSuperUser { get; set; }
+
+        public DateTime? PasswordExpirationDate { get; set; }
     }
 }

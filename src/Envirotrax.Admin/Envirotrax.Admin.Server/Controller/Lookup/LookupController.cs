@@ -1,5 +1,4 @@
 
-
 using Envirotrax.Admin.Server.Domain.Services.Definitions.Lookup;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +18,6 @@ public class LookupController : AdminBaseController
     public async Task<IActionResult> GetStatesAsync(CancellationToken cancellationToken)
     {
         var states = await _lookupService.GetStatesAsync(cancellationToken);
-
         return Ok(states);
     }
 }

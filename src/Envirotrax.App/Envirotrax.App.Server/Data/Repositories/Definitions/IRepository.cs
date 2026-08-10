@@ -15,6 +15,10 @@ public interface IRepository<TModel, TKey>
     Task<IEnumerable<TModel>> GetAllAsync(CancellationToken cancellationToken);
     Task<IEnumerable<TModel>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<IEnumerable<TModel>> GetAllAsync(PageInfo pageInfo, Query query, int maxPageSize, CancellationToken cancellationToken);
+
+    Task<int> CountAsync(CancellationToken cancellationToken);
+    Task<int> CountAsync(Query query, CancellationToken cancellationToken);
+
     Task<TModel?> GetAsync(TKey id, CancellationToken cancellationToken);
     Task<TModel?> GetNoIncludesAsync(TKey id, CancellationToken cancellationToken);
     Task<TModel> AddAsync(TModel model);

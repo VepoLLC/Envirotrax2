@@ -93,6 +93,10 @@
                                                       type="number"
                                                       [form]="form">
                                             </vp-input>
+                                            <div class="text-danger small mt-1"
+                                                 *ngIf="form.controls['tripTicketInterval']?.touched && form.controls['tripTicketInterval']?.hasError('interval')">
+                                                Trip ticket interval must be a whole, non-negative number of days.
+                                            </div>
                                         </div>
                                     </div>
 
@@ -346,19 +350,23 @@
                             <dp-loading-spinner *ngIf="sectionLoading.location"></dp-loading-spinner>
 
                             <div>
-                                <div class="mb-3">
+                                <div class="mb-4">
                                     <vp-input [(ngModel)]="site.accountNumber"
                                               name="accountNumber"
-                                              label="Account number"
+                                              label="Account number:"
+                                              labelStyle="horizontal"
+                                              class="fw-bold"
                                               [required]="true"
                                               [maxLength]="50"
                                               [form]="form">
                                     </vp-input>
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="mb-1">
                                     <vp-input name="propertyType"
-                                              label="Property type"
+                                              label="Property type:"
+                                              labelStyle="horizontal"
+                                              class="fw-bold"
                                               type="select"
                                               [(ngModel)]="site.propertyType"
                                               [options]="propertyTypeOptions"
@@ -366,58 +374,63 @@
                                     </vp-input>
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="mb-1">
                                     <vp-input [(ngModel)]="site.businessName"
                                               name="businessName"
-                                              label="Business name"
+                                              label="Business name:"
+                                              labelStyle="horizontal"
+                                              class="fw-bold"
                                               [maxLength]="255"
                                               [form]="form">
                                     </vp-input>
                                 </div>
-
-                                <p class="fw-bold">Property Address</p>
-
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
+                           
+                                <div class="row justify-content-center">
+                                    <div class="fw-bold col-md-3 mt-2 pe-0">Property Address:</div>
+                                    <div class="col-md-3">
+                                        <div>
                                             <vp-input [(ngModel)]="site.streetNumber"
                                                       name="streetNumber"
-                                                      label="Street #"
+                                                      label="Street #:"
                                                       [form]="form">
                                             </vp-input>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
+                                    <div class="col-md-3">
+                                        <div>
                                             <vp-input [(ngModel)]="site.streetName"
                                                       name="streetName"
-                                                      label="Street name"
+                                                      label="Street name:"
                                                       [form]="form">
                                             </vp-input>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
+                                    <div class="col-md-3">
+                                        <div class="mb-4">
                                             <vp-input [(ngModel)]="site.propertyNumber"
                                                       name="propertyNumber"
-                                                      label="Suite / Apt #"
+                                                      label="Suite / Apt #:"
                                                       [form]="form">
                                             </vp-input>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="mb-1">
                                     <vp-input [(ngModel)]="site.city"
                                               name="city"
-                                              label="City"
+                                              label="City:"
+                                              labelStyle="horizontal"
+                                              class="fw-bold"
                                               [form]="form">
                                     </vp-input>
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="mb-1">
                                     <vp-input name="stateId"
-                                              label="State"
+                                              label="State:"
+                                              labelStyle="horizontal"
+                                              class="fw-bold"
                                               type="select"
                                               [ngModel]="site.state?.id"
                                               (ngModelChange)="site.state = $event ? { id: $event } : undefined"
@@ -426,27 +439,36 @@
                                     </vp-input>
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="mb-4">
                                     <vp-input [(ngModel)]="site.zipCode"
                                               name="zip"
-                                              label="ZIP"
+                                              label="ZIP:"
+                                              labelStyle="horizontal"
+                                              class="fw-bold"
                                               [maxLength]="10"
                                               [form]="form">
                                     </vp-input>
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="mb-1 fw-bold">
+                                    FOG Generator Contact Information:
+                                </div>
+                                <div class="mb-1">
                                     <vp-input [(ngModel)]="site.fogGeneratorPhoneNumber"
                                               name="phone"
-                                              label="Phone number"
+                                              label="Phone number:"
+                                              labelStyle="horizontal"
+                                              class="fw-bold"
                                               [form]="form">
                                     </vp-input>
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="mb-1">
                                     <vp-input [(ngModel)]="site.fogGeneratorEmailAddress"
                                               name="email"
-                                              label="Email address"
+                                              label="Email address:"
+                                              labelStyle="horizontal"
+                                              class="fw-bold"
                                               [form]="form">
                                     </vp-input>
                                 </div>
@@ -477,73 +499,80 @@
                             <dp-loading-spinner *ngIf="sectionLoading.mailing"></dp-loading-spinner>
 
                             <div>
-                                <div class="mb-3">
+                                <div class="mb-1">
                                     <vp-input [(ngModel)]="site.mailingCompanyName"
                                               name="companyName"
-                                              label="Company name"
+                                              label="Company name:"
+                                              labelStyle="horizontal"
+                                              class="fw-bold"
                                               [form]="form">
                                     </vp-input>
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="mb-1">
                                     <vp-input [(ngModel)]="site.mailingContactName"
                                               name="contactName"
-                                              label="Contact name"
+                                              label="Contact name:"
+                                              labelStyle="horizontal"
+                                              class="fw-bold"
                                               [form]="form">
                                     </vp-input>
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="d-flex justify-content-end mb-4">
                                     <button type="button"
-                                            class="btn btn-info text-white"
+                                            class="btn btn-primary vp-section-button"
                                             (click)="copyFromPropertyAddress()">
                                         Copy from Property Address
                                     </button>
                                 </div>
 
-                                <p class="fw-bold">Mailing Address</p>
-
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="fw-bold col-md-3 mt-2 pe-0">Mailing Address: </div>
+                                    <div class="col-md-3">
                                         <div class="mb-3">
                                             <vp-input [(ngModel)]="site.mailingStreetNumber"
                                                       name="mailingStreetNumber"
-                                                      label="Street #"
+                                                      label="Street #:"
                                                       [form]="form">
                                             </vp-input>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div class="mb-3">
                                             <vp-input [(ngModel)]="site.mailingStreetName"
                                                       name="mailingStreetName"
-                                                      label="Street name"
+                                                      label="Street name:"
                                                       [form]="form">
                                             </vp-input>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
+                                    <div class="col-md-3">
+                                        <div class="mb-4">
                                             <vp-input [(ngModel)]="site.mailingNumber"
                                                       name="mailingNumber"
-                                                      label="Suite / Apt #"
+                                                      label="Suite / Apt #:"
                                                       [form]="form">
                                             </vp-input>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="mb-1">
                                     <vp-input [(ngModel)]="site.mailingCity"
                                               name="mailingCity"
-                                              label="City"
+                                              label="City:"
+                                              labelStyle="horizontal"
+                                              class="fw-bold"
                                               [form]="form">
                                     </vp-input>
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="mb-1">
                                     <vp-input name="mailingStateId"
-                                              label="State"
+                                              label="State:"
+                                              labelStyle="horizontal"
+                                              class="fw-bold"
                                               type="select"
                                               [ngModel]="site.mailingState?.id"
                                               (ngModelChange)="site.mailingState = $event ? { id: $event } : undefined"
@@ -552,27 +581,33 @@
                                     </vp-input>
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="mb-1">
                                     <vp-input [(ngModel)]="site.mailingZipCode"
                                               name="mailingZip"
-                                              label="ZIP"
+                                              label="ZIP:"
+                                              labelStyle="horizontal"
+                                              class="fw-bold"
                                               [maxLength]="10"
                                               [form]="form">
                                     </vp-input>
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="mb-1">
                                     <vp-input [(ngModel)]="site.mailingPhoneNumber"
                                               name="mailingPhone"
-                                              label="Phone number"
+                                              label="Phone number:"
+                                              labelStyle="horizontal"
+                                              class="fw-bold"
                                               [form]="form">
                                     </vp-input>
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="mb-1">
                                     <vp-input [(ngModel)]="site.mailingEmailAddress"
                                               name="mailingEmail"
-                                              label="Email address"
+                                              label="Email address:"
+                                              labelStyle="horizontal"
+                                              class="fw-bold"
                                               [form]="form">
                                     </vp-input>
                                 </div>
@@ -598,7 +633,7 @@
         </div>
     </form>
 
-    <div class="text-center my-3" *ngIf="canViewLogHistory || canViewCsi || canViewBackflow">
+    <div class="text-center my-3" *ngIf="canViewLogHistory || canViewCsi || canViewBackflow || canViewOutOfService || canViewFog">
         <ul class="vp-tabs nav nav-pills d-inline-flex flex-wrap justify-content-center">
             <li class="nav-item" *ngIf="canViewLogHistory">
                 <a class="nav-link" role="button"
@@ -615,6 +650,16 @@
                    [class.active]="activeTab === 'backflow'"
                    (click)="setActiveTab('backflow')">Backflow Tests</a>
             </li>
+            <li class="nav-item" *ngIf="canViewOutOfService">
+                <a class="nav-link" role="button"
+                   [class.active]="activeTab === 'outOfService'"
+                   (click)="setActiveTab('outOfService')">Out of Service</a>
+            </li>
+            <li class="nav-item" *ngIf="canViewFog">
+                <a class="nav-link" role="button"
+                   [class.active]="activeTab === 'fog'"
+                   (click)="setActiveTab('fog')">FOG Inspections</a>
+            </li>
         </ul>
     </div>
 
@@ -628,5 +673,13 @@
 
     <div *ngIf="backflowInitialized && canViewBackflow && site.id" [hidden]="activeTab !== 'backflow'">
         <app-site-backflow-tests [siteId]="site.id" />
+    </div>
+
+    <div *ngIf="outOfServiceInitialized && canViewOutOfService && site.id" [hidden]="activeTab !== 'outOfService'">
+        <app-site-backflow-out-of-service [siteId]="site.id" />
+    </div>
+
+    <div *ngIf="fogInitialized && canViewFog && site.id" [hidden]="activeTab !== 'fog'">
+        <app-site-fog-inspections [siteId]="site.id" />
     </div>
 </div>

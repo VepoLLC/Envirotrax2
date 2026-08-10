@@ -23,6 +23,7 @@ import { MessageModalComponent } from "./components/modals/message-modal.compone
 import { ValidationFieldComponent } from "./components/validation/validation-field/validation-field.component";
 import { ValidationSummaryComponent } from "./components/validation/validation-summary/validation-summary.component";
 import { SectionComponent } from "./components/section/section.component";
+import { SectionActionsComponent } from "./components/section/section-actions.component";
 import { InfoIconComponent } from "./components/info-icon/info-icon.component";
 import { StatusIconComponent } from "./components/status-icon/status-icon.component";
 import { FileUploadComponent } from "./components/file-upload/file-upload.component";
@@ -31,6 +32,7 @@ import { MapComponent } from "./components/map/map.component";
 import { MapResultsComponent } from "./components/map/map-results.component";
 import { AppLoadingSpinnerModule } from "./components/loading-spinner/app-loading-spinner.module";
 import { InputAddOnComponent } from "./components/input/input-add-on.component";
+import { ToastContainerComponent } from "./components/toast-container/toast-container.component";
 
 @NgModule({
     declarations: [
@@ -54,12 +56,14 @@ import { InputAddOnComponent } from "./components/input/input-add-on.component";
         ValidationFieldComponent,
         ValidationSummaryComponent,
         SectionComponent,
+        SectionActionsComponent,
         InfoIconComponent,
         StatusIconComponent,
         FileUploadComponent,
         LookupFieldComponent,
         MapComponent,
         MapResultsComponent,
+        ToastContainerComponent,
     ],
     imports: [
         CommonModule,
@@ -84,12 +88,14 @@ import { InputAddOnComponent } from "./components/input/input-add-on.component";
         ValidationFieldComponent,
         ValidationSummaryComponent,
         SectionComponent,
+        SectionActionsComponent,
         InfoIconComponent,
         StatusIconComponent,
         FileUploadComponent,
         LookupFieldComponent,
         MapComponent,
         MapResultsComponent,
+        ToastContainerComponent,
         ModalModule,
         AppLoadingSpinnerModule
     ]

@@ -76,6 +76,21 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         return existing;
     }
 
+    public async Task<ProfessionalUser?> UpdateSignaturePathAsync(int userId, string signaturePath)
+    {
+        var professionalId = _authService.ProfessionalId;
+        var existing = await DbContext.ProfessionalUsers.SingleOrDefaultAsync(u => u.ProfessionalId == professionalId && u.UserId == userId);
+
+        if (existing != null)
+        {
+            existing.SignaturePath = signaturePath;
+
+            await DbContext.SaveChangesAsync();
+        }
+
+        return existing;
+    }
+
     public async Task<ProfessionalUser?> UpdateSubAccountAsync(int professionalId, int userId, string? contactName, string? jobTitle)
     {
         var existing = await DbContext.ProfessionalUsers

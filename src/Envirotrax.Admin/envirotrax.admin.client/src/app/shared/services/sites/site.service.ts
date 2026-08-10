@@ -2,6 +2,8 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { PagedData, PageInfo, Query, QueryHelperService, UrlResolverService } from "@envirotrax/common-ui";
 import { FogCompliancyStatus, Site } from "../../models/sites/site";
+import { SiteDetail } from "../../models/sites/site-detail";
+import { SiteGisUpdate, SiteUpdate } from "../../models/sites/site-update";
 import { lastValueFrom } from "rxjs";
 
 @Injectable({
@@ -28,5 +30,29 @@ export class SiteService {
         const observable = this._http.get<PagedData<Site>>(url, { params });
 
         return await lastValueFrom(observable);
+    }
+
+    public async getById(siteId: number): Promise<SiteDetail> {
+        const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}`);
+
+        const observable = this._http.get<SiteDetail>(url);
+
+        return await lastValueFrom(observable);
+    }
+
+    public async update(siteId: number, site: SiteUpdate): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}`);
+
+        const observable = this._http.put<void>(url, site);
+
+        await lastValueFrom(observable);
+    }
+
+    public async updateGis(siteId: number, gis: SiteGisUpdate): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}/gis-data`);
+
+        const observable = this._http.put<void>(url, gis);
+
+        await lastValueFrom(observable);
     }
 }

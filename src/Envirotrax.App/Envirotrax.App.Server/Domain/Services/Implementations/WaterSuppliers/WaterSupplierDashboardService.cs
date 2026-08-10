@@ -40,4 +40,11 @@ public class WaterSupplierDashboardService : IWaterSupplierDashboardService
 
         return stats;
     }
+
+    public Task<FogTripTicketSubmissionStatsDto> GetFogTripTicketSubmissionStatsAsync(CancellationToken cancellationToken)
+    {
+        var stats = _repository.GetFogTripTicketSubmissionStatsAsync(cancellationToken);
+
+        return stats;
+    }
 }

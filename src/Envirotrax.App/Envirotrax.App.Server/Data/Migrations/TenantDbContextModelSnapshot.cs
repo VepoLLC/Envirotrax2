@@ -2062,12 +2062,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("DeletedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeletedTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime?>("InspectionDueDate")
                         .HasColumnType("datetime2");
 
@@ -2079,21 +2073,12 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedTime")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("WaterSupplierId", "VehicleId");
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("UpdatedById");
-
-                    b.HasIndex("VehicleId");
+                    b.HasIndex("VehicleId")
+                        .IsUnique();
 
                     b.ToTable("FogVehiclePermits");
                 });
@@ -4223,19 +4208,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "DeletedBy")
-                        .WithMany()
-                        .HasForeignKey("DeletedById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "UpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Envirotrax.App.Server.Data.Models.Fog.FogVehicle", "Vehicle")
-                        .WithMany()
-                        .HasForeignKey("VehicleId")
+                        .WithOne("Permit")
+                        .HasForeignKey("Envirotrax.App.Server.Data.Models.Fog.FogVehiclePermit", "VehicleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -4246,10 +4221,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
-
-                    b.Navigation("DeletedBy");
-
-                    b.Navigation("UpdatedBy");
 
                     b.Navigation("Vehicle");
 
@@ -4788,6 +4759,11 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("State");
 
                     b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Fog.FogVehicle", b =>
+                {
+                    b.Navigation("Permit");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Users.WaterSupplierUser", b =>

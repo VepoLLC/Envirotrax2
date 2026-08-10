@@ -241,11 +241,11 @@
 
     <div class="d-flex flex-column align-items-center gap-2 mt-3">
         <div class="d-flex justify-content-center">
-            <button class="btn btn-primary vp-section-button" [disabled]="isLoading || !ticket?.transactionId" (click)="exportPdf()">
+            <button class="btn btn-primary vp-section-button" [disabled]="isLoading || !ticket.transactionId" (click)="exportPdf()">
                 Export to Printable Document
             </button>
         </div>
-        <div *ngIf="!ticket?.transactionId" class="text-danger text-center small">
+        <div *ngIf="!ticket.transactionId" class="text-danger text-center small">
             Report can't be downloaded until it's paid. Please go to checkout and pay for this transaction, then try downloading again.
         </div>
     </div>

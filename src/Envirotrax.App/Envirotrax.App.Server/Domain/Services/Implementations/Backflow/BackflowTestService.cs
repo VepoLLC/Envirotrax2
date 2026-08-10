@@ -107,6 +107,16 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         return dtos.ToPagedData(pageInfo);
     }
 
+    public async Task<IPagedData<BackflowTestDto>> SearchForAdminAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<BackflowTest, BackflowTestDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<BackflowTest, BackflowTestDto>(Mapper);
+
+        var tests = await _testRepository.SearchForAdminAsync(pageInfo, query, paymentStatus, cancellationToken);
+
+        return tests.Select(t => Mapper.Map<BackflowTestDto>(t)!).ToPagedData(pageInfo);
+    }
+
     private async Task PopulateBpatSnapshotAsync(BackflowTestDto dto)
     {
         if (dto.Professional?.Id is int professionalId)

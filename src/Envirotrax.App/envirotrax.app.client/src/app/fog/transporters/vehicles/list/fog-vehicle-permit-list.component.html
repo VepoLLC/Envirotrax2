@@ -7,7 +7,7 @@
                 <div class="col-md-6">
                     <vp-section header="Search By Vehicle">
                         <div class="mb-2">
-                            <vp-filter-panel-field fieldName="transporterCompanyName"
+                            <vp-filter-panel-field fieldName="professional.name"
                                                    label="Transporter company name"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
@@ -30,20 +30,20 @@
                 <div class="col-md-6 mt-3 mt-md-0">
                     <vp-section header="Search By Permit">
                         <div class="mb-2">
-                            <vp-filter-panel-field fieldName="permitNumber"
+                            <vp-filter-panel-field fieldName="permit.permitNumber"
                                                    label="Permit #"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-2">
-                            <vp-filter-panel-field fieldName="inspectionDueDate"
+                            <vp-filter-panel-field fieldName="permit.inspectionDueDate"
                                                    label="Inspection due date"
                                                    labelStyle="horizontal"
                                                    type="daterange"
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-2">
-                            <vp-filter-panel-field fieldName="isActive"
+                            <vp-filter-panel-field fieldName="permit.isActive"
                                                    label="Active"
                                                    labelStyle="horizontal"
                                                    type="select"
@@ -71,7 +71,7 @@
 
 <!-- Cell Templates -->
 <ng-template #transporterCell let-vehicle="rowData">
-    <div>{{vehicle.transporterCompanyName}}</div>
+    <div>{{vehicle.transporterName}}</div>
     <div>{{vehicle.transporterAddress}}</div>
     <div>{{vehicle.transporterCityStateZip}}</div>
 </ng-template>
@@ -82,14 +82,16 @@
 </ng-template>
 
 <ng-template #inspectionDueDateCell let-vehicle="rowData">
-    <span *ngIf="vehicle.inspectionDueDate"
-          [class]="vehicle.inspectionDueStatusClass">{{vehicle.inspectionDueDate | date:'M/d/yyyy'}}</span>
+    <div *ngIf="vehicle.permit?.inspectionDueDate"
+         class="rounded p-1 text-nowrap text-center"
+         [ngClass]="vehicle.inspectionDueStatusClass">{{vehicle.permit?.inspectionDueDate | date:'M/d/yyyy'}}
+    </div>
 </ng-template>
 
 <ng-template #activeCell let-vehicle="rowData">
     <div *ngIf="vehicle.hasPermit" class="fw-bold text-center">
-        <i *ngIf="vehicle.isActive" class="fa-solid fa-check text-success" aria-label="Active"></i>
-        <i *ngIf="!vehicle.isActive" class="fa-solid fa-xmark text-danger" aria-label="Disabled"></i>
+        <i *ngIf="vehicle.permit?.isActive" class="fa-solid fa-check text-success" aria-label="Active"></i>
+        <i *ngIf="!vehicle.permit?.isActive" class="fa-solid fa-xmark text-danger" aria-label="Disabled"></i>
     </div>
 </ng-template>
 

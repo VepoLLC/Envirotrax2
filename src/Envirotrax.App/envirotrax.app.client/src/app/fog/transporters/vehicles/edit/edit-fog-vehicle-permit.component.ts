@@ -36,13 +36,13 @@ export class EditFogVehiclePermitComponent {
         this.vehicleId = vehicle.id!;
         this.permit = {
             id: vehicle.id,
-            permitNumber: vehicle.permitNumber ?? '',
-            inspectionDueDate: vehicle.inspectionDueDate ?? null,
+            permitNumber: vehicle.permit?.permitNumber ?? '',
+            inspectionDueDate: vehicle.permit?.inspectionDueDate ?? null,
             // V1 defaulted a brand new permit to active.
-            isActive: vehicle.hasPermit ? !!vehicle.isActive : true
+            isActive: vehicle.permit ? !!vehicle.permit.isActive : true
         };
 
-        this.transporterName = vehicle.transporterCompanyName ?? '';
+        this.transporterName = vehicle.professional?.name ?? '';
         this.vehicleDescription = this.buildVehicleDescription(vehicle);
     }
 

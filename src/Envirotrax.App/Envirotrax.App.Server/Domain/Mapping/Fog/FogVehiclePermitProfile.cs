@@ -13,14 +13,10 @@ public class FogVehiclePermitProfile : Profile
             .ReverseMap()
             .ForMember(p => p.VehicleId, opt => opt.MapFrom(dto => dto.Id))
             .ForMember(p => p.CreatedTime, opt => opt.Ignore())
-            .ForMember(p => p.UpdatedTime, opt => opt.Ignore())
             .ForMember(p => p.Vehicle, opt => opt.Ignore())
             .ForMember(p => p.WaterSupplier, opt => opt.Ignore())
-            .ForMember(p => p.CreatedBy, opt => opt.Ignore())
-            .ForMember(p => p.UpdatedBy, opt => opt.Ignore())
-            .ForMember(p => p.DeletedBy, opt => opt.Ignore());
+            .ForMember(p => p.CreatedBy, opt => opt.Ignore());
 
-        CreateMap<FogVehiclePermitSearchResult, FogVehiclePermitSearchDto>()
-            .ForMember(dto => dto.Id, opt => opt.MapFrom(result => result.VehicleId));
+        CreateMap<FogVehicle, FogVehiclePermitSearchDto>();
     }
 }

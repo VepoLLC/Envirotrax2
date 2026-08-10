@@ -1,4 +1,5 @@
-import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { FogTripTicketService } from '../../../shared/services/fog/fog-trip-ticket.service';
@@ -17,7 +18,8 @@ import { PrintableTableService } from '../../../shared/services/printable-table.
     standalone: false,
     templateUrl: './fog-trip-ticket-list.component.html'
 })
-export class FogTripTicketListComponent implements OnInit {
+export class FogTripTicketListComponent implements OnInit, OnDestroy {
+    private _queryParamSub?: Subscription;
     public showResults: boolean = false;
     public readonly PropertyType = PropertyType;
     public readonly FogVehicleCapacityType = FogVehicleCapacityType;
@@ -99,7 +101,9 @@ export class FogTripTicketListComponent implements OnInit {
         { id: FogTripTicketDateType.WasteDeliveredDate, text: 'Waste delivered date' }
     ];
 
-    public selectedDateType: string = '';
+    public get selectedDateType(): string {
+        return this.table.query.filter?.find(qp => qp.columnName === 'dateType')?.value ?? '';
+    }
 
     constructor(
         private readonly _fogTripTicketService: FogTripTicketService,
@@ -111,6 +115,25 @@ export class FogTripTicketListComponent implements OnInit {
 
     public ngOnInit(): void {
         this.table.columns = this.getColumns();
+
+        this._queryParamSub = this._activatedRoute.queryParamMap.subscribe(async params => {
+            const dateParam = params.get('date');
+            if (dateParam) {
+                this.table.query.filter = [{
+                    columnName: 'createdTime',
+                    children: [
+                        { columnName: 'createdTime', value: dateParam, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                        { columnName: 'createdTime', value: dateParam, comparisonOperator: 'Lte', logicalOperator: 'And' }
+                    ]
+                }];
+                await this.getTripTickets();
+                this.setShowResults((this.table.items?.pageInfo?.totalItems ?? 0) > 0);
+            }
+        });
+    }
+
+    public ngOnDestroy(): void {
+        this._queryParamSub?.unsubscribe();
     }
 
     private getColumns(): TableColumn<FogTripTicket>[] {

@@ -226,6 +226,8 @@ public class ReferencedSiteDto
 
     public bool HasAuxWaterSupply { get; set; }
 
+    public bool IsFeeExempt { get; set; }
+
     public double? GisLatitude { get; set; }
 
     public double? GisLongitude { get; set; }

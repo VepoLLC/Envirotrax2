@@ -5,6 +5,7 @@ using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Services.Definitions;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow;
@@ -110,6 +111,32 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
                 && t.Site.Active
                 && !t.Site.OutOfArea)
             .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<BackflowTest>> SearchForAdminAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken)
+    {
+        if (query.Sort.IsNullOrEmpty())
+        {
+            query.Sort[nameof(BackflowTest.TestDate)] = SortOperator.Desc;
+        }
+
+        var dbQuery = GetListQuery().Where(query.Filter);
+
+        if (paymentStatus == BackflowPaymentStatus.Paid)
+        {
+            dbQuery = dbQuery.Where(t => t.TransactionId != null && t.TransactionId != string.Empty);
+        }
+
+        if (paymentStatus == BackflowPaymentStatus.Unpaid)
+        {
+            dbQuery = dbQuery.Where(t => t.TransactionId == null || t.TransactionId == string.Empty);
+        }
+
+        var paginated = await dbQuery
             .OrderBy(query.Sort)
             .PaginateAsync(pageInfo, cancellationToken);
 

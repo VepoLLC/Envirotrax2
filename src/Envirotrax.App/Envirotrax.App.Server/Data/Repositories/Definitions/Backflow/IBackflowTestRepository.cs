@@ -1,5 +1,6 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Models.Backflow;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 
 namespace Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 
@@ -11,6 +12,8 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
 
     // Compliance Management: current, in-service, renewal-required assemblies on active, in-area sites.
     Task<IEnumerable<BackflowTest>> GetComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+
+    Task<IEnumerable<BackflowTest>> SearchForAdminAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken);
 
     // Process 1 — Site level
     Task<IEnumerable<BackflowTest>> GetAllCurrentBySiteIdAsync(int siteId, CancellationToken cancellationToken);

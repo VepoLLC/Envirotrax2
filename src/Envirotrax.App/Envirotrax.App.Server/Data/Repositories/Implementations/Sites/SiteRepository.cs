@@ -134,12 +134,24 @@ public class SiteRepository : Repository<Site>, ISiteRepository
                 .SetProperty(s => s.CsiAccountAssignmentDate, assignmentDate));
     }
 
-    public async Task ClearNeedsRenewalCheckAsync(int siteId, CancellationToken cancellationToken)
+    public async Task ClearNeedsRenewalCheckAsync(int siteId)
     {
         await DbContext
             .Sites
             .Where(s => s.Id == siteId)
             .ExecuteUpdateAsync(setter => setter
-                .SetProperty(s => s.NeedsRenewalCheck, false), cancellationToken);
+                .SetProperty(s => s.NeedsRenewalCheck, false));
+    }
+
+    public async Task<IEnumerable<Site>> GetAllPendingRenewalAsync(int batchSize)
+    {
+        return await DbContext.Sites
+            .IgnoreQueryFilters()
+            .Where(s => s.DeletedTime == null && s.NeedsRenewalCheck)
+            .OrderBy(s => s.Id)
+            .Take(batchSize)
+            .Select(s => new Site { Id = s.Id, WaterSupplierId = s.WaterSupplierId })
+            .AsNoTracking()
+            .ToListAsync();
     }
 }

@@ -55,11 +55,15 @@ public static class ServiceRegistration
         services.AddTransient<IFogInspectionService, FogInspectionService>();
         services.AddTransient<IBackflowTesterService, BackflowTesterService>();
         services.AddTransient<IBackflowTestService, BackflowTestService>();
+        services.AddTransient<IBackflowTestReportService, BackflowTestReportService>();
+        services.AddTransient<IBackflowComplianceReportService, BackflowComplianceReportService>();
+        services.AddTransient<IBackflowNewRemovedReportService, BackflowNewRemovedReportService>();
         services.AddTransient<IBackflowGaugeService, BackflowGaugeService>();
         services.AddTransient<IBackflowOutOfServiceRequestService, BackflowOutOfServiceRequestService>();
         services.AddTransient<IFogVehicleService, FogVehicleService>();
         services.AddTransient<IFogTransporterDisposalSiteService, FogTransporterDisposalSiteService>();
         services.AddTransient<IFogDisposalSiteService, FogDisposalSiteService>();
+        services.AddTransient<IFogTripTicketService, FogTripTicketService>();
         services.AddTransient<ILookupService, LookupService>();
 
         services.AddTransient<ICsiSettingsService, CsiSettingsService>();

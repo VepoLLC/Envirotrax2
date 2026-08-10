@@ -36,7 +36,11 @@ public static class ServiceRegistration
         });
 
         services.Configure<BackflowRenewalOptions>(configuration.GetSection("Tasks:BackflowRenewal"));
-        services.AddQueueWorker(new QueueWorkerOptions<BackflowTestRenewalWorker, BackflowTestDto>(QueueNames.BackflowTests.ExtendDate)
+        services.AddQueueWorker(new QueueWorkerOptions<BackflowTestSiteRenewalWorker, SiteDto>(QueueNames.BackflowTests.ProcessSiteRenewal)
+        {
+            MaxDequeuCount = 2
+        });
+        services.AddQueueWorker(new QueueWorkerOptions<BackflowTestTestRenewalWorker, BackflowTestDto>(QueueNames.BackflowTests.ProcessTestRenewal)
         {
             MaxDequeuCount = 2
         });

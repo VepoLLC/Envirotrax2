@@ -315,7 +315,7 @@
     </form>
 </div>
 
-<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+<dp-loading-spinner [hidden]="!table.isLoading"></dp-loading-spinner>
 
 <div *ngIf="showResults">
     <div class="d-flex justify-content-end mb-3">

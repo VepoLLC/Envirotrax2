@@ -27,6 +27,81 @@
             </ul>
         </div>
 
+        <div class="mb-3 mt-3">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="fw-bold">Expiration Date:</span>
+                <div class="form-control form-control-sm text-center"
+                     style="width: 110px;"
+                     [class.bg-success]="test.renewalRequired && test.expirationDate && !isExpired"
+                     [class.bg-danger]="test.renewalRequired && test.expirationDate && isExpired"
+                     [class.text-white]="test.renewalRequired && !!test.expirationDate"
+                     [class.text-muted]="!test.renewalRequired || !test.expirationDate">
+                    {{ (test.renewalRequired && test.expirationDate) ? (test.expirationDate | date:'MM.dd.yyyy') : 'N/A' }}
+                </div>
+                <button class="btn btn-sm"
+                        [class.btn-success]="test.renewalRequired"
+                        [class.btn-danger]="!test.renewalRequired"
+                        [disabled]="isLoading || !canModify"
+                        (click)="toggleRenewalRequired()">
+                    {{ test.renewalRequired ? 'Renewal Required' : 'Renewal Not Required' }}
+                </button>
+            </div>
+
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="fw-bold">Test Renewal Month:</span>
+                <vp-input type="select"
+                          style="width: 13rem;"
+                          [ngModel]="test.backflowScheduleMonth ?? 0"
+                          (ngModelChange)="test.backflowScheduleMonth = $event"
+                          name="backflowScheduleMonth"
+                          [options]="scheduleMonthOptions"
+                          [disabled]="!canModify" />
+                <button class="btn btn-sm btn-primary"
+                        [disabled]="isLoading || !canModify"
+                        (click)="updateScheduleMonth()">
+                    Update
+                </button>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-sm"
+                        [class.btn-success]="test.isCurrent"
+                        [class.btn-danger]="!test.isCurrent"
+                        [disabled]="isLoading || !canModify"
+                        (click)="toggleIsCurrent()">
+                    {{ test.isCurrent ? 'Is Current Test' : 'Non-Current' }}
+                </button>
+                <button class="btn btn-sm"
+                        [class.btn-success]="!test.outOfService"
+                        [class.btn-danger]="test.outOfService"
+                        [disabled]="isLoading || !canModify"
+                        (click)="toggleOutOfService()">
+                    {{ test.outOfService ? 'Out Of Service' : 'In Service' }}
+                </button>
+                <button class="btn btn-sm"
+                        [class.btn-success]="!test.disapproved"
+                        [class.btn-danger]="test.disapproved"
+                        [disabled]="isLoading || !canModify"
+                        (click)="toggleDisapproval()">
+                    {{ test.disapproved ? 'Disapproved' : 'Approved' }}
+                </button>
+                <button class="btn btn-sm"
+                        [class.btn-success]="!test.rejected"
+                        [class.btn-danger]="test.rejected"
+                        [disabled]="isLoading || !canModify"
+                        (click)="toggleRejection()">
+                    {{ test.rejected ? 'Rejected' : 'Accepted' }}
+                </button>
+                <button class="btn btn-sm"
+                        [class.btn-success]="test.forceRenewal"
+                        [class.btn-danger]="!test.forceRenewal"
+                        [disabled]="isLoading || !canForceRenewal"
+                        (click)="toggleForceRenewal()">
+                    Force Renewal [{{ test.forceRenewal ? 'On' : 'Off' }}]
+                </button>
+            </div>
+        </div>
+
         <div class="row mt-3">
             <vp-backflow-test-water-supplier [test]="test" />
         </div>

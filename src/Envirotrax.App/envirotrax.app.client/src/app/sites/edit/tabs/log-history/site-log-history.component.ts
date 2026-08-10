@@ -80,6 +80,18 @@ export class SiteLogHistoryComponent implements OnInit, OnChanges {
         }
     }
 
+    public async openAttachment(log: SiteLog): Promise<void> {
+        if (!this.siteId || log.id == null) {
+            return;
+        }
+
+        const url = await this._siteLogService.getAttachmentUrl(this.siteId, log.id);
+
+        if (url) {
+            window.open(url, '_blank');
+        }
+    }
+
     public openAddModal(): void {
         this._modalHelper.show<SiteLogEditModel, SiteLog>(SiteLogEditComponent, {
             title: 'Add Log Record',

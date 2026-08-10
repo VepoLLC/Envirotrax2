@@ -6,6 +6,7 @@ import { FogInspectorListComponent } from "./inspectors/list/fog-inspector-list.
 import { FogInspectorDetailsComponent } from "./inspectors/details/fog-inspector-details.component";
 import { FogInspectionListComponent } from "./inspections/list/fog-inspection-list.component";
 import { FogInspectionViewComponent } from "./inspections/view/fog-inspection-view.component";
+import { FogTripTicketListComponent } from "./trip-tickets/list/fog-trip-ticket-list.component";
 
 const routes: Routes = [
     {
@@ -31,6 +32,34 @@ const routes: Routes = [
             permissions: [
                 {
                     type: PermissionType.FogInspections,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
+    },
+    {
+        path: 'trip-tickets',
+        title: 'FOG Trip Ticket Search',
+        component: FogTripTicketListComponent,
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.FogTripTickets,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
+    },
+    {
+        path: 'trip-tickets/:id',
+        title: 'View FOG Trip Ticket',
+        component: FogTripTicketListComponent,
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.FogTripTickets,
                     action: PermissionAction.CanView
                 }
             ]

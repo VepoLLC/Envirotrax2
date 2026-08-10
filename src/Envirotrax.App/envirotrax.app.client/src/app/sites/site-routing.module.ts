@@ -2,6 +2,7 @@ import { RouterModule, Routes } from "@angular/router";
 import { SiteListComponent } from "./list/site-list.component";
 import { NgModule } from "@angular/core";
 import { EditSiteComponent } from './edit/edit-site-component';
+import { PropertyLogManagementComponent } from "./reports/property-log-management/property-log-management.component";
 import { PermissionGuard } from "../shared/guards/permission.guard";
 import { PermissionAction, PermissionType } from "../shared/models/permission-type";
 
@@ -15,6 +16,28 @@ const routes: Routes = [
             permissions: [
                 {
                     type: PermissionType.Sites,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
+    },
+    {
+        path: 'reports/property-log-management',
+        title: 'Property Log Management',
+        component: PropertyLogManagementComponent,
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.CsiReports,
+                    action: PermissionAction.CanView
+                },
+                {
+                    type: PermissionType.BackflowReports,
+                    action: PermissionAction.CanView
+                },
+                {
+                    type: PermissionType.FogReports,
                     action: PermissionAction.CanView
                 }
             ]

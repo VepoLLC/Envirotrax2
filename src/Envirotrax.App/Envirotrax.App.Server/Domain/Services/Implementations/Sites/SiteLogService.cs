@@ -33,9 +33,18 @@ public class SiteLogService : ISiteLogService
         query.Sort = query.ConvertSortProperties<SiteLog, SiteLogDto>(_mapper);
 
         var results = await _repository.GetBySiteAsync(siteId, pageInfo, query, cancellationToken);
-        var dtos = results.Select(m => _mapper.Map<SiteLogDto>(m)!).ToList();
+        var dtos = results.Select(MapToDto).ToList();
 
-        await EnrichAsync(dtos);
+        return dtos.ToPagedData(pageInfo);
+    }
+
+    public async Task<IPagedData<PropertyLogDto>> GetForManagementAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Filter = query.ConvertFilterProperties<SiteLog, PropertyLogDto>(_mapper);
+        query.Sort = query.ConvertSortProperties<SiteLog, PropertyLogDto>(_mapper);
+
+        var results = await _repository.GetAllAsync(pageInfo, query, cancellationToken);
+        var dtos = results.Select(MapToPropertyLogDto).ToList();
 
         return dtos.ToPagedData(pageInfo);
     }
@@ -44,35 +53,39 @@ public class SiteLogService : ISiteLogService
     {
         var results = await _repository.GetBySiteIdsAsync(siteIds, cancellationToken);
 
-        var trimmed = results
+        return results
             .GroupBy(sl => sl.SiteId)
             .SelectMany(group => group.Take(5))
+            .Select(MapToDto)
             .ToList();
-
-        var dtos = trimmed.Select(m => _mapper.Map<SiteLogDto>(m)!).ToList();
-
-        await EnrichAsync(dtos);
-
-        return dtos;
     }
 
-    private async Task EnrichAsync(IReadOnlyCollection<SiteLogDto> dtos)
+    public async Task<string?> GetAttachmentUrlAsync(int logId, CancellationToken cancellationToken)
     {
-        var now = DateTime.UtcNow;
+        var log = await _repository.GetAsync(logId, cancellationToken);
 
-        foreach (var dto in dtos)
+        if (log?.FileAttachmentPath == null || log.SkipFile)
         {
-            dto.ReviewDateStatus = ComputeReviewDateStatus(dto, now);
+            return null;
         }
 
-        if (dtos.Any(d => d.FileAttachmentPath != null && !d.SkipFile))
-        {
-            var delegationKey = await _fileStorageService.GetUserDelegationKeyAsync();
-            foreach (var dto in dtos.Where(d => d.FileAttachmentPath != null && !d.SkipFile))
-            {
-                dto.Url = (await _fileStorageService.GenerateSasUrlAsync(delegationKey, dto.FileAttachmentPath!)).ToString();
-            }
-        }
+        return (await _fileStorageService.GenerateSasUrlAsync(log.FileAttachmentPath)).ToString();
+    }
+
+    private SiteLogDto MapToDto(SiteLog model)
+    {
+        var dto = _mapper.Map<SiteLogDto>(model)!;
+        dto.ReviewDateStatus = ComputeReviewDateStatus(dto.LogType, dto.ReviewDate, DateTime.UtcNow);
+
+        return dto;
+    }
+
+    private PropertyLogDto MapToPropertyLogDto(SiteLog model)
+    {
+        var dto = _mapper.Map<PropertyLogDto>(model)!;
+        dto.ReviewDateStatus = ComputeReviewDateStatus(dto.LogType, dto.ReviewDate, DateTime.UtcNow);
+
+        return dto;
     }
 
     public async Task<SiteLogDto> AddAsync(int siteId, SiteLogDto dto, Stream? fileStream, string? fileName)
@@ -99,13 +112,7 @@ public class SiteLogService : ISiteLogService
         }
         scope.Complete();
 
-        var result = _mapper.Map<SiteLogDto>(saved);
-        result.ReviewDateStatus = ComputeReviewDateStatus(result, DateTime.UtcNow);
-        if (result.FileAttachmentPath != null && !result.SkipFile)
-        {
-            result.Url = (await _fileStorageService.GenerateSasUrlAsync(result.FileAttachmentPath)).ToString();
-        }
-        return result;
+        return MapToDto(saved);
     }
 
     public async Task<SiteLogDto?> UpdateAsync(SiteLogDto dto, Stream? fileStream, string? fileName)
@@ -137,13 +144,7 @@ public class SiteLogService : ISiteLogService
         }
         scope.Complete();
 
-        var result = _mapper.Map<SiteLogDto>(updated);
-        result.ReviewDateStatus = ComputeReviewDateStatus(result, DateTime.UtcNow);
-        if (result.FileAttachmentPath != null && !result.SkipFile)
-        {
-            result.Url = (await _fileStorageService.GenerateSasUrlAsync(result.FileAttachmentPath)).ToString();
-        }
-        return result;
+        return MapToDto(updated);
     }
 
     public async Task<bool> DeleteAsync(int id)
@@ -167,24 +168,24 @@ public class SiteLogService : ISiteLogService
         return true;
     }
 
-    private static SiteLogReviewDateStatus ComputeReviewDateStatus(SiteLogDto dto, DateTime now)
+    private static SiteLogReviewDateStatus ComputeReviewDateStatus(SiteLogType logType, DateTime? reviewDate, DateTime now)
     {
-        if (!dto.ReviewDate.HasValue)
+        if (!reviewDate.HasValue)
         {
             return SiteLogReviewDateStatus.None;
         }
 
-        if (dto.LogType == SiteLogType.CompletedReminder)
+        if (logType == SiteLogType.CompletedReminder)
         {
             return SiteLogReviewDateStatus.Completed;
         }
 
-        if (dto.ReviewDate.Value < now)
+        if (reviewDate.Value < now)
         {
             return SiteLogReviewDateStatus.Overdue;
         }
 
-        if (dto.ReviewDate.Value <= now.AddDays(30))
+        if (reviewDate.Value <= now.AddDays(30))
         {
             return SiteLogReviewDateStatus.DueSoon;
         }

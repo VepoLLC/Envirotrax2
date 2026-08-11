@@ -170,6 +170,11 @@ public class UpdateBackflowAssignmentDto
     public int? UserId { get; set; }
 }
 
+public class UpdateSiteWaterSupplierDto
+{
+    public int WaterSupplierId { get; set; }
+}
+
 public class CsiComplianceSiteDto : SiteDto
 {
     public List<SiteLogDto> Logs { get; set; } = [];

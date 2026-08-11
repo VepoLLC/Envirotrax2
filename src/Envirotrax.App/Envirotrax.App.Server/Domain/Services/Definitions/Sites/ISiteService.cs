@@ -11,6 +11,7 @@ public interface ISiteService : IService<Site, SiteDto>
     Task<SiteDto?> GeocodeAsync(int siteId, bool assignGisArea, CancellationToken cancellationToken);
     Task UpdateGisDataAsync(int siteId, UpdateSiteGisDataDto dto, CancellationToken cancellationToken);
     Task<bool> UpdateFromAdminAsync(int siteId, SiteDto dto, CancellationToken cancellationToken);
+    Task<bool> UpdateWaterSupplierAsync(int siteId, UpdateSiteWaterSupplierDto dto);
     Task<IPagedData<CsiComplianceSiteDto>> GetCsiComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task UpdateCsiAssignmentAsync(int siteId, int? userId);
     Task UpdateBackflowAssignmentAsync(int siteId, int? userId);

@@ -57,4 +57,17 @@ public class SiteController : AdminBaseController
 
         return Ok();
     }
+
+    [HttpPut("{id}/water-supplier")]
+    public async Task<IActionResult> UpdateWaterSupplierAsync(int id, [FromBody] UpdateSiteWaterSupplierDto dto)
+    {
+        var updated = await _siteService.UpdateWaterSupplierAsync(id, dto);
+
+        if (!updated)
+        {
+            return NotFound();
+        }
+
+        return Ok();
+    }
 }

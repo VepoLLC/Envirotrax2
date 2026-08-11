@@ -1,8 +1,8 @@
-<dp-loading-spinner [hidden]="!isLoading && !isSaving"></dp-loading-spinner>
+<dp-loading-spinner [hidden]="!isLoading && !isSaving && !isLoadingWaterSuppliers"></dp-loading-spinner>
 
 @if (!isLoading && editableSite) {
     <form #form="ngForm">
-        <app-site-water-supplier-section [site]="editableSite"></app-site-water-supplier-section>
+        <app-site-water-supplier-section [site]="editableSite" (changeWaterSupplier)="changeWaterSupplier()"></app-site-water-supplier-section>
 
         <div class="mt-3">
             <app-site-property-settings-section [site]="editableSite" [form]="form"></app-site-property-settings-section>

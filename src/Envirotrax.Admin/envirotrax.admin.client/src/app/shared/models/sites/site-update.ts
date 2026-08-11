@@ -70,3 +70,11 @@ export interface SiteGisUpdate {
     longitude: number | null;
     status: number;
 }
+
+/**
+ * Water supplier reassignment payload (PUT /api/sites/{id}/water-supplier) — a dedicated operation, never
+ * part of the normal Site save.
+ */
+export interface SiteWaterSupplierUpdate {
+    waterSupplierId: number;
+}

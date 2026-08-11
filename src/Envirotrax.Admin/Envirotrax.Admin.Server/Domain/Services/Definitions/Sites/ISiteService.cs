@@ -13,4 +13,6 @@ public interface ISiteService
     Task UpdateAsync(int siteId, SiteUpdateDto dto, CancellationToken cancellationToken);
 
     Task UpdateGisAsync(int siteId, SiteGisUpdateDto dto, CancellationToken cancellationToken);
+
+    Task UpdateWaterSupplierAsync(int siteId, SiteWaterSupplierUpdateDto dto, CancellationToken cancellationToken);
 }

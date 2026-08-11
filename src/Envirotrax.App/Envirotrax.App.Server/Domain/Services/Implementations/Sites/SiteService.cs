@@ -1,12 +1,14 @@
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.GisAreas;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Sites;
@@ -15,6 +17,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 {
     private readonly ISiteRepository _siteRepository;
     private readonly ISiteLogService _siteLogService;
+    private readonly IRecordLogService _recordLogService;
     private readonly IGeocodingService _geocodingService;
     private readonly IGisAreaCoordinateRepository _coordinateRepository;
     private readonly ILogger<SiteService> _logger;
@@ -23,6 +26,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         IMapper mapper,
         ISiteRepository repository,
         ISiteLogService siteLogService,
+        IRecordLogService recordLogService,
         IGeocodingService geocodingService,
         IGisAreaCoordinateRepository coordinateRepository,
         ILogger<SiteService> logger)
@@ -30,6 +34,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     {
         _siteRepository = repository;
         _siteLogService = siteLogService;
+        _recordLogService = recordLogService;
         _geocodingService = geocodingService;
         _coordinateRepository = coordinateRepository;
         _logger = logger;
@@ -214,6 +219,37 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         site.HasIrrigation = dto.HasIrrigation;
         site.IrrigationSeparateWater = dto.IrrigationSeparateWater;
         site.HasDomesticPremisesIsolation = dto.HasDomesticPremisesIsolation;
+    }
+
+    public async Task<bool> UpdateWaterSupplierAsync(int siteId, UpdateSiteWaterSupplierDto dto)
+    {
+        var site = await _siteRepository.GetTrackedForUpdateAsync(siteId, CancellationToken.None);
+
+        if (site == null)
+        {
+            return false;
+        }
+
+        var previousWaterSupplierId = site.WaterSupplierId;
+
+        site.WaterSupplierId = dto.WaterSupplierId;
+
+        site.UserAccountAssignmentId = null;
+        site.CsiAccountAssignmentId = null;
+        site.CsiAccountAssignmentDate = null;
+        site.BackflowAccountAssignmentId = null;
+        site.BackflowAccountAssignmentDate = null;
+        site.FogAccountAssignmentId = null;
+        site.FogAccountAssignmentDate = null;
+
+        site.GisAreaId = 0;
+        site.NeedsRenewalCheck = true;
+
+        await _siteRepository.SaveChangesAsync(CancellationToken.None);
+
+        await _recordLogService.AddAsync(RecordLogTableNames.Sites, siteId, dto.WaterSupplierId, RecordLogType.Edit, $"Water Supplier changed from {previousWaterSupplierId} to {dto.WaterSupplierId}");
+
+        return true;
     }
 
     public async Task<IPagedData<CsiComplianceSiteDto>> GetCsiComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)

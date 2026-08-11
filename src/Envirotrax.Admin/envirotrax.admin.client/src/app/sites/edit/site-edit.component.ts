@@ -1,13 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { InputOption, ToastService, ToastType } from '@envirotrax/common-ui';
+import { ModalSize } from '@developer-partners/ngx-modal-dialog';
+import { InputOption, ModalHelperService, PagedData, ToastService, ToastType } from '@envirotrax/common-ui';
 import { FacilityType, GreaseTrapType, PropertyType } from '../../shared/models/sites/site';
 import { SiteDetail, SiteEditWindowModel } from '../../shared/models/sites/site-detail';
 import { SiteGisUpdate, SiteUpdate } from '../../shared/models/sites/site-update';
+import { WaterSupplier } from '../../shared/models/water-suppliers/water-supplier';
 import { SiteService } from '../../shared/services/sites/site.service';
 import { LookupService } from '../../shared/services/lookup/lookup.service';
+import { WaterSupplierService } from '../../shared/services/water-suppliers/water-supplier.service';
 import { SharedComponentsModule } from '../../shared/components/shared.components.module';
+import { WaterSupplierLookupComponent } from '../../shared/components/lookups/water-supplier-lookup.component';
 import { WindowReference } from '../../window/window-config';
 import { SiteEditSectionsModule } from './sections/site-edit-sections.module';
 
@@ -35,6 +39,7 @@ export class SiteEditComponent implements OnInit {
 
     public isLoading: boolean = false;
     public isSaving: boolean = false;
+    public isLoadingWaterSuppliers: boolean = false;
 
     public siteId?: number;
     public waterSupplierId?: number;
@@ -54,6 +59,8 @@ export class SiteEditComponent implements OnInit {
         private readonly _windowReference: WindowReference<SiteEditWindowModel>,
         private readonly _siteService: SiteService,
         private readonly _lookupService: LookupService,
+        private readonly _waterSupplierService: WaterSupplierService,
+        private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService
     ) {
 
@@ -231,6 +238,104 @@ export class SiteEditComponent implements OnInit {
             });
         } else {
             this._toastService.successfullySaved();
+        }
+    }
+
+ 
+    public async changeWaterSupplier(): Promise<void> {
+        if (!this.editableSite) {
+            return;
+        }
+
+        if (this.form?.dirty) {
+            this._toastService.show({
+                text: 'Please save or close your changes before changing the water supplier.',
+                type: ToastType.Error
+            });
+
+            return;
+        }
+
+        const suppliers = await this.loadWaterSuppliers();
+
+        if (!suppliers) {
+            return;
+        }
+
+        this._modalHelper
+            .show<PagedData<WaterSupplier>, WaterSupplier>(WaterSupplierLookupComponent, {
+                title: 'Water Suppliers',
+                size: ModalSize.large,
+                model: suppliers
+            })
+            .result()
+            .subscribe(supplier => this.confirmWaterSupplierChange(supplier));
+    }
+
+   
+    private async loadWaterSuppliers(): Promise<PagedData<WaterSupplier> | null> {
+        try {
+            this.isLoadingWaterSuppliers = true;
+
+            return await this._waterSupplierService.getAll({}, { sort: { name: 'Asc' }, filter: [] });
+        } catch {
+            this._toastService.show({
+                text: 'The water suppliers could not be loaded — please try again.',
+                type: ToastType.Error
+            });
+
+            return null;
+        } finally {
+            this.isLoadingWaterSuppliers = false;
+        }
+    }
+
+    private confirmWaterSupplierChange(supplier: WaterSupplier): void {
+        const current = this.editableSite?.waterSupplier;
+
+        if (supplier?.id == null || supplier.id === current?.id) {
+            return;
+        }
+
+        this._modalHelper
+            .confirm({
+                title: 'Confirm Water Supplier Change',
+                messages: [
+                    `Are you sure you want to change this property's water supplier from ${current?.id} - ${current?.name} to ${supplier.id} - ${supplier.name}?`,
+                    'Existing inspections, tests and trip tickets stay with the current water supplier.'
+                ]
+            })
+            .result()
+            .subscribe(() => this.saveWaterSupplier(supplier.id!));
+    }
+
+    private async saveWaterSupplier(waterSupplierId: number): Promise<void> {
+        if (this.siteId == null) {
+            return;
+        }
+
+        try {
+            this.isSaving = true;
+
+            await this._siteService.updateWaterSupplier(this.siteId, waterSupplierId);
+
+            const refreshFailed = await this.refreshQuietly();
+
+            if (refreshFailed) {
+                this._toastService.show({
+                    text: 'The water supplier was changed, but the latest data could not be reloaded. Please reload or reopen the window.',
+                    type: ToastType.Warning
+                });
+            } else {
+                this._toastService.successfullySaved();
+            }
+        } catch {
+            this._toastService.show({
+                text: 'The water supplier could not be changed — please try again.',
+                type: ToastType.Error
+            });
+        } finally {
+            this.isSaving = false;
         }
     }
 

@@ -20,11 +20,26 @@ public class BackflowTestController : WaterSupplierCrudController<BackflowTestDt
         _testService = service;
     }
 
+    protected override Task<IPagedData<BackflowTestDto>> ProcessGetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        return _testService.SearchAsync(pageInfo, query, ReadPaymentStatus(), cancellationToken);
+    }
+
+    private BackflowPaymentStatus? ReadPaymentStatus()
+    {
+        if (Enum.TryParse<BackflowPaymentStatus>(Request.Query["paymentStatus"], out var paymentStatus))
+        {
+            return paymentStatus;
+        }
+
+        return null;
+    }
+
     [HttpGet("pdf")]
     [HasPermission(PermissionAction.CanView)]
-    public async Task<IActionResult> GetAllPdfAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllPdfAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, [FromQuery] BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken)
     {
-        var tests = await _testService.GetAllAsync(pageInfo, query, cancellationToken);
+        var tests = await _testService.SearchAsync(pageInfo, query, paymentStatus, cancellationToken);
         var pdf = await _testService.GeneratePdfAsync(tests.Data);
         return File(pdf, "application/pdf");
     }

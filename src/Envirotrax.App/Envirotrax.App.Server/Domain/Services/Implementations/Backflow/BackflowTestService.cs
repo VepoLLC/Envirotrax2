@@ -107,14 +107,34 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         return dtos.ToPagedData(pageInfo);
     }
 
+    public async Task<IPagedData<BackflowTestDto>> SearchAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<BackflowTest, BackflowTestDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<BackflowTest, BackflowTestDto>(Mapper);
+
+        if (query.Sort.IsNullOrEmpty())
+        {
+            query.Sort[nameof(BackflowTest.Id)] = SortOperator.Asc;
+        }
+
+        var tests = await _testRepository.SearchAsync(pageInfo, query, paymentStatus, cancellationToken);
+
+        return tests.Select(t => MapToDto(t)!).ToPagedData(pageInfo);
+    }
+
     public async Task<IPagedData<BackflowTestDto>> SearchForAdminAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken)
     {
         query.Sort = query.ConvertSortProperties<BackflowTest, BackflowTestDto>(Mapper);
         query.Filter = query.ConvertFilterProperties<BackflowTest, BackflowTestDto>(Mapper);
 
-        var tests = await _testRepository.SearchForAdminAsync(pageInfo, query, paymentStatus, cancellationToken);
+        if (query.Sort.IsNullOrEmpty())
+        {
+            query.Sort[nameof(BackflowTest.TestDate)] = SortOperator.Desc;
+        }
 
-        return tests.Select(t => Mapper.Map<BackflowTestDto>(t)!).ToPagedData(pageInfo);
+        var tests = await _testRepository.SearchAsync(pageInfo, query, paymentStatus, cancellationToken);
+
+        return tests.Select(t => MapToDto(t)!).ToPagedData(pageInfo);
     }
 
     private async Task PopulateBpatSnapshotAsync(BackflowTestDto dto)

@@ -13,7 +13,7 @@ import { BackflowTest } from '../../shared/models/backflow/backflow-test';
 import { GisArea } from '../../shared/models/gis-areas/gis-area';
 import { FacilityType } from '../../shared/enums/facility-type.enum';
 import { CellTemplateData, ColumnType, InputOption, MapMarker, MapPolygon } from '@envirotrax/common-ui';
-import { BackflowTestResult } from '../../shared/models/backflow/backflow-test-enums';
+import { BackflowPaymentStatus, BackflowTestResult } from '../../shared/models/backflow/backflow-test-enums';
 import { DownloadConfig } from '../../shared/models/download-config';
 import { DownloadService } from '../../shared/services/download.service';
 import { PrintableTableService } from '../../shared/services/printable-table.service';
@@ -98,6 +98,8 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
 
     public testResultOptions: InputOption[];
     public paymentStatusOptions: InputOption[];
+
+    private paymentStatus: BackflowPaymentStatus | null = null;
     public approvalStatusOptions: InputOption[];
     public reasonForTestOptions: InputOption[];
 
@@ -271,6 +273,13 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
     }
 
     public showDownloadManager(): void {
+        const additionalParams = this.paymentStatus != null
+            ? { paymentStatus: String(this.paymentStatus) }
+            : undefined;
+
+        this.downloadConfig.endpoint.additionalParams = additionalParams;
+        this.downloadConfig.pdfEndpoint!.additionalParams = additionalParams;
+
         this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
     }
 
@@ -372,7 +381,8 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
             this.table.isLoading = true;
             const result = await this._backflowTestService.getAll(
                 this.table.items?.pageInfo || {},
-                this.table.query
+                this.table.query,
+                this.paymentStatus
             );
             const startIndex = ((result.pageInfo.pageNumber ?? 1) - 1) * (result.pageInfo.pageSize ?? 10);
             result.data.forEach((item, i) => (item as any)['_rowNumber'] = startIndex + i + 1);
@@ -388,7 +398,11 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
-        this.table.query.filter = queryProperties;
+        const payment = queryProperties.find(p => p.columnName === 'paymentStatus');
+
+        this.paymentStatus = payment?.value ? Number(payment.value) as BackflowPaymentStatus : null;
+
+        this.table.query.filter = queryProperties.filter(p => p.columnName !== 'paymentStatus');
     }
 
     // Builds the preset filter for a Tab 2 (Current Compliance Status) View drill-down: the non-compliant
@@ -451,7 +465,7 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
             this.showMapResults = false;
 
             const [testsPage, areas, coordinates, defaultView] = await Promise.all([
-                this._backflowTestService.getAll({ pageSize: 10000, pageNumber: 1 }, this.table.query),
+                this._backflowTestService.getAll({ pageSize: 10000, pageNumber: 1 }, this.table.query, this.paymentStatus),
                 this._gisAreaService.getAllAreas(),
                 this._coordinateService.getAll(),
                 this._gisAreaService.getDefaultView()

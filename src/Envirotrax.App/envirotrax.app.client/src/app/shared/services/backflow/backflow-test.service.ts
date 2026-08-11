@@ -7,6 +7,7 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { BackflowTest, BackflowExpiryCounts } from "../../models/backflow/backflow-test";
+import { BackflowPaymentStatus } from "../../models/backflow/backflow-test-enums";
 import { BackflowCompliance } from "../../models/backflow/backflow-compliance";
 import { BackflowTestImages } from "../../models/backflow/backflow-test-images";
 import { DownloadEndpoint } from "../../models/download-config";
@@ -39,12 +40,16 @@ export class BackflowTestService {
     ) {
     }
 
-    public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<BackflowTest>> {
+    public async getAll(pageInfo: PageInfo, query: Query, paymentStatus?: BackflowPaymentStatus | null): Promise<PagedData<BackflowTest>> {
         const url = this._urlResolver.resolveUrl('/api/backflow/tests');
 
-        const observable = this._http.get<PagedData<BackflowTest>>(url, {
-            params: this._queryHelper.buildQuery(pageInfo, query)
-        });
+        let params = this._queryHelper.buildQuery(pageInfo, query);
+
+        if (paymentStatus != null) {
+            params = params.append('paymentStatus', String(paymentStatus));
+        }
+
+        const observable = this._http.get<PagedData<BackflowTest>>(url, { params });
 
         return await lastValueFrom(observable);
     }

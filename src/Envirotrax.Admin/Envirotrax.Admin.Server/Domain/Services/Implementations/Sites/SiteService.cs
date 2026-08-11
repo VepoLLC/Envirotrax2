@@ -41,4 +41,9 @@ public class SiteService : ISiteService
     {
         return _apiClient.PutAsync<SiteGisUpdateDto, object>($"/api/admin/sites/{siteId}/gis-data", dto, cancellationToken);
     }
+
+    public Task UpdateWaterSupplierAsync(int siteId, SiteWaterSupplierUpdateDto dto, CancellationToken cancellationToken)
+    {
+        return _apiClient.PutAsync<SiteWaterSupplierUpdateDto, object>($"/api/admin/sites/{siteId}/water-supplier", dto, cancellationToken);
+    }
 }

@@ -53,4 +53,12 @@ public class SiteController : AdminBaseController
 
         return Ok();
     }
+
+    [HttpPut("{id}/water-supplier")]
+    public async Task<IActionResult> UpdateWaterSupplierAsync(int id, [FromBody] SiteWaterSupplierUpdateDto dto, CancellationToken cancellationToken)
+    {
+        await _siteService.UpdateWaterSupplierAsync(id, dto, cancellationToken);
+
+        return Ok();
+    }
 }

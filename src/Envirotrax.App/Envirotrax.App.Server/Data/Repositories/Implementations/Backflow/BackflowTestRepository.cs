@@ -117,13 +117,8 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return await paginated.ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<BackflowTest>> SearchForAdminAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken)
+    public async Task<IEnumerable<BackflowTest>> SearchAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken)
     {
-        if (query.Sort.IsNullOrEmpty())
-        {
-            query.Sort[nameof(BackflowTest.TestDate)] = SortOperator.Desc;
-        }
-
         var dbQuery = GetListQuery().Where(query.Filter);
 
         if (paymentStatus == BackflowPaymentStatus.Paid)

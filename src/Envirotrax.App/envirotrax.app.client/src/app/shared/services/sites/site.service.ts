@@ -67,6 +67,31 @@ export class SiteService {
         );
     }
 
+    public getFogTripTicketComplianceEndpoint(): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/sites/fog-trip-ticket-compliance'),
+        };
+    }
+
+    public async getFogTripTicketCompliance(pageInfo: PageInfo, query: Query): Promise<PagedData<Site>> {
+        const url = this._urlResolver.resolveUrl('/api/sites/fog-trip-ticket-compliance');
+
+        const observable = this._http.get<PagedData<Site>>(url, {
+            params: this._queryHelper.buildQuery(pageInfo, query)
+        });
+
+        return await lastValueFrom(observable);
+    }
+
+    public updateFogAssignment(siteId: number, userId: number | null): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}/fog-assignment`);
+
+        return lastValueFrom(
+            this._http.put<void>(url, { userId })
+        );
+    }
+
     public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<Site>> {
         const url = this._urlResolver.resolveUrl('/api/sites');
 

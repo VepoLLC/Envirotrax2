@@ -22,14 +22,14 @@ export class DashboardComponent implements OnInit {
     public fogTripTicketVm?: FogTripTicketStatsVm;
     public isLoading: boolean = false;
 
-    public hasWiseGuys: boolean = false;
+    
     public hasCsi: boolean = false;
     public hasBackflow: boolean = false;
     public hasFogInspection: boolean = false;
     public hasFogTransportation: boolean = false;
 
     public get hasAnyProgram(): boolean {
-        return this.hasWiseGuys || this.hasCsi || this.hasBackflow || this.hasFogInspection || this.hasFogTransportation;
+        return this.hasCsi || this.hasBackflow || this.hasFogInspection || this.hasFogTransportation;
     }
 
     constructor(
@@ -40,14 +40,12 @@ export class DashboardComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         [
             this.waterSupplierId,
-            this.hasWiseGuys,
             this.hasCsi,
             this.hasBackflow,
             this.hasFogInspection,
             this.hasFogTransportation
         ] = await Promise.all([
             this._authService.getWaterSupplierId(),
-            this._authService.hasAnyFeatures(FeatureType.WiseGuys),
             this._authService.hasAnyFeatures(FeatureType.CsiInspection),
             this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
             this._authService.hasAnyFeatures(FeatureType.FogInspection),

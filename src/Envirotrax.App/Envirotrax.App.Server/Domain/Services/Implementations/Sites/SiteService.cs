@@ -252,6 +252,91 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         await _siteRepository.UpdateBackflowAssignmentAsync(siteId, userId, assignmentDate);
     }
 
+    public async Task<IPagedData<FogTripTicketComplianceSiteDto>> GetFogTripTicketComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        // TripTicket due dates are derived from LastTripTicketDate + TripTicketInterval (a per-row variable
+        // offset), so they can't flow through the generic DTO-property sort/filter converter like a real
+        // column. The client sends them under the synthetic "dueDate" key; pull those out here and apply
+        // them explicitly in the repository, before converting the remaining, real-column filters/sort.
+        var (dueDateFrom, dueDateTo) = ExtractDueDateFilter(query);
+        var sortDescending = ExtractDueDateSortDescending(query);
+
+        query.Sort = query.ConvertSortProperties<Site, SiteDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<Site, SiteDto>(Mapper);
+
+        var sites = await _siteRepository.GetFogTripTicketComplianceAsync(pageInfo, query, dueDateFrom, dueDateTo, sortDescending, cancellationToken);
+        var dtos = sites.Select(s => Mapper.Map<FogTripTicketComplianceSiteDto>(s)).ToList();
+
+        if (dtos.Count > 0)
+        {
+            var logs = await _siteLogService.GetBySitesAsync(dtos.Select(d => d.Id), cancellationToken);
+            var logsBySite = logs.ToLookup(l => l.Site.Id ?? 0);
+
+            foreach (var dto in dtos)
+            {
+                dto.Logs = logsBySite[dto.Id].ToList();
+            }
+        }
+
+        return dtos.ToPagedData(pageInfo);
+    }
+
+    public async Task UpdateFogAssignmentAsync(int siteId, int? userId)
+    {
+        var assignmentDate = userId.HasValue ? DateTime.UtcNow : (DateTime?)null;
+
+        await _siteRepository.UpdateFogAssignmentAsync(siteId, userId, assignmentDate);
+    }
+
+    private static (DateTime? From, DateTime? To) ExtractDueDateFilter(Query query)
+    {
+        var node = query.Filter.FirstOrDefault(f => string.Equals(f.ColumnName, "dueDate", StringComparison.OrdinalIgnoreCase));
+
+        if (node == null)
+        {
+            return (null, null);
+        }
+
+        query.Filter.Remove(node);
+
+        DateTime? from = null;
+        DateTime? to = null;
+
+        foreach (var child in node.Children ?? [])
+        {
+            if (!DateTime.TryParse(child.Value, out var value))
+            {
+                continue;
+            }
+
+            if (child.ComparisonOperator == ComparisonOperator.Gte)
+            {
+                from = value;
+            }
+            else if (child.ComparisonOperator == ComparisonOperator.Lte)
+            {
+                to = value;
+            }
+        }
+
+        return (from, to);
+    }
+
+    private static bool ExtractDueDateSortDescending(Query query)
+    {
+        var key = query.Sort.Keys.FirstOrDefault(k => string.Equals(k, "dueDate", StringComparison.OrdinalIgnoreCase));
+
+        if (key == null)
+        {
+            return false;
+        }
+
+        var descending = query.Sort[key] == SortOperator.Desc;
+        query.Sort.Remove(key);
+
+        return descending;
+    }
+
     public async Task<IEnumerable<SiteDto>> GetAllPendingRenewalAsync(int batchSize, CancellationToken cancellationToken)
     {
         var sites = await _siteRepository.GetAllPendingRenewalAsync(batchSize);

@@ -170,7 +170,17 @@ public class UpdateBackflowAssignmentDto
     public int? UserId { get; set; }
 }
 
+public class UpdateFogAssignmentDto
+{
+    public int? UserId { get; set; }
+}
+
 public class CsiComplianceSiteDto : SiteDto
+{
+    public List<SiteLogDto> Logs { get; set; } = [];
+}
+
+public class FogTripTicketComplianceSiteDto : SiteDto
 {
     public List<SiteLogDto> Logs { get; set; } = [];
 }

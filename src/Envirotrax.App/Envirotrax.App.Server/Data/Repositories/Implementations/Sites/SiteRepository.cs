@@ -149,6 +149,45 @@ public class SiteRepository : Repository<Site>, ISiteRepository
                 .SetProperty(s => s.BackflowAccountAssignmentDate, assignmentDate));
     }
 
+    public async Task<IEnumerable<Site>> GetFogTripTicketComplianceAsync(PageInfo pageInfo, Query query, DateTime? dueDateFrom, DateTime? dueDateTo, bool sortDescending, CancellationToken cancellationToken)
+    {
+        var now = DateTime.UtcNow;
+
+        var sites = GetListQuery()
+            .Where(s => s.TripTicketInterval > 0 && s.LastTripTicketDate != null && !s.OutOfArea)
+            .Where(s => s.LastTripTicketDate!.Value.AddDays(s.TripTicketInterval) < now);
+
+        if (dueDateFrom.HasValue)
+        {
+            sites = sites.Where(s => s.LastTripTicketDate!.Value.AddDays(s.TripTicketInterval) >= dueDateFrom.Value);
+        }
+
+        if (dueDateTo.HasValue)
+        {
+            sites = sites.Where(s => s.LastTripTicketDate!.Value.AddDays(s.TripTicketInterval) <= dueDateTo.Value);
+        }
+
+        sites = sites.Where(query.Filter);
+
+        var sorted = sortDescending
+            ? sites.OrderByDescending(s => s.LastTripTicketDate!.Value.AddDays(s.TripTicketInterval))
+            : sites.OrderBy(s => s.LastTripTicketDate!.Value.AddDays(s.TripTicketInterval));
+
+        var paginated = await sorted.PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public async Task UpdateFogAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate)
+    {
+        await DbContext
+            .Sites
+            .Where(s => s.Id == siteId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(s => s.FogAccountAssignmentId, userId)
+                .SetProperty(s => s.FogAccountAssignmentDate, assignmentDate));
+    }
+
     // Loads the non-deleted Site TRACKED (unlike GetAsync/GetNoIncludesAsync, which use AsNoTracking) so the
     // caller can mutate approved fields and persist via SaveChangesAsync. Loaded via the query, not Attach/
     // Entry, to preserve the row's real WaterSupplierId under AdminDbContext.

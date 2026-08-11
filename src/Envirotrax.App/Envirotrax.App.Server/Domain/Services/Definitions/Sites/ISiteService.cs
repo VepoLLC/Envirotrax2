@@ -14,5 +14,7 @@ public interface ISiteService : IService<Site, SiteDto>
     Task<IPagedData<CsiComplianceSiteDto>> GetCsiComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task UpdateCsiAssignmentAsync(int siteId, int? userId);
     Task UpdateBackflowAssignmentAsync(int siteId, int? userId);
+    Task<IPagedData<FogTripTicketComplianceSiteDto>> GetFogTripTicketComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task UpdateFogAssignmentAsync(int siteId, int? userId);
     Task<IEnumerable<SiteDto>> GetAllPendingRenewalAsync(int batchSize, CancellationToken cancellationToken);
 }

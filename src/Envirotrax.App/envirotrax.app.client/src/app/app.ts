@@ -433,8 +433,8 @@ export class App implements OnInit {
           {
             title: 'Trip Ticket Compliance Management',
             iconCss: 'fa-solid fa-list-check',
-            routerLink: ['/'],
-            hasPermission: true,
+            routerLink: ['/fog/trip-ticket-compliance'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogReports),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
           },
           {

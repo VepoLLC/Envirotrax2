@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { BackflowTest } from "../../../../shared/models/backflow/backflow-test";
 import { BackflowTestService } from "../../../../shared/services/backflow/backflow-test.service";
 import { BackflowDeviceType } from "../../../../shared/models/backflow/backflow-test-enums";
-import { ToastService } from "../../../../shared/services/toast.service";
+import { ToastService } from '@envirotrax/common-ui';
 
 interface ImageSlot {
     type: string;

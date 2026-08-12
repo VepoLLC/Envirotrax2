@@ -8,10 +8,9 @@ import { State } from "../../shared/models/lookup/state";
 import { LookupService } from "../../shared/services/lookup/lookup.service";
 import { Professional } from "../../shared/models/professionals/professional";
 import { WaterSupplierRegistrationComponent, WaterSupplierRegistrationVm } from "./registration/water-supplier-registration.component";
-import { ToastService } from "../../shared/services/toast.service";
+import { ToastService, CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 import { AuthService } from "../../shared/services/auth/auth.service";
 import { FeatureType } from "../../shared/models/feature-type";
-import { CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
 
 type TabType = 'backflow' | 'csi' | 'fogInspection' | 'fogTransport';

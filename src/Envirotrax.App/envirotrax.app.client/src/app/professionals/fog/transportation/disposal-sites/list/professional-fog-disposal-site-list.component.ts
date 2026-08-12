@@ -4,8 +4,7 @@ import { PhysicalType, PHYSICAL_TYPE_LABELS } from "../../../../../shared/models
 import { ProfessionalFogDisposalSiteService } from "../../../../../shared/services/fog/professional-fog-disposal-site.service";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
 import { MAX_PAGE_SIZE } from "../../../../../shared/models/page-info";
-import { ToastService } from "../../../../../shared/services/toast.service";
-import { CellTemplateData, ColumnType, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
+import { ToastService, CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,

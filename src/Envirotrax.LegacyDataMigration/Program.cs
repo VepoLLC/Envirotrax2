@@ -1,4 +1,5 @@
 ﻿
+using Envirotrax.Common.Data.Services.Definitions;
 using Envirotrax.LegacyDataMigration.Data;
 using Envirotrax.LegacyDataMigration.Data.Users;
 using Envirotrax.LegacyDataMigration.Services;
@@ -8,27 +9,28 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
-var legacyV1DatabasConnection = @"Server=(localdb)\mssqllocaldb;Database=Vepo;Trusted_Connection=True;MultipleActiveResultSets=true";
 var newV2DatabaseConnection = @"Server=(localdb)\mssqllocaldb;Database=Envirotrax2Dev;Trusted_Connection=True;MultipleActiveResultSets=true";
 
 var services = new ServiceCollection();
 
-services.AddTransient(_ => new LegacyDbService(legacyV1DatabasConnection));
+void ConfigureDbContext(DbContextOptionsBuilder options)
+{
+    options.UseSqlServer(newV2DatabaseConnection);
 
-services
-    .AddDbContext<AppDbContext>(options =>
-    {
-        options.UseSqlServer(newV2DatabaseConnection);
+    options.EnableDetailedErrors();
+    options.EnableSensitiveDataLogging();
+    options.LogTo(Console.WriteLine, LogLevel.Information);
+}
 
-        options.EnableDetailedErrors();
-        options.EnableSensitiveDataLogging();
-        options.LogTo(Console.WriteLine, LogLevel.Information);
-    });
+services.AddDbContext<AppIdentityDbContext>(options => ConfigureDbContext(options));
+services.AddDbContext<AppDbContext>(options => ConfigureDbContext(options));
+
+services.AddSingleton<ITenantProvidersService, MigrationTenantProvidersService>();
 
 services
     .AddIdentityCore<AppUser>()
     .AddRoles<IdentityRole<int>>()
-    .AddEntityFrameworkStores<AppDbContext>();
+    .AddEntityFrameworkStores<AppIdentityDbContext>();
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -44,6 +46,7 @@ services.AddLogging(builder => builder.AddSerilog(Log.Logger, dispose: true));
 
 services.AddTransient<UserService>();
 services.AddTransient<WaterSupplierService>();
+services.AddTransient<WaterSupplierUserService>();
 
 var provider = services.BuildServiceProvider();
 
@@ -55,3 +58,6 @@ await userService.MigrateAsync();
 
 var waterSupplierService = provider.GetRequiredService<WaterSupplierService>();
 await waterSupplierService.MigrateAsync();
+
+var supplierUserService = provider.GetRequiredService<WaterSupplierUserService>();
+await supplierUserService.MigrateAsync();

@@ -53,4 +53,9 @@ export class FogInspectorInsurancesService {
         const url = this._urlResolver.resolveUrl(`/api/fog/inspectors/${inspectorId}/insurances/${insuranceId}/file-url`);
         return await lastValueFrom(this._http.get<string>(url));
     }
+
+    public delete(inspectorId: number, insuranceId: number): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/inspectors/${inspectorId}/insurances/${insuranceId}`);
+        return lastValueFrom(this._http.delete<void>(url));
+    }
 }

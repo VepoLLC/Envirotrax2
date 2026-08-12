@@ -4,6 +4,7 @@ import { ProfessionalInsurance, ExpirationType as InsuranceExpirationType } from
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
 import { FogInspectorLicensesService } from "../../../../../shared/services/fog/fog-inspector-licenses.service";
 import { FogInspectorInsurancesService } from "../../../../../shared/services/fog/fog-inspector-insurances.service";
+import { Professional } from "../../../../../shared/models/professionals/professional";
 import { DownloadService } from "../../../../../shared/services/download.service";
 import { AuthService } from "../../../../../shared/services/auth/auth.service";
 import { FeatureType } from "../../../../../shared/models/feature-type";
@@ -11,7 +12,7 @@ import { PermissionAction, PermissionType } from "../../../../../shared/models/p
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { EditFogInspectorLicenseComponent, FogLicenseModalData } from "../edit/edit-fog-inspector-license.component";
 import { EditFogInspectorInsuranceComponent, FogInsuranceModalData } from "../edit/edit-fog-inspector-insurance.component";
-import { CellTemplateData, ColumnType, ModalHelperService, TableColumn, TableCustomAction } from "@envirotrax/common-ui";
+import { CellTemplateData, ColumnType, ModalHelperService, TableColumn, TableCustomAction, ToastService } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'vp-fog-inspector-license-insurances',
@@ -20,6 +21,7 @@ import { CellTemplateData, ColumnType, ModalHelperService, TableColumn, TableCus
 })
 export class FogInspectorLicenseInsuranceComponent implements OnInit {
     @Input() public inspectorId!: number;
+    @Input() public inspector: Professional | null = null;
 
     public activeTab: 'insurances' | 'licenses' = 'insurances';
 
@@ -61,20 +63,12 @@ export class FogInspectorLicenseInsuranceComponent implements OnInit {
         private readonly _insurancesService: FogInspectorInsurancesService,
         private readonly _authService: AuthService,
         private readonly _modalHelper: ModalHelperService,
+        private readonly _toastService: ToastService,
         private readonly _downloadService: DownloadService
     ) { }
 
     public async ngOnInit(): Promise<void> {
         await this.setPermissions();
-
-        this.insuranceCustomActions = [
-            {
-                text: 'View',
-                iconClass: 'fa-solid fa-eye',
-                action: (insurance: ProfessionalInsurance) => this.viewInsuranceFile(insurance)
-            }
-        ];
-
         this.setupColumns();
         await this.loadInsurances();
     }
@@ -84,6 +78,21 @@ export class FogInspectorLicenseInsuranceComponent implements OnInit {
 
         this.canManageLicenses = canEditFogInspectors && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalLicenses);
         this.canManageInsurances = canEditFogInspectors && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalInsurances);
+
+        if (this.canManageInsurances) {
+            this.insuranceCustomActions = [
+                {
+                    text: 'View',
+                    iconClass: 'fa-solid fa-eye',
+                    action: (insurance: ProfessionalInsurance) => this.viewInsuranceFile(insurance)
+                },
+                {
+                    text: 'Email',
+                    iconClass: 'fa-solid fa-envelope',
+                    action: (insurance: ProfessionalInsurance) => this.prepareEmail(insurance)
+                }
+            ];
+        }
     }
 
     public async setActiveTab(tab: 'insurances' | 'licenses'): Promise<void> {
@@ -182,6 +191,19 @@ export class FogInspectorLicenseInsuranceComponent implements OnInit {
         }).result().subscribe(() => this.loadInsurances());
     }
 
+    public deleteInsurance(insurance: ProfessionalInsurance): void {
+        this._modalHelper.showDeleteConfirmation().result().subscribe(async () => {
+            try {
+                this.insurancesTable.isLoading = true;
+                await this._insurancesService.delete(this.inspectorId, insurance.id!);
+                this._toastService.successFullyDeleted('Insurance');
+            } finally {
+                this.insurancesTable.isLoading = false;
+            }
+            await this.loadInsurances();
+        });
+    }
+
     public async viewInsuranceFile(insurance: ProfessionalInsurance): Promise<void> {
         try {
             this.insurancesTable.isLoading = true;
@@ -190,6 +212,23 @@ export class FogInspectorLicenseInsuranceComponent implements OnInit {
         } finally {
             this.insurancesTable.isLoading = false;
         }
+    }
+
+    public async prepareEmail(insurance: ProfessionalInsurance): Promise<void> {
+        if (!this.inspector) {
+            return;
+        }
+
+        const adminEmail = await this._authService.getUserEmail();
+        const body = `${this.inspector.name},%0D%0A%0D%0A` +
+            `We have the Insurance: ${insurance.insuranceNumber} updated in your account. ` +
+            `Please let us know if you need anything else.%0D%0A%0D%0A` +
+            `Sincerely,%0D%0A${adminEmail} - Envirotrax`;
+        const link = `mailto:${this.inspector.companyEmail}` +
+            `?subject=${encodeURIComponent('Envirotrax - Insurance Validation')}` +
+            `&body=${body}`;
+
+        window.open(link);
     }
 
     public async loadLicenses(): Promise<void> {

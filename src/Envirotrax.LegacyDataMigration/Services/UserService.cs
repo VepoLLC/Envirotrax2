@@ -2,7 +2,6 @@
 using Envirotrax.LegacyDataMigration.Data;
 using Envirotrax.LegacyDataMigration.Data.Users;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -10,24 +9,20 @@ namespace Envirotrax.LegacyDataMigration.Services;
 
 public class UserService
 {
-    private const string V1ScriptsFolder = "Scripts/Users/V1";
-    private const string V2ScriptsFolder = "Scripts/Users/V2";
+    private const string ScriptsFolder = "Scripts/Users";
 
     private readonly UserManager<AppUser> _userManager;
     private readonly ILogger<UserService> _logger;
-    private readonly LegacyDbService _legacyDb;
-    private readonly AppDbContext _appDbContext;
+    private readonly AppIdentityDbContext _identityDbContext;
 
     public UserService(
         UserManager<AppUser> userManager,
         ILogger<UserService> logger,
-        LegacyDbService legacyDb,
-        AppDbContext appDbContext)
+        AppIdentityDbContext identityDbContext)
     {
         _userManager = userManager;
         _logger = logger;
-        _legacyDb = legacyDb;
-        _appDbContext = appDbContext;
+        _identityDbContext = identityDbContext;
     }
 
     public async Task MigrateAsync()
@@ -42,43 +37,20 @@ public class UserService
 
     private async Task ExecuteSqlScriptsAsync()
     {
-        await ExecuteV2ScriptsAsync();
-        await ExecuteV1ScriptsAsync();
-    }
+        _logger.LogInformation("Executing database scripts from {folderName}.", ScriptsFolder);
 
-    private async Task ExecuteV2ScriptsAsync()
-    {
-        _logger.LogInformation("Executing database scripts from {folderName}.", V2ScriptsFolder);
-
-        var scripts = Directory.GetFiles(V2ScriptsFolder, "*.sql");
+        var scripts = Directory.GetFiles(ScriptsFolder, "*.sql").OrderBy(file => file);
 
         foreach (var file in scripts)
         {
             _logger.LogInformation("Executing script {file}", file);
             var sql = await File.ReadAllTextAsync(file);
 
-            await _appDbContext.Database.ExecuteSqlRawAsync(sql);
-        }
-
-        _logger.LogInformation("Completed executing database scripts from {folderName}.", V2ScriptsFolder);
-    }
-
-    private async Task ExecuteV1ScriptsAsync()
-    {
-        _logger.LogInformation("Executing database scripts from {folderName}.", V1ScriptsFolder);
-
-        var scripts = Directory.GetFiles(V1ScriptsFolder, "*.sql");
-
-        foreach (var file in scripts)
-        {
-            _logger.LogInformation("Executing script {file}", file);
-            var sql = await File.ReadAllTextAsync(file);
-
-            var addedRows = await _legacyDb.ExecuteNonQueryAsync(sql);
+            var addedRows = await _identityDbContext.Database.ExecuteSqlRawAsync(sql);
             _logger.LogInformation("Imported users. Count: {count}", addedRows);
         }
 
-        _logger.LogInformation("Completed executing database scripts from {folderName}.", V1ScriptsFolder);
+        _logger.LogInformation("Completed executing database scripts from {folderName}.", ScriptsFolder);
     }
 
     private async Task HashLegacyPasswordsAsync()
@@ -116,6 +88,6 @@ public class UserService
         _logger.LogInformation("Hashed {HashedCount} records and failed {FailedCount} records.", hashedCount, failedCount);
         _logger.LogInformation("Executing database updates of password hashes.");
 
-        await _appDbContext.SaveChangesAsync();
+        await _identityDbContext.SaveChangesAsync();
     }
 }

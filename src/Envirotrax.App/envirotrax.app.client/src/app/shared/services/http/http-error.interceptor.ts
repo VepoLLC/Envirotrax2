@@ -2,9 +2,8 @@ import { HttpContextToken, HttpErrorResponse, HttpEvent, HttpHandler, HttpInterc
 import { Injectable } from "@angular/core";
 import { Observable, throwError } from "rxjs";
 import { catchError } from "rxjs/operators";
-import { ModalHelperService } from "@envirotrax/common-ui";
+import { ModalHelperService, ToastService, ToastType } from "@envirotrax/common-ui";
 import { AuthService } from "../auth/auth.service";
-import { ToastService, ToastType } from "../toast.service";
 
 // Requests that already treat a particular status as expected control flow (e.g. a 404
 // meaning "no record yet") can opt out of the global handling by setting this to true.

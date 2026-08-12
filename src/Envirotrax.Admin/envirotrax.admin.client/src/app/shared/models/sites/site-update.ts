@@ -1,15 +1,14 @@
 import { FacilityType, GreaseTrapType, PropertyType } from './site';
 
+// State reference sent as `{ id }`, matching the App SiteDto's nested State/MailingState shape.
+export interface SiteStateReference {
+    id: number;
+}
+
 /**
- * Update payload sent by the Edit Site Save action to PUT /api/sites/{id}. Contains ONLY the fields the
- * Edit Site screen makes editable (Property Information, Mailing Information, Property Settings). GIS
- * values are excluded here and saved separately via SiteGisUpdate; protected fields (id, waterSupplier,
- * audit, assignments, needsRenewalCheck) are never sent — the server derives/owns those.
- *
- * Every property is required: this is a full PUT and the server's load-then-modify copies each field onto
- * the site unconditionally, so a field must always be sent. Nullable domain fields (optional strings,
- * dates and state ids) are typed `| null` and sent as null when empty; the value-type fields (booleans,
- * numbers, enums) always carry a concrete value.
+ * Edit Site save payload (PUT /api/sites/{id}) — only the editable Property/Mailing/Settings fields.
+ * GIS is saved separately via SiteGisUpdate; protected fields (id, waterSupplier, audit, needsRenewalCheck)
+ * are never sent. state/mailingState are nested `{ id }` to match the App SiteDto.
  */
 export interface SiteUpdate {
     // Property Information
@@ -19,7 +18,7 @@ export interface SiteUpdate {
     streetName: string | null;
     propertyNumber: string | null;
     city: string | null;
-    stateId: number | null;
+    state: SiteStateReference | null;
     zipCode: string | null;
 
     // Mailing Information
@@ -29,7 +28,7 @@ export interface SiteUpdate {
     mailingStreetName: string | null;
     mailingNumber: string | null;
     mailingCity: string | null;
-    mailingStateId: number | null;
+    mailingState: SiteStateReference | null;
     mailingZipCode: string | null;
     mailingPhoneNumber: string | null;
     mailingEmailAddress: string | null;
@@ -63,11 +62,8 @@ export interface SiteUpdate {
 }
 
 /**
- * GIS update payload sent to PUT /api/sites/{id}/gis-data. Saved through its own endpoint (GIS is
- * write-isolated from the normal Site save) and only when a GIS value actually changed. All properties
- * are required (full PUT); latitude/longitude are `number | null`. Status mirrors the GisStatusType
- * values: Error = -1, Not Set = 0, Geocoded = 1 (kept as a number, matching the client's existing GIS
- * status representation — there is no GIS status enum in the client models).
+ * GIS payload (PUT /api/sites/{id}/gis-data) — saved separately from the normal Site save, only when a
+ * GIS value changed. latitude/longitude are `number | null`; status: Error -1 / Not Set 0 / Geocoded 1.
  */
 export interface SiteGisUpdate {
     latitude: number | null;

@@ -5,8 +5,7 @@ import { FogVehicle } from "../../../../../shared/models/fog/fog-vehicle";
 import { FogVehicleCapacityType, FOG_VEHICLE_CAPACITY_TYPE_LABELS } from "../../../../../shared/models/fog/fog-vehicle-enums";
 import { ProfessionalFogVehicleService } from "../../../../../shared/services/fog/professional-fog-vehicle.service";
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
-import { ToastService } from "../../../../../shared/services/toast.service";
-import { InputOption } from "@envirotrax/common-ui";
+import { ToastService, InputOption } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,

@@ -1,6 +1,6 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { CellTemplateData, ColumnType, InputOption, MAX_PAGE_SIZE, QueryProperty, TableColumn, TableViewModel } from '@envirotrax/common-ui';
+import { CellTemplateData, ColumnType, InputOption, QueryProperty, TableColumn, TableViewModel } from '@envirotrax/common-ui';
 import { FogCompliancyStatus, PropertyType, Site } from '../../shared/models/sites/site';
 import { SiteEditWindowModel } from '../../shared/models/sites/site-detail';
 import { SiteService } from '../../shared/services/sites/site.service';
@@ -144,12 +144,7 @@ export class SiteListComponent implements OnInit {
     }
 
     private async loadWaterSuppliers(): Promise<void> {
-        const result = await this._waterSupplierService.getAll(
-            { pageSize: MAX_PAGE_SIZE },
-            { sort: { name: 'Asc' }, filter: [] }
-        );
-
-        const options: InputOption[] = (result.data ?? []).map(ws => ({ id: String(ws.id), text: ws.name }));
+        const options = await this._waterSupplierService.getAllAsOptions();
 
         this.waterSupplierOptions = [{ id: '', text: 'Any Value' }, ...options];
     }

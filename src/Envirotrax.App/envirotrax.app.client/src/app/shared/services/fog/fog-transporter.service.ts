@@ -38,4 +38,18 @@ export class FogTransporterService {
             url: url
         };
     }
+
+    public async search(registrationNumber: string | undefined, insurancePolicyNumber: string | undefined, pageInfo: PageInfo): Promise<PagedData<Professional>> {
+        const url = this._urlResolver.resolveUrl('/api/fog/transporters/search');
+        let params = this._queryHelper.pageInfoToQueryString(pageInfo);
+
+        if (registrationNumber) {
+            params = params.append('registrationNumber', registrationNumber);
+        }
+        if (insurancePolicyNumber) {
+            params = params.append('insurancePolicyNumber', insurancePolicyNumber);
+        }
+
+        return await lastValueFrom(this._http.get<PagedData<Professional>>(url, { params }));
+    }
 }

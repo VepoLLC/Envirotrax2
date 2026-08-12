@@ -94,6 +94,8 @@ public static class ServiceRegistration
         services.AddTransient<IFogDisposalSiteRepository, FogDisposalSiteRepository>();
         services.AddTransient<IFogTripTicketRepository, FogTripTicketRepository>();
         services.AddTransient<IFogSettingsRepository, FogSettingsRepository>();
+        services.AddTransient<IFogTripTicketReportRepository, FogTripTicketReportRepository>();
+        services.AddTransient<IFogInspectionReportRepository, FogInspectionReportRepository>();
 
         services.AddTransient<IGisAreaRepository, GisAreaRepository>();
         services.AddTransient<IGisAreaCoordinateRepository, GisAreaCoordinateRepository>();

@@ -17,8 +17,7 @@ import { HttpErrorInterceptor } from './shared/services/http/http-error.intercep
   declarations: [
     App,
     WindowContainerComponent,
-    WindowComponent,
-    ToastContainerComponent
+    WindowComponent
   ],
   imports: [
     BrowserModule,

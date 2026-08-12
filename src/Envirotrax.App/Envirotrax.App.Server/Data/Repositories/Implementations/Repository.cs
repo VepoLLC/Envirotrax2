@@ -112,6 +112,27 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    public virtual Task<int> CountAsync(CancellationToken cancellationToken)
+    {
+        return CountAsync(new Query(), cancellationToken);
+    }
+
+    /// <summary>
+    /// Counts the rows the list query would return, without fetching or materializing any of them.
+    /// </summary>
+    /// <remarks>
+    /// This builds on <see cref="GetListQuery"/> so that every filter a repository applies there —
+    /// soft deletes, tenant scoping, business rules — is honoured by the count too. Sorting and
+    /// pagination are skipped because they cannot change a count, and EF Core drops the includes
+    /// it doesn't need, so this is a single COUNT query rather than the two a paged read costs.
+    /// </remarks>
+    public virtual Task<int> CountAsync(Query query, CancellationToken cancellationToken)
+    {
+        return GetListQuery()
+            .Where(query.Filter)
+            .CountAsync(cancellationToken);
+    }
+
     public virtual async Task<TModel?> GetNoIncludesAsync(TKey id, CancellationToken cancellationToken)
     {
         return await Entity

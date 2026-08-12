@@ -5,6 +5,7 @@ import { WindowService } from './shared/services/window.service';
 import { WaterSupplierListComponent } from './water-suppliers/list/water-supplier-list.component';
 import { SiteListComponent } from './sites/list/site-list.component';
 import { CsiInspectionListComponent } from './csi/inspections/list/csi-inspection-list.component';
+import { CsiInspectorListComponent } from './csi/inspectors/list/csi-inspector-list.component';
 import { BackflowTestListComponent } from './backflow/tests/list/backflow-test-list.component';
 
 @Component({
@@ -55,6 +56,11 @@ export class App implements OnInit {
             title: 'Inspection Search',
             iconCss: 'fa-solid fa-magnifying-glass',
             onClick: this.showCsiInspectionSearch.bind(this)
+          },
+          {
+            title: 'Inspector Search',
+            iconCss: 'fa-solid fa-user',
+            onClick: this.showCsiInspectorSearch.bind(this)
           }
         ]
       },
@@ -120,6 +126,12 @@ export class App implements OnInit {
   public showCsiInspectionSearch(): void {
     this._windowService.addWindow(CsiInspectionListComponent, {
       title: 'CSI Search'
+    });
+  }
+
+  public showCsiInspectorSearch(): void {
+    this._windowService.addWindow(CsiInspectorListComponent, {
+      title: 'CSI Inspector Search'
     });
   }
 

@@ -22,7 +22,10 @@ builder.Configuration.AddAzureKeyVault(
     vaultUri: new Uri(builder.Configuration["KeyVault:Url"] ?? throw new InvalidOperationException()),
     credential: new DefaultAzureCredential());
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ApiExceptionFilter>();
+});
 
 builder.Services.AddApplicationServices(builder.Configuration, builder.Environment);
 

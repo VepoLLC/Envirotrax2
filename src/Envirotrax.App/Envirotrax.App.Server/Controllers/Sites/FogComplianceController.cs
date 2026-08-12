@@ -20,9 +20,15 @@ public class FogComplianceController : WaterSupplierProtectedController
 
     [HttpGet]
     [HasPermission(PermissionAction.CanView)]
-    public async Task<IActionResult> GetFogTripTicketComplianceAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetFogTripTicketComplianceAsync(
+        [FromQuery] PageInfo pageInfo,
+        [FromQuery] Query query,
+        [FromQuery] DateTime? dueDateFrom,
+        [FromQuery] DateTime? dueDateTo,
+        [FromQuery] bool sortDescending,
+        CancellationToken cancellationToken)
     {
-        var result = await _siteService.GetFogTripTicketComplianceAsync(pageInfo, query, cancellationToken);
+        var result = await _siteService.GetFogTripTicketComplianceAsync(pageInfo, query, dueDateFrom, dueDateTo, sortDescending, cancellationToken);
 
         return Ok(result);
     }

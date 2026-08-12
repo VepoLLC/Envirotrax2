@@ -67,21 +67,43 @@ export class SiteService {
         );
     }
 
-    public getFogTripTicketComplianceEndpoint(): DownloadEndpoint {
+    // dueDateFrom/dueDateTo/sortDescending are plain query-string params, not part of the Query object:
+    // a site's due date (LastTripTicketDate + TripTicketInterval) isn't a real column, so it can't be
+    // filtered/sorted through the generic Query mechanism the way a real column like csiRenewalDate can.
+    public getFogTripTicketComplianceEndpoint(dueDateFrom?: string, dueDateTo?: string, sortDescending?: boolean): DownloadEndpoint {
         return {
             method: 'GET',
-            url: this._urlResolver.resolveUrl('/api/sites/fog-trip-ticket-compliance'),
+            url: this._urlResolver.resolveUrl(this.fogTripTicketComplianceUrl(dueDateFrom, dueDateTo, sortDescending)),
         };
     }
 
-    public async getFogTripTicketCompliance(pageInfo: PageInfo, query: Query): Promise<PagedData<Site>> {
-        const url = this._urlResolver.resolveUrl('/api/sites/fog-trip-ticket-compliance');
+    public async getFogTripTicketCompliance(pageInfo: PageInfo, query: Query, dueDateFrom?: string, dueDateTo?: string, sortDescending?: boolean): Promise<PagedData<Site>> {
+        const url = this._urlResolver.resolveUrl(this.fogTripTicketComplianceUrl(dueDateFrom, dueDateTo, sortDescending));
 
         const observable = this._http.get<PagedData<Site>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)
         });
 
         return await lastValueFrom(observable);
+    }
+
+    private fogTripTicketComplianceUrl(dueDateFrom?: string, dueDateTo?: string, sortDescending?: boolean): string {
+        const params = new URLSearchParams();
+
+        if (dueDateFrom) {
+            params.set('dueDateFrom', dueDateFrom);
+        }
+
+        if (dueDateTo) {
+            params.set('dueDateTo', dueDateTo);
+        }
+
+        if (sortDescending) {
+            params.set('sortDescending', 'true');
+        }
+
+        const queryString = params.toString();
+        return queryString ? `/api/sites/fog-trip-ticket-compliance?${queryString}` : '/api/sites/fog-trip-ticket-compliance';
     }
 
     public updateFogAssignment(siteId: number, userId: number | null): Promise<void> {

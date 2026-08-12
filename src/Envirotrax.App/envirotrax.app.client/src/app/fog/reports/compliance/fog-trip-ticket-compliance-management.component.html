@@ -1,9 +1,5 @@
 <h1 class="text-center h2">FOG Trip Ticket Compliance Management</h1>
 
-<ng-template #numberTemplate let-data="rowData">
-    {{ data.rowNumber }}
-</ng-template>
-
 <ng-template #propertyTemplate let-data="rowData">
     <div class="d-flex gap-2 align-items-center">
         <i class="fa-solid fs-5"
@@ -38,30 +34,17 @@
 <ng-template #assignedToTemplate let-data="rowData">
     <ng-container *ngIf="canModify; else assignedReadonly">
         <select class="form-select form-select-sm"
-                [value]="data.fogAccountAssignmentId ?? ''"
                 (change)="onAssignmentChange(data, $any($event.target).value)">
-            <option value="">Unassigned</option>
-            <option *ngFor="let user of users" [value]="user.id">{{ user.contactName }}</option>
+            <option value="" [selected]="data.fogAccountAssignmentId == null">Unassigned</option>
+            <option *ngFor="let user of users" [value]="user.id" [selected]="user.id === data.fogAccountAssignmentId">{{ user.contactName }}</option>
         </select>
     </ng-container>
     <ng-template #assignedReadonly>
         <span>{{ data.assignedName }}</span>
     </ng-template>
-    <div *ngIf="data.fogAccountAssignmentDate" class="small text-muted mt-1">
-        {{ data.fogAccountAssignmentDate | date:'short' }}
+    <div *ngIf="data.assignedDate" class="small text-muted mt-1">
+        {{ data.assignedDate | date:'short' }}
     </div>
-</ng-template>
-
-<ng-template #lastTripTicketDateTemplate let-data="rowData">
-    {{ data.lastTripTicketDate | date }}
-</ng-template>
-
-<ng-template #intervalTemplate let-data="rowData">
-    {{ data.tripTicketInterval }} days
-</ng-template>
-
-<ng-template #dueDateTemplate let-data="rowData">
-    {{ data.dueDate | date }}
 </ng-template>
 
 <ng-template #daysOverdueTemplate let-data="rowData">

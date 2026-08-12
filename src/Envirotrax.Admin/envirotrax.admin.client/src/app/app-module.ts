@@ -11,6 +11,7 @@ import { AuthInterceptor } from './shared/services/auth/auth.iterceptor';
 import { WindowContainerComponent } from './window/window-container.component';
 import { WindowComponent } from './window/window.component';
 import { ToastContainerComponent } from './toast-container/toast-container.component';
+import { HttpErrorInterceptor } from './shared/services/http/http-error.interceptor';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,11 @@ import { ToastContainerComponent } from './toast-container/toast-container.compo
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TimeZoneInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpErrorInterceptor,
       multi: true
     },
   ],

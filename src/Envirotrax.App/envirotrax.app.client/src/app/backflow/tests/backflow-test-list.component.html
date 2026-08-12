@@ -220,13 +220,14 @@
                                                            borderColor="orange" />
                                 </div>
                                 <div class="mb-2">
-                                    <vp-filter-panel-field fieldName="paymentStatus"
-                                                           label="Payment status"
-                                                           labelStyle="horizontal"
-                                                           type="select"
-                                                           [options]="paymentStatusOptions"
-                                                           [form]="searchForm"
-                                                           borderColor="orange" />
+                                    <vp-input name="paymentStatus"
+                                              label="Payment status"
+                                              labelStyle="horizontal"
+                                              type="select"
+                                              [options]="paymentStatusOptions"
+                                              [form]="searchForm"
+                                              borderColor="orange"
+                                              [(ngModel)]="paymentStatus" />
                                 </div>
                                 <div class="mb-2">
                                     <vp-filter-panel-field fieldName="disapproved"

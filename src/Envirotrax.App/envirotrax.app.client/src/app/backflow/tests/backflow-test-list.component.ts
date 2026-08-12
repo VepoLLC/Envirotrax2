@@ -99,7 +99,7 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
     public testResultOptions: InputOption[];
     public paymentStatusOptions: InputOption[];
 
-    private paymentStatus: BackflowPaymentStatus | null = null;
+    public paymentStatus: string = '';
     public approvalStatusOptions: InputOption[];
     public reasonForTestOptions: InputOption[];
 
@@ -273,14 +273,18 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
     }
 
     public showDownloadManager(): void {
-        const additionalParams = this.paymentStatus != null
-            ? { paymentStatus: String(this.paymentStatus) }
+        const additionalParams = this.paymentStatus
+            ? { paymentStatus: this.paymentStatus }
             : undefined;
 
         this.downloadConfig.endpoint.additionalParams = additionalParams;
         this.downloadConfig.pdfEndpoint!.additionalParams = additionalParams;
 
         this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
+    }
+
+    private getPaymentStatus(): BackflowPaymentStatus | null {
+        return this.paymentStatus ? Number(this.paymentStatus) as BackflowPaymentStatus : null;
     }
 
     public viewPrintableTable(): void {
@@ -382,7 +386,7 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
             const result = await this._backflowTestService.getAll(
                 this.table.items?.pageInfo || {},
                 this.table.query,
-                this.paymentStatus
+                this.getPaymentStatus()
             );
             const startIndex = ((result.pageInfo.pageNumber ?? 1) - 1) * (result.pageInfo.pageSize ?? 10);
             result.data.forEach((item, i) => (item as any)['_rowNumber'] = startIndex + i + 1);
@@ -398,11 +402,7 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
-        const payment = queryProperties.find(p => p.columnName === 'paymentStatus');
-
-        this.paymentStatus = payment?.value ? Number(payment.value) as BackflowPaymentStatus : null;
-
-        this.table.query.filter = queryProperties.filter(p => p.columnName !== 'paymentStatus');
+        this.table.query.filter = queryProperties;
     }
 
     // Builds the preset filter for a Tab 2 (Current Compliance Status) View drill-down: the non-compliant
@@ -465,7 +465,7 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
             this.showMapResults = false;
 
             const [testsPage, areas, coordinates, defaultView] = await Promise.all([
-                this._backflowTestService.getAll({ pageSize: 10000, pageNumber: 1 }, this.table.query, this.paymentStatus),
+                this._backflowTestService.getAll({ pageSize: 10000, pageNumber: 1 }, this.table.query, this.getPaymentStatus()),
                 this._gisAreaService.getAllAreas(),
                 this._coordinateService.getAll(),
                 this._gisAreaService.getDefaultView()

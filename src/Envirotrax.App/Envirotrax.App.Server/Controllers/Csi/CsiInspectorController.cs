@@ -22,9 +22,9 @@ namespace Envirotrax.App.Server.Controllers.Csi
 
         [HttpGet("search")]
         [HasPermission(PermissionAction.CanView)]
-        public async Task<IActionResult> SearchAsync([FromQuery] PageInfo pageInfo, [FromQuery] string? inspectorLicenseNumber, [FromQuery] string? insurancePolicyNumber, CancellationToken cancellationToken)
+        public async Task<IActionResult> SearchAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, [FromQuery] string? inspectorLicenseNumber, [FromQuery] string? insurancePolicyNumber, [FromQuery] string? userEmail, [FromQuery] string? contactName, CancellationToken cancellationToken)
         {
-            var result = await _inspectorService.SearchAsync(inspectorLicenseNumber, insurancePolicyNumber, pageInfo, cancellationToken);
+            var result = await _inspectorService.SearchAsync(inspectorLicenseNumber, insurancePolicyNumber, userEmail, contactName, pageInfo, query, cancellationToken);
             return Ok(result);
         }
     }

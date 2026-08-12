@@ -1,11 +1,10 @@
 import { HttpContextToken, HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { AuthService } from "../auth/auth.service";
-import { ToastService, ToastType } from "../toast.service";
-import { ModalHelperService } from "@envirotrax/common-ui";
 import { Observable } from "rxjs/internal/Observable";
 import { catchError } from "rxjs/internal/operators/catchError";
 import { throwError } from "rxjs/internal/observable/throwError";
+import { ModalHelperService, ToastService, ToastType } from "@envirotrax/common-ui";
 
 export const SKIP_ERROR_INTERCEPTOR = new HttpContextToken<boolean>(() => false);
 

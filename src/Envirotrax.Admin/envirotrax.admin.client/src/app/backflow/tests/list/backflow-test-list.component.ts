@@ -59,9 +59,9 @@ export class BackflowTestListComponent implements OnInit {
 
     public dateRange?: DateRange;
 
-    private panelFilter: QueryProperty[] = [];
+    public paymentStatus: string = '';
 
-    private paymentStatus: BackflowPaymentStatus | null = null;
+    private panelFilter: QueryProperty[] = [];
 
     public table: TableViewModel<BackflowTest> = {
         query: {
@@ -157,11 +157,7 @@ export class BackflowTestListComponent implements OnInit {
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
-        const payment = queryProperties.find(p => p.columnName === 'paymentStatus');
-
-        this.paymentStatus = payment?.value ? Number(payment.value) as BackflowPaymentStatus : null;
-
-        this.panelFilter = queryProperties.filter(p => p.columnName !== 'paymentStatus');
+        this.panelFilter = queryProperties;
 
         this.table.query.filter = this.buildFilter();
     }
@@ -185,7 +181,7 @@ export class BackflowTestListComponent implements OnInit {
             this.table.items = await this._backflowTestService.getAll(
                 this.table.items?.pageInfo || {},
                 this.table.query,
-                this.paymentStatus
+                this.paymentStatus ? Number(this.paymentStatus) as BackflowPaymentStatus : null
             );
         } finally {
             this.table.isLoading = false;

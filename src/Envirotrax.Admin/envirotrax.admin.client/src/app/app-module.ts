@@ -10,6 +10,7 @@ import { SharedComponentsModule } from './shared/components/shared.components.mo
 import { AuthInterceptor } from './shared/services/auth/auth.iterceptor';
 import { WindowContainerComponent } from './window/window-container.component';
 import { WindowComponent } from './window/window.component';
+import { HttpErrorInterceptor } from './shared/services/http/http-error.interceptor';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,11 @@ import { WindowComponent } from './window/window.component';
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TimeZoneInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpErrorInterceptor,
       multi: true
     },
   ],

@@ -45,6 +45,7 @@ type SiteRow = Site & {
     daysOverdue?: number;
     overdueClass?: string;
     assignedName?: string;
+    assignedDate?: Date;
     rowNumber?: number;
     canModify?: boolean;   // surfaced to the shared property-log cell
 };
@@ -54,9 +55,6 @@ type SiteRow = Site & {
     templateUrl: './fog-trip-ticket-compliance-management.component.html'
 })
 export class FogTripTicketComplianceManagementComponent implements OnInit {
-    @ViewChild('numberTemplate', { static: true })
-    public numberTemplate!: TemplateRef<CellTemplateData<Site>>;
-
     @ViewChild('propertyTemplate', { static: true })
     public propertyTemplate!: TemplateRef<CellTemplateData<Site>>;
 
@@ -65,15 +63,6 @@ export class FogTripTicketComplianceManagementComponent implements OnInit {
 
     @ViewChild('assignedToTemplate', { static: true })
     public assignedToTemplate!: TemplateRef<CellTemplateData<Site>>;
-
-    @ViewChild('lastTripTicketDateTemplate', { static: true })
-    public lastTripTicketDateTemplate!: TemplateRef<CellTemplateData<Site>>;
-
-    @ViewChild('intervalTemplate', { static: true })
-    public intervalTemplate!: TemplateRef<CellTemplateData<Site>>;
-
-    @ViewChild('dueDateTemplate', { static: true })
-    public dueDateTemplate!: TemplateRef<CellTemplateData<Site>>;
 
     @ViewChild('daysOverdueTemplate', { static: true })
     public daysOverdueTemplate!: TemplateRef<CellTemplateData<Site>>;
@@ -135,13 +124,20 @@ export class FogTripTicketComplianceManagementComponent implements OnInit {
 
     public table: TableViewModel<Site> = {
         columns: [],
-        query: { sort: { dueDate: 'Asc' }, filter: [] }
+        query: { sort: {}, filter: [] }
     };
 
     public downloadConfig: DownloadConfig;
 
     private panelFilters: QueryProperty[] = [];
     private readonly today: number = new Date().setHours(0, 0, 0, 0);
+
+    // Site's due date (LastTripTicketDate + TripTicketInterval) isn't a real column, so it can't be
+    // filtered/sorted through the Query object the way a real column like csiRenewalDate can — these are
+    // sent to the backend as plain query-string params instead.
+    private dueDateFrom?: string;
+    private dueDateTo?: string;
+    private sortDescending: boolean = false;
 
     constructor(
         private readonly _siteService: SiteService,
@@ -206,7 +202,10 @@ export class FogTripTicketComplianceManagementComponent implements OnInit {
 
         this.table.columns = this.getColumns();
         this.table.query = this.buildQuery();
+        this.applyDaysOverdueBounds();
+        this.sortDescending = this.sortBy === '1';
         this.daysOverdueLabel = this.buildDaysOverdueLabel();
+        this.downloadConfig.endpoint = this._siteService.getFogTripTicketComplianceEndpoint(this.dueDateFrom, this.dueDateTo, this.sortDescending);
 
         if (this.table.items?.pageInfo) {
             this.table.items.pageInfo.pageNumber = 1;
@@ -228,7 +227,10 @@ export class FogTripTicketComplianceManagementComponent implements OnInit {
             this.table.isLoading = true;
             this.table.items = await this._siteService.getFogTripTicketCompliance(
                 this.table.items?.pageInfo || {},
-                this.table.query
+                this.table.query,
+                this.dueDateFrom,
+                this.dueDateTo,
+                this.sortDescending
             );
 
             const pageInfo = this.table.items?.pageInfo;
@@ -271,40 +273,99 @@ export class FogTripTicketComplianceManagementComponent implements OnInit {
 
     private getColumns(): TableColumn<Site>[] {
         const columns: TableColumn<Site>[] = [
-            { field: '', caption: '', type: ColumnType.other, queryColumnExcluded: true, cellTemplate: this.numberTemplate, rowCssClass: 'align-top' },
-            this.templateColumn('Property Information', this.propertyTemplate),
-            { field: 'accountNumber', caption: 'Account Number', type: ColumnType.text, rowCssClass: 'align-top' },
-            this.logColumn(),
-            this.templateColumn('Assigned To', this.assignedToTemplate),
-            this.templateColumn('Last Trip Ticket Date', this.lastTripTicketDateTemplate),
-            this.templateColumn('Interval', this.intervalTemplate),
-            this.templateColumn('Due Date', this.dueDateTemplate),
-            this.templateColumn('Days Overdue', this.daysOverdueTemplate),
-            this.templateColumn('', this.viewSiteTemplate)
+            {
+                field: 'rowNumber',
+                caption: '',
+                type: ColumnType.number,
+                queryColumnExcluded: true,
+                rowCssClass: 'align-top'
+            },
+            {
+                field: '',
+                caption: 'Property Information',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.propertyTemplate,
+                rowCssClass: 'align-top'
+            },
+            {
+                field: 'accountNumber',
+                caption: 'Account Number',
+                type: ColumnType.text,
+                rowCssClass: 'align-top'
+            },
+            // Property Log rendered by the shared app cell component (via cellComponent, not cellTemplate).
+            // The cell reads canModify + the site's logs off the row (decorated in getCompliance / decorate).
+            {
+                field: '',
+                caption: 'Property Log',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellComponent: PropertyLogCellComponent,
+                rowCssClass: 'align-top'
+            },
+            {
+                field: '',
+                caption: 'Assigned To',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.assignedToTemplate,
+                rowCssClass: 'align-top'
+            },
+            {
+                field: 'lastTripTicketDate',
+                caption: 'Last Trip Ticket Date',
+                type: ColumnType.date,
+                rowCssClass: 'align-top'
+            },
+            {
+                field: 'tripTicketInterval',
+                caption: 'Interval (Days)',
+                type: ColumnType.number,
+                rowCssClass: 'align-top'
+            },
+            {
+                field: 'dueDate',
+                caption: 'Due Date',
+                type: ColumnType.date,
+                queryColumnExcluded: true,
+                rowCssClass: 'align-top'
+            },
+            {
+                field: '',
+                caption: 'Days Overdue',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.daysOverdueTemplate,
+                rowCssClass: 'align-top'
+            },
+            {
+                field: '',
+                caption: '',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.viewSiteTemplate,
+                rowCssClass: 'align-top'
+            }
         ];
 
         if (this.showMailing) {
-            columns.splice(2, 0, this.templateColumn('Mailing Information', this.mailingTemplate));
+            columns.splice(2, 0, {
+                field: '',
+                caption: 'Mailing Information',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.mailingTemplate,
+                rowCssClass: 'align-top'
+            });
         }
 
         return columns;
     }
 
-    private templateColumn(caption: string, template: TemplateRef<CellTemplateData<Site>>): TableColumn<Site> {
-        return { field: '', caption, type: ColumnType.other, queryColumnExcluded: true, cellTemplate: template, rowCssClass: 'align-top' };
-    }
-
-    // Property Log rendered by the shared app cell component (via cellComponent, not cellTemplate). The cell
-    // reads canModify + the site's logs off the row (decorated in getCompliance / decorate).
-    private logColumn(): TableColumn<Site> {
-        return { field: '', caption: 'Property Log', type: ColumnType.other, queryColumnExcluded: true, cellComponent: PropertyLogCellComponent, rowCssClass: 'align-top' };
-    }
-
-    // "dueDate" is a synthetic column name (Site has no such column — it's LastTripTicketDate +
-    // TripTicketInterval days) that the backend intercepts before generic filter/sort conversion.
     private buildQuery(): Query {
-        const filter = [...this.panelFilters, ...this.buildDaysOverdueFilter(), ...this.buildStreetFilter()];
-        return { sort: { dueDate: this.sortBy === '0' ? 'Asc' : 'Desc' }, filter };
+        const filter = [...this.panelFilters, ...this.buildStreetFilter()];
+        return { sort: {}, filter };
     }
 
     private buildDaysOverdueLabel(): string {
@@ -317,23 +378,24 @@ export class FogTripTicketComplianceManagementComponent implements OnInit {
         return this.daysOverdue === '0' ? label : `${label} overdue`;
     }
 
-    private buildDaysOverdueFilter(): QueryProperty[] {
+    private applyDaysOverdueBounds(): void {
         const bucket = OVERDUE_BUCKETS[Number(this.daysOverdue)];
 
         if (!bucket) {
-            return [];
+            this.dueDateFrom = undefined;
+            this.dueDateTo = undefined;
+            return;
         }
 
         const threshold = this.subtractFromToday(bucket.amount, bucket.unit);
 
         if (bucket.mode === 'greaterThan') {
-            return [this.rangeFilter('dueDate', [{ value: threshold, op: 'Lte' }])];
+            this.dueDateFrom = undefined;
+            this.dueDateTo = threshold;
+        } else {
+            this.dueDateFrom = threshold;
+            this.dueDateTo = this.toIso(new Date());
         }
-
-        return [this.rangeFilter('dueDate', [
-            { value: threshold, op: 'Gte' },
-            { value: this.toIso(new Date()), op: 'Lte' }
-        ])];
     }
 
     private buildStreetFilter(): QueryProperty[] {
@@ -377,6 +439,7 @@ export class FogTripTicketComplianceManagementComponent implements OnInit {
         row.daysOverdue = this.getDaysOverdue(row.dueDate);
         row.overdueClass = row.daysOverdue != null ? this.overdueBadgeClass(row.daysOverdue) : '';
         row.assignedName = this.assignedUserName(site);
+        row.assignedDate = this.toUtcDate(site.fogAccountAssignmentDate);
         row.canModify = this.canModify;
     }
 
@@ -389,6 +452,18 @@ export class FogTripTicketComplianceManagementComponent implements OnInit {
         dueDate.setDate(dueDate.getDate() + site.tripTicketInterval);
 
         return dueDate;
+    }
+
+    // The server stores/serializes assignment timestamps without a UTC "Z" marker (EF Core loses
+    // DateTimeKind on the round trip through SQL Server), so the browser's Date parser would otherwise
+    // treat the raw value as local time instead of UTC. Force UTC interpretation here before display.
+    private toUtcDate(isoString?: string): Date | undefined {
+        if (!isoString) {
+            return undefined;
+        }
+
+        const hasTimezone = /[zZ]|[+-]\d{2}:?\d{2}$/.test(isoString);
+        return new Date(hasTimezone ? isoString : `${isoString}Z`);
     }
 
     private getDaysOverdue(dueDate: Date | undefined): number | undefined {

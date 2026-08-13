@@ -44,14 +44,36 @@ export class CheckoutService {
     }
 
     private async fetchCartCount(): Promise<number> {
-        const [isAdmin, currentUser, hasBackflowTesting, hasCsiInspection, hasFogInspection, hasFogTransportation] = await Promise.all([
+        const [
+            isAdmin,
+            currentUser,
+            hasBackflowTesting,
+            hasCsiInspection,
+            hasFogInspection,
+            hasFogTransportation,
+            isBackflowTester,
+            isCsiInspector,
+            isFogInspector,
+            isFogTransporter
+        ] = await Promise.all([
             this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.ADMIN),
             this._professionalUserService.getMyData(),
             this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
             this._authService.hasAnyFeatures(FeatureType.CsiInspection),
             this._authService.hasAnyFeatures(FeatureType.FogInspection),
-            this._authService.hasAnyFeatures(FeatureType.FogTransportation)
+            this._authService.hasAnyFeatures(FeatureType.FogTransportation),
+            this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.BACKFLOW_TESTER),
+            this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.CSI_INSPECTOR),
+            this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.FOG_INSPECTOR),
+            this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.FOG_TRANSPORTER)
         ]);
+
+        // Having the feature enabled isn't enough - the professional also needs the matching role,
+        // same as dashboard.component.ts, otherwise the backend correctly 403s these calls.
+        const canViewBackflow = hasBackflowTesting && isBackflowTester;
+        const canViewCsi = hasCsiInspection && isCsiInspector ;
+        const canViewFog = hasFogInspection && isFogInspector;
+        const canViewFogTransportation = hasFogTransportation && isFogTransporter;
 
         const buildQuery = (ownerColumnName: string): Query => ({
             sort: {},
@@ -61,16 +83,16 @@ export class CheckoutService {
         });
 
         const counts = await Promise.all([
-            hasBackflowTesting
+            canViewBackflow
                 ? this._backflowTestService.getAllForProfessional(COUNT_PAGE_INFO, buildQuery('bpat.id'))
                 : Promise.resolve(null),
-            hasCsiInspection
+            canViewCsi
                 ? this._csiInspectionService.getProfessionalInspections(COUNT_PAGE_INFO, buildQuery('inspectorUser.id'), false)
                 : Promise.resolve(null),
-            hasFogInspection
+            canViewFog
                 ? this._fogInspectionService.getAll(COUNT_PAGE_INFO, buildQuery('inspector.id'), false)
                 : Promise.resolve(null),
-            hasFogTransportation
+            canViewFogTransportation
                 ? this._fogTripTicketService.searchForProfessional(COUNT_PAGE_INFO, buildQuery('transporter.id'))
                 : Promise.resolve(null)
         ]);

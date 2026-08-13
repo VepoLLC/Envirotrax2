@@ -46,6 +46,11 @@ import { environment } from '../environments/environment';
       useClass: HttpErrorInterceptor,
       multi: true
     },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpErrorInterceptor,
+      multi: true
+    },
   ],
   bootstrap: [App]
 })

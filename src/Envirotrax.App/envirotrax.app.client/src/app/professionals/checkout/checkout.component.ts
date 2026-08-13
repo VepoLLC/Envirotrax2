@@ -82,10 +82,10 @@ export class CheckoutComponent implements OnInit {
         // Having the feature enabled isn't enough - the professional also needs the matching role,
         // otherwise the backend correctly 403s the tab's checkout calls.
         this.isAdmin = isAdmin;
-        this.canViewBackflowTesting = hasBackflowTesting && isBackflowTester;
-        this.canViewCsiInspection = hasCsiInspection && isCsiInspector;
-        this.canViewFogInspection = hasFogInspection && isFogInspector;
-        this.canViewFogTransportation = hasFogTransportation && isFogTransporter;
+        this.canViewBackflowTesting = hasBackflowTesting && (isBackflowTester || isAdmin);
+        this.canViewCsiInspection = hasCsiInspection && (isCsiInspector || isAdmin);
+        this.canViewFogInspection = hasFogInspection && (isFogInspector || isAdmin);
+        this.canViewFogTransportation = hasFogTransportation && (isFogTransporter || isAdmin);
 
         if (this.canViewBackflowTesting) {
             this.activeTab = 'backflow';

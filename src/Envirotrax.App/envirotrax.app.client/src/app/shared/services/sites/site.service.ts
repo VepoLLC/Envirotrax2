@@ -41,6 +41,23 @@ export class SiteService {
         };
     }
 
+    public getFogInspectionComplianceEndpoint(): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/fog/inspection-compliance'),
+        };
+    }
+
+    public async getFogInspectionCompliance(pageInfo: PageInfo, query: Query): Promise<PagedData<Site>> {
+        const url = this._urlResolver.resolveUrl('/api/fog/inspection-compliance');
+
+        const observable = this._http.get<PagedData<Site>>(url, {
+            params: this._queryHelper.buildQuery(pageInfo, query)
+        });
+
+        return await lastValueFrom(observable);
+    }
+
     public async getCsiCompliance(pageInfo: PageInfo, query: Query): Promise<PagedData<Site>> {
         const url = this._urlResolver.resolveUrl('/api/sites/csi-compliance');
 
@@ -61,6 +78,14 @@ export class SiteService {
 
     public updateBackflowAssignment(siteId: number, userId: number | null): Promise<void> {
         const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}/backflow-assignment`);
+
+        return lastValueFrom(
+            this._http.put<void>(url, { userId })
+        );
+    }
+
+    public updateFogAssignment(siteId: number, userId: number | null): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}/fog-assignment`);
 
         return lastValueFrom(
             this._http.put<void>(url, { userId })
@@ -104,14 +129,6 @@ export class SiteService {
 
         const queryString = params.toString();
         return queryString ? `/api/sites/fog-trip-ticket-compliance?${queryString}` : '/api/sites/fog-trip-ticket-compliance';
-    }
-
-    public updateFogAssignment(siteId: number, userId: number | null): Promise<void> {
-        const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}/fog-assignment`);
-
-        return lastValueFrom(
-            this._http.put<void>(url, { userId })
-        );
     }
 
     public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<Site>> {

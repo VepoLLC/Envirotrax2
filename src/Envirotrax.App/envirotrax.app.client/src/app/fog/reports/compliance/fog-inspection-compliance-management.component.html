@@ -1,0 +1,198 @@
+<h1 class="text-center h2">FOG Inspection Compliance Management</h1>
+
+<!-- ===================== Cell templates ===================== -->
+<ng-template #numberTemplate let-data="rowData">
+    {{ data.rowNumber }}
+</ng-template>
+
+<ng-template #propertyTemplate let-data="rowData">
+    <div class="d-flex gap-2 align-items-start">
+        <i class="fa-solid fs-5 mt-1"
+           [ngClass]="data.propertyType === PropertyType.Residential ? 'fa-home text-primary' : 'fa-building text-danger'">
+        </i>
+
+        <a [routerLink]="['/sites', data.id, 'edit']" target="_blank">
+            <div *ngIf="data.businessName" class="fw-semibold">{{ data.businessName }}</div>
+            <div>
+                {{ data.streetNumber }} {{ data.streetName }}
+                <span *ngIf="data.propertyNumber">#{{ data.propertyNumber }}</span>
+            </div>
+            <div>{{ data.city }}<span *ngIf="data.city">, </span>{{ data.state?.code }} {{ data.zipCode }}</div>
+        </a>
+    </div>
+</ng-template>
+
+<ng-template #mailingTemplate let-data="rowData">
+    <div>
+        <div *ngIf="data.mailingCompanyName" class="fw-semibold">{{ data.mailingCompanyName }}</div>
+        <div *ngIf="data.mailingContactName">{{ data.mailingContactName }}</div>
+        <div>
+            {{ data.mailingStreetNumber }} {{ data.mailingStreetName }}
+            <span *ngIf="data.mailingNumber">#{{ data.mailingNumber }}</span>
+        </div>
+        <div>{{ data.mailingCity }}<span *ngIf="data.mailingCity">, </span>{{ data.mailingState?.code }}
+            {{ data.mailingZipCode }}
+        </div>
+        <div *ngIf="data.mailingPhoneNumber">{{ data.mailingPhoneNumber }}</div>
+        <div *ngIf="data.mailingEmailAddress">{{ data.mailingEmailAddress }}</div>
+    </div>
+</ng-template>
+
+<ng-template #assignedToTemplate let-data="rowData">
+    <ng-container *ngIf="canModify; else assignedReadonly">
+        <select class="form-select form-select-sm"
+                [value]="data.fogAccountAssignmentId ?? ''"
+                (change)="onAssignmentChange(data, $any($event.target).value)">
+            <option value="">Unassigned</option>
+            <option *ngFor="let user of users" [value]="user.id">{{ user.contactName }}</option>
+        </select>
+    </ng-container>
+    <ng-template #assignedReadonly>
+        <span>{{ data.assignedName }}</span>
+    </ng-template>
+    <div *ngIf="data.fogAccountAssignmentDate" class="small text-muted mt-1">
+        {{ data.fogAccountAssignmentDate | date:'short' }}
+    </div>
+</ng-template>
+
+<ng-template #daysOverdueTemplate let-data="rowData">
+    <span *ngIf="data.daysOverdue != null" class="badge rounded-pill"
+          [ngClass]="data.overdueClass">{{ data.daysOverdue }} days</span>
+</ng-template>
+
+<ng-template #viewSiteTemplate let-data="rowData">
+    <a class="btn btn-sm btn-success text-nowrap" [routerLink]="['/sites', data.id, 'edit']" target="_blank">
+        <i class="fa-regular fa-building-magnifying-glass me-1"></i>
+        View Site
+    </a>
+</ng-template>
+
+<!-- ===================== Page ===================== -->
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
+            (click)="exportResults()">
+        <i class="fa-regular fa-file-export me-1"></i>
+        Export Results
+    </button>
+    <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
+            (click)="viewPrintableTable()">
+        <i class="fa-regular fa-table me-1"></i>
+        View Printable Table
+    </button>
+</div>
+
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+<div class="results-section">
+    <vp-section
+                header="Overdue FOG Inspections ({{ daysOverdueLabel }}) - {{ table.items?.pageInfo?.totalItems || 0 }} Results">
+        <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+            <vp-filter-panel (filterChange)="onFilterChange($event)">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <vp-input type="select"
+                                      label="Days overdue"
+                                      name="daysOverdue"
+                                      labelStyle="horizontal"
+                                      [(ngModel)]="daysOverdue"
+                                      [options]="daysOverdueOptions" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-input type="select"
+                                      label="Sort by"
+                                      name="sortBy"
+                                      labelStyle="horizontal"
+                                      [(ngModel)]="sortBy"
+                                      [options]="sortOptions" />
+                        </div>
+
+                        <div class="d-xl-flex justify-content-end">
+                            <div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           id="showMailing"
+                                           name="showMailing"
+                                           [(ngModel)]="showMailing" />
+                                    <label class="form-check-label" for="showMailing">Show mailing information</label>
+                                </div>
+
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           id="emailWhenAssigned"
+                                           name="emailWhenAssigned"
+                                           [(ngModel)]="emailWhenAssigned" />
+                                    <label class="form-check-label" for="emailWhenAssigned">Email users when
+                                        assigned</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="fogAccountAssignmentId"
+                                                   label="User account assignment"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="userOptions" />
+                        </div>
+
+                        <div class="mb-3">
+                            <app-gis-area-lookup [form]="searchForm" labelStyle="horizontal" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-input label="Property street name"
+                                      name="propertyStreetName"
+                                      labelStyle="horizontal"
+                                      [(ngModel)]="propertyStreet" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="facilityType"
+                                                   label="Facility type"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="facilityTypes" />
+                        </div>
+                    </div>
+                </div>
+            </vp-filter-panel>
+
+            <vp-validation-summary [form]="searchForm" />
+
+            <div class="d-flex justify-content-center mb-3">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    <i class="fa-solid fa-rotate me-1"></i>
+                    Refresh Compliance Records
+                </button>
+            </div>
+        </form>
+
+        <div #printableSection>
+            <div class="d-flex justify-content-center gap-4 mb-3">
+                <vp-status-icon iconClass="fa-solid fa-home text-primary" text="Residential" />
+                <vp-status-icon iconClass="fa-solid fa-building text-danger" text="Commercial" />
+            </div>
+
+            <vp-table *ngIf="table.items && table.items.data && table.items.data.length > 0"
+                      [columns]="table.columns!"
+                      [data]="table.items.data"
+                      [(pageInfo)]="table.items.pageInfo"
+                      (pageInfoChange)="getCompliance()"
+                      [(query)]="table.query"
+                      (queryChange)="getCompliance()"
+                      (queryReset)="getCompliance()" />
+
+            <div *ngIf="table.items?.data?.length === 0" class="text-center py-3 text-muted">
+                No records found matching the search criteria.
+            </div>
+        </div>
+    </vp-section>
+</div>

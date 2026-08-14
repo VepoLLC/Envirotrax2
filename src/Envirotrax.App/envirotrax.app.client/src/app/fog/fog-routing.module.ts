@@ -11,9 +11,24 @@ import { FogTripTicketViewComponent } from "./trip-tickets/view/fog-trip-ticket-
 import { FogTransporterListComponent } from "./transporters/list/fog-transporter-list.component";
 import { FogTransporterDetailsComponent } from "./transporters/details/fog-transporter-details.component";
 import { FogVehiclePermitListComponent } from "./transporters/vehicles/list/fog-vehicle-permit-list.component";
+import { FogInspectionComplianceManagementComponent } from "./reports/compliance/fog-inspection-compliance-management.component";
 import { FogTripTicketComplianceManagementComponent } from "./reports/compliance/fog-trip-ticket-compliance-management.component";
 
 const routes: Routes = [
+    {
+        path: 'inspection-compliance',
+        title: 'FOG Inspection Compliance Management',
+        component: FogInspectionComplianceManagementComponent,
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.FogReports,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
+    },
     {
         path: 'trip-ticket-compliance',
         title: 'FOG Trip Ticket Compliance Management',

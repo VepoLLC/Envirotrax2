@@ -234,9 +234,9 @@ export class DashboardComponent implements OnInit {
 
             this.isAdmin = isAdmin;
             this.hasCsi = hasCsi && (isCsiInspector || isAdmin);
-            this.hasFog = hasFog && isFogInspector;
+            this.hasFog = hasFog && (isFogInspector || isAdmin);
             this.hasBackflow = hasBackflow && (isBackflowTester || isAdmin);
-            this.hasFogTransportation = hasFogTransportation && isFogTransporter;
+            this.hasFogTransportation = hasFogTransportation && (isFogTransporter || isAdmin);
 
             const promises: Promise<void>[] = [];
 

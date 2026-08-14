@@ -9,18 +9,30 @@
     }
 }
 
-<h1>Manage your account</h1>
+<div class="row">
+    <div class="col-md-9 offset-md-3">
+        <section id="divPageTitle" class="page-title">
+            <div class="text-center">
+                <h1 class="h2">Manage your account</h1>
+            </div>
+        </section>
+    </div>
+</div>
 
-<div>
-    <h2>Change your account settings</h2>
-    <hr />
-    <div class="row">
-        <div class="col-md-3">
-            <partial name="_ManageNav" />
-        </div>
-        <div class="col-md-9">
-            @RenderBody()
-        </div>
+<div class="row">
+    <div class="col-md-3 mb-3">
+        <partial name="_ManageNav" />
+    </div>
+
+    <div class="col-md-9">
+        <section id="sectionManage" class="card shadow-sm">
+            <div class="card-header border-bottom-0 text-center text-white bg-info fw-semibold fs-5 rounded-top">
+                <h2 class="h5 mb-0">@ViewData["Title"]</h2>
+            </div>
+            <div class="card-body border border-info rounded-bottom">
+                @RenderBody()
+            </div>
+        </section>
     </div>
 </div>
 

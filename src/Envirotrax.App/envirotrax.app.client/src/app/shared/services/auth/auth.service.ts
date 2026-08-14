@@ -70,6 +70,10 @@ export class AuthService {
         window.open(`${environment.authUrl}/Identity/Account/Manage`, '_blank');
     }
 
+    public navigateToSecuritySettings(): void {
+        window.open(`${environment.authUrl}/Identity/Account/Manage/ChangePassword`, '_blank');
+    }
+
     private async getProfileField(fieldName: string): Promise<any> {
         const user = await this._userManager.getUser();
 

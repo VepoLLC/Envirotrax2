@@ -6,12 +6,9 @@
 }
 
 <partial name="_StatusMessage" for="StatusMessage" />
-<h3>@ViewData["Title"]</h3>
+
 <div class="alert alert-warning" role="alert">
-    <p>
-        <span class="glyphicon glyphicon-warning-sign"></span>
-        <strong>Put these codes in a safe place.</strong>
-    </p>
+    <strong>Put these codes in a safe place.</strong>
     <p>
         If you lose your device and don't have the recovery codes you will lose access to your account.
     </p>
@@ -20,8 +17,9 @@
         used in an authenticator app you should <a asp-page="./ResetAuthenticator">reset your authenticator keys.</a>
     </p>
 </div>
-<div>
-    <form method="post">
-        <button class="btn btn-danger" type="submit">Generate Recovery Codes</button>
-    </form>
-</div>
+
+<form method="post">
+    <div class="text-center">
+        <button type="submit" class="btn red px-5">Generate Recovery Codes</button>
+    </div>
+</form>

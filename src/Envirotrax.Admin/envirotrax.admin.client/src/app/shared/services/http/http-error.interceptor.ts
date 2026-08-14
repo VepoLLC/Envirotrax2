@@ -75,6 +75,11 @@ export class HttpErrorInterceptor implements HttpInterceptor {
                     messages.push(error.error);
                 } else if (error.error?.errors) {
                     messages.push(...Object.values<string[]>(error.error.errors).flat());
+                } else if (error.error && typeof error.error === 'object') {
+                    const values = Object.values(error.error);
+                    if (values.length && values.every(value => Array.isArray(value))) {
+                        messages.push(...(values as string[][]).flat());
+                    }
                 }
 
                 if (messages.length) {

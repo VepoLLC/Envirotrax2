@@ -31,6 +31,10 @@ export class BackflowComplianceHistoryTabComponent implements OnInit, OnDestroy 
     private readonly minimumChartWidth = 640;   // px floor so a few months aren't cramped
     private readonly chartWidthPerMonth = 46;   // px of width each month column needs
 
+    // The table shows all available history (matches V1); the charts stay capped at the most recent
+    // 48 months so they don't grow unbounded as snapshots accumulate.
+    private readonly chartMonthWindow = 48;
+
     // Semibold weight for the % value labels drawn on the percent chart's points.
     private readonly percentLabelFontWeight = 600;
 
@@ -167,7 +171,6 @@ export class BackflowComplianceHistoryTabComponent implements OnInit, OnDestroy 
             this.points = this.report?.points ?? [];
             this.reversedPoints = [...this.points].reverse();
             this.buildYearBarColors();
-            this.chartPixelWidth = Math.max(this.minimumChartWidth, this.points.length * this.chartWidthPerMonth);
             this.buildCharts();
         } finally {
             this.isLoading = false;
@@ -179,14 +182,19 @@ export class BackflowComplianceHistoryTabComponent implements OnInit, OnDestroy 
     }
 
     private buildCharts(): void {
-        const labels = this.points.map(p => p.label);
+        // Charts render only the most recent months; the table (reversedPoints) still shows everything.
+        const chartPoints = this.points.slice(-this.chartMonthWindow);
+
+        this.chartPixelWidth = Math.max(this.minimumChartWidth, chartPoints.length * this.chartWidthPerMonth);
+
+        const labels = chartPoints.map(p => p.label);
 
         this.countChartData = {
             labels,
             datasets: [
-                { label: 'Total', data: this.points.map(p => p.total), backgroundColor: this.totalColor },
-                { label: 'Compliant', data: this.points.map(p => p.compliant), backgroundColor: this.compliantColor },
-                { label: 'Non-Compliant', data: this.points.map(p => p.nonCompliant), backgroundColor: this.nonCompliantColor }
+                { label: 'Total', data: chartPoints.map(p => p.total), backgroundColor: this.totalColor },
+                { label: 'Compliant', data: chartPoints.map(p => p.compliant), backgroundColor: this.compliantColor },
+                { label: 'Non-Compliant', data: chartPoints.map(p => p.nonCompliant), backgroundColor: this.nonCompliantColor }
             ]
         };
 
@@ -194,7 +202,7 @@ export class BackflowComplianceHistoryTabComponent implements OnInit, OnDestroy 
             labels,
             datasets: [{
                 label: 'Percent Compliant',
-                data: this.points.map(p => p.percentage),
+                data: chartPoints.map(p => p.percentage),
                 fill: true,
                 backgroundColor: this.percentFillColor,
                 borderColor: this.percentLineColor,

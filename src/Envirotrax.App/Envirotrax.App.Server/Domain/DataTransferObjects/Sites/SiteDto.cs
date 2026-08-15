@@ -190,6 +190,11 @@ public class FogTripTicketComplianceSiteDto : SiteDto
     public List<SiteLogDto> Logs { get; set; } = [];
 }
 
+public class FogComplianceSiteDto : SiteDto
+{
+    public List<SiteLogDto> Logs { get; set; } = [];
+}
+
 public class ReferencedSiteDto
 {
     [Required]

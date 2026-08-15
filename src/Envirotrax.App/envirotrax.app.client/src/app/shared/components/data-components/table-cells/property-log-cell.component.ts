@@ -25,8 +25,8 @@ export interface PropertyLogCellRow {
 
 // Reusable app-level table cell (used via TableColumn.cellComponent, not cellTemplate) that renders a site's
 // property logs with add/edit/delete + attachment download, self-contained via injected services. Declared in
-// SharedComponentsModule so any feature can drop it onto a column. Consumers: Backflow / CSI Compliance
-// Management. Mirrors the log rendering those pages previously inlined.
+// SharedComponentsModule so any feature can drop it onto a column. Consumers: Backflow / CSI / FOG Inspection
+// Compliance Management. Mirrors the log rendering those pages previously inlined.
 @Component({
     standalone: false,
     templateUrl: './property-log-cell.component.html'

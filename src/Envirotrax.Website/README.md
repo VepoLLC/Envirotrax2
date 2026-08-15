@@ -1,3 +1,9 @@
+## Umbraco Login
+This is an Umbraco app. To login to the backoffice, please navigate to /umbraco URL and use the following credentials:
+
+- Username: hayk.shirinyan@developerpartners.com
+- Passsword: P@ssw0rd!!
+
 ## Azure Resource Access
 This project uses Managed Identities for accessing Azure resources such as Key Vaults and Storage Accounts. Please open a terminal and type the following command before launching the project:
 

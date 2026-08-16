@@ -1,5 +1,6 @@
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
@@ -17,9 +18,13 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Csi
             _inspectorRepository = repository;
         }
 
-        public async Task<IPagedData<ProfessionalDto>> SearchAsync(string? inspectorLicenseNumber, string? insurancePolicyNumber, PageInfo pageInfo, CancellationToken cancellationToken)
+        public async Task<IPagedData<ProfessionalDto>> SearchAsync(string? inspectorLicenseNumber, string? insurancePolicyNumber, string? userEmail, string? contactName, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
         {
-            var items = await _inspectorRepository.SearchAsync(inspectorLicenseNumber, insurancePolicyNumber, pageInfo, cancellationToken);
+            query.Filter = query.ConvertFilterProperties<Professional, ProfessionalDto>(Mapper);
+            query.Sort = query.ConvertSortProperties<Professional, ProfessionalDto>(Mapper);
+
+            var items = await _inspectorRepository.SearchAsync(inspectorLicenseNumber, insurancePolicyNumber, userEmail, contactName, pageInfo, query, cancellationToken);
+
             return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
         }
     }

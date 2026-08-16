@@ -16,8 +16,6 @@ using Envirotrax.Admin.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.Admin.Server.Domain.Services.Implementations.Csi;
 using Envirotrax.Admin.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.Admin.Server.Domain.Services.Implementations.Backflow;
-using Envirotrax.Admin.Server.Domain.Services.Definitions.Lookup;
-using Envirotrax.Admin.Server.Domain.Services.Implementations.Lookup;
 
 namespace Envirotrax.Admin.Server.Domain.Configuration;
 
@@ -37,6 +35,7 @@ public static class ServiceRegistration
                 services.AddTransient<ILookupService, LookupService>();
                 services.AddTransient<IGoogleMapsService, GoogleMapsService>();
                 services.AddTransient<ICsiInspectionService, CsiInspectionService>();
+                services.AddTransient<ICsiInspectorService, CsiInspectorService>();
                 services.AddTransient<IBackflowTestService, BackflowTestService>();
 
                 return services;

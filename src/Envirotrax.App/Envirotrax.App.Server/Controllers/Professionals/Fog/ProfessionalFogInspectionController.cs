@@ -10,7 +10,7 @@ namespace Envirotrax.App.Server.Controllers.Professionals.Fog;
 
 [Route("api/professionals/fog/inspections")]
 [HasFeature(FeatureType.FogInspection)]
-[Authorize(Roles = RoleDefinitions.Professionals.FogInspector)]
+[Authorize(Roles = $"{RoleDefinitions.Professionals.Admin},{RoleDefinitions.Professionals.FogInspector}")]
 public class ProfessionalFogInspectionController : ProfessionalProtectedController
 {
     private readonly IFogInspectionService _fogInspectionService;

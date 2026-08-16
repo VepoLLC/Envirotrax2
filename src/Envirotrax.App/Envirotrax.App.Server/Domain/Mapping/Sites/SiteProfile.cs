@@ -32,6 +32,10 @@ public class SiteProfile : Profile
             .IncludeBase<Site, SiteDto>()
             .ForMember(dto => dto.Logs, opt => opt.Ignore());
 
+        CreateMap<Site, FogComplianceSiteDto>()
+            .IncludeBase<Site, SiteDto>()
+            .ForMember(dto => dto.Logs, opt => opt.Ignore());
+
         CreateMap<Site, FogTripTicketComplianceSiteDto>()
             .IncludeBase<Site, SiteDto>()
             .ForMember(dto => dto.Logs, opt => opt.Ignore());

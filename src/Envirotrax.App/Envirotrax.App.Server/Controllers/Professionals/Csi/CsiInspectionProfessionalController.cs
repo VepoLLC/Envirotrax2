@@ -10,7 +10,7 @@ namespace Envirotrax.App.Server.Controllers.Professionals.Csi;
 
 [Route("api/professionals/csi/inspections")]
 [HasFeature(FeatureType.CsiInspection)]
-[Authorize(Roles = RoleDefinitions.Professionals.CsiInspector)]
+[Authorize(Roles = $"{RoleDefinitions.Professionals.Admin},{RoleDefinitions.Professionals.CsiInspector}")]
 public class CsiInspectionProfessionalController : ProfessionalProtectedController
 {
     private readonly ICsiInspectionService _inspectionService;
@@ -28,7 +28,7 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
         {
             return NotFound();
         }
-        
+
         return Ok(result);
     }
 

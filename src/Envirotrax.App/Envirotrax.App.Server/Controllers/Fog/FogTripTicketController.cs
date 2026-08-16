@@ -1,3 +1,4 @@
+using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Filters;
@@ -16,6 +17,21 @@ public class FogTripTicketController : WaterSupplierCrudController<FogTripTicket
         : base(service)
     {
         _tripTicketService = service;
+    }
+
+    protected override Task<IPagedData<FogTripTicketDto>> ProcessGetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        return _tripTicketService.SearchForWaterSupplierAsync(pageInfo, query, ReadSubAccountWaterSupplierId(), cancellationToken);
+    }
+
+    private int? ReadSubAccountWaterSupplierId()
+    {
+        if (int.TryParse(Request.Query["subAccountWaterSupplierId"], out var waterSupplierId))
+        {
+            return waterSupplierId;
+        }
+
+        return null;
     }
 
     [HttpPut("{id}/approval")]

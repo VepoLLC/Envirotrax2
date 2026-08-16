@@ -19,6 +19,7 @@ import { AppContainerHelperService } from "../../../shared/services/helpers/app-
 })
 export class FogInspectionListComponent implements OnInit, OnDestroy {
     private _queryParamSub?: Subscription;
+    private _subAccountWaterSupplierId?: number;
     public showResults: boolean = false;
 
     public readonly FogInspectionResult = FogInspectionResult;
@@ -122,7 +123,15 @@ export class FogInspectionListComponent implements OnInit, OnDestroy {
                     ]
                 }];
                 await this.getInspections();
-                this.setShowResults((this.table.items?.pageInfo?.totalItems ?? 0) > 0);
+                this.setShowResults(true);
+                return;
+            }
+
+            const subAccountWaterSupplierIdParam = params.get('subAccountWaterSupplierId');
+            if (subAccountWaterSupplierIdParam) {
+                this._subAccountWaterSupplierId = Number(subAccountWaterSupplierIdParam);
+                await this.getInspections();
+                this.setShowResults(true);
             }
         });
     }
@@ -182,7 +191,8 @@ export class FogInspectionListComponent implements OnInit, OnDestroy {
             this.table.isLoading = true;
             this.table.items = await this._fogInspectionService.getAll(
                 this.table.items?.pageInfo || {},
-                this.table.query
+                this.table.query,
+                this._subAccountWaterSupplierId
             );
         } finally {
             this.table.isLoading = false;
@@ -205,6 +215,12 @@ export class FogInspectionListComponent implements OnInit, OnDestroy {
     public setShowResults(visible: boolean): void {
         this.showResults = visible;
         this._containerHelper.setContainerVisibility(!visible);
+
+        // "Search Again" returns to the form - a subsequent manual search should search the water
+        // supplier's own inspections again, not stay silently scoped to a dashboard sub account.
+        if (!visible) {
+            this._subAccountWaterSupplierId = undefined;
+        }
     }
 
     public async search(searchForm: NgForm): Promise<void> {

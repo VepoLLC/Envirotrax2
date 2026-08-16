@@ -81,6 +81,36 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
         return await paginated.ToListAsync(ct);
     }
 
+    public async Task<IEnumerable<FogTripTicket>> SearchForWaterSupplierAsync(
+        PageInfo pageInfo, Query query, int? subAccountWaterSupplierId, CancellationToken cancellationToken)
+    {
+        var dbQuery = GetListQuery();
+
+        // This is for the dashboard "View" button on a sub account. Normally every query only sees
+        // the logged-in water supplier's own trip tickets, so we turn that off here - but only after
+        // checking that the id passed in really is one of this water supplier's sub accounts. If it's
+        // not, we just search the water supplier's own trip tickets like normal.
+        if (subAccountWaterSupplierId.HasValue)
+        {
+            var isOwnChild = await DbContext.WaterSuppliers
+                .AnyAsync(ws => ws.Id == subAccountWaterSupplierId.Value && ws.ParentId == _tenantProvider.WaterSupplierId, cancellationToken);
+
+            if (isOwnChild)
+            {
+                dbQuery = dbQuery
+                    .IgnoreQueryFilters()
+                    .Where(t => t.WaterSupplierId == subAccountWaterSupplierId.Value);
+            }
+        }
+
+        var paginated = await dbQuery
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
     public async Task<FogTripTicket?> UpdateApprovalAsync(int id, bool disapproved, int? approvedById, CancellationToken cancellationToken)
     {
         var ticket = await GetNoIncludesAsync(id, cancellationToken);

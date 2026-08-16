@@ -21,12 +21,16 @@ export class CsiInspectionService {
     ) {
     }
 
-    public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<CsiInspection>> {
+    public async getAll(pageInfo: PageInfo, query: Query, subAccountWaterSupplierId?: number | null): Promise<PagedData<CsiInspection>> {
         const url = this._urlResolver.resolveUrl('/api/csi/inspections');
 
-        const observable = this._http.get<PagedData<CsiInspection>>(url, {
-            params: this._queryHelper.buildQuery(pageInfo, query)
-        });
+        let params = this._queryHelper.buildQuery(pageInfo, query);
+
+        if (subAccountWaterSupplierId != null) {
+            params = params.append('subAccountWaterSupplierId', String(subAccountWaterSupplierId));
+        }
+
+        const observable = this._http.get<PagedData<CsiInspection>>(url, { params });
 
         return await lastValueFrom(observable);
     }

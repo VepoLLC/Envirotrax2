@@ -18,7 +18,7 @@ public class BackflowTestController : AdminBaseController
     [HttpGet]
     public async Task<IActionResult> SearchAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, [FromQuery] BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken)
     {
-        var tests = await _testService.SearchAsync(pageInfo, query, paymentStatus, cancellationToken);
+        var tests = await _testService.SearchAsync(pageInfo, query, paymentStatus, null, cancellationToken);
 
         return Ok(tests);
     }

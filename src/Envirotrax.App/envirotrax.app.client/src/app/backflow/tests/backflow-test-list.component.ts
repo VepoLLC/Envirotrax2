@@ -27,6 +27,7 @@ import { AppContainerHelperService } from '../../shared/services/helpers/app-con
 })
 export class BackflowTestListComponent implements OnInit, OnDestroy {
     private _queryParamSub?: Subscription;
+    private _subAccountWaterSupplierId?: number;
 
     @ViewChild('statusTemplate', { static: true })
     public statusTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
@@ -245,12 +246,20 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
             if (dateParam) {
                 this.applyDateFilter(dateParam);
                 await this.getTests();
-                this.setShowResults((this.table.items?.pageInfo?.totalItems ?? 0) > 0);
+                this.setShowResults(true);
                 return;
             }
 
             if (params.get(BackflowComplianceParams.mode)) {
                 this.applyComplianceFilter(params);
+                await this.getTests();
+                this.setShowResults(true);
+                return;
+            }
+
+            const subAccountWaterSupplierIdParam = params.get('subAccountWaterSupplierId');
+            if (subAccountWaterSupplierIdParam) {
+                this._subAccountWaterSupplierId = Number(subAccountWaterSupplierIdParam);
                 await this.getTests();
                 this.setShowResults(true);
             }
@@ -386,7 +395,8 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
             const result = await this._backflowTestService.getAll(
                 this.table.items?.pageInfo || {},
                 this.table.query,
-                this.getPaymentStatus()
+                this.getPaymentStatus(),
+                this._subAccountWaterSupplierId
             );
             const startIndex = ((result.pageInfo.pageNumber ?? 1) - 1) * (result.pageInfo.pageSize ?? 10);
             result.data.forEach((item, i) => (item as any)['_rowNumber'] = startIndex + i + 1);
@@ -399,6 +409,12 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
     public setShowResults(visible: boolean): void {
         this.showResults = visible;
         this._containerHelper.setContainerVisibility(!visible);
+
+        // "Search Again" returns to the form - a subsequent manual search should search the tester's
+        // own tests again, not stay silently scoped to whatever dashboard sub account was drilled into.
+        if (!visible) {
+            this._subAccountWaterSupplierId = undefined;
+        }
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {

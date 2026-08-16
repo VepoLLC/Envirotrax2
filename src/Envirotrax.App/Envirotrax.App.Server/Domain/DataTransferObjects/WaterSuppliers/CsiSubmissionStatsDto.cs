@@ -10,6 +10,7 @@ public class CsiDailyStatsDto
 
 public class CsiSubAccountStatsDto
 {
+    public int WaterSupplierId { get; set; }
     public string WaterSupplierName { get; set; } = "";
     public List<CsiDailyStatsDto> DailyStats { get; set; } = new();
 }

@@ -4,15 +4,19 @@ using Envirotrax.App.Server.Data.Models.Csi;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
+using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Csi;
 
 public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspectionRepository
 {
-    public CsiInspectionRepository(IDbContextSelector dbContextSelector)
+    private readonly ITenantProvidersService _tenantProvider;
+
+    public CsiInspectionRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider)
         : base(dbContextSelector)
     {
+        _tenantProvider = tenantProvider;
     }
 
     protected override IQueryable<CsiInspection> GetListQuery()
@@ -75,6 +79,39 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         }
 
         var paginated = await dbQuery
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<CsiInspection>> SearchForWaterSupplierAsync(
+        PageInfo pageInfo,
+        Query query,
+        int? subAccountWaterSupplierId,
+        CancellationToken cancellationToken)
+    {
+        var dbQuery = GetListQuery();
+
+        // This is for the dashboard "View" button on a sub account. Normally every query only sees
+        // the logged-in water supplier's own inspections, so we turn that off here - but only after
+        // checking that the id passed in really is one of this water supplier's sub accounts. If it's
+        // not, we just search the water supplier's own inspections like normal.
+        if (subAccountWaterSupplierId.HasValue)
+        {
+            var isOwnChild = await DbContext.WaterSuppliers
+                .AnyAsync(ws => ws.Id == subAccountWaterSupplierId.Value && ws.ParentId == _tenantProvider.WaterSupplierId, cancellationToken);
+
+            if (isOwnChild)
+            {
+                dbQuery = dbQuery
+                    .IgnoreQueryFilters()
+                    .Where(c => c.WaterSupplierId == subAccountWaterSupplierId.Value);
+            }
+        }
+
+        var paginated = await dbQuery
+            .Where(query.Filter)
             .OrderBy(query.Sort)
             .PaginateAsync(pageInfo, cancellationToken);
 

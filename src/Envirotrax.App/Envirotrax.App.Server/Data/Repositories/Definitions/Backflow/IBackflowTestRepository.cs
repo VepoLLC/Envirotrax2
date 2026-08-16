@@ -13,7 +13,7 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
     // Compliance Management: current, in-service, renewal-required assemblies on active, in-area sites.
     Task<IEnumerable<BackflowTest>> GetComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
 
-    Task<IEnumerable<BackflowTest>> SearchAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken);
+    Task<IEnumerable<BackflowTest>> SearchAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, int? subAccountWaterSupplierId, CancellationToken cancellationToken);
 
     // Process 1 — Site level
     Task<IEnumerable<BackflowTest>> GetAllCurrentBySiteIdAsync(int siteId, CancellationToken cancellationToken);

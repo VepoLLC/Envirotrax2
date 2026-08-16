@@ -20,12 +20,16 @@ export class FogTripTicketService {
     ) {
     }
 
-    public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<FogTripTicket>> {
+    public async getAll(pageInfo: PageInfo, query: Query, subAccountWaterSupplierId?: number | null): Promise<PagedData<FogTripTicket>> {
         const url = this._urlResolver.resolveUrl('/api/fog/trip-tickets');
 
-        const observable = this._http.get<PagedData<FogTripTicket>>(url, {
-            params: this._queryHelper.buildQuery(pageInfo, query)
-        });
+        let params = this._queryHelper.buildQuery(pageInfo, query);
+
+        if (subAccountWaterSupplierId != null) {
+            params = params.append('subAccountWaterSupplierId', String(subAccountWaterSupplierId));
+        }
+
+        const observable = this._http.get<PagedData<FogTripTicket>>(url, { params });
 
         return await lastValueFrom(observable);
     }

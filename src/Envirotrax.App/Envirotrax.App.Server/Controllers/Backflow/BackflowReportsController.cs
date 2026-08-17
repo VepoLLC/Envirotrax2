@@ -34,6 +34,39 @@ public class BackflowReportsController : WaterSupplierProtectedController
         return Ok(report);
     }
 
+    [HttpGet("tests/pdf")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetTestReportPdfAsync(
+        [FromQuery] DateTime fromDate,
+        [FromQuery] DateTime toDate,
+        CancellationToken cancellationToken)
+    {
+        var pdf = await _testReportService.GeneratePdfAsync(fromDate, toDate, cancellationToken);
+        return File(pdf, MimeTypes.Pdf);
+    }
+
+    [HttpGet("tests/excel")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetTestReportExcelAsync(
+        [FromQuery] DateTime fromDate,
+        [FromQuery] DateTime toDate,
+        CancellationToken cancellationToken)
+    {
+        var excel = await _testReportService.GenerateExcelAsync(fromDate, toDate, cancellationToken);
+        return File(excel, MimeTypes.Excel);
+    }
+
+    [HttpGet("tests/word")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetTestReportWordAsync(
+        [FromQuery] DateTime fromDate,
+        [FromQuery] DateTime toDate,
+        CancellationToken cancellationToken)
+    {
+        var word = await _testReportService.GenerateWordAsync(fromDate, toDate, cancellationToken);
+        return File(word, MimeTypes.Word);
+    }
+
     [HttpGet("tests/earliest-date")]
     [HasPermission(PermissionAction.CanView)]
     public async Task<IActionResult> GetEarliestTestDateAsync(CancellationToken cancellationToken)

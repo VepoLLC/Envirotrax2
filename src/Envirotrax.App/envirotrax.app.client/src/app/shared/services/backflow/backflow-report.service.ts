@@ -33,6 +33,54 @@ export class BackflowReportService {
         );
     }
 
+    public getTestReportPdf(fromDate: string, toDate: string): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/tests/pdf');
+
+        let params = new HttpParams();
+        if (fromDate) {
+            params = params.set('fromDate', fromDate);
+        }
+        if (toDate) {
+            params = params.set('toDate', toDate);
+        }
+
+        return lastValueFrom(
+            this._http.get(url, { params, responseType: 'blob' })
+        );
+    }
+
+    public getTestReportExcel(fromDate: string, toDate: string): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/tests/excel');
+
+        let params = new HttpParams();
+        if (fromDate) {
+            params = params.set('fromDate', fromDate);
+        }
+        if (toDate) {
+            params = params.set('toDate', toDate);
+        }
+
+        return lastValueFrom(
+            this._http.get(url, { params, responseType: 'blob' })
+        );
+    }
+
+    public getTestReportWord(fromDate: string, toDate: string): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/tests/word');
+
+        let params = new HttpParams();
+        if (fromDate) {
+            params = params.set('fromDate', fromDate);
+        }
+        if (toDate) {
+            params = params.set('toDate', toDate);
+        }
+
+        return lastValueFrom(
+            this._http.get(url, { params, responseType: 'blob' })
+        );
+    }
+
     public async getEarliestTestDate(): Promise<string | null> {
         const url = this._urlResolver.resolveUrl('/api/backflow/reports/tests/earliest-date');
 

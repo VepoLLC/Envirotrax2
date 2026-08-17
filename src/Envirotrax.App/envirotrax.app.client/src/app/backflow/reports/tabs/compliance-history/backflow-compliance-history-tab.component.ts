@@ -177,7 +177,21 @@ export class BackflowComplianceHistoryTabComponent implements OnInit, OnDestroy 
         }
     }
 
-    public viewPrintableReport(): void {
+    public async downloadPDF(): Promise<void> {
+        try {
+            this.isLoading = true;
+            //const blob = await this._reportService.getComplianceHistoryPdf();
+
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    public downloadWord(): void {
+        // Printable / export report is not implemented yet (parity placeholder).
+    }
+
+    public downloadExcel(): void {
         // Printable / export report is not implemented yet (parity placeholder).
     }
 

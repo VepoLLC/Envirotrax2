@@ -1,0 +1,45 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+	Layout = null;
+
+	var socialMediaImageElement = ViewData["SocialMediaImage"] as IPublishedContent;
+
+	var socialMediaImage = socialMediaImageElement != null
+		? Umbraco.Media(socialMediaImageElement.Id)
+		: null;
+}
+
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<meta name="description" content="@(Model.Value("pageDescription") ?? ViewData["Description"])">
+	<title>@(Model.Value("pageTitle") ?? ViewData["Title"])</title>
+
+	<meta name="og:title" content="@(Model.Value("pageTitle") ?? ViewData["Title"])" />
+	<meta name="og:description" content="@(Model.Value("pageDescription") ?? ViewData["Description"])" />
+	<meta name="og:type" content="@(ViewData["SocialMediaType"] ?? "website")" />
+
+	@if (socialMediaImage != null)
+	{
+		<meta name="og:image" content="@socialMediaImage.Url(mode: UrlMode.Absolute)" />
+	}
+
+	<link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
+
+	@await RenderSectionAsync("Styles", required: false)
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<body>
+	@RenderBody()
+
+	<script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+	@await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

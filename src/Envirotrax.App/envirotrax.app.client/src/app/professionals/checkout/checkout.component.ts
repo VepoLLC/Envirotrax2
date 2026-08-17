@@ -41,10 +41,10 @@ const TAB_ICONS: Record<TabType, string> = {
 })
 export class CheckoutComponent implements OnInit {
     public activeTab: TabType = 'backflow';
-    public hasBackflowTesting = false;
-    public hasCsiInspection = false;
-    public hasFogInspection = false;
-    public hasFogTransportation = false;
+    public canViewBackflowTesting = false;
+    public canViewCsiInspection = false;
+    public canViewFogInspection = false;
+    public canViewFogTransportation = false;
     public isAdmin = false;
 
     constructor(
@@ -57,21 +57,43 @@ export class CheckoutComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         this._containerHelper.setContainerVisibility(false);
 
-        [this.hasBackflowTesting, this.hasCsiInspection, this.hasFogInspection, this.hasFogTransportation, this.isAdmin] = await Promise.all([
+        const [
+            hasBackflowTesting,
+            hasCsiInspection,
+            hasFogInspection,
+            hasFogTransportation,
+            isAdmin,
+            isBackflowTester,
+            isCsiInspector,
+            isFogInspector,
+            isFogTransporter
+        ] = await Promise.all([
             this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
             this._authService.hasAnyFeatures(FeatureType.CsiInspection),
             this._authService.hasAnyFeatures(FeatureType.FogInspection),
             this._authService.hasAnyFeatures(FeatureType.FogTransportation),
-            this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.ADMIN)
+            this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.ADMIN),
+            this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.BACKFLOW_TESTER),
+            this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.CSI_INSPECTOR),
+            this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.FOG_INSPECTOR),
+            this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.FOG_TRANSPORTER)
         ]);
 
-        if (this.hasBackflowTesting) {
+        // Having the feature enabled isn't enough - the professional also needs the matching role,
+        // otherwise the backend correctly 403s the tab's checkout calls.
+        this.isAdmin = isAdmin;
+        this.canViewBackflowTesting = hasBackflowTesting && (isBackflowTester || isAdmin);
+        this.canViewCsiInspection = hasCsiInspection && (isCsiInspector || isAdmin);
+        this.canViewFogInspection = hasFogInspection && (isFogInspector || isAdmin);
+        this.canViewFogTransportation = hasFogTransportation && (isFogTransporter || isAdmin);
+
+        if (this.canViewBackflowTesting) {
             this.activeTab = 'backflow';
-        } else if (this.hasCsiInspection) {
+        } else if (this.canViewCsiInspection) {
             this.activeTab = 'csi';
-        } else if (this.hasFogInspection) {
+        } else if (this.canViewFogInspection) {
             this.activeTab = 'fogInspection';
-        } else if (this.hasFogTransportation) {
+        } else if (this.canViewFogTransportation) {
             this.activeTab = 'fogTransport';
         }
     }

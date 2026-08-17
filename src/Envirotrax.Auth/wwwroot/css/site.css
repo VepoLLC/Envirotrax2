@@ -1232,13 +1232,6 @@ input[type=reset].tab.orange {
     color: #fff !important;
 }
 
-.vp-tabs.flex-column .nav-link {
-    margin: 3px 0;
-    min-width: 0;
-    width: 100%;
-    text-align: center;
-}
-
 /*--------------------------------------------------------------
 # quick search
 --------------------------------------------------------------*/

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
+import { ModalSize } from '@developer-partners/ngx-modal-dialog';
 import { InputOption, ModalHelperService, ToastService, ToastType } from '@envirotrax/common-ui';
 import { FacilityType, GreaseTrapType, PropertyType } from '../../shared/models/sites/site';
 import { SiteDetail, SiteEditWindowModel } from '../../shared/models/sites/site-detail';
@@ -9,7 +10,7 @@ import { WaterSupplier } from '../../shared/models/water-suppliers/water-supplie
 import { SiteService } from '../../shared/services/sites/site.service';
 import { LookupService } from '../../shared/services/lookup/lookup.service';
 import { SharedComponentsModule } from '../../shared/components/shared.components.module';
-import { WaterSupplierLookupService } from '../../shared/components/lookups/water-supplier-lookup.service';
+import { WaterSupplierLookupComponent } from '../../shared/components/lookups/water-supplier-lookup.component';
 import { WindowReference } from '../../window/window-config';
 import { SiteEditSectionsModule } from './sections/site-edit-sections.module';
 
@@ -37,7 +38,6 @@ export class SiteEditComponent implements OnInit {
 
     public isLoading: boolean = false;
     public isSaving: boolean = false;
-    public isLoadingWaterSuppliers: boolean = false;
 
     public siteId?: number;
     public waterSupplierId?: number;
@@ -57,7 +57,6 @@ export class SiteEditComponent implements OnInit {
         private readonly _windowReference: WindowReference<SiteEditWindowModel>,
         private readonly _siteService: SiteService,
         private readonly _lookupService: LookupService,
-        private readonly _waterSupplierLookup: WaterSupplierLookupService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService
     ) {
@@ -240,7 +239,7 @@ export class SiteEditComponent implements OnInit {
     }
 
  
-    public async changeWaterSupplier(): Promise<void> {
+    public changeWaterSupplier(): void {
         if (!this.editableSite) {
             return;
         }
@@ -254,17 +253,13 @@ export class SiteEditComponent implements OnInit {
             return;
         }
 
-        try {
-            this.isLoadingWaterSuppliers = true;
-
-            const lookup = await this._waterSupplierLookup.open();
-
-            lookup
-                .result()
-                .subscribe(supplier => this.confirmWaterSupplierChange(supplier));
-        } finally {
-            this.isLoadingWaterSuppliers = false;
-        }
+        this._modalHelper
+            .show<WaterSupplier>(WaterSupplierLookupComponent, {
+                title: 'Water Suppliers',
+                size: ModalSize.large
+            })
+            .result()
+            .subscribe(supplier => this.confirmWaterSupplierChange(supplier));
     }
 
     private confirmWaterSupplierChange(supplier: WaterSupplier): void {

@@ -296,6 +296,28 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         return dtos.ToPagedData(pageInfo);
     }
 
+    public async Task<IPagedData<FogPermitComplianceSiteDto>> GetFogPermitComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<Site, SiteDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<Site, SiteDto>(Mapper);
+
+        var sites = await _siteRepository.GetFogPermitComplianceAsync(pageInfo, query, cancellationToken);
+        var dtos = sites.Select(s => Mapper.Map<FogPermitComplianceSiteDto>(s)).ToList();
+
+        if (dtos.Count > 0)
+        {
+            var logs = await _siteLogService.GetBySitesAsync(dtos.Select(d => d.Id), cancellationToken);
+            var logsBySite = logs.ToLookup(l => l.Site.Id ?? 0);
+
+            foreach (var dto in dtos)
+            {
+                dto.Logs = logsBySite[dto.Id].ToList();
+            }
+        }
+
+        return dtos.ToPagedData(pageInfo);
+    }
+
     public async Task UpdateCsiAssignmentAsync(int siteId, int? userId)
     {
         var assignmentDate = userId.HasValue ? DateTime.UtcNow : (DateTime?)null;

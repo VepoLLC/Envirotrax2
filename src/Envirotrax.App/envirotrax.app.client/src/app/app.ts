@@ -426,7 +426,7 @@ export class App implements OnInit {
           {
             title: 'Permit Compliance Management',
             iconCss: 'fa-solid fa-list-check',
-            routerLink: ['/'],
+            routerLink: ['/fog/permit-compliance'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogReports),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
           },

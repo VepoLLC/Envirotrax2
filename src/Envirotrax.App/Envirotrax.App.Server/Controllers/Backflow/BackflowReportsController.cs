@@ -85,6 +85,36 @@ public class BackflowReportsController : WaterSupplierProtectedController
         return Ok(report);
     }
 
+    [HttpGet("compliance/current/pdf")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetCurrentCompliancePdfAsync(
+        [FromQuery] bool ignoreLast30Days,
+        CancellationToken cancellationToken)
+    {
+        var pdf = await _complianceReportService.GeneratePdfAsync(ignoreLast30Days, cancellationToken);
+        return File(pdf, MimeTypes.Pdf);
+    }
+
+    [HttpGet("compliance/current/excel")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetCurrentComplianceExcelAsync(
+        [FromQuery] bool ignoreLast30Days,
+        CancellationToken cancellationToken)
+    {
+        var excel = await _complianceReportService.GenerateExcelAsync(ignoreLast30Days, cancellationToken);
+        return File(excel, MimeTypes.Excel);
+    }
+
+    [HttpGet("compliance/current/word")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetCurrentComplianceWordAsync(
+        [FromQuery] bool ignoreLast30Days,
+        CancellationToken cancellationToken)
+    {
+        var word = await _complianceReportService.GenerateWordAsync(ignoreLast30Days, cancellationToken);
+        return File(word, MimeTypes.Word);
+    }
+
     [HttpGet("compliance/history")]
     [HasPermission(PermissionAction.CanView)]
     public async Task<IActionResult> GetComplianceHistoryAsync(CancellationToken cancellationToken)

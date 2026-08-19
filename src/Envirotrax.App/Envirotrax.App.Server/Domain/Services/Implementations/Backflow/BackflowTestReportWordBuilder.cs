@@ -1,4 +1,5 @@
 using System.Globalization;
+using DocumentFormat.OpenXml.Packaging;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using MiniSoftware;
 
@@ -77,7 +78,24 @@ public static class BackflowTestReportWordBuilder
         using var output = new MemoryStream();
         MiniWord.SaveAsByTemplate(output, templateBytes, value);
 
+        FixColoredTextRunProperties(output);
+
         return output.ToArray();
+    }
+
+    // MiniWord's colored-text substitution (used for the bars above) produces a few schema-invalid
+    // <w:rPr> shapes; see MiniWordDocumentFixup for details.
+    private static void FixColoredTextRunProperties(MemoryStream documentStream)
+    {
+        documentStream.Position = 0;
+
+        using (var doc = WordprocessingDocument.Open(documentStream, true))
+        {
+            MiniWordDocumentFixup.FixColoredTextRunProperties(doc.MainDocumentPart!);
+            doc.MainDocumentPart!.Document.Save();
+        }
+
+        documentStream.Position = 0;
     }
 
     private static string FormatPercentage(double percentage)
@@ -95,7 +113,8 @@ public static class BackflowTestReportWordBuilder
         return new MiniWordColorText
         {
             Text = new string('█', blockCount),
-            FontColor = hexColor
+            FontColor = hexColor,
+            HighlightColor = "auto"
         };
     }
 

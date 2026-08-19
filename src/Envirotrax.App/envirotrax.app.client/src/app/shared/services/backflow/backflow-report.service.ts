@@ -101,6 +101,33 @@ export class BackflowReportService {
         );
     }
 
+    public getComplianceReportPdf(ignoreLast30Days: boolean): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/compliance/current/pdf');
+        const params = new HttpParams().set('ignoreLast30Days', ignoreLast30Days);
+
+        return lastValueFrom(
+            this._http.get(url, { params, responseType: 'blob' })
+        );
+    }
+
+    public getComplianceReportExcel(ignoreLast30Days: boolean): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/compliance/current/excel');
+        const params = new HttpParams().set('ignoreLast30Days', ignoreLast30Days);
+
+        return lastValueFrom(
+            this._http.get(url, { params, responseType: 'blob' })
+        );
+    }
+
+    public getComplianceReportWord(ignoreLast30Days: boolean): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/compliance/current/word');
+        const params = new HttpParams().set('ignoreLast30Days', ignoreLast30Days);
+
+        return lastValueFrom(
+            this._http.get(url, { params, responseType: 'blob' })
+        );
+    }
+
     public getComplianceHistory(): Promise<BackflowComplianceHistory> {
         const url = this._urlResolver.resolveUrl('/api/backflow/reports/compliance/history');
 

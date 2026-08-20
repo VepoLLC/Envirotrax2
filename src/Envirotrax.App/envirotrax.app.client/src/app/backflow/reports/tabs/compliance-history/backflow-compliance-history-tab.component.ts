@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, QueryList, ViewChildren } from "@angular/
 import { BaseChartDirective } from "ng2-charts";
 import { BackflowComplianceHistory, BackflowComplianceHistoryPoint } from "../../../../shared/models/backflow/backflow-compliance-history";
 import { BackflowReportService } from "../../../../shared/services/backflow/backflow-report.service";
+import { DownloadService } from "../../../../shared/services/download.service";
 import { chartGridColor, chartTickColor, onThemeChange, themeLegendLabels } from "../../../../shared/utils/chart-theme.util";
 import { ChartConfiguration, ChartData, Plugin } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
@@ -138,7 +139,10 @@ export class BackflowComplianceHistoryTabComponent implements OnInit, OnDestroy 
     // Registered only on this chart (not globally) so labels appear on the percent line, not the other charts.
     public readonly percentChartPlugins: Plugin<'line'>[] = [ChartDataLabels];
 
-    constructor(private readonly _reportService: BackflowReportService) {}
+    constructor(
+        private readonly _reportService: BackflowReportService,
+        private readonly _downloadService: DownloadService
+    ) {}
 
     public async ngOnInit(): Promise<void> {
         // Axis/legend/grid colors are drawn from theme CSS variables, so repaint both charts on toggle.
@@ -180,19 +184,31 @@ export class BackflowComplianceHistoryTabComponent implements OnInit, OnDestroy 
     public async downloadPDF(): Promise<void> {
         try {
             this.isLoading = true;
-            //const blob = await this._reportService.getComplianceHistoryPdf();
-
+            const blob = await this._reportService.getComplianceHistoryPdf();
+            this._downloadService.downloadFileFromBlob(blob, 'backflow-compliance-history.pdf');
         } finally {
             this.isLoading = false;
         }
     }
 
-    public downloadWord(): void {
-        // Printable / export report is not implemented yet (parity placeholder).
+    public async downloadWord(): Promise<void> {
+        try {
+            this.isLoading = true;
+            const blob = await this._reportService.getComplianceHistoryWord();
+            this._downloadService.downloadFileFromBlob(blob, 'backflow-compliance-history.docx');
+        } finally {
+            this.isLoading = false;
+        }
     }
 
-    public downloadExcel(): void {
-        // Printable / export report is not implemented yet (parity placeholder).
+    public async downloadExcel(): Promise<void> {
+        try {
+            this.isLoading = true;
+            const blob = await this._reportService.getComplianceHistoryExcel();
+            this._downloadService.downloadFileFromBlob(blob, 'backflow-compliance-history.xlsx');
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     private buildCharts(): void {

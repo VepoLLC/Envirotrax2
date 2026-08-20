@@ -136,6 +136,30 @@ export class BackflowReportService {
         );
     }
 
+    public getComplianceHistoryPdf(): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/compliance/history/pdf');
+
+        return lastValueFrom(
+            this._http.get(url, { responseType: 'blob' })
+        );
+    }
+
+    public getComplianceHistoryExcel(): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/compliance/history/excel');
+
+        return lastValueFrom(
+            this._http.get(url, { responseType: 'blob' })
+        );
+    }
+
+    public getComplianceHistoryWord(): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/compliance/history/word');
+
+        return lastValueFrom(
+            this._http.get(url, { responseType: 'blob' })
+        );
+    }
+
     public getNewRemoved(): Promise<BackflowNewRemovedReport> {
         const url = this._urlResolver.resolveUrl('/api/backflow/reports/assemblies/new-removed');
 

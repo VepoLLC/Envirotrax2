@@ -56,6 +56,28 @@ public class BackflowComplianceReportService(
         return result;
     }
 
+    public async Task<byte[]> GenerateHistoryPdfAsync(CancellationToken cancellationToken)
+    {
+        var history = await GetComplianceHistoryAsync(cancellationToken);
+
+        return await pdfTemplateService.GenerateAsync("Backflow.BackflowComplianceHistory", history);
+    }
+
+    public async Task<byte[]> GenerateHistoryExcelAsync(CancellationToken cancellationToken)
+    {
+
+        var history = await GetComplianceHistoryAsync(cancellationToken);
+
+        return BackflowComplianceHistoryExcelBuilder.Build(history);
+    }
+
+    public async Task<byte[]> GenerateHistoryWordAsync(CancellationToken cancellationToken)
+    {
+        var history = await GetComplianceHistoryAsync(cancellationToken);
+
+        return BackflowComplianceHistoryWordBuilder.Build(history);
+    }
+
     private static BackflowComplianceHistoryPointDto BuildPoint(BackflowComplianceSnapshot snapshot)
     {
         var nonCompliant = snapshot.Total - snapshot.Compliant;

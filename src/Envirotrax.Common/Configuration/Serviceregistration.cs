@@ -60,6 +60,15 @@ public static class ServiceRegistrations
         return services;
     }
 
+    public static IServiceCollection AddSmsService(this IServiceCollection services, IConfigurationSection smsConfigSection)
+    {
+        services.AddHttpClient();
+        services.Configure<SmsOptions>(smsConfigSection);
+        services.AddTransient<ISmsService, SmsService>();
+
+        return services;
+    }
+
     public static IServiceCollection AddInternalApi<TOptions>(this IServiceCollection services, IConfigurationSection configuration)
         where TOptions : InternalApiOptions
     {

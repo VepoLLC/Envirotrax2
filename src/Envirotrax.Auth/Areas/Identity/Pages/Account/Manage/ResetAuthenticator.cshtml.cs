@@ -55,6 +55,10 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account.Manage
             }
 
             await _userManager.ResetAuthenticatorKeyAsync(user);
+
+            user.AuthenticatorConfirmed = false;
+            await _userManager.UpdateAsync(user);
+
             var userId = await _userManager.GetUserIdAsync(user);
             _logger.LogInformation("User with ID '{UserId}' has reset their authentication app key.", user.Id);
 

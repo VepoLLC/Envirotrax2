@@ -48,7 +48,7 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
             ReturnUrl = returnUrl;
             RememberMe = rememberMe;
 
-            HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null && await _userManager.GetTwoFactorEnabledAsync(user);
+            HasAuthenticator = user.AuthenticatorConfirmed;
             HasSms = await _userManager.IsPhoneNumberConfirmedAsync(user);
 
             return Page();

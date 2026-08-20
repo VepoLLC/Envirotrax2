@@ -23,7 +23,8 @@
         <div class="row justify-content-center">
             <div class="col-sm-12 col-md-6 col-lg-5 col-xl-4">
                 <div class="d-flex flex-column align-items-center gap-3">
-                    <form method="post" asp-page-handler="SendEmail" asp-route-returnUrl="@Model.ReturnUrl" asp-route-rememberMe="@Model.RememberMe" class="w-100">
+                    <form method="post" asp-page-handler="SendEmail" asp-route-returnUrl="@Model.ReturnUrl"
+                          asp-route-rememberMe="@Model.RememberMe" class="w-100">
                         <button type="submit" class="btn btn-primary link-button block text-decoration-none">
                             <i class="fa-solid fa-envelope"></i>
                             Send a code to my email
@@ -31,10 +32,11 @@
                     </form>
                     @if (Model.HasSms)
                     {
-                        <form method="post" asp-page-handler="SendSms" asp-route-returnUrl="@Model.ReturnUrl" asp-route-rememberMe="@Model.RememberMe" class="w-100">
+                        <form method="post" asp-page-handler="SendSms" asp-route-returnUrl="@Model.ReturnUrl"
+                              asp-route-rememberMe="@Model.RememberMe" class="w-100">
                             <button type="submit" class="btn btn-primary link-button block text-decoration-none">
                                 <i class="fa-solid fa-mobile-screen"></i>
-                                Send a code to my phone
+                                Text a code to my phone
                             </button>
                         </form>
                     }
@@ -51,7 +53,8 @@
                 </div>
 
                 <div class="mt-4 text-center">
-                    <a id="recovery-code-login" asp-page="./LoginWithRecoveryCode" asp-route-returnUrl="@Model.ReturnUrl">
+                    <a id="recovery-code-login" asp-page="./LoginWithRecoveryCode"
+                       asp-route-returnUrl="@Model.ReturnUrl">
                         Don't have access to any of these? Log in with a recovery code
                     </a>
                 </div>

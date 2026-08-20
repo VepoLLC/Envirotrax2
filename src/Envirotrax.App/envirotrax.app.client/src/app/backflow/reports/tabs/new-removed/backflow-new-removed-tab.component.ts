@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { BaseChartDirective } from "ng2-charts";
 import { BackflowNewRemovedReport, BackflowNewRemovedPoint } from "../../../../shared/models/backflow/backflow-new-removed-report";
 import { BackflowReportService } from "../../../../shared/services/backflow/backflow-report.service";
+import { DownloadService } from "../../../../shared/services/download.service";
 import { chartGridColor, chartTickColor, onThemeChange, themeLegendLabels } from "../../../../shared/utils/chart-theme.util";
 import { ChartConfiguration, ChartData, Plugin } from "chart.js";
 
@@ -83,7 +84,10 @@ export class BackflowNewRemovedTabComponent implements OnInit, OnDestroy {
         }
     }];
 
-    constructor(private readonly _reportService: BackflowReportService) {}
+    constructor(
+        private readonly _reportService: BackflowReportService,
+        private readonly _downloadService: DownloadService
+    ) {}
 
     public async ngOnInit(): Promise<void> {
         // Axis/legend/grid colors are drawn from theme CSS variables, so repaint on theme toggle.
@@ -107,8 +111,34 @@ export class BackflowNewRemovedTabComponent implements OnInit, OnDestroy {
         }
     }
 
-    public viewPrintableReport(): void {
-        // Printable / export report is not implemented yet (parity placeholder).
+    public async downloadPDF(): Promise<void> {
+        try {
+            this.isLoading = true;
+            const blob = await this._reportService.getNewRemovedPdf();
+            this._downloadService.downloadFileFromBlob(blob, 'backflow-new-removed.pdf');
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    public async downloadWord(): Promise<void> {
+        try {
+            this.isLoading = true;
+            const blob = await this._reportService.getNewRemovedWord();
+            this._downloadService.downloadFileFromBlob(blob, 'backflow-new-removed.docx');
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    public async downloadExcel(): Promise<void> {
+        try {
+            this.isLoading = true;
+            const blob = await this._reportService.getNewRemovedExcel();
+            this._downloadService.downloadFileFromBlob(blob, 'backflow-new-removed.xlsx');
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     private buildChart(): void {

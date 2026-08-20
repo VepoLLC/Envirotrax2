@@ -18,35 +18,12 @@ internal static class BackflowComplianceHistoryChartHelper
 
     public static C.ChartSpace BuildBarChartSpace(IReadOnlyList<string> categories, IReadOnlyList<int> total, IReadOnlyList<int> compliant, IReadOnlyList<int> nonCompliant)
     {
-        const uint catAxisId = 111111111;
-        const uint valAxisId = 222222222;
-
-        var barChart = new C.BarChart(
-            new C.BarDirection { Val = C.BarDirectionValues.Column },
-            new C.BarGrouping { Val = C.BarGroupingValues.Clustered },
-            new C.VaryColors { Val = false },
-            BuildBarSeries(0, "Total", TotalColor, categories, total),
-            BuildBarSeries(1, "Compliant", CompliantColor, categories, compliant),
-            BuildBarSeries(2, "Non-Compliant", NonCompliantColor, categories, nonCompliant),
-            new C.GapWidth { Val = 60 },
-            new C.Overlap { Val = -10 },
-            new C.AxisId { Val = catAxisId },
-            new C.AxisId { Val = valAxisId });
-
-        var plotArea = new C.PlotArea(
-            new C.Layout(),
-            barChart,
-            BuildCategoryAxis(catAxisId, valAxisId),
-            BuildValueAxis(valAxisId, catAxisId),
-            new C.ShapeProperties(new A.NoFill(), new A.Outline(new A.NoFill())));
-
-        var chart = new C.Chart(
-            new C.AutoTitleDeleted { Val = true },
-            plotArea,
-            new C.Legend(new C.LegendPosition { Val = C.LegendPositionValues.Top }, new C.Overlay { Val = false }),
-            new C.PlotVisibleOnly { Val = true });
-
-        return new C.ChartSpace(chart, new C.ShapeProperties(new A.NoFill(), new A.Outline(new A.NoFill())));
+        return BackflowGroupedBarChartHelper.BuildChartSpace(categories,
+        [
+            ("Total", TotalColor, total),
+            ("Compliant", CompliantColor, compliant),
+            ("Non-Compliant", NonCompliantColor, nonCompliant)
+        ]);
     }
 
     public static C.ChartSpace BuildLineChartSpace(IReadOnlyList<string> categories, IReadOnlyList<double> percentages)
@@ -65,8 +42,8 @@ internal static class BackflowComplianceHistoryChartHelper
         var plotArea = new C.PlotArea(
             new C.Layout(),
             lineChart,
-            BuildCategoryAxis(catAxisId, valAxisId),
-            BuildValueAxis(valAxisId, catAxisId, min: 0, max: 100),
+            BackflowChartAxisHelper.BuildCategoryAxis(catAxisId, valAxisId),
+            BackflowChartAxisHelper.BuildValueAxis(valAxisId, catAxisId, min: 0, max: 100),
             new C.ShapeProperties(new A.NoFill(), new A.Outline(new A.NoFill())));
 
         var chart = new C.Chart(
@@ -75,17 +52,6 @@ internal static class BackflowComplianceHistoryChartHelper
             new C.PlotVisibleOnly { Val = true });
 
         return new C.ChartSpace(chart, new C.ShapeProperties(new A.NoFill(), new A.Outline(new A.NoFill())));
-    }
-
-    private static C.BarChartSeries BuildBarSeries(uint index, string name, string color, IReadOnlyList<string> categories, IReadOnlyList<int> values)
-    {
-        return new C.BarChartSeries(
-            new C.Index { Val = index },
-            new C.Order { Val = index },
-            new C.SeriesText(new C.NumericValue(name)),
-            new C.ChartShapeProperties(new A.SolidFill(new A.RgbColorModelHex { Val = color })),
-            new C.CategoryAxisData(BuildStringLiteral(categories)),
-            new C.Values(BuildNumberLiteral(values.Select(v => (double)v).ToList())));
     }
 
     private static C.LineChartSeries BuildLineSeries(uint index, string name, IReadOnlyList<string> categories, IReadOnlyList<double> values)
@@ -98,65 +64,7 @@ internal static class BackflowComplianceHistoryChartHelper
             new C.Marker(
                 new C.Symbol { Val = C.MarkerStyleValues.Circle },
                 new C.ChartShapeProperties(new A.SolidFill(new A.RgbColorModelHex { Val = PercentLineColor }))),
-            new C.CategoryAxisData(BuildStringLiteral(categories)),
-            new C.Values(BuildNumberLiteral(values)));
-    }
-
-    private static C.CategoryAxis BuildCategoryAxis(uint axisId, uint crossAxisId)
-    {
-        return new C.CategoryAxis(
-            new C.AxisId { Val = axisId },
-            new C.Scaling(new C.Orientation { Val = C.OrientationValues.MinMax }),
-            new C.Delete { Val = false },
-            new C.AxisPosition { Val = C.AxisPositionValues.Bottom },
-            new C.TickLabelPosition { Val = C.TickLabelPositionValues.Low },
-            new C.CrossingAxis { Val = crossAxisId });
-    }
-
-    private static C.ValueAxis BuildValueAxis(uint axisId, uint crossAxisId, double? min = null, double? max = null)
-    {
-        var scaling = new C.Scaling(new C.Orientation { Val = C.OrientationValues.MinMax });
-
-        if (max.HasValue)
-        {
-            scaling.MaxAxisValue = new C.MaxAxisValue { Val = max.Value };
-        }
-
-        if (min.HasValue)
-        {
-            scaling.MinAxisValue = new C.MinAxisValue { Val = min.Value };
-        }
-
-        return new C.ValueAxis(
-            new C.AxisId { Val = axisId },
-            scaling,
-            new C.Delete { Val = false },
-            new C.AxisPosition { Val = C.AxisPositionValues.Left },
-            new C.MajorGridlines(),
-            new C.CrossingAxis { Val = crossAxisId });
-    }
-
-    private static C.StringLiteral BuildStringLiteral(IReadOnlyList<string> values)
-    {
-        var literal = new C.StringLiteral(new C.PointCount { Val = (uint)values.Count });
-
-        for (var i = 0; i < values.Count; i++)
-        {
-            literal.Append(new C.StringPoint { Index = (uint)i, NumericValue = new C.NumericValue(values[i]) });
-        }
-
-        return literal;
-    }
-
-    private static C.NumberLiteral BuildNumberLiteral(IReadOnlyList<double> values)
-    {
-        var literal = new C.NumberLiteral(new C.FormatCode("General"), new C.PointCount { Val = (uint)values.Count });
-
-        for (var i = 0; i < values.Count; i++)
-        {
-            literal.Append(new C.NumericPoint { Index = (uint)i, NumericValue = new C.NumericValue(values[i].ToString(System.Globalization.CultureInfo.InvariantCulture)) });
-        }
-
-        return literal;
+            new C.CategoryAxisData(BackflowChartAxisHelper.BuildStringLiteral(categories)),
+            new C.Values(BackflowChartAxisHelper.BuildNumberLiteral(values)));
     }
 }

@@ -154,4 +154,28 @@ public class BackflowReportsController : WaterSupplierProtectedController
         var report = await _newRemovedReportService.GetNewRemovedAsync(cancellationToken);
         return Ok(report);
     }
+
+    [HttpGet("assemblies/new-removed/pdf")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetNewRemovedPdfAsync(CancellationToken cancellationToken)
+    {
+        var pdf = await _newRemovedReportService.GeneratePdfAsync(cancellationToken);
+        return File(pdf, MimeTypes.Pdf);
+    }
+
+    [HttpGet("assemblies/new-removed/excel")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetNewRemovedExcelAsync(CancellationToken cancellationToken)
+    {
+        var excel = await _newRemovedReportService.GenerateExcelAsync(cancellationToken);
+        return File(excel, MimeTypes.Excel);
+    }
+
+    [HttpGet("assemblies/new-removed/word")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetNewRemovedWordAsync(CancellationToken cancellationToken)
+    {
+        var word = await _newRemovedReportService.GenerateWordAsync(cancellationToken);
+        return File(word, MimeTypes.Word);
+    }
 }

@@ -167,4 +167,28 @@ export class BackflowReportService {
             this._http.get<BackflowNewRemovedReport>(url)
         );
     }
+
+    public getNewRemovedPdf(): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/assemblies/new-removed/pdf');
+
+        return lastValueFrom(
+            this._http.get(url, { responseType: 'blob' })
+        );
+    }
+
+    public getNewRemovedExcel(): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/assemblies/new-removed/excel');
+
+        return lastValueFrom(
+            this._http.get(url, { responseType: 'blob' })
+        );
+    }
+
+    public getNewRemovedWord(): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/assemblies/new-removed/word');
+
+        return lastValueFrom(
+            this._http.get(url, { responseType: 'blob' })
+        );
+    }
 }

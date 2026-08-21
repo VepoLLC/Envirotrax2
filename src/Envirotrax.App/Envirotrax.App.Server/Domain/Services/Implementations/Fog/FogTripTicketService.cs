@@ -129,17 +129,6 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         return tickets.Select(Mapper.Map<FogTripTicketDto>).ToPagedData(pageInfo);
     }
 
-    public async Task<IPagedData<FogTripTicketDto>> SearchForWaterSupplierAsync(
-        PageInfo pageInfo, Query query, int? subAccountWaterSupplierId, CancellationToken cancellationToken)
-    {
-        query.Filter = query.ConvertFilterProperties<FogTripTicket, FogTripTicketDto>(Mapper);
-        query.Sort = query.ConvertSortProperties<FogTripTicket, FogTripTicketDto>(Mapper);
-
-        var tickets = await _repository.SearchForWaterSupplierAsync(pageInfo, query, subAccountWaterSupplierId, cancellationToken);
-
-        return tickets.Select(Mapper.Map<FogTripTicketDto>).ToPagedData(pageInfo);
-    }
-
     public async Task<FogTripTicketDto> SubmitAsync(
         FogTripTicketDto request,
         Stream? generatorSignatureStream, string? generatorSignatureFileName,

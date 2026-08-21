@@ -8,7 +8,5 @@ public interface IFogTripTicketRepository : IRepository<FogTripTicket>
 {
     Task<IEnumerable<FogTripTicket>> SearchForProfessionalAsync(PageInfo pageInfo, Query query, int? waterSupplierId, CancellationToken ct);
 
-    Task<IEnumerable<FogTripTicket>> SearchForWaterSupplierAsync(PageInfo pageInfo, Query query, int? subAccountWaterSupplierId, CancellationToken cancellationToken);
-
     Task<FogTripTicket?> UpdateApprovalAsync(int id, bool disapproved, int? approvedById, CancellationToken cancellationToken);
 }

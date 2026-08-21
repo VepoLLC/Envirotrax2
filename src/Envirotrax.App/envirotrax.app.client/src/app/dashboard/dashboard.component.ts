@@ -135,7 +135,6 @@ export class DashboardComponent implements OnInit {
         }));
 
         const subAccountStats = (stats.subAccountStats ?? []).map(sub => ({
-            waterSupplierId: sub.waterSupplierId,
             waterSupplierName: sub.waterSupplierName,
             totalInspections: sub.dailyStats.reduce((s, d) => s + d.totalInspections, 0),
             totalPaidInspections: sub.dailyStats.reduce((s, d) => s + d.totalPaidInspections, 0)
@@ -166,7 +165,6 @@ export class DashboardComponent implements OnInit {
         }));
 
         const subAccountStats = (stats.subAccountStats ?? []).map(sub => ({
-            waterSupplierId: sub.waterSupplierId,
             waterSupplierName: sub.waterSupplierName,
             totalTests: sub.dailyStats.reduce((s, d) => s + d.totalTests, 0),
             totalPaidTests: sub.dailyStats.reduce((s, d) => s + d.totalPaidTests, 0)
@@ -197,7 +195,6 @@ export class DashboardComponent implements OnInit {
         }));
 
         const subAccountStats = (stats.subAccountStats ?? []).map(sub => ({
-            waterSupplierId: sub.waterSupplierId,
             waterSupplierName: sub.waterSupplierName,
             totalInspections: sub.dailyStats.reduce((s, d) => s + d.totalInspections, 0),
             totalPaidInspections: sub.dailyStats.reduce((s, d) => s + d.totalPaidInspections, 0)
@@ -228,7 +225,6 @@ export class DashboardComponent implements OnInit {
         }));
 
         const subAccountStats = (stats.subAccountStats ?? []).map(sub => ({
-            waterSupplierId: sub.waterSupplierId,
             waterSupplierName: sub.waterSupplierName,
             totalTripTickets: sub.dailyStats.reduce((s, d) => s + d.totalTripTickets, 0),
             totalPaidTripTickets: sub.dailyStats.reduce((s, d) => s + d.totalPaidTripTickets, 0)
@@ -264,7 +260,6 @@ interface CsiDailyStatsVm {
 }
 
 interface CsiSubAccountVm {
-    waterSupplierId: number;
     waterSupplierName: string;
     totalInspections: number;
     totalPaidInspections: number;
@@ -290,7 +285,6 @@ interface BackflowDailyStatsVm {
 }
 
 interface BackflowSubAccountVm {
-    waterSupplierId: number;
     waterSupplierName: string;
     totalTests: number;
     totalPaidTests: number;
@@ -316,7 +310,6 @@ interface FogInspectionDailyStatsVm {
 }
 
 interface FogInspectionSubAccountVm {
-    waterSupplierId: number;
     waterSupplierName: string;
     totalInspections: number;
     totalPaidInspections: number;
@@ -342,7 +335,6 @@ interface FogTripTicketDailyStatsVm {
 }
 
 interface FogTripTicketSubAccountVm {
-    waterSupplierId: number;
     waterSupplierName: string;
     totalTripTickets: number;
     totalPaidTripTickets: number;

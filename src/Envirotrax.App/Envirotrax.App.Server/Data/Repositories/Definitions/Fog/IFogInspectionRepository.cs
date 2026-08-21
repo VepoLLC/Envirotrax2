@@ -8,8 +8,4 @@ public interface IFogInspectionRepository : IRepository<FogInspection>
     Task<IEnumerable<FogInspection>> SearchForProfessionalAsync(
         PageInfo pageInfo, Query query,
         bool latestOnly, CancellationToken cancellationToken);
-
-    Task<IEnumerable<FogInspection>> SearchForWaterSupplierAsync(
-        PageInfo pageInfo, Query query,
-        int? subAccountWaterSupplierId, CancellationToken cancellationToken);
 }

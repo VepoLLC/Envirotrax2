@@ -18,7 +18,6 @@ import { AppContainerHelperService } from "../../../shared/services/helpers/app-
 })
 export class CsiInspectionListComponent implements OnInit, OnDestroy {
     private _queryParamSub?: Subscription;
-    private _subAccountWaterSupplierId?: number;
     @ViewChild('statusTemplate', { static: true })
     public statusTemplate!: TemplateRef<CellTemplateData<CsiInspection>>;
 
@@ -137,14 +136,6 @@ export class CsiInspectionListComponent implements OnInit, OnDestroy {
                 }];
                 await this.getInspections();
                 this.setShowResults(true);
-                return;
-            }
-
-            const subAccountWaterSupplierIdParam = params.get('subAccountWaterSupplierId');
-            if (subAccountWaterSupplierIdParam) {
-                this._subAccountWaterSupplierId = Number(subAccountWaterSupplierIdParam);
-                await this.getInspections();
-                this.setShowResults(true);
             }
         });
     }
@@ -217,8 +208,7 @@ export class CsiInspectionListComponent implements OnInit, OnDestroy {
             this.table.isLoading = true;
             this.table.items = await this._csiInspectionService.getAll(
                 this.table.items?.pageInfo || {},
-                this.table.query,
-                this._subAccountWaterSupplierId
+                this.table.query
             );
         } finally {
             this.table.isLoading = false;
@@ -226,9 +216,6 @@ export class CsiInspectionListComponent implements OnInit, OnDestroy {
     }
 
     public searchAgain(): void {
-        // Returning to the form should search this water supplier's own inspections again, not stay
-        // silently scoped to whatever dashboard sub account was drilled into.
-        this._subAccountWaterSupplierId = undefined;
         this.setShowResults(false);
     }
 

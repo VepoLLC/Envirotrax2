@@ -6,19 +6,15 @@ using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
-using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow;
 
 public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRepository
 {
-    private readonly ITenantProvidersService _tenantProvider;
-
-    public BackflowTestRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider)
+    public BackflowTestRepository(IDbContextSelector dbContextSelector)
         : base(dbContextSelector)
     {
-        _tenantProvider = tenantProvider;
     }
 
     protected override IQueryable<BackflowTest> GetListQuery()
@@ -121,26 +117,9 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return await paginated.ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<BackflowTest>> SearchAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, int? subAccountWaterSupplierId, CancellationToken cancellationToken)
+    public async Task<IEnumerable<BackflowTest>> SearchAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken)
     {
         var dbQuery = GetListQuery().Where(query.Filter);
-
-        // This is for the dashboard "View" button on a sub account. Normally every query only sees
-        // the logged-in water supplier's own tests, so we turn that off here - but only after checking
-        // that the id passed in really is one of this water supplier's sub accounts. If it's not, we
-        // just search the water supplier's own tests like normal.
-        if (subAccountWaterSupplierId.HasValue)
-        {
-            var isOwnChild = await DbContext.WaterSuppliers
-                .AnyAsync(ws => ws.Id == subAccountWaterSupplierId.Value && ws.ParentId == _tenantProvider.WaterSupplierId, cancellationToken);
-
-            if (isOwnChild)
-            {
-                dbQuery = dbQuery
-                    .IgnoreQueryFilters()
-                    .Where(t => t.WaterSupplierId == subAccountWaterSupplierId.Value);
-            }
-        }
 
         if (paymentStatus == BackflowPaymentStatus.Paid)
         {

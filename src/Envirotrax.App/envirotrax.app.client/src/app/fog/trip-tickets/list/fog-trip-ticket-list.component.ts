@@ -20,7 +20,6 @@ import { PrintableTableService } from '../../../shared/services/printable-table.
 })
 export class FogTripTicketListComponent implements OnInit, OnDestroy {
     private _queryParamSub?: Subscription;
-    private _subAccountWaterSupplierId?: number;
     public showResults: boolean = false;
     public readonly PropertyType = PropertyType;
     public readonly FogVehicleCapacityType = FogVehicleCapacityType;
@@ -129,14 +128,6 @@ export class FogTripTicketListComponent implements OnInit, OnDestroy {
                 }];
                 await this.getTripTickets();
                 this.setShowResults(true);
-                return;
-            }
-
-            const subAccountWaterSupplierIdParam = params.get('subAccountWaterSupplierId');
-            if (subAccountWaterSupplierIdParam) {
-                this._subAccountWaterSupplierId = Number(subAccountWaterSupplierIdParam);
-                await this.getTripTickets();
-                this.setShowResults(true);
             }
         });
     }
@@ -193,8 +184,7 @@ export class FogTripTicketListComponent implements OnInit, OnDestroy {
             this.table.isLoading = true;
             this.table.items = await this._fogTripTicketService.getAll(
                 this.table.items?.pageInfo || {},
-                this.table.query,
-                this._subAccountWaterSupplierId
+                this.table.query
             );
         } finally {
             this.table.isLoading = false;
@@ -208,12 +198,6 @@ export class FogTripTicketListComponent implements OnInit, OnDestroy {
     public setShowResults(visible: boolean): void {
         this.showResults = visible;
         this._containerHelper.setContainerVisibility(!visible);
-
-        // "Search Again" returns to the form - a subsequent manual search should search the water
-        // supplier's own trip tickets again, not stay silently scoped to a dashboard sub account.
-        if (!visible) {
-            this._subAccountWaterSupplierId = undefined;
-        }
     }
 
     public async search(searchForm: NgForm): Promise<void> {

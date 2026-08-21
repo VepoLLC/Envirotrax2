@@ -19,16 +19,12 @@ export class FogInspectionService {
     ) {
     }
 
-    public async getAll(pageInfo: PageInfo, query: Query, subAccountWaterSupplierId?: number | null): Promise<PagedData<FogInspection>> {
+    public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<FogInspection>> {
         const url = this._urlResolver.resolveUrl('/api/fog/inspections');
 
-        let params = this._queryHelper.buildQuery(pageInfo, query);
-
-        if (subAccountWaterSupplierId != null) {
-            params = params.append('subAccountWaterSupplierId', String(subAccountWaterSupplierId));
-        }
-
-        const observable = this._http.get<PagedData<FogInspection>>(url, { params });
+        const observable = this._http.get<PagedData<FogInspection>>(url, {
+            params: this._queryHelper.buildQuery(pageInfo, query)
+        });
 
         return await lastValueFrom(observable);
     }

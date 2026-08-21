@@ -6,7 +6,6 @@ export interface CsiDailyStats {
 }
 
 export interface CsiSubAccountStats {
-    waterSupplierId: number;
     waterSupplierName: string;
     dailyStats: CsiDailyStats[];
 }

@@ -40,17 +40,13 @@ export class BackflowTestService {
     ) {
     }
 
-    public async getAll(pageInfo: PageInfo, query: Query, paymentStatus?: BackflowPaymentStatus | null, subAccountWaterSupplierId?: number | null): Promise<PagedData<BackflowTest>> {
+    public async getAll(pageInfo: PageInfo, query: Query, paymentStatus?: BackflowPaymentStatus | null): Promise<PagedData<BackflowTest>> {
         const url = this._urlResolver.resolveUrl('/api/backflow/tests');
 
         let params = this._queryHelper.buildQuery(pageInfo, query);
 
         if (paymentStatus != null) {
             params = params.append('paymentStatus', String(paymentStatus));
-        }
-
-        if (subAccountWaterSupplierId != null) {
-            params = params.append('subAccountWaterSupplierId', String(subAccountWaterSupplierId));
         }
 
         const observable = this._http.get<PagedData<BackflowTest>>(url, { params });

@@ -159,13 +159,16 @@ public class BackflowComplianceReportRepository(IDbContextSelector dbContextSele
         };
     }
 
-    public async Task<BackflowComplianceHistoryDto> GetComplianceHistoryAsync(CancellationToken cancellationToken)
+    // Reconstructs each month's compliance "as of the 1st" (matching V1's snapshot-on-day-1) directly
+    // from the test history, across the FULL available range: earliest test month → current month, with
+    // no window cap. This seeds the persisted snapshot table with all history, mirroring V1's
+    // WaterSupplierReports (whose report table shows every month; the 48-month cap is a chart-only
+    // concern applied on the client). Assemblies are identified by site + serial number; an assembly is
+    // active in a month if it has a test on or before that month and has not been taken out of service
+    // by then; compliant if its latest test as of that month has not expired. Site active/in-area state
+    // is the current state (not reconstructed). Used by the one-time backfill.
+    public async Task<BackflowComplianceHistoryDto> ReconstructComplianceHistoryAsync(CancellationToken cancellationToken)
     {
-        // V2 has no monthly snapshot table, so we reconstruct each month's compliance "as of the 1st"
-        // (matching V1's snapshot-on-day-1) directly from the test history. Assemblies are identified
-        // by site + serial number; an assembly is active in a month if it has a test on or before that
-        // month and has not been taken out of service by then; compliant if its latest test as of that
-        // month has not expired. Site active/in-area state is the current state (not reconstructed).
         var tests = await LoadHistoryTestPointsAsync(cancellationToken);
 
         var result = new BackflowComplianceHistoryDto();
@@ -178,7 +181,9 @@ public class BackflowComplianceReportRepository(IDbContextSelector dbContextSele
 
         var now = _timeZoneHelper.GetUserLocalTime();
         var currentMonth = new DateTime(now.Year, now.Month, 1);
-        var startMonth = GetHistoryStartMonth(tests, currentMonth);
+
+        var earliest = tests.Min(t => t.TestDate);
+        var startMonth = new DateTime(earliest.Year, earliest.Month, 1);
 
         for (var asOf = startMonth; asOf <= currentMonth; asOf = asOf.AddMonths(1))
         {
@@ -186,6 +191,24 @@ public class BackflowComplianceReportRepository(IDbContextSelector dbContextSele
         }
 
         return result;
+    }
+
+    // Compute compliance "as of the 1st" for exactly the requested months, reusing the same per-month
+    // BuildHistoryPoint logic as ReconstructComplianceHistoryAsync. Test data is loaded once, so the
+    // monthly snapshot flow can compute a single month without running the full-history reconstruction.
+    public async Task<IReadOnlyList<BackflowComplianceHistoryPointDto>> ComputeHistoryPointsAsync(IReadOnlyCollection<DateTime> months, CancellationToken cancellationToken)
+    {
+        if (months.Count == 0)
+        {
+            return [];
+        }
+
+        var tests = await LoadHistoryTestPointsAsync(cancellationToken);
+        var assemblies = BuildAssemblyHistories(tests);
+
+        return months
+            .Select(month => BuildHistoryPoint(assemblies, month))
+            .ToList();
     }
 
     private async Task<List<TestPoint>> LoadHistoryTestPointsAsync(CancellationToken cancellationToken)
@@ -218,15 +241,6 @@ public class BackflowComplianceReportRepository(IDbContextSelector dbContextSele
                     .Min()
             })
             .ToList();
-    }
-
-    private static DateTime GetHistoryStartMonth(List<TestPoint> tests, DateTime currentMonth)
-    {
-        var earliest = tests.Min(t => t.TestDate);
-        var earliestMonth = new DateTime(earliest.Year, earliest.Month, 1);
-        var windowStart = currentMonth.AddMonths(-47);
-
-        return earliestMonth > windowStart ? earliestMonth : windowStart;
     }
 
     // Compliance as of the 1st of a month: an assembly counts if it has a test on or before the month

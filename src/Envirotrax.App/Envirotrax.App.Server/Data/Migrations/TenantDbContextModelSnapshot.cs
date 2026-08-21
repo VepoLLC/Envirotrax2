@@ -22,6 +22,25 @@ namespace Envirotrax.App.Server.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Backflow.BackflowComplianceSnapshot", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ReportDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("Compliant")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Total")
+                        .HasColumnType("int");
+
+                    b.HasKey("WaterSupplierId", "ReportDate");
+
+                    b.ToTable("BackflowComplianceSnapshots");
+                });
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Backflow.BackflowGauge", b =>
                 {
                     b.Property<int>("Id")
@@ -3700,6 +3719,17 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("UpdatedById");
 
                     b.ToTable("WaterSuppliers");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Backflow.BackflowComplianceSnapshot", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("WaterSupplier");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Backflow.BackflowGauge", b =>

@@ -39,6 +39,15 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
             .WhereIf(!_tenantProvider.HasScope(ScopeDefinitions.AdminInternal), supplier => supplier.ParentId == _tenantProvider.WaterSupplierId);
     }
 
+    public async Task<IEnumerable<int>> GetAllSupplierIdsAsync(CancellationToken cancellationToken)
+    {
+        return await DbContext
+            .WaterSuppliers
+            .Where(supplier => supplier.DeletedTime == null)
+            .Select(supplier => supplier.Id)
+            .ToListAsync(cancellationToken);
+    }
+
     public override Task<WaterSupplier> AddAsync(WaterSupplier supplier)
     {
         supplier.ParentId = _tenantProvider.WaterSupplierId;

@@ -1,0 +1,322 @@
+@using System.Globalization
+@using Envirotrax.App.Server.Domain.Services.Implementations.Backflow
+@model Envirotrax.App.Server.Domain.DataTransferObjects.Backflow.BackflowComplianceHistoryDto
+@{
+    Layout = null;
+
+    var reversedPoints = Model.Points.AsEnumerable().Reverse().ToList();
+    var yearColors = BackflowComplianceHistoryColors.BuildYearColorMap(Model.Points.Select(p => p.Year));
+
+    string ColorFor(int year) => yearColors.TryGetValue(year, out var color) ? color : "20A845";
+
+    // Charts read chronologically (oldest to newest) and cap at the most recent 48 months, matching
+    // backflow-compliance-history-tab.component.ts's buildCharts; the table below still shows everything.
+    // Rendered as pure CSS/SVG (no JS, no external script) — same self-contained approach as the
+    // conic-gradient doughnut in BackflowComplianceReport.cshtml — since Puppeteer's headless render
+    // has no guaranteed network access for a CDN chart library.
+    const int chartMonthWindow = 48;
+    var chartPoints = Model.Points.Count > chartMonthWindow
+        ? Model.Points.Skip(Model.Points.Count - chartMonthWindow).ToList()
+        : Model.Points;
+
+    var maxTotal = chartPoints.Count > 0 ? chartPoints.Max(p => p.Total) : 0;
+
+    double HeightPercent(int value) => maxTotal > 0 ? (double)value / maxTotal * 100 : 0;
+
+    const int lineSvgWidth = 700;
+    const int lineSvgHeight = 160;
+
+    string Coord(double value) => value.ToString(CultureInfo.InvariantCulture);
+
+    double XFor(int index) => chartPoints.Count <= 1 ? lineSvgWidth / 2.0 : index * (lineSvgWidth / (double)(chartPoints.Count - 1));
+    double YFor(double percentage) => lineSvgHeight - Math.Clamp(percentage, 0, 100) / 100.0 * lineSvgHeight;
+
+    var linePoints = string.Join(" ", chartPoints.Select((p, i) => $"{Coord(XFor(i))},{Coord(YFor(p.Percentage))}"));
+    var areaPoints = chartPoints.Count > 0
+        ? $"{linePoints} {Coord(XFor(chartPoints.Count - 1))},{lineSvgHeight} {Coord(XFor(0))},{lineSvgHeight}"
+        : "";
+
+    // Percent labels are drawn as plain HTML <span> overlays positioned by percentage offset, not as
+    // SVG <text> — Razor's parser treats a literal "<text>" tag as its own markup-transition syntax
+    // and rejects attributes on it (RZ1023), and there's no raw-output helper that works both at
+    // design-time (compiled as an MVC Razor view) and at runtime (compiled by RazorLight, which has no
+    // Html.Raw and instead exposes its own incompatible Raw() method) to work around it.
+    double LeftPercentFor(int index) => chartPoints.Count <= 1 ? 50.0 : index * (100.0 / (chartPoints.Count - 1));
+    double TopPercentFor(double percentage) => 100.0 - Math.Clamp(percentage, 0, 100);
+}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <style>
+        body {
+            font-size: 9.1px;
+            font-family: Arial, sans-serif;
+        }
+
+        .page-title {
+            background-color: #323232;
+            color: #ffffff;
+            font-size: 10.6px;
+            font-weight: bold;
+            text-align: center;
+            padding: 5px 3px;
+            margin-bottom: 5px;
+        }
+
+        .section-header {
+            background-color: #a0a0a0;
+            color: #ffffff;
+            font-weight: bold;
+            padding: 2.5px 5px;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .chart-wrapper {
+            margin-bottom: 10px;
+            break-inside: avoid;
+        }
+
+        .chart-legend {
+            text-align: center;
+            padding: 5px 0 8px;
+        }
+
+        .chart-legend span {
+            display: inline-block;
+            margin: 0 8px;
+        }
+
+        .chart-legend .swatch {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            margin-right: 3px;
+            border-radius: 1px;
+        }
+
+        .bar-plot {
+            display: flex;
+            align-items: flex-end;
+            height: 130px;
+            border-bottom: 1px solid #ccc;
+            padding: 0 4px;
+        }
+
+        .bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .bar-set {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 1.5px;
+            height: 120px;
+            width: 100%;
+        }
+
+        .bar {
+            width: 6px;
+        }
+
+        .bar.total {
+            background: #50a0ff;
+        }
+
+        .bar.compliant {
+            background: #3ec46e;
+        }
+
+        .bar.noncompliant {
+            background: #ff5a5a;
+        }
+
+        .bar-month-labels {
+            display: flex;
+            padding: 0 4px;
+        }
+
+        .bar-month-labels span {
+            flex: 1;
+            text-align: center;
+            font-size: 7.5px;
+        }
+
+        .line-chart-plot {
+            position: relative;
+        }
+
+        .line-svg {
+            width: 100%;
+            height: 160px;
+            display: block;
+        }
+
+        .line-chart-plot .point-labels {
+            position: absolute;
+            inset: 0;
+        }
+
+        .line-chart-plot .point-label {
+            position: absolute;
+            transform: translate(-50%, -140%);
+            font-size: 8px;
+            color: #333333;
+            white-space: nowrap;
+        }
+
+        .line-month-labels {
+            display: flex;
+            padding: 0 4px;
+        }
+
+        .line-month-labels span {
+            flex: 1;
+            text-align: center;
+            font-size: 7.5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        tr {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        td,
+        th {
+            border: none;
+            padding: 2.5px 5px;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: #e9ecef;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .col-num {
+            width: 8%;
+            text-align: right;
+        }
+
+        .reportbar-cell {
+            width: 20%;
+        }
+
+        .reportbar {
+            height: 16px;
+            border-radius: 0 8px 8px 0;
+            min-width: 2px;
+        }
+
+        .reportbar.green {
+            background: linear-gradient(to right, #b5e8c0, #20a845);
+        }
+
+        .reportbar.blue {
+            background: linear-gradient(to right, #b5cfe8, #207ce5);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-title">Backflow Compliance History</div>
+
+    @if (chartPoints.Count > 0)
+    {
+        <div class="section-header">Compliance History By Number of Assemblies</div>
+        <div class="chart-wrapper">
+            <div class="chart-legend">
+                <span><span class="swatch" style="background:#50a0ff"></span>Total</span>
+                <span><span class="swatch" style="background:#3ec46e"></span>Compliant</span>
+                <span><span class="swatch" style="background:#ff5a5a"></span>Non-Compliant</span>
+            </div>
+            <div class="bar-plot">
+                @foreach (var point in chartPoints)
+                {
+                    <div class="bar-group">
+                        <div class="bar-set">
+                            <div class="bar total" style="height:@(HeightPercent(point.Total))%"></div>
+                            <div class="bar compliant" style="height:@(HeightPercent(point.Compliant))%"></div>
+                            <div class="bar noncompliant" style="height:@(HeightPercent(point.NonCompliant))%"></div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="bar-month-labels">
+                @foreach (var point in chartPoints)
+                {
+                    <span>@point.Label.Split(' ')[0]</span>
+                }
+            </div>
+        </div>
+
+        <div class="section-header">Percent of Compliant Assemblies</div>
+        <div class="chart-wrapper">
+            <div class="line-chart-plot">
+                <svg class="line-svg" viewBox="0 0 @lineSvgWidth @lineSvgHeight" preserveAspectRatio="none">
+                    <polygon points="@areaPoints" fill="rgba(80, 240, 80, 0.35)" stroke="none" />
+                    <polyline points="@linePoints" fill="none" stroke="#2bbd4f" stroke-width="2" />
+                    @for (var i = 0; i < chartPoints.Count; i++)
+                    {
+                        <circle cx="@Coord(XFor(i))" cy="@Coord(YFor(chartPoints[i].Percentage))" r="2.5" fill="#2bbd4f" />
+                    }
+                </svg>
+                <div class="point-labels">
+                    @for (var i = 0; i < chartPoints.Count; i++)
+                    {
+                        <span class="point-label" style="left:@(LeftPercentFor(i))%; top:@(TopPercentFor(chartPoints[i].Percentage))%">@(chartPoints[i].Percentage)%</span>
+                    }
+                </div>
+            </div>
+            <div class="line-month-labels">
+                @foreach (var point in chartPoints)
+                {
+                    <span>@point.Label.Split(' ')[0]</span>
+                }
+            </div>
+        </div>
+    }
+
+    @if (reversedPoints.Count > 0)
+    {
+        <div class="section-header">Compliance History Report</div>
+        <table>
+            <tr>
+                <th>Month</th>
+                <th>Year</th>
+                <th class="reportbar-cell"></th>
+                <th class="col-num">Total Assemblies</th>
+                <th class="col-num">Compliant Assemblies</th>
+                <th class="col-num">%</th>
+            </tr>
+            @foreach (var point in reversedPoints)
+            {
+                var colorClass = ColorFor(point.Year) == "207CE5" ? "blue" : "green";
+                <tr>
+                    <td>@point.Label.Split(' ')[0]</td>
+                    <td>@point.Year</td>
+                    <td class="reportbar-cell">
+                        <div class="reportbar @colorClass" style="width:@(point.Percentage)%">&nbsp;</div>
+                    </td>
+                    <td class="col-num">@point.Total</td>
+                    <td class="col-num">@point.Compliant</td>
+                    <td class="col-num">@(point.Percentage)%</td>
+                </tr>
+            }
+        </table>
+    }
+</body>
+
+</html>

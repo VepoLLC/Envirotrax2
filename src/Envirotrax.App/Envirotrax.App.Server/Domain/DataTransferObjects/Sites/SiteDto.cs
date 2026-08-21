@@ -195,6 +195,11 @@ public class FogComplianceSiteDto : SiteDto
     public List<SiteLogDto> Logs { get; set; } = [];
 }
 
+public class FogPermitComplianceSiteDto : SiteDto
+{
+    public List<SiteLogDto> Logs { get; set; } = [];
+}
+
 public class ReferencedSiteDto
 {
     [Required]

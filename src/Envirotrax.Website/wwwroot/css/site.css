@@ -1,0 +1,249 @@
+/*--------------------------------------------------------------
+# Design Tokens
+--------------------------------------------------------------*/
+:root {
+    --et-blue: #008fd4;
+    --et-blue-dark: #004fa4;
+    --et-slate: #2f4d5a;
+    --et-footer-bg: #304050;
+    --et-footer-border: #385b6b;
+    --et-header-height: 60px;
+}
+
+/*--------------------------------------------------------------
+# Base
+--------------------------------------------------------------*/
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: "Open Sans", sans-serif;
+    color: var(--et-slate);
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+/*--------------------------------------------------------------
+# Header
+--------------------------------------------------------------*/
+#header {
+    background: var(--et-blue);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .25);
+    z-index: 997;
+}
+
+#header .navbar {
+    padding: 5px 0;
+    min-height: var(--et-header-height);
+}
+
+#header .navbar-brand {
+    padding: 0;
+    margin: 0;
+}
+
+#header .header-logo {
+    max-height: 50px;
+    max-width: 100%;
+}
+
+/*--------------------------------------------------------------
+# Navigation — Top Level
+--------------------------------------------------------------*/
+#header .navbar-nav .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    margin-left: 10px;
+    font-family: "Raleway", sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    transition: .3s;
+}
+
+#header .navbar-nav .nav-link:hover,
+#header .navbar-nav .nav-link:focus,
+#header .navbar-nav .show > .nav-link {
+    background: rgba(40, 119, 207, .05);
+    border-color: rgba(255, 255, 255, .5);
+    color: #fff;
+}
+
+/* The sign-in glyph sits inline with the label, unlike the dropdown icons. */
+#header .nav-link-login i {
+    font-size: 16px;
+    margin-right: 8px;
+}
+
+/* Replace Bootstrap's triangle caret with V1's chevron. */
+#header .navbar-nav .dropdown-toggle::after {
+    display: inline-block;
+    margin-left: 6px;
+    border: 0;
+    font-family: "Font Awesome 7 Free";
+    font-weight: 900;
+    font-size: 10px;
+    vertical-align: middle;
+    content: "\f078";
+}
+
+/*--------------------------------------------------------------
+# Navigation — Dropdowns
+--------------------------------------------------------------*/
+#header .dropdown-menu {
+    padding: 10px 0;
+    min-width: 240px;
+    border: 1px solid var(--et-blue);
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 5px 5px 20px rgba(0, 0, 0, .5);
+}
+
+#header .dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--et-slate);
+    white-space: normal;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    transition: .3s;
+}
+
+#header .dropdown-item i {
+    flex: 0 0 auto;
+    width: 28px;
+    font-size: 18px;
+    color: var(--et-blue);
+}
+
+#header .dropdown-item:hover,
+#header .dropdown-item:focus {
+    background: rgba(0, 143, 212, .1);
+    border-color: rgba(0, 143, 212, .5);
+    color: #000;
+}
+
+/* V1 opened the menus on hover. Keep that on desktop only — on the
+   collapsed mobile navbar the menus stay tap-driven. */
+@media (min-width: 992px) {
+    #header .navbar-nav .dropdown-menu {
+        margin-top: 0;
+    }
+
+    #header .navbar-nav .dropdown:hover > .dropdown-menu {
+        display: block;
+    }
+}
+
+@media (max-width: 991.98px) {
+    #header .navbar-nav .nav-link {
+        margin-left: 0;
+    }
+
+    #header .dropdown-menu {
+        margin: 5px 0 10px 15px;
+        box-shadow: none;
+    }
+}
+
+/*--------------------------------------------------------------
+# Footer
+--------------------------------------------------------------*/
+#footer {
+    background: var(--et-footer-bg);
+    padding: 0 0 30px 0;
+    color: #fff;
+    font-size: 14px;
+}
+
+#footer .footer-top {
+    padding: 25px 0 10px 0;
+}
+
+#footer .footer-info {
+    padding: 30px 20px;
+    background: #fff;
+    color: var(--et-slate);
+    border: 1px solid var(--et-blue-dark);
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: rgba(0, 0, 0, .25) 5px 5px 5px;
+    transition: box-shadow .3s;
+}
+
+#footer .footer-info:hover {
+    box-shadow: #fff 0 0 15px;
+}
+
+#footer .footer-info a {
+    color: var(--et-blue);
+    text-decoration: none;
+}
+
+#footer .footer-info a:hover {
+    text-decoration: underline;
+}
+
+#footer .footer-logo {
+    max-height: 60px;
+    max-width: 100%;
+}
+
+#footer .footer-top h4 {
+    padding-bottom: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+}
+
+#footer .footer-links ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#footer .footer-links ul li {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+}
+
+#footer .footer-links ul li:first-child {
+    padding-top: 0;
+}
+
+#footer .footer-links ul i {
+    flex: 0 0 auto;
+    width: 20px;
+    font-size: 14px;
+    color: #fff;
+}
+
+#footer .footer-links ul a {
+    color: #fff;
+    text-decoration: none;
+    transition: .3s;
+}
+
+#footer .footer-links ul a:hover {
+    color: #d0d0d0;
+}
+
+#footer .copyright {
+    padding-top: 30px;
+    border-top: 1px solid var(--et-footer-border);
+    text-align: center;
+}
+
+#footer .copyright p {
+    margin-bottom: .25rem;
+}

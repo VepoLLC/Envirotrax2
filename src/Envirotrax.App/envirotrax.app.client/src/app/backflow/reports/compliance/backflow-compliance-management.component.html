@@ -82,7 +82,7 @@
             <span *ngIf="!data.expirationDate" class="text-muted">—</span>
         </div>
         <div class="mt-1" *ngIf="data.daysExpired != null">
-            <span class="badge rounded-pill" [ngClass]="data.expiredClass">{{ data.daysExpired }} Days</span>
+            <span class="badge rounded-pill" [ngClass]="severityClasses[data.expiredSeverity]">{{ data.daysExpired }} Days</span>
         </div>
     </div>
 </ng-template>

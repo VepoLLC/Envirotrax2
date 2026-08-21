@@ -6,12 +6,18 @@ import { FogReportsRoutingModule } from "./fog-reports-routing.module";
 import { FogReportComponent } from "./fog-report.component";
 import { FogTripTicketReportTabComponent } from "./tabs/trip-tickets/fog-trip-ticket-report-tab.component";
 import { FogInspectionReportTabComponent } from "./tabs/inspections/fog-inspection-report-tab.component";
+import { FogInspectionComplianceManagementComponent } from "./compliance/fog-inspection-compliance-management.component";
+import { FogPermitComplianceManagementComponent } from "./compliance/fog-permit-compliance-management.component";
+import { FogTripTicketComplianceManagementComponent } from "./compliance/fog-trip-ticket-compliance-management.component";
 
 @NgModule({
     declarations: [
         FogReportComponent,
         FogTripTicketReportTabComponent,
-        FogInspectionReportTabComponent
+        FogInspectionReportTabComponent,
+        FogInspectionComplianceManagementComponent,
+        FogPermitComplianceManagementComponent,
+        FogTripTicketComplianceManagementComponent
     ],
     imports: [
         CommonModule,

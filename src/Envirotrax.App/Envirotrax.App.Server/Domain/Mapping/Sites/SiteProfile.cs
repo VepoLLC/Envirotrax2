@@ -40,6 +40,10 @@ public class SiteProfile : Profile
             .IncludeBase<Site, SiteDto>()
             .ForMember(dto => dto.Logs, opt => opt.Ignore());
 
+        CreateMap<Site, FogPermitComplianceSiteDto>()
+            .IncludeBase<Site, SiteDto>()
+            .ForMember(dto => dto.Logs, opt => opt.Ignore());
+
         CreateMap<Site, ReferencedSiteDto>()
             .AfterMap((model, dto) =>
             {

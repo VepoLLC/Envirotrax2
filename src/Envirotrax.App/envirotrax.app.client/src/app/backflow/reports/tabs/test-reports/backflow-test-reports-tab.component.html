@@ -12,7 +12,11 @@
                 <span class="fw-semibold">To Date:</span>
                 <input type="date" class="form-control w-auto" [(ngModel)]="toDate" />
                 <button type="button" class="btn btn-primary btn-sm" (click)="search()">Search</button>
-                <button type="button" class="btn btn-primary btn-sm" (click)="viewPrintableReport()">View Printable Report</button>
+                <vp-dropdown [label]="'Download Printable Report'" [showCaret]="true" placement="bottom" buttonClass="btn-primary btn-sm">
+                    <vp-dropdown-option (click)="downloadPDF()">PDF</vp-dropdown-option>
+                    <vp-dropdown-option (click)="downloadWord()">Word Document</vp-dropdown-option>
+                    <vp-dropdown-option (click)="downloadExcel()">Excel</vp-dropdown-option>
+                </vp-dropdown>
                 <button type="button" class="btn btn-primary btn-sm" (click)="reset()">Reset</button>
             </div>
             @if (dateRangeError) {

@@ -58,6 +58,7 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
     public DbSet<FogInspection> FogInspections { get; set; }
     public DbSet<BackflowTest> BackflowTests { get; set; }
     public DbSet<BackflowOutOfServiceRequest> BackflowOutOfServiceRequests { get; set; }
+    public DbSet<BackflowComplianceSnapshot> BackflowComplianceSnapshots { get; set; }
     public DbSet<SiteLog> SiteLogs { get; set; }
 
     // Site is not an ITenantModel, so the base class does not filter or stamp it. The tenant

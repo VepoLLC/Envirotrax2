@@ -16,9 +16,6 @@ public static class BackflowComplianceReportWordBuilder
     private const string BarPlaceholderText = "{{Requirements.bar}}";
     private const long EmuPerTwip = 635L;
 
-    // Conservative estimate of a block-character glyph's width, used to size the bar so it always
-    // fits on one line within its column — however wide the template's own "bar" column is — instead
-    // of a fixed block count that only fit the column width the template happened to have at the time.
     private const int TwipsPerBlockEstimate = 140;
     private const double BarCellWidthSafetyFactor = 0.85;
     private const int FallbackBarMaxBlocks = 20;
@@ -82,8 +79,6 @@ public static class BackflowComplianceReportWordBuilder
         };
     }
 
-    // Measures the template's own "bar" column so the block-character bar always fits on one line
-    // within it — a fixed block count only stays correct until someone resizes that column again.
     private static int GetBarMaxBlocks(byte[] templateBytes)
     {
         using var stream = new MemoryStream(templateBytes);
@@ -164,9 +159,6 @@ public static class BackflowComplianceReportWordBuilder
         documentStream.Position = 0;
     }
 
-    // Sizes the chart to exactly match its host cell — the template reserves one (possibly vertically
-    // merged) table cell for the chart, and however that cell gets resized by future template edits,
-    // the chart should always fill it rather than a hardcoded EMU size going stale.
     private static (long WidthEmu, long HeightEmu) GetHostCellSizeEmu(Text placeholder)
     {
         var cell = placeholder.Ancestors<TableCell>().First();

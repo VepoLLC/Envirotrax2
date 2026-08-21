@@ -40,6 +40,7 @@ public static class BackflowComplianceHistoryExcelBuilder
         using var output = new MemoryStream();
         workbook.SaveAs(output);
 
+        BackflowDataBarGuidFixup.FixWorksheetParts(output);
         AddCharts(output, "Report", history.Points);
 
         return output.ToArray();
@@ -91,8 +92,6 @@ public static class BackflowComplianceHistoryExcelBuilder
         }
     }
 
-    // Inserts `count` copies of `templateRow` immediately below it, each carrying the template row's style.
-    // A count <= 0 (a single-item section) leaves the template row as-is.
     private static void CloneRowsBelow(IXLWorksheet ws, int templateRow, int count)
     {
         if (count <= 0)
@@ -109,10 +108,6 @@ public static class BackflowComplianceHistoryExcelBuilder
         }
     }
 
-    // ClosedXML (0.105.0) doesn't expose a public API for creating charts, so the two charts are
-    // injected as native OOXML DrawingML chart parts directly into the workbook ClosedXML already
-    // produced — same technique as BackflowComplianceReportExcelBuilder's doughnut. They land in the
-    // blank rows 2-27 the template reserves for them (row 2/15 are the section header labels).
     private static void AddCharts(MemoryStream workbookStream, string sheetName, IReadOnlyList<BackflowComplianceHistoryPointDto> points)
     {
         var chartPoints = points.Count > ChartMonthWindow
@@ -157,8 +152,6 @@ public static class BackflowComplianceHistoryExcelBuilder
         var worksheet = sheetPart.Worksheet;
         var drawingElement = new Ss.Drawing { Id = sheetPart.GetIdOfPart(drawingsPart) };
 
-        // CT_Worksheet has a strict child sequence — <drawing> must come before <tableParts>/<extLst>
-        // if present, so insert relative to those rather than blindly appending.
         var insertBeforeElement = worksheet.Elements<Ss.TableParts>().FirstOrDefault()
             ?? (DocumentFormat.OpenXml.OpenXmlElement?)worksheet.Elements<Ss.WorksheetExtensionList>().FirstOrDefault();
 
@@ -183,7 +176,6 @@ public static class BackflowComplianceHistoryExcelBuilder
         return new Xdr.WorksheetDrawing(barAnchor, lineAnchor);
     }
 
-    // Anchored across the full column width (A-F) within the row range reserved for it.
     private static Xdr.TwoCellAnchor BuildChartAnchor(string chartRelationshipId, string name, int fromRow, int toRow)
     {
         var fromMarker = new Xdr.FromMarker(

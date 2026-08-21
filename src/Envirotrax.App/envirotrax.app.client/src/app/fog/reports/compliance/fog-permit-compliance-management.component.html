@@ -1,10 +1,6 @@
 <h1 class="text-center h2">FOG Permit Compliance Management</h1>
 
 <!-- ===================== Cell templates ===================== -->
-<ng-template #numberTemplate let-data="rowData">
-    {{ data.rowNumber }}
-</ng-template>
-
 <ng-template #propertyTemplate let-data="rowData">
     <div class="d-flex gap-2 align-items-start">
         <i class="fa-solid fs-5 mt-1"
@@ -57,7 +53,7 @@
 
 <ng-template #daysOverdueTemplate let-data="rowData">
     <span *ngIf="data.daysOverdue != null" class="badge rounded-pill"
-          [ngClass]="data.overdueClass">{{ data.daysOverdue }} days</span>
+          [ngClass]="severityClasses[data.overdueSeverity]">{{ data.daysOverdue }} days</span>
 </ng-template>
 
 <ng-template #viewSiteTemplate let-data="rowData">

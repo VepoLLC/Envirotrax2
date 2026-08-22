@@ -2,9 +2,6 @@ using C = DocumentFormat.OpenXml.Drawing.Charts;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Backflow;
 
-// Category/value axis and string/number literal builders shared by every Backflow DrawingML chart
-// that isn't the axis-less doughnut (BackflowComplianceChartHelper) — grouped bar charts and line
-// charts all need the same axis pair, just with different cross-axis ids and optional min/max.
 internal static class BackflowChartAxisHelper
 {
     public static C.CategoryAxis BuildCategoryAxis(uint axisId, uint crossAxisId)

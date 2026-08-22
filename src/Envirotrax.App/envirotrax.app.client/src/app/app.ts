@@ -419,21 +419,21 @@ export class App implements OnInit {
           {
             title: 'Inspection Compliance Management',
             iconCss: 'fa-solid fa-list-check',
-            routerLink: ['/fog/inspection-compliance'],
+            routerLink: ['/fog/reports/inspection-compliance'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogReports),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
           },
           {
             title: 'Permit Compliance Management',
             iconCss: 'fa-solid fa-list-check',
-            routerLink: ['/fog/permit-compliance'],
+            routerLink: ['/fog/reports/permit-compliance'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogReports),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection)
           },
           {
             title: 'Trip Ticket Compliance Management',
             iconCss: 'fa-solid fa-list-check',
-            routerLink: ['/fog/trip-ticket-compliance'],
+            routerLink: ['/fog/reports/trip-ticket-compliance'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.FogReports),
             hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogTransportation)
           },

@@ -39,13 +39,12 @@ public static class BackflowComplianceReportExcelBuilder
         using var output = new MemoryStream();
         workbook.SaveAs(output);
 
+        BackflowDataBarGuidFixup.FixWorksheetParts(output);
         AddComplianceChart(output, "Report", report.Compliant, report.NonCompliant);
 
         return output.ToArray();
     }
 
-    // A legend row is a colored swatch (column E) followed by a label spanning F:G, a count (H), and
-    // an optional percentage (I) — matching the doughnut's legend in the PDF/on-screen report.
     private static void WriteLegendRow(IXLWorksheet ws, int row, string swatchColor, string label, int count, double? percentage)
     {
         ws.Cell(row, 5).Style.Fill.BackgroundColor = XLColor.FromHtml(swatchColor);
@@ -63,8 +62,6 @@ public static class BackflowComplianceReportExcelBuilder
         }
     }
 
-    // The "Requirements" section is a section-header row, a column-header row, and a template data row.
-    // Deletes the whole section (all 3 rows) when there are no requirements.
     private static void WriteRequirements(IXLWorksheet ws, int headerRow, IReadOnlyList<BackflowComplianceRequirementDto> requirements)
     {
         var columnHeaderRow = headerRow + 1;
@@ -107,8 +104,6 @@ public static class BackflowComplianceReportExcelBuilder
         range.AddConditionalFormat().DataBar(XLColor.FromHtml(BarColor));
     }
 
-    // Inserts `count` copies of `templateRow` immediately below it, each carrying the template row's style.
-    // A count <= 0 (a single-item section) leaves the template row as-is.
     private static void CloneRowsBelow(IXLWorksheet ws, int templateRow, int count)
     {
         if (count <= 0)
@@ -125,10 +120,6 @@ public static class BackflowComplianceReportExcelBuilder
         }
     }
 
-    // ClosedXML (0.105.0) doesn't expose a public API for creating charts, so the doughnut chart is
-    // injected as a native OOXML DrawingML chart part directly into the workbook ClosedXML already
-    // produced. It lands in the blank rows 5-18 reserved for it in the template, to the right of the
-    // summary lines and above the "Requirements" section.
     private static void AddComplianceChart(MemoryStream workbookStream, string sheetName, int compliant, int nonCompliant)
     {
         workbookStream.Position = 0;
@@ -150,8 +141,6 @@ public static class BackflowComplianceReportExcelBuilder
         var worksheet = sheetPart.Worksheet;
         var drawingElement = new Ss.Drawing { Id = sheetPart.GetIdOfPart(drawingsPart) };
 
-        // CT_Worksheet has a strict child sequence — <drawing> must come before <tableParts>/<extLst>
-        // if present, so insert relative to those rather than blindly appending.
         var insertBeforeElement = worksheet.Elements<Ss.TableParts>().FirstOrDefault()
             ?? (DocumentFormat.OpenXml.OpenXmlElement?)worksheet.Elements<Ss.WorksheetExtensionList>().FirstOrDefault();
 
@@ -170,8 +159,6 @@ public static class BackflowComplianceReportExcelBuilder
 
     private static Xdr.WorksheetDrawing BuildWorksheetDrawing(string chartRelationshipId)
     {
-        // Anchored in the blank rows/columns reserved for it: columns A-D, rows 2-10 (0-based markers),
-        // to the left of the summary legend in columns G-J.
         var fromMarker = new Xdr.FromMarker(
             new Xdr.ColumnId("0"), new Xdr.ColumnOffset("0"),
             new Xdr.RowId("1"), new Xdr.RowOffset("0"));

@@ -3,18 +3,11 @@ using C = DocumentFormat.OpenXml.Drawing.Charts;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Backflow;
 
-// Builds the DrawingML chart shared by the Excel and Word compliance report exports. Neither
-// ClosedXML nor MiniWord can create charts through their own APIs, so both builders inject this
-// directly into the OOXML package they've already produced (see AddComplianceChart in
-// BackflowComplianceReportExcelBuilder and BackflowComplianceReportWordBuilder).
 internal static class BackflowComplianceChartHelper
 {
     private const string CompliantColor = "20A845";
     private const string NonCompliantColor = "DC3545";
 
-    // includeLegend: Excel draws its own colored-swatch legend alongside the chart (matching the
-    // on-screen/PDF legend), so its chart omits the native one; Word has no such custom legend, so
-    // its chart keeps the native one to still identify which color is which.
     public static C.ChartSpace BuildChartSpace(int compliant, int nonCompliant, bool includeLegend)
     {
         var categories = new C.StringLiteral(

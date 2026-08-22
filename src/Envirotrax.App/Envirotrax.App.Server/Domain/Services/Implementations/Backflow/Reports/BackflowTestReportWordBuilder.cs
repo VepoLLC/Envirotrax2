@@ -83,8 +83,6 @@ public static class BackflowTestReportWordBuilder
         return output.ToArray();
     }
 
-    // MiniWord's colored-text substitution (used for the bars above) produces a few schema-invalid
-    // <w:rPr> shapes; see MiniWordDocumentFixup for details.
     private static void FixColoredTextRunProperties(MemoryStream documentStream)
     {
         documentStream.Position = 0;

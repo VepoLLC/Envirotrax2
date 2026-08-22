@@ -15,10 +15,10 @@ import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
 import { FacilityType } from "../../../shared/enums/facility-type.enum";
 import { PropertyType } from "../../../shared/enums/property-type.enum";
+import { complianceOverdueSeverityClasses } from "../../../shared/enums/compliance-overdue-severity.enum";
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
+import { DateHelperService } from "../../../shared/services/helpers/date-helper.service";
 import { PropertyLogCellComponent } from "../../../shared/components/data-components/table-cells/property-log-cell.component";
-
-const DAY_MS = 86400000;
 
 interface OverdueBucket {
     amount: number;
@@ -48,8 +48,6 @@ const OVERDUE_BUCKETS: { [index: number]: OverdueBucket } = {
 // A grid row: a site with an overdue FOG permit, decorated with presentation-only fields.
 type SiteRow = Site & {
     rowNumber?: number;
-    daysOverdue?: number;
-    overdueClass?: string;
     assignedName?: string;
     assignedDate?: Date;
     canModify?: boolean;   // surfaced to the shared property-log cell
@@ -60,13 +58,6 @@ type SiteRow = Site & {
     templateUrl: './fog-permit-compliance-management.component.html'
 })
 export class FogPermitComplianceManagementComponent implements OnInit {
-    // Kept as a template (rather than a plain field binding) so the column's `field` stays empty: vp-table's
-    // sortColumn() emits a query change — resetting to page 1 and refetching — for ANY column with a truthy
-    // field, even one flagged queryColumnExcluded. It only interpolates the pre-computed rowNumber, so it
-    // does no per-row work on change detection.
-    @ViewChild('numberTemplate', { static: true })
-    public numberTemplate!: TemplateRef<CellTemplateData<Site>>;
-
     @ViewChild('propertyTemplate', { static: true })
     public propertyTemplate!: TemplateRef<CellTemplateData<Site>>;
 
@@ -86,6 +77,7 @@ export class FogPermitComplianceManagementComponent implements OnInit {
     private _printableSection!: ElementRef;
 
     public readonly PropertyType = PropertyType;
+    public readonly severityClasses = complianceOverdueSeverityClasses;
 
     public canModify: boolean = false;
     public daysOverdueLabel: string = 'All overdue';
@@ -144,7 +136,6 @@ export class FogPermitComplianceManagementComponent implements OnInit {
     public downloadConfig: DownloadConfig;
 
     private panelFilters: QueryProperty[] = [];
-    private readonly today: number = new Date().setHours(0, 0, 0, 0);
 
     constructor(
         private readonly _siteService: SiteService,
@@ -152,7 +143,8 @@ export class FogPermitComplianceManagementComponent implements OnInit {
         private readonly _authService: AuthService,
         private readonly _downloadService: DownloadService,
         private readonly _printService: PrintableTableService,
-        private readonly _containerHelper: AppContainerHelperService
+        private readonly _containerHelper: AppContainerHelperService,
+        private readonly _dateHelper: DateHelperService
     ) {
         this.downloadConfig = {
             fileName: 'FOG Permit Compliance',
@@ -297,7 +289,7 @@ export class FogPermitComplianceManagementComponent implements OnInit {
         // The permit date binds straight to the field — vp-table's ColumnType.date renders it exactly as the
         // sibling pages' `| date` template did, and keeps the header sortable on a real DTO column.
         const columns: TableColumn<Site>[] = [
-            this.templateColumn('', this.numberTemplate),
+            { field: 'rowNumber', caption: '', type: ColumnType.number, queryColumnExcluded: true, rowCssClass: 'align-top' },
             this.templateColumn('Property Information', this.propertyTemplate),
             { field: 'accountNumber', caption: 'Account Number', type: ColumnType.text, rowCssClass: 'align-top' },
             this.logColumn(),
@@ -393,58 +385,13 @@ export class FogPermitComplianceManagementComponent implements OnInit {
         };
     }
 
+    // daysOverdue and overdueSeverity arrive already computed on the DTO — the server measures them against
+    // the caller's local time zone, so there is no date arithmetic here.
     private decorate(site: Site): void {
         const row = site as SiteRow;
-        row.daysOverdue = this.getDaysOverdue(site);
-        row.overdueClass = row.daysOverdue != null ? this.overdueBadgeClass(row.daysOverdue) : '';
         row.assignedName = this.assignedUserName(site);
-        row.assignedDate = this.toUtcDate(site.fogAccountAssignmentDate);
+        row.assignedDate = this._dateHelper.toUtcDate(site.fogAccountAssignmentDate);
         row.canModify = this.canModify;
-    }
-
-    // The server stores/serializes assignment timestamps without a UTC "Z" marker (EF Core loses
-    // DateTimeKind on the round trip through SQL Server), so the browser's Date parser would otherwise
-    // treat the raw value as local time instead of UTC. Force UTC interpretation here before display.
-    // Matches the FOG Trip Ticket compliance page.
-    private toUtcDate(isoString?: string): Date | undefined {
-        if (!isoString) {
-            return undefined;
-        }
-
-        const hasTimezone = /[zZ]|[+-]\d{2}:?\d{2}$/.test(isoString);
-        return new Date(hasTimezone ? isoString : `${isoString}Z`);
-    }
-
-    // Deliberate deviation from the "compute date-based status on the backend" convention: every sibling
-    // compliance page (CSI, Backflow, FOG Inspection, FOG Trip Ticket) derives its overdue count and badge
-    // class client-side in decorate(), and five near-identical grids disagreeing would be worse than one
-    // shared deviation. Moving this to a DTO enum + int is a cross-page change to make on all of them at
-    // once (and would also make DaysOverdue exportable). Computed once per load, never from the template.
-    private getDaysOverdue(site: Site): number | undefined {
-        if (!site.fogPermitExpirationDate) {
-            return undefined;
-        }
-
-        const expiration = new Date(site.fogPermitExpirationDate).setHours(0, 0, 0, 0);
-        const days = Math.floor((this.today - expiration) / DAY_MS);
-
-        return days < 0 ? undefined : days;
-    }
-
-    private overdueBadgeClass(days: number): string {
-        if (days > 90) {
-            return 'bg-danger';
-        }
-
-        if (days >= 30) {
-            return 'bg-warning text-dark';
-        }
-
-        if (days > 0) {
-            return 'bg-warning-subtle text-dark border';
-        }
-
-        return 'bg-secondary';
     }
 
     private assignedUserName(site: Site): string {

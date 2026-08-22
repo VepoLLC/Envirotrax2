@@ -65,8 +65,6 @@ public static class BackflowNewRemovedExcelBuilder
         var worksheet = sheetPart.Worksheet;
         var drawingElement = new Ss.Drawing { Id = sheetPart.GetIdOfPart(drawingsPart) };
 
-        // CT_Worksheet has a strict child sequence — <drawing> must come before <tableParts>/<extLst>
-        // if present, so insert relative to those rather than blindly appending.
         var insertBeforeElement = worksheet.Elements<Ss.TableParts>().FirstOrDefault()
             ?? (DocumentFormat.OpenXml.OpenXmlElement?)worksheet.Elements<Ss.WorksheetExtensionList>().FirstOrDefault();
 
@@ -85,8 +83,6 @@ public static class BackflowNewRemovedExcelBuilder
 
     private static Xdr.WorksheetDrawing BuildWorksheetDrawing(string chartRelationshipId)
     {
-        // Anchored across the full column width (A-D), spanning the blank rows 3-14 the template
-        // reserves for it (row 2 is its section header).
         var fromMarker = new Xdr.FromMarker(
             new Xdr.ColumnId("0"), new Xdr.ColumnOffset("0"),
             new Xdr.RowId("2"), new Xdr.RowOffset("0"));

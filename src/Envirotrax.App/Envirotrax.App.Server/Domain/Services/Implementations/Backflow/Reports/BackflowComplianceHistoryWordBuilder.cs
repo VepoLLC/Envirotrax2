@@ -65,12 +65,6 @@ public static class BackflowComplianceHistoryWordBuilder
         };
     }
 
-    // MiniWord has no chart support, so — mirroring BackflowComplianceReportWordBuilder — the two
-    // charts are injected as native OOXML DrawingML chart parts directly into the document MiniWord
-    // already produced, replacing the literal "{{barChart}}"/"{{lineChart}}" placeholders the template
-    // reserves for them (MiniWord only rewrites recognized {{tag}} placeholders, so these unrecognized
-    // ones survive template processing untouched). Also applies MiniWordDocumentFixup here, same as
-    // the other Word builders, since it must run after the substitutions above regardless of charts.
     private static void AddCharts(MemoryStream documentStream, IReadOnlyList<BackflowComplianceHistoryPointDto> points)
     {
         var chartPoints = points.Count > ChartMonthWindow

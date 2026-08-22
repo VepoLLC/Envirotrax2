@@ -3,12 +3,6 @@ using C = DocumentFormat.OpenXml.Drawing.Charts;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Backflow;
 
-// Builds the two DrawingML charts shared by the Excel and Word compliance history exports (a grouped
-// column chart of Total/Compliant/Non-Compliant per month, and a line chart of % compliant per month) —
-// matching backflow-compliance-history-tab.component.ts's countChartData/percentChartData. Neither
-// ClosedXML nor MiniWord can create charts through their own APIs, so both builders inject these
-// directly into the OOXML package they've already produced, the same way
-// BackflowComplianceChartHelper does for the current-compliance doughnut.
 internal static class BackflowComplianceHistoryChartHelper
 {
     private const string TotalColor = "50A0FF";

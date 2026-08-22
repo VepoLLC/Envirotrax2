@@ -64,12 +64,11 @@ public static class BackflowTestReportExcelBuilder
         using var output = new MemoryStream();
         workbook.SaveAs(output);
 
+        BackflowDataBarGuidFixup.FixWorksheetParts(output);
+
         return output.ToArray();
     }
 
-    // A "section" is a header row followed by a template item row. Writes `itemCount` items starting
-    // at the template row (cloning it as needed), or deletes the header+template row pair when empty.
-    // Returns the row number immediately after the section.
     private static int WriteListSection(IXLWorksheet ws, int headerRow, int itemCount, Action<int, int> fill, string barColor)
     {
         var templateRow = headerRow + 1;
@@ -104,8 +103,6 @@ public static class BackflowTestReportExcelBuilder
             return;
         }
 
-        // Clone the master header+item block as a flat unit for every category after the first,
-        // so each category temporarily has exactly one item row before per-category expansion below.
         var templateItemRow = blockHeaderRow + 1;
 
         for (var i = 1; i < categories.Count; i++)
@@ -151,8 +148,6 @@ public static class BackflowTestReportExcelBuilder
         }
     }
 
-    // Inserts `count` copies of `templateRow` immediately below it, each carrying the template row's style.
-    // A count <= 0 (a single-item section) leaves the template row as-is.
     private static void CloneRowsBelow(IXLWorksheet ws, int templateRow, int count)
     {
         if (count <= 0)
@@ -175,8 +170,6 @@ public static class BackflowTestReportExcelBuilder
         range.AddConditionalFormat().DataBar(XLColor.FromHtml(color));
     }
 
-    // Column 2 carries only the data bar (its value drives the bar's fill but the number itself is
-    // hidden via a blank number format); column 3 is the plain count; column 4 is the visible percentage.
     private static void FillBarCountPercentage(IXLWorksheet ws, int row, int count, double percentage)
     {
         ws.Cell(row, 2).Value = percentage;

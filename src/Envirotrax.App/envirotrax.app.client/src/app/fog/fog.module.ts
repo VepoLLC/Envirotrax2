@@ -30,15 +30,10 @@ import { FogTransporterVehiclesComponent } from "./transporters/details/vehicles
 import { EditFogTransporterVehicleComponent } from "./transporters/details/vehicles/edit/edit-fog-transporter-vehicle.component";
 import { FogVehiclePermitListComponent } from "./transporters/vehicles/list/fog-vehicle-permit-list.component";
 import { EditFogVehiclePermitComponent } from "./transporters/vehicles/edit/edit-fog-vehicle-permit.component";
-import { FogTripTicketComplianceManagementComponent } from "./reports/compliance/fog-trip-ticket-compliance-management.component";
 import { ProfessionalModule } from "../professionals/professional.module";
-import { FogInspectionComplianceManagementComponent } from "./reports/compliance/fog-inspection-compliance-management.component";
-import { FogPermitComplianceManagementComponent } from "./reports/compliance/fog-permit-compliance-management.component";
 
 @NgModule({
     declarations: [
-        FogInspectionComplianceManagementComponent,
-        FogPermitComplianceManagementComponent,
         FogInspectorListComponent,
         FogInspectorDetailsComponent,
         FogInspectorWaterSuppliersComponent,
@@ -64,8 +59,7 @@ import { FogPermitComplianceManagementComponent } from "./reports/compliance/fog
         FogTransporterVehiclesComponent,
         EditFogTransporterVehicleComponent,
         FogVehiclePermitListComponent,
-        EditFogVehiclePermitComponent,
-        FogTripTicketComplianceManagementComponent
+        EditFogVehiclePermitComponent
     ],
     imports: [
         CommonModule,

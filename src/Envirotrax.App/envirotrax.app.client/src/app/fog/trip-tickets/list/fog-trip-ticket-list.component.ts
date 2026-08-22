@@ -127,7 +127,7 @@ export class FogTripTicketListComponent implements OnInit, OnDestroy {
                     ]
                 }];
                 await this.getTripTickets();
-                this.setShowResults((this.table.items?.pageInfo?.totalItems ?? 0) > 0);
+                this.setShowResults(true);
             }
         });
     }

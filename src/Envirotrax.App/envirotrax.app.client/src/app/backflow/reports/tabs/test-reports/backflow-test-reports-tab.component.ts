@@ -55,10 +55,16 @@ export class BackflowTestReportsTabComponent implements OnInit, OnDestroy {
     ) {}
 
     public async ngOnInit(): Promise<void> {
-        // Axis/legend/grid colors are drawn from theme CSS variables, so repaint on theme toggle.
-        this._disposeThemeObserver = onThemeChange(() => this._chart?.update());
-        await this.setDefaultDateRange();
-        await this.search();
+        try {
+            this.isLoading = true;
+            // Axis/legend/grid colors are drawn from theme CSS variables, so repaint on theme toggle.
+            this._disposeThemeObserver = onThemeChange(() => this._chart?.update());
+
+            await this.setDefaultDateRange();
+            await this.search();
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public ngOnDestroy(): void {

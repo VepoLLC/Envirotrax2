@@ -39,12 +39,9 @@ public class BackflowComplianceReportService(
         return BackflowComplianceReportWordBuilder.Build(report, ignoreLast30Days);
     }
 
-    // Reads the persisted monthly snapshots (written by the TaskRunner job) instead of reconstructing
-    // the history from every test on each request. Rows come back ordered by month; NonCompliant and
-    // Percentage are derived here, mirroring how the reconstruct path built each point.
     public async Task<BackflowComplianceHistoryDto> GetComplianceHistoryAsync(CancellationToken cancellationToken)
     {
-        var snapshots = await snapshotRepository.GetAllAsync(cancellationToken);
+        var snapshots = await snapshotRepository.GetMonthlyHistoryAsync(cancellationToken);
 
         var result = new BackflowComplianceHistoryDto();
 

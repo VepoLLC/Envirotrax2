@@ -37,9 +37,9 @@ public class WaterSupplierService : Service<WaterSupplier, WaterSupplierDto>, IW
         return GetLoggedInSupplierAsync(CancellationToken.None);
     }
 
-    public Task<IEnumerable<int>> GetAllSupplierIdsAsync(CancellationToken cancellationToken)
+    public Task<IEnumerable<int>> GetBackflowSupplierIdsAsync(CancellationToken cancellationToken)
     {
-        return _repository.GetAllSupplierIdsAsync(cancellationToken);
+        return _repository.GetBackflowSupplierIdsAsync(cancellationToken);
     }
 
     public async Task<WaterSupplierDto> GetLoggedInSupplierAsync(CancellationToken cancellationToken)

@@ -8,5 +8,5 @@ public interface IWaterSupplierRepository : IRepository<WaterSupplier>
 {
     Task<IEnumerable<WaterSupplier>> GetAllMySuppliersAsync(CancellationToken cancellationToken);
 
-    Task<IEnumerable<int>> GetAllSupplierIdsAsync(CancellationToken cancellationToken);
+    Task<IEnumerable<int>> GetBackflowSupplierIdsAsync(CancellationToken cancellationToken);
 }

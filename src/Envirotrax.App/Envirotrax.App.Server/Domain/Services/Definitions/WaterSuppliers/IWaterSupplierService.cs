@@ -12,7 +12,7 @@ public interface IWaterSupplierService : IService<WaterSupplier, WaterSupplierDt
 
     Task<MySupplierHierarchyDto> GetAllMySuppliersAsync(CancellationToken cancellationToken);
 
-    Task<IEnumerable<int>> GetAllSupplierIdsAsync(CancellationToken cancellationToken);
+    Task<IEnumerable<int>> GetBackflowSupplierIdsAsync(CancellationToken cancellationToken);
 
     Task<WaterSupplierDetailsDto?> GetDetailsAsync(int id, CancellationToken cancellationToken);
 

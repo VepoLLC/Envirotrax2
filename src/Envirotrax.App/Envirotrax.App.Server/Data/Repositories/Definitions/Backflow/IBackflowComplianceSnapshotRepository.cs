@@ -4,9 +4,7 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 
 public interface IBackflowComplianceSnapshotRepository
 {
-    Task<IEnumerable<BackflowComplianceSnapshot>> GetAllAsync(CancellationToken cancellationToken);
+    Task<IEnumerable<BackflowComplianceSnapshot>> GetMonthlyHistoryAsync(CancellationToken cancellationToken);
 
     Task<BackflowComplianceSnapshot> UpsertAsync(BackflowComplianceSnapshot snapshot, CancellationToken cancellationToken);
-
-    Task BulkUpsertAsync(IEnumerable<BackflowComplianceSnapshot> snapshots, CancellationToken cancellationToken);
 }

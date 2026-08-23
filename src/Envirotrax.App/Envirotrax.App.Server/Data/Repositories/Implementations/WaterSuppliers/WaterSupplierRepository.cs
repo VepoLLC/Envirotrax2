@@ -39,11 +39,17 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
             .WhereIf(!_tenantProvider.HasScope(ScopeDefinitions.AdminInternal), supplier => supplier.ParentId == _tenantProvider.WaterSupplierId);
     }
 
-    public async Task<IEnumerable<int>> GetAllSupplierIdsAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<int>> GetBackflowSupplierIdsAsync(CancellationToken cancellationToken)
     {
         return await DbContext
             .WaterSuppliers
-            .Where(supplier => supplier.DeletedTime == null)
+            // Bypass the GeneralSettings tenant filter for cross-tenant supplier enumeration.
+            .IgnoreQueryFilters()
+            .Where(supplier => supplier.DeletedTime == null
+                && supplier.IsActive
+                && supplier.GeneralSettings != null
+                && supplier.GeneralSettings.BackflowTesting
+                && !supplier.GeneralSettings.AdministrativeOnly)
             .Select(supplier => supplier.Id)
             .ToListAsync(cancellationToken);
     }

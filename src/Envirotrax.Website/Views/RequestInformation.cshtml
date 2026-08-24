@@ -1,0 +1,318 @@
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.RequestInformation>
+@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
+@{
+	Layout = "master.cshtml";
+
+	ViewData["Title"] = Model.PageTitle;
+	ViewData["Description"] = Model.PageDescription;
+}
+
+<section class="py-5 bg-light">
+	<div class="section-title text-center mb-5">
+		<h1 class="fw-bold">@Model.PageTitle</h1>
+	</div>
+	<div class="container">
+
+		<div id="divError" class="alert alert-danger d-none"></div>
+
+		<div id="divRequest">
+			<div class="row justify-content-center">
+				<div class="col-md-12 col-lg-9 col-xl-7">
+
+					<div class="border border-secondary bg-white rounded-4 shadow-sm  mb-4">
+						<div class="px-3 py-2 rounded-top-4">
+							<h5 class="fw-bold my-3 text-center" style="color: var(--et-blue);">Which
+								Envirotrax&reg; management
+								program are
+								you interested in?</h5>
+							</div>
+							<div class="p-4">
+								<div class="row justify-content-center">
+									<div class="col-md-6">
+										<select id="programType" class="form-select form-select-sm bg-light">
+											<option selected>All Envirotrax&reg; Programs</option>
+											<option>Backflow Prevention</option>
+											<option>CSI Inspections</option>
+											<option>FOG Waste Disposal</option>
+										</select>
+									</div>
+								</div>
+							</div>
+
+							<h5 class="fw-bold my-3 text-center" style="color: var(--et-blue);">Please complete the
+								following contact
+								information.
+							</h5>
+
+							<div class="p-4">
+								<div class="row mb-2">
+									<label class="col-auto col-form-label fw-bold" style="width:200px;">City/Company
+										Name</label>
+										<div class="col"><input id="companyName" type="text"
+																	class="form-control form-control-sm bg-light" required /></div>
+										</div>
+										<div class="row">
+											<label class="col-auto col-form-label fw-bold" style="width:200px;">Contact Name</label>
+											<div class="col"><input id="txtContactName" type="text"
+																		class="form-control form-control-sm bg-light" required /></div>
+											</div>
+										</div>
+
+									</div>
+
+
+									<div class="border border-secondary bg-white rounded-4 shadow-sm  mb-4">
+										<div class="px-3 py-2 rounded-top-4">
+											<h5 class="fw-bold my-3 text-center" style="color: var(--et-blue);">How may we provide you
+												with more
+												information
+												on
+												Envirotrax&reg;?</h5>
+											</div>
+											<div class="p-4">
+												<div class="row justify-content-center mb-3">
+													<div class="col-md-6">
+														<select id="informationType" class="form-select form-select-sm bg-light"
+																onchange="setInformationType(this.selectedIndex)" required>
+															<option selected value=""></option>
+															<option>Schedule an online demo</option>
+															<option>Mail an information packet</option>
+															<option>Phone call from a service rep</option>
+															<option>Email from a service rep</option>
+														</select>
+													</div>
+												</div>
+
+												<h5 id="contactHeader" class="fw-bold my-5 text-primary text-center"></h5>
+
+												<div id="divMailing" class="d-none">
+													<div class="row mb-2">
+														<label class="col-auto col-form-label fw-bold" style="width:200px;">Mailing
+															Address</label>
+															<div class="col"><input id="txtMailingAddress" type="text"
+																						class="form-control form-control-sm bg-light" /></div>
+															</div>
+															<div class="row mb-2">
+																<label class="col-auto col-form-label fw-bold" style="width:200px;">Mailing
+																	City</label>
+																	<div class="col"><input id="txtMailingCity" type="text"
+																								class="form-control form-control-sm bg-light" /></div>
+																	</div>
+																	<div class="row mb-2">
+																		<label class="col-auto col-form-label fw-bold" style="width:200px;">Mailing
+																			State</label>
+																			<div class="col">
+																				<select id="cmbMailingState" class="form-select form-select-sm bg-light">
+																					<option>Alabama</option>
+																					<option>Alaska</option>
+																					<option>Arizona</option>
+																					<option>Arkansas</option>
+																					<option>California</option>
+																					<option>Colorado</option>
+																					<option>Connecticut</option>
+																					<option>Delaware</option>
+																					<option>District of Columbia</option>
+																					<option>Florida</option>
+																					<option>Georgia</option>
+																					<option>Hawaii</option>
+																					<option>Idaho</option>
+																					<option>Illinois</option>
+																					<option>Indiana</option>
+																					<option>Iowa</option>
+																					<option>Kansas</option>
+																					<option>Kentucky</option>
+																					<option>Louisiana</option>
+																					<option>Maine</option>
+																					<option>Maryland</option>
+																					<option>Massachusetts</option>
+																					<option>Michigan</option>
+																					<option>Minnesota</option>
+																					<option>Mississippi</option>
+																					<option>Missouri</option>
+																					<option>Montana</option>
+																					<option>Nebraska</option>
+																					<option>Nevada</option>
+																					<option>New Hampshire</option>
+																					<option>New Jersey</option>
+																					<option>New Mexico</option>
+																					<option>New York</option>
+																					<option>North Carolina</option>
+																					<option>North Dakota</option>
+																					<option>Ohio</option>
+																					<option>Oklahoma</option>
+																					<option>Oregon</option>
+																					<option>Pennsylvania</option>
+																					<option>Puerto Rico</option>
+																					<option>Rhode Island</option>
+																					<option>South Carolina</option>
+																					<option>South Dakota</option>
+																					<option>Tennessee</option>
+																					<option selected>Texas</option>
+																					<option>Utah</option>
+																					<option>Vermont</option>
+																					<option>Virginia</option>
+																					<option>Washington</option>
+																					<option>West Virginia</option>
+																					<option>Wisconsin</option>
+																					<option>Wyoming</option>
+																				</select>
+																			</div>
+																		</div>
+																		<div class="row">
+																			<label class="col-auto col-form-label fw-bold" style="width:200px;">Mailing
+																				ZIP</label>
+																				<div class="col"><input id="txtMailingZip" type="text"
+																											class="form-control form-control-sm bg-light" /></div>
+																				</div>
+																			</div>
+
+																			<div id="divPhoneNumber" class="row mt-3 d-none">
+																				<label class="col-auto col-form-label fw-bold" style="width:200px;">Phone Number</label>
+																				<div class="col"><input id="txtPhoneNumber" type="tel"
+																											class="form-control form-control-sm bg-light" /></div>
+																				</div>
+																				<div id="divEmailAddress" class="row mt-2 d-none">
+																					<label class="col-auto col-form-label fw-bold" style="width:200px;">Email
+																						Address</label>
+																						<div class="col"><input id="txtEmailAddress" type="email"
+																													class="form-control form-control-sm bg-light" /></div>
+																						</div>
+																					</div>
+																				</div>
+
+																				<div class="border border-secondary bg-white rounded-4 shadow-sm mb-4">
+																					<div class="px-3 py-2 rounded-top-4">
+																						<h5 class="fw-bold my-3 text-center" style="color: var(--et-blue);">If you have any
+																							additional information
+																							you
+																							would
+																							like to add you may enter it below.</h5>
+																						</div>
+																						<div class="p-4">
+																							<textarea id="txtComments" class="form-control form-control-sm bg-light"
+																									  rows="4"></textarea>
+																						</div>
+																					</div>
+
+																				</div>
+																			</div>
+
+																			<div class="text-center mt-3">
+																				<button type="button" id="btnSubmit" class="btn btn-primary">Submit Request</button>
+																			</div>
+																		</div>
+
+																		<div id="divConfirm" class="d-none">
+																			<div class="text-center">
+																				<i class="fa-regular fa-thumbs-up fa-2x text-success"></i>
+																				<p class="mt-3 mb-0">Your request for information has been sent.</p>
+																				<p>An Envirotrax&reg; representative will be contacting you shortly.</p>
+																			</div>
+																			<div class="text-center mt-3">
+																				<a href="/#programs" class="btn btn-outline-info">Return to Envirotrax&reg; Services and Benefits</a>
+																			</div>
+																		</div>
+
+																	</div>
+																</section>
+
+																@section Scripts
+																{
+																	<script>
+																		function setInformationType(index) {
+																			var contactHeader = document.getElementById("contactHeader");
+																			var divMailing = document.getElementById("divMailing");
+																			var divPhoneNumber = document.getElementById("divPhoneNumber");
+																			var divEmailAddress = document.getElementById("divEmailAddress");
+
+																			contactHeader.classList.toggle("d-none", index === 0);
+
+																			switch (index) {
+																				case 0:
+																					contactHeader.innerHTML = "";
+																					divMailing.classList.add("d-none");
+																					divPhoneNumber.classList.add("d-none");
+																					divEmailAddress.classList.add("d-none");
+																					break;
+																				case 1: // schedule an online demo
+																					contactHeader.innerHTML = "Please provide a callback number and/or email address so we may contact you to schedule an online demo.";
+																					divMailing.classList.add("d-none");
+																					divPhoneNumber.classList.remove("d-none");
+																					divEmailAddress.classList.remove("d-none");
+																					break;
+																				case 2: // mail an information packet
+																					contactHeader.innerHTML = "Please provide your mailing address so we may mail you an information packet.";
+																					divMailing.classList.remove("d-none");
+																					divPhoneNumber.classList.remove("d-none");
+																					divEmailAddress.classList.remove("d-none");
+																					break;
+																				case 3: // phone call from a service rep
+																					contactHeader.innerHTML = "What is a good phone number for a callback?";
+																					divMailing.classList.add("d-none");
+																					divPhoneNumber.classList.remove("d-none");
+																					divEmailAddress.classList.remove("d-none");
+																					break;
+																				case 4: // email from a service rep
+																					contactHeader.innerHTML = "Please provide your email address for us to send you more information.";
+																					divMailing.classList.add("d-none");
+																					divPhoneNumber.classList.remove("d-none");
+																					divEmailAddress.classList.remove("d-none");
+																					break;
+																			}
+																		}
+
+																		document.getElementById("btnSubmit").addEventListener("click", function () {
+																			var divError = document.getElementById("divError");
+																			var companyName = document.getElementById("companyName").value.trim();
+																			var contactName = document.getElementById("txtContactName").value.trim();
+																			var informationType = document.getElementById("informationType").value;
+
+																			divError.classList.add("d-none");
+
+																			if (!companyName || !contactName || !informationType) {
+																				divError.textContent = "Please complete the required fields before submitting.";
+																				divError.classList.remove("d-none");
+																				return;
+																			}
+
+																			var submission = {
+																				programType: document.getElementById("programType").value,
+																				companyName: companyName,
+																				contactName: contactName,
+																				informationType: informationType,
+																				mailingAddress: document.getElementById("txtMailingAddress").value,
+																				mailingCity: document.getElementById("txtMailingCity").value,
+																				mailingState: document.getElementById("cmbMailingState").value,
+																				mailingZip: document.getElementById("txtMailingZip").value,
+																				phoneNumber: document.getElementById("txtPhoneNumber").value,
+																				emailAddress: document.getElementById("txtEmailAddress").value,
+																				comments: document.getElementById("txtComments").value
+																			};
+
+																			var btnSubmit = document.getElementById("btnSubmit");
+																			btnSubmit.disabled = true;
+
+																			fetch("/api/request-information/submit", {
+																				method: "POST",
+																				headers: { "Content-Type": "application/json" },
+																				body: JSON.stringify(submission)
+																			})
+																				.then(function (response) {
+																					if (!response.ok) {
+																						throw new Error("Request failed");
+																					}
+
+																					document.getElementById("divRequest").classList.add("d-none");
+																					document.getElementById("divConfirm").classList.remove("d-none");
+																				})
+																				.catch(function () {
+																					divError.textContent = "There was a problem submitting your request. Please try again or contact us directly.";
+																					divError.classList.remove("d-none");
+																				})
+																				.finally(function () {
+																					btnSubmit.disabled = false;
+																				});
+																		});
+																	</script>
+																}

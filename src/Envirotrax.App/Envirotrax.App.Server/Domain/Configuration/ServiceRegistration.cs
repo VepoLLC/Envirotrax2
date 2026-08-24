@@ -62,6 +62,7 @@ public static class ServiceRegistration
         services.AddTransient<IBackflowTestService, BackflowTestService>();
         services.AddTransient<IBackflowTestReportService, BackflowTestReportService>();
         services.AddTransient<IBackflowComplianceReportService, BackflowComplianceReportService>();
+        services.AddTransient<IBackflowComplianceSnapshotService, BackflowComplianceSnapshotService>();
         services.AddTransient<IBackflowNewRemovedReportService, BackflowNewRemovedReportService>();
         services.AddTransient<IBackflowGaugeService, BackflowGaugeService>();
         services.AddTransient<IBackflowOutOfServiceRequestService, BackflowOutOfServiceRequestService>();

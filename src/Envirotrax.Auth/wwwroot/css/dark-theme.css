@@ -234,6 +234,24 @@ body.vp-dark-theme .input-group .btn:hover {
     border-color: #007ab8c0 !important;
 }
 
+/* Tabs */
+
+body.vp-dark-theme .vp-tabs .nav-link {
+    background-color: rgba(0, 143, 212, 0.35);
+    border-color: #3a3a5c;
+    color: #e0e0e0;
+}
+
+body.vp-dark-theme .vp-tabs .nav-link:hover {
+    color: #fff;
+}
+
+body.vp-dark-theme .vp-tabs .nav-link.active {
+    background-color: #1a5a8a !important;
+    border-color: #1a5a8a !important;
+    color: #fff !important;
+}
+
 /* link-button (Create Account) — fix border and text color bleeding from <a> override */
 
 body.vp-dark-theme a.link-button {
@@ -246,4 +264,22 @@ body.vp-dark-theme a.link-button:hover {
     color: #fff !important;
     background-color: #007ab8c0 !important;
     border-color: #007ab8c0 !important;
+}
+
+/* Destructive actions stay red — the a.link-button and .btn-primary rules above would otherwise turn them blue */
+
+body.vp-dark-theme a.link-button.red,
+body.vp-dark-theme button.red,
+body.vp-dark-theme button[type=submit].red {
+    color: #fff !important;
+    background-color: #a01515 !important;
+    border-color: #a01515 !important;
+}
+
+body.vp-dark-theme a.link-button.red:hover,
+body.vp-dark-theme button.red:hover,
+body.vp-dark-theme button[type=submit].red:hover {
+    color: #fff !important;
+    background-color: #c01a1a !important;
+    border-color: #c01a1a !important;
 }

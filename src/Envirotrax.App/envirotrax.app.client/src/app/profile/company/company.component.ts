@@ -90,6 +90,10 @@ export class CompanyComponent implements OnInit {
         }
     }
 
+    public openSecuritySettings(): void {
+        this._authService.navigateToSecuritySettings();
+    }
+
     public stateChanged(stateId: number): void {
         if (stateId) {
             this.professional.state = this.professional.state || {};

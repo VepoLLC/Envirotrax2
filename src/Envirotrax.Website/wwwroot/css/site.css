@@ -120,7 +120,8 @@ main {
 
 #header .dropdown-item i {
     flex: 0 0 auto;
-    width: 28px;
+    width: 22px;
+    margin-right: 10px;
     font-size: 18px;
     color: var(--et-blue);
 }

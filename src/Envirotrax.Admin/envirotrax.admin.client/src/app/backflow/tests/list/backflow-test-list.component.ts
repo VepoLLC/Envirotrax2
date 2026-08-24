@@ -15,6 +15,8 @@ import { PropertyType } from '../../../shared/models/sites/site';
 import { BackflowTestService } from '../../../shared/services/backflow/backflow-test.service';
 import { BackflowTestOptionsService } from '../../../shared/services/backflow/backflow-test-options.service';
 import { WaterSupplierService } from '../../../shared/services/water-suppliers/water-supplier.service';
+import { WindowService } from '../../../shared/services/window.service';
+import { BackflowTestDetailsComponent } from '../details/backflow-test-details.component';
 
 @Component({
     templateUrl: './backflow-test-list.component.html',
@@ -143,6 +145,7 @@ export class BackflowTestListComponent implements OnInit {
     constructor(
         private readonly _backflowTestService: BackflowTestService,
         private readonly _waterSupplierService: WaterSupplierService,
+        private readonly _windowService: WindowService,
         private readonly _options: BackflowTestOptionsService
     ) {
         this.deviceTypeOptions = this._options.deviceTypeOptions;
@@ -154,6 +157,23 @@ export class BackflowTestListComponent implements OnInit {
         this.table.columns = this.getColumns();
 
         await this.loadWaterSuppliers();
+    }
+
+    public viewDetails(test: BackflowTest): void {
+        this._windowService.addWindow(BackflowTestDetailsComponent, {
+            title: this.buildWindowTitle(test),
+            model: { id: test.id }
+        });
+    }
+
+    private buildWindowTitle(test: BackflowTest): string {
+        let address = `${test.propertyStreetNumber ?? ''} ${test.propertyStreetName ?? ''}`.trim();
+
+        if (test.propertyNumber) {
+            address = `${address} #${test.propertyNumber}`.trim();
+        }
+
+        return address ? `${test.id} - ${address}` : String(test.id);
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {

@@ -1,0 +1,26 @@
+<vp-section header="Validation Notes" [isExpanded]="isExpanded">
+    <vp-input name="validationNotes"
+              type="textarea"
+              [rows]="4"
+              [maxLength]="255"
+              [form]="form"
+              [(ngModel)]="test.validationNotes" />
+
+    <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+    <div class="border-top pt-2 mt-2" *ngFor="let note of notes">
+        <div class="d-flex flex-wrap gap-2 small text-secondary">
+            <span>{{ note.createdTime | date:'short' }}</span>
+            <span>{{ note.createdBy?.email }}</span>
+            <span>{{ note.logTypeLabel }}</span>
+            <span *ngIf="note.reviewDate">Review: {{ note.reviewDate | date }}</span>
+        </div>
+
+        <div style="white-space: pre-wrap;">{{ note.noteText }}</div>
+
+        <div class="small" *ngIf="note.fileAttachmentName">
+            <i class="fa-solid fa-paperclip me-1"></i>
+            {{ note.fileAttachmentName }}
+        </div>
+    </div>
+</vp-section>

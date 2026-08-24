@@ -715,6 +715,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("ValidationNewSite")
                         .HasColumnType("bit");
 
+                    b.Property<string>("ValidationNotes")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
                     b.Property<bool>("ValidationSiteInformationChanged")
                         .HasColumnType("bit");
 

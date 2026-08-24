@@ -36,4 +36,19 @@ public class BackflowSettingsRepository : TenantSettingsRepository<BackflowSetti
 
         return await query.SingleOrDefaultAsync(cancellationToken);
     }
+
+    public async Task<BackflowTestingSettingsDto?> GetTestingSettingsByWaterSupplierAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        var query =
+            from settings in Entity
+            where settings.WaterSupplierId == waterSupplierId
+            select new BackflowTestingSettingsDto
+            {
+                ShowRainSensor = settings.ShowRainSensor,
+                ShowOSSF = settings.ShowOSSF,
+                ShowPermitNumber = settings.ShowPermitNumber
+            };
+
+        return await query.SingleOrDefaultAsync(cancellationToken);
+    }
 }

@@ -1,4 +1,3 @@
-using System.Text;
 using System.Transactions;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
@@ -123,28 +122,18 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
 
     public async Task<CsiInspectionDto?> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request)
     {
-        var inspection = await _repository.GetNoIncludesAsync(id, default);
-
-        if (inspection == null)
-        {
-            return null;
-        }
-
-        var waterSupplierId = inspection.WaterSupplierId;
-        var changes = BuildChangeDescription(inspection, request);
-
         using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
             var saved = await _repository.UpdateForAdminAsync(id, request);
 
-            if (saved == null)
+            if (saved.Model == null)
             {
                 return null;
             }
 
-            if (changes.Length > 0)
+            if (saved.Changes.Length > 0)
             {
-                await _recordLogService.AddAsync(RecordLogTableNames.CsiInspections, id, waterSupplierId, RecordLogType.Edit, changes);
+                await _recordLogService.AddAsync(RecordLogTableNames.CsiInspections, id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
             }
 
             scope.Complete();
@@ -153,103 +142,6 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         var updated = await _repository.GetAsync(id, default);
 
         return Mapper.Map<CsiInspectionDto>(updated);
-    }
-
-    private static string BuildChangeDescription(CsiInspection inspection, CsiInspectionAdminUpdateRequest request)
-    {
-        var changes = new StringBuilder();
-
-        void Append(string label, object? oldValue, object? newValue)
-        {
-            var oldText = FormatChangeValue(oldValue);
-            var newText = FormatChangeValue(newValue);
-
-            if (oldText == newText)
-            {
-                return;
-            }
-
-            if (changes.Length > 0)
-            {
-                changes.AppendLine();
-            }
-
-            changes.Append($"{label}: '{oldText}' -> '{newText}'");
-        }
-
-        Append("Property Type", inspection.PropertyType, request.PropertyType);
-        Append("Property Business Name", inspection.PropertyBusinessName, request.PropertyBusinessName);
-        Append("Property Street Number", inspection.PropertyStreetNumber, request.PropertyStreetNumber);
-        Append("Property Street Name", inspection.PropertyStreetName, request.PropertyStreetName);
-        Append("Property Number", inspection.PropertyNumber, request.PropertyNumber);
-        Append("Property City", inspection.PropertyCity, request.PropertyCity);
-        Append("Property State", inspection.PropertyStateId, request.PropertyState?.Id);
-        Append("Property ZIP", inspection.PropertyZip, request.PropertyZip);
-
-        Append("Mailing Company Name", inspection.MailingCompanyName, request.MailingCompanyName);
-        Append("Mailing Contact Name", inspection.MailingContactName, request.MailingContactName);
-        Append("Mailing Street Number", inspection.MailingStreetNumber, request.MailingStreetNumber);
-        Append("Mailing Street Name", inspection.MailingStreetName, request.MailingStreetName);
-        Append("Mailing Number", inspection.MailingNumber, request.MailingNumber);
-        Append("Mailing City", inspection.MailingCity, request.MailingCity);
-        Append("Mailing State", inspection.MailingStateId, request.MailingState?.Id);
-        Append("Mailing ZIP", inspection.MailingZip, request.MailingZip);
-
-        Append("Reason For Inspection", inspection.ReasonForInspection, request.ReasonForInspection);
-        Append("Inspection Date", inspection.InspectionDate, request.InspectionDate);
-
-        Append("Compliance 1", inspection.Compliance1, request.Compliance1);
-        Append("Compliance 2", inspection.Compliance2, request.Compliance2);
-        Append("Compliance 3", inspection.Compliance3, request.Compliance3);
-        Append("Compliance 4", inspection.Compliance4, request.Compliance4);
-        Append("Compliance 5", inspection.Compliance5, request.Compliance5);
-        Append("Compliance 6", inspection.Compliance6, request.Compliance6);
-
-        Append("Service Line Lead", inspection.MaterialServiceLineLead, request.MaterialServiceLineLead);
-        Append("Service Line Copper", inspection.MaterialServiceLineCopper, request.MaterialServiceLineCopper);
-        Append("Service Line PVC", inspection.MaterialServiceLinePVC, request.MaterialServiceLinePVC);
-        Append("Service Line Other", inspection.MaterialServiceLineOther, request.MaterialServiceLineOther);
-        Append("Service Line Other Description", inspection.MaterialServiceLineOtherDescription, request.MaterialServiceLineOtherDescription);
-
-        Append("Solder Lead", inspection.MaterialSolderLead, request.MaterialSolderLead);
-        Append("Solder Lead Free", inspection.MaterialSolderLeadFree, request.MaterialSolderLeadFree);
-        Append("Solder Solvent Weld", inspection.MaterialSolderSolventWeld, request.MaterialSolderSolventWeld);
-        Append("Solder Other", inspection.MaterialSolderOther, request.MaterialSolderOther);
-        Append("Solder Other Description", inspection.MaterialSolderOtherDescription, request.MaterialSolderOtherDescription);
-
-        Append("On-Site Sewage Facility", inspection.AiOssf, request.AiOssf);
-        Append("Water Well", inspection.AiWaterWell, request.AiWaterWell);
-        Append("Fire System", inspection.AiFireSystem, request.AiFireSystem);
-        Append("Fire System On Separate Supply", inspection.AiFireSystem2, request.AiFireSystem2);
-        Append("Grease Trap", inspection.AiGreaseTrap, request.AiGreaseTrap);
-        Append("Sand & Grit Trap", inspection.AiSandGrit, request.AiSandGrit);
-        Append("Reclaimed Water", inspection.AiReclaimedWater, request.AiReclaimedWater);
-        Append("Irrigation System", inspection.AiIrrigationSystem, request.AiIrrigationSystem);
-        Append("Irrigation System On Separate Supply", inspection.AiIrrigationSystem2, request.AiIrrigationSystem2);
-
-        Append("Remarks", inspection.Comments, request.Comments);
-
-        return changes.ToString();
-    }
-
-    private static string FormatChangeValue(object? value)
-    {
-        if (value == null)
-        {
-            return string.Empty;
-        }
-
-        if (value is bool flag)
-        {
-            return flag ? "Yes" : "No";
-        }
-
-        if (value is DateTime date)
-        {
-            return date.ToString("g");
-        }
-
-        return value.ToString() ?? string.Empty;
     }
 
     public async Task<IPagedData<CsiInspectionDto>> SearchForProfessionalAsync(PageInfo pageInfo, Query query, bool latestOnly, CancellationToken cancellationToken)

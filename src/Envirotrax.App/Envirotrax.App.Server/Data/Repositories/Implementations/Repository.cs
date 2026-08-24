@@ -1,6 +1,8 @@
 
 
+using System.Globalization;
 using System.Reflection;
+using System.Text;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.DbContexts;
@@ -34,6 +36,17 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
     where TModel : class
     where TDbContext : DbContext
 {
+    private static readonly string[] ChangeDescriptionSkippedProperties = new[]
+    {
+        "CreatedById",
+        "CreatedTime",
+        "UpdatedById",
+        "UpdatedTime",
+        "DeletedById",
+        "DeletedTime",
+        "SubmissionId"
+    };
+
     private readonly string _primaryKeyName;
 
     protected TDbContext DbContext { get; private set; }
@@ -220,5 +233,40 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
         var model = await GetAsync(id, default);
 
         return await ReactivateAsync(model);
+    }
+
+    protected string BuildChangeDescription(TModel model)
+    {
+        var changes = new StringBuilder();
+
+        foreach (var property in DbContext.Entry(model).Properties)
+        {
+            if (!property.IsModified || ChangeDescriptionSkippedProperties.Contains(property.Metadata.Name))
+            {
+                continue;
+            }
+
+            var oldValue = FormatChangeValue(property.OriginalValue);
+            var newValue = FormatChangeValue(property.CurrentValue);
+
+            if (oldValue == newValue)
+            {
+                continue;
+            }
+
+            changes.AppendLine($"{property.Metadata.Name} >> '{oldValue}' >> '{newValue}'");
+        }
+
+        return changes.ToString().TrimEnd();
+    }
+
+    private static string FormatChangeValue(object? value)
+    {
+        if (value == null)
+        {
+            return "NULL";
+        }
+
+        return Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
     }
 }

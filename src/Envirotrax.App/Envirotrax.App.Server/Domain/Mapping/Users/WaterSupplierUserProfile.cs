@@ -19,5 +19,8 @@ public class WaterSupplierUserProfile : Profile
             .ForMember(supplierUser => supplierUser.User, opt => opt.Ignore())
             .ForMember(supplierUser => supplierUser.UserRoles, opt => opt.Ignore())
             .ForMember(supplierUser => supplierUser.UserId, opt => opt.MapFrom(supplierUser => supplierUser.Id));
+
+        CreateMap<WaterSupplierUser, ReferencedWaterSupplierUserDto>()
+            .ForMember(supplierUser => supplierUser.Id, opt => opt.MapFrom(supplierUser => supplierUser.UserId));
     }
 }

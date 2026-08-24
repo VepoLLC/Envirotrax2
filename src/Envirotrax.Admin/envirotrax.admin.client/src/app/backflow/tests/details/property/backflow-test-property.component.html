@@ -1,0 +1,82 @@
+<vp-section header="Property Information">
+    <vp-section-actions>
+        <button type="button"
+                class="btn btn-link p-0 text-decoration-none"
+                title="Open Site"
+                (click)="openSite.emit()">
+            <i class="fa-solid fa-house"></i>
+        </button>
+    </vp-section-actions>
+
+    <div class="mb-2">
+        <vp-input name="propertyType"
+                  type="select"
+                  label="Property Type"
+                  [form]="form"
+                  [options]="propertyTypeOptions"
+                  [(ngModel)]="propertyTypeId"
+                  (ngModelChange)="onPropertyTypeChange($event)" />
+    </div>
+
+    <div class="mb-2">
+        <vp-input name="propertyBusinessName"
+                  label="Business Name"
+                  [form]="form"
+                  [maxLength]="100"
+                  [(ngModel)]="test.propertyBusinessName" />
+    </div>
+
+    <div class="row">
+        <div class="col-3 mb-2">
+            <vp-input name="propertyStreetNumber"
+                      label="Street #"
+                      [form]="form"
+                      [maxLength]="50"
+                      [(ngModel)]="test.propertyStreetNumber" />
+        </div>
+
+        <div class="col-6 mb-2">
+            <vp-input name="propertyStreetName"
+                      label="Street Name"
+                      [form]="form"
+                      [maxLength]="100"
+                      [(ngModel)]="test.propertyStreetName" />
+        </div>
+
+        <div class="col-3 mb-2">
+            <vp-input name="propertyNumber"
+                      label="#"
+                      [form]="form"
+                      [maxLength]="50"
+                      [(ngModel)]="test.propertyNumber" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-6 mb-2">
+            <vp-input name="propertyCity"
+                      label="City"
+                      [form]="form"
+                      [maxLength]="50"
+                      [(ngModel)]="test.propertyCity" />
+        </div>
+
+        <div class="col-3 mb-2">
+            <vp-input name="propertyState"
+                      type="select"
+                      label="State"
+                      [form]="form"
+                      [options]="stateOptions"
+                      [(ngModel)]="propertyStateId"
+                      (ngModelChange)="onPropertyStateChange($event)" />
+        </div>
+
+        <div class="col-3 mb-2">
+            <vp-input name="propertyZip"
+                      label="ZIP"
+                      [form]="form"
+                      [maxLength]="20"
+                      [(ngModel)]="test.propertyZip" />
+        </div>
+    </div>
+</vp-section>

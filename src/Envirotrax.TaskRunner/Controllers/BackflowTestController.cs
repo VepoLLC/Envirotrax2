@@ -47,4 +47,35 @@ public class BackflowTestController : ControllerBase
 
         return Accepted(tests!.Count);
     }
+
+    [HttpPost("compliance-snapshots")]
+    public async Task<IActionResult> ProcessComplianceSnapshotsAsync(CancellationToken cancellationToken)
+    {
+        var supplierIds = await _internalApi.GetAsync<ICollection<int>>(
+            null,
+            "api/task-runner/water-suppliers?hasBackflowTests=true",
+            cancellationToken);
+
+        var reportDate = DateTime.UtcNow.Date;
+
+        await _queueService.EnsureQueueExistsAsync(QueueNames.BackflowComplianceSnapshots.Process, cancellationToken);
+
+        var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = 10, CancellationToken = cancellationToken };
+
+        await Parallel.ForEachAsync(supplierIds!, parallelOptions, async (supplierId, ct) =>
+        {
+            if (!ct.IsCancellationRequested)
+            {
+                var message = new ComplianceSnapshotMessageDto
+                {
+                    WaterSupplier = new WaterSupplierDto { Id = supplierId },
+                    ReportDate = reportDate
+                };
+
+                await _queueService.SendMessageAsync(QueueNames.BackflowComplianceSnapshots.Process, message, ct);
+            }
+        });
+
+        return Accepted(supplierIds!.Count);
+    }
 }

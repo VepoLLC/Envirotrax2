@@ -37,6 +37,10 @@ builder.Services.AddControllers(options =>
     options.OutputFormatters.Add(new ExcelMediaTypeFormatter());
     options.OutputFormatters.Add(new XmlMediaTypeFormatter());
 });
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -51,6 +55,11 @@ app.MapStaticAssets();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseExceptionHandler();
 }
 
 app.UseRequestLocalization(new RequestLocalizationOptions

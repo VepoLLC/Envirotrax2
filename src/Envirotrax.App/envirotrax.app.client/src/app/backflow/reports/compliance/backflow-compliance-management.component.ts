@@ -11,6 +11,7 @@ import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
 import { FacilityType } from "../../../shared/enums/facility-type.enum";
 import { PropertyType } from "../../../shared/enums/property-type.enum";
+import { complianceOverdueSeverityClasses } from "../../../shared/enums/compliance-overdue-severity.enum";
 import { BackflowTestService } from "../../../shared/services/backflow/backflow-test.service";
 import { BackflowTestOptionsService } from "../../../shared/services/backflow/backflow-test-options.service";
 import { SiteService } from "../../../shared/services/sites/site.service";
@@ -21,15 +22,11 @@ import { PrintableTableService } from "../../../shared/services/printable-table.
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 import { PropertyLogCellComponent } from "../../../shared/components/data-components/table-cells/property-log-cell.component";
 
-const DAY_MS = 86400000;
-
 // A grid row: an expired assembly plus its site's logs, decorated with presentation-only fields.
 type ComplianceRow = BackflowCompliance & {
     rowNumber?: number;
     isFirstOfGroup?: boolean;   // first row of a contiguous same-site group — site columns render here only
     canModify?: boolean;        // page-level Sites-modify permission, surfaced to the property-log cell
-    daysExpired?: number;
-    expiredClass?: string;
     assignedName?: string;
 };
 
@@ -73,6 +70,7 @@ export class BackflowComplianceManagementComponent implements OnInit {
 
     public readonly BackflowTestResult = BackflowTestResult;
     public readonly PropertyType = PropertyType;
+    public readonly severityClasses = complianceOverdueSeverityClasses;
 
     public canModify: boolean = false;
     public resultsHeaderPrefix: string = 'Expired Assemblies';
@@ -160,7 +158,6 @@ export class BackflowComplianceManagementComponent implements OnInit {
     public downloadConfig: DownloadConfig;
 
     private panelFilters: QueryProperty[] = [];
-    private readonly today: number = new Date().setHours(0, 0, 0, 0);
 
     constructor(
         private readonly _backflowTestService: BackflowTestService,
@@ -500,33 +497,11 @@ export class BackflowComplianceManagementComponent implements OnInit {
     }
 
     private decorate(row: ComplianceRow): void {
-        row.daysExpired = this.getDaysExpired(row);
-        row.expiredClass = row.daysExpired != null ? this.expiredBadgeClass(row.daysExpired) : '';
+        // daysExpired and expiredSeverity arrive already computed on the DTO, measured server-side against
+        // the caller's local time zone.
         row.assignedName = this.assignedUserName(row);
     }
 
-    private getDaysExpired(row: BackflowCompliance): number | undefined {
-        if (!row.expirationDate) {
-            return undefined;
-        }
-
-        const expiration = new Date(row.expirationDate).setHours(0, 0, 0, 0);
-        const days = Math.floor((this.today - expiration) / DAY_MS);
-
-        return days < 0 ? undefined : days;
-    }
-
-    private expiredBadgeClass(days: number): string {
-        if (days > 60) {
-            return 'bg-danger';
-        }
-
-        if (days > 30) {
-            return 'bg-warning text-dark';
-        }
-
-        return 'bg-warning-subtle text-dark border';
-    }
 
     private assignedUserName(row: BackflowCompliance): string {
         if (row.site?.backflowAccountAssignmentId == null) {

@@ -384,11 +384,6 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
     private static void ValidateAdminUpdate(BackflowTestAdminUpdateRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Manufacturer))
-        {
-            throw new AppValidationException("Main Assembly Manufacturer is required.");
-        }
-
         if (!HasBypassAssembly(request.DeviceType))
         {
             return;

@@ -37,9 +37,9 @@ public class BackflowTestController : AdminBaseController
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync(int id, [FromBody] BackflowTestUpdateRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateAsync(int id, [FromQuery] int waterSupplierId, [FromBody] BackflowTestUpdateRequest request, CancellationToken cancellationToken)
     {
-        var test = await _testService.UpdateAsync(id, request, cancellationToken);
+        var test = await _testService.UpdateAsync(id, waterSupplierId, request, cancellationToken);
 
         if (test == null)
         {
@@ -50,7 +50,7 @@ public class BackflowTestController : AdminBaseController
     }
 
     [HttpPost("{id}/images/{imageType}")]
-    public async Task<IActionResult> UploadImageAsync(int id, string imageType, [FromForm] IFormFile file, CancellationToken cancellationToken)
+    public async Task<IActionResult> UploadImageAsync(int id, string imageType, [FromQuery] int waterSupplierId, [FromForm] IFormFile file, CancellationToken cancellationToken)
     {
         if (file == null || file.Length == 0)
         {
@@ -59,7 +59,7 @@ public class BackflowTestController : AdminBaseController
 
         await using var stream = file.OpenReadStream();
 
-        var test = await _testService.UploadImageAsync(id, imageType, stream, file.FileName, cancellationToken);
+        var test = await _testService.UploadImageAsync(id, waterSupplierId, imageType, stream, file.FileName, cancellationToken);
 
         if (test == null)
         {

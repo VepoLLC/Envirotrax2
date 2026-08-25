@@ -3,10 +3,8 @@
 @{
 	Layout = null;
 
-	var page = Model as Home;
-
-	var pageTitle = page?.PageTitle ?? ViewData["Title"] as string;
-	var pageDescription = page?.PageDescription ?? ViewData["Description"] as string;
+	var pageTitle = Model.Value<string>("pageTitle") ?? ViewData["Title"] as string;
+	var pageDescription = Model.Value<string>("pageDescription") ?? ViewData["Description"] as string;
 
 	var socialMediaImageElement = ViewData["SocialMediaImage"] as IPublishedContent;
 

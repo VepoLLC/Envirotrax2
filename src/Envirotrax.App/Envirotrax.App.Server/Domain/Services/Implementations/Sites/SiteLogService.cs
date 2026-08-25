@@ -60,6 +60,15 @@ public class SiteLogService : ISiteLogService
             .ToList();
     }
 
+    public async Task<IEnumerable<SiteLogDto>> GetByAssemblyAsync(int assemblyId, CancellationToken cancellationToken)
+    {
+        var results = await _repository.GetByAssemblyAsync(assemblyId, cancellationToken);
+
+        return results
+            .Select(MapToDto)
+            .ToList();
+    }
+
     public async Task<string?> GetAttachmentUrlAsync(int logId, CancellationToken cancellationToken)
     {
         var log = await _repository.GetAsync(logId, cancellationToken);

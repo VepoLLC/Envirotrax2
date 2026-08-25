@@ -24,6 +24,8 @@ export class LoginRedirectComponent {
     public showProfessionalSelection: boolean = false;
     public showWaterSupplierSelection: boolean = false;
 
+    private _returnUrl: string | null = null;
+
     constructor(
         private readonly _authService: AuthService,
         private readonly _supplierService: WaterSupplierService,
@@ -36,7 +38,7 @@ export class LoginRedirectComponent {
         try {
             this.isLoading = true;
 
-            await this._authService.signInCallback();
+            this._returnUrl = await this._authService.signInCallback();
 
             const [profesisonalId, waterSupplierId] = await Promise.all([
                 this._authService.getProfessionalId(),
@@ -56,7 +58,7 @@ export class LoginRedirectComponent {
     private loginWithExistingSystem(): void {
         this._authService.setLoggedIn(true);
 
-        this._router.navigateByUrl('/', {
+        this._router.navigateByUrl(this._returnUrl ?? '/', {
             replaceUrl: true
         });
     }
@@ -89,7 +91,7 @@ export class LoginRedirectComponent {
 
         if (hasProfessional) {
             if (this.professionals.data.length == 1) {
-                await this._authService.signIn(undefined, this.professionals.data[0].id);
+                await this._authService.signIn(undefined, this.professionals.data[0].id, this._returnUrl ?? undefined);
                 return;
             }
 
@@ -101,7 +103,7 @@ export class LoginRedirectComponent {
             const onlySupplier = this.checkIfOneSupplier(this.suppliers);
 
             if (onlySupplier) {
-                await this._authService.signIn(onlySupplier.id);
+                await this._authService.signIn(onlySupplier.id, undefined, this._returnUrl ?? undefined);
                 return;
             }
 
@@ -152,7 +154,7 @@ export class LoginRedirectComponent {
     public async selectSupplier(supplier: WaterSupplier): Promise<void> {
         try {
             this.isLoading = true;
-            await this._authService.signIn(supplier.id);
+            await this._authService.signIn(supplier.id, undefined, this._returnUrl ?? undefined);
         } finally {
             this.isLoading = false;
         }
@@ -161,7 +163,7 @@ export class LoginRedirectComponent {
     public async selectProfessional(professional: Professional): Promise<void> {
         try {
             this.isLoading = true;
-            await this._authService.signIn(undefined, professional.id);
+            await this._authService.signIn(undefined, professional.id, this._returnUrl ?? undefined);
         } finally {
             this.isLoading = false;
         }

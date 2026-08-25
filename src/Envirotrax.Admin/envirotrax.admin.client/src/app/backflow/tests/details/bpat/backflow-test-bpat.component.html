@@ -1,0 +1,38 @@
+<vp-section [header]="header">
+    <div class="row">
+        <div class="col-md-6">
+            <dl class="row mb-0">
+                <dt class="col-sm-5">Company Name</dt>
+                <dd class="col-sm-7">{{ test.bpatCompanyName }}</dd>
+
+                <dt class="col-sm-5">Title</dt>
+                <dd class="col-sm-7">{{ test.bpatJobTitle }}</dd>
+
+                <dt class="col-sm-5">Contact Name</dt>
+                <dd class="col-sm-7">{{ test.bpatContactName }}</dd>
+
+                <dt class="col-sm-5">Address</dt>
+                <dd class="col-sm-7">{{ test.bpatAddress }}</dd>
+
+                <dt class="col-sm-5"></dt>
+                <dd class="col-sm-7">{{ cityStateZip }}</dd>
+            </dl>
+        </div>
+
+        <div class="col-md-6">
+            <dl class="row mb-0">
+                <dt class="col-sm-5">Phone Number</dt>
+                <dd class="col-sm-7">{{ test.bpatWorkNumber }}</dd>
+
+                <dt class="col-sm-5">EmailAddress</dt>
+                <dd class="col-sm-7">{{ test.bpat?.emailAddress }}</dd>
+
+                <dt class="col-sm-5">License Number</dt>
+                <dd class="col-sm-7">{{ test.bpatLicenseNumber }}</dd>
+
+                <dt class="col-sm-5">License Exp Date</dt>
+                <dd class="col-sm-7">{{ test.bpatLicenseExpiration | date:'short' }}</dd>
+            </dl>
+        </div>
+    </div>
+</vp-section>

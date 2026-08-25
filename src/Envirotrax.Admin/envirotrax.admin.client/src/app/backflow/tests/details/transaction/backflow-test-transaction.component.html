@@ -1,0 +1,37 @@
+<vp-section header="Transaction Information" [isExpanded]="false">
+    <div class="row">
+        <div class="col-md-3 mb-2">
+            <vp-input name="transactionId"
+                      label="TransactionID"
+                      [form]="form"
+                      [maxLength]="100"
+                      [(ngModel)]="test.transactionId" />
+        </div>
+
+        <div class="col-md-3 mb-2">
+            <vp-input name="amount"
+                      type="number"
+                      label="Amount"
+                      [form]="form"
+                      [decimals]="2"
+                      [(ngModel)]="test.amount" />
+        </div>
+
+        <div class="col-md-3 mb-2">
+            <vp-input name="transactionDate"
+                      type="datetime"
+                      label="Transaction Date"
+                      [form]="form"
+                      [(ngModel)]="test.transactionDate" />
+        </div>
+
+        <div class="col-md-3 mb-2">
+            <vp-input name="amountShare"
+                      type="number"
+                      label="Amount Share"
+                      [form]="form"
+                      [decimals]="2"
+                      [(ngModel)]="test.amountShare" />
+        </div>
+    </div>
+</vp-section>

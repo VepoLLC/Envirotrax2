@@ -1,0 +1,114 @@
+<vp-section header="Test Results">
+    <div class="row align-items-end">
+        <div class="col-md-3 mb-2">
+            <vp-input name="testResult"
+                      type="select"
+                      label="Test Result"
+                      [form]="form"
+                      [options]="testResultOptions"
+                      [(ngModel)]="testResultId"
+                      (ngModelChange)="onTestResultChange($event)" />
+        </div>
+
+        <div class="col-md-3 mb-2">
+            <vp-input name="jobNumber"
+                      label="Job Number"
+                      [form]="form"
+                      [maxLength]="50"
+                      [(ngModel)]="test.jobNumber" />
+        </div>
+
+        <div class="col-md-3 mb-2">
+            <vp-input name="reasonForTest"
+                      type="select"
+                      label="Reason for Test"
+                      [form]="form"
+                      [options]="reasonForTestOptions"
+                      [(ngModel)]="reasonForTestId"
+                      (ngModelChange)="onReasonForTestChange($event)" />
+        </div>
+
+        <div class="col-md-3 mb-2">
+            <vp-input name="replacementAssembly"
+                      label="Replacement Assembly Model/Serial #"
+                      [form]="form"
+                      [maxLength]="100"
+                      [(ngModel)]="test.replacementAssembly" />
+        </div>
+    </div>
+
+    <div *ngIf="visibility.showGauge">
+        <div class="row align-items-center mt-2">
+            <div class="col-md-9">
+                Is the assembly installed in accordance with manufacturer recommendations and/or local codes?
+            </div>
+
+            <div class="col-md-3">
+                <div class="d-flex gap-3">
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio"
+                               [attr.id]="idPrefix + '-properly-installed-yes'"
+                               name="properlyInstalled"
+                               [value]="true"
+                               [(ngModel)]="test.properlyInstalled" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-properly-installed-yes'">Yes</label>
+                    </div>
+
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio"
+                               [attr.id]="idPrefix + '-properly-installed-no'"
+                               name="properlyInstalled"
+                               [value]="false"
+                               [(ngModel)]="test.properlyInstalled" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-properly-installed-no'">No</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row align-items-center mt-2">
+            <div class="col-md-9">
+                Is the assembly installed on a non-potable water supply (auxiliary)?
+            </div>
+
+            <div class="col-md-3">
+                <div class="d-flex gap-3">
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio"
+                               [attr.id]="idPrefix + '-non-potable-yes'"
+                               name="nonPotable"
+                               [value]="true"
+                               [(ngModel)]="test.nonPotable" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-non-potable-yes'">Yes</label>
+                    </div>
+
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio"
+                               [attr.id]="idPrefix + '-non-potable-no'"
+                               name="nonPotable"
+                               [value]="false"
+                               [(ngModel)]="test.nonPotable" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-non-potable-no'">No</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex flex-wrap justify-content-evenly gap-3 mt-3">
+            <dl class="d-flex gap-2 mb-0">
+                <dt>Differential Pressure Gauge Used</dt>
+                <dd class="mb-0">{{ gaugeDescription }}</dd>
+            </dl>
+
+            <dl class="d-flex gap-2 mb-0">
+                <dt>Serial Number</dt>
+                <dd class="mb-0">{{ test.gaugeSerialNumber }}</dd>
+            </dl>
+
+            <dl class="d-flex gap-2 mb-0">
+                <dt>Date Tested for Accuracy</dt>
+                <dd class="mb-0">{{ test.gaugeLastCalibrationDate | date }}</dd>
+            </dl>
+        </div>
+    </div>
+</vp-section>

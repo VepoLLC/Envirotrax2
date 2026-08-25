@@ -348,6 +348,8 @@ public class BackflowTestDto : IDto
     [StringLength(100)]
     public string? TransactionId { get; set; }
 
+    public DateTime? TransactionDate { get; set; }
+
     public decimal Amount { get; set; }
     public decimal AmountShare { get; set; }
 

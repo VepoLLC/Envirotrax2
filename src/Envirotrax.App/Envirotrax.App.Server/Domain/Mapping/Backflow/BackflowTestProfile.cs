@@ -82,5 +82,12 @@ public class BackflowTestProfile : Profile
         CreateMap<BackflowTest, BackflowComplianceDto>()
             .IncludeBase<BackflowTest, BackflowTestDto>()
             .ForMember(dto => dto.Logs, opt => opt.Ignore());
+
+        CreateMap<BackflowTest, BackflowTestAdminDetailsDto>()
+            .IncludeBase<BackflowTest, BackflowTestDto>()
+            .ForMember(dto => dto.BpatJobTitle, opt => opt.MapFrom(model => model.Bpat != null ? model.Bpat.JobTitle : null))
+            .ForMember(dto => dto.ShowRainSensor, opt => opt.Ignore())
+            .ForMember(dto => dto.ShowOSSF, opt => opt.Ignore())
+            .ForMember(dto => dto.ShowPermitNumber, opt => opt.Ignore());
     }
 }

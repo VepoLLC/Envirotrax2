@@ -33,4 +33,18 @@ public class CsiInspectorService : ICsiInspectorService
 
         return _apiClient.GetAsync<CsiInspectorAccountDto>(BaseUrl, pageInfo, query, additionalParameters, cancellationToken);
     }
+
+    public Task<CsiInspectorAccountDetailsDto?> GetDetailsAsync(int professionalId, int? userId, CancellationToken cancellationToken)
+    {
+        var url = userId.HasValue
+            ? $"{BaseUrl}/{professionalId}?userId={userId.Value}"
+            : $"{BaseUrl}/{professionalId}";
+
+        return _apiClient.GetAsync<CsiInspectorAccountDetailsDto>(url, cancellationToken);
+    }
+
+    public Task<CsiInspectorAccountDetailsDto?> UpdateDetailsAsync(int professionalId, CsiInspectorAccountDetailsDto details, CancellationToken cancellationToken)
+    {
+        return _apiClient.PutAsync<CsiInspectorAccountDetailsDto, CsiInspectorAccountDetailsDto>($"{BaseUrl}/{professionalId}", details, cancellationToken);
+    }
 }

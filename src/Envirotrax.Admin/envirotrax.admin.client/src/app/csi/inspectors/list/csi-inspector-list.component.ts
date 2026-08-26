@@ -5,6 +5,8 @@ import { CellTemplateData, ColumnType, QueryProperty, TableColumn, TableViewMode
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import { CsiInspectorAccount } from '../../../shared/models/csi/csi-inspector-account';
 import { CsiInspectorService } from '../../../shared/services/csi/csi-inspector.service';
+import { WindowService } from '../../../shared/services/window.service';
+import { CsiInspectorDetailsComponent } from '../details/csi-inspector-details.component';
 
 @Component({
     templateUrl: './csi-inspector-list.component.html',
@@ -40,12 +42,28 @@ export class CsiInspectorListComponent implements OnInit {
         }
     };
 
-    constructor(private readonly _csiInspectorService: CsiInspectorService) {
+    constructor(
+        private readonly _csiInspectorService: CsiInspectorService,
+        private readonly _windowService: WindowService
+    ) {
 
     }
 
     public ngOnInit(): void {
         this.table.columns = this.getColumns();
+    }
+
+    public openDetails(account: CsiInspectorAccount): void {
+        this._windowService.addWindow(CsiInspectorDetailsComponent, {
+            title: this.buildTitle(account),
+            model: account
+        });
+    }
+
+    private buildTitle(account: CsiInspectorAccount): string {
+        return [account.companyName, account.contactName, account.emailAddress]
+            .filter(part => part)
+            .join(' - ');
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {

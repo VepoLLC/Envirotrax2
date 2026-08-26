@@ -47,14 +47,23 @@ export class AuthService {
         this._userManager = userManager;
 
         this._userManager.events.addUserLoaded(user => {
-            this.setLoggedIn(true);
             this.broadcastUserChanged(user.toStorageString());
+
+            if (this.hasResolvedTenant(user)) {
+                this.setLoggedIn(true);
+            }
         });
 
         this._userManager.events.addUserUnloaded(() => {
             this.setLoggedIn(false);
             this.broadcastUserChanged(null);
         });
+    }
+
+    private hasResolvedTenant(user: User): boolean {
+        const profile = user.profile as any;
+
+        return !!profile?.wsId || !!profile?.prfId;
     }
 
     private broadcastUserChanged(user: string | null): void {
@@ -111,8 +120,11 @@ export class AuthService {
             };
 
             const listener = (event: MessageEvent<AuthBroadcastMessage>) => {
-                if (event.data?.type === 'user-response') {
-                    finish(event.data.user ? User.fromStorageString(event.data.user) : null);
+                // Only a positive reply short-circuits the wait — with more than one other tab
+                // open, an empty tab's "no user" reply shouldn't win a race against a tab that
+                // actually has a session, so a negative reply just keeps waiting for the timeout.
+                if (event.data?.type === 'user-response' && event.data.user) {
+                    finish(User.fromStorageString(event.data.user));
                 }
             };
 

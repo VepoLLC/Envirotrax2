@@ -140,7 +140,7 @@ export class App implements OnInit {
           {
             title: 'Notification Management',
             iconCss: 'fa-regular fa-bell',
-            routerLink: ['/'],
+            routerLink: ['admin/notifications'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Notifications),
             hasFeature: true
           },

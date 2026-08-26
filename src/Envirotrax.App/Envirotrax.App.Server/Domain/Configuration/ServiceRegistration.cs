@@ -3,7 +3,9 @@ using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.GisAreas;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
+using Envirotrax.App.Server.Domain.Services.Definitions.Notifications;
 using Envirotrax.App.Server.Domain.Services.Implementations.Logs;
+using Envirotrax.App.Server.Domain.Services.Implementations.Notifications;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
@@ -92,6 +94,8 @@ public static class ServiceRegistration
 
         services.AddTransient<IGisAreaService, GisAreaService>();
         services.AddTransient<IGisAreaCoordinateService, GisAreaCoordinateService>();
+
+        services.AddTransient<INotificationSettingService, NotificationSettingService>();
 
         services.AddTransient<IWaterSupplierDashboardService, WaterSupplierDashboardService>();
 

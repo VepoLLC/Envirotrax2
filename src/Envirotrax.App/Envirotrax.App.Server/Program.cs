@@ -1,8 +1,10 @@
+using System.Globalization;
 using Azure.Identity;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Envirotrax.App.Server.Configuration;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.App.Server.MediaTypeFormatters;
+using Microsoft.AspNetCore.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,10 +31,16 @@ builder.Services.AddControllers(options =>
     options.Filters.Add(typeof(CheckFeaturesFilter));
     options.Filters.Add(typeof(CheckPermissionFilter));
     options.Filters.Add(typeof(QueryFilter));
+    options.Filters.Add(typeof(ApiExceptionFilter));
 
     options.OutputFormatters.Add(new CsvMediaTypeFormatter());
     options.OutputFormatters.Add(new ExcelMediaTypeFormatter());
+    options.OutputFormatters.Add(new XmlMediaTypeFormatter());
 });
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -47,7 +55,19 @@ app.MapStaticAssets();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseDeveloperExceptionPage();
 }
+else
+{
+    app.UseExceptionHandler();
+}
+
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(CultureInfo.InvariantCulture),
+    SupportedCultures = [CultureInfo.InvariantCulture],
+    SupportedUICultures = [CultureInfo.InvariantCulture]
+});
 
 app.UseHttpsRedirection();
 

@@ -10,21 +10,3 @@
         text-decoration: none;
     }
 }
-
-.reportbar {
-    height: 16px;
-    border-radius: 0 8px 8px 0;
-    min-width: 2px;
-
-    &.orange {
-        background: linear-gradient(to right, #f5d5a8, #e87b20);
-    }
-
-    &.green {
-        background: linear-gradient(to right, #b5e8c0, #20a845);
-    }
-
-    &.steelblue {
-        background: linear-gradient(to right, #a8c4d4, #4682b4);
-    }
-}

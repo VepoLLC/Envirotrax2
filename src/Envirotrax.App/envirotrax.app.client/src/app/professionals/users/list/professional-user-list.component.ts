@@ -3,11 +3,8 @@ import { TableViewModel } from "../../../shared/models/table-view-model";
 import { ProfessionalUser } from "../../../shared/models/professionals/professional-user";
 import { ProfesionalUserService } from "../../../shared/services/professionals/professional-user.service";
 import { ActivatedRoute, Router } from "@angular/router";
-import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
-import { TableColumn } from "../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { CreateProfessionalUserComponent } from "../create/create-professional-user.component";
-import { ToastService } from "../../../shared/services/toast.service";
+import { ToastService, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,

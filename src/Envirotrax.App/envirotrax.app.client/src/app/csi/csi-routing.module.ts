@@ -7,9 +7,24 @@ import { CsiInspectorListComponent } from "./inspectors/list/csi-inspector-list.
 import { CsiInspectorDetailsComponent } from "./inspectors/details/csi-inspector-details.component";
 import { CsiInspectionDetailsComponent } from "./inspections/details/csi-inspection-details.component";
 import { CsiSystemReportComponent } from "./reports/system/csi-system-report.component";
+import { CsiComplianceManagementComponent } from "./reports/compliance/csi-compliance-management.component";
 
 const routes: Routes = [
 
+    {
+        path: 'compliance',
+        title: 'CSI Compliance Management',
+        component: CsiComplianceManagementComponent,
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.CsiReports,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
+    },
     {
         path: 'reports/system',
         title: 'CSI System Report',
@@ -82,7 +97,7 @@ const routes: Routes = [
     }
 ];
 @NgModule({
-    imports: [
+    imports: [              
         RouterModule.forChild(routes)
     ],
     exports: [

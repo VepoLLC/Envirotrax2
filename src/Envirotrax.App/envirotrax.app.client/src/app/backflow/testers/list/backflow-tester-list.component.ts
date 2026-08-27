@@ -5,8 +5,14 @@ import { BackflowTesterManagementService } from "../../../shared/services/backfl
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { Professional } from "../../../shared/models/professionals/professional";
-import { TableColumn } from "../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
+import { ColumnType, TableColumn } from '@envirotrax/common-ui';
+import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
+
+interface BackflowLicenseSearchVm {
+    bpatLicenseNumber?: string;
+    fireLicenseNumber?: string;
+    insurancePolicyNumber?: string;
+}
 
 @Component({
     selector: 'app-backflow-tester-list',
@@ -31,10 +37,13 @@ export class BackflowTesterListComponent implements OnInit {
         }
     };
 
+    private _licenseSearch: BackflowLicenseSearchVm = {};
+
     constructor(
         private readonly _backflowTesterManagementService: BackflowTesterManagementService,
         private readonly _router: Router,
-        private readonly _activatedRoute: ActivatedRoute
+        private readonly _activatedRoute: ActivatedRoute,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
     }
 
@@ -79,10 +88,31 @@ export class BackflowTesterListComponent implements OnInit {
     public async getTesters(): Promise<void> {
         try {
             this.table.isLoading = true;
-            this.table.items = await this._backflowTesterManagementService.getAll(this.table.items?.pageInfo || {}, this.table.query);
+            const pageInfo = this.table.items?.pageInfo || {};
+            const { bpatLicenseNumber, fireLicenseNumber, insurancePolicyNumber } = this._licenseSearch;
+
+            this.table.items = (bpatLicenseNumber || fireLicenseNumber || insurancePolicyNumber)
+                ? await this._backflowTesterManagementService.search(bpatLicenseNumber, fireLicenseNumber, insurancePolicyNumber, pageInfo)
+                : await this._backflowTesterManagementService.getAll(pageInfo, this.table.query);
         } finally {
             this.table.isLoading = false;
         }
+    }
+
+    private extractLicenseSearchVm(): BackflowLicenseSearchVm {
+        const getValue = (columnName: string) =>
+            this.table.query.filter?.find(f => f.columnName === columnName)?.value as string | undefined;
+
+        return {
+            bpatLicenseNumber: getValue('bpatLicenseNumber'),
+            fireLicenseNumber: getValue('fireLicenseNumber'),
+            insurancePolicyNumber: getValue('insurancePolicyNumber')
+        };
+    }
+
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
@@ -97,8 +127,10 @@ export class BackflowTesterListComponent implements OnInit {
 
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
+            this._licenseSearch = this.extractLicenseSearchVm();
+
             await this.getTesters();
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 }

@@ -1,13 +1,13 @@
 import { Injectable, SecurityContext } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
 import { GisArea, GisAreaCoordinate } from "../../models/gis-areas/gis-area";
-import { MapPolygon } from "../../components/map/map.component";
+import { MapPolygon } from "@envirotrax/common-ui";
 
 @Injectable({
     providedIn: 'root'
 })
 export class GisMapService {
-    constructor(private readonly _sanitizer: DomSanitizer) {}
+    constructor(private readonly _sanitizer: DomSanitizer) { }
 
     public buildMapPolygons(areas: GisArea[], coordinates: GisAreaCoordinate[]): MapPolygon<GisArea>[] {
         return areas

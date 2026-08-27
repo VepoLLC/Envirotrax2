@@ -12,3 +12,18 @@ export enum FacilityType {
     Industrial = 10,
     CityOwnedFacility = 11
 }
+
+export const facilityTypeLabels: Record<FacilityType, string> = {
+    [FacilityType.Other]: 'Other',
+    [FacilityType.Restaurant]: 'Restaurant',
+    [FacilityType.FastFoodEstablishment]: 'Fast food establishment',
+    [FacilityType.HotelMotel]: 'Hotel/motel',
+    [FacilityType.CarWash]: 'Car wash',
+    [FacilityType.SchoolUniversity]: 'School/university',
+    [FacilityType.GroceryStore]: 'Grocery store',
+    [FacilityType.ConvenienceStore]: 'Convenience store',
+    [FacilityType.AssistedLivingFacility]: 'Assisted living facility',
+    [FacilityType.MedicalFacility]: 'Medical facility',
+    [FacilityType.Industrial]: 'Industrial',
+    [FacilityType.CityOwnedFacility]: 'City-owned facility'
+};

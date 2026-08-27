@@ -70,8 +70,16 @@ const routes: Routes = [
         }
       },
       {
-        path: 'dashboard',
+        path: 'account-overview',
         loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule),
+        canActivate: [RoleGuard],
+        data: {
+          roles: [ROLE_DEFINITIONS.WATER_SUPPLIER]
+        }
+      },
+      {
+        path: 'licenses',
+        loadChildren: () => import('./licenses/licenses.module').then(m => m.LicensesModule),
         canActivate: [RoleGuard],
         data: {
           roles: [ROLE_DEFINITIONS.WATER_SUPPLIER]

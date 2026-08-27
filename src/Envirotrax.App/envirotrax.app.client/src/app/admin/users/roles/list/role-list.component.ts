@@ -1,8 +1,5 @@
 import { Component, OnInit } from "@angular/core";
 import { TableViewModel } from "../../../../shared/models/table-view-model";
-import { TableColumn } from "../../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../../shared/components/data-components/sorting-filtering/query-view-model";
-import { ModalHelperService } from "../../../../shared/services/helpers/modal-helper.service";
 import { CreateRoleComponent } from "../create/create-role.component";
 import { ActivatedRoute, Router } from "@angular/router";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
@@ -10,6 +7,7 @@ import { Role } from "../../../../shared/models/users/role";
 import { RoleService } from "../../../../shared/services/users/role.service";
 import { AuthService } from "../../../../shared/services/auth/auth.service";
 import { PermissionAction, PermissionType } from "../../../../shared/models/permission-type";
+import { ColumnType, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 
 @Component({
     templateUrl: './role-list.component.html',

@@ -1,5 +1,6 @@
-
 using AutoMapper;
+using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Users;
 using Envirotrax.App.Server.Domain.Configuration;
@@ -13,6 +14,7 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Users;
 public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUserService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IUserRoleRepository _userRoleRepository;
     private readonly IAuthService _authService;
     private readonly IInternalApiClientService<AuthApiOptions> _authApiClient;
     private readonly IWaterSupplierService _waterSupplierService;
@@ -20,12 +22,14 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
     public UserService(
         IMapper mapper,
         IUserRepository repository,
+        IUserRoleRepository userRoleRepository,
         IAuthService authService,
         IInternalApiClientService<AuthApiOptions> authApiClient,
         IWaterSupplierService waterSupplierService)
         : base(mapper, repository)
     {
         _userRepository = repository;
+        _userRoleRepository = userRoleRepository;
         _authService = authService;
         _authApiClient = authApiClient;
         _waterSupplierService = waterSupplierService;
@@ -44,7 +48,7 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
         var addedInvitation = await _authApiClient.PostAsync<UserInvitationDto, UserInvitationDto>("/api/users/invitations", new(_authService.WaterSupplierId, _authService.UserId)
         {
             Data = invitation
-        });
+        }, CancellationToken.None);
 
         if (addedInvitation == null)
         {
@@ -58,14 +62,17 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
 
     public override async Task<WaterSupplierUserDto?> DeleteAsync(int id)
     {
-        await _authApiClient.DeleteAsync<object>(_authService.WaterSupplierId, _authService.UserId, $"/api/users/{id}/invitations");
+        await _authApiClient.DeleteAsync<object>(_authService.WaterSupplierId, _authService.UserId, $"/api/users/{id}/invitations", CancellationToken.None);
+
+        await _userRoleRepository.DeleteAllForUserAsync(id);
+
         return await base.DeleteAsync(id);
     }
 
-    public async Task<WaterSupplierUserDto?> ResendInvitationAsync(int id)
+    public async Task<WaterSupplierUserDto?> ResendInvitationAsync(int id, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.GetAsync(id, CancellationToken.None) ?? throw new InvalidOperationException();
-        var supplier = await _waterSupplierService.GetLoggedInSupplierAsync();
+        var user = await _userRepository.GetAsync(id, cancellationToken) ?? throw new InvalidOperationException();
+        var supplier = await _waterSupplierService.GetLoggedInSupplierAsync(cancellationToken);
 
         var invitation = new UserInvitationDto
         {
@@ -76,7 +83,7 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
         var addedInvitation = await _authApiClient.PostAsync<UserInvitationDto, UserInvitationDto>("/api/users/invitations", new(_authService.WaterSupplierId, _authService.UserId)
         {
             Data = invitation
-        });
+        }, cancellationToken);
 
         if (addedInvitation == null)
         {
@@ -84,6 +91,18 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
         }
 
         return MapToDto(user);
+    }
+
+    public async Task<IPagedData<WaterSupplierUserDto>> GetAllForWaterSupplierAsync(int waterSupplierId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<WaterSupplierUser, WaterSupplierUserDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<WaterSupplierUser, WaterSupplierUserDto>(Mapper);
+
+        var users = await _userRepository.GetAllForWaterSupplierAsync(waterSupplierId, pageInfo, query, cancellationToken);
+
+        return users
+            .Select(user => MapToDto(user)!)
+            .ToPagedData(pageInfo);
     }
 }
 class UserInvitationDto

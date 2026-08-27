@@ -1,0 +1,145 @@
+@model Envirotrax.App.Server.Domain.DataTransferObjects.Backflow.BackflowNewRemovedReportDto
+@{
+    Layout = null;
+
+    // Chart-only, matching the on-screen tab exactly (no table there). Chronological order matches
+    // backflow-new-removed-tab.component.ts's barChartData, which reads this.points as-is.
+    var maxValue = Model.Points.Count > 0 ? Model.Points.Max(p => Math.Max(p.Created, p.Removed)) : 0;
+
+    double HeightPercent(int value) => maxValue > 0 ? (double)value / maxValue * 100 : 0;
+}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <style>
+        body {
+            font-size: 9.1px;
+            font-family: Arial, sans-serif;
+        }
+
+        .page-title {
+            background-color: #323232;
+            color: #ffffff;
+            font-size: 10.6px;
+            font-weight: bold;
+            text-align: center;
+            padding: 5px 3px;
+            margin-bottom: 5px;
+        }
+
+        .section-header {
+            background-color: #a0a0a0;
+            color: #ffffff;
+            font-weight: bold;
+            padding: 2.5px 5px;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .chart-wrapper {
+            margin-bottom: 10px;
+            break-inside: avoid;
+        }
+
+        .chart-legend {
+            text-align: center;
+            padding: 5px 0 8px;
+        }
+
+        .chart-legend span {
+            display: inline-block;
+            margin: 0 8px;
+        }
+
+        .chart-legend .swatch {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            margin-right: 3px;
+            border-radius: 1px;
+        }
+
+        .bar-plot {
+            display: flex;
+            align-items: flex-end;
+            height: 150px;
+            border-bottom: 1px solid #ccc;
+            padding: 0 4px;
+        }
+
+        .bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .bar-set {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 2px;
+            height: 140px;
+            width: 100%;
+        }
+
+        .bar {
+            width: 10px;
+        }
+
+        .bar.created {
+            background: #f0922b;
+        }
+
+        .bar.removed {
+            background: #5ac8e8;
+        }
+
+        .bar-month-labels {
+            display: flex;
+            padding: 0 4px;
+        }
+
+        .bar-month-labels span {
+            flex: 1;
+            text-align: center;
+            font-size: 7.5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-title">Backflow New/Removed Assemblies</div>
+
+    @if (Model.Points.Count > 0)
+    {
+        <div class="section-header">New/Removed Assemblies</div>
+        <div class="chart-wrapper">
+            <div class="chart-legend">
+                <span><span class="swatch" style="background:#f0922b"></span>Assemblies Created</span>
+                <span><span class="swatch" style="background:#5ac8e8"></span>Assemblies Removed</span>
+            </div>
+            <div class="bar-plot">
+                @foreach (var point in Model.Points)
+                {
+                    <div class="bar-group">
+                        <div class="bar-set">
+                            <div class="bar created" style="height:@(HeightPercent(point.Created))%"></div>
+                            <div class="bar removed" style="height:@(HeightPercent(point.Removed))%"></div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="bar-month-labels">
+                @foreach (var point in Model.Points)
+                {
+                    <span>@point.Label.Split(' ')[0]</span>
+                }
+            </div>
+        </div>
+    }
+</body>
+
+</html>

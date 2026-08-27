@@ -4,12 +4,10 @@ import { UserService } from "../../../shared/services/water-suppliers/user.servi
 import { ActivatedRoute } from "@angular/router";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { NgForm } from "@angular/forms";
-import { InputOption } from "../../../shared/components/input/input.component";
 import { RoleService } from "../../../shared/services/users/role.service";
 import { UserRoleService } from "../../../shared/services/users/user-role.service";
 import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
-import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
-import { ToastService } from "../../../shared/services/toast.service";
+import { ToastService, InputOption, ModalHelperService } from '@envirotrax/common-ui';
 
 
 @Component({

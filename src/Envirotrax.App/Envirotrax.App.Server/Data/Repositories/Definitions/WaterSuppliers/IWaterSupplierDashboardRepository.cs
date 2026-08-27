@@ -6,4 +6,7 @@ public interface IWaterSupplierDashboardRepository
 {
     Task<WaterSupplierDashboardStatsDto> GetStatsAsync(CancellationToken cancellationToken);
     Task<CsiSubmissionStatsDto> GetCsiSubmissionStatsAsync(CancellationToken cancellationToken);
+    Task<BackflowSubmissionStatsDto> GetBackflowSubmissionStatsAsync(CancellationToken cancellationToken);
+    Task<FogInspectionSubmissionStatsDto> GetFogInspectionSubmissionStatsAsync(CancellationToken cancellationToken);
+    Task<FogTripTicketSubmissionStatsDto> GetFogTripTicketSubmissionStatsAsync(CancellationToken cancellationToken);
 }

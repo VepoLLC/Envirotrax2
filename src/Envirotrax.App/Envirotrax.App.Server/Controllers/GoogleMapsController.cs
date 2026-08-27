@@ -5,7 +5,7 @@ namespace Envirotrax.App.Server.Controllers;
 
 [ApiController]
 [Route("api/google-maps")]
-public class GoogleMapsApiController : ControllerBase
+public class GoogleMapsApiController : EnvirotraxBaseController
 {
     private readonly IConfiguration _configuration;
 

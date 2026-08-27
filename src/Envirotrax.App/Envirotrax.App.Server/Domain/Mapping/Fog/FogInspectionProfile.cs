@@ -2,6 +2,7 @@ using AutoMapper;
 using Envirotrax.App.Server.Data.Models.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
+using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.App.Server.Domain.Mapping.Fog;
 
@@ -11,11 +12,10 @@ public class FogInspectionProfile : Profile
     {
         CreateMap<FogInspection, FogInspectionDto>()
             .ForMember(dest => dest.Site, opt => opt.Ignore())
-            .ForMember(dest => dest.PropertyState, opt => opt.Ignore())
-            .ForMember(dest => dest.MailingState, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())
-            .ForMember(dest => dest.Professional, opt => opt.Ignore())
-            .ForMember(dest => dest.Inspector, opt => opt.Ignore())
+            .ForMember(dest => dest.ExteriorImageUrl, opt => opt.Ignore())
+            .ForMember(dest => dest.InteriorImageUrl, opt => opt.Ignore())
+            .ForMember(dest => dest.SignatureImageUrl, opt => opt.Ignore())
             .AfterMap((model, dto) =>
             {
                 dto.Site ??= new ReferencedSiteDto { Id = model.SiteId };
@@ -32,8 +32,11 @@ public class FogInspectionProfile : Profile
 
                 dto.Professional ??= new() { Id = model.ProfessionalId };
                 dto.Inspector ??= new() { Id = model.InspectorId };
+
+                dto.WaterSupplier ??= new ReferencedWaterSupplierDto { Id = model.WaterSupplierId };
             })
             .ReverseMap()
+            .ForMember(m => m.WaterSupplier, opt => opt.Ignore())
             .ForMember(m => m.Site, opt => opt.Ignore())
             .ForMember(m => m.SiteId, opt => opt.MapFrom(dto => dto.Site!.Id))
             .ForMember(m => m.PropertyState, opt => opt.Ignore())

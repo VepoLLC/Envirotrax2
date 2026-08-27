@@ -16,12 +16,12 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
 const routes: Routes = [
     {
         path: '',
-        redirectTo: 'dashboard',
+        redirectTo: 'account-overview',
         pathMatch: 'full'
     },
     {
-        path: 'dashboard',
-        title: 'Dashboard',
+        path: 'account-overview',
+        title: 'Account Overview',
         component: DashboardComponent,
         canActivate: [RoleGuard],
         data: {
@@ -92,6 +92,14 @@ const routes: Routes = [
         }
     },
     {
+        path: 'checkout',
+        loadChildren: () => import('./checkout/professionals-checkout.module').then(m => m.ProfessionalsCheckoutModule),
+        canActivate: [RoleGuard],
+        data: {
+            roles: [ROLE_DEFINITIONS.PROFESSIONAL]
+        }
+    },
+    {
         path: 'csi',
         loadChildren: () => import('./csi/professionals-csi.module').then(m => m.ProfessionalsCsiModule),
         canActivate: [FeatureGuard, RoleGuard],
@@ -107,6 +115,24 @@ const routes: Routes = [
         data: {
             features: [FeatureType.BackflowTesting],
             roles: [ROLE_DEFINITIONS.PROFESSIONAL, ROLE_DEFINITIONS.PROFESSIONALS.BACKFLOW_TESTER]
+        }
+    },
+    {
+        path: 'fog/transportation',
+        loadChildren: () => import('./fog/transportation/professionals-fog-transportation.module').then(m => m.ProfessionalsFogTransportationModule),
+        canActivate: [FeatureGuard, RoleGuard],
+        data: {
+            features: [FeatureType.FogTransportation],
+            roles: [ROLE_DEFINITIONS.PROFESSIONAL, ROLE_DEFINITIONS.PROFESSIONALS.FOG_TRANSPORTER]
+        }
+    },
+    {
+        path: 'fog',
+        loadChildren: () => import('./fog/professionals-fog.module').then(m => m.ProfessionalsFogModule),
+        canActivate: [FeatureGuard, RoleGuard],
+        data: {
+            features: [FeatureType.FogInspection],
+            roles: [ROLE_DEFINITIONS.PROFESSIONAL, ROLE_DEFINITIONS.PROFESSIONALS.FOG_INSPECTOR]
         }
     }
 ];

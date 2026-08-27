@@ -4,9 +4,7 @@ import { ProfesionalUserService } from "../../../shared/services/professionals/p
 import { ActivatedRoute } from "@angular/router";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { NgForm } from "@angular/forms";
-import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
-import { ToastService } from "../../../shared/services/toast.service";
-import { InputOption } from "../../../shared/components/input/input.component";
+import { ToastService, InputOption, ModalHelperService } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,

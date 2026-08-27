@@ -1,0 +1,183 @@
+<vp-section header="Backflow Test Information">
+    <form #testInfoForm="ngForm" dp-spinner-parent>
+        <dp-loading-spinner *ngIf="saving"></dp-loading-spinner>
+        <div class="row">
+            <div class="col-md-6">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Test Result:</dt>
+                    <dd class="col-sm-8">{{ getTestResultLabel() }}</dd>
+                    <dt class="col-sm-4">Reason for Test:</dt>
+                    <dd class="col-sm-8">
+                        {{ getReasonForTestLabel() }}
+                        <span *ngIf="test.reasonForTest === BackflowReasonForTest.Replacement && test.replacementAssembly">
+                            &nbsp;<strong>Old Model/Serial #:</strong> {{ test.replacementAssembly }}
+                        </span>
+                    </dd>
+                </dl>
+            </div>
+            <div class="col-md-6" *ngIf="test.jobNumber">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Job Number:</dt>
+                    <dd class="col-sm-8">{{ test.jobNumber }}</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="mt-2" *ngIf="test.deviceType !== BackflowDeviceType.AG">
+            <div class="row mb-1">
+                <div class="col-md-9 fw-bold">
+                    Is the assembly installed in accordance with manufacturer recommendations and/or local codes?
+                </div>
+                <div class="col-md-3">{{ test.properlyInstalled ? 'Yes' : 'No' }}</div>
+            </div>
+            <div class="row mb-1">
+                <div class="col-md-9 fw-bold">
+                    Is the assembly installed on a non-potable water supply (auxiliary)?
+                </div>
+                <div class="col-md-3">{{ test.nonPotable ? 'Yes' : 'No' }}</div>
+            </div>
+        </div>
+
+        <div class="row mt-3" *ngIf="test.deviceType !== BackflowDeviceType.AG">
+            <div class="col-md-5"><strong>Differential Pressure Gauge Used:</strong> {{ gaugeDescription }}</div>
+            <div class="col-md-3"><strong>Serial Number:</strong> {{ test.gaugeSerialNumber }}</div>
+            <div class="col-md-4">
+                <strong>Date Tested for Accuracy:</strong> {{ test.gaugeLastCalibrationDate | date:'dd.MM.yyyy' }}
+            </div>
+        </div>
+
+        <div class="table-responsive mt-3" *ngIf="test.deviceType !== BackflowDeviceType.AG">
+            <table class="table table-bordered table-sm text-center align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="border-0"></th>
+                        <th [attr.colspan]="visibleValveColumns.length">{{ getDeviceTypeLabel() }}</th>
+                    </tr>
+                    <tr *ngIf="showAssemblySubheader">
+                        <th class="border-0"></th>
+                        <th [attr.colspan]="mainColumnCount">Main Assembly</th>
+                        <th [attr.colspan]="bypassColumnCount">Bypass Assembly</th>
+                    </tr>
+                    <tr>
+                        <th class="border-0"></th>
+                        <th *ngFor="let col of visibleValveColumns">{{ col.header }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th class="text-start">
+                            <div class="fw-bold text-center mb-1">Initial Test</div>
+                            <div><strong>Date:</strong> {{ test.initialTestDate | date:'dd.MM.yyyy' }}</div>
+                            <div><strong>Time:</strong> {{ test.initialTestDate | date:'h:mm a' }}</div>
+                        </th>
+                        <td *ngFor="let col of visibleValveColumns" class="text-start">
+                            <div *ngIf="col.initialValue" class="mb-1">
+                                {{ col.initialVerb }} {{ field(col.initialValue) }} PSID
+                            </div>
+                            <div *ngFor="let c of col.initialChecks" class="mt-1">
+                                <div class="form-check form-check-inline mb-0">
+                                    <input type="checkbox" class="form-check-input readonly-checkbox"
+                                           [name]="'init_chk_' + col.index + '_' + c.field"
+                                           [(ngModel)]="$any(test)[c.field]"
+                                           [disabled]="!canModify" />
+                                    <label class="form-check-label">{{ c.label }}</label>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="text-start">Repairs and Materials Used **</th>
+                        <td *ngFor="let col of visibleValveColumns" class="text-start">{{ field(col.repairField) }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-start">Repair Details</th>
+                        <td *ngFor="let col of visibleValveColumns" class="text-start">{{ field(col.repairDetailsField) }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-start">
+                            <div class="fw-bold text-center mb-1">Test After Repairs</div>
+                            <div><strong>Date:</strong> {{ test.repairTestDate | date:'dd.MM.yyyy' }}</div>
+                            <div><strong>Time:</strong> {{ test.repairTestDate | date:'h:mm a' }}</div>
+                        </th>
+                        <td *ngFor="let col of visibleValveColumns" class="text-start">
+                            <div *ngIf="col.finalValue" class="mb-1">
+                                {{ col.finalVerb }} {{ field(col.finalValue) }} PSID
+                            </div>
+                            <div *ngFor="let c of col.finalChecks" class="mt-1">
+                                <div class="form-check form-check-inline mb-0">
+                                    <input type="checkbox" class="form-check-input readonly-checkbox"
+                                           [name]="'final_chk_' + col.index + '_' + c.field"
+                                           [(ngModel)]="$any(test)[c.field]"
+                                           [disabled]="!canModify" />
+                                    <label class="form-check-label">{{ c.label }}</label>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr *ngIf="showMeterTest">
+                        <th class="text-start">Bypass Meter Test ****</th>
+                        <td [attr.colspan]="visibleValveColumns.length" class="text-start">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-lg">Bypass Meter Number: {{ test.meterNumber }}</div>
+                                <div class="col-lg">Meter reading prior to test: {{ test.meterReadingBefore }}</div>
+                                <div class="col-lg">
+                                    <div class="form-check mb-0">
+                                        <input type="checkbox" class="form-check-input readonly-checkbox"
+                                               id="meterRegisters" name="meterRegisters"
+                                               [(ngModel)]="test.meterRegisters"
+                                               [disabled]="!canModify" />
+                                        <label class="form-check-label" for="meterRegisters">
+                                            Meter registers a flow?
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-lg">Meter reading upon completion: {{ test.meterReadingAfter }}</div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-responsive mt-3" *ngIf="test.deviceType === BackflowDeviceType.AG">
+            <table class="table table-bordered table-sm mb-0">
+                <tbody>
+                    <tr>
+                        <td class="text-center fw-bold" colspan="2">Air Gap Test Information</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Do you certify that the air gap between the potable water supply and the overflow rim
+                            of the containment vessel complies with the requirements of an approved air gap and has
+                            not been bypassed, or otherwise made ineffective?
+                        </td>
+                        <td class="text-nowrap">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input readonly-checkbox" id="airGapValid"
+                                       name="airGapValid" [(ngModel)]="test.airGapValid"
+                                       [disabled]="!canModify" />
+                                <label class="form-check-label" for="airGapValid">Yes</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><strong>Test Date:</strong> {{ test.testDate | date:'dd.MM.yyyy' }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            (An approved air gap shall be at least twice the diameter of the supply pipe measured
+                            vertically above the overflow rim of the receiving vessel, and in no case less than 1 inch.)
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-end mt-3" *ngIf="canModify">
+            <button type="button" class="btn btn-primary vp-section-button" [disabled]="saving"
+                    (click)="save.emit(testInfoForm)">
+                Update
+            </button>
+        </div>
+    </form>
+</vp-section>

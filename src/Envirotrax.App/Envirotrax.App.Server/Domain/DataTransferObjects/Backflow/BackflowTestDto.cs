@@ -196,6 +196,9 @@ public class BackflowTestDto : IDto
 
     public bool Ossf { get; set; }
 
+    public bool RainFreezeSensorInstalled { get; set; }
+    public bool RainFreezeSensorWorkingProperly { get; set; }
+
     // Initial test readings - main assembly
     [Precision(5, 2)]
     public decimal? InitCV1HeldPSID { get; set; }
@@ -241,7 +244,7 @@ public class BackflowTestDto : IDto
     [StringLength(100)]
     public string? RepairCV2Details { get; set; }
 
-    [StringLength(200)]
+    [StringLength(250)]
     public string? RepairRV { get; set; }
 
     [StringLength(100)]
@@ -303,15 +306,30 @@ public class BackflowTestDto : IDto
     [StringLength(100)]
     public string? RepairCV2Details2 { get; set; }
 
-    [StringLength(200)]
+    [StringLength(250)]
     public string? RepairRV2 { get; set; }
 
     [StringLength(100)]
     public string? RepairRVDetails2 { get; set; }
 
+    [StringLength(200)]
+    public string? RepairPvbAirInlet { get; set; }
+
+    [StringLength(200)]
+    public string? RepairPvbCV { get; set; }
+
+    [StringLength(100)]
+    public string? RepairPvbAirInletDetails { get; set; }
+
+    [StringLength(100)]
+    public string? RepairPvbCVDetails { get; set; }
+
     [Precision(5, 2)]
     public decimal? FinalCV1HeldPSID2 { get; set; }
     public bool FinalCV1ClosedTight2 { get; set; }
+
+    [Precision(5, 2)]
+    public decimal? FinalCV2HeldPSID2 { get; set; }
     public bool FinalCV2ClosedTight2 { get; set; }
 
     [Precision(5, 2)]
@@ -330,6 +348,8 @@ public class BackflowTestDto : IDto
     [StringLength(100)]
     public string? TransactionId { get; set; }
 
+    public DateTime? TransactionDate { get; set; }
+
     public decimal Amount { get; set; }
     public decimal AmountShare { get; set; }
 
@@ -340,8 +360,27 @@ public class BackflowTestDto : IDto
 
     public bool NeedsValidation { get; set; }
 
+    // Images
+    public string? AssemblyImagePath { get; set; }
+    public string? SerialNumberImagePath { get; set; }
+    public string? BypassAssemblyImagePath { get; set; }
+    public string? BypassSerialNumberImagePath { get; set; }
+    public string? AirGapImagePath { get; set; }
+
+    // Image download URLs (generated SAS URLs; not persisted)
+    public string? AssemblyImageUrl { get; set; }
+    public string? SerialNumberImageUrl { get; set; }
+    public string? BypassAssemblyImageUrl { get; set; }
+    public string? BypassSerialNumberImageUrl { get; set; }
+    public string? AirGapImageUrl { get; set; }
+
     // Audit
     public DateTime CreatedTime { get; set; }
     public DateTime? UpdatedTime { get; set; }
     public AppUserDto? UpdatedBy { get; set; }
+    public bool NeedsRenewalCheck { get; set; }
+    public bool RenewalRequired { get; set; }
+    public int BackflowScheduleMonth { get; set; }
+    public bool ForceRenewal { get; set; }
+    public int ForceRenewalYears { get; set; }
 }

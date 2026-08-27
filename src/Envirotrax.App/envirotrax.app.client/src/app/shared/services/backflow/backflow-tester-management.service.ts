@@ -33,4 +33,21 @@ export class BackflowTesterManagementService {
         const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${id}`);
         return await lastValueFrom(this._http.get<Professional>(url));
     }
+
+    public async search(bpatLicenseNumber: string | undefined, fireLicenseNumber: string | undefined, insurancePolicyNumber: string | undefined, pageInfo: PageInfo): Promise<PagedData<Professional>> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/testers/search');
+        let params = this._queryHelper.pageInfoToQueryString(pageInfo);
+
+        if (bpatLicenseNumber) {
+            params = params.append('bpatLicenseNumber', bpatLicenseNumber);
+        }
+        if (fireLicenseNumber) {
+            params = params.append('fireLicenseNumber', fireLicenseNumber);
+        }
+        if (insurancePolicyNumber) {
+            params = params.append('insurancePolicyNumber', insurancePolicyNumber);
+        }
+
+        return await lastValueFrom(this._http.get<PagedData<Professional>>(url, { params }));
+    }
 }

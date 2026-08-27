@@ -15,21 +15,21 @@
             <ul class="vp-tabs nav nav-pills settings-tabs d-inline-flex">
                 <li class="nav-item">
                     <a class="nav-link" [class.active]="selectedTab === 'main'" [routerLink]="['/csi', id, 'view']"
-                       (click)="selectedTab = 'main'">Csi Main Form</a>
+                       (click)="onTabChange('main')">Csi Main Form</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" [class.active]="selectedTab === 'assemblies'"
-                       [routerLink]="['/csi', id, 'view']" (click)="selectedTab = 'assemblies'">Assemblies At This
+                       [routerLink]="['/csi', id, 'view']" (click)="onTabChange('assemblies')">Assemblies At This
                         Location</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" [class.active]="selectedTab === 'additional'"
-                       [routerLink]="['/csi', id, 'view']" (click)="selectedTab = 'additional'">Additional
+                       [routerLink]="['/csi', id, 'view']" (click)="onTabChange('additional')">Additional
                         Information</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" [class.active]="selectedTab === 'images'" [routerLink]="['/csi', id, 'view']"
-                       (click)="selectedTab = 'images'">Images</a>
+                       (click)="onTabChange('images')">Images</a>
                 </li>
             </ul>
         </div>
@@ -165,10 +165,10 @@
                                     Commission regulations.
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance1 === true" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance1 === true" disabled />
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance1 === false" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance1 === false" disabled />
                                 </td>
                             </tr>
                             <tr>
@@ -180,10 +180,10 @@
                                     properly installed.
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance2 === true" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance2 === true" disabled />
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance2 === false" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance2 === false" disabled />
                                 </td>
                             </tr>
                             <tr>
@@ -193,10 +193,10 @@
                                     condensing, cooling or industrial processes back to the public water supply.
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance3 === true" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance3 === true" disabled />
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance3 === false" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance3 === false" disabled />
                                 </td>
                             </tr>
                             <tr>
@@ -207,10 +207,10 @@
                                     January 4, 2014.
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance4 === true" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance4 === true" disabled />
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance4 === false" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance4 === false" disabled />
                                 </td>
                             </tr>
                             <tr>
@@ -220,10 +220,10 @@
                                     written comment.
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance5 === true" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance5 === true" disabled />
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance5 === false" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance5 === false" disabled />
                                 </td>
                             </tr>
                             <tr>
@@ -232,10 +232,10 @@
                                     private water distribution facilities installed on or after July 1, 1988.
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance6 === true" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance6 === true" disabled />
                                 </td>
                                 <td class="text-center">
-                                    <input type="radio" [checked]="inspection.compliance6 === false" disabled />
+                                    <input class="form-check-input readonly-checkbox" type="radio" [checked]="inspection.compliance6 === false" disabled />
                                 </td>
                             </tr>
                         </table>
@@ -247,34 +247,28 @@
                         </tr>
                         <tr>
                             <td class="fw-bold">Service Lines:</td>
-                            <td><input type="checkbox" [checked]="inspection.materialServiceLineLead"
-                                       disabled />&nbsp;Lead</td>
-                            <td><input type="checkbox" [checked]="inspection.materialServiceLineCopper"
-                                       disabled />&nbsp;Copper</td>
-                            <td><input type="checkbox" [checked]="inspection.materialServiceLinePVC"
-                                       disabled />&nbsp;PVC</td>
-                            <td><input type="checkbox" [checked]="inspection.materialServiceLineOther"
-                                       disabled />&nbsp;Other</td>
+                            <td><label class="d-inline-flex align-items-center"><input class="form-check-input readonly-checkbox me-1" type="checkbox" [checked]="inspection.materialServiceLineLead" disabled />Lead</label></td>
+                            <td><label class="d-inline-flex align-items-center"><input class="form-check-input readonly-checkbox me-1" type="checkbox" [checked]="inspection.materialServiceLineCopper" disabled />Copper</label></td>
+                            <td><label class="d-inline-flex align-items-center"><input class="form-check-input readonly-checkbox me-1" type="checkbox" [checked]="inspection.materialServiceLinePVC" disabled />PVC</label></td>
+                            <td><label class="d-inline-flex align-items-center"><input class="form-check-input readonly-checkbox me-1" type="checkbox" [checked]="inspection.materialServiceLineOther" disabled />Other</label></td>
                         </tr>
                         <tr>
                             <td class="fw-bold">Solder:</td>
-                            <td><input type="checkbox" [checked]="inspection.materialSolderLead" disabled />&nbsp;Lead
-                            </td>
-                            <td><input type="checkbox" [checked]="inspection.materialSolderLeadFree"
-                                       disabled />&nbsp;Lead Free</td>
-                            <td><input type="checkbox" [checked]="inspection.materialSolderSolventWeld"
-                                       disabled />&nbsp;Solvent Weld</td>
-                            <td><input type="checkbox" [checked]="inspection.materialSolderOther" disabled />&nbsp;Other
-                            </td>
+                            <td><label class="d-inline-flex align-items-center"><input class="form-check-input readonly-checkbox me-1" type="checkbox" [checked]="inspection.materialSolderLead" disabled />Lead</label></td>
+                            <td><label class="d-inline-flex align-items-center"><input class="form-check-input readonly-checkbox me-1" type="checkbox" [checked]="inspection.materialSolderLeadFree" disabled />Lead Free</label></td>
+                            <td><label class="d-inline-flex align-items-center"><input class="form-check-input readonly-checkbox me-1" type="checkbox" [checked]="inspection.materialSolderSolventWeld" disabled />Solvent Weld</label></td>
+                            <td><label class="d-inline-flex align-items-center"><input class="form-check-input readonly-checkbox me-1" type="checkbox" [checked]="inspection.materialSolderOther" disabled />Other</label></td>
                         </tr>
                     </table>
                     <table class="table table-sm table-borderless">
                         <tr>
                             <td>
-                                <input type="checkbox" [checked]="true" disabled />
-                                I recognize that this document shall be retained by the aforementioned Public Water
-                                System for a minimum of ten years and that I am legally responsible for the validity of
-                                the information I have provided.
+                                <label class="d-inline-flex align-items-start">
+                                    <input class="form-check-input readonly-checkbox me-1 flex-shrink-0" type="checkbox" [checked]="true" disabled />
+                                    I recognize that this document shall be retained by the aforementioned Public Water
+                                    System for a minimum of ten years and that I am legally responsible for the validity of
+                                    the information I have provided.
+                                </label>
                             </td>
                         </tr>
                     </table>
@@ -293,6 +287,26 @@
                 A Customer Service Inspection Certificate should be on file for each connection in a public water system
                 to document compliance with 30 TAC §290.44(h)/290.46(j).
             </div>
+        </div>
+
+        <div *ngIf="selectedTab === 'images'" class="row mt-3">
+            <vp-section header="Inspection Images">
+                <dp-loading-spinner *ngIf="isLoadingImages"></dp-loading-spinner>
+                <div *ngIf="!isLoadingImages">
+                    <p *ngIf="images.length === 0" class="text-muted">No images for this inspection.</p>
+                    <div class="row">
+                        <div class="col-md-6 mb-3" *ngFor="let img of images">
+                            <div class="border rounded p-2">
+                                <div class="mb-2">
+                                    <span class="fw-semibold small">{{ img.description || '(no description)' }}</span>
+                                </div>
+                                <img [src]="img.url" alt="{{ img.description }}" class="img-fluid rounded"
+                                     style="max-height: 200px; width: 100%; object-fit: contain;" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </vp-section>
         </div>
 
         <div class="d-flex justify-content-center mt-3">

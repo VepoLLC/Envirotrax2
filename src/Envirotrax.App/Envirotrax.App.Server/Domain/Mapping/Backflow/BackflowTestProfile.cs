@@ -9,6 +9,11 @@ public class BackflowTestProfile : Profile
     public BackflowTestProfile()
     {
         CreateMap<BackflowTest, BackflowTestDto>()
+            .ForMember(dto => dto.AssemblyImageUrl, opt => opt.Ignore())
+            .ForMember(dto => dto.SerialNumberImageUrl, opt => opt.Ignore())
+            .ForMember(dto => dto.BypassAssemblyImageUrl, opt => opt.Ignore())
+            .ForMember(dto => dto.BypassSerialNumberImageUrl, opt => opt.Ignore())
+            .ForMember(dto => dto.AirGapImageUrl, opt => opt.Ignore())
             .AfterMap((model, dto) =>
             {
                 dto.WaterSupplier ??= new() { Id = model.WaterSupplierId };
@@ -72,5 +77,17 @@ public class BackflowTestProfile : Profile
             .ForMember(m => m.UpdatedBy, opt => opt.Ignore())
             .ForMember(m => m.CreatedBy, opt => opt.Ignore())
             .ForMember(m => m.DeletedBy, opt => opt.Ignore());
+
+        // Compliance Management row = base test DTO + the site's logs (stitched in the service).
+        CreateMap<BackflowTest, BackflowComplianceDto>()
+            .IncludeBase<BackflowTest, BackflowTestDto>()
+            .ForMember(dto => dto.Logs, opt => opt.Ignore());
+
+        CreateMap<BackflowTest, BackflowTestAdminDetailsDto>()
+            .IncludeBase<BackflowTest, BackflowTestDto>()
+            .ForMember(dto => dto.BpatJobTitle, opt => opt.MapFrom(model => model.Bpat != null ? model.Bpat.JobTitle : null))
+            .ForMember(dto => dto.ShowRainSensor, opt => opt.Ignore())
+            .ForMember(dto => dto.ShowOSSF, opt => opt.Ignore())
+            .ForMember(dto => dto.ShowPermitNumber, opt => opt.Ignore());
     }
 }

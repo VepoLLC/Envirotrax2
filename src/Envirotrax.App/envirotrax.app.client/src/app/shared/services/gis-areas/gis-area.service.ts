@@ -7,7 +7,7 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { DefaultGisMapView, GisArea } from "../../models/gis-areas/gis-area";
-import { InputOption } from "../../components/input/input.component";
+import { InputOption } from "@envirotrax/common-ui";
 
 @Injectable({
     providedIn: 'root'
@@ -22,6 +22,13 @@ export class GisAreaService {
     public getAllAreas(): Promise<GisArea[]> {
         const url = this._urlResolver.resolveUrl('/api/gis-areas/all');
         return lastValueFrom(this._http.get<GisArea[]>(url));
+    }
+
+    public getAllAreasForProfessional(waterSupplierId: number): Promise<GisArea[]> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/gis-areas/all');
+        return lastValueFrom(this._http.get<GisArea[]>(url, {
+            params: { waterSupplierId }
+        }));
     }
 
     public async getAllAsOptions(): Promise<InputOption[]> {
@@ -67,6 +74,13 @@ export class GisAreaService {
     public getDefaultView(): Promise<DefaultGisMapView> {
         const url = this._urlResolver.resolveUrl('/api/gis-areas/default-view');
         return lastValueFrom(this._http.get<DefaultGisMapView>(url));
+    }
+
+    public getDefaultViewForProfessional(waterSupplierId: number): Promise<DefaultGisMapView> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/gis-areas/default-view');
+        return lastValueFrom(this._http.get<DefaultGisMapView>(url, {
+            params: { waterSupplierId }
+        }));
     }
 
     public updateDefaultView(dto: DefaultGisMapView): Promise<DefaultGisMapView> {

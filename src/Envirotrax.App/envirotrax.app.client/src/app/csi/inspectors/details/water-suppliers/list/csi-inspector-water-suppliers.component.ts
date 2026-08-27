@@ -1,16 +1,12 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { ProfessionalWaterSupplier } from "../../../../../shared/models/professionals/professional-water-supplier";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
-import { TableColumn } from "../../../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { CsiInspectorWaterSuppliersService } from "../../../../../shared/services/csi/csi-inspector-water-suppliers.service";
-import { CheckboxCellComponent } from "../../../../../shared/components/data-components/table/table-cells/checkbox-cell.component";
-import { CurrencyCellComponent } from "../../../../../shared/components/data-components/table/table-cells/currency-cell.component";
 import { AuthService } from "../../../../../shared/services/auth/auth.service";
 import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
-import { ModalHelperService } from "../../../../../shared/services/helpers/modal-helper.service";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { EditCsiInspectorWaterSupplierComponent, EditWaterSupplierModalData } from "../edit/edit-csi-inspector-water-supplier.component";
+import { CheckboxCellComponent, ColumnType, CurrencyCellComponent, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'vp-csi-inspector-water-suppliers',

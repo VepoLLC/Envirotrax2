@@ -1,6 +1,7 @@
 using AutoMapper;
 using Envirotrax.App.Server.Data.Models.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 
@@ -12,6 +13,8 @@ public class CsiInspectionProfile : Profile
     {
         CreateMap<CsiInspection, CsiInspectionDto>()
             .ForMember(dto => dto.Site, opt => opt.Ignore())
+            .ForMember(dto => dto.Professional, opt => opt.Ignore())
+            .ForMember(dto => dto.InspectorUser, opt => opt.MapFrom(model => model.Inspector))
             .AfterMap((model, dto, context) =>
             {
                 dto.Site ??= new ReferencedSiteDto
@@ -20,6 +23,10 @@ public class CsiInspectionProfile : Profile
                     BusinessName = model.Site?.BusinessName,
                     AccountNumber = model.Site?.AccountNumber,
                 };
+
+                dto.Professional ??= new ReferencedProfessionalDto { Id = model.ProfessionalId };
+
+                dto.InspectorUser ??= new ReferencedProfessionalUserDto { Id = model.InspectorId };
 
                 dto.WaterSupplier ??= new ReferencedWaterSupplierDto { Id = model.WaterSupplierId };
 
@@ -34,6 +41,10 @@ public class CsiInspectionProfile : Profile
                 }
             })
             .ReverseMap()
+            .ForMember(m => m.Professional, opt => opt.Ignore())
+            .ForMember(m => m.ProfessionalId, opt => opt.Ignore())
+            .ForMember(m => m.Inspector, opt => opt.Ignore())
+            .ForMember(m => m.InspectorId, opt => opt.Ignore())
             .ForMember(m => m.Site, opt => opt.Ignore())
             .ForMember(m => m.SiteId, opt => opt.MapFrom(dto => dto.Site!.Id))
             .ForMember(m => m.PropertyState, opt => opt.Ignore())

@@ -258,6 +258,11 @@ namespace Envirotrax.Auth.Controllers
                 new Claim(OpenIddictConstants.Claims.Email, result.Principal.FindFirstValue(ClaimTypes.Email)!).SetDestinations(OpenIddictConstants.Destinations.AccessToken)
             };
 
+            if (result.Principal.HasClaim(ClaimTypes.Role))
+            {
+                claims.Add(new Claim(OpenIddictConstants.Claims.Role, result.Principal.FindFirstValue(ClaimTypes.Role)!).SetDestinations(OpenIddictConstants.Destinations.AccessToken));
+            }
+
             if (result.Principal.HasClaim(ClaimTypes.GivenName))
             {
                 claims.Add(new Claim(OpenIddictConstants.Claims.GivenName, result.Principal.FindFirstValue(ClaimTypes.GivenName)!).SetDestinations(OpenIddictConstants.Destinations.AccessToken));

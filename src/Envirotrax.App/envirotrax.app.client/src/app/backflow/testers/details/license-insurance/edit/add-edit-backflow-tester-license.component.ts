@@ -4,11 +4,10 @@ import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { ProfessionalUserLicense, ProfessionalType } from "../../../../../shared/models/professionals/licenses/professional-user-license";
 import { BackflowTesterLicensesService } from "../../../../../shared/services/backflow/backflow-tester-licenses.service";
 import { BackflowTesterUserService } from "../../../../../shared/services/backflow/backflow-tester-user.service";
-import { InputOption } from "../../../../../shared/components/input/input.component";
 import { ProfessionalLicenseType } from "../../../../../shared/models/professionals/licenses/professional-license-type";
 import { ProfessionalUser } from "../../../../../shared/models/professionals/professional-user";
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
-import { ToastService } from "../../../../../shared/services/toast.service";
+import { ToastService, InputOption } from '@envirotrax/common-ui';
 
 export interface BackflowLicenseModalData {
     testerId: number;

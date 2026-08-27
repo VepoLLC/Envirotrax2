@@ -1,0 +1,108 @@
+<div class="row mt-3" *ngIf="!showAirGapImages">
+    <vp-section header="Backflow Assembly Images">
+        <div dp-spinner-parent>
+            <dp-loading-spinner *ngIf="isSavingImages(assemblyImageSlots)"></dp-loading-spinner>
+            <div class="row gy-3">
+                <div class="col-lg-6" *ngFor="let slot of assemblyImageSlots">
+                    <ng-container *ngTemplateOutlet="imageCell; context: { slot: slot }"></ng-container>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end mt-3" *ngIf="canModify">
+                <button type="button" class="btn btn-primary vp-section-button"
+                        [disabled]="isSavingImages(assemblyImageSlots) || !hasStagedImages(assemblyImageSlots)"
+                        (click)="saveImages(assemblyImageSlots)">
+                    Update
+                </button>
+            </div>
+        </div>
+    </vp-section>
+</div>
+
+<div class="row mt-3" *ngIf="showBypassImages">
+    <vp-section header="Bypass Assembly Images">
+        <div dp-spinner-parent>
+            <dp-loading-spinner *ngIf="isSavingImages(bypassImageSlots)"></dp-loading-spinner>
+            <div class="row gy-3">
+                <div class="col-lg-6" *ngFor="let slot of bypassImageSlots">
+                    <ng-container *ngTemplateOutlet="imageCell; context: { slot: slot }"></ng-container>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end mt-3" *ngIf="canModify">
+                <button type="button" class="btn btn-primary vp-section-button"
+                        [disabled]="isSavingImages(bypassImageSlots) || !hasStagedImages(bypassImageSlots)"
+                        (click)="saveImages(bypassImageSlots)">
+                    Update
+                </button>
+            </div>
+        </div>
+    </vp-section>
+</div>
+
+<div class="row mt-3" *ngIf="showAirGapImages">
+    <vp-section header="Air Gap Image">
+        <div dp-spinner-parent>
+            <dp-loading-spinner *ngIf="isSavingImages(airGapImageSlots)"></dp-loading-spinner>
+            <div class="row gy-3">
+                <div class="col-lg-12" *ngFor="let slot of airGapImageSlots">
+                    <ng-container *ngTemplateOutlet="imageCell; context: { slot: slot }"></ng-container>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end mt-3" *ngIf="canModify">
+                <button type="button" class="btn btn-primary vp-section-button"
+                        [disabled]="isSavingImages(airGapImageSlots) || !hasStagedImages(airGapImageSlots)"
+                        (click)="saveImages(airGapImageSlots)">
+                    Update
+                </button>
+            </div>
+        </div>
+    </vp-section>
+</div>
+
+<ng-template #imageCell let-slot="slot">
+    <div class="image-cell border rounded p-3 h-100">
+        <div class="text-center fw-semibold mb-2">{{ slot.label }}</div>
+
+        <input #fileInput type="file" class="d-none"
+               accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
+               (change)="onImageInputChange($event, slot.type)" />
+
+        <div *ngIf="stagedImagePreviews[slot.type]" class="text-center mb-2">
+            <div class="d-flex justify-content-between align-items-center mb-2 px-3 py-2 border rounded bg-success-subtle">
+                <button type="button" class="btn btn-sm btn-primary" (click)="fileInput.click()">
+                    Choose File
+                </button>
+                <span class="fw-semibold small text-truncate">{{ stagedImageFiles[slot.type]?.name }}</span>
+                <button type="button" class="btn btn-sm btn-primary" (click)="removeStagedImage(slot.type)">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </div>
+            <img [src]="stagedImagePreviews[slot.type]" [alt]="slot.alt"
+                 class="rounded img-fluid" style="max-height: 350px;" />
+        </div>
+
+        <ng-container *ngIf="!stagedImagePreviews[slot.type] && imageUrl(slot)">
+            <div *ngIf="canModify" class="d-flex justify-content-center mb-2">
+                <button type="button" class="btn btn-sm btn-primary" (click)="fileInput.click()">
+                    Choose File
+                </button>
+            </div>
+            <div class="text-center mb-2">
+                <img [src]="imageUrl(slot)" [alt]="slot.alt"
+                     class="rounded img-fluid" style="max-height: 350px;" />
+            </div>
+        </ng-container>
+
+        <vp-file-upload *ngIf="!stagedImagePreviews[slot.type] && !imageUrl(slot) && canModify"
+            [name]="slot.type"
+            accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff"
+            label="Choose an image or drag and drop here"
+            [file]="null"
+            (fileChange)="onImageFileChange($event, slot.type)" />
+
+        <div *ngIf="!stagedImagePreviews[slot.type] && !imageUrl(slot) && !canModify"
+             class="d-flex align-items-center justify-content-center text-muted border rounded"
+             style="min-height: 200px;">
+            NO IMAGE AVAILABLE
+        </div>
+    </div>
+</ng-template>

@@ -1,0 +1,380 @@
+<div [hidden]="showResults">
+    <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+        <vp-filter-panel (filterChange)="onFilterChange($event)">
+            <vp-section header="General Search Criteria">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="waterSupplier.id"
+                                                   label="Water Supplier"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="waterSupplierOptions" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="id"
+                                                   label="Site ID"
+                                                   type="number"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="accountNumber"
+                                                   label="Account Number"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="active"
+                                                   label="Active"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="invalidMailingAddress"
+                                                   label="Invalid Mailing Address"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="outOfArea"
+                                                   label="Out of Area"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="isFeeExempt"
+                                                   label="Is Fee Exempt"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="needsCsiInspection"
+                                                   label="Needs CSI Inspection"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="csiRenewalDate"
+                                                   label="CSI Renewal Date"
+                                                   type="daterange"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="fogCompliancyStatus"
+                                                   label="FOG Compliancy Status"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="fogCompliancyStatusOptions" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="needsFogInspection"
+                                                   label="Needs FOG Inspection"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="fogInspectionExpirationDate"
+                                                   label="FOG Inspection Expiration"
+                                                   type="daterange"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="needsFogPermit"
+                                                   label="Needs FOG Permit"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+
+                        <vp-filter-panel-field fieldName="fogPermitExpirationDate"
+                                               label="FOG Permit Expiration"
+                                               type="daterange"
+                                               labelStyle="horizontal"
+                                               [form]="searchForm" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="facilityType"
+                                                   label="Facility Type"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="facilityTypes" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="greaseTrapType"
+                                                   label="Grease Trap"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="greaseTrapOptions" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="hasOnSiteSewageFacility"
+                                                   label="Has On-Site Sewage Facility"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="hasAuxWaterSupply"
+                                                   label="Has Auxiliary Water Supply"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="hasFireSystem"
+                                                   label="Has Fire System"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="fireSeparateWater"
+                                                   label="Fire System on Separate Water Supply"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="hasGritTrap"
+                                                   label="Has Sand & Grit Trap"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="hasIrrigation"
+                                                   label="Has Irrigation System"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="irrigationSeparateWater"
+                                                   label="Irrigation on Separate Water Supply"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="yesNoOptions" />
+                        </div>
+
+                        <vp-filter-panel-field fieldName="hasDomesticPremisesIsolation"
+                                               label="Has Domestic/Premises Isolation"
+                                               type="select"
+                                               labelStyle="horizontal"
+                                               [form]="searchForm"
+                                               [options]="yesNoOptions" />
+                    </div>
+                </div>
+            </vp-section>
+
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <vp-section header="Property Information">
+                        <div>
+                            <div class="mb-2">
+                                <vp-filter-panel-field fieldName="propertyType"
+                                                       label="Property Type"
+                                                       type="select"
+                                                       labelStyle="horizontal"
+                                                       [form]="searchForm"
+                                                       [options]="propertyTypes" />
+                            </div>
+
+                            <div class="mb-2">
+                                <vp-filter-panel-field fieldName="businessName"
+                                                       label="Business Name"
+                                                       labelStyle="horizontal"
+                                                       [form]="searchForm" />
+                            </div>
+
+                            <div class="mb-2">
+                                <vp-filter-panel-field fieldName="streetNumber"
+                                                       label="Street #"
+                                                       labelStyle="horizontal"
+                                                       [form]="searchForm" />
+                            </div>
+
+                            <div class="mb-2">
+                                <vp-filter-panel-field fieldName="streetName"
+                                                       label="Street name"
+                                                       labelStyle="horizontal"
+                                                       [form]="searchForm" />
+                            </div>
+
+                            <div class="mb-2">
+                                <vp-filter-panel-field fieldName="propertyNumber"
+                                                       label="Suite/Apt #"
+                                                       labelStyle="horizontal"
+                                                       [form]="searchForm" />
+                            </div>
+                        </div>
+                    </vp-section>
+                </div>
+
+                <div class="col-md-6 mt-3 mt-md-0">
+                    <vp-section header="Mailing Information">
+                        <div>
+                            <div class="mb-2">
+                                <vp-filter-panel-field fieldName="mailingCompanyName"
+                                                       label="Company Name"
+                                                       labelStyle="horizontal"
+                                                       [form]="searchForm" />
+                            </div>
+
+                            <div class="mb-2">
+                                <vp-filter-panel-field fieldName="mailingContactName"
+                                                       label="Contact Name"
+                                                       labelStyle="horizontal"
+                                                       [form]="searchForm" />
+                            </div>
+
+                            <div class="mb-2">
+                                <vp-filter-panel-field fieldName="mailingStreetNumber"
+                                                       label="Street #"
+                                                       labelStyle="horizontal"
+                                                       [form]="searchForm" />
+                            </div>
+
+                            <div class="mb-2">
+                                <vp-filter-panel-field fieldName="mailingStreetName"
+                                                       label="Street Name"
+                                                       labelStyle="horizontal"
+                                                       [form]="searchForm" />
+                            </div>
+
+                            <div class=" mb-2">
+                                <vp-filter-panel-field fieldName="mailingNumber"
+                                                       label="#"
+                                                       labelStyle="horizontal"
+                                                       [form]="searchForm" />
+                            </div>
+                        </div>
+                    </vp-section>
+                </div>
+            </div>
+        </vp-filter-panel>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="searchForm" />
+
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>
+                    Search
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<dp-loading-spinner [hidden]="!table.isLoading"></dp-loading-spinner>
+
+<div [hidden]="!showResults">
+    <div class="d-flex justify-content-end mb-3">
+        <button type="button" class="btn btn-primary vp-section-button" (click)="showResults = false">
+            <i class="fa-solid fa-magnifying-glass me-1"></i>
+            Search Again
+        </button>
+    </div>
+
+    <vp-section header="Search Results ({{ table.items?.pageInfo?.totalItems }})">
+        <!-- Status legend (V1 Vepo parity): Active / Out of Area / Is Fee Exempt. -->
+        <div class="row gap-2 justify-content-center mb-3">
+            <div class="col-auto">
+                <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Active" />
+            </div>
+            <div class="col-auto">
+                <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Out of Area" />
+            </div>
+            <div class="col-auto">
+                <vp-status-icon imageSrc="/images/icons/bstatus-blue-on.png" text="Is Fee Exempt" />
+            </div>
+        </div>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [canSelect]="true"
+                  (select)="openSite($event)"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getSites()"
+                  [(query)]="table.query"
+                  (queryChange)="getSites()"
+                  (queryReset)="getSites()" />
+    </vp-section>
+</div>
+
+<ng-template #statusCell let-rowData="rowData">
+    <!-- V1 (Vepo) Property Search status squares: always shown, filled (on) when true, outline (off) when false. -->
+    <div class="d-flex gap-1">
+        <vp-status-icon [imageSrc]="rowData?.active ? '/images/icons/bstatus-green-on.png' : '/images/icons/bstatus-green-off.png'"
+                        [text]="rowData?.active ? 'Active' : 'Inactive'"
+                        [showText]="false" />
+        <vp-status-icon [imageSrc]="rowData?.outOfArea ? '/images/icons/bstatus-red-on.png' : '/images/icons/bstatus-red-off.png'"
+                        [text]="rowData?.outOfArea ? 'Out of Area' : 'In Area'"
+                        [showText]="false" />
+        <vp-status-icon [imageSrc]="rowData?.isFeeExempt ? '/images/icons/bstatus-blue-on.png' : '/images/icons/bstatus-blue-off.png'"
+                        [text]="rowData?.isFeeExempt ? 'Is Fee Exempt' : 'Not Fee Exempt'"
+                        [showText]="false" />
+    </div>
+</ng-template>
+
+<ng-template #propertyTypeCell let-rowData="rowData">
+    <!-- Property-type icon (V1 Vepo / App parity): house = Residential, building = Commercial. -->
+    <i *ngIf="rowData?.propertyType === propertyType.Residential"
+       class="fa-solid fa-house text-primary"
+       title="Residential"
+       aria-label="Residential"></i>
+    <i *ngIf="rowData?.propertyType === propertyType.Commercial"
+       class="fa-solid fa-building text-danger"
+       title="Commercial"
+       aria-label="Commercial"></i>
+</ng-template>

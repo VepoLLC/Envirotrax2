@@ -1,0 +1,13 @@
+<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+<p class="text-muted text-center" *ngIf="!isLoading && logs.length === 0">
+    No log entries for this inspection.
+</p>
+
+<vp-table *ngIf="logs.length > 0"
+          [columns]="columns"
+          [data]="logs" />
+
+<ng-template #descriptionCell let-rowData="rowData">
+    <div style="white-space: pre-wrap;">{{ rowData?.description }}</div>
+</ng-template>

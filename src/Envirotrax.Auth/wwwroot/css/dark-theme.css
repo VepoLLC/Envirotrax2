@@ -1,0 +1,285 @@
+/* ============================================================
+   Envirotrax Auth Dark Theme
+   Applied when body has the .vp-dark-theme class.
+   Palette:
+     Background  #1a1a2e
+     Surface     #252540
+     Surface-alt #2d2d50
+     Border      #4b4b67
+     Text        #e0e0e0
+     Text-muted  #a0a8b8
+   ============================================================ */
+
+/* Body */
+
+body.vp-dark-theme {
+    background-color: #1a1a2e !important;
+    color: #e0e0e0;
+}
+
+body.vp-dark-theme h1,
+body.vp-dark-theme h2,
+body.vp-dark-theme h3 {
+    color: #e0e0e0;
+}
+
+body.vp-dark-theme .bg-light,
+body.vp-dark-theme .bg-body,
+body.vp-dark-theme .bg-white {
+    background-color: #252540 !important;
+    color: #e0e0e0;
+}
+
+body.vp-dark-theme .text-dark,
+body.vp-dark-theme .text-body {
+    color: #e0e0e0 !important;
+}
+
+body.vp-dark-theme .text-muted {
+    color: #a0a8b8 !important;
+}
+
+body.vp-dark-theme a {
+    color: #3db8f5;
+}
+
+body.vp-dark-theme a:hover {
+    color: #7dd4fc;
+}
+
+body.vp-dark-theme .border,
+body.vp-dark-theme .border-top,
+body.vp-dark-theme .border-bottom,
+body.vp-dark-theme .border-start,
+body.vp-dark-theme .border-end {
+    border-color: #4b4b67 !important;
+}
+
+body.vp-dark-theme hr {
+    border-color: #4b4b67;
+}
+
+/* Cards */
+
+body.vp-dark-theme .card {
+    background-color: #252540;
+    border-color: #4b4b67;
+    color: #e0e0e0;
+}
+
+body.vp-dark-theme .card-header {
+    background-color: #2d2d50;
+    border-bottom-color: #4b4b67;
+    color: #e0e0e0;
+}
+
+body.vp-dark-theme .card-footer {
+    background-color: #2d2d50;
+    border-top-color: #4b4b67;
+    color: #e0e0e0;
+}
+
+body.vp-dark-theme .card-body {
+    color: #e0e0e0;
+}
+
+/* Form controls */
+
+body.vp-dark-theme .form-control,
+body.vp-dark-theme .form-control:focus,
+body.vp-dark-theme .form-select,
+body.vp-dark-theme .form-select:focus {
+    background-color: #252540;
+    border-color: #4b4b67;
+    color: #e0e0e0;
+}
+
+body.vp-dark-theme .form-control::placeholder,
+body.vp-dark-theme .form-select::placeholder {
+    color: #a0a8b8;
+}
+
+body.vp-dark-theme .form-control:disabled,
+body.vp-dark-theme .form-control[readonly],
+body.vp-dark-theme .form-select:disabled {
+    background-color: #1e1e38;
+    color: #a0a8b8;
+}
+
+body.vp-dark-theme .input-group-text {
+    background-color: #2d2d50;
+    border-color: #4b4b67;
+    color: #e0e0e0;
+}
+
+body.vp-dark-theme .form-check-input {
+    background-color: #252540;
+    border-color: #4b4b67;
+}
+
+body.vp-dark-theme label,
+body.vp-dark-theme .form-label {
+    color: #e0e0e0;
+}
+
+/* Webkit autofill */
+
+body.vp-dark-theme input:-webkit-autofill,
+body.vp-dark-theme input:-webkit-autofill:hover,
+body.vp-dark-theme input:-webkit-autofill:focus,
+body.vp-dark-theme input:-webkit-autofill:active {
+    -webkit-text-fill-color: #e0e0e0 !important;
+    -webkit-box-shadow: 0 0 0 1000px #252540 inset !important;
+    background-clip: content-box !important;
+}
+
+/* Validation messages */
+
+body.vp-dark-theme .text-danger {
+    color: #f87171 !important;
+}
+
+body.vp-dark-theme .validation-summary-errors ul {
+    color: #f87171;
+}
+
+/* Buttons */
+
+body.vp-dark-theme .btn-secondary {
+    background-color: #2d2d50;
+    border-color: #4b4b67;
+    color: #e0e0e0;
+}
+
+body.vp-dark-theme .btn-secondary:hover {
+    background-color: #4b4b67;
+    color: #e0e0e0;
+}
+
+body.vp-dark-theme .btn-outline-secondary {
+    border-color: #4b4b67;
+    color: #a0a8b8;
+}
+
+body.vp-dark-theme .btn-outline-secondary:hover {
+    background-color: #2d2d50;
+    color: #e0e0e0;
+}
+
+/* Footer card (Vepo contact card — keep readable on dark footer) */
+
+body.vp-dark-theme .footer-card {
+    background-color: #252540 !important;
+    color: #e0e0e0 !important;
+    border-color: #3a8fd4;
+}
+
+body.vp-dark-theme .footer-card a {
+    color: #3db8f5;
+}
+
+body.vp-dark-theme .footer-card p {
+    color: #e0e0e0;
+}
+
+/* Bootstrap list utilities */
+
+body.vp-dark-theme .list-group-item {
+    background-color: #252540;
+    border-color: #4b4b67;
+    color: #e0e0e0;
+}
+
+body.vp-dark-theme .list-group-item:hover {
+    background-color: #2d2d50;
+}
+
+/* Section headers (card-header with bg-info) */
+
+body.vp-dark-theme .bg-info {
+    background-color: #066d7f !important;
+}
+
+body.vp-dark-theme .border-info {
+    border-color: #066d7f !important;
+}
+
+/* Primary buttons and bg-primary */
+
+body.vp-dark-theme .bg-primary {
+    background-color: #008fd485 !important;
+}
+
+body.vp-dark-theme .btn-primary,
+body.vp-dark-theme button.btn-primary {
+    background-color: #008fd485 !important;
+    border-color: #008fd485 !important;
+}
+
+body.vp-dark-theme .btn-primary:hover,
+body.vp-dark-theme button.btn-primary:hover {
+    background-color: #007ab8c0 !important;
+    border-color: #007ab8c0 !important;
+}
+
+/* Eye icon toggle button in password input group */
+
+body.vp-dark-theme .input-group .btn {
+    background-color: #008fd485 !important;
+    border-color: #008fd485 !important;
+}
+
+body.vp-dark-theme .input-group .btn:hover {
+    background-color: #007ab8c0 !important;
+    border-color: #007ab8c0 !important;
+}
+
+/* Tabs */
+
+body.vp-dark-theme .vp-tabs .nav-link {
+    background-color: rgba(0, 143, 212, 0.35);
+    border-color: #3a3a5c;
+    color: #e0e0e0;
+}
+
+body.vp-dark-theme .vp-tabs .nav-link:hover {
+    color: #fff;
+}
+
+body.vp-dark-theme .vp-tabs .nav-link.active {
+    background-color: #1a5a8a !important;
+    border-color: #1a5a8a !important;
+    color: #fff !important;
+}
+
+/* link-button (Create Account) — fix border and text color bleeding from <a> override */
+
+body.vp-dark-theme a.link-button {
+    color: #fff !important;
+    background-color: #008fd485 !important;
+    border-color: #008fd485 !important;
+}
+
+body.vp-dark-theme a.link-button:hover {
+    color: #fff !important;
+    background-color: #007ab8c0 !important;
+    border-color: #007ab8c0 !important;
+}
+
+/* Destructive actions stay red — the a.link-button and .btn-primary rules above would otherwise turn them blue */
+
+body.vp-dark-theme a.link-button.red,
+body.vp-dark-theme button.red,
+body.vp-dark-theme button[type=submit].red {
+    color: #fff !important;
+    background-color: #a01515 !important;
+    border-color: #a01515 !important;
+}
+
+body.vp-dark-theme a.link-button.red:hover,
+body.vp-dark-theme button.red:hover,
+body.vp-dark-theme button[type=submit].red:hover {
+    color: #fff !important;
+    background-color: #c01a1a !important;
+    border-color: #c01a1a !important;
+}

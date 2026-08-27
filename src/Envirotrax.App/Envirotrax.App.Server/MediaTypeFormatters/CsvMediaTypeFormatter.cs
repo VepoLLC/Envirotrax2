@@ -14,6 +14,7 @@ namespace Envirotrax.App.Server.MediaTypeFormatters
     {
         private const string FileNameHeader = "Vp-File-Name";
         private const string ColumnsHeader = "Vp-Columns";
+        private const string DelimiterHeader = "Vp-Delimiter";
 
         private static readonly char[] _invalidFileNameChars = Path.GetInvalidFileNameChars();
 
@@ -41,17 +42,18 @@ namespace Envirotrax.App.Server.MediaTypeFormatters
             throw new InvalidOperationException("The object type cannot be converted to CSV");
         }
 
-        private async Task WriteBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding, string csvData)
+        private async Task WriteBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding, string csvData, string delimiter)
         {
             var downloadFileNmaeHeader = context.HttpContext.Request.Headers[FileNameHeader];
 
             if (!string.IsNullOrEmpty(downloadFileNmaeHeader))
             {
                 var cleanFileName = new string(downloadFileNmaeHeader.ToString().Select(ch => _invalidFileNameChars.Contains(ch) ? '_' : ch).ToArray());
+                var extension = delimiter == "," ? ".csv" : ".txt";
 
                 var contentDispositionValue = new ContentDisposition
                 {
-                    FileName = Path.ChangeExtension(cleanFileName, ".csv")
+                    FileName = Path.ChangeExtension(cleanFileName, extension)
                 };
 
                 context.HttpContext.Response.ContentType = "application/octet-stream";
@@ -83,6 +85,23 @@ namespace Envirotrax.App.Server.MediaTypeFormatters
             return list;
         }
 
+        private string GetDelimiter(OutputFormatterWriteContext context)
+        {
+            var delimiter = context.HttpContext.Request.Headers[DelimiterHeader];
+
+            if (string.IsNullOrEmpty(delimiter))
+            {
+                return ",";
+            }
+
+            if (delimiter == "tab")
+            {
+                return "\t";
+            }
+
+            return delimiter!;
+        }
+
         public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
         {
             if (context.Object != null)
@@ -91,9 +110,14 @@ namespace Envirotrax.App.Server.MediaTypeFormatters
                 var selectedColumns = GetSelectedColumns(context.HttpContext.Request.Headers);
 
                 var csvHelper = context.HttpContext.RequestServices.GetRequiredService<ICsvHelperService>();
-                var csvData = await csvHelper.WriteAsStringAsync(enumerableObject, selectedColumns);
+                var delimiter = GetDelimiter(context);
 
-                await WriteBodyAsync(context, selectedEncoding, csvData);
+                var csvData = await csvHelper.WriteAsStringAsync(enumerableObject, selectedColumns, new()
+                {
+                    Delimiter = delimiter
+                });
+
+                await WriteBodyAsync(context, selectedEncoding, csvData, delimiter);
             }
         }
 

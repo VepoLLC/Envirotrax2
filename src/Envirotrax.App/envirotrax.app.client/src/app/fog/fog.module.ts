@@ -7,9 +7,29 @@ import { FogRoutingModule } from "./fog-routing.module";
 import { FogInspectorListComponent } from "./inspectors/list/fog-inspector-list.component";
 import { FogInspectorDetailsComponent } from "./inspectors/details/fog-inspector-details.component";
 import { FogInspectorWaterSuppliersComponent } from "./inspectors/details/water-suppliers/list/fog-inspector-water-suppliers.component";
+import { EditFogInspectorWaterSupplierComponent } from "./inspectors/details/water-suppliers/edit/edit-fog-inspector-water-supplier.component";
 import { FogInspectorUsersComponent } from "./inspectors/details/users/list/fog-inspector-users.component";
+import { EditFogInspectorUserComponent } from "./inspectors/details/users/edit/edit-fog-inspector-user.component";
 import { FogInspectorLicenseInsuranceComponent } from "./inspectors/details/license-insurance/list/fog-inspector-license-insurance.component";
+import { EditFogInspectorLicenseComponent } from "./inspectors/details/license-insurance/edit/edit-fog-inspector-license.component";
+import { EditFogInspectorInsuranceComponent } from "./inspectors/details/license-insurance/edit/edit-fog-inspector-insurance.component";
 import { FogInspectionListComponent } from "./inspections/list/fog-inspection-list.component";
+import { FogInspectionViewComponent } from "./inspections/view/fog-inspection-view.component";
+import { FogTripTicketListComponent } from "./trip-tickets/list/fog-trip-ticket-list.component";
+import { FogTripTicketViewComponent } from "./trip-tickets/view/fog-trip-ticket-view.component";
+import { FogTransporterListComponent } from "./transporters/list/fog-transporter-list.component";
+import { FogTransporterDetailsComponent } from "./transporters/details/fog-transporter-details.component";
+import { FogTransporterWaterSuppliersComponent } from "./transporters/details/water-suppliers/list/fog-transporter-water-suppliers.component";
+import { EditFogTransporterWaterSupplierComponent } from "./transporters/details/water-suppliers/edit/edit-fog-transporter-water-supplier.component";
+import { FogTransporterUsersComponent } from "./transporters/details/users/list/fog-transporter-users.component";
+import { EditFogTransporterUserComponent } from "./transporters/details/users/edit/edit-fog-transporter-user.component";
+import { FogTransporterLicenseInsuranceComponent } from "./transporters/details/license-insurance/list/fog-transporter-license-insurance.component";
+import { EditFogTransporterLicenseComponent } from "./transporters/details/license-insurance/edit/edit-fog-transporter-license.component";
+import { EditFogTransporterInsuranceComponent } from "./transporters/details/license-insurance/edit/edit-fog-transporter-insurance.component";
+import { FogTransporterVehiclesComponent } from "./transporters/details/vehicles/list/fog-transporter-vehicles.component";
+import { EditFogTransporterVehicleComponent } from "./transporters/details/vehicles/edit/edit-fog-transporter-vehicle.component";
+import { FogVehiclePermitListComponent } from "./transporters/vehicles/list/fog-vehicle-permit-list.component";
+import { EditFogVehiclePermitComponent } from "./transporters/vehicles/edit/edit-fog-vehicle-permit.component";
 import { ProfessionalModule } from "../professionals/professional.module";
 
 @NgModule({
@@ -17,9 +37,29 @@ import { ProfessionalModule } from "../professionals/professional.module";
         FogInspectorListComponent,
         FogInspectorDetailsComponent,
         FogInspectorWaterSuppliersComponent,
+        EditFogInspectorWaterSupplierComponent,
         FogInspectorUsersComponent,
+        EditFogInspectorUserComponent,
         FogInspectorLicenseInsuranceComponent,
-        FogInspectionListComponent
+        EditFogInspectorLicenseComponent,
+        EditFogInspectorInsuranceComponent,
+        FogInspectionListComponent,
+        FogInspectionViewComponent,
+        FogTripTicketListComponent,
+        FogTripTicketViewComponent,
+        FogTransporterListComponent,
+        FogTransporterDetailsComponent,
+        FogTransporterWaterSuppliersComponent,
+        EditFogTransporterWaterSupplierComponent,
+        FogTransporterUsersComponent,
+        EditFogTransporterUserComponent,
+        FogTransporterLicenseInsuranceComponent,
+        EditFogTransporterLicenseComponent,
+        EditFogTransporterInsuranceComponent,
+        FogTransporterVehiclesComponent,
+        EditFogTransporterVehicleComponent,
+        FogVehiclePermitListComponent,
+        EditFogVehiclePermitComponent
     ],
     imports: [
         CommonModule,

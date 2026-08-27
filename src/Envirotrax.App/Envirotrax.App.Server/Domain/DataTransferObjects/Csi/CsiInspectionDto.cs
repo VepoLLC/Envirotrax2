@@ -21,6 +21,8 @@ public class CsiInspectionDto : IDto
     [Required]
     public ReferencedProfessionalUserDto? InspectorUser { get; set; }
 
+    public ReferencedProfessionalDto? Professional { get; set; }
+
     public DateTime? InspectionDate { get; set; }
 
     [StringLength(50)]

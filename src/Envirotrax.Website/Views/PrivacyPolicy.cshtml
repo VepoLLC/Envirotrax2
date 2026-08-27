@@ -1,0 +1,23 @@
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.PrivacyPolicy>
+@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
+@{
+	Layout = "master.cshtml";
+
+	ViewData["Title"] = Model.PageTitle;
+	ViewData["Description"] = Model.PageDescription;
+}
+
+<section class="py-5">
+	<div class="container">
+
+		<div class="text-center mb-4">
+			<h1 class="fw-bold">@Model.PageTitle</h1>
+		</div>
+
+		<div class="info-box privacy-policy p-4 p-lg-5">
+			@Model.Body
+		</div>
+
+	</div>
+</section>

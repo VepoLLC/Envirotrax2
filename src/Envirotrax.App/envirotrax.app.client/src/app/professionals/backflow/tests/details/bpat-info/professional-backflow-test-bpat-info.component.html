@@ -1,0 +1,29 @@
+<vp-section header="BPAT Information">
+    <div class="row">
+        <div class="col-md-6">
+            <dl class="row mb-0">
+                <dt class="col-sm-5">Company name:</dt>
+                <dd class="col-sm-7">{{ test.bpatCompanyName }}</dd>
+                <dt class="col-sm-5">BPAT name:</dt>
+                <dd class="col-sm-7">{{ test.bpatContactName }}</dd>
+                <dt class="col-sm-5">Address:</dt>
+                <dd class="col-sm-7">
+                    <div>{{ test.bpatAddress }}</div>
+                    <div *ngIf="test.bpatCity || test.bpatState?.name || test.bpatZip">
+                        {{ test.bpatCity }}<span *ngIf="test.bpatCity && (test.bpatState?.name || test.bpatZip)">, </span>{{ test.bpatState?.name }} {{ test.bpatZip }}
+                    </div>
+                </dd>
+            </dl>
+        </div>
+        <div class="col-md-6">
+            <dl class="row mb-0">
+                <dt class="col-sm-5">Phone number:</dt>
+                <dd class="col-sm-7">{{ test.bpatCellNumber }}</dd>
+                <dt class="col-sm-5">License number:</dt>
+                <dd class="col-sm-7">{{ test.bpatLicenseNumber }}</dd>
+                <dt class="col-sm-5">License exp date:</dt>
+                <dd class="col-sm-7">{{ test.bpatLicenseExpiration | date:'dd.MM.yyyy' }}</dd>
+            </dl>
+        </div>
+    </div>
+</vp-section>

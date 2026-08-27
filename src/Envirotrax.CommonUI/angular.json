@@ -1,0 +1,37 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "packageManager": "npm",
+    "analytics": false
+  },
+  "newProjectRoot": "projects",
+  "projects": {
+    "@envirotrax/common-ui": {
+      "projectType": "library",
+      "root": "projects/envirotrax/common-ui",
+      "sourceRoot": "projects/envirotrax/common-ui/src",
+      "prefix": "vp",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/envirotrax/common-ui/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/envirotrax/common-ui/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/envirotrax/common-ui/tsconfig.spec.json"
+          }
+        }
+      }
+    }
+  }
+}

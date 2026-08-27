@@ -28,6 +28,37 @@ public class SiteProfile : Profile
             .ForMember(s => s.MailingState, opt => opt.Ignore())
             .ForMember(s => s.MailingStateId, opt => opt.MapFrom(dto => dto.MailingState != null ? dto.MailingState.Id : (int?)null));
 
-        CreateMap<Site, ReferencedSiteDto>().ReverseMap();
+        CreateMap<Site, CsiComplianceSiteDto>()
+            .IncludeBase<Site, SiteDto>()
+            .ForMember(dto => dto.Logs, opt => opt.Ignore())
+            .ForMember(dto => dto.DaysOverdue, opt => opt.Ignore())
+            .ForMember(dto => dto.OverdueSeverity, opt => opt.Ignore());
+
+        CreateMap<Site, FogComplianceSiteDto>()
+            .IncludeBase<Site, SiteDto>()
+            .ForMember(dto => dto.Logs, opt => opt.Ignore())
+            .ForMember(dto => dto.DaysOverdue, opt => opt.Ignore())
+            .ForMember(dto => dto.OverdueSeverity, opt => opt.Ignore());
+
+        CreateMap<Site, FogTripTicketComplianceSiteDto>()
+            .IncludeBase<Site, SiteDto>()
+            .ForMember(dto => dto.Logs, opt => opt.Ignore())
+            .ForMember(dto => dto.DaysOverdue, opt => opt.Ignore())
+            .ForMember(dto => dto.OverdueSeverity, opt => opt.Ignore())
+            .ForMember(dto => dto.DueDate, opt => opt.Ignore());
+
+        CreateMap<Site, FogPermitComplianceSiteDto>()
+            .IncludeBase<Site, SiteDto>()
+            .ForMember(dto => dto.Logs, opt => opt.Ignore())
+            .ForMember(dto => dto.DaysOverdue, opt => opt.Ignore())
+            .ForMember(dto => dto.OverdueSeverity, opt => opt.Ignore());
+
+        CreateMap<Site, ReferencedSiteDto>()
+            .AfterMap((model, dto) =>
+            {
+                dto.State ??= model.StateId.HasValue ? new ReferencedStateDto { Id = model.StateId } : null;
+                dto.MailingState ??= model.MailingStateId.HasValue ? new ReferencedStateDto { Id = model.MailingStateId } : null;
+            })
+            .ReverseMap();
     }
 }

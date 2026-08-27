@@ -4,10 +4,18 @@ import { Site } from '../sites/site';
 import { State } from '../lookup/state';
 import { WaterSupplierUser } from '../users/water-supplier-user';
 import { BackflowReasonForTest, BackflowTestResult } from './backflow-test-enums';
+import { ReferencedWaterSupplier } from '../csi/csi-inspection';
+
+export interface BackflowExpiryCounts {
+    expired: number;
+    thisMonth: number;
+    nextMonth: number;
+    twoMonths: number;
+}
 
 export interface BackflowTest {
     id: number;
-    waterSupplier?: { id?: number } | null;
+    waterSupplier?: ReferencedWaterSupplier | null;
     site?: Site | null;
     createdTime?: string;
     updatedTime?: string;
@@ -19,7 +27,12 @@ export interface BackflowTest {
     bpatLicenseExpiration?: string;
     bpatCompanyName?: string;
     bpatContactName?: string;
+    bpatAddress?: string;
+    bpatCity?: string;
+    bpatZip?: string;
     bpatState?: State | null;
+    bpatWorkNumber?: string;
+    bpatCellNumber?: string;
     accountNumber?: string;
     propertyBusinessName?: string;
     propertyType?: number;
@@ -75,6 +88,8 @@ export interface BackflowTest {
     meterReadingAfter?: number;
     permitNumber?: string;
     ossf?: boolean;
+    rainFreezeSensorInstalled?: boolean;
+    rainFreezeSensorWorkingProperly?: boolean;
     comments?: string;
     isCurrent?: boolean;
     disapproved?: boolean;
@@ -88,7 +103,21 @@ export interface BackflowTest {
     rejectedBy?: WaterSupplierUser | null;
     rejectedDate?: string;
     rejectedReason?: string;
+    renewalRequired?: boolean;
+    backflowScheduleMonth?: number;
+    forceRenewal?: boolean;
+    forceRenewalYears?: number;
     needsValidation?: boolean;
+    assemblyImagePath?: string;
+    serialNumberImagePath?: string;
+    bypassAssemblyImagePath?: string;
+    bypassSerialNumberImagePath?: string;
+    airGapImagePath?: string;
+    assemblyImageUrl?: string;
+    serialNumberImageUrl?: string;
+    bypassAssemblyImageUrl?: string;
+    bypassSerialNumberImageUrl?: string;
+    airGapImageUrl?: string;
 
     // Initial test readings - main assembly
     initCV1HeldPSID?: number;
@@ -146,8 +175,14 @@ export interface BackflowTest {
     repairCV2Details2?: string;
     repairRV2?: string;
     repairRVDetails2?: string;
+    repairPvbAirInlet?:string; 
+    repairPvbCV?:string; 
+    repairPvbAirInletDetails?:string; 
+    repairPvbCVDetails?:string; 
+
     finalCV1HeldPSID2?: number;
     finalCV1ClosedTight2?: boolean;
+    finalCV2HeldPSID2?: number; 
     finalCV2ClosedTight2?: boolean;
     finalRVOpenedPSID2?: number;
 }

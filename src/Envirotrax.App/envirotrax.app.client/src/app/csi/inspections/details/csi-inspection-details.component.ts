@@ -1,11 +1,12 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { CsiInspection } from "../../../shared/models/csi/csi-inspection";
+import { CsiInspectionImage } from "../../../shared/models/csi/csi-inspection-image";
 import { CsiInspectionService } from "../../../shared/services/csi/csi-inspection.service";
-import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { DisapproveCsiInspectionComponent } from "./disapprove/disapprove-csi-inspection.component";
 import { DownloadService } from "../../../shared/services/download.service";
+import { ModalHelperService } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'app-csi-inspection-details',
@@ -17,6 +18,10 @@ export class CsiInspectionDetailsComponent implements OnInit {
     public inspection: CsiInspection | null = null;
     public isLoading: boolean = false;
     public selectedTab: string = 'main';
+    public images: CsiInspectionImage[] = [];
+    public isLoadingImages: boolean = false;
+
+    private imagesLoaded = false;
 
     private readonly _reasonForInspectionLabels: Record<number, string> = {
         0: 'New construction',
@@ -47,12 +52,30 @@ export class CsiInspectionDetailsComponent implements OnInit {
         });
     }
 
+    private async loadImages(): Promise<void> {
+        if (!this.id) return;
+        try {
+            this.isLoadingImages = true;
+            this.images = await this._inspectionService.getImages(this.id);
+        } finally {
+            this.imagesLoaded = true;
+            this.isLoadingImages = false;
+        }
+    }
+
     private async loadInspection(): Promise<void> {
         try {
             this.isLoading = true;
             this.inspection = await this._inspectionService.get(this.id);
         } finally {
             this.isLoading = false;
+        }
+    }
+
+    public onTabChange(tab: string): void {
+        this.selectedTab = tab;
+        if (tab === 'images' && !this.imagesLoaded) {
+            this.loadImages();
         }
     }
 

@@ -19,6 +19,13 @@ public static class ServiceRegistrations
             .AddTransient<IAuthService, AuthService>();
     }
 
+    public static IServiceCollection AddAuthService(this IServiceCollection services)
+    {
+        return services
+            .AddHttpContextAccessor()
+            .AddTransient<IAuthService, AuthService>();
+    }
+
     public static IServiceCollection AddHtmlTemplateService(this IServiceCollection services, Action<HtmlTemplateOptions> templateConfigAction)
     {
         services
@@ -29,8 +36,16 @@ public static class ServiceRegistrations
         return services;
     }
 
-    public static IServiceCollection AddPdfTemplateService(this IServiceCollection services)
+    public static IServiceCollection AddPdfTemplateService(
+        this IServiceCollection services,
+        bool isDevelopment,
+        IConfigurationSection? pdfConfigSection = null)
     {
+        services.Configure<PdfTemplateOptions>(opts =>
+        {
+            opts.IsDevelopment = isDevelopment;
+            pdfConfigSection?.Bind(opts);
+        });
         services.AddTransient<IPdfTemplateService, PdfTemplateService>();
         return services;
     }
@@ -40,7 +55,16 @@ public static class ServiceRegistrations
         services.AddHtmlTemplateService(templateConfigAction);
 
         services.Configure<EmailOptions>(emailConfigSection);
-        services.AddTransient<IEmailService, EmailService>();
+        services.AddSingleton<IEmailService, EmailService>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddSmsService(this IServiceCollection services, IConfigurationSection smsConfigSection)
+    {
+        services.AddHttpClient();
+        services.Configure<SmsOptions>(smsConfigSection);
+        services.AddTransient<ISmsService, SmsService>();
 
         return services;
     }

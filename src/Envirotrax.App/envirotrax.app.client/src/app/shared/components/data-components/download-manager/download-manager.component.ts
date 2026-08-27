@@ -4,7 +4,7 @@ import { ModalReference, ModalSize } from "@developer-partners/ngx-modal-dialog"
 import { DownloadConfig } from "../../../models/download-config";
 import { DownloadService } from "../../../services/download.service";
 import { MAX_PAGE_SIZE } from "../../../models/page-info";
-import { InputOption } from "../../input/input.component";
+import { InputOption } from "@envirotrax/common-ui";
 
 @Component({
     templateUrl: './download-manager.component.html',
@@ -14,6 +14,11 @@ export class DownloadManagerComponent {
     public isLoading: boolean = false;
     public downloadConfig: DownloadConfig;
     public formatOptions: InputOption[];
+    public delimiterOptions: InputOption[] = [
+        { id: ',', text: 'Comma' },
+        { id: '|', text: 'Pipe' },
+        { id: 'tab', text: 'Tab' }
+    ];
 
     constructor(
         private readonly _modalReference: ModalReference<DownloadConfig, void>,
@@ -36,6 +41,7 @@ export class DownloadManagerComponent {
         }
 
         this.downloadConfig.selectedFormat = 'CSV';
+        this.downloadConfig.csvDelimiter = ',';
 
         this.formatOptions = (this.downloadConfig.suppoertedFormats ?? ['CSV']).map(f => ({
             id: f,

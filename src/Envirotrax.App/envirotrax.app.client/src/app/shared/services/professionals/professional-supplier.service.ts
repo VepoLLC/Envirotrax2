@@ -7,8 +7,8 @@ import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { lastValueFrom } from "rxjs";
 import { AvailableWaterSupplier, ProfessionalWaterSupplier } from "../../models/professionals/professional-water-supplier";
-import { InputOption } from "../../components/input/input.component";
 import { QueryProperty } from "../../models/query";
+import { InputOption } from "@envirotrax/common-ui";
 
 @Injectable({
     providedIn: 'root'
@@ -32,26 +32,33 @@ export class ProfessionalSupplierService {
         return lastValueFrom(obsertvable);
     }
 
-    public async getMyAsOptions(hasCsiInspection = false): Promise<InputOption[]> {
-        const suppliers = await this.getAllMy(hasCsiInspection);
+    public async getMyAsOptions(options?: MySupplierFilterOptions): Promise<InputOption<ProfessionalWaterSupplier>[]> {
+        const suppliers = await this.getAllMy(options);
         return [
             { id: '', text: 'Select a water supplier' },
             ...suppliers.data
                 .filter(s => s.waterSupplier?.id)
-                .map(s => ({ id: String(s.waterSupplier!.id!), text: s.waterSupplier!.name ?? '' }))
+                .map(s => ({
+                    id: s.waterSupplier!.id!,
+                    text: s.waterSupplier!.name ?? '',
+                    data: s
+                }))
         ];
     }
 
-    public getAllMy(hasCsiInspection = false, hasBackflowTesting = false): Promise<PagedData<ProfessionalWaterSupplier>> {
+    public getAllMy(options?: MySupplierFilterOptions): Promise<PagedData<ProfessionalWaterSupplier>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/water-suppliers');
         const pageInfo: PageInfo = { pageSize: MAX_PAGE_SIZE };
         const filter: QueryProperty[] = [];
 
-        if (hasCsiInspection) {
+        if (options?.hasCsiInspection) {
             filter.push({ columnName: 'hasCsiInspection', comparisonOperator: 'Eq', value: 'true' });
         }
-        if (hasBackflowTesting) {
+        if (options?.hasBackflowTesting) {
             filter.push({ columnName: 'hasBackflowTesting', comparisonOperator: 'Eq', value: 'true' });
+        }
+        if (options?.hasFogInspection) {
+            filter.push({ columnName: 'hasFogInspection', comparisonOperator: 'Eq', value: 'true' });
         }
 
         const query: Query = filter.length > 0 ? { filter } : {};
@@ -89,4 +96,11 @@ export class ProfessionalSupplierService {
 
         return lastValueFrom(observable);
     }
+}
+
+export interface MySupplierFilterOptions {
+    hasCsiInspection?: boolean;
+    hasBackflowTesting?: boolean;
+    hasFogInspection?: boolean;
+    hasFogTransportation?: boolean;
 }

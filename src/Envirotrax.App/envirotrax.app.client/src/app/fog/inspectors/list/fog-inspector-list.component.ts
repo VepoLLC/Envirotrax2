@@ -5,8 +5,13 @@ import { FogInspectorService } from "../../../shared/services/fog/fog-inspector.
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { Professional } from "../../../shared/models/professionals/professional";
-import { CellTemplateData, TableColumn } from "../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
+import { CellTemplateData, ColumnType, TableColumn } from '@envirotrax/common-ui';
+import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
+
+interface FogInspectorLicenseSearchVm {
+    inspectorLicenseNumber?: string;
+    insurancePolicyNumber?: string;
+}
 
 @Component({
     selector: 'app-fog-inspector-list',
@@ -23,9 +28,9 @@ export class FogInspectorListComponent implements OnInit {
         },
         freeTextSearch: {
             searchQuery: [
-                {field: 'name', operator: 'Ct', multiWordSearch: true},
-                {field: 'companyEmail', operator: 'Ct', multiWordSearch: true},
-                {field: 'phoneNumber', operator: 'Ct', multiWordSearch: true}
+                { field: 'name', operator: 'Ct', multiWordSearch: true },
+                { field: 'companyEmail', operator: 'Ct', multiWordSearch: true },
+                { field: 'phoneNumber', operator: 'Ct', multiWordSearch: true }
             ]
         }
     };
@@ -33,10 +38,13 @@ export class FogInspectorListComponent implements OnInit {
     @ViewChild('addressCell', { static: true })
     public addressCell?: TemplateRef<CellTemplateData<Professional>>;
 
+    private _licenseSearch: FogInspectorLicenseSearchVm = {};
+
     constructor(
         private readonly _fogInspectorService: FogInspectorService,
         private readonly _router: Router,
-        private readonly _activatedRoute: ActivatedRoute
+        private readonly _activatedRoute: ActivatedRoute,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
     }
 
@@ -73,10 +81,30 @@ export class FogInspectorListComponent implements OnInit {
     public async getInspectors(): Promise<void> {
         try {
             this.table.isLoading = true;
-            this.table.items = await this._fogInspectorService.getAll(this.table.items?.pageInfo || {}, this.table.query);
+            const pageInfo = this.table.items?.pageInfo || {};
+            const { inspectorLicenseNumber, insurancePolicyNumber } = this._licenseSearch;
+
+            this.table.items = (inspectorLicenseNumber || insurancePolicyNumber)
+                ? await this._fogInspectorService.search(inspectorLicenseNumber, insurancePolicyNumber, pageInfo)
+                : await this._fogInspectorService.getAll(pageInfo, this.table.query);
         } finally {
             this.table.isLoading = false;
         }
+    }
+
+    private extractLicenseSearchVm(): FogInspectorLicenseSearchVm {
+        const getValue = (columnName: string) =>
+            this.table.query.filter?.find(f => f.columnName === columnName)?.value as string | undefined;
+
+        return {
+            inspectorLicenseNumber: getValue('inspectorLicenseNumber'),
+            insurancePolicyNumber: getValue('insurancePolicyNumber')
+        };
+    }
+
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
@@ -91,8 +119,10 @@ export class FogInspectorListComponent implements OnInit {
 
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
+            this._licenseSearch = this.extractLicenseSearchVm();
+
             await this.getInspectors();
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 }

@@ -4,6 +4,7 @@ using Envirotrax.TaskRunner.Authentication;
 using Envirotrax.TaskRunner.Domain.DataTransferObjects;
 using Envirotrax.TaskRunner.Domain.Services.Definitions;
 using Envirotrax.TaskRunner.Domain.Services.Implementations;
+using Envirotrax.TaskRunner.Workers.Backflow;
 using Envirotrax.TaskRunner.Workers.Sites;
 
 namespace Envirotrax.TaskRunner.Configuration;
@@ -30,6 +31,26 @@ public static class ServiceRegistration
 
         services.Configure<GeocodingOptions>(configuration.GetSection("Tasks:Geocoding"));
         services.AddQueueWorker(new QueueWorkerOptions<SiteGeocoder, SiteDto>(QueueNames.Sites.Geocode)
+        {
+            MaxDequeuCount = 2
+        });
+
+        services.Configure<BackflowRenewalOptions>(configuration.GetSection("Tasks:BackflowRenewal"));
+        services.AddQueueWorker(new QueueWorkerOptions<BackflowTestSiteRenewalWorker, SiteDto>(QueueNames.BackflowTests.ProcessSiteRenewal)
+        {
+            MaxDequeuCount = 2
+        });
+        services.AddQueueWorker(new QueueWorkerOptions<BackflowTestTestRenewalWorker, BackflowTestDto>(QueueNames.BackflowTests.ProcessTestRenewal)
+        {
+            MaxDequeuCount = 2
+        });
+
+        services.AddQueueWorker(new QueueWorkerOptions<ComplianceSnapshotWorker, ComplianceSnapshotMessageDto>(QueueNames.BackflowComplianceSnapshots.Process)
+        {
+            MaxDequeuCount = 2
+        });
+
+        services.AddQueueWorker(new QueueWorkerOptions<ComplianceSnapshotBackfillWorker, WaterSupplierDto>(QueueNames.BackflowComplianceSnapshots.Backfill)
         {
             MaxDequeuCount = 2
         });

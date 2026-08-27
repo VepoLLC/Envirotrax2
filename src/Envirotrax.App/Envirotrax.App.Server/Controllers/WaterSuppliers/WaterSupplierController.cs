@@ -20,13 +20,6 @@ public class WaterSupplierController : WaterSupplierCrudController<WaterSupplier
     {
         _supplierService = service;
     }
-
-    [HttpGet("my/current")]
-    public async Task<IActionResult> GetLoggedInSupplierAsync(CancellationToken cancellationToken)
-    {
-        var supplier = await _supplierService.GetLoggedInSupplierAsync(cancellationToken);
-        return Ok(supplier);
-    }
 }
 
 // We this controller because /api/water-suppliers/my endpoint requires the user to be logged in, but it doesn't require having WaterSupplier role.
@@ -34,7 +27,7 @@ public class WaterSupplierController : WaterSupplierCrudController<WaterSupplier
 [Authorize]
 [ApiController]
 [Route("api/water-suppliers")]
-public class MyWaterSupplierController : ControllerBase
+public class MyWaterSupplierController : EnvirotraxBaseController
 {
     private readonly IWaterSupplierService _supplierService;
 
@@ -48,5 +41,12 @@ public class MyWaterSupplierController : ControllerBase
     {
         var tenants = await _supplierService.GetAllMySuppliersAsync(cancellationToken);
         return Ok(tenants);
+    }
+
+    [HttpGet("my/current")]
+    public async Task<IActionResult> GetLoggedInSupplierAsync(CancellationToken cancellationToken)
+    {
+        var supplier = await _supplierService.GetLoggedInSupplierAsync(cancellationToken);
+        return Ok(supplier);
     }
 }

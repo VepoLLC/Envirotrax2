@@ -1,0 +1,194 @@
+<div class="mt-2">
+    <vp-section header="Out of Service Requests">
+
+        <ng-template #statusIcons let-test>
+            <div class="d-flex flex-wrap gap-1">
+                @if (test?.isCurrent) {
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Current Test"
+                                    [showText]="false" />
+                } @else {
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Non Current Test"
+                                    [showText]="false" />
+                }
+                @if (test?.testResult !== BackflowTestResult.Fail) {
+                    <vp-status-icon imageSrc="/images/icons/bstatus-magenta-on.png" text="Passed Test"
+                                    [showText]="false" />
+                } @else {
+                    <vp-status-icon imageSrc="/images/icons/bstatus-magenta-off.png" text="Failed Test"
+                                    [showText]="false" />
+                }
+                @if (!test?.outOfService) {
+                    <vp-status-icon imageSrc="/images/icons/bstatus-blue-on.png" text="In Service" [showText]="false" />
+                } @else {
+                    <vp-status-icon imageSrc="/images/icons/bstatus-blue-off.png" text="Out of Service"
+                                    [showText]="false" />
+                }
+                @if (test?.transactionId) {
+                    <vp-status-icon imageSrc="/images/icons/bstatus-orange-on.png" text="Paid" [showText]="false" />
+                } @else {
+                    <vp-status-icon imageSrc="/images/icons/bstatus-orange-off.png" text="Unpaid" [showText]="false" />
+                }
+                @if (!test?.disapproved) {
+                    <vp-status-icon imageSrc="/images/icons/bstatus-cyan-on.png" text="Approved" [showText]="false" />
+                } @else {
+                    <vp-status-icon imageSrc="/images/icons/bstatus-cyan-off.png" text="Disapproved"
+                                    [showText]="false" />
+                }
+                @if (!test?.rejected) {
+                    <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Accepted" [showText]="false" />
+                } @else {
+                    <vp-status-icon imageSrc="/images/icons/bstatus-red-off.png" text="Rejected" [showText]="false" />
+                }
+            </div>
+        </ng-template>
+
+        <ng-template #assemblyRow let-line>
+            <tr>
+                <td style="min-width: 160px">
+                    <div class="fw-semibold mb-1">{{ line.label }}</div>
+                    <ng-container [ngTemplateOutlet]="statusIcons"
+                                  [ngTemplateOutletContext]="{ $implicit: line.test }" />
+                </td>
+                <td class="text-nowrap">
+                    <div>{{ (line.submittedDate | date:'M/d/yyyy') || 'N/A' }}</div>
+                    <div>{{ (line.testDate | date:'M/d/yyyy') || 'N/A' }}</div>
+                    <div>{{ (line.expirationDate | date:'M/d/yyyy') || 'N/A' }}</div>
+                </td>
+                <td>
+                    @if (line.isBypassDevice) {
+                        <div><span class="fw-semibold">Main:</span> {{ line.serial }}</div>
+                        <div><span class="fw-semibold">Bypass:</span> {{ line.bypassSerial }}</div>
+                    } @else {
+                        <div>{{ line.serial }}</div>
+                    }
+                </td>
+                <td>
+                    <div><span class="fw-semibold">Assembly Desc:</span> {{ line.assemblyDescription }}</div>
+                    @if (line.hazard) {
+                        <div><span class="fw-semibold">Hazard Type:</span> {{ line.hazard }}</div>
+                    }
+                    @if (line.location) {
+                        <div><span class="fw-semibold">Location Desc:</span> {{ line.location }}</div>
+                    }
+                    @if (line.comments) {
+                        <div><span class="fw-semibold">Comments:</span> {{ line.comments }}</div>
+                    }
+                </td>
+                <td>{{ line.property }}</td>
+                <td>{{ line.bpat }}</td>
+                <td class="text-end">
+                    <button type="button" class="btn btn-primary btn-sm" (click)="viewTest(line.test)">
+                        <i class="fa-solid fa-eye me-1"></i>View
+                    </button>
+                </td>
+            </tr>
+        </ng-template>
+
+        <div class="row g-2 align-items-end mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Status:</label>
+                <vp-input type="select"
+                          [options]="statusOptions"
+                          [ngModel]="status.toString()"
+                          (ngModelChange)="onStatusChange($event)"
+                          [ngModelOptions]="{standalone: true}" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Request type:</label>
+                <vp-input type="select"
+                          [options]="typeOptions"
+                          [ngModel]="typeFilter"
+                          (ngModelChange)="onTypeChange($event)"
+                          [ngModelOptions]="{standalone: true}" />
+            </div>
+            <div class="col-md-4">
+                <button type="button" class="btn btn-primary vp-section-button" (click)="load()">
+                    <i class="fa-solid fa-rotate me-1"></i>Update
+                </button>
+            </div>
+        </div>
+
+        <div class="row gap-2 justify-content-center mb-3">
+            <div class="col-auto mb-2">
+                <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Current Test" />
+                <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Non Current Test" />
+            </div>
+            <div class="col-auto mb-2">
+                <vp-status-icon imageSrc="/images/icons/bstatus-magenta-on.png" text="Passed Test" />
+                <vp-status-icon imageSrc="/images/icons/bstatus-magenta-off.png" text="Failed Test" />
+            </div>
+            <div class="col-auto mb-2">
+                <vp-status-icon imageSrc="/images/icons/bstatus-blue-on.png" text="In Service" />
+                <vp-status-icon imageSrc="/images/icons/bstatus-blue-off.png" text="Out of Service" />
+            </div>
+            <div class="col-auto mb-2">
+                <vp-status-icon imageSrc="/images/icons/bstatus-orange-on.png" text="Paid" />
+                <vp-status-icon imageSrc="/images/icons/bstatus-orange-off.png" text="Unpaid" />
+            </div>
+            <div class="col-auto mb-2">
+                <vp-status-icon imageSrc="/images/icons/bstatus-cyan-on.png" text="Approved" />
+                <vp-status-icon imageSrc="/images/icons/bstatus-cyan-off.png" text="Disapproved" />
+            </div>
+            <div class="col-auto mb-2">
+                <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Accepted" />
+                <vp-status-icon imageSrc="/images/icons/bstatus-red-off.png" text="Rejected" />
+            </div>
+        </div>
+
+        @if (isLoading) {
+            <dp-loading-spinner></dp-loading-spinner>
+        }
+
+        <div dp-spinner-parent>
+            @if (!isLoading && requests.length === 0) {
+                <div class="text-center py-3 text-muted">
+                    There are no assembly out of service requests.
+                </div>
+            }
+
+            @for (request of requests; track request.id) {
+                <div class="mt-3">
+                    <vp-section [header]="request.header" [collapsible]="false" [noPadding]="true">
+                        <vp-section-actions>
+                            @if (!request.cleared) {
+                                <button type="button"
+                                        class="btn btn-danger btn-sm"
+                                        (click)="clear(request)">
+                                    Clear
+                                </button>
+                            }
+                        </vp-section-actions>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped mb-0 align-middle">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Submission/Test/Exp Dates</th>
+                                        <th>Serial Number</th>
+                                        <th>Assembly Information</th>
+                                        <th>Property Information</th>
+                                        <th>BPAT Information</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <ng-container [ngTemplateOutlet]="assemblyRow"
+                                                  [ngTemplateOutletContext]="{ $implicit: request.submitted }" />
+                                    @if (request.replacement) {
+                                        <ng-container [ngTemplateOutlet]="assemblyRow"
+                                                      [ngTemplateOutletContext]="{ $implicit: request.replacement }" />
+                                    } @else if (request.description) {
+                                        <tr>
+                                            <td></td>
+                                            <td colspan="6" class="text-muted">{{ request.description }}</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </vp-section>
+                </div>
+            }
+        </div>
+    </vp-section>
+</div>

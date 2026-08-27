@@ -5,8 +5,13 @@ import { CsiInspectoreManagementService } from "../../../shared/services/csi/csi
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { Professional } from "../../../shared/models/professionals/professional";
-import { CellTemplateData, TableColumn } from "../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
+import { CellTemplateData, ColumnType, TableColumn } from '@envirotrax/common-ui';
+import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
+
+interface CsiInspectorLicenseSearchVm {
+    inspectorLicenseNumber?: string;
+    insurancePolicyNumber?: string;
+}
 
 @Component({
     selector: 'app-csi-inspector-list',
@@ -33,10 +38,13 @@ export class CsiInspectorListComponent implements OnInit {
     @ViewChild('addressCell', { static: true })
     public addressCell?: TemplateRef<CellTemplateData<Professional>>;
 
+    private _licenseSearch: CsiInspectorLicenseSearchVm = {};
+
     constructor(
         private readonly _csiInspectoreManagementService: CsiInspectoreManagementService,
         private readonly _router: Router,
-        private readonly _activatedRoute: ActivatedRoute
+        private readonly _activatedRoute: ActivatedRoute,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
     }
 
@@ -73,10 +81,30 @@ export class CsiInspectorListComponent implements OnInit {
     public async getInspectors(): Promise<void> {
         try {
             this.table.isLoading = true;
-            this.table.items = await this._csiInspectoreManagementService.getAll(this.table.items?.pageInfo || {}, this.table.query);
+            const pageInfo = this.table.items?.pageInfo || {};
+            const { inspectorLicenseNumber, insurancePolicyNumber } = this._licenseSearch;
+
+            this.table.items = (inspectorLicenseNumber || insurancePolicyNumber)
+                ? await this._csiInspectoreManagementService.search(inspectorLicenseNumber, insurancePolicyNumber, pageInfo)
+                : await this._csiInspectoreManagementService.getAll(pageInfo, this.table.query);
         } finally {
             this.table.isLoading = false;
         }
+    }
+
+    private extractLicenseSearchVm(): CsiInspectorLicenseSearchVm {
+        const getValue = (columnName: string) =>
+            this.table.query.filter?.find(f => f.columnName === columnName)?.value as string | undefined;
+
+        return {
+            inspectorLicenseNumber: getValue('inspectorLicenseNumber'),
+            insurancePolicyNumber: getValue('insurancePolicyNumber')
+        };
+    }
+
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
@@ -91,8 +119,10 @@ export class CsiInspectorListComponent implements OnInit {
 
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
+            this._licenseSearch = this.extractLicenseSearchVm();
+
             await this.getInspectors();
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 }

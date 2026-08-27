@@ -10,9 +10,13 @@ import { HelperService } from "../../shared/services/helpers/helper.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import { UserService } from "../../shared/services/water-suppliers/user.service";
 import { FacilityType } from '../../shared/enums/facility-type.enum';
-import { InputOption } from "../../shared/components/input/input.component";
 import { GreaseTrapType } from '../../shared/enums/grease-trap-type.enum';
-import { ToastService, ToastType } from '../../shared/services/toast.service';
+import { ToastService, ToastType, InputOption } from '@envirotrax/common-ui';
+import { AuthService } from '../../shared/services/auth/auth.service';
+import { PermissionAction, PermissionType } from '../../shared/models/permission-type';
+import { FeatureType } from '../../shared/models/feature-type';
+
+type SiteTab = 'logHistory' | 'csi' | 'backflow' | 'outOfService' | 'fog';
 
 @Component({
     selector: 'app-edit-site-component',
@@ -21,6 +25,18 @@ import { ToastService, ToastType } from '../../shared/services/toast.service';
 })
 export class EditSiteComponent implements OnInit {
     public validationErrors: string[] = [];
+
+    public activeTab?: SiteTab;
+    public canViewLogHistory: boolean = false;
+    public canViewCsi: boolean = false;
+    public canViewBackflow: boolean = false;
+    public canViewOutOfService: boolean = false;
+    public canViewFog: boolean = false;
+    public logHistoryInitialized: boolean = false;
+    public csiInitialized: boolean = false;
+    public backflowInitialized: boolean = false;
+    public outOfServiceInitialized: boolean = false;
+    public fogInitialized: boolean = false;
 
     public site: Site = {
         backflowScheduleMonth: 0,
@@ -59,11 +75,13 @@ export class EditSiteComponent implements OnInit {
         private readonly _router: Router,
         private readonly _helper: HelperService,
         private readonly _userService: UserService,
-        private readonly _toastService: ToastService
+        private readonly _toastService: ToastService,
+        private readonly _authService: AuthService
     ) {
     }
 
     public async ngOnInit(): Promise<void> {
+        await this.loadPermissions();
         await this.loadStates();
         await this.getUsers();
         this._acitvatedRoute.paramMap.subscribe(async params => {
@@ -73,6 +91,58 @@ export class EditSiteComponent implements OnInit {
                 this.currentSite = { ...this.site };
             }
         });
+    }
+
+    private async loadPermissions(): Promise<void> {
+        this.canViewLogHistory = await this._authService.hasAnyPermisison(
+            PermissionAction.CanView, PermissionType.Sites);
+
+        const canViewCsiPermission = await this._authService.hasAnyPermisison(
+            PermissionAction.CanView, PermissionType.CsiInspections);
+        const hasCsiFeature = await this._authService.hasAnyFeatures(FeatureType.CsiInspection);
+        this.canViewCsi = canViewCsiPermission && hasCsiFeature;
+
+        this.canViewBackflow = await this._authService.hasAnyPermisison(
+            PermissionAction.CanView, PermissionType.BackflowTests);
+
+        this.canViewOutOfService = await this._authService.hasAnyPermisison(
+            PermissionAction.CanView, PermissionType.BackflowOutOfService);
+
+        const canViewFogPermission = await this._authService.hasAnyPermisison(
+            PermissionAction.CanView, PermissionType.FogInspections);
+        const hasFogFeature = await this._authService.hasAnyFeatures(FeatureType.FogInspection);
+        this.canViewFog = canViewFogPermission && hasFogFeature;
+
+        if (this.canViewLogHistory) {
+            this.setActiveTab('logHistory');
+        } else if (this.canViewCsi) {
+            this.setActiveTab('csi');
+        } else if (this.canViewBackflow) {
+            this.setActiveTab('backflow');
+        } else if (this.canViewOutOfService) {
+            this.setActiveTab('outOfService');
+        } else if (this.canViewFog) {
+            this.setActiveTab('fog');
+        }
+    }
+
+    public setActiveTab(tab: SiteTab): void {
+        this.activeTab = tab;
+        this.markActiveTabInitialized();
+    }
+
+    private markActiveTabInitialized(): void {
+        if (this.activeTab === 'logHistory') {
+            this.logHistoryInitialized = true;
+        } else if (this.activeTab === 'csi') {
+            this.csiInitialized = true;
+        } else if (this.activeTab === 'backflow') {
+            this.backflowInitialized = true;
+        } else if (this.activeTab === 'outOfService') {
+            this.outOfServiceInitialized = true;
+        } else if (this.activeTab === 'fog') {
+            this.fogInitialized = true;
+        }
     }
 
     public propertyTypeOptions: InputOption[] = [
@@ -193,6 +263,8 @@ export class EditSiteComponent implements OnInit {
     }
 
     public async updateSiteSettings(form: NgForm): Promise<void> {
+        this.applyTripTicketIntervalValidation(form);
+
         if (form.valid) {
             try {
                 this.sectionLoading.siteSettings = true;
@@ -202,7 +274,8 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.id = this.site.id;
                     this.currentSite.backflowScheduleMonth = this.site.backflowScheduleMonth;
                     this.currentSite.lastTripTicketDate = this.site.lastTripTicketDate;
-                    this.currentSite.tripTicketInterval = this.site.tripTicketInterval;
+                    // Blank → 0; negative/decimal is blocked above.
+                    this.currentSite.tripTicketInterval = this.toNumberOrNull(this.site.tripTicketInterval) ?? 0;
                     this.currentSite.active = this.site.active;
                     this.currentSite.invalidMailingAddress = this.site.invalidMailingAddress;
                     this.currentSite.outOfArea = this.site.outOfArea;
@@ -227,6 +300,8 @@ export class EditSiteComponent implements OnInit {
             } finally {
                 this.sectionLoading.siteSettings = false;
             }
+        } else {
+            form.controls['tripTicketInterval']?.markAsTouched();
         }
     }
 
@@ -307,8 +382,9 @@ export class EditSiteComponent implements OnInit {
 
                 if (this.site.id) {
                     await this._siteService.updateGisData(this.site.id, {
-                        gisLatitude: this.site.gisLatitude,
-                        gisLongitude: this.site.gisLongitude,
+                        // Blank → null so a cleared coordinate clears instead of failing the server bind.
+                        gisLatitude: this.toNumberOrNull(this.site.gisLatitude),
+                        gisLongitude: this.toNumberOrNull(this.site.gisLongitude),
                         gisStatus: this.site.gisStatus
                     });
 
@@ -323,6 +399,38 @@ export class EditSiteComponent implements OnInit {
             } finally {
                 this.sectionLoading.gisData = false;
             }
+        }
+    }
+
+    // Coerces a vp-input number (a string once edited, '' once cleared) to a number; blank → null.
+    private toNumberOrNull(value: unknown): number | null {
+        if (value === null || value === undefined || value === '') {
+            return null;
+        }
+
+        const parsed = Number(value);
+
+        return Number.isNaN(parsed) ? null : parsed;
+    }
+
+    // Blocks Save on a negative/decimal Trip Ticket Interval via an `interval` error; blank is valid (→ 0).
+    private applyTripTicketIntervalValidation(form: NgForm): void {
+        const control = form.controls['tripTicketInterval'];
+
+        if (!control) {
+            return;
+        }
+
+        const value: unknown = this.site.tripTicketInterval;
+        const isBlank = value === null || value === undefined || value === '';
+        const isNonNegativeWholeNumber = /^\d+$/.test(String(value).trim());
+
+        if (!isBlank && !isNonNegativeWholeNumber) {
+            control.setErrors({ ...(control.errors ?? {}), interval: true });
+        } else if (control.hasError('interval')) {
+            const errors = { ...control.errors };
+            delete errors['interval'];
+            control.setErrors(Object.keys(errors).length ? errors : null);
         }
     }
 

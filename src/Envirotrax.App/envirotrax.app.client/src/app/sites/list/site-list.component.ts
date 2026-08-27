@@ -3,19 +3,20 @@ import { TableViewModel } from "../../shared/models/table-view-model";
 import { Site } from "../../shared/models/sites/site";
 import { SiteService } from "../../shared/services/sites/site.service";
 import { ActivatedRoute, Router } from "@angular/router";
-import { CellTemplateData, TableColumn } from "../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../shared/components/data-components/sorting-filtering/query-view-model";
 import { QueryProperty } from "../../shared/models/query";
 import { NgForm } from "@angular/forms";
-import { ModalHelperService } from "../../shared/services/helpers/modal-helper.service";
 import { CreateSiteComponent } from "../create/create-site-component";
-import { InputOption } from "../../shared/components/input/input.component";
 import { PropertyType } from "../../shared/enums/property-type.enum";
 import { GisAreaService } from "../../shared/services/gis-areas/gis-area.service";
 import { GisAreaCoordinateService } from "../../shared/services/gis-areas/gis-area-coordinate.service";
 import { GisMapService } from "../../shared/services/gis-areas/gis-map.service";
 import { GisArea } from "../../shared/models/gis-areas/gis-area";
-import { MapMarker, MapPolygon } from "../../shared/components/map/map.component";
+import { DownloadConfig } from "../../shared/models/download-config";
+import { AuthService } from "../../shared/services/auth/auth.service";
+import { FeatureType } from "../../shared/models/feature-type";
+import { DownloadService } from "../../shared/services/download.service";
+import { CellTemplateData, ColumnType, InputOption, MapMarker, MapPolygon, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
+import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
 
 @Component({
     standalone: false,
@@ -85,6 +86,8 @@ export class SiteListComponent implements OnInit {
 
     public propertyType = PropertyType;
 
+    public downloadConfig?: DownloadConfig<'Property Information' | 'Mailing Information' | 'GIS Data' | 'Additional Information'>;
+
     @ViewChild('propertyInformation', { static: true })
     public propertyInformation?: TemplateRef<CellTemplateData<Site>>
 
@@ -101,12 +104,102 @@ export class SiteListComponent implements OnInit {
         private readonly _modalHelper: ModalHelperService,
         private readonly _gisAreaService: GisAreaService,
         private readonly _coordinateService: GisAreaCoordinateService,
-        private readonly _gisMapService: GisMapService
+        private readonly _gisMapService: GisMapService,
+        private readonly _authService: AuthService,
+        private readonly _downloadService: DownloadService,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
+
+    }
+
+    private async setDownloadConfig(): Promise<void> {
+        this.downloadConfig = {
+            fileName: 'Sites',
+            endpoint: this._siteService.getAllEndpoint(),
+            suppoertedFormats: ['CSV', 'Excel', 'XML'],
+            categories: [
+                { name: 'Property Information', isSelected: true },
+                { name: 'Mailing Information', isSelected: true },
+                { name: 'GIS Data', isSelected: true },
+                { name: 'Additional Information', isSelected: true, caption: 'Additional Information - Facility Type, Has On-Site Sewage Facility, Has Grease Trap, Has Fire System, Has Irrigation System, etc.' }
+            ],
+            columns: [
+                { field: 'id', caption: 'SiteID' },
+                { field: 'accountNumber', caption: 'AccountNumber' },
+                { field: 'active', caption: 'Active' },
+                { field: 'outOfArea', caption: 'OutOfArea' },
+                { field: 'invalidMailingAddress', caption: 'InvalidMailingAddress' },
+                { field: 'isFeeExempt', caption: 'IsFeeExempt' },
+                { field: 'propertyType', caption: 'PropertyType', category: 'Property Information' },
+                { field: 'businessName', caption: 'PropertyBusinessName', category: 'Property Information' },
+                { field: 'streetNumber', caption: 'PropertyStreetNumber', category: 'Property Information' },
+                { field: 'streetName', caption: 'PropertyStreetName', category: 'Property Information' },
+                { field: 'propertyNumber', caption: 'PropertyNumber', category: 'Property Information' },
+                { field: 'city', caption: 'PropertyCity', category: 'Property Information' },
+                { field: 'state.code', caption: 'PropertyState', category: 'Property Information' },
+                { field: 'zipCode', caption: 'PropertyZIP', category: 'Property Information' },
+                { field: 'mailingCompanyName', caption: 'MailingCompanyName', category: 'Mailing Information' },
+                { field: 'mailingContactName', caption: 'MailingContactName', category: 'Mailing Information' },
+                { field: 'mailingStreetNumber', caption: 'MailingStreetNumber', category: 'Mailing Information' },
+                { field: 'mailingStreetName', caption: 'MailingStreetName', category: 'Mailing Information' },
+                { field: 'mailingNumber', caption: 'MailingNumber', category: 'Mailing Information' },
+                { field: 'mailingCity', caption: 'MailingCity', category: 'Mailing Information' },
+                { field: 'mailingState.code', caption: 'MailingState', category: 'Mailing Information' },
+                { field: 'mailingZipCode', caption: 'MailingZIP', category: 'Mailing Information' },
+                { field: 'mailingPhoneNumber', caption: 'MailingPhoneNumber', category: 'Mailing Information' },
+                { field: 'mailingEmailAddress', caption: 'MailingEmailAddress', category: 'Mailing Information' },
+                { field: 'gisLatitude', caption: 'GisLatitude', category: 'GIS Data' },
+                { field: 'gisLongitude', caption: 'GisLongitude', category: 'GIS Data' },
+                { field: 'gisStatus', caption: 'GisStatus', category: 'GIS Data' },
+                { field: 'gisDate', caption: 'GisDate', category: 'GIS Data' },
+                { field: 'gisAreaId', caption: 'GisAreaID', category: 'GIS Data' }
+            ]
+        };
+
+        if (await this._authService.hasAnyFeatures(FeatureType.BackflowTesting)) {
+            this.downloadConfig.columns.push({ field: 'backflowScheduleMonth', caption: 'BackflowScheduleMonth' });
+        }
+
+        if (await this._authService.hasAnyFeatures(FeatureType.CsiInspection)) {
+            this.downloadConfig.columns.push(
+                { field: 'needsCsiInspection', caption: 'NeedsCSIInspection' },
+                { field: 'csiRenewalDate', caption: 'CSIRenewalDate' }
+            );
+        }
+
+        if (await this._authService.hasAnyFeatures(FeatureType.FogInspection, FeatureType.FogTransportation)) {
+            this.downloadConfig.columns.push(
+                { field: 'needsFogInspection', caption: 'NeedsFogInspection' },
+                { field: 'fogInspectionExpirationDate', caption: 'FogInspectionExpirationDate' },
+                { field: 'needsFogPermit', caption: 'NeedsFogPermit' },
+                { field: 'fogPermitExpirationDate', caption: 'FogPermitExpirationDate' },
+                { field: 'lastTripTicketDate', caption: 'LastTripTicketDate' },
+                { field: 'tripTicketInterval', caption: 'TripTicketInterval' },
+                { field: 'fogDaysOverdue', caption: 'FogDaysOverdue' }
+            );
+        }
+
+        this.downloadConfig.columns.push(
+            { field: 'facilityType', caption: 'FacilityType', category: 'Additional Information' },
+            { field: 'hasOnSiteSewageFacility', caption: 'HasOnSiteSewageFacility', category: 'Additional Information' },
+            { field: 'hasAuxWaterSupply', caption: 'HasAuxWaterSupply', category: 'Additional Information' },
+            { field: 'hasFireSystem', caption: 'HasFireSystem', category: 'Additional Information' },
+            { field: 'fireSeparateWater', caption: 'FireSeparateWater', category: 'Additional Information' },
+            { field: 'greaseTrapType', caption: 'HasGreaseTrap', category: 'Additional Information' },
+            { field: 'hasGritTrap', caption: 'HasGritTrap', category: 'Additional Information' },
+            { field: 'hasReclaimed', caption: 'HasReclaimed', category: 'Additional Information' },
+            { field: 'hasIrrigation', caption: 'HasIrrigation', category: 'Additional Information' },
+            { field: 'irrigationSeparateWater', caption: 'IrrigationSeparateWater', category: 'Additional Information' },
+            { field: 'hasDomesticPremisesIsolation', caption: 'HasDomesticPremisesIsolation', category: 'Additional Information' },
+            { field: 'requiresDomesticPremisesIsolation', caption: 'RequiresDomesticPremisesIsolation', category: 'Additional Information' },
+            { field: 'updatedBy.email', caption: 'LastModifiedBy' },
+            { field: 'updatedTime', caption: 'LastModifiedDate' }
+        );
     }
 
     public async ngOnInit(): Promise<void> {
         this.table.columns = this.getColumns();
+        this.setDownloadConfig();
     }
 
     private getColumns(): TableColumn<Site>[] {
@@ -152,11 +245,16 @@ export class SiteListComponent implements OnInit {
         this.table.query.filter = queryProperties
     }
 
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
+    }
+
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
             this.showMapResults = false;
             await this.getSites();
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 
@@ -167,7 +265,7 @@ export class SiteListComponent implements OnInit {
 
         try {
             this.isMapLoading = true;
-            this.showResults = false;
+            this.setShowResults(false);
             this.showMapResults = false;
 
             const [sitesPage, areas, coordinates, defaultView] = await Promise.all([
@@ -209,6 +307,10 @@ export class SiteListComponent implements OnInit {
         this._router.navigate([site.id, 'edit'], {
             relativeTo: this._activatedRoute
         });
+    }
+
+    public showDownloadManager(): void {
+        this._downloadService.showDownloadManager(this.downloadConfig!, this.table.query);
     }
 
     private buildMapMarkers(sites: Site[]): MapMarker<Site>[] {

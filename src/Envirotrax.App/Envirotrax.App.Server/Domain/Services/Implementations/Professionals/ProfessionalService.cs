@@ -72,6 +72,12 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
         return dto;
     }
 
+    public async Task<IReadOnlyList<ProfessionalDto>> GetSubAccountsAsync(CancellationToken cancellationToken)
+    {
+        var subAccounts = await _professionalRepository.GetSubAccountsAsync(cancellationToken);
+        return [.. Mapper.Map<IEnumerable<ProfessionalDto>>(subAccounts)];
+    }
+
     public async Task<ProfessionalDto> AddMyAsync(CreateProfessionalDto createProfessional)
     {
         using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))

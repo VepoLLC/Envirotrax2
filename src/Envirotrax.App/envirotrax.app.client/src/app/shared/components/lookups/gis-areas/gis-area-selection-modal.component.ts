@@ -3,7 +3,7 @@ import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { GisArea, GisAreaCoordinate } from "../../../models/gis-areas/gis-area";
 import { GisAreaService } from "../../../services/gis-areas/gis-area.service";
 import { GisAreaCoordinateService } from "../../../services/gis-areas/gis-area-coordinate.service";
-import { MapPolygon } from "../../map/map.component";
+import { MapPolygon } from "@envirotrax/common-ui";
 
 export interface GisAreaSelectionModel {
     currentAreaId: string;

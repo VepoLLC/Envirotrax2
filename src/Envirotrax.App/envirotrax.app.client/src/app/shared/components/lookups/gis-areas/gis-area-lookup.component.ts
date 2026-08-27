@@ -1,12 +1,9 @@
 import { Component, forwardRef, Input, OnInit, Optional, SkipSelf } from "@angular/core";
 import { ControlContainer, NgForm } from "@angular/forms";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
-import { FilterPanelComponent } from "../../data-components/sorting-filtering/filter-panel/filter-panel.component";
-import { FilterPanelFieldComponent } from "../../data-components/sorting-filtering/filter-panel/filter-panel-field.component";
-import { InputOption } from "../../input/input.component";
 import { GisAreaService } from "../../../services/gis-areas/gis-area.service";
-import { ModalHelperService } from "../../../services/helpers/modal-helper.service";
 import { GisAreaSelectionModalComponent, GisAreaSelectionModel } from "./gis-area-selection-modal.component";
+import { FilterPanelComponent, FilterPanelFieldComponent, InputOption, ModalHelperService } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'app-gis-area-lookup',
@@ -24,9 +21,16 @@ import { GisAreaSelectionModalComponent, GisAreaSelectionModel } from "./gis-are
     ]
 })
 export class GisAreaLookupComponent implements OnInit {
-    @Input() public fieldName: string = 'gisAreaId';
-    @Input() public label: string = 'GIS Area';
-    @Input() public form?: NgForm;
+    @Input()
+    public fieldName: string = 'gisAreaId';
+
+    @Input()
+    public label: string = 'GIS Area';
+
+    @Input()
+    public form?: NgForm;
+    @Input()
+    public labelStyle: 'horizontal' | 'vertical' = 'vertical';
 
     public readonly type: 'select' = 'select';
     public value: string = '';

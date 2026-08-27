@@ -10,7 +10,7 @@ namespace Envirotrax.App.Server.Controllers.Professionals.Csi;
 
 [Route("api/professionals/csi/inspections")]
 [HasFeature(FeatureType.CsiInspection)]
-[Authorize(Roles = RoleDefinitions.Professionals.CsiInspector)]
+[Authorize(Roles = $"{RoleDefinitions.Professionals.Admin},{RoleDefinitions.Professionals.CsiInspector}")]
 public class CsiInspectionProfessionalController : ProfessionalProtectedController
 {
     private readonly ICsiInspectionService _inspectionService;
@@ -28,8 +28,21 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
         {
             return NotFound();
         }
-        
+
         return Ok(result);
+    }
+
+    [HttpGet("{id}/pdf")]
+    public async Task<IActionResult> GetPdfAsync(int id, CancellationToken cancellationToken)
+    {
+        var inspection = await _inspectionService.GetAsync(id, cancellationToken);
+        if (inspection == null)
+        {
+            return NotFound();
+        }
+
+        var pdf = await _inspectionService.GeneratePdfForProfessionalAsync(inspection);
+        return File(pdf, "application/pdf");
     }
 
     [HttpGet]
@@ -44,5 +57,12 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
     {
         var result = await _inspectionService.SubmitAsync(request, cancellationToken);
         return Ok(result);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync(int id)
+    {
+        var result = await _inspectionService.DeleteAsync(id);
+        return result == null ? NotFound() : Ok(result);
     }
 }

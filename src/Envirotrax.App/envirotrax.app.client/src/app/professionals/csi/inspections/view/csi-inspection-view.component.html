@@ -6,22 +6,22 @@
 
     <ul class="nav vp-tabs justify-content-center mb-3">
         <li class="nav-item">
-            <a class="nav-link" [class.active]="activeTab === 'main'" (click)="activeTab = 'main'" role="button">
+            <a class="nav-link" [class.active]="activeTab === 'main'" (click)="onTabChange('main')" role="button">
                 CSI Main Form
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" [class.active]="activeTab === 'assemblies'" (click)="activeTab = 'assemblies'" role="button">
+            <a class="nav-link" [class.active]="activeTab === 'assemblies'" (click)="onTabChange('assemblies')" role="button">
                 Assemblies at this Location
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" [class.active]="activeTab === 'additional'" (click)="activeTab = 'additional'" role="button">
+            <a class="nav-link" [class.active]="activeTab === 'additional'" (click)="onTabChange('additional')" role="button">
                 Additional Information
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" [class.active]="activeTab === 'images'" (click)="activeTab = 'images'" role="button">
+            <a class="nav-link" [class.active]="activeTab === 'images'" (click)="onTabChange('images')" role="button">
                 Images
             </a>
         </li>
@@ -213,25 +213,25 @@
                         <td class="fw-bold pe-3 text-end text-nowrap align-middle col-material-label">Service Lines:</td>
                         <td class="pe-4 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="slLead" disabled [checked]="inspection.materialServiceLineLead" />
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="slLead" disabled [checked]="inspection.materialServiceLineLead" />
                                 <label class="form-check-label" for="slLead">Lead</label>
                             </div>
                         </td>
                         <td class="pe-4 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="slCopper" disabled [checked]="inspection.materialServiceLineCopper" />
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="slCopper" disabled [checked]="inspection.materialServiceLineCopper" />
                                 <label class="form-check-label" for="slCopper">Copper</label>
                             </div>
                         </td>
                         <td class="pe-4 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="slPVC" disabled [checked]="inspection.materialServiceLinePVC" />
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="slPVC" disabled [checked]="inspection.materialServiceLinePVC" />
                                 <label class="form-check-label" for="slPVC">PVC</label>
                             </div>
                         </td>
                         <td class="pe-3 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="slOther" disabled [checked]="inspection.materialServiceLineOther" />
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="slOther" disabled [checked]="inspection.materialServiceLineOther" />
                                 <label class="form-check-label" for="slOther">Other</label>
                             </div>
                         </td>
@@ -245,25 +245,25 @@
                         <td class="fw-bold pe-3 text-end text-nowrap align-middle">Solder:</td>
                         <td class="pe-4 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="soldLead" disabled [checked]="inspection.materialSolderLead" />
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="soldLead" disabled [checked]="inspection.materialSolderLead" />
                                 <label class="form-check-label" for="soldLead">Lead</label>
                             </div>
                         </td>
                         <td class="pe-4 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="soldLeadFree" disabled [checked]="inspection.materialSolderLeadFree" />
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="soldLeadFree" disabled [checked]="inspection.materialSolderLeadFree" />
                                 <label class="form-check-label" for="soldLeadFree">Lead Free</label>
                             </div>
                         </td>
                         <td class="pe-4 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="soldSolvent" disabled [checked]="inspection.materialSolderSolventWeld" />
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="soldSolvent" disabled [checked]="inspection.materialSolderSolventWeld" />
                                 <label class="form-check-label" for="soldSolvent">Solvent Weld</label>
                             </div>
                         </td>
                         <td class="pe-3 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="soldOther" disabled [checked]="inspection.materialSolderOther" />
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="soldOther" disabled [checked]="inspection.materialSolderOther" />
                                 <label class="form-check-label" for="soldOther">Other</label>
                             </div>
                         </td>
@@ -277,7 +277,7 @@
             </table>
 
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="legalAck" disabled [checked]="true" />
+                <input class="form-check-input readonly-checkbox" type="checkbox" id="legalAck" disabled [checked]="true" />
                 <label class="form-check-label" for="legalAck">
                     "I recognize that this document shall be retained by the aforementioned Public Water System for a minimum of ten years and that I am legally responsible for the validity of the information I have provided."
                 </label>
@@ -293,6 +293,18 @@
             A Customer Service Inspection Certificate should be on file for each connection in a public water system to document compliance with 30 TAC &sect;290.44(h)/290.46(j).
         </p>
 
+        <div class="d-flex flex-column align-items-center gap-2 mt-3">
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <button type="button" class="btn btn-primary vp-section-button" (click)="exportPdf()"
+                        [disabled]="!inspection.transactionId">
+                    Export Inspection to Printable Document
+                </button>
+            </div>
+            <div *ngIf="!inspection.transactionId" class="text-danger text-center small">
+                Report can't be downloaded until it's paid. Please go to checkout and pay for this transaction, then try downloading again.
+            </div>
+        </div>
+
     </div>
 
     <div *ngIf="activeTab === 'assemblies'">
@@ -302,6 +314,80 @@
     </div>
     
     <div *ngIf="activeTab === 'images'">
+        <dp-loading-spinner *ngIf="isLoadingImages"></dp-loading-spinner>
+        <div *ngIf="!isLoadingImages">
+            <vp-section header="Inspection Images" class="d-block">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted small">{{ images.length }} / 24 images</span>
+                    <button type="button" class="btn btn-primary btn-sm"
+                            [disabled]="images.length >= 24 || isLoadingImages"
+                            (click)="openAddImageModal()">
+                        Add Image
+                    </button>
+                </div>
+
+                <p *ngIf="images.length === 0" class="text-muted">
+                    If you would like to add images associated with this inspection, click the "Add Image" button in the upper right corner. You may insert a maximum of 24 images to each report.
+                </p>
+                <div class="row">
+                    <div class="col-12 col-lg-6 mb-3" *ngFor="let img of images">
+                        <div class="border rounded p-2">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-semibold small">{{ img.description || '(no description)' }}</span>
+                                <button type="button" class="btn btn-danger btn-sm"
+                                        (click)="deleteImage(img.id!)">Delete</button>
+                            </div>
+                            <img [src]="img.url" alt="{{ img.description }}" class="img-fluid rounded"
+                                 style="width: 100%; object-fit: contain;" />
+                        </div>
+                    </div>
+                </div>
+            </vp-section>
+
+            <!-- Add Image Modal -->
+            <div *ngIf="showAddImageModal" class="modal d-block" tabindex="-1"
+                 style="background: rgba(0,0,0,0.5);">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-info text-white py-2">
+                            <h5 class="modal-title h6 mb-0">Add Image to Inspection</h5>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <vp-file-upload
+                                    [file]="modalSelectedFile"
+                                    (fileChange)="onModalFileChange($event)"
+                                    accept=".jpg,.jpeg,.gif,.png,.bmp,.tiff"
+                                    label="Choose an image or drag and drop here">
+                                </vp-file-upload>
+                            </div>
+                            <div *ngIf="modalPreviewUrl" class="text-center mb-3">
+                                <img [src]="modalPreviewUrl"
+                                     style="max-width: 350px; max-height: 350px;"
+                                     class="img-fluid border rounded" />
+                            </div>
+                            <div>
+                                Image Description:<br />
+                                <textarea class="form-control form-control-sm" rows="3"
+                                          maxlength="1000"
+                                          [(ngModel)]="newImageDescription"
+                                          [ngModelOptions]="{standalone: true}"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer py-2">
+                            <div class="d-flex w-100 gap-2">
+                                <button type="button" class="btn btn-primary flex-fill"
+                                        style="width: 50%"
+                                        (click)="onModalOk()">OK</button>
+                                <button type="button" class="btn btn-primary flex-fill"
+                                        style="width: 50%"
+                                        (click)="closeAddImageModal()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>

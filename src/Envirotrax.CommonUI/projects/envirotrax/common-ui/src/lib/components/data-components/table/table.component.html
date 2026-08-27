@@ -1,0 +1,133 @@
+<ng-template #actionsTemplate let-rowData="rowData">
+    <div class="d-flex gap-1" (click)="$event.stopPropagation()">
+        <button *ngIf="canViewDetails"
+                type="button"
+                class="btn btn-primary btn-sm text-nowrap"
+                (click)="onViewDetails(rowData)"
+                aria-label="View">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span class="ms-1" *ngIf="showActionLabels">View</span>
+        </button>
+        <button *ngIf="canEdit"
+                type="button"
+                class="btn btn-primary btn-sm text-nowrap"
+                (click)="onEdit(rowData)"
+                aria-label="Edit">
+            <i class="fa-solid fa-pencil"></i>
+            <span class="ms-1" *ngIf="showActionLabels">Edit</span>
+        </button>
+        <button *ngIf="canDelete"
+                type="button" class="btn btn-primary btn-sm text-nowrap"
+                (click)="onDelete(rowData)"
+                aria-label="Delete">
+            <i class="fa-solid fa-trash"></i>
+            <span class="ms-1" *ngIf="showActionLabels">Delete</span>
+        </button>
+        <ng-container *ngIf="customActions">
+            <button *ngFor="let action of customActions"
+                    type="button"
+                    class="btn btn-primary btn-sm text-nowrap"
+                    (click)="customActionClicked(action, rowData)"
+                    [attr.aria-label]="action.text">
+                <i [attr.class]="action.iconClass"></i>
+                <span class="ms-1" *ngIf="showActionLabels">{{action.text}}</span>
+            </button>
+        </ng-container>
+    </div>
+</ng-template>
+
+<div>
+    <div class="align-items-center border-bottom d-md-flex flex-row-reverse pb-2 gap-1">
+        <div class="d-flex justify-content-end gap-1">
+            <div *ngIf="canFilterAdvanced" class="me-2">
+                <vp-sorting-filtering *ngIf="query" [(query)]="query" (queryChange)="onQueryChange($event)"
+                                      (queryReset)="onQueryReset()" [columns]="queryColumns!">
+                </vp-sorting-filtering>
+            </div>
+
+            <button *ngIf="canHaveSoftDelete && !showSoftDeleted" type="button" class="btn"
+                    title="Show Archived Records" aria-label="Show Archived Records" (click)="showSoftDelete()">
+                <i class="fa-solid fa-box-archive"></i>
+            </button>
+
+            <button *ngIf="canHaveSoftDelete && showSoftDeleted" type="button" class="btn" title="Show Active Records"
+                    aria-label="Show Active Records" (click)="showSoftDelete()">
+                <i class="fa-solid fa-check-double"></i>
+            </button>
+
+            <button *ngIf="canAdd" type="button" class="btn btn-primary" title="Add New Record"
+                    aria-label="Add New Record" (click)="onAdd()">
+                <i class="fa-solid fa-circle-plus"></i>
+                Add New
+            </button>
+        </div>
+
+        <div *ngIf="freeTextSearch" class="flex-fill mt-2 mt-md-0">
+            <form (ngSubmit)="performSearch()">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="freeTextSearch" [(ngModel)]="freeTextSearch.text"
+                           [attr.placeholder]="freeTextSearch.placeholder"
+                           [attr.aria-label]="freeTextSearch.placeholder"
+                           [attr.aria-describedby]="searchId">
+                    <button class="btn btn-primary" type="submit" [attr.id]="searchId" title="Click to Search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                    <button *ngIf="freeTextSearch.text" class="btn btn-primary" type="button"
+                            [attr.id]="resetSearchId" title="Click to Reset Search" (click)="resetFreeTextSearch()">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table align-middle table-striped">
+            <thead>
+                <tr>
+                    <ng-container *ngFor="let column of columns">
+                        <th *ngIf="!column.isTableColumnExcluded"
+                            [hidden]="column.isInvisible"
+                            [class]="column.headerCssClass"
+                            class="text-nowrap vp-table-header"
+                            role="button"
+                            (click)="sortColumn(column)">
+                            {{column.caption}}
+
+                            <span *ngIf="query?.sort && query?.sort![column.field]">
+                                <i *ngIf="query?.sort![column.field] == 'Asc'" class="fa-solid fa-arrow-up"></i>
+                                <i *ngIf="query?.sort![column.field] == 'Desc'" class="fa-solid fa-arrow-down"></i>
+                            </span>
+                        </th>
+                    </ng-container>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let row of data" [attr.role]="canSelect || canEdit ? 'button' : null"
+                    (click)="onSelect(row)">
+                    <ng-container *ngFor="let column of columns">
+                        <td *ngIf="!column.isTableColumnExcluded"
+                            [hidden]="column.isInvisible"
+                            [class]="column.rowCssClass">
+                            <vp-table-cell *ngIf="!column.cellTemplate" [column]="column" [rowData]="row"
+                                           [componentType]="column.cellComponent!">
+                            </vp-table-cell>
+
+                            <ng-container *ngIf="column.cellTemplate">
+                                <ng-container
+                                              *ngTemplateOutlet="column.cellTemplate; context: { rowData: row, column: column }">
+                                </ng-container>
+                            </ng-container>
+                        </td>
+                    </ng-container>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-center">
+        <vp-pagination *ngIf="pageInfo" [(pageInfo)]="pageInfo" (pageInfoChange)="pageInfoChange.emit($event)">
+        </vp-pagination>
+    </div>
+</div>

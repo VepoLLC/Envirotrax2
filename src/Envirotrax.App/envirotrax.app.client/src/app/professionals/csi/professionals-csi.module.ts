@@ -5,7 +5,7 @@ import { SharedComponentsModule } from "../../shared/components/shared.component
 import { ProfessionalsCsiRoutingModule } from "./professionals-csi-routing.module";
 import { CsiSubmissionPropertySearchComponent } from "./inspections/create/csi-submission-property-search.component";
 import { CsiSubmissionCreateComponent } from "./inspections/create/csi-submission-create.component";
-import { CsiInspectionListComponent } from "./inspections/list/csi-inspection-list.component";
+import { CsiInspectionListComponent } from "./inspections/list/professional-csi-inspection-list.component";
 import { CsiInspectionViewComponent } from "./inspections/view/csi-inspection-view.component";
 
 @NgModule({

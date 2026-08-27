@@ -4,10 +4,11 @@ import { GisAreaCoordinateService } from "../../../shared/services/gis-areas/gis
 import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { GisArea, GisAreaCoordinate } from "../../../shared/models/gis-areas/gis-area";
-import { MapPolygon } from "../../../shared/components/map/map.component";
 import { AuthService } from "../../../shared/services/auth/auth.service";
 import { FeatureType } from "../../../shared/models/feature-type";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
+import { MapPolygon } from "@envirotrax/common-ui";
+import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 
 @Component({
     standalone: false,
@@ -32,7 +33,8 @@ export class GisAreaListComponent implements OnInit {
         private readonly _helper: HelperService,
         private readonly _gisAreaService: GisAreaService,
         private readonly _gisAreaCoordinateService: GisAreaCoordinateService,
-        private readonly _authService: AuthService
+        private readonly _authService: AuthService,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
 
     }
@@ -85,6 +87,8 @@ export class GisAreaListComponent implements OnInit {
     }
 
     public async ngOnInit(): Promise<void> {
+        this._containerHelper.setContainerVisibility(false);
+
         await Promise.all([
             this.getAreas(),
             this.getDefaultView(),

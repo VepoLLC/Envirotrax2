@@ -1,0 +1,205 @@
+<h1 class="text-center h2">Property Log Management</h1>
+
+<ng-template #propertyTemplate let-data="rowData">
+    <div class="d-flex gap-2 align-items-center">
+        <i class="fa-solid fs-5"
+           [ngClass]="data.site?.propertyType === PropertyType.Residential ? 'fa-home text-primary' : 'fa-building text-danger'">
+        </i>
+
+        <a [routerLink]="['/sites', data.site?.id, 'edit']" target="_blank">
+            <div *ngIf="data.site?.businessName" class="fw-semibold">{{ data.site?.businessName }}</div>
+            <div>
+                {{ data.site?.streetNumber }} {{ data.site?.streetName }}
+                <span *ngIf="data.site?.propertyNumber">#{{ data.site?.propertyNumber }}</span>
+            </div>
+            <div>{{ data.site?.city }}<span *ngIf="data.site?.city">, </span>{{ data.site?.state?.code }}
+                {{ data.site?.zipCode }}
+            </div>
+        </a>
+    </div>
+</ng-template>
+
+<ng-template #mailingTemplate let-data="rowData">
+    <div>
+        <div *ngIf="data.site?.mailingCompanyName" class="fw-semibold">{{ data.site?.mailingCompanyName }}</div>
+        <div *ngIf="data.site?.mailingContactName">{{ data.site?.mailingContactName }}</div>
+        <div>
+            {{ data.site?.mailingStreetNumber }} {{ data.site?.mailingStreetName }}
+            <span *ngIf="data.site?.mailingNumber">#{{ data.site?.mailingNumber }}</span>
+        </div>
+        <div>{{ data.site?.mailingCity }}<span *ngIf="data.site?.mailingCity">, </span>{{ data.site?.mailingState?.code }}
+            {{ data.site?.mailingZipCode }}
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #logTemplate let-data="rowData">
+    <div>
+        <i class="fa-regular"
+           [ngClass]="data.logType === SiteLogType.Note ? 'fa-file-lines' : (data.logType === SiteLogType.CompletedReminder ? 'fa-clock text-secondary' : 'fa-clock')"></i>
+        <span class="fw-semibold ms-1">{{ data.createdTime | date }}</span>
+        <span class="ms-3" *ngIf="data.createdBy?.email">
+            <span class="fw-semibold">User:</span> {{ data.createdBy?.email }}
+        </span>
+
+        <p class="mb-0 mt-1 ps-3" *ngIf="data.noteText">{{ data.noteText }}</p>
+
+        <p class="mb-0 mt-1 ps-3" *ngIf="data.assemblyId">
+            <span class="fw-semibold">Tagged Assembly:</span>
+            <a class="ms-1" [routerLink]="['/backflow/tests', data.assemblyId, 'view']" target="_blank">Tagged Assembly</a>
+        </p>
+
+        <p class="mb-0 mt-1 ps-3" *ngIf="data.fileAttachmentName">
+            <a *ngIf="!data.skipFile" href="javascript:void(0)" (click)="openAttachment(data)">
+                <i class="fa-solid fa-paperclip me-1"></i>{{ data.fileAttachmentName }}
+            </a>
+            <span *ngIf="data.skipFile">
+                <i class="fa-solid fa-paperclip me-1"></i>{{ data.fileAttachmentName }}
+            </span>
+        </p>
+    </div>
+</ng-template>
+
+<ng-template #reviewDateTemplate let-data="rowData">
+    <span *ngIf="data.logType !== SiteLogType.Note && data.reviewDate"
+          class="badge rounded-pill"
+          [ngClass]="reviewDateStatusClasses[data.reviewDateStatus || 0]">{{ data.reviewDate | date }}</span>
+</ng-template>
+
+<ng-template #viewSiteTemplate let-data="rowData">
+    <a class="btn btn-sm btn-success" [routerLink]="['/sites', data.site?.id, 'edit']" target="_blank">
+        <i class="fa-regular fa-building-magnifying-glass me-1"></i>
+        View Site
+    </a>
+</ng-template>
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
+            (click)="exportResults()">
+        <i class="fa-regular fa-file-export me-1"></i>
+        Export Results
+    </button>
+    <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
+            (click)="viewPrintableTable()">
+        <i class="fa-regular fa-table me-1"></i>
+        View Printable Table
+    </button>
+</div>
+
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+<div class="results-section">
+    <vp-section header="{{ resultsHeaderPrefix }} - {{ table.items?.pageInfo?.totalItems || 0 }} Results">
+        <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+            <vp-filter-panel (filterChange)="onFilterChange($event)">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <vp-input type="select"
+                                      label="Log Type"
+                                      name="logType"
+                                      labelStyle="horizontal"
+                                      [(ngModel)]="logType"
+                                      [options]="logTypeOptions" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-input type="select"
+                                      label="Sort By"
+                                      name="sortBy"
+                                      labelStyle="horizontal"
+                                      [(ngModel)]="sortBy"
+                                      [options]="sortOptions" />
+                        </div>
+
+                        <div class="d-xl-flex justify-content-end">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       id="showMailing"
+                                       name="showMailing"
+                                       [(ngModel)]="showMailing" />
+                                <label class="form-check-label" for="showMailing">Show mailing information</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <vp-input type="select"
+                                      label="User Account Type"
+                                      name="userAccountType"
+                                      labelStyle="horizontal"
+                                      [(ngModel)]="userAccountType"
+                                      [options]="userAccountTypeOptions" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-input type="select"
+                                      label="User Account"
+                                      name="accountId"
+                                      labelStyle="horizontal"
+                                      [(ngModel)]="accountId"
+                                      [options]="accountOptions" />
+                        </div>
+
+                        <div class="mb-3">
+                            <app-gis-area-lookup fieldName="site.gisAreaId" [form]="searchForm" labelStyle="horizontal" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <vp-input label="Account Number"
+                                      name="accountNumber"
+                                      labelStyle="horizontal"
+                                      [(ngModel)]="accountNumber" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-filter-panel-field fieldName="site.propertyType"
+                                                   label="Property Type"
+                                                   type="select"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm"
+                                                   [options]="propertyTypes" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-input label="Property Street Name"
+                                      name="propertyStreetName"
+                                      labelStyle="horizontal"
+                                      [(ngModel)]="propertyStreet" />
+                        </div>
+                    </div>
+                </div>
+            </vp-filter-panel>
+
+            <vp-validation-summary [form]="searchForm" />
+
+            <div class="d-flex justify-content-center mb-3">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    <i class="fa-solid fa-rotate me-1"></i>
+                    Refresh Property Log Records
+                </button>
+            </div>
+        </form>
+
+        <div #printableSection>
+            <div class="d-flex justify-content-center gap-4 mb-3">
+                <vp-status-icon iconClass="fa-solid fa-home text-primary" text="Residential" />
+                <vp-status-icon iconClass="fa-solid fa-building text-danger" text="Commercial" />
+            </div>
+
+            <vp-table *ngIf="table.items && table.items.data && table.items.data.length > 0"
+                      [columns]="table.columns!"
+                      [data]="table.items.data"
+                      [(pageInfo)]="table.items.pageInfo"
+                      (pageInfoChange)="getPropertyLogs()" />
+
+            <div *ngIf="table.items?.data?.length === 0" class="text-center py-3 text-muted">
+                There are no site records matching your search criteria.
+            </div>
+        </div>
+    </vp-section>
+</div>

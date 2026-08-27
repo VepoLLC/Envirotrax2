@@ -1,9 +1,4 @@
+import { MAX_PAGE_SIZE as maxPageSize } from "@envirotrax/common-ui";
+export type { PageInfo } from "@envirotrax/common-ui";
 
-export interface PageInfo {
-    pageNumber?: number;
-    pageSize?: number;
-    totalItems?: number;
-    totalPages?: number;
-}
-
-export const MAX_PAGE_SIZE = 2000;
+export const MAX_PAGE_SIZE = maxPageSize;

@@ -1,36 +1,56 @@
-<h1 class="text-center h2">BPAT Management</h1>
+﻿<h1 class="text-center h2">BPAT Management</h1>
 
 <div [hidden]="showResults">
     <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
         <vp-filter-panel (filterChange)="onFilterChange($event)">
             <vp-section header="BPAT Account Search Criteria">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-5">
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="companyEmail"
-                                                   label="Company Email"
+                                                   label="Company email:"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="name"
-                                                   label="Company Name"
+                                                   label="Company name:"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
-                        </div>
+                        </div>                   
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="address"
-                                                   label="Address"
+                                                   label="Address:"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-3">
                             <vp-filter-panel-field fieldName="phoneNumber"
-                                                   label="Company Phone"
+                                                   label="Phone #:"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
+                    <div class="col-md-2 d-flex justify-content-center align-items-center">
+                        Or
+                    </div>
+                    <div class="col-md-5">
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="bpatLicenseNumber"
+                                                   label="BPAT license number"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="fireLicenseNumber"
+                                                   label="Fire license number"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm" />
+                        </div>
+                        <div class="mb-2">
                             <vp-filter-panel-field fieldName="insurancePolicyNumber"
-                                                   label="Insurance Policy Number"
+                                                   label="Insurance policy number"
+                                                   labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                     </div>
@@ -52,7 +72,7 @@
 
 <div *ngIf="showResults">
 
-    <div class="d-flex justify-content-between mb-3">
+    <div class="d-flex justify-content-between mb-2">
         <button type="button"
                 class="btn btn-primary"
                 title="Export excel"
@@ -63,7 +83,7 @@
 
         <button type="button"
                 class="btn btn-primary vp-section-button"
-                (click)="showResults = false;">
+                (click)="setShowResults(false)">
             Search Again
         </button>
     </div>
@@ -78,8 +98,8 @@
                     (queryChange)="getTesters()"
                     (queryReset)="getTesters()"
                     [freeTextSearch]="table.freeTextSearch"
-                    [canSelect]="true"
-                    (select)="openDetails($event)" />
+                    [canViewDetails]="true"
+                    (viewDetails)="openDetails($event)" />
     </vp-section>
 
 </div>

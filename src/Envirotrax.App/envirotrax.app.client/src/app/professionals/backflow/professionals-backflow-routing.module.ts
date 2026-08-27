@@ -4,8 +4,10 @@ import { RoleGuard } from "../../shared/guards/role.guard";
 import { ROLE_DEFINITIONS } from "../../shared/models/role-definitions";
 import { GaugeListComponent } from "./gauges/gauge-list.component";
 import { ProfessionalBackflowTestListComponent } from "./tests/professional-backflow-test-list.component";
+import { ProfessionalBackflowTestDetailsComponent } from "./tests/details/professional-backflow-test-details.component";
 import { BackflowTestAssemblySearchComponent } from "./submit/backflow-test-assembly-search.component";
 import { BackflowTestSubmitComponent } from "./submit/backflow-test-submit.component";
+import { BackflowOutOfServiceRequestComponent } from "./tests/out-of-service/backflow-out-of-service-request.component";
 
 const routes: Routes = [
     {
@@ -19,6 +21,20 @@ const routes: Routes = [
         path: 'tests',
         title: 'Backflow Test Search',
         component: ProfessionalBackflowTestListComponent,
+        canActivate: [RoleGuard],
+        data: { roles: [ROLE_DEFINITIONS.PROFESSIONAL] }
+    },
+    {
+        path: 'tests/:id/view',
+        title: 'Backflow Test Details',
+        component: ProfessionalBackflowTestDetailsComponent,
+        canActivate: [RoleGuard],
+        data: { roles: [ROLE_DEFINITIONS.PROFESSIONAL] }
+    },
+    {
+        path: 'tests/:id/out-of-service',
+        title: 'Out of Service Request',
+        component: BackflowOutOfServiceRequestComponent,
         canActivate: [RoleGuard],
         data: { roles: [ROLE_DEFINITIONS.PROFESSIONAL] }
     },

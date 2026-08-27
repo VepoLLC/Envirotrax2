@@ -1,0 +1,75 @@
+﻿<header class="vp-header">
+    <nav class="vp-navbar align-items-start bg-gradient bg-primary d-flex navbar navbar-expand-lg py-0"
+         [class.show]="isNavbarVisible">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <img src="/images/logo-navbar.svg" alt="Envirotrax Logo" class="vp-logo">
+            </a>
+
+            <button class="border-0 navbar-toggler text-white"
+                    type="button"
+                    ata-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation"
+                    (click)="isNavbarVisible = !isNavbarVisible">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <div *ngIf="isAuthenticated"
+                 class="collapse justify-content-end navbar-collapse"
+                 id="navbarSupportedContent"
+                 [class.show]="isNavbarVisible">
+                <div class="d-flex justify-content-center justify-content-lg-end">
+                    <ul class="navbar-nav mb-2 mb-lg-0">
+                        <ng-container *ngFor="let item of menuItems">
+                            <li class="nav-item pb-3 pb-lg-0">
+                                <a role="button"
+                                   class="fw-bold nav-link p1 rounded-3"
+                                   #dropdownButton
+                                   (click)="toggleExpanded($event, dropdownButton, dropdownContent, item)">
+                                    <i [class]="item.iconCss"></i>
+                                    {{item.title}}
+
+                                    <i *ngIf="item.children && item.children.length"
+                                       class="fa-solid fa-angles-down small"></i>
+
+                                    <div *ngIf="item.isExpanded"
+                                         class="vp-backdrop position-fixed w-100 h-100 vp-backdrop z-1"
+                                         style="left: 0">
+                                    </div>
+
+                                    <ul class="dropdown-menu shadow-lg border border-primary"
+                                        [class.show]="item.isExpanded"
+                                        #dropdownContent>
+                                        <ng-container *ngFor="let child of item.children">
+                                            <li *ngIf="child.type === 'separator'"
+                                                class="m-2">
+                                                <hr class="dropdown-divider my-2">
+                                            </li>
+                                            <li *ngIf="child.type !== 'separator'"
+                                                class="m-2">
+                                                <a class="dropdown-item rounded" role="button"
+                                                   (click)="child?.onClick()">
+                                                    <i [class]="child.iconCss" class="me-1"></i>
+                                                    {{child.title}}
+                                                </a>
+                                            </li>
+                                        </ng-container>
+                                    </ul>
+                                </a>
+                            </li>
+                        </ng-container>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<vp-toast-container />
+
+<div id="main-content" class="container-fluid d-flex flex-fill py-2 min-h-0 overflow-x-auto">
+    <vp-window-container class="d-flex flex-fill flex-column min-h-0" />
+    <router-outlet></router-outlet>
+</div>

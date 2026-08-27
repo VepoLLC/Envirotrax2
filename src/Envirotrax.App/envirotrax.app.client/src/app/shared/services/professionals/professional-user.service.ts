@@ -8,6 +8,7 @@ import { ProfesisonalService } from "./professional.service";
 import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
+import { InputOption, MAX_PAGE_SIZE } from "@envirotrax/common-ui";
 
 @Injectable({
     providedIn: 'root'
@@ -45,6 +46,26 @@ export class ProfesionalUserService {
         return lastValueFrom(observable);
     }
 
+    public async saveMySignature(signature: File): Promise<string | null> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/users/my/signature');
+
+        const formData = new FormData();
+        formData.append('signature', signature);
+
+        const result = await lastValueFrom(this._http.post<{ signatureUrl: string | null }>(url, formData));
+        this._currentUser$ = undefined;
+
+        return result.signatureUrl;
+    }
+
+    public async getSignatureUrl(id: number): Promise<string | null> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/users/${id}/signature-url`);
+
+        const result = await lastValueFrom(this._http.get<{ signatureUrl: string | null }>(url));
+
+        return result.signatureUrl;
+    }
+
     public getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<ProfessionalUser>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/users');
 
@@ -53,6 +74,22 @@ export class ProfesionalUserService {
                 params: this._queryHelper.buildQuery(pageInfo, query)
             })
         );
+    }
+
+    public async getAllAsOptions(includeEmpty: boolean, emptyOptionText: string, query: Query): Promise<InputOption<ProfessionalUser>[]> {
+        const users = await this.getAll({ pageSize: MAX_PAGE_SIZE }, query);
+
+        const options: InputOption<ProfessionalUser>[] = users.data.map(u => ({
+            id: u.id,
+            text: u.contactName ?? '',
+            data: u
+        }));
+
+        if (includeEmpty) {
+            options.splice(0, 0, { id: '', text: emptyOptionText ?? '' });
+        }
+
+        return options;
     }
 
     public get(id: number): Promise<ProfessionalUser> {

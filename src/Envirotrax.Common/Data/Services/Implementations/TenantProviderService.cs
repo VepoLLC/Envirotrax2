@@ -14,7 +14,7 @@ namespace Envirotrax.Common.Data.Services.Implementations
         {
             get
             {
-                if (HasScopes("envirotrax_app_internal", "task_runner"))
+                if (HasAnyScopes(ScopeDefinitions.EnvirotraxAppinternal, ScopeDefinitions.TaskRunner, ScopeDefinitions.AdminInternal))
                 {
                     var supplierIdHeader = _contextAccessor.HttpContext?.Request?.Headers["Vp-Water-Supplier-Id"];
 
@@ -49,7 +49,7 @@ namespace Envirotrax.Common.Data.Services.Implementations
         {
             get
             {
-                if (HasScopes("envirotrax_app_internal", "task_runner"))
+                if (HasAnyScopes(ScopeDefinitions.EnvirotraxAppinternal, ScopeDefinitions.TaskRunner, ScopeDefinitions.AdminInternal))
                 {
                     var userIdHeader = _contextAccessor.HttpContext?.Request?.Headers["Vp-User-Id"];
 
@@ -163,7 +163,7 @@ namespace Envirotrax.Common.Data.Services.Implementations
             return false;
         }
 
-        public bool HasScopes(params string[] scopesToCheck)
+        public bool HasAnyScopes(params string[] scopesToCheck)
         {
             var scope = _contextAccessor.HttpContext?.User?.FindFirstValue("scope");
 

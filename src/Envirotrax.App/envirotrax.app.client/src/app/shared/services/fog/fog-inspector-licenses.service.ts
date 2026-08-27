@@ -8,7 +8,7 @@ import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { ProfessionalUserLicense } from "../../models/professionals/licenses/professional-user-license";
 import { ProfessionalLicenseType } from "../../models/professionals/licenses/professional-license-type";
-import { InputOption } from "../../components/input/input.component";
+import { InputOption } from "@envirotrax/common-ui";
 
 @Injectable({
     providedIn: 'root'
@@ -34,5 +34,15 @@ export class FogInspectorLicensesService {
         return await lastValueFrom(this._http.get<PagedData<ProfessionalUserLicense>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));
+    }
+
+    public add(inspectorId: number, license: ProfessionalUserLicense): Promise<ProfessionalUserLicense> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/inspectors/${inspectorId}/licenses`);
+        return lastValueFrom(this._http.post<ProfessionalUserLicense>(url, license));
+    }
+
+    public update(inspectorId: number, license: ProfessionalUserLicense): Promise<ProfessionalUserLicense> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/inspectors/${inspectorId}/licenses/${license.id}`);
+        return lastValueFrom(this._http.put<ProfessionalUserLicense>(url, license));
     }
 }

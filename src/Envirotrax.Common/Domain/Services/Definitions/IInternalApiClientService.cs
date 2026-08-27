@@ -12,15 +12,17 @@ public interface IInternalApiClientService : IInternalApiClientService<InternalA
 public interface IInternalApiClientService<TOptions>
     where TOptions : InternalApiOptions
 {
-    Task<T?> GetAsync<T>(int? loggedInUserId, string url);
+    Task<T?> GetAsync<T>(int? loggedInUserId, string url, CancellationToken cancellationToken);
 
-    Task<T?> GetAsync<T>(int waterSupplierId, int? loggedInUserId, string url);
+    Task<T?> GetAsync<T>(int waterSupplierId, int? loggedInUserId, string url, CancellationToken cancellationToken);
 
-    Task<TResponse?> PostAsync<TRequest, TResponse>(string url, ServiceMessageDto<TRequest> requestData);
+    Task<TResponse?> PostAsync<TRequest, TResponse>(string url, ServiceMessageDto<TRequest> requestData, CancellationToken cancellationToken);
 
-    Task<TResponse?> PutAsync<TRequest, TResponse>(string url, ServiceMessageDto<TRequest> requestData);
+    Task<TResponse?> PostFileAsync<TResponse>(int? loggedInUserId, string url, Stream fileStream, string fileName, string fileFieldName, IDictionary<string, string> formFields, CancellationToken cancellationToken);
 
-    Task<T?> DeleteAsync<T>(int? loggedInUserId, string url);
-    Task<T?> DeleteAsync<T>(int waterSupplierId, int? loggedInUserId, string url);
+    Task<TResponse?> PutAsync<TRequest, TResponse>(string url, ServiceMessageDto<TRequest> requestData, CancellationToken cancellationToken);
+
+    Task<T?> DeleteAsync<T>(int? loggedInUserId, string url, CancellationToken cancellationToken);
+    Task<T?> DeleteAsync<T>(int waterSupplierId, int? loggedInUserId, string url, CancellationToken cancellationToken);
 }
 

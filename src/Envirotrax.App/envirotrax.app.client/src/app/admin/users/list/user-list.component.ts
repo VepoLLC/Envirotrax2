@@ -3,12 +3,10 @@ import { TableViewModel } from "../../../shared/models/table-view-model";
 import { WaterSupplierUser } from "../../../shared/models/users/water-supplier-user";
 import { UserService } from "../../../shared/services/water-suppliers/user.service";
 import { ActivatedRoute, Router } from "@angular/router";
-import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
-import { TableColumn } from "../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { CreateUserComponent } from "../create/create-user.component";
 import { AuthService } from "../../../shared/services/auth/auth.service";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
+import { ColumnType, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 
 @Component({
     standalone: false,
@@ -24,7 +22,8 @@ export class UserListComponent implements OnInit {
         freeTextSearch: {
             searchQuery: [
                 { field: 'contactName', operator: 'Ct', multiWordSearch: true },
-                { field: 'emailAddress', operator: 'Ct' }
+                { field: 'emailAddress', operator: 'Ct' },
+                { field: 'cellNumber', operator: 'Ct' }
             ]
         }
     };
@@ -60,6 +59,11 @@ export class UserListComponent implements OnInit {
             {
                 field: 'emailAddress',
                 caption: 'Email',
+                type: ColumnType.text
+            },
+            {
+                field: 'cellNumber',
+                caption: 'Cell Number',
                 type: ColumnType.text
             }
         ];

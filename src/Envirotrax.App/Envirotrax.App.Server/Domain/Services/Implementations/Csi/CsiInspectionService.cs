@@ -1,15 +1,21 @@
+using System.Transactions;
+using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Csi;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Licenses;
+using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
+using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Csi;
@@ -22,6 +28,8 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
     private readonly IProfessionalUserLicenseService _licenseService;
     private readonly ISiteService _siteService;
     private readonly IPdfTemplateService _pdfTemplateService;
+    private readonly IAuthService _authService;
+    private readonly IRecordLogService _recordLogService;
 
     public CsiInspectionService(
         IMapper mapper,
@@ -30,7 +38,9 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         IProfessionalUserService professionalUserService,
         IProfessionalUserLicenseService licenseService,
         ISiteService siteService,
-        IPdfTemplateService pdfTemplateService)
+        IPdfTemplateService pdfTemplateService,
+        IAuthService authService,
+        IRecordLogService recordLogService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -39,6 +49,23 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         _licenseService = licenseService;
         _siteService = siteService;
         _pdfTemplateService = pdfTemplateService;
+        _authService = authService;
+        _recordLogService = recordLogService;
+    }
+
+    public override async Task<CsiInspectionDto?> DeleteAsync(int id)
+    {
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+        var deleted = await _repository.DeleteAsync(id);
+
+        if (deleted == null || deleted.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(deleted.TransactionId))
+        {
+            return null;
+        }
+
+        scope.Complete();
+        return MapToDto(deleted);
     }
 
     public async Task<CsiInspectionDto> SubmitAsync(CsiInspectionDto request, CancellationToken cancellationToken)
@@ -93,11 +120,45 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         return inspection == null ? null : Mapper.Map<CsiInspectionDto>(inspection);
     }
 
+    public async Task<CsiInspectionDto?> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request)
+    {
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            var saved = await _repository.UpdateForAdminAsync(id, request);
+
+            if (saved.Model == null)
+            {
+                return null;
+            }
+
+            if (saved.Changes.Length > 0)
+            {
+                await _recordLogService.AddAsync(RecordLogTableNames.CsiInspections, id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
+            }
+
+            scope.Complete();
+        }
+
+        var updated = await _repository.GetAsync(id, default);
+
+        return Mapper.Map<CsiInspectionDto>(updated);
+    }
+
     public async Task<IPagedData<CsiInspectionDto>> SearchForProfessionalAsync(PageInfo pageInfo, Query query, bool latestOnly, CancellationToken cancellationToken)
     {
         query.Filter = query.ConvertFilterProperties<CsiInspection, CsiInspectionDto>(Mapper);
         query.Sort = query.ConvertSortProperties<CsiInspection, CsiInspectionDto>(Mapper);
         var inspections = await _repository.SearchForProfessionalAsync(pageInfo, query, latestOnly, cancellationToken);
+        return inspections.Select(m => Mapper.Map<CsiInspectionDto>(m)!).ToPagedData(pageInfo);
+    }
+
+    public async Task<IPagedData<CsiInspectionDto>> SearchForAdminAsync(PageInfo pageInfo, Query query, CsiPaymentStatus? paymentStatus, CancellationToken cancellationToken)
+    {
+        query.Filter = query.ConvertFilterProperties<CsiInspection, CsiInspectionDto>(Mapper);
+        query.Sort = query.ConvertSortProperties<CsiInspection, CsiInspectionDto>(Mapper);
+
+        var inspections = await _repository.SearchForAdminAsync(pageInfo, query, paymentStatus, cancellationToken);
+
         return inspections.Select(m => Mapper.Map<CsiInspectionDto>(m)!).ToPagedData(pageInfo);
     }
 
@@ -131,6 +192,16 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
     public Task<byte[]> GeneratePdfAsync(IEnumerable<CsiInspectionDto> inspections)
     {
         return _pdfTemplateService.GenerateAsync("Csi.CsiInspection", inspections);
+    }
+
+    public Task<byte[]> GeneratePdfForProfessionalAsync(CsiInspectionDto inspection)
+    {
+        if (inspection.TransactionId == null)
+        {
+            throw new AppValidationException("Report can't be downloaded until it's paid. Please go to checkout and pay for this transaction, then try downloading again.");
+        }
+
+        return GeneratePdfAsync(inspection);
     }
 
     private static void ApplyInspectorSnapshot(

@@ -4,7 +4,7 @@
     ViewData["Title"] = "Invitation Confirmation";
 }
 
-<div class="d-flex align-items-center justify-content-center bg-light">
+<div class="d-flex align-items-center justify-content-center">
     <div class="card shadow-sm vp-login-form">
         <div class="card-header text-center text-white bg-info fw-semibold fs-5 rounded-top">
             <h1 class="h4 mb-0">@ViewData["Title"]</h1>
@@ -12,6 +12,11 @@
         <div class="card-body border border-info rounded-bottom">
             <p>
                 Thank you for accepting the invitation. Please click the button below to login.
+            </p>
+
+            <p class="text-muted small">
+                Tip: after logging in, you'll be able to add a phone number so you can receive
+                two-factor codes by text message &mdash; it's faster than email.
             </p>
 
             <div class="d-flex justify-content-center mt-4">

@@ -2,13 +2,9 @@ import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core"
 import { BackflowGauge, GaugeExpirationType } from "../../../../../shared/models/backflow/backflow-gauge";
 import { BackflowTesterGaugeService } from "../../../../../shared/services/backflow/backflow-tester-gauge.service";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
-import { CellTemplateData, TableColumn, TableCustomAction } from "../../../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { AuthService } from "../../../../../shared/services/auth/auth.service";
 import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
-import { ModalHelperService } from "../../../../../shared/services/helpers/modal-helper.service";
-import { ToastService } from "../../../../../shared/services/toast.service";
-import { HelperService } from "../../../../../shared/services/helpers/helper.service";
+import { ToastService, CellTemplateData, ColumnType, ModalHelperService, TableColumn, TableCustomAction } from '@envirotrax/common-ui';
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { AddEditBackflowTesterGaugeComponent, BackflowGaugeModalData } from "../edit/add-edit-backflow-tester-gauge.component";
 import { Professional } from "../../../../../shared/models/professionals/professional";
@@ -43,7 +39,6 @@ export class BackflowTesterGaugeComponent implements OnInit {
         private readonly _authService: AuthService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService,
-        private readonly _helper: HelperService,
         private readonly _downloadService: DownloadService
     ) { }
 

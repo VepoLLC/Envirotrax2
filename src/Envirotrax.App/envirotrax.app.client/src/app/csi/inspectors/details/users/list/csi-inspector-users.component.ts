@@ -1,11 +1,8 @@
 ﻿import { Component, Input, OnInit } from "@angular/core";
 import { ProfessionalUser } from "../../../../../shared/models/professionals/professional-user";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
-import { TableColumn } from "../../../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { CsiInspectorSubAccountsService } from "../../../../../shared/services/csi/csi-inspector-user.service";
-import { ModalHelperService } from "../../../../../shared/services/helpers/modal-helper.service";
-import { ToastService } from "../../../../../shared/services/toast.service";
+import { ToastService, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 import { AuthService } from "../../../../../shared/services/auth/auth.service";
 import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
 import { FeatureType } from "../../../../../shared/models/feature-type";

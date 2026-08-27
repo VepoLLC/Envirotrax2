@@ -1,23 +1,33 @@
 ﻿import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { TableViewModel } from "../../shared/models/table-view-model";
 import { ProfessionalSupplierService } from "../../shared/services/professionals/professional-supplier.service";
-import { CellTemplateData, TableColumn, TableCustomAction } from "../../shared/components/data-components/table/table.component";
-import { CurrencyCellComponent } from "../../shared/components/data-components/table/table-cells/currency-cell.component";
-import { ColumnType } from "../../shared/components/data-components/sorting-filtering/query-view-model";
 import { AvailableWaterSupplier, ProfessionalWaterSupplier } from "../../shared/models/professionals/professional-water-supplier";
 import { ProfesisonalService } from "../../shared/services/professionals/professional.service";
 import { QueryProperty } from "../../shared/models/query";
 import { State } from "../../shared/models/lookup/state";
 import { LookupService } from "../../shared/services/lookup/lookup.service";
 import { Professional } from "../../shared/models/professionals/professional";
-import { InputOption } from "../../shared/components/input/input.component";
-import { ModalHelperService } from "../../shared/services/helpers/modal-helper.service";
 import { WaterSupplierRegistrationComponent, WaterSupplierRegistrationVm } from "./registration/water-supplier-registration.component";
-import { ToastService } from "../../shared/services/toast.service";
+import { ToastService, CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 import { AuthService } from "../../shared/services/auth/auth.service";
 import { FeatureType } from "../../shared/models/feature-type";
+import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
 
 type TabType = 'backflow' | 'csi' | 'fogInspection' | 'fogTransport';
+
+const TAB_LABELS: Record<TabType, string> = {
+    backflow: 'Backflow Tester',
+    csi: 'CSI Inspector',
+    fogInspection: 'FOG Inspector',
+    fogTransport: 'FOG Transporter'
+};
+
+const TAB_ICONS: Record<TabType, string> = {
+    backflow: 'fa-regular fa-gauge',
+    csi: 'fa-solid fa-building-magnifying-glass',
+    fogInspection: 'fa-regular fa-tank-water',
+    fogTransport: 'fa-regular fa-tank-water'
+};
 
 @Component({
     standalone: false,
@@ -37,6 +47,20 @@ type TabType = 'backflow' | 'csi' | 'fogInspection' | 'fogTransport';
 
         :host ::ng-deep .vp-registration-actions-column {
             min-width: 150px;
+        }
+
+        .vp-tabs-mobile {
+            display: none;
+        }
+
+        @media (max-width: 840px) {
+            .vp-tabs-desktop {
+                display: none !important;
+            }
+
+            .vp-tabs-mobile {
+                display: inline-block;
+            }
         }
     `
 })
@@ -93,12 +117,15 @@ export class WaterSuppliersComponent implements OnInit {
         private readonly _lookupService: LookupService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService,
-        private readonly _authService: AuthService
+        private readonly _authService: AuthService,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
 
     }
 
     public async ngOnInit(): Promise<void> {
+        this._containerHelper.setContainerVisibility(false);
+
         [this.hasBackflowTesting, this.hasCsiInspection, this.hasFogInspection, this.hasFogTransportation] = await Promise.all([
             this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
             this._authService.hasAnyFeatures(FeatureType.CsiInspection),
@@ -166,6 +193,14 @@ export class WaterSuppliersComponent implements OnInit {
         this._tabQuery.columnName = this._getTabColumnName();
         this.suppliers.columns = this.getColumns();
         this.getSuppliers();
+    }
+
+    public getTabLabel(tab: TabType): string {
+        return TAB_LABELS[tab];
+    }
+
+    public getTabIcon(tab: TabType): string {
+        return TAB_ICONS[tab];
     }
 
     public openRegistration(supplier: ProfessionalSupplierVm): void {

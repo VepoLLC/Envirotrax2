@@ -13,9 +13,10 @@ import { ProfessionalUserLicense, ExpirationType, ProfessionalType } from '../..
 import { ProfessionalWaterSupplier } from '../../../../shared/models/professionals/professional-water-supplier';
 import { Site } from '../../../../shared/models/sites/site';
 import { CsiInspectionReason, csiInspectionReasonLabels } from '../../../../shared/enums/csi-inspection-reason.enum';
-import { InputOption } from '../../../../shared/components/input/input.component';
 import { MAX_PAGE_SIZE } from '../../../../shared/models/page-info';
 import { ProfessionalSupplierService } from '../../../../shared/services/professionals/professional-supplier.service';
+import { CheckoutService } from '../../../../shared/services/professionals/checkout.service';
+import { ToastService, InputOption } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,
@@ -44,6 +45,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
     public waterSupplierOptions: InputOption[] = [];
 
     public legalAcknowledgment = false;
+    public pendingImages: { file: File; description: string; previewUrl: string }[] = [];
 
     public model: CsiInspection = {
         site: {},
@@ -85,7 +87,9 @@ export class CsiSubmissionCreateComponent implements OnInit {
         private readonly _licenseService: ProfessionalUserLicenseService,
         private readonly _siteService: SiteService,
         private readonly _inspectionService: CsiInspectionService,
-        private readonly _professionalSupplierService: ProfessionalSupplierService
+        private readonly _professionalSupplierService: ProfessionalSupplierService,
+        private readonly _toastService: ToastService,
+        private readonly _checkoutService: CheckoutService
     ) { }
 
     public ngOnInit(): void {
@@ -137,6 +141,20 @@ export class CsiSubmissionCreateComponent implements OnInit {
         }
     }
 
+    public onImageFileChange(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        if (!input.files?.length) return;
+        const file = input.files[0];
+        input.value = '';
+        if (this.pendingImages.length >= 24) return;
+        this.pendingImages.push({ file, description: '', previewUrl: URL.createObjectURL(file) });
+    }
+
+    public removePendingImage(index: number): void {
+        URL.revokeObjectURL(this.pendingImages[index].previewUrl);
+        this.pendingImages.splice(index, 1);
+    }
+
     public async submit(submitForm: NgForm): Promise<void> {
         this.resetValidation();
         this.collectValidationErrors();
@@ -147,8 +165,20 @@ export class CsiSubmissionCreateComponent implements OnInit {
 
         this.isLoading = true;
         try {
-            await this._inspectionService.submit({ ...this.model, site: { id: this._siteId } });
+            const result = await this._inspectionService.submit({ ...this.model, site: { id: this._siteId } });
+            let imagesFailed = false;
+            for (const img of this.pendingImages) {
+                try {
+                    await this._inspectionService.addImage(result.id!, img.description || null, img.file);
+                } catch {
+                    imagesFailed = true;
+                }
+            }
+            if (imagesFailed) {
+                this._toastService.failedToSave('One or more images');
+            }
             this.submitSuccess = true;
+            this._checkoutService.refresh();
         } finally {
             this.isLoading = false;
         }
@@ -187,7 +217,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
             this.csiUsers = usersPage.data ?? [];
             this.site = site;
 
-            const waterSuppliersPage = await this._professionalSupplierService.getAllMy(true);
+            const waterSuppliersPage = await this._professionalSupplierService.getAllMy({ hasCsiInspection: true });
             this.waterSuppliers = waterSuppliersPage.data ?? [];
 
             this.buildDropdownOptions();

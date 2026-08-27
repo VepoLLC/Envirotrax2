@@ -1,11 +1,8 @@
 import { Component, Input, OnInit, ViewChild, TemplateRef } from "@angular/core";
 import { ExpirationType, ProfessionalUserLicense, professionalTypeLabels } from "../../../../../shared/models/professionals/licenses/professional-user-license";
 import { ProfessionalUserLicenseService } from "../../../../../shared/services/professionals/professional-user-license.service";
-import { ModalHelperService } from "../../../../../shared/services/helpers/modal-helper.service";
-import { ToastService } from "../../../../../shared/services/toast.service";
+import { ToastService, CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
-import { CellTemplateData, TableColumn } from "../../../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { CreateEditLicenseComponent } from "../create-edit/create-edit-license.component";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 

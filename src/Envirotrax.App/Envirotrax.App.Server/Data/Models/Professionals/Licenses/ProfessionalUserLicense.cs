@@ -20,6 +20,8 @@ public class ProfessionalUserLicense : IProfessionalModel, ICreateAuditableModel
     public int UserId { get; set; }
     public AppUser? User { get; set; }
 
+    public ProfessionalUser? ProfessionalUser { get; set; }
+
     public ProfessionalType ProfessionalType { get; set; }
 
     public int LicenseTypeId { get; set; }
@@ -40,7 +42,7 @@ public class ProfessionalUserConfiguration : IEntityTypeConfiguration<Profession
 {
     public void Configure(EntityTypeBuilder<ProfessionalUserLicense> builder)
     {
-        builder.HasOne<ProfessionalUser>()
+        builder.HasOne(license => license.ProfessionalUser)
             .WithMany()
             .HasForeignKey(license => new { license.ProfessionalId, license.UserId });
     }

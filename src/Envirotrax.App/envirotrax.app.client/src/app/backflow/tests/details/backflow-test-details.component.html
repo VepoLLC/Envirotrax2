@@ -1,0 +1,187 @@
+<div>
+    <h1 class="text-center h2">Backflow Assembly Test</h1>
+
+    <div>
+         <div class="d-flex flex-row justify-content-center">
+                <div class="me-3">
+                    <span>A  </span> 
+                    <input class="form-check-input" type="checkbox" [checked]="true"/>
+                    <span>  indicates Yes.</span>
+                </div>
+
+                <div class="ms-3">
+                    <span>A  </span> 
+                    <input class="form-check-input" type="checkbox" [checked]="false"/>
+                    <span>  indicates a No.</span>
+                </div>
+        </div>
+        <p class="text-center mt-1">The following form must be completed for each assembly tested for recordkeeping *purposes:</p>
+    </div>
+
+    <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+    <div *ngIf="!isLoading && test">
+        <div class="alert alert-danger" *ngIf="validationErrors.length">
+            <ul class="mb-0">
+                <li *ngFor="let error of validationErrors">{{ error }}</li>
+            </ul>
+        </div>
+
+        <div class="mb-3 mt-3">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="fw-bold">Expiration Date:</span>
+                <div class="form-control form-control-sm text-center"
+                     style="width: 110px;"
+                     [class.bg-success]="test.renewalRequired && test.expirationDate && !isExpired"
+                     [class.bg-danger]="test.renewalRequired && test.expirationDate && isExpired"
+                     [class.text-white]="test.renewalRequired && !!test.expirationDate"
+                     [class.text-muted]="!test.renewalRequired || !test.expirationDate">
+                    {{ (test.renewalRequired && test.expirationDate) ? (test.expirationDate | date:'MM.dd.yyyy') : 'N/A' }}
+                </div>
+                <button class="btn btn-sm"
+                        [class.btn-success]="test.renewalRequired"
+                        [class.btn-danger]="!test.renewalRequired"
+                        [disabled]="isLoading || !canModify"
+                        (click)="toggleRenewalRequired()">
+                    {{ test.renewalRequired ? 'Renewal Required' : 'Renewal Not Required' }}
+                </button>
+            </div>
+
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="fw-bold">Test Renewal Month:</span>
+                <vp-input type="select"
+                          style="width: 13rem;"
+                          [ngModel]="test.backflowScheduleMonth ?? 0"
+                          (ngModelChange)="test.backflowScheduleMonth = $event"
+                          name="backflowScheduleMonth"
+                          [options]="scheduleMonthOptions"
+                          [disabled]="!canModify" />
+                <button class="btn btn-sm btn-primary"
+                        [disabled]="isLoading || !canModify"
+                        (click)="updateScheduleMonth()">
+                    Update
+                </button>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-sm"
+                        [class.btn-success]="test.isCurrent"
+                        [class.btn-danger]="!test.isCurrent"
+                        [disabled]="isLoading || !canModify"
+                        (click)="toggleIsCurrent()">
+                    {{ test.isCurrent ? 'Is Current Test' : 'Non-Current' }}
+                </button>
+                <button class="btn btn-sm"
+                        [class.btn-success]="!test.outOfService"
+                        [class.btn-danger]="test.outOfService"
+                        [disabled]="isLoading || !canModify"
+                        (click)="toggleOutOfService()">
+                    {{ test.outOfService ? 'Out Of Service' : 'In Service' }}
+                </button>
+                <button class="btn btn-sm"
+                        [class.btn-success]="!test.disapproved"
+                        [class.btn-danger]="test.disapproved"
+                        [disabled]="isLoading || !canModify"
+                        (click)="toggleDisapproval()">
+                    {{ test.disapproved ? 'Disapproved' : 'Approved' }}
+                </button>
+                <button class="btn btn-sm"
+                        [class.btn-success]="!test.rejected"
+                        [class.btn-danger]="test.rejected"
+                        [disabled]="isLoading || !canModify"
+                        (click)="toggleRejection()">
+                    {{ test.rejected ? 'Rejected' : 'Accepted' }}
+                </button>
+                <button class="btn btn-sm"
+                        [class.btn-success]="test.forceRenewal"
+                        [class.btn-danger]="!test.forceRenewal"
+                        [disabled]="isLoading || !canForceRenewal"
+                        (click)="toggleForceRenewal()">
+                    Force Renewal [{{ test.forceRenewal ? 'On' : 'Off' }}]
+                </button>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <vp-backflow-test-water-supplier [test]="test" />
+        </div>
+
+        <div class="row mt-3">
+            <vp-backflow-test-bpat-info [test]="test" />
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <vp-backflow-test-property-info
+                    [test]="test"
+                    [canModify]="canModify"
+                    [states]="states"
+                    [saving]="savingSection === 'Property information'"
+                    (save)="save($event, 'Property information')" />
+            </div>
+            <div class="col-md-6">
+                <vp-backflow-test-mailing-info
+                    [test]="test"
+                    [canModify]="canModify"
+                    [states]="states"
+                    [saving]="savingSection === 'Mailing information'"
+                    (save)="save($event, 'Mailing information')" />
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <vp-backflow-test-backflow-info
+                [test]="test"
+                [canModify]="canModify"
+                [saving]="savingSection === 'Backflow information'"
+                (save)="save($event, 'Backflow information')" />
+        </div>
+
+        <div class="row mt-3">
+            <vp-backflow-test-info
+                [test]="test"
+                [canModify]="canModify"
+                [saving]="savingSection === 'Test information'"
+                (save)="save($event, 'Test information')" />
+        </div>
+
+        <!--implementation of Additional Information-->
+
+        <vp-backflow-test-additional-info
+            [test]="test"
+            [canModify]="canModify"
+            [showRainSensor]="settings?.showRainSensor ?? false"
+            [showOSSF]="settings?.showOSSF ?? false"
+            [showPermitNumber]="settings?.showPermitNumber ?? false"
+            [saving]="savingSection === 'Additional information'"
+            (save)="save($event, 'Additional information')" />
+
+        <div class="row mt-3">
+            <vp-backflow-test-remarks [test]="test" />
+        </div>
+
+        <vp-backflow-test-images
+            [test]="test"
+            [canModify]="canModify"
+            (imageUrlUpdated)="onImageUrlUpdated($event)" />
+
+        <div class="row mt-3" *ngIf="test.site?.id">
+            <vp-backflow-test-history
+                [test]="test"
+                [canViewTesters]="canViewTesters" />
+        </div>
+
+        <div class="d-flex justify-content-center mt-3">
+            <button class="btn btn-primary vp-section-button" [disabled]="isLoading" (click)="exportPdf()">
+                Export Test to Printable Document
+            </button>
+        </div>
+
+    </div>
+        <div class="text-center mt-3"> The above is certified to be true at the time of testing.
+        <br>* TEST RECORDS MUST BE KEPT FOR AT LEAST THREE YEARS [30 TAC §290.46(B)]
+        <br>** USE ONLY MANUFACTURER'S REPLACEMENT PARTS
+        <br>*** 2nd Check: Numeric reading required for Double Check Valve only.
+        <br>**** Indicates additional information not present on the standard TCEQ report
+    </div>
+</div>

@@ -28,4 +28,9 @@ export class FogInspectionService {
 
         return await lastValueFrom(observable);
     }
+
+    public getById(id: number): Promise<FogInspection> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/inspections/${id}`);
+        return lastValueFrom(this._http.get<FogInspection>(url));
+    }
 }

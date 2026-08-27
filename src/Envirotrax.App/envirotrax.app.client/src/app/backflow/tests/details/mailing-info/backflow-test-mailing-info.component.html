@@ -1,0 +1,70 @@
+<vp-section header="Contact / Mailing Information">
+    <form #mailingForm="ngForm" dp-spinner-parent>
+        <dp-loading-spinner *ngIf="saving"></dp-loading-spinner>
+        <div class="mb-3">
+            <vp-input name="mailingCompanyName" label="Company name" [maxLength]="100"
+                      [form]="mailingForm" [disabled]="!canModify"
+                      [(ngModel)]="test.mailingCompanyName" />
+        </div>
+        <div class="mb-3">
+            <vp-input name="mailingContactName" label="Contact name" [maxLength]="100"
+                      [form]="mailingForm" [disabled]="!canModify"
+                      [(ngModel)]="test.mailingContactName" />
+        </div>
+        <div class="mb-2" *ngIf="canModify">
+            <button type="button" class="btn btn-primary vp-section-button"
+                    (click)="copyFromPropertyAddress()">
+                Copy from Property Address
+            </button>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <vp-input name="mailingStreetNumber" label="Street #"
+                          [form]="mailingForm" [disabled]="!canModify"
+                          [(ngModel)]="test.mailingStreetNumber" />
+            </div>
+            <div class="col-md-5 mb-3">
+                <vp-input name="mailingStreetName" label="Street name"
+                          [form]="mailingForm" [disabled]="!canModify"
+                          [(ngModel)]="test.mailingStreetName" />
+            </div>
+            <div class="col-md-3 mb-3">
+                <vp-input name="mailingNumber" label="Suite/Apt #"
+                          [form]="mailingForm" [disabled]="!canModify"
+                          [(ngModel)]="test.mailingNumber" />
+            </div>
+        </div>
+        <div class="mb-3">
+            <vp-input name="mailingCity" label="City" [form]="mailingForm"
+                      [disabled]="!canModify" [(ngModel)]="test.mailingCity" />
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <vp-input name="mailingStateId" label="State" type="select" [form]="mailingForm"
+                          [options]="states" [disabled]="!canModify"
+                          [ngModel]="test.mailingState?.id"
+                          (ngModelChange)="mailingStateChanged($event)" />
+            </div>
+            <div class="col-md-6 mb-3">
+                <vp-input name="mailingZip" label="ZIP" [maxLength]="20" [form]="mailingForm"
+                          [disabled]="!canModify" [(ngModel)]="test.mailingZip" />
+            </div>
+        </div>
+        <div class="mb-3">
+            <vp-input name="mailingPhoneNumber" label="Phone number"
+                      [form]="mailingForm" [disabled]="!canModify"
+                      [(ngModel)]="test.mailingPhoneNumber" />
+        </div>
+        <div class="mb-3">
+            <vp-input name="mailingEmailAddress" label="Email address" type="email"
+                      [form]="mailingForm" [disabled]="!canModify"
+                      [(ngModel)]="test.mailingEmailAddress" />
+        </div>
+        <div class="d-flex justify-content-end mt-2" *ngIf="canModify">
+            <button type="button" class="btn btn-primary vp-section-button" [disabled]="saving"
+                    (click)="save.emit(mailingForm)">
+                Update
+            </button>
+        </div>
+    </form>
+</vp-section>

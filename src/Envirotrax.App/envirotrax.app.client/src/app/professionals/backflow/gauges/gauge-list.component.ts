@@ -1,11 +1,8 @@
 import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { BackflowGauge, GaugeExpirationType } from "../../../shared/models/backflow/backflow-gauge";
 import { BackflowGaugeService } from "../../../shared/services/backflow/backflow-gauge.service";
-import { ModalHelperService } from "../../../shared/services/helpers/modal-helper.service";
-import { ToastService, ToastType } from "../../../shared/services/toast.service";
+import { ToastService, ToastType, CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 import { TableViewModel } from "../../../shared/models/table-view-model";
-import { CellTemplateData, TableColumn } from "../../../shared/components/data-components/table/table.component";
-import { ColumnType } from "../../../shared/components/data-components/sorting-filtering/query-view-model";
 import { ProfesisonalService } from "../../../shared/services/professionals/professional.service";
 import { NgForm } from "@angular/forms";
 import { HelperService } from "../../../shared/services/helpers/helper.service";

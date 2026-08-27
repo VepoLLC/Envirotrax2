@@ -18,6 +18,13 @@ export class GisAreaCoordinateService {
         return lastValueFrom(this._http.get<GisAreaCoordinate[]>(url));
     }
 
+    public getAllForProfessional(waterSupplierId: number): Promise<GisAreaCoordinate[]> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/gis-areas/coordinates');
+        return lastValueFrom(this._http.get<GisAreaCoordinate[]>(url, {
+            params: { waterSupplierId }
+        }));
+    }
+
     public getByAreaId(areaId: number): Promise<GisAreaCoordinate[]> {
         const url = this._urlResolver.resolveUrl(`/api/gis-areas/${areaId}/coordinates`);
         return lastValueFrom(this._http.get<GisAreaCoordinate[]>(url));

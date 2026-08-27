@@ -1,0 +1,25 @@
+<section class="border border-info d-flex flex-column rounded-4 shadow-sm h-100"
+         [class.h-100]="isExpanded">
+    <div class="bg-info px-3 py-1 rounded-top-4">
+        <div role="button" class="d-flex justify-content-between text-white">
+            <div class="d-flex align-items-center">
+                <h2 *ngIf="header" class="h5 mb-0">
+                    {{header}}
+                </h2>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <ng-content select="vp-section-actions"></ng-content>
+                <button *ngIf="collapsible" type="button" class="border btn px-1 py-0 text-white" (click)="isExpanded = !isExpanded">
+                    <i *ngIf="!isExpanded" class="fa-solid fa-chevron-down"></i>
+                    <i *ngIf="isExpanded" class="fa-solid fa-chevron-up"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="isExpanded" class="bg-white border-top-0 flex-fill overflow-hidden rounded-bottom-4"
+         [class.p-3]="!noPadding">
+        <ng-content></ng-content>
+    </div>
+</section>

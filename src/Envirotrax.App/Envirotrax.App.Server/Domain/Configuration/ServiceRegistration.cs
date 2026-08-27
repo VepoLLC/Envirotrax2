@@ -2,6 +2,8 @@ using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.GisAreas;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
+using Envirotrax.App.Server.Domain.Services.Implementations.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
@@ -46,18 +48,36 @@ public static class ServiceRegistration
         services.AddTransient<IWaterSupplierService, WaterSupplierService>();
         services.AddTransient<IGeneralSettingsService, GeneralSettingsService>();
         services.AddTransient<ISiteService, SiteService>();
+        services.AddTransient<ISiteLogService, SiteLogService>();
         services.AddTransient<ICsiInspectionService, CsiInspectionService>();
+        services.AddTransient<ICsiInspectionImageService, CsiInspectionImageService>();
+        services.AddTransient<ICsiInspectionAssemblyService, CsiInspectionAssemblyService>();
+        services.AddTransient<IRecordLogService, RecordLogService>();
         services.AddTransient<ICsiInspectorService, CsiInspectorService>();
         services.AddTransient<ICsiSystemReportService, CsiSystemReportService>();
         services.AddTransient<IFogInspectorService, FogInspectorService>();
+        services.AddTransient<IFogTransporterService, FogTransporterService>();
         services.AddTransient<IFogInspectionService, FogInspectionService>();
         services.AddTransient<IBackflowTesterService, BackflowTesterService>();
         services.AddTransient<IBackflowTestService, BackflowTestService>();
+        services.AddTransient<IBackflowTestReportService, BackflowTestReportService>();
+        services.AddTransient<IBackflowComplianceReportService, BackflowComplianceReportService>();
+        services.AddTransient<IBackflowComplianceSnapshotService, BackflowComplianceSnapshotService>();
+        services.AddTransient<IBackflowNewRemovedReportService, BackflowNewRemovedReportService>();
         services.AddTransient<IBackflowGaugeService, BackflowGaugeService>();
+        services.AddTransient<IBackflowOutOfServiceRequestService, BackflowOutOfServiceRequestService>();
+        services.AddTransient<IFogVehicleService, FogVehicleService>();
+        services.AddTransient<IFogVehiclePermitService, FogVehiclePermitService>();
+        services.AddTransient<IFogTransporterDisposalSiteService, FogTransporterDisposalSiteService>();
+        services.AddTransient<IFogDisposalSiteService, FogDisposalSiteService>();
+        services.AddTransient<IFogTripTicketService, FogTripTicketService>();
+        services.AddTransient<IFogSettingsService, FogSettingsService>();
+        services.AddTransient<IFogSystemReportService, FogSystemReportService>();
         services.AddTransient<ILookupService, LookupService>();
 
         services.AddTransient<ICsiSettingsService, CsiSettingsService>();
         services.AddTransient<IBackflowSettingsService, BackflowSettingsService>();
+        services.AddTransient<IBackflowRenewalRequirementService, BackflowRenewalRequirementService>();
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IUserRoleService, UserRoleService>();
         services.AddTransient<IRolePermissionService, RolePermissionService>();
@@ -83,7 +103,7 @@ public static class ServiceRegistration
             opts.Assembly = typeof(ServiceRegistration).Assembly;
             opts.Namespace = "Envirotrax.App.Server";
         });
-        services.AddPdfTemplateService();
+        services.AddPdfTemplateService(environment.IsDevelopment(), configuration.GetSection("PdfTemplate"));
 
         services.AddTransient<ICsvHelperService, CsvHelperService>();
 

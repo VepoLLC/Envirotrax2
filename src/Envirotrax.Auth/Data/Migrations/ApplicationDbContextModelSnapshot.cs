@@ -33,6 +33,9 @@ namespace Envirotrax.Auth.Data.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<bool>("AuthenticatorConfirmed")
+                        .HasColumnType("bit");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -42,6 +45,9 @@ namespace Envirotrax.Auth.Data.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSuperUser")
                         .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
@@ -57,6 +63,9 @@ namespace Envirotrax.Auth.Data.Migrations
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<DateTime?>("PasswordExpirationDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -90,6 +99,36 @@ namespace Envirotrax.Auth.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Envirotrax.Auth.Data.Models.GeneralSettings", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("BackflowTesting")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CsiInspections")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("FogProgram")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("WaterSupplierId1")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("WiseGuys")
+                        .HasColumnType("bit");
+
+                    b.HasKey("WaterSupplierId");
+
+                    b.HasIndex("WaterSupplierId1");
+
+                    b.ToTable("GeneralSettings", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
             modelBuilder.Entity("Envirotrax.Auth.Data.Models.Professional", b =>
                 {
                     b.Property<int>("Id")
@@ -97,6 +136,21 @@ namespace Envirotrax.Auth.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("HasBackflowTesting")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasCsiInspection")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasFogInspection")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasFogTransportation")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasWiseGuys")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -124,11 +178,84 @@ namespace Envirotrax.Auth.Data.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsBackflowTester")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsCsiInspector")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsFogInspector")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsFogTransporter")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsWiseGuy")
+                        .HasColumnType("bit");
+
                     b.HasKey("ProfessionalId", "UserId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("ProfessionalUsers", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
+            modelBuilder.Entity("Envirotrax.Auth.Data.Models.Role", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("DeletedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DeletedTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("WaterSupplierId", "Id");
+
+                    b.HasIndex("DeletedById");
+
+                    b.ToTable("Roles", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
+            modelBuilder.Entity("Envirotrax.Auth.Data.Models.RolePermission", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PermissionId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("CanDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CanModify")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CanView")
+                        .HasColumnType("bit");
+
+                    b.HasKey("WaterSupplierId", "RoleId", "PermissionId");
+
+                    b.ToTable("RolePermissions", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -164,6 +291,30 @@ namespace Envirotrax.Auth.Data.Migrations
                     b.ToTable("UserInvitations");
                 });
 
+            modelBuilder.Entity("Envirotrax.Auth.Data.Models.UserRole", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoleWaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.HasKey("WaterSupplierId", "UserId", "RoleId");
+
+                    b.HasIndex("RoleWaterSupplierId", "RoleId");
+
+                    b.ToTable("UserRoles", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
             modelBuilder.Entity("Envirotrax.Auth.Data.Models.WaterSupplier", b =>
                 {
                     b.Property<int>("Id")
@@ -190,6 +341,22 @@ namespace Envirotrax.Auth.Data.Migrations
                     b.HasIndex("ParentId");
 
                     b.ToTable("WaterSuppliers", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
+            modelBuilder.Entity("Envirotrax.Auth.Data.Models.WaterSupplierFeature", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FeatureId")
+                        .HasColumnType("int");
+
+                    b.HasKey("WaterSupplierId", "FeatureId");
+
+                    b.ToTable("WaterSupplierFeatures", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -561,6 +728,17 @@ namespace Envirotrax.Auth.Data.Migrations
                     b.ToTable("OpenIddictTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Envirotrax.Auth.Data.Models.GeneralSettings", b =>
+                {
+                    b.HasOne("Envirotrax.Auth.Data.Models.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WaterSupplier");
+                });
+
             modelBuilder.Entity("Envirotrax.Auth.Data.Models.Professional", b =>
                 {
                     b.HasOne("Envirotrax.Auth.Data.Models.Professional", "Parent")
@@ -589,6 +767,34 @@ namespace Envirotrax.Auth.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Envirotrax.Auth.Data.Models.Role", b =>
+                {
+                    b.HasOne("Envirotrax.Auth.Data.Models.AppUser", "DeletedBy")
+                        .WithMany()
+                        .HasForeignKey("DeletedById");
+
+                    b.HasOne("Envirotrax.Auth.Data.Models.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DeletedBy");
+
+                    b.Navigation("WaterSupplier");
+                });
+
+            modelBuilder.Entity("Envirotrax.Auth.Data.Models.RolePermission", b =>
+                {
+                    b.HasOne("Envirotrax.Auth.Data.Models.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WaterSupplier");
+                });
+
             modelBuilder.Entity("Envirotrax.Auth.Data.Models.UserInvitation", b =>
                 {
                     b.HasOne("Envirotrax.Auth.Data.Models.AppUser", "CreatedBy")
@@ -604,6 +810,25 @@ namespace Envirotrax.Auth.Data.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Envirotrax.Auth.Data.Models.UserRole", b =>
+                {
+                    b.HasOne("Envirotrax.Auth.Data.Models.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Envirotrax.Auth.Data.Models.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleWaterSupplierId", "RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+
+                    b.Navigation("WaterSupplier");
                 });
 
             modelBuilder.Entity("Envirotrax.Auth.Data.Models.WaterSupplier", b =>

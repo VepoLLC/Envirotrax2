@@ -8,6 +8,8 @@ public class RecordLogProfile : Profile
 {
     public RecordLogProfile()
     {
-        CreateMap<RecordLog, RecordLogDto>();
+        CreateMap<RecordLog, RecordLogDto>()
+            .ForMember(dest => dest.LogDate, opt => opt.MapFrom(src => src.CreatedTime))
+            .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.CreatedBy));
     }
 }

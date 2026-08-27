@@ -734,6 +734,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("ValidationNewSite")
                         .HasColumnType("bit");
 
+                    b.Property<string>("ValidationNotes")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
                     b.Property<bool>("ValidationSiteInformationChanged")
                         .HasColumnType("bit");
 
@@ -2959,6 +2963,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<string>("NormalizedEmail")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("AspNetUsers", t =>
@@ -3084,10 +3091,6 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
-
-                    b.Property<string>("CellNumber")
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
 
                     b.Property<string>("ContactName")
                         .IsRequired()

@@ -4,6 +4,7 @@ using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Backflow;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
@@ -16,6 +17,7 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 using Envirotrax.Common.Data;
@@ -43,6 +45,8 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     private readonly ISiteLogService _siteLogService;
     private readonly IBackflowRenewalRequirementService _renewalRequirementService;
     private readonly ITimeZoneHelperService _timeZoneHelper;
+    private readonly IBackflowSettingsService _settingsService;
+    private readonly IRecordLogService _recordLogService;
     private readonly ILogger<BackflowTestService> _logger;
 
     public BackflowTestService(
@@ -58,6 +62,8 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         ISiteLogService siteLogService,
         IBackflowRenewalRequirementService renewalRequirementService,
         ITimeZoneHelperService timeZoneHelper,
+        IBackflowSettingsService settingsService,
+        IRecordLogService recordLogService,
         ILogger<BackflowTestService> logger)
         : base(mapper, repository)
     {
@@ -72,6 +78,8 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         _siteLogService = siteLogService;
         _renewalRequirementService = renewalRequirementService;
         _timeZoneHelper = timeZoneHelper;
+        _settingsService = settingsService;
+        _recordLogService = recordLogService;
         _logger = logger;
     }
 
@@ -370,6 +378,83 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         }
 
         return dto;
+    }
+
+    public async Task<BackflowTestAdminDetailsDto?> GetForAdminAsync(int id, CancellationToken cancellationToken)
+    {
+        var test = await _testRepository.GetAsync(id, cancellationToken);
+
+        if (test == null)
+        {
+            return null;
+        }
+
+        var dto = Mapper.Map<BackflowTestAdminDetailsDto>(test);
+
+        await PopulateImageUrlsAsync(dto);
+
+        var settings = await _settingsService.GetTestingSettingsByWaterSupplierAsync(test.WaterSupplierId, cancellationToken);
+
+        dto.ShowRainSensor = settings.ShowRainSensor;
+        dto.ShowOSSF = settings.ShowOSSF;
+        dto.ShowPermitNumber = settings.ShowPermitNumber;
+
+        return dto;
+    }
+
+    public async Task<BackflowTestAdminDetailsDto?> UpdateForAdminAsync(int id, BackflowTestAdminUpdateRequest request)
+    {
+        ValidateAdminUpdate(request);
+
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            var saved = await _testRepository.UpdateForAdminAsync(id, request, _authService.UserId);
+
+            if (saved.Model == null)
+            {
+                return null;
+            }
+
+            if (saved.Changes.Length > 0)
+            {
+                await _recordLogService.AddAsync(RecordLogTableNames.BackflowTests, id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
+            }
+
+            scope.Complete();
+        }
+
+        return await GetForAdminAsync(id, default);
+    }
+
+    private static void ValidateAdminUpdate(BackflowTestAdminUpdateRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Manufacturer))
+        {
+            throw new AppValidationException("Main Assembly Manufacturer is required.");
+        }
+
+        if (!HasBypassAssembly(request.DeviceType))
+        {
+            return;
+        }
+
+        var bypassIsIncomplete = string.IsNullOrWhiteSpace(request.Manufacturer2)
+            || string.IsNullOrWhiteSpace(request.Model2)
+            || string.IsNullOrWhiteSpace(request.Size2)
+            || string.IsNullOrWhiteSpace(request.SerialNumber2);
+
+        if (bypassIsIncomplete)
+        {
+            throw new AppValidationException("Bypass Assembly Manufacturer, Model, Size and Serial Number are required for this backflow method.");
+        }
+    }
+
+    private static bool HasBypassAssembly(string? deviceType)
+    {
+        return deviceType == nameof(BackflowDeviceType.DCD)
+            || deviceType == nameof(BackflowDeviceType.DCD2)
+            || deviceType == nameof(BackflowDeviceType.RPPD)
+            || deviceType == nameof(BackflowDeviceType.RPPD2);
     }
 
     public override async Task<BackflowTestDto?> DeleteAsync(int id)

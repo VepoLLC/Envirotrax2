@@ -1,0 +1,47 @@
+<vp-section header="Additional Information" *ngIf="isVisible">
+    <div class="row" *ngIf="test.showRainSensor">
+        <div class="col-md-4 mb-2">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox"
+                       [attr.id]="idPrefix + '-rain-freeze-sensor-installed'"
+                       name="rainFreezeSensorInstalled"
+                       [(ngModel)]="test.rainFreezeSensorInstalled" />
+                <label class="form-check-label" [attr.for]="idPrefix + '-rain-freeze-sensor-installed'">Rain/Freeze Sensors Installed</label>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-2">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox"
+                       [attr.id]="idPrefix + '-rain-freeze-sensor-working'"
+                       name="rainFreezeSensorWorkingProperly"
+                       [(ngModel)]="test.rainFreezeSensorWorkingProperly" />
+                <label class="form-check-label" [attr.for]="idPrefix + '-rain-freeze-sensor-working'">Sensors Working Properly</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-2" *ngIf="test.showOSSF">
+            <div class="form-check pt-2">
+                <input class="form-check-input" type="checkbox"
+                       [attr.id]="idPrefix + '-ossf'"
+                       name="ossf"
+                       [(ngModel)]="test.ossf" />
+                <label class="form-check-label" [attr.for]="idPrefix + '-ossf'">Is there an On-Site Sewage Facility?</label>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-2" *ngIf="test.showPermitNumber">
+            <div class="d-flex align-items-center gap-2">
+                <span class="col-form-label text-nowrap">Permit Number</span>
+
+                <vp-input name="permitNumber"
+                          [flexFill]="true"
+                          [form]="form"
+                          [maxLength]="50"
+                          [(ngModel)]="test.permitNumber" />
+            </div>
+        </div>
+    </div>
+</vp-section>

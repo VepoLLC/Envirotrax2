@@ -21,7 +21,7 @@
     </ng-container>
 </div>
 
-<div class="d-flex overflow-x-auto gap-2 w-100 flex-fill" #container>
+<div class="d-flex gap-2 w-100 flex-fill" #container>
     <div *ngFor="let window of windows" class="vp-window-wrapper flex-fill" [hidden]="window.isMinimized">
         <vp-window [config]="window.config"
                    [componentType]="window.componentType"

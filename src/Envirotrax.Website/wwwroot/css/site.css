@@ -23,6 +23,49 @@ body {
 
 main {
     flex: 1 0 auto;
+    background: #dadada;
+}
+
+.form-control {
+    background: #f0f0f0;
+}
+
+.form-select {
+    background-color: #f0f0f0;
+}
+
+.demo-group {
+    border: 1px solid #aaa;
+    border-radius: 25px;
+    background: #f9f9f9;
+    padding: 16px;
+}
+
+.demo-group h4 {
+    font-size: 18px;
+    font-weight: 600 !important;
+    padding: 0px 0px 8px 0px;
+    text-align: center;
+    color: #008fd4;
+}
+
+.success {
+    border: 2px solid #0a0;
+    border-radius: 12px;
+    background: #f0fff0;
+    padding: 30px 20px;
+    margin-top: 30px;
+}
+
+.link-button {
+    color: #fff;
+    background-color: #06a3ef;
+    border: 1px solid #026899;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 25px;
+    white-space: nowrap;
 }
 
 /*--------------------------------------------------------------
@@ -69,7 +112,7 @@ main {
 
 #header .navbar-nav .nav-link:hover,
 #header .navbar-nav .nav-link:focus,
-#header .navbar-nav .show > .nav-link {
+#header .navbar-nav .show>.nav-link {
     background: rgba(40, 119, 207, .05);
     border-color: rgba(255, 255, 255, .5);
     color: #fff;
@@ -120,7 +163,8 @@ main {
 
 #header .dropdown-item i {
     flex: 0 0 auto;
-    width: 28px;
+    width: 22px;
+    margin-right: 10px;
     font-size: 18px;
     color: var(--et-blue);
 }
@@ -139,7 +183,7 @@ main {
         margin-top: 0;
     }
 
-    #header .navbar-nav .dropdown:hover > .dropdown-menu {
+    #header .navbar-nav .dropdown:hover>.dropdown-menu {
         display: block;
     }
 }
@@ -153,6 +197,75 @@ main {
         margin: 5px 0 10px 15px;
         box-shadow: none;
     }
+}
+
+/*--------------------------------------------------------------
+# Page Header
+--------------------------------------------------------------*/
+.page-header {
+    padding: 40px 0;
+    background: var(--et-blue);
+    color: #fff;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-family: "Raleway", sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+/*--------------------------------------------------------------
+# Content Box
+--------------------------------------------------------------*/
+.info-box {
+    border: 2px solid #008fd440;
+    border-radius: 15px;
+    background: #fafafa;
+    color: #444;
+}
+
+/*--------------------------------------------------------------
+# Privacy Policy
+--------------------------------------------------------------*/
+.privacy-policy {
+    font-size: 80%;
+}
+
+.privacy-policy h3 {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.privacy-policy h4 {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.privacy-policy .indent {
+    padding-left: 20px;
+}
+
+.privacy-policy [id] {
+    scroll-margin-top: calc(var(--et-header-height) + 10px);
+}
+
+.privacy-policy table {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.privacy-policy th,
+.privacy-policy td {
+    border: 1px solid #ccc;
+    padding: 3px 8px;
+    vertical-align: middle;
+}
+
+.privacy-policy th {
+    background: #f0f0f0;
+    text-align: center;
+    font-weight: 600;
 }
 
 /*--------------------------------------------------------------

@@ -137,6 +137,8 @@ namespace Envirotrax.Auth.Domain.Configuration
                 options.Namespace = "Envirotrax.Auth";
             });
 
+            services.AddSmsService(configuration.GetSection("Sms"));
+
             services.Configure<AdminUserOptions>(configuration.GetSection("AdminUser"));
             services.AddHostedService<SeedDataService>();
 

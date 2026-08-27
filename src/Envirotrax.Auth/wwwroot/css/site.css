@@ -1561,12 +1561,6 @@ select.form-select-inline {
     background: var(--control-bg-color) !important;
 }
 
-.form-check-input {
-    margin: 0px 2px;
-    white-space: nowrap;
-    border: none;
-}
-
 .form-check-input input[type=radio] {
     vertical-align: middle;
 }

@@ -27,6 +27,17 @@
                        class="form-control"
                        placeholder="Please enter your phone number." />
                 <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                @if (!string.IsNullOrWhiteSpace(Model.Input.PhoneNumber))
+                {
+                    if (Model.PhoneNumberConfirmed)
+                    {
+                        <div class="form-text text-success">Verified</div>
+                    }
+                    else
+                    {
+                        <div class="form-text text-danger">Not verified &mdash; save to receive a verification code</div>
+                    }
+                }
             </div>
 
             <div class="mt-4 text-center">

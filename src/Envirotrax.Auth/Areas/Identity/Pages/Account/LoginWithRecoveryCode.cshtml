@@ -1,28 +1,47 @@
-﻿@page
+@page
 @model LoginWithRecoveryCodeModel
 @{
     ViewData["Title"] = "Recovery code verification";
 }
 
-<h1>@ViewData["Title"]</h1>
-<hr />
-<p>
-    You have requested to log in with a recovery code. This login will not be remembered until you provide
-    an authenticator app code at log in or disable 2FA and log in again.
-</p>
-<div class="row">
-    <div class="col-md-4">
+<section id="divPageTitle" class="container-lg page-title">
+    <div class="text-center">
+        <h1 class="h2">Account Login</h1>
+    </div>
+</section>
+
+<section id="sectionLoginWithRecoveryCode" class="card shadow-sm">
+    <div class="card-header border-bottom-0 text-center text-white bg-info fw-semibold fs-5 rounded-top">
+        <h2 class="h5 mb-0">Verify With Recovery Code</h2>
+    </div>
+    <div class="card-body border border-info rounded-bottom">
+        <div class="w-100 text-center mb-4">
+            You have requested to log in with a recovery code. This login will not be remembered until you provide
+            an authenticator app code, email code, or SMS code at log in.
+        </div>
+
         <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.RecoveryCode" class="form-control" autocomplete="off" placeholder="RecoveryCode" />
-                <label asp-for="Input.RecoveryCode" class="form-label"></label>
-                <span asp-validation-for="Input.RecoveryCode" class="text-danger"></span>
+            <div asp-validation-summary="ModelOnly" class="text-danger text-center mb-3" role="alert"></div>
+
+            <div class="row justify-content-center">
+                <div class="col-sm-12 col-md-6 col-lg-5 col-xl-4">
+                    <div class="mb-3">
+                        <label asp-for="Input.RecoveryCode" class="form-label fw-bold"></label>
+                        <input asp-for="Input.RecoveryCode" class="form-control" autocomplete="off" placeholder="Recovery Code" />
+                        <span asp-validation-for="Input.RecoveryCode" class="text-danger"></span>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <button type="submit" class="btn btn-primary px-5">
+                            <i class="fa-solid fa-right-to-bracket me-2"></i>
+                            LOG IN
+                        </button>
+                    </div>
+                </div>
             </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
         </form>
     </div>
-</div>
+</section>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

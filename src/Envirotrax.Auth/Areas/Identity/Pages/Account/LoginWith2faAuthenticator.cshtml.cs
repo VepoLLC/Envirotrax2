@@ -6,6 +6,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Envirotrax.Auth.Data.Models;
+using Envirotrax.Auth.Domain.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -88,6 +89,12 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
             if (result.Succeeded)
             {
                 _logger.LogInformation("User with ID '{UserId}' logged in with 2fa.", user.Id);
+
+                if (!await _userManager.IsPhoneNumberConfirmedAsync(user))
+                {
+                    return RedirectToPage("./SecuritySuggestion", new { type = SecuritySuggestionType.PhoneNumber, returnUrl });
+                }
+
                 return LocalRedirect(returnUrl);
             }
             else if (result.IsLockedOut)

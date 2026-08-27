@@ -18,7 +18,14 @@ public class UserRepository : Repository<WaterSupplierUser>, IUserRepository
     {
         return base.GetListQuery()
             .Include(user => user.UserRoles!)
-            .ThenInclude(userRole => userRole.Role);
+            .ThenInclude(userRole => userRole.Role)
+            .Include(user => user.User);
+    }
+
+    protected override IQueryable<WaterSupplierUser> GetDetailsQuery()
+    {
+        return base.GetDetailsQuery()
+            .Include(user => user.User);
     }
 
     public override Task<IEnumerable<WaterSupplierUser>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)

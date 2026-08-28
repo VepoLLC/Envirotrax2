@@ -277,7 +277,6 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             if (previousId.HasValue)
             {
                 await DbContext.BackflowTests
-                    .IgnoreQueryFilters()
                     .Where(t => t.Id == previousId.Value)
                     .ExecuteUpdateAsync(s => s.SetProperty(x => x.IsCurrent, true));
             }
@@ -434,7 +433,6 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         }
 
         var settings = await DbContext.Set<BackflowSettings>()
-            .IgnoreQueryFilters()
             .SingleOrDefaultAsync(s => s.WaterSupplierId == test.WaterSupplierId);
 
         if (settings?.OutOfServiceRequiresApproval == true)
@@ -504,7 +502,6 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         }
 
         var exists = await DbContext.Set<WaterSupplierUser>()
-            .IgnoreQueryFilters()
             .AnyAsync(u => u.WaterSupplierId == waterSupplierId && u.UserId == userId);
 
         return exists ? userId : null;

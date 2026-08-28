@@ -49,16 +49,16 @@ export class BackflowTestService {
         return await lastValueFrom(observable);
     }
 
-    public async update(id: number, test: BackflowTestDetails): Promise<BackflowTestDetails> {
-        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}`);
+    public async update(id: number, waterSupplierId: number, test: BackflowTestDetails): Promise<BackflowTestDetails> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}?waterSupplierId=${waterSupplierId}`);
 
         const observable = this._http.put<BackflowTestDetails>(url, test);
 
         return await lastValueFrom(observable);
     }
 
-    public async uploadImage(id: number, imageType: string, file: File): Promise<BackflowTestDetails> {
-        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/images/${imageType}`);
+    public async uploadImage(id: number, waterSupplierId: number, imageType: string, file: File): Promise<BackflowTestDetails> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/images/${imageType}?waterSupplierId=${waterSupplierId}`);
 
         const formData = new FormData();
         formData.append('file', file, file.name);

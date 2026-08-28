@@ -32,18 +32,18 @@ public class SiteService : ISiteService
         return _apiClient.GetAsync<SiteDetailDto>($"/api/admin/sites/{siteId}", cancellationToken);
     }
 
-    public Task UpdateAsync(int siteId, SiteUpdateDto dto, CancellationToken cancellationToken)
+    public Task UpdateAsync(int siteId, int waterSupplierId, SiteUpdateDto dto, CancellationToken cancellationToken)
     {
-        return _apiClient.PutAsync<SiteUpdateDto, object>($"/api/admin/sites/{siteId}", dto, cancellationToken);
+        return _apiClient.PutAsync<SiteUpdateDto, object>(waterSupplierId, $"/api/admin/sites/{siteId}", dto, cancellationToken);
     }
 
-    public Task UpdateGisAsync(int siteId, SiteGisUpdateDto dto, CancellationToken cancellationToken)
+    public Task UpdateGisAsync(int siteId, int waterSupplierId, SiteGisUpdateDto dto, CancellationToken cancellationToken)
     {
-        return _apiClient.PutAsync<SiteGisUpdateDto, object>($"/api/admin/sites/{siteId}/gis-data", dto, cancellationToken);
+        return _apiClient.PutAsync<SiteGisUpdateDto, object>(waterSupplierId, $"/api/admin/sites/{siteId}/gis-data", dto, cancellationToken);
     }
 
-    public Task UpdateWaterSupplierAsync(int siteId, SiteWaterSupplierUpdateDto dto, CancellationToken cancellationToken)
+    public Task UpdateWaterSupplierAsync(int siteId, int waterSupplierId, SiteWaterSupplierUpdateDto dto, CancellationToken cancellationToken)
     {
-        return _apiClient.PutAsync<SiteWaterSupplierUpdateDto, object>($"/api/admin/sites/{siteId}/water-supplier", dto, cancellationToken);
+        return _apiClient.PutAsync<SiteWaterSupplierUpdateDto, object>(waterSupplierId, $"/api/admin/sites/{siteId}/water-supplier", dto, cancellationToken);
     }
 }

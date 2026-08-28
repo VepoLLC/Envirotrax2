@@ -28,6 +28,6 @@ public class WaterSupplierService : IWaterSupplierService
 
     public Task<WaterSupplierDetailsDto?> UpdateDetailsAsync(int id, WaterSupplierDetailsDto details)
     {
-        return _apiClient.PutAsync<WaterSupplierDetailsDto, WaterSupplierDetailsDto>($"/api/admin/water-suppliers/{id}", details, CancellationToken.None);
+        return _apiClient.PutAsync<WaterSupplierDetailsDto, WaterSupplierDetailsDto>(id, $"/api/admin/water-suppliers/{id}", details, CancellationToken.None);
     }
 }

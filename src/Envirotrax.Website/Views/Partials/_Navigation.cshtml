@@ -1,0 +1,108 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@{
+	var loginUrl = Configuration["Envirotrax:LoginUrl"];
+}
+
+<header id="header" class="sticky-top">
+	<nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+		<div class="container-fluid">
+
+			<a class="navbar-brand" href="~/">
+				<img src="~/images/header/envirotrax_logo_navbar.svg" alt="Envirotrax" class="header-logo" />
+			</a>
+
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+					aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<div class="collapse navbar-collapse" id="mainNavbar">
+				<ul class="navbar-nav ms-auto">
+
+					<li class="nav-item">
+						<a class="nav-link" href="~/">Home</a>
+					</li>
+
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="/#programs" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							Our Services
+						</a>
+						<ul class="dropdown-menu dropdown-menu-lg-end" data-bs-theme="light">
+							<li>
+								<a class="dropdown-item" href="/#backflow-program">
+									<i class="fa-solid fa-gauge-high"></i>Backflow - Cross Connection Program
+								</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href="/#csi-program">
+									<i class="fa-solid fa-magnifying-glass-location"></i>CSI Site Inspection
+								</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href="/#fog-program">
+									<i class="fa-solid fa-oil-can"></i>FOG Inspection &amp; Waste Disposal
+								</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href="~/request-information/">
+									<i class="fa-solid fa-hand-point-right"></i>Request Information
+								</a>
+							</li>
+						</ul>
+					</li>
+
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							Registered Professionals
+						</a>
+						<ul class="dropdown-menu dropdown-menu-lg-end" data-bs-theme="light">
+							<li>
+								<a class="dropdown-item" href="~/registered-professionals/backflow-testers/">
+									Find a Registered Backflow Tester
+								</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href="~/registered-professionals/csi-inspectors/">
+									Find a Registered CSI Inspector
+								</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href="~/registered-professionals/fog-inspectors/">
+									Find a Registered FOG Inspector
+								</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href="~/registered-professionals/fog-transporters/">
+									Find a Registered FOG Transporter
+								</a>
+							</li>
+						</ul>
+					</li>
+
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="~/about-us/" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							About Us
+						</a>
+						<ul class="dropdown-menu dropdown-menu-lg-end" data-bs-theme="light">
+							<li>
+								<a class="dropdown-item" href="~/privacy-policy/">Privacy Policy</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href="~/accessibility-statement/">Accessibility Statement</a>
+							</li>
+						</ul>
+					</li>
+
+					<li class="nav-item">
+						<a class="nav-link nav-link-login" href="@loginUrl">
+							<i class="fa-solid fa-right-to-bracket"></i>Account Login
+						</a>
+					</li>
+
+				</ul>
+			</div>
+
+		</div>
+	</nav>
+</header>

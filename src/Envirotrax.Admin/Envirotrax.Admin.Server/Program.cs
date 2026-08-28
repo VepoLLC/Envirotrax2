@@ -27,6 +27,9 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<ApiExceptionFilter>();
 });
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 builder.Services.AddApplicationServices(builder.Configuration, builder.Environment);
 
 var app = builder.Build();
@@ -35,6 +38,14 @@ app.UseDefaultFiles();
 app.MapStaticAssets();
 
 // Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseExceptionHandler();
+}
 
 app.UseHttpsRedirection();
 

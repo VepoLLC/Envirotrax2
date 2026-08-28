@@ -22,7 +22,8 @@ export class UserListComponent implements OnInit {
         freeTextSearch: {
             searchQuery: [
                 { field: 'contactName', operator: 'Ct', multiWordSearch: true },
-                { field: 'emailAddress', operator: 'Ct' }
+                { field: 'emailAddress', operator: 'Ct' },
+                { field: 'cellNumber', operator: 'Ct' }
             ]
         }
     };
@@ -58,6 +59,11 @@ export class UserListComponent implements OnInit {
             {
                 field: 'emailAddress',
                 caption: 'Email',
+                type: ColumnType.text
+            },
+            {
+                field: 'cellNumber',
+                caption: 'Cell Number',
                 type: ColumnType.text
             }
         ];

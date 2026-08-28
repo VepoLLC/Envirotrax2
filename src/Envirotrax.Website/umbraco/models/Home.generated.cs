@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 {
 	/// <summary>Home</summary>
 	[PublishedModel("home")]
-	public partial class Home : PublishedContentModel
+	public partial class Home : PublishedContentModel, IPageMetadata
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "18.1.0+fb0dc5b")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("pageDescription")]
-		public virtual string PageDescription => this.Value<string>(_publishedValueFallback, "pageDescription");
+		public virtual string PageDescription => global::Umbraco.Cms.Web.Common.PublishedModels.PageMetadata.GetPageDescription(this, _publishedValueFallback);
 
 		///<summary>
 		/// Page Title
@@ -63,6 +63,6 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "18.1.0+fb0dc5b")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("pageTitle")]
-		public virtual string PageTitle => this.Value<string>(_publishedValueFallback, "pageTitle");
+		public virtual string PageTitle => global::Umbraco.Cms.Web.Common.PublishedModels.PageMetadata.GetPageTitle(this, _publishedValueFallback);
 	}
 }

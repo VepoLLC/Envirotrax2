@@ -1,3 +1,4 @@
+import { ComplianceOverdueSeverity } from "../../enums/compliance-overdue-severity.enum";
 import { FacilityType } from "../../enums/facility-type.enum";
 import { GreaseTrapType } from "../../enums/grease-trap-type.enum";
 import { PropertyType } from "../../enums/property-type.enum";
@@ -8,6 +9,12 @@ import { SiteLog } from "./site-log";
 export interface Site {
     id?: number;
     logs?: SiteLog[];
+
+    // Compliance-grid figures. Only the compliance endpoints populate these; they are computed server-side
+    // against the caller's local time (see ComplianceSiteDtoBase / FogTripTicketComplianceSiteDto).
+    daysOverdue?: number;
+    overdueSeverity?: ComplianceOverdueSeverity;
+    dueDate?: string;
     waterSupplier?: WaterSupplier;
     subArea?: string;
     accountNumber?: string;

@@ -16,6 +16,7 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
+using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
@@ -43,6 +44,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     private readonly ISiteRepository _siteRepository;
     private readonly ISiteLogService _siteLogService;
     private readonly IBackflowRenewalRequirementService _renewalRequirementService;
+    private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly IBackflowSettingsService _settingsService;
     private readonly IRecordLogService _recordLogService;
     private readonly ILogger<BackflowTestService> _logger;
@@ -59,6 +61,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         ISiteRepository siteRepository,
         ISiteLogService siteLogService,
         IBackflowRenewalRequirementService renewalRequirementService,
+        ITimeZoneHelperService timeZoneHelper,
         IBackflowSettingsService settingsService,
         IRecordLogService recordLogService,
         ILogger<BackflowTestService> logger)
@@ -74,6 +77,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         _siteRepository = siteRepository;
         _siteLogService = siteLogService;
         _renewalRequirementService = renewalRequirementService;
+        _timeZoneHelper = timeZoneHelper;
         _settingsService = settingsService;
         _recordLogService = recordLogService;
         _logger = logger;
@@ -112,7 +116,47 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             }
         }
 
+        var today = _timeZoneHelper.GetUserLocalTime().Date;
+
+        foreach (var dto in dtos)
+        {
+            dto.DaysExpired = ComputeDaysExpired(dto.ExpirationDate, today);
+            dto.ExpiredSeverity = ComputeExpiredSeverity(dto.DaysExpired);
+        }
+
         return dtos.ToPagedData(pageInfo);
+    }
+
+    private static int? ComputeDaysExpired(DateTime? expirationDate, DateTime today)
+    {
+        if (!expirationDate.HasValue)
+        {
+            return null;
+        }
+
+        var days = (today - expirationDate.Value.Date).Days;
+
+        return days < 0 ? null : days;
+    }
+
+    private static ComplianceOverdueSeverity ComputeExpiredSeverity(int? daysExpired)
+    {
+        if (!daysExpired.HasValue)
+        {
+            return ComplianceOverdueSeverity.None;
+        }
+
+        if (daysExpired.Value > 60)
+        {
+            return ComplianceOverdueSeverity.High;
+        }
+
+        if (daysExpired.Value > 30)
+        {
+            return ComplianceOverdueSeverity.Moderate;
+        }
+
+        return ComplianceOverdueSeverity.Low;
     }
 
     public async Task<IPagedData<BackflowTestDto>> SearchAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken)

@@ -55,7 +55,16 @@ public static class ServiceRegistrations
         services.AddHtmlTemplateService(templateConfigAction);
 
         services.Configure<EmailOptions>(emailConfigSection);
-        services.AddTransient<IEmailService, EmailService>();
+        services.AddSingleton<IEmailService, EmailService>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddSmsService(this IServiceCollection services, IConfigurationSection smsConfigSection)
+    {
+        services.AddHttpClient();
+        services.Configure<SmsOptions>(smsConfigSection);
+        services.AddTransient<ISmsService, SmsService>();
 
         return services;
     }

@@ -1,0 +1,225 @@
+@model Envirotrax.App.Server.Domain.DataTransferObjects.Backflow.BackflowComplianceReportExportDto
+@{
+    Layout = null;
+
+    var report = Model.Report;
+}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <style>
+        body {
+            font-size: 9.1px;
+            font-family: Arial, sans-serif;
+        }
+
+        .page-title {
+            background-color: #323232;
+            color: #ffffff;
+            font-size: 10.6px;
+            font-weight: bold;
+            text-align: center;
+            padding: 5px 3px;
+            margin-bottom: 5px;
+        }
+
+        .section-header {
+            background-color: #a0a0a0;
+            color: #ffffff;
+            font-weight: bold;
+            padding: 2.5px 5px;
+            margin-top: 5px;
+            text-align: center;
+            border: 1px solid #323232;
+        }
+
+        .compliance-summary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            padding: 10px 0;
+        }
+
+        .compliance-donut {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+        }
+
+        .compliance-donut-hole {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 62%;
+            height: 62%;
+            background-color: #ffffff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .compliance-donut-percent {
+            font-size: 15px;
+            font-weight: bold;
+            color: #212529;
+        }
+
+        .compliance-donut-label {
+            font-size: 7.5px;
+            color: #6c757d;
+        }
+
+        .compliance-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .compliance-legend-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .compliance-swatch {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            flex: 0 0 auto;
+        }
+
+        .compliance-legend-text {
+            min-width: 150px;
+        }
+
+        .compliance-legend-num {
+            font-weight: bold;
+            margin-left: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        tr {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        td,
+        th {
+            border: none;
+            padding: 2.5px 5px;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: #e9ecef;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .col-num {
+            width: 6%;
+            text-align: right;
+        }
+
+        .reportbar-cell {
+            width: 16%;
+        }
+
+        .reportbar {
+            height: 16px;
+            border-radius: 0 8px 8px 0;
+            min-width: 2px;
+        }
+
+        .reportbar.green {
+            background: linear-gradient(to right, #b5e8c0, #20a845);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-title">
+        Backflow Compliance Report
+        @if (Model.IgnoreLast30Days)
+        {
+            <text>&ndash; Ignoring Last 30 Days</text>
+        }
+    </div>
+
+    <div class="compliance-summary">
+        <div class="compliance-donut"
+             style="background: conic-gradient(#20a845 0% @(report.CompliantPercentage)%, #dc3545 @(report.CompliantPercentage)% 100%)">
+            <div class="compliance-donut-hole">
+                <div class="compliance-donut-percent">@(report.CompliantPercentage)%</div>
+                <div class="compliance-donut-label">Compliant</div>
+            </div>
+        </div>
+
+        <div class="compliance-legend">
+            <div class="compliance-legend-row">
+                <span class="compliance-swatch" style="background-color:#adb5bd"></span>
+                <span class="compliance-legend-text">Total Active Assemblies</span>
+                <span class="compliance-legend-num">@report.TotalActive</span>
+            </div>
+            <div class="compliance-legend-row">
+                <span class="compliance-swatch" style="background-color:#20a845"></span>
+                <span class="compliance-legend-text">Compliant Assemblies</span>
+                <span class="compliance-legend-num">@report.Compliant (@(report.CompliantPercentage)%)</span>
+            </div>
+            <div class="compliance-legend-row">
+                <span class="compliance-swatch" style="background-color:#dc3545"></span>
+                <span class="compliance-legend-text">Non-Compliant Assemblies</span>
+                <span class="compliance-legend-num">@report.NonCompliant (@(report.NonCompliantPercentage)%)</span>
+            </div>
+        </div>
+    </div>
+
+    @if (report.Requirements.Count > 0)
+    {
+        <div class="section-header">Requirements</div>
+        <table>
+            <tr>
+                <th>Property Type</th>
+                <th>Assembly Type</th>
+                <th>Hazard Type</th>
+                <th>OSSF</th>
+                <th>Aux Water</th>
+                <th class="col-num">Renewal Years</th>
+                <th class="reportbar-cell"></th>
+                <th class="col-num">Active</th>
+                <th class="col-num">Compliant</th>
+                <th class="col-num">%</th>
+            </tr>
+            @foreach (var requirement in report.Requirements)
+            {
+                <tr>
+                    <td>@requirement.PropertyType</td>
+                    <td>@requirement.AssemblyType</td>
+                    <td>@requirement.HazardType</td>
+                    <td>@(requirement.HasSiteOssf ? "1" : "0")</td>
+                    <td>@(requirement.AuxWaterSupply ? "1" : "0")</td>
+                    <td class="col-num">@requirement.RenewalYears</td>
+                    <td class="reportbar-cell">
+                        <div class="reportbar green" style="width:@(requirement.Percentage)%">&nbsp;</div>
+                    </td>
+                    <td class="col-num">@requirement.Active</td>
+                    <td class="col-num">@requirement.Compliant</td>
+                    <td class="col-num">@(requirement.Percentage)%</td>
+                </tr>
+            }
+        </table>
+    }
+</body>
+
+</html>

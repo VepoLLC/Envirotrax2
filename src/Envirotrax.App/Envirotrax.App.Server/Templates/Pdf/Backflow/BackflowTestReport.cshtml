@@ -1,0 +1,197 @@
+@model Envirotrax.App.Server.Domain.DataTransferObjects.Backflow.BackflowTestReportExportDto
+@{
+    Layout = null;
+
+    var report = Model.Report;
+
+    var sectionBarColors = new System.Collections.Generic.Dictionary<string, string>
+    {
+        ["Added By"] = "steelblue",
+        ["Property Type"] = "green",
+        ["Test Result"] = "blue",
+        ["Reason for Test"] = "steelblue",
+        ["Hazard Type"] = "blue",
+        ["Assembly Type"] = "steelblue",
+        ["Rain / Freeze Sensor"] = "green",
+        ["On-site Sewage Facility"] = "green"
+    };
+
+    string BarColor(string title) => sectionBarColors.TryGetValue(title, out var color) ? color : "green";
+}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <style>
+            body {
+                font-size: 9.1px;
+                font-family: Arial, sans-serif;
+            }
+
+            .page-title {
+                background-color: #323232;
+                color: #ffffff;
+                font-size: 10.6px;
+                font-weight: bold;
+                text-align: center;
+                padding: 5px 3px;
+                margin-bottom: 5px;
+            }
+
+            .section-header {
+                background-color: #a0a0a0;
+                color: #ffffff;
+                font-weight: bold;
+                padding: 2.5px 5px;
+                margin-top: 5px;
+                text-align: center;
+                border: 1px solid #323232;
+            }
+
+            .total-line {
+                font-weight: bold;
+                text-align: center;
+                padding: 5px 0;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            tr {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .stat-section {
+                break-inside: avoid-page;
+                page-break-inside: avoid;
+            }
+
+            td,
+            th {
+                border: none;
+                padding: 2.5px 5px;
+                vertical-align: middle;
+            }
+
+            .table-secondary td {
+                background-color: #e9ecef;
+                font-weight: bold;
+            }
+
+            .col-label {
+                width: 20%;
+            }
+
+            .col-num {
+                width: 6%;
+                text-align: right;
+            }
+
+            .reportbar-cell {
+                width: 40%;
+            }
+
+            .reportbar {
+                height: 16px;
+                border-radius: 0 8px 8px 0;
+                min-width: 2px;
+            }
+
+            .reportbar.green {
+                background: linear-gradient(to right, #b5e8c0, #20a845);
+            }
+
+            .reportbar.orange {
+                background: linear-gradient(to right, #f5d5a8, #e87b20);
+            }
+
+            .reportbar.steelblue {
+                background: linear-gradient(to right, #a8c4d4, #4682b4);
+            }
+
+            .reportbar.blue {
+                background: linear-gradient(to right, #b5cfe8, #207ce5);
+            }
+    </style>
+</head>
+
+<body>
+    <div class="page-title">Backflow Test Report &ndash; @Model.FromDate.ToString("MM/dd/yyyy") to
+        @Model.ToDate.ToString("MM/dd/yyyy")</div>
+
+        <div class="total-line">Total Tests: @report.TotalCount</div>
+
+        @if (report.Periods.Count > 0)
+        {
+            <div class="section-header">Totals</div>
+            <table>
+                @foreach (var period in report.Periods)
+                {
+                    <tr>
+                        <td class="col-label">@period.Label</td>
+                        <td class="reportbar-cell">
+                            <div class="reportbar orange" style="width:@(period.Percentage)%">&nbsp;</div>
+                        </td>
+                        <td class="col-num">@period.Count</td>
+                        <td class="col-num">@(period.Percentage)%</td>
+                    </tr>
+                }
+            </table>
+        }
+
+        @if (report.SubAccounts.Count > 0 || report.Stats.Count > 0)
+        {
+            <div class="section-header">Statistics</div>
+            <table>
+                <tr>
+                    <td class="col-label">Total Tests</td>
+                    <td class="reportbar-cell"></td>
+                    <td class="col-num">@report.TotalCount</td>
+                    <td class="col-num"></td>
+                </tr>
+
+                @if (report.SubAccounts.Count > 0)
+                {
+                    <tr class="table-secondary">
+                        <td colspan="4">Sub Accounts</td>
+                    </tr>
+                    @foreach (var sub in report.SubAccounts)
+                    {
+                        <tr>
+                            <td class="col-label">@sub.Name</td>
+                            <td class="reportbar-cell">
+                                <div class="reportbar green" style="width:@(sub.Percentage)%">&nbsp;</div>
+                            </td>
+                            <td class="col-num">@sub.Count</td>
+                            <td class="col-num">@(sub.Percentage)%</td>
+                        </tr>
+                    }
+                }
+
+                @foreach (var category in report.Stats)
+                {
+                    var colorClass = BarColor(category.Title);
+                    <tr class="table-secondary">
+                        <td colspan="4">@category.Title</td>
+                    </tr>
+                    @foreach (var item in category.Items)
+                    {
+                        <tr>
+                            <td class="col-label">@item.Label</td>
+                            <td class="reportbar-cell">
+                                <div class="reportbar @colorClass" style="width:@(item.Percentage)%">&nbsp;</div>
+                            </td>
+                            <td class="col-num">@item.Count</td>
+                            <td class="col-num">@(item.Percentage)%</td>
+                        </tr>
+                    }
+                }
+            </table>
+        }
+    </body>
+
+</html>

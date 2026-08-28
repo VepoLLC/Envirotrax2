@@ -1,7 +1,10 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
 	Layout = null;
+
+	var pageTitle = Model.Value<string>("pageTitle") ?? ViewData["Title"] as string;
+	var pageDescription = Model.Value<string>("pageDescription") ?? ViewData["Description"] as string;
 
 	var socialMediaImageElement = ViewData["SocialMediaImage"] as IPublishedContent;
 
@@ -10,23 +13,27 @@
 		: null;
 }
 
-<html>
+<html lang="en">
 
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-	<meta name="description" content="@(Model.Value("pageDescription") ?? ViewData["Description"])">
-	<title>@(Model.Value("pageTitle") ?? ViewData["Title"])</title>
+	<meta name="description" content="@pageDescription">
+	<title>@pageTitle</title>
 
-	<meta name="og:title" content="@(Model.Value("pageTitle") ?? ViewData["Title"])" />
-	<meta name="og:description" content="@(Model.Value("pageDescription") ?? ViewData["Description"])" />
+	<meta name="og:title" content="@pageTitle" />
+	<meta name="og:description" content="@pageDescription" />
 	<meta name="og:type" content="@(ViewData["SocialMediaType"] ?? "website")" />
 
 	@if (socialMediaImage != null)
 	{
 		<meta name="og:image" content="@socialMediaImage.Url(mode: UrlMode.Absolute)" />
 	}
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Raleway:300,400,600,700&display=swap">
 
 	<link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
@@ -36,7 +43,13 @@
 </head>
 
 <body>
-	@RenderBody()
+	@await Html.PartialAsync("_Navigation")
+
+	<main>
+		@RenderBody()
+	</main>
+
+	@await Html.PartialAsync("_Footer")
 
 	<script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
 	@await RenderSectionAsync("Scripts", required: false)

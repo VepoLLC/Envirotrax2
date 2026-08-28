@@ -7,5 +7,5 @@ public interface IRecordLogService
 {
     Task<List<RecordLogDto>> GetByRecordAsync(string tableName, int recordId, CancellationToken cancellationToken);
     Task<int> GetCountByRecordAsync(string tableName, int recordId, CancellationToken cancellationToken);
-    Task AddAsync(string tableName, int recordId, int waterSupplierId, RecordLogType logType, string? description);
+    Task AddAsync(string tableName, int recordId, int? waterSupplierId, RecordLogType logType, string? description, int? professionalId = null);
 }

@@ -80,11 +80,10 @@ export interface SiteDetail {
 }
 
 /**
- * Model passed into the Edit Site window, carried from the Property Search row. Only siteId is used by the
- * current flow: it drives both the load (GET /api/sites/{id}) and the save, which targets the site by its
- * globally-unique Id via a server-side load-then-modify — no water-supplier or tenant context is needed.
- * waterSupplierId is carried but not currently consumed; it is kept as optional context for a potential
- * future operation such as water-supplier reassignment.
+ * Model passed into the Edit Site window, carried from the Property Search row. siteId drives the load
+ * (GET /api/sites/{id}) and targets the site by its globally-unique Id on save. waterSupplierId is the
+ * tenant every write sends to the App API (as ?waterSupplierId=); it is optional here because the loaded
+ * site detail carries the authoritative value, which also keeps it correct after a supplier reassignment.
  */
 export interface SiteEditWindowModel {
     siteId: number;

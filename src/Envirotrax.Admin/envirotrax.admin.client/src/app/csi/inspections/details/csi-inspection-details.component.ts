@@ -41,6 +41,7 @@ export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
     public recordLog?: CsiInspectionRecordLogComponent;
 
     public id: number = 0;
+    public waterSupplierId: number = 0;
     public idPrefix: string = 'csi';
 
     public isLoading: boolean = false;
@@ -118,7 +119,7 @@ export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
 
         try {
             this.isSaving = true;
-            this.inspection = await this._inspectionService.update(this.id, this.inspection);
+            this.inspection = await this._inspectionService.update(this.id, this.waterSupplierId, this.inspection);
         } finally {
             this.isSaving = false;
         }
@@ -221,6 +222,8 @@ export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
 
     private setHeaders(): void {
         const supplier = this.inspection.waterSupplier;
+
+        this.waterSupplierId = supplier?.id ?? 0;
 
         this.waterSupplierHeader = supplier?.name
             ? `Water Supplier - ${supplier.name}`

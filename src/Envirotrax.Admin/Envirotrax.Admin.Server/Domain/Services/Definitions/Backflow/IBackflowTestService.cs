@@ -11,9 +11,9 @@ public interface IBackflowTestService
 
     Task<BackflowTestDetailsDto?> GetAsync(int id, CancellationToken cancellationToken);
 
-    Task<BackflowTestDetailsDto?> UpdateAsync(int id, BackflowTestUpdateRequest request, CancellationToken cancellationToken);
+    Task<BackflowTestDetailsDto?> UpdateAsync(int id, int waterSupplierId, BackflowTestUpdateRequest request, CancellationToken cancellationToken);
 
-    Task<BackflowTestDetailsDto?> UploadImageAsync(int id, string imageType, Stream fileStream, string fileName, CancellationToken cancellationToken);
+    Task<BackflowTestDetailsDto?> UploadImageAsync(int id, int waterSupplierId, string imageType, Stream fileStream, string fileName, CancellationToken cancellationToken);
 
     Task<BackflowTestCountsDto?> GetCountsAsync(int id, CancellationToken cancellationToken);
 

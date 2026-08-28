@@ -16,7 +16,6 @@ import { BackflowTestOptionsService } from '../../../../shared/services/backflow
 export class BackflowTestPropertyComponent implements OnInit {
     @Input() public test: BackflowTestDetails = {};
     @Input() public form?: NgForm;
-    @Input() public idPrefix: string = '';
     @Input() public stateOptions: InputOption<State>[] = [];
 
     @Output() public openSite: EventEmitter<void> = new EventEmitter<void>();

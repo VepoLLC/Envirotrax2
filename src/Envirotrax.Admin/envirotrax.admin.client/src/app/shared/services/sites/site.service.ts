@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import { PagedData, PageInfo, Query, QueryHelperService, UrlResolverService } from "@envirotrax/common-ui";
 import { FogCompliancyStatus, Site } from "../../models/sites/site";
 import { SiteDetail } from "../../models/sites/site-detail";
-import { SiteGisUpdate, SiteUpdate } from "../../models/sites/site-update";
+import { SiteGisUpdate, SiteUpdate, SiteWaterSupplierUpdate } from "../../models/sites/site-update";
 import { lastValueFrom } from "rxjs";
 
 @Injectable({
@@ -40,18 +40,28 @@ export class SiteService {
         return await lastValueFrom(observable);
     }
 
-    public async update(siteId: number, site: SiteUpdate): Promise<void> {
-        const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}`);
+    public async update(siteId: number, waterSupplierId: number, site: SiteUpdate): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}?waterSupplierId=${waterSupplierId}`);
 
         const observable = this._http.put<void>(url, site);
 
         await lastValueFrom(observable);
     }
 
-    public async updateGis(siteId: number, gis: SiteGisUpdate): Promise<void> {
-        const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}/gis-data`);
+    public async updateGis(siteId: number, waterSupplierId: number, gis: SiteGisUpdate): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}/gis-data?waterSupplierId=${waterSupplierId}`);
 
         const observable = this._http.put<void>(url, gis);
+
+        await lastValueFrom(observable);
+    }
+
+    public async updateWaterSupplier(siteId: number, currentWaterSupplierId: number, waterSupplierId: number): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}/water-supplier?waterSupplierId=${currentWaterSupplierId}`);
+
+        const payload: SiteWaterSupplierUpdate = { waterSupplierId };
+
+        const observable = this._http.put<void>(url, payload);
 
         await lastValueFrom(observable);
     }

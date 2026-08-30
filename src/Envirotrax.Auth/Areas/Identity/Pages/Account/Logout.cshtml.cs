@@ -6,6 +6,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Envirotrax.Auth.Data.Models;
+using Envirotrax.Auth.Domain.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Envirotrax.Auth.Areas.Identity.Pages.Account
 {
+    [AllowExpiredPassword]
     public class LogoutModel : PageModel
     {
         private readonly SignInManager<AppUser> _signInManager;

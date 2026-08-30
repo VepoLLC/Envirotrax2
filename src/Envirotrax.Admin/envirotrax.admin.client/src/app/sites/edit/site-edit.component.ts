@@ -1,13 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { InputOption, ToastService, ToastType } from '@envirotrax/common-ui';
+import { ModalSize } from '@developer-partners/ngx-modal-dialog';
+import { HelperService, InputOption, ModalHelperService, ToastService, ToastType } from '@envirotrax/common-ui';
 import { FacilityType, GreaseTrapType, PropertyType } from '../../shared/models/sites/site';
 import { SiteDetail, SiteEditWindowModel } from '../../shared/models/sites/site-detail';
 import { SiteGisUpdate, SiteUpdate } from '../../shared/models/sites/site-update';
+import { WaterSupplier } from '../../shared/models/water-suppliers/water-supplier';
 import { SiteService } from '../../shared/services/sites/site.service';
 import { LookupService } from '../../shared/services/lookup/lookup.service';
 import { SharedComponentsModule } from '../../shared/components/shared.components.module';
+import { WaterSupplierLookupComponent } from '../../shared/components/lookups/water-supplier-lookup.component';
 import { WindowReference } from '../../window/window-config';
 import { SiteEditSectionsModule } from './sections/site-edit-sections.module';
 
@@ -54,7 +57,9 @@ export class SiteEditComponent implements OnInit {
         private readonly _windowReference: WindowReference<SiteEditWindowModel>,
         private readonly _siteService: SiteService,
         private readonly _lookupService: LookupService,
-        private readonly _toastService: ToastService
+        private readonly _modalHelper: ModalHelperService,
+        private readonly _toastService: ToastService,
+        private readonly _helperService: HelperService
     ) {
 
     }
@@ -88,6 +93,8 @@ export class SiteEditComponent implements OnInit {
             // Two independent deep clones: the pristine snapshot and the editable working copy.
             this.originalSite = structuredClone(site);
             this.editableSite = structuredClone(site);
+
+            this.waterSupplierId = site.waterSupplier?.id ?? this.waterSupplierId;
         } finally {
             this.isLoading = false;
         }
@@ -110,6 +117,8 @@ export class SiteEditComponent implements OnInit {
 
         this.originalSite = structuredClone(site);
         this.editableSite = structuredClone(site);
+
+        this.waterSupplierId = site.waterSupplier?.id ?? this.waterSupplierId;
 
         this.form?.form.markAsPristine();
     }
@@ -152,7 +161,7 @@ export class SiteEditComponent implements OnInit {
             // The normal (non-GIS) save is the only thing whose failure counts as a Save failure — it stays
             // in this try so it reaches the catch below. GIS and refresh each swallow their own errors.
             if (normalChanged) {
-                await this._siteService.update(this.siteId, this.buildSiteUpdate(this.editableSite!));
+                await this._siteService.update(this.siteId, this.waterSupplierId ?? 0, this.buildSiteUpdate(this.editableSite!));
             }
 
             const gisFailed = await this.saveGisIfChanged(gisChanged);
@@ -194,7 +203,7 @@ export class SiteEditComponent implements OnInit {
         }
 
         try {
-            await this._siteService.updateGis(this.siteId!, this.buildGisUpdate());
+            await this._siteService.updateGis(this.siteId!, this.waterSupplierId ?? 0, this.buildGisUpdate());
 
             return false;
         } catch {
@@ -231,6 +240,66 @@ export class SiteEditComponent implements OnInit {
             });
         } else {
             this._toastService.successfullySaved();
+        }
+    }
+
+ 
+    public changeWaterSupplier(): void {
+        if (!this.editableSite) {
+            return;
+        }
+
+        if (this.form?.dirty) {
+            this._toastService.show({
+                text: 'Please save or close your changes before changing the water supplier.',
+                type: ToastType.Error
+            });
+
+            return;
+        }
+
+        this._modalHelper
+            .show<WaterSupplier>(WaterSupplierLookupComponent, {
+                title: 'Water Suppliers',
+                size: ModalSize.large
+            })
+            .result()
+            .subscribe(supplier => this.confirmWaterSupplierChange(supplier));
+    }
+
+    private confirmWaterSupplierChange(supplier: WaterSupplier): void {
+        const current = this.editableSite?.waterSupplier;
+
+        if (supplier?.id == null || supplier.id === current?.id) {
+            return;
+        }
+
+        this._modalHelper
+            .confirm({
+                title: 'Confirm Water Supplier Change',
+                messages: [
+                    `Are you sure you want to change this property's water supplier from ${current?.id} - ${current?.name} to ${supplier.id} - ${supplier.name}?`,
+                    'Existing inspections, tests and trip tickets stay with the current water supplier.'
+                ]
+            })
+            .result()
+            .subscribe(() => this.saveWaterSupplier(supplier.id!));
+    }
+
+    private async saveWaterSupplier(waterSupplierId: number): Promise<void> {
+        if (this.siteId == null) {
+            return;
+        }
+
+        try {
+            this.isSaving = true;
+
+            await this._siteService.updateWaterSupplier(this.siteId, this.waterSupplierId ?? 0, waterSupplierId);
+            await this.refreshAfterSave();
+
+            this._toastService.successfullySaved();
+        } finally {
+            this.isSaving = false;
         }
     }
 
@@ -309,13 +378,7 @@ export class SiteEditComponent implements OnInit {
      * content, so no extra text validation is needed here.
      */
     private toNumberOrNull(value: unknown): number | null {
-        if (value === null || value === undefined || value === '') {
-            return null;
-        }
-
-        const parsed = Number(value);
-
-        return Number.isNaN(parsed) ? null : parsed;
+        return this._helperService.toNumberOrUndefined(value) ?? null;
     }
 
     // Builds the update payload from the editable model. Only the approved editable fields are included;

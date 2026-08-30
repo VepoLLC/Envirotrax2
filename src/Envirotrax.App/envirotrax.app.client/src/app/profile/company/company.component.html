@@ -25,6 +25,19 @@
                               [(ngModel)]="user.jobTitle" />
                 </div>
             </div>
+
+            <div class="text-center">
+                <button type="button"
+                        class="btn btn-primary px-4"
+                        (click)="openSecuritySettings()">
+                    Security Settings
+                </button>
+
+                <div class="mt-2">
+                    Click here to configure your account security such as email address, password,
+                    and Multi-Factor Authentication (MFA) settings.
+                </div>
+            </div>
         </vp-section>
     </div>
 

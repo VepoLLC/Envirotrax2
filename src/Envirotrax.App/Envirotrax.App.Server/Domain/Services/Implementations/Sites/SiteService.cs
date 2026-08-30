@@ -1,12 +1,15 @@
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.GisAreas;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions;
+using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Sites;
@@ -15,23 +18,29 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 {
     private readonly ISiteRepository _siteRepository;
     private readonly ISiteLogService _siteLogService;
+    private readonly IRecordLogService _recordLogService;
     private readonly IGeocodingService _geocodingService;
     private readonly IGisAreaCoordinateRepository _coordinateRepository;
+    private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly ILogger<SiteService> _logger;
 
     public SiteService(
         IMapper mapper,
         ISiteRepository repository,
         ISiteLogService siteLogService,
+        IRecordLogService recordLogService,
         IGeocodingService geocodingService,
         IGisAreaCoordinateRepository coordinateRepository,
+        ITimeZoneHelperService timeZoneHelper,
         ILogger<SiteService> logger)
         : base(mapper, repository)
     {
         _siteRepository = repository;
         _siteLogService = siteLogService;
+        _recordLogService = recordLogService;
         _geocodingService = geocodingService;
         _coordinateRepository = coordinateRepository;
+        _timeZoneHelper = timeZoneHelper;
         _logger = logger;
     }
 
@@ -216,6 +225,37 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         site.HasDomesticPremisesIsolation = dto.HasDomesticPremisesIsolation;
     }
 
+    public async Task<bool> UpdateWaterSupplierAsync(int siteId, UpdateSiteWaterSupplierDto dto)
+    {
+        var site = await _siteRepository.GetTrackedForUpdateAsync(siteId, CancellationToken.None);
+
+        if (site == null)
+        {
+            return false;
+        }
+
+        var previousWaterSupplierId = site.WaterSupplierId;
+
+        site.WaterSupplierId = dto.WaterSupplierId;
+
+        site.UserAccountAssignmentId = null;
+        site.CsiAccountAssignmentId = null;
+        site.CsiAccountAssignmentDate = null;
+        site.BackflowAccountAssignmentId = null;
+        site.BackflowAccountAssignmentDate = null;
+        site.FogAccountAssignmentId = null;
+        site.FogAccountAssignmentDate = null;
+
+        site.GisAreaId = 0;
+        site.NeedsRenewalCheck = true;
+
+        await _siteRepository.SaveChangesAsync(CancellationToken.None);
+
+        await _recordLogService.AddAsync(RecordLogTableNames.Sites, siteId, dto.WaterSupplierId, RecordLogType.Edit, $"Water Supplier changed from {previousWaterSupplierId} to {dto.WaterSupplierId}");
+
+        return true;
+    }
+
     public async Task<IPagedData<CsiComplianceSiteDto>> GetCsiComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         query.Sort = query.ConvertSortProperties<Site, SiteDto>(Mapper);
@@ -224,16 +264,33 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         var sites = await _siteRepository.GetCsiComplianceAsync(pageInfo, query, cancellationToken);
         var dtos = sites.Select(s => Mapper.Map<CsiComplianceSiteDto>(s)).ToList();
 
-        if (dtos.Count > 0)
-        {
-            var logs = await _siteLogService.GetBySitesAsync(dtos.Select(d => d.Id), cancellationToken);
-            var logsBySite = logs.ToLookup(l => l.Site.Id ?? 0);
+        await PopulateComplianceRowsAsync(dtos, dto => dto.CsiRenewalDate, cancellationToken);
 
-            foreach (var dto in dtos)
-            {
-                dto.Logs = logsBySite[dto.Id].ToList();
-            }
-        }
+        return dtos.ToPagedData(pageInfo);
+    }
+
+    public async Task<IPagedData<FogComplianceSiteDto>> GetFogInspectionComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<Site, SiteDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<Site, SiteDto>(Mapper);
+
+        var sites = await _siteRepository.GetFogInspectionComplianceAsync(pageInfo, query, cancellationToken);
+        var dtos = sites.Select(s => Mapper.Map<FogComplianceSiteDto>(s)).ToList();
+
+        await PopulateComplianceRowsAsync(dtos, dto => dto.FogInspectionExpirationDate, cancellationToken);
+
+        return dtos.ToPagedData(pageInfo);
+    }
+
+    public async Task<IPagedData<FogPermitComplianceSiteDto>> GetFogPermitComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<Site, SiteDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<Site, SiteDto>(Mapper);
+
+        var sites = await _siteRepository.GetFogPermitComplianceAsync(pageInfo, query, cancellationToken);
+        var dtos = sites.Select(s => Mapper.Map<FogPermitComplianceSiteDto>(s)).ToList();
+
+        await PopulateComplianceRowsAsync(dtos, dto => dto.FogPermitExpirationDate, cancellationToken);
 
         return dtos.ToPagedData(pageInfo);
     }
@@ -250,6 +307,99 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         var assignmentDate = userId.HasValue ? DateTime.UtcNow : (DateTime?)null;
 
         await _siteRepository.UpdateBackflowAssignmentAsync(siteId, userId, assignmentDate);
+    }
+
+    public async Task<IPagedData<FogTripTicketComplianceSiteDto>> GetFogTripTicketComplianceAsync(PageInfo pageInfo, Query query, DateTime? dueDateFrom, DateTime? dueDateTo, bool sortDescending, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<Site, SiteDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<Site, SiteDto>(Mapper);
+
+        var sites = await _siteRepository.GetFogTripTicketComplianceAsync(pageInfo, query, dueDateFrom, dueDateTo, sortDescending, cancellationToken);
+        var dtos = sites.Select(s => Mapper.Map<FogTripTicketComplianceSiteDto>(s)).ToList();
+
+        foreach (var dto in dtos)
+        {
+            dto.DueDate = ComputeTripTicketDueDate(dto.LastTripTicketDate, dto.TripTicketInterval);
+        }
+
+        await PopulateComplianceRowsAsync(dtos, dto => dto.DueDate, cancellationToken);
+
+        return dtos.ToPagedData(pageInfo);
+    }
+
+    private async Task PopulateComplianceRowsAsync<TDto>(List<TDto> dtos, Func<TDto, DateTime?> dueDateSelector, CancellationToken cancellationToken)
+        where TDto : ComplianceSiteDtoBase
+    {
+        if (dtos.Count == 0)
+        {
+            return;
+        }
+
+        var logs = await _siteLogService.GetBySitesAsync(dtos.Select(d => d.Id), cancellationToken);
+        var logsBySite = logs.ToLookup(l => l.Site.Id ?? 0);
+
+        var today = _timeZoneHelper.GetUserLocalTime().Date;
+
+        foreach (var dto in dtos)
+        {
+            dto.Logs = logsBySite[dto.Id].ToList();
+            dto.DaysOverdue = ComputeDaysOverdue(dueDateSelector(dto), today);
+            dto.OverdueSeverity = ComputeOverdueSeverity(dto.DaysOverdue);
+        }
+    }
+
+    private static DateTime? ComputeTripTicketDueDate(DateTime? lastTripTicketDate, int tripTicketInterval)
+    {
+        if (!lastTripTicketDate.HasValue || tripTicketInterval <= 0)
+        {
+            return null;
+        }
+
+        return lastTripTicketDate.Value.AddDays(tripTicketInterval);
+    }
+
+    private static int? ComputeDaysOverdue(DateTime? dueDate, DateTime today)
+    {
+        if (!dueDate.HasValue)
+        {
+            return null;
+        }
+
+        var days = (today - dueDate.Value.Date).Days;
+
+        return days < 0 ? null : days;
+    }
+
+    private static ComplianceOverdueSeverity ComputeOverdueSeverity(int? daysOverdue)
+    {
+        if (!daysOverdue.HasValue)
+        {
+            return ComplianceOverdueSeverity.None;
+        }
+
+        if (daysOverdue.Value > 90)
+        {
+            return ComplianceOverdueSeverity.High;
+        }
+
+        if (daysOverdue.Value >= 30)
+        {
+            return ComplianceOverdueSeverity.Moderate;
+        }
+
+        if (daysOverdue.Value > 0)
+        {
+            return ComplianceOverdueSeverity.Low;
+        }
+
+        return ComplianceOverdueSeverity.DueToday;
+    }
+
+    public async Task UpdateFogAssignmentAsync(int siteId, int? userId)
+    {
+        var assignmentDate = userId.HasValue ? DateTime.UtcNow : (DateTime?)null;
+
+        await _siteRepository.UpdateFogAssignmentAsync(siteId, userId, assignmentDate);
     }
 
     public async Task<IEnumerable<SiteDto>> GetAllPendingRenewalAsync(int batchSize, CancellationToken cancellationToken)

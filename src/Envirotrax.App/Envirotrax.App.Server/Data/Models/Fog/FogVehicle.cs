@@ -4,6 +4,8 @@ using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Envirotrax.App.Server.Data.Models.Fog;
 
@@ -34,6 +36,8 @@ public class FogVehicle : IProfessionalModel, ICreateAuditableModel<AppUser>, ID
     [MaxLength(50)]
     public string StickerNumber { get; set; } = null!;
 
+    public FogVehiclePermit? Permit { get; set; }
+
     // Audit
     public int? CreatedById { get; set; }
     public AppUser? CreatedBy { get; set; }
@@ -42,4 +46,14 @@ public class FogVehicle : IProfessionalModel, ICreateAuditableModel<AppUser>, ID
     public int? DeletedById { get; set; }
     public AppUser? DeletedBy { get; set; }
     public DateTime? DeletedTime { get; set; }
+}
+
+public class FogVehicleConfiguration : IEntityTypeConfiguration<FogVehicle>
+{
+    public void Configure(EntityTypeBuilder<FogVehicle> builder)
+    {
+        builder.HasOne(vehicle => vehicle.Permit)
+            .WithOne(permit => permit.Vehicle)
+            .HasForeignKey<FogVehiclePermit>(permit => permit.VehicleId);
+    }
 }

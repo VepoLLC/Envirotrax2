@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Logs;
 
-public class RecordLogRepository : Repository<RecordLog>, IRecordLogRepository
+public class RecordLogRepository : Repository<RecordLog, long>, IRecordLogRepository
 {
     public RecordLogRepository(IDbContextSelector dbContextSelector)
         : base(dbContextSelector)
@@ -15,14 +15,14 @@ public class RecordLogRepository : Repository<RecordLog>, IRecordLogRepository
     protected override IQueryable<RecordLog> GetListQuery()
     {
         return base.GetListQuery()
-            .Include(log => log.User);
+            .Include(log => log.CreatedBy);
     }
 
     public async Task<List<RecordLog>> GetByRecordAsync(string tableName, int recordId, CancellationToken cancellationToken)
     {
         return await GetListQuery()
             .Where(log => log.TableName == tableName && log.RecordId == recordId)
-            .OrderByDescending(log => log.LogDate)
+            .OrderByDescending(log => log.CreatedTime)
             .ToListAsync(cancellationToken);
     }
 

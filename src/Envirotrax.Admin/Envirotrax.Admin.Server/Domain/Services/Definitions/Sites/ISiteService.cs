@@ -10,7 +10,9 @@ public interface ISiteService
 
     Task<SiteDetailDto?> GetByIdAsync(int siteId, CancellationToken cancellationToken);
 
-    Task UpdateAsync(int siteId, SiteUpdateDto dto, CancellationToken cancellationToken);
+    Task UpdateAsync(int siteId, int waterSupplierId, SiteUpdateDto dto, CancellationToken cancellationToken);
 
-    Task UpdateGisAsync(int siteId, SiteGisUpdateDto dto, CancellationToken cancellationToken);
+    Task UpdateGisAsync(int siteId, int waterSupplierId, SiteGisUpdateDto dto, CancellationToken cancellationToken);
+
+    Task UpdateWaterSupplierAsync(int siteId, int waterSupplierId, SiteWaterSupplierUpdateDto dto, CancellationToken cancellationToken);
 }

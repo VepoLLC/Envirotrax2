@@ -10,8 +10,12 @@ public interface ISiteRepository : IRepository<Site>
     Task UpdateGisCoordinatesAsync(Site site);
     Task UpdateManualGisDataAsync(int siteId, double? latitude, double? longitude, GisStatusType status);
     Task<IEnumerable<Site>> GetCsiComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<IEnumerable<Site>> GetFogInspectionComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<IEnumerable<Site>> GetFogPermitComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task UpdateCsiAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate);
     Task UpdateBackflowAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate);
+    Task<IEnumerable<Site>> GetFogTripTicketComplianceAsync(PageInfo pageInfo, Query query, DateTime? dueDateFrom, DateTime? dueDateTo, bool sortDescending, CancellationToken cancellationToken);
+    Task UpdateFogAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate);
     Task<Site?> GetTrackedForUpdateAsync(int siteId, CancellationToken cancellationToken);
     Task SaveChangesAsync(CancellationToken cancellationToken);
     Task ClearNeedsRenewalCheckAsync(int siteId);

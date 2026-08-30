@@ -81,13 +81,15 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         return await paginated.ToListAsync(cancellationToken);
     }
 
-    public async Task<CsiInspection?> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request)
+    public async Task<AdminUpdateResult<CsiInspection>> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request)
     {
+        var result = new AdminUpdateResult<CsiInspection>();
+
         var inspection = await Entity.SingleOrDefaultAsync(i => i.Id == id);
 
         if (inspection == null)
         {
-            return null;
+            return result;
         }
 
         inspection.PropertyType = request.PropertyType;
@@ -142,9 +144,13 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
 
         inspection.Comments = request.Comments;
 
+        result.Changes = BuildChangeDescription(inspection);
+
         await DbContext.SaveChangesAsync();
 
-        return inspection;
+        result.Model = inspection;
+
+        return result;
     }
 
     public async Task<CsiInspection?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken)

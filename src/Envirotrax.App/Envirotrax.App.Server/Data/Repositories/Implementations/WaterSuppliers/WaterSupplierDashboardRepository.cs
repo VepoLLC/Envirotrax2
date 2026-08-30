@@ -88,6 +88,7 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
         {
             var childIds = childWaterSuppliers.Select(ws => ws.Id).ToList();
             var rawSub = await _context.CsiInspections
+                .IgnoreQueryFilters()
                 .Where(c => childIds.Contains(c.WaterSupplierId) && c.CreatedTime >= utcStart && c.CreatedTime < utcEnd)
                 .Select(c => new { c.WaterSupplierId, c.CreatedTime, c.TransactionId })
                 .ToListAsync(cancellationToken);
@@ -166,6 +167,7 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
         {
             var childIds = childWaterSuppliers.Select(ws => ws.Id).ToList();
             var rawSub = await _context.BackflowTests
+                .IgnoreQueryFilters()
                 .Where(b => childIds.Contains(b.WaterSupplierId) && b.TestDate >= utcStart && b.TestDate < utcEnd)
                 .Select(b => new { b.WaterSupplierId, b.TestDate, b.TransactionId })
                 .ToListAsync(cancellationToken);
@@ -244,6 +246,7 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
         {
             var childIds = childWaterSuppliers.Select(ws => ws.Id).ToList();
             var rawSub = await _context.FogInspections
+                .IgnoreQueryFilters()
                 .Where(f => childIds.Contains(f.WaterSupplierId) && f.CreatedTime >= utcStart && f.CreatedTime < utcEnd)
                 .Select(f => new { f.WaterSupplierId, f.CreatedTime, f.TransactionId })
                 .ToListAsync(cancellationToken);
@@ -273,5 +276,84 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
         }
 
         return new FogInspectionSubmissionStatsDto { DailyStats = dailyStats, SubAccountStats = subAccountStats };
+    }
+
+    public async Task<FogTripTicketSubmissionStatsDto> GetFogTripTicketSubmissionStatsAsync(CancellationToken cancellationToken)
+    {
+        var wsId = _tenantProvider.WaterSupplierId;
+        var userTz = _timeZoneHelper.GetUserTimeZone();
+        var localToday = _timeZoneHelper.GetUserLocalTime().Date;
+        var localStart = localToday.AddDays(-9);
+
+        var utcStart = TimeZoneInfo.ConvertTimeToUtc(localStart, userTz);
+        var utcEnd = TimeZoneInfo.ConvertTimeToUtc(localToday.AddDays(1), userTz);
+
+        var allDates = Enumerable.Range(0, 10)
+            .Select(i => DateOnly.FromDateTime(localStart.AddDays(i)))
+            .ToList();
+
+        var rawMain = await _context.FogTripTickets
+            .Where(t => t.WaterSupplierId == wsId && t.CreatedTime >= utcStart && t.CreatedTime < utcEnd)
+            .Select(t => new { t.CreatedTime, t.TransactionId })
+            .ToListAsync(cancellationToken);
+
+        var groupedMain = rawMain
+            .GroupBy(t => DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(t.CreatedTime, userTz)))
+            .Select(g => new
+            {
+                Date = g.Key,
+                Total = g.Count(),
+                Paid = g.Count(t => !string.IsNullOrEmpty(t.TransactionId))
+            })
+            .ToList();
+
+        var dailyStats = allDates.Select(d => new FogTripTicketDailyStatsDto
+        {
+            Date = d,
+            IsWeekend = d.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday,
+            TotalTripTickets = groupedMain.FirstOrDefault(r => r.Date == d)?.Total ?? 0,
+            TotalPaidTripTickets = groupedMain.FirstOrDefault(r => r.Date == d)?.Paid ?? 0
+        }).ToList();
+
+        var childWaterSuppliers = await _context.WaterSuppliers
+            .Where(ws => ws.ParentId == wsId)
+            .Select(ws => new { ws.Id, ws.Name })
+            .ToListAsync(cancellationToken);
+
+        List<FogTripTicketSubAccountStatsDto>? subAccountStats = null;
+        if (childWaterSuppliers.Count > 0)
+        {
+            var childIds = childWaterSuppliers.Select(ws => ws.Id).ToList();
+            var rawSub = await _context.FogTripTickets
+                .IgnoreQueryFilters()
+                .Where(t => childIds.Contains(t.WaterSupplierId) && t.CreatedTime >= utcStart && t.CreatedTime < utcEnd)
+                .Select(t => new { t.WaterSupplierId, t.CreatedTime, t.TransactionId })
+                .ToListAsync(cancellationToken);
+
+            var groupedSub = rawSub
+                .GroupBy(t => new { t.WaterSupplierId, Date = DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(t.CreatedTime, userTz)) })
+                .Select(g => new
+                {
+                    g.Key.WaterSupplierId,
+                    g.Key.Date,
+                    Total = g.Count(),
+                    Paid = g.Count(t => !string.IsNullOrEmpty(t.TransactionId))
+                })
+                .ToList();
+
+            subAccountStats = [..childWaterSuppliers.Select(ws => new FogTripTicketSubAccountStatsDto
+            {
+                WaterSupplierName = ws.Name,
+                DailyStats = [..allDates.Select(d => new FogTripTicketDailyStatsDto
+                {
+                    Date = d,
+                    IsWeekend = d.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday,
+                    TotalTripTickets = groupedSub.FirstOrDefault(r => r.WaterSupplierId == ws.Id && r.Date == d)?.Total ?? 0,
+                    TotalPaidTripTickets = groupedSub.FirstOrDefault(r => r.WaterSupplierId == ws.Id && r.Date == d)?.Paid ?? 0
+                })]
+            })];
+        }
+
+        return new FogTripTicketSubmissionStatsDto { DailyStats = dailyStats, SubAccountStats = subAccountStats };
     }
 }

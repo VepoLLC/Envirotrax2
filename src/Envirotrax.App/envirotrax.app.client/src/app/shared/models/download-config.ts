@@ -33,4 +33,5 @@ export interface DownloadEndpoint {
     url: string;
     pageInfo?: PageInfo;
     query?: Query;
+    additionalParams?: { [key: string]: string };
 }

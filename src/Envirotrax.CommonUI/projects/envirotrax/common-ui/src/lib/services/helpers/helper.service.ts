@@ -69,4 +69,22 @@ export class HelperService {
     public isDefined(value: any): boolean {
         return value != undefined && value != null;
     }
+
+    public toNumberOrUndefined(value: unknown): number | undefined {
+        if (value === null || value === undefined || value === '') {
+            return undefined;
+        }
+
+        const parsed = Number(value);
+
+        return Number.isNaN(parsed) ? undefined : parsed;
+    }
+
+    public toTextOrUndefined(value: unknown): string | undefined {
+        if (value === null || value === undefined || value === '') {
+            return undefined;
+        }
+
+        return String(value);
+    }
 }

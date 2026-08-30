@@ -170,9 +170,40 @@ public class UpdateBackflowAssignmentDto
     public int? UserId { get; set; }
 }
 
-public class CsiComplianceSiteDto : SiteDto
+public class UpdateFogAssignmentDto
+{
+    public int? UserId { get; set; }
+}
+
+public class UpdateSiteWaterSupplierDto
+{
+    public int WaterSupplierId { get; set; }
+}
+
+public abstract class ComplianceSiteDtoBase : SiteDto
 {
     public List<SiteLogDto> Logs { get; set; } = [];
+
+    public int? DaysOverdue { get; set; }
+
+    public ComplianceOverdueSeverity OverdueSeverity { get; set; }
+}
+
+public class CsiComplianceSiteDto : ComplianceSiteDtoBase
+{
+}
+
+public class FogTripTicketComplianceSiteDto : ComplianceSiteDtoBase
+{
+    public DateTime? DueDate { get; set; }
+}
+
+public class FogComplianceSiteDto : ComplianceSiteDtoBase
+{
+}
+
+public class FogPermitComplianceSiteDto : ComplianceSiteDtoBase
+{
 }
 
 public class ReferencedSiteDto
@@ -225,6 +256,8 @@ public class ReferencedSiteDto
     public bool HasOnSiteSewageFacility { get; set; }
 
     public bool HasAuxWaterSupply { get; set; }
+
+    public bool IsFeeExempt { get; set; }
 
     public double? GisLatitude { get; set; }
 

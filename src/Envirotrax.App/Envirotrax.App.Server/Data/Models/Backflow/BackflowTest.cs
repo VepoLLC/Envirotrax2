@@ -252,6 +252,9 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public bool ValidationUnknownSerialNumber { get; set; }
     public bool ValidationDeviceInformationChanged { get; set; }
 
+    [StringLength(255)]
+    public string? ValidationNotes { get; set; }
+
     // Initial test readings - main assembly
     [Precision(5, 2)]
     public decimal? InitCV1HeldPSID { get; set; }

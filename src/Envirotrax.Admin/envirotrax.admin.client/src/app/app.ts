@@ -6,6 +6,7 @@ import { WaterSupplierListComponent } from './water-suppliers/list/water-supplie
 import { SiteListComponent } from './sites/list/site-list.component';
 import { CsiInspectionListComponent } from './csi/inspections/list/csi-inspection-list.component';
 import { CsiInspectorListComponent } from './csi/inspectors/list/csi-inspector-list.component';
+import { BackflowTestListComponent } from './backflow/tests/list/backflow-test-list.component';
 
 @Component({
   selector: 'app-root',
@@ -60,6 +61,17 @@ export class App implements OnInit {
             title: 'Inspector Search',
             iconCss: 'fa-solid fa-user',
             onClick: this.showCsiInspectorSearch.bind(this)
+          }
+        ]
+      },
+      {
+        title: 'Backflow Management',
+        iconCss: 'fa-solid fa-gauge',
+        children: [
+          {
+            title: 'Backflow Test Search',
+            iconCss: 'fa-solid fa-magnifying-glass',
+            onClick: this.showBackflowTestSearch.bind(this)
           }
         ]
       }
@@ -120,6 +132,12 @@ export class App implements OnInit {
   public showCsiInspectorSearch(): void {
     this._windowService.addWindow(CsiInspectorListComponent, {
       title: 'CSI Inspector Search'
+    });
+  }
+
+  public showBackflowTestSearch(): void {
+    this._windowService.addWindow(BackflowTestListComponent, {
+      title: 'Backflow Test Search'
     });
   }
 }

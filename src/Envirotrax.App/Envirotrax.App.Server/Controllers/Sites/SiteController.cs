@@ -34,6 +34,14 @@ public class SiteController : WaterSupplierCrudController<SiteDto>
         return Ok();
     }
 
+    [HttpPut("{id}/fog-assignment")]
+    [HasPermission(PermissionAction.CanModify)]
+    public async Task<IActionResult> UpdateFogAssignmentAsync(int id, [FromBody] UpdateFogAssignmentDto dto)
+    {
+        await _siteService.UpdateFogAssignmentAsync(id, dto.UserId);
+        return Ok();
+    }
+
     [HttpPut("{id}/gis-data")]
     [HasPermission(PermissionAction.CanModify)]
     public async Task<IActionResult> UpdateGisDataAsync(int id, [FromBody] UpdateSiteGisDataDto dto, CancellationToken cancellationToken)

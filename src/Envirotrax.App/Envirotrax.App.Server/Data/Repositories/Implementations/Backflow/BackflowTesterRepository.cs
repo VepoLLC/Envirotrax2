@@ -10,9 +10,6 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow
 {
     public class BackflowTesterRepository : Repository<Professional>, IBackflowTesterRepository
     {
-        private static readonly string[] BpatLicenseTypeNames = ["TCEQ - BPAT License", "ASSE - Tester", "WCS - BAT License"];
-        private static readonly string[] FireLicenseTypeNames = ["TX Fire Marshal Office - SCR", "ASSE - Fire BP Tester"];
-
         public BackflowTesterRepository(IDbContextSelector dbContextSelector)
             : base(dbContextSelector)
         {
@@ -40,7 +37,7 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow
                 query = query.Where(p => DbContext.ProfessionalUserLicenses.Any(l =>
                     l.ProfessionalId == p.Id &&
                     l.ProfessionalType == ProfessionalType.Bpat &&
-                    BpatLicenseTypeNames.Contains(l.LicenseType!.Name) &&
+                    !l.LicenseType!.IsFireLicense &&
                     l.LicenseNumber.Contains(bpatLicenseNumber)));
             }
 
@@ -49,7 +46,7 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow
                 query = query.Where(p => DbContext.ProfessionalUserLicenses.Any(l =>
                     l.ProfessionalId == p.Id &&
                     l.ProfessionalType == ProfessionalType.Bpat &&
-                    FireLicenseTypeNames.Contains(l.LicenseType!.Name) &&
+                    l.LicenseType!.IsFireLicense &&
                     l.LicenseNumber.Contains(fireLicenseNumber)));
             }
 

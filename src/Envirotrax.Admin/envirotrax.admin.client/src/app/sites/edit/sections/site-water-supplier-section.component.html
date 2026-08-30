@@ -1,7 +1,10 @@
 <vp-section [header]="'Water Supplier - ' + (site.waterSupplier?.name || '')">
     <div class="mb-3">
-        <label class="form-label mb-1">Water Supplier</label>
-        <input type="text" class="form-control" [value]="site.waterSupplier?.name || ''" readonly />
+        <vp-lookup-field name="siteWaterSupplier"
+                         label="Water Supplier"
+                         [canSearch]="true"
+                         [displayText]="site.waterSupplier?.name"
+                         (search)="changeWaterSupplier.emit()" />
     </div>
 
     <div class="row">

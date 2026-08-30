@@ -1,0 +1,80 @@
+<vp-section header="Mailing Information">
+    <vp-section-actions>
+        <button type="button"
+                class="btn btn-link p-0 text-decoration-none"
+                title="Open Site"
+                (click)="openSite.emit()">
+            <i class="fa-solid fa-house"></i>
+        </button>
+    </vp-section-actions>
+
+    <div class="mb-2">
+        <vp-input name="mailingCompanyName"
+                  label="Company Name"
+                  [form]="form"
+                  [maxLength]="100"
+                  [(ngModel)]="test.mailingCompanyName" />
+    </div>
+
+    <div class="mb-2">
+        <vp-input name="mailingContactName"
+                  label="Contact Name"
+                  [form]="form"
+                  [maxLength]="100"
+                  [(ngModel)]="test.mailingContactName" />
+    </div>
+
+    <div class="row">
+        <div class="col-3 mb-2">
+            <vp-input name="mailingStreetNumber"
+                      label="Street #"
+                      [form]="form"
+                      [maxLength]="50"
+                      [(ngModel)]="test.mailingStreetNumber" />
+        </div>
+
+        <div class="col-6 mb-2">
+            <vp-input name="mailingStreetName"
+                      label="Street Name"
+                      [form]="form"
+                      [maxLength]="100"
+                      [(ngModel)]="test.mailingStreetName" />
+        </div>
+
+        <div class="col-3 mb-2">
+            <vp-input name="mailingNumber"
+                      label="#"
+                      [form]="form"
+                      [maxLength]="50"
+                      [(ngModel)]="test.mailingNumber" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-6 mb-2">
+            <vp-input name="mailingCity"
+                      label="City"
+                      [form]="form"
+                      [maxLength]="50"
+                      [(ngModel)]="test.mailingCity" />
+        </div>
+
+        <div class="col-3 mb-2">
+            <vp-input name="mailingState"
+                      type="select"
+                      label="State"
+                      [form]="form"
+                      [options]="stateOptions"
+                      [(ngModel)]="mailingStateId"
+                      (ngModelChange)="onMailingStateChange($event)" />
+        </div>
+
+        <div class="col-3 mb-2">
+            <vp-input name="mailingZip"
+                      label="ZIP"
+                      [form]="form"
+                      [maxLength]="20"
+                      [(ngModel)]="test.mailingZip" />
+        </div>
+    </div>
+</vp-section>

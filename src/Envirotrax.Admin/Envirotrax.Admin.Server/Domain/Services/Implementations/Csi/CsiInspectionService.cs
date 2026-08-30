@@ -35,9 +35,9 @@ public class CsiInspectionService : ICsiInspectionService
         return _apiClient.GetAsync<CsiInspectionDetailsDto>($"{BaseUrl}/{id}", cancellationToken);
     }
 
-    public Task<CsiInspectionDetailsDto?> UpdateAsync(int id, CsiInspectionUpdateRequest request, CancellationToken cancellationToken)
+    public Task<CsiInspectionDetailsDto?> UpdateAsync(int id, int waterSupplierId, CsiInspectionUpdateRequest request, CancellationToken cancellationToken)
     {
-        return _apiClient.PutAsync<CsiInspectionUpdateRequest, CsiInspectionDetailsDto>($"{BaseUrl}/{id}", request, cancellationToken);
+        return _apiClient.PutAsync<CsiInspectionUpdateRequest, CsiInspectionDetailsDto>(waterSupplierId, $"{BaseUrl}/{id}", request, cancellationToken);
     }
 
     public Task<CsiInspectionCountsDto?> GetCountsAsync(int id, CancellationToken cancellationToken)
@@ -60,9 +60,9 @@ public class CsiInspectionService : ICsiInspectionService
         return _apiClient.GetAsync<List<CsiInspectionImageDto>>($"{BaseUrl}/{id}/images", cancellationToken);
     }
 
-    public Task<CsiInspectionImageDto?> AddImageAsync(int id, Stream fileStream, string fileName, string? description, CancellationToken cancellationToken)
+    public Task<CsiInspectionImageDto?> AddImageAsync(int id, int waterSupplierId, Stream fileStream, string fileName, string? description, CancellationToken cancellationToken)
     {
-        return _apiClient.PostFileAsync<CsiInspectionImageDto>($"{BaseUrl}/{id}/images", fileStream, fileName, description, cancellationToken);
+        return _apiClient.PostFileAsync<CsiInspectionImageDto>(waterSupplierId, $"{BaseUrl}/{id}/images", fileStream, fileName, description, cancellationToken);
     }
 
     public Task DeleteImageAsync(int id, int imageId, CancellationToken cancellationToken)

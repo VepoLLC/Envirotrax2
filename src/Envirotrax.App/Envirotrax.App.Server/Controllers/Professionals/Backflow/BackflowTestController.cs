@@ -11,7 +11,7 @@ namespace Envirotrax.App.Server.Controllers.Professionals.Backflow;
 
 [Route("api/professionals/backflow/tests")]
 [HasFeature(FeatureType.BackflowTesting)]
-[Authorize(Roles = RoleDefinitions.Professionals.BackflowTester)]
+[Authorize(Roles = $"{RoleDefinitions.Professionals.Admin},{RoleDefinitions.Professionals.BackflowTester}")]
 public class BackflowTestController : ProfessionalProtectedController
 {
     private readonly IBackflowTestService _backflowTestService;

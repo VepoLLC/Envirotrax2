@@ -39,17 +39,25 @@ public class SiteController : AdminBaseController
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync(int id, [FromBody] SiteUpdateDto dto, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateAsync(int id, [FromQuery] int waterSupplierId, [FromBody] SiteUpdateDto dto, CancellationToken cancellationToken)
     {
-        await _siteService.UpdateAsync(id, dto, cancellationToken);
+        await _siteService.UpdateAsync(id, waterSupplierId, dto, cancellationToken);
 
         return Ok();
     }
 
     [HttpPut("{id}/gis-data")]
-    public async Task<IActionResult> UpdateGisAsync(int id, [FromBody] SiteGisUpdateDto dto, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateGisAsync(int id, [FromQuery] int waterSupplierId, [FromBody] SiteGisUpdateDto dto, CancellationToken cancellationToken)
     {
-        await _siteService.UpdateGisAsync(id, dto, cancellationToken);
+        await _siteService.UpdateGisAsync(id, waterSupplierId, dto, cancellationToken);
+
+        return Ok();
+    }
+
+    [HttpPut("{id}/water-supplier")]
+    public async Task<IActionResult> UpdateWaterSupplierAsync(int id, [FromQuery] int waterSupplierId, [FromBody] SiteWaterSupplierUpdateDto dto, CancellationToken cancellationToken)
+    {
+        await _siteService.UpdateWaterSupplierAsync(id, waterSupplierId, dto, cancellationToken);
 
         return Ok();
     }

@@ -84,6 +84,7 @@ public static class ServiceRegistration
         services.AddTransient<IRoleService, RoleService>();
 
         services.AddTransient<IProfessionalService, ProfessionalService>();
+        services.AddTransient<IRegisteredProfessionalService, RegisteredProfessionalService>();
         services.AddTransient<IProfessionalUserService, ProfessionalUserService>();
         services.AddTransient<IProfessionalSupplierService, ProfessionalSupplierService>();
         services.AddTransient<IProfessionalUserLicenseService, ProfessionalUserLicenseService>();

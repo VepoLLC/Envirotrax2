@@ -88,6 +88,7 @@ public static class ServiceRegistration
         services.AddTransient<IUserRoleRepository, UserReoleRepository>();
 
         services.AddTransient<IProfessionalRepository, ProfessionalRepository>();
+        services.AddTransient<IRegisteredProfessionalRepository, RegisteredProfessionalRepository>();
         services.AddTransient<IProfessionalUserRepository, ProfessionalUserRepository>();
         services.AddTransient<IProfessionalSupplierRepository, ProfessionalSupplierRepository>();
         services.AddTransient<IProfessionalUserLicenseRepository, ProfessionalUserLicenseRepository>();

@@ -8,4 +8,10 @@ public interface IFogInspectionRepository : IRepository<FogInspection>
     Task<IEnumerable<FogInspection>> SearchForProfessionalAsync(
         PageInfo pageInfo, Query query,
         bool latestOnly, CancellationToken cancellationToken);
+
+    // Dashboard "View" on a sub account: shows that child water supplier's own inspections without
+    // switching the current session's authentication.
+    Task<IEnumerable<FogInspection>> SearchForSubAccountAsync(
+        PageInfo pageInfo, Query query,
+        int subAccountWaterSupplierId, CancellationToken cancellationToken);
 }

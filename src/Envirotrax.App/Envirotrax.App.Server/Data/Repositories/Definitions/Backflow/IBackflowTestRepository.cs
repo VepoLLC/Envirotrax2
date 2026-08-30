@@ -15,6 +15,10 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
 
     Task<IEnumerable<BackflowTest>> SearchAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken);
 
+    // Dashboard "View" on a sub account: shows that child water supplier's own tests without
+    // switching the current session's authentication.
+    Task<IEnumerable<BackflowTest>> SearchForSubAccountAsync(PageInfo pageInfo, Query query, int subAccountWaterSupplierId, CancellationToken cancellationToken);
+
     // Process 1 — Site level
     Task<IEnumerable<BackflowTest>> GetAllCurrentBySiteIdAsync(int siteId, CancellationToken cancellationToken);
     Task UpdateTestRenewalAsync(int testId, bool renewalRequired, DateTime? expirationDate);

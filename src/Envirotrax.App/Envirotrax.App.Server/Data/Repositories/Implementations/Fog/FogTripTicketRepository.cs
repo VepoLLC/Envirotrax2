@@ -81,6 +81,26 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
         return await paginated.ToListAsync(ct);
     }
 
+    public async Task<IEnumerable<FogTripTicket>> SearchForSubAccountAsync(PageInfo pageInfo, Query query, int subAccountWaterSupplierId, CancellationToken cancellationToken)
+    {
+        var isOwnChild = await DbContext.WaterSuppliers
+            .AnyAsync(ws => ws.Id == subAccountWaterSupplierId && ws.ParentId == _tenantProvider.WaterSupplierId, cancellationToken);
+
+        if (!isOwnChild)
+        {
+            return [];
+        }
+
+        var paginated = await GetListQuery()
+            .IgnoreQueryFilters()
+            .Where(t => t.WaterSupplierId == subAccountWaterSupplierId)
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
     public async Task<FogTripTicket?> UpdateApprovalAsync(int id, bool disapproved, int? approvedById, CancellationToken cancellationToken)
     {
         var ticket = await GetNoIncludesAsync(id, cancellationToken);

@@ -22,6 +22,13 @@ public class BackflowTestController : WaterSupplierCrudController<BackflowTestDt
 
     protected override Task<IPagedData<BackflowTestDto>> ProcessGetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
+        var subAccountWaterSupplierId = ReadSubAccountWaterSupplierId();
+
+        if (subAccountWaterSupplierId.HasValue)
+        {
+            return _testService.SearchForSubAccountAsync(pageInfo, query, subAccountWaterSupplierId.Value, cancellationToken);
+        }
+
         return _testService.SearchAsync(pageInfo, query, ReadPaymentStatus(), cancellationToken);
     }
 
@@ -30,6 +37,16 @@ public class BackflowTestController : WaterSupplierCrudController<BackflowTestDt
         if (Enum.TryParse<BackflowPaymentStatus>(Request.Query["paymentStatus"], out var paymentStatus))
         {
             return paymentStatus;
+        }
+
+        return null;
+    }
+
+    private int? ReadSubAccountWaterSupplierId()
+    {
+        if (int.TryParse(Request.Query["subAccountWaterSupplierId"], out var waterSupplierId))
+        {
+            return waterSupplierId;
         }
 
         return null;

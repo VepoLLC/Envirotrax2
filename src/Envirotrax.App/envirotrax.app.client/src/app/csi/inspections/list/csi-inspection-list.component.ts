@@ -18,6 +18,7 @@ import { AppContainerHelperService } from "../../../shared/services/helpers/app-
 })
 export class CsiInspectionListComponent implements OnInit, OnDestroy {
     private _queryParamSub?: Subscription;
+    private _subAccountWaterSupplierId?: number;
     @ViewChild('statusTemplate', { static: true })
     public statusTemplate!: TemplateRef<CellTemplateData<CsiInspection>>;
 
@@ -127,17 +128,36 @@ export class CsiInspectionListComponent implements OnInit, OnDestroy {
         this._queryParamSub = this._activatedRoute.queryParamMap.subscribe(async params => {
             const dateParam = params.get('date');
             if (dateParam) {
-                this.table.query.filter = [{
-                    columnName: 'inspectionDate',
-                    children: [
-                        { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Gte', logicalOperator: 'And' },
-                        { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Lte', logicalOperator: 'And' }
-                    ]
-                }];
+                this.applyDateFilter(dateParam);
+                await this.getInspections();
+                this.setShowResults(true);
+                return;
+            }
+
+            const subAccountWaterSupplierIdParam = params.get('subAccountWaterSupplierId');
+            if (subAccountWaterSupplierIdParam) {
+                this._subAccountWaterSupplierId = Number(subAccountWaterSupplierIdParam);
+
+                const startDateParam = params.get('startDate');
+                const endDateParam = params.get('endDate');
+                if (startDateParam && endDateParam) {
+                    this.applyDateFilter(startDateParam, endDateParam);
+                }
+
                 await this.getInspections();
                 this.setShowResults(true);
             }
         });
+    }
+
+    private applyDateFilter(startDate: string, endDate: string = startDate): void {
+        this.table.query.filter = [{
+            columnName: 'inspectionDate',
+            children: [
+                { columnName: 'inspectionDate', value: startDate, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                { columnName: 'inspectionDate', value: endDate, comparisonOperator: 'Lte', logicalOperator: 'And' }
+            ]
+        }];
     }
 
     public ngOnDestroy(): void {
@@ -208,7 +228,8 @@ export class CsiInspectionListComponent implements OnInit, OnDestroy {
             this.table.isLoading = true;
             this.table.items = await this._csiInspectionService.getAll(
                 this.table.items?.pageInfo || {},
-                this.table.query
+                this.table.query,
+                this._subAccountWaterSupplierId
             );
         } finally {
             this.table.isLoading = false;
@@ -216,10 +237,21 @@ export class CsiInspectionListComponent implements OnInit, OnDestroy {
     }
 
     public searchAgain(): void {
+        this._subAccountWaterSupplierId = undefined;
         this.setShowResults(false);
     }
 
     public viewDetails(inspection: CsiInspection): void {
+        if (this._subAccountWaterSupplierId) {
+            const url = this._router.serializeUrl(
+                this._router.createUrlTree(['/csi', inspection.id, 'view'], {
+                    queryParams: { waterSupplierId: this._subAccountWaterSupplierId }
+                })
+            );
+            window.open(url, '_blank');
+            return;
+        }
+
         this._router.navigate([inspection.id, 'view'], {
             relativeTo: this._activatedRoute
         });

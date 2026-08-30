@@ -20,6 +20,7 @@ import { PrintableTableService } from '../../../shared/services/printable-table.
 })
 export class FogTripTicketListComponent implements OnInit, OnDestroy {
     private _queryParamSub?: Subscription;
+    private _subAccountWaterSupplierId?: number;
     public showResults: boolean = false;
     public readonly PropertyType = PropertyType;
     public readonly FogVehicleCapacityType = FogVehicleCapacityType;
@@ -119,17 +120,36 @@ export class FogTripTicketListComponent implements OnInit, OnDestroy {
         this._queryParamSub = this._activatedRoute.queryParamMap.subscribe(async params => {
             const dateParam = params.get('date');
             if (dateParam) {
-                this.table.query.filter = [{
-                    columnName: 'createdTime',
-                    children: [
-                        { columnName: 'createdTime', value: dateParam, comparisonOperator: 'Gte', logicalOperator: 'And' },
-                        { columnName: 'createdTime', value: dateParam, comparisonOperator: 'Lte', logicalOperator: 'And' }
-                    ]
-                }];
+                this.applyDateFilter(dateParam);
+                await this.getTripTickets();
+                this.setShowResults(true);
+                return;
+            }
+
+            const subAccountWaterSupplierIdParam = params.get('subAccountWaterSupplierId');
+            if (subAccountWaterSupplierIdParam) {
+                this._subAccountWaterSupplierId = Number(subAccountWaterSupplierIdParam);
+
+                const startDateParam = params.get('startDate');
+                const endDateParam = params.get('endDate');
+                if (startDateParam && endDateParam) {
+                    this.applyDateFilter(startDateParam, endDateParam);
+                }
+
                 await this.getTripTickets();
                 this.setShowResults(true);
             }
         });
+    }
+
+    private applyDateFilter(startDate: string, endDate: string = startDate): void {
+        this.table.query.filter = [{
+            columnName: 'createdTime',
+            children: [
+                { columnName: 'createdTime', value: startDate, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                { columnName: 'createdTime', value: endDate, comparisonOperator: 'Lte', logicalOperator: 'And' }
+            ]
+        }];
     }
 
     public ngOnDestroy(): void {
@@ -184,7 +204,8 @@ export class FogTripTicketListComponent implements OnInit, OnDestroy {
             this.table.isLoading = true;
             this.table.items = await this._fogTripTicketService.getAll(
                 this.table.items?.pageInfo || {},
-                this.table.query
+                this.table.query,
+                this._subAccountWaterSupplierId
             );
         } finally {
             this.table.isLoading = false;
@@ -198,6 +219,10 @@ export class FogTripTicketListComponent implements OnInit, OnDestroy {
     public setShowResults(visible: boolean): void {
         this.showResults = visible;
         this._containerHelper.setContainerVisibility(!visible);
+
+        if (!visible) {
+            this._subAccountWaterSupplierId = undefined;
+        }
     }
 
     public async search(searchForm: NgForm): Promise<void> {
@@ -208,6 +233,16 @@ export class FogTripTicketListComponent implements OnInit, OnDestroy {
     }
 
     public viewDetails(ticket: FogTripTicket): void {
+        if (this._subAccountWaterSupplierId) {
+            const url = this._router.serializeUrl(
+                this._router.createUrlTree(['/fog/trip-tickets', ticket.id], {
+                    queryParams: { waterSupplierId: this._subAccountWaterSupplierId }
+                })
+            );
+            window.open(url, '_blank');
+            return;
+        }
+
         this._router.navigate([ticket.id], { relativeTo: this._activatedRoute });
     }
 

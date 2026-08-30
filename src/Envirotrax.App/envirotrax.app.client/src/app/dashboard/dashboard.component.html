@@ -225,7 +225,9 @@
                                                         <td>{{sub.totalInspections}}</td>
                                                         <td>{{sub.totalPaidInspections}}</td>
                                                         <td>
-                                                            <button type="button" class="btn btn-sm btn-primary py-0">View</button>
+                                                            <a class="btn btn-sm btn-primary py-0"
+                                                               [routerLink]="['/csi']"
+                                                               [queryParams]="{subAccountWaterSupplierId: sub.waterSupplierId, startDate: csiVm!.rangeStartDate, endDate: csiVm!.rangeEndDate}">View</a>
                                                         </td>
                                                     </tr>
                                                 }
@@ -314,7 +316,9 @@
                                                         <td>{{sub.totalTests}}</td>
                                                         <td>{{sub.totalPaidTests}}</td>
                                                         <td>
-                                                            <button type="button" class="btn btn-sm btn-primary py-0">View</button>
+                                                            <a class="btn btn-sm btn-primary py-0"
+                                                               [routerLink]="['/backflow/tests']"
+                                                               [queryParams]="{subAccountWaterSupplierId: sub.waterSupplierId, startDate: backflowVm!.rangeStartDate, endDate: backflowVm!.rangeEndDate}">View</a>
                                                         </td>
                                                     </tr>
                                                 }
@@ -403,7 +407,9 @@
                                                         <td>{{sub.totalInspections}}</td>
                                                         <td>{{sub.totalPaidInspections}}</td>
                                                         <td>
-                                                            <button type="button" class="btn btn-sm btn-primary py-0">View</button>
+                                                            <a class="btn btn-sm btn-primary py-0"
+                                                               [routerLink]="['/fog/inspections']"
+                                                               [queryParams]="{subAccountWaterSupplierId: sub.waterSupplierId, startDate: fogInspectionVm!.rangeStartDate, endDate: fogInspectionVm!.rangeEndDate}">View</a>
                                                         </td>
                                                     </tr>
                                                 }
@@ -492,7 +498,9 @@
                                                         <td>{{sub.totalTripTickets}}</td>
                                                         <td>{{sub.totalPaidTripTickets}}</td>
                                                         <td>
-                                                            <button type="button" class="btn btn-sm btn-primary py-0">View</button>
+                                                            <a class="btn btn-sm btn-primary py-0"
+                                                               [routerLink]="['/fog/trip-tickets']"
+                                                               [queryParams]="{subAccountWaterSupplierId: sub.waterSupplierId, startDate: fogTripTicketVm!.rangeStartDate, endDate: fogTripTicketVm!.rangeEndDate}">View</a>
                                                         </td>
                                                     </tr>
                                                 }

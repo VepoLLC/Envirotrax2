@@ -213,6 +213,17 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         return inspections.Select(m => Mapper.Map<FogInspectionDto>(m)!).ToPagedData(pageInfo);
     }
 
+    public async Task<IPagedData<FogInspectionDto>> SearchForSubAccountAsync(
+        PageInfo pageInfo, Query query, int subAccountWaterSupplierId, CancellationToken cancellationToken)
+    {
+        query.Filter = query.ConvertFilterProperties<FogInspection, FogInspectionDto>(Mapper);
+        query.Sort = query.ConvertSortProperties<FogInspection, FogInspectionDto>(Mapper);
+
+        var inspections = await _repository.SearchForSubAccountAsync(pageInfo, query, subAccountWaterSupplierId, cancellationToken);
+
+        return inspections.Select(m => Mapper.Map<FogInspectionDto>(m)!).ToPagedData(pageInfo);
+    }
+
     private async Task PopulateImageUrlsAsync(FogInspectionDto dto)
     {
         var images = new (string? Path, Action<string> SetUrl)[]

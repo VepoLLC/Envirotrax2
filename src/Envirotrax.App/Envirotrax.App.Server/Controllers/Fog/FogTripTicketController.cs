@@ -1,3 +1,4 @@
+using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Filters;
@@ -16,6 +17,31 @@ public class FogTripTicketController : WaterSupplierCrudController<FogTripTicket
         : base(service)
     {
         _tripTicketService = service;
+    }
+
+    protected override Task<IPagedData<FogTripTicketDto>> ProcessGetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var subAccountWaterSupplierId = ReadSubAccountWaterSupplierId();
+
+        if (subAccountWaterSupplierId.HasValue)
+        {
+            return _tripTicketService.SearchForSubAccountAsync(pageInfo, query, subAccountWaterSupplierId.Value, cancellationToken);
+        }
+
+        return base.ProcessGetAllAsync(pageInfo, query, cancellationToken);
+    }
+
+    // Dashboard "View" drill-down into a sub account's trip tickets, without switching the current
+    // session's authentication. Only water suppliers that are an actual child of the current
+    // tenant are honored - see FogTripTicketRepository.SearchForSubAccountAsync.
+    private int? ReadSubAccountWaterSupplierId()
+    {
+        if (int.TryParse(Request.Query["subAccountWaterSupplierId"], out var waterSupplierId))
+        {
+            return waterSupplierId;
+        }
+
+        return null;
     }
 
     [HttpPut("{id}/approval")]

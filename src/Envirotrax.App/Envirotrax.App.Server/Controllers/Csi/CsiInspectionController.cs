@@ -22,6 +22,28 @@ public class CsiInspectionController : WaterSupplierCrudController<CsiInspection
         _imageService = imageService;
     }
 
+    protected override Task<IPagedData<CsiInspectionDto>> ProcessGetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var subAccountWaterSupplierId = ReadSubAccountWaterSupplierId();
+
+        if (subAccountWaterSupplierId.HasValue)
+        {
+            return _inspectionService.SearchForSubAccountAsync(pageInfo, query, subAccountWaterSupplierId.Value, cancellationToken);
+        }
+
+        return base.ProcessGetAllAsync(pageInfo, query, cancellationToken);
+    }
+
+    private int? ReadSubAccountWaterSupplierId()
+    {
+        if (int.TryParse(Request.Query["subAccountWaterSupplierId"], out var waterSupplierId))
+        {
+            return waterSupplierId;
+        }
+
+        return null;
+    }
+
     [HttpGet("pdf")]
     [HasPermission(PermissionAction.CanView)]
     public async Task<IActionResult> GetAllPdfAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)

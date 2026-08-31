@@ -162,16 +162,6 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         return inspections.Select(m => Mapper.Map<CsiInspectionDto>(m)!).ToPagedData(pageInfo);
     }
 
-    public async Task<IPagedData<CsiInspectionDto>> SearchForSubAccountAsync(PageInfo pageInfo, Query query, int subAccountWaterSupplierId, CancellationToken cancellationToken)
-    {
-        query.Filter = query.ConvertFilterProperties<CsiInspection, CsiInspectionDto>(Mapper);
-        query.Sort = query.ConvertSortProperties<CsiInspection, CsiInspectionDto>(Mapper);
-
-        var inspections = await _repository.SearchForSubAccountAsync(pageInfo, query, subAccountWaterSupplierId, cancellationToken);
-
-        return inspections.Select(m => Mapper.Map<CsiInspectionDto>(m)!).ToPagedData(pageInfo);
-    }
-
     private static void ApplySiteSnapshot(CsiInspection inspection, DataTransferObjects.Sites.SiteDto site)
     {
         inspection.PropertyBusinessName = site.BusinessName;

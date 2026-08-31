@@ -174,21 +174,6 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         return tests.Select(t => MapToDto(t)!).ToPagedData(pageInfo);
     }
 
-    public async Task<IPagedData<BackflowTestDto>> SearchForSubAccountAsync(PageInfo pageInfo, Query query, int subAccountWaterSupplierId, CancellationToken cancellationToken)
-    {
-        query.Sort = query.ConvertSortProperties<BackflowTest, BackflowTestDto>(Mapper);
-        query.Filter = query.ConvertFilterProperties<BackflowTest, BackflowTestDto>(Mapper);
-
-        if (query.Sort.IsNullOrEmpty())
-        {
-            query.Sort[nameof(BackflowTest.Id)] = SortOperator.Asc;
-        }
-
-        var tests = await _testRepository.SearchForSubAccountAsync(pageInfo, query, subAccountWaterSupplierId, cancellationToken);
-
-        return tests.Select(t => MapToDto(t)!).ToPagedData(pageInfo);
-    }
-
     private async Task PopulateBpatSnapshotAsync(BackflowTestDto dto)
     {
         if (dto.Professional?.Id is int professionalId)

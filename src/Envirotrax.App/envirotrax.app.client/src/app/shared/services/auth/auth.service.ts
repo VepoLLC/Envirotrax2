@@ -153,8 +153,9 @@ export class AuthService {
     }
 
     private async syncFromOtherTabs(): Promise<void> {
-        // This tab intentionally logged in as a different water supplier (WaterSupplierSwitchGuard).
-        // Don't let it copy another tab's user - that would undo the switch it just made.
+        // This tab intentionally logged in as a different water supplier (see LoginRedirectComponent's
+        // initiateWaterSupplierSwitch). Don't let it copy another tab's user - that would undo the
+        // switch it just made.
         if (this.isTabIsolated()) {
             return;
         }

@@ -1,7 +1,6 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
 import { PermissionGuard } from "../shared/guards/permission.guard";
-import { WaterSupplierSwitchGuard } from "../shared/guards/water-supplier-switch.guard";
 import { PermissionAction, PermissionType } from "../shared/models/permission-type";
 import { FogInspectorListComponent } from "./inspectors/list/fog-inspector-list.component";
 import { FogInspectorDetailsComponent } from "./inspectors/details/fog-inspector-details.component";
@@ -45,7 +44,7 @@ const routes: Routes = [
         path: 'inspections/:id',
         title: 'View FOG Inspection',
         component: FogInspectionViewComponent,
-        canActivate: [WaterSupplierSwitchGuard, PermissionGuard],
+        canActivate: [PermissionGuard],
         data: {
             permissions: [
                 {
@@ -73,7 +72,7 @@ const routes: Routes = [
         path: 'trip-tickets/:id',
         title: 'View FOG Trip Ticket',
         component: FogTripTicketViewComponent,
-        canActivate: [WaterSupplierSwitchGuard, PermissionGuard],
+        canActivate: [PermissionGuard],
         data: {
             permissions: [
                 {

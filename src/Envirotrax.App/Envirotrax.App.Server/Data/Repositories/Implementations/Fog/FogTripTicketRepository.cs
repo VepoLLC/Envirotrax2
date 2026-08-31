@@ -4,7 +4,6 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Models.Fog;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Data.Services.Definitions;
-using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Fog;
@@ -12,13 +11,11 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Fog;
 public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicketRepository
 {
     private readonly TenantDbContext _context;
-    private readonly ITenantProvidersService _tenantProvider;
 
-    public FogTripTicketRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider)
+    public FogTripTicketRepository(IDbContextSelector dbContextSelector)
         : base(dbContextSelector)
     {
         _context = dbContextSelector.Current;
-        _tenantProvider = tenantProvider;
     }
 
     protected override IQueryable<FogTripTicket> GetListQuery()
@@ -79,26 +76,6 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
             .PaginateAsync(pageInfo, ct);
 
         return await paginated.ToListAsync(ct);
-    }
-
-    public async Task<IEnumerable<FogTripTicket>> SearchForSubAccountAsync(PageInfo pageInfo, Query query, int subAccountWaterSupplierId, CancellationToken cancellationToken)
-    {
-        var isOwnChild = await DbContext.WaterSuppliers
-            .AnyAsync(ws => ws.Id == subAccountWaterSupplierId && ws.ParentId == _tenantProvider.WaterSupplierId, cancellationToken);
-
-        if (!isOwnChild)
-        {
-            return [];
-        }
-
-        var paginated = await GetListQuery()
-            .IgnoreQueryFilters()
-            .Where(t => t.WaterSupplierId == subAccountWaterSupplierId)
-            .Where(query.Filter)
-            .OrderBy(query.Sort)
-            .PaginateAsync(pageInfo, cancellationToken);
-
-        return await paginated.ToListAsync(cancellationToken);
     }
 
     public async Task<FogTripTicket?> UpdateApprovalAsync(int id, bool disapproved, int? approvedById, CancellationToken cancellationToken)

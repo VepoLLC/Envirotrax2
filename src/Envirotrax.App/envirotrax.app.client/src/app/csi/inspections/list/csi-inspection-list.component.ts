@@ -18,7 +18,6 @@ import { AppContainerHelperService } from "../../../shared/services/helpers/app-
 })
 export class CsiInspectionListComponent implements OnInit, OnDestroy {
     private _queryParamSub?: Subscription;
-    private _subAccountWaterSupplierId?: number;
     @ViewChild('statusTemplate', { static: true })
     public statusTemplate!: TemplateRef<CellTemplateData<CsiInspection>>;
 
@@ -134,16 +133,13 @@ export class CsiInspectionListComponent implements OnInit, OnDestroy {
                 return;
             }
 
-            const subAccountWaterSupplierIdParam = params.get('subAccountWaterSupplierId');
-            if (subAccountWaterSupplierIdParam) {
-                this._subAccountWaterSupplierId = Number(subAccountWaterSupplierIdParam);
-
-                const startDateParam = params.get('startDate');
-                const endDateParam = params.get('endDate');
-                if (startDateParam && endDateParam) {
-                    this.applyDateFilter(startDateParam, endDateParam);
-                }
-
+            // Dashboard "View" on a sub account lands here already authenticated as that water
+            // supplier (via /auth/login-redirect); this just carries over the same last-10-days
+            // window shown on the dashboard so the results match what was clicked.
+            const startDateParam = params.get('startDate');
+            const endDateParam = params.get('endDate');
+            if (startDateParam && endDateParam) {
+                this.applyDateFilter(startDateParam, endDateParam);
                 await this.getInspections();
                 this.setShowResults(true);
             }
@@ -228,8 +224,7 @@ export class CsiInspectionListComponent implements OnInit, OnDestroy {
             this.table.isLoading = true;
             this.table.items = await this._csiInspectionService.getAll(
                 this.table.items?.pageInfo || {},
-                this.table.query,
-                this._subAccountWaterSupplierId
+                this.table.query
             );
         } finally {
             this.table.isLoading = false;
@@ -237,21 +232,10 @@ export class CsiInspectionListComponent implements OnInit, OnDestroy {
     }
 
     public searchAgain(): void {
-        this._subAccountWaterSupplierId = undefined;
         this.setShowResults(false);
     }
 
     public viewDetails(inspection: CsiInspection): void {
-        if (this._subAccountWaterSupplierId) {
-            const url = this._router.serializeUrl(
-                this._router.createUrlTree(['/csi', inspection.id, 'view'], {
-                    queryParams: { waterSupplierId: this._subAccountWaterSupplierId }
-                })
-            );
-            window.open(url, '_blank');
-            return;
-        }
-
         this._router.navigate([inspection.id, 'view'], {
             relativeTo: this._activatedRoute
         });

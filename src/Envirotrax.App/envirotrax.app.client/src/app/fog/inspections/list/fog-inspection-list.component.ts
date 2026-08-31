@@ -19,7 +19,6 @@ import { AppContainerHelperService } from "../../../shared/services/helpers/app-
 })
 export class FogInspectionListComponent implements OnInit, OnDestroy {
     private _queryParamSub?: Subscription;
-    private _subAccountWaterSupplierId?: number;
     public showResults: boolean = false;
 
     public readonly FogInspectionResult = FogInspectionResult;
@@ -121,16 +120,13 @@ export class FogInspectionListComponent implements OnInit, OnDestroy {
                 return;
             }
 
-            const subAccountWaterSupplierIdParam = params.get('subAccountWaterSupplierId');
-            if (subAccountWaterSupplierIdParam) {
-                this._subAccountWaterSupplierId = Number(subAccountWaterSupplierIdParam);
-
-                const startDateParam = params.get('startDate');
-                const endDateParam = params.get('endDate');
-                if (startDateParam && endDateParam) {
-                    this.applyDateFilter(startDateParam, endDateParam);
-                }
-
+            // Dashboard "View" on a sub account lands here already authenticated as that water
+            // supplier (via /auth/login-redirect); this just carries over the same last-10-days
+            // window shown on the dashboard so the results match what was clicked.
+            const startDateParam = params.get('startDate');
+            const endDateParam = params.get('endDate');
+            if (startDateParam && endDateParam) {
+                this.applyDateFilter(startDateParam, endDateParam);
                 await this.getInspections();
                 this.setShowResults(true);
             }
@@ -202,8 +198,7 @@ export class FogInspectionListComponent implements OnInit, OnDestroy {
             this.table.isLoading = true;
             this.table.items = await this._fogInspectionService.getAll(
                 this.table.items?.pageInfo || {},
-                this.table.query,
-                this._subAccountWaterSupplierId
+                this.table.query
             );
         } finally {
             this.table.isLoading = false;
@@ -226,10 +221,6 @@ export class FogInspectionListComponent implements OnInit, OnDestroy {
     public setShowResults(visible: boolean): void {
         this.showResults = visible;
         this._containerHelper.setContainerVisibility(!visible);
-
-        if (!visible) {
-            this._subAccountWaterSupplierId = undefined;
-        }
     }
 
     public async search(searchForm: NgForm): Promise<void> {
@@ -240,16 +231,6 @@ export class FogInspectionListComponent implements OnInit, OnDestroy {
     }
 
     public viewDetails(inspection: FogInspection): void {
-        if (this._subAccountWaterSupplierId) {
-            const url = this._router.serializeUrl(
-                this._router.createUrlTree(['/fog/inspections', inspection.id], {
-                    queryParams: { waterSupplierId: this._subAccountWaterSupplierId }
-                })
-            );
-            window.open(url, '_blank');
-            return;
-        }
-
         this._router.navigate([inspection.id], { relativeTo: this._activatedRoute });
     }
 }

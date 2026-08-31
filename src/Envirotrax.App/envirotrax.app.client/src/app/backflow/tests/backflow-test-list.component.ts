@@ -27,7 +27,6 @@ import { AppContainerHelperService } from '../../shared/services/helpers/app-con
 })
 export class BackflowTestListComponent implements OnInit, OnDestroy {
     private _queryParamSub?: Subscription;
-    private _subAccountWaterSupplierId?: number;
 
     @ViewChild('statusTemplate', { static: true })
     public statusTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
@@ -257,16 +256,13 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
                 return;
             }
 
-            const subAccountWaterSupplierIdParam = params.get('subAccountWaterSupplierId');
-            if (subAccountWaterSupplierIdParam) {
-                this._subAccountWaterSupplierId = Number(subAccountWaterSupplierIdParam);
-
-                const startDateParam = params.get('startDate');
-                const endDateParam = params.get('endDate');
-                if (startDateParam && endDateParam) {
-                    this.applyDateFilter(startDateParam, endDateParam);
-                }
-
+            // Dashboard "View" on a sub account lands here already authenticated as that water
+            // supplier (via /auth/login-redirect); this just carries over the same last-10-days
+            // window shown on the dashboard so the results match what was clicked.
+            const startDateParam = params.get('startDate');
+            const endDateParam = params.get('endDate');
+            if (startDateParam && endDateParam) {
+                this.applyDateFilter(startDateParam, endDateParam);
                 await this.getTests();
                 this.setShowResults(true);
             }
@@ -284,16 +280,6 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
     }
 
     public viewDetails(test: BackflowTest): void {
-        if (this._subAccountWaterSupplierId) {
-            const url = this._router.serializeUrl(
-                this._router.createUrlTree(['/backflow/tests', test.id, 'view'], {
-                    queryParams: { waterSupplierId: this._subAccountWaterSupplierId }
-                })
-            );
-            window.open(url, '_blank');
-            return;
-        }
-
         this._router.navigate([test.id, 'view'], { relativeTo: this._activatedRoute });
     }
 
@@ -411,8 +397,7 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
             const result = await this._backflowTestService.getAll(
                 this.table.items?.pageInfo || {},
                 this.table.query,
-                this.getPaymentStatus(),
-                this._subAccountWaterSupplierId
+                this.getPaymentStatus()
             );
             const startIndex = ((result.pageInfo.pageNumber ?? 1) - 1) * (result.pageInfo.pageSize ?? 10);
             result.data.forEach((item, i) => (item as any)['_rowNumber'] = startIndex + i + 1);
@@ -425,10 +410,6 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
     public setShowResults(visible: boolean): void {
         this.showResults = visible;
         this._containerHelper.setContainerVisibility(!visible);
-    
-        if (!visible) {
-            this._subAccountWaterSupplierId = undefined;
-        }
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {

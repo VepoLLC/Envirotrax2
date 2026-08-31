@@ -7,7 +7,6 @@ using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
-using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow;
@@ -16,12 +15,9 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
 {
     private const string HazardTypeOther = "Other";
 
-    private readonly ITenantProvidersService _tenantProvider;
-
-    public BackflowTestRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider)
+    public BackflowTestRepository(IDbContextSelector dbContextSelector)
         : base(dbContextSelector)
     {
-        _tenantProvider = tenantProvider;
     }
 
     protected override IQueryable<BackflowTest> GetListQuery()
@@ -144,26 +140,6 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         }
 
         var paginated = await dbQuery
-            .OrderBy(query.Sort)
-            .PaginateAsync(pageInfo, cancellationToken);
-
-        return await paginated.ToListAsync(cancellationToken);
-    }
-
-    public async Task<IEnumerable<BackflowTest>> SearchForSubAccountAsync(PageInfo pageInfo, Query query, int subAccountWaterSupplierId, CancellationToken cancellationToken)
-    {
-        var isOwnChild = await DbContext.WaterSuppliers
-            .AnyAsync(ws => ws.Id == subAccountWaterSupplierId && ws.ParentId == _tenantProvider.WaterSupplierId, cancellationToken);
-
-        if (!isOwnChild)
-        {
-            return [];
-        }
-
-        var paginated = await GetListQuery()
-            .IgnoreQueryFilters()
-            .Where(t => t.WaterSupplierId == subAccountWaterSupplierId)
-            .Where(query.Filter)
             .OrderBy(query.Sort)
             .PaginateAsync(pageInfo, cancellationToken);
 

@@ -226,8 +226,9 @@
                                                         <td>{{sub.totalPaidInspections}}</td>
                                                         <td>
                                                             <a class="btn btn-sm btn-primary py-0"
-                                                               [routerLink]="['/csi']"
-                                                               [queryParams]="{subAccountWaterSupplierId: sub.waterSupplierId, startDate: csiVm!.rangeStartDate, endDate: csiVm!.rangeEndDate}">View</a>
+                                                               [routerLink]="['/auth/login-redirect']"
+                                                               [queryParams]="{waterSupplierId: sub.waterSupplierId, returnUrl: buildReturnUrl('/csi', csiVm!.rangeStartDate, csiVm!.rangeEndDate)}"
+                                                               target="_blank" rel="noopener">View</a>
                                                         </td>
                                                     </tr>
                                                 }
@@ -317,8 +318,9 @@
                                                         <td>{{sub.totalPaidTests}}</td>
                                                         <td>
                                                             <a class="btn btn-sm btn-primary py-0"
-                                                               [routerLink]="['/backflow/tests']"
-                                                               [queryParams]="{subAccountWaterSupplierId: sub.waterSupplierId, startDate: backflowVm!.rangeStartDate, endDate: backflowVm!.rangeEndDate}">View</a>
+                                                               [routerLink]="['/auth/login-redirect']"
+                                                               [queryParams]="{waterSupplierId: sub.waterSupplierId, returnUrl: buildReturnUrl('/backflow/tests', backflowVm!.rangeStartDate, backflowVm!.rangeEndDate)}"
+                                                               target="_blank" rel="noopener">View</a>
                                                         </td>
                                                     </tr>
                                                 }
@@ -408,8 +410,9 @@
                                                         <td>{{sub.totalPaidInspections}}</td>
                                                         <td>
                                                             <a class="btn btn-sm btn-primary py-0"
-                                                               [routerLink]="['/fog/inspections']"
-                                                               [queryParams]="{subAccountWaterSupplierId: sub.waterSupplierId, startDate: fogInspectionVm!.rangeStartDate, endDate: fogInspectionVm!.rangeEndDate}">View</a>
+                                                               [routerLink]="['/auth/login-redirect']"
+                                                               [queryParams]="{waterSupplierId: sub.waterSupplierId, returnUrl: buildReturnUrl('/fog/inspections', fogInspectionVm!.rangeStartDate, fogInspectionVm!.rangeEndDate)}"
+                                                               target="_blank" rel="noopener">View</a>
                                                         </td>
                                                     </tr>
                                                 }
@@ -499,8 +502,9 @@
                                                         <td>{{sub.totalPaidTripTickets}}</td>
                                                         <td>
                                                             <a class="btn btn-sm btn-primary py-0"
-                                                               [routerLink]="['/fog/trip-tickets']"
-                                                               [queryParams]="{subAccountWaterSupplierId: sub.waterSupplierId, startDate: fogTripTicketVm!.rangeStartDate, endDate: fogTripTicketVm!.rangeEndDate}">View</a>
+                                                               [routerLink]="['/auth/login-redirect']"
+                                                               [queryParams]="{waterSupplierId: sub.waterSupplierId, returnUrl: buildReturnUrl('/fog/trip-tickets', fogTripTicketVm!.rangeStartDate, fogTripTicketVm!.rangeEndDate)}"
+                                                               target="_blank" rel="noopener">View</a>
                                                         </td>
                                                     </tr>
                                                 }

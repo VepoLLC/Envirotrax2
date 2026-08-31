@@ -252,6 +252,10 @@ export class DashboardComponent implements OnInit {
         };
     }
 
+    public buildReturnUrl(basePath: string, startDate: string, endDate: string): string {
+        return `${basePath}?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
+    }
+
     private formatDayName(date: string): string {
         return new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short' });
     }

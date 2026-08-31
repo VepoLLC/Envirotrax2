@@ -11,7 +11,6 @@ public class CsiInspectorAccountProfile : Profile
     {
         CreateMap<ProfessionalUser, CsiInspectorAccountDto>()
             .ForMember(dto => dto.Id, opt => opt.MapFrom(model => model.UserId))
-            .ForMember(dto => dto.IsMasterAccount, opt => opt.MapFrom(model => model.IsAdmin))
             .ForMember(dto => dto.EmailAddress, opt => opt.MapFrom(model => model.User!.Email))
             .ForMember(dto => dto.CompanyName, opt => opt.MapFrom(model => model.Professional!.Name))
             .ForMember(dto => dto.Address, opt => opt.MapFrom(model => model.Professional!.Address))

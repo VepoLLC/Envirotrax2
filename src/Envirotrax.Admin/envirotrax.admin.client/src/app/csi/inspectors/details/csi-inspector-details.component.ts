@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { HelperService, InputOption } from '@envirotrax/common-ui';
+import { HelperService, InputOption, ToastService } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import { CsiInspectorAccount, CsiInspectorAccountDetails } from '../../../shared/models/csi/csi-inspector-account';
 import { State } from '../../../shared/models/lookup/state';
@@ -10,16 +10,27 @@ import { ProfessionalWaterSupplier } from '../../../shared/models/professionals/
 import { CsiInspectorService } from '../../../shared/services/csi/csi-inspector.service';
 import { LookupService } from '../../../shared/services/lookup/lookup.service';
 import { WindowReference } from '../../../window/window-config';
+import { CsiInspectorInsuranceListComponent } from './insurances/list/csi-inspector-insurance-list.component';
+import { CsiInspectorLicenseListComponent } from './licenses/list/csi-inspector-license-list.component';
+import { CsiInspectorUserListComponent } from './users/list/csi-inspector-user-list.component';
 
 @Component({
     templateUrl: './csi-inspector-details.component.html',
     imports: [
         CommonModule,
         FormsModule,
-        SharedComponentsModule
+        SharedComponentsModule,
+        CsiInspectorUserListComponent,
+        CsiInspectorLicenseListComponent,
+        CsiInspectorInsuranceListComponent
     ],
 })
 export class CsiInspectorDetailsComponent implements OnInit {
+    // Contact Name and Title of Inspector are editable both here and in the User Accounts grid, so the
+    // grid has to be reloaded after a save or the two halves of the window disagree.
+    @ViewChild(CsiInspectorUserListComponent)
+    public userList?: CsiInspectorUserListComponent;
+
     public professionalId: number = 0;
     public userId?: number;
 
@@ -45,7 +56,8 @@ export class CsiInspectorDetailsComponent implements OnInit {
         private readonly _windowReference: WindowReference<CsiInspectorAccount>,
         private readonly _csiInspectorService: CsiInspectorService,
         private readonly _lookupService: LookupService,
-        private readonly _helper: HelperService
+        private readonly _helper: HelperService,
+        private readonly _toastService: ToastService
     ) {
 
     }
@@ -83,12 +95,17 @@ export class CsiInspectorDetailsComponent implements OnInit {
 
             this.applyDetails(saved);
 
+            await this.userList?.getUsers();
+
             this.isSaved = true;
+            this._toastService.successfullySaved('CSI Inspector Account');
         } catch (error) {
             const validationErrors: string[] = [];
 
             this.saveFailed = !this._helper.parseValidationErrors(error, validationErrors);
             this.validationErrors = validationErrors;
+
+            this._toastService.failedToSave('CSI Inspector Account');
         } finally {
             this.isSaving = false;
         }

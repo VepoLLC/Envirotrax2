@@ -2,6 +2,13 @@
 @inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 @{
 	var loginUrl = Configuration["Envirotrax:LoginUrl"];
+
+	// The registered professional directories are pages of Envirotrax.App, not CMS content. Link
+	// straight to them so visitors skip a redirect hop. With no app URL configured these fall back
+	// to the site's own /registered-professionals/... paths, which RegisteredProfessionalsController
+	// still answers, so bookmarks of the old links keep working either way.
+	var appUrl = Configuration["Envirotrax:AppUrl"]?.TrimEnd('/') ?? string.Empty;
+	var registeredProfessionalsUrl = $"{appUrl}/registered-professionals";
 }
 
 <header id="header" class="sticky-top">
@@ -58,22 +65,22 @@
 						</a>
 						<ul class="dropdown-menu dropdown-menu-lg-end" data-bs-theme="light">
 							<li>
-								<a class="dropdown-item" href="~/registered-professionals/backflow-testers/">
+								<a class="dropdown-item" href="@registeredProfessionalsUrl/backflow-testers">
 									Find a Registered Backflow Tester
 								</a>
 							</li>
 							<li>
-								<a class="dropdown-item" href="~/registered-professionals/csi-inspectors/">
+								<a class="dropdown-item" href="@registeredProfessionalsUrl/csi-inspectors">
 									Find a Registered CSI Inspector
 								</a>
 							</li>
 							<li>
-								<a class="dropdown-item" href="~/registered-professionals/fog-inspectors/">
+								<a class="dropdown-item" href="@registeredProfessionalsUrl/fog-inspectors">
 									Find a Registered FOG Inspector
 								</a>
 							</li>
 							<li>
-								<a class="dropdown-item" href="~/registered-professionals/fog-transporters/">
+								<a class="dropdown-item" href="@registeredProfessionalsUrl/fog-transporters">
 									Find a Registered FOG Transporter
 								</a>
 							</li>

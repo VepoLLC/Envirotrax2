@@ -5,7 +5,6 @@ import { ProfessionalWaterSupplier } from '../professionals/professional-water-s
 export class CsiInspectorAccount {
     id?: number;
     professionalId?: number;
-    isMasterAccount?: boolean;
     emailAddress?: string;
     companyName?: string;
     contactName?: string;

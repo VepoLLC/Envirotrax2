@@ -18,8 +18,12 @@ public interface IEnvirotraxApiClient
     Task<TResponse?> PutAsync<TRequest, TResponse>(int waterSupplierId, string url, TRequest requestData, CancellationToken cancellationToken);
 
     // Professionals are not owned by a water supplier, so the admin-side professional writes have no
-    // tenant to send. ServiceMessageDto rejects a WaterSupplierId of 0, so they need this overload.
+    // tenant to send. ServiceMessageDto rejects a WaterSupplierId of 0, so they need these overloads.
     Task<TResponse?> PutAsync<TRequest, TResponse>(string url, TRequest requestData, CancellationToken cancellationToken);
+
+    Task<TResponse?> PostAsync<TRequest, TResponse>(string url, TRequest requestData, CancellationToken cancellationToken);
+
+    Task<TResponse?> PostFileAsync<TResponse>(string url, Stream fileStream, string fileName, string fileFieldName, IDictionary<string, string> formFields, CancellationToken cancellationToken);
 
     Task<TResponse?> DeleteAsync<TResponse>(string url, CancellationToken cancellationToken);
 }

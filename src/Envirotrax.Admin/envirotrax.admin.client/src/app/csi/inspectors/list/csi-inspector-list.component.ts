@@ -17,9 +17,6 @@ import { CsiInspectorDetailsComponent } from '../details/csi-inspector-details.c
     ],
 })
 export class CsiInspectorListComponent implements OnInit {
-    @ViewChild('accountTypeCell', { static: true })
-    public accountTypeCell?: TemplateRef<CellTemplateData<CsiInspectorAccount>>;
-
     @ViewChild('companyCell', { static: true })
     public companyCell?: TemplateRef<CellTemplateData<CsiInspectorAccount>>;
 
@@ -103,7 +100,6 @@ export class CsiInspectorListComponent implements OnInit {
 
     private getColumns(): TableColumn<CsiInspectorAccount>[] {
         return [
-            { field: 'isMasterAccount', caption: '', type: ColumnType.other, cellTemplate: this.accountTypeCell, queryColumnExcluded: true },
             { field: 'companyName', caption: 'Company/Contact', type: ColumnType.text, cellTemplate: this.companyCell },
             { field: 'address', caption: 'Address Information', type: ColumnType.text, cellTemplate: this.addressCell },
             { field: 'emailAddress', caption: 'Contact Information', type: ColumnType.text, cellTemplate: this.contactCell }

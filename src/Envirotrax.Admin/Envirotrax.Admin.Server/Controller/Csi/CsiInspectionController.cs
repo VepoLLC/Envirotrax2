@@ -33,9 +33,9 @@ public class CsiInspectionController : AdminBaseController
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync(int id, [FromBody] CsiInspectionUpdateRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateAsync(int id, [FromQuery] int waterSupplierId, [FromBody] CsiInspectionUpdateRequest request, CancellationToken cancellationToken)
     {
-        var inspection = await _inspectionService.UpdateAsync(id, request, cancellationToken);
+        var inspection = await _inspectionService.UpdateAsync(id, waterSupplierId, request, cancellationToken);
 
         return inspection == null ? NotFound() : Ok(inspection);
     }
@@ -73,11 +73,11 @@ public class CsiInspectionController : AdminBaseController
     }
 
     [HttpPost("{id}/images")]
-    public async Task<IActionResult> AddImageAsync(int id, [FromForm] string? description, [FromForm] IFormFile image, CancellationToken cancellationToken)
+    public async Task<IActionResult> AddImageAsync(int id, [FromQuery] int waterSupplierId, [FromForm] string? description, [FromForm] IFormFile image, CancellationToken cancellationToken)
     {
         await using var stream = image.OpenReadStream();
 
-        var result = await _inspectionService.AddImageAsync(id, stream, image.FileName, description, cancellationToken);
+        var result = await _inspectionService.AddImageAsync(id, waterSupplierId, stream, image.FileName, description, cancellationToken);
 
         return Ok(result);
     }

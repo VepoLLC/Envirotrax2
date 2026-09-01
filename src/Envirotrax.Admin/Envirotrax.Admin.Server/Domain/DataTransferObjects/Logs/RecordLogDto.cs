@@ -3,7 +3,7 @@ namespace Envirotrax.Admin.Server.Domain.DataTransferObjects.Logs;
 
 public class RecordLogDto
 {
-    public int Id { get; set; }
+    public long Id { get; set; }
 
     public DateTime LogDate { get; set; }
 

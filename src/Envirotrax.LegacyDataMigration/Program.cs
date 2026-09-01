@@ -15,7 +15,7 @@ var services = new ServiceCollection();
 
 void ConfigureDbContext(DbContextOptionsBuilder options)
 {
-    options.UseSqlServer(newV2DatabaseConnection);
+    options.UseSqlServer(newV2DatabaseConnection, sqlServerOptions => sqlServerOptions.CommandTimeout(120));
 
     options.EnableDetailedErrors();
     options.EnableSensitiveDataLogging();
@@ -47,6 +47,7 @@ services.AddLogging(builder => builder.AddSerilog(Log.Logger, dispose: true));
 services.AddTransient<UserService>();
 services.AddTransient<WaterSupplierService>();
 services.AddTransient<WaterSupplierUserService>();
+services.AddTransient<SiteService>();
 
 var provider = services.BuildServiceProvider();
 
@@ -61,3 +62,6 @@ await waterSupplierService.MigrateAsync();
 
 var supplierUserService = provider.GetRequiredService<WaterSupplierUserService>();
 await supplierUserService.MigrateAsync();
+
+var siteService = provider.GetRequiredService<SiteService>();
+await siteService.MigrateAsync();

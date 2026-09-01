@@ -79,8 +79,9 @@ public class BackflowTestAdminUpdateRequest
     [StringLength(50)]
     public string? DeviceType { get; set; }
 
+    [Required(ErrorMessage = "Main Assembly Manufacturer is required.")]
     [StringLength(100)]
-    public string? Manufacturer { get; set; }
+    public string Manufacturer { get; set; } = null!;
 
     [StringLength(100)]
     public string? Model { get; set; }

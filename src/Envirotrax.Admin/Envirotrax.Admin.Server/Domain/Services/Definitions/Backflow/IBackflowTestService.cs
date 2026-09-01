@@ -1,7 +1,6 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.Logs;
-using Envirotrax.Admin.Server.Domain.DataTransferObjects.Sites;
 
 namespace Envirotrax.Admin.Server.Domain.Services.Definitions.Backflow;
 
@@ -18,6 +17,4 @@ public interface IBackflowTestService
     Task<BackflowTestCountsDto?> GetCountsAsync(int id, CancellationToken cancellationToken);
 
     Task<List<RecordLogDto>?> GetLogsAsync(int id, CancellationToken cancellationToken);
-
-    Task<List<SiteLogDto>?> GetSiteLogsAsync(int id, CancellationToken cancellationToken);
 }

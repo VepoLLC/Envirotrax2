@@ -432,6 +432,12 @@ public class BackflowTestExpiryCounts
     public int TwoMonths { get; set; }
 }
 
+public class BackflowComplianceCounts
+{
+    public int Total { get; set; }
+    public int Compliant { get; set; }
+}
+
 public class BackflowTestConfiguration : IEntityTypeConfiguration<BackflowTest>
 {
     public void Configure(EntityTypeBuilder<BackflowTest> builder)

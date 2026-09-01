@@ -94,7 +94,7 @@ public class WaterSupplier : TenantBase, IAuditableModel<AppUser>
     [ForeignKey(nameof(ParentId))]
     public WaterSupplier? Parent { get; set; }
 
-    public bool IsActive { get; set; }
+    public bool IsActive { get; set; } = true;
 
     public GeneralSettings? GeneralSettings { get; set; }
 

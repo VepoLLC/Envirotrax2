@@ -9,6 +9,7 @@ import { PermissionAction, PermissionType } from "../../models/permission-type";
 
 const AUTH_BROADCAST_CHANNEL_NAME = 'envirotrax-auth-sync';
 const CROSS_TAB_SYNC_TIMEOUT_MS = 250;
+const TAB_ISOLATED_KEY = 'vp-tab-isolated';
 
 type AuthBroadcastMessage =
     | { type: 'user-changed'; user: string | null }
@@ -66,8 +67,12 @@ export class AuthService {
         return !!profile?.wsId || !!profile?.prfId;
     }
 
+    private isTabIsolated(): boolean {
+        return sessionStorage.getItem(TAB_ISOLATED_KEY) === '1';
+    }
+
     private broadcastUserChanged(user: string | null): void {
-        if (this._suppressBroadcast || !this._channel) {
+        if (this._suppressBroadcast || !this._channel || this.isTabIsolated()) {
             return;
         }
 
@@ -75,6 +80,10 @@ export class AuthService {
     }
 
     private async handleBroadcastMessage(message: AuthBroadcastMessage): Promise<void> {
+        if (this.isTabIsolated()) {
+            return;
+        }
+
         if (message.type !== 'user-changed' && message.type !== 'request-user') {
             return;
         }
@@ -144,6 +153,20 @@ export class AuthService {
     }
 
     private async syncFromOtherTabs(): Promise<void> {
+        // This tab intentionally logged in as a different water supplier (see LoginRedirectComponent's
+        // initiateWaterSupplierSwitch). Don't let it copy another tab's user - that would undo the
+        // switch it just made.
+        if (this.isTabIsolated()) {
+            return;
+        }
+
+        // This tab is on /auth/login-redirect, which is in the middle of finishing its own login
+        // (signInCallback below) and is about to save the newly-authenticated user. If we copied
+        // another tab's user right now, we could overwrite that new user immediately after it's saved.
+        if (window.location.pathname === '/auth/login-redirect') {
+            return;
+        }
+
         const localUser = await this._userManager.getUser();
 
         if (localUser) {
@@ -197,7 +220,11 @@ export class AuthService {
         this.setLoggedIn(false);
     }
 
-    public async signIn(waterSupplierId?: number, professionalId?: number, returnUrl?: string): Promise<void> {
+    public async signIn(waterSupplierId?: number, professionalId?: number, returnUrl?: string, isolateTab: boolean = false): Promise<void> {
+        if (isolateTab) {
+            sessionStorage.setItem(TAB_ISOLATED_KEY, '1');
+        }
+
         this._suppressBroadcast = true;
 
         try {

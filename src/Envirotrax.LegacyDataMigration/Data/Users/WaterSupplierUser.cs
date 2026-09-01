@@ -19,9 +19,6 @@ public class WaterSupplierUser : TenantModel<WaterSupplier>
     [StringLength(100)]
     public string EmailAddress { get; set; } = null!;
 
-    [StringLength(25)]
-    public string? CellNumber { get; set; }
-
     // Points back to Vepo.dbo.WaterSupplierUserAccounts.ID - the source of truth for this user's
     // legacy data (including the permission columns used by the one-time role migration).
     public int? LegacyRecordId { get; set; }

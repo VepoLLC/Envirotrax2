@@ -23,9 +23,9 @@ export class FogTripTicketService {
     public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<FogTripTicket>> {
         const url = this._urlResolver.resolveUrl('/api/fog/trip-tickets');
 
-        const observable = this._http.get<PagedData<FogTripTicket>>(url, {
-            params: this._queryHelper.buildQuery(pageInfo, query)
-        });
+        const params = this._queryHelper.buildQuery(pageInfo, query);
+
+        const observable = this._http.get<PagedData<FogTripTicket>>(url, { params });
 
         return await lastValueFrom(observable);
     }

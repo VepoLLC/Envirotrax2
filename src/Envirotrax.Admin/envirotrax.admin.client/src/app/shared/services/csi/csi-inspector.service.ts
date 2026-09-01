@@ -2,14 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { PagedData, PageInfo, Query, QueryHelperService, UrlResolverService } from "@envirotrax/common-ui";
 import { lastValueFrom } from "rxjs";
-import { Professional } from "../../models/professionals/professional";
-
-export interface CsiInspectorSearchCriteria {
-    inspectorLicenseNumber?: string | null;
-    insurancePolicyNumber?: string | null;
-    userEmail?: string | null;
-    contactName?: string | null;
-}
+import { CsiInspectorAccount, CsiInspectorAccountDetails } from "../../models/csi/csi-inspector-account";
 
 @Injectable({
     providedIn: 'root'
@@ -23,28 +16,42 @@ export class CsiInspectorService {
 
     }
 
-    public async getAll(pageInfo: PageInfo, query: Query, criteria: CsiInspectorSearchCriteria): Promise<PagedData<Professional>> {
+    public async getAll(
+        pageInfo: PageInfo,
+        query: Query,
+        licenseNumber?: string | null,
+        insuranceNumber?: string | null
+    ): Promise<PagedData<CsiInspectorAccount>> {
         const url = this._urlResolver.resolveUrl('/api/csi/inspectors');
 
         let params = this._queryHelper.buildQuery(pageInfo, query);
 
-        if (criteria.inspectorLicenseNumber) {
-            params = params.append('inspectorLicenseNumber', criteria.inspectorLicenseNumber);
+        if (licenseNumber) {
+            params = params.append('licenseNumber', licenseNumber);
         }
 
-        if (criteria.insurancePolicyNumber) {
-            params = params.append('insurancePolicyNumber', criteria.insurancePolicyNumber);
+        if (insuranceNumber) {
+            params = params.append('insuranceNumber', insuranceNumber);
         }
 
-        if (criteria.userEmail) {
-            params = params.append('userEmail', criteria.userEmail);
-        }
+        const observable = this._http.get<PagedData<CsiInspectorAccount>>(url, { params });
 
-        if (criteria.contactName) {
-            params = params.append('contactName', criteria.contactName);
-        }
+        return await lastValueFrom(observable);
+    }
 
-        const observable = this._http.get<PagedData<Professional>>(url, { params });
+    public async getDetails(professionalId: number, userId?: number | null): Promise<CsiInspectorAccountDetails> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${professionalId}`);
+
+        const options = userId ? { params: { userId } } : {};
+        const observable = this._http.get<CsiInspectorAccountDetails>(url, options);
+
+        return await lastValueFrom(observable);
+    }
+
+    public async updateDetails(professionalId: number, details: CsiInspectorAccountDetails): Promise<CsiInspectorAccountDetails> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${professionalId}`);
+
+        const observable = this._http.put<CsiInspectorAccountDetails>(url, details);
 
         return await lastValueFrom(observable);
     }

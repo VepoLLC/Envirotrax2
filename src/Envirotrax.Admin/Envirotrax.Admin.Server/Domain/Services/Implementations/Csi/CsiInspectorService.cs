@@ -1,6 +1,6 @@
 
 using DeveloperPartners.SortingFiltering;
-using Envirotrax.Admin.Server.Domain.DataTransferObjects.Professionals;
+using Envirotrax.Admin.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.Admin.Server.Domain.Services.Definitions;
 using Envirotrax.Admin.Server.Domain.Services.Definitions.Csi;
 
@@ -17,30 +17,34 @@ public class CsiInspectorService : ICsiInspectorService
         _apiClient = apiClient;
     }
 
-    public Task<IPagedData<ProfessionalDto>> SearchAsync(PageInfo pageInfo, Query query, string? inspectorLicenseNumber, string? insurancePolicyNumber, string? userEmail, string? contactName, CancellationToken cancellationToken)
+    public Task<IPagedData<CsiInspectorAccountDto>> SearchAsync(PageInfo pageInfo, Query query, string? licenseNumber, string? insuranceNumber, CancellationToken cancellationToken)
     {
         var additionalParameters = new Dictionary<string, string>();
 
-        if (!string.IsNullOrWhiteSpace(inspectorLicenseNumber))
+        if (!string.IsNullOrWhiteSpace(licenseNumber))
         {
-            additionalParameters["inspectorLicenseNumber"] = inspectorLicenseNumber;
+            additionalParameters["licenseNumber"] = licenseNumber;
         }
 
-        if (!string.IsNullOrWhiteSpace(insurancePolicyNumber))
+        if (!string.IsNullOrWhiteSpace(insuranceNumber))
         {
-            additionalParameters["insurancePolicyNumber"] = insurancePolicyNumber;
+            additionalParameters["insuranceNumber"] = insuranceNumber;
         }
 
-        if (!string.IsNullOrWhiteSpace(userEmail))
-        {
-            additionalParameters["userEmail"] = userEmail;
-        }
+        return _apiClient.GetAsync<CsiInspectorAccountDto>(BaseUrl, pageInfo, query, additionalParameters, cancellationToken);
+    }
 
-        if (!string.IsNullOrWhiteSpace(contactName))
-        {
-            additionalParameters["contactName"] = contactName;
-        }
+    public Task<CsiInspectorAccountDetailsDto?> GetDetailsAsync(int professionalId, int? userId, CancellationToken cancellationToken)
+    {
+        var url = userId.HasValue
+            ? $"{BaseUrl}/{professionalId}?userId={userId.Value}"
+            : $"{BaseUrl}/{professionalId}";
 
-        return _apiClient.GetAsync<ProfessionalDto>(BaseUrl, pageInfo, query, additionalParameters, cancellationToken);
+        return _apiClient.GetAsync<CsiInspectorAccountDetailsDto>(url, cancellationToken);
+    }
+
+    public Task<CsiInspectorAccountDetailsDto?> UpdateDetailsAsync(int professionalId, CsiInspectorAccountDetailsDto details, CancellationToken cancellationToken)
+    {
+        return _apiClient.PutAsync<CsiInspectorAccountDetailsDto, CsiInspectorAccountDetailsDto>($"{BaseUrl}/{professionalId}", details, cancellationToken);
     }
 }

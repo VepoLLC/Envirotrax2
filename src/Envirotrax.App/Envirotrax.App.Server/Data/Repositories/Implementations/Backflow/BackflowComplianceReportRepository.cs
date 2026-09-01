@@ -6,14 +6,16 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
+using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow;
 
-public class BackflowComplianceReportRepository(IDbContextSelector dbContextSelector, ITimeZoneHelperService timeZoneHelper) : Repository<BackflowTest>(dbContextSelector), IBackflowComplianceReportRepository
+public class BackflowComplianceReportRepository(IDbContextSelector dbContextSelector, ITimeZoneHelperService timeZoneHelper, ITenantProvidersService tenantProvider) : Repository<BackflowTest>(dbContextSelector), IBackflowComplianceReportRepository
 {
     private readonly TenantDbContext _tenantContext = dbContextSelector.Current;
     private readonly ITimeZoneHelperService _timeZoneHelper = timeZoneHelper;
+    private readonly ITenantProvidersService _tenantProvider = tenantProvider;
 
     private const string AllValue = "All";
 
@@ -159,126 +161,42 @@ public class BackflowComplianceReportRepository(IDbContextSelector dbContextSele
         };
     }
 
-    // Reconstructs each month's compliance "as of the 1st" (matching V1's snapshot-on-day-1) directly
-    // from the test history, across the FULL available range: earliest test month → current month, with
-    // no window cap. This seeds the persisted snapshot table with all history, mirroring V1's
-    // WaterSupplierReports (whose report table shows every month; the 48-month cap is a chart-only
-    // concern applied on the client). Assemblies are identified by site + serial number; an assembly is
-    // active in a month if it has a test on or before that month and has not been taken out of service
-    // by then; compliant if its latest test as of that month has not expired. Site active/in-area state
-    // is the current state (not reconstructed). Used by the one-time backfill.
-    public async Task<BackflowComplianceHistoryDto> ReconstructComplianceHistoryAsync(CancellationToken cancellationToken)
+    public async Task<BackflowComplianceCounts> CountComplianceAsync(DateTime reportDate, CancellationToken cancellationToken)
     {
-        var tests = await LoadHistoryTestPointsAsync(cancellationToken);
+        var supplierId = _tenantProvider.WaterSupplierId;
 
-        var result = new BackflowComplianceHistoryDto();
-        if (tests.Count == 0)
-        {
-            return result;
-        }
-
-        var assemblies = BuildAssemblyHistories(tests);
-
-        var now = _timeZoneHelper.GetUserLocalTime();
-        var currentMonth = new DateTime(now.Year, now.Month, 1);
-
-        var earliest = tests.Min(t => t.TestDate);
-        var startMonth = new DateTime(earliest.Year, earliest.Month, 1);
-
-        for (var asOf = startMonth; asOf <= currentMonth; asOf = asOf.AddMonths(1))
-        {
-            result.Points.Add(BuildHistoryPoint(assemblies, asOf));
-        }
-
-        return result;
-    }
-
-    // Compute compliance "as of the 1st" for exactly the requested months, reusing the same per-month
-    // BuildHistoryPoint logic as ReconstructComplianceHistoryAsync. Test data is loaded once, so the
-    // monthly snapshot flow can compute a single month without running the full-history reconstruction.
-    public async Task<IReadOnlyList<BackflowComplianceHistoryPointDto>> ComputeHistoryPointsAsync(IReadOnlyCollection<DateTime> months, CancellationToken cancellationToken)
-    {
-        if (months.Count == 0)
-        {
-            return [];
-        }
-
-        var tests = await LoadHistoryTestPointsAsync(cancellationToken);
-        var assemblies = BuildAssemblyHistories(tests);
-
-        return months
-            .Select(month => BuildHistoryPoint(assemblies, month))
-            .ToList();
-    }
-
-    private async Task<List<TestPoint>> LoadHistoryTestPointsAsync(CancellationToken cancellationToken)
-    {
-        return await Entity
-            .Where(t => t.TestDate != null && t.Site != null && t.Site.Active && !t.Site.OutOfArea)
-            .Select(t => new TestPoint
-            {
-                SiteId = t.SiteId,
-                SerialNumber = t.SerialNumber,
-                TestDate = t.TestDate!.Value,
-                ExpirationDate = t.ExpirationDate,
-                OutOfService = t.OutOfService,
-                OutOfServiceDate = t.OutOfServiceDate
-            })
+        var supplierIds = await _tenantContext.WaterSuppliers
+            .Where(ws => ws.Id == supplierId || ws.ParentId == supplierId)
+            .Select(ws => ws.Id)
             .ToListAsync(cancellationToken);
-    }
 
-    // Group tests into per-assembly histories keyed by site + normalized serial number.
-    private static List<AssemblyHistory> BuildAssemblyHistories(List<TestPoint> tests)
-    {
-        return tests
-            .GroupBy(t => $"{t.SiteId}|{(t.SerialNumber ?? "").Trim().ToUpperInvariant()}")
-            .Select(g => new AssemblyHistory
+        // IgnoreQueryFilters: the tenant filter would restrict to the current supplier and drop the
+        // direct child-supplier tests that the roll-up must include.
+        var qualifyingTests = _tenantContext.BackflowTests
+            .IgnoreQueryFilters()
+            .Where(t => supplierIds.Contains(t.WaterSupplierId)
+                && t.DeletedTime == null
+                && t.RenewalRequired
+                && t.IsCurrent
+                && !t.OutOfService
+                && t.TransactionId != null && t.TransactionId != "");
+
+        var counts = await qualifyingTests
+            .GroupBy(_ => 1)
+            .Select(g => new
             {
-                Tests = g.OrderByDescending(x => x.TestDate).ToList(),
-                RemovedDate = g.Where(x => x.OutOfService && x.OutOfServiceDate != null)
-                    .Select(x => x.OutOfServiceDate!.Value)
-                    .DefaultIfEmpty(DateTime.MaxValue)
-                    .Min()
+                Total = g.Count(),
+                NonCompliant = g.Count(t => t.ExpirationDate != null && t.ExpirationDate <= reportDate)
             })
-            .ToList();
-    }
+            .FirstOrDefaultAsync(cancellationToken);
 
-    // Compliance as of the 1st of a month: an assembly counts if it has a test on or before the month
-    // and wasn't removed by then; it's compliant if that latest test's ExpirationDate hasn't passed.
-    private static BackflowComplianceHistoryPointDto BuildHistoryPoint(List<AssemblyHistory> assemblies, DateTime asOf)
-    {
-        var total = 0;
-        var compliant = 0;
+        var total = counts?.Total ?? 0;
+        var nonCompliant = counts?.NonCompliant ?? 0;
 
-        foreach (var assembly in assemblies)
+        return new BackflowComplianceCounts
         {
-            if (assembly.RemovedDate <= asOf)
-            {
-                continue;
-            }
-
-            var latest = assembly.Tests.FirstOrDefault(x => x.TestDate <= asOf);
-            if (latest == null)
-            {
-                continue;
-            }
-
-            total++;
-            if (latest.ExpirationDate != null && latest.ExpirationDate.Value >= asOf)
-            {
-                compliant++;
-            }
-        }
-
-        return new BackflowComplianceHistoryPointDto
-        {
-            Year = asOf.Year,
-            Month = asOf.Month,
-            Label = asOf.ToString("MMM yyyy", System.Globalization.CultureInfo.InvariantCulture),
             Total = total,
-            Compliant = compliant,
-            NonCompliant = total - compliant,
-            Percentage = CalculatePercentage(compliant, total)
+            Compliant = total - nonCompliant
         };
     }
 
@@ -290,23 +208,6 @@ public class BackflowComplianceReportRepository(IDbContextSelector dbContextSele
         public bool HasOssf { get; init; }
         public bool HasAuxWater { get; init; }
         public DateTime? ExpirationDate { get; init; }
-    }
-
-    private sealed class TestPoint
-    {
-        public int? SiteId { get; init; }
-        public string? SerialNumber { get; init; }
-        public DateTime TestDate { get; init; }
-        public DateTime? ExpirationDate { get; init; }
-        public bool OutOfService { get; init; }
-        public DateTime? OutOfServiceDate { get; init; }
-    }
-
-    private sealed class AssemblyHistory
-    {
-        // Tests ordered newest first, so FirstOrDefault(TestDate <= asOf) is the latest as of that month.
-        public List<TestPoint> Tests { get; init; } = [];
-        public DateTime RemovedDate { get; init; }
     }
 
     private static double CalculatePercentage(int count, int total)

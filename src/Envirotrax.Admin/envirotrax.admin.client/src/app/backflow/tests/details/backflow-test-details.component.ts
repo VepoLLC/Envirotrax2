@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { InputOption } from '@envirotrax/common-ui';
+import { HelperService, InputOption } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import {
     BackflowTestDetails,
@@ -61,6 +61,7 @@ export class BackflowTestDetailsComponent implements OnInit, OnDestroy {
     public recordLog?: BackflowTestRecordLogComponent;
 
     public id: number = 0;
+    public waterSupplierId: number = 0;
     public idPrefix: string = 'backflow-test';
 
     public isLoading: boolean = false;
@@ -96,7 +97,8 @@ export class BackflowTestDetailsComponent implements OnInit, OnDestroy {
         private readonly _testService: BackflowTestService,
         private readonly _lookupService: LookupService,
         private readonly _windowService: WindowService,
-        private readonly _options: BackflowTestOptionsService
+        private readonly _options: BackflowTestOptionsService,
+        private readonly _helperService: HelperService
     ) {
         this.scheduleMonthOptions = this._options.scheduleMonthOptions;
         this.forceRenewalYearsOptions = this._options.forceRenewalYearsOptions;
@@ -205,7 +207,7 @@ export class BackflowTestDetailsComponent implements OnInit, OnDestroy {
 
         try {
             this.isSaving = true;
-            this.test = await this._testService.update(this.id, this.buildUpdateRequest());
+            this.test = await this._testService.update(this.id, this.waterSupplierId, this.buildUpdateRequest());
         } finally {
             this.isSaving = false;
         }
@@ -222,60 +224,43 @@ export class BackflowTestDetailsComponent implements OnInit, OnDestroy {
 
     private buildUpdateRequest(): BackflowTestDetails {
         const test = this.test;
+        const helper = this._helperService;
 
         const request: BackflowTestDetails = { ...test };
 
-        request.testDate = this.toTextOrUndefined(test.testDate);
-        request.expirationDate = this.toTextOrUndefined(test.expirationDate);
-        request.transactionDate = this.toTextOrUndefined(test.transactionDate);
-        request.initialTestDate = this.toTextOrUndefined(test.initialTestDate);
-        request.repairTestDate = this.toTextOrUndefined(test.repairTestDate);
+        request.testDate = helper.toTextOrUndefined(test.testDate);
+        request.expirationDate = helper.toTextOrUndefined(test.expirationDate);
+        request.transactionDate = helper.toTextOrUndefined(test.transactionDate);
+        request.initialTestDate = helper.toTextOrUndefined(test.initialTestDate);
+        request.repairTestDate = helper.toTextOrUndefined(test.repairTestDate);
 
-        request.amount = this.toNumberOrUndefined(test.amount) ?? 0;
-        request.amountShare = this.toNumberOrUndefined(test.amountShare) ?? 0;
+        request.amount = helper.toNumberOrUndefined(test.amount) ?? 0;
+        request.amountShare = helper.toNumberOrUndefined(test.amountShare) ?? 0;
 
-        request.initCV1HeldPSID = this.toNumberOrUndefined(test.initCV1HeldPSID);
-        request.initCV2HeldPSID = this.toNumberOrUndefined(test.initCV2HeldPSID);
-        request.initRVOpenedPSID = this.toNumberOrUndefined(test.initRVOpenedPSID);
-        request.initBCHeldPSID = this.toNumberOrUndefined(test.initBCHeldPSID);
-        request.initPvbAirInletOpenedPSID = this.toNumberOrUndefined(test.initPvbAirInletOpenedPSID);
-        request.initPvbCVHeldPSID = this.toNumberOrUndefined(test.initPvbCVHeldPSID);
-        request.initCV1HeldPSID2 = this.toNumberOrUndefined(test.initCV1HeldPSID2);
-        request.initCV2HeldPSID2 = this.toNumberOrUndefined(test.initCV2HeldPSID2);
-        request.initRVOpenedPSID2 = this.toNumberOrUndefined(test.initRVOpenedPSID2);
+        request.initCV1HeldPSID = helper.toNumberOrUndefined(test.initCV1HeldPSID);
+        request.initCV2HeldPSID = helper.toNumberOrUndefined(test.initCV2HeldPSID);
+        request.initRVOpenedPSID = helper.toNumberOrUndefined(test.initRVOpenedPSID);
+        request.initBCHeldPSID = helper.toNumberOrUndefined(test.initBCHeldPSID);
+        request.initPvbAirInletOpenedPSID = helper.toNumberOrUndefined(test.initPvbAirInletOpenedPSID);
+        request.initPvbCVHeldPSID = helper.toNumberOrUndefined(test.initPvbCVHeldPSID);
+        request.initCV1HeldPSID2 = helper.toNumberOrUndefined(test.initCV1HeldPSID2);
+        request.initCV2HeldPSID2 = helper.toNumberOrUndefined(test.initCV2HeldPSID2);
+        request.initRVOpenedPSID2 = helper.toNumberOrUndefined(test.initRVOpenedPSID2);
 
-        request.finalCV1HeldPSID = this.toNumberOrUndefined(test.finalCV1HeldPSID);
-        request.finalCV2HeldPSID = this.toNumberOrUndefined(test.finalCV2HeldPSID);
-        request.finalRVOpenedPSID = this.toNumberOrUndefined(test.finalRVOpenedPSID);
-        request.finalBCHeldPSID = this.toNumberOrUndefined(test.finalBCHeldPSID);
-        request.finalPvbAirInletOpenedPSID = this.toNumberOrUndefined(test.finalPvbAirInletOpenedPSID);
-        request.finalPvbCVHeldPSID = this.toNumberOrUndefined(test.finalPvbCVHeldPSID);
-        request.finalCV1HeldPSID2 = this.toNumberOrUndefined(test.finalCV1HeldPSID2);
-        request.finalCV2HeldPSID2 = this.toNumberOrUndefined(test.finalCV2HeldPSID2);
-        request.finalRVOpenedPSID2 = this.toNumberOrUndefined(test.finalRVOpenedPSID2);
+        request.finalCV1HeldPSID = helper.toNumberOrUndefined(test.finalCV1HeldPSID);
+        request.finalCV2HeldPSID = helper.toNumberOrUndefined(test.finalCV2HeldPSID);
+        request.finalRVOpenedPSID = helper.toNumberOrUndefined(test.finalRVOpenedPSID);
+        request.finalBCHeldPSID = helper.toNumberOrUndefined(test.finalBCHeldPSID);
+        request.finalPvbAirInletOpenedPSID = helper.toNumberOrUndefined(test.finalPvbAirInletOpenedPSID);
+        request.finalPvbCVHeldPSID = helper.toNumberOrUndefined(test.finalPvbCVHeldPSID);
+        request.finalCV1HeldPSID2 = helper.toNumberOrUndefined(test.finalCV1HeldPSID2);
+        request.finalCV2HeldPSID2 = helper.toNumberOrUndefined(test.finalCV2HeldPSID2);
+        request.finalRVOpenedPSID2 = helper.toNumberOrUndefined(test.finalRVOpenedPSID2);
 
-        request.meterReadingBefore = this.toNumberOrUndefined(test.meterReadingBefore);
-        request.meterReadingAfter = this.toNumberOrUndefined(test.meterReadingAfter);
+        request.meterReadingBefore = helper.toNumberOrUndefined(test.meterReadingBefore);
+        request.meterReadingAfter = helper.toNumberOrUndefined(test.meterReadingAfter);
 
         return request;
-    }
-
-    private toNumberOrUndefined(value: unknown): number | undefined {
-        if (value === null || value === undefined || value === '') {
-            return undefined;
-        }
-
-        const parsed = Number(value);
-
-        return Number.isNaN(parsed) ? undefined : parsed;
-    }
-
-    private toTextOrUndefined(value: unknown): string | undefined {
-        if (value === null || value === undefined || value === '') {
-            return undefined;
-        }
-
-        return String(value);
     }
 
     private showSaveMessage(): void {
@@ -314,6 +299,8 @@ export class BackflowTestDetailsComponent implements OnInit, OnDestroy {
     }
 
     private applyTestToEditors(): void {
+        this.waterSupplierId = this.test.waterSupplier?.id ?? 0;
+
         this.scheduleMonthId = String(this.test.backflowScheduleMonth ?? 0);
         this.forceRenewalYearsId = String(this.test.forceRenewalYears ?? 0);
 

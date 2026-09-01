@@ -11,6 +11,7 @@ import { CsiInspectionService } from '../../../../shared/services/csi/csi-inspec
 })
 export class CsiInspectionImagesComponent implements OnInit {
     @Input() public inspectionId: number = 0;
+    @Input() public waterSupplierId: number = 0;
 
     public isLoading: boolean = false;
 
@@ -32,7 +33,7 @@ export class CsiInspectionImagesComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            const image = await this._inspectionService.addImage(this.inspectionId, file, '');
+            const image = await this._inspectionService.addImage(this.inspectionId, this.waterSupplierId, file, '');
 
             this.images = [...this.images, image];
         } finally {

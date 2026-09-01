@@ -36,6 +36,9 @@ public static class ServiceRegistration
                 services.AddTransient<IGoogleMapsService, GoogleMapsService>();
                 services.AddTransient<ICsiInspectionService, CsiInspectionService>();
                 services.AddTransient<ICsiInspectorService, CsiInspectorService>();
+                services.AddTransient<ICsiInspectorUserService, CsiInspectorUserService>();
+                services.AddTransient<ICsiInspectorLicenseService, CsiInspectorLicenseService>();
+                services.AddTransient<ICsiInspectorInsuranceService, CsiInspectorInsuranceService>();
                 services.AddTransient<IBackflowTestService, BackflowTestService>();
 
                 return services;

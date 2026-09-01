@@ -50,11 +50,6 @@ public static class ServiceRegistration
             MaxDequeuCount = 2
         });
 
-        services.AddQueueWorker(new QueueWorkerOptions<ComplianceSnapshotBackfillWorker, WaterSupplierDto>(QueueNames.BackflowComplianceSnapshots.Backfill)
-        {
-            MaxDequeuCount = 2
-        });
-
         return services;
     }
 

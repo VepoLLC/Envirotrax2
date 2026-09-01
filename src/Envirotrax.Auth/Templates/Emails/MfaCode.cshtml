@@ -1,0 +1,18 @@
+@using RazorLight
+@using Envirotrax.Auth.Templates.Emails
+@inherits TemplatePage<MfaCodeVm>
+
+@{
+    Layout = "Templates.Emails._EmailLayout";
+}
+
+<div>
+    <p style="margin-top: 0;">Your Envirotrax verification code is:</p>
+
+    <p style="font-size: 28px; font-weight: bold; letter-spacing: 4px;">@Model.Code</p>
+
+    <p>
+        If you didn't request this code, please contact us as soon as possible to ensure your account is
+        safe.
+    </p>
+</div>

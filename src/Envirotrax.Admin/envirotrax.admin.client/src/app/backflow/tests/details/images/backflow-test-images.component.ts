@@ -81,7 +81,9 @@ export class BackflowTestImagesComponent implements OnInit, OnDestroy {
     }
 
     public async saveImages(group: BackflowImageGroup): Promise<void> {
-        if (this.test.id == null || group.isSaving) {
+        const waterSupplierId = this.test.waterSupplier?.id;
+
+        if (this.test.id == null || waterSupplierId == null || group.isSaving) {
             return;
         }
 
@@ -96,7 +98,7 @@ export class BackflowTestImagesComponent implements OnInit, OnDestroy {
 
             for (const slot of staged) {
                 const file = slot.stagedFile!;
-                const updated = await this._testService.uploadImage(this.test.id, slot.type, file);
+                const updated = await this._testService.uploadImage(this.test.id, waterSupplierId, slot.type, file);
 
                 this.applyUploadedUrls(updated);
                 this.removeStagedImage(group, slot);

@@ -2189,14 +2189,17 @@ namespace Envirotrax.App.Server.Data.Migrations
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Logs.RecordLog", b =>
                 {
-                    b.Property<int>("WaterSupplierId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -2205,10 +2208,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<DateTime>("LogDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("LogType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProfessionalId")
                         .HasColumnType("int");
 
                     b.Property<int>("RecordId")
@@ -2223,12 +2226,18 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int?>("WaterSupplierId")
                         .HasColumnType("int");
 
-                    b.HasKey("WaterSupplierId", "Id");
+                    b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ProfessionalId");
+
+                    b.HasIndex("WaterSupplierId");
+
+                    b.HasIndex("TableName", "RecordId", "WaterSupplierId", "ProfessionalId");
 
                     b.ToTable("RecordLogs");
                 });
@@ -3116,6 +3125,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<string>("NormalizedEmail")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("AspNetUsers", t =>
@@ -3241,10 +3253,6 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
-
-                    b.Property<string>("CellNumber")
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
 
                     b.Property<string>("ContactName")
                         .IsRequired()
@@ -4460,18 +4468,24 @@ namespace Envirotrax.App.Server.Data.Migrations
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Logs.RecordLog", b =>
                 {
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "User")
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
+                        .WithMany()
+                        .HasForeignKey("ProfessionalId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
                         .WithMany()
                         .HasForeignKey("WaterSupplierId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("User");
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Professional");
 
                     b.Navigation("WaterSupplier");
                 });

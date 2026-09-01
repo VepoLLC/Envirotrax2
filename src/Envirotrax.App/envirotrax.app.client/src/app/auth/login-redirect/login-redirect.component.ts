@@ -1,11 +1,12 @@
 import { Component } from "@angular/core";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { PagedData } from "../../shared/models/paged-data";
 import { AuthService } from "../../shared/services/auth/auth.service";
-import { MySupplierHierarchyDto, WaterSupplier, WaterSupplierHierarchy } from "../../shared/models/water-suppliers/water-supplier";
+import { MySupplierHierarchyDto, WaterSupplier } from "../../shared/models/water-suppliers/water-supplier";
 import { WaterSupplierService } from "../../shared/services/water-suppliers/water-supplier.service";
 import { ProfesisonalService } from "../../shared/services/professionals/professional.service";
 import { Professional } from "../../shared/models/professionals/professional";
+import { isSafeReturnUrl } from "../../shared/utils/return-url.util";
 
 export type LoginAccountType = 'professional' | 'waterSupplier';
 
@@ -24,19 +25,35 @@ export class LoginRedirectComponent {
     public showProfessionalSelection: boolean = false;
     public showWaterSupplierSelection: boolean = false;
 
+    public returnUrl: string | null = null;
+
     constructor(
         private readonly _authService: AuthService,
         private readonly _supplierService: WaterSupplierService,
         private readonly _professionalService: ProfesisonalService,
-        private readonly _router: Router) {
+        private readonly _router: Router,
+        private readonly _route: ActivatedRoute) {
 
     }
 
     public async ngOnInit(): Promise<void> {
+        // A dashboard "View" on a sub account opens a new tab straight to this route with
+        // ?waterSupplierId=<id>&returnUrl=<listPageUrl> to switch into that water supplier before
+        // this tab has ever done an OIDC round trip. Everything else hitting this route is the OIDC
+        // callback leg (it carries code/state/error), which the existing flow below handles.
+        const params = this._route.snapshot.queryParamMap;
+        const waterSupplierIdParam = params.get('waterSupplierId');
+        const isOidcCallback = params.has('code') || params.has('state') || params.has('error');
+
+        if (waterSupplierIdParam && !isOidcCallback) {
+            await this.initiateWaterSupplierSwitch(Number(waterSupplierIdParam), params.get('returnUrl'));
+            return;
+        }
+
         try {
             this.isLoading = true;
 
-            await this._authService.signInCallback();
+            this.returnUrl = await this._authService.signInCallback();
 
             const [profesisonalId, waterSupplierId] = await Promise.all([
                 this._authService.getProfessionalId(),
@@ -53,12 +70,28 @@ export class LoginRedirectComponent {
         }
     }
 
+    private async initiateWaterSupplierSwitch(targetWaterSupplierId: number, rawReturnUrl: string | null): Promise<void> {
+        const returnUrl = isSafeReturnUrl(rawReturnUrl) ? rawReturnUrl : '/';
+
+        const currentWaterSupplierId = await this._authService.getWaterSupplierId();
+        if (currentWaterSupplierId === targetWaterSupplierId) {
+            window.location.replace(returnUrl);
+            return;
+        }
+
+        try {
+            this.isLoading = true;
+            await this._authService.signIn(targetWaterSupplierId, undefined, returnUrl, true);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
     private loginWithExistingSystem(): void {
         this._authService.setLoggedIn(true);
+        const returnUrl = isSafeReturnUrl(this.returnUrl) ? this.returnUrl : '/';
 
-        this._router.navigateByUrl('/', {
-            replaceUrl: true
-        });
+        window.location.replace(returnUrl);
     }
 
     private checkIfOneSupplier(myHierarchy: MySupplierHierarchyDto): WaterSupplier | null {
@@ -89,7 +122,7 @@ export class LoginRedirectComponent {
 
         if (hasProfessional) {
             if (this.professionals.data.length == 1) {
-                await this._authService.signIn(undefined, this.professionals.data[0].id);
+                await this._authService.signIn(undefined, this.professionals.data[0].id, this.returnUrl ?? undefined);
                 return;
             }
 
@@ -101,7 +134,7 @@ export class LoginRedirectComponent {
             const onlySupplier = this.checkIfOneSupplier(this.suppliers);
 
             if (onlySupplier) {
-                await this._authService.signIn(onlySupplier.id);
+                await this._authService.signIn(onlySupplier.id, undefined, this.returnUrl ?? undefined);
                 return;
             }
 
@@ -152,7 +185,7 @@ export class LoginRedirectComponent {
     public async selectSupplier(supplier: WaterSupplier): Promise<void> {
         try {
             this.isLoading = true;
-            await this._authService.signIn(supplier.id);
+            await this._authService.signIn(supplier.id, undefined, this.returnUrl ?? undefined);
         } finally {
             this.isLoading = false;
         }
@@ -161,7 +194,7 @@ export class LoginRedirectComponent {
     public async selectProfessional(professional: Professional): Promise<void> {
         try {
             this.isLoading = true;
-            await this._authService.signIn(undefined, professional.id);
+            await this._authService.signIn(undefined, professional.id, this.returnUrl ?? undefined);
         } finally {
             this.isLoading = false;
         }

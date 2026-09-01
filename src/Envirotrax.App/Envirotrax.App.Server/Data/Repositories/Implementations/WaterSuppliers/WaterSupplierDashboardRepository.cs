@@ -106,6 +106,7 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
 
             subAccountStats = [..childWaterSuppliers.Select(ws => new CsiSubAccountStatsDto
             {
+                WaterSupplierId = ws.Id,
                 WaterSupplierName = ws.Name,
                 DailyStats = [..allDates.Select(d => new CsiDailyStatsDto
                 {
@@ -185,6 +186,7 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
 
             subAccountStats = [..childWaterSuppliers.Select(ws => new BackflowSubAccountStatsDto
             {
+                WaterSupplierId = ws.Id,
                 WaterSupplierName = ws.Name,
                 DailyStats = [..allDates.Select(d => new BackflowDailyStatsDto
                 {
@@ -264,6 +266,7 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
 
             subAccountStats = [..childWaterSuppliers.Select(ws => new FogInspectionSubAccountStatsDto
             {
+                WaterSupplierId = ws.Id,
                 WaterSupplierName = ws.Name,
                 DailyStats = [..allDates.Select(d => new FogInspectionDailyStatsDto
                 {
@@ -343,6 +346,7 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
 
             subAccountStats = [..childWaterSuppliers.Select(ws => new FogTripTicketSubAccountStatsDto
             {
+                WaterSupplierId = ws.Id,
                 WaterSupplierName = ws.Name,
                 DailyStats = [..allDates.Select(d => new FogTripTicketDailyStatsDto
                 {

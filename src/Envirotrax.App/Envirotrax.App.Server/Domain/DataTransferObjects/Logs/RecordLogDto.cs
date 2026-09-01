@@ -3,9 +3,9 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Logs;
 
-public class RecordLogDto : IDto
+public class RecordLogDto : IDto<long>
 {
-    public int Id { get; set; }
+    public long Id { get; set; }
 
     public DateTime LogDate { get; set; }
 

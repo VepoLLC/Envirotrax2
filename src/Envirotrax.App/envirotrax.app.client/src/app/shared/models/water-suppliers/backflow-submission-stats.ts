@@ -6,6 +6,7 @@ export interface BackflowDailyStats {
 }
 
 export interface BackflowSubAccountStats {
+    waterSupplierId: number;
     waterSupplierName: string;
     dailyStats: BackflowDailyStats[];
 }

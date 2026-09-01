@@ -135,6 +135,7 @@ export class DashboardComponent implements OnInit {
         }));
 
         const subAccountStats = (stats.subAccountStats ?? []).map(sub => ({
+            waterSupplierId: sub.waterSupplierId,
             waterSupplierName: sub.waterSupplierName,
             totalInspections: sub.dailyStats.reduce((s, d) => s + d.totalInspections, 0),
             totalPaidInspections: sub.dailyStats.reduce((s, d) => s + d.totalPaidInspections, 0)
@@ -146,7 +147,9 @@ export class DashboardComponent implements OnInit {
             totalPaidInspections,
             subAccountStats,
             subAccountTotalInspections: subAccountStats.reduce((s, sub) => s + sub.totalInspections, 0),
-            subAccountTotalPaidInspections: subAccountStats.reduce((s, sub) => s + sub.totalPaidInspections, 0)
+            subAccountTotalPaidInspections: subAccountStats.reduce((s, sub) => s + sub.totalPaidInspections, 0),
+            rangeStartDate: dailyStats[0]?.date,
+            rangeEndDate: dailyStats[dailyStats.length - 1]?.date
         };
     }
 
@@ -165,6 +168,7 @@ export class DashboardComponent implements OnInit {
         }));
 
         const subAccountStats = (stats.subAccountStats ?? []).map(sub => ({
+            waterSupplierId: sub.waterSupplierId,
             waterSupplierName: sub.waterSupplierName,
             totalTests: sub.dailyStats.reduce((s, d) => s + d.totalTests, 0),
             totalPaidTests: sub.dailyStats.reduce((s, d) => s + d.totalPaidTests, 0)
@@ -176,7 +180,9 @@ export class DashboardComponent implements OnInit {
             totalPaidTests,
             subAccountStats,
             subAccountTotalTests: subAccountStats.reduce((s, sub) => s + sub.totalTests, 0),
-            subAccountTotalPaidTests: subAccountStats.reduce((s, sub) => s + sub.totalPaidTests, 0)
+            subAccountTotalPaidTests: subAccountStats.reduce((s, sub) => s + sub.totalPaidTests, 0),
+            rangeStartDate: dailyStats[0]?.date,
+            rangeEndDate: dailyStats[dailyStats.length - 1]?.date
         };
     }
 
@@ -195,6 +201,7 @@ export class DashboardComponent implements OnInit {
         }));
 
         const subAccountStats = (stats.subAccountStats ?? []).map(sub => ({
+            waterSupplierId: sub.waterSupplierId,
             waterSupplierName: sub.waterSupplierName,
             totalInspections: sub.dailyStats.reduce((s, d) => s + d.totalInspections, 0),
             totalPaidInspections: sub.dailyStats.reduce((s, d) => s + d.totalPaidInspections, 0)
@@ -206,7 +213,9 @@ export class DashboardComponent implements OnInit {
             totalPaidInspections,
             subAccountStats,
             subAccountTotalInspections: subAccountStats.reduce((s, sub) => s + sub.totalInspections, 0),
-            subAccountTotalPaidInspections: subAccountStats.reduce((s, sub) => s + sub.totalPaidInspections, 0)
+            subAccountTotalPaidInspections: subAccountStats.reduce((s, sub) => s + sub.totalPaidInspections, 0),
+            rangeStartDate: dailyStats[0]?.date,
+            rangeEndDate: dailyStats[dailyStats.length - 1]?.date
         };
     }
 
@@ -225,6 +234,7 @@ export class DashboardComponent implements OnInit {
         }));
 
         const subAccountStats = (stats.subAccountStats ?? []).map(sub => ({
+            waterSupplierId: sub.waterSupplierId,
             waterSupplierName: sub.waterSupplierName,
             totalTripTickets: sub.dailyStats.reduce((s, d) => s + d.totalTripTickets, 0),
             totalPaidTripTickets: sub.dailyStats.reduce((s, d) => s + d.totalPaidTripTickets, 0)
@@ -236,8 +246,14 @@ export class DashboardComponent implements OnInit {
             totalPaidTripTickets,
             subAccountStats,
             subAccountTotalTripTickets: subAccountStats.reduce((s, sub) => s + sub.totalTripTickets, 0),
-            subAccountTotalPaidTripTickets: subAccountStats.reduce((s, sub) => s + sub.totalPaidTripTickets, 0)
+            subAccountTotalPaidTripTickets: subAccountStats.reduce((s, sub) => s + sub.totalPaidTripTickets, 0),
+            rangeStartDate: dailyStats[0]?.date,
+            rangeEndDate: dailyStats[dailyStats.length - 1]?.date
         };
+    }
+
+    public buildReturnUrl(basePath: string, startDate: string, endDate: string): string {
+        return `${basePath}?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
     }
 
     private formatDayName(date: string): string {
@@ -260,6 +276,7 @@ interface CsiDailyStatsVm {
 }
 
 interface CsiSubAccountVm {
+    waterSupplierId: number;
     waterSupplierName: string;
     totalInspections: number;
     totalPaidInspections: number;
@@ -272,6 +289,8 @@ interface CsiStatsVm {
     subAccountStats: CsiSubAccountVm[];
     subAccountTotalInspections: number;
     subAccountTotalPaidInspections: number;
+    rangeStartDate: string;
+    rangeEndDate: string;
 }
 
 interface BackflowDailyStatsVm {
@@ -285,6 +304,7 @@ interface BackflowDailyStatsVm {
 }
 
 interface BackflowSubAccountVm {
+    waterSupplierId: number;
     waterSupplierName: string;
     totalTests: number;
     totalPaidTests: number;
@@ -297,6 +317,8 @@ interface BackflowStatsVm {
     subAccountStats: BackflowSubAccountVm[];
     subAccountTotalTests: number;
     subAccountTotalPaidTests: number;
+    rangeStartDate: string;
+    rangeEndDate: string;
 }
 
 interface FogInspectionDailyStatsVm {
@@ -310,6 +332,7 @@ interface FogInspectionDailyStatsVm {
 }
 
 interface FogInspectionSubAccountVm {
+    waterSupplierId: number;
     waterSupplierName: string;
     totalInspections: number;
     totalPaidInspections: number;
@@ -322,6 +345,8 @@ interface FogInspectionStatsVm {
     subAccountStats: FogInspectionSubAccountVm[];
     subAccountTotalInspections: number;
     subAccountTotalPaidInspections: number;
+    rangeStartDate: string;
+    rangeEndDate: string;
 }
 
 interface FogTripTicketDailyStatsVm {
@@ -335,6 +360,7 @@ interface FogTripTicketDailyStatsVm {
 }
 
 interface FogTripTicketSubAccountVm {
+    waterSupplierId: number;
     waterSupplierName: string;
     totalTripTickets: number;
     totalPaidTripTickets: number;
@@ -347,4 +373,6 @@ interface FogTripTicketStatsVm {
     subAccountStats: FogTripTicketSubAccountVm[];
     subAccountTotalTripTickets: number;
     subAccountTotalPaidTripTickets: number;
+    rangeStartDate: string;
+    rangeEndDate: string;
 }

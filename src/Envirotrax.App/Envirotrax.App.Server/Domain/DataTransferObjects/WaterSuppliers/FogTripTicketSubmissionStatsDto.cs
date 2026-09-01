@@ -10,6 +10,7 @@ public class FogTripTicketDailyStatsDto
 
 public class FogTripTicketSubAccountStatsDto
 {
+    public int WaterSupplierId { get; set; }
     public string WaterSupplierName { get; set; } = "";
     public List<FogTripTicketDailyStatsDto> DailyStats { get; set; } = new();
 }

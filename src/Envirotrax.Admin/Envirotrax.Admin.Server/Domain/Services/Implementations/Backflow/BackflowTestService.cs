@@ -35,16 +35,16 @@ public class BackflowTestService : IBackflowTestService
         return _apiClient.GetAsync<BackflowTestDetailsDto>($"{BaseUrl}/{id}", cancellationToken);
     }
 
-    public Task<BackflowTestDetailsDto?> UpdateAsync(int id, BackflowTestUpdateRequest request, CancellationToken cancellationToken)
+    public Task<BackflowTestDetailsDto?> UpdateAsync(int id, int waterSupplierId, BackflowTestUpdateRequest request, CancellationToken cancellationToken)
     {
-        return _apiClient.PutAsync<BackflowTestUpdateRequest, BackflowTestDetailsDto>($"{BaseUrl}/{id}", request, cancellationToken);
+        return _apiClient.PutAsync<BackflowTestUpdateRequest, BackflowTestDetailsDto>(waterSupplierId, $"{BaseUrl}/{id}", request, cancellationToken);
     }
 
-    public Task<BackflowTestDetailsDto?> UploadImageAsync(int id, string imageType, Stream fileStream, string fileName, CancellationToken cancellationToken)
+    public Task<BackflowTestDetailsDto?> UploadImageAsync(int id, int waterSupplierId, string imageType, Stream fileStream, string fileName, CancellationToken cancellationToken)
     {
         var formFields = new Dictionary<string, string>();
 
-        return _apiClient.PostFileAsync<BackflowTestDetailsDto>($"{BaseUrl}/{id}/images/{imageType}", fileStream, fileName, "file", formFields, cancellationToken);
+        return _apiClient.PostFileAsync<BackflowTestDetailsDto>(waterSupplierId, $"{BaseUrl}/{id}/images/{imageType}", fileStream, fileName, "file", formFields, cancellationToken);
     }
 
     public Task<BackflowTestCountsDto?> GetCountsAsync(int id, CancellationToken cancellationToken)

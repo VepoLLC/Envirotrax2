@@ -23,9 +23,6 @@ public class WaterSupplierUser : TenantModel<WaterSupplier>
     [StringLength(100)]
     public string EmailAddress { get; set; } = null!;
 
-    [StringLength(25)]
-    public string? CellNumber { get; set; }
-
     public IEnumerable<UserRole>? UserRoles { get; set; }
 }
 

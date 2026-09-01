@@ -4,8 +4,8 @@ BEGIN TRAN
 BEGIN TRY
 
     INSERT INTO WaterSupplierUsers
-        (LegacyRecordId, ContactName, EmailAddress, CellNumber, UserId, WaterSupplierId)
-    SELECT ID, ContactName, UserId, CellNumber,
+        (LegacyRecordId, ContactName, EmailAddress, UserId, WaterSupplierId)
+    SELECT ID, ContactName, UserId,
         (SELECT Id FROM AspNetUsers WHERE Email = LegacyUsers.UserID),
         (SELECT Id FROM WaterSuppliers WHERE LegacyRecordId = LegacyUsers.WaterSupplierID)
     FROM 

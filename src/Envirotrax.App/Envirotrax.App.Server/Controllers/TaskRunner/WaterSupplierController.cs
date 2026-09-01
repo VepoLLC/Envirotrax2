@@ -14,9 +14,9 @@ public class WaterSupplierController : TaskRunnerBaseContoller
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllSupplierIdsAsync(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetSupplierIdsAsync([FromQuery] bool hasBackflowTests, CancellationToken cancellationToken)
     {
-        var ids = await _waterSupplierService.GetAllSupplierIdsAsync(cancellationToken);
+        var ids = await _waterSupplierService.GetSupplierIdsAsync(hasBackflowTests, cancellationToken);
         return Ok(ids);
     }
 }

@@ -17,6 +17,5 @@ public class QueueNames
     public class BackflowComplianceSnapshots
     {
         public const string Process = "backflow-compliance-snapshots-process";
-        public const string Backfill = "backflow-compliance-snapshots-backfill";
     }
 }

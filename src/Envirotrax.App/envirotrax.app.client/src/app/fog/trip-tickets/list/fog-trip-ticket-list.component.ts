@@ -119,17 +119,33 @@ export class FogTripTicketListComponent implements OnInit, OnDestroy {
         this._queryParamSub = this._activatedRoute.queryParamMap.subscribe(async params => {
             const dateParam = params.get('date');
             if (dateParam) {
-                this.table.query.filter = [{
-                    columnName: 'createdTime',
-                    children: [
-                        { columnName: 'createdTime', value: dateParam, comparisonOperator: 'Gte', logicalOperator: 'And' },
-                        { columnName: 'createdTime', value: dateParam, comparisonOperator: 'Lte', logicalOperator: 'And' }
-                    ]
-                }];
+                this.applyDateFilter(dateParam);
+                await this.getTripTickets();
+                this.setShowResults(true);
+                return;
+            }
+
+            // Dashboard "View" on a sub account lands here already authenticated as that water
+            // supplier (via /auth/login-redirect); this just carries over the same last-10-days
+            // window shown on the dashboard so the results match what was clicked.
+            const startDateParam = params.get('startDate');
+            const endDateParam = params.get('endDate');
+            if (startDateParam && endDateParam) {
+                this.applyDateFilter(startDateParam, endDateParam);
                 await this.getTripTickets();
                 this.setShowResults(true);
             }
         });
+    }
+
+    private applyDateFilter(startDate: string, endDate: string = startDate): void {
+        this.table.query.filter = [{
+            columnName: 'createdTime',
+            children: [
+                { columnName: 'createdTime', value: startDate, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                { columnName: 'createdTime', value: endDate, comparisonOperator: 'Lte', logicalOperator: 'And' }
+            ]
+        }];
     }
 
     public ngOnDestroy(): void {

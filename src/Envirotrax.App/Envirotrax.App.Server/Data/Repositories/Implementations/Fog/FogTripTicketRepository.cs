@@ -4,7 +4,6 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Models.Fog;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Data.Services.Definitions;
-using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Fog;
@@ -12,13 +11,11 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Fog;
 public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicketRepository
 {
     private readonly TenantDbContext _context;
-    private readonly ITenantProvidersService _tenantProvider;
 
-    public FogTripTicketRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider)
+    public FogTripTicketRepository(IDbContextSelector dbContextSelector)
         : base(dbContextSelector)
     {
         _context = dbContextSelector.Current;
-        _tenantProvider = tenantProvider;
     }
 
     protected override IQueryable<FogTripTicket> GetListQuery()

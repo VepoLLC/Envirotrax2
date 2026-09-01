@@ -23,6 +23,6 @@ public class ComplianceSnapshotWorker : IQueueWorker<ComplianceSnapshotMessageDt
         };
 
         await _internalApi.PostAsync<GenerateComplianceSnapshotRequest, object>(
-            "/api/task-runner/backflow-compliance-snapshots", apiRequest, cancellationToken);
+            "/api/task-runner/backflow-tests/compliance-snapshots", apiRequest, cancellationToken);
     }
 }

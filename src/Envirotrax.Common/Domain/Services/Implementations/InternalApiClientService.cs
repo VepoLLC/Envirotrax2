@@ -148,7 +148,7 @@ public class InternalApiClientService<TOptions> : IInternalApiClientService<TOpt
         });
     }
 
-    public Task<TResponse?> PostFileAsync<TResponse>(int waterSupplierId, int? loggedInUserId, string url, Stream fileStream, string fileName, string fileFieldName, IDictionary<string, string> formFields, CancellationToken cancellationToken)
+    public Task<TResponse?> PostFileAsync<TResponse>(int? waterSupplierId, int? loggedInUserId, string url, Stream fileStream, string fileName, string fileFieldName, IDictionary<string, string> formFields, CancellationToken cancellationToken)
     {
         return ProcessRequestAsync<TResponse>(cancellationToken, () =>
         {

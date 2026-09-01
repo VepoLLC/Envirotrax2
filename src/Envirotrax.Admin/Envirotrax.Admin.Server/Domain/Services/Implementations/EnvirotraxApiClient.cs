@@ -81,6 +81,27 @@ public class EnvirotraxApiClient : IEnvirotraxApiClient
         }, cancellationToken);
     }
 
+    public Task<TResponse?> PutAsync<TRequest, TResponse>(string url, TRequest requestData, CancellationToken cancellationToken)
+    {
+        return _apiClient.PutAsync<TRequest, TResponse>(url, new ServiceMessageDto<TRequest>(_authService.UserId)
+        {
+            Data = requestData
+        }, cancellationToken);
+    }
+
+    public Task<TResponse?> PostAsync<TRequest, TResponse>(string url, TRequest requestData, CancellationToken cancellationToken)
+    {
+        return _apiClient.PostAsync<TRequest, TResponse>(url, new ServiceMessageDto<TRequest>(_authService.UserId)
+        {
+            Data = requestData
+        }, cancellationToken);
+    }
+
+    public Task<TResponse?> PostFileAsync<TResponse>(string url, Stream fileStream, string fileName, string fileFieldName, IDictionary<string, string> formFields, CancellationToken cancellationToken)
+    {
+        return _apiClient.PostFileAsync<TResponse>(null, _authService.UserId, url, fileStream, fileName, fileFieldName, formFields, cancellationToken);
+    }
+
     public Task<TResponse?> DeleteAsync<TResponse>(string url, CancellationToken cancellationToken)
     {
         return _apiClient.DeleteAsync<TResponse>(_authService.UserId, url, cancellationToken);

@@ -54,6 +54,7 @@ public static class ServiceRegistration
         services.AddTransient<ICsiInspectionAssemblyService, CsiInspectionAssemblyService>();
         services.AddTransient<IRecordLogService, RecordLogService>();
         services.AddTransient<ICsiInspectorService, CsiInspectorService>();
+        services.AddTransient<ICsiInspectorAccountService, CsiInspectorAccountService>();
         services.AddTransient<ICsiSystemReportService, CsiSystemReportService>();
         services.AddTransient<IFogInspectorService, FogInspectorService>();
         services.AddTransient<IFogTransporterService, FogTransporterService>();

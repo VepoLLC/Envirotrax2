@@ -2,7 +2,7 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Envirotrax.App.Server.Controllers.TaskRunner.Backflow;
+namespace Envirotrax.App.Server.Controllers.TaskRunner;
 
 [Route("api/task-runner/backflow-tests")]
 public class BackflowTestController : TaskRunnerBaseContoller

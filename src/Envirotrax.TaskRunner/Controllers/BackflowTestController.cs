@@ -56,7 +56,8 @@ public class BackflowTestController : ControllerBase
             "api/task-runner/water-suppliers?hasBackflowTests=true",
             cancellationToken);
 
-        var reportDate = DateTime.UtcNow.Date;
+        var centralTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
+        var reportDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, centralTimeZone).Date;
 
         await _queueService.EnsureQueueExistsAsync(QueueNames.BackflowComplianceSnapshots.Process, cancellationToken);
 

@@ -24,9 +24,9 @@ export class CsiInspectionService {
     public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<CsiInspection>> {
         const url = this._urlResolver.resolveUrl('/api/csi/inspections');
 
-        const observable = this._http.get<PagedData<CsiInspection>>(url, {
-            params: this._queryHelper.buildQuery(pageInfo, query)
-        });
+        const params = this._queryHelper.buildQuery(pageInfo, query);
+
+        const observable = this._http.get<PagedData<CsiInspection>>(url, { params });
 
         return await lastValueFrom(observable);
     }

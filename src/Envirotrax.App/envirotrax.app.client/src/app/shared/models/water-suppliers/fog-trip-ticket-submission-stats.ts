@@ -6,6 +6,7 @@ export interface FogTripTicketDailyStats {
 }
 
 export interface FogTripTicketSubAccountStats {
+    waterSupplierId: number;
     waterSupplierName: string;
     dailyStats: FogTripTicketDailyStats[];
 }

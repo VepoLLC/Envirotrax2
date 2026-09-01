@@ -225,7 +225,10 @@
                                                         <td>{{sub.totalInspections}}</td>
                                                         <td>{{sub.totalPaidInspections}}</td>
                                                         <td>
-                                                            <button type="button" class="btn btn-sm btn-primary py-0">View</button>
+                                                            <a class="btn btn-sm btn-primary py-0"
+                                                               [routerLink]="['/auth/login-redirect']"
+                                                               [queryParams]="{waterSupplierId: sub.waterSupplierId, returnUrl: buildReturnUrl('/csi', csiVm!.rangeStartDate, csiVm!.rangeEndDate)}"
+                                                               target="_blank" rel="noopener">View</a>
                                                         </td>
                                                     </tr>
                                                 }
@@ -314,7 +317,10 @@
                                                         <td>{{sub.totalTests}}</td>
                                                         <td>{{sub.totalPaidTests}}</td>
                                                         <td>
-                                                            <button type="button" class="btn btn-sm btn-primary py-0">View</button>
+                                                            <a class="btn btn-sm btn-primary py-0"
+                                                               [routerLink]="['/auth/login-redirect']"
+                                                               [queryParams]="{waterSupplierId: sub.waterSupplierId, returnUrl: buildReturnUrl('/backflow/tests', backflowVm!.rangeStartDate, backflowVm!.rangeEndDate)}"
+                                                               target="_blank" rel="noopener">View</a>
                                                         </td>
                                                     </tr>
                                                 }
@@ -403,7 +409,10 @@
                                                         <td>{{sub.totalInspections}}</td>
                                                         <td>{{sub.totalPaidInspections}}</td>
                                                         <td>
-                                                            <button type="button" class="btn btn-sm btn-primary py-0">View</button>
+                                                            <a class="btn btn-sm btn-primary py-0"
+                                                               [routerLink]="['/auth/login-redirect']"
+                                                               [queryParams]="{waterSupplierId: sub.waterSupplierId, returnUrl: buildReturnUrl('/fog/inspections', fogInspectionVm!.rangeStartDate, fogInspectionVm!.rangeEndDate)}"
+                                                               target="_blank" rel="noopener">View</a>
                                                         </td>
                                                     </tr>
                                                 }
@@ -492,7 +501,10 @@
                                                         <td>{{sub.totalTripTickets}}</td>
                                                         <td>{{sub.totalPaidTripTickets}}</td>
                                                         <td>
-                                                            <button type="button" class="btn btn-sm btn-primary py-0">View</button>
+                                                            <a class="btn btn-sm btn-primary py-0"
+                                                               [routerLink]="['/auth/login-redirect']"
+                                                               [queryParams]="{waterSupplierId: sub.waterSupplierId, returnUrl: buildReturnUrl('/fog/trip-tickets', fogTripTicketVm!.rangeStartDate, fogTripTicketVm!.rangeEndDate)}"
+                                                               target="_blank" rel="noopener">View</a>
                                                         </td>
                                                     </tr>
                                                 }

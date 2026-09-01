@@ -253,17 +253,28 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
                 this.applyComplianceFilter(params);
                 await this.getTests();
                 this.setShowResults(true);
+                return;
+            }
+
+            // Dashboard "View" on a sub account lands here already authenticated as that water
+            // supplier (via /auth/login-redirect); this just carries over the same last-10-days
+            // window shown on the dashboard so the results match what was clicked.
+            const startDateParam = params.get('startDate');
+            const endDateParam = params.get('endDate');
+            if (startDateParam && endDateParam) {
+                this.applyDateFilter(startDateParam, endDateParam);
+                await this.getTests();
+                this.setShowResults(true);
             }
         });
     }
 
-    // Dashboard drill-down: show only the tests on the clicked day.
-    private applyDateFilter(date: string): void {
+    private applyDateFilter(startDate: string, endDate: string = startDate): void {
         this.table.query.filter = [{
             columnName: 'testDate',
             children: [
-                { columnName: 'testDate', value: date, comparisonOperator: 'Gte', logicalOperator: 'And' },
-                { columnName: 'testDate', value: date, comparisonOperator: 'Lte', logicalOperator: 'And' }
+                { columnName: 'testDate', value: startDate, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                { columnName: 'testDate', value: endDate, comparisonOperator: 'Lte', logicalOperator: 'And' }
             ]
         }];
     }

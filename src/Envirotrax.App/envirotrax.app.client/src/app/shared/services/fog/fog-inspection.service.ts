@@ -22,9 +22,9 @@ export class FogInspectionService {
     public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<FogInspection>> {
         const url = this._urlResolver.resolveUrl('/api/fog/inspections');
 
-        const observable = this._http.get<PagedData<FogInspection>>(url, {
-            params: this._queryHelper.buildQuery(pageInfo, query)
-        });
+        const params = this._queryHelper.buildQuery(pageInfo, query);
+
+        const observable = this._http.get<PagedData<FogInspection>>(url, { params });
 
         return await lastValueFrom(observable);
     }

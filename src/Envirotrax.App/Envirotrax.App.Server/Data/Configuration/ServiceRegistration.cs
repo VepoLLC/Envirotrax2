@@ -51,6 +51,7 @@ public static class ServiceRegistration
         AddDbContext<TenantDbContext>(services, configuration, environment);
         AddDbContext<ProfessionalDbContext>(services, configuration, environment);
         AddDbContext<AdminDbContext>(services, configuration, environment);
+        AddDbContext<PublicDbContext>(services, configuration, environment);
         services.AddScoped<IDbContextSelector, DbContextSelector>();
 
         services.AddTenantProvider();

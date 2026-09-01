@@ -1,11 +1,11 @@
-
+using System.Linq.Expressions;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
+using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
-using Envirotrax.App.Server.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
@@ -13,38 +13,26 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 /// <summary>
 /// Backs the public "Registered Professionals" directory (V1: registrations.aspx).
 ///
-/// Every query here calls <c>IgnoreQueryFilters()</c> on purpose. The directory is anonymous and
-/// cross-tenant: an anonymous visitor carries no water supplier, and a signed-in professional would
-/// otherwise be scoped to their own company by <c>ProfessionalDbContext</c>. Scoping comes from the
+/// Runs on <see cref="PublicDbContext"/>, which applies no tenant filters, because the directory is
+/// anonymous and cross-tenant: an anonymous visitor carries no water supplier, and a signed-in
+/// professional must not have the listing narrowed to their own company. Scoping comes from the
 /// explicit <c>waterSupplierId</c> every method takes instead of from the ambient tenant.
 /// </summary>
-public class RegisteredProfessionalRepository : Repository<Professional>, IRegisteredProfessionalRepository
+public class RegisteredProfessionalRepository : Repository<Professional, int, PublicDbContext>, IRegisteredProfessionalRepository
 {
     /// <summary>Accounts registered within this many months are listed first, as they were in V1.</summary>
     private const int NewAccountMonths = 6;
 
-    public RegisteredProfessionalRepository(IDbContextSelector dbContextSelector)
-        : base(dbContextSelector)
+    public RegisteredProfessionalRepository(PublicDbContext dbContext)
+        : base(dbContext)
     {
-    }
-
-    protected override IQueryable<Professional> GetListQuery()
-    {
-        return base.GetListQuery().IgnoreQueryFilters();
     }
 
     public async Task<IEnumerable<RegisteredProfessionalSupplier>> GetWaterSuppliersAsync(
         ProfessionalType professionalType,
         CancellationToken cancellationToken)
     {
-        var settings = GetProgramSettingsQuery(professionalType);
-
-        return await DbContext.WaterSuppliers
-            .AsNoTracking()
-            .IgnoreQueryFilters()
-            .Where(supplier => supplier.IsActive
-                && supplier.DeletedTime == null
-                && settings.Any(programSettings => programSettings.WaterSupplierId == supplier.Id))
+        return await GetPublicSuppliersQuery(professionalType)
             .OrderBy(supplier => supplier.Name)
             .Select(supplier => new RegisteredProfessionalSupplier
             {
@@ -105,13 +93,9 @@ public class RegisteredProfessionalRepository : Repository<Professional>, IRegis
         ProfessionalType professionalType,
         CancellationToken cancellationToken)
     {
-        var supplier = await DbContext.WaterSuppliers
-            .AsNoTracking()
-            .IgnoreQueryFilters()
-            .Where(candidate => candidate.Id == waterSupplierId
-                && candidate.IsActive
-                && candidate.DeletedTime == null)
-            .Select(candidate => new { candidate.StateId })
+        var supplier = await GetPublicSuppliersQuery(professionalType)
+            .Where(candidate => candidate.Id == waterSupplierId)
+            .Select(candidate => new { candidate.StateId, Settings = candidate.GeneralSettings! })
             .SingleOrDefaultAsync(cancellationToken);
 
         if (supplier == null)
@@ -119,17 +103,8 @@ public class RegisteredProfessionalRepository : Repository<Professional>, IRegis
             return null;
         }
 
-        var settings = await GetProgramSettingsQuery(professionalType)
-            .SingleOrDefaultAsync(programSettings => programSettings.WaterSupplierId == waterSupplierId, cancellationToken);
-
-        if (settings == null)
-        {
-            return null;
-        }
-
         var hasRequiredLicenseTypes = await DbContext.ProfessionalLicenseTypes
             .AsNoTracking()
-            .IgnoreQueryFilters()
             .AnyAsync(licenseType => licenseType.StateId == supplier.StateId
                 && licenseType.ProfessionalType == professionalType
                 && !licenseType.IsFireLicense, cancellationToken);
@@ -138,27 +113,36 @@ public class RegisteredProfessionalRepository : Repository<Professional>, IRegis
         {
             StateId = supplier.StateId,
             HasRequiredLicenseTypes = hasRequiredLicenseTypes,
-            RequiresInsurance = RequiresInsurance(settings, professionalType)
+            RequiresInsurance = RequiresInsurance(supplier.Settings, professionalType)
         };
     }
 
     /// <summary>
-    /// Settings of every water supplier that publicly runs the program this professional type serves.
+    /// Every water supplier that publicly runs the program this professional type serves.
+    /// Uses the <see cref="WaterSupplier.GeneralSettings"/> navigation so the settings come back as
+    /// a single LEFT JOIN instead of a correlated EXISTS subquery.
     /// </summary>
-    private IQueryable<GeneralSettings> GetProgramSettingsQuery(ProfessionalType professionalType)
+    private IQueryable<WaterSupplier> GetPublicSuppliersQuery(ProfessionalType professionalType)
     {
-        var settings = DbContext.GeneralSettings
+        return DbContext.WaterSuppliers
             .AsNoTracking()
-            .IgnoreQueryFilters()
-            .Where(programSettings => !programSettings.AdministrativeOnly);
+            .Where(supplier => supplier.IsActive
+                && supplier.DeletedTime == null
+                && supplier.GeneralSettings != null
+                && !supplier.GeneralSettings.AdministrativeOnly)
+            .Where(RunsProgram(professionalType));
+    }
 
+    /// <summary>Predicate for the program checkbox this professional type depends on.</summary>
+    private static Expression<Func<WaterSupplier, bool>> RunsProgram(ProfessionalType professionalType)
+    {
         return professionalType switch
         {
-            ProfessionalType.Bpat => settings.Where(programSettings => programSettings.BackflowTesting),
-            ProfessionalType.CsiInspector => settings.Where(programSettings => programSettings.CsiInspections),
-            ProfessionalType.FogInspector => settings.Where(programSettings => programSettings.FogProgram),
-            ProfessionalType.FogTransporter => settings.Where(programSettings => programSettings.FogProgram),
-            _ => settings.Where(programSettings => false)
+            ProfessionalType.Bpat => supplier => supplier.GeneralSettings!.BackflowTesting,
+            ProfessionalType.CsiInspector => supplier => supplier.GeneralSettings!.CsiInspections,
+            ProfessionalType.FogInspector => supplier => supplier.GeneralSettings!.FogProgram,
+            ProfessionalType.FogTransporter => supplier => supplier.GeneralSettings!.FogProgram,
+            _ => supplier => false
         };
     }
 
@@ -169,7 +153,6 @@ public class RegisteredProfessionalRepository : Repository<Professional>, IRegis
     {
         var registrations = DbContext.ProfessionalWaterSuppliers
             .AsNoTracking()
-            .IgnoreQueryFilters()
             .Where(registration => registration.WaterSupplierId == waterSupplierId && !registration.IsBanned);
 
         return professionalType switch
@@ -186,7 +169,6 @@ public class RegisteredProfessionalRepository : Repository<Professional>, IRegis
     {
         return DbContext.ProfessionalUserLicenses
             .AsNoTracking()
-            .IgnoreQueryFilters()
             .Where(license => license.ProfessionalType == professionalType
                 && license.ExpirationDate != null
                 && license.ExpirationDate > now);
@@ -237,7 +219,6 @@ public class RegisteredProfessionalRepository : Repository<Professional>, IRegis
 
         var insurances = DbContext.ProfessionalInsurances
             .AsNoTracking()
-            .IgnoreQueryFilters()
             .Where(insurance => insurance.ExpirationDate != null && insurance.ExpirationDate > now);
 
         return professionals.Where(professional =>
@@ -249,8 +230,7 @@ public class RegisteredProfessionalRepository : Repository<Professional>, IRegis
         var newAccountCutoff = now.AddMonths(-NewAccountMonths);
 
         var contacts = DbContext.ProfessionalUsers
-            .AsNoTracking()
-            .IgnoreQueryFilters();
+            .AsNoTracking();
 
         // V1 flagged fireline testers from any unexpired fire license on the account, regardless of
         // which state issued it, so this deliberately does not filter by the supplier's state.

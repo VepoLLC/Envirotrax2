@@ -33,10 +33,11 @@
 
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Raleway:300,400,600,700&display=swap">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Raleway:300,400,600,700|Montserrat:300,400,500,600,700&display=swap">
 
 	<link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
+	<link rel="stylesheet" href="~/lib/aos/aos.css" />
 
 	@await RenderSectionAsync("Styles", required: false)
 	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -52,6 +53,10 @@
 	@await Html.PartialAsync("_Footer")
 
 	<script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="~/lib/aos/aos.js"></script>
+	<script>
+		AOS.init();
+	</script>
 	@await RenderSectionAsync("Scripts", required: false)
 </body>
 

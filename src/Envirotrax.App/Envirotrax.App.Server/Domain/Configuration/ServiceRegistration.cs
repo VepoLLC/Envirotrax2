@@ -28,6 +28,8 @@ using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Implementations.Helpers;
+using Envirotrax.App.Server.Domain.Services.Definitions.Payments;
+using Envirotrax.App.Server.Domain.Services.Implementations.Payments;
 
 namespace Envirotrax.App.Server.Domain.Configuration;
 
@@ -103,6 +105,15 @@ public static class ServiceRegistration
 
         services.Configure<GeocodingOptions>(configuration.GetSection("Geocoding"));
         services.AddHttpClient<IGeocodingService, GeocodingService>();
+
+        services.Configure<AuthorizeNetOptions>(options =>
+        {
+            configuration.GetSection("AuthorizeNet").Bind(options);
+            options.BaseUrl = environment.IsDevelopment()
+                ? "https://apitest.authorize.net/xml/v1/request.api"
+                : "https://api.authorize.net/xml/v1/request.api";
+        });
+        services.AddHttpClient<IAuthorizeNetPaymentService, AuthorizeNetPaymentService>();
 
         services.AddHtmlTemplateService(opts =>
         {

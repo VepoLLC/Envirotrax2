@@ -8,7 +8,9 @@ using Envirotrax.App.Server.Data.Repositories.Definitions;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
+using Envirotrax.App.Server.Domain.Services.Definitions.Payments;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
+using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Professionals;
@@ -20,6 +22,7 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
     private readonly IAuthService _authService;
     private readonly IProfessionalInsuranceRepository _insuranceRepository;
     private readonly ITimeZoneHelperService _timeZoneHelper;
+    private readonly IAuthorizeNetPaymentService _authorizeNetPaymentService;
 
     public ProfessionalService(
         IMapper mapper,
@@ -27,7 +30,8 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
         IProfessionalUserRepository professionalUserRepository,
         IAuthService authService,
         IProfessionalInsuranceRepository insuranceRepository,
-        ITimeZoneHelperService timeZoneHelper)
+        ITimeZoneHelperService timeZoneHelper,
+        IAuthorizeNetPaymentService authorizeNetPaymentService)
         : base(mapper, repository)
     {
         _professionalRepository = repository;
@@ -35,6 +39,7 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
         _authService = authService;
         _insuranceRepository = insuranceRepository;
         _timeZoneHelper = timeZoneHelper;
+        _authorizeNetPaymentService = authorizeNetPaymentService;
     }
 
     public async Task<IPagedData<ProfessionalDto>> GetAllMyAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
@@ -76,6 +81,48 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
     {
         var subAccounts = await _professionalRepository.GetSubAccountsAsync(cancellationToken);
         return [.. Mapper.Map<IEnumerable<ProfessionalDto>>(subAccounts)];
+    }
+
+    public async Task<ProfessionalDto> UpdateMyAccountBalanceAsync(ProfessionalAccountBalanceDto dto, CancellationToken cancellationToken)
+    {
+        var professional = await _professionalRepository.GetTrackedForUpdateAsync(_authService.ProfessionalId, cancellationToken)
+            ?? throw new InvalidOperationException("Professional not found.");
+
+        if (dto.AmountToAdd > 0)
+        {
+            var chargeResult = await _authorizeNetPaymentService.ChargeAsync(
+                dto.DataDescriptor,
+                dto.DataValue,
+                dto.AmountToAdd,
+                new AuthorizeNetBillingInfo
+                {
+                    FirstName = dto.BillingFirstName,
+                    LastName = dto.BillingLastName,
+                    Address = dto.BillingAddress,
+                    City = dto.BillingCity,
+                    State = dto.BillingState.Code,
+                    Zip = dto.BillingZipCode
+                },
+                cancellationToken);
+
+            if (!chargeResult.IsApproved)
+            {
+                throw new AppValidationException($"Your card was declined: {chargeResult.ErrorMessage}");
+            }
+
+            professional.AccountBalance += dto.AmountToAdd;
+        }
+
+        professional.BillingFirstName = dto.BillingFirstName;
+        professional.BillingLastName = dto.BillingLastName;
+        professional.BillingAddress = dto.BillingAddress;
+        professional.BillingCity = dto.BillingCity;
+        professional.BillingStateId = dto.BillingState.Id;
+        professional.BillingZipCode = dto.BillingZipCode;
+
+        await _professionalRepository.SaveChangesAsync(cancellationToken);
+
+        return MapToDto(professional)!;
     }
 
     public async Task<ProfessionalDto> AddMyAsync(CreateProfessionalDto createProfessional)

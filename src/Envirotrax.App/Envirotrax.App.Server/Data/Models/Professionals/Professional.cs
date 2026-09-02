@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.Models.States;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Models.Professionals;
 
@@ -60,4 +61,24 @@ public class Professional : IAuditableModel<AppUser>
     public int? DeletedById { get; set; }
     public AppUser? DeletedBy { get; set; }
     public DateTime? DeletedTime { get; set; }
+    [Precision(19, 4)]
+    public decimal AccountBalance { get; set; }
+
+    [StringLength(255)]
+    public string? BillingFirstName { get; set; }
+
+    [StringLength(255)]
+    public string? BillingLastName { get; set; }
+
+    [StringLength(255)]
+    public string? BillingAddress { get; set; }
+
+    [StringLength(255)]
+    public string? BillingCity { get; set; }
+
+    public int? BillingStateId { get; set; }
+    public State? BillingState { get; set; }
+
+    [StringLength(25)]
+    public string? BillingZipCode { get; set; }
 }

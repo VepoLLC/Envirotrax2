@@ -12,6 +12,7 @@ import { LicenseListComponent } from "./licenses/license-list.component";
 import { FeatureGuard } from "../shared/guards/feature.guard";
 import { FeatureType } from "../shared/models/feature-type";
 import { DashboardComponent } from "./dashboard/dashboard.component";
+import { AccountBalanceManagementComponent } from "./account/account-balance-management.component";
 
 const routes: Routes = [
     {
@@ -23,6 +24,15 @@ const routes: Routes = [
         path: 'account-overview',
         title: 'Account Overview',
         component: DashboardComponent,
+        canActivate: [RoleGuard],
+        data: {
+            roles: [ROLE_DEFINITIONS.PROFESSIONAL]
+        }
+    },
+    {
+        path: 'account-balance',
+        title: 'Account Balance Management',
+        component: AccountBalanceManagementComponent,
         canActivate: [RoleGuard],
         data: {
             roles: [ROLE_DEFINITIONS.PROFESSIONAL]

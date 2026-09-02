@@ -54,6 +54,26 @@ public class ProfessionalDto : IDto
     public ExpirationType? InsuranceExpirationType { get; set; }
 
     public List<ProfessionalLicenseOrInsuranceRowDto>? LicensesAndInsurances { get; set; }
+
+
+    public decimal AccountBalance { get; set; }
+
+    [StringLength(255)]
+    public string? BillingFirstName { get; set; }
+
+    [StringLength(255)]
+    public string? BillingLastName { get; set; }
+
+    [StringLength(255)]
+    public string? BillingAddress { get; set; }
+
+    [StringLength(255)]
+    public string? BillingCity { get; set; }
+
+    public ReferencedStateDto? BillingState { get; set; }
+
+    [StringLength(25)]
+    public string? BillingZipCode { get; set; }
 }
 
 public class ReferencedProfessionalDto

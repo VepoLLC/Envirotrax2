@@ -50,7 +50,7 @@
                                   [form]="searchForm" />
                     </div>
 
-                    <div class="col-lg-3 mb-3">
+                    <div [class.col-lg-3]="!isAccountTypeFixed" [class.col-lg-4]="isAccountTypeFixed" class="mb-3">
                         <vp-filter-panel-field fieldName="waterSupplierId"
                                                label="Water supplier"
                                                type="select"
@@ -60,13 +60,13 @@
                                                [form]="searchForm" />
                     </div>
 
-                    <div class="col-lg-3 mb-3">
+                    <div [class.col-lg-3]="!isAccountTypeFixed" [class.col-lg-4]="isAccountTypeFixed" class="mb-3">
                         <vp-filter-panel-field fieldName="companyName"
                                                label="Company name"
                                                [form]="searchForm" />
                     </div>
 
-                    <div class="col-lg-3 mb-3">
+                    <div [class.col-lg-3]="!isAccountTypeFixed" [class.col-lg-4]="isAccountTypeFixed" class="mb-3">
                         <vp-filter-panel-field fieldName="city"
                                                label="City"
                                                [form]="searchForm" />

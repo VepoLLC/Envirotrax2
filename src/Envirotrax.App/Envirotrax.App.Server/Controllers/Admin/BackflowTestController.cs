@@ -3,7 +3,6 @@ using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
-using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers.Admin;
@@ -12,13 +11,11 @@ namespace Envirotrax.App.Server.Controllers.Admin;
 public class BackflowTestController : AdminBaseController
 {
     private readonly IBackflowTestService _testService;
-    private readonly ISiteLogService _siteLogService;
     private readonly IRecordLogService _recordLogService;
 
-    public BackflowTestController(IBackflowTestService testService, ISiteLogService siteLogService, IRecordLogService recordLogService)
+    public BackflowTestController(IBackflowTestService testService, IRecordLogService recordLogService)
     {
         _testService = testService;
-        _siteLogService = siteLogService;
         _recordLogService = recordLogService;
     }
 
@@ -98,14 +95,6 @@ public class BackflowTestController : AdminBaseController
     public async Task<IActionResult> GetLogsAsync(int id, CancellationToken cancellationToken)
     {
         var logs = await _recordLogService.GetByRecordAsync(RecordLogTableNames.BackflowTests, id, cancellationToken);
-
-        return Ok(logs);
-    }
-
-    [HttpGet("{id}/site-logs")]
-    public async Task<IActionResult> GetSiteLogsAsync(int id, CancellationToken cancellationToken)
-    {
-        var logs = await _siteLogService.GetByAssemblyAsync(id, cancellationToken);
 
         return Ok(logs);
     }

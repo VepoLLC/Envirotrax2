@@ -7,5 +7,4 @@ public interface ISiteLogRepository : IRepository<SiteLog>
 {
     Task<IEnumerable<SiteLog>> GetBySiteAsync(int siteId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<IEnumerable<SiteLog>> GetBySiteIdsAsync(IEnumerable<int> siteIds, CancellationToken cancellationToken);
-    Task<IEnumerable<SiteLog>> GetByAssemblyAsync(int assemblyId, CancellationToken cancellationToken);
 }

@@ -64,12 +64,4 @@ public class SiteLogRepository : Repository<SiteLog>, ISiteLogRepository
             .OrderByDescending(sl => sl.Id)
             .ToListAsync(cancellationToken);
     }
-
-    public async Task<IEnumerable<SiteLog>> GetByAssemblyAsync(int assemblyId, CancellationToken cancellationToken)
-    {
-        return await GetListQuery()
-            .Where(sl => sl.AssemblyId == assemblyId)
-            .OrderByDescending(sl => sl.Id)
-            .ToListAsync(cancellationToken);
-    }
 }

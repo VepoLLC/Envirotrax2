@@ -22,14 +22,9 @@ if (!builder.Environment.IsDevelopment())
 }
 
 // Add services to the container.
-var keyVaultUrl = builder.Configuration["KeyVault:Url"];
-if (!string.IsNullOrEmpty(keyVaultUrl))
-{
-    builder.Configuration.AddAzureKeyVault(
-        vaultUri: new Uri(keyVaultUrl),
-        credential: new DefaultAzureCredential());
-}
-
+builder.Configuration.AddAzureKeyVault(
+    vaultUri: new Uri(builder.Configuration["KeyVault:Url"] ?? throw new InvalidOperationException()),
+    credential: new DefaultAzureCredential());
 
 builder.Services.AddControllers(options =>
 {

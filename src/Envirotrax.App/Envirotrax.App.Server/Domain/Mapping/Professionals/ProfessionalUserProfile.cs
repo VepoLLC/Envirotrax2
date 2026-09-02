@@ -22,7 +22,7 @@ public class ProfessionalUserProfile : Profile
                .ForMember(d => d.ContactName, opt => opt.Ignore());
 
         CreateMap<ProfessionalUser, ReferencedProfessionalUserDto>()
-            .ForMember(proUser => proUser.Id, opt => opt.MapFrom(proUser => proUser.UserId))
-            .ForMember(proUser => proUser.EmailAddress, opt => opt.MapFrom(proUser => proUser.User!.Email));
+             .ForMember(d => d.Id, opt => opt.MapFrom(s => s.UserId))
+             .ForMember(d => d.EmailAddress, opt => opt.MapFrom(s => s.User != null ? s.User.Email : null));
     }
 }

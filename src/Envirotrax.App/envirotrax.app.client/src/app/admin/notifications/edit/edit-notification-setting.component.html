@@ -1,0 +1,416 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="isLoading" />
+
+    <form #form="ngForm" (ngSubmit)="save(form)">
+        <div class="row">
+            <div class="col-md-6 col-xl-3">
+                <div class="mb-3">
+                    <vp-input name="description"
+                              label="Description"
+                              [maxLength]="50"
+                              [required]="true"
+                              [form]="form"
+                              [(ngModel)]="setting.description" />
+                </div>
+
+                <div *ngIf="canSelectAccount" class="mb-3">
+                    <vp-input type="select"
+                              name="userId"
+                              label="Account"
+                              [options]="accountOptions"
+                              [required]="true"
+                              [form]="form"
+                              [(ngModel)]="setting.userId" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Color Identifier</label>
+                    <div class="d-flex flex-wrap gap-1">
+                        <button *ngFor="let color of colorOptions"
+                                type="button"
+                                class="btn p-0 border border-dark"
+                                [class.border-3]="setting.color === color"
+                                style="width: 40px; height: 40px;"
+                                [style.background-color]="color"
+                                [attr.aria-label]="color"
+                                (click)="setColor(color)"></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="mb-3">
+                    <vp-input type="select"
+                              name="reasonForTest"
+                              label="Backflow Test Type"
+                              [options]="reasonForTestOptions"
+                              [form]="form"
+                              [(ngModel)]="setting.reasonForTest" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Property Type</label>
+
+                    <div class="form-check">
+                        <input id="notification-property-type-residential"
+                               type="checkbox"
+                               class="form-check-input"
+                               name="propertyTypeResidential"
+                               [(ngModel)]="setting.propertyTypeResidential">
+                        <label for="notification-property-type-residential" class="form-check-label">Residential</label>
+                    </div>
+
+                    <div class="form-check">
+                        <input id="notification-property-type-commercial"
+                               type="checkbox"
+                               class="form-check-input"
+                               name="propertyTypeCommercial"
+                               [(ngModel)]="setting.propertyTypeCommercial">
+                        <label for="notification-property-type-commercial" class="form-check-label">Commercial</label>
+                    </div>
+
+                    <div class="form-check">
+                        <input id="notification-property-type-any"
+                               type="checkbox"
+                               class="form-check-input"
+                               name="propertyTypeAny"
+                               [(ngModel)]="setting.propertyTypeAny"
+                               (ngModelChange)="onPropertyTypeAnyChanged()">
+                        <label for="notification-property-type-any" class="form-check-label">Any</label>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <vp-input type="select"
+                              name="interval"
+                              label="Interval"
+                              [options]="intervalOptions"
+                              [required]="true"
+                              [form]="form"
+                              [(ngModel)]="setting.interval" />
+                </div>
+
+                <div class="mb-3">
+                    <vp-input type="select"
+                              name="deliveryType"
+                              label="Type"
+                              [options]="deliveryTypeOptions"
+                              [required]="true"
+                              [form]="form"
+                              [(ngModel)]="setting.deliveryType" />
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <label class="form-label">Notification Filters</label>
+
+                <div class="form-check">
+                    <input id="notification-filter-failed-test"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="filterFailedTest"
+                           [(ngModel)]="setting.filterFailedTest">
+                    <label for="notification-filter-failed-test" class="form-check-label">Failed Test</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-filter-passing-test"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="filterPassingTest"
+                           [(ngModel)]="setting.filterPassingTest">
+                    <label for="notification-filter-passing-test" class="form-check-label">Passing Test</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-filter-unknown-serial-number"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="filterUnknownSerialNumber"
+                           [(ngModel)]="setting.filterUnknownSerialNumber">
+                    <label for="notification-filter-unknown-serial-number" class="form-check-label">Unknown Serial Number</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-filter-inactive-property"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="filterInactiveProperty"
+                           [(ngModel)]="setting.filterInactiveProperty">
+                    <label for="notification-filter-inactive-property" class="form-check-label">Inactive Property</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-filter-non-compliance"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="filterNonCompliance"
+                           [(ngModel)]="setting.filterNonCompliance">
+                    <label for="notification-filter-non-compliance" class="form-check-label">Non-Compliance</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-filter-potable-non-potable-mismatch"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="filterPotableNonPotableMismatch"
+                           [(ngModel)]="setting.filterPotableNonPotableMismatch">
+                    <label for="notification-filter-potable-non-potable-mismatch" class="form-check-label">Potable/NonPotable Mismatch</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-filter-duplicate-test"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="filterDuplicateTest"
+                           [(ngModel)]="setting.filterDuplicateTest">
+                    <label for="notification-filter-duplicate-test" class="form-check-label">Duplicate Test</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-filter-out-of-service"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="filterOutOfService"
+                           [(ngModel)]="setting.filterOutOfService">
+                    <label for="notification-filter-out-of-service" class="form-check-label">Out of Service</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-filter-contains-remarks"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="filterContainsRemarks"
+                           [(ngModel)]="setting.filterContainsRemarks">
+                    <label for="notification-filter-contains-remarks" class="form-check-label">Contains Remarks</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-filter-backflow-not-properly-installed"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="filterBackflowNotProperlyInstalled"
+                           [(ngModel)]="setting.filterBackflowNotProperlyInstalled">
+                    <label for="notification-filter-backflow-not-properly-installed" class="form-check-label">Backflow not Properly Installed</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-filter-fee-exempt"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="filterFeeExempt"
+                           [(ngModel)]="setting.filterFeeExempt">
+                    <label for="notification-filter-fee-exempt" class="form-check-label">Fee Exempt</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-filter-has-ossf"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="filterHasOnSiteSewageFacility"
+                           [(ngModel)]="setting.filterHasOnSiteSewageFacility">
+                    <label for="notification-filter-has-ossf" class="form-check-label">Has OSSF</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-filter-has-aux-water-supply"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="filterHasAuxWaterSupply"
+                           [(ngModel)]="setting.filterHasAuxWaterSupply">
+                    <label for="notification-filter-has-aux-water-supply" class="form-check-label">Has Aux Water Supply</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-filter-submission-days-exeeded"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="filterSubmissionDaysExceeded"
+                           [(ngModel)]="setting.filterSubmissionDaysExceeded">
+                    <label for="notification-filter-submission-days-exeeded" class="form-check-label">Submission Days Exeeded</label>
+                </div>
+
+                <div class="mb-3 ms-4">
+                    <vp-input type="number"
+                              name="filterSubmissionDaysExceededDays"
+                              label="Allowed Submission Days"
+                              [min]="0"
+                              [form]="form"
+                              [(ngModel)]="setting.filterSubmissionDaysExceededDays" />
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-filter-any"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="filterAny"
+                           [(ngModel)]="setting.filterAny"
+                           (ngModelChange)="onFilterAnyChanged()">
+                    <label for="notification-filter-any" class="form-check-label">Any</label>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <label class="form-label">Hazard Types</label>
+
+                <div class="form-check">
+                    <input id="notification-hazard-type-agricultural-feed-lot"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="hazardTypeAgriculturalFeedLot"
+                           [(ngModel)]="setting.hazardTypeAgriculturalFeedLot">
+                    <label for="notification-hazard-type-agricultural-feed-lot" class="form-check-label">Agricultural/Feed Lot</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-hazard-type-domestic-premises-isolation"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="hazardTypeDomesticPremisesIsolation"
+                           [(ngModel)]="setting.hazardTypeDomesticPremisesIsolation">
+                    <label for="notification-hazard-type-domestic-premises-isolation" class="form-check-label">Domestic/Premises Isolation</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-hazard-type-fire-system"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="hazardTypeFireSystem"
+                           [(ngModel)]="setting.hazardTypeFireSystem">
+                    <label for="notification-hazard-type-fire-system" class="form-check-label">Fire System</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-hazard-type-fire-hydrant-temporary-construction"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="hazardTypeFireHydrantTemporaryConstruction"
+                           [(ngModel)]="setting.hazardTypeFireHydrantTemporaryConstruction">
+                    <label for="notification-hazard-type-fire-hydrant-temporary-construction" class="form-check-label">Fire Hydrant/Temporary Construction</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-hazard-type-gas-station-car-wash"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="hazardTypeGasStationCarWash"
+                           [(ngModel)]="setting.hazardTypeGasStationCarWash">
+                    <label for="notification-hazard-type-gas-station-car-wash" class="form-check-label">Gas Station/Car Wash</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-hazard-type-irrigation-non-chemical"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="hazardTypeIrrigationNonChemical"
+                           [(ngModel)]="setting.hazardTypeIrrigationNonChemical">
+                    <label for="notification-hazard-type-irrigation-non-chemical" class="form-check-label">Irrigation - Non Chemical</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-hazard-type-irrigation-chemical-feed"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="hazardTypeIrrigationChemicalFeed"
+                           [(ngModel)]="setting.hazardTypeIrrigationChemicalFeed">
+                    <label for="notification-hazard-type-irrigation-chemical-feed" class="form-check-label">Irrigation - Chemical Feed</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-hazard-type-laundry-cleaners"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="hazardTypeLaundryCleaners"
+                           [(ngModel)]="setting.hazardTypeLaundryCleaners">
+                    <label for="notification-hazard-type-laundry-cleaners" class="form-check-label">Laundry/Cleaners</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-hazard-type-medical-dental-laboratory-mortuary"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="hazardTypeMedicalDentalLaboratoryMortuary"
+                           [(ngModel)]="setting.hazardTypeMedicalDentalLaboratoryMortuary">
+                    <label for="notification-hazard-type-medical-dental-laboratory-mortuary" class="form-check-label">Medical/Dental/Laboratory/Mortuary</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-hazard-type-nails-salon-grooming"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="hazardTypeNailsSalonGrooming"
+                           [(ngModel)]="setting.hazardTypeNailsSalonGrooming">
+                    <label for="notification-hazard-type-nails-salon-grooming" class="form-check-label">Nails/Salon/Grooming</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-hazard-type-pool-recreation-athletics"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="hazardTypePoolRecreationAthletics"
+                           [(ngModel)]="setting.hazardTypePoolRecreationAthletics">
+                    <label for="notification-hazard-type-pool-recreation-athletics" class="form-check-label">Pool/Recreation/Athletics</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-hazard-type-restaurant-vending-grocery"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="hazardTypeRestaurantVendingGrocery"
+                           [(ngModel)]="setting.hazardTypeRestaurantVendingGrocery">
+                    <label for="notification-hazard-type-restaurant-vending-grocery" class="form-check-label">Restaurant/Vending/Grocery</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-hazard-type-fountains-garden-ponds-water-features"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="hazardTypeFountainsGardenPondsWaterFeatures"
+                           [(ngModel)]="setting.hazardTypeFountainsGardenPondsWaterFeatures">
+                    <label for="notification-hazard-type-fountains-garden-ponds-water-features" class="form-check-label">Fountains/Garden Ponds/Water Features</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-hazard-type-water-softener"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="hazardTypeWaterSoftener"
+                           [(ngModel)]="setting.hazardTypeWaterSoftener">
+                    <label for="notification-hazard-type-water-softener" class="form-check-label">Water Softener</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-hazard-type-other"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="hazardTypeOther"
+                           [(ngModel)]="setting.hazardTypeOther">
+                    <label for="notification-hazard-type-other" class="form-check-label">Other</label>
+                </div>
+
+                <div class="form-check">
+                    <input id="notification-hazard-type-any"
+                           type="checkbox"
+                           class="form-check-input"
+                           name="hazardTypeAny"
+                           [(ngModel)]="setting.hazardTypeAny"
+                           (ngModelChange)="onHazardTypeAnyChanged()">
+                    <label for="notification-hazard-type-any" class="form-check-label">Any</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="form" [validationErrors]="validationErrors" />
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-primary vp-section-button w-100" (click)="cancel()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn btn-primary vp-section-button w-100">
+                    Save
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

@@ -1,4 +1,4 @@
-<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+<dp-loading-spinner *ngIf="isLoading || isSaving" class="vp-spinner-overlay"></dp-loading-spinner>
 
 <div class="alert alert-success alert-dismissible d-flex align-items-center mb-3 sticky-top"
      role="alert"
@@ -58,28 +58,29 @@
         </div>
 
         <div class="col-6 col-md-3 mb-2">
-            <button type="button" class="btn btn-link p-0 text-decoration-none text-body" (click)="toggleForceRenewal()">
-                <i class="fa-solid fa-circle me-1"
-                   [class.text-success]="test.forceRenewal"
-                   [class.text-danger]="!test.forceRenewal"></i>
-                {{ test.forceRenewal ? 'Force Renewal [On]' : 'Force Renewal [Off]' }}
-            </button>
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-link flex-shrink-0 p-0 text-decoration-none text-body" (click)="toggleForceRenewal()">
+                    <i class="fa-solid fa-circle me-1"
+                       [class.text-success]="test.forceRenewal"
+                       [class.text-danger]="!test.forceRenewal"></i>
+                    {{ test.forceRenewal ? 'Force Renewal [On]' : 'Force Renewal [Off]' }}
+                </button>
+
+                <vp-input *ngIf="test.forceRenewal"
+                          class="flex-grow-1"
+                          name="forceRenewalYears"
+                          type="select"
+                          [form]="detailsForm"
+                          [options]="forceRenewalYearsOptions"
+                          [(ngModel)]="forceRenewalYearsId"
+                          (ngModelChange)="onForceRenewalYearsChange($event)" />
+            </div>
         </div>
 
-        <div class="col-6 col-md-3 mb-2" *ngIf="test.forceRenewal">
-            <vp-input name="forceRenewalYears"
-                      type="select"
-                      [form]="detailsForm"
-                      [options]="forceRenewalYearsOptions"
-                      [(ngModel)]="forceRenewalYearsId"
-                      (ngModelChange)="onForceRenewalYearsChange($event)" />
-        </div>
-
-        <div class="col-6 col-md-3 mt-2 mb-2">
+        <div class="col-6 col-md-3 mb-2">
             <vp-input name="backflowScheduleMonth"
                       type="select"
                       label="Schedule Month"
-                      labelStyle="horizontal"
                       [form]="detailsForm"
                       [options]="scheduleMonthOptions"
                       [(ngModel)]="scheduleMonthId"
@@ -101,15 +102,15 @@
         </div>
     </div>
 
-    <div class="row align-items-end mt-2">
-        <div class="col-md-3 mb-2">
-            <dl class="row mb-0">
-                <dt class="col-12">Submission Date</dt>
-                <dd class="col-12 mb-0">{{ test.transactionDate | date:'short' }}</dd>
+    <div class="row mt-2">
+        <div class="col-6 col-md-3 mb-2">
+            <dl class="mb-0">
+                <dt class="col-form-label fw-normal">Submission Date</dt>
+                <dd class="form-control-plaintext mb-0">{{ test.transactionDate | date:'short' }}</dd>
             </dl>
         </div>
 
-        <div class="col-md-3 mb-2">
+        <div class="col-6 col-md-3 mb-2">
             <vp-input name="testDate"
                       type="datetime"
                       label="Test Date"
@@ -117,25 +118,29 @@
                       [(ngModel)]="test.testDate" />
         </div>
 
-        <div class="col-md-3 mb-2">
-            <vp-input name="expirationDate"
-                      type="date"
-                      label="Expiration Date"
-                      [form]="detailsForm"
-                      [(ngModel)]="test.expirationDate" />
-        </div>
+        <div class="col-12 col-md-6 mb-2">
+            <div class="d-flex align-items-end gap-3">
+                <div class="flex-grow-1">
+                    <vp-input name="expirationDate"
+                              type="date"
+                              label="Expiration Date"
+                              [form]="detailsForm"
+                              [(ngModel)]="test.expirationDate" />
+                </div>
 
-        <div class="col-md-3 mb-2">
-            <button type="button" class="btn btn-link p-0 text-decoration-none text-body" (click)="toggleRenewalRequired()">
-                <i class="fa-solid fa-circle me-1"
-                   [class.text-success]="test.renewalRequired"
-                   [class.text-danger]="!test.renewalRequired"></i>
-                {{ test.renewalRequired ? 'Renewal Required' : 'Not Required' }}
-            </button>
+                <div class="d-flex align-items-center gap-2 py-2">
+                    <button type="button" class="btn btn-link p-0 text-decoration-none text-body" (click)="toggleRenewalRequired()">
+                        <i class="fa-solid fa-circle me-1"
+                           [class.text-success]="test.renewalRequired"
+                           [class.text-danger]="!test.renewalRequired"></i>
+                        {{ test.renewalRequired ? 'Renewal Required' : 'Not Required' }}
+                    </button>
 
-            <span class="badge ms-2" [ngClass]="expirationBadgeClass" *ngIf="test.expirationDate">
-                {{ test.expirationDate | date }}
-            </span>
+                    <span class="badge" [ngClass]="expirationBadgeClass" *ngIf="test.expirationDate">
+                        {{ test.expirationDate | date }}
+                    </span>
+                </div>
+            </div>
         </div>
     </div>
 

@@ -1,0 +1,136 @@
+<ng-template #fireLicenseCell let-row="rowData">
+    <i *ngIf="row.hasFireLicense"
+       class="fa-solid fa-fire text-danger"
+       title="Licensed for Fireline Testing"></i>
+</ng-template>
+
+<ng-template #companyCell let-row="rowData">
+    <div class="fw-semibold">{{row.companyName}}</div>
+    <div>{{row.contactName}}</div>
+    <div class="small text-muted">{{row.registeredDate | date:'M/d/yyyy h:mm a'}}</div>
+</ng-template>
+
+<ng-template #addressCell let-row="rowData">
+    <div>{{row.address}}</div>
+    <div>{{row.cityStateZip}}</div>
+</ng-template>
+
+<ng-template #contactCell let-row="rowData">
+    <div *ngIf="row.workNumber"><span class="fw-semibold">Work:</span>&nbsp;{{row.workNumber}}</div>
+    <div *ngIf="row.cellNumber"><span class="fw-semibold">Cell:</span>&nbsp;{{row.cellNumber}}</div>
+    <div *ngIf="row.faxNumber"><span class="fw-semibold">Fax:</span>&nbsp;{{row.faxNumber}}</div>
+    <div *ngIf="row.emailAddress">
+        <span class="fw-semibold">Email:</span>&nbsp;<a [href]="'mailto:' + row.emailAddress">{{row.emailAddress}}</a>
+    </div>
+    <div *ngIf="row.websiteUrl">
+        <span class="fw-semibold">Website:</span>&nbsp;<a [href]="row.websiteHref"
+           target="_blank"
+           rel="noopener noreferrer">{{row.websiteUrl}}</a>
+    </div>
+</ng-template>
+
+<h1 class="text-center h2">
+    <span *ngIf="showResults && selectedWaterSupplierName" class="d-block">{{selectedWaterSupplierName}}</span>
+    {{pageTitle}}
+</h1>
+
+<div [hidden]="showResults">
+    <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+        <vp-filter-panel (filterChange)="onFilterChange($event)">
+            <vp-section header="Registered Accounts Search Filter">
+                <div class="row">
+                    <div *ngIf="!isAccountTypeFixed" class="col-lg-3 mb-3">
+                        <vp-input type="select"
+                                  name="accountType"
+                                  label="Account type"
+                                  [options]="accountTypeOptions"
+                                  [ngModel]="accountTypeSlug"
+                                  (ngModelChange)="onAccountTypeChange($event)"
+                                  [required]="true"
+                                  [form]="searchForm" />
+                    </div>
+
+                    <div [class.col-lg-3]="!isAccountTypeFixed" [class.col-lg-4]="isAccountTypeFixed" class="mb-3">
+                        <vp-filter-panel-field fieldName="waterSupplierId"
+                                               label="Water supplier"
+                                               type="select"
+                                               [options]="waterSupplierOptions"
+                                               [value]="selectedWaterSupplierId"
+                                               [required]="true"
+                                               [form]="searchForm" />
+                    </div>
+
+                    <div [class.col-lg-3]="!isAccountTypeFixed" [class.col-lg-4]="isAccountTypeFixed" class="mb-3">
+                        <vp-filter-panel-field fieldName="companyName"
+                                               label="Company name"
+                                               [form]="searchForm" />
+                    </div>
+
+                    <div [class.col-lg-3]="!isAccountTypeFixed" [class.col-lg-4]="isAccountTypeFixed" class="mb-3">
+                        <vp-filter-panel-field fieldName="city"
+                                               label="City"
+                                               [form]="searchForm" />
+                    </div>
+                </div>
+
+                <div *ngIf="accountType" class="alert alert-danger mb-0 text-center">
+                    {{accountType.instructions}}
+                </div>
+            </vp-section>
+        </vp-filter-panel>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="searchForm" />
+
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>
+                    Show Registrations
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+<dp-loading-spinner *ngIf="isSuppliersLoading"></dp-loading-spinner>
+
+<div *ngIf="showResults && !table.isLoading">
+    <div class="d-flex justify-content-between mb-3 flex-wrap gap-2">
+        <button *ngIf="table.items?.data?.length"
+                type="button"
+                class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
+                (click)="showDownloadManager()">
+            <i class="fa-regular fa-file-export me-1"></i>
+            Export Results
+        </button>
+
+        <button type="button"
+                class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0 ms-auto"
+                (click)="searchAgain()">
+            <i class="fa-solid fa-magnifying-glass me-1"></i>
+            Search Again
+        </button>
+    </div>
+
+    <vp-section
+                header="{{table.items?.pageInfo?.totalItems || 0}} {{accountType?.resultsLabel}} for {{selectedWaterSupplierName}}">
+        <div *ngIf="accountType?.showFireLicense" class="d-flex justify-content-center mb-3">
+            <vp-status-icon iconClass="fa-solid fa-fire text-danger" text="Licensed for Fireline Testing" />
+        </div>
+
+        <div *ngIf="searchAttempted && !table.items?.data?.length" class="alert alert-info mb-0">
+            No {{accountType?.resultsLabel}} were found for {{selectedWaterSupplierName}}. Try widening your search by
+            clearing the company name or city.
+        </div>
+
+        <vp-table *ngIf="table.items?.data?.length"
+                  [columns]="table.columns!"
+                  [data]="table.items!.data"
+                  [(pageInfo)]="table.items!.pageInfo"
+                  (pageInfoChange)="getProfessionals()"
+                  [(query)]="table.query"
+                  (queryChange)="getProfessionals()"
+                  (queryReset)="getProfessionals()" />
+    </vp-section>
+</div>

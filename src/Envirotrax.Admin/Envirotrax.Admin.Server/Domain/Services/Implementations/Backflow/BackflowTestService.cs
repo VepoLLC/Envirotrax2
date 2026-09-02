@@ -1,7 +1,6 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.Logs;
-using Envirotrax.Admin.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.Admin.Server.Domain.Services.Definitions;
 using Envirotrax.Admin.Server.Domain.Services.Definitions.Backflow;
 
@@ -55,10 +54,5 @@ public class BackflowTestService : IBackflowTestService
     public Task<List<RecordLogDto>?> GetLogsAsync(int id, CancellationToken cancellationToken)
     {
         return _apiClient.GetAsync<List<RecordLogDto>>($"{BaseUrl}/{id}/logs", cancellationToken);
-    }
-
-    public Task<List<SiteLogDto>?> GetSiteLogsAsync(int id, CancellationToken cancellationToken)
-    {
-        return _apiClient.GetAsync<List<SiteLogDto>>($"{BaseUrl}/{id}/site-logs", cancellationToken);
     }
 }

@@ -8,7 +8,6 @@ import {
     BackflowTestDetails
 } from "../../models/backflow/backflow-test";
 import { RecordLog } from "../../models/logs/record-log";
-import { SiteLog } from "../../models/sites/site-log";
 import { lastValueFrom } from "rxjs";
 
 @Injectable({
@@ -80,14 +79,6 @@ export class BackflowTestService {
         const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/logs`);
 
         const observable = this._http.get<RecordLog[]>(url);
-
-        return await lastValueFrom(observable);
-    }
-
-    public async getSiteLogs(id: number): Promise<SiteLog[]> {
-        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/site-logs`);
-
-        const observable = this._http.get<SiteLog[]>(url);
 
         return await lastValueFrom(observable);
     }

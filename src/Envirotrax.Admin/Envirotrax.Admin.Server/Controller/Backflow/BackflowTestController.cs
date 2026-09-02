@@ -84,12 +84,4 @@ public class BackflowTestController : AdminBaseController
 
         return Ok(logs);
     }
-
-    [HttpGet("{id}/site-logs")]
-    public async Task<IActionResult> GetSiteLogsAsync(int id, CancellationToken cancellationToken)
-    {
-        var logs = await _testService.GetSiteLogsAsync(id, cancellationToken);
-
-        return Ok(logs);
-    }
 }

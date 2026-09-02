@@ -442,6 +442,11 @@ public class BackflowTestConfiguration : IEntityTypeConfiguration<BackflowTest>
 {
     public void Configure(EntityTypeBuilder<BackflowTest> builder)
     {
+        builder.HasOne(bt => bt.Professional)
+            .WithMany()
+            .HasForeignKey(bt => bt.ProfessionalId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasOne<ProfessionalUser>(bt => bt.Bpat)
             .WithMany()
             .HasForeignKey(bt => new { bt.ProfessionalId, bt.BpatId })

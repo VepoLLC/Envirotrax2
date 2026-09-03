@@ -262,6 +262,12 @@ a:hover {
     overflow: hidden !important;
 }
 
+dp-loading-spinner.vp-spinner-overlay .dp-spinner-container {
+    position: fixed;
+    top: 0 !important;
+    bottom: 0 !important;
+}
+
 .input-group .vp-input-container .form-control {
     margin-left: calc(-1 * var(--bs-border-width));
     border-top-left-radius: 0px;

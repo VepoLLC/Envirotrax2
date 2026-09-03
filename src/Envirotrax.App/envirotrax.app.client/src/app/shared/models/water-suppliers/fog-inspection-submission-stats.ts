@@ -6,6 +6,7 @@ export interface FogInspectionDailyStats {
 }
 
 export interface FogInspectionSubAccountStats {
+    waterSupplierId: number;
     waterSupplierName: string;
     dailyStats: FogInspectionDailyStats[];
 }

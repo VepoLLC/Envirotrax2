@@ -23,6 +23,10 @@ public interface IBackflowTestService : IService<BackflowTest, BackflowTestDto>
 
     Task<IPagedData<BackflowTestDto>> SearchAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken);
 
+    Task<BackflowTestAdminDetailsDto?> GetForAdminAsync(int id, CancellationToken cancellationToken);
+
+    Task<BackflowTestAdminDetailsDto?> UpdateForAdminAsync(int id, BackflowTestAdminUpdateRequest request);
+
     Task<byte[]> GeneratePdfAsync(BackflowTestDto test);
     Task<byte[]> GeneratePdfAsync(IEnumerable<BackflowTestDto> tests);
     Task<byte[]> GeneratePdfForProfessionalAsync(BackflowTestDto test);

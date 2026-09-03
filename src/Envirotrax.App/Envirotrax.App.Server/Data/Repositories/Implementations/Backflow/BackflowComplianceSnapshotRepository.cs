@@ -19,17 +19,16 @@ public class BackflowComplianceSnapshotRepository : IBackflowComplianceSnapshotR
         _dbContext = dbContextSelector.Current;
     }
 
-    public async Task<IEnumerable<BackflowComplianceSnapshot>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<BackflowComplianceSnapshot>> GetMonthlyHistoryAsync(CancellationToken cancellationToken)
     {
         return await _dbContext
             .BackflowComplianceSnapshots
             .AsNoTracking()
+            .Where(s => s.ReportDate.Day == 1)
             .OrderBy(s => s.ReportDate)
             .ToListAsync(cancellationToken);
     }
-
-    // Add the month's snapshot if it doesn't exist yet, otherwise refresh its counts. Used by the
-    // monthly job to write a single supplier/month row.
+    
     public async Task<BackflowComplianceSnapshot> UpsertAsync(BackflowComplianceSnapshot snapshot, CancellationToken cancellationToken)
     {
         var existing = await _dbContext
@@ -50,41 +49,5 @@ public class BackflowComplianceSnapshotRepository : IBackflowComplianceSnapshotR
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return existing;
-    }
-
-    // Upsert many months in one read + one write pass. Only the existing rows whose ReportDate is in
-    // the incoming set are loaded (SQL IN), so a partial refresh never pulls the supplier's full
-    // history. Existing rows are updated in place; missing ones are inserted together.
-    public async Task BulkUpsertAsync(IEnumerable<BackflowComplianceSnapshot> snapshots, CancellationToken cancellationToken)
-    {
-        var incoming = snapshots.ToList();
-
-        var reportDates = incoming
-            .Select(s => s.ReportDate)
-            .ToList();
-
-        var existingByDate = await _dbContext
-            .BackflowComplianceSnapshots
-            .Where(s => reportDates.Contains(s.ReportDate))
-            .ToDictionaryAsync(s => s.ReportDate, cancellationToken);
-
-        var toAdd = new List<BackflowComplianceSnapshot>();
-
-        foreach (var snapshot in incoming)
-        {
-            if (existingByDate.TryGetValue(snapshot.ReportDate, out var existing))
-            {
-                existing.Total = snapshot.Total;
-                existing.Compliant = snapshot.Compliant;
-            }
-            else
-            {
-                toAdd.Add(snapshot);
-            }
-        }
-
-        _dbContext.BackflowComplianceSnapshots.AddRange(toAdd);
-
-        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

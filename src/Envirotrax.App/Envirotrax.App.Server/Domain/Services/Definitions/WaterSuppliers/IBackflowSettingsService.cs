@@ -8,5 +8,7 @@ public interface IBackflowSettingsService : IService<BackflowSettings, BackflowS
 {
     Task<BackflowTestingSettingsDto> GetTestingSettingsAsync(int waterSupplierId, CancellationToken cancellationToken);
 
+    Task<BackflowTestingSettingsDto> GetTestingSettingsByWaterSupplierAsync(int waterSupplierId, CancellationToken cancellationToken);
+
     Task<BackflowSettingsDto> AddOrUpdateAsync(int waterSupplierId, BackflowSettingsDto settings);
 }

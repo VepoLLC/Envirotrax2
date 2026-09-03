@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
-import { InputOption, ModalHelperService, ToastService, ToastType } from '@envirotrax/common-ui';
+import { HelperService, InputOption, ModalHelperService, ToastService, ToastType } from '@envirotrax/common-ui';
 import { FacilityType, GreaseTrapType, PropertyType } from '../../shared/models/sites/site';
 import { SiteDetail, SiteEditWindowModel } from '../../shared/models/sites/site-detail';
 import { SiteGisUpdate, SiteUpdate } from '../../shared/models/sites/site-update';
@@ -58,7 +58,8 @@ export class SiteEditComponent implements OnInit {
         private readonly _siteService: SiteService,
         private readonly _lookupService: LookupService,
         private readonly _modalHelper: ModalHelperService,
-        private readonly _toastService: ToastService
+        private readonly _toastService: ToastService,
+        private readonly _helperService: HelperService
     ) {
 
     }
@@ -92,6 +93,8 @@ export class SiteEditComponent implements OnInit {
             // Two independent deep clones: the pristine snapshot and the editable working copy.
             this.originalSite = structuredClone(site);
             this.editableSite = structuredClone(site);
+
+            this.waterSupplierId = site.waterSupplier?.id ?? this.waterSupplierId;
         } finally {
             this.isLoading = false;
         }
@@ -114,6 +117,8 @@ export class SiteEditComponent implements OnInit {
 
         this.originalSite = structuredClone(site);
         this.editableSite = structuredClone(site);
+
+        this.waterSupplierId = site.waterSupplier?.id ?? this.waterSupplierId;
 
         this.form?.form.markAsPristine();
     }
@@ -156,7 +161,7 @@ export class SiteEditComponent implements OnInit {
             // The normal (non-GIS) save is the only thing whose failure counts as a Save failure — it stays
             // in this try so it reaches the catch below. GIS and refresh each swallow their own errors.
             if (normalChanged) {
-                await this._siteService.update(this.siteId, this.buildSiteUpdate(this.editableSite!));
+                await this._siteService.update(this.siteId, this.waterSupplierId ?? 0, this.buildSiteUpdate(this.editableSite!));
             }
 
             const gisFailed = await this.saveGisIfChanged(gisChanged);
@@ -198,7 +203,7 @@ export class SiteEditComponent implements OnInit {
         }
 
         try {
-            await this._siteService.updateGis(this.siteId!, this.buildGisUpdate());
+            await this._siteService.updateGis(this.siteId!, this.waterSupplierId ?? 0, this.buildGisUpdate());
 
             return false;
         } catch {
@@ -289,7 +294,7 @@ export class SiteEditComponent implements OnInit {
         try {
             this.isSaving = true;
 
-            await this._siteService.updateWaterSupplier(this.siteId, waterSupplierId);
+            await this._siteService.updateWaterSupplier(this.siteId, this.waterSupplierId ?? 0, waterSupplierId);
             await this.refreshAfterSave();
 
             this._toastService.successfullySaved();
@@ -373,13 +378,7 @@ export class SiteEditComponent implements OnInit {
      * content, so no extra text validation is needed here.
      */
     private toNumberOrNull(value: unknown): number | null {
-        if (value === null || value === undefined || value === '') {
-            return null;
-        }
-
-        const parsed = Number(value);
-
-        return Number.isNaN(parsed) ? null : parsed;
+        return this._helperService.toNumberOrUndefined(value) ?? null;
     }
 
     // Builds the update payload from the editable model. Only the approved editable fields are included;

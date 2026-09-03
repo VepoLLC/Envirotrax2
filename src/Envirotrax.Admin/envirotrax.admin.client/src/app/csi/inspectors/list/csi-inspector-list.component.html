@@ -5,13 +5,13 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-2">
-                            <vp-filter-panel-field fieldName="userEmail"
+                            <vp-filter-panel-field fieldName="emailAddress"
                                                    label="User ID/Email"
                                                    [form]="searchForm" />
                         </div>
 
                         <div class="mb-2">
-                            <vp-filter-panel-field fieldName="name"
+                            <vp-filter-panel-field fieldName="companyName"
                                                    label="Company Name"
                                                    [form]="searchForm" />
                         </div>
@@ -23,7 +23,7 @@
                         </div>
 
                         <div class="mb-2">
-                            <vp-filter-panel-field fieldName="phoneNumber"
+                            <vp-filter-panel-field fieldName="workNumber"
                                                    label="Work #"
                                                    [form]="searchForm" />
                         </div>
@@ -31,13 +31,13 @@
 
                     <div class="col-md-6">
                         <div class="mb-2">
-                            <vp-filter-panel-field fieldName="inspectorLicenseNumber"
+                            <vp-filter-panel-field fieldName="licenseNumber"
                                                    label="License #"
                                                    [form]="searchForm" />
                         </div>
 
                         <div class="mb-2">
-                            <vp-filter-panel-field fieldName="insurancePolicyNumber"
+                            <vp-filter-panel-field fieldName="insuranceNumber"
                                                    label="Insurance Policy #"
                                                    [form]="searchForm" />
                         </div>
@@ -73,6 +73,8 @@
         <vp-table *ngIf="table.items"
                   [columns]="table.columns!"
                   [data]="table.items.data"
+                  [canViewDetails]="true"
+                  (viewDetails)="openDetails($event)"
                   [(pageInfo)]="table.items.pageInfo"
                   (pageInfoChange)="getInspectors()"
                   [(query)]="table.query"
@@ -80,6 +82,13 @@
                   (queryReset)="getInspectors()" />
     </vp-section>
 </div>
+
+<ng-template #companyCell let-rowData="rowData">
+    <div>
+        <div *ngIf="rowData?.companyName">{{ rowData.companyName }}</div>
+        <div *ngIf="rowData?.contactName">{{ rowData.contactName }}</div>
+    </div>
+</ng-template>
 
 <ng-template #addressCell let-rowData="rowData">
     <div>
@@ -94,7 +103,7 @@
 
 <ng-template #contactCell let-rowData="rowData">
     <div>
-        <div>Email: {{ rowData?.companyEmail }}</div>
-        <div>Work #: {{ rowData?.phoneNumber }}</div>
+        <div>Email: {{ rowData?.emailAddress }}</div>
+        <div>Work #: {{ rowData?.workNumber }}</div>
     </div>
 </ng-template>

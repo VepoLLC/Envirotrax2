@@ -50,8 +50,8 @@ export class CsiInspectionService {
         return await lastValueFrom(observable);
     }
 
-    public async update(id: number, inspection: CsiInspectionDetails): Promise<CsiInspectionDetails> {
-        const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${id}`);
+    public async update(id: number, waterSupplierId: number, inspection: CsiInspectionDetails): Promise<CsiInspectionDetails> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${id}?waterSupplierId=${waterSupplierId}`);
 
         const observable = this._http.put<CsiInspectionDetails>(url, inspection);
 
@@ -90,8 +90,8 @@ export class CsiInspectionService {
         return await lastValueFrom(observable);
     }
 
-    public async addImage(id: number, file: File, description: string): Promise<CsiInspectionImage> {
-        const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${id}/images`);
+    public async addImage(id: number, waterSupplierId: number, file: File, description: string): Promise<CsiInspectionImage> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${id}/images?waterSupplierId=${waterSupplierId}`);
 
         const formData = new FormData();
         formData.append('image', file, file.name);

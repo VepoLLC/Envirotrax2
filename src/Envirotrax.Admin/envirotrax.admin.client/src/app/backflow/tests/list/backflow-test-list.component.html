@@ -339,6 +339,8 @@
         <vp-table *ngIf="table.items"
                   [columns]="table.columns!"
                   [data]="table.items.data"
+                  [canViewDetails]="true"
+                  (viewDetails)="viewDetails($event)"
                   [(pageInfo)]="table.items.pageInfo"
                   (pageInfoChange)="getTests()"
                   [(query)]="table.query"

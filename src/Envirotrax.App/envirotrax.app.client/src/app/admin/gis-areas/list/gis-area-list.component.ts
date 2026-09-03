@@ -113,7 +113,7 @@ export class GisAreaListComponent implements OnInit {
 
             this.polygons = areas.data.map(area => ({
                 name: area.name,
-                color: area.color ?? '#000000',
+                color: area.color || '#000000',
                 onClick: this.edit.bind(this),
                 coordinates: allCoordinates
                     .filter(c => c.area?.id === area.id)

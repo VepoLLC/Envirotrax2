@@ -221,7 +221,6 @@ main {
 # Content Box
 --------------------------------------------------------------*/
 .info-box {
-    height: 100%;
     padding: 20px 25px;
     border: 2px solid #008fd440;
     border-radius: 15px;

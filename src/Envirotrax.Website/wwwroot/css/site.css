@@ -320,13 +320,15 @@ main {
     width: 100%;
     min-height: 100vh;
     margin: 0;
+    padding-top: 40px;
     background: radial-gradient(rgba(255, 255, 255, .6) 50%, rgba(0, 143, 212, 0)), url(../images/home/hero-bg11.jpg) top center;
     background-size: cover;
     background-attachment: fixed;
 }
 
 .hero-container {
-    padding: 60px 0 40px 0;
+    padding-top: 100px;
+    padding-bottom: 30px;
 }
 
 .hero-logo {
@@ -616,14 +618,32 @@ main {
 .testimonials .carousel {
     display: flex;
     flex-direction: column;
-    height: 950px;
+    height: 690px;
     padding-bottom: 10px;
     overflow: hidden;
 }
 
+@media (min-width: 768px) {
+    .testimonials .carousel {
+        height: 520px;
+    }
+}
+
+@media (min-width: 992px) {
+    .testimonials .carousel {
+        height: 440px;
+    }
+}
+
 @media (min-width: 1200px) {
     .testimonials .carousel {
-        height: 1050px;
+        height: 880px;
+    }
+}
+
+@media (min-width: 1400px) {
+    .testimonials .carousel {
+        height: 740px;
     }
 }
 
@@ -676,7 +696,6 @@ main {
     color: #444;
     text-align: left;
     font-style: italic;
-    min-height: 220px;
 }
 
 .testimonial-item p::after {

@@ -5,6 +5,7 @@ import { UrlResolverService } from "../helpers/url-resolver.service";
 import { WaterSupplierDashboardStats } from "../../models/water-suppliers/water-supplier-dashboard-stats";
 import { CsiSubmissionStats } from "../../models/water-suppliers/csi-submission-stats";
 import { BackflowSubmissionStats } from "../../models/water-suppliers/backflow-submission-stats";
+import { BackflowComplianceSnapshot } from "../../models/backflow/backflow-compliance-snapshot";
 import { FogInspectionSubmissionStats } from "../../models/water-suppliers/fog-inspection-submission-stats";
 import { FogTripTicketSubmissionStats } from "../../models/water-suppliers/fog-trip-ticket-submission-stats";
 
@@ -30,6 +31,11 @@ export class WaterSupplierDashboardService {
     public getBackflowSubmissionStats(): Promise<BackflowSubmissionStats> {
         const url = this._urlResolver.resolveUrl('/api/water-suppliers/dashboard/backflow-submission-stats');
         return lastValueFrom(this._http.get<BackflowSubmissionStats>(url));
+    }
+
+    public getBackflowCompliance(): Promise<BackflowComplianceSnapshot | null> {
+        const url = this._urlResolver.resolveUrl('/api/water-suppliers/dashboard/backflow-compliance');
+        return lastValueFrom(this._http.get<BackflowComplianceSnapshot | null>(url));
     }
 
     public getFogInspectionSubmissionStats(): Promise<FogInspectionSubmissionStats> {

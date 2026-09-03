@@ -56,6 +56,25 @@ public class BackflowComplianceReportService(
         return result;
     }
 
+    public async Task<BackflowComplianceSnapshotDto?> GetLatestComplianceAsync(CancellationToken cancellationToken)
+    {
+        var snapshot = await snapshotRepository.GetLatestAsync(cancellationToken);
+
+        if (snapshot == null || snapshot.Total == 0)
+        {
+            return null;
+        }
+
+        return new BackflowComplianceSnapshotDto
+        {
+            ReportDate = snapshot.ReportDate,
+            Total = snapshot.Total,
+            Compliant = snapshot.Compliant,
+            NonCompliant = snapshot.Total - snapshot.Compliant,
+            CompliantPercentage = Math.Round((double)snapshot.Compliant / snapshot.Total * 100, 1)
+        };
+    }
+
     public async Task<byte[]> GenerateHistoryPdfAsync(CancellationToken cancellationToken)
     {
         var history = await GetComplianceHistoryAsync(cancellationToken);

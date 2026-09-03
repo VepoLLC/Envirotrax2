@@ -28,6 +28,15 @@ public class BackflowComplianceSnapshotRepository : IBackflowComplianceSnapshotR
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<BackflowComplianceSnapshot?> GetLatestAsync(CancellationToken cancellationToken)
+    {
+        return await _dbContext
+            .BackflowComplianceSnapshots
+            .AsNoTracking()
+            .OrderByDescending(s => s.ReportDate)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
     // Add the month's snapshot if it doesn't exist yet, otherwise refresh its counts. Used by the
     // monthly job to write a single supplier/month row.
     public async Task<BackflowComplianceSnapshot> UpsertAsync(BackflowComplianceSnapshot snapshot, CancellationToken cancellationToken)

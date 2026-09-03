@@ -8,6 +8,8 @@ public interface IBackflowComplianceReportService
 
     Task<BackflowComplianceHistoryDto> GetComplianceHistoryAsync(CancellationToken cancellationToken);
 
+    Task<BackflowComplianceSnapshotDto?> GetLatestComplianceAsync(CancellationToken cancellationToken);
+
     Task<byte[]> GeneratePdfAsync(bool ignoreLast30Days, CancellationToken cancellationToken);
 
     Task<byte[]> GenerateExcelAsync(bool ignoreLast30Days, CancellationToken cancellationToken);

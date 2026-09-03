@@ -9,6 +9,7 @@ import { GisAreaListComponent } from "./gis-areas/list/gis-area-list.component";
 import { CreateEditGisAreaComponent } from "./gis-areas/create-edit/create-edit-gis-area.component";
 import { NotificationSettingListComponent } from "./notifications/list/notification-setting-list.component";
 import { EditNotificationSettingComponent } from "./notifications/edit/edit-notification-setting.component";
+import { AccountContactInformationComponent } from "./account/account-contact-information.component";
 
 @NgModule({
     declarations: [
@@ -16,7 +17,8 @@ import { EditNotificationSettingComponent } from "./notifications/edit/edit-noti
         GisAreaListComponent,
         CreateEditGisAreaComponent,
         NotificationSettingListComponent,
-        EditNotificationSettingComponent
+        EditNotificationSettingComponent,
+        AccountContactInformationComponent
     ],
     imports: [
         CommonModule,

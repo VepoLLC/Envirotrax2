@@ -5,12 +5,18 @@ import { GisAreaListComponent } from "./gis-areas/list/gis-area-list.component";
 import { NotificationSettingListComponent } from "./notifications/list/notification-setting-list.component";
 import { PermissionGuard } from "../shared/guards/permission.guard";
 import { PermissionAction, PermissionType } from "../shared/models/permission-type";
+import { AccountContactInformationComponent } from "./account/account-contact-information.component";
 
 const routes: Routes = [
     {
         path: '',
         component: HomeComponent,
         title: 'Administration'
+    },
+    {
+        path: 'account-information',
+        title: 'Account Contact Information',
+        component: AccountContactInformationComponent
     },
     {
         path: 'water-suppliers',

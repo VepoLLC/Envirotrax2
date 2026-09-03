@@ -119,7 +119,7 @@ export class App implements OnInit {
           {
             title: 'Account Contact Information',
             iconCss: 'fa-regular fa-user',
-            routerLink: ['/'],
+            routerLink: ['admin/account-information'],
             hasPermission: true,
             hasFeature: true
           },

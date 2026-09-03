@@ -1,0 +1,549 @@
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Home>
+@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
+@{
+	Layout = "master.cshtml";
+
+	ViewData["Title"] = Model.PageTitle;
+	ViewData["Description"] = Model.PageDescription;
+}
+
+<section id="hero">
+	<div class="hero-container">
+
+		<div class="mb-4" data-aos="flip-up" data-aos-delay="0">
+			<div class="col-12 text-center">
+				<img src="~/images/home/envirotrax_logo.svg" class="hero-logo"
+					 alt="Envirotrax Cross-connection, CSI, and FOG online management system" />
+			</div>
+		</div>
+
+		<div class="container">
+			<div class="row mb-md-3" data-aos="fade-down" data-aos-delay="100">
+				<div class="col-12">
+					<h1 class="text-center">The Envirotrax&reg; online management system offers the most comprehensive
+						and robust turn-key solutions to manage your compliancy programs:</h1>
+					</div>
+				</div>
+
+				<div class="row gx-4 gy-4 mb-4 align-items-center">
+					<div class="col-lg-5" data-aos="flip-right" data-aos-delay="200">
+						<img src="~/images/home/devices.png" class="img-fluid"
+							 alt="Envirotrax on desktop, tablet, and phone" />
+					</div>
+					<div class="col-lg-7">
+						<div class="content" data-aos="fade-down" data-aos-delay="300">
+							<h3 class="text-center">About the Envirotrax&reg; System</h3>
+							<p>
+								Since 2014, the Envirotrax&reg; system has helped to better manage cross-connection control
+								and FOG programs for hundreds of cities, utility districts and water management companies.
+								The robust Envirotrax&reg; management system is completely online, 100% free to the water
+								purveyor, and extremely user friendly.
+							</p>
+						</div>
+
+						<div class="content" data-aos="fade-up" data-aos-delay="400">
+							<h3 class="text-center">What is the Envirotrax&reg; System?</h3>
+							<p>
+								Envirotrax&reg; is a state-of-the-art online
+								<span class="program steelblue">backflow prevention</span>,
+								<span class="program cyan">customer service inspection (CSI)</span>, and
+								<span class="program magenta">fats, oils, and grease (FOG)</span>
+								management system that will optimize workflow efficiency, maximize productivity, and
+								increase your program compliance.
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="programs-scroll text-center" data-aos="fade-up" data-aos-delay="500">
+					<div class="mb-4">
+						<a href="~/shared/texas_clients.html" class="h3 fs-5">Trusted by 500+ Texas Water Utilities - Click
+							to See Where</a>
+						</div>
+
+						<a href="#programs" class="scroll-down">
+							<h3 class="mb-3">Click or scroll for more information.</h3>
+							<i class="fa-solid fa-angles-down fa-beat fs-1"></i>
+						</a>
+					</div>
+				</div>
+
+			</div>
+		</section>
+
+		<section id="programs" class="programs">
+			<div class="container">
+				<h1 class="text-center" data-aos="zoom-in" data-aos-delay="100">Envirotrax&reg; Services &amp; Benefits</h1>
+
+				<div class="row justify-content-center align-items-center mt-3 gy-3">
+					<div class="col-md-4">
+						<img src="~/images/home/management1.jpg" class="img-fluid rounded"
+							 alt="Envirotrax program management" />
+					</div>
+					<div class="col-md-8">
+						The Envirotrax&reg; system is designed to meet and exceed all customer requirements, offering the
+						most
+						comprehensive tools for managing compliance programs.
+						Whether you are a small utility district, a large city, or a water management company overseeing
+						multiple water systems, Envirotrax&reg; has the capacity to accommodate your needs.
+						<div class="mt-3">
+							<a href="~/shared/texas_clients.html" target="_blank" class="texas-link">Look who&rsquo;s using
+								Envirotrax&reg; across
+								Texas</a>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="section">
+					<div class="container">
+						<div class="text-center mb-5" data-aos="zoom-in" data-aos-delay="100">
+							<h2>Supercharge Your Compliancy Programs</h2>
+						</div>
+
+						<div class="row justify-content-center g-4">
+							<div class="col-12" data-aos="fade-down" data-aos-delay="200">
+								<div id="backflow-program" class="info-box steelblue">
+									<div class="row justify-content-center align-items-center g-2">
+										<div class="col-auto">
+											<i class="fa-solid fa-gauge-high"></i>
+										</div>
+										<div class="col-auto">
+											<h3>Backflow Assembly Tracking</h3>
+										</div>
+									</div>
+									<div class="content">
+										<p>
+											Envirotrax&reg; provides user-friendly online tools for entering backflow test and
+											maintenance reports and performing regular periodic testing of assemblies.
+											From the initial consultation through the duration of the service contract, cities
+											or
+											water purveyors incur NO CHARGES for using the system.
+											A small fee is paid by the Backflow Prevention Assembly Tester (BPAT) when
+											submitting a
+											passing test report.
+										</p>
+										<p>
+											Water purveyor personnel can access the system through a password-protected account.
+											There are no limits placed on the number of employees who may access the system.
+										</p>
+										<p>
+											Envirotrax&reg; ensures the validity of all BPAT licenses, insurance policies, and
+											gauge
+											test for accuracy reports. If any credentials expire, testers will be unable to
+											submit
+											test reports.
+											Our advanced letter generation software allows for flexible and customizable
+											creation of
+											up to three renewal letters, and we handle 100% of the letter generation and
+											mailing.
+										</p>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-12" data-aos="fade-down" data-aos-delay="300">
+								<div id="csi-program" class="info-box cyan">
+									<div class="row justify-content-center align-items-center g-2">
+										<div class="col-auto">
+											<i class="fa-solid fa-building"></i>
+										</div>
+										<div class="col-auto">
+											<h3>Customer Service Inspections (CSI)</h3>
+										</div>
+									</div>
+									<div class="content">
+										<p>
+											A Customer Service Inspection (CSI) examines private water distribution facilities
+											to
+											approve or deny water service, focusing on identifying and preventing
+											cross-connections,
+											potential contaminant hazards, and illegal lead materials.
+										</p>
+										<p>
+											Envirotrax&reg; offers the online entry of Customer Service Inspection Certificates
+											at
+											NO CHARGE to cities or water purveyors. A small fee is paid by third-party Customer
+											Service Inspectors for each certificate entered, while certificates entered by city
+											or
+											water purveyor personnel are entered at NO CHARGE.
+										</p>
+										<p>
+											Our system links any cross-connections found during the inspection with existing
+											test
+											and maintenance reports on backflow assemblies already on file within the system.
+										</p>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-12" data-aos="fade-down" data-aos-delay="400">
+								<div id="fog-program" class="info-box magenta">
+									<div class="row justify-content-center align-items-center g-2">
+										<div class="col-auto">
+											<i class="fa-solid fa-truck"></i>
+										</div>
+										<div class="col-auto">
+											<h3>FOG Inspections and Waste Disposal</h3>
+										</div>
+									</div>
+									<div class="content">
+										<p>
+											FOG, or Fats, Oils, and Grease, are natural by-products of cooking that can solidify
+											and
+											stick to sewer pipes, causing backups or overflows.
+											Regular pumping and inspections of grease and grit traps are necessary to prevent
+											these
+											issues and determine the required frequency of pumping.
+										</p>
+										<p>
+											Envirotrax&reg; offers a complete system for the online entry, tracking, and
+											reporting
+											of waste removal and disposal through our FOG program.
+											This service is provided at NO CHARGE to cities or water purveyors. A small fee is
+											paid
+											by the transporter for each trip ticket or manifest entered,
+											while inspections performed on grease or grit taps by city or water purveyor
+											personnel
+											are entered at NO CHARGE.
+										</p>
+										<p>
+											Additional tools help to manage transporter vehicle permits and inspections,
+											automatically calculate the 25% rule on FOG inspections, and set future inspection
+											due
+											dates, follow-ups and more.
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="section steelblue">
+					<div class="container">
+						<div class="text-center mb-5" data-aos="zoom-in" data-aos-delay="100">
+							<h2>It's Easy to Get Started</h2>
+						</div>
+
+						<div class="row g-4">
+							<div class="col-md-6" data-aos="fade-right" data-aos-delay="100">
+								<div class="info-box inverted">
+									<div class="row align-items-center g-2">
+										<div class="col-auto">
+											<i class="fa-solid fa-globe text-white"></i>
+										</div>
+										<div class="col ms-3">
+											<h3>Completely Online</h3>
+										</div>
+									</div>
+									<div class="content py-2 px-3">
+										There's no software for the IT department to install and update. Our Envirotrax&reg;
+										management system is 100% online.
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6" data-aos="fade-left" data-aos-delay="200">
+								<div class="info-box inverted">
+									<div class="row align-items-center g-2">
+										<div class="col-auto"><i class="fa-solid fa-handshake-angle text-white"></i></div>
+										<div class="col ms-3">
+											<h3>Extremely Easy to Use</h3>
+										</div>
+									</div>
+									<div class="content py-2 px-3">
+										Extremely user-friendly interface that is accessible on a phone, tablet or computer.
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6" data-aos="fade-right" data-aos-delay="300">
+								<div class="info-box inverted">
+									<div class="row align-items-center g-2">
+										<div class="col-auto"><i class="fa-solid fa-sack-dollar text-white"></i></div>
+										<div class="col ms-3">
+											<h3>Completely Free to the Water Purveyor</h3>
+										</div>
+									</div>
+									<div class="content py-2 px-3">
+										From initial consultation through the life of the service contract, there is absolutely
+										no
+										cost to the city or water management company unless specialized services are required.
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6" data-aos="fade-left" data-aos-delay="400">
+								<div class="info-box inverted">
+									<div class="row align-items-center g-2">
+										<div class="col-auto"><i class="fa-solid fa-key text-white"></i></div>
+										<div class="col ms-3">
+											<h3>Painless Turn-Key Solutions</h3>
+										</div>
+									</div>
+									<div class="content py-2 px-3">
+										Our experienced staff will coordinate with the program administrator/s and any IT
+										personnel
+										to setup your account and import any existing data into our system
+										at absolutely no cost to the city or water purveyor.
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="section">
+					<div class="container">
+						<div class="row justify-content-center align-items-center gy-3">
+							<div class="col-md-6 text-end" data-aos="fade-right" data-aos-delay="100">
+								<img src="~/images/home/customer_service4.jpg" class="img-fluid rounded customer-service-photo"
+									 alt="Envirotrax customer service" />
+							</div>
+							<div class="col-md-6" data-aos="fade-left" data-aos-delay="200">
+								<div class="info-box">
+									<h3 class="text-center fs-4">Customer Service is our Priority</h3>
+									<div class="content">
+										We pride ourselves on providing exceptional customer service. We coordinate daily with
+										city
+										program administrators, testers, inspectors, and transporters.
+										Our customer service and IT departments respond swiftly to any situation or request for
+										assistance that may arise.
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="section steelblue">
+					<div class="container">
+						<div class="text-center mb-5" data-aos="zoom-in" data-aos-delay="100">
+							<h2>Exceptional Management Services at Your Disposal</h2>
+						</div>
+
+						<div class="row g-4">
+							<div class="col-md-6" data-aos="fade-right" data-aos-delay="100">
+								<div class="info-box">
+									<div class="row align-items-center g-2">
+										<div class="col-auto"><i class="fa-solid fa-gear"></i></div>
+										<div class="col">
+											<h3>Advanced Management Tools</h3>
+										</div>
+									</div>
+									<div class="content">
+										At the core of any management system lies the ability to access data through a versatile
+										search system. Envirotrax&reg; provides both water supplier administrators and testers
+										with
+										the most comprehensive
+										search tools available in the market.
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6" data-aos="fade-left" data-aos-delay="200">
+								<div class="info-box">
+									<div class="row align-items-center g-2">
+										<div class="col-auto"><i class="fa-solid fa-server"></i></div>
+										<div class="col">
+											<h3>Enterprise Level Systems</h3>
+										</div>
+									</div>
+									<div class="content">
+										The Envirotrax&reg; system operates within our private networks across georedundant
+										datacenters. Our system will continue to operate if one of the data centers ceases to
+										operate. Your data is backed up multiple times an
+										hour to our cloud backup servers.
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6" data-aos="fade-right" data-aos-delay="400">
+								<div class="info-box">
+									<div class="row align-items-center g-2">
+										<div class="col-auto"><i class="fa-solid fa-file-export"></i></div>
+										<div class="col">
+											<h3>Advanced Data Exporting</h3>
+										</div>
+									</div>
+									<div class="content">
+										All search results within Envirotrax&reg; can be exported to a variety of universal data
+										formats.
+										<br /><br />
+										While many competitor systems only allow export to a comma-separated text file (CSV),
+										Envirotrax&reg; offers administrators common data formats such as CSV, Excel, and PDF.
+										Additionally our XML datasets are invaluable for your IT and GIS departments.
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6" data-aos="fade-left" data-aos-delay="400">
+								<div class="info-box">
+									<div class="row align-items-center g-2">
+										<div class="col-auto"><i class="fa-solid fa-code"></i></div>
+										<div class="col">
+											<h3>Envirotrax&reg; REST API</h3>
+										</div>
+									</div>
+									<div class="content">
+										Our API grants full read and write access to your water system's property records. In
+										addition to property records, the API can retrieve backflow test, CSI, FOG Inspection,
+										and
+										FOG trip ticket records.
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="section">
+					<div class="container">
+						<div class="text-center mb-4" data-aos="zoom-in" data-aos-delay="100">
+							<h2>Powerful Reporting Tools Keep You Informed</h2>
+						</div>
+
+						<div class="row justify-content-center gy-3">
+							<div class="col-md-4 text-center" data-aos="fade-right" data-aos-delay="100">
+								<img src="~/images/home/analysis.svg" class="img-fluid" alt="Reporting analysis" />
+							</div>
+							<div class="col-md-4" data-aos="fade-down" data-aos-delay="200">
+								<div class="info-box">
+
+									<div class="content">
+										Envirotrax's® extensive reporting tools give program administrators powerful reporting with
+										the click of a button.
+										<div class="report-item">
+											<i class="fa-solid fa-chart-bar me-3 fs-2" aria-hidden="true"></i>Submission
+											Statistics
+										</div>
+										<div class="report-item">
+											<i class="fa-solid fa-chart-pie me-3 fs-2" aria-hidden="true"></i>Current Compliance
+											Metrics
+										</div>
+										<div class="report-item">
+											<i class="fa-solid fa-arrow-trend-up me-3 fs-2" aria-hidden="true"></i>Compliance
+											History
+											Analysis
+										</div>
+										<div class="report-item">
+											<i class="fa-solid fa-chart-column me-3 fs-2" aria-hidden="true"></i>Current Year Growth
+											Summary
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-4 text-center" data-aos="fade-left" data-aos-delay="100">
+								<img src="~/images/home/reports.png" class="img-fluid rounded" alt="Envirotrax reports" />
+							</div>
+						</div>
+
+						<div class="text-center mt-4" data-aos="fade-up" data-aos-delay="100">
+							<a href="~/shared/texas_clients.html" class="texas-link fs-5 fst-italic fw-normal"
+							   target="_blank">Trusted statewide to
+								manage the records required by the TCEQ</a>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				@if (Model.TestimonalSection != null)
+				{
+					foreach (var testimonialBlock in Model.TestimonalSection)
+					{
+						var testimonialSection = testimonialBlock.Content as ContentModels.TestimonialSection;
+
+						if (testimonialSection == null)
+						{
+							continue;
+						}
+
+						var testimonials = testimonialSection.Testimonials?
+							.Select(t => t as ContentModels.Testimonial)
+							.Where(t => t != null)
+							.ToList() ?? new List<ContentModels.Testimonial>();
+
+						if (!testimonials.Any())
+						{
+							continue;
+						}
+
+						<section id="testimonials" class="testimonials section steelblue gradient-left">
+							<div class="container">
+								<div>
+									<h1 class="text-center fw-bold" data-aos="zoom-in" data-aos-delay="100">Testimonials</h1>
+									@if (!string.IsNullOrWhiteSpace(testimonialSection.HeaderText))
+									{
+										<p class="p-2 mb-4">@testimonialSection.HeaderText</p>
+									}
+								</div>
+
+								@{
+									var carouselId = "testimonialsCarousel";
+									var count = testimonials.Count;
+									var visiblePerSlide = Math.Min(3, count);
+								}
+
+								<div id="@carouselId" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000" data-aos="fade-up"
+									 data-aos-delay="100">
+									<div class="carousel-inner">
+										@for (var start = 0; start < count; start++)
+										{
+											<div class="carousel-item @(start == 0 ? "active" : "")">
+												<div class="row justify-content-center g-4">
+													@for (var offset = 0; offset < visiblePerSlide; offset++)
+													{
+														var testimonial = testimonials[(start + offset) % count];
+
+														<div class="col-md-4 @(offset > 0 ? "testimonial-extra" : "")">
+															<div class="testimonial-item">
+																<p>
+																	<i class="bx bxs-quote-alt-left quote-icon-left"></i>
+																	@testimonial.ShortDescription
+																	<i class="bx bxs-quote-alt-right quote-icon-right"></i>
+																</p>
+																<h3>@testimonial.AttesterName</h3>
+																@if (!string.IsNullOrWhiteSpace(testimonial.AttesterCompany))
+																{
+																	<h4 class="m-1">@testimonial.AttesterCompany</h4>
+																}
+																@if (!string.IsNullOrWhiteSpace(testimonial.AttesterCity))
+																{
+																	<h4>@testimonial.AttesterCity</h4>
+																}
+															</div>
+														</div>
+													}
+												</div>
+											</div>
+										}
+									</div>
+
+									<div class="carousel-buffer"></div>
+
+									@if (count > 1)
+									{
+										<div class="carousel-indicators">
+											@for (var index = 0; index < count; index++)
+											{
+												<button type="button" data-bs-target="#@carouselId" data-bs-slide-to="@index"
+														class="@(index == 0 ? "active" : "")" aria-current="@(index == 0 ? "true" : null)"
+														aria-label="Slide @(index + 1)"></button>
+											}
+										</div>
+									}
+								</div>
+							</div>
+						</section>
+					}
+				}
+
+				<a href="~/request-information/" class="request-info" data-aos="flip-up" data-aos-delay="1000">
+					<div class="row g-0">
+						<div class="col-auto">
+							<i class="fa-solid fa-circle-info fs-1" aria-hidden="true"></i>
+						</div>
+						<div class="col-auto align-content-center fs-5 me-2">
+							Request Info
+						</div>
+					</div>
+				</a>
+
+				@section Styles
+				{
+					<link rel="stylesheet" href="~/lib/boxicons/css/boxicons.min.css" />
+				}

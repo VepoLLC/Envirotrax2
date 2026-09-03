@@ -18,7 +18,7 @@ public interface IInternalApiClientService<TOptions>
 
     Task<TResponse?> PostAsync<TRequest, TResponse>(string url, ServiceMessageDto<TRequest> requestData, CancellationToken cancellationToken);
 
-    Task<TResponse?> PostFileAsync<TResponse>(int? loggedInUserId, string url, Stream fileStream, string fileName, string fileFieldName, IDictionary<string, string> formFields, CancellationToken cancellationToken);
+    Task<TResponse?> PostFileAsync<TResponse>(int? waterSupplierId, int? loggedInUserId, string url, Stream fileStream, string fileName, string fileFieldName, IDictionary<string, string> formFields, CancellationToken cancellationToken);
 
     Task<TResponse?> PutAsync<TRequest, TResponse>(string url, ServiceMessageDto<TRequest> requestData, CancellationToken cancellationToken);
 

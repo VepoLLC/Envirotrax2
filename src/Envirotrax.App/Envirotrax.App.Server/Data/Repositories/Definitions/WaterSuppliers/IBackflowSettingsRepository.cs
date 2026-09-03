@@ -6,4 +6,6 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
 public interface IBackflowSettingsRepository : ITenantSettingsRepository<BackflowSettings>
 {
     Task<BackflowTestingSettingsDto?> GetTestingSettingsAsync(int waterSupplierId, CancellationToken cancellationToken);
+
+    Task<BackflowTestingSettingsDto?> GetTestingSettingsByWaterSupplierAsync(int waterSupplierId, CancellationToken cancellationToken);
 }

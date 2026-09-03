@@ -1,7 +1,7 @@
 
 using System.Dynamic;
-using System.Net;
-using System.Net.Mail;
+using Azure.Communication.Email;
+using Azure.Identity;
 using Envirotrax.Common.Configuration;
 using Envirotrax.Common.Domain.DataTransferObjects;
 using Envirotrax.Common.Domain.Services.Defintions;
@@ -20,6 +20,8 @@ public class EmailService : IEmailService
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IHostEnvironment _environment;
 
+    private readonly EmailClient _emailClient;
+
     public EmailService(
         IOptions<EmailOptions> emailOptions,
         ILogger<EmailService> logger,
@@ -32,19 +34,18 @@ public class EmailService : IEmailService
         _templateService = templateService;
         _contextAccessor = contextAccessor;
         _environment = environment;
+
+        _emailClient = new(new Uri(_emailOptions.Endpoint), new DefaultAzureCredential());
     }
 
-    private MailAddress GetFromAddress(FromAddressType addressType)
+    private string GetFromAddress(FromAddressType addressType)
     {
-        switch (addressType)
+        return addressType switch
         {
-            case FromAddressType.Team:
-                return new(_emailOptions.TeamAddress);
-            case FromAddressType.Info:
-                return new(_emailOptions.InfoAddress);
-            default:
-                return new(_emailOptions.NoreplyAddress);
-        }
+            FromAddressType.Team => _emailOptions.TeamAddress,
+            FromAddressType.Info => _emailOptions.InfoAddress,
+            _ => _emailOptions.NoreplyAddress
+        };
     }
 
     private IEnumerable<string> GetToAddresses(IEnumerable<string> recipients)
@@ -59,19 +60,14 @@ public class EmailService : IEmailService
 
     public Task SendAsync(EmailDto email)
     {
-        return SendAsync(email);
+        return SendAsync<object>(email);
     }
 
     public async Task SendAsync<TTemplate>(EmailDto<TTemplate> email)
     {
         try
         {
-            var mail = new MailMessage
-            {
-                From = GetFromAddress(email.FromAddress),
-                Subject = email.Subject,
-                IsBodyHtml = true
-            };
+            var body = string.Empty;
 
             if (!string.IsNullOrWhiteSpace(email.TemplateId))
             {
@@ -80,19 +76,17 @@ public class EmailService : IEmailService
 
                 viewBag.BaseUrl = $"https://{request.Host}";
 
-                mail.Body = await _templateService.ParseEmailAsync(email.TemplateId, email.TemplateData, viewBag);
+                body = await _templateService.ParseEmailAsync(email.TemplateId, email.TemplateData, viewBag);
             }
 
-            foreach (var address in GetToAddresses(email.Recipients))
-            {
-                mail.To.Add(address);
-            }
+            var fromAddress = GetFromAddress(email.FromAddress);
 
-            using (var smtp = new SmtpClient(_emailOptions.Host, _emailOptions.Port))
-            {
-                smtp.Credentials = new NetworkCredential(_emailOptions.Username, _emailOptions.Password);
-                await smtp.SendMailAsync(mail);
-            }
+            var message = new EmailMessage(
+                senderAddress: GetFromAddress(email.FromAddress),
+                content: new EmailContent(email.Subject ?? string.Empty) { Html = body },
+                recipients: new EmailRecipients(GetToAddresses(email.Recipients).Select(address => new EmailAddress(address))));
+
+            await _emailClient.SendAsync(Azure.WaitUntil.Completed, message);
         }
         catch (Exception ex)
         {

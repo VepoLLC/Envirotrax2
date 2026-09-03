@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { BackflowDeviceType, BackflowReasonForTest, BackflowTestResult } from "../../models/backflow/backflow-test-enums";
+import { BackflowDeviceType, BackflowPaymentStatus, BackflowReasonForTest, BackflowTestResult } from "../../models/backflow/backflow-test-enums";
 import { InputOption } from "@envirotrax/common-ui";
 
 @Injectable({
@@ -75,7 +75,7 @@ export class BackflowTestOptionsService {
 
     public readonly paymentStatusOptions: InputOption[] = [
         { id: '', text: 'Any Status' },
-        { id: 'true', text: 'Paid' },
-        { id: 'false', text: 'Unpaid' }
+        { id: BackflowPaymentStatus.Paid.toString(), text: 'Paid' },
+        { id: BackflowPaymentStatus.Unpaid.toString(), text: 'Unpaid' }
     ];
 }

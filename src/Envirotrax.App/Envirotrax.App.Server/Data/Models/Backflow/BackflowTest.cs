@@ -252,6 +252,9 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public bool ValidationUnknownSerialNumber { get; set; }
     public bool ValidationDeviceInformationChanged { get; set; }
 
+    [StringLength(255)]
+    public string? ValidationNotes { get; set; }
+
     // Initial test readings - main assembly
     [Precision(5, 2)]
     public decimal? InitCV1HeldPSID { get; set; }
@@ -429,10 +432,21 @@ public class BackflowTestExpiryCounts
     public int TwoMonths { get; set; }
 }
 
+public class BackflowComplianceCounts
+{
+    public int Total { get; set; }
+    public int Compliant { get; set; }
+}
+
 public class BackflowTestConfiguration : IEntityTypeConfiguration<BackflowTest>
 {
     public void Configure(EntityTypeBuilder<BackflowTest> builder)
     {
+        builder.HasOne(bt => bt.Professional)
+            .WithMany()
+            .HasForeignKey(bt => bt.ProfessionalId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasOne<ProfessionalUser>(bt => bt.Bpat)
             .WithMany()
             .HasForeignKey(bt => new { bt.ProfessionalId, bt.BpatId })

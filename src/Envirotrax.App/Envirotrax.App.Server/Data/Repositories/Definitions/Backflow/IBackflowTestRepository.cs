@@ -1,5 +1,6 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Models.Backflow;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 
 namespace Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 
@@ -12,6 +13,8 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
     // Compliance Management: current, in-service, renewal-required assemblies on active, in-area sites.
     Task<IEnumerable<BackflowTest>> GetComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
 
+    Task<IEnumerable<BackflowTest>> SearchAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken);
+
     // Process 1 — Site level
     Task<IEnumerable<BackflowTest>> GetAllCurrentBySiteIdAsync(int siteId, CancellationToken cancellationToken);
     Task UpdateTestRenewalAsync(int testId, bool renewalRequired, DateTime? expirationDate);
@@ -22,6 +25,8 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
     Task ClearTestNeedsRenewalCheckAsync(int testId, CancellationToken cancellationToken);
 
     // Status updates
+    Task<AdminUpdateResult<BackflowTest>> UpdateForAdminAsync(int id, BackflowTestAdminUpdateRequest request, int updatedById);
+
     Task<BackflowTest?> UpdateRenewalRequiredAsync(int id, bool renewalRequired, int updatedById, CancellationToken cancellationToken);
     Task<BackflowTest?> UpdateScheduleMonthAsync(int id, int month, int updatedById, CancellationToken cancellationToken);
     Task<BackflowTest?> UpdateIsCurrentAsync(int id, bool isCurrent, int updatedById, CancellationToken cancellationToken);

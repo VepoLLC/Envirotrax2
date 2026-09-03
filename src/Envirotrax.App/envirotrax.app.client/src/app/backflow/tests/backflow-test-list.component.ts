@@ -13,7 +13,7 @@ import { BackflowTest } from '../../shared/models/backflow/backflow-test';
 import { GisArea } from '../../shared/models/gis-areas/gis-area';
 import { FacilityType } from '../../shared/enums/facility-type.enum';
 import { CellTemplateData, ColumnType, InputOption, MapMarker, MapPolygon } from '@envirotrax/common-ui';
-import { BackflowTestResult } from '../../shared/models/backflow/backflow-test-enums';
+import { BackflowPaymentStatus, BackflowTestResult } from '../../shared/models/backflow/backflow-test-enums';
 import { DownloadConfig } from '../../shared/models/download-config';
 import { DownloadService } from '../../shared/services/download.service';
 import { PrintableTableService } from '../../shared/services/printable-table.service';
@@ -98,6 +98,8 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
 
     public testResultOptions: InputOption[];
     public paymentStatusOptions: InputOption[];
+
+    public paymentStatus: string = '';
     public approvalStatusOptions: InputOption[];
     public reasonForTestOptions: InputOption[];
 
@@ -243,7 +245,7 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
             if (dateParam) {
                 this.applyDateFilter(dateParam);
                 await this.getTests();
-                this.setShowResults((this.table.items?.pageInfo?.totalItems ?? 0) > 0);
+                this.setShowResults(true);
                 return;
             }
 
@@ -251,17 +253,28 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
                 this.applyComplianceFilter(params);
                 await this.getTests();
                 this.setShowResults(true);
+                return;
+            }
+
+            // Dashboard "View" on a sub account lands here already authenticated as that water
+            // supplier (via /auth/login-redirect); this just carries over the same last-10-days
+            // window shown on the dashboard so the results match what was clicked.
+            const startDateParam = params.get('startDate');
+            const endDateParam = params.get('endDate');
+            if (startDateParam && endDateParam) {
+                this.applyDateFilter(startDateParam, endDateParam);
+                await this.getTests();
+                this.setShowResults(true);
             }
         });
     }
 
-    // Dashboard drill-down: show only the tests on the clicked day.
-    private applyDateFilter(date: string): void {
+    private applyDateFilter(startDate: string, endDate: string = startDate): void {
         this.table.query.filter = [{
             columnName: 'testDate',
             children: [
-                { columnName: 'testDate', value: date, comparisonOperator: 'Gte', logicalOperator: 'And' },
-                { columnName: 'testDate', value: date, comparisonOperator: 'Lte', logicalOperator: 'And' }
+                { columnName: 'testDate', value: startDate, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                { columnName: 'testDate', value: endDate, comparisonOperator: 'Lte', logicalOperator: 'And' }
             ]
         }];
     }
@@ -271,7 +284,18 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
     }
 
     public showDownloadManager(): void {
+        const additionalParams = this.paymentStatus
+            ? { paymentStatus: this.paymentStatus }
+            : undefined;
+
+        this.downloadConfig.endpoint.additionalParams = additionalParams;
+        this.downloadConfig.pdfEndpoint!.additionalParams = additionalParams;
+
         this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
+    }
+
+    private getPaymentStatus(): BackflowPaymentStatus | null {
+        return this.paymentStatus ? Number(this.paymentStatus) as BackflowPaymentStatus : null;
     }
 
     public viewPrintableTable(): void {
@@ -372,7 +396,8 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
             this.table.isLoading = true;
             const result = await this._backflowTestService.getAll(
                 this.table.items?.pageInfo || {},
-                this.table.query
+                this.table.query,
+                this.getPaymentStatus()
             );
             const startIndex = ((result.pageInfo.pageNumber ?? 1) - 1) * (result.pageInfo.pageSize ?? 10);
             result.data.forEach((item, i) => (item as any)['_rowNumber'] = startIndex + i + 1);
@@ -451,7 +476,7 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
             this.showMapResults = false;
 
             const [testsPage, areas, coordinates, defaultView] = await Promise.all([
-                this._backflowTestService.getAll({ pageSize: 10000, pageNumber: 1 }, this.table.query),
+                this._backflowTestService.getAll({ pageSize: 10000, pageNumber: 1 }, this.table.query, this.getPaymentStatus()),
                 this._gisAreaService.getAllAreas(),
                 this._coordinateService.getAll(),
                 this._gisAreaService.getDefaultView()

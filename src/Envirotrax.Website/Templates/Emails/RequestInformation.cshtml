@@ -1,0 +1,58 @@
+@using RazorLight
+@using Envirotrax.Website.Templates.Emails
+@inherits TemplatePage<RequestInformationVm>
+
+@{
+    Layout = "Templates.Emails._EmailLayout";
+}
+
+<div style="text-align: left;">
+    <p style="margin-top: 0;">A new request for information was submitted on the Envirotrax&reg; website.</p>
+
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 4px 8px; font-weight: bold;">Program Type</td>
+            <td style="padding: 4px 8px;">@Model.ProgramType</td>
+        </tr>
+        <tr>
+            <td style="padding: 4px 8px; font-weight: bold;">City/Company Name</td>
+            <td style="padding: 4px 8px;">@Model.CompanyName</td>
+        </tr>
+        <tr>
+            <td style="padding: 4px 8px; font-weight: bold;">Contact Name</td>
+            <td style="padding: 4px 8px;">@Model.ContactName</td>
+        </tr>
+        <tr>
+            <td style="padding: 4px 8px; font-weight: bold;">Information Requested</td>
+            <td style="padding: 4px 8px;">@Model.InformationType</td>
+        </tr>
+        @if (!string.IsNullOrWhiteSpace(Model.MailingAddress) || !string.IsNullOrWhiteSpace(Model.MailingCity) || !string.IsNullOrWhiteSpace(Model.MailingState) || !string.IsNullOrWhiteSpace(Model.MailingZip))
+        {
+            <tr>
+                <td style="padding: 4px 8px; font-weight: bold;">Mailing Address</td>
+                <td style="padding: 4px 8px;">@Model.MailingAddress, @Model.MailingCity, @Model.MailingState @Model.MailingZip</td>
+            </tr>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.PhoneNumber))
+        {
+            <tr>
+                <td style="padding: 4px 8px; font-weight: bold;">Phone Number</td>
+                <td style="padding: 4px 8px;">@Model.PhoneNumber</td>
+            </tr>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.EmailAddress))
+        {
+            <tr>
+                <td style="padding: 4px 8px; font-weight: bold;">Email Address</td>
+                <td style="padding: 4px 8px;">@Model.EmailAddress</td>
+            </tr>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.Comments))
+        {
+            <tr>
+                <td style="padding: 4px 8px; font-weight: bold;">Comments</td>
+                <td style="padding: 4px 8px;">@Model.Comments</td>
+            </tr>
+        }
+    </table>
+</div>

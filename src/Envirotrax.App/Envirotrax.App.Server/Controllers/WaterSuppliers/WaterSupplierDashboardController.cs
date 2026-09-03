@@ -45,4 +45,12 @@ public class WaterSupplierDashboardController : WaterSupplierProtectedController
 
         return Ok(stats);
     }
+
+    [HttpGet("fog-trip-ticket-submission-stats")]
+    public async Task<IActionResult> GetFogTripTicketSubmissionStatsAsync(CancellationToken cancellationToken)
+    {
+        var stats = await _dashboardService.GetFogTripTicketSubmissionStatsAsync(cancellationToken);
+
+        return Ok(stats);
+    }
 }

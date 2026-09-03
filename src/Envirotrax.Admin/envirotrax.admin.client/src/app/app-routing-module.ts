@@ -31,6 +31,11 @@ const routes: Routes = [
     title: 'CSI Management',
     loadChildren: () => import('./csi/csi.module').then(m => m.CsiModule)
   },
+  {
+    path: 'backflow',
+    title: 'Backflow Management',
+    loadChildren: () => import('./backflow/backflow.module').then(m => m.BackflowModule)
+  },
 ];
 
 @NgModule({

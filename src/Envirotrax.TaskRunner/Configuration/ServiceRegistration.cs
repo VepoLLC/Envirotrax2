@@ -45,6 +45,11 @@ public static class ServiceRegistration
             MaxDequeuCount = 2
         });
 
+        services.AddQueueWorker(new QueueWorkerOptions<ComplianceSnapshotWorker, ComplianceSnapshotMessageDto>(QueueNames.BackflowComplianceSnapshots.Process)
+        {
+            MaxDequeuCount = 2
+        });
+
         return services;
     }
 

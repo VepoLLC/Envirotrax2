@@ -127,17 +127,33 @@ export class CsiInspectionListComponent implements OnInit, OnDestroy {
         this._queryParamSub = this._activatedRoute.queryParamMap.subscribe(async params => {
             const dateParam = params.get('date');
             if (dateParam) {
-                this.table.query.filter = [{
-                    columnName: 'inspectionDate',
-                    children: [
-                        { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Gte', logicalOperator: 'And' },
-                        { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Lte', logicalOperator: 'And' }
-                    ]
-                }];
+                this.applyDateFilter(dateParam);
                 await this.getInspections();
-                this.setShowResults((this.table.items?.pageInfo?.totalItems ?? 0) > 0);
+                this.setShowResults(true);
+                return;
+            }
+
+            // Dashboard "View" on a sub account lands here already authenticated as that water
+            // supplier (via /auth/login-redirect); this just carries over the same last-10-days
+            // window shown on the dashboard so the results match what was clicked.
+            const startDateParam = params.get('startDate');
+            const endDateParam = params.get('endDate');
+            if (startDateParam && endDateParam) {
+                this.applyDateFilter(startDateParam, endDateParam);
+                await this.getInspections();
+                this.setShowResults(true);
             }
         });
+    }
+
+    private applyDateFilter(startDate: string, endDate: string = startDate): void {
+        this.table.query.filter = [{
+            columnName: 'inspectionDate',
+            children: [
+                { columnName: 'inspectionDate', value: startDate, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                { columnName: 'inspectionDate', value: endDate, comparisonOperator: 'Lte', logicalOperator: 'And' }
+            ]
+        }];
     }
 
     public ngOnDestroy(): void {

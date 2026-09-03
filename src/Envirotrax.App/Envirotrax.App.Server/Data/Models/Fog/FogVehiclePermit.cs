@@ -8,7 +8,7 @@ using Envirotrax.Common.Data.Models;
 namespace Envirotrax.App.Server.Data.Models.Fog;
 
 [Table("FogVehiclePermits")]
-public class FogVehiclePermit : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
+public class FogVehiclePermit : TenantModel<WaterSupplier>, ICreateAuditableModel<AppUser>
 {
     [AppPrimaryKey(false)]
     public int VehicleId { get; set; }
@@ -26,10 +26,4 @@ public class FogVehiclePermit : TenantModel<WaterSupplier>, IAuditableModel<AppU
     public int? CreatedById { get; set; }
     public AppUser? CreatedBy { get; set; }
     public DateTime CreatedTime { get; set; }
-    public int? UpdatedById { get; set; }
-    public AppUser? UpdatedBy { get; set; }
-    public DateTime? UpdatedTime { get; set; }
-    public int? DeletedById { get; set; }
-    public AppUser? DeletedBy { get; set; }
-    public DateTime? DeletedTime { get; set; }
 }

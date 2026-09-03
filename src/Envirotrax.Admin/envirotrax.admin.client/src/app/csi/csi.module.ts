@@ -5,6 +5,8 @@ import { SharedComponentsModule } from '../shared/components/shared.components.m
 import { CsiRoutingModule } from './csi-routing.module';
 import { CsiInspectionListComponent } from './inspections/list/csi-inspection-list.component';
 import { CsiInspectionDetailsComponent } from './inspections/details/csi-inspection-details.component';
+import { CsiInspectorListComponent } from './inspectors/list/csi-inspector-list.component';
+import { CsiInspectorDetailsComponent } from './inspectors/details/csi-inspector-details.component';
 
 @NgModule({
     declarations: [
@@ -16,6 +18,8 @@ import { CsiInspectionDetailsComponent } from './inspections/details/csi-inspect
         SharedComponentsModule,
         CsiRoutingModule,
         CsiInspectionDetailsComponent,
+        CsiInspectorListComponent,
+        CsiInspectorDetailsComponent,
     ],
 })
 export class CsiModule { }

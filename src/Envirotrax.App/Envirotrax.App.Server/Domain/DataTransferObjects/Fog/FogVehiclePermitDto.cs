@@ -16,5 +16,4 @@ public class FogVehiclePermitDto : IDto
 
     // Audit
     public DateTime CreatedTime { get; set; }
-    public DateTime? UpdatedTime { get; set; }
 }

@@ -26,8 +26,8 @@ public class FogVehiclePermitService : Service<FogVehiclePermit, FogVehiclePermi
 
     public async Task<IPagedData<FogVehiclePermitSearchDto>> SearchAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        query.Filter = query.ConvertFilterProperties<FogVehiclePermitSearchResult, FogVehiclePermitSearchDto>(Mapper);
-        query.Sort = query.ConvertSortProperties<FogVehiclePermitSearchResult, FogVehiclePermitSearchDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<FogVehicle, FogVehiclePermitSearchDto>(Mapper);
+        query.Sort = query.ConvertSortProperties<FogVehicle, FogVehiclePermitSearchDto>(Mapper);
 
         var results = await _permitRepository.SearchAsync(pageInfo, query, cancellationToken);
 
@@ -56,10 +56,10 @@ public class FogVehiclePermitService : Service<FogVehiclePermit, FogVehiclePermi
             : null;
     }
 
-    private FogVehiclePermitSearchDto MapToDto(FogVehiclePermitSearchResult result, DateTime now)
+    private FogVehiclePermitSearchDto MapToDto(FogVehicle vehicle, DateTime now)
     {
-        var dto = Mapper.Map<FogVehiclePermitSearchDto>(result)!;
-        dto.InspectionDueStatus = ComputeInspectionDueStatus(dto.InspectionDueDate, now);
+        var dto = Mapper.Map<FogVehiclePermitSearchDto>(vehicle)!;
+        dto.InspectionDueStatus = ComputeInspectionDueStatus(dto.Permit?.InspectionDueDate, now);
 
         return dto;
     }

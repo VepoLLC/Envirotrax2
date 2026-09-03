@@ -129,6 +129,32 @@ public class SiteRepository : Repository<Site>, ISiteRepository
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    // FOG Inspection Compliance Management gate. Mirrors GetCsiComplianceAsync but keyed off the FOG
+    // inspection flag; the overdue date range and every other criterion arrive as the client's filter.
+    public async Task<IEnumerable<Site>> GetFogInspectionComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var paginated = await GetListQuery()
+            .Where(s => s.NeedsFogInspection && !s.OutOfArea)
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
+    // FOG Permit Compliance Management gate. Same shape as GetFogInspectionComplianceAsync, keyed off the
+    // FOG permit flag; the overdue date range and every other criterion arrive as the client's filter.
+    public async Task<IEnumerable<Site>> GetFogPermitComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var paginated = await GetListQuery()
+            .Where(s => s.NeedsFogPermit && !s.OutOfArea)
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
     public async Task UpdateCsiAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate)
     {
         await DbContext
@@ -147,6 +173,45 @@ public class SiteRepository : Repository<Site>, ISiteRepository
             .ExecuteUpdateAsync(setter => setter
                 .SetProperty(s => s.BackflowAccountAssignmentId, userId)
                 .SetProperty(s => s.BackflowAccountAssignmentDate, assignmentDate));
+    }
+
+    public async Task<IEnumerable<Site>> GetFogTripTicketComplianceAsync(PageInfo pageInfo, Query query, DateTime? dueDateFrom, DateTime? dueDateTo, bool sortDescending, CancellationToken cancellationToken)
+    {
+        var now = DateTime.UtcNow;
+
+        var sites = GetListQuery()
+            .Where(s => s.TripTicketInterval > 0 && s.LastTripTicketDate != null && !s.OutOfArea)
+            .Where(s => s.LastTripTicketDate!.Value.AddDays(s.TripTicketInterval) < now);
+
+        if (dueDateFrom.HasValue)
+        {
+            sites = sites.Where(s => s.LastTripTicketDate!.Value.AddDays(s.TripTicketInterval) >= dueDateFrom.Value);
+        }
+
+        if (dueDateTo.HasValue)
+        {
+            sites = sites.Where(s => s.LastTripTicketDate!.Value.AddDays(s.TripTicketInterval) <= dueDateTo.Value);
+        }
+
+        sites = sites.Where(query.Filter);
+
+        var sorted = sortDescending
+            ? sites.OrderByDescending(s => s.LastTripTicketDate!.Value.AddDays(s.TripTicketInterval))
+            : sites.OrderBy(s => s.LastTripTicketDate!.Value.AddDays(s.TripTicketInterval));
+
+        var paginated = await sorted.PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public async Task UpdateFogAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate)
+    {
+        await DbContext
+            .Sites
+            .Where(s => s.Id == siteId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(s => s.FogAccountAssignmentId, userId)
+                .SetProperty(s => s.FogAccountAssignmentDate, assignmentDate));
     }
 
     // Loads the non-deleted Site TRACKED (unlike GetAsync/GetNoIncludesAsync, which use AsNoTracking) so the

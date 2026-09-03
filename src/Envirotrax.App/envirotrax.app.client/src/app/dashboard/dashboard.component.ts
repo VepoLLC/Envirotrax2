@@ -5,6 +5,7 @@ import { WaterSupplierDashboardStats } from "../shared/models/water-suppliers/wa
 import { CsiSubmissionStats } from "../shared/models/water-suppliers/csi-submission-stats";
 import { BackflowSubmissionStats } from "../shared/models/water-suppliers/backflow-submission-stats";
 import { FogInspectionSubmissionStats } from "../shared/models/water-suppliers/fog-inspection-submission-stats";
+import { FogTripTicketSubmissionStats } from "../shared/models/water-suppliers/fog-trip-ticket-submission-stats";
 import { FeatureType } from "../shared/models/feature-type";
 
 @Component({
@@ -18,16 +19,17 @@ export class DashboardComponent implements OnInit {
     public csiVm?: CsiStatsVm;
     public backflowVm?: BackflowStatsVm;
     public fogInspectionVm?: FogInspectionStatsVm;
+    public fogTripTicketVm?: FogTripTicketStatsVm;
     public isLoading: boolean = false;
 
-    public hasWiseGuys: boolean = false;
+    
     public hasCsi: boolean = false;
     public hasBackflow: boolean = false;
     public hasFogInspection: boolean = false;
     public hasFogTransportation: boolean = false;
 
     public get hasAnyProgram(): boolean {
-        return this.hasWiseGuys || this.hasCsi || this.hasBackflow || this.hasFogInspection || this.hasFogTransportation;
+        return this.hasCsi || this.hasBackflow || this.hasFogInspection || this.hasFogTransportation;
     }
 
     constructor(
@@ -38,14 +40,12 @@ export class DashboardComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         [
             this.waterSupplierId,
-            this.hasWiseGuys,
             this.hasCsi,
             this.hasBackflow,
             this.hasFogInspection,
             this.hasFogTransportation
         ] = await Promise.all([
             this._authService.getWaterSupplierId(),
-            this._authService.hasAnyFeatures(FeatureType.WiseGuys),
             this._authService.hasAnyFeatures(FeatureType.CsiInspection),
             this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
             this._authService.hasAnyFeatures(FeatureType.FogInspection),
@@ -72,6 +72,10 @@ export class DashboardComponent implements OnInit {
 
             if (this.hasFogInspection) {
                 requests.push(this._dashboardService.getFogInspectionSubmissionStats().then(s => this.fogInspectionVm = this.buildFogInspectionVm(s)));
+            }
+
+            if (this.hasFogTransportation) {
+                requests.push(this._dashboardService.getFogTripTicketSubmissionStats().then(s => this.fogTripTicketVm = this.buildFogTripTicketVm(s)));
             }
 
             await Promise.all(requests);
@@ -131,6 +135,7 @@ export class DashboardComponent implements OnInit {
         }));
 
         const subAccountStats = (stats.subAccountStats ?? []).map(sub => ({
+            waterSupplierId: sub.waterSupplierId,
             waterSupplierName: sub.waterSupplierName,
             totalInspections: sub.dailyStats.reduce((s, d) => s + d.totalInspections, 0),
             totalPaidInspections: sub.dailyStats.reduce((s, d) => s + d.totalPaidInspections, 0)
@@ -142,7 +147,9 @@ export class DashboardComponent implements OnInit {
             totalPaidInspections,
             subAccountStats,
             subAccountTotalInspections: subAccountStats.reduce((s, sub) => s + sub.totalInspections, 0),
-            subAccountTotalPaidInspections: subAccountStats.reduce((s, sub) => s + sub.totalPaidInspections, 0)
+            subAccountTotalPaidInspections: subAccountStats.reduce((s, sub) => s + sub.totalPaidInspections, 0),
+            rangeStartDate: dailyStats[0]?.date,
+            rangeEndDate: dailyStats[dailyStats.length - 1]?.date
         };
     }
 
@@ -161,6 +168,7 @@ export class DashboardComponent implements OnInit {
         }));
 
         const subAccountStats = (stats.subAccountStats ?? []).map(sub => ({
+            waterSupplierId: sub.waterSupplierId,
             waterSupplierName: sub.waterSupplierName,
             totalTests: sub.dailyStats.reduce((s, d) => s + d.totalTests, 0),
             totalPaidTests: sub.dailyStats.reduce((s, d) => s + d.totalPaidTests, 0)
@@ -172,7 +180,9 @@ export class DashboardComponent implements OnInit {
             totalPaidTests,
             subAccountStats,
             subAccountTotalTests: subAccountStats.reduce((s, sub) => s + sub.totalTests, 0),
-            subAccountTotalPaidTests: subAccountStats.reduce((s, sub) => s + sub.totalPaidTests, 0)
+            subAccountTotalPaidTests: subAccountStats.reduce((s, sub) => s + sub.totalPaidTests, 0),
+            rangeStartDate: dailyStats[0]?.date,
+            rangeEndDate: dailyStats[dailyStats.length - 1]?.date
         };
     }
 
@@ -191,6 +201,7 @@ export class DashboardComponent implements OnInit {
         }));
 
         const subAccountStats = (stats.subAccountStats ?? []).map(sub => ({
+            waterSupplierId: sub.waterSupplierId,
             waterSupplierName: sub.waterSupplierName,
             totalInspections: sub.dailyStats.reduce((s, d) => s + d.totalInspections, 0),
             totalPaidInspections: sub.dailyStats.reduce((s, d) => s + d.totalPaidInspections, 0)
@@ -202,8 +213,47 @@ export class DashboardComponent implements OnInit {
             totalPaidInspections,
             subAccountStats,
             subAccountTotalInspections: subAccountStats.reduce((s, sub) => s + sub.totalInspections, 0),
-            subAccountTotalPaidInspections: subAccountStats.reduce((s, sub) => s + sub.totalPaidInspections, 0)
+            subAccountTotalPaidInspections: subAccountStats.reduce((s, sub) => s + sub.totalPaidInspections, 0),
+            rangeStartDate: dailyStats[0]?.date,
+            rangeEndDate: dailyStats[dailyStats.length - 1]?.date
         };
+    }
+
+    private buildFogTripTicketVm(stats: FogTripTicketSubmissionStats): FogTripTicketStatsVm {
+        const totalTripTickets = stats.dailyStats.reduce((s, d) => s + d.totalTripTickets, 0);
+        const totalPaidTripTickets = stats.dailyStats.reduce((s, d) => s + d.totalPaidTripTickets, 0);
+
+        const dailyStats = stats.dailyStats.map(d => ({
+            date: d.date,
+            dayName: this.formatDayName(d.date),
+            formattedDate: this.formatDate(d.date),
+            isWeekend: d.isWeekend,
+            totalTripTickets: d.totalTripTickets,
+            totalPaidTripTickets: d.totalPaidTripTickets,
+            barPercent: totalTripTickets > 0 ? Math.round((d.totalTripTickets / totalTripTickets) * 100) : 0
+        }));
+
+        const subAccountStats = (stats.subAccountStats ?? []).map(sub => ({
+            waterSupplierId: sub.waterSupplierId,
+            waterSupplierName: sub.waterSupplierName,
+            totalTripTickets: sub.dailyStats.reduce((s, d) => s + d.totalTripTickets, 0),
+            totalPaidTripTickets: sub.dailyStats.reduce((s, d) => s + d.totalPaidTripTickets, 0)
+        }));
+
+        return {
+            dailyStats,
+            totalTripTickets,
+            totalPaidTripTickets,
+            subAccountStats,
+            subAccountTotalTripTickets: subAccountStats.reduce((s, sub) => s + sub.totalTripTickets, 0),
+            subAccountTotalPaidTripTickets: subAccountStats.reduce((s, sub) => s + sub.totalPaidTripTickets, 0),
+            rangeStartDate: dailyStats[0]?.date,
+            rangeEndDate: dailyStats[dailyStats.length - 1]?.date
+        };
+    }
+
+    public buildReturnUrl(basePath: string, startDate: string, endDate: string): string {
+        return `${basePath}?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
     }
 
     private formatDayName(date: string): string {
@@ -226,6 +276,7 @@ interface CsiDailyStatsVm {
 }
 
 interface CsiSubAccountVm {
+    waterSupplierId: number;
     waterSupplierName: string;
     totalInspections: number;
     totalPaidInspections: number;
@@ -238,6 +289,8 @@ interface CsiStatsVm {
     subAccountStats: CsiSubAccountVm[];
     subAccountTotalInspections: number;
     subAccountTotalPaidInspections: number;
+    rangeStartDate: string;
+    rangeEndDate: string;
 }
 
 interface BackflowDailyStatsVm {
@@ -251,6 +304,7 @@ interface BackflowDailyStatsVm {
 }
 
 interface BackflowSubAccountVm {
+    waterSupplierId: number;
     waterSupplierName: string;
     totalTests: number;
     totalPaidTests: number;
@@ -263,6 +317,8 @@ interface BackflowStatsVm {
     subAccountStats: BackflowSubAccountVm[];
     subAccountTotalTests: number;
     subAccountTotalPaidTests: number;
+    rangeStartDate: string;
+    rangeEndDate: string;
 }
 
 interface FogInspectionDailyStatsVm {
@@ -276,6 +332,7 @@ interface FogInspectionDailyStatsVm {
 }
 
 interface FogInspectionSubAccountVm {
+    waterSupplierId: number;
     waterSupplierName: string;
     totalInspections: number;
     totalPaidInspections: number;
@@ -288,4 +345,34 @@ interface FogInspectionStatsVm {
     subAccountStats: FogInspectionSubAccountVm[];
     subAccountTotalInspections: number;
     subAccountTotalPaidInspections: number;
+    rangeStartDate: string;
+    rangeEndDate: string;
+}
+
+interface FogTripTicketDailyStatsVm {
+    date: string;
+    dayName: string;
+    formattedDate: string;
+    isWeekend: boolean;
+    totalTripTickets: number;
+    totalPaidTripTickets: number;
+    barPercent: number;
+}
+
+interface FogTripTicketSubAccountVm {
+    waterSupplierId: number;
+    waterSupplierName: string;
+    totalTripTickets: number;
+    totalPaidTripTickets: number;
+}
+
+interface FogTripTicketStatsVm {
+    dailyStats: FogTripTicketDailyStatsVm[];
+    totalTripTickets: number;
+    totalPaidTripTickets: number;
+    subAccountStats: FogTripTicketSubAccountVm[];
+    subAccountTotalTripTickets: number;
+    subAccountTotalPaidTripTickets: number;
+    rangeStartDate: string;
+    rangeEndDate: string;
 }

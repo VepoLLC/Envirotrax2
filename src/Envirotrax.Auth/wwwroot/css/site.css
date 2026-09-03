@@ -1091,6 +1091,13 @@ input[type=reset]:disabled {
     color: #666;
 }
 
+button.btn-close,
+button[type=button].btn-close {
+    background-color: transparent;
+    border: none;
+    padding: .25em;
+}
+
 /*--------------------------------------------------------------
 # Page LinkButton Navigation
 --------------------------------------------------------------*/
@@ -1200,6 +1207,29 @@ input[type=button].tab.orange,
 input[type=submit].tab.orange,
 input[type=reset].tab.orange {
     background-color: var(--orange);
+}
+
+.vp-tabs .nav-link {
+    border: 1px solid var(--bs-border-color);
+    margin: 0 6px;
+    background-color: rgba(0, 143, 212, 0.63);
+    border-radius: 13px 13px 4px 4px;
+    min-width: 175px;
+    padding: 3px 25px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+}
+
+.vp-tabs .nav-link:hover {
+    color: #fff;
+    text-decoration: none;
+}
+
+.vp-tabs .nav-link.active {
+    background-color: #337ab7 !important;
+    border-color: #2e6da4 !important;
+    color: #fff !important;
 }
 
 /*--------------------------------------------------------------
@@ -1529,12 +1559,6 @@ select.form-select-inline {
 
 .form-select:disabled {
     background: var(--control-bg-color) !important;
-}
-
-.form-check-input {
-    margin: 0px 2px;
-    white-space: nowrap;
-    border: none;
 }
 
 .form-check-input input[type=radio] {

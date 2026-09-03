@@ -1,4 +1,5 @@
-import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { FogTripTicketService } from '../../../shared/services/fog/fog-trip-ticket.service';
@@ -17,7 +18,8 @@ import { PrintableTableService } from '../../../shared/services/printable-table.
     standalone: false,
     templateUrl: './fog-trip-ticket-list.component.html'
 })
-export class FogTripTicketListComponent implements OnInit {
+export class FogTripTicketListComponent implements OnInit, OnDestroy {
+    private _queryParamSub?: Subscription;
     public showResults: boolean = false;
     public readonly PropertyType = PropertyType;
     public readonly FogVehicleCapacityType = FogVehicleCapacityType;
@@ -99,7 +101,9 @@ export class FogTripTicketListComponent implements OnInit {
         { id: FogTripTicketDateType.WasteDeliveredDate, text: 'Waste delivered date' }
     ];
 
-    public selectedDateType: string = '';
+    public get selectedDateType(): string {
+        return this.table.query.filter?.find(qp => qp.columnName === 'dateType')?.value ?? '';
+    }
 
     constructor(
         private readonly _fogTripTicketService: FogTripTicketService,
@@ -111,6 +115,41 @@ export class FogTripTicketListComponent implements OnInit {
 
     public ngOnInit(): void {
         this.table.columns = this.getColumns();
+
+        this._queryParamSub = this._activatedRoute.queryParamMap.subscribe(async params => {
+            const dateParam = params.get('date');
+            if (dateParam) {
+                this.applyDateFilter(dateParam);
+                await this.getTripTickets();
+                this.setShowResults(true);
+                return;
+            }
+
+            // Dashboard "View" on a sub account lands here already authenticated as that water
+            // supplier (via /auth/login-redirect); this just carries over the same last-10-days
+            // window shown on the dashboard so the results match what was clicked.
+            const startDateParam = params.get('startDate');
+            const endDateParam = params.get('endDate');
+            if (startDateParam && endDateParam) {
+                this.applyDateFilter(startDateParam, endDateParam);
+                await this.getTripTickets();
+                this.setShowResults(true);
+            }
+        });
+    }
+
+    private applyDateFilter(startDate: string, endDate: string = startDate): void {
+        this.table.query.filter = [{
+            columnName: 'createdTime',
+            children: [
+                { columnName: 'createdTime', value: startDate, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                { columnName: 'createdTime', value: endDate, comparisonOperator: 'Lte', logicalOperator: 'And' }
+            ]
+        }];
+    }
+
+    public ngOnDestroy(): void {
+        this._queryParamSub?.unsubscribe();
     }
 
     private getColumns(): TableColumn<FogTripTicket>[] {

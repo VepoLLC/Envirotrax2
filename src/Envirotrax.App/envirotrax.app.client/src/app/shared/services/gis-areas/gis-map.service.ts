@@ -18,7 +18,7 @@ export class GisMapService {
                 if (coords.length === 0) {
                     return null;
                 }
-                return { name: area.name, color: area.color ?? '#000000', coordinates: coords, data: area };
+                return { name: area.name, color: area.color || '#000000', coordinates: coords, data: area };
             })
             .filter((p): p is MapPolygon<GisArea> => p !== null);
     }

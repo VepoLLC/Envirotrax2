@@ -49,4 +49,18 @@ public class MyWaterSupplierController : EnvirotraxBaseController
         var supplier = await _supplierService.GetLoggedInSupplierAsync(cancellationToken);
         return Ok(supplier);
     }
+
+    [HttpPut("my/current")]
+    [HasPermission(PermissionAction.CanModify, PermissionType.AccountInformation)]
+    public async Task<IActionResult> UpdateLoggedInSupplierAsync(WaterSupplierDto dto)
+    {
+        var updated = await _supplierService.UpdateOwnAsync(dto);
+
+        if (updated == null)
+        {
+            return Conflict();
+        }
+
+        return Ok(updated);
+    }
 }

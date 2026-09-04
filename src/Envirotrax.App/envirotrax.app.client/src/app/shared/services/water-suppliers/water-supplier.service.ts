@@ -6,7 +6,7 @@ import { QueryHelperService } from "../helpers/query-helper.service";
 import { HttpClient } from "@angular/common/http";
 import { PagedData } from "../../models/paged-data";
 import { MySupplierHierarchyDto, WaterSupplier } from "../../models/water-suppliers/water-supplier";
-import { lastValueFrom, Observable, shareReplay } from "rxjs";
+import { lastValueFrom, Observable, of, shareReplay } from "rxjs";
 
 @Injectable({
     providedIn: 'root'
@@ -83,5 +83,17 @@ export class WaterSupplierService {
         }
 
         return lastValueFrom(this._currentSupplier$);
+    }
+
+    public async updateLoggedInSupplier(supplier: WaterSupplier): Promise<WaterSupplier> {
+        const url = this._urlResolver.resolveUrl('/api/water-suppliers/my/current');
+
+        const updated = await lastValueFrom(
+            this._http.put<WaterSupplier>(url, supplier)
+        );
+
+        this._currentSupplier$ = of(updated);
+
+        return updated;
     }
 }

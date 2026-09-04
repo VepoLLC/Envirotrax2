@@ -28,7 +28,16 @@ public class BackflowComplianceSnapshotRepository : IBackflowComplianceSnapshotR
             .OrderBy(s => s.ReportDate)
             .ToListAsync(cancellationToken);
     }
-    
+
+    public async Task<BackflowComplianceSnapshot?> GetLatestAsync(CancellationToken cancellationToken)
+    {
+        return await _dbContext
+            .BackflowComplianceSnapshots
+            .AsNoTracking()
+            .OrderByDescending(s => s.ReportDate)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<BackflowComplianceSnapshot> UpsertAsync(BackflowComplianceSnapshot snapshot, CancellationToken cancellationToken)
     {
         var existing = await _dbContext

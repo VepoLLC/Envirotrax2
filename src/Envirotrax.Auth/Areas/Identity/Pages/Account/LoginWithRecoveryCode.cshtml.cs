@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 namespace Envirotrax.Auth.Areas.Identity.Pages.Account
 {
-    public class LoginWithRecoveryCodeModel : PageModel
+    public class LoginWithRecoveryCodeModel : TwoFactorLoginPageModel
     {
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UserManager<AppUser> _userManager;
@@ -66,7 +66,7 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
             {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+                return RedirectToExpiredLogin(returnUrl);
             }
 
             ReturnUrl = returnUrl;
@@ -84,7 +84,7 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
             {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+                return RedirectToExpiredLogin(returnUrl);
             }
 
             var recoveryCode = Input.RecoveryCode.Replace(" ", string.Empty);

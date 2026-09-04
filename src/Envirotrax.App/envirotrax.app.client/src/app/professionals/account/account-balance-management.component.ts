@@ -3,7 +3,9 @@ import { NgForm } from "@angular/forms";
 import { LookupService } from "../../shared/services/lookup/lookup.service";
 import { State } from "../../shared/models/lookup/state";
 import { Professional } from "../../shared/models/professionals/professional";
+import { ProfessionalUser } from "../../shared/models/professionals/professional-user";
 import { ProfesisonalService } from "../../shared/services/professionals/professional.service";
+import { ProfesionalUserService } from "../../shared/services/professionals/professional-user.service";
 import { HelperService } from "../../shared/services/helpers/helper.service";
 import { InputOption, ToastService } from '@envirotrax/common-ui';
 import { CreditCardPaymentComponent, CreditCardToken } from "../../shared/components/credit-card-payment/credit-card-payment.component";
@@ -21,6 +23,7 @@ export class AccountBalanceManagementComponent implements OnInit {
     public validationErrors: string[] = [];
 
     public professional: Professional = {};
+    public professionalUser: ProfessionalUser = {};
     public amountToAdd?: number;
     public cardToken?: CreditCardToken;
 
@@ -29,6 +32,7 @@ export class AccountBalanceManagementComponent implements OnInit {
     constructor(
         private readonly _lookupService: LookupService,
         private readonly _professionalService: ProfesisonalService,
+        private readonly _professionalUserService: ProfesionalUserService,
         private readonly _helper: HelperService,
         private readonly _toastService: ToastService
     ) { }
@@ -37,24 +41,27 @@ export class AccountBalanceManagementComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            const [states, professional] = await Promise.all([
+            const [states, professional, professionalUser] = await Promise.all([
                 this._lookupService.getAllStatesAsOptions(true),
-                this._professionalService.getLoggedInProfessional()
+                this._professionalService.getLoggedInProfessional(),
+                this._professionalUserService.getMyData()
             ]);
 
             this.states = states;
             this.professional = professional;
+            this.professionalUser = professionalUser;
         } finally {
             this.isLoading = false;
         }
     }
 
     public stateChanged(stateId: number): void {
-        this.professional.billingState = stateId ? { id: stateId } : undefined;
+        this.professionalUser.billingState = stateId ? { id: stateId } : undefined;
     }
 
-    public onTokenCaptured(token: CreditCardToken): void {
+    public onTokenCaptured(token: CreditCardToken, form: NgForm): void {
         this.cardToken = token;
+        this.save(form);
     }
 
     public async save(form: NgForm): Promise<void> {
@@ -73,12 +80,12 @@ export class AccountBalanceManagementComponent implements OnInit {
                     amountToAdd: amountEntered ? Number(this.amountToAdd) : 0,
                     dataDescriptor: this.cardToken!.dataDescriptor,
                     dataValue: this.cardToken!.dataValue,
-                    billingFirstName: this.professional.billingFirstName!,
-                    billingLastName: this.professional.billingLastName!,
-                    billingAddress: this.professional.billingAddress!,
-                    billingCity: this.professional.billingCity!,
-                    billingState: this.professional.billingState!,
-                    billingZipCode: this.professional.billingZipCode!
+                    billingFirstName: this.professionalUser.billingFirstName!,
+                    billingLastName: this.professionalUser.billingLastName!,
+                    billingAddress: this.professionalUser.billingAddress!,
+                    billingCity: this.professionalUser.billingCity!,
+                    billingState: this.professionalUser.billingState!,
+                    billingZipCode: this.professionalUser.billingZipCode!
                 };
 
                 this.professional = await this._professionalService.updateMyAccountBalance(request);

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, NgZone, OnInit, Output } from "@angular/core";
+import { ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnInit, Output } from "@angular/core";
 import { AuthorizeNetService } from "../../services/authorize-net/authorize-net.service";
 
 export interface CreditCardToken {
@@ -29,6 +29,9 @@ declare global {
     templateUrl: './credit-card-payment.component.html'
 })
 export class CreditCardPaymentComponent implements OnInit {
+    @Input()
+    public disabled: boolean = false;
+
     @Output()
     public tokenCaptured = new EventEmitter<CreditCardToken>();
 
@@ -68,9 +71,9 @@ export class CreditCardPaymentComponent implements OnInit {
         this.errors = [];
     }
 
-    public onEnterCardDetailsClick(): void {
-        // Clear the previous attempt's result so a repeat "Enter Card Details" click doesn't keep
-        // showing a stale success/error message from an earlier, already-used token.
+    public onContinueClick(): void {
+        // Clear the previous attempt's result so a repeat click doesn't keep showing a stale
+        // success/error message from an earlier, already-used token.
         this.reset();
     }
 

@@ -35,7 +35,7 @@ const routes: Routes = [
         component: AccountBalanceManagementComponent,
         canActivate: [RoleGuard],
         data: {
-            roles: [ROLE_DEFINITIONS.PROFESSIONAL]
+            roles: [ROLE_DEFINITIONS.PROFESSIONALS.ADMIN]
         }
     },
     {

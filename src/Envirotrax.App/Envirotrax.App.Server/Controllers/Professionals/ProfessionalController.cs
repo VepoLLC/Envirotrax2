@@ -27,6 +27,7 @@ public class ProfessionalControler : ProfessionalProtectedController
     }
 
     [HttpPut("my/account-balance")]
+    [Authorize(Roles = RoleDefinitions.Professionals.Admin)]
     public async Task<IActionResult> UpdateMyAccountBalanceAsync(ProfessionalAccountBalanceDto dto, CancellationToken cancellationToken)
     {
         var updated = await _professionalService.UpdateMyAccountBalanceAsync(dto, cancellationToken);

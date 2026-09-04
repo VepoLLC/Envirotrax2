@@ -106,13 +106,7 @@ public static class ServiceRegistration
         services.Configure<GeocodingOptions>(configuration.GetSection("Geocoding"));
         services.AddHttpClient<IGeocodingService, GeocodingService>();
 
-        services.Configure<AuthorizeNetOptions>(options =>
-        {
-            configuration.GetSection("AuthorizeNet").Bind(options);
-            options.BaseUrl = environment.IsDevelopment()
-                ? "https://apitest.authorize.net/xml/v1/request.api"
-                : "https://api.authorize.net/xml/v1/request.api";
-        });
+        services.Configure<AuthorizeNetOptions>(configuration.GetSection("AuthorizeNet"));
         services.AddHttpClient<IAuthorizeNetPaymentService, AuthorizeNetPaymentService>();
 
         services.AddHtmlTemplateService(opts =>

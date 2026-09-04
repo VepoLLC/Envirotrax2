@@ -113,14 +113,17 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
             professional.AccountBalance += dto.AmountToAdd;
         }
 
-        professional.BillingFirstName = dto.BillingFirstName;
-        professional.BillingLastName = dto.BillingLastName;
-        professional.BillingAddress = dto.BillingAddress;
-        professional.BillingCity = dto.BillingCity;
-        professional.BillingStateId = dto.BillingState.Id;
-        professional.BillingZipCode = dto.BillingZipCode;
+        var professionalUser = await _professionalUserRepository.GetTrackedForUpdateAsync(_authService.UserId, cancellationToken)
+            ?? throw new InvalidOperationException("Professional user not found.");
 
-        await _professionalRepository.SaveChangesAsync(cancellationToken);
+        professionalUser.BillingFirstName = dto.BillingFirstName;
+        professionalUser.BillingLastName = dto.BillingLastName;
+        professionalUser.BillingAddress = dto.BillingAddress;
+        professionalUser.BillingCity = dto.BillingCity;
+        professionalUser.BillingStateId = dto.BillingState.Id;
+        professionalUser.BillingZipCode = dto.BillingZipCode;
+
+        await _professionalRepository.SaveChangesAsync();
 
         return MapToDto(professional)!;
     }

@@ -5,9 +5,6 @@ import { UrlResolverService } from "../helpers/url-resolver.service";
 import { AuthorizeNetClientConfig } from "../../models/authorize-net/authorize-net-client-config";
 import { environment } from "../../../../environments/environment";
 
-const PRODUCTION_ACCEPT_UI_SCRIPT_URL = 'https://js.authorize.net/v3/AcceptUI.js';
-const SANDBOX_ACCEPT_UI_SCRIPT_URL = 'https://jstest.authorize.net/v3/AcceptUI.js';
-
 @Injectable({
     providedIn: 'root'
 })
@@ -35,9 +32,7 @@ export class AuthorizeNetService {
             this._scriptLoaded$ = new Promise<void>((resolve, reject) => {
                 const script = document.createElement('script');
 
-                script.src = environment.production
-                    ? PRODUCTION_ACCEPT_UI_SCRIPT_URL
-                    : SANDBOX_ACCEPT_UI_SCRIPT_URL;
+                script.src = environment.authorizeNetScriptUrl;
                 script.async = true;
                 script.onload = () => resolve();
                 script.onerror = () => reject(new Error('Failed to load Authorize.Net AcceptUI script.'));

@@ -49,14 +49,4 @@ public class ProfessionalRepository : Repository<Professional>, IProfessionalRep
             .OrderBy(p => p.Name)
             .ToListAsync(cancellationToken);
     }
-
-    public async Task<Professional?> GetTrackedForUpdateAsync(int id, CancellationToken cancellationToken)
-    {
-        return await Entity.SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
-    }
-
-    public Task SaveChangesAsync(CancellationToken cancellationToken)
-    {
-        return DbContext.SaveChangesAsync(cancellationToken);
-    }
 }

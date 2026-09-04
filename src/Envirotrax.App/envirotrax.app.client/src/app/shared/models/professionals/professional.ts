@@ -16,12 +16,6 @@ export interface Professional {
     createdTime?: string;
 
     accountBalance?: number;
-    billingFirstName?: string;
-    billingLastName?: string;
-    billingAddress?: string;
-    billingCity?: string;
-    billingState?: State;
-    billingZipCode?: string;
 
     hasWiseGuys?: boolean;
     hasBackflowTesting?: boolean;

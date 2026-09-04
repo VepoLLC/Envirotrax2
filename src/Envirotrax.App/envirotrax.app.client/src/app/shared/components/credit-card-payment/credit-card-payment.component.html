@@ -1,15 +1,15 @@
 <div class="text-center">
     <button type="button"
             class="AcceptUI btn btn-primary vp-section-button btn-lg px-5"
-            [disabled]="!isReady"
+            [disabled]="!isReady || disabled"
             [attr.data-apiLoginID]="apiLoginId"
             [attr.data-clientKey]="publicClientKey"
             data-acceptUIFormBtnTxt="Submit"
             data-acceptUIFormHeaderTxt="Card Information"
             data-billingAddressOptions='{"show":false}'
             data-responseHandler="acceptUiResponseHandler"
-            (click)="onEnterCardDetailsClick()">
-        Enter Card Details
+            (click)="onContinueClick()">
+        Continue
     </button>
 
     <div *ngIf="hasCapturedToken" class="text-success mt-2">

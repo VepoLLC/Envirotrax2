@@ -60,6 +60,11 @@ public class AuthorizeNetPaymentService : IAuthorizeNetPaymentService
         var httpResponse = await _http.PostAsJsonAsync(string.Empty, request, cancellationToken);
         var json = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
 
+        if (!httpResponse.IsSuccessStatusCode)
+        {
+            throw new InvalidOperationException($"Authorize.Net request failed with status {(int)httpResponse.StatusCode}. Response: {json}");
+        }
+
         // Authorize.Net's JSON API prepends a UTF-8 BOM to the response body, which breaks strict JSON parsing.
         json = json.TrimStart((char)0xFEFF);
 

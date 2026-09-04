@@ -19,20 +19,10 @@ public class ProfessionalProfile : Profile
                         Id = model.StateId.Value
                     };
                 }
-
-                if (model.BillingStateId.HasValue)
-                {
-                    dto.BillingState ??= new()
-                    {
-                        Id = model.BillingStateId.Value
-                    };
-                }
             })
             .ReverseMap()
             .ForMember(pro => pro.State, opt => opt.Ignore())
             .ForMember(pro => pro.StateId, opt => opt.MapFrom(pro => pro.State!.Id))
-            .ForMember(pro => pro.BillingState, opt => opt.Ignore())
-            .ForMember(pro => pro.BillingStateId, opt => opt.MapFrom(pro => pro.BillingState!.Id))
             .ForMember(pro => pro.CreatedTime, opt => opt.Ignore());
 
         CreateMap<Professional, ReferencedProfessionalDto>();

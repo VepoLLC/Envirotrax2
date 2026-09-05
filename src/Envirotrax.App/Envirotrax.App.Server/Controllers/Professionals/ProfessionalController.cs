@@ -25,6 +25,14 @@ public class ProfessionalControler : ProfessionalProtectedController
         var updated = await _professionalService.UpdateAsync(professional);
         return Ok(updated);
     }
+
+    [HttpPut("my/account-balance")]
+    [Authorize(Roles = RoleDefinitions.Professionals.Admin)]
+    public async Task<IActionResult> UpdateMyAccountBalanceAsync(ProfessionalAccountBalanceDto dto, CancellationToken cancellationToken)
+    {
+        var updated = await _professionalService.UpdateMyAccountBalanceAsync(dto, cancellationToken);
+        return Ok(updated);
+    }
 }
 
 // We this controller because /api/professionals/my endpoint requires the user to be logged in, but it doesn't require having Professional role.

@@ -15,6 +15,8 @@ export interface Professional {
     hidePublicListing?: boolean;
     createdTime?: string;
 
+    accountBalance?: number;
+
     hasWiseGuys?: boolean;
     hasBackflowTesting?: boolean;
     hasCsiInspection?: boolean;

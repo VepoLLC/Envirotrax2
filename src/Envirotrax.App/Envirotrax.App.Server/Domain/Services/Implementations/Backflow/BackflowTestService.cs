@@ -174,6 +174,59 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         return tests.Select(t => MapToDto(t)!).ToPagedData(pageInfo);
     }
 
+    public async Task<IPagedData<BackflowReplacementDto>> GetReplacementsAsync(PageInfo pageInfo, Query query, bool onHold, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<BackflowTest, BackflowReplacementDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<BackflowTest, BackflowReplacementDto>(Mapper);
+
+        var tests = await _testRepository.GetReplacementsAsync(pageInfo, query, onHold, cancellationToken);
+
+        var replacements = new List<BackflowReplacementDto>();
+
+        foreach (var test in tests)
+        {
+            replacements.Add(Mapper.Map<BackflowReplacementDto>(test));
+        }
+
+        return replacements.ToPagedData(pageInfo);
+    }
+
+    public async Task<BackflowReplacementDto?> GetReplacedAssemblyAsync(int id, CancellationToken cancellationToken)
+    {
+        var test = await _testRepository.GetReplacedAssemblyAsync(id, cancellationToken);
+
+        if (test == null)
+        {
+            return null;
+        }
+
+        return Mapper.Map<BackflowReplacementDto>(test);
+    }
+
+    public async Task<BackflowReplacementDto?> UpdateReplacementHoldAsync(int id, bool onHold)
+    {
+        var test = await _testRepository.UpdateReplacementHoldAsync(id, onHold);
+
+        if (test == null)
+        {
+            return null;
+        }
+
+        return Mapper.Map<BackflowReplacementDto>(test);
+    }
+
+    public async Task<BackflowReplacementDto?> UpdateReplacementClearedAsync(int id, bool cleared)
+    {
+        var test = await _testRepository.UpdateReplacementClearedAsync(id, cleared);
+
+        if (test == null)
+        {
+            return null;
+        }
+
+        return Mapper.Map<BackflowReplacementDto>(test);
+    }
+
     private async Task PopulateBpatSnapshotAsync(BackflowTestDto dto)
     {
         if (dto.Professional?.Id is int professionalId)

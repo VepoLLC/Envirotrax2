@@ -15,4 +15,6 @@ public interface IProfessionalService : IService<Professional, ProfessionalDto>
     Task<IReadOnlyList<ProfessionalDto>> GetSubAccountsAsync(CancellationToken cancellationToken);
 
     Task<ProfessionalDto> AddMyAsync(CreateProfessionalDto createProfessional);
+
+    Task<ProfessionalDto> UpdateMyAccountBalanceAsync(ProfessionalAccountBalanceDto dto, CancellationToken cancellationToken);
 }

@@ -15,6 +15,7 @@ using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
+using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Fog;
 
@@ -31,6 +32,8 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
     private readonly IFogDisposalSiteService _disposalSiteService;
     private readonly IFileStorageService _fileStorageService;
     private readonly IPdfTemplateService _pdfTemplateService;
+    private readonly IGeneralSettingsService _generalSettingsService;
+    private readonly IProfessionalSupplierService _professionalSupplierService;
 
     public FogTripTicketService(
         IMapper mapper,
@@ -42,7 +45,9 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         IFogVehicleService vehicleService,
         IFogDisposalSiteService disposalSiteService,
         IFileStorageService fileStorageService,
-        IPdfTemplateService pdfTemplateService)
+        IPdfTemplateService pdfTemplateService,
+        IGeneralSettingsService generalSettingsService,
+        IProfessionalSupplierService professionalSupplierService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -54,6 +59,8 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         _disposalSiteService = disposalSiteService;
         _fileStorageService = fileStorageService;
         _pdfTemplateService = pdfTemplateService;
+        _generalSettingsService = generalSettingsService;
+        _professionalSupplierService = professionalSupplierService;
     }
 
     public override async Task<FogTripTicketDto?> DeleteAsync(int id)
@@ -186,6 +193,7 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         ApplyTransporterSnapshot(ticket, professional!, transporterUser, transporterUserId);
         ApplyVehicleSnapshot(ticket, vehicle);
         ApplyReceiverSnapshot(ticket, disposalSite);
+        await ApplyAmountAsync(ticket, site?.IsFeeExempt ?? false, cancellationToken);
 
         if (generatorSignatureStream != null && generatorSignatureFileName != null)
         {
@@ -212,6 +220,23 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
 
         scope.Complete();
         return Mapper.Map<FogTripTicketDto>(added);
+    }
+
+    private async Task ApplyAmountAsync(FogTripTicket ticket, bool siteIsFeeExempt, CancellationToken cancellationToken)
+    {
+        ticket.Amount = 0;
+        ticket.AmountShare = 0;
+
+        if (siteIsFeeExempt)
+        {
+            return;
+        }
+
+        var settings = await _generalSettingsService.GetAsync(ticket.WaterSupplierId, cancellationToken);
+        var registration = await _professionalSupplierService.GetAsync(ticket.WaterSupplierId, cancellationToken);
+
+        ticket.Amount = registration?.FogTransportFee ?? settings?.FogTransportFee ?? 0;
+        ticket.AmountShare = settings?.FogTransportFeeWsShare ?? 0;
     }
 
     private async Task PopulateSignatureUrlsAsync(FogTripTicketDto dto)

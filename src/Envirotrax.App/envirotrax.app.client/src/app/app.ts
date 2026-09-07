@@ -119,7 +119,7 @@ export class App implements OnInit {
           {
             title: 'Account Contact Information',
             iconCss: 'fa-regular fa-user',
-            routerLink: ['/'],
+            routerLink: ['admin/account-information'],
             hasPermission: true,
             hasFeature: true
           },
@@ -475,6 +475,13 @@ export class App implements OnInit {
             iconCss: 'fa-regular fa-user',
             routerLink: ['/profile'],
             hasPermission: true,
+            hasFeature: true
+          },
+          {
+            title: 'Account Balance Management',
+            iconCss: 'fa-solid fa-wallet',
+            routerLink: ['professionals/account-balance'],
+            hasPermission: isAdmin,
             hasFeature: true
           },
           {

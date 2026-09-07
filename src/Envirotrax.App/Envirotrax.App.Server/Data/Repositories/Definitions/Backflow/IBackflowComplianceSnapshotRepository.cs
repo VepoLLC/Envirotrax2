@@ -6,5 +6,7 @@ public interface IBackflowComplianceSnapshotRepository
 {
     Task<IEnumerable<BackflowComplianceSnapshot>> GetMonthlyHistoryAsync(CancellationToken cancellationToken);
 
+    Task<BackflowComplianceSnapshot?> GetLatestAsync(CancellationToken cancellationToken);
+
     Task<BackflowComplianceSnapshot> UpsertAsync(BackflowComplianceSnapshot snapshot, CancellationToken cancellationToken);
 }

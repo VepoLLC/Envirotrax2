@@ -1,0 +1,309 @@
+<dp-loading-spinner *ngIf="isLoading" />
+
+<div class="d-flex justify-content-center align-items-center mb-3">
+    <h2>Edit Water Supplier Account Information</h2>
+</div>
+
+<div>
+    <form #accountForm="ngForm" (ngSubmit)="save(accountForm)">
+
+        <vp-section header="Main Account Information" class="mb-3">
+            <div class="row">
+                <div class="col-md-6">
+
+                    <div class="mb-3">
+                        <vp-input [(ngModel)]="supplier.name"
+                                  name="name"
+                                  label="Water supplier name"
+                                  labelStyle="horizontal"
+                                  [required]="true"
+                                  [maxLength]="255"
+                                  [disabled]="!canModify"
+                                  [form]="accountForm" />
+                    </div>
+
+                    <div class="mb-3">
+                        <vp-input [(ngModel)]="supplier.contactName"
+                                  name="contactName"
+                                  label="Contact name"
+                                  labelStyle="horizontal"
+                                  [required]="true"
+                                  [maxLength]="100"
+                                  [disabled]="!canModify"
+                                  [form]="accountForm" />
+                    </div>
+
+                    <div class="mb-3">
+                        <vp-input [(ngModel)]="supplier.address"
+                                  name="address"
+                                  label="Address"
+                                  labelStyle="horizontal"
+                                  [maxLength]="100"
+                                  [disabled]="!canModify"
+                                  [form]="accountForm" />
+                    </div>
+
+                    <div class="mb-3">
+                        <vp-input [(ngModel)]="supplier.city"
+                                  name="city"
+                                  label="City"
+                                  labelStyle="horizontal"
+                                  [maxLength]="50"
+                                  [disabled]="!canModify"
+                                  [form]="accountForm" />
+                    </div>
+
+                    <div class="mb-3">
+                        <vp-input [ngModel]="supplier.state?.id"
+                                  (ngModelChange)="supplier.state = $event ? { id: $event } : undefined"
+                                  type="select"
+                                  name="stateId"
+                                  label="State"
+                                  labelStyle="horizontal"
+                                  [options]="states"
+                                  [disabled]="!canModify"
+                                  [form]="accountForm" />
+                    </div>
+
+                    <div class="mb-3">
+                        <vp-input [(ngModel)]="supplier.zipCode"
+                                  name="zipCode"
+                                  label="Zip code"
+                                  labelStyle="horizontal"
+                                  [maxLength]="50"
+                                  [disabled]="!canModify"
+                                  [form]="accountForm" />
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <div class="mb-3">
+                        <vp-input [(ngModel)]="supplier.pwsId"
+                                  name="pwsId"
+                                  label="PWS ID"
+                                  labelStyle="horizontal"
+                                  [maxLength]="25"
+                                  [disabled]="!canModify"
+                                  [form]="accountForm" />
+                    </div>
+
+                    <div class="mb-3">
+                        <vp-input [(ngModel)]="supplier.phoneNumber"
+                                  name="phoneNumber"
+                                  label="Phone number"
+                                  labelStyle="horizontal"
+                                  [maxLength]="25"
+                                  [disabled]="!canModify"
+                                  [form]="accountForm" />
+                    </div>
+
+                    <div class="mb-3">
+                        <vp-input [(ngModel)]="supplier.faxNumber"
+                                  name="faxNumber"
+                                  label="Fax number"
+                                  labelStyle="horizontal"
+                                  [maxLength]="25"
+                                  [disabled]="!canModify"
+                                  [form]="accountForm" />
+                    </div>
+
+                    <div class="mb-3">
+                        <vp-input [(ngModel)]="supplier.emailAddress"
+                                  name="emailAddress"
+                                  label="Email address"
+                                  labelStyle="horizontal"
+                                  type="email"
+                                  [maxLength]="100"
+                                  [disabled]="!canModify"
+                                  [form]="accountForm" />
+                    </div>
+
+                </div>
+            </div>
+        </vp-section>
+
+        <div class="row mt-3 mb-3">
+            <div class="col-md-6">
+                <vp-section header="Letter Return Address Information">
+
+                        <div class="mb-3">
+                            <vp-input [(ngModel)]="supplier.letterCompanyName"
+                                      name="lrCompanyName"
+                                      label="Company name"
+                                      labelStyle="horizontal"
+                                      [maxLength]="255"
+                                      [disabled]="!canModify"
+                                      [form]="accountForm" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-input [(ngModel)]="supplier.letterContactName"
+                                      name="lrContactName"
+                                      label="Contact name"
+                                      labelStyle="horizontal"
+                                      [maxLength]="100"
+                                      [disabled]="!canModify"
+                                      [form]="accountForm" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-input [(ngModel)]="supplier.letterAddress"
+                                      name="lrAddress"
+                                      label="Address"
+                                      labelStyle="horizontal"
+                                      [maxLength]="100"
+                                      [disabled]="!canModify"
+                                      [form]="accountForm" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-input [(ngModel)]="supplier.letterCity"
+                                      name="lrCity"
+                                      label="City"
+                                      labelStyle="horizontal"
+                                      [maxLength]="50"
+                                      [disabled]="!canModify"
+                                      [form]="accountForm" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-input [ngModel]="supplier.letterState?.id"
+                                      (ngModelChange)="supplier.letterState = $event ? { id: $event } : undefined"
+                                      type="select"
+                                      name="letterStateId"
+                                      label="State"
+                                      labelStyle="horizontal"
+                                      [options]="states"
+                                      [disabled]="!canModify"
+                                      [form]="accountForm" />
+                        </div>
+
+                        <div class="mb-3">
+                            <vp-input [(ngModel)]="supplier.letterZipCode"
+                                      name="lrZipCode"
+                                      label="Zip code"
+                                      labelStyle="horizontal"
+                                      [maxLength]="50"
+                                      [disabled]="!canModify"
+                                      [form]="accountForm" />
+                        </div>
+
+
+                </vp-section>
+            </div>
+
+            <div class="col-md-6">
+                <vp-section header="Letter Contact Information">
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+                            <vp-input [(ngModel)]="supplier.letterContactCompanyName"
+                                      name="lcCompanyName"
+                                      label="Company name"
+                                      labelStyle="horizontal"
+                                      [maxLength]="100"
+                                      [disabled]="!canModify"
+                                      [form]="accountForm" />
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <vp-input [(ngModel)]="supplier.letterContactContactName"
+                                      name="lcContactName"
+                                      label="Contact name"
+                                      labelStyle="horizontal"
+                                      [maxLength]="100"
+                                      [disabled]="!canModify"
+                                      [form]="accountForm" />
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <vp-input [(ngModel)]="supplier.letterContactAddress"
+                                      name="lcAddress"
+                                      label="Address"
+                                      labelStyle="horizontal"
+                                      [maxLength]="100"
+                                      [disabled]="!canModify"
+                                      [form]="accountForm" />
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <vp-input [(ngModel)]="supplier.letterContactCity"
+                                      name="lcCity"
+                                      label="City"
+                                      labelStyle="horizontal"
+                                      [maxLength]="50"
+                                      [disabled]="!canModify"
+                                      [form]="accountForm" />
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <vp-input [ngModel]="supplier.letterContactState?.id"
+                                      (ngModelChange)="supplier.letterContactState = $event ? { id: $event } : undefined"
+                                      type="select"
+                                      name="letterContactStateId"
+                                      label="State"
+                                      labelStyle="horizontal"
+                                      [options]="states"
+                                      [disabled]="!canModify"
+                                      [form]="accountForm" />
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <vp-input [(ngModel)]="supplier.letterContactZipCode"
+                                      name="lcZipCode"
+                                      label="Zip code"
+                                      labelStyle="horizontal"
+                                      [maxLength]="50"
+                                      [disabled]="!canModify"
+                                      [form]="accountForm" />
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <vp-input [(ngModel)]="supplier.letterContactPhoneNumber"
+                                      name="lcPhone"
+                                      label="Phone number"
+                                      labelStyle="horizontal"
+                                      [maxLength]="25"
+                                      [disabled]="!canModify"
+                                      [form]="accountForm" />
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <vp-input [(ngModel)]="supplier.letterContactFaxNumber"
+                                      name="lcFax"
+                                      label="Fax number"
+                                      labelStyle="horizontal"
+                                      [maxLength]="25"
+                                      [disabled]="!canModify"
+                                      [form]="accountForm" />
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <vp-input [(ngModel)]="supplier.letterContactEmailAddress"
+                                      name="lcEmail"
+                                      label="Email address"
+                                      labelStyle="horizontal"
+                                      type="email"
+                                      [maxLength]="100"
+                                      [disabled]="!canModify"
+                                      [form]="accountForm" />
+                        </div>
+
+                    </div>
+                </vp-section>
+            </div>
+        </div>
+
+        <div class="mt-3" *ngIf="canModify">
+            <vp-validation-summary [form]="accountForm" [validationErrors]="validationErrors" />
+
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    Update Account
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

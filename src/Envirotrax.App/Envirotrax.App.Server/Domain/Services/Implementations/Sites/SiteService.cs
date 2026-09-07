@@ -153,7 +153,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
         ApplyAdminUpdate(site, dto);
 
-        await _siteRepository.SaveChangesAsync(cancellationToken);
+        await _siteRepository.SaveChangesAsync();
 
         return true;
     }
@@ -249,7 +249,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         site.GisAreaId = 0;
         site.NeedsRenewalCheck = true;
 
-        await _siteRepository.SaveChangesAsync(CancellationToken.None);
+        await _siteRepository.SaveChangesAsync();
 
         await _recordLogService.AddAsync(RecordLogTableNames.Sites, siteId, dto.WaterSupplierId, RecordLogType.Edit, $"Water Supplier changed from {previousWaterSupplierId} to {dto.WaterSupplierId}");
 

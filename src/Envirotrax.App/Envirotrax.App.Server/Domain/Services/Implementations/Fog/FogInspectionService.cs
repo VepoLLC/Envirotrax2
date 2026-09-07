@@ -12,6 +12,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
+using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
@@ -28,6 +29,8 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
     private readonly IFileStorageService _fileStorageService;
     private readonly IAuthService _authService;
     private readonly IPdfTemplateService _pdfTemplateService;
+    private readonly IGeneralSettingsService _generalSettingsService;
+    private readonly IProfessionalSupplierService _professionalSupplierService;
 
     public FogInspectionService(
         IMapper mapper,
@@ -37,7 +40,9 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         ISiteService siteService,
         IFileStorageService fileStorageService,
         IAuthService authService,
-        IPdfTemplateService pdfTemplateService)
+        IPdfTemplateService pdfTemplateService,
+        IGeneralSettingsService generalSettingsService,
+        IProfessionalSupplierService professionalSupplierService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -47,6 +52,8 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         _fileStorageService = fileStorageService;
         _authService = authService;
         _pdfTemplateService = pdfTemplateService;
+        _generalSettingsService = generalSettingsService;
+        _professionalSupplierService = professionalSupplierService;
     }
 
     public Task<byte[]> GeneratePdfAsync(FogInspectionDto inspection)
@@ -154,6 +161,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
 
         ApplySiteSnapshot(inspection, site);
         ApplyInspectorSnapshot(inspection, professional, inspectorUser, inspectorUserId);
+        await ApplyAmountAsync(inspection, site.IsFeeExempt, cancellationToken);
 
         // Set image paths before AddAsync so they persist with the initial insert (both optional).
         if (exteriorStream != null && exteriorFileName != null)
@@ -188,6 +196,23 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
 
         scope.Complete();
         return Mapper.Map<FogInspectionDto>(added);
+    }
+
+    private async Task ApplyAmountAsync(FogInspection inspection, bool siteIsFeeExempt, CancellationToken cancellationToken)
+    {
+        inspection.Amount = 0;
+        inspection.AmountShare = 0;
+
+        //implemented V1 logic that isFeeExempt sites are not charged, but this is not in the current requirements, so commenting out for now
+        //if (siteIsFeeExempt)
+        //{
+        //    return;
+        //}
+
+        var settings = await _generalSettingsService.GetAsync(inspection.WaterSupplierId, cancellationToken);
+        var registration = await _professionalSupplierService.GetAsync(inspection.WaterSupplierId, cancellationToken);
+
+        inspection.Amount = registration?.FogInspectorFee ?? settings?.FogInspectorFee ?? 0;
     }
 
     public override async Task<FogInspectionDto?> GetAsync(int id, CancellationToken cancellationToken)

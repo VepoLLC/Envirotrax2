@@ -1,4 +1,6 @@
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -11,11 +13,13 @@ namespace Envirotrax.App.Server.Controllers.Sites;
 public class SiteController : WaterSupplierCrudController<SiteDto>
 {
     private readonly ISiteService _siteService;
+    private readonly IRecordLogService _recordLogService;
 
-    public SiteController(ISiteService service)
+    public SiteController(ISiteService service, IRecordLogService recordLogService)
         : base(service)
     {
         _siteService = service;
+        _recordLogService = recordLogService;
     }
 
     [HttpPut("{id}/csi-assignment")]
@@ -48,5 +52,19 @@ public class SiteController : WaterSupplierCrudController<SiteDto>
     {
         await _siteService.UpdateGisDataAsync(id, dto, cancellationToken);
         return Ok();
+    }
+
+    [HttpGet("{id}/record-logs")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetLogsAsync(int id, CancellationToken cancellationToken)
+    {
+        var site = await _siteService.GetAsync(id, cancellationToken);
+        if (site == null)
+        {
+            return NotFound();
+        }
+
+        var logs = await _recordLogService.GetByRecordAsync(RecordLogTableNames.Sites, id, cancellationToken);
+        return Ok(logs);
     }
 }

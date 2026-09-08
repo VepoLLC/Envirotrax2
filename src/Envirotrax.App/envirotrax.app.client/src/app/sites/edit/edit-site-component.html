@@ -638,27 +638,32 @@
             <li class="nav-item" *ngIf="canViewLogHistory">
                 <a class="nav-link" role="button"
                    [class.active]="activeTab === 'logHistory'"
-                   (click)="setActiveTab('logHistory')">Log History</a>
+                   (click)="setActiveTab('logHistory')">Log History ({{ logHistoryCount }})</a>
             </li>
             <li class="nav-item" *ngIf="canViewCsi">
                 <a class="nav-link" role="button"
                    [class.active]="activeTab === 'csi'"
-                   (click)="setActiveTab('csi')">CSI Inspections</a>
+                   (click)="setActiveTab('csi')">CSI Inspections ({{ csiCount }})</a>
             </li>
             <li class="nav-item" *ngIf="canViewBackflow">
                 <a class="nav-link" role="button"
                    [class.active]="activeTab === 'backflow'"
-                   (click)="setActiveTab('backflow')">Backflow Tests</a>
+                   (click)="setActiveTab('backflow')">Backflow Tests ({{ backflowCount }})</a>
             </li>
             <li class="nav-item" *ngIf="canViewOutOfService">
                 <a class="nav-link" role="button"
                    [class.active]="activeTab === 'outOfService'"
-                   (click)="setActiveTab('outOfService')">Out of Service</a>
+                   (click)="setActiveTab('outOfService')">Out of Service ({{ outOfServiceCount }})</a>
             </li>
             <li class="nav-item" *ngIf="canViewFog">
                 <a class="nav-link" role="button"
                    [class.active]="activeTab === 'fog'"
-                   (click)="setActiveTab('fog')">FOG Inspections</a>
+                   (click)="setActiveTab('fog')">FOG Inspections ({{ fogCount }})</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" role="button"
+                   [class.active]="activeTab === 'recordLog'"
+                   (click)="setActiveTab('recordLog')">Record Log ({{ recordLogs.length }})</a>
             </li>
         </ul>
     </div>
@@ -681,5 +686,11 @@
 
     <div *ngIf="fogInitialized && canViewFog && site.id" [hidden]="activeTab !== 'fog'">
         <app-site-fog-inspections [siteId]="site.id" />
+    </div>
+
+    <div *ngIf="site.id" [hidden]="activeTab !== 'recordLog'">
+        <vp-section header="Record Log">
+            <vp-record-log-list [logs]="recordLogs" [isLoading]="isLoadingRecordLogs" [recordLabel]="'site'" />
+        </vp-section>
     </div>
 </div>

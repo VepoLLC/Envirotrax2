@@ -3,20 +3,27 @@ import { Site } from '../../shared/models/sites/site';
 import { NgForm } from "@angular/forms";
 import { State } from "../../shared/models/lookup/state";
 import { PageInfo } from "../../shared/models/page-info";
+import { ComparisonOperator, QueryProperty } from "../../shared/models/query";
 import { LookupService } from "../../shared/services/lookup/lookup.service";
 import { PropertyType } from "../../shared/enums/property-type.enum";
 import { SiteService } from "../../shared/services/sites/site.service";
+import { SiteLogService } from "../../shared/services/sites/site-log.service";
+import { CsiInspectionService } from "../../shared/services/csi/csi-inspection.service";
+import { BackflowTestService } from "../../shared/services/backflow/backflow-test.service";
+import { BackflowOutOfServiceRequestService } from "../../shared/services/backflow/backflow-out-of-service-request.service";
+import { OutOfServiceRequestStatusFilter } from "../../shared/models/backflow/out-of-service-request-status-filter.enum";
+import { FogInspectionService } from "../../shared/services/fog/fog-inspection.service";
 import { HelperService } from "../../shared/services/helpers/helper.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import { UserService } from "../../shared/services/water-suppliers/user.service";
 import { FacilityType } from '../../shared/enums/facility-type.enum';
 import { GreaseTrapType } from '../../shared/enums/grease-trap-type.enum';
-import { ToastService, ToastType, InputOption } from '@envirotrax/common-ui';
+import { ToastService, ToastType, InputOption, RecordLog } from '@envirotrax/common-ui';
 import { AuthService } from '../../shared/services/auth/auth.service';
 import { PermissionAction, PermissionType } from '../../shared/models/permission-type';
 import { FeatureType } from '../../shared/models/feature-type';
 
-type SiteTab = 'logHistory' | 'csi' | 'backflow' | 'outOfService' | 'fog';
+type SiteTab = 'logHistory' | 'csi' | 'backflow' | 'outOfService' | 'fog' | 'recordLog';
 
 @Component({
     selector: 'app-edit-site-component',
@@ -37,6 +44,13 @@ export class EditSiteComponent implements OnInit {
     public backflowInitialized: boolean = false;
     public outOfServiceInitialized: boolean = false;
     public fogInitialized: boolean = false;
+    public recordLogs: RecordLog[] = [];
+    public isLoadingRecordLogs: boolean = false;
+    public logHistoryCount: number = 0;
+    public csiCount: number = 0;
+    public backflowCount: number = 0;
+    public outOfServiceCount: number = 0;
+    public fogCount: number = 0;
 
     public site: Site = {
         backflowScheduleMonth: 0,
@@ -70,6 +84,11 @@ export class EditSiteComponent implements OnInit {
 
     constructor(
         private readonly _siteService: SiteService,
+        private readonly _siteLogService: SiteLogService,
+        private readonly _csiInspectionService: CsiInspectionService,
+        private readonly _backflowTestService: BackflowTestService,
+        private readonly _backflowOutOfServiceRequestService: BackflowOutOfServiceRequestService,
+        private readonly _fogInspectionService: FogInspectionService,
         private readonly _stateService: LookupService,
         private readonly _acitvatedRoute: ActivatedRoute,
         private readonly _router: Router,
@@ -87,10 +106,57 @@ export class EditSiteComponent implements OnInit {
         this._acitvatedRoute.paramMap.subscribe(async params => {
             const siteId = params.get('id');
             if (siteId) {
-                await this.getSite(+siteId);
+                await Promise.all([
+                    this.getSite(+siteId),
+                    this.loadRecordLogs(+siteId),
+                    this.loadTabCounts(+siteId)
+                ]);
                 this.currentSite = { ...this.site };
             }
         });
+    }
+
+    private async loadTabCounts(siteId: number): Promise<void> {
+        const countPageInfo: PageInfo = { pageNumber: 1, pageSize: 1 };
+        const siteFilter: QueryProperty = {
+            columnName: 'site.id',
+            value: siteId.toString(),
+            comparisonOperator: 'Eq' as ComparisonOperator
+        };
+
+        await Promise.all([
+            this.canViewLogHistory
+                ? this._siteLogService.getAll(siteId, countPageInfo, { sort: {}, filter: [] })
+                    .then(result => this.logHistoryCount = result.pageInfo.totalItems ?? 0)
+                : Promise.resolve(),
+
+            this.canViewCsi
+                ? this._csiInspectionService.getAll(countPageInfo, { sort: {}, filter: [siteFilter] })
+                    .then(result => this.csiCount = result.pageInfo.totalItems ?? 0)
+                : Promise.resolve(),
+
+            this.canViewBackflow
+                ? this._backflowTestService.getAll(countPageInfo, {
+                    sort: {},
+                    filter: [
+                        siteFilter,
+                        { columnName: 'isCurrent', value: 'true', comparisonOperator: 'Eq' as ComparisonOperator },
+                        { columnName: 'outOfService', value: 'false', comparisonOperator: 'Eq' as ComparisonOperator }
+                    ]
+                }).then(result => this.backflowCount = result.pageInfo.totalItems ?? 0)
+                : Promise.resolve(),
+
+            this.canViewOutOfService
+                ? this._backflowOutOfServiceRequestService.getAllForWaterSupplier(
+                    countPageInfo, { sort: {}, filter: [siteFilter] }, OutOfServiceRequestStatusFilter.All)
+                    .then(result => this.outOfServiceCount = result.pageInfo.totalItems ?? 0)
+                : Promise.resolve(),
+
+            this.canViewFog
+                ? this._fogInspectionService.getAll(countPageInfo, { sort: {}, filter: [siteFilter] })
+                    .then(result => this.fogCount = result.pageInfo.totalItems ?? 0)
+                : Promise.resolve()
+        ]);
     }
 
     private async loadPermissions(): Promise<void> {
@@ -142,6 +208,15 @@ export class EditSiteComponent implements OnInit {
             this.outOfServiceInitialized = true;
         } else if (this.activeTab === 'fog') {
             this.fogInitialized = true;
+        }
+    }
+
+    private async loadRecordLogs(siteId: number): Promise<void> {
+        try {
+            this.isLoadingRecordLogs = true;
+            this.recordLogs = await this._siteService.getLogs(siteId);
+        } finally {
+            this.isLoadingRecordLogs = false;
         }
     }
 

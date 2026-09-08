@@ -8,6 +8,7 @@ import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { Site } from "../../models/sites/site";
 import { DownloadEndpoint } from "../../models/download-config";
+import { RecordLog } from "@envirotrax/common-ui";
 
 @Injectable({
     providedIn: 'root'
@@ -171,6 +172,14 @@ export class SiteService {
 
         return lastValueFrom(
             this._http.get<Site>(url)
+        );
+    }
+
+    public getLogs(id: number): Promise<RecordLog[]> {
+        const url = this._urlResolver.resolveUrl(`/api/sites/${id}/record-logs`);
+
+        return lastValueFrom(
+            this._http.get<RecordLog[]>(url)
         );
     }
 

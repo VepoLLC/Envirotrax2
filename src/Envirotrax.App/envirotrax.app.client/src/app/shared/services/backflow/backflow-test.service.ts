@@ -11,6 +11,7 @@ import { BackflowPaymentStatus } from "../../models/backflow/backflow-test-enums
 import { BackflowCompliance } from "../../models/backflow/backflow-compliance";
 import { BackflowTestImages } from "../../models/backflow/backflow-test-images";
 import { DownloadEndpoint } from "../../models/download-config";
+import { RecordLog } from "@envirotrax/common-ui";
 
 export type BackflowExpiryRangeKey = 'expired' | 'thismonth' | 'nextmonth' | 'twomonths';
 
@@ -129,6 +130,11 @@ export class BackflowTestService {
     public async get(id: number): Promise<BackflowTest> {
         const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}`);
         return await lastValueFrom(this._http.get<BackflowTest>(url));
+    }
+
+    public async getLogs(id: number): Promise<RecordLog[]> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/logs`);
+        return await lastValueFrom(this._http.get<RecordLog[]>(url));
     }
 
     public async getPdf(id: number): Promise<Blob> {

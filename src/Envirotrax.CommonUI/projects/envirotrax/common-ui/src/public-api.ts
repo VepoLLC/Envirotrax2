@@ -36,12 +36,14 @@ export * from './lib/components/lookup-field/lookup-field.component';
 export * from './lib/components/map/map.component';
 export * from './lib/components/map/map-results.component';
 export * from './lib/components/toast-container/toast-container.component';
+export * from './lib/components/record-log/record-log-list.component';
 
 // Models
 export * from './lib/models/page-info';
 export * from './lib/models/paged-data';
 export * from './lib/models/query';
 export * from './lib/models/table-view-model';
+export * from './lib/models/record-log';
 
 // Services
 export * from './lib/services/helpers/url-resolver.service';

@@ -1,13 +1,12 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { PagedData, PageInfo, Query, QueryHelperService, UrlResolverService } from "@envirotrax/common-ui";
+import { PagedData, PageInfo, Query, QueryHelperService, RecordLog, UrlResolverService } from "@envirotrax/common-ui";
 import {
     BackflowPaymentStatus,
     BackflowTest,
     BackflowTestCounts,
     BackflowTestDetails
 } from "../../models/backflow/backflow-test";
-import { RecordLog } from "../../models/logs/record-log";
 import { lastValueFrom } from "rxjs";
 
 @Injectable({

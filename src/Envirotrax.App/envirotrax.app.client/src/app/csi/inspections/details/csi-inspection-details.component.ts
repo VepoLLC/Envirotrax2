@@ -6,7 +6,7 @@ import { CsiInspectionService } from "../../../shared/services/csi/csi-inspectio
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { DisapproveCsiInspectionComponent } from "./disapprove/disapprove-csi-inspection.component";
 import { DownloadService } from "../../../shared/services/download.service";
-import { ModalHelperService } from "@envirotrax/common-ui";
+import { ModalHelperService, RecordLog } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'app-csi-inspection-details',
@@ -20,6 +20,8 @@ export class CsiInspectionDetailsComponent implements OnInit {
     public selectedTab: string = 'main';
     public images: CsiInspectionImage[] = [];
     public isLoadingImages: boolean = false;
+    public recordLogs: RecordLog[] = [];
+    public isLoadingRecordLogs: boolean = false;
 
     private imagesLoaded = false;
 
@@ -47,7 +49,10 @@ export class CsiInspectionDetailsComponent implements OnInit {
 
             if (id) {
                 this.id = +id;
-                await this.loadInspection();
+                await Promise.all([
+                    this.loadInspection(),
+                    this.loadRecordLogs()
+                ]);
             }
         });
     }
@@ -69,6 +74,15 @@ export class CsiInspectionDetailsComponent implements OnInit {
             this.inspection = await this._inspectionService.get(this.id);
         } finally {
             this.isLoading = false;
+        }
+    }
+
+    private async loadRecordLogs(): Promise<void> {
+        try {
+            this.isLoadingRecordLogs = true;
+            this.recordLogs = await this._inspectionService.getLogs(this.id);
+        } finally {
+            this.isLoadingRecordLogs = false;
         }
     }
 

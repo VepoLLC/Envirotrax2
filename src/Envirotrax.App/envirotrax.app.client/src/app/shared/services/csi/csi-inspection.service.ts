@@ -9,6 +9,7 @@ import { PagedData } from "../../models/paged-data";
 import { CsiInspection } from "../../models/csi/csi-inspection";
 import { CsiInspectionImage } from "../../models/csi/csi-inspection-image";
 import { DownloadEndpoint } from "../../models/download-config";
+import { RecordLog } from "@envirotrax/common-ui";
 
 @Injectable({
     providedIn: 'root'
@@ -54,6 +55,14 @@ export class CsiInspectionService {
 
         return lastValueFrom(
             this._http.get<CsiInspection>(url)
+        );
+    }
+
+    public getLogs(id: number): Promise<RecordLog[]> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${id}/logs`);
+
+        return lastValueFrom(
+            this._http.get<RecordLog[]>(url)
         );
     }
 

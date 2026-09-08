@@ -3,6 +3,7 @@ using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Data.Services.Definitions;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Sites;
@@ -12,6 +13,95 @@ public class SiteRepository : Repository<Site>, ISiteRepository
     public SiteRepository(IDbContextSelector dbContextSelector)
         : base(dbContextSelector)
     {
+    }
+
+    public async Task<AdminUpdateResult<Site>> UpdateForAdminAsync(int id, SiteDto dto)
+    {
+        var result = new AdminUpdateResult<Site>();
+
+        var site = await GetTrackedForUpdateAsync(id, CancellationToken.None);
+
+        if (site == null)
+        {
+            return result;
+        }
+
+        ApplyAdminEditableFields(site, dto);
+
+        result.Changes = BuildChangeDescription(site);
+
+        await DbContext.SaveChangesAsync();
+
+        result.Model = site;
+
+        return result;
+    }
+
+    /// <summary>
+    /// Copies the approved editable fields from a SiteDto onto the loaded (tracked) Site — a deliberate
+    /// ALLOWLIST, so protected DTO columns (WaterSupplier, GIS, audit, NeedsRenewalCheck, …) are ignored.
+    /// Runs on the freshly-loaded entity so the NeedsRenewalCheck compare below sees the pre-overwrite values.
+    /// </summary>
+    private static void ApplyAdminEditableFields(Site site, SiteDto dto)
+    {
+        var renewalTriggerChanged =
+            site.PropertyType != dto.PropertyType
+            || site.HasOnSiteSewageFacility != dto.HasOnSiteSewageFacility
+            || site.HasAuxWaterSupply != dto.HasAuxWaterSupply;
+
+        if (renewalTriggerChanged)
+        {
+            site.NeedsRenewalCheck = true;
+        }
+
+        // Property Information
+        site.PropertyType = dto.PropertyType;
+        site.BusinessName = dto.BusinessName;
+        site.StreetNumber = dto.StreetNumber;
+        site.StreetName = dto.StreetName;
+        site.PropertyNumber = dto.PropertyNumber;
+        site.City = dto.City;
+        site.StateId = dto.State?.Id;
+        site.ZipCode = dto.ZipCode;
+
+        // Mailing Information
+        site.MailingCompanyName = dto.MailingCompanyName;
+        site.MailingContactName = dto.MailingContactName;
+        site.MailingStreetNumber = dto.MailingStreetNumber;
+        site.MailingStreetName = dto.MailingStreetName;
+        site.MailingNumber = dto.MailingNumber;
+        site.MailingCity = dto.MailingCity;
+        site.MailingStateId = dto.MailingState?.Id;
+        site.MailingZipCode = dto.MailingZipCode;
+        site.MailingPhoneNumber = dto.MailingPhoneNumber;
+        site.MailingEmailAddress = dto.MailingEmailAddress;
+
+        // Property Settings
+        site.AccountNumber = dto.AccountNumber;
+        site.Active = dto.Active;
+        site.InvalidMailingAddress = dto.InvalidMailingAddress;
+        site.OutOfArea = dto.OutOfArea;
+        site.IsFeeExempt = dto.IsFeeExempt;
+        site.BypassPropertyNumberValidation = dto.BypassPropertyNumberValidation;
+        site.BackflowScheduleMonth = dto.BackflowScheduleMonth;
+        site.NeedsCsiInspection = dto.NeedsCsiInspection;
+        site.CsiRenewalDate = dto.CsiRenewalDate;
+        site.NeedsFogInspection = dto.NeedsFogInspection;
+        site.FogInspectionExpirationDate = dto.FogInspectionExpirationDate;
+        site.NeedsFogPermit = dto.NeedsFogPermit;
+        site.FogPermitExpirationDate = dto.FogPermitExpirationDate;
+        site.LastTripTicketDate = dto.LastTripTicketDate;
+        site.TripTicketInterval = dto.TripTicketInterval;
+        site.FacilityType = dto.FacilityType;
+        site.GreaseTrapType = dto.GreaseTrapType;
+        site.HasOnSiteSewageFacility = dto.HasOnSiteSewageFacility;
+        site.HasAuxWaterSupply = dto.HasAuxWaterSupply;
+        site.HasFireSystem = dto.HasFireSystem;
+        site.FireSeparateWater = dto.FireSeparateWater;
+        site.HasGritTrap = dto.HasGritTrap;
+        site.HasIrrigation = dto.HasIrrigation;
+        site.IrrigationSeparateWater = dto.IrrigationSeparateWater;
+        site.HasDomesticPremisesIsolation = dto.HasDomesticPremisesIsolation;
     }
 
     protected override void UpdateEntity(Site model)

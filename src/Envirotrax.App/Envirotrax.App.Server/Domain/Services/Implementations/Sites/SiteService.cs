@@ -1,3 +1,4 @@
+using System.Transactions;
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
@@ -142,87 +143,28 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         await _siteRepository.UpdateManualGisDataAsync(siteId, dto.Latitude, dto.Longitude, dto.Status);
     }
 
+    // TODO(needs sign-off): this now writes a RecordLog entry on every normal site edit (mirroring the
+    // Backflow/CSI pattern), whereas before it wrote nothing. Confirm this is the desired behavior before merging.
     public async Task<bool> UpdateFromAdminAsync(int siteId, SiteDto dto, CancellationToken cancellationToken)
     {
-        var site = await _siteRepository.GetTrackedForUpdateAsync(siteId, cancellationToken);
-
-        if (site == null)
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            return false;
+            var saved = await _siteRepository.UpdateForAdminAsync(siteId, dto);
+
+            if (saved.Model == null)
+            {
+                return false;
+            }
+
+            if (saved.Changes.Length > 0)
+            {
+                await _recordLogService.AddAsync(RecordLogTableNames.Sites, siteId, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
+            }
+
+            scope.Complete();
         }
-
-        ApplyAdminUpdate(site, dto);
-
-        await _siteRepository.SaveChangesAsync();
 
         return true;
-    }
-
-    /// <summary>
-    /// Copies the approved editable fields from a SiteDto onto the loaded (tracked) Site — a deliberate
-    /// ALLOWLIST, so protected DTO columns (WaterSupplier, GIS, audit, NeedsRenewalCheck, …) are ignored.
-    /// Runs on the freshly-loaded entity so the NeedsRenewalCheck compare below sees the pre-overwrite values.
-    /// </summary>
-    private static void ApplyAdminUpdate(Site site, SiteDto dto)
-    {
-        var renewalTriggerChanged =
-            site.PropertyType != dto.PropertyType
-            || site.HasOnSiteSewageFacility != dto.HasOnSiteSewageFacility
-            || site.HasAuxWaterSupply != dto.HasAuxWaterSupply;
-
-        if (renewalTriggerChanged)
-        {
-            site.NeedsRenewalCheck = true;
-        }
-
-        // Property Information
-        site.PropertyType = dto.PropertyType;
-        site.BusinessName = dto.BusinessName;
-        site.StreetNumber = dto.StreetNumber;
-        site.StreetName = dto.StreetName;
-        site.PropertyNumber = dto.PropertyNumber;
-        site.City = dto.City;
-        site.StateId = dto.State?.Id;
-        site.ZipCode = dto.ZipCode;
-
-        // Mailing Information
-        site.MailingCompanyName = dto.MailingCompanyName;
-        site.MailingContactName = dto.MailingContactName;
-        site.MailingStreetNumber = dto.MailingStreetNumber;
-        site.MailingStreetName = dto.MailingStreetName;
-        site.MailingNumber = dto.MailingNumber;
-        site.MailingCity = dto.MailingCity;
-        site.MailingStateId = dto.MailingState?.Id;
-        site.MailingZipCode = dto.MailingZipCode;
-        site.MailingPhoneNumber = dto.MailingPhoneNumber;
-        site.MailingEmailAddress = dto.MailingEmailAddress;
-
-        // Property Settings
-        site.AccountNumber = dto.AccountNumber;
-        site.Active = dto.Active;
-        site.InvalidMailingAddress = dto.InvalidMailingAddress;
-        site.OutOfArea = dto.OutOfArea;
-        site.IsFeeExempt = dto.IsFeeExempt;
-        site.BypassPropertyNumberValidation = dto.BypassPropertyNumberValidation;
-        site.BackflowScheduleMonth = dto.BackflowScheduleMonth;
-        site.NeedsCsiInspection = dto.NeedsCsiInspection;
-        site.CsiRenewalDate = dto.CsiRenewalDate;
-        site.NeedsFogInspection = dto.NeedsFogInspection;
-        site.FogInspectionExpirationDate = dto.FogInspectionExpirationDate;
-        site.NeedsFogPermit = dto.NeedsFogPermit;
-        site.FogPermitExpirationDate = dto.FogPermitExpirationDate;
-        site.LastTripTicketDate = dto.LastTripTicketDate;
-        site.TripTicketInterval = dto.TripTicketInterval;
-        site.FacilityType = dto.FacilityType;
-        site.GreaseTrapType = dto.GreaseTrapType;
-        site.HasOnSiteSewageFacility = dto.HasOnSiteSewageFacility;
-        site.HasAuxWaterSupply = dto.HasAuxWaterSupply;
-        site.HasFireSystem = dto.HasFireSystem;
-        site.FireSeparateWater = dto.FireSeparateWater;
-        site.HasGritTrap = dto.HasGritTrap;
-        site.HasIrrigation = dto.HasIrrigation;
-        site.IrrigationSeparateWater = dto.IrrigationSeparateWater;
-        site.HasDomesticPremisesIsolation = dto.HasDomesticPremisesIsolation;
     }
 
     public async Task<bool> UpdateWaterSupplierAsync(int siteId, UpdateSiteWaterSupplierDto dto)

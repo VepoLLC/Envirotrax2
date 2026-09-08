@@ -68,6 +68,8 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         entry.Property(m => m.BypassAssemblyImagePath).IsModified = false;
         entry.Property(m => m.BypassSerialNumberImagePath).IsModified = false;
         entry.Property(m => m.AirGapImagePath).IsModified = false;
+        entry.Property(m => m.ValidationReplacementOnHold).IsModified = false;
+        entry.Property(m => m.ValidationReplacementCleared).IsModified = false;
     }
 
     public async Task<BackflowTest> UpdateImagePathAsync(BackflowTest model, string imagePathPropertyName)

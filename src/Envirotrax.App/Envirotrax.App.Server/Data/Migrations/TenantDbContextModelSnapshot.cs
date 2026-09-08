@@ -738,6 +738,12 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<bool>("ValidationReplacementCleared")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ValidationReplacementOnHold")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("ValidationSiteInformationChanged")
                         .HasColumnType("bit");
 

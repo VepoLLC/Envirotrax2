@@ -124,25 +124,27 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         return await paginated.ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<ProfessionalUser>> SearchCsiInspectorsAsync(PageInfo pageInfo, Query query, string? licenseNumber, string? insuranceNumber, CancellationToken cancellationToken)
+    public async Task<IEnumerable<ProfessionalUser>> SearchAccountsAsync(PageInfo pageInfo, Query query, string? licenseNumber, string? insuranceNumber, Expression<Func<ProfessionalUserLicense, bool>> licenseFilter, Expression<Func<ProfessionalUser, bool>> roleFilter, CancellationToken cancellationToken)
     {
         var dbQuery = DbContext.ProfessionalUsers
             .AsNoTracking()
             .Include(proUser => proUser.User)
             .Include(proUser => proUser.Professional)
                 .ThenInclude(professional => professional!.State)
-            .Where(proUser => proUser.IsCsiInspector)
+            .Where(roleFilter)
             .Where(query.Filter);
 
         if (!string.IsNullOrWhiteSpace(licenseNumber))
         {
             string license = licenseNumber;
 
-            dbQuery = dbQuery.Where(proUser => DbContext.ProfessionalUserLicenses.Any(l =>
+            var licenses = DbContext.ProfessionalUserLicenses
+                .Where(licenseFilter)
+                .Where(l => l.LicenseNumber.Contains(license));
+
+            dbQuery = dbQuery.Where(proUser => licenses.Any(l =>
                 l.ProfessionalId == proUser.ProfessionalId &&
-                l.UserId == proUser.UserId &&
-                l.ProfessionalType == ProfessionalType.CsiInspector &&
-                l.LicenseNumber.Contains(license)));
+                l.UserId == proUser.UserId));
         }
 
         if (!string.IsNullOrWhiteSpace(insuranceNumber))

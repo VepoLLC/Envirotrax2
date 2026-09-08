@@ -4,6 +4,7 @@ using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Professionals;
+using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
@@ -42,7 +43,14 @@ public class CsiInspectorAccountService : Service<ProfessionalUser, CsiInspector
         query.Filter = query.ConvertFilterProperties<ProfessionalUser, CsiInspectorAccountDto>(Mapper);
         query.Sort = query.ConvertSortProperties<ProfessionalUser, CsiInspectorAccountDto>(Mapper);
 
-        var accounts = await _repository.SearchCsiInspectorsAsync(pageInfo, query, licenseNumber, insuranceNumber, cancellationToken);
+        var accounts = await _repository.SearchAccountsAsync(
+            pageInfo,
+            query,
+            licenseNumber,
+            insuranceNumber,
+            license => license.ProfessionalType == ProfessionalType.CsiInspector,
+            proUser => proUser.IsCsiInspector,
+            cancellationToken);
 
         return accounts
             .Select(a => MapToDto(a)!)

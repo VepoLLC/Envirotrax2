@@ -203,11 +203,10 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         inspection.Amount = 0;
         inspection.AmountShare = 0;
 
-        //implemented V1 logic that isFeeExempt sites are not charged, but this is not in the current requirements, so commenting out for now
-        //if (siteIsFeeExempt)
-        //{
-        //    return;
-        //}
+        if (siteIsFeeExempt)
+        {
+            return;
+        }
 
         var settings = await _generalSettingsService.GetAsync(inspection.WaterSupplierId, cancellationToken);
         var registration = await _professionalSupplierService.GetAsync(inspection.WaterSupplierId, cancellationToken);

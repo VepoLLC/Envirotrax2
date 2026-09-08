@@ -6,20 +6,6 @@ export enum FogInspectionResult {
     Failed = 1
 }
 
-export enum FogPaymentStatus {
-    Paid = 1,
-    Unpaid = 2
-}
-
-/**
- * V1 offers the total capacity criteria as two fixed buckets around 25% rather than
- * a free numeric range, so it is sent to the API as its own parameter.
- */
-export enum FogTotalCapacityRange {
-    TwentyFivePercentOrLess = 1,
-    GreaterThanTwentyFivePercent = 2
-}
-
 export enum InterceptorType {
     GreaseTrap = 'Grease Trap',
     GritTrap = 'Grit Trap',

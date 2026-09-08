@@ -203,11 +203,10 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         inspection.Amount = 0;
         inspection.AmountShare = 0;
 
-        //implemented V1 logic that isFeeExempt sites are not charged, but this is not in the current requirements, so commenting out for now
-        //if (siteIsFeeExempt)
-        //{
-        //    return;
-        //}
+        if (siteIsFeeExempt)
+        {
+            return;
+        }
 
         var settings = await _generalSettingsService.GetAsync(inspection.WaterSupplierId, cancellationToken);
         var registration = await _professionalSupplierService.GetAsync(inspection.WaterSupplierId, cancellationToken);
@@ -234,26 +233,6 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         query.Sort = query.ConvertSortProperties<FogInspection, FogInspectionDto>(Mapper);
 
         var inspections = await _repository.SearchForProfessionalAsync(pageInfo, query, latestOnly, cancellationToken);
-
-        return inspections.Select(m => Mapper.Map<FogInspectionDto>(m)!).ToPagedData(pageInfo);
-    }
-
-    public async Task<IPagedData<FogInspectionDto>> SearchForAdminAsync(
-        PageInfo pageInfo, Query query,
-        FogPaymentStatus? paymentStatus, FogTotalCapacityRange? totalCapacityRange,
-        CancellationToken cancellationToken)
-    {
-        query.Filter = query.ConvertFilterProperties<FogInspection, FogInspectionDto>(Mapper);
-        query.Sort = query.ConvertSortProperties<FogInspection, FogInspectionDto>(Mapper);
-
-        // V1 orders the FOG inspection search by inspection date ascending when the user has not
-        // chosen a column to sort by.
-        if (query.Sort.IsNullOrEmpty())
-        {
-            query.Sort[nameof(FogInspection.InspectionDate)] = SortOperator.Asc;
-        }
-
-        var inspections = await _repository.SearchForAdminAsync(pageInfo, query, paymentStatus, totalCapacityRange, cancellationToken);
 
         return inspections.Select(m => Mapper.Map<FogInspectionDto>(m)!).ToPagedData(pageInfo);
     }

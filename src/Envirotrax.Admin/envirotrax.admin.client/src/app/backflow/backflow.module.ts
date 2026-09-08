@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { SharedComponentsModule } from '../shared/components/shared.components.module';
 import { BackflowRoutingModule } from './backflow-routing.module';
 import { BackflowTestListComponent } from './tests/list/backflow-test-list.component';
+import { BackflowReplacementListComponent } from './replacements/list/backflow-replacement-list.component';
 
 @NgModule({
     declarations: [
@@ -14,6 +15,7 @@ import { BackflowTestListComponent } from './tests/list/backflow-test-list.compo
         FormsModule,
         SharedComponentsModule,
         BackflowRoutingModule,
+        BackflowReplacementListComponent,
     ],
 })
 export class BackflowModule { }

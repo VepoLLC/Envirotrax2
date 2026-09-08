@@ -40,6 +40,7 @@ public static class ServiceRegistration
                 services.AddTransient<ICsiInspectorLicenseService, CsiInspectorLicenseService>();
                 services.AddTransient<ICsiInspectorInsuranceService, CsiInspectorInsuranceService>();
                 services.AddTransient<IBackflowTestService, BackflowTestService>();
+                services.AddTransient<IBackflowReplacementService, BackflowReplacementService>();
 
                 return services;
         }

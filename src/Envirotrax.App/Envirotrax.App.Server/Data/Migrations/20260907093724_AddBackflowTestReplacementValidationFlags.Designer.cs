@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260907093724_AddBackflowTestReplacementValidationFlags")]
+    partial class AddBackflowTestReplacementValidationFlags
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2489,10 +2492,6 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("AccountBalance")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
-
                     b.Property<string>("Address")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -2629,29 +2628,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<string>("BillingAddress")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("BillingCity")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("BillingFirstName")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("BillingLastName")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int?>("BillingStateId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("BillingZipCode")
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
-
                     b.Property<string>("ContactName")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -2683,8 +2659,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.HasKey("ProfessionalId", "UserId");
-
-                    b.HasIndex("BillingStateId");
 
                     b.HasIndex("UserId");
 
@@ -4661,11 +4635,6 @@ namespace Envirotrax.App.Server.Data.Migrations
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalUser", b =>
                 {
-                    b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "BillingState")
-                        .WithMany()
-                        .HasForeignKey("BillingStateId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
                         .WithMany()
                         .HasForeignKey("ProfessionalId")
@@ -4677,8 +4646,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("BillingState");
 
                     b.Navigation("Professional");
 

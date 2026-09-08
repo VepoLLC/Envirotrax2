@@ -2,6 +2,7 @@ import { NgModule } from "@angular/core";
 import { EnvirotraxComponentsModule } from "@envirotrax/common-ui";
 import { WaterSupplierHierarchyComponent } from "./water-supplier-hierarchy/water-supplier-hierarchy.component";
 import { ProfessionalUserLookupComponent } from "./lookups/professional-user-lookup/professional-user-lookup.component";
+import { WaterSupplierUserLookupComponent } from "./lookups/water-supplier-user-lookup/water-supplier-user-lookup.component";
 import { GisAreaLookupComponent } from "./lookups/gis-areas/gis-area-lookup.component";
 import { GisAreaSelectionModalComponent } from "./lookups/gis-areas/gis-area-selection-modal.component";
 import { DownloadManagerComponent } from "./data-components/download-manager/download-manager.component";
@@ -14,6 +15,7 @@ import { CommonModule } from "@angular/common";
     declarations: [
         WaterSupplierHierarchyComponent,
         ProfessionalUserLookupComponent,
+        WaterSupplierUserLookupComponent,
         GisAreaLookupComponent,
         GisAreaSelectionModalComponent,
         DownloadManagerComponent,
@@ -30,6 +32,7 @@ import { CommonModule } from "@angular/common";
         WaterSupplierHierarchyComponent,
         GisAreaLookupComponent,
         ProfessionalUserLookupComponent,
+        WaterSupplierUserLookupComponent,
         DownloadManagerComponent
     ]
 })

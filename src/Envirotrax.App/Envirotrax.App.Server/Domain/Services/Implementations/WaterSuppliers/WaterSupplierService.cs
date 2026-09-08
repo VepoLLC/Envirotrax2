@@ -124,6 +124,43 @@ public class WaterSupplierService : Service<WaterSupplier, WaterSupplierDto>, IW
         };
     }
 
+    public async Task<WaterSupplierDto?> UpdateOwnAsync(WaterSupplierDto dto)
+    {
+        var model = new WaterSupplier
+        {
+            Name = dto.Name,
+            ContactName = dto.ContactName,
+            PwsId = dto.PwsId,
+            Address = dto.Address,
+            City = dto.City,
+            StateId = dto.State?.Id,
+            ZipCode = dto.ZipCode,
+            PhoneNumber = dto.PhoneNumber,
+            FaxNumber = dto.FaxNumber,
+            EmailAddress = dto.EmailAddress,
+
+            LetterCompanyName = dto.LetterCompanyName,
+            LetterContactName = dto.LetterContactName,
+            LetterAddress = dto.LetterAddress,
+            LetterCity = dto.LetterCity,
+            LetterStateId = dto.LetterState?.Id,
+            LetterZipCode = dto.LetterZipCode,
+
+            LetterContactCompanyName = dto.LetterContactCompanyName,
+            LetterContactContactName = dto.LetterContactContactName,
+            LetterContactAddress = dto.LetterContactAddress,
+            LetterContactCity = dto.LetterContactCity,
+            LetterContactStateId = dto.LetterContactState?.Id,
+            LetterContactZipCode = dto.LetterContactZipCode,
+            LetterContactPhoneNumber = dto.LetterContactPhoneNumber,
+            LetterContactFaxNumber = dto.LetterContactFaxNumber,
+            LetterContactEmailAddress = dto.LetterContactEmailAddress
+        };
+
+        var updated = await _repository.UpdateOwnAsync(model);
+        return MapToDto(updated);
+    }
+
     public async Task<WaterSupplierDetailsDto?> UpdateDetailsAsync(int id, WaterSupplierDetailsDto details)
     {
         details.WaterSupplier.Id = id;

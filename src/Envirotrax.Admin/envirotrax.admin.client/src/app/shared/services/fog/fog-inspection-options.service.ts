@@ -2,8 +2,6 @@ import { Injectable } from "@angular/core";
 import { InputOption } from "@envirotrax/common-ui";
 import {
     FogInspectionResult,
-    FogPaymentStatus,
-    FogTotalCapacityRange,
     InterceptorType
 } from "../../models/fog/fog-inspection";
 import { FacilityType, PropertyType } from "../../models/sites/site";
@@ -39,8 +37,8 @@ export class FogInspectionOptionsService {
 
     public readonly totalCapacityOptions: InputOption[] = [
         { id: '', text: 'Any Value' },
-        { id: String(FogTotalCapacityRange.TwentyFivePercentOrLess), text: '25% or less' },
-        { id: String(FogTotalCapacityRange.GreaterThanTwentyFivePercent), text: 'Greater than 25%' }
+        { id: 'lte25', text: '25% or less' },
+        { id: 'gt25', text: 'Greater than 25%' }
     ];
 
     public readonly inspectionResultOptions: InputOption[] = [
@@ -51,8 +49,8 @@ export class FogInspectionOptionsService {
 
     public readonly paymentStatusOptions: InputOption[] = [
         { id: '', text: 'Any Value' },
-        { id: String(FogPaymentStatus.Paid), text: 'Paid' },
-        { id: String(FogPaymentStatus.Unpaid), text: 'Unpaid' }
+        { id: 'paid', text: 'Paid' },
+        { id: 'unpaid', text: 'Unpaid' }
     ];
 
     public readonly propertyTypeOptions: InputOption[] = [

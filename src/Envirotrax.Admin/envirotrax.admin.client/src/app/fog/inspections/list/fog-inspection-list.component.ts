@@ -14,8 +14,6 @@ import {
     FogInspection,
     FogInspectionResult,
     FogInspectionRow,
-    FogPaymentStatus,
-    FogTotalCapacityRange,
     InterceptorCapacityType,
     interceptorCapacityTypeLabels,
     InterceptorType
@@ -57,10 +55,6 @@ export class FogInspectionListComponent implements OnInit {
 
     private panelFilter: QueryProperty[] = [];
 
-    private paymentStatus: FogPaymentStatus | null = null;
-
-    private totalCapacityRange: FogTotalCapacityRange | null = null;
-
     public table: TableViewModel<FogInspectionRow> = {
         query: {
             sort: {},
@@ -98,17 +92,26 @@ export class FogInspectionListComponent implements OnInit {
         await this.loadWaterSuppliers();
     }
 
-    // Total capacity and payment status are their own API parameters rather than column
-    // filters, so they are split out of the panel filter before it reaches the query.
+    // Total capacity and payment status are rewritten onto the real columns they live on, the same
+    // way the water supplier FOG inspection search does it, so they need no server-side handling.
     public onFilterChange(queryProperties: QueryProperty[]): void {
-        const payment = queryProperties.find(p => p.columnName === 'paymentStatus');
-        const capacity = queryProperties.find(p => p.columnName === 'totalCapacityRange');
+        this.panelFilter = queryProperties.map(property => {
+            if (property.columnName === 'totalCapacityPercent') {
+                if (property.value === 'lte25') {
+                    return { ...property, value: '25', comparisonOperator: 'Lte' as const };
+                }
 
-        this.paymentStatus = payment?.value ? Number(payment.value) as FogPaymentStatus : null;
-        this.totalCapacityRange = capacity?.value ? Number(capacity.value) as FogTotalCapacityRange : null;
+                if (property.value === 'gt25') {
+                    return { ...property, value: '25', comparisonOperator: 'Gt' as const };
+                }
+            }
 
-        this.panelFilter = queryProperties.filter(p =>
-            p.columnName !== 'paymentStatus' && p.columnName !== 'totalCapacityRange');
+            if (property.columnName === 'paymentStatus') {
+                return { columnName: 'transactionId', isValueNull: property.value === 'unpaid' };
+            }
+
+            return property;
+        });
 
         this.table.query.filter = this.buildFilter();
     }
@@ -132,9 +135,7 @@ export class FogInspectionListComponent implements OnInit {
 
             const inspections = await this._fogInspectionService.getAll(
                 this.table.items?.pageInfo || {},
-                this.table.query,
-                this.paymentStatus,
-                this.totalCapacityRange
+                this.table.query
             );
 
             this.table.items = {

@@ -1,5 +1,4 @@
 using DeveloperPartners.SortingFiltering;
-using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,14 +15,9 @@ public class FogInspectionController : AdminBaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> SearchAsync(
-        [FromQuery] PageInfo pageInfo,
-        [FromQuery] Query query,
-        [FromQuery] FogPaymentStatus? paymentStatus,
-        [FromQuery] FogTotalCapacityRange? totalCapacityRange,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> SearchAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
     {
-        var inspections = await _inspectionService.SearchForAdminAsync(pageInfo, query, paymentStatus, totalCapacityRange, cancellationToken);
+        var inspections = await _inspectionService.GetAllAsync(pageInfo, query, cancellationToken);
 
         return Ok(inspections);
     }

@@ -6,6 +6,7 @@ using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Sites;
+using Envirotrax.App.Server.Data.Repositories;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
@@ -669,53 +670,70 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
     public async Task<BackflowTestDto?> UpdateRenewalRequiredAsync(int id, bool renewalRequired, CancellationToken cancellationToken = default)
     {
-        var test = await _testRepository.UpdateRenewalRequiredAsync(id, renewalRequired, _authService.UserId, cancellationToken);
+        var saved = await _testRepository.UpdateRenewalRequiredAsync(id, renewalRequired, _authService.UserId, cancellationToken);
 
-        return test == null ? null : MapToDto(test);
+        return await FinishToggleUpdateAsync(saved);
     }
 
     public async Task<BackflowTestDto?> UpdateScheduleMonthAsync(int id, int month, CancellationToken cancellationToken = default)
     {
-        var test = await _testRepository.UpdateScheduleMonthAsync(id, month, _authService.UserId, cancellationToken);
+        var saved = await _testRepository.UpdateScheduleMonthAsync(id, month, _authService.UserId, cancellationToken);
 
-        return test == null ? null : MapToDto(test);
+        return await FinishToggleUpdateAsync(saved);
     }
 
     public async Task<BackflowTestDto?> UpdateIsCurrentAsync(int id, bool isCurrent, CancellationToken cancellationToken = default)
     {
-        var test = await _testRepository.UpdateIsCurrentAsync(id, isCurrent, _authService.UserId, cancellationToken);
+        var saved = await _testRepository.UpdateIsCurrentAsync(id, isCurrent, _authService.UserId, cancellationToken);
 
-        return test == null ? null : MapToDto(test);
+        return await FinishToggleUpdateAsync(saved);
     }
 
     public async Task<BackflowTestDto?> UpdateOutOfServiceAsync(int id, bool outOfService, CancellationToken cancellationToken = default)
     {
-        var test = await _testRepository.UpdateOutOfServiceAsync(id, outOfService, _authService.UserId, cancellationToken);
+        var saved = await _testRepository.UpdateOutOfServiceAsync(id, outOfService, _authService.UserId, cancellationToken);
 
-        return test == null ? null : MapToDto(test);
+        return await FinishToggleUpdateAsync(saved);
     }
 
     public async Task<BackflowTestDto?> UpdateDisapprovalAsync(int id, bool disapproved, CancellationToken cancellationToken = default)
     {
-        var test = await _testRepository.UpdateDisapprovalAsync(id, disapproved, _authService.UserId, cancellationToken);
+        var saved = await _testRepository.UpdateDisapprovalAsync(id, disapproved, _authService.UserId, cancellationToken);
 
-        return test == null ? null : MapToDto(test);
+        return await FinishToggleUpdateAsync(saved);
     }
 
     public async Task<BackflowTestDto?> UpdateForceRenewalAsync(int id, BackflowTestForceRenewalRequest request, CancellationToken cancellationToken = default)
     {
         var forceRenewalYears = request.ForceRenewalYears ?? 0;
 
-        var test = await _testRepository.UpdateForceRenewalAsync(id, request.ForceRenewal, forceRenewalYears, _authService.UserId, cancellationToken);
+        var saved = await _testRepository.UpdateForceRenewalAsync(id, request.ForceRenewal, forceRenewalYears, _authService.UserId, cancellationToken);
 
-        return test == null ? null : MapToDto(test);
+        return await FinishToggleUpdateAsync(saved);
     }
 
     public async Task<BackflowTestDto?> UpdateRejectionAsync(int id, BackflowTestRejectionRequest request, CancellationToken cancellationToken = default)
     {
-        var test = await _testRepository.UpdateRejectionAsync(id, request.Rejected, request.RejectedReason, _authService.UserId, cancellationToken);
+        var saved = await _testRepository.UpdateRejectionAsync(id, request.Rejected, request.RejectedReason, _authService.UserId, cancellationToken);
 
-        return test == null ? null : MapToDto(test);
+        return await FinishToggleUpdateAsync(saved);
+    }
+
+    // Shared tail for the 7 single-field toggle updates above: logs an Edit RecordLog entry when the
+    // auto-diff found a real change, mirroring the pattern already used by UpdateForAdminAsync.
+    private async Task<BackflowTestDto?> FinishToggleUpdateAsync(UpdateResult<BackflowTest> saved)
+    {
+        if (saved.Model == null)
+        {
+            return null;
+        }
+
+        if (saved.Changes.Length > 0)
+        {
+            await _recordLogService.AddAsync(RecordLogTableNames.BackflowTests, saved.Model.Id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
+        }
+
+        return MapToDto(saved.Model);
     }
 
     private static (bool RenewalRequired, DateTime? ExpirationDate) ComputeRenewal(

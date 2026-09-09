@@ -81,9 +81,9 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         return await paginated.ToListAsync(cancellationToken);
     }
 
-    public async Task<AdminUpdateResult<CsiInspection>> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request)
+    public async Task<UpdateResult<CsiInspection>> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request)
     {
-        var result = new AdminUpdateResult<CsiInspection>();
+        var result = new UpdateResult<CsiInspection>();
 
         var inspection = await Entity.SingleOrDefaultAsync(i => i.Id == id);
 
@@ -153,20 +153,32 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         return result;
     }
 
-    public async Task<CsiInspection?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken)
+    public async Task<UpdateResult<CsiInspection>> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken)
     {
+        var result = new UpdateResult<CsiInspection>();
+
         var inspection = await GetAsync(id, cancellationToken);
-        if (inspection == null) return null;
+
+        if (inspection == null)
+        {
+            return result;
+        }
+
+        // Attach BEFORE mutating so EF's change tracker captures the true pre-update values as
+        // OriginalValue — attaching after mutation would seed OriginalValue from the already-new values,
+        // making BuildChangeDescription always report "no changes".
+        DbContext.Attach(inspection);
 
         inspection.Disapproved = request.Disapproved;
         inspection.DisapprovedReason = request.Disapproved ? request.DisapprovedReason : null;
 
-        DbContext.Entry(inspection).Property(x => x.Disapproved).IsModified = true;
-        DbContext.Entry(inspection).Property(x => x.DisapprovedReason).IsModified = true;
+        result.Changes = BuildChangeDescription(inspection);
 
         await DbContext.SaveChangesAsync(cancellationToken);
 
-        return inspection;
+        result.Model = inspection;
+
+        return result;
     }
 
     private static async Task<IQueryable<CsiInspection>> ApplyLatestOnlyFilterAsync(IQueryable<CsiInspection> query, bool latestOnly, CancellationToken cancellationToken)

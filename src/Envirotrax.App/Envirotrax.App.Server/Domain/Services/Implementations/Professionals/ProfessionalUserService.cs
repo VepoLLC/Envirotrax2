@@ -5,6 +5,7 @@ using System.Transactions;
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
@@ -13,6 +14,7 @@ using Envirotrax.App.Server.Domain.Configuration;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.Common.Domain.Services.Defintions;
 
@@ -29,6 +31,7 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
     private readonly IProfessionalUserLicenseRepository _licenseRepository;
     private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly IFileStorageService _fileStorageService;
+    private readonly IRecordLogService _recordLogService;
 
     public ProfessionalUserService(
         IMapper mapper,
@@ -38,7 +41,8 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         IProfessionalService professionalService,
         IProfessionalUserLicenseRepository licenseRepository,
         ITimeZoneHelperService timeZoneHelper,
-        IFileStorageService fileStorageService)
+        IFileStorageService fileStorageService,
+        IRecordLogService recordLogService)
         : base(mapper, repository)
     {
         _professionalUserRepository = repository;
@@ -48,6 +52,7 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         _licenseRepository = licenseRepository;
         _timeZoneHelper = timeZoneHelper;
         _fileStorageService = fileStorageService;
+        _recordLogService = recordLogService;
     }
 
     public override async Task<IPagedData<ProfessionalUserDto>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
@@ -109,10 +114,15 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
 
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        await _professionalUserRepository.UpdateSignaturePathAsync(userId, path);
+        var saved = await _professionalUserRepository.UpdateSignaturePathAsync(userId, path);
         await _fileStorageService.UploadAsync(path, signatureStream);
 
         scope.Complete();
+
+        if (saved.Model != null && saved.Changes.Length > 0)
+        {
+            await _recordLogService.AddAsync(RecordLogTableNames.ProfessionalUsers, saved.Model.UserId, null, RecordLogType.Edit, saved.Changes, professionalId: saved.Model.ProfessionalId);
+        }
 
         return await BuildSignatureUrlAsync(path);
     }
@@ -146,9 +156,19 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         user.Id = _authService.UserId;
 
         var model = MapToModel(user);
-        var updated = await _professionalUserRepository.UpdateNonSensitiveDataAsync(model!);
+        var saved = await _professionalUserRepository.UpdateNonSensitiveDataAsync(model!);
 
-        return MapToDto(updated);
+        if (saved.Model == null)
+        {
+            return null;
+        }
+
+        if (saved.Changes.Length > 0)
+        {
+            await _recordLogService.AddAsync(RecordLogTableNames.ProfessionalUsers, saved.Model.UserId, null, RecordLogType.Edit, saved.Changes, professionalId: saved.Model.ProfessionalId);
+        }
+
+        return MapToDto(saved.Model);
     }
 
     public override async Task<ProfessionalUserDto> AddAsync(ProfessionalUserDto dto)
@@ -183,8 +203,19 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
 
     public async Task<ProfessionalUserDto?> UpdateSubAccountAsync(int professionalId, int userId, string? contactName, string? jobTitle)
     {
-        var updated = await _professionalUserRepository.UpdateSubAccountAsync(professionalId, userId, contactName, jobTitle);
-        return MapToDto(updated);
+        var saved = await _professionalUserRepository.UpdateSubAccountAsync(professionalId, userId, contactName, jobTitle);
+
+        if (saved.Model == null)
+        {
+            return null;
+        }
+
+        if (saved.Changes.Length > 0)
+        {
+            await _recordLogService.AddAsync(RecordLogTableNames.ProfessionalUsers, saved.Model.UserId, null, RecordLogType.Edit, saved.Changes, professionalId: saved.Model.ProfessionalId);
+        }
+
+        return MapToDto(saved.Model);
     }
 
     public async Task<IPagedData<ProfessionalUserDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null)

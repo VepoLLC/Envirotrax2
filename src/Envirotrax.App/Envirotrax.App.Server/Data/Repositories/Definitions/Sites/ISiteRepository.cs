@@ -6,7 +6,7 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 
 public interface ISiteRepository : IRepository<Site>
 {
-    Task<AdminUpdateResult<Site>> UpdateForAdminAsync(int id, SiteDto dto);
+    Task<UpdateResult<Site>> UpdateForAdminAsync(int id, SiteDto dto);
 
     Task<IEnumerable<Site>> SearchAsync(PageInfo pageInfo, Query query, bool? fogCompliant, CancellationToken cancellationToken);
     Task<IEnumerable<Site>> GetAllPendingGeocodingAsync(int batchSize);

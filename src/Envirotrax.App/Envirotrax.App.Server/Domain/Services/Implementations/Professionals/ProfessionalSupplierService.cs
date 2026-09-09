@@ -3,10 +3,12 @@ using System.Linq.Expressions;
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Professionals;
@@ -15,11 +17,28 @@ public class ProfessionalSupplierService : Service<ProfessionalWaterSupplier, Pr
 {
     private readonly IMapper _mapper;
     private readonly IProfessionalSupplierRepository _proSupplierRepository;
+    private readonly IRecordLogService _recordLogService;
 
-    public ProfessionalSupplierService(IMapper mapper, IProfessionalSupplierRepository repository) : base(mapper, repository)
+    public ProfessionalSupplierService(IMapper mapper, IProfessionalSupplierRepository repository, IRecordLogService recordLogService) : base(mapper, repository)
     {
         _mapper = mapper;
         _proSupplierRepository = repository;
+        _recordLogService = recordLogService;
+    }
+
+    public override async Task<ProfessionalWaterSupplierDto?> DeleteAsync(int id)
+    {
+        var deleted = await base.DeleteAsync(id);
+
+        if (deleted != null)
+        {
+            var waterSupplierId = deleted.WaterSupplier.Id ?? id;
+
+            await _recordLogService.AddAsync(RecordLogTableNames.ProfessionalWaterSupplierRegistrations, waterSupplierId, waterSupplierId, RecordLogType.Delete,
+                "Deleted water supplier registration", professionalId: deleted.Professional?.Id);
+        }
+
+        return deleted;
     }
 
     public async Task<IPagedData<ProfessionalWaterSupplierDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalWaterSupplier, bool>>? filter = null)

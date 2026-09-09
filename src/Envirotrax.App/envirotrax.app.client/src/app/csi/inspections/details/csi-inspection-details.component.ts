@@ -105,6 +105,7 @@ export class CsiInspectionDetailsComponent implements OnInit {
                 model: this.inspection
             }).result().subscribe(updated => {
                 this.inspection = updated;
+                this.loadRecordLogs();
             });
         }
     }
@@ -113,6 +114,7 @@ export class CsiInspectionDetailsComponent implements OnInit {
         try {
             this.isLoading = true;
             this.inspection = await this._inspectionService.updateApproval(this.inspection!.id!, { disapproved: false });
+            await this.loadRecordLogs();
         } finally {
             this.isLoading = false;
         }

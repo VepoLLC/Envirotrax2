@@ -15,9 +15,9 @@ public class SiteRepository : Repository<Site>, ISiteRepository
     {
     }
 
-    public async Task<AdminUpdateResult<Site>> UpdateForAdminAsync(int id, SiteDto dto)
+    public async Task<UpdateResult<Site>> UpdateForAdminAsync(int id, SiteDto dto)
     {
-        var result = new AdminUpdateResult<Site>();
+        var result = new UpdateResult<Site>();
 
         var site = await GetTrackedForUpdateAsync(id, CancellationToken.None);
 

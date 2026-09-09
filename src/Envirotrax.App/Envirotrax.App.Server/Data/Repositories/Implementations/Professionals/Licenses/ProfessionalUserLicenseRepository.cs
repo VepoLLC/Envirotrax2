@@ -126,7 +126,7 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
         };
     }
 
-    public async Task<ProfessionalUserLicense> UpdateForWaterSupplierAsync(int id, string licenseNumber, string? contactName, DateTime? expirationDate, CancellationToken cancellationToken)
+    public async Task<UpdateResult<ProfessionalUserLicense>> UpdateForWaterSupplierAsync(int id, string licenseNumber, string? contactName, DateTime? expirationDate, CancellationToken cancellationToken)
     {
         var license = await DbContext.ProfessionalUserLicenses
             .Include(l => l.LicenseType)
@@ -143,11 +143,14 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
         if (license.ProfessionalUser != null)
             license.ProfessionalUser.ContactName = contactName;
 
+        var changes = BuildChangeDescription(license);
+
         await DbContext.SaveChangesAsync(cancellationToken);
-        return license;
+
+        return new UpdateResult<ProfessionalUserLicense> { Model = license, Changes = changes };
     }
 
-    public async Task DeleteForWaterSupplierAsync(int id, CancellationToken cancellationToken)
+    public async Task<ProfessionalUserLicense> DeleteForWaterSupplierAsync(int id, CancellationToken cancellationToken)
     {
         var license = await DbContext.ProfessionalUserLicenses
             .FirstOrDefaultAsync(l => l.Id == id
@@ -156,5 +159,7 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
 
         DbContext.ProfessionalUserLicenses.Remove(license);
         await DbContext.SaveChangesAsync(cancellationToken);
+
+        return license;
     }
 }

@@ -45,6 +45,20 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         _logger = logger;
     }
 
+    // Mirrors V1's site_search.aspx.vb: creating a site always logs a fixed "New site record" entry
+    // (no field-level diff — V1 doesn't diff on create either, since there's no prior row to compare against).
+    public override async Task<SiteDto> AddAsync(SiteDto dto)
+    {
+        var added = await base.AddAsync(dto);
+
+        if (added.WaterSupplier?.Id is int waterSupplierId)
+        {
+            await _recordLogService.AddAsync(RecordLogTableNames.Sites, added.Id, waterSupplierId, RecordLogType.Add, "New site record");
+        }
+
+        return added;
+    }
+
     public async Task<IPagedData<SiteDto>> SearchAsync(PageInfo pageInfo, Query query, FogCompliancyStatus? fogCompliancyStatus, CancellationToken cancellationToken)
     {
         query.Sort = query.ConvertSortProperties<Site, SiteDto>(Mapper);

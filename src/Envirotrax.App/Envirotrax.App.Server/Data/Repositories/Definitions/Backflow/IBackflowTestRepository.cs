@@ -25,13 +25,13 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
     Task ClearTestNeedsRenewalCheckAsync(int testId, CancellationToken cancellationToken);
 
     // Status updates
-    Task<AdminUpdateResult<BackflowTest>> UpdateForAdminAsync(int id, BackflowTestAdminUpdateRequest request, int updatedById);
+    Task<UpdateResult<BackflowTest>> UpdateForAdminAsync(int id, BackflowTestAdminUpdateRequest request, int updatedById);
 
-    Task<BackflowTest?> UpdateRenewalRequiredAsync(int id, bool renewalRequired, int updatedById, CancellationToken cancellationToken);
-    Task<BackflowTest?> UpdateScheduleMonthAsync(int id, int month, int updatedById, CancellationToken cancellationToken);
-    Task<BackflowTest?> UpdateIsCurrentAsync(int id, bool isCurrent, int updatedById, CancellationToken cancellationToken);
-    Task<BackflowTest?> UpdateOutOfServiceAsync(int id, bool outOfService, int updatedById, CancellationToken cancellationToken);
-    Task<BackflowTest?> UpdateDisapprovalAsync(int id, bool disapproved, int updatedById, CancellationToken cancellationToken);
-    Task<BackflowTest?> UpdateForceRenewalAsync(int id, bool forceRenewal, int forceRenewalYears, int updatedById, CancellationToken cancellationToken);
-    Task<BackflowTest?> UpdateRejectionAsync(int id, bool rejected, string? rejectedReason, int updatedById, CancellationToken cancellationToken);
+    Task<UpdateResult<BackflowTest>> UpdateRenewalRequiredAsync(int id, bool renewalRequired, int updatedById, CancellationToken cancellationToken);
+    Task<UpdateResult<BackflowTest>> UpdateScheduleMonthAsync(int id, int month, int updatedById, CancellationToken cancellationToken);
+    Task<UpdateResult<BackflowTest>> UpdateIsCurrentAsync(int id, bool isCurrent, int updatedById, CancellationToken cancellationToken);
+    Task<UpdateResult<BackflowTest>> UpdateOutOfServiceAsync(int id, bool outOfService, int updatedById, CancellationToken cancellationToken);
+    Task<UpdateResult<BackflowTest>> UpdateDisapprovalAsync(int id, bool disapproved, int updatedById, CancellationToken cancellationToken);
+    Task<UpdateResult<BackflowTest>> UpdateForceRenewalAsync(int id, bool forceRenewal, int forceRenewalYears, int updatedById, CancellationToken cancellationToken);
+    Task<UpdateResult<BackflowTest>> UpdateRejectionAsync(int id, bool rejected, string? rejectedReason, int updatedById, CancellationToken cancellationToken);
 }

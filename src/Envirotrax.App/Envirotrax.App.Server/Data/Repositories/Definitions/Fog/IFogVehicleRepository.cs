@@ -6,4 +6,6 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 public interface IFogVehicleRepository : IRepository<FogVehicle>
 {
     Task<IEnumerable<FogVehicle>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+
+    Task<UpdateResult<FogVehicle>> UpdateVehicleAsync(FogVehicle model);
 }

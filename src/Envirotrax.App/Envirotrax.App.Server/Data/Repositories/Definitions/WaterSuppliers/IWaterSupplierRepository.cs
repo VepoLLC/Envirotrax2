@@ -10,5 +10,5 @@ public interface IWaterSupplierRepository : IRepository<WaterSupplier>
 
     Task<IEnumerable<int>> GetSupplierIdsAsync(bool hasBackflowTests, CancellationToken cancellationToken);
 
-    Task<WaterSupplier?> UpdateOwnAsync(WaterSupplier supplier);
+    Task<UpdateResult<WaterSupplier>> UpdateOwnAsync(WaterSupplier supplier);
 }

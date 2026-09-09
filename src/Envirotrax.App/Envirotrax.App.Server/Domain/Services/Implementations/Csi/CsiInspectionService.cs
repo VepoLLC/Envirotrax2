@@ -116,8 +116,19 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
 
     public async Task<CsiInspectionDto?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken)
     {
-        var inspection = await _repository.UpdateApprovalAsync(id, request, cancellationToken);
-        return inspection == null ? null : Mapper.Map<CsiInspectionDto>(inspection);
+        var saved = await _repository.UpdateApprovalAsync(id, request, cancellationToken);
+
+        if (saved.Model == null)
+        {
+            return null;
+        }
+
+        if (saved.Changes.Length > 0)
+        {
+            await _recordLogService.AddAsync(RecordLogTableNames.CsiInspections, id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
+        }
+
+        return Mapper.Map<CsiInspectionDto>(saved.Model);
     }
 
     public async Task<CsiInspectionDto?> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request)

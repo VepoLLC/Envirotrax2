@@ -181,6 +181,84 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         return result;
     }
 
+    public async Task<UpdateResult<CsiInspection>> UpdateForProfessionalAsync(CsiInspection model, int professionalId)
+    {
+        var result = new UpdateResult<CsiInspection>();
+
+        var inspection = await GetTrackedForUpdateAsync(model.Id, default);
+
+        if (inspection == null || inspection.ProfessionalId != professionalId || !string.IsNullOrEmpty(inspection.TransactionId))
+        {
+            return result;
+        }
+
+        inspection.InspectionDate = model.InspectionDate;
+        inspection.ReasonForInspection = model.ReasonForInspection;
+
+        inspection.Compliance1 = model.Compliance1;
+        inspection.Compliance2 = model.Compliance2;
+        inspection.Compliance3 = model.Compliance3;
+        inspection.Compliance4 = model.Compliance4;
+        inspection.Compliance5 = model.Compliance5;
+        inspection.Compliance6 = model.Compliance6;
+
+        inspection.MaterialServiceLineLead = model.MaterialServiceLineLead;
+        inspection.MaterialServiceLineCopper = model.MaterialServiceLineCopper;
+        inspection.MaterialServiceLinePVC = model.MaterialServiceLinePVC;
+        inspection.MaterialServiceLineOther = model.MaterialServiceLineOther;
+        inspection.MaterialServiceLineOtherDescription = model.MaterialServiceLineOtherDescription;
+
+        inspection.MaterialSolderLead = model.MaterialSolderLead;
+        inspection.MaterialSolderLeadFree = model.MaterialSolderLeadFree;
+        inspection.MaterialSolderSolventWeld = model.MaterialSolderSolventWeld;
+        inspection.MaterialSolderOther = model.MaterialSolderOther;
+        inspection.MaterialSolderOtherDescription = model.MaterialSolderOtherDescription;
+
+        inspection.Comments = model.Comments;
+        inspection.NeedsValidation = true;
+
+        // Site/Inspector snapshot fields — refreshed the same way SubmitAsync populates them for a new row.
+        inspection.PropertyBusinessName = model.PropertyBusinessName;
+        inspection.PropertyType = model.PropertyType;
+        inspection.PropertyStreetNumber = model.PropertyStreetNumber;
+        inspection.PropertyStreetName = model.PropertyStreetName;
+        inspection.PropertyNumber = model.PropertyNumber;
+        inspection.PropertyCity = model.PropertyCity;
+        inspection.PropertyStateId = model.PropertyStateId;
+        inspection.PropertyZip = model.PropertyZip;
+        inspection.MailingCompanyName = model.MailingCompanyName;
+        inspection.MailingContactName = model.MailingContactName;
+        inspection.MailingStreetNumber = model.MailingStreetNumber;
+        inspection.MailingStreetName = model.MailingStreetName;
+        inspection.MailingNumber = model.MailingNumber;
+        inspection.MailingCity = model.MailingCity;
+        inspection.MailingStateId = model.MailingStateId;
+        inspection.MailingZip = model.MailingZip;
+        inspection.MailingPhoneNumber = model.MailingPhoneNumber;
+        inspection.MailingEmailAddress = model.MailingEmailAddress;
+
+        inspection.InspectorId = model.InspectorId;
+        inspection.InspectorCompanyName = model.InspectorCompanyName;
+        inspection.InspectorContactName = model.InspectorContactName;
+        inspection.InspectorJobTitle = model.InspectorJobTitle;
+        inspection.InspectorAddress = model.InspectorAddress;
+        inspection.InspectorCity = model.InspectorCity;
+        inspection.InspectorState = model.InspectorState;
+        inspection.InspectorZip = model.InspectorZip;
+        inspection.InspectorWorkNumber = model.InspectorWorkNumber;
+        inspection.InspectorFaxNumber = model.InspectorFaxNumber;
+        inspection.InspectorLicenseNumber = model.InspectorLicenseNumber;
+        inspection.InspectorLicenseType = model.InspectorLicenseType;
+
+        result.Changes = BuildChangeDescription(inspection);
+
+        await DbContext.SaveChangesAsync();
+
+        result.Model = inspection;
+
+        return result;
+    }
+
     private static async Task<IQueryable<CsiInspection>> ApplyLatestOnlyFilterAsync(IQueryable<CsiInspection> query, bool latestOnly, CancellationToken cancellationToken)
     {
         if (!latestOnly)

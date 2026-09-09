@@ -356,6 +356,114 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         return saved;
     }
 
+    // Checkout "Edit" on an own, still-unpaid test: mirrors SubmitWithImagesAsync's snapshot/renewal/image
+    // logic, but against an existing row instead of AddAsync. Ownership + payment-status guard lives in
+    // the repository (UpdateForProfessionalAsync returns Model == null for not-found/not-owned/already-paid).
+    public async Task<BackflowTestDto?> UpdateForProfessionalAsync(
+        int id,
+        BackflowTestDto dto,
+        Stream? assemblyStream, string? assemblyFileName,
+        Stream? serialStream, string? serialFileName,
+        Stream? bypassAssemblyStream, string? bypassAssemblyFileName,
+        Stream? bypassSerialStream, string? bypassSerialFileName,
+        Stream? airGapStream, string? airGapFileName,
+        CancellationToken cancellationToken = default)
+    {
+        var professionalId = _authService.ProfessionalId;
+        dto.Id = id;
+        dto.Professional = new ReferencedProfessionalDto { Id = professionalId };
+
+        await PopulateBpatSnapshotAsync(dto);
+        DeriveTestDate(dto);
+
+        bool hasAuxWaterSupply = false;
+
+        if (dto.Site?.Id != null)
+        {
+            var site = await _siteService.GetAsync(dto.Site.Id.Value, cancellationToken);
+
+            if (site != null)
+            {
+                ApplySiteSnapshot(dto, site);
+                hasAuxWaterSupply = site.HasAuxWaterSupply;
+            }
+        }
+
+        await ApplyRenewalAsync(dto, hasAuxWaterSupply, cancellationToken);
+
+        string? newAssemblyPath = null;
+        string? newSerialPath = null;
+        string? newBypassAssemblyPath = null;
+        string? newBypassSerialPath = null;
+        string? newAirGapPath = null;
+
+        if (assemblyStream != null && assemblyFileName != null)
+        {
+            newAssemblyPath = $"professionals/{professionalId}/backflow-tests/assembly/{Guid.NewGuid()}{ValidateAndGetExtension(assemblyFileName)}";
+        }
+        if (serialStream != null && serialFileName != null)
+        {
+            newSerialPath = $"professionals/{professionalId}/backflow-tests/serial-number/{Guid.NewGuid()}{ValidateAndGetExtension(serialFileName)}";
+        }
+        if (bypassAssemblyStream != null && bypassAssemblyFileName != null)
+        {
+            newBypassAssemblyPath = $"professionals/{professionalId}/backflow-tests/bypass-assembly/{Guid.NewGuid()}{ValidateAndGetExtension(bypassAssemblyFileName)}";
+        }
+        if (bypassSerialStream != null && bypassSerialFileName != null)
+        {
+            newBypassSerialPath = $"professionals/{professionalId}/backflow-tests/bypass-serial-number/{Guid.NewGuid()}{ValidateAndGetExtension(bypassSerialFileName)}";
+        }
+        if (airGapStream != null && airGapFileName != null)
+        {
+            newAirGapPath = $"professionals/{professionalId}/backflow-tests/air-gap/{Guid.NewGuid()}{ValidateAndGetExtension(airGapFileName)}";
+        }
+
+        var model = MapToModel(dto)!;
+
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+        var saved = await _testRepository.UpdateForProfessionalAsync(
+            model, professionalId,
+            newAssemblyPath, newSerialPath, newBypassAssemblyPath, newBypassSerialPath, newAirGapPath);
+
+        if (saved.Model == null)
+        {
+            return null;
+        }
+
+        if (newAssemblyPath != null)
+        {
+            await _fileStorageService.UploadAsync(newAssemblyPath, assemblyStream!);
+        }
+        if (newSerialPath != null)
+        {
+            await _fileStorageService.UploadAsync(newSerialPath, serialStream!);
+        }
+        if (newBypassAssemblyPath != null)
+        {
+            await _fileStorageService.UploadAsync(newBypassAssemblyPath, bypassAssemblyStream!);
+        }
+        if (newBypassSerialPath != null)
+        {
+            await _fileStorageService.UploadAsync(newBypassSerialPath, bypassSerialStream!);
+        }
+        if (newAirGapPath != null)
+        {
+            await _fileStorageService.UploadAsync(newAirGapPath, airGapStream!);
+        }
+
+        if (saved.Changes.Length > 0)
+        {
+            await _recordLogService.AddAsync(RecordLogTableNames.BackflowTests, saved.Model.Id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes, professionalId);
+        }
+
+        scope.Complete();
+
+        var result = MapToDto(saved.Model)!;
+        await PopulateImageUrlsAsync(result);
+        return result;
+    }
+
     public async Task<BackflowTestExpiryCountsDto> GetExpiryCountsAsync(CancellationToken cancellationToken = default)
     {
         var counts = await _testRepository.GetExpiryCountsAsync(cancellationToken);

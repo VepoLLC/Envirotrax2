@@ -114,6 +114,64 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         return Mapper.Map<CsiInspectionDto>(added);
     }
 
+    // Checkout "Edit" on an own, still-unpaid inspection: mirrors SubmitAsync's field list and snapshot
+    // logic, but against an existing row. Ownership + payment-status guard lives in the repository
+    // (UpdateForProfessionalAsync returns Model == null for not-found/not-owned/already-paid).
+    public async Task<CsiInspectionDto?> UpdateForProfessionalAsync(int id, CsiInspectionDto request, CancellationToken cancellationToken)
+    {
+        var professionalId = _authService.ProfessionalId;
+        var siteId = request.Site!.Id!.Value;
+        var inspectorUserId = request.InspectorUser!.Id!.Value;
+
+        var site = await _siteService.GetAsync(siteId, cancellationToken);
+        var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
+        var inspectorUser = await _professionalUserService.GetAsync(inspectorUserId, cancellationToken);
+        var licenses = await _licenseService.GetAllAsync(inspectorUserId, new PageInfo(), new Query());
+
+        var csiLicense = licenses.Data.FirstOrDefault();
+
+        var inspection = new CsiInspection
+        {
+            Id = id,
+            InspectionDate = request.InspectionDate,
+            ReasonForInspection = request.ReasonForInspection,
+            Compliance1 = request.Compliance1,
+            Compliance2 = request.Compliance2,
+            Compliance3 = request.Compliance3,
+            Compliance4 = request.Compliance4,
+            Compliance5 = request.Compliance5,
+            Compliance6 = request.Compliance6,
+            MaterialServiceLineLead = request.MaterialServiceLineLead,
+            MaterialServiceLineCopper = request.MaterialServiceLineCopper,
+            MaterialServiceLinePVC = request.MaterialServiceLinePVC,
+            MaterialServiceLineOther = request.MaterialServiceLineOther,
+            MaterialServiceLineOtherDescription = request.MaterialServiceLineOtherDescription,
+            MaterialSolderLead = request.MaterialSolderLead,
+            MaterialSolderLeadFree = request.MaterialSolderLeadFree,
+            MaterialSolderSolventWeld = request.MaterialSolderSolventWeld,
+            MaterialSolderOther = request.MaterialSolderOther,
+            MaterialSolderOtherDescription = request.MaterialSolderOtherDescription,
+            Comments = request.Comments
+        };
+
+        ApplySiteSnapshot(inspection, site);
+        ApplyInspectorSnapshot(inspection, professional, inspectorUser, csiLicense, inspectorUserId);
+
+        var saved = await _repository.UpdateForProfessionalAsync(inspection, professionalId);
+
+        if (saved.Model == null)
+        {
+            return null;
+        }
+
+        if (saved.Changes.Length > 0)
+        {
+            await _recordLogService.AddAsync(RecordLogTableNames.CsiInspections, saved.Model.Id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes, professionalId);
+        }
+
+        return Mapper.Map<CsiInspectionDto>(saved.Model);
+    }
+
     public async Task<CsiInspectionDto?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken)
     {
         var saved = await _repository.UpdateApprovalAsync(id, request, cancellationToken);

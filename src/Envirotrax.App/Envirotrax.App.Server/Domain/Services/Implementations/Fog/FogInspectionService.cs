@@ -4,12 +4,14 @@ using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Fog;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.Common.Data;
@@ -28,6 +30,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
     private readonly IFileStorageService _fileStorageService;
     private readonly IAuthService _authService;
     private readonly IPdfTemplateService _pdfTemplateService;
+    private readonly IRecordLogService _recordLogService;
 
     public FogInspectionService(
         IMapper mapper,
@@ -37,7 +40,8 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         ISiteService siteService,
         IFileStorageService fileStorageService,
         IAuthService authService,
-        IPdfTemplateService pdfTemplateService)
+        IPdfTemplateService pdfTemplateService,
+        IRecordLogService recordLogService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -47,6 +51,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         _fileStorageService = fileStorageService;
         _authService = authService;
         _pdfTemplateService = pdfTemplateService;
+        _recordLogService = recordLogService;
     }
 
     public Task<byte[]> GeneratePdfAsync(FogInspectionDto inspection)
@@ -188,6 +193,129 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
 
         scope.Complete();
         return Mapper.Map<FogInspectionDto>(added);
+    }
+
+    // Checkout "Edit" on an own, still-unpaid inspection: mirrors SubmitAsync's field list and snapshot
+    // logic, but against an existing row. Ownership + payment-status guard lives in the repository
+    // (UpdateForProfessionalAsync returns Model == null for not-found/not-owned/already-paid).
+    public async Task<FogInspectionDto?> UpdateForProfessionalAsync(
+        int id,
+        FogInspectionDto request,
+        Stream? exteriorStream, string? exteriorFileName,
+        Stream? interiorStream, string? interiorFileName,
+        Stream? signatureStream, string? signatureFileName,
+        CancellationToken cancellationToken)
+    {
+        var professionalId = _authService.ProfessionalId;
+        var siteId = request.Site!.Id!.Value;
+        var inspectorUserId = request.Inspector!.Id!.Value;
+
+        var site = await _siteService.GetAsync(siteId, cancellationToken);
+        var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
+        var inspectorUser = await _professionalUserService.GetAsync(inspectorUserId, cancellationToken);
+
+        var inspection = new FogInspection
+        {
+            Id = id,
+            InspectionDate = request.InspectionDate,
+            FacilityType = request.FacilityType,
+            ReasonForInspection = request.ReasonForInspection,
+
+            InterceptorType = request.InterceptorType,
+            InterceptorOtherDescription = request.InterceptorOtherDescription,
+            InterceptorCapacity = request.InterceptorCapacity,
+            InterceptorCapacityType = request.InterceptorCapacityType,
+            InterceptorLocationDescription = request.InterceptorLocationDescription,
+            InterceptorLatitude = request.InterceptorLatitude,
+            InterceptorLongitude = request.InterceptorLongitude,
+            InterceptorComments = request.InterceptorComments,
+
+            Maintained = request.Maintained,
+            Accessible = request.Accessible,
+            PastOverflow = request.PastOverflow,
+
+            InletChamberWettingHeight = request.InletChamberWettingHeight,
+            InletChamberGreaseBlanket = request.InletChamberGreaseBlanket,
+            InletChamberSediments = request.InletChamberSediments,
+            OutletChamberWettingHeight = request.OutletChamberWettingHeight,
+            OutletChamberGreaseBlanket = request.OutletChamberGreaseBlanket,
+            OutletChamberSediments = request.OutletChamberSediments,
+            InletTeeIntact = request.InletTeeIntact,
+            OutletTeeIntact = request.OutletTeeIntact,
+            InletTeeVisible = request.InletTeeVisible,
+            OutletTeeVisible = request.OutletTeeVisible,
+
+            SampledFrom = request.SampledFrom,
+            SamplingPointAccessible = request.SamplingPointAccessible,
+            SamplingPointClean = request.SamplingPointClean,
+
+            InletTotalCapacityPercent = request.InletTotalCapacityPercent,
+            OutletTotalCapacityPercent = request.OutletTotalCapacityPercent,
+            TotalCapacityPercent = request.TotalCapacityPercent,
+
+            InspectionResult = request.InspectionResult,
+
+            SignatureContactName = request.SignatureContactName,
+            SignatureDate = request.SignatureDate,
+
+            Comments = request.Comments,
+
+            FogGeneratorPhoneNumber = request.FogGeneratorPhoneNumber,
+            FogGeneratorEmailAddress = request.FogGeneratorEmailAddress
+        };
+
+        ApplySiteSnapshot(inspection, site);
+        ApplyInspectorSnapshot(inspection, professional, inspectorUser, inspectorUserId);
+
+        string? newExteriorPath = null;
+        string? newInteriorPath = null;
+        string? newSignaturePath = null;
+
+        if (exteriorStream != null && exteriorFileName != null)
+        {
+            newExteriorPath = $"professionals/{professional.Id}/fog-inspections/exterior/{Guid.NewGuid()}{ValidateAndGetExtension(exteriorFileName)}";
+        }
+        if (interiorStream != null && interiorFileName != null)
+        {
+            newInteriorPath = $"professionals/{professional.Id}/fog-inspections/interior/{Guid.NewGuid()}{ValidateAndGetExtension(interiorFileName)}";
+        }
+        if (signatureStream != null && signatureFileName != null)
+        {
+            newSignaturePath = $"professionals/{professional.Id}/fog-inspections/signature/{Guid.NewGuid()}{ValidateAndGetExtension(signatureFileName)}";
+        }
+
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+        var saved = await _repository.UpdateForProfessionalAsync(inspection, professionalId, newExteriorPath, newInteriorPath, newSignaturePath);
+
+        if (saved.Model == null)
+        {
+            return null;
+        }
+
+        if (newExteriorPath != null)
+        {
+            await _fileStorageService.UploadAsync(newExteriorPath, exteriorStream!);
+        }
+        if (newInteriorPath != null)
+        {
+            await _fileStorageService.UploadAsync(newInteriorPath, interiorStream!);
+        }
+        if (newSignaturePath != null)
+        {
+            await _fileStorageService.UploadAsync(newSignaturePath, signatureStream!);
+        }
+
+        if (saved.Changes.Length > 0)
+        {
+            await _recordLogService.AddAsync(RecordLogTableNames.FogInspections, saved.Model.Id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes, professionalId);
+        }
+
+        scope.Complete();
+
+        var dto = Mapper.Map<FogInspectionDto>(saved.Model);
+        await PopulateImageUrlsAsync(dto);
+        return dto;
     }
 
     public override async Task<FogInspectionDto?> GetAsync(int id, CancellationToken cancellationToken)

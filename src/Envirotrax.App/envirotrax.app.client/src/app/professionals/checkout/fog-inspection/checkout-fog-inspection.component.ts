@@ -135,6 +135,14 @@ export class CheckoutFogInspectionComponent implements OnInit {
         this._router.navigate(['/professionals/fog/inspections', inspection.id]);
     }
 
+    public editInspection(inspection: CheckoutFogInspectionVm): void {
+        if (inspection?.id == null) {
+            return;
+        }
+
+        this._router.navigate(['/professionals/fog/inspections/edit', inspection.id]);
+    }
+
     public deleteInspection(inspection: CheckoutFogInspectionVm): void {
         if (inspection?.id == null) {
             return;

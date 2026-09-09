@@ -127,6 +127,19 @@ export class BackflowTestService {
         return await lastValueFrom(this._http.post<BackflowTest>(url, formData));
     }
 
+    public async updateForProfessional(id: number, test: BackflowTest, images: BackflowTestImages = {}): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/backflow/tests/${id}`);
+        const formData = buildBackflowTestFormData(test);
+
+        if (images.assemblyImage) { formData.append('assemblyImage', images.assemblyImage); }
+        if (images.serialNumberImage) { formData.append('serialNumberImage', images.serialNumberImage); }
+        if (images.bypassAssemblyImage) { formData.append('bypassAssemblyImage', images.bypassAssemblyImage); }
+        if (images.bypassSerialNumberImage) { formData.append('bypassSerialNumberImage', images.bypassSerialNumberImage); }
+        if (images.airGapImage) { formData.append('airGapImage', images.airGapImage); }
+
+        return await lastValueFrom(this._http.put<BackflowTest>(url, formData));
+    }
+
     public async get(id: number): Promise<BackflowTest> {
         const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}`);
         return await lastValueFrom(this._http.get<BackflowTest>(url));

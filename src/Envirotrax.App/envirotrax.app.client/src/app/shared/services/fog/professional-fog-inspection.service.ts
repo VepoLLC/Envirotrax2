@@ -68,6 +68,17 @@ export class ProfessionalFogInspectionService {
 
         return lastValueFrom(this._http.post<FogInspection>(url, formData));
     }
+
+    public updateForProfessional(id: number, inspection: FogInspection, images: FogInspectionImages = {}): Promise<FogInspection> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/fog/inspections/${id}`);
+        const formData = buildFogInspectionFormData(inspection);
+
+        if (images.exteriorImage) { formData.append('exteriorImage', images.exteriorImage); }
+        if (images.interiorImage) { formData.append('interiorImage', images.interiorImage); }
+        if (images.signatureImage) { formData.append('signatureImage', images.signatureImage); }
+
+        return lastValueFrom(this._http.put<FogInspection>(url, formData));
+    }
 }
 
 function buildFogInspectionFormData(inspection: FogInspection): FormData {

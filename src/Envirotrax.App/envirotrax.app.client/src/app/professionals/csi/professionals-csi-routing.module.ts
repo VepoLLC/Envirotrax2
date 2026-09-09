@@ -22,6 +22,11 @@ const routes: Routes = [
         component: CsiSubmissionCreateComponent
     },
     {
+        path: 'inspections/edit/:editId',
+        title: 'Edit CSI Inspection',
+        component: CsiSubmissionCreateComponent
+    },
+    {
         path: 'inspections/:id',
         title: 'View CSI Inspection',
         component: CsiInspectionViewComponent

@@ -35,6 +35,7 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
 
     public site?: Site;
     public professional?: Professional;
+    public editingId: number | null = null;
 
     private fogUsers: ProfessionalUser[] = [];
     private waterSuppliers: ProfessionalWaterSupplier[] = [];
@@ -106,6 +107,14 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
 
     public ngOnInit(): void {
         this._activatedRoute.paramMap.subscribe(async params => {
+            const editIdParam = params.get('editId');
+
+            if (editIdParam) {
+                this.editingId = Number(editIdParam);
+                await this.loadForEdit(this.editingId);
+                return;
+            }
+
             const idParam = params.get('siteId');
             this._siteId = idParam ? Number(idParam) : 0;
 
@@ -202,12 +211,18 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
 
         this.isLoading = true;
         try {
-            await this._inspectionService.submit({
+            const submission = {
                 ...this.model,
                 site: { id: this._siteId },
                 waterSupplier: { id: this.selectedWaterSupplierId },
                 inspector: { id: this.selectedFogUserId }
-            }, this.images);
+            };
+
+            if (this.editingId) {
+                await this._inspectionService.updateForProfessional(this.editingId, submission, this.images);
+            } else {
+                await this._inspectionService.submit(submission, this.images);
+            }
             this.submitSuccess = true;
             this._checkoutService.refresh();
         } finally {
@@ -339,6 +354,48 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
             this.buildDropdownOptions();
             await this.setDefaultFogUser();
             this.setDefaultWaterSupplier(site);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    // Checkout "Edit": full field load of an own, still-unpaid inspection — unlike loadData, which builds a
+    // blank form pre-scoped only to a site id.
+    private async loadForEdit(id: number): Promise<void> {
+        try {
+            this.isLoading = true;
+
+            const inspection = await this._inspectionService.getById(id);
+            this._siteId = inspection.site?.id ?? 0;
+
+            const [professional, usersPage, site] = await Promise.all([
+                this._professionalService.getLoggedInProfessional(),
+                this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isFogInspector', comparisonOperator: 'Eq', value: 'true' }] }),
+                this._siteService.getForProfessional(this._siteId)
+            ]);
+
+            this.professional = professional;
+            this.fogUsers = usersPage.data ?? [];
+            this.site = site;
+
+            const waterSuppliersPage = await this._professionalSupplierService.getAllMy({ hasFogInspection: true });
+            this.waterSuppliers = waterSuppliersPage.data ?? [];
+
+            this.buildDropdownOptions();
+
+            this.model = { ...inspection };
+            this.remarksLength = this.model.comments?.length ?? 0;
+            this.recalcCapacity();
+
+            this.selectedWaterSupplierId = inspection.waterSupplier?.id;
+            this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === inspection.waterSupplier?.id);
+
+            this.selectedFogUserId = inspection.inspector?.id ?? 0;
+            this.selectedFogUser = this.fogUsers.find(u => u.id === this.selectedFogUserId);
+
+            this.exteriorImagePreview = inspection.exteriorImageUrl ?? null;
+            this.interiorImagePreview = inspection.interiorImageUrl ?? null;
+            this.signatureImagePreview = inspection.signatureImageUrl ?? null;
         } finally {
             this.isLoading = false;
         }

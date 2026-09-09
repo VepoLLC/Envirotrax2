@@ -14,4 +14,5 @@ public static class RecordLogTableNames
     public const string NotificationSettings = "NotificationSettings";
     public const string WaterSupplierUserAccounts = "WaterSupplierUserAccounts";
     public const string ProfessionalWaterSupplierRegistrations = "ProfessionalWaterSupplierRegistrations";
+    public const string FogInspections = "FogInspections";
 }

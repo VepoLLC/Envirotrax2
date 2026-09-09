@@ -146,11 +146,11 @@ export class CheckoutCsiComponent implements OnInit {
     }
 
     public editInspection(inspection: CheckoutCsiInspectionVm): void {
-        if (inspection?.site?.id == null) {
+        if (inspection?.id == null) {
             return;
         }
 
-        this._router.navigate(['/professionals/csi/inspections/create', inspection.site.id]);
+        this._router.navigate(['/professionals/csi/inspections/edit', inspection.id]);
     }
 
     public deleteInspection(inspection: CheckoutCsiInspectionVm): void {

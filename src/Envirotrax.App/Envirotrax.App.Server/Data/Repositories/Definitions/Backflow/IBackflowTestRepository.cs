@@ -34,4 +34,14 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
     Task<UpdateResult<BackflowTest>> UpdateDisapprovalAsync(int id, bool disapproved, int updatedById, CancellationToken cancellationToken);
     Task<UpdateResult<BackflowTest>> UpdateForceRenewalAsync(int id, bool forceRenewal, int forceRenewalYears, int updatedById, CancellationToken cancellationToken);
     Task<UpdateResult<BackflowTest>> UpdateRejectionAsync(int id, bool rejected, string? rejectedReason, int updatedById, CancellationToken cancellationToken);
+
+    // Professional edit-in-place (checkout "Edit" on an own, still-unpaid test)
+    Task<UpdateResult<BackflowTest>> UpdateForProfessionalAsync(
+        BackflowTest model,
+        int professionalId,
+        string? newAssemblyImagePath,
+        string? newSerialNumberImagePath,
+        string? newBypassAssemblyImagePath,
+        string? newBypassSerialNumberImagePath,
+        string? newAirGapImagePath);
 }

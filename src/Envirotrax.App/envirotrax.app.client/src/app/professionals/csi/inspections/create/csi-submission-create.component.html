@@ -1,4 +1,4 @@
-<h1 class="text-center h2">CSI Inspection Submission</h1>
+<h1 class="text-center h2">{{ editingId ? 'Edit CSI Inspection' : 'CSI Inspection Submission' }}</h1>
 
 <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
 
@@ -52,7 +52,7 @@
                 <div class="d-flex justify-content-center gap-2 mt-3">
                     <button type="button" class="btn btn-primary vp-section-button"
                             (click)="returnToAccountOverview()">Return to Account Overview</button>
-                    <button type="button" class="btn btn-primary vp-section-button" (click)="submitAnother()">Submit
+                    <button type="button" class="btn btn-primary vp-section-button" *ngIf="!editingId" (click)="submitAnother()">Submit
                         Another Inspection</button>
                     <button type="button" class="btn btn-primary vp-section-button">Checkout</button>
                 </div>

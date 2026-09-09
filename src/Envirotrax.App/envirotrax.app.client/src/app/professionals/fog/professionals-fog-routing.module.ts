@@ -26,6 +26,11 @@ const routes: Routes = [
         component: ProfessionalFogSubmissionCreateComponent
     },
     {
+        path: 'inspections/edit/:editId',
+        title: 'Edit FOG Inspection',
+        component: ProfessionalFogSubmissionCreateComponent
+    },
+    {
         path: 'inspections/:id',
         title: 'View FOG Inspection',
         component: FogInspectionViewComponent

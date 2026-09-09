@@ -100,6 +100,11 @@ export class CsiInspectionService {
         return lastValueFrom(this._http.post<CsiInspection>(url, inspection));
     }
 
+    public updateForProfessional(id: number, inspection: CsiInspection): Promise<CsiInspection> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${id}`);
+        return lastValueFrom(this._http.put<CsiInspection>(url, inspection));
+    }
+
     public updateApproval(id: number, request: { disapproved: boolean; disapprovedReason?: string | null }): Promise<CsiInspection> {
         const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${id}/approval`);
         return lastValueFrom(this._http.put<CsiInspection>(url, request));

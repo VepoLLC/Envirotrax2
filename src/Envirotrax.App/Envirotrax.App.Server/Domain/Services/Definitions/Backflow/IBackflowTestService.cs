@@ -42,4 +42,14 @@ public interface IBackflowTestService : IService<BackflowTest, BackflowTestDto>
     Task<BackflowTestDto?> UpdateDisapprovalAsync(int id, bool disapproved, CancellationToken cancellationToken = default);
     Task<BackflowTestDto?> UpdateForceRenewalAsync(int id, BackflowTestForceRenewalRequest request, CancellationToken cancellationToken = default);
     Task<BackflowTestDto?> UpdateRejectionAsync(int id, BackflowTestRejectionRequest request, CancellationToken cancellationToken = default);
+
+    Task<BackflowTestDto?> UpdateForProfessionalAsync(
+        int id,
+        BackflowTestDto dto,
+        Stream? assemblyStream, string? assemblyFileName,
+        Stream? serialStream, string? serialFileName,
+        Stream? bypassAssemblyStream, string? bypassAssemblyFileName,
+        Stream? bypassSerialStream, string? bypassSerialFileName,
+        Stream? airGapStream, string? airGapFileName,
+        CancellationToken cancellationToken = default);
 }

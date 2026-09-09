@@ -51,6 +51,13 @@ const routes: Routes = [
         component: BackflowTestSubmitComponent,
         canActivate: [RoleGuard],
         data: { roles: [ROLE_DEFINITIONS.PROFESSIONAL] }
+    },
+    {
+        path: 'submit/:testId/edit',
+        title: 'Edit Backflow Test',
+        component: BackflowTestSubmitComponent,
+        canActivate: [RoleGuard],
+        data: { roles: [ROLE_DEFINITIONS.PROFESSIONAL], editMode: true }
     }
 ];
 

@@ -798,6 +798,97 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return string.Concat(serial.Where(char.IsDigit)).TrimStart('0');
     }
 
+    public async Task<UpdateResult<BackflowTest>> UpdateForProfessionalAsync(
+        BackflowTest model,
+        int professionalId,
+        string? newAssemblyImagePath,
+        string? newSerialNumberImagePath,
+        string? newBypassAssemblyImagePath,
+        string? newBypassSerialNumberImagePath,
+        string? newAirGapImagePath)
+    {
+        var result = new UpdateResult<BackflowTest>();
+
+        var test = await GetTrackedForUpdateAsync(model.Id, default);
+
+        if (test == null || test.ProfessionalId != professionalId || !string.IsNullOrEmpty(test.TransactionId))
+        {
+            return result;
+        }
+
+        // Snapshot everything a professional edit must never be able to touch — admin review/workflow
+        // state, payment state, tenancy, and audit stamps — before the bulk SetValues below, then restore
+        // it afterward (same technique as NotificationSettingRepository.UpdateSettingAsync, just a longer
+        // protect-list, since BackflowTest's professional-editable surface is nearly the whole entity).
+        var createdById = test.CreatedById;
+        var createdTime = test.CreatedTime;
+        var professionalIdSnapshot = test.ProfessionalId;
+        var siteId = test.SiteId;
+        var waterSupplierId = test.WaterSupplierId;
+        var isCurrent = test.IsCurrent;
+        var disapproved = test.Disapproved;
+        var approvalDate = test.ApprovalDate;
+        var approvedById = test.ApprovedById;
+        var rejected = test.Rejected;
+        var rejectedById = test.RejectedById;
+        var rejectedDate = test.RejectedDate;
+        var rejectedReason = test.RejectedReason;
+        var transactionId = test.TransactionId;
+        var transactionDate = test.TransactionDate;
+        var amount = test.Amount;
+        var amountShare = test.AmountShare;
+        var needsRenewalCheck = test.NeedsRenewalCheck;
+        var backflowScheduleMonth = test.BackflowScheduleMonth;
+        var forceRenewal = test.ForceRenewal;
+        var forceRenewalYears = test.ForceRenewalYears;
+        var outOfService = test.OutOfService;
+        var outOfServiceDate = test.OutOfServiceDate;
+        var assemblyImagePath = test.AssemblyImagePath;
+        var serialNumberImagePath = test.SerialNumberImagePath;
+        var bypassAssemblyImagePath = test.BypassAssemblyImagePath;
+        var bypassSerialNumberImagePath = test.BypassSerialNumberImagePath;
+        var airGapImagePath = test.AirGapImagePath;
+
+        DbContext.Entry(test).CurrentValues.SetValues(model);
+
+        test.CreatedById = createdById;
+        test.CreatedTime = createdTime;
+        test.ProfessionalId = professionalIdSnapshot;
+        test.SiteId = siteId;
+        test.WaterSupplierId = waterSupplierId;
+        test.IsCurrent = isCurrent;
+        test.Disapproved = disapproved;
+        test.ApprovalDate = approvalDate;
+        test.ApprovedById = approvedById;
+        test.Rejected = rejected;
+        test.RejectedById = rejectedById;
+        test.RejectedDate = rejectedDate;
+        test.RejectedReason = rejectedReason;
+        test.TransactionId = transactionId;
+        test.TransactionDate = transactionDate;
+        test.Amount = amount;
+        test.AmountShare = amountShare;
+        test.NeedsRenewalCheck = needsRenewalCheck;
+        test.BackflowScheduleMonth = backflowScheduleMonth;
+        test.ForceRenewal = forceRenewal;
+        test.ForceRenewalYears = forceRenewalYears;
+        test.OutOfService = outOfService;
+        test.OutOfServiceDate = outOfServiceDate;
+        test.AssemblyImagePath = newAssemblyImagePath ?? assemblyImagePath;
+        test.SerialNumberImagePath = newSerialNumberImagePath ?? serialNumberImagePath;
+        test.BypassAssemblyImagePath = newBypassAssemblyImagePath ?? bypassAssemblyImagePath;
+        test.BypassSerialNumberImagePath = newBypassSerialNumberImagePath ?? bypassSerialNumberImagePath;
+        test.AirGapImagePath = newAirGapImagePath ?? airGapImagePath;
+
+        result.Changes = BuildChangeDescription(test);
+
+        await DbContext.SaveChangesAsync();
+
+        result.Model = test;
+
+        return result;
+    }
+
     private async Task<int?> FindPreviousTestIdAsync(BackflowTest fromTest)
     {
         if (string.IsNullOrWhiteSpace(fromTest.SerialNumber))

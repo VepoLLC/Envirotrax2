@@ -39,7 +39,9 @@ export class BackflowTestSubmitComponent implements OnInit {
     public previousTest?: BackflowTest;
 
     public site: Site | null = null;
+    public editingTestId: number | null = null;
     private _siteId = 0;
+    private editMode = false;
 
     private _bpats: ProfessionalUser[] = [];
     private _waterSuppliers: ProfessionalWaterSupplier[] = [];
@@ -461,13 +463,19 @@ export class BackflowTestSubmitComponent implements OnInit {
     }
 
     public ngOnInit(): void {
+        this.editMode = this._activatedRoute.snapshot.data['editMode'] === true;
+
         this._activatedRoute.paramMap.subscribe(async params => {
             const testId = params.get('testId');
 
             const siteIdParam = this._activatedRoute.snapshot.queryParamMap.get('siteId');
             this._siteId = siteIdParam ? Number(siteIdParam) : 0;
 
-            await this.loadData(testId && testId !== 'new' ? Number(testId) : null);
+            if (this.editMode && testId) {
+                await this.loadForEdit(Number(testId));
+            } else {
+                await this.loadData(testId && testId !== 'new' ? Number(testId) : null);
+            }
         });
     }
 
@@ -555,7 +563,9 @@ export class BackflowTestSubmitComponent implements OnInit {
             ...this.model,
             waterSupplier: this.selectedWaterSupplierId ? { id: this.selectedWaterSupplierId } : undefined,
             bpat: this.selectedBpatId ? { id: this.selectedBpatId } : undefined,
-            site: this.previousTest?.site ? { id: this.previousTest.site.id } : (this._siteId > 0 ? { id: this._siteId } : undefined),
+            site: this.editingTestId
+                ? (this.model.site?.id ? { id: this.model.site.id } : undefined)
+                : (this.previousTest?.site ? { id: this.previousTest.site.id } : (this._siteId > 0 ? { id: this._siteId } : undefined)),
             gaugeManufacturer: this.selectedGauge?.manufacturer,
             gaugeModel: this.selectedGauge?.model,
             gaugeSerialNumber: this.selectedGauge?.serialNumber,
@@ -564,7 +574,11 @@ export class BackflowTestSubmitComponent implements OnInit {
 
         this.isLoading = true;
         try {
-            await this._backflowTestService.submit(submission, this.images);
+            if (this.editingTestId) {
+                await this._backflowTestService.updateForProfessional(this.editingTestId, submission, this.images);
+            } else {
+                await this._backflowTestService.submit(submission, this.images);
+            }
             this.submitSuccess = true;
             this._checkoutService.refresh();
         } finally {
@@ -687,6 +701,112 @@ export class BackflowTestSubmitComponent implements OnInit {
         this.model.model2 = test.model2;
         this.model.size2 = test.size2;
         this.model.serialNumber2 = test.serialNumber2;
+    }
+
+    // Checkout "Edit": full field load of an own, still-unpaid test — unlike loadData/populateFromPreviousTest,
+    // which only template a subset of fields for a brand-new test based on a prior year's assembly.
+    private async loadForEdit(testId: number): Promise<void> {
+        this.isLoading = true;
+        try {
+            const [professional, usersPage, gaugesPage] = await Promise.all([
+                this._professionalService.getLoggedInProfessional(),
+                this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isBackflowTester', comparisonOperator: 'Eq', value: 'true' }] }),
+                this._gaugeService.getAll({ pageSize: MAX_PAGE_SIZE }, {})
+            ]);
+
+            this.professional = professional;
+            this._bpats = usersPage.data ?? [];
+            this._gauges = gaugesPage.data ?? [];
+
+            const suppliersPage = await this._supplierService.getAllMy({ hasBackflowTesting: true });
+            this._waterSuppliers = suppliersPage.data ?? [];
+
+            this.buildOptions();
+
+            const test = await this._backflowTestService.getForProfessional(testId);
+            this.editingTestId = testId;
+            this.populateForEdit(test);
+
+            if (test.site?.id) {
+                this.site = await this._siteService.getForProfessional(test.site.id);
+            }
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    private populateForEdit(test: BackflowTest): void {
+        this.model = { ...test };
+
+        this.selectedBpatId = test.bpat?.id;
+        this.selectedBpat = this._bpats.find(u => u.id === test.bpat?.id);
+
+        this.selectedWaterSupplierId = test.waterSupplier?.id;
+        this.selectedWaterSupplier = this._waterSuppliers.find(ws => ws.waterSupplier?.id === test.waterSupplier?.id);
+        if (this.selectedWaterSupplierId) {
+            this.loadAdditionalInfoSettings();
+        }
+
+        this.selectedGauge = this._gauges.find(g =>
+            g.manufacturer === test.gaugeManufacturer &&
+            g.model === test.gaugeModel &&
+            g.serialNumber === test.gaugeSerialNumber);
+        this.selectedGaugeId = this.selectedGauge?.id;
+
+        this.assemblyImagePreview = test.assemblyImageUrl ?? null;
+        this.serialNumberImagePreview = test.serialNumberImageUrl ?? null;
+        this.bypassAssemblyImagePreview = test.bypassAssemblyImageUrl ?? null;
+        this.bypassSerialNumberImagePreview = test.bypassSerialNumberImageUrl ?? null;
+        this.airGapImagePreview = test.airGapImageUrl ?? null;
+
+        this.repairCV1 = this.deserializeCV(test.repairCV1);
+        this.repairCV2 = this.deserializeCV(test.repairCV2);
+        this.repairCV12 = this.deserializeCV(test.repairCV12);
+        this.repairCV22 = this.deserializeCV(test.repairCV22);
+        this.repairBC = this.deserializeCV(test.repairBC);
+        this.repairRV = this.deserializeRV(test.repairRV);
+        this.repairRV2 = this.deserializeRV(test.repairRV2);
+        this.repairPvbAirInlet = this.deserializePvb(test.repairPvbAirInlet);
+        this.repairPvbCV = this.deserializePvb(test.repairPvbCV);
+    }
+
+    private deserializeCV(text: string | undefined): typeof this.repairCV1 {
+        const t = text ?? '';
+        return {
+            cleaned: t.includes('Cleaned'),
+            disc: t.includes('Replaced Disc'),
+            spring: t.includes('Replaced Spring'),
+            guide: t.includes('Replaced Guide'),
+            pinRetainer: t.includes('Replaced Pin Retainer'),
+            hingePin: t.includes('Replaced Hinge Pin'),
+            seat: t.includes('Replaced Seat'),
+            diaphragm: t.includes('Replaced Diaphragm')
+        };
+    }
+
+    private deserializeRV(text: string | undefined): typeof this.repairRV {
+        const t = text ?? '';
+        return {
+            cleaned: t.includes('Cleaned'),
+            discUpper: t.includes('Replaced Disc Upper'),
+            discLower: t.includes('Replaced Disc Lower'),
+            spring: t.includes('Replaced Spring'),
+            diaphragmUpper: t.includes('Replaced Diaphragm Upper'),
+            diaphragmLower: t.includes('Replaced Diaphragm Lower'),
+            diaphragmSmall: t.includes('Replaced Diaphragm Small'),
+            seatUpper: t.includes('Replaced Seat Upper'),
+            seatLower: t.includes('Replaced Seat Lower'),
+            spacerLower: t.includes('Replaced Spacer Lower')
+        };
+    }
+
+    private deserializePvb(text: string | undefined): typeof this.repairPvbAirInlet {
+        const t = text ?? '';
+        return {
+            cleaned: t.includes('Cleaned'),
+            disc: t.includes('Replaced Disc'),
+            spring: t.includes('Replaced Spring')
+        };
     }
 
     private applySiteWaterSupplier(site: Site): void {

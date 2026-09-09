@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Envirotrax.App.Server.Data.Models.Csi;
 
 [Table("CsiInspections")]
-public class CsiInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IProfessionalModel
+public class CsiInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }

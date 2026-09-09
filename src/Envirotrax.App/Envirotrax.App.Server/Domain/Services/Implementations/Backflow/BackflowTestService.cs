@@ -458,7 +458,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
         var deleted = await _testRepository.DeleteAsync(id);
 
-        if (deleted == null || !string.IsNullOrEmpty(deleted.TransactionId))
+        if (deleted == null || deleted.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(deleted.TransactionId))
         {
             return null;
         }

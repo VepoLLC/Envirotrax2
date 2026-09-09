@@ -6,7 +6,9 @@ using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Services.Definitions;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
+using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow;
@@ -15,9 +17,12 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
 {
     private const string HazardTypeOther = "Other";
 
-    public BackflowTestRepository(IDbContextSelector dbContextSelector)
+    private readonly ITenantProvidersService _tenantProvider;
+
+    public BackflowTestRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider)
         : base(dbContextSelector)
     {
+        _tenantProvider = tenantProvider;
     }
 
     protected override IQueryable<BackflowTest> GetListQuery()
@@ -53,6 +58,9 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         {
             query.Sort[nameof(BackflowTest.Id)] = SortOperator.Asc;
         }
+
+        ProfessionalRecordScope.ApplyToProfessionalSearch(query, _tenantProvider.ProfessionalId, nameof(BackflowTest.ProfessionalId));
+
         return base.GetAllAsync(pageInfo, query, cancellationToken);
     }
 
@@ -89,8 +97,10 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         var twoMonthsStart = thisMonthStart.AddMonths(2);
         var threeMonthsStart = thisMonthStart.AddMonths(3);
 
+        var professionalId = _tenantProvider.ProfessionalId;
+
         var counts = await Entity
-            .Where(t => t.IsCurrent)
+            .Where(t => t.IsCurrent && (professionalId <= 0 || t.ProfessionalId == professionalId))
             .GroupBy(t => 1)
             .Select(g => new BackflowTestExpiryCounts
             {

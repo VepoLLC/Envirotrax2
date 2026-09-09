@@ -168,21 +168,36 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             .ToListAsync(cancellationToken);
     }
 
-    public async Task UpdateTestRenewalAsync(int testId, bool renewalRequired, DateTime? expirationDate)
+    public async Task<UpdateResult<BackflowTest>> UpdateTestRenewalAsync(int testId, bool renewalRequired, DateTime? expirationDate)
     {
+        var result = new UpdateResult<BackflowTest>();
+
+        // IgnoreQueryFilters: this runs from the TaskRunner queue-worker pipeline, not a normal
+        // tenant-scoped request, so the usual WaterSupplier query filter must be bypassed here —
+        // same as the bulk-update this replaces.
+        var test = await DbContext.BackflowTests
+            .IgnoreQueryFilters()
+            .SingleOrDefaultAsync(t => t.Id == testId);
+
+        if (test == null)
+        {
+            return result;
+        }
+
+        test.RenewalRequired = renewalRequired;
+
         if (expirationDate.HasValue)
         {
-            await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
-                .ExecuteUpdateAsync(s => s
-                    .SetProperty(x => x.RenewalRequired, renewalRequired)
-                    .SetProperty(x => x.ExpirationDate, expirationDate.Value));
+            test.ExpirationDate = expirationDate.Value;
         }
-        else
-        {
-            await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
-                .ExecuteUpdateAsync(s => s
-                    .SetProperty(x => x.RenewalRequired, renewalRequired));
-        }
+
+        result.Changes = BuildChangeDescription(test);
+
+        await DbContext.SaveChangesAsync();
+
+        result.Model = test;
+
+        return result;
     }
 
     public async Task<IEnumerable<BackflowTest>> GetAllPendingRenewalByTestFlagAsync(int batchSize, CancellationToken cancellationToken)
@@ -209,23 +224,35 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             .ToListAsync(cancellationToken);
     }
 
-    public async Task UpdateTestRenewalAndClearFlagAsync(int testId, bool renewalRequired, DateTime? expirationDate, CancellationToken cancellationToken)
+    public async Task<UpdateResult<BackflowTest>> UpdateTestRenewalAndClearFlagAsync(int testId, bool renewalRequired, DateTime? expirationDate, CancellationToken cancellationToken)
     {
+        var result = new UpdateResult<BackflowTest>();
+
+        var test = await DbContext.BackflowTests
+            .IgnoreQueryFilters()
+            .SingleOrDefaultAsync(t => t.Id == testId, cancellationToken);
+
+        if (test == null)
+        {
+            return result;
+        }
+
+        test.RenewalRequired = renewalRequired;
+
         if (expirationDate.HasValue)
         {
-            await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
-                .ExecuteUpdateAsync(s => s
-                    .SetProperty(x => x.RenewalRequired, renewalRequired)
-                    .SetProperty(x => x.ExpirationDate, expirationDate.Value)
-                    .SetProperty(x => x.NeedsRenewalCheck, false), cancellationToken);
+            test.ExpirationDate = expirationDate.Value;
         }
-        else
-        {
-            await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
-                .ExecuteUpdateAsync(s => s
-                    .SetProperty(x => x.RenewalRequired, renewalRequired)
-                    .SetProperty(x => x.NeedsRenewalCheck, false), cancellationToken);
-        }
+
+        test.NeedsRenewalCheck = false;
+
+        result.Changes = BuildChangeDescription(test);
+
+        await DbContext.SaveChangesAsync(cancellationToken);
+
+        result.Model = test;
+
+        return result;
     }
 
     public async Task ClearTestNeedsRenewalCheckAsync(int testId, CancellationToken cancellationToken)

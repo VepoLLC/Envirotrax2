@@ -735,7 +735,12 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
                     newExpirationDate = (test.TestDate ?? DateTime.UtcNow).AddYears(matched.RenewalYears);
                 }
 
-                await _testRepository.UpdateTestRenewalAsync(test.Id, renewalRequired, newExpirationDate);
+                var saved = await _testRepository.UpdateTestRenewalAsync(test.Id, renewalRequired, newExpirationDate);
+
+                if (saved.Model != null && saved.Changes.Length > 0)
+                {
+                    await _recordLogService.AddAsync(RecordLogTableNames.BackflowTests, saved.Model.Id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
+                }
             }
             catch (Exception ex)
             {
@@ -768,7 +773,12 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
         var (renewalRequired, newExpirationDate) = ComputeRenewal(test, requirements);
 
-        await _testRepository.UpdateTestRenewalAndClearFlagAsync(testId, renewalRequired, newExpirationDate, cancellationToken);
+        var saved = await _testRepository.UpdateTestRenewalAndClearFlagAsync(testId, renewalRequired, newExpirationDate, cancellationToken);
+
+        if (saved.Model != null && saved.Changes.Length > 0)
+        {
+            await _recordLogService.AddAsync(RecordLogTableNames.BackflowTests, saved.Model.Id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
+        }
     }
 
     private static readonly HashSet<string> SkippedDeviceTypes = new(StringComparer.OrdinalIgnoreCase)

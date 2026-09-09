@@ -17,11 +17,11 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
 
     // Process 1 — Site level
     Task<IEnumerable<BackflowTest>> GetAllCurrentBySiteIdAsync(int siteId, CancellationToken cancellationToken);
-    Task UpdateTestRenewalAsync(int testId, bool renewalRequired, DateTime? expirationDate);
+    Task<UpdateResult<BackflowTest>> UpdateTestRenewalAsync(int testId, bool renewalRequired, DateTime? expirationDate);
 
     // Process 2 — Test level
     Task<IEnumerable<BackflowTest>> GetAllPendingRenewalByTestFlagAsync(int batchSize, CancellationToken cancellationToken);
-    Task UpdateTestRenewalAndClearFlagAsync(int testId, bool renewalRequired, DateTime? expirationDate, CancellationToken cancellationToken);
+    Task<UpdateResult<BackflowTest>> UpdateTestRenewalAndClearFlagAsync(int testId, bool renewalRequired, DateTime? expirationDate, CancellationToken cancellationToken);
     Task ClearTestNeedsRenewalCheckAsync(int testId, CancellationToken cancellationToken);
 
     // Status updates

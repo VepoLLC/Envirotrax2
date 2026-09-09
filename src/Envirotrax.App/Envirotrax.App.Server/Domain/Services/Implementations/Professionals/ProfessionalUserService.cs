@@ -183,8 +183,19 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
 
     public override async Task<ProfessionalUserDto?> DeleteAsync(int id)
     {
+        var user = await _professionalUserRepository.GetAsync(id, CancellationToken.None);
+
         await _authApiClient.DeleteAsync<object>(_authService.UserId, $"/api/users/{id}/invitations", CancellationToken.None);
-        return await base.DeleteAsync(id);
+
+        var deleted = await base.DeleteAsync(id);
+
+        if (deleted != null && user != null)
+        {
+            await _recordLogService.AddAsync(RecordLogTableNames.ProfessionalUsers, user.UserId, null, RecordLogType.Delete,
+                $"Deleted user — ContactName: '{user.ContactName}'", professionalId: user.ProfessionalId);
+        }
+
+        return deleted;
     }
 
     public async Task<ProfessionalUserDto> AddForProfessionalAsync(int professionalId, ProfessionalUserDto dto, CancellationToken cancellationToken)

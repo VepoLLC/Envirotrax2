@@ -1,0 +1,96 @@
+<div class="d-flex align-items-center justify-content-center gap-4 mb-3">
+    <div class="form-check">
+        <input class="form-check-input"
+               type="checkbox"
+               name="replacementOnHold"
+               [attr.id]="idPrefix + '-on-hold'"
+               [(ngModel)]="onHold"
+               (ngModelChange)="onHoldChange()">
+        <label class="form-check-label" [attr.for]="idPrefix + '-on-hold'">Validation On Hold</label>
+    </div>
+
+    <button type="button" class="btn btn-primary vp-section-button" (click)="getReplacements()">
+        <i class="fa-solid fa-rotate me-1"></i>
+        Refresh
+    </button>
+</div>
+
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+<vp-section [header]="headerText">
+    <vp-table *ngIf="table.items"
+              [columns]="table.columns!"
+              [data]="table.items.data"
+              [customActions]="customActions"
+              [(pageInfo)]="table.items.pageInfo"
+              (pageInfoChange)="getReplacements()"
+              [(query)]="table.query"
+              (queryChange)="getReplacements()"
+              (queryReset)="getReplacements()" />
+</vp-section>
+
+<ng-template #holdCell let-rowData="rowData">
+    <div class="form-check d-flex justify-content-center mb-0">
+        <input class="form-check-input"
+               type="checkbox"
+               aria-label="Hold"
+               [attr.id]="idPrefix + '-hold-' + rowData?.id"
+               [checked]="rowData?.validationReplacementOnHold"
+               (change)="toggleHold(rowData, $event)">
+    </div>
+</ng-template>
+
+<ng-template #propertyCell let-rowData="rowData">
+    <button type="button"
+            class="btn btn-link p-0 text-start text-decoration-none"
+            [disabled]="!rowData?.site?.id"
+            (click)="openSite(rowData)">
+        <div>
+            <i class="fa-solid fa-house text-primary me-1"
+               title="Residential"
+               *ngIf="rowData?.propertyType === propertyType.Residential"></i>
+            <i class="fa-solid fa-building text-danger me-1"
+               title="Commercial"
+               *ngIf="rowData?.propertyType === propertyType.Commercial"></i>
+
+            <span class="fw-semibold"
+                  *ngIf="rowData?.propertyType === propertyType.Commercial && rowData?.propertyBusinessName">
+                {{ rowData.propertyBusinessName }}
+            </span>
+        </div>
+
+        <div>
+            {{ rowData?.propertyStreetNumber }} {{ rowData?.propertyStreetName }}
+            <span *ngIf="rowData?.propertyNumber">#{{ rowData.propertyNumber }}</span>
+        </div>
+
+        <div>
+            {{ rowData?.propertyCity }}<span *ngIf="rowData?.propertyCity">,</span>
+            {{ rowData?.propertyState?.code }} {{ rowData?.propertyZip }}
+        </div>
+    </button>
+</ng-template>
+
+<ng-template #assemblyCell let-rowData="rowData">
+    <div>
+        <div>
+            <span class="fw-semibold">Assembly:</span>
+            <span class="ms-1">
+                {{ rowData?.deviceType }} - {{ rowData?.manufacturer }} {{ rowData?.model }} {{ rowData?.size }}
+            </span>
+        </div>
+
+        <div>
+            <span class="fw-semibold">Serial #:</span>
+            <span class="ms-1">{{ rowData?.serialNumber }}</span>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #replacedCell let-rowData="rowData">
+    <button type="button"
+            class="btn btn-link p-0 text-start text-decoration-none"
+            (click)="openReplacedAssembly(rowData)">
+        {{ rowData?.replacementAssembly }}
+    </button>
+</ng-template>

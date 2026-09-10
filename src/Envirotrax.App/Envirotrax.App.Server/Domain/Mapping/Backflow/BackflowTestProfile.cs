@@ -83,6 +83,9 @@ public class BackflowTestProfile : Profile
             .IncludeBase<BackflowTest, BackflowTestDto>()
             .ForMember(dto => dto.Logs, opt => opt.Ignore());
 
+        CreateMap<BackflowTest, BackflowReplacementDto>()
+            .IncludeBase<BackflowTest, BackflowTestDto>();
+
         CreateMap<BackflowTest, BackflowTestAdminDetailsDto>()
             .IncludeBase<BackflowTest, BackflowTestDto>()
             .ForMember(dto => dto.BpatJobTitle, opt => opt.MapFrom(model => model.Bpat != null ? model.Bpat.JobTitle : null))

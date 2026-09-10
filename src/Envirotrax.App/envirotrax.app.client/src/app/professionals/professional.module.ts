@@ -19,10 +19,12 @@ import { EditInsuranceComponent } from "./insurances/edit/edit-insurance.compone
 import { LicenseHelpTextComponent } from "./users/edit/licenses/help-text/license-help-text.component";
 import { LicenseListComponent } from "./licenses/license-list.component";
 import { DashboardComponent } from "./dashboard/dashboard.component";
+import { AccountBalanceManagementComponent } from "./account/account-balance-management.component";
 
 @NgModule({
     declarations: [
         DashboardComponent,
+        AccountBalanceManagementComponent,
         WaterSuppliersComponent,
         WaterSupplierRegistrationComponent,
         ProfessionalUserListComponent,

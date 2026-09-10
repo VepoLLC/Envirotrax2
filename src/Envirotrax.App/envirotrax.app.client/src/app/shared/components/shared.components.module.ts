@@ -8,6 +8,7 @@ import { GisAreaSelectionModalComponent } from "./lookups/gis-areas/gis-area-sel
 import { DownloadManagerComponent } from "./data-components/download-manager/download-manager.component";
 import { PropertyLogCellComponent } from "./data-components/table-cells/property-log-cell.component";
 import { SiteLogEditComponent } from "./site-log/site-log-edit.component";
+import { CreditCardPaymentComponent } from "./credit-card-payment/credit-card-payment.component";
 import { FormsModule } from "@angular/forms";
 import { CommonModule } from "@angular/common";
 
@@ -20,7 +21,8 @@ import { CommonModule } from "@angular/common";
         GisAreaSelectionModalComponent,
         DownloadManagerComponent,
         PropertyLogCellComponent,
-        SiteLogEditComponent
+        SiteLogEditComponent,
+        CreditCardPaymentComponent
     ],
     imports: [
         EnvirotraxComponentsModule,
@@ -33,7 +35,8 @@ import { CommonModule } from "@angular/common";
         GisAreaLookupComponent,
         ProfessionalUserLookupComponent,
         WaterSupplierUserLookupComponent,
-        DownloadManagerComponent
+        DownloadManagerComponent,
+        CreditCardPaymentComponent
     ]
 })
 export class SharedComponentsModule {

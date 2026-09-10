@@ -478,6 +478,13 @@ export class App implements OnInit {
             hasFeature: true
           },
           {
+            title: 'Account Balance Management',
+            iconCss: 'fa-solid fa-wallet',
+            routerLink: ['professionals/account-balance'],
+            hasPermission: isAdmin,
+            hasFeature: true
+          },
+          {
             title: 'User Accounts',
             iconCss: 'fa-solid fa-users',
             routerLink: ['professionals/users'],

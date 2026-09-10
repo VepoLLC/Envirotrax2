@@ -1,3 +1,4 @@
+using Envirotrax.App.Server.Data.Models.Api;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Csi;
 using Envirotrax.App.Server.Data.Models.Fog;
@@ -38,6 +39,8 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
     public DbSet<GisAreaCoordinate> GisAreaCoordinates { get; set; }
 
     public DbSet<NotificationSetting> NotificationSettings { get; set; }
+
+    public DbSet<ApiAccount> ApiAccounts { get; set; }
 
     public DbSet<Professional> Professionals { get; set; }
     public DbSet<ProfessionalUser> ProfessionalUsers { get; set; }

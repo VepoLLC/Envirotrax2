@@ -6,6 +6,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
 using Envirotrax.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers.Professionals;
@@ -20,6 +21,7 @@ public class ProfessionalDashboardController : ProfessionalProtectedController
     private readonly IBackflowGaugeService _gaugeService;
     private readonly IFogVehicleService _vehicleService;
     private readonly IFogTransporterDisposalSiteService _disposalSiteService;
+    private readonly IProfessionalDashboardService _dashboardService;
 
     public ProfessionalDashboardController(
         IProfessionalSupplierService supplierService,
@@ -28,7 +30,8 @@ public class ProfessionalDashboardController : ProfessionalProtectedController
         IProfessionalInsuranceService insuranceService,
         IBackflowGaugeService gaugeService,
         IFogVehicleService vehicleService,
-        IFogTransporterDisposalSiteService disposalSiteService)
+        IFogTransporterDisposalSiteService disposalSiteService,
+        IProfessionalDashboardService dashboardService)
     {
         _supplierService = supplierService;
         _userService = userService;
@@ -37,6 +40,7 @@ public class ProfessionalDashboardController : ProfessionalProtectedController
         _gaugeService = gaugeService;
         _vehicleService = vehicleService;
         _disposalSiteService = disposalSiteService;
+        _dashboardService = dashboardService;
     }
 
     [HttpGet("stats")]
@@ -68,5 +72,14 @@ public class ProfessionalDashboardController : ProfessionalProtectedController
         }
 
         return Ok(dto);
+    }
+
+    [HttpGet("licenses-and-insurances")]
+    [Authorize(Roles = RoleDefinitions.Professionals.Admin)]
+    public async Task<IActionResult> GetLicensesAndInsurancesAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
+    {
+        var dtoList = await _dashboardService.GetLicensesAndInsurancesAsync(pageInfo, query, cancellationToken);
+
+        return Ok(dtoList);
     }
 }

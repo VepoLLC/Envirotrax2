@@ -98,23 +98,13 @@
     </div>
 </ng-template>
 
-<ng-template #licenseExpirationTemplate let-license="rowData">
+<ng-template #licenseInsuranceExpirationTemplate let-row="rowData">
     <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
-         [class.text-bg-primary]="!license.expirationDate"
-         [class.text-bg-success]="license.expirationDate && license.expirationType == ExpirationType.Valid"
-         [class.text-bg-warning]="license.expirationDate && license.expirationType == ExpirationType.AboutToExpire"
-         [class.text-bg-danger]="license.expirationDate && license.expirationType == ExpirationType.Expired">
-        {{ license.expirationDate ? (license.expirationDate | date) : 'Validating...' }}
-    </div>
-</ng-template>
-
-<ng-template #insuranceExpirationTemplate let-insurance="rowData">
-    <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
-         [class.text-bg-primary]="!insurance.expirationDate"
-         [class.text-bg-success]="insurance.expirationDate && insurance.expirationType == ExpirationType.Valid"
-         [class.text-bg-warning]="insurance.expirationDate && insurance.expirationType == ExpirationType.AboutToExpire"
-         [class.text-bg-danger]="insurance.expirationDate && insurance.expirationType == ExpirationType.Expired">
-        {{ insurance.expirationDate ? (insurance.expirationDate | date) : 'Validating...' }}
+         [class.text-bg-primary]="!row.expirationDate"
+         [class.text-bg-success]="row.expirationDate && row.expirationType == ExpirationType.Valid"
+         [class.text-bg-warning]="row.expirationDate && row.expirationType == ExpirationType.AboutToExpire"
+         [class.text-bg-danger]="row.expirationDate && row.expirationType == ExpirationType.Expired">
+        {{ row.expirationDate ? (row.expirationDate | date) : 'Validating...' }}
     </div>
 </ng-template>
 
@@ -387,63 +377,28 @@
         <div *ngIf="isAdmin || hasBackflow" class="row mb-4">
             <div *ngIf="isAdmin" [ngClass]="hasBackflow ? 'col-md-6' : 'col-md-12'" class="mb-4 mb-md-0">
                 <vp-section header="License &amp; Insurance">
-                    <div class="text-center mb-3">
-                        <ul class="vp-tabs nav nav-pills d-inline-flex">
-                            <li class="nav-item">
-                                <a class="nav-link" [class.active]="licenseInsuranceTab === 'insurances'" (click)="setLicenseInsuranceTab('insurances')">
-                                    Insurance Policies
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" [class.active]="licenseInsuranceTab === 'licenses'" (click)="setLicenseInsuranceTab('licenses')">
-                                    Licenses
-                                </a>
-                            </li>
-                        </ul>
+                    <div dp-spinner-parent>
+                        <dp-loading-spinner *ngIf="licensesAndInsurancesTable.isLoading"></dp-loading-spinner>
+
+                        <vp-table *ngIf="licensesAndInsurancesTable.items"
+                                  [columns]="licensesAndInsurancesTable.columns!"
+                                  [data]="licensesAndInsurancesTable.items.data"
+                                  [(pageInfo)]="licensesAndInsurancesTable.items.pageInfo"
+                                  (pageInfoChange)="loadLicensesAndInsurances()"
+                                  [(query)]="licensesAndInsurancesTable.query"
+                                  (queryChange)="loadLicensesAndInsurances()"
+                                  (queryReset)="loadLicensesAndInsurances()"
+                                  [freeTextSearch]="licensesAndInsurancesTable.freeTextSearch" />
                     </div>
-
-                    <div *ngIf="licenseInsuranceTab === 'licenses'">
-                        <div dp-spinner-parent>
-                            <dp-loading-spinner *ngIf="licensesTable.isLoading"></dp-loading-spinner>
-
-                            <vp-table *ngIf="licensesTable.items"
-                                      [columns]="licensesTable.columns!"
-                                      [data]="licensesTable.items.data"
-                                      [(pageInfo)]="licensesTable.items.pageInfo"
-                                      (pageInfoChange)="loadLicenses()"
-                                      [(query)]="licensesTable.query"
-                                      (queryChange)="loadLicenses()"
-                                      (queryReset)="loadLicenses()"
-                                      [freeTextSearch]="licensesTable.freeTextSearch" />
-                        </div>
-                        <div class="text-end mt-3">
-                            <a routerLink="/professionals/licenses" class="btn btn-primary vp-section-button">
-                                <i class="fa-solid fa-id-card me-1"></i>
-                                License Management
-                            </a>
-                        </div>
-                    </div>
-
-                    <div *ngIf="licenseInsuranceTab === 'insurances'">
-                        <div dp-spinner-parent>
-                            <dp-loading-spinner *ngIf="insurancesTable.isLoading"></dp-loading-spinner>
-
-                            <vp-table *ngIf="insurancesTable.items"
-                                      [columns]="insurancesTable.columns!"
-                                      [data]="insurancesTable.items.data"
-                                      [(pageInfo)]="insurancesTable.items.pageInfo"
-                                      (pageInfoChange)="loadInsurances()"
-                                      [(query)]="insurancesTable.query"
-                                      (queryChange)="loadInsurances()"
-                                      (queryReset)="loadInsurances()"
-                                      [freeTextSearch]="insurancesTable.freeTextSearch" />
-                        </div>
-                        <div class="text-end mt-3">
-                            <a routerLink="/professionals/insurances" class="btn btn-primary vp-section-button">
-                                <i class="fa-solid fa-shield-halved me-1"></i>
-                                Insurance Management
-                            </a>
-                        </div>
+                    <div class="text-end mt-3">
+                        <a routerLink="/professionals/licenses" class="btn btn-primary vp-section-button me-2">
+                            <i class="fa-solid fa-id-card me-1"></i>
+                            License Management
+                        </a>
+                        <a routerLink="/professionals/insurances" class="btn btn-primary vp-section-button">
+                            <i class="fa-solid fa-shield-halved me-1"></i>
+                            Insurance Management
+                        </a>
                     </div>
                 </vp-section>
             </div>

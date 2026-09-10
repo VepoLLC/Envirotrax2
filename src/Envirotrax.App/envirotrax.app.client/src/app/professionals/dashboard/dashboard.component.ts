@@ -9,16 +9,13 @@ import { FogInspectionResult } from '../../shared/models/fog/fog-inspection-enum
 import { FeatureType } from '../../shared/models/feature-type';
 import { ROLE_DEFINITIONS } from '../../shared/models/role-definitions';
 import { ProfesionalUserService } from '../../shared/services/professionals/professional-user.service';
-import { ProfessionalUserLicenseService } from '../../shared/services/professionals/professional-user-license.service';
-import { ProfessionalInsuranceService } from '../../shared/services/professionals/professional-insurance.service';
 import { BackflowGaugeService } from '../../shared/services/backflow/backflow-gauge.service';
 import { BackflowTestService, BackflowExpiryRangeKey } from '../../shared/services/backflow/backflow-test.service';
 import { BackflowTest } from '../../shared/models/backflow/backflow-test';
 import { BackflowTestResult } from '../../shared/models/backflow/backflow-test-enums';
 import { ProfessionalDashboardService } from '../../shared/services/professionals/professional-dashboard.service';
 import { ProfessionalUser } from '../../shared/models/professionals/professional-user';
-import { ProfessionalUserLicense, ExpirationType } from '../../shared/models/professionals/licenses/professional-user-license';
-import { ProfessionalInsurance } from '../../shared/models/professionals/professional-insurance';
+import { ProfessionalDashboardLicenseInsurance, ExpirationType } from '../../shared/models/professionals/professional-dashboard-license-insurance';
 import { BackflowGauge, GaugeExpirationType } from '../../shared/models/backflow/backflow-gauge';
 import { ProfessionalFogVehicleService } from '../../shared/services/fog/professional-fog-vehicle.service';
 import { ProfessionalFogDisposalSiteService } from '../../shared/services/fog/professional-fog-disposal-site.service';
@@ -61,11 +58,8 @@ export class DashboardComponent implements OnInit {
     public fogMailingTemplate!: TemplateRef<CellTemplateData<FogInspection>>;
 
     // License & insurance cell templates
-    @ViewChild('licenseExpirationTemplate', { static: true })
-    public licenseExpirationTemplate!: TemplateRef<CellTemplateData<ProfessionalUserLicense>>;
-
-    @ViewChild('insuranceExpirationTemplate', { static: true })
-    public insuranceExpirationTemplate!: TemplateRef<CellTemplateData<ProfessionalInsurance>>;
+    @ViewChild('licenseInsuranceExpirationTemplate', { static: true })
+    public licenseInsuranceExpirationTemplate!: TemplateRef<CellTemplateData<ProfessionalDashboardLicenseInsurance>>;
 
     // Gauge cell templates
     @ViewChild('gaugeCellTemplate', { static: true })
@@ -121,23 +115,16 @@ export class DashboardComponent implements OnInit {
         } as FreeTextSearchSettings
     };
 
-    public licensesTable: TableViewModel<ProfessionalUserLicense> = {
-        query: { sort: {}, filter: [] },
+    // Licenses and insurance policies are unioned into one grid server-side. Sorted by expiration so
+    // paging is deterministic (a UNION with no ORDER BY can repeat or drop rows across Skip/Take).
+    public licensesAndInsurancesTable: TableViewModel<ProfessionalDashboardLicenseInsurance> = {
+        query: { sort: { expirationDate: 'Asc' }, filter: [] },
         columns: [],
         freeTextSearch: {
             searchQuery: [
-                { field: 'licenseType.name' },
-                { field: 'licenseNumber' }
-            ]
-        } as FreeTextSearchSettings
-    };
-
-    public insurancesTable: TableViewModel<ProfessionalInsurance> = {
-        query: { sort: {}, filter: [] },
-        columns: [],
-        freeTextSearch: {
-            searchQuery: [
-                { field: 'insuranceNumber' }
+                { field: 'typeName' },
+                { field: 'number' },
+                { field: 'assignedTo' }
             ]
         } as FreeTextSearchSettings
     };
@@ -169,12 +156,6 @@ export class DashboardComponent implements OnInit {
     public readonly ExpirationType = ExpirationType;
     public readonly GaugeExpirationType = GaugeExpirationType;
 
-    public licenseInsuranceTab: 'licenses' | 'insurances' = 'licenses';
-
-    public setLicenseInsuranceTab(tab: 'licenses' | 'insurances'): void {
-        this.licenseInsuranceTab = tab;
-    }
-
     public get licenseAndInsuranceCount(): number {
         return (this.dashboardStats.licenseCount ?? 0) + (this.dashboardStats.insuranceCount ?? 0);
     }
@@ -201,8 +182,6 @@ export class DashboardComponent implements OnInit {
         private readonly _inspectionService: CsiInspectionService,
         private readonly _fogInspectionService: ProfessionalFogInspectionService,
         private readonly _userService: ProfesionalUserService,
-        private readonly _licenseService: ProfessionalUserLicenseService,
-        private readonly _insuranceService: ProfessionalInsuranceService,
         private readonly _gaugeService: BackflowGaugeService,
         private readonly _backflowTestService: BackflowTestService,
         private readonly _dashboardService: ProfessionalDashboardService,
@@ -263,8 +242,7 @@ export class DashboardComponent implements OnInit {
             if (this.isAdmin) {
                 promises.push(
                     this.loadSubAccounts(),
-                    this.loadLicenses(),
-                    this.loadInsurances()
+                    this.loadLicensesAndInsurances()
                 );
             }
             if (this.hasBackflow) {
@@ -322,8 +300,7 @@ export class DashboardComponent implements OnInit {
         this.recentFogInspections.columns = this.buildFogInspectionColumns();
         this.recentBackflowTests.columns = this.buildBackflowTestColumns();
         this.subAccountsTable.columns = this.buildSubAccountsColumns();
-        this.licensesTable.columns = this.buildLicensesColumns();
-        this.insurancesTable.columns = this.buildInsurancesColumns();
+        this.licensesAndInsurancesTable.columns = this.buildLicensesAndInsurancesColumns();
         this.gaugesTable.columns = this.buildGaugesColumns();
         this.vehiclesTable.columns = this.buildVehiclesColumns();
         this.disposalSitesTable.columns = this.buildDisposalSitesColumns();
@@ -446,27 +423,15 @@ export class DashboardComponent implements OnInit {
         }
     }
 
-    public async loadLicenses(): Promise<void> {
+    public async loadLicensesAndInsurances(): Promise<void> {
         try {
-            this.licensesTable.isLoading = true;
-            this.licensesTable.items = await this._licenseService.getAll(
-                this.licensesTable.items?.pageInfo || {},
-                this.licensesTable.query
+            this.licensesAndInsurancesTable.isLoading = true;
+            this.licensesAndInsurancesTable.items = await this._dashboardService.getLicensesAndInsurances(
+                this.licensesAndInsurancesTable.items?.pageInfo || {},
+                this.licensesAndInsurancesTable.query
             );
         } finally {
-            this.licensesTable.isLoading = false;
-        }
-    }
-
-    public async loadInsurances(): Promise<void> {
-        try {
-            this.insurancesTable.isLoading = true;
-            this.insurancesTable.items = await this._insuranceService.getAll(
-                this.insurancesTable.items?.pageInfo || {},
-                this.insurancesTable.query
-            );
-        } finally {
-            this.insurancesTable.isLoading = false;
+            this.licensesAndInsurancesTable.isLoading = false;
         }
     }
 
@@ -689,27 +654,16 @@ export class DashboardComponent implements OnInit {
         ];
     }
 
-    private buildLicensesColumns(): TableColumn<ProfessionalUserLicense>[] {
+    private buildLicensesAndInsurancesColumns(): TableColumn<ProfessionalDashboardLicenseInsurance>[] {
         return [
-            { field: 'licenseType.name', caption: 'Type', type: ColumnType.text },
-            { field: 'licenseNumber', caption: 'License Number', type: ColumnType.text },
+            { field: 'typeName', caption: 'Type', type: ColumnType.text },
+            { field: 'number', caption: 'Number', type: ColumnType.text },
+            { field: 'assignedTo', caption: 'Assignee', type: ColumnType.text },
             {
                 field: 'expirationDate',
                 caption: 'Expiration Date',
                 type: ColumnType.date,
-                cellTemplate: this.licenseExpirationTemplate
-            }
-        ];
-    }
-
-    private buildInsurancesColumns(): TableColumn<ProfessionalInsurance>[] {
-        return [
-            { field: 'insuranceNumber', caption: 'Policy Number', type: ColumnType.text },
-            {
-                field: 'expirationDate',
-                caption: 'Expiration Date',
-                type: ColumnType.date,
-                cellTemplate: this.insuranceExpirationTemplate
+                cellTemplate: this.licenseInsuranceExpirationTemplate
             }
         ];
     }

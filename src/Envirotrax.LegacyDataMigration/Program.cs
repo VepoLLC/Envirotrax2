@@ -48,6 +48,7 @@ services.AddTransient<UserService>();
 services.AddTransient<WaterSupplierService>();
 services.AddTransient<WaterSupplierUserService>();
 services.AddTransient<SiteService>();
+services.AddTransient<SiteLogService>();
 
 var provider = services.BuildServiceProvider();
 
@@ -65,3 +66,6 @@ await supplierUserService.MigrateAsync();
 
 var siteService = provider.GetRequiredService<SiteService>();
 await siteService.MigrateAsync();
+
+var siteLogService = provider.GetRequiredService<SiteLogService>();
+await siteLogService.MigrateAsync();

@@ -2,7 +2,20 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { PagedData, PageInfo, Query, QueryHelperService, UrlResolverService } from "@envirotrax/common-ui";
 import { lastValueFrom } from "rxjs";
-import { BackflowTesterAccount } from "../../models/backflow/backflow-tester-account";
+import { Professional } from "../../models/professionals/professional";
+
+/**
+ * Criteria that cannot ride the generic Query pipeline because they match child collections
+ * (licences, insurances) or a person inside the company rather than a column on the company row.
+ */
+export interface BackflowTesterSearchCriteria {
+    bpatLicenseNumber?: string | null;
+    fireLicenseNumber?: string | null;
+    insurancePolicyNumber?: string | null;
+    userEmail?: string | null;
+    contactName?: string | null;
+    cellNumber?: string | null;
+}
 
 @Injectable({
     providedIn: 'root'
@@ -16,25 +29,18 @@ export class BackflowTesterService {
 
     }
 
-    public async getAll(
-        pageInfo: PageInfo,
-        query: Query,
-        licenseNumber?: string | null,
-        insuranceNumber?: string | null
-    ): Promise<PagedData<BackflowTesterAccount>> {
+    public async getAll(pageInfo: PageInfo, query: Query, criteria: BackflowTesterSearchCriteria): Promise<PagedData<Professional>> {
         const url = this._urlResolver.resolveUrl('/api/backflow/testers');
 
         let params = this._queryHelper.buildQuery(pageInfo, query);
 
-        if (licenseNumber) {
-            params = params.append('licenseNumber', licenseNumber);
+        for (const [name, value] of Object.entries(criteria)) {
+            if (value) {
+                params = params.append(name, value);
+            }
         }
 
-        if (insuranceNumber) {
-            params = params.append('insuranceNumber', insuranceNumber);
-        }
-
-        const observable = this._http.get<PagedData<BackflowTesterAccount>>(url, { params });
+        const observable = this._http.get<PagedData<Professional>>(url, { params });
 
         return await lastValueFrom(observable);
     }

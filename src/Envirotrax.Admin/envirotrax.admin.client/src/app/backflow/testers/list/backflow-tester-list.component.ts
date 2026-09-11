@@ -3,8 +3,22 @@ import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { CellTemplateData, ColumnType, QueryProperty, TableColumn, TableViewModel } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
-import { BackflowTesterAccount } from '../../../shared/models/backflow/backflow-tester-account';
-import { BackflowTesterService } from '../../../shared/services/backflow/backflow-tester.service';
+import { Professional } from '../../../shared/models/professionals/professional';
+import { BackflowTesterSearchCriteria, BackflowTesterService } from '../../../shared/services/backflow/backflow-tester.service';
+
+/**
+ * Criteria that match a child collection (licences, insurances) or a person inside the company rather than a
+ * column on the company row. They are stripped out of the emitted filter and sent as their own query
+ * parameters - the same split the CSI window uses.
+ */
+const CRITERIA_FIELDS: (keyof BackflowTesterSearchCriteria)[] = [
+    'bpatLicenseNumber',
+    'fireLicenseNumber',
+    'insurancePolicyNumber',
+    'userEmail',
+    'contactName',
+    'cellNumber'
+];
 
 @Component({
     templateUrl: './backflow-tester-list.component.html',
@@ -15,25 +29,17 @@ import { BackflowTesterService } from '../../../shared/services/backflow/backflo
     ],
 })
 export class BackflowTesterListComponent implements OnInit {
-    @ViewChild('accountTypeCell', { static: true })
-    public accountTypeCell?: TemplateRef<CellTemplateData<BackflowTesterAccount>>;
-
-    @ViewChild('companyCell', { static: true })
-    public companyCell?: TemplateRef<CellTemplateData<BackflowTesterAccount>>;
-
     @ViewChild('addressCell', { static: true })
-    public addressCell?: TemplateRef<CellTemplateData<BackflowTesterAccount>>;
+    public addressCell?: TemplateRef<CellTemplateData<Professional>>;
 
     @ViewChild('contactCell', { static: true })
-    public contactCell?: TemplateRef<CellTemplateData<BackflowTesterAccount>>;
+    public contactCell?: TemplateRef<CellTemplateData<Professional>>;
 
     public showResults: boolean = false;
 
-    private licenseNumber: string | null = null;
+    private criteria: BackflowTesterSearchCriteria = {};
 
-    private insuranceNumber: string | null = null;
-
-    public table: TableViewModel<BackflowTesterAccount> = {
+    public table: TableViewModel<Professional> = {
         query: {
             sort: {},
             filter: []
@@ -51,14 +57,15 @@ export class BackflowTesterListComponent implements OnInit {
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
-        const license = queryProperties.find(p => p.columnName === 'licenseNumber');
-        const insurance = queryProperties.find(p => p.columnName === 'insuranceNumber');
+        this.criteria = {};
 
-        this.licenseNumber = license?.value ? license.value : null;
-        this.insuranceNumber = insurance?.value ? insurance.value : null;
+        for (const field of CRITERIA_FIELDS) {
+            const property = queryProperties.find(p => p.columnName === field);
 
-        this.table.query.filter = queryProperties.filter(p =>
-            p.columnName !== 'licenseNumber' && p.columnName !== 'insuranceNumber');
+            this.criteria[field] = property?.value ? property.value : null;
+        }
+
+        this.table.query.filter = queryProperties.filter(p => !CRITERIA_FIELDS.includes(p.columnName as keyof BackflowTesterSearchCriteria));
     }
 
     public async search(searchForm: NgForm): Promise<void> {
@@ -77,21 +84,18 @@ export class BackflowTesterListComponent implements OnInit {
             this.table.items = await this._backflowTesterService.getAll(
                 this.table.items?.pageInfo || {},
                 this.table.query,
-                this.licenseNumber,
-                this.insuranceNumber
+                this.criteria
             );
         } finally {
             this.table.isLoading = false;
         }
     }
 
-    private getColumns(): TableColumn<BackflowTesterAccount>[] {
+    private getColumns(): TableColumn<Professional>[] {
         return [
-            // Presentation-only icon column - a non-empty field would add a sortable header that refires the search.
-            { field: '', caption: '', type: ColumnType.other, cellTemplate: this.accountTypeCell },
-            { field: 'companyName', caption: 'Company/Contact', type: ColumnType.text, cellTemplate: this.companyCell },
+            { field: 'name', caption: 'Company Name', type: ColumnType.text },
             { field: 'address', caption: 'Address Information', type: ColumnType.text, cellTemplate: this.addressCell },
-            { field: 'emailAddress', caption: 'Contact Information', type: ColumnType.text, cellTemplate: this.contactCell }
+            { field: 'companyEmail', caption: 'Contact Information', type: ColumnType.text, cellTemplate: this.contactCell }
         ];
     }
 }

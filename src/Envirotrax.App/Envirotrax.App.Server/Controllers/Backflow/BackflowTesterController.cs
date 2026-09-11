@@ -22,9 +22,9 @@ namespace Envirotrax.App.Server.Controllers.Backflow
 
         [HttpGet("search")]
         [HasPermission(PermissionAction.CanView)]
-        public async Task<IActionResult> SearchAsync([FromQuery] PageInfo pageInfo, [FromQuery] string? bpatLicenseNumber, [FromQuery] string? fireLicenseNumber, [FromQuery] string? insurancePolicyNumber, CancellationToken cancellationToken)
+        public async Task<IActionResult> SearchAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, [FromQuery] string? bpatLicenseNumber, [FromQuery] string? fireLicenseNumber, [FromQuery] string? insurancePolicyNumber, [FromQuery] string? userEmail, [FromQuery] string? contactName, [FromQuery] string? cellNumber, CancellationToken cancellationToken)
         {
-            var result = await _testerService.SearchAsync(bpatLicenseNumber, fireLicenseNumber, insurancePolicyNumber, pageInfo, cancellationToken);
+            var result = await _testerService.SearchAsync(bpatLicenseNumber, fireLicenseNumber, insurancePolicyNumber, userEmail, contactName, cellNumber, pageInfo, query, cancellationToken);
             return Ok(result);
         }
     }

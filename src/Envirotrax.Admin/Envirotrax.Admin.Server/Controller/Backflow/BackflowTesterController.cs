@@ -16,10 +16,29 @@ public class BackflowTesterController : AdminBaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> SearchAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, [FromQuery] string? licenseNumber, [FromQuery] string? insuranceNumber, CancellationToken cancellationToken)
+    public async Task<IActionResult> SearchAsync(
+        [FromQuery] PageInfo pageInfo,
+        [FromQuery] Query query,
+        [FromQuery] string? bpatLicenseNumber,
+        [FromQuery] string? fireLicenseNumber,
+        [FromQuery] string? insurancePolicyNumber,
+        [FromQuery] string? userEmail,
+        [FromQuery] string? contactName,
+        [FromQuery] string? cellNumber,
+        CancellationToken cancellationToken)
     {
-        var accounts = await _testerService.SearchAsync(pageInfo, query, licenseNumber, insuranceNumber, cancellationToken);
+        var criteria = new Dictionary<string, string>
+        {
+            ["bpatLicenseNumber"] = bpatLicenseNumber ?? string.Empty,
+            ["fireLicenseNumber"] = fireLicenseNumber ?? string.Empty,
+            ["insurancePolicyNumber"] = insurancePolicyNumber ?? string.Empty,
+            ["userEmail"] = userEmail ?? string.Empty,
+            ["contactName"] = contactName ?? string.Empty,
+            ["cellNumber"] = cellNumber ?? string.Empty
+        };
 
-        return Ok(accounts);
+        var testers = await _testerService.SearchAsync(pageInfo, query, criteria, cancellationToken);
+
+        return Ok(testers);
     }
 }

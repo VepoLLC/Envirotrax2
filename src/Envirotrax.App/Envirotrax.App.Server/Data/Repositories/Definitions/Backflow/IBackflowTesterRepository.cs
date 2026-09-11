@@ -5,6 +5,15 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Backflow
 {
     public interface IBackflowTesterRepository : IRepository<Professional>
     {
-        Task<IEnumerable<Professional>> SearchAsync(string? bpatLicenseNumber, string? fireLicenseNumber, string? insurancePolicyNumber, PageInfo pageInfo, CancellationToken cancellationToken);
+        Task<IEnumerable<Professional>> SearchAsync(
+            string? bpatLicenseNumber,
+            string? fireLicenseNumber,
+            string? insurancePolicyNumber,
+            string? userEmail,
+            string? contactName,
+            string? cellNumber,
+            PageInfo pageInfo,
+            Query query,
+            CancellationToken cancellationToken);
     }
 }

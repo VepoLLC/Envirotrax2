@@ -3,7 +3,6 @@ using Envirotrax.Common.Configuration;
 using Envirotrax.TaskRunner.Authentication;
 using Envirotrax.TaskRunner.Domain.DataTransferObjects;
 using Envirotrax.TaskRunner.Domain.Services.Definitions;
-using Envirotrax.TaskRunner.Domain.Services.Implementations;
 using Envirotrax.TaskRunner.Workers.Backflow;
 using Envirotrax.TaskRunner.Workers.Sites;
 
@@ -15,9 +14,8 @@ public static class ServiceRegistration
     {
         services
             .AddInternalApi(configuration.GetSection("EnvirotraxApi"))
-            .AddQueueService(configuration.GetSection("Queue"));
-
-        services.AddTransient<IKeyHashingService, KeyHashingService>();
+            .AddQueueService(configuration.GetSection("Queue"))
+            .AddKeyHashingService();
 
         services
              .AddAuthentication("ApiKey")

@@ -8,8 +8,17 @@ import { Subscription } from "rxjs";
     selector: 'vp-window-container',
     templateUrl: './window-container.component.html',
     styles: `
+    :host {
+        min-width: 0;
+    }
+
     .vp-window-wrapper {
         min-width: calc(50% - 0.5rem);
+    }
+
+    .vp-window-container {
+        min-width: 0;
+        overflow-x: auto;
     }
     `
 })

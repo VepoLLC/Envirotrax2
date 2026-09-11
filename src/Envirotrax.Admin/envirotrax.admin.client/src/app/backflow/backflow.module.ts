@@ -5,6 +5,7 @@ import { SharedComponentsModule } from '../shared/components/shared.components.m
 import { BackflowRoutingModule } from './backflow-routing.module';
 import { BackflowTestListComponent } from './tests/list/backflow-test-list.component';
 import { BackflowTesterListComponent } from './testers/list/backflow-tester-list.component';
+import { BackflowReplacementListComponent } from './replacements/list/backflow-replacement-list.component';
 
 @NgModule({
     declarations: [
@@ -16,6 +17,7 @@ import { BackflowTesterListComponent } from './testers/list/backflow-tester-list
         SharedComponentsModule,
         BackflowRoutingModule,
         BackflowTesterListComponent,
+        BackflowReplacementListComponent,
     ],
 })
 export class BackflowModule { }

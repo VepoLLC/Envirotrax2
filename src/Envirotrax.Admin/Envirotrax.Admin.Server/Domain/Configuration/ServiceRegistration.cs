@@ -16,6 +16,8 @@ using Envirotrax.Admin.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.Admin.Server.Domain.Services.Implementations.Csi;
 using Envirotrax.Admin.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.Admin.Server.Domain.Services.Implementations.Backflow;
+using Envirotrax.Admin.Server.Domain.Services.Definitions.Fog;
+using Envirotrax.Admin.Server.Domain.Services.Implementations.Fog;
 
 namespace Envirotrax.Admin.Server.Domain.Configuration;
 
@@ -41,6 +43,8 @@ public static class ServiceRegistration
                 services.AddTransient<ICsiInspectorInsuranceService, CsiInspectorInsuranceService>();
                 services.AddTransient<IBackflowTestService, BackflowTestService>();
                 services.AddTransient<IBackflowTesterService, BackflowTesterService>();
+                services.AddTransient<IBackflowReplacementService, BackflowReplacementService>();
+                services.AddTransient<IFogInspectionService, FogInspectionService>();
 
                 return services;
         }

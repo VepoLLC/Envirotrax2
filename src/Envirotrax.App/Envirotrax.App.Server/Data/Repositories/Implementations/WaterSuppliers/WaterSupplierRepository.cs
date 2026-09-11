@@ -54,6 +54,28 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<WaterSupplier?> GetUnscopedAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        return await DbContext
+            .WaterSuppliers
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Where(supplier => supplier.DeletedTime == null)
+            .FirstOrDefaultAsync(supplier => supplier.Id == waterSupplierId, cancellationToken);
+    }
+
+    public async Task<IEnumerable<int>> GetChildSupplierIdsAsync(int parentWaterSupplierId, CancellationToken cancellationToken)
+    {
+        return await DbContext
+            .WaterSuppliers
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Where(supplier => supplier.DeletedTime == null)
+            .Where(supplier => supplier.ParentId == parentWaterSupplierId)
+            .Select(supplier => supplier.Id)
+            .ToListAsync(cancellationToken);
+    }
+
     public override Task<WaterSupplier> AddAsync(WaterSupplier supplier)
     {
         supplier.ParentId = _tenantProvider.WaterSupplierId;
@@ -110,6 +132,49 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
         dbSupplier.LetterContactEmailAddress = supplier.LetterContactEmailAddress;
 
         // dbSupplier.UpdatedById = _tenantProvider.UserId;
+
+        await DbContext.SaveChangesAsync();
+        return dbSupplier;
+    }
+
+    public async Task<WaterSupplier?> UpdateOwnAsync(WaterSupplier supplier)
+    {
+        var dbSupplier = await DbContext.WaterSuppliers
+            .SingleOrDefaultAsync(x => x.Id == _tenantProvider.WaterSupplierId);
+
+        if (dbSupplier == null)
+        {
+            return null;
+        }
+
+        dbSupplier.Name = supplier.Name;
+        dbSupplier.ContactName = supplier.ContactName;
+        dbSupplier.PwsId = supplier.PwsId;
+        dbSupplier.Address = supplier.Address;
+        dbSupplier.City = supplier.City;
+        dbSupplier.StateId = supplier.StateId;
+        dbSupplier.ZipCode = supplier.ZipCode;
+        dbSupplier.PhoneNumber = supplier.PhoneNumber;
+        dbSupplier.FaxNumber = supplier.FaxNumber;
+        dbSupplier.EmailAddress = supplier.EmailAddress;
+        dbSupplier.UpdatedTime = DateTime.UtcNow;
+
+        dbSupplier.LetterCompanyName = supplier.LetterCompanyName;
+        dbSupplier.LetterContactName = supplier.LetterContactName;
+        dbSupplier.LetterAddress = supplier.LetterAddress;
+        dbSupplier.LetterCity = supplier.LetterCity;
+        dbSupplier.LetterStateId = supplier.LetterStateId;
+        dbSupplier.LetterZipCode = supplier.LetterZipCode;
+
+        dbSupplier.LetterContactCompanyName = supplier.LetterContactCompanyName;
+        dbSupplier.LetterContactContactName = supplier.LetterContactContactName;
+        dbSupplier.LetterContactAddress = supplier.LetterContactAddress;
+        dbSupplier.LetterContactCity = supplier.LetterContactCity;
+        dbSupplier.LetterContactStateId = supplier.LetterContactStateId;
+        dbSupplier.LetterContactZipCode = supplier.LetterContactZipCode;
+        dbSupplier.LetterContactPhoneNumber = supplier.LetterContactPhoneNumber;
+        dbSupplier.LetterContactFaxNumber = supplier.LetterContactFaxNumber;
+        dbSupplier.LetterContactEmailAddress = supplier.LetterContactEmailAddress;
 
         await DbContext.SaveChangesAsync();
         return dbSupplier;

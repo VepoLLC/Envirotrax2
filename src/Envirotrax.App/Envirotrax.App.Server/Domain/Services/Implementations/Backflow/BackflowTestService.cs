@@ -18,6 +18,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
+using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 using Envirotrax.Common.Data;
@@ -46,6 +47,8 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     private readonly IBackflowRenewalRequirementService _renewalRequirementService;
     private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly IBackflowSettingsService _settingsService;
+    private readonly IGeneralSettingsService _generalSettingsService;
+    private readonly IProfessionalSupplierService _professionalSupplierService;
     private readonly IRecordLogService _recordLogService;
     private readonly ILogger<BackflowTestService> _logger;
 
@@ -63,6 +66,8 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         IBackflowRenewalRequirementService renewalRequirementService,
         ITimeZoneHelperService timeZoneHelper,
         IBackflowSettingsService settingsService,
+        IGeneralSettingsService generalSettingsService,
+        IProfessionalSupplierService professionalSupplierService,
         IRecordLogService recordLogService,
         ILogger<BackflowTestService> logger)
         : base(mapper, repository)
@@ -79,6 +84,8 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         _renewalRequirementService = renewalRequirementService;
         _timeZoneHelper = timeZoneHelper;
         _settingsService = settingsService;
+        _generalSettingsService = generalSettingsService;
+        _professionalSupplierService = professionalSupplierService;
         _recordLogService = recordLogService;
         _logger = logger;
     }
@@ -174,6 +181,59 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         return tests.Select(t => MapToDto(t)!).ToPagedData(pageInfo);
     }
 
+    public async Task<IPagedData<BackflowReplacementDto>> GetReplacementsAsync(PageInfo pageInfo, Query query, bool onHold, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<BackflowTest, BackflowReplacementDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<BackflowTest, BackflowReplacementDto>(Mapper);
+
+        var tests = await _testRepository.GetReplacementsAsync(pageInfo, query, onHold, cancellationToken);
+
+        var replacements = new List<BackflowReplacementDto>();
+
+        foreach (var test in tests)
+        {
+            replacements.Add(Mapper.Map<BackflowReplacementDto>(test));
+        }
+
+        return replacements.ToPagedData(pageInfo);
+    }
+
+    public async Task<BackflowReplacementDto?> GetReplacedAssemblyAsync(int id, CancellationToken cancellationToken)
+    {
+        var test = await _testRepository.GetReplacedAssemblyAsync(id, cancellationToken);
+
+        if (test == null)
+        {
+            return null;
+        }
+
+        return Mapper.Map<BackflowReplacementDto>(test);
+    }
+
+    public async Task<BackflowReplacementDto?> UpdateReplacementHoldAsync(int id, bool onHold)
+    {
+        var test = await _testRepository.UpdateReplacementHoldAsync(id, onHold);
+
+        if (test == null)
+        {
+            return null;
+        }
+
+        return Mapper.Map<BackflowReplacementDto>(test);
+    }
+
+    public async Task<BackflowReplacementDto?> UpdateReplacementClearedAsync(int id, bool cleared)
+    {
+        var test = await _testRepository.UpdateReplacementClearedAsync(id, cleared);
+
+        if (test == null)
+        {
+            return null;
+        }
+
+        return Mapper.Map<BackflowReplacementDto>(test);
+    }
+
     private async Task PopulateBpatSnapshotAsync(BackflowTestDto dto)
     {
         if (dto.Professional?.Id is int professionalId)
@@ -251,6 +311,38 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         dto.ExpirationDate = expirationDate;
     }
 
+    // Fee-exempt sites, failed tests, and air-gap devices are never charged; otherwise the water supplier's fee schedule applies,
+    // optionally overridden per-BPAT. The fee share always comes from the fee schedule, never the override.
+    private async Task ApplyAmountAsync(BackflowTestDto dto, bool siteIsFeeExempt, CancellationToken cancellationToken)
+    {
+        dto.Amount = 0;
+        dto.AmountShare = 0;
+
+        if (dto.WaterSupplier?.Id is not int waterSupplierId)
+        {
+            return;
+        }
+
+        var isAirGap = dto.DeviceType == nameof(BackflowDeviceType.AG);
+
+        if (siteIsFeeExempt || dto.TestResult == BackflowTestResult.Fail || isAirGap)
+        {
+            return;
+        }
+
+        var isResidential = (PropertyType)dto.PropertyType == PropertyType.Residential;
+
+        var settings = await _generalSettingsService.GetAsync(waterSupplierId, cancellationToken);
+        var testFee = isResidential ? settings?.BackflowResidentialTestFee ?? 0 : settings?.BackflowCommercialTestFee ?? 0;
+        var testFeeShare = isResidential ? settings?.BackflowResidentialTestFeeWsShare ?? 0 : settings?.BackflowCommercialTestFeeWsShare ?? 0;
+
+        var registration = await _professionalSupplierService.GetAsync(waterSupplierId, cancellationToken);
+        var feeOverride = isResidential ? registration?.BackflowResidentialTestFee : registration?.BackflowCommercialTestFee;
+
+        dto.Amount = feeOverride ?? testFee;
+        dto.AmountShare = testFeeShare;
+    }
+
     private static void ApplySiteSnapshot(BackflowTestDto dto, SiteDto site)
     {
         dto.AccountNumber = site.AccountNumber;
@@ -291,6 +383,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         DeriveTestDate(dto);
 
         bool hasAuxWaterSupply = false;
+        bool siteIsFeeExempt = false;
 
         if (dto.Site?.Id != null)
         {
@@ -300,10 +393,12 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             {
                 ApplySiteSnapshot(dto, site);
                 hasAuxWaterSupply = site.HasAuxWaterSupply;
+                siteIsFeeExempt = site.IsFeeExempt;
             }
         }
 
         await ApplyRenewalAsync(dto, hasAuxWaterSupply, cancellationToken);
+        await ApplyAmountAsync(dto, siteIsFeeExempt, cancellationToken);
 
         // Set paths before AddAsync to avoid a second EF update (double-tracking conflict)
         if (assemblyStream != null && assemblyFileName != null)
@@ -458,7 +553,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
         var deleted = await _testRepository.DeleteAsync(id);
 
-        if (deleted == null || !string.IsNullOrEmpty(deleted.TransactionId))
+        if (deleted == null || deleted.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(deleted.TransactionId))
         {
             return null;
         }

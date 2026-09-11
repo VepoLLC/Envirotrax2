@@ -54,6 +54,9 @@ public class ProfessionalDto : IDto
     public ExpirationType? InsuranceExpirationType { get; set; }
 
     public List<ProfessionalLicenseOrInsuranceRowDto>? LicensesAndInsurances { get; set; }
+
+
+    public decimal AccountBalance { get; set; }
 }
 
 public class ReferencedProfessionalDto

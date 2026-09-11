@@ -26,6 +26,12 @@ public static class ServiceRegistrations
             .AddTransient<IAuthService, AuthService>();
     }
 
+    public static IServiceCollection AddKeyHashingService(this IServiceCollection services)
+    {
+        return services
+            .AddTransient<IKeyHashingService, KeyHashingService>();
+    }
+
     public static IServiceCollection AddHtmlTemplateService(this IServiceCollection services, Action<HtmlTemplateOptions> templateConfigAction)
     {
         services

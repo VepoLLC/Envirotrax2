@@ -42,4 +42,9 @@ public interface IBackflowTestService : IService<BackflowTest, BackflowTestDto>
     Task<BackflowTestDto?> UpdateDisapprovalAsync(int id, bool disapproved, CancellationToken cancellationToken = default);
     Task<BackflowTestDto?> UpdateForceRenewalAsync(int id, BackflowTestForceRenewalRequest request, CancellationToken cancellationToken = default);
     Task<BackflowTestDto?> UpdateRejectionAsync(int id, BackflowTestRejectionRequest request, CancellationToken cancellationToken = default);
+
+    Task<IPagedData<BackflowReplacementDto>> GetReplacementsAsync(PageInfo pageInfo, Query query, bool onHold, CancellationToken cancellationToken);
+    Task<BackflowReplacementDto?> GetReplacedAssemblyAsync(int id, CancellationToken cancellationToken);
+    Task<BackflowReplacementDto?> UpdateReplacementHoldAsync(int id, bool onHold);
+    Task<BackflowReplacementDto?> UpdateReplacementClearedAsync(int id, bool cleared);
 }

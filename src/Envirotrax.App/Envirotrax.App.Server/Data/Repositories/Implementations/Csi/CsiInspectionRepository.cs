@@ -2,7 +2,9 @@ using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Csi;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 using Envirotrax.App.Server.Data.Services.Definitions;
+using Envirotrax.Common.Data.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,9 +12,12 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Csi;
 
 public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspectionRepository
 {
-    public CsiInspectionRepository(IDbContextSelector dbContextSelector)
+    private readonly ITenantProvidersService _tenantProvider;
+
+    public CsiInspectionRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider)
         : base(dbContextSelector)
     {
+        _tenantProvider = tenantProvider;
     }
 
     protected override IQueryable<CsiInspection> GetListQuery()
@@ -41,6 +46,8 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         bool latestOnly,
         CancellationToken cancellationToken)
     {
+        ProfessionalRecordScope.ApplyToProfessionalSearch(query, _tenantProvider.ProfessionalId, nameof(CsiInspection.ProfessionalId));
+
         var dbQuery = GetListQuery()
             .Where(c => c.Site != null && !c.Site.OutOfArea)
             .Where(query.Filter);

@@ -1,3 +1,5 @@
+using Envirotrax.App.Server.Domain.Services.Definitions.Api;
+using Envirotrax.App.Server.Domain.Services.Implementations.Api;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
@@ -28,6 +30,8 @@ using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Implementations.Helpers;
+using Envirotrax.App.Server.Domain.Services.Definitions.Payments;
+using Envirotrax.App.Server.Domain.Services.Implementations.Payments;
 
 namespace Envirotrax.App.Server.Domain.Configuration;
 
@@ -42,6 +46,12 @@ public static class ServiceRegistration
         });
 
         services.AddInternalApi<AuthApiOptions>(configuration.GetSection("AuthApi"));
+        services.AddKeyHashingService();
+        services.AddTransient<IApiAuthenticationService, ApiAuthenticationService>();
+        services.AddTransient<IApiSupplierScopeService, ApiSupplierScopeService>();
+        services.AddTransient<ILegacyFieldMapService, LegacyFieldMapService>();
+        services.AddTransient<ILegacySelectService, LegacySelectService>();
+        services.AddTransient<ILegacyResponseWriter, LegacyResponseWriter>();
         services.AddTransient<ITimeZoneHelperService, TimeZoneHelperService>();
 
         services.Configure<FileStorageOptions>(configuration.GetSection("FileStorage"));
@@ -104,6 +114,9 @@ public static class ServiceRegistration
 
         services.Configure<GeocodingOptions>(configuration.GetSection("Geocoding"));
         services.AddHttpClient<IGeocodingService, GeocodingService>();
+
+        services.Configure<AuthorizeNetOptions>(configuration.GetSection("AuthorizeNet"));
+        services.AddHttpClient<IAuthorizeNetPaymentService, AuthorizeNetPaymentService>();
 
         services.AddHtmlTemplateService(opts =>
         {

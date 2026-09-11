@@ -6,7 +6,9 @@ using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Services.Definitions;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
+using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow;
@@ -15,9 +17,12 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
 {
     private const string HazardTypeOther = "Other";
 
-    public BackflowTestRepository(IDbContextSelector dbContextSelector)
+    private readonly ITenantProvidersService _tenantProvider;
+
+    public BackflowTestRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider)
         : base(dbContextSelector)
     {
+        _tenantProvider = tenantProvider;
     }
 
     protected override IQueryable<BackflowTest> GetListQuery()
@@ -53,6 +58,9 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         {
             query.Sort[nameof(BackflowTest.Id)] = SortOperator.Asc;
         }
+
+        ProfessionalRecordScope.ApplyToProfessionalSearch(query, _tenantProvider.ProfessionalId, nameof(BackflowTest.ProfessionalId));
+
         return base.GetAllAsync(pageInfo, query, cancellationToken);
     }
 
@@ -68,6 +76,8 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         entry.Property(m => m.BypassAssemblyImagePath).IsModified = false;
         entry.Property(m => m.BypassSerialNumberImagePath).IsModified = false;
         entry.Property(m => m.AirGapImagePath).IsModified = false;
+        entry.Property(m => m.ValidationReplacementOnHold).IsModified = false;
+        entry.Property(m => m.ValidationReplacementCleared).IsModified = false;
     }
 
     public async Task<BackflowTest> UpdateImagePathAsync(BackflowTest model, string imagePathPropertyName)
@@ -89,8 +99,10 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         var twoMonthsStart = thisMonthStart.AddMonths(2);
         var threeMonthsStart = thisMonthStart.AddMonths(3);
 
+        var professionalId = _tenantProvider.ProfessionalId;
+
         var counts = await Entity
-            .Where(t => t.IsCurrent)
+            .Where(t => t.IsCurrent && (professionalId <= 0 || t.ProfessionalId == professionalId))
             .GroupBy(t => 1)
             .Select(g => new BackflowTestExpiryCounts
             {
@@ -144,6 +156,59 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             .PaginateAsync(pageInfo, cancellationToken);
 
         return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<BackflowTest>> GetReplacementsAsync(PageInfo pageInfo, Query query, bool onHold, CancellationToken cancellationToken)
+    {
+        if (query.Sort.IsNullOrEmpty())
+        {
+            query.Sort[nameof(BackflowTest.Id)] = SortOperator.Desc;
+        }
+
+        var backflowProgramWaterSupplierIds = DbContext.GeneralSettings
+            .Where(gs => gs.BackflowTesting)
+            .Select(gs => gs.WaterSupplierId);
+
+        var vepoManagedWaterSupplierIds = DbContext.BackflowSettings
+            .Where(bs => bs.OutOfServiceType == BackflowOutOfServiceType.VepoManaged)
+            .Select(bs => bs.WaterSupplierId);
+
+        var dbQuery = GetListQuery()
+            .Where(t => t.ReasonForTest == BackflowReasonForTest.Replacement
+                && t.TransactionId != null
+                && t.TransactionId != string.Empty
+                && t.ReplacementAssembly != null
+                && t.ReplacementAssembly != string.Empty
+                && !t.ValidationReplacementCleared
+                && t.ValidationReplacementOnHold == onHold
+                && t.Site != null
+                && backflowProgramWaterSupplierIds.Contains(t.WaterSupplierId)
+                && vepoManagedWaterSupplierIds.Contains(t.WaterSupplierId));
+
+        var paginated = await dbQuery
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public async Task<BackflowTest?> GetReplacedAssemblyAsync(int id, CancellationToken cancellationToken)
+    {
+        var replacement = await GetNoIncludesAsync(id, cancellationToken);
+
+        if (replacement == null || string.IsNullOrWhiteSpace(replacement.ReplacementAssembly))
+        {
+            return null;
+        }
+
+        var waterSupplierId = replacement.WaterSupplierId;
+        var serialNumber = replacement.ReplacementAssembly;
+
+        return await GetListQuery()
+            .Where(t => t.WaterSupplierId == waterSupplierId && t.SerialNumber == serialNumber)
+            .OrderByDescending(t => t.Id)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<BackflowTest>> GetAllCurrentBySiteIdAsync(int siteId, CancellationToken cancellationToken)
@@ -679,6 +744,40 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
 
             await ReassignIsCurrentForDeviceAsync(test, cancellationToken);
         }
+
+        return test;
+    }
+
+    public async Task<BackflowTest?> UpdateReplacementHoldAsync(int id, bool onHold)
+    {
+        var test = await GetNoIncludesAsync(id, CancellationToken.None);
+
+        if (test == null)
+        {
+            return null;
+        }
+
+        DbContext.Attach(test);
+        test.ValidationReplacementOnHold = onHold;
+
+        await DbContext.SaveChangesAsync();
+
+        return test;
+    }
+
+    public async Task<BackflowTest?> UpdateReplacementClearedAsync(int id, bool cleared)
+    {
+        var test = await GetNoIncludesAsync(id, CancellationToken.None);
+
+        if (test == null)
+        {
+            return null;
+        }
+
+        DbContext.Attach(test);
+        test.ValidationReplacementCleared = cleared;
+
+        await DbContext.SaveChangesAsync();
 
         return test;
     }

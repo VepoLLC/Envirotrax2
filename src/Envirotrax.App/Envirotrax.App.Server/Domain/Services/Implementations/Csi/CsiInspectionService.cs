@@ -5,6 +5,7 @@ using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Csi;
 using Envirotrax.App.Server.Data.Models.Logs;
+using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
@@ -15,6 +16,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
+using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
@@ -30,6 +32,8 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
     private readonly IPdfTemplateService _pdfTemplateService;
     private readonly IAuthService _authService;
     private readonly IRecordLogService _recordLogService;
+    private readonly IGeneralSettingsService _generalSettingsService;
+    private readonly IProfessionalSupplierService _professionalSupplierService;
 
     public CsiInspectionService(
         IMapper mapper,
@@ -40,7 +44,9 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         ISiteService siteService,
         IPdfTemplateService pdfTemplateService,
         IAuthService authService,
-        IRecordLogService recordLogService)
+        IRecordLogService recordLogService,
+        IGeneralSettingsService generalSettingsService,
+        IProfessionalSupplierService professionalSupplierService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -51,6 +57,8 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         _pdfTemplateService = pdfTemplateService;
         _authService = authService;
         _recordLogService = recordLogService;
+        _generalSettingsService = generalSettingsService;
+        _professionalSupplierService = professionalSupplierService;
     }
 
     public override async Task<CsiInspectionDto?> DeleteAsync(int id)
@@ -109,9 +117,33 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
 
         ApplySiteSnapshot(inspection, site);
         ApplyInspectorSnapshot(inspection, professional, inspectorUser, csiLicense, inspectorUserId);
+        await ApplyAmountAsync(inspection, site.IsFeeExempt, cancellationToken);
 
         var added = await _repository.AddAsync(inspection);
         return Mapper.Map<CsiInspectionDto>(added);
+    }
+
+    private async Task ApplyAmountAsync(CsiInspection inspection, bool siteIsFeeExempt, CancellationToken cancellationToken)
+    {
+        inspection.Amount = 0;
+        inspection.AmountShare = 0;
+
+        if (siteIsFeeExempt)
+        {
+            return;
+        }
+
+        var isResidential = inspection.PropertyType == PropertyType.Residential;
+
+        var settings = await _generalSettingsService.GetAsync(inspection.WaterSupplierId, cancellationToken);
+        var fee = isResidential ? settings?.CsiResidentialInspectionFee ?? 0 : settings?.CsiCommercialInspectionFee ?? 0;
+        var feeShare = isResidential ? settings?.CsiResidentialInspectionFeeWsShare ?? 0 : settings?.CsiCommercialInspectionFeeWsShare ?? 0;
+
+        var registration = await _professionalSupplierService.GetAsync(inspection.WaterSupplierId, cancellationToken);
+        var feeOverride = isResidential ? registration?.CsiResidentialInspectionFee : registration?.CsiCommercialInspectionFee;
+
+        inspection.Amount = feeOverride ?? fee;
+        inspection.AmountShare = feeShare;
     }
 
     public async Task<CsiInspectionDto?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken)

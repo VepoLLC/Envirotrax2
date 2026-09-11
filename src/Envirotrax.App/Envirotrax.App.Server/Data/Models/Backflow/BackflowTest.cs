@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Envirotrax.App.Server.Data.Models.Backflow;
 
 [Table("BackflowTests")]
-public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IProfessionalModel
+public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }
@@ -254,6 +254,9 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 
     [StringLength(255)]
     public string? ValidationNotes { get; set; }
+
+    public bool ValidationReplacementOnHold { get; set; }
+    public bool ValidationReplacementCleared { get; set; }
 
     // Initial test readings - main assembly
     [Precision(5, 2)]

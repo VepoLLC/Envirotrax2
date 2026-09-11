@@ -1,4 +1,4 @@
-namespace Envirotrax.TaskRunner.Domain.Services.Definitions;
+namespace Envirotrax.Common.Domain.Services.Defintions;
 
 public interface IKeyHashingService
 {

@@ -2,16 +2,21 @@ using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Fog;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 using Envirotrax.App.Server.Data.Services.Definitions;
+using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Fog;
 
 public class FogInspectionRepository : Repository<FogInspection>, IFogInspectionRepository
 {
-    public FogInspectionRepository(IDbContextSelector dbContextSelector)
+    private readonly ITenantProvidersService _tenantProvider;
+
+    public FogInspectionRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider)
         : base(dbContextSelector)
     {
+        _tenantProvider = tenantProvider;
     }
 
     protected override IQueryable<FogInspection> GetListQuery()
@@ -47,6 +52,8 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
     {
         if (query.Sort.IsNullOrEmpty())
             query.Sort[nameof(FogInspection.Id)] = SortOperator.Asc;
+
+        ProfessionalRecordScope.ApplyToProfessionalSearch(query, _tenantProvider.ProfessionalId, nameof(FogInspection.ProfessionalId));
 
         var filteredQ = GetListQuery()
             .Where(query.Filter);

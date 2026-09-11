@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Envirotrax.App.Server.Data.Models.Backflow;
 
 [Table("BackflowTests")]
-public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IProfessionalModel
+public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }

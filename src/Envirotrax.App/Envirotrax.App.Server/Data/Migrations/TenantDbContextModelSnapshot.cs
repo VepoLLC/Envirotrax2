@@ -22,6 +22,79 @@ namespace Envirotrax.App.Server.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Api.ApiAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApiKeyHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<bool>("IsLive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("PermissionBackflowTests")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("PermissionCsiInspections")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("PermissionFogInspections")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("PermissionFogTripTickets")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("PermissionSites")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("PermissionWaterSuppliers")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("WaterSupplierId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("ApiAccounts");
+                });
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Backflow.BackflowComplianceSnapshot", b =>
                 {
                     b.Property<int>("WaterSupplierId")
@@ -2696,6 +2769,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<int>("WaterSupplierId")
                         .HasColumnType("int");
 
+                    b.Property<int>("ProfessionalId")
+                        .HasColumnType("int");
+
                     b.Property<decimal?>("BackflowCommercialTestFee")
                         .HasPrecision(19, 4)
                         .HasColumnType("decimal(19,4)");
@@ -2738,10 +2814,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("IsBanned")
                         .HasColumnType("bit");
 
-                    b.Property<int>("ProfessionalId")
-                        .HasColumnType("int");
-
-                    b.HasKey("WaterSupplierId");
+                    b.HasKey("WaterSupplierId", "ProfessionalId");
 
                     b.HasIndex("ProfessionalId");
 
@@ -3919,6 +3992,16 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("UpdatedById");
 
                     b.ToTable("WaterSuppliers");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Api.ApiAccount", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Backflow.BackflowComplianceSnapshot", b =>

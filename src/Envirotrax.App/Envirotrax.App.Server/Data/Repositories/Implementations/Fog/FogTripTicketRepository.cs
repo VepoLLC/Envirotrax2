@@ -1,21 +1,22 @@
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
-using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Models.Fog;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 using Envirotrax.App.Server.Data.Services.Definitions;
+using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Fog;
 
 public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicketRepository
 {
-    private readonly TenantDbContext _context;
+    private readonly ITenantProvidersService _tenantProvider;
 
-    public FogTripTicketRepository(IDbContextSelector dbContextSelector)
+    public FogTripTicketRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider)
         : base(dbContextSelector)
     {
-        _context = dbContextSelector.Current;
+        _tenantProvider = tenantProvider;
     }
 
     protected override IQueryable<FogTripTicket> GetListQuery()
@@ -59,15 +60,15 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
             query.Sort[nameof(FogTripTicket.Id)] = SortOperator.Asc;
         }
 
-        IQueryable<FogTripTicket> dbQuery = _context.FogTripTickets
-            .IgnoreQueryFilters()
-            .Include(t => t.WaterSupplier)
-            .Include(t => t.Site)
-            .Include(t => t.Professional);
+        var dbQuery = GetListQuery();
 
         if (waterSupplierId.HasValue)
         {
             dbQuery = dbQuery.Where(t => t.WaterSupplierId == waterSupplierId.Value);
+        }
+        else
+        {
+            ProfessionalRecordScope.ApplyToProfessionalSearch(query, _tenantProvider.ProfessionalId, nameof(FogTripTicket.ProfessionalId));
         }
 
         var paginated = await dbQuery

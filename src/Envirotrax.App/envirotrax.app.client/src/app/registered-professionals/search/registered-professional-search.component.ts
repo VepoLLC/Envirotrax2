@@ -5,8 +5,6 @@ import { combineLatest, Subscription } from "rxjs";
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from "@envirotrax/common-ui";
 import { TableViewModel } from "../../shared/models/table-view-model";
 import { QueryProperty } from "../../shared/models/query";
-import { DownloadConfig } from "../../shared/models/download-config";
-import { DownloadService } from "../../shared/services/download.service";
 import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
 import { TitleHelperService } from "../../shared/services/helpers/title/title-helper.service";
 import { RegisteredProfessionalService } from "../../shared/services/professionals/registered-professional.service";
@@ -58,8 +56,6 @@ export class RegisteredProfessionalSearchComponent implements OnInit, OnDestroy 
     public searchAttempted: boolean = false;
     public isSuppliersLoading: boolean = false;
 
-    public downloadConfig?: DownloadConfig;
-
     public readonly accountTypeOptions: InputOption[] = [
         { id: '', text: 'Select an account type' },
         ...REGISTERED_PROFESSIONAL_ACCOUNT_TYPES.map(type => ({ id: type.slug, text: type.name }))
@@ -88,7 +84,6 @@ export class RegisteredProfessionalSearchComponent implements OnInit, OnDestroy 
 
     constructor(
         private readonly _registeredProfessionalService: RegisteredProfessionalService,
-        private readonly _downloadService: DownloadService,
         private readonly _containerHelper: AppContainerHelperService,
         private readonly _titleHelper: TitleHelperService,
         private readonly _activatedRoute: ActivatedRoute
@@ -157,8 +152,6 @@ export class RegisteredProfessionalSearchComponent implements OnInit, OnDestroy 
             this.table.items.pageInfo = { ...this.table.items.pageInfo, pageNumber: 1 };
         }
 
-        this.setDownloadConfig();
-
         await this.getProfessionals();
 
         this.searchAttempted = true;
@@ -188,10 +181,6 @@ export class RegisteredProfessionalSearchComponent implements OnInit, OnDestroy 
         } finally {
             this.table.isLoading = false;
         }
-    }
-
-    public showDownloadManager(): void {
-        this._downloadService.showDownloadManager(this.downloadConfig!, this.table.query);
     }
 
     private async setAccountType(slug: string): Promise<void> {
@@ -270,35 +259,6 @@ export class RegisteredProfessionalSearchComponent implements OnInit, OnDestroy 
         );
 
         return columns;
-    }
-
-    private setDownloadConfig(): void {
-        this.downloadConfig = {
-            fileName: this.accountType!.name,
-            suppoertedFormats: ['CSV', 'Excel', 'XML'],
-            endpoint: {
-                method: 'GET',
-                url: this._registeredProfessionalService.getSearchEndpoint(),
-                additionalParams: {
-                    waterSupplierId: this.selectedWaterSupplierId,
-                    professionalType: String(this.accountType!.professionalType)
-                }
-            },
-            columns: [
-                { field: 'companyName', caption: 'CompanyName' },
-                { field: 'contactName', caption: 'ContactName' },
-                { field: 'registeredDate', caption: 'RegisteredDate' },
-                { field: 'address', caption: 'Address' },
-                { field: 'city', caption: 'City' },
-                { field: 'state', caption: 'State' },
-                { field: 'zipCode', caption: 'ZIP' },
-                { field: 'workNumber', caption: 'WorkNumber' },
-                { field: 'cellNumber', caption: 'CellNumber' },
-                { field: 'faxNumber', caption: 'FaxNumber' },
-                { field: 'emailAddress', caption: 'EmailAddress' },
-                { field: 'websiteUrl', caption: 'WebsiteUrl' }
-            ]
-        };
     }
 
     private buildViewModel(professional: RegisteredProfessional): RegisteredProfessionalVm {

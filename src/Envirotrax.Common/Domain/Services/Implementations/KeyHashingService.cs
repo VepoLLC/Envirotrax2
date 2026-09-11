@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
-using Envirotrax.TaskRunner.Domain.Services.Definitions;
+using Envirotrax.Common.Domain.Services.Defintions;
 
-namespace Envirotrax.TaskRunner.Domain.Services.Implementations;
+namespace Envirotrax.Common.Domain.Services.Implementations;
 
 public class KeyHashingService : IKeyHashingService
 {

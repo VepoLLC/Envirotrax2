@@ -56,6 +56,30 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return base.GetAllAsync(pageInfo, query, cancellationToken);
     }
 
+    public async Task<List<BackflowTest>> GetByIdsAsync(IEnumerable<int> ids, CancellationToken cancellationToken)
+    {
+        return await GetListQuery()
+            .Include(t => t.WaterSupplier)
+                .ThenInclude(ws => ws!.Parent)
+            .Where(t => ids.Contains(t.Id))
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<BackflowTest?> FindPreviousTestAsync(BackflowTest test, CancellationToken cancellationToken)
+    {
+        return await DbContext.BackflowTests
+            .IgnoreQueryFilters()
+            .Where(t => t.WaterSupplierId == test.WaterSupplierId
+                && t.SiteId == test.SiteId
+                && t.Manufacturer == test.Manufacturer
+                && t.SerialNumber == test.SerialNumber
+                && t.DeletedTime == null
+                && !t.Rejected
+                && t.CreatedTime < test.CreatedTime)
+            .OrderByDescending(t => t.CreatedTime)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
     // Image paths are owned by the dedicated image flow (UpdateImagePathAsync),
     // so a regular update must never overwrite them.
     protected override void UpdateEntity(BackflowTest model)

@@ -112,6 +112,7 @@ public static class ServiceRegistration
         services.AddTransient<IGisAreaCoordinateRepository, GisAreaCoordinateRepository>();
 
         services.AddTransient<INotificationSettingRepository, NotificationSettingRepository>();
+        services.AddTransient<INotificationRepository, NotificationRepository>();
 
         services.AddTransient<IWaterSupplierDashboardRepository, WaterSupplierDashboardRepository>();
 

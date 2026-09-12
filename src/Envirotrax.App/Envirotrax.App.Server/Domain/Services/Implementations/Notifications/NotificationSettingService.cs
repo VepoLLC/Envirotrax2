@@ -9,6 +9,7 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Notifications;
 
 public class NotificationSettingService : Service<NotificationSetting, NotificationSettingDto>, INotificationSettingService
 {
+    private readonly INotificationSettingRepository _repository;
     private readonly ITenantProvidersService _tenantProvider;
 
     public NotificationSettingService(
@@ -17,7 +18,13 @@ public class NotificationSettingService : Service<NotificationSetting, Notificat
         ITenantProvidersService tenantProvider)
         : base(mapper, repository)
     {
+        _repository = repository;
         _tenantProvider = tenantProvider;
+    }
+
+    public Task<List<NotificationSetting>> GetCandidateSettingsAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        return _repository.GetCandidateSettingsAsync(waterSupplierId, cancellationToken);
     }
 
     public override Task<NotificationSettingDto> AddAsync(NotificationSettingDto dto)

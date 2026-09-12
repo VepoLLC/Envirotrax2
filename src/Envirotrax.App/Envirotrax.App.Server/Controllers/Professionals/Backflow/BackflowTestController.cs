@@ -1,6 +1,7 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
+using Envirotrax.App.Server.Domain.Services.Definitions.Notifications;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -15,10 +16,17 @@ namespace Envirotrax.App.Server.Controllers.Professionals.Backflow;
 public class BackflowTestController : ProfessionalProtectedController
 {
     private readonly IBackflowTestService _backflowTestService;
+    private readonly IBackflowTestNotificationService _notificationService;
+    private readonly ILogger<BackflowTestController> _logger;
 
-    public BackflowTestController(IBackflowTestService backflowTestService)
+    public BackflowTestController(
+        IBackflowTestService backflowTestService,
+        IBackflowTestNotificationService notificationService,
+        ILogger<BackflowTestController> logger)
     {
         _backflowTestService = backflowTestService;
+        _notificationService = notificationService;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -102,5 +110,20 @@ public class BackflowTestController : ProfessionalProtectedController
     {
         var result = await _backflowTestService.DeleteAsync(id);
         return result == null ? NotFound() : Ok(result);
+    }
+
+    [HttpPost("checkout")]
+    public async Task<IActionResult> CheckoutAsync([FromBody] List<int> testIds, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _notificationService.StartCheckingNotificationsAsync(testIds, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to process notifications during backflow test checkout.");
+        }
+
+        return Ok();
     }
 }

@@ -47,6 +47,8 @@
                       [(query)]="items.query"
                       [canViewDetails]="true"
                       (viewDetails)="viewInspection($event)"
+                      [canEdit]="true"
+                      (edit)="editInspection($event)"
                       [canDelete]="true"
                       (delete)="deleteInspection($event)" />
         </div>

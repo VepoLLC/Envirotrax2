@@ -1,5 +1,6 @@
 
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.Admin.Server.Domain.DataTransferObjects.Logs;
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.Sites;
 
 namespace Envirotrax.Admin.Server.Domain.Services.Definitions.Sites;
@@ -15,4 +16,6 @@ public interface ISiteService
     Task UpdateGisAsync(int siteId, int waterSupplierId, SiteGisUpdateDto dto, CancellationToken cancellationToken);
 
     Task UpdateWaterSupplierAsync(int siteId, int waterSupplierId, SiteWaterSupplierUpdateDto dto, CancellationToken cancellationToken);
+
+    Task<List<RecordLogDto>?> GetLogsAsync(int siteId, CancellationToken cancellationToken);
 }

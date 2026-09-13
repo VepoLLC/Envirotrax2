@@ -233,21 +233,36 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             .ToListAsync(cancellationToken);
     }
 
-    public async Task UpdateTestRenewalAsync(int testId, bool renewalRequired, DateTime? expirationDate)
+    public async Task<UpdateResult<BackflowTest>> UpdateTestRenewalAsync(int testId, bool renewalRequired, DateTime? expirationDate)
     {
+        var result = new UpdateResult<BackflowTest>();
+
+        // IgnoreQueryFilters: this runs from the TaskRunner queue-worker pipeline, not a normal
+        // tenant-scoped request, so the usual WaterSupplier query filter must be bypassed here —
+        // same as the bulk-update this replaces.
+        var test = await DbContext.BackflowTests
+            .IgnoreQueryFilters()
+            .SingleOrDefaultAsync(t => t.Id == testId);
+
+        if (test == null)
+        {
+            return result;
+        }
+
+        test.RenewalRequired = renewalRequired;
+
         if (expirationDate.HasValue)
         {
-            await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
-                .ExecuteUpdateAsync(s => s
-                    .SetProperty(x => x.RenewalRequired, renewalRequired)
-                    .SetProperty(x => x.ExpirationDate, expirationDate.Value));
+            test.ExpirationDate = expirationDate.Value;
         }
-        else
-        {
-            await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
-                .ExecuteUpdateAsync(s => s
-                    .SetProperty(x => x.RenewalRequired, renewalRequired));
-        }
+
+        result.Changes = BuildChangeDescription(test);
+
+        await DbContext.SaveChangesAsync();
+
+        result.Model = test;
+
+        return result;
     }
 
     public async Task<IEnumerable<BackflowTest>> GetAllPendingRenewalByTestFlagAsync(int batchSize, CancellationToken cancellationToken)
@@ -274,23 +289,35 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             .ToListAsync(cancellationToken);
     }
 
-    public async Task UpdateTestRenewalAndClearFlagAsync(int testId, bool renewalRequired, DateTime? expirationDate, CancellationToken cancellationToken)
+    public async Task<UpdateResult<BackflowTest>> UpdateTestRenewalAndClearFlagAsync(int testId, bool renewalRequired, DateTime? expirationDate, CancellationToken cancellationToken)
     {
+        var result = new UpdateResult<BackflowTest>();
+
+        var test = await DbContext.BackflowTests
+            .IgnoreQueryFilters()
+            .SingleOrDefaultAsync(t => t.Id == testId, cancellationToken);
+
+        if (test == null)
+        {
+            return result;
+        }
+
+        test.RenewalRequired = renewalRequired;
+
         if (expirationDate.HasValue)
         {
-            await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
-                .ExecuteUpdateAsync(s => s
-                    .SetProperty(x => x.RenewalRequired, renewalRequired)
-                    .SetProperty(x => x.ExpirationDate, expirationDate.Value)
-                    .SetProperty(x => x.NeedsRenewalCheck, false), cancellationToken);
+            test.ExpirationDate = expirationDate.Value;
         }
-        else
-        {
-            await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
-                .ExecuteUpdateAsync(s => s
-                    .SetProperty(x => x.RenewalRequired, renewalRequired)
-                    .SetProperty(x => x.NeedsRenewalCheck, false), cancellationToken);
-        }
+
+        test.NeedsRenewalCheck = false;
+
+        result.Changes = BuildChangeDescription(test);
+
+        await DbContext.SaveChangesAsync(cancellationToken);
+
+        result.Model = test;
+
+        return result;
     }
 
     public async Task ClearTestNeedsRenewalCheckAsync(int testId, CancellationToken cancellationToken)
@@ -300,9 +327,9 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
                 .SetProperty(x => x.NeedsRenewalCheck, false), CancellationToken.None);
     }
 
-    public async Task<AdminUpdateResult<BackflowTest>> UpdateForAdminAsync(int id, BackflowTestAdminUpdateRequest request, int updatedById)
+    public async Task<UpdateResult<BackflowTest>> UpdateForAdminAsync(int id, BackflowTestAdminUpdateRequest request, int updatedById)
     {
-        var result = new AdminUpdateResult<BackflowTest>();
+        var result = new UpdateResult<BackflowTest>();
 
         var test = await Entity.SingleOrDefaultAsync(t => t.Id == id);
 
@@ -572,64 +599,84 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return exists ? userId : null;
     }
 
-    public async Task<BackflowTest?> UpdateRenewalRequiredAsync(int id, bool renewalRequired, int updatedById, CancellationToken cancellationToken)
+    public async Task<UpdateResult<BackflowTest>> UpdateRenewalRequiredAsync(int id, bool renewalRequired, int updatedById, CancellationToken cancellationToken)
     {
+        var result = new UpdateResult<BackflowTest>();
+
         var test = await GetNoIncludesAsync(id, cancellationToken);
 
         if (test == null)
         {
-            return null;
+            return result;
         }
 
         DbContext.Attach(test);
         test.RenewalRequired = renewalRequired;
 
+        result.Changes = BuildChangeDescription(test);
+
         await DbContext.SaveChangesAsync();
 
-        return test;
+        result.Model = test;
+
+        return result;
     }
 
-    public async Task<BackflowTest?> UpdateScheduleMonthAsync(int id, int month, int updatedById, CancellationToken cancellationToken)
+    public async Task<UpdateResult<BackflowTest>> UpdateScheduleMonthAsync(int id, int month, int updatedById, CancellationToken cancellationToken)
     {
+        var result = new UpdateResult<BackflowTest>();
+
         var test = await GetNoIncludesAsync(id, cancellationToken);
 
         if (test == null)
         {
-            return null;
+            return result;
         }
 
         DbContext.Attach(test);
         test.BackflowScheduleMonth = month;
 
+        result.Changes = BuildChangeDescription(test);
+
         await DbContext.SaveChangesAsync();
 
-        return test;
+        result.Model = test;
+
+        return result;
     }
 
-    public async Task<BackflowTest?> UpdateIsCurrentAsync(int id, bool isCurrent, int updatedById, CancellationToken cancellationToken)
+    public async Task<UpdateResult<BackflowTest>> UpdateIsCurrentAsync(int id, bool isCurrent, int updatedById, CancellationToken cancellationToken)
     {
+        var result = new UpdateResult<BackflowTest>();
+
         var test = await GetNoIncludesAsync(id, cancellationToken);
 
         if (test == null)
         {
-            return null;
+            return result;
         }
 
         DbContext.Attach(test);
         test.IsCurrent = isCurrent;
 
+        result.Changes = BuildChangeDescription(test);
+
         await DbContext.SaveChangesAsync();
 
-        return test;
+        result.Model = test;
+
+        return result;
     }
 
-    public async Task<BackflowTest?> UpdateOutOfServiceAsync(int id, bool outOfService, int updatedById, CancellationToken cancellationToken)
+    public async Task<UpdateResult<BackflowTest>> UpdateOutOfServiceAsync(int id, bool outOfService, int updatedById, CancellationToken cancellationToken)
     {
+        var result = new UpdateResult<BackflowTest>();
+
         var test = await GetNoIncludesAsync(id, cancellationToken);
 
         if (test == null)
         {
-            return null;
+            return result;
         }
 
         DbContext.Attach(test);
@@ -646,18 +693,24 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             }
         }
 
+        result.Changes = BuildChangeDescription(test);
+
         await DbContext.SaveChangesAsync();
 
-        return test;
+        result.Model = test;
+
+        return result;
     }
 
-    public async Task<BackflowTest?> UpdateDisapprovalAsync(int id, bool disapproved, int updatedById, CancellationToken cancellationToken)
+    public async Task<UpdateResult<BackflowTest>> UpdateDisapprovalAsync(int id, bool disapproved, int updatedById, CancellationToken cancellationToken)
     {
+        var result = new UpdateResult<BackflowTest>();
+
         var test = await GetNoIncludesAsync(id, cancellationToken);
 
         if (test == null)
         {
-            return null;
+            return result;
         }
 
         DbContext.Attach(test);
@@ -674,18 +727,24 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             }
         }
 
+        result.Changes = BuildChangeDescription(test);
+
         await DbContext.SaveChangesAsync();
 
-        return test;
+        result.Model = test;
+
+        return result;
     }
 
-    public async Task<BackflowTest?> UpdateForceRenewalAsync(int id, bool forceRenewal, int forceRenewalYears, int updatedById, CancellationToken cancellationToken)
+    public async Task<UpdateResult<BackflowTest>> UpdateForceRenewalAsync(int id, bool forceRenewal, int forceRenewalYears, int updatedById, CancellationToken cancellationToken)
     {
+        var result = new UpdateResult<BackflowTest>();
+
         var test = await GetNoIncludesAsync(id, cancellationToken);
 
         if (test == null)
         {
-            return null;
+            return result;
         }
 
         DbContext.Attach(test);
@@ -702,18 +761,24 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             test.ExpirationDate = newExpiration;
         }
 
+        result.Changes = BuildChangeDescription(test);
+
         await DbContext.SaveChangesAsync();
 
-        return test;
+        result.Model = test;
+
+        return result;
     }
 
-    public async Task<BackflowTest?> UpdateRejectionAsync(int id, bool rejected, string? rejectedReason, int updatedById, CancellationToken cancellationToken)
+    public async Task<UpdateResult<BackflowTest>> UpdateRejectionAsync(int id, bool rejected, string? rejectedReason, int updatedById, CancellationToken cancellationToken)
     {
+        var result = new UpdateResult<BackflowTest>();
+
         var test = await GetNoIncludesAsync(id, cancellationToken);
 
         if (test == null)
         {
-            return null;
+            return result;
         }
 
         DbContext.Attach(test);
@@ -725,7 +790,13 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             test.RejectedById = updatedById;
             test.RejectedDate = DateTime.UtcNow;
             test.RejectedReason = rejectedReason;
+        }
 
+        result.Changes = BuildChangeDescription(test);
+        result.Model = test;
+
+        if (rejected)
+        {
             await DbContext.SaveChangesAsync();
 
             var previousId = await FindPreviousTestIdAsync(test);
@@ -745,7 +816,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             await ReassignIsCurrentForDeviceAsync(test, cancellationToken);
         }
 
-        return test;
+        return result;
     }
 
     public async Task<BackflowTest?> UpdateReplacementHoldAsync(int id, bool onHold)
@@ -851,6 +922,97 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
     private static string NormalizeSerialNumber(string serial)
     {
         return string.Concat(serial.Where(char.IsDigit)).TrimStart('0');
+    }
+
+    public async Task<UpdateResult<BackflowTest>> UpdateForProfessionalAsync(
+        BackflowTest model,
+        int professionalId,
+        string? newAssemblyImagePath,
+        string? newSerialNumberImagePath,
+        string? newBypassAssemblyImagePath,
+        string? newBypassSerialNumberImagePath,
+        string? newAirGapImagePath)
+    {
+        var result = new UpdateResult<BackflowTest>();
+
+        var test = await GetTrackedForUpdateAsync(model.Id, default);
+
+        if (test == null || test.ProfessionalId != professionalId || !string.IsNullOrEmpty(test.TransactionId))
+        {
+            return result;
+        }
+
+        // Snapshot everything a professional edit must never be able to touch — admin review/workflow
+        // state, payment state, tenancy, and audit stamps — before the bulk SetValues below, then restore
+        // it afterward (same technique as NotificationSettingRepository.UpdateSettingAsync, just a longer
+        // protect-list, since BackflowTest's professional-editable surface is nearly the whole entity).
+        var createdById = test.CreatedById;
+        var createdTime = test.CreatedTime;
+        var professionalIdSnapshot = test.ProfessionalId;
+        var siteId = test.SiteId;
+        var waterSupplierId = test.WaterSupplierId;
+        var isCurrent = test.IsCurrent;
+        var disapproved = test.Disapproved;
+        var approvalDate = test.ApprovalDate;
+        var approvedById = test.ApprovedById;
+        var rejected = test.Rejected;
+        var rejectedById = test.RejectedById;
+        var rejectedDate = test.RejectedDate;
+        var rejectedReason = test.RejectedReason;
+        var transactionId = test.TransactionId;
+        var transactionDate = test.TransactionDate;
+        var amount = test.Amount;
+        var amountShare = test.AmountShare;
+        var needsRenewalCheck = test.NeedsRenewalCheck;
+        var backflowScheduleMonth = test.BackflowScheduleMonth;
+        var forceRenewal = test.ForceRenewal;
+        var forceRenewalYears = test.ForceRenewalYears;
+        var outOfService = test.OutOfService;
+        var outOfServiceDate = test.OutOfServiceDate;
+        var assemblyImagePath = test.AssemblyImagePath;
+        var serialNumberImagePath = test.SerialNumberImagePath;
+        var bypassAssemblyImagePath = test.BypassAssemblyImagePath;
+        var bypassSerialNumberImagePath = test.BypassSerialNumberImagePath;
+        var airGapImagePath = test.AirGapImagePath;
+
+        DbContext.Entry(test).CurrentValues.SetValues(model);
+
+        test.CreatedById = createdById;
+        test.CreatedTime = createdTime;
+        test.ProfessionalId = professionalIdSnapshot;
+        test.SiteId = siteId;
+        test.WaterSupplierId = waterSupplierId;
+        test.IsCurrent = isCurrent;
+        test.Disapproved = disapproved;
+        test.ApprovalDate = approvalDate;
+        test.ApprovedById = approvedById;
+        test.Rejected = rejected;
+        test.RejectedById = rejectedById;
+        test.RejectedDate = rejectedDate;
+        test.RejectedReason = rejectedReason;
+        test.TransactionId = transactionId;
+        test.TransactionDate = transactionDate;
+        test.Amount = amount;
+        test.AmountShare = amountShare;
+        test.NeedsRenewalCheck = needsRenewalCheck;
+        test.BackflowScheduleMonth = backflowScheduleMonth;
+        test.ForceRenewal = forceRenewal;
+        test.ForceRenewalYears = forceRenewalYears;
+        test.OutOfService = outOfService;
+        test.OutOfServiceDate = outOfServiceDate;
+        test.AssemblyImagePath = newAssemblyImagePath ?? assemblyImagePath;
+        test.SerialNumberImagePath = newSerialNumberImagePath ?? serialNumberImagePath;
+        test.BypassAssemblyImagePath = newBypassAssemblyImagePath ?? bypassAssemblyImagePath;
+        test.BypassSerialNumberImagePath = newBypassSerialNumberImagePath ?? bypassSerialNumberImagePath;
+        test.AirGapImagePath = newAirGapImagePath ?? airGapImagePath;
+
+        result.Changes = BuildChangeDescription(test);
+
+        await DbContext.SaveChangesAsync();
+
+        result.Model = test;
+
+        return result;
     }
 
     private async Task<int?> FindPreviousTestIdAsync(BackflowTest fromTest)

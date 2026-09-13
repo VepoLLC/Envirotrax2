@@ -92,6 +92,34 @@ public class ProfessionalFogInspectionController : ProfessionalProtectedControll
         return Ok(result);
     }
 
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAsync(
+        int id,
+        [FromForm] FogInspectionDto dto,
+        [FromForm] IFormFile? exteriorImage,
+        [FromForm] IFormFile? interiorImage,
+        [FromForm] IFormFile? signatureImage,
+        CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
+
+        await using var exteriorStream = exteriorImage?.OpenReadStream();
+        await using var interiorStream = interiorImage?.OpenReadStream();
+        await using var signatureStream = signatureImage?.OpenReadStream();
+
+        var result = await _fogInspectionService.UpdateForProfessionalAsync(
+            id, dto,
+            exteriorStream, exteriorImage?.FileName,
+            interiorStream, interiorImage?.FileName,
+            signatureStream, signatureImage?.FileName,
+            cancellationToken);
+
+        return result == null ? NotFound() : Ok(result);
+    }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {

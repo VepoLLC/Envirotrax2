@@ -1,6 +1,8 @@
 
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +12,12 @@ namespace Envirotrax.App.Server.Controllers.Admin;
 public class SiteController : AdminBaseController
 {
     private readonly ISiteService _siteService;
+    private readonly IRecordLogService _recordLogService;
 
-    public SiteController(ISiteService siteService)
+    public SiteController(ISiteService siteService, IRecordLogService recordLogService)
     {
         _siteService = siteService;
+        _recordLogService = recordLogService;
     }
 
     [HttpGet]
@@ -69,5 +73,13 @@ public class SiteController : AdminBaseController
         }
 
         return Ok();
+    }
+
+    [HttpGet("{id}/logs")]
+    public async Task<IActionResult> GetLogsAsync(int id, CancellationToken cancellationToken)
+    {
+        var logs = await _recordLogService.GetByRecordAsync(RecordLogTableNames.Sites, id, cancellationToken);
+
+        return Ok(logs);
     }
 }

@@ -47,4 +47,14 @@ public interface IBackflowTestService : IService<BackflowTest, BackflowTestDto>
     Task<BackflowReplacementDto?> GetReplacedAssemblyAsync(int id, CancellationToken cancellationToken);
     Task<BackflowReplacementDto?> UpdateReplacementHoldAsync(int id, bool onHold);
     Task<BackflowReplacementDto?> UpdateReplacementClearedAsync(int id, bool cleared);
+
+    Task<BackflowTestDto?> UpdateForProfessionalAsync(
+        int id,
+        BackflowTestDto dto,
+        Stream? assemblyStream, string? assemblyFileName,
+        Stream? serialStream, string? serialFileName,
+        Stream? bypassAssemblyStream, string? bypassAssemblyFileName,
+        Stream? bypassSerialStream, string? bypassSerialFileName,
+        Stream? airGapStream, string? airGapFileName,
+        CancellationToken cancellationToken = default);
 }

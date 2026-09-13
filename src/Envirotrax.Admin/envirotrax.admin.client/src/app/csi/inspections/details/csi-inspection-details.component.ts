@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { InputOption } from '@envirotrax/common-ui';
+import { InputOption, RecordLog } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import {
     CsiInspection,
@@ -16,7 +16,6 @@ import { WindowReference } from '../../../window/window-config';
 import { CsiInspectionAdditionalInformationComponent } from './additional-information/csi-inspection-additional-information.component';
 import { CsiInspectionAssembliesComponent } from './assemblies/csi-inspection-assemblies.component';
 import { CsiInspectionImagesComponent } from './images/csi-inspection-images.component';
-import { CsiInspectionRecordLogComponent } from './record-log/csi-inspection-record-log.component';
 import { ComplianceItem, CsiInspectionResultsComponent } from './results/csi-inspection-results.component';
 
 type CsiInspectionTab = 'results' | 'assemblies' | 'additional' | 'images' | 'logs';
@@ -32,14 +31,10 @@ const SaveMessageDurationMs = 5000;
         CsiInspectionResultsComponent,
         CsiInspectionAssembliesComponent,
         CsiInspectionAdditionalInformationComponent,
-        CsiInspectionImagesComponent,
-        CsiInspectionRecordLogComponent
+        CsiInspectionImagesComponent
     ],
 })
 export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
-    @ViewChild(CsiInspectionRecordLogComponent)
-    public recordLog?: CsiInspectionRecordLogComponent;
-
     public id: number = 0;
     public waterSupplierId: number = 0;
     public idPrefix: string = 'csi';
@@ -61,6 +56,9 @@ export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
 
     public assembliesTabTitle: string = 'Assemblies at Location';
     public recordLogTabTitle: string = 'Record Log';
+
+    public recordLogs: RecordLog[] = [];
+    public isLoadingRecordLogs: boolean = false;
 
     public complianceItems: ComplianceItem[] = [];
 
@@ -101,7 +99,8 @@ export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
         await Promise.all([
             this.loadStates(),
             this.loadInspection(),
-            this.loadCounts()
+            this.loadCounts(),
+            this.loadRecordLogs()
         ]);
     }
 
@@ -127,7 +126,7 @@ export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
         this.applyInspectionToEditors();
 
         await this.loadCounts();
-        await this.reloadRecordLog();
+        await this.loadRecordLogs();
 
         this.showSaveMessage();
     }
@@ -147,12 +146,13 @@ export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
         this._saveMessageTimeoutId = setTimeout(() => this.dismissSaveMessage(), SaveMessageDurationMs);
     }
 
-    private async reloadRecordLog(): Promise<void> {
-        if (this.recordLog == null) {
-            return;
+    private async loadRecordLogs(): Promise<void> {
+        try {
+            this.isLoadingRecordLogs = true;
+            this.recordLogs = await this._inspectionService.getLogs(this.id);
+        } finally {
+            this.isLoadingRecordLogs = false;
         }
-
-        await this.recordLog.reload();
     }
 
     private async loadStates(): Promise<void> {

@@ -1,10 +1,12 @@
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Users;
 using Envirotrax.App.Server.Domain.Configuration;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 using Envirotrax.Common.Domain.Services.Defintions;
@@ -18,6 +20,7 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
     private readonly IAuthService _authService;
     private readonly IInternalApiClientService<AuthApiOptions> _authApiClient;
     private readonly IWaterSupplierService _waterSupplierService;
+    private readonly IRecordLogService _recordLogService;
 
     public UserService(
         IMapper mapper,
@@ -25,7 +28,8 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
         IUserRoleRepository userRoleRepository,
         IAuthService authService,
         IInternalApiClientService<AuthApiOptions> authApiClient,
-        IWaterSupplierService waterSupplierService)
+        IWaterSupplierService waterSupplierService,
+        IRecordLogService recordLogService)
         : base(mapper, repository)
     {
         _userRepository = repository;
@@ -33,6 +37,25 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
         _authService = authService;
         _authApiClient = authApiClient;
         _waterSupplierService = waterSupplierService;
+        _recordLogService = recordLogService;
+    }
+
+    public override async Task<WaterSupplierUserDto> UpdateAsync(WaterSupplierUserDto dto)
+    {
+        var model = MapToModel(dto)!;
+        var saved = await _userRepository.UpdateUserAsync(model);
+
+        if (saved.Model == null)
+        {
+            throw new InvalidOperationException($"User {dto.Id} not found.");
+        }
+
+        if (saved.Changes.Length > 0)
+        {
+            await _recordLogService.AddAsync(RecordLogTableNames.WaterSupplierUserAccounts, saved.Model.UserId, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
+        }
+
+        return MapToDto(saved.Model)!;
     }
 
     public override async Task<WaterSupplierUserDto> AddAsync(WaterSupplierUserDto dto)
@@ -66,7 +89,15 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
 
         await _userRoleRepository.DeleteAllForUserAsync(id);
 
-        return await base.DeleteAsync(id);
+        var deleted = await base.DeleteAsync(id);
+
+        if (deleted != null)
+        {
+            await _recordLogService.AddAsync(RecordLogTableNames.WaterSupplierUserAccounts, deleted.Id, _authService.WaterSupplierId, RecordLogType.Delete,
+                $"Deleted user account — ContactName: '{deleted.ContactName}', EmailAddress: '{deleted.EmailAddress}'");
+        }
+
+        return deleted;
     }
 
     public async Task<WaterSupplierUserDto?> ResendInvitationAsync(int id, CancellationToken cancellationToken)

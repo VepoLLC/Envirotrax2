@@ -1,5 +1,6 @@
 
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.Admin.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.Admin.Server.Domain.Services.Definitions;
 using Envirotrax.Admin.Server.Domain.Services.Definitions.Backflow;
@@ -17,8 +18,8 @@ public class BackflowTesterService : IBackflowTesterService
         _apiClient = apiClient;
     }
 
-    public Task<IPagedData<ProfessionalDto>> SearchAsync(PageInfo pageInfo, Query query, IDictionary<string, string> criteria, CancellationToken cancellationToken)
+    public Task<IPagedData<ProfessionalDto>> SearchAsync(BackflowTesterSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        return _apiClient.GetAsync<ProfessionalDto>(BaseUrl, pageInfo, query, criteria, cancellationToken);
+        return _apiClient.GetAsync<ProfessionalDto>(BaseUrl, pageInfo, query, criteria.ToParameters(), cancellationToken);
     }
 }

@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Services.Definitions;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow
@@ -28,22 +29,15 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow
                 .Where(p => p.HasBackflowTesting);
         }
 
-        public async Task<IEnumerable<Professional>> SearchAsync(
-            string? bpatLicenseNumber,
-            string? fireLicenseNumber,
-            string? insurancePolicyNumber,
-            string? userEmail,
-            string? contactName,
-            string? cellNumber,
-            PageInfo pageInfo,
-            Query query,
-            CancellationToken cancellationToken)
+        public async Task<IEnumerable<Professional>> SearchAsync(BackflowTesterSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
         {
             var dbQuery = GetListQuery()
                 .Where(query.Filter);
 
-            if (!string.IsNullOrWhiteSpace(bpatLicenseNumber))
+            if (!string.IsNullOrWhiteSpace(criteria.BpatLicenseNumber))
             {
+                var bpatLicenseNumber = criteria.BpatLicenseNumber;
+
                 dbQuery = dbQuery.Where(p => DbContext.ProfessionalUserLicenses.Any(l =>
                     l.ProfessionalId == p.Id &&
                     l.ProfessionalType == ProfessionalType.Bpat &&
@@ -51,8 +45,10 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow
                     l.LicenseNumber.Contains(bpatLicenseNumber)));
             }
 
-            if (!string.IsNullOrWhiteSpace(fireLicenseNumber))
+            if (!string.IsNullOrWhiteSpace(criteria.FireLicenseNumber))
             {
+                var fireLicenseNumber = criteria.FireLicenseNumber;
+
                 dbQuery = dbQuery.Where(p => DbContext.ProfessionalUserLicenses.Any(l =>
                     l.ProfessionalId == p.Id &&
                     l.ProfessionalType == ProfessionalType.Bpat &&
@@ -60,15 +56,19 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow
                     l.LicenseNumber.Contains(fireLicenseNumber)));
             }
 
-            if (!string.IsNullOrWhiteSpace(insurancePolicyNumber))
+            if (!string.IsNullOrWhiteSpace(criteria.InsurancePolicyNumber))
             {
+                var insurancePolicyNumber = criteria.InsurancePolicyNumber;
+
                 dbQuery = dbQuery.Where(p => DbContext.ProfessionalInsurances.Any(i =>
                     i.ProfessionalId == p.Id &&
                     i.InsuranceNumber.Contains(insurancePolicyNumber)));
             }
 
-            if (!string.IsNullOrWhiteSpace(userEmail))
+            if (!string.IsNullOrWhiteSpace(criteria.UserEmail))
             {
+                var userEmail = criteria.UserEmail;
+
                 dbQuery = dbQuery.Where(p =>
                     p.CompanyEmail!.Contains(userEmail) ||
                     DbContext.ProfessionalUsers.Any(u =>
@@ -77,16 +77,20 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow
                         u.User!.Email!.Contains(userEmail)));
             }
 
-            if (!string.IsNullOrWhiteSpace(contactName))
+            if (!string.IsNullOrWhiteSpace(criteria.ContactName))
             {
+                var contactName = criteria.ContactName;
+
                 dbQuery = dbQuery.Where(p => DbContext.ProfessionalUsers.Any(u =>
                     u.ProfessionalId == p.Id &&
                     u.IsBackflowTester &&
                     u.ContactName!.Contains(contactName)));
             }
 
-            if (!string.IsNullOrWhiteSpace(cellNumber))
+            if (!string.IsNullOrWhiteSpace(criteria.CellNumber))
             {
+                var cellNumber = criteria.CellNumber;
+
                 dbQuery = dbQuery.Where(p => DbContext.ProfessionalUsers.Any(u =>
                     u.ProfessionalId == p.Id &&
                     u.IsBackflowTester &&

@@ -75,15 +75,19 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
         foreach (var group in gisCoordiantesByArea)
         {
-            var gisPoints = group.Select(c => new CoordinateDto
-            {
-                Latitude = c.Latitude,
-                Longitude = c.Longitude
-            }).ToList();
+            var gisPoints = group
+                .Where(c => c.PolygonIndex == 0)
+                .OrderBy(c => c.Id)
+                .Select(c => new CoordinateDto
+                {
+                    Latitude = c.Latitude,
+                    Longitude = c.Longitude
+                }).ToList();
 
             if (_geocodingService.IsPointInArea(gisPoints, coordinates))
             {
                 site.GisAreaId = group.Key;
+                break;
             }
         }
     }

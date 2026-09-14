@@ -46,6 +46,14 @@ export class CreateEditGisAreaComponent implements OnInit, OnChanges {
             if (this.polygon?.data) {
                 this.polygon.data.coordinates = this._helper.copy(newPolygon.data?.coordinates ?? []);
                 this.polygon.coordinates = [...newPolygon.coordinates];
+
+                const holes: { lat: number, lng: number }[][] = [];
+
+                for (const hole of newPolygon.holes ?? []) {
+                    holes.push([...hole]);
+                }
+
+                this.polygon.holes = holes;
             }
             this.setCoordinatesText();
         });
@@ -59,27 +67,61 @@ export class CreateEditGisAreaComponent implements OnInit, OnChanges {
     }
 
     private setCoordinatesText(): void {
-        if (this.polygon?.data?.coordinates?.length) {
-            this.coordinatesText = this.polygon
-                .data
-                .coordinates
-                .map(c => `${c.longitude}, ${c.latitude}`)
-                .join('\n');
-        } else {
+        const coordinates = this.polygon?.data?.coordinates;
+
+        if (!coordinates?.length) {
             this.coordinatesText = '';
+            return;
         }
+
+        const lines: string[] = [];
+        let polygonIndex = 0;
+
+        for (const coordinate of coordinates) {
+            const index = coordinate.polygonIndex ?? 0;
+
+            while (polygonIndex < index) {
+                lines.push('0, 0');
+                polygonIndex++;
+            }
+
+            lines.push(`${coordinate.longitude}, ${coordinate.latitude}`);
+        }
+
+        this.coordinatesText = lines.join('\n');
     }
 
     private getCoordinatesModel(): GisAreaCoordinate[] {
-        return this.coordinatesText.split('\n')
-            .map(coordinate => {
-                const parts = coordinate.split(',');
+        const coordinates: GisAreaCoordinate[] = [];
+        let polygonIndex = 0;
 
-                return {
-                    longitude: +(parts[0].trim()),
-                    latitude: +(parts[1].trim())
-                };
+        for (const line of this.coordinatesText.split('\n')) {
+            const parts = line.split(',');
+
+            if (parts.length < 2) {
+                continue;
+            }
+
+            const longitude = +(parts[0].trim());
+            const latitude = +(parts[1].trim());
+
+            if (isNaN(longitude) || isNaN(latitude)) {
+                continue;
+            }
+
+            if (longitude === 0 && latitude === 0) {
+                polygonIndex++;
+                continue;
+            }
+
+            coordinates.push({
+                polygonIndex: polygonIndex,
+                longitude: longitude,
+                latitude: latitude
             });
+        }
+
+        return coordinates;
     }
 
     public async save(form: NgForm): Promise<void> {

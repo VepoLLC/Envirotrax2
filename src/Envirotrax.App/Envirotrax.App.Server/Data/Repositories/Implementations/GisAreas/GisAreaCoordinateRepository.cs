@@ -19,6 +19,8 @@ public class GisAreaCoordinateRepository : Repository<GisAreaCoordinate, long>, 
         return await DbContext.GisAreaCoordinates
             .AsNoTracking()
             .Where(c => c.AreaId == areaId)
+            .OrderBy(c => c.PolygonIndex)
+            .ThenBy(c => c.Id)
             .ToListAsync(cancellationToken);
     }
 
@@ -27,6 +29,9 @@ public class GisAreaCoordinateRepository : Repository<GisAreaCoordinate, long>, 
         return await DbContext.GisAreaCoordinates
             .AsNoTracking()
             .Where(c => c.WaterSupplierId == waterSupplierId)
+            .OrderBy(c => c.AreaId)
+            .ThenBy(c => c.PolygonIndex)
+            .ThenBy(c => c.Id)
             .ToListAsync(cancellationToken);
     }
 

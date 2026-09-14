@@ -214,8 +214,16 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
                 continue;
             }
 
+            const paths: { lat: number; lng: number }[][] = [polygon.coordinates];
+
+            if (polygon.holes) {
+                for (const hole of polygon.holes) {
+                    paths.push(hole);
+                }
+            }
+
             const instance = new Polygon({
-                paths: polygon.coordinates,
+                paths: paths,
                 strokeColor: polygon.color,
                 strokeOpacity: 0.8,
                 strokeWeight: 1,
@@ -238,10 +246,16 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
             }
 
             if (polygon.onEdit) {
-                const path = instance.getPath();
-                if (path) {
-                    path.addListener("set_at", () => this._ngZone.run(() => this.onPolygonEdit(polygon, instance)));
-                    path.addListener("insert_at", () => this._ngZone.run(() => this.onPolygonEdit(polygon, instance)));
+                const paths = instance.getPaths();
+
+                if (paths) {
+                    for (let pathIndex = 0; pathIndex < paths.getLength(); pathIndex++) {
+                        const path = paths.getAt(pathIndex);
+
+                        path.addListener("set_at", () => this._ngZone.run(() => this.onPolygonEdit(polygon, instance)));
+                        path.addListener("insert_at", () => this._ngZone.run(() => this.onPolygonEdit(polygon, instance)));
+                        path.addListener("remove_at", () => this._ngZone.run(() => this.onPolygonEdit(polygon, instance)));
+                    }
                 }
             }
         }
@@ -387,19 +401,27 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
     }
 
     private onPolygonEdit(polygonVm: MapPolygon<any>, polygonInstance: any): void {
-        const coordinates: { lat: number; lng: number }[] = [];
-        const vertices = polygonInstance.getPath();
+        const paths = polygonInstance.getPaths();
+        const rings: { lat: number; lng: number }[][] = [];
 
-        for (let i = 0; i < vertices.getLength(); i++) {
-            const xy = vertices.getAt(i);
+        for (let pathIndex = 0; pathIndex < paths.getLength(); pathIndex++) {
+            const vertices = paths.getAt(pathIndex);
+            const ring: { lat: number; lng: number }[] = [];
 
-            coordinates.push({
-                lat: xy.lat(),
-                lng: xy.lng()
-            });
+            for (let i = 0; i < vertices.getLength(); i++) {
+                const xy = vertices.getAt(i);
+
+                ring.push({
+                    lat: xy.lat(),
+                    lng: xy.lng()
+                });
+            }
+
+            rings.push(ring);
         }
 
-        polygonVm.coordinates = coordinates;
+        polygonVm.coordinates = rings.length ? rings[0] : [];
+        polygonVm.holes = rings.slice(1);
 
         if (polygonVm.onEdit) {
             polygonVm.onEdit(polygonVm);
@@ -420,6 +442,7 @@ export interface MapPolygon<TData extends any> {
     name?: string;
     color: string;
     coordinates: { lat: number; lng: number }[];
+    holes?: { lat: number; lng: number }[][];
     onClick?: (polygon: MapPolygon<TData>) => void;
     onEdit?: (polygon: MapPolygon<TData>) => void;
     onDrawComplete?: (polygon: MapPolygon<TData>) => void;

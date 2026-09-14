@@ -13,6 +13,8 @@ public class GisAreaCoordinate : TenantModel<WaterSupplier>
     public int AreaId { get; set; }
     public GisArea? Area { get; set; }
 
+    public int PolygonIndex { get; set; }
+
     public double Latitude { get; set; }
     public double Longitude { get; set; }
 }

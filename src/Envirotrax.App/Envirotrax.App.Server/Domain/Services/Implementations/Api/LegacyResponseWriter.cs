@@ -66,18 +66,22 @@ public class LegacyResponseWriter : ILegacyResponseWriter
     {
         var criteria = new XElement("SelectCriteria");
 
-        // V1 lists the forced supplier restriction first, and omits it for an open account.
+        // V1 lists the forced supplier restriction first, and omits it for an open account. The id
+        // reported here is the account supplier's V1 id, matching what V1 echoed: the internal V2
+        // key that the query actually filters on is never written to the wire.
+        var legacyWaterSupplierId = scope.LegacyWaterSupplierId?.ToString(CultureInfo.InvariantCulture) ?? string.Empty;
+
         if (scope.Kind == ApiSupplierScopeKind.Master)
         {
             criteria.Add(new XElement(
                 "MasterWaterSupplierID",
-                "MasterWaterSupplierID = " + scope.WaterSupplierId.ToString(CultureInfo.InvariantCulture)));
+                "MasterWaterSupplierID = " + legacyWaterSupplierId));
         }
         else if (scope.Kind == ApiSupplierScopeKind.Single)
         {
             criteria.Add(new XElement(
                 "WaterSupplierID",
-                "WaterSupplierID = " + scope.WaterSupplierId.ToString(CultureInfo.InvariantCulture)));
+                "WaterSupplierID = " + legacyWaterSupplierId));
         }
 
         foreach (var criterion in result.AppliedCriteria)

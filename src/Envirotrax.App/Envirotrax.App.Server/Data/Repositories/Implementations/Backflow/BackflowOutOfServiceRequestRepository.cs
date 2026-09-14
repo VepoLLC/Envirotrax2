@@ -143,6 +143,11 @@ public class BackflowOutOfServiceRequestRepository : Repository<BackflowOutOfSer
         return true;
     }
 
+    public Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken)
+    {
+        return Entity.CountAsync(r => r.Test!.SiteId == siteId, cancellationToken);
+    }
+
     private static bool SerialNumbersMatch(string? first, string? second)
     {
         var a = NormalizeSerialNumber(first);

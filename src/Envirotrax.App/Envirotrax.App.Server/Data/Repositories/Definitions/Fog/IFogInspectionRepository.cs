@@ -15,4 +15,6 @@ public interface IFogInspectionRepository : IRepository<FogInspection>
         string? newExteriorImagePath,
         string? newInteriorImagePath,
         string? newSignatureImagePath);
+
+    Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken);
 }

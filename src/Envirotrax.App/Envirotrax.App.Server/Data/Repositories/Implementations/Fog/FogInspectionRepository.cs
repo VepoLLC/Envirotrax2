@@ -188,4 +188,9 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
 
         return result;
     }
+
+    public Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken)
+    {
+        return Entity.CountAsync(f => f.SiteId == siteId, cancellationToken);
+    }
 }

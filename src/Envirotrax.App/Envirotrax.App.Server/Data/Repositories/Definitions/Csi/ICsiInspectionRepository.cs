@@ -11,4 +11,5 @@ public interface ICsiInspectionRepository : IRepository<CsiInspection>
     Task<UpdateResult<CsiInspection>> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken);
     Task<UpdateResult<CsiInspection>> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request);
     Task<UpdateResult<CsiInspection>> UpdateForProfessionalAsync(CsiInspection model, int professionalId);
+    Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken);
 }

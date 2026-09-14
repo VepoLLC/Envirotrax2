@@ -44,4 +44,6 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
         string? newBypassAssemblyImagePath,
         string? newBypassSerialNumberImagePath,
         string? newAirGapImagePath);
+
+    Task<int> CountCurrentInServiceBySiteAsync(int siteId, CancellationToken cancellationToken);
 }

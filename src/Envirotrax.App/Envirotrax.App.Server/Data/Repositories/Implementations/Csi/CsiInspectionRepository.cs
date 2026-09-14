@@ -259,6 +259,11 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         return result;
     }
 
+    public Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken)
+    {
+        return Entity.CountAsync(c => c.SiteId == siteId, cancellationToken);
+    }
+
     private static async Task<IQueryable<CsiInspection>> ApplyLatestOnlyFilterAsync(IQueryable<CsiInspection> query, bool latestOnly, CancellationToken cancellationToken)
     {
         if (!latestOnly)

@@ -580,7 +580,7 @@ export class App implements OnInit {
           {
             title: 'Submit Backflow Test',
             iconCss: 'fa-regular fa-file-plus',
-            routerLink: ['professionals/backflow/submit'],
+            routerLink: ['professionals/backflow/tests/submit'],
             hasPermission: isBackflowTester,
             hasFeature: true
           }

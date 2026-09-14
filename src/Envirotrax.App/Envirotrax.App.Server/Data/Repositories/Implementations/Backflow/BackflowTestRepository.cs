@@ -916,6 +916,11 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return result;
     }
 
+    public Task<int> CountCurrentInServiceBySiteAsync(int siteId, CancellationToken cancellationToken)
+    {
+        return Entity.CountAsync(t => t.SiteId == siteId && t.IsCurrent && !t.OutOfService, cancellationToken);
+    }
+
     private async Task<int?> FindPreviousTestIdAsync(BackflowTest fromTest)
     {
         if (string.IsNullOrWhiteSpace(fromTest.SerialNumber))

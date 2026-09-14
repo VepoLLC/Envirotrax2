@@ -34,4 +34,9 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
     Task<BackflowTest?> UpdateDisapprovalAsync(int id, bool disapproved, int updatedById, CancellationToken cancellationToken);
     Task<BackflowTest?> UpdateForceRenewalAsync(int id, bool forceRenewal, int forceRenewalYears, int updatedById, CancellationToken cancellationToken);
     Task<BackflowTest?> UpdateRejectionAsync(int id, bool rejected, string? rejectedReason, int updatedById, CancellationToken cancellationToken);
+
+    Task<IEnumerable<BackflowTest>> GetReplacementsAsync(PageInfo pageInfo, Query query, bool onHold, CancellationToken cancellationToken);
+    Task<BackflowTest?> GetReplacedAssemblyAsync(int id, CancellationToken cancellationToken);
+    Task<BackflowTest?> UpdateReplacementHoldAsync(int id, bool onHold);
+    Task<BackflowTest?> UpdateReplacementClearedAsync(int id, bool cleared);
 }

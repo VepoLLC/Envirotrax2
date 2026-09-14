@@ -74,7 +74,7 @@ jobs:
       - name: Deploy files to IIS site
         shell: powershell
         run: |
-          robocopy "${{ env.ARTIFACT_PATH }}" "${{ env.IIS_SITE_PATH }}" /MIR /NP /NFL /NDL /XF app_offline.htm
+          robocopy "${{ env.ARTIFACT_PATH }}" "${{ env.IIS_SITE_PATH }}" /MIR /NP /NFL /NDL /XF app_offline.htm /XD "${{ env.IIS_SITE_PATH }}\umbraco" "${{ env.IIS_SITE_PATH }}\wwwroot\media"
           if ($LASTEXITCODE -ge 8) { exit $LASTEXITCODE }
           exit 0
 

@@ -214,20 +214,11 @@ public class SiteRepository : Repository<Site>, ISiteRepository
                 .SetProperty(s => s.FogAccountAssignmentDate, assignmentDate));
     }
 
-    // Loads the non-deleted Site TRACKED (unlike GetAsync/GetNoIncludesAsync, which use AsNoTracking) so the
-    // caller can mutate approved fields and persist via SaveChangesAsync. Loaded via the query, not Attach/
-    // Entry, to preserve the row's real WaterSupplierId under AdminDbContext.
-    public Task<Site?> GetTrackedForUpdateAsync(int siteId, CancellationToken cancellationToken)
+    // Excludes soft-deleted rows on top of the base GetTrackedForUpdateAsync. Loaded via the query, not
+    // Attach/Entry, to preserve the row's real WaterSupplierId under AdminDbContext.
+    public override Task<Site?> GetTrackedForUpdateAsync(int siteId, CancellationToken cancellationToken)
     {
         return Entity.SingleOrDefaultAsync(s => s.Id == siteId && s.DeletedTime == null, cancellationToken);
-    }
-
-    // Commits the request-scoped DbContext via EF SaveChanges (the same mechanism every base repository
-    // method uses). The admin update loads only the single tracked Site, so nothing else is pending; audit
-    // (UpdatedById/UpdatedTime) is stamped by the base context from Vp-User-Id.
-    public Task SaveChangesAsync(CancellationToken cancellationToken)
-    {
-        return DbContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task ClearNeedsRenewalCheckAsync(int siteId)

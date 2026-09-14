@@ -160,6 +160,16 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
             .SingleOrDefaultAsync(m => EF.Property<TKey>(m, _primaryKeyName)!.Equals(id), cancellationToken);
     }
 
+    public virtual async Task<TModel?> GetTrackedForUpdateAsync(TKey id, CancellationToken cancellationToken)
+    {
+        return await Entity.SingleOrDefaultAsync(m => EF.Property<TKey>(m, _primaryKeyName)!.Equals(id), cancellationToken);
+    }
+
+    public virtual Task SaveChangesAsync()
+    {
+        return DbContext.SaveChangesAsync();
+    }
+
     public virtual async Task<TModel> AddAsync(TModel model)
     {
         Entity.Add(model);

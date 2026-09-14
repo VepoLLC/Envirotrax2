@@ -102,8 +102,7 @@ export class CheckoutCsiComponent implements OnInit {
             this.isLoading = true;
 
             const filter: QueryProperty[] = [
-                { columnName: 'transactionId', isValueNull: true },
-                { columnName: 'amount', comparisonOperator: 'Gt', value: '0' }
+                { columnName: 'transactionId', isValueNull: true }
             ];
 
             if (this.reportFor !== '') {

@@ -21,6 +21,18 @@ public interface IRepository<TModel, TKey>
 
     Task<TModel?> GetAsync(TKey id, CancellationToken cancellationToken);
     Task<TModel?> GetNoIncludesAsync(TKey id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Loads the entity TRACKED (unlike <see cref="GetAsync"/>/<see cref="GetNoIncludesAsync"/>, which use
+    /// AsNoTracking) so the caller can mutate a subset of fields and persist via <see cref="SaveChangesAsync"/>
+    /// without a full-entity overwrite.
+    /// </summary>
+    Task<TModel?> GetTrackedForUpdateAsync(TKey id, CancellationToken cancellationToken);
+
+    // Deliberately takes no CancellationToken: once a save is in flight, cancelling the request
+    // shouldn't be able to abort a write partway through and leave the database inconsistent.
+    Task SaveChangesAsync();
+
     Task<TModel> AddAsync(TModel model);
     Task<TModel?> UpdateAsync(TModel model);
     Task<TModel?> DeleteAsync(TKey id);

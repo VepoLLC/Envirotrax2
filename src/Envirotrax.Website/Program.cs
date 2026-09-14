@@ -16,6 +16,7 @@ await app.BootUmbracoAsync();
 app.UseUmbraco()
     .WithMiddleware(u =>
     {
+        u.AppBuilder.UseMiddleware<Envirotrax.Website.Middleware.LegacyUrlRedirectMiddleware>();
         u.UseBackOffice();
         u.UseWebsite();
     })

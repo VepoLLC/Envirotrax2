@@ -1,7 +1,8 @@
 import { Injectable } from "@angular/core";
 import { UrlResolverService } from "../helpers/url-resolver.service";
 import { QueryHelperService } from "../helpers/query-helper.service";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpContext } from "@angular/common/http";
+import { SKIP_ERROR_INTERCEPTOR } from "../http/http-error.interceptor";
 import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
@@ -34,11 +35,13 @@ export class ProfesisonalService {
         return lastValueFrom(observable);
     }
 
-    public getLoggedInProfessional(): Promise<Professional> {
+    public getLoggedInProfessional(skipErrorInterceptorForStatuses: number[] = []): Promise<Professional> {
         const url = this._urlResolver.resolveUrl('/api/professionals/my/current');
 
         if (!this._currentProfessional$) {
-            this._currentProfessional$ = this._http.get<Professional>(url).pipe(shareReplay(1));
+            this._currentProfessional$ = this._http.get<Professional>(url, {
+                context: new HttpContext().set(SKIP_ERROR_INTERCEPTOR, skipErrorInterceptorForStatuses)
+            }).pipe(shareReplay(1));
         }
 
         return lastValueFrom(this._currentProfessional$);

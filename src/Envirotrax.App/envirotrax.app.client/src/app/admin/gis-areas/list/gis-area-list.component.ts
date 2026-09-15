@@ -115,14 +115,14 @@ export class GisAreaListComponent implements OnInit {
 
             this.polygons = areas.data.map(area => {
                 const areaCoordinates = allCoordinates.filter(c => c.area?.id === area.id);
-                const rings = this._gisMapService.buildRings(areaCoordinates);
+                const rings = this._gisMapService.buildPolygonRings(areaCoordinates);
 
                 return {
                     name: area.name,
                     color: area.color || '#000000',
                     onClick: this.edit.bind(this),
-                    coordinates: rings[0] ?? [],
-                    holes: rings.slice(1),
+                    coordinates: rings.outer,
+                    holes: rings.holes,
                     data: {
                         area: area,
                         coordinates: areaCoordinates,
@@ -150,7 +150,7 @@ export class GisAreaListComponent implements OnInit {
             onDrawComplete: (newPalygon: MapPolygon<GisAreaVm>) => {
                 newPalygon.onDrawComplete = undefined;
 
-                newPalygon.data!.coordinates = this._gisMapService.buildCoordinates(newPalygon.coordinates, newPalygon.holes);
+                newPalygon.data!.coordinates = this._gisMapService.buildFlatCoordinates(newPalygon);
 
                 newPalygon.onEdit = this.createOnEditHandler();
 
@@ -183,7 +183,7 @@ export class GisAreaListComponent implements OnInit {
 
     private createOnEditHandler(): (polygon: MapPolygon<GisAreaVm>) => void {
         return (polygon) => {
-            polygon.data!.coordinates = this._gisMapService.buildCoordinates(polygon.coordinates, polygon.holes);
+            polygon.data!.coordinates = this._gisMapService.buildFlatCoordinates(polygon);
             this.polygonChanged?.emit(polygon);
         };
     }

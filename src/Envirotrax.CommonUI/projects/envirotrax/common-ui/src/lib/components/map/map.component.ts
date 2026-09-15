@@ -214,13 +214,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
                 continue;
             }
 
-            const paths: { lat: number; lng: number }[][] = [polygon.coordinates];
-
-            if (polygon.holes) {
-                for (const hole of polygon.holes) {
-                    paths.push(hole);
-                }
-            }
+            // Google Maps draws the first path as the outer edge and every path after it as a hole.
+            const paths: MapPoint[][] = [polygon.coordinates, ...(polygon.holes ?? [])];
 
             const instance = new Polygon({
                 paths: paths,
@@ -245,12 +240,14 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
                 })
             }
 
+            // Each ring is a separate editable path, so every one needs its own listeners —
+            // otherwise dragging a vertex of a hole would never reach the view model.
             if (polygon.onEdit) {
-                const paths = instance.getPaths();
+                const editablePaths = instance.getPaths();
 
-                if (paths) {
-                    for (let pathIndex = 0; pathIndex < paths.getLength(); pathIndex++) {
-                        const path = paths.getAt(pathIndex);
+                if (editablePaths) {
+                    for (let pathIndex = 0; pathIndex < editablePaths.getLength(); pathIndex++) {
+                        const path = editablePaths.getAt(pathIndex);
 
                         path.addListener("set_at", () => this._ngZone.run(() => this.onPolygonEdit(polygon, instance)));
                         path.addListener("insert_at", () => this._ngZone.run(() => this.onPolygonEdit(polygon, instance)));
@@ -400,20 +397,22 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
         }
     }
 
+    // Google Maps returns one path per ring, in the order they were passed in: the outer edge
+    // first, then the holes. Copy them back so the caller can persist the edited shape.
     private onPolygonEdit(polygonVm: MapPolygon<any>, polygonInstance: any): void {
         const paths = polygonInstance.getPaths();
-        const rings: { lat: number; lng: number }[][] = [];
+        const rings: MapPoint[][] = [];
 
         for (let pathIndex = 0; pathIndex < paths.getLength(); pathIndex++) {
             const vertices = paths.getAt(pathIndex);
-            const ring: { lat: number; lng: number }[] = [];
+            const ring: MapPoint[] = [];
 
-            for (let i = 0; i < vertices.getLength(); i++) {
-                const xy = vertices.getAt(i);
+            for (let vertexIndex = 0; vertexIndex < vertices.getLength(); vertexIndex++) {
+                const vertex = vertices.getAt(vertexIndex);
 
                 ring.push({
-                    lat: xy.lat(),
-                    lng: xy.lng()
+                    lat: vertex.lat(),
+                    lng: vertex.lng()
                 });
             }
 
@@ -438,11 +437,19 @@ interface ApiKey {
     apiKey: string;
 }
 
+export interface MapPoint {
+    lat: number;
+    lng: number;
+}
+
+// A polygon is one outer ring with any number of holes cut out of it — a doughnut shape, where
+// "coordinates" is the outer edge and each entry of "holes" is a piece removed from the middle.
+// Google Maps renders them as a single shape, so a point inside a hole falls outside the polygon.
 export interface MapPolygon<TData extends any> {
     name?: string;
     color: string;
-    coordinates: { lat: number; lng: number }[];
-    holes?: { lat: number; lng: number }[][];
+    coordinates: MapPoint[];
+    holes?: MapPoint[][];
     onClick?: (polygon: MapPolygon<TData>) => void;
     onEdit?: (polygon: MapPolygon<TData>) => void;
     onDrawComplete?: (polygon: MapPolygon<TData>) => void;

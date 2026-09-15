@@ -75,9 +75,9 @@ export class GisAreaSelectionModalComponent implements OnInit {
         return this._areas
             .map((area): MapPolygon<GisArea> | null => {
                 const areaCoordinates = this._coordinates.filter(c => c.area?.id === area.id);
-                const rings = this._gisMapService.buildRings(areaCoordinates);
+                const rings = this._gisMapService.buildPolygonRings(areaCoordinates);
 
-                if (!rings.length || !rings[0].length) {
+                if (!rings.outer.length) {
                     return null;
                 }
 
@@ -85,8 +85,8 @@ export class GisAreaSelectionModalComponent implements OnInit {
                 return {
                     name: area.name,
                     color: isSelected ? '#0d0772' : (area.color ?? '#000000'), // Highlight selected area
-                    coordinates: rings[0],
-                    holes: rings.slice(1),
+                    coordinates: rings.outer,
+                    holes: rings.holes,
                     onClick: (polygon) => this.onPolygonClick(polygon),
                     data: area
                 };

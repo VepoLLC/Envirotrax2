@@ -75,6 +75,9 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
         foreach (var group in gisCoordiantesByArea)
         {
+            // Only the outer edge decides whether the site falls into the area, exactly as V1 did
+            // (checkPointInArea in WaterSupplierGisArea.vb never looked at the inner polygons), so a
+            // site standing inside a hole still gets the area assigned.
             var gisPoints = group
                 .Where(c => c.PolygonIndex == 0)
                 .OrderBy(c => c.Id)

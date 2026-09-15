@@ -13,6 +13,16 @@ BEGIN
     ADD LegacyAssemblyRecordId INT NULL;
 END
 
+-- Where the attachment sits underneath the legacy file server root, for example
+-- site_log/17390000/17394521.pdf. SiteLogService downloads each one, uploads it to Azure Storage and
+-- only then fills in FileAttachmentPath. The file server address itself is deliberately not stored
+-- here: it is configuration and lives in Program.cs, because that server is being decommissioned too.
+IF COL_LENGTH('SiteLogs', 'LegacyFilePath') IS NULL
+BEGIN
+    ALTER TABLE SiteLogs
+    ADD LegacyFilePath NVARCHAR(500) NULL;
+END
+
 IF OBJECT_ID('MigrationSkippedSiteLogs', 'U') IS NULL
 BEGIN
     CREATE TABLE MigrationSkippedSiteLogs (

@@ -2,10 +2,12 @@ using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Fog;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Fog;
 
@@ -13,15 +15,18 @@ public class FogVehiclePermitService : Service<FogVehiclePermit, FogVehiclePermi
 {
     private readonly IFogVehiclePermitRepository _permitRepository;
     private readonly ITimeZoneHelperService _timeZoneHelper;
+    private readonly IRecordLogService _recordLogService;
 
     public FogVehiclePermitService(
         IMapper mapper,
         IFogVehiclePermitRepository repository,
-        ITimeZoneHelperService timeZoneHelper)
+        ITimeZoneHelperService timeZoneHelper,
+        IRecordLogService recordLogService)
         : base(mapper, repository)
     {
         _permitRepository = repository;
         _timeZoneHelper = timeZoneHelper;
+        _recordLogService = recordLogService;
     }
 
     public async Task<IPagedData<FogVehiclePermitSearchDto>> SearchAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
@@ -47,7 +52,19 @@ public class FogVehiclePermitService : Service<FogVehiclePermit, FogVehiclePermi
         var permit = MapToModel(dto)!;
         permit.VehicleId = vehicleId;
 
-        await _permitRepository.SetPermitAsync(permit, cancellationToken);
+        var saved = await _permitRepository.SetPermitAsync(permit, cancellationToken);
+
+        if (saved.Model != null)
+        {
+            if (saved.IsNew)
+            {
+                await _recordLogService.AddAsync(RecordLogTableNames.FogVehiclePermits, saved.Model.VehicleId, saved.Model.WaterSupplierId, RecordLogType.Add, "New vehicle permit record");
+            }
+            else if (saved.Changes.Length > 0)
+            {
+                await _recordLogService.AddAsync(RecordLogTableNames.FogVehiclePermits, saved.Model.VehicleId, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
+            }
+        }
 
         var result = await _permitRepository.GetSearchResultByVehicleIdAsync(vehicleId, cancellationToken);
 

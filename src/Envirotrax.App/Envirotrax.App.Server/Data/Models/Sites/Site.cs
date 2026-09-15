@@ -5,6 +5,8 @@ using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Envirotrax.App.Server.Data.Models.Sites;
 
@@ -13,6 +15,10 @@ public class Site : IAuditableModel<AppUser>
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }
+
+    // Original Vepo.dbo.CsiBackflowSites.ID. Populated by the legacy import; null for records
+    // created in V2.
+    public int? LegacyRecordId { get; set; }
 
     public int WaterSupplierId { get; set; }
     public WaterSupplier? WaterSupplier { get; set; }
@@ -221,4 +227,12 @@ public class Site : IAuditableModel<AppUser>
     public int? DeletedById { get; set; }
     public AppUser? DeletedBy { get; set; }
     public DateTime? DeletedTime { get; set; }
+}
+
+public class SiteConfiguration : IEntityTypeConfiguration<Site>
+{
+    public void Configure(EntityTypeBuilder<Site> builder)
+    {
+        builder.HasIndex(site => site.LegacyRecordId);
+    }
 }

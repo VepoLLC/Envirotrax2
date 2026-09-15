@@ -2,9 +2,11 @@
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
 using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 using Envirotrax.Common.Data.Services.Definitions;
 using System.Transactions;
@@ -17,19 +19,22 @@ public class WaterSupplierService : Service<WaterSupplier, WaterSupplierDto>, IW
     private readonly ITenantProvidersService _tenantProvider;
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IBackflowSettingsService _backflowSettingsService;
+    private readonly IRecordLogService _recordLogService;
 
     public WaterSupplierService(
         IMapper mapper,
         IWaterSupplierRepository repository,
         ITenantProvidersService tenantProvider,
         IGeneralSettingsService generalSettingsService,
-        IBackflowSettingsService backflowSettingsService)
+        IBackflowSettingsService backflowSettingsService,
+        IRecordLogService recordLogService)
         : base(mapper, repository)
     {
         _repository = repository;
         _tenantProvider = tenantProvider;
         _generalSettingsService = generalSettingsService;
         _backflowSettingsService = backflowSettingsService;
+        _recordLogService = recordLogService;
     }
 
     public Task<WaterSupplierDto> GetLoggedInSupplierAsync()
@@ -157,8 +162,19 @@ public class WaterSupplierService : Service<WaterSupplier, WaterSupplierDto>, IW
             LetterContactEmailAddress = dto.LetterContactEmailAddress
         };
 
-        var updated = await _repository.UpdateOwnAsync(model);
-        return MapToDto(updated);
+        var saved = await _repository.UpdateOwnAsync(model);
+
+        if (saved.Model == null)
+        {
+            return null;
+        }
+
+        if (saved.Changes.Length > 0)
+        {
+            await _recordLogService.AddAsync(RecordLogTableNames.WaterSuppliers, saved.Model.Id, saved.Model.Id, RecordLogType.Edit, saved.Changes);
+        }
+
+        return MapToDto(saved.Model);
     }
 
     public async Task<WaterSupplierDetailsDto?> UpdateDetailsAsync(int id, WaterSupplierDetailsDto details)

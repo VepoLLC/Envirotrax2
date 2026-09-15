@@ -6,11 +6,13 @@ using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Backflow;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Backflow;
@@ -23,19 +25,40 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
     private readonly IFileStorageService _fileStorageService;
     private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly IAuthService _authService;
+    private readonly IRecordLogService _recordLogService;
 
     public BackflowGaugeService(
         IMapper mapper,
         IBackflowGaugeRepository repository,
         IFileStorageService fileStorageService,
         ITimeZoneHelperService timeZoneHelper,
-        IAuthService authService)
+        IAuthService authService,
+        IRecordLogService recordLogService)
         : base(mapper, repository)
     {
         _gaugeRepository = repository;
         _fileStorageService = fileStorageService;
         _timeZoneHelper = timeZoneHelper;
         _authService = authService;
+        _recordLogService = recordLogService;
+    }
+
+    public override async Task<BackflowGaugeDto> UpdateAsync(BackflowGaugeDto dto)
+    {
+        var model = MapToModel(dto)!;
+        var saved = await _gaugeRepository.UpdateGaugeAsync(model);
+
+        if (saved.Model == null)
+        {
+            throw new InvalidOperationException($"Gauge {dto.Id} not found.");
+        }
+
+        if (saved.Changes.Length > 0)
+        {
+            await _recordLogService.AddAsync(RecordLogTableNames.BackflowGauges, saved.Model.Id, null, RecordLogType.Edit, saved.Changes, professionalId: saved.Model.ProfessionalId);
+        }
+
+        return MapToDto(saved.Model)!;
     }
 
     protected override BackflowGaugeDto? MapToDto(BackflowGauge? model)
@@ -90,5 +113,18 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         await _fileStorageService.UploadAsync(dto.FilePath, fileStream);
         scope.Complete();
         return added;
+    }
+
+    public override async Task<BackflowGaugeDto?> DeleteAsync(int id)
+    {
+        var deleted = await base.DeleteAsync(id);
+
+        if (deleted != null)
+        {
+            await _recordLogService.AddAsync(RecordLogTableNames.BackflowGauges, deleted.Id, null, RecordLogType.Delete,
+                $"Deleted gauge — Manufacturer: '{deleted.Manufacturer}', SerialNumber: '{deleted.SerialNumber}'", professionalId: deleted.Professional?.Id);
+        }
+
+        return deleted;
     }
 }

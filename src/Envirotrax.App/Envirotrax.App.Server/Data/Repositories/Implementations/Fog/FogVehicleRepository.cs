@@ -34,4 +34,31 @@ public class FogVehicleRepository : Repository<FogVehicle>, IFogVehicleRepositor
 
         return await paginated.ToListAsync(cancellationToken);
     }
+
+    public async Task<UpdateResult<FogVehicle>> UpdateVehicleAsync(FogVehicle model)
+    {
+        var result = new UpdateResult<FogVehicle>();
+
+        var vehicle = await GetTrackedForUpdateAsync(model.Id, default);
+
+        if (vehicle == null)
+        {
+            return result;
+        }
+
+        vehicle.LicensePlateNumber = model.LicensePlateNumber;
+        vehicle.Manufacturer = model.Manufacturer;
+        vehicle.ManufacturedYear = model.ManufacturedYear;
+        vehicle.Capacity = model.Capacity;
+        vehicle.CapacityType = model.CapacityType;
+        vehicle.StickerNumber = model.StickerNumber;
+
+        result.Changes = BuildChangeDescription(vehicle);
+
+        await DbContext.SaveChangesAsync();
+
+        result.Model = vehicle;
+
+        return result;
+    }
 }

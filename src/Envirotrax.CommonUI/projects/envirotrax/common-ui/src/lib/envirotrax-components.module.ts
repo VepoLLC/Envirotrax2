@@ -33,6 +33,7 @@ import { MapResultsComponent } from "./components/map/map-results.component";
 import { AppLoadingSpinnerModule } from "./components/loading-spinner/app-loading-spinner.module";
 import { InputAddOnComponent } from "./components/input/input-add-on.component";
 import { ToastContainerComponent } from "./components/toast-container/toast-container.component";
+import { RecordLogListComponent } from "./components/record-log/record-log-list.component";
 
 @NgModule({
     declarations: [
@@ -64,6 +65,7 @@ import { ToastContainerComponent } from "./components/toast-container/toast-cont
         MapComponent,
         MapResultsComponent,
         ToastContainerComponent,
+        RecordLogListComponent,
     ],
     imports: [
         CommonModule,
@@ -96,6 +98,7 @@ import { ToastContainerComponent } from "./components/toast-container/toast-cont
         MapComponent,
         MapResultsComponent,
         ToastContainerComponent,
+        RecordLogListComponent,
         ModalModule,
         AppLoadingSpinnerModule
     ]

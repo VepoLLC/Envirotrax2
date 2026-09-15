@@ -41,7 +41,7 @@ public class FogVehiclePermitRepository : Repository<FogVehiclePermit>, IFogVehi
             .AnyAsync(vehicle => vehicle.Id == vehicleId, cancellationToken);
     }
 
-    public async Task<FogVehiclePermit> SetPermitAsync(FogVehiclePermit permit, CancellationToken cancellationToken)
+    public async Task<UpdateResult<FogVehiclePermit>> SetPermitAsync(FogVehiclePermit permit, CancellationToken cancellationToken)
     {
         var existing = await Entity
             .SingleOrDefaultAsync(p => p.VehicleId == permit.VehicleId, cancellationToken);
@@ -51,16 +51,18 @@ public class FogVehiclePermitRepository : Repository<FogVehiclePermit>, IFogVehi
             Entity.Add(permit);
             await DbContext.SaveChangesAsync(cancellationToken);
 
-            return permit;
+            return new UpdateResult<FogVehiclePermit> { Model = permit, IsNew = true };
         }
 
         existing.PermitNumber = permit.PermitNumber;
         existing.InspectionDueDate = permit.InspectionDueDate;
         existing.IsActive = permit.IsActive;
 
+        var changes = BuildChangeDescription(existing);
+
         await DbContext.SaveChangesAsync(cancellationToken);
 
-        return existing;
+        return new UpdateResult<FogVehiclePermit> { Model = existing, Changes = changes };
     }
 
     private IQueryable<int> GetRegisteredTransporterIdsQuery()

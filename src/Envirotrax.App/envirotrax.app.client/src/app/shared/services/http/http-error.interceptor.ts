@@ -1,4 +1,4 @@
-import { HttpContextToken, HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from "@angular/common/http";
+import { HttpContextToken, HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpStatusCode } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable, throwError } from "rxjs";
 import { catchError } from "rxjs/operators";
@@ -6,8 +6,9 @@ import { ModalHelperService, ToastService, ToastType } from "@envirotrax/common-
 import { AuthService } from "../auth/auth.service";
 
 // Requests that already treat a particular status as expected control flow (e.g. a 404
-// meaning "no record yet") can opt out of the global handling by setting this to true.
-export const SKIP_ERROR_INTERCEPTOR = new HttpContextToken<boolean>(() => false);
+// meaning "no record yet") can list those statuses here to opt out of the global handling
+// just for them, while still getting the global handler for anything unexpected (e.g. 500).
+export const SKIP_ERROR_INTERCEPTOR = new HttpContextToken<number[]>(() => []);
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
@@ -21,7 +22,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     public intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         return next.handle(req).pipe(
             catchError((error: HttpErrorResponse) => {
-                if (!req.context.get(SKIP_ERROR_INTERCEPTOR)) {
+                if (!req.context.get(SKIP_ERROR_INTERCEPTOR).includes(error.status)) {
                     this.handleError(error);
                 }
 
@@ -44,7 +45,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 
                 break;
 
-            case 404:
+            case HttpStatusCode.NotFound:
                 this._toastService.show({
                     text: 'The requested resource could not be found.',
                     type: ToastType.Error
@@ -69,7 +70,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
                 break;
             }
 
-            case 400: {
+            case HttpStatusCode.BadRequest: {
                 const messages: string[] = [];
 
                 if (typeof error.error === 'string') {

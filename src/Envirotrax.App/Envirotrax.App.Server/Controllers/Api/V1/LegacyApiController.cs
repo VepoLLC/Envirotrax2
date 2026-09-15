@@ -14,6 +14,7 @@ namespace Envirotrax.App.Server.Controllers.Api.V1;
 /// </summary>
 [AllowAnonymous]
 [ApiController]
+[Route("api/v1")]
 public class LegacyApiController : ControllerBase
 {
     private readonly IApiAuthenticationService _apiAuthenticationService;
@@ -64,7 +65,7 @@ public class LegacyApiController : ControllerBase
         return LegacyApiErrorCode.RequestSelectCriteriaFieldInvalid;
     }
 
-    [HttpPost("/")]
+    [HttpPost("run")]
     public async Task<IActionResult> ProcessAsync(CancellationToken cancellationToken)
     {
         // V1 wraps the whole pipeline in a catch that reports the failure as error 100, so the

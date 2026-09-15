@@ -233,6 +233,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<DateTime?>("AirGapTestDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("AirGapValid")
                         .HasColumnType("bit");
 
@@ -507,6 +510,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<DateTime?>("InitialTestDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("InspectorId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("InstallationDate")
                         .HasColumnType("datetime2");
 
@@ -517,9 +523,16 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int?>("LegacyRecordId")
+                        .HasColumnType("int");
+
                     b.Property<string>("LocationDescription")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("MailingAddress")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("MailingCity")
                         .HasMaxLength(50)
@@ -823,6 +836,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("ValidationUnknownSerialNumber")
                         .HasColumnType("bit");
 
+                    b.Property<string>("WaterMeterNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.HasKey("WaterSupplierId", "Id");
 
                     b.HasIndex("BpatStateId");
@@ -830,6 +847,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("DeletedById");
+
+                    b.HasIndex("LegacyRecordId");
 
                     b.HasIndex("MailingStateId");
 
@@ -840,6 +859,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("UpdatedById");
 
                     b.HasIndex("ProfessionalId", "BpatId");
+
+                    b.HasIndex("ProfessionalId", "InspectorId");
 
                     b.HasIndex("WaterSupplierId", "ApprovedById");
 
@@ -3000,6 +3021,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<DateTime?>("LastTripTicketDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("LegacyRecordId")
+                        .HasColumnType("int");
+
                     b.Property<string>("MailingCity")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -3124,6 +3148,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("DeletedById");
+
+                    b.HasIndex("LegacyRecordId");
 
                     b.HasIndex("MailingStateId");
 
@@ -3888,6 +3914,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("LegacyRecordId")
+                        .HasColumnType("int");
+
                     b.Property<string>("LetterAddress")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -3980,6 +4009,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("DeletedById");
+
+                    b.HasIndex("LegacyRecordId");
 
                     b.HasIndex("LetterContactStateId");
 
@@ -4128,6 +4159,11 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasForeignKey("ProfessionalId", "BpatId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalUser", "Inspector")
+                        .WithMany()
+                        .HasForeignKey("ProfessionalId", "InspectorId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Envirotrax.App.Server.Data.Models.Users.WaterSupplierUser", "ApprovedBy")
                         .WithMany()
                         .HasForeignKey("WaterSupplierId", "ApprovedById")
@@ -4147,6 +4183,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("DeletedBy");
+
+                    b.Navigation("Inspector");
 
                     b.Navigation("MailingState");
 

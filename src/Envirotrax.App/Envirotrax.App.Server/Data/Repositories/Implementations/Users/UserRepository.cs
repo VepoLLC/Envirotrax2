@@ -48,4 +48,27 @@ public class UserRepository : Repository<WaterSupplierUser>, IUserRepository
 
         return await paginated.ToListAsync(cancellationToken);
     }
+
+    public async Task<UpdateResult<WaterSupplierUser>> UpdateUserAsync(WaterSupplierUser model)
+    {
+        var result = new UpdateResult<WaterSupplierUser>();
+
+        var user = await GetTrackedForUpdateAsync(model.UserId, default);
+
+        if (user == null)
+        {
+            return result;
+        }
+
+        user.ContactName = model.ContactName;
+        user.EmailAddress = model.EmailAddress;
+
+        result.Changes = BuildChangeDescription(user);
+
+        await DbContext.SaveChangesAsync();
+
+        result.Model = user;
+
+        return result;
+    }
 }

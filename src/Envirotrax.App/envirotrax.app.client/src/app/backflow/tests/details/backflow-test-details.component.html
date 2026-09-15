@@ -171,6 +171,12 @@
                 [canViewTesters]="canViewTesters" />
         </div>
 
+        <div class="row mt-3">
+            <vp-section header="Record Log">
+                <vp-record-log-list [logs]="recordLogs" [isLoading]="isLoadingRecordLogs" [recordLabel]="'backflow test'" />
+            </vp-section>
+        </div>
+
         <div class="d-flex justify-content-center mt-3">
             <button class="btn btn-primary vp-section-button" [disabled]="isLoading" (click)="exportPdf()">
                 Export Test to Printable Document

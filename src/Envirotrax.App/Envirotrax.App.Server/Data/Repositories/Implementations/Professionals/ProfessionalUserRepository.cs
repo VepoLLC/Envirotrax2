@@ -60,8 +60,10 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         entry.Property(u => u.IsWiseGuy).IsModified = isAdmin;
     }
 
-    public async Task<ProfessionalUser?> UpdateNonSensitiveDataAsync(ProfessionalUser user)
+    public async Task<UpdateResult<ProfessionalUser>> UpdateNonSensitiveDataAsync(ProfessionalUser user)
     {
+        var result = new UpdateResult<ProfessionalUser>();
+
         user.ProfessionalId = _authService.ProfessionalId;
         var existing = await DbContext.ProfessionalUsers.SingleOrDefaultAsync(u => u.ProfessionalId == user.ProfessionalId && u.UserId == user.UserId);
 
@@ -70,14 +72,20 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
             existing.ContactName = user.ContactName;
             existing.JobTitle = user.JobTitle;
 
+            result.Changes = BuildChangeDescription(existing);
+
             await DbContext.SaveChangesAsync();
+
+            result.Model = existing;
         }
 
-        return existing;
+        return result;
     }
 
-    public async Task<ProfessionalUser?> UpdateSignaturePathAsync(int userId, string signaturePath)
+    public async Task<UpdateResult<ProfessionalUser>> UpdateSignaturePathAsync(int userId, string signaturePath)
     {
+        var result = new UpdateResult<ProfessionalUser>();
+
         var professionalId = _authService.ProfessionalId;
         var existing = await DbContext.ProfessionalUsers.SingleOrDefaultAsync(u => u.ProfessionalId == professionalId && u.UserId == userId);
 
@@ -85,14 +93,20 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         {
             existing.SignaturePath = signaturePath;
 
+            result.Changes = BuildChangeDescription(existing);
+
             await DbContext.SaveChangesAsync();
+
+            result.Model = existing;
         }
 
-        return existing;
+        return result;
     }
 
-    public async Task<ProfessionalUser?> UpdateSubAccountAsync(int professionalId, int userId, string? contactName, string? jobTitle)
+    public async Task<UpdateResult<ProfessionalUser>> UpdateSubAccountAsync(int professionalId, int userId, string? contactName, string? jobTitle)
     {
+        var result = new UpdateResult<ProfessionalUser>();
+
         var existing = await DbContext.ProfessionalUsers
             .SingleOrDefaultAsync(u => u.ProfessionalId == professionalId && u.UserId == userId);
 
@@ -100,10 +114,15 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         {
             existing.ContactName = contactName;
             existing.JobTitle = jobTitle;
+
+            result.Changes = BuildChangeDescription(existing);
+
             await DbContext.SaveChangesAsync();
+
+            result.Model = existing;
         }
 
-        return existing;
+        return result;
     }
 
     public async Task<IEnumerable<ProfessionalUser>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null)
@@ -124,25 +143,27 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         return await paginated.ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<ProfessionalUser>> SearchCsiInspectorsAsync(PageInfo pageInfo, Query query, string? licenseNumber, string? insuranceNumber, CancellationToken cancellationToken)
+    public async Task<IEnumerable<ProfessionalUser>> SearchAccountsAsync(PageInfo pageInfo, Query query, string? licenseNumber, string? insuranceNumber, Expression<Func<ProfessionalUserLicense, bool>> licenseFilter, Expression<Func<ProfessionalUser, bool>> roleFilter, CancellationToken cancellationToken)
     {
         var dbQuery = DbContext.ProfessionalUsers
             .AsNoTracking()
             .Include(proUser => proUser.User)
             .Include(proUser => proUser.Professional)
                 .ThenInclude(professional => professional!.State)
-            .Where(proUser => proUser.IsCsiInspector)
+            .Where(roleFilter)
             .Where(query.Filter);
 
         if (!string.IsNullOrWhiteSpace(licenseNumber))
         {
             string license = licenseNumber;
 
-            dbQuery = dbQuery.Where(proUser => DbContext.ProfessionalUserLicenses.Any(l =>
+            var licenses = DbContext.ProfessionalUserLicenses
+                .Where(licenseFilter)
+                .Where(l => l.LicenseNumber.Contains(license));
+
+            dbQuery = dbQuery.Where(proUser => licenses.Any(l =>
                 l.ProfessionalId == proUser.ProfessionalId &&
-                l.UserId == proUser.UserId &&
-                l.ProfessionalType == ProfessionalType.CsiInspector &&
-                l.LicenseNumber.Contains(license)));
+                l.UserId == proUser.UserId));
         }
 
         if (!string.IsNullOrWhiteSpace(insuranceNumber))

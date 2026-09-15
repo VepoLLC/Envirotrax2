@@ -11,5 +11,5 @@ public interface IFogVehiclePermitRepository : IRepository<FogVehiclePermit>
 
     Task<bool> HasVehicleInScopeAsync(int vehicleId, CancellationToken cancellationToken);
 
-    Task<FogVehiclePermit> SetPermitAsync(FogVehiclePermit permit, CancellationToken cancellationToken);
+    Task<UpdateResult<FogVehiclePermit>> SetPermitAsync(FogVehiclePermit permit, CancellationToken cancellationToken);
 }

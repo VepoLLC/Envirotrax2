@@ -33,7 +33,7 @@ public class ApiSupplierScopeService : IApiSupplierScopeService
         // is itself a child, so the account is scoped to that supplier alone.
         if (supplier.ParentId != null && supplier.ParentId != 0)
         {
-            return ApiSupplierScope.Single(account.WaterSupplierId);
+            return ApiSupplierScope.Single(account.WaterSupplierId, supplier.LegacyRecordId);
         }
 
         var childWaterSupplierIds = await _waterSupplierRepository.GetChildSupplierIdsAsync(account.WaterSupplierId, cancellationToken);
@@ -42,9 +42,9 @@ public class ApiSupplierScopeService : IApiSupplierScopeService
         // V1 promotes a top-level supplier to master only when it actually has children.
         if (childIds.Count > 0)
         {
-            return ApiSupplierScope.Master(account.WaterSupplierId, childIds);
+            return ApiSupplierScope.Master(account.WaterSupplierId, supplier.LegacyRecordId, childIds);
         }
 
-        return ApiSupplierScope.Single(account.WaterSupplierId);
+        return ApiSupplierScope.Single(account.WaterSupplierId, supplier.LegacyRecordId);
     }
 }

@@ -9,7 +9,7 @@ import { NgForm } from "@angular/forms";
 import { ProfessionalUser } from "../../shared/models/professionals/professional-user";
 import { AuthService } from "../../shared/services/auth/auth.service";
 import { ProfesionalUserService } from "../../shared/services/professionals/professional-user.service";
-import { HttpErrorResponse } from "@angular/common/http";
+import { HttpErrorResponse, HttpStatusCode } from "@angular/common/http";
 import { ROLE_DEFINITIONS } from "../../shared/models/role-definitions";
 import { ToastService, InputOption } from '@envirotrax/common-ui';
 
@@ -66,7 +66,7 @@ export class CompanyComponent implements OnInit {
 
     private async getLoggedInProfessional(): Promise<Professional> {
         try {
-            return await this._professionalService.getLoggedInProfessional();
+            return await this._professionalService.getLoggedInProfessional([HttpStatusCode.NotFound]);
         } catch (e) {
             if (this._helper.isNotFoundError(e)) {
                 return {};
@@ -78,7 +78,7 @@ export class CompanyComponent implements OnInit {
 
     private async getMyData(): Promise<ProfessionalUser> {
         try {
-            return await this._professionalUserService.getMyData();
+            return await this._professionalUserService.getMyData([HttpStatusCode.NotFound]);
         } catch (e) {
             if (this._helper.isNotFoundError(e)) {
                 return {

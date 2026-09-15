@@ -61,4 +61,12 @@ public class SiteController : AdminBaseController
 
         return Ok();
     }
+
+    [HttpGet("{id}/logs")]
+    public async Task<IActionResult> GetLogsAsync(int id, CancellationToken cancellationToken)
+    {
+        var logs = await _siteService.GetLogsAsync(id, cancellationToken);
+
+        return Ok(logs);
+    }
 }

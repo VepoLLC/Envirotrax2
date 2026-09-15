@@ -283,6 +283,14 @@
         </div>
 
         <div class="row mt-3">
+            <vp-section header="Record Log">
+                <vp-record-log-list [logs]="recordLogs" [isLoading]="isLoadingRecordLogs" [recordLabel]="'inspection'" />
+            </vp-section>
+        </div>
+
+        
+
+        <div class="row mt-3">
             <div class="col-12 text-center text-muted">
                 A Customer Service Inspection Certificate should be on file for each connection in a public water system
                 to document compliance with 30 TAC §290.44(h)/290.46(j).

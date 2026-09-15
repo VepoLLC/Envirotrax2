@@ -75,7 +75,7 @@ function suppressLoadingSpinner() {
     loadingSpinnerSuppressedUntil = Date.now() + 2000;
 }
 
-function keepsCurrentPage(link) {
+function opensOutsideCurrentPage(link) {
     if (link.hasAttribute('download')) {
         return true;
     }
@@ -84,11 +84,15 @@ function keepsCurrentPage(link) {
         return true;
     }
 
+    return link.protocol !== 'http:' && link.protocol !== 'https:' && link.protocol !== 'javascript:';
+}
+
+function navigatesAwayOnClick(link) {
     if (link.protocol !== 'http:' && link.protocol !== 'https:') {
-        return true;
+        return false;
     }
 
-    return !!link.hash && link.href.split('#')[0] === location.href.split('#')[0];
+    return !link.hash || link.href.split('#')[0] !== location.href.split('#')[0];
 }
 
 document.addEventListener('click', function (event) {
@@ -102,9 +106,13 @@ document.addEventListener('click', function (event) {
         return;
     }
 
-    if (keepsCurrentPage(link)) {
+    if (opensOutsideCurrentPage(link)) {
         suppressLoadingSpinner();
 
+        return;
+    }
+
+    if (!navigatesAwayOnClick(link)) {
         return;
     }
 

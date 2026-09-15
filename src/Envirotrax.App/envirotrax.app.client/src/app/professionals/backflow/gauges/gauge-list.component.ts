@@ -86,14 +86,14 @@ export class GaugeListComponent implements OnInit {
                 type: ColumnType.text
             },
             {
-                field: 'isPortable',
-                caption: 'Type',
-                cellTemplate: this.typeCellTemplate,
+                field: 'serialNumber',
+                caption: 'Serial number',
                 type: ColumnType.text
             },
             {
-                field: 'serialNumber',
-                caption: 'Serial number',
+                field: 'isPortable',
+                caption: 'Type',
+                cellTemplate: this.typeCellTemplate,
                 type: ColumnType.text
             },
             {

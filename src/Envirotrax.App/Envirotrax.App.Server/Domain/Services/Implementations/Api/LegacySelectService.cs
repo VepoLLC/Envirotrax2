@@ -220,7 +220,7 @@ public class LegacySelectService : ILegacySelectService
         }
 
         var parameter = Expression.Parameter(typeof(TEntity), "entity");
-        var member = BuildMemberAccess(parameter, descriptor.Source, descriptor.PropertyPath, siteNavigation);
+        var member = BuildFieldAccess(parameter, descriptor, siteNavigation);
         var selector = Expression.Lambda(member, parameter);
 
         var method = descending ? nameof(Queryable.OrderByDescending) : nameof(Queryable.OrderBy);
@@ -245,7 +245,7 @@ public class LegacySelectService : ILegacySelectService
 
         var items = fields
             .Select(field => (Expression)Expression.Convert(
-                BuildMemberAccess(parameter, field.Source, field.PropertyPath, siteNavigation),
+                BuildFieldAccess(parameter, field, siteNavigation),
                 typeof(object)))
             .ToList();
 
@@ -306,6 +306,26 @@ public class LegacySelectService : ILegacySelectService
         }
 
         return "=";
+    }
+
+    /// <summary>
+    /// Resolves a field descriptor to its value expression: the PropertyPath, then the descriptor's
+    /// transform when it has one. The transform is composed into the same expression tree, so a
+    /// derived field is translated by EF exactly like a plain column.
+    /// </summary>
+    private static Expression BuildFieldAccess(
+        ParameterExpression parameter,
+        LegacyFieldDescriptor field,
+        string? siteNavigation)
+    {
+        var member = BuildMemberAccess(parameter, field.Source, field.PropertyPath, siteNavigation);
+
+        if (field.ValueTransform == null)
+        {
+            return member;
+        }
+
+        return field.ValueTransform(member);
     }
 
     private static Expression BuildMemberAccess(

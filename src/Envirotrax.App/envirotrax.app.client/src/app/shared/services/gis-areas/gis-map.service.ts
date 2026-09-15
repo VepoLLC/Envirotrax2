@@ -3,7 +3,10 @@ import { DomSanitizer } from "@angular/platform-browser";
 import { GisArea, GisAreaCoordinate } from "../../models/gis-areas/gis-area";
 import { MapPoint, MapPolygon } from "@envirotrax/common-ui";
 
-// The database keeps one flat, ordered list of vertices per area, with polygonIndex saying which
+// The database keeps one flat, ordered list of vertices per area, with polygonIndex indicating which
+// part of the shape each vertex belongs to: 0 is the outer edge, 1 and up are holes cut out of it.
+// The map works with the nested shape directly, so on the client that flat list is regrouped into an
+// outer edge plus its holes.
 export interface PolygonRings {
     outer: MapPoint[];
     holes: MapPoint[][];

@@ -245,7 +245,7 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
             if (dateParam) {
                 this.applyDateFilter(dateParam);
                 await this.getTests();
-                this.setShowResults((this.table.items?.pageInfo?.totalItems ?? 0) > 0);
+                this.setShowResults(true);
                 return;
             }
 

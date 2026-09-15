@@ -1,0 +1,59 @@
+@page
+@model LoginWith2faAuthenticatorModel
+@{
+    ViewData["Title"] = "Two-factor authentication";
+}
+
+<section id="divPageTitle" class="container-lg page-title">
+    <div class="text-center">
+        <h1 class="h2">Account Login</h1>
+    </div>
+</section>
+
+<section id="sectionLoginWith2faAuthenticator" class="card shadow-sm">
+    <div class="card-header border-bottom-0 text-center text-white bg-info fw-semibold fs-5 rounded-top">
+        <h2 class="h5 mb-0">Verify With Authenticator App</h2>
+    </div>
+    <div class="card-body border border-info rounded-bottom">
+        <div class="w-100 text-center mb-4">
+            Your login is protected with an authenticator app. Enter your authenticator code below.
+        </div>
+
+        <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
+            <input asp-for="RememberMe" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="text-danger text-center mb-3" role="alert"></div>
+
+            <div class="row justify-content-center">
+                <div class="col-sm-12 col-md-6 col-lg-5 col-xl-4">
+                    <div class="mb-3">
+                        <label asp-for="Input.TwoFactorCode" class="form-label fw-bold"></label>
+                        <input asp-for="Input.TwoFactorCode" class="form-control" autocomplete="off" />
+                        <span asp-validation-for="Input.TwoFactorCode" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input asp-for="Input.RememberMachine" class="form-check-input" />
+                        <label asp-for="Input.RememberMachine" class="form-check-label"></label>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <button type="submit" class="btn btn-primary px-5">
+                            <i class="fa-solid fa-right-to-bracket me-2"></i>
+                            LOG IN
+                        </button>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <a asp-page="./LoginWith2fa" asp-route-returnUrl="@Model.ReturnUrl">
+                            Choose a different verification method
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

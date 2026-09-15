@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { ModalReference } from "@developer-partners/ngx-modal-dialog";
-import { ColumnType, PagedData, TableColumn, TableViewModel } from "@envirotrax/common-ui";
+import { ColumnType, TableColumn, TableViewModel } from "@envirotrax/common-ui";
 import { WaterSupplier } from "../../models/water-suppliers/water-supplier";
 import { WaterSupplierService } from "../../services/water-suppliers/water-supplier.service";
 import { SharedComponentsModule } from "../shared.components.module";
@@ -28,14 +28,15 @@ export class WaterSupplierLookupComponent implements OnInit {
 
     constructor(
         private readonly _waterSupplierService: WaterSupplierService,
-        private readonly _modalReference: ModalReference<PagedData<WaterSupplier>, WaterSupplier>
+        private readonly _modalReference: ModalReference<WaterSupplier>
     ) {
 
     }
 
-    public ngOnInit(): void {
+    public async ngOnInit(): Promise<void> {
         this.table.columns = this.getColumns();
-        this.table.items = this._modalReference.config.model;
+
+        await this.getSuppliers();
     }
 
     public async getSuppliers(): Promise<void> {

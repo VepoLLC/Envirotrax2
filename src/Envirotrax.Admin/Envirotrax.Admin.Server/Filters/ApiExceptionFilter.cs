@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Envirotrax.Common.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -21,23 +20,6 @@ public class ApiExceptionFilter : IExceptionFilter
 
             case DuplicateRecordException duplicateRecordException:
                 context.Result = new BadRequestObjectResult(duplicateRecordException.Message);
-                context.ExceptionHandled = true;
-
-                break;
-
-            default:
-
-                var traceId = Activity.Current?.Id ?? context.HttpContext.TraceIdentifier;
-
-                context.Result = new ObjectResult(new
-                {
-                    message = "An unexpected error occurred. Please contact support and include this reference ID.",
-                    traceId
-                })
-                {
-                    StatusCode = StatusCodes.Status500InternalServerError
-                };
-
                 context.ExceptionHandled = true;
 
                 break;

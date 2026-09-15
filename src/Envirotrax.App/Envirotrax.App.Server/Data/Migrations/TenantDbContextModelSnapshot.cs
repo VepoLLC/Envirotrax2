@@ -22,6 +22,25 @@ namespace Envirotrax.App.Server.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Backflow.BackflowComplianceSnapshot", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ReportDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("Compliant")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Total")
+                        .HasColumnType("int");
+
+                    b.HasKey("WaterSupplierId", "ReportDate");
+
+                    b.ToTable("BackflowComplianceSnapshots");
+                });
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Backflow.BackflowGauge", b =>
                 {
                     b.Property<int>("Id")
@@ -2940,6 +2959,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<string>("NormalizedEmail")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("AspNetUsers", t =>
@@ -3065,10 +3087,6 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
-
-                    b.Property<string>("CellNumber")
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
 
                     b.Property<string>("ContactName")
                         .IsRequired()
@@ -3700,6 +3718,17 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("UpdatedById");
 
                     b.ToTable("WaterSuppliers");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Backflow.BackflowComplianceSnapshot", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("WaterSupplier");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Backflow.BackflowGauge", b =>

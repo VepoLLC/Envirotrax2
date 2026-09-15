@@ -15,10 +15,9 @@ import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
 import { FacilityType } from "../../../shared/enums/facility-type.enum";
 import { PropertyType } from "../../../shared/enums/property-type.enum";
+import { complianceOverdueSeverityClasses } from "../../../shared/enums/compliance-overdue-severity.enum";
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 import { PropertyLogCellComponent } from "../../../shared/components/data-components/table-cells/property-log-cell.component";
-
-const DAY_MS = 86400000;
 
 interface OverdueBucket {
     amount: number;
@@ -48,8 +47,6 @@ const OVERDUE_BUCKETS: { [index: number]: OverdueBucket } = {
 // A grid row: a site with an overdue FOG inspection, decorated with presentation-only fields.
 type SiteRow = Site & {
     rowNumber?: number;
-    daysOverdue?: number;
-    overdueClass?: string;
     assignedName?: string;
     canModify?: boolean;   // surfaced to the shared property-log cell
 };
@@ -85,6 +82,7 @@ export class FogInspectionComplianceManagementComponent implements OnInit {
     private _printableSection!: ElementRef;
 
     public readonly PropertyType = PropertyType;
+    public readonly severityClasses = complianceOverdueSeverityClasses;
 
     public canModify: boolean = false;
     public daysOverdueLabel: string = 'All overdue';
@@ -143,7 +141,6 @@ export class FogInspectionComplianceManagementComponent implements OnInit {
     public downloadConfig: DownloadConfig;
 
     private panelFilters: QueryProperty[] = [];
-    private readonly today: number = new Date().setHours(0, 0, 0, 0);
 
     constructor(
         private readonly _siteService: SiteService,
@@ -392,44 +389,12 @@ export class FogInspectionComplianceManagementComponent implements OnInit {
         };
     }
 
+    // daysOverdue and overdueSeverity arrive already computed on the DTO — the server measures them against
+    // the caller's local time zone, so there is no date arithmetic here.
     private decorate(site: Site): void {
         const row = site as SiteRow;
-        row.daysOverdue = this.getDaysOverdue(site);
-        row.overdueClass = row.daysOverdue != null ? this.overdueBadgeClass(row.daysOverdue) : '';
         row.assignedName = this.assignedUserName(site);
         row.canModify = this.canModify;
-    }
-
-    // Deliberate deviation from the "compute date-based status on the backend" convention: both sibling
-    // compliance pages (CSI, Backflow) derive their overdue count and badge class client-side in decorate(),
-    // and three near-identical grids disagreeing would be worse than one shared deviation. Moving this to a
-    // DTO enum + int is a cross-page change to make on all three at once (and would also make DaysOverdue
-    // exportable — see buildDownloadColumns). Computed once per load, never from the template.
-    private getDaysOverdue(site: Site): number | undefined {
-        if (!site.fogInspectionExpirationDate) {
-            return undefined;
-        }
-
-        const expiration = new Date(site.fogInspectionExpirationDate).setHours(0, 0, 0, 0);
-        const days = Math.floor((this.today - expiration) / DAY_MS);
-
-        return days < 0 ? undefined : days;
-    }
-
-    private overdueBadgeClass(days: number): string {
-        if (days > 90) {
-            return 'bg-danger';
-        }
-
-        if (days >= 30) {
-            return 'bg-warning text-dark';
-        }
-
-        if (days > 0) {
-            return 'bg-warning-subtle text-dark border';
-        }
-
-        return 'bg-secondary';
     }
 
     private assignedUserName(site: Site): string {

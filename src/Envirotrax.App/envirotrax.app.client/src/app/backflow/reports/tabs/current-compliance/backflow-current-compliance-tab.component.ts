@@ -3,6 +3,7 @@ import { Router } from "@angular/router";
 import { BaseChartDirective } from "ng2-charts";
 import { BackflowComplianceReport, BackflowComplianceRequirement } from "../../../../shared/models/backflow/backflow-compliance-report";
 import { BackflowReportService } from "../../../../shared/services/backflow/backflow-report.service";
+import { DownloadService } from "../../../../shared/services/download.service";
 import { PropertyType } from "../../../../shared/enums/property-type.enum";
 import { BackflowComplianceParams } from "../../../../shared/models/backflow/backflow-compliance-params";
 import { readCssVar, onThemeChange } from "../../../../shared/utils/chart-theme.util";
@@ -103,6 +104,7 @@ export class BackflowCurrentComplianceTabComponent implements OnInit, OnDestroy 
 
     constructor(
         private readonly _reportService: BackflowReportService,
+        private readonly _downloadService: DownloadService,
         private readonly _router: Router
     ) {}
 
@@ -126,8 +128,34 @@ export class BackflowCurrentComplianceTabComponent implements OnInit, OnDestroy 
         }
     }
 
-    public viewPrintableReport(): void {
-        // Printable / export report is not implemented yet (parity placeholder).
+    public async downloadPDF(): Promise<void> {
+        try {
+            this.isLoading = true;
+            const blob = await this._reportService.getComplianceReportPdf(this.ignoreLast30Days);
+            this._downloadService.downloadFileFromBlob(blob, 'backflow-compliance-report.pdf');
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    public async downloadWord(): Promise<void> {
+        try {
+            this.isLoading = true;
+            const blob = await this._reportService.getComplianceReportWord(this.ignoreLast30Days);
+            this._downloadService.downloadFileFromBlob(blob, 'backflow-compliance-report.docx');
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    public async downloadExcel(): Promise<void> {
+        try {
+            this.isLoading = true;
+            const blob = await this._reportService.getComplianceReportExcel(this.ignoreLast30Days);
+            this._downloadService.downloadFileFromBlob(blob, 'backflow-compliance-report.xlsx');
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public viewRequirement(requirement: BackflowComplianceRequirement): void {

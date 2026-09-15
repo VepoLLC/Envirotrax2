@@ -33,6 +33,54 @@ export class BackflowReportService {
         );
     }
 
+    public getTestReportPdf(fromDate: string, toDate: string): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/tests/pdf');
+
+        let params = new HttpParams();
+        if (fromDate) {
+            params = params.set('fromDate', fromDate);
+        }
+        if (toDate) {
+            params = params.set('toDate', toDate);
+        }
+
+        return lastValueFrom(
+            this._http.get(url, { params, responseType: 'blob' })
+        );
+    }
+
+    public getTestReportExcel(fromDate: string, toDate: string): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/tests/excel');
+
+        let params = new HttpParams();
+        if (fromDate) {
+            params = params.set('fromDate', fromDate);
+        }
+        if (toDate) {
+            params = params.set('toDate', toDate);
+        }
+
+        return lastValueFrom(
+            this._http.get(url, { params, responseType: 'blob' })
+        );
+    }
+
+    public getTestReportWord(fromDate: string, toDate: string): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/tests/word');
+
+        let params = new HttpParams();
+        if (fromDate) {
+            params = params.set('fromDate', fromDate);
+        }
+        if (toDate) {
+            params = params.set('toDate', toDate);
+        }
+
+        return lastValueFrom(
+            this._http.get(url, { params, responseType: 'blob' })
+        );
+    }
+
     public async getEarliestTestDate(): Promise<string | null> {
         const url = this._urlResolver.resolveUrl('/api/backflow/reports/tests/earliest-date');
 
@@ -53,6 +101,33 @@ export class BackflowReportService {
         );
     }
 
+    public getComplianceReportPdf(ignoreLast30Days: boolean): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/compliance/current/pdf');
+        const params = new HttpParams().set('ignoreLast30Days', ignoreLast30Days);
+
+        return lastValueFrom(
+            this._http.get(url, { params, responseType: 'blob' })
+        );
+    }
+
+    public getComplianceReportExcel(ignoreLast30Days: boolean): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/compliance/current/excel');
+        const params = new HttpParams().set('ignoreLast30Days', ignoreLast30Days);
+
+        return lastValueFrom(
+            this._http.get(url, { params, responseType: 'blob' })
+        );
+    }
+
+    public getComplianceReportWord(ignoreLast30Days: boolean): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/compliance/current/word');
+        const params = new HttpParams().set('ignoreLast30Days', ignoreLast30Days);
+
+        return lastValueFrom(
+            this._http.get(url, { params, responseType: 'blob' })
+        );
+    }
+
     public getComplianceHistory(): Promise<BackflowComplianceHistory> {
         const url = this._urlResolver.resolveUrl('/api/backflow/reports/compliance/history');
 
@@ -61,11 +136,59 @@ export class BackflowReportService {
         );
     }
 
+    public getComplianceHistoryPdf(): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/compliance/history/pdf');
+
+        return lastValueFrom(
+            this._http.get(url, { responseType: 'blob' })
+        );
+    }
+
+    public getComplianceHistoryExcel(): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/compliance/history/excel');
+
+        return lastValueFrom(
+            this._http.get(url, { responseType: 'blob' })
+        );
+    }
+
+    public getComplianceHistoryWord(): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/compliance/history/word');
+
+        return lastValueFrom(
+            this._http.get(url, { responseType: 'blob' })
+        );
+    }
+
     public getNewRemoved(): Promise<BackflowNewRemovedReport> {
         const url = this._urlResolver.resolveUrl('/api/backflow/reports/assemblies/new-removed');
 
         return lastValueFrom(
             this._http.get<BackflowNewRemovedReport>(url)
+        );
+    }
+
+    public getNewRemovedPdf(): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/assemblies/new-removed/pdf');
+
+        return lastValueFrom(
+            this._http.get(url, { responseType: 'blob' })
+        );
+    }
+
+    public getNewRemovedExcel(): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/assemblies/new-removed/excel');
+
+        return lastValueFrom(
+            this._http.get(url, { responseType: 'blob' })
+        );
+    }
+
+    public getNewRemovedWord(): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/reports/assemblies/new-removed/word');
+
+        return lastValueFrom(
+            this._http.get(url, { responseType: 'blob' })
         );
     }
 }

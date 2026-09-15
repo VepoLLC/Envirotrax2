@@ -6,5 +6,7 @@ public interface IBackflowComplianceReportRepository
 {
     Task<BackflowComplianceReportDto> GetComplianceReportAsync(bool ignoreLast30Days, CancellationToken cancellationToken);
 
-    Task<BackflowComplianceHistoryDto> GetComplianceHistoryAsync(CancellationToken cancellationToken);
+    Task<BackflowComplianceHistoryDto> ReconstructComplianceHistoryAsync(CancellationToken cancellationToken);
+
+    Task<IReadOnlyList<BackflowComplianceHistoryPointDto>> ComputeHistoryPointsAsync(IReadOnlyCollection<DateTime> months, CancellationToken cancellationToken);
 }

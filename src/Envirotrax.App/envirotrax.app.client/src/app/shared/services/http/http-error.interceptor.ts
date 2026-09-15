@@ -33,7 +33,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     private handleError(error: HttpErrorResponse): void {
         switch (error.status) {
             case 401:
-                this._authService.signIn();
+                this._authService.signIn(undefined, undefined, window.location.pathname + window.location.search + window.location.hash);
                 break;
 
             case 403:

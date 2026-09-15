@@ -14,13 +14,12 @@ namespace Envirotrax.App.Server.MediaTypeFormatters
     {
         private const string FileNameHeader = "Vp-File-Name";
         private const string ColumnsHeader = "Vp-Columns";
-        private const string ExcelMimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
         private static readonly char[] _invalidFileNameChars = Path.GetInvalidFileNameChars();
 
         public ExcelMediaTypeFormatter()
         {
-            SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse(ExcelMimeType));
+            SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse(MimeTypes.Excel));
         }
 
         private IEnumerable? GetEnumerableObject(OutputFormatterWriteContext context)
@@ -139,7 +138,7 @@ namespace Envirotrax.App.Server.MediaTypeFormatters
                     FileName = Path.ChangeExtension(cleanFileName, ".xlsx")
                 };
 
-                context.HttpContext.Response.ContentType = ExcelMimeType;
+                context.HttpContext.Response.ContentType = MimeTypes.Excel;
                 context.HttpContext.Response.Headers.Append("Content-Disposition", contentDispositionValue.ToString());
             }
 
@@ -173,7 +172,7 @@ namespace Envirotrax.App.Server.MediaTypeFormatters
 
         public override bool CanWriteResult(OutputFormatterCanWriteContext context)
         {
-            if (context.HttpContext.Request.Headers["Accept"].Contains(ExcelMimeType, StringComparer.OrdinalIgnoreCase))
+            if (context.HttpContext.Request.Headers["Accept"].Contains(MimeTypes.Excel, StringComparer.OrdinalIgnoreCase))
             {
                 return base.CanWriteResult(context);
             }

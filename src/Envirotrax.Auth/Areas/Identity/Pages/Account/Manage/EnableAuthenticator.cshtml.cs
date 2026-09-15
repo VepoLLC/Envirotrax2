@@ -126,6 +126,10 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account.Manage
             }
 
             await _userManager.SetTwoFactorEnabledAsync(user, true);
+
+            user.AuthenticatorConfirmed = true;
+            await _userManager.UpdateAsync(user);
+
             var userId = await _userManager.GetUserIdAsync(user);
             _logger.LogInformation("User with ID '{UserId}' has enabled 2FA with an authenticator app.", userId);
 

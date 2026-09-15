@@ -180,19 +180,30 @@ public class UpdateSiteWaterSupplierDto
     public int WaterSupplierId { get; set; }
 }
 
-public class CsiComplianceSiteDto : SiteDto
+public abstract class ComplianceSiteDtoBase : SiteDto
 {
     public List<SiteLogDto> Logs { get; set; } = [];
+
+    public int? DaysOverdue { get; set; }
+
+    public ComplianceOverdueSeverity OverdueSeverity { get; set; }
 }
 
-public class FogTripTicketComplianceSiteDto : SiteDto
+public class CsiComplianceSiteDto : ComplianceSiteDtoBase
 {
-    public List<SiteLogDto> Logs { get; set; } = [];
 }
 
-public class FogComplianceSiteDto : SiteDto
+public class FogTripTicketComplianceSiteDto : ComplianceSiteDtoBase
 {
-    public List<SiteLogDto> Logs { get; set; } = [];
+    public DateTime? DueDate { get; set; }
+}
+
+public class FogComplianceSiteDto : ComplianceSiteDtoBase
+{
+}
+
+public class FogPermitComplianceSiteDto : ComplianceSiteDtoBase
+{
 }
 
 public class ReferencedSiteDto

@@ -8,6 +8,7 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions;
+using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 
@@ -20,6 +21,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     private readonly IRecordLogService _recordLogService;
     private readonly IGeocodingService _geocodingService;
     private readonly IGisAreaCoordinateRepository _coordinateRepository;
+    private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly ILogger<SiteService> _logger;
 
     public SiteService(
@@ -29,6 +31,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         IRecordLogService recordLogService,
         IGeocodingService geocodingService,
         IGisAreaCoordinateRepository coordinateRepository,
+        ITimeZoneHelperService timeZoneHelper,
         ILogger<SiteService> logger)
         : base(mapper, repository)
     {
@@ -37,6 +40,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         _recordLogService = recordLogService;
         _geocodingService = geocodingService;
         _coordinateRepository = coordinateRepository;
+        _timeZoneHelper = timeZoneHelper;
         _logger = logger;
     }
 
@@ -260,16 +264,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         var sites = await _siteRepository.GetCsiComplianceAsync(pageInfo, query, cancellationToken);
         var dtos = sites.Select(s => Mapper.Map<CsiComplianceSiteDto>(s)).ToList();
 
-        if (dtos.Count > 0)
-        {
-            var logs = await _siteLogService.GetBySitesAsync(dtos.Select(d => d.Id), cancellationToken);
-            var logsBySite = logs.ToLookup(l => l.Site.Id ?? 0);
-
-            foreach (var dto in dtos)
-            {
-                dto.Logs = logsBySite[dto.Id].ToList();
-            }
-        }
+        await PopulateComplianceRowsAsync(dtos, dto => dto.CsiRenewalDate, cancellationToken);
 
         return dtos.ToPagedData(pageInfo);
     }
@@ -282,16 +277,20 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         var sites = await _siteRepository.GetFogInspectionComplianceAsync(pageInfo, query, cancellationToken);
         var dtos = sites.Select(s => Mapper.Map<FogComplianceSiteDto>(s)).ToList();
 
-        if (dtos.Count > 0)
-        {
-            var logs = await _siteLogService.GetBySitesAsync(dtos.Select(d => d.Id), cancellationToken);
-            var logsBySite = logs.ToLookup(l => l.Site.Id ?? 0);
+        await PopulateComplianceRowsAsync(dtos, dto => dto.FogInspectionExpirationDate, cancellationToken);
 
-            foreach (var dto in dtos)
-            {
-                dto.Logs = logsBySite[dto.Id].ToList();
-            }
-        }
+        return dtos.ToPagedData(pageInfo);
+    }
+
+    public async Task<IPagedData<FogPermitComplianceSiteDto>> GetFogPermitComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<Site, SiteDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<Site, SiteDto>(Mapper);
+
+        var sites = await _siteRepository.GetFogPermitComplianceAsync(pageInfo, query, cancellationToken);
+        var dtos = sites.Select(s => Mapper.Map<FogPermitComplianceSiteDto>(s)).ToList();
+
+        await PopulateComplianceRowsAsync(dtos, dto => dto.FogPermitExpirationDate, cancellationToken);
 
         return dtos.ToPagedData(pageInfo);
     }
@@ -318,18 +317,82 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         var sites = await _siteRepository.GetFogTripTicketComplianceAsync(pageInfo, query, dueDateFrom, dueDateTo, sortDescending, cancellationToken);
         var dtos = sites.Select(s => Mapper.Map<FogTripTicketComplianceSiteDto>(s)).ToList();
 
-        if (dtos.Count > 0)
+        foreach (var dto in dtos)
         {
-            var logs = await _siteLogService.GetBySitesAsync(dtos.Select(d => d.Id), cancellationToken);
-            var logsBySite = logs.ToLookup(l => l.Site.Id ?? 0);
-
-            foreach (var dto in dtos)
-            {
-                dto.Logs = logsBySite[dto.Id].ToList();
-            }
+            dto.DueDate = ComputeTripTicketDueDate(dto.LastTripTicketDate, dto.TripTicketInterval);
         }
 
+        await PopulateComplianceRowsAsync(dtos, dto => dto.DueDate, cancellationToken);
+
         return dtos.ToPagedData(pageInfo);
+    }
+
+    private async Task PopulateComplianceRowsAsync<TDto>(List<TDto> dtos, Func<TDto, DateTime?> dueDateSelector, CancellationToken cancellationToken)
+        where TDto : ComplianceSiteDtoBase
+    {
+        if (dtos.Count == 0)
+        {
+            return;
+        }
+
+        var logs = await _siteLogService.GetBySitesAsync(dtos.Select(d => d.Id), cancellationToken);
+        var logsBySite = logs.ToLookup(l => l.Site.Id ?? 0);
+
+        var today = _timeZoneHelper.GetUserLocalTime().Date;
+
+        foreach (var dto in dtos)
+        {
+            dto.Logs = logsBySite[dto.Id].ToList();
+            dto.DaysOverdue = ComputeDaysOverdue(dueDateSelector(dto), today);
+            dto.OverdueSeverity = ComputeOverdueSeverity(dto.DaysOverdue);
+        }
+    }
+
+    private static DateTime? ComputeTripTicketDueDate(DateTime? lastTripTicketDate, int tripTicketInterval)
+    {
+        if (!lastTripTicketDate.HasValue || tripTicketInterval <= 0)
+        {
+            return null;
+        }
+
+        return lastTripTicketDate.Value.AddDays(tripTicketInterval);
+    }
+
+    private static int? ComputeDaysOverdue(DateTime? dueDate, DateTime today)
+    {
+        if (!dueDate.HasValue)
+        {
+            return null;
+        }
+
+        var days = (today - dueDate.Value.Date).Days;
+
+        return days < 0 ? null : days;
+    }
+
+    private static ComplianceOverdueSeverity ComputeOverdueSeverity(int? daysOverdue)
+    {
+        if (!daysOverdue.HasValue)
+        {
+            return ComplianceOverdueSeverity.None;
+        }
+
+        if (daysOverdue.Value > 90)
+        {
+            return ComplianceOverdueSeverity.High;
+        }
+
+        if (daysOverdue.Value >= 30)
+        {
+            return ComplianceOverdueSeverity.Moderate;
+        }
+
+        if (daysOverdue.Value > 0)
+        {
+            return ComplianceOverdueSeverity.Low;
+        }
+
+        return ComplianceOverdueSeverity.DueToday;
     }
 
     public async Task UpdateFogAssignmentAsync(int siteId, int? userId)

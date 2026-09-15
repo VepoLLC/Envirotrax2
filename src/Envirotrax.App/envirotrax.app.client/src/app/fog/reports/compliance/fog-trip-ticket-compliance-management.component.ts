@@ -14,10 +14,10 @@ import { DownloadConfig } from "../../../shared/models/download-config";
 import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
 import { FacilityType } from "../../../shared/enums/facility-type.enum";
+import { complianceOverdueSeverityClasses } from "../../../shared/enums/compliance-overdue-severity.enum";
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
+import { DateHelperService } from "../../../shared/services/helpers/date-helper.service";
 import { PropertyLogCellComponent } from "../../../shared/components/data-components/table-cells/property-log-cell.component";
-
-const DAY_MS = 86400000;
 
 interface OverdueBucket {
     amount: number;
@@ -41,9 +41,6 @@ const OVERDUE_BUCKETS: { [index: number]: OverdueBucket } = {
 };
 
 type SiteRow = Site & {
-    dueDate?: Date;
-    daysOverdue?: number;
-    overdueClass?: string;
     assignedName?: string;
     assignedDate?: Date;
     rowNumber?: number;
@@ -72,6 +69,8 @@ export class FogTripTicketComplianceManagementComponent implements OnInit {
 
     @ViewChild('printableSection')
     private _printableSection!: ElementRef;
+
+    public readonly severityClasses = complianceOverdueSeverityClasses;
 
     public canModify: boolean = false;
     public daysOverdueLabel: string = 'All overdue';
@@ -130,7 +129,6 @@ export class FogTripTicketComplianceManagementComponent implements OnInit {
     public downloadConfig: DownloadConfig;
 
     private panelFilters: QueryProperty[] = [];
-    private readonly today: number = new Date().setHours(0, 0, 0, 0);
 
     // Site's due date (LastTripTicketDate + TripTicketInterval) isn't a real column, so it can't be
     // filtered/sorted through the Query object the way a real column like csiRenewalDate can — these are
@@ -145,7 +143,8 @@ export class FogTripTicketComplianceManagementComponent implements OnInit {
         private readonly _authService: AuthService,
         private readonly _downloadService: DownloadService,
         private readonly _printService: PrintableTableService,
-        private readonly _containerHelper: AppContainerHelperService
+        private readonly _containerHelper: AppContainerHelperService,
+        private readonly _dateHelper: DateHelperService
     ) {
         this.downloadConfig = {
             fileName: 'FOG Trip Ticket Compliance',
@@ -433,64 +432,14 @@ export class FogTripTicketComplianceManagementComponent implements OnInit {
         };
     }
 
+    // dueDate, daysOverdue and overdueSeverity arrive already computed on the DTO — the server derives the
+    // due date from LastTripTicketDate + TripTicketInterval and measures it against the caller's local time
+    // zone, so there is no date arithmetic here.
     private decorate(site: Site): void {
         const row = site as SiteRow;
-        row.dueDate = this.getDueDate(site);
-        row.daysOverdue = this.getDaysOverdue(row.dueDate);
-        row.overdueClass = row.daysOverdue != null ? this.overdueBadgeClass(row.daysOverdue) : '';
         row.assignedName = this.assignedUserName(site);
-        row.assignedDate = this.toUtcDate(site.fogAccountAssignmentDate);
+        row.assignedDate = this._dateHelper.toUtcDate(site.fogAccountAssignmentDate);
         row.canModify = this.canModify;
-    }
-
-    private getDueDate(site: Site): Date | undefined {
-        if (!site.lastTripTicketDate || !site.tripTicketInterval) {
-            return undefined;
-        }
-
-        const dueDate = new Date(site.lastTripTicketDate);
-        dueDate.setDate(dueDate.getDate() + site.tripTicketInterval);
-
-        return dueDate;
-    }
-
-    // The server stores/serializes assignment timestamps without a UTC "Z" marker (EF Core loses
-    // DateTimeKind on the round trip through SQL Server), so the browser's Date parser would otherwise
-    // treat the raw value as local time instead of UTC. Force UTC interpretation here before display.
-    private toUtcDate(isoString?: string): Date | undefined {
-        if (!isoString) {
-            return undefined;
-        }
-
-        const hasTimezone = /[zZ]|[+-]\d{2}:?\d{2}$/.test(isoString);
-        return new Date(hasTimezone ? isoString : `${isoString}Z`);
-    }
-
-    private getDaysOverdue(dueDate: Date | undefined): number | undefined {
-        if (!dueDate) {
-            return undefined;
-        }
-
-        const due = new Date(dueDate).setHours(0, 0, 0, 0);
-        const days = Math.floor((this.today - due) / DAY_MS);
-
-        return days < 0 ? undefined : days;
-    }
-
-    private overdueBadgeClass(days: number): string {
-        if (days > 90) {
-            return 'bg-danger';
-        }
-
-        if (days >= 30) {
-            return 'bg-warning text-dark';
-        }
-
-        if (days > 0) {
-            return 'bg-warning-subtle text-dark border';
-        }
-
-        return 'bg-secondary';
     }
 
     private assignedUserName(site: Site): string {

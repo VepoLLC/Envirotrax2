@@ -2,6 +2,7 @@ import { Component, NgZone, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { BaseChartDirective } from "ng2-charts";
 import { BackflowTestReport, BackflowReportPeriod } from "../../../../shared/models/backflow/backflow-test-report";
 import { BackflowReportService } from "../../../../shared/services/backflow/backflow-report.service";
+import { DownloadService } from "../../../../shared/services/download.service";
 import { chartGridColor, chartTickColor, onThemeChange, themeLegendLabels } from "../../../../shared/utils/chart-theme.util";
 import { ChartConfiguration, ChartData } from "chart.js";
 
@@ -49,14 +50,21 @@ export class BackflowTestReportsTabComponent implements OnInit, OnDestroy {
 
     constructor(
         private readonly _reportService: BackflowReportService,
+        private readonly _downloadService: DownloadService,
         private readonly _zone: NgZone
     ) {}
 
     public async ngOnInit(): Promise<void> {
-        // Axis/legend/grid colors are drawn from theme CSS variables, so repaint on theme toggle.
-        this._disposeThemeObserver = onThemeChange(() => this._chart?.update());
-        await this.setDefaultDateRange();
-        await this.search();
+        try {
+            this.isLoading = true;
+            // Axis/legend/grid colors are drawn from theme CSS variables, so repaint on theme toggle.
+            this._disposeThemeObserver = onThemeChange(() => this._chart?.update());
+
+            await this.setDefaultDateRange();
+            await this.search();
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public ngOnDestroy(): void {
@@ -224,8 +232,34 @@ export class BackflowTestReportsTabComponent implements OnInit, OnDestroy {
         return `${year}-${pad(month)}-${pad(day)}`;
     }
 
-    public viewPrintableReport(): void {
-        // Printable / export report is not implemented yet (parity placeholder).
+    public async downloadPDF(): Promise<void> {
+        try {
+            this.isLoading = true;
+            const blob = await this._reportService.getTestReportPdf(this.fromDate, this.toDate);
+            this._downloadService.downloadFileFromBlob(blob, `backflow-test-report_${this.fromDate}_${this.toDate}.pdf`);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    public async downloadWord(): Promise<void> {
+        try {
+            this.isLoading = true;
+            const blob = await this._reportService.getTestReportWord(this.fromDate, this.toDate);
+            this._downloadService.downloadFileFromBlob(blob, `backflow-test-report_${this.fromDate}_${this.toDate}.docx`);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    public async downloadExcel(): Promise<void> {
+        try {
+            this.isLoading = true;
+            const blob = await this._reportService.getTestReportExcel(this.fromDate, this.toDate);
+            this._downloadService.downloadFileFromBlob(blob, `backflow-test-report_${this.fromDate}_${this.toDate}.xlsx`);
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public isYearView(): boolean {

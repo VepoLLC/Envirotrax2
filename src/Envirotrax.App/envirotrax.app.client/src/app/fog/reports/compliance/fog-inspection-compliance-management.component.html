@@ -57,7 +57,7 @@
 
 <ng-template #daysOverdueTemplate let-data="rowData">
     <span *ngIf="data.daysOverdue != null" class="badge rounded-pill"
-          [ngClass]="data.overdueClass">{{ data.daysOverdue }} days</span>
+          [ngClass]="severityClasses[data.overdueSeverity]">{{ data.daysOverdue }} days</span>
 </ng-template>
 
 <ng-template #viewSiteTemplate let-data="rowData">

@@ -122,7 +122,7 @@ export class FogInspectionListComponent implements OnInit, OnDestroy {
                     ]
                 }];
                 await this.getInspections();
-                this.setShowResults((this.table.items?.pageInfo?.totalItems ?? 0) > 0);
+                this.setShowResults(true);
             }
         });
     }

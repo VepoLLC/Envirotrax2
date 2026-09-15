@@ -88,6 +88,7 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
         {
             var childIds = childWaterSuppliers.Select(ws => ws.Id).ToList();
             var rawSub = await _context.CsiInspections
+                .IgnoreQueryFilters()
                 .Where(c => childIds.Contains(c.WaterSupplierId) && c.CreatedTime >= utcStart && c.CreatedTime < utcEnd)
                 .Select(c => new { c.WaterSupplierId, c.CreatedTime, c.TransactionId })
                 .ToListAsync(cancellationToken);
@@ -166,6 +167,7 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
         {
             var childIds = childWaterSuppliers.Select(ws => ws.Id).ToList();
             var rawSub = await _context.BackflowTests
+                .IgnoreQueryFilters()
                 .Where(b => childIds.Contains(b.WaterSupplierId) && b.TestDate >= utcStart && b.TestDate < utcEnd)
                 .Select(b => new { b.WaterSupplierId, b.TestDate, b.TransactionId })
                 .ToListAsync(cancellationToken);
@@ -244,6 +246,7 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
         {
             var childIds = childWaterSuppliers.Select(ws => ws.Id).ToList();
             var rawSub = await _context.FogInspections
+                .IgnoreQueryFilters()
                 .Where(f => childIds.Contains(f.WaterSupplierId) && f.CreatedTime >= utcStart && f.CreatedTime < utcEnd)
                 .Select(f => new { f.WaterSupplierId, f.CreatedTime, f.TransactionId })
                 .ToListAsync(cancellationToken);
@@ -322,6 +325,7 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
         {
             var childIds = childWaterSuppliers.Select(ws => ws.Id).ToList();
             var rawSub = await _context.FogTripTickets
+                .IgnoreQueryFilters()
                 .Where(t => childIds.Contains(t.WaterSupplierId) && t.CreatedTime >= utcStart && t.CreatedTime < utcEnd)
                 .Select(t => new { t.WaterSupplierId, t.CreatedTime, t.TransactionId })
                 .ToListAsync(cancellationToken);

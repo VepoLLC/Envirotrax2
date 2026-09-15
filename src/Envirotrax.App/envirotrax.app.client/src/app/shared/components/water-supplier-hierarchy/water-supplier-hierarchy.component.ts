@@ -18,6 +18,9 @@ export class WaterSupplierHierarchyComponent implements OnInit, OnChanges {
     @Input()
     public mySuppliers?: MySupplierHierarchyDto;
 
+    @Input()
+    public returnUrl?: string;
+
     constructor(
         private readonly _authService: AuthService,
         private readonly _containerHelper: AppContainerHelperService
@@ -65,7 +68,7 @@ export class WaterSupplierHierarchyComponent implements OnInit, OnChanges {
     public async selectSupplier(supplier: WaterSupplier): Promise<void> {
         try {
             this.isLoading = true;
-            await this._authService.signIn(supplier.id);
+            await this._authService.signIn(supplier.id, undefined, this.returnUrl);
         } finally {
             this.isLoading = false;
         }

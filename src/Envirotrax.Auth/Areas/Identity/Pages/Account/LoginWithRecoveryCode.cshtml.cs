@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Envirotrax.Auth.Data.Models;
+using Envirotrax.Auth.Domain.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -95,7 +96,15 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
             if (result.Succeeded)
             {
                 _logger.LogInformation("User with ID '{UserId}' logged in with a recovery code.", user.Id);
-                return LocalRedirect(returnUrl ?? Url.Content("~/"));
+
+                returnUrl ??= Url.Content("~/");
+
+                if (!await _userManager.IsPhoneNumberConfirmedAsync(user))
+                {
+                    return RedirectToPage("./SecuritySuggestion", new { type = SecuritySuggestionType.PhoneNumber, returnUrl });
+                }
+
+                return LocalRedirect(returnUrl);
             }
             if (result.IsLockedOut)
             {

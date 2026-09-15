@@ -142,6 +142,19 @@ public class SiteRepository : Repository<Site>, ISiteRepository
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    // FOG Permit Compliance Management gate. Same shape as GetFogInspectionComplianceAsync, keyed off the
+    // FOG permit flag; the overdue date range and every other criterion arrive as the client's filter.
+    public async Task<IEnumerable<Site>> GetFogPermitComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var paginated = await GetListQuery()
+            .Where(s => s.NeedsFogPermit && !s.OutOfArea)
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
     public async Task UpdateCsiAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate)
     {
         await DbContext

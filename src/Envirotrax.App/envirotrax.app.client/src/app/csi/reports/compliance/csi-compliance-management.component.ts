@@ -14,10 +14,9 @@ import { DownloadConfig } from "../../../shared/models/download-config";
 import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
 import { FacilityType } from "../../../shared/enums/facility-type.enum";
+import { complianceOverdueSeverityClasses } from "../../../shared/enums/compliance-overdue-severity.enum";
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 import { PropertyLogCellComponent } from "../../../shared/components/data-components/table-cells/property-log-cell.component";
-
-const DAY_MS = 86400000;
 
 interface OverdueBucket {
     amount: number;
@@ -41,8 +40,6 @@ const OVERDUE_BUCKETS: { [index: number]: OverdueBucket } = {
 };
 
 type SiteRow = Site & {
-    daysOverdue?: number;
-    overdueClass?: string;
     assignedName?: string;
     rowNumber?: number;
     canModify?: boolean;   // surfaced to the shared property-log cell
@@ -76,6 +73,8 @@ export class CsiComplianceManagementComponent implements OnInit {
 
     @ViewChild('printableSection')
     private _printableSection!: ElementRef;
+
+    public readonly severityClasses = complianceOverdueSeverityClasses;
 
     public canModify: boolean = false;
     public daysOverdueLabel: string = 'All overdue';
@@ -146,7 +145,6 @@ export class CsiComplianceManagementComponent implements OnInit {
     public downloadConfig: DownloadConfig;
 
     private panelFilters: QueryProperty[] = [];
-    private readonly today: number = new Date().setHours(0, 0, 0, 0);
 
     constructor(
         private readonly _siteService: SiteService,
@@ -371,39 +369,12 @@ export class CsiComplianceManagementComponent implements OnInit {
         };
     }
 
+    // daysOverdue and overdueSeverity arrive already computed on the DTO — the server measures them against
+    // the caller's local time zone, so there is no date arithmetic here.
     private decorate(site: Site): void {
         const row = site as SiteRow;
-        row.daysOverdue = this.getDaysOverdue(site);
-        row.overdueClass = row.daysOverdue != null ? this.overdueBadgeClass(row.daysOverdue) : '';
         row.assignedName = this.assignedUserName(site);
         row.canModify = this.canModify;
-    }
-
-    private getDaysOverdue(site: Site): number | undefined {
-        if (!site.csiRenewalDate) {
-            return undefined;
-        }
-
-        const renewal = new Date(site.csiRenewalDate).setHours(0, 0, 0, 0);
-        const days = Math.floor((this.today - renewal) / DAY_MS);
-
-        return days < 0 ? undefined : days;
-    }
-
-    private overdueBadgeClass(days: number): string {
-        if (days > 90) {
-            return 'bg-danger';
-        }
-
-        if (days >= 30) {
-            return 'bg-warning text-dark';
-        }
-
-        if (days > 0) {
-            return 'bg-warning-subtle text-dark border';
-        }
-
-        return 'bg-secondary';
     }
 
     private assignedUserName(site: Site): string {

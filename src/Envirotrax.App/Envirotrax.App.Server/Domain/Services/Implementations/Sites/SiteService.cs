@@ -75,15 +75,22 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
         foreach (var group in gisCoordiantesByArea)
         {
-            var gisPoints = group.Select(c => new CoordinateDto
-            {
-                Latitude = c.Latitude,
-                Longitude = c.Longitude
-            }).ToList();
+            // Only the outer edge decides whether the site falls into the area, exactly as V1 did
+            // (checkPointInArea in WaterSupplierGisArea.vb never looked at the inner polygons), so a
+            // site standing inside a hole still gets the area assigned.
+            var gisPoints = group
+                .Where(c => c.PolygonIndex == 0)
+                .OrderBy(c => c.Id)
+                .Select(c => new CoordinateDto
+                {
+                    Latitude = c.Latitude,
+                    Longitude = c.Longitude
+                }).ToList();
 
             if (_geocodingService.IsPointInArea(gisPoints, coordinates))
             {
                 site.GisAreaId = group.Key;
+                break;
             }
         }
     }

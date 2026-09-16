@@ -8,6 +8,8 @@ public partial class TenantDbContext
     // Set when a record comes in from an external submission; it is bookkeeping, not a user edit.
     private const string SubmissionIdPropertyName = "SubmissionId";
 
+    private readonly List<RecordLog> _stagedLogs = new();
+
     private bool _logDataForCurrentSave;
 
     /// <summary>
@@ -31,9 +33,25 @@ public partial class TenantDbContext
             // Awaited rather than returned: the finally must not clear the flag before the save runs.
             return await SaveChangesAsync(cancellationToken);
         }
+        catch
+        {
+            // The edit did not commit, so its log rows must not stay staged in the change tracker:
+            // the context is scoped to the request, and any later save on it would insert them.
+            DiscardStagedLogs();
+            throw;
+        }
         finally
         {
             _logDataForCurrentSave = false;
+            _stagedLogs.Clear();
+        }
+    }
+
+    private void DiscardStagedLogs()
+    {
+        foreach (var log in _stagedLogs)
+        {
+            Entry(log).State = EntityState.Detached;
         }
     }
 
@@ -76,6 +94,7 @@ public partial class TenantDbContext
         }
 
         RecordLogs.AddRange(logs);
+        _stagedLogs.AddRange(logs);
     }
 
     protected override bool IsChangeDescriptionSkipped(string propertyName)

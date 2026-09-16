@@ -39,6 +39,7 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
     public DbSet<GisAreaCoordinate> GisAreaCoordinates { get; set; }
 
     public DbSet<NotificationSetting> NotificationSettings { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
 
     public DbSet<ApiAccount> ApiAccounts { get; set; }
 

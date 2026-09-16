@@ -114,6 +114,7 @@ public static class ServiceRegistration
         services.AddTransient<IGisAreaCoordinateRepository, GisAreaCoordinateRepository>();
 
         services.AddTransient<INotificationSettingRepository, NotificationSettingRepository>();
+        services.AddTransient<INotificationRepository, NotificationRepository>();
 
         services.AddTransient<IApiAccountRepository, ApiAccountRepository>();
         services.AddTransient<ILegacyQueryRepository, LegacyQueryRepository>();

@@ -15,7 +15,7 @@ public class NotificationSettingRepository : Repository<NotificationSetting>, IN
     protected override IQueryable<NotificationSetting> GetListQuery()
     {
         return base.GetListQuery().Include(setting => setting.User);
-           
+
     }
 
     protected override IQueryable<NotificationSetting> GetDetailsQuery()
@@ -53,5 +53,14 @@ public class NotificationSettingRepository : Repository<NotificationSetting>, IN
         result.Model = setting;
 
         return result;
+    }
+
+    public async Task<List<NotificationSetting>> GetCandidateSettingsAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        return await DbContext.NotificationSettings
+            .IgnoreQueryFilters()
+            .Include(setting => setting.User)
+            .Where(setting => setting.WaterSupplierId == waterSupplierId)
+            .ToListAsync(cancellationToken);
     }
 }

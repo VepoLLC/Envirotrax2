@@ -27,6 +27,11 @@ public class NotificationSettingService : Service<NotificationSetting, Notificat
         _recordLogService = recordLogService;
     }
 
+    public Task<List<NotificationSetting>> GetCandidateSettingsAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        return _repository.GetCandidateSettingsAsync(waterSupplierId, cancellationToken);
+    }
+
     public override Task<NotificationSettingDto> AddAsync(NotificationSettingDto dto)
     {
         SetLoggedInUserWhenNotSpecified(dto);

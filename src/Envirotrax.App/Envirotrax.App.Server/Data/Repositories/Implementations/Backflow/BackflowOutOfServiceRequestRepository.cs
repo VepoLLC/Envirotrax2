@@ -145,7 +145,9 @@ public class BackflowOutOfServiceRequestRepository : Repository<BackflowOutOfSer
 
     public Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken)
     {
-        return Entity.CountAsync(r => r.Test!.SiteId == siteId, cancellationToken);
+        // BackflowOutOfServiceRequest itself is not soft-deletable, but a request whose test was deleted
+        // is no longer shown on the site, so it should not be counted either.
+        return Entity.CountAsync(r => r.Test!.SiteId == siteId && r.Test.DeletedTime == null, cancellationToken);
     }
 
     private static bool SerialNumbersMatch(string? first, string? second)

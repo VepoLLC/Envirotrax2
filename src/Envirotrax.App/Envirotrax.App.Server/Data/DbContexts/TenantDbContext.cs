@@ -19,7 +19,8 @@ using Envirotrax.App.Server.Data.Models.Notifications;
 
 namespace Envirotrax.App.Server.Data.DbContexts;
 
-public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
+// Record logging lives in TenantDbContext.RecordLogging.cs.
+public partial class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
 {
     public DbSet<GeneralSettings> GeneralSettings { get; set; }
     public DbSet<CsiSettings> CsiSettings { get; set; }

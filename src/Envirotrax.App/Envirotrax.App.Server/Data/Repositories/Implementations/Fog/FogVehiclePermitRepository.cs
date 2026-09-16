@@ -58,11 +58,9 @@ public class FogVehiclePermitRepository : Repository<FogVehiclePermit>, IFogVehi
         existing.InspectionDueDate = permit.InspectionDueDate;
         existing.IsActive = permit.IsActive;
 
-        var changes = BuildChangeDescription(existing);
+        await SaveChangesAsync(logData: true, cancellationToken);
 
-        await DbContext.SaveChangesAsync(cancellationToken);
-
-        return new UpdateResult<FogVehiclePermit> { Model = existing, Changes = changes };
+        return new UpdateResult<FogVehiclePermit> { Model = existing };
     }
 
     private IQueryable<int> GetRegisteredTransporterIdsQuery()

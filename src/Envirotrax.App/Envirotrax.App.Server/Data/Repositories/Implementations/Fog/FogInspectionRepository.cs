@@ -180,9 +180,7 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
             inspection.SignatureDate = model.SignatureDate;
         }
 
-        result.Changes = BuildChangeDescription(inspection);
-
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         result.Model = inspection;
 
@@ -191,6 +189,6 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
 
     public Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken)
     {
-        return Entity.CountAsync(f => f.SiteId == siteId, cancellationToken);
+        return Entity.CountAsync(f => f.SiteId == siteId && f.DeletedTime == null, cancellationToken);
     }
 }

@@ -4,14 +4,12 @@ using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Fog;
-using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
-using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.Common.Data;
@@ -30,7 +28,6 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
     private readonly IFileStorageService _fileStorageService;
     private readonly IAuthService _authService;
     private readonly IPdfTemplateService _pdfTemplateService;
-    private readonly IRecordLogService _recordLogService;
 
     public FogInspectionService(
         IMapper mapper,
@@ -40,8 +37,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         ISiteService siteService,
         IFileStorageService fileStorageService,
         IAuthService authService,
-        IPdfTemplateService pdfTemplateService,
-        IRecordLogService recordLogService)
+        IPdfTemplateService pdfTemplateService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -51,7 +47,6 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         _fileStorageService = fileStorageService;
         _authService = authService;
         _pdfTemplateService = pdfTemplateService;
-        _recordLogService = recordLogService;
     }
 
     public Task<byte[]> GeneratePdfAsync(FogInspectionDto inspection)
@@ -304,11 +299,6 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         if (newSignaturePath != null)
         {
             await _fileStorageService.UploadAsync(newSignaturePath, signatureStream!);
-        }
-
-        if (saved.Changes.Length > 0)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.FogInspections, saved.Model.Id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes, professionalId);
         }
 
         scope.Complete();

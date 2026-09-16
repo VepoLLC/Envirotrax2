@@ -23,6 +23,12 @@ public interface IRepository<TModel, TKey>
     Task<TModel?> GetNoIncludesAsync(TKey id, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Returns whether a row with this id exists, without reading it. Use this instead of calling
+    /// <see cref="GetAsync"/> and null-checking the result when the entity itself isn't needed.
+    /// </summary>
+    Task<bool> ExistsAsync(TKey id, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Loads the entity TRACKED (unlike <see cref="GetAsync"/>/<see cref="GetNoIncludesAsync"/>, which use
     /// AsNoTracking) so the caller can mutate a subset of fields and persist via <see cref="SaveChangesAsync"/>
     /// without a full-entity overwrite.

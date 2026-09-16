@@ -1,3 +1,4 @@
+using Envirotrax.App.Server.Data.Models.Logs;
 using System.ComponentModel.DataAnnotations;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Users;
@@ -7,6 +8,7 @@ using Envirotrax.Common.Data.Models;
 
 namespace Envirotrax.App.Server.Data.Models.Notifications;
 
+[RecordLogged(RecordLogTableNames.NotificationSettings, ProfessionalSource = RecordLogIdSource.None)]
 public class NotificationSetting : TenantModel<WaterSupplier>, ICreateAuditableModel<AppUser>
 {
     [AppPrimaryKey(true)]

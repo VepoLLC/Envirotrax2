@@ -119,11 +119,6 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
 
         scope.Complete();
 
-        if (saved.Model != null && saved.Changes.Length > 0)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.ProfessionalUsers, saved.Model.UserId, null, RecordLogType.Edit, saved.Changes, professionalId: saved.Model.ProfessionalId);
-        }
-
         return await BuildSignatureUrlAsync(path);
     }
 
@@ -163,11 +158,6 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
             return null;
         }
 
-        if (saved.Changes.Length > 0)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.ProfessionalUsers, saved.Model.UserId, null, RecordLogType.Edit, saved.Changes, professionalId: saved.Model.ProfessionalId);
-        }
-
         return MapToDto(saved.Model);
     }
 
@@ -191,6 +181,7 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
 
         if (deleted != null && user != null)
         {
+            // recordLog manual
             await _recordLogService.AddAsync(RecordLogTableNames.ProfessionalUsers, user.UserId, null, RecordLogType.Delete,
                 $"Deleted user — ContactName: '{user.ContactName}'", professionalId: user.ProfessionalId);
         }
@@ -219,11 +210,6 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         if (saved.Model == null)
         {
             return null;
-        }
-
-        if (saved.Changes.Length > 0)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.ProfessionalUsers, saved.Model.UserId, null, RecordLogType.Edit, saved.Changes, professionalId: saved.Model.ProfessionalId);
         }
 
         return MapToDto(saved.Model);

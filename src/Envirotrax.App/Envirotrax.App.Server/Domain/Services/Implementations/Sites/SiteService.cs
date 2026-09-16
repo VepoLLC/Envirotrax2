@@ -62,9 +62,9 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
     public async Task<SiteTabCountsDto?> GetTabCountsAsync(int siteId, CancellationToken cancellationToken)
     {
-        var site = await GetAsync(siteId, cancellationToken);
+        var siteExists = await _siteRepository.ExistsAsync(siteId, cancellationToken);
 
-        if (site == null)
+        if (!siteExists)
         {
             return null;
         }
@@ -93,6 +93,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
         if (added.WaterSupplier?.Id is int waterSupplierId)
         {
+            // recordLog manual
             await _recordLogService.AddAsync(RecordLogTableNames.Sites, added.Id, waterSupplierId, RecordLogType.Add, "New site record");
         }
 
@@ -210,11 +211,6 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
                 return false;
             }
 
-            if (saved.Changes.Length > 0)
-            {
-                await _recordLogService.AddAsync(RecordLogTableNames.Sites, siteId, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
-            }
-
             scope.Complete();
         }
 
@@ -247,6 +243,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
         await _siteRepository.SaveChangesAsync();
 
+        // recordLog manual
         await _recordLogService.AddAsync(RecordLogTableNames.Sites, siteId, dto.WaterSupplierId, RecordLogType.Edit, $"Water Supplier changed from {previousWaterSupplierId} to {dto.WaterSupplierId}");
 
         return true;

@@ -28,9 +28,7 @@ public class SiteRepository : Repository<Site>, ISiteRepository
 
         ApplyAdminEditableFields(site, dto);
 
-        result.Changes = BuildChangeDescription(site);
-
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         result.Model = site;
 

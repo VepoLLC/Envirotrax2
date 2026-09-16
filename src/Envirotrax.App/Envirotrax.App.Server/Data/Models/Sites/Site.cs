@@ -1,3 +1,4 @@
+using Envirotrax.App.Server.Data.Models.Logs;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Envirotrax.App.Server.Data.Models.States;
@@ -9,6 +10,7 @@ using Envirotrax.Common.Data.Models;
 namespace Envirotrax.App.Server.Data.Models.Sites;
 
 [Table("Sites")]
+[RecordLogged(RecordLogTableNames.Sites, ProfessionalSource = RecordLogIdSource.None)]
 public class Site : IAuditableModel<AppUser>
 {
     [AppPrimaryKey(true)]

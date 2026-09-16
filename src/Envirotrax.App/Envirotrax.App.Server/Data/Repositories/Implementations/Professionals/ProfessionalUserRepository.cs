@@ -72,9 +72,7 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
             existing.ContactName = user.ContactName;
             existing.JobTitle = user.JobTitle;
 
-            result.Changes = BuildChangeDescription(existing);
-
-            await DbContext.SaveChangesAsync();
+            await SaveChangesAsync(logData: true);
 
             result.Model = existing;
         }
@@ -93,9 +91,7 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         {
             existing.SignaturePath = signaturePath;
 
-            result.Changes = BuildChangeDescription(existing);
-
-            await DbContext.SaveChangesAsync();
+            await SaveChangesAsync(logData: true);
 
             result.Model = existing;
         }
@@ -115,9 +111,7 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
             existing.ContactName = contactName;
             existing.JobTitle = jobTitle;
 
-            result.Changes = BuildChangeDescription(existing);
-
-            await DbContext.SaveChangesAsync();
+            await SaveChangesAsync(logData: true);
 
             result.Model = existing;
         }

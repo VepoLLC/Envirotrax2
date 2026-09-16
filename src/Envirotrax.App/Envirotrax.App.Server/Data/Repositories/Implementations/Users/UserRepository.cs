@@ -63,9 +63,7 @@ public class UserRepository : Repository<WaterSupplierUser>, IUserRepository
         user.ContactName = model.ContactName;
         user.EmailAddress = model.EmailAddress;
 
-        result.Changes = BuildChangeDescription(user);
-
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         result.Model = user;
 

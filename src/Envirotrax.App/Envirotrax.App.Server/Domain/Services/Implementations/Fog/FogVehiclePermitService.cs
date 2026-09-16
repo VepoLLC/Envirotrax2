@@ -58,11 +58,8 @@ public class FogVehiclePermitService : Service<FogVehiclePermit, FogVehiclePermi
         {
             if (saved.IsNew)
             {
+                // recordLog manual
                 await _recordLogService.AddAsync(RecordLogTableNames.FogVehiclePermits, saved.Model.VehicleId, saved.Model.WaterSupplierId, RecordLogType.Add, "New vehicle permit record");
-            }
-            else if (saved.Changes.Length > 0)
-            {
-                await _recordLogService.AddAsync(RecordLogTableNames.FogVehiclePermits, saved.Model.VehicleId, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
             }
         }
 

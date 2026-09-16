@@ -143,11 +143,11 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
         if (license.ProfessionalUser != null)
             license.ProfessionalUser.ContactName = contactName;
 
-        var changes = BuildChangeDescription(license);
+        // Both the license and the professional user are record logged, so this save writes a log row
+        // for each one that actually changed — the contact name edit used to go unlogged.
+        await SaveChangesAsync(logData: true, cancellationToken);
 
-        await DbContext.SaveChangesAsync(cancellationToken);
-
-        return new UpdateResult<ProfessionalUserLicense> { Model = license, Changes = changes };
+        return new UpdateResult<ProfessionalUserLicense> { Model = license };
     }
 
     public async Task<ProfessionalUserLicense> DeleteForWaterSupplierAsync(int id, CancellationToken cancellationToken)

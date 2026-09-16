@@ -45,9 +45,7 @@ public class BackflowGaugeRepository : Repository<BackflowGauge>, IBackflowGauge
         gauge.IsPortable = model.IsPortable;
         gauge.FilePath = model.FilePath;
 
-        result.Changes = BuildChangeDescription(gauge);
-
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         result.Model = gauge;
 

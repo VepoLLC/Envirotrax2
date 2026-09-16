@@ -144,9 +144,7 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
 
         inspection.Comments = request.Comments;
 
-        result.Changes = BuildChangeDescription(inspection);
-
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         result.Model = inspection;
 
@@ -166,15 +164,13 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
 
         // Attach BEFORE mutating so EF's change tracker captures the true pre-update values as
         // OriginalValue — attaching after mutation would seed OriginalValue from the already-new values,
-        // making BuildChangeDescription always report "no changes".
+        // making the record log's change description always report "no changes".
         DbContext.Attach(inspection);
 
         inspection.Disapproved = request.Disapproved;
         inspection.DisapprovedReason = request.Disapproved ? request.DisapprovedReason : null;
 
-        result.Changes = BuildChangeDescription(inspection);
-
-        await DbContext.SaveChangesAsync(cancellationToken);
+        await SaveChangesAsync(logData: true, cancellationToken);
 
         result.Model = inspection;
 
@@ -250,9 +246,7 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         inspection.InspectorLicenseNumber = model.InspectorLicenseNumber;
         inspection.InspectorLicenseType = model.InspectorLicenseType;
 
-        result.Changes = BuildChangeDescription(inspection);
-
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         result.Model = inspection;
 
@@ -261,7 +255,7 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
 
     public Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken)
     {
-        return Entity.CountAsync(c => c.SiteId == siteId, cancellationToken);
+        return Entity.CountAsync(c => c.SiteId == siteId && c.DeletedTime == null, cancellationToken);
     }
 
     private static async Task<IQueryable<CsiInspection>> ApplyLatestOnlyFilterAsync(IQueryable<CsiInspection> query, bool latestOnly, CancellationToken cancellationToken)

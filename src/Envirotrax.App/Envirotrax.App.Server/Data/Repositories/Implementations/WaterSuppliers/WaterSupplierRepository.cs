@@ -156,9 +156,7 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
         dbSupplier.LetterContactFaxNumber = supplier.LetterContactFaxNumber;
         dbSupplier.LetterContactEmailAddress = supplier.LetterContactEmailAddress;
 
-        result.Changes = BuildChangeDescription(dbSupplier);
-
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         result.Model = dbSupplier;
 

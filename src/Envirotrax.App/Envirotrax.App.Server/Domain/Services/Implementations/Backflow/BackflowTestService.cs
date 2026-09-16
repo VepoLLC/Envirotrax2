@@ -4,7 +4,6 @@ using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Backflow;
-using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
@@ -47,7 +46,6 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     private readonly IBackflowRenewalRequirementService _renewalRequirementService;
     private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly IBackflowSettingsService _settingsService;
-    private readonly IRecordLogService _recordLogService;
     private readonly ILogger<BackflowTestService> _logger;
 
     public BackflowTestService(
@@ -64,7 +62,6 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         IBackflowRenewalRequirementService renewalRequirementService,
         ITimeZoneHelperService timeZoneHelper,
         IBackflowSettingsService settingsService,
-        IRecordLogService recordLogService,
         ILogger<BackflowTestService> logger)
         : base(mapper, repository)
     {
@@ -80,7 +77,6 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         _renewalRequirementService = renewalRequirementService;
         _timeZoneHelper = timeZoneHelper;
         _settingsService = settingsService;
-        _recordLogService = recordLogService;
         _logger = logger;
     }
 
@@ -452,11 +448,6 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             await _fileStorageService.UploadAsync(newAirGapPath, airGapStream!);
         }
 
-        if (saved.Changes.Length > 0)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.BackflowTests, saved.Model.Id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes, professionalId);
-        }
-
         scope.Complete();
 
         var result = MapToDto(saved.Model)!;
@@ -522,11 +513,6 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             if (saved.Model == null)
             {
                 return null;
-            }
-
-            if (saved.Changes.Length > 0)
-            {
-                await _recordLogService.AddAsync(RecordLogTableNames.BackflowTests, id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
             }
 
             scope.Complete();
@@ -735,12 +721,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
                     newExpirationDate = (test.TestDate ?? DateTime.UtcNow).AddYears(matched.RenewalYears);
                 }
 
-                var saved = await _testRepository.UpdateTestRenewalAsync(test.Id, renewalRequired, newExpirationDate);
-
-                if (saved.Model != null && saved.Changes.Length > 0)
-                {
-                    await _recordLogService.AddAsync(RecordLogTableNames.BackflowTests, saved.Model.Id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
-                }
+                await _testRepository.UpdateTestRenewalAsync(test.Id, renewalRequired, newExpirationDate);
             }
             catch (Exception ex)
             {
@@ -773,12 +754,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
         var (renewalRequired, newExpirationDate) = ComputeRenewal(test, requirements);
 
-        var saved = await _testRepository.UpdateTestRenewalAndClearFlagAsync(testId, renewalRequired, newExpirationDate, cancellationToken);
-
-        if (saved.Model != null && saved.Changes.Length > 0)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.BackflowTests, saved.Model.Id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
-        }
+        await _testRepository.UpdateTestRenewalAndClearFlagAsync(testId, renewalRequired, newExpirationDate, cancellationToken);
     }
 
     private static readonly HashSet<string> SkippedDeviceTypes = new(StringComparer.OrdinalIgnoreCase)
@@ -790,35 +766,35 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     {
         var saved = await _testRepository.UpdateRenewalRequiredAsync(id, renewalRequired, _authService.UserId, cancellationToken);
 
-        return await FinishToggleUpdateAsync(saved);
+        return MapToggleResult(saved);
     }
 
     public async Task<BackflowTestDto?> UpdateScheduleMonthAsync(int id, int month, CancellationToken cancellationToken = default)
     {
         var saved = await _testRepository.UpdateScheduleMonthAsync(id, month, _authService.UserId, cancellationToken);
 
-        return await FinishToggleUpdateAsync(saved);
+        return MapToggleResult(saved);
     }
 
     public async Task<BackflowTestDto?> UpdateIsCurrentAsync(int id, bool isCurrent, CancellationToken cancellationToken = default)
     {
         var saved = await _testRepository.UpdateIsCurrentAsync(id, isCurrent, _authService.UserId, cancellationToken);
 
-        return await FinishToggleUpdateAsync(saved);
+        return MapToggleResult(saved);
     }
 
     public async Task<BackflowTestDto?> UpdateOutOfServiceAsync(int id, bool outOfService, CancellationToken cancellationToken = default)
     {
         var saved = await _testRepository.UpdateOutOfServiceAsync(id, outOfService, _authService.UserId, cancellationToken);
 
-        return await FinishToggleUpdateAsync(saved);
+        return MapToggleResult(saved);
     }
 
     public async Task<BackflowTestDto?> UpdateDisapprovalAsync(int id, bool disapproved, CancellationToken cancellationToken = default)
     {
         var saved = await _testRepository.UpdateDisapprovalAsync(id, disapproved, _authService.UserId, cancellationToken);
 
-        return await FinishToggleUpdateAsync(saved);
+        return MapToggleResult(saved);
     }
 
     public async Task<BackflowTestDto?> UpdateForceRenewalAsync(int id, BackflowTestForceRenewalRequest request, CancellationToken cancellationToken = default)
@@ -827,28 +803,23 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
         var saved = await _testRepository.UpdateForceRenewalAsync(id, request.ForceRenewal, forceRenewalYears, _authService.UserId, cancellationToken);
 
-        return await FinishToggleUpdateAsync(saved);
+        return MapToggleResult(saved);
     }
 
     public async Task<BackflowTestDto?> UpdateRejectionAsync(int id, BackflowTestRejectionRequest request, CancellationToken cancellationToken = default)
     {
         var saved = await _testRepository.UpdateRejectionAsync(id, request.Rejected, request.RejectedReason, _authService.UserId, cancellationToken);
 
-        return await FinishToggleUpdateAsync(saved);
+        return MapToggleResult(saved);
     }
 
-    // Shared tail for the 7 single-field toggle updates above: logs an Edit RecordLog entry when the
-    // auto-diff found a real change, mirroring the pattern already used by UpdateForAdminAsync.
-    private async Task<BackflowTestDto?> FinishToggleUpdateAsync(UpdateResult<BackflowTest> saved)
+    // Shared tail for the 7 single-field toggle updates above. The Edit record log is written by the
+    // repository save itself (SaveChangesAsync(logData: true)), so nothing is logged here.
+    private BackflowTestDto? MapToggleResult(UpdateResult<BackflowTest> saved)
     {
         if (saved.Model == null)
         {
             return null;
-        }
-
-        if (saved.Changes.Length > 0)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.BackflowTests, saved.Model.Id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
         }
 
         return MapToDto(saved.Model);

@@ -4,14 +4,12 @@ using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Csi;
-using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
-using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
@@ -29,7 +27,6 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
     private readonly ISiteService _siteService;
     private readonly IPdfTemplateService _pdfTemplateService;
     private readonly IAuthService _authService;
-    private readonly IRecordLogService _recordLogService;
 
     public CsiInspectionService(
         IMapper mapper,
@@ -39,8 +36,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         IProfessionalUserLicenseService licenseService,
         ISiteService siteService,
         IPdfTemplateService pdfTemplateService,
-        IAuthService authService,
-        IRecordLogService recordLogService)
+        IAuthService authService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -50,7 +46,6 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         _siteService = siteService;
         _pdfTemplateService = pdfTemplateService;
         _authService = authService;
-        _recordLogService = recordLogService;
     }
 
     public override async Task<CsiInspectionDto?> DeleteAsync(int id)
@@ -164,11 +159,6 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
             return null;
         }
 
-        if (saved.Changes.Length > 0)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.CsiInspections, saved.Model.Id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes, professionalId);
-        }
-
         return Mapper.Map<CsiInspectionDto>(saved.Model);
     }
 
@@ -179,11 +169,6 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         if (saved.Model == null)
         {
             return null;
-        }
-
-        if (saved.Changes.Length > 0)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.CsiInspections, id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
         }
 
         return Mapper.Map<CsiInspectionDto>(saved.Model);
@@ -198,11 +183,6 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
             if (saved.Model == null)
             {
                 return null;
-            }
-
-            if (saved.Changes.Length > 0)
-            {
-                await _recordLogService.AddAsync(RecordLogTableNames.CsiInspections, id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
             }
 
             scope.Complete();

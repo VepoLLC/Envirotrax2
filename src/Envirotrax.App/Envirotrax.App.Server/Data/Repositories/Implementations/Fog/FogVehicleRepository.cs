@@ -53,9 +53,7 @@ public class FogVehicleRepository : Repository<FogVehicle>, IFogVehicleRepositor
         vehicle.CapacityType = model.CapacityType;
         vehicle.StickerNumber = model.StickerNumber;
 
-        result.Changes = BuildChangeDescription(vehicle);
-
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         result.Model = vehicle;
 

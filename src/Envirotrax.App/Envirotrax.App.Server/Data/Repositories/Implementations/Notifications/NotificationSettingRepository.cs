@@ -46,9 +46,7 @@ public class NotificationSettingRepository : Repository<NotificationSetting>, IN
         setting.CreatedById = createdById;
         setting.CreatedTime = createdTime;
 
-        result.Changes = BuildChangeDescription(setting);
-
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         result.Model = setting;
 

@@ -5,9 +5,7 @@ public class UpdateResult<TModel>
 {
     public TModel? Model { get; set; }
 
-    public string Changes { get; set; } = string.Empty;
-
-    // Set by upsert-style repository methods (Add-or-Update in one call) to tell the caller
-    // which RecordLogType applies — Changes is never meaningful for a brand-new row.
+    // Set by upsert-style repository methods (Add-or-Update in one call) to tell the caller which
+    // RecordLogType applies: an insert has no field diff, so it needs a written "record added" log.
     public bool IsNew { get; set; }
 }

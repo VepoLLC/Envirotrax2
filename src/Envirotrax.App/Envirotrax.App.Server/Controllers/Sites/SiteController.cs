@@ -71,8 +71,8 @@ public class SiteController : WaterSupplierCrudController<SiteDto>
     [HasPermission(PermissionAction.CanView)]
     public async Task<IActionResult> GetLogsAsync(int id, CancellationToken cancellationToken)
     {
-        var site = await _siteService.GetAsync(id, cancellationToken);
-        if (site == null)
+        var exists = await _siteService.ExistsAsync(id, cancellationToken);
+        if (!exists)
         {
             return NotFound();
         }

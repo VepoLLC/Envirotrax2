@@ -191,9 +191,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             test.ExpirationDate = expirationDate.Value;
         }
 
-        result.Changes = BuildChangeDescription(test);
-
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         result.Model = test;
 
@@ -246,9 +244,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
 
         test.NeedsRenewalCheck = false;
 
-        result.Changes = BuildChangeDescription(test);
-
-        await DbContext.SaveChangesAsync(cancellationToken);
+        await SaveChangesAsync(logData: true, cancellationToken);
 
         result.Model = test;
 
@@ -293,9 +289,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             test.NeedsRenewalCheck = true;
         }
 
-        result.Changes = BuildChangeDescription(test);
-
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         if (test.Rejected && !wasRejected)
         {
@@ -548,9 +542,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         DbContext.Attach(test);
         test.RenewalRequired = renewalRequired;
 
-        result.Changes = BuildChangeDescription(test);
-
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         result.Model = test;
 
@@ -571,9 +563,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         DbContext.Attach(test);
         test.BackflowScheduleMonth = month;
 
-        result.Changes = BuildChangeDescription(test);
-
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         result.Model = test;
 
@@ -594,9 +584,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         DbContext.Attach(test);
         test.IsCurrent = isCurrent;
 
-        result.Changes = BuildChangeDescription(test);
-
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         result.Model = test;
 
@@ -628,9 +616,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             }
         }
 
-        result.Changes = BuildChangeDescription(test);
-
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         result.Model = test;
 
@@ -662,9 +648,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             }
         }
 
-        result.Changes = BuildChangeDescription(test);
-
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         result.Model = test;
 
@@ -696,9 +680,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             test.ExpirationDate = newExpiration;
         }
 
-        result.Changes = BuildChangeDescription(test);
-
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         result.Model = test;
 
@@ -727,12 +709,11 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             test.RejectedReason = rejectedReason;
         }
 
-        result.Changes = BuildChangeDescription(test);
         result.Model = test;
 
         if (rejected)
         {
-            await DbContext.SaveChangesAsync();
+            await SaveChangesAsync(logData: true);
 
             var previousId = await FindPreviousTestIdAsync(test);
 
@@ -746,7 +727,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         }
         else
         {
-            await DbContext.SaveChangesAsync();
+            await SaveChangesAsync(logData: true);
 
             await ReassignIsCurrentForDeviceAsync(test, cancellationToken);
         }
@@ -907,9 +888,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         test.BypassSerialNumberImagePath = newBypassSerialNumberImagePath ?? bypassSerialNumberImagePath;
         test.AirGapImagePath = newAirGapImagePath ?? airGapImagePath;
 
-        result.Changes = BuildChangeDescription(test);
-
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         result.Model = test;
 
@@ -918,7 +897,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
 
     public Task<int> CountCurrentInServiceBySiteAsync(int siteId, CancellationToken cancellationToken)
     {
-        return Entity.CountAsync(t => t.SiteId == siteId && t.IsCurrent && !t.OutOfService, cancellationToken);
+        return Entity.CountAsync(t => t.SiteId == siteId && t.DeletedTime == null && t.IsCurrent && !t.OutOfService, cancellationToken);
     }
 
     private async Task<int?> FindPreviousTestIdAsync(BackflowTest fromTest)

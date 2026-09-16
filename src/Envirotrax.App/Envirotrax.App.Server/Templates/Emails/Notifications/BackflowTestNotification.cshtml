@@ -1,0 +1,39 @@
+@using RazorLight
+@using Envirotrax.App.Server.Templates.Emails.Notifications
+@inherits TemplatePage<BackflowTestNotificationVm>
+
+@{
+    Layout = "Templates.Emails._EmailLayout";
+
+    var testUrl = $"{ViewBag.BaseUrl}/backflow/tests/{Model.TestId}/view";
+}
+
+<div>
+    <p style="margin-top: 0;">
+        <strong>Notification:</strong> @Model.Description
+    </p>
+
+    @if (!string.IsNullOrEmpty(Model.PropertyAddress))
+    {
+        <p><strong>Property Address:</strong> @Model.PropertyAddress</p>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.DeviceDescription) || !string.IsNullOrEmpty(Model.SerialNumber))
+    {
+        <p><strong>Assembly:</strong> @Model.DeviceDescription &nbsp; <strong>Serial Number:</strong> @Model.SerialNumber</p>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.HazardType))
+    {
+        <p><strong>Hazard Type:</strong> @Model.HazardType</p>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.LocationDescription))
+    {
+        <p><strong>Location:</strong> @Model.LocationDescription</p>
+    }
+
+    <p>
+        <a href="@testUrl" target="_blank">View the backflow test record</a>
+    </p>
+</div>

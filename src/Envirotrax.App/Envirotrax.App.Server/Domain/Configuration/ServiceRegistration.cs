@@ -109,6 +109,9 @@ public static class ServiceRegistration
         services.AddTransient<IGisAreaCoordinateService, GisAreaCoordinateService>();
 
         services.AddTransient<INotificationSettingService, NotificationSettingService>();
+        services.AddTransient<INotificationService, NotificationService>();
+        services.AddTransient<IBackflowTestNotificationService, BackflowTestNotificationService>();
+        services.AddTransient<IBackflowTestNotificationMatcher, BackflowTestNotificationMatcher>();
 
         services.AddTransient<IWaterSupplierDashboardService, WaterSupplierDashboardService>();
 
@@ -118,7 +121,7 @@ public static class ServiceRegistration
         services.Configure<AuthorizeNetOptions>(configuration.GetSection("AuthorizeNet"));
         services.AddHttpClient<IAuthorizeNetPaymentService, AuthorizeNetPaymentService>();
 
-        services.AddHtmlTemplateService(opts =>
+        services.AddEmailService(configuration.GetSection("Email"), opts =>
         {
             opts.Assembly = typeof(ServiceRegistration).Assembly;
             opts.Namespace = "Envirotrax.App.Server";

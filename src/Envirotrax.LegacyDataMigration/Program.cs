@@ -11,6 +11,13 @@ using Serilog;
 
 var newV2DatabaseConnection = @"Server=(localdb)\mssqllocaldb;Database=Envirotrax2Dev;Trusted_Connection=True;MultipleActiveResultSets=true";
 
+// Where V1 file attachments are downloaded from, and the Azure Storage account they are uploaded to.
+// The storage account is REAL and SHARED - there is no local stand-in for it - and DefaultAzureCredential
+// signs in as you, so your Azure login needs write access to it. See the README before running.
+var legacyFileServerAddress = "https://iofiles.envirotrax.com";
+var azureStorageAccountName = "envirotrax2dev";
+var azureStorageContainerName = "default";
+
 var services = new ServiceCollection();
 
 void ConfigureDbContext(DbContextOptionsBuilder options)
@@ -44,10 +51,15 @@ Log.Logger = new LoggerConfiguration()
 
 services.AddLogging(builder => builder.AddSerilog(Log.Logger, dispose: true));
 
+services.AddSingleton(new LegacyFileServerService(legacyFileServerAddress));
+services.AddSingleton(new BlobStorageService(azureStorageAccountName, azureStorageContainerName));
+
 services.AddTransient<UserService>();
 services.AddTransient<WaterSupplierService>();
 services.AddTransient<WaterSupplierUserService>();
+services.AddTransient<GisAreaService>();
 services.AddTransient<SiteService>();
+services.AddTransient<SiteLogService>();
 
 var provider = services.BuildServiceProvider();
 
@@ -63,5 +75,11 @@ await waterSupplierService.MigrateAsync();
 var supplierUserService = provider.GetRequiredService<WaterSupplierUserService>();
 await supplierUserService.MigrateAsync();
 
+var gisAreaService = provider.GetRequiredService<GisAreaService>();
+await gisAreaService.MigrateAsync();
+
 var siteService = provider.GetRequiredService<SiteService>();
 await siteService.MigrateAsync();
+
+var siteLogService = provider.GetRequiredService<SiteLogService>();
+await siteLogService.MigrateAsync();

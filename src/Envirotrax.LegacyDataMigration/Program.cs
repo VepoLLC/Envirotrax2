@@ -57,6 +57,7 @@ services.AddSingleton(new BlobStorageService(azureStorageAccountName, azureStora
 services.AddTransient<UserService>();
 services.AddTransient<WaterSupplierService>();
 services.AddTransient<WaterSupplierUserService>();
+services.AddTransient<ProfessionalService>();
 services.AddTransient<GisAreaService>();
 services.AddTransient<SiteService>();
 services.AddTransient<SiteLogService>();
@@ -74,6 +75,9 @@ await waterSupplierService.MigrateAsync();
 
 var supplierUserService = provider.GetRequiredService<WaterSupplierUserService>();
 await supplierUserService.MigrateAsync();
+
+var professionalService = provider.GetRequiredService<ProfessionalService>();
+await professionalService.MigrateAsync();
 
 var gisAreaService = provider.GetRequiredService<GisAreaService>();
 await gisAreaService.MigrateAsync();

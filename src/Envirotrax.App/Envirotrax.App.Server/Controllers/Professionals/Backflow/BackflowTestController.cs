@@ -17,16 +17,13 @@ public class BackflowTestController : ProfessionalProtectedController
 {
     private readonly IBackflowTestService _backflowTestService;
     private readonly IBackflowTestNotificationService _notificationService;
-    private readonly ILogger<BackflowTestController> _logger;
 
     public BackflowTestController(
         IBackflowTestService backflowTestService,
-        IBackflowTestNotificationService notificationService,
-        ILogger<BackflowTestController> logger)
+        IBackflowTestNotificationService notificationService)
     {
         _backflowTestService = backflowTestService;
         _notificationService = notificationService;
-        _logger = logger;
     }
 
     [HttpGet]
@@ -115,14 +112,7 @@ public class BackflowTestController : ProfessionalProtectedController
     [HttpPost("checkout")]
     public async Task<IActionResult> CheckoutAsync([FromBody] List<int> testIds, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _notificationService.StartCheckingNotificationsAsync(testIds, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to process notifications during backflow test checkout.");
-        }
+        await _notificationService.StartCheckingNotificationsAsync(testIds, cancellationToken);
 
         return Ok();
     }

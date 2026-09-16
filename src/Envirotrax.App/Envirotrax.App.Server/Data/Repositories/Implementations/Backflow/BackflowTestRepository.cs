@@ -56,28 +56,72 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return base.GetAllAsync(pageInfo, query, cancellationToken);
     }
 
+    // Deliberately not GetListQuery: this feeds notification matching, which only needs the site flags
+    // it filters on and the supplier chain a notification is attributed to. The other list includes
+    // (Bpat, BpatState, PropertyState, MailingState) would only widen the join.
     public async Task<List<BackflowTest>> GetByIdsAsync(IEnumerable<int> ids, CancellationToken cancellationToken)
     {
-        return await GetListQuery()
+        return await Entity
+            .AsNoTracking()
             .Include(t => t.WaterSupplier)
                 .ThenInclude(ws => ws!.Parent)
+            .Include(t => t.Site)
             .Where(t => ids.Contains(t.Id))
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<BackflowTest?> FindPreviousTestAsync(BackflowTest test, CancellationToken cancellationToken)
+    public async Task<Dictionary<int, BackflowTest>> FindPreviousTestsAsync(
+        IReadOnlyCollection<BackflowTest> tests, CancellationToken cancellationToken)
     {
-        return await DbContext.BackflowTests
+        if (tests.Count == 0)
+        {
+            return [];
+        }
+
+        var waterSupplierIds = tests.Select(t => t.WaterSupplierId).Distinct().ToList();
+        var siteIds = tests.Select(t => t.SiteId).Where(siteId => siteId != null).Distinct().ToList();
+        var includeMissingSite = tests.Any(t => t.SiteId == null);
+
+        // One query for the whole batch instead of a lookup per test. Supplier and site narrow it down in
+        // SQL — both are foreign keys, so they are indexed, unlike the serial number. The exact key match
+        // (including manufacturer and serial) and the "most recent earlier test" pick happen in memory
+        // below, which also keeps the null-matching semantics the per-test query relied on.
+        var candidates = await DbContext.BackflowTests
             .IgnoreQueryFilters()
-            .Where(t => t.WaterSupplierId == test.WaterSupplierId
-                && t.SiteId == test.SiteId
-                && t.Manufacturer == test.Manufacturer
-                && t.SerialNumber == test.SerialNumber
-                && t.DeletedTime == null
+            .AsNoTracking()
+            .Where(t => t.DeletedTime == null
                 && !t.Rejected
-                && t.CreatedTime < test.CreatedTime)
-            .OrderByDescending(t => t.CreatedTime)
-            .FirstOrDefaultAsync(cancellationToken);
+                && waterSupplierIds.Contains(t.WaterSupplierId)
+                && (siteIds.Contains(t.SiteId) || (includeMissingSite && t.SiteId == null)))
+            .ToListAsync(cancellationToken);
+
+        var candidatesByKey = candidates
+            .GroupBy(BuildPreviousTestKey)
+            .ToDictionary(group => group.Key, group => group.OrderByDescending(t => t.CreatedTime).ToList());
+
+        var previousTests = new Dictionary<int, BackflowTest>();
+
+        foreach (var test in tests)
+        {
+            if (!candidatesByKey.TryGetValue(BuildPreviousTestKey(test), out var matching))
+            {
+                continue;
+            }
+
+            var previousTest = matching.FirstOrDefault(candidate => candidate.CreatedTime < test.CreatedTime);
+
+            if (previousTest != null)
+            {
+                previousTests[test.Id] = previousTest;
+            }
+        }
+
+        return previousTests;
+    }
+
+    private static (int, int?, string?, string?) BuildPreviousTestKey(BackflowTest test)
+    {
+        return (test.WaterSupplierId, test.SiteId, test.Manufacturer, test.SerialNumber);
     }
 
     // Image paths are owned by the dedicated image flow (UpdateImagePathAsync),

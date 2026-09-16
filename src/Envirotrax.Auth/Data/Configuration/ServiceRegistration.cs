@@ -2,6 +2,7 @@
 using Envirotrax.Auth.Data.Models;
 using Envirotrax.Auth.Data.Repositories.Defintions;
 using Envirotrax.Auth.Data.Repositories.Implementations;
+using Envirotrax.Auth.Domain.Security;
 using Envirotrax.Common.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +32,10 @@ public static class ServiceRegistration
 
         services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
             .AddEntityFrameworkStores<ApplicationDbContext>()
-            .AddDefaultTokenProviders();
+            .AddDefaultTokenProviders()
+            // Overrides the built-in "Email" 2FA token provider to extend code validity to 15
+            // minutes; the "Phone" (SMS) provider registered above is left untouched.
+            .AddTokenProvider<EmailTwoFactorTokenProvider<AppUser>>("Email");
 
         services.AddTransient<IWaterSupplierUserRepository, WaterSupplierUserRepository>();
         services.AddTransient<IProfessionalUserRepository, ProfessionalUserRepository>();

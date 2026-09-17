@@ -1,15 +1,12 @@
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Notifications;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
-using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Notifications;
 
 public class NotificationDto : IDto
 {
     public int Id { get; set; }
-
-    public ReferencedWaterSupplierDto? ParentWaterSupplier { get; set; }
 
     public int UserId { get; set; }
     public ReferencedWaterSupplierUserDto? User { get; set; }

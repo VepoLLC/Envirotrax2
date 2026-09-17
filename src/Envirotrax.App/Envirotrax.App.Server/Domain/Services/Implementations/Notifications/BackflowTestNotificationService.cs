@@ -175,7 +175,6 @@ public class BackflowTestNotificationService : IBackflowTestNotificationService
         notification.WaterSupplierId = waterSupplierId;
         notification.ModuleType = NotificationModuleType.Backflow;
         notification.RecordId = test.Id;
-        notification.ParentWaterSupplierId = test.WaterSupplier?.Parent?.Id;
         notification.PropertyDescription = BuildPropertyDescription(test);
         notification.RecordDescription = BuildDeviceDescription(test);
     }

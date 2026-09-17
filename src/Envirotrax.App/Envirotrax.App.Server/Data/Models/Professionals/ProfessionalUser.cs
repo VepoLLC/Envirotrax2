@@ -1,4 +1,5 @@
 
+using Envirotrax.App.Server.Data.Models.Logs;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.Contracts;
 using Envirotrax.App.Server.Data.Models.States;
@@ -7,6 +8,7 @@ using Envirotrax.Common.Data.Attributes;
 
 namespace Envirotrax.App.Server.Data.Models.Professionals;
 
+[RecordLogged(RecordLogTableNames.ProfessionalUsers, ProfessionalSource = RecordLogIdSource.Entity)]
 public class ProfessionalUser : IProfessionalModel
 {
     [AppPrimaryKey(false, IsShadowKey = true)]

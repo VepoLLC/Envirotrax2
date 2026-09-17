@@ -16,4 +16,6 @@ public interface IBackflowOutOfServiceRequestRepository : IRepository<BackflowOu
         OutOfServiceType? type, CancellationToken cancellationToken);
 
     Task<bool> ClearAsync(int id, CancellationToken cancellationToken);
+
+    Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken);
 }

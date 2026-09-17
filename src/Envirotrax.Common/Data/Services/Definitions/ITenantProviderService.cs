@@ -17,6 +17,11 @@ namespace Envirotrax.Common.Data.Services.Definitions
 
         int ParentProfessionalId { get; }
 
+        /// <summary>
+        /// Remote address of the current request, or null outside a request (background jobs, seeding).
+        /// </summary>
+        string? IpAddress { get; }
+
         void SetWaterSupplierId(int supplierId);
         void SetWaterSupplier(ClaimsPrincipal principal, int supplierId);
 

@@ -36,17 +36,12 @@ public class FogVehicleService : Service<FogVehicle, FogVehicleDto>, IFogVehicle
         var model = MapToModel(dto)!;
         var saved = await _vehicleRepository.UpdateVehicleAsync(model);
 
-        if (saved.Model == null)
+        if (saved == null)
         {
             throw new InvalidOperationException($"Vehicle {dto.Id} not found.");
         }
 
-        if (saved.Changes.Length > 0)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.FogVehicles, saved.Model.Id, null, RecordLogType.Edit, saved.Changes, professionalId: saved.Model.ProfessionalId);
-        }
-
-        return MapToDto(saved.Model)!;
+        return MapToDto(saved)!;
     }
 
     public override async Task<FogVehicleDto?> DeleteAsync(int id)
@@ -55,6 +50,7 @@ public class FogVehicleService : Service<FogVehicle, FogVehicleDto>, IFogVehicle
 
         if (deleted != null)
         {
+            // recordLog manual
             await _recordLogService.AddAsync(RecordLogTableNames.FogVehicles, deleted.Id, null, RecordLogType.Delete,
                 $"Deleted vehicle — LicensePlateNumber: '{deleted.LicensePlateNumber}', StickerNumber: '{deleted.StickerNumber}'", professionalId: deleted.Professional?.Id);
         }

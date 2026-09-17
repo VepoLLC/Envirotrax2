@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Models.States;
@@ -13,6 +14,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Envirotrax.App.Server.Data.Models.Backflow;
 
 [Table("BackflowTests")]
+[RecordLogged(RecordLogTableNames.BackflowTests)]
 public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 {
     [AppPrimaryKey(true)]

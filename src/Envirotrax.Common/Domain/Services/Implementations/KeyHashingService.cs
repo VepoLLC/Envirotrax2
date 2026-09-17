@@ -1,3 +1,4 @@
+using System.Buffers.Text;
 using System.Security.Cryptography;
 using Envirotrax.Common.Domain.Services.Defintions;
 
@@ -8,7 +9,7 @@ public class KeyHashingService : IKeyHashingService
     public string GenerateApiKey()
     {
         byte[] keyBytes = RandomNumberGenerator.GetBytes(32);
-        return Convert.ToBase64String(keyBytes);
+        return Base64Url.EncodeToString(keyBytes);
     }
 
     public string HashText(string text)

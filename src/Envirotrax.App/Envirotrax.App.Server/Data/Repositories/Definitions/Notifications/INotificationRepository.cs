@@ -4,5 +4,9 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Notifications;
 
 public interface INotificationRepository : IRepository<Notification>
 {
-    Task MarkSentAsync(int id, CancellationToken cancellationToken);
+    // One insert for the whole batch — saving notifications one by one cost a database
+    // round trip each, which dominated the time of a multi-item checkout.
+    Task<List<Notification>> AddRangeAsync(List<Notification> notifications);
+
+    Task MarkSentAsync(IEnumerable<int> ids, CancellationToken cancellationToken);
 }

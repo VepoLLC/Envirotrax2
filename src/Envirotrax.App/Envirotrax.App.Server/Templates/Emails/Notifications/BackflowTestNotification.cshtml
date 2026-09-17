@@ -4,36 +4,39 @@
 
 @{
     Layout = "Templates.Emails._EmailLayout";
-
-    var testUrl = $"{ViewBag.BaseUrl}/backflow/tests/{Model.TestId}/view";
 }
 
 <div>
     <p style="margin-top: 0;">
-        <strong>Notification:</strong> @Model.Description
+        The following backflow tests matched your notification settings.
     </p>
 
-    @if (!string.IsNullOrEmpty(Model.PropertyAddress))
+    @foreach (var notificationGroup in Model.Groups)
     {
-        <p><strong>Property Address:</strong> @Model.PropertyAddress</p>
-    }
+        <div style="border-left: 4px solid @notificationGroup.Color; padding-left: 14px; margin-bottom: 28px;">
+            <p style="margin: 0 0 14px 0;">
+                <strong>@notificationGroup.Description</strong>
+                <span style="color: #6c757d;">(@notificationGroup.Items.Count)</span>
+            </p>
 
-    @if (!string.IsNullOrEmpty(Model.DeviceDescription) || !string.IsNullOrEmpty(Model.SerialNumber))
-    {
-        <p><strong>Assembly:</strong> @Model.DeviceDescription &nbsp; <strong>Serial Number:</strong> @Model.SerialNumber</p>
-    }
+            @foreach (var entry in notificationGroup.Items)
+            {
+                var testUrl = $"{ViewBag.BaseUrl}/backflow/tests/{entry.TestId}/view";
 
-    @if (!string.IsNullOrEmpty(Model.HazardType))
-    {
-        <p><strong>Hazard Type:</strong> @Model.HazardType</p>
-    }
+                <div style="margin-bottom: 14px;">
+                    <a href="@testUrl" target="_blank" style="font-weight: bold;">@entry.Title</a>
 
-    @if (!string.IsNullOrEmpty(Model.LocationDescription))
-    {
-        <p><strong>Location:</strong> @Model.LocationDescription</p>
-    }
+                    @if (!string.IsNullOrEmpty(entry.Details))
+                    {
+                        <div style="color: #6c757d; font-size: 13px;">@entry.Details</div>
+                    }
 
-    <p>
-        <a href="@testUrl" target="_blank">View the backflow test record</a>
-    </p>
+                    @if (!string.IsNullOrEmpty(entry.LocationDescription))
+                    {
+                        <div style="color: #6c757d; font-size: 13px;">@entry.LocationDescription</div>
+                    }
+                </div>
+            }
+        </div>
+    }
 </div>

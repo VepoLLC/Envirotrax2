@@ -8,7 +8,9 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
 {
     Task<List<BackflowTest>> GetByIdsAsync(IEnumerable<int> ids, CancellationToken cancellationToken);
 
-    Task<BackflowTest?> FindPreviousTestAsync(BackflowTest test, CancellationToken cancellationToken);
+    // Resolved for the whole batch in one query, keyed by test id. Tests without an earlier
+    // match are simply absent from the result.
+    Task<Dictionary<int, BackflowTest>> FindPreviousTestsAsync(IReadOnlyCollection<BackflowTest> tests, CancellationToken cancellationToken);
 
     Task<BackflowTest> UpdateImagePathAsync(BackflowTest model, string imagePathPropertyName);
 

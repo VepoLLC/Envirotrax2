@@ -1,0 +1,109 @@
+<ng-template #statusTemplate let-ticket="rowData">
+    <div class="d-flex gap-1 align-items-center flex-wrap">
+        <vp-status-icon *ngIf="ticket.pickupCompleted && !ticket.completed"
+                        imageSrc="/images/icons/bstatus-green-half.png"
+                        text="Completed Pickup"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="ticket.completed"
+                        imageSrc="/images/icons/bstatus-green-on.png"
+                        text="Completed Ticket"
+                        [showText]="false" />
+        <vp-status-icon [imageSrc]="ticket.transactionId ? '/images/icons/bstatus-orange-on.png' : '/images/icons/bstatus-orange-off.png'"
+                        [text]="ticket.transactionId ? 'Paid' : 'Unpaid'"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="ticket.approvalDate && !ticket.disapproved"
+                        imageSrc="/images/icons/bstatus-cyan-on.png"
+                        text="Approved"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="ticket.disapproved"
+                        imageSrc="/images/icons/bstatus-cyan-off.png"
+                        text="Disapproved"
+                        [showText]="false" />
+    </div>
+</ng-template>
+
+<ng-template #removalDateTemplate let-ticket="rowData">
+    <span>{{ ticket.interceptorWasteRemovedDate | date:'dd.MM.yyyy HH:mm' }}</span>
+</ng-template>
+
+<ng-template #deliveryDateTemplate let-ticket="rowData">
+    <span>{{ ticket.receiverWasteDeliveredDate | date:'dd.MM.yyyy HH:mm' }}</span>
+</ng-template>
+
+<ng-template #transporterTemplate let-ticket="rowData">
+    <div>
+        <div *ngIf="ticket.transporterCompanyName" class="fw-semibold">{{ ticket.transporterCompanyName }}</div>
+        <div *ngIf="ticket.transporterContactName">{{ ticket.transporterContactName }}</div>
+        <div *ngIf="ticket.transporterAddress">{{ ticket.transporterAddress }}</div>
+        <div *ngIf="ticket.transporterCity || ticket.transporterState || ticket.transporterZip">
+            {{ ticket.transporterCity }}<span *ngIf="ticket.transporterCity && (ticket.transporterState || ticket.transporterZip)">, </span>{{ ticket.transporterState }} {{ ticket.transporterZip }}
+        </div>
+        <div *ngIf="ticket.transporterLicenseNumber">
+            <small class="fw-semibold">License #:</small> {{ ticket.transporterLicenseNumber }}
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #receiverTemplate let-ticket="rowData">
+    <div>
+        <div *ngIf="ticket.receiverCompanyName" class="fw-semibold">{{ ticket.receiverCompanyName }}</div>
+        <div *ngIf="ticket.receiverAddress">{{ ticket.receiverAddress }}</div>
+        <div *ngIf="ticket.receiverCity || ticket.receiverState || ticket.receiverZip">
+            {{ ticket.receiverCity }}<span *ngIf="ticket.receiverCity && (ticket.receiverState || ticket.receiverZip)">, </span>{{ ticket.receiverState }} {{ ticket.receiverZip }}
+        </div>
+        <div *ngIf="ticket.receiverRegistrationNumber">
+            <small class="fw-semibold">Registration #:</small> {{ ticket.receiverRegistrationNumber }}
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #wasteTemplate let-ticket="rowData">
+    <div>
+        <div *ngIf="ticket.interceptorType">
+            <small class="fw-semibold">Interceptor Type:</small>
+            {{ ticket.interceptorType }}<span *ngIf="ticket.interceptorType === 'Other'"> - {{ ticket.interceptorOtherDescription }}</span>
+        </div>
+        <div *ngIf="ticket.interceptorCapacity">
+            <small class="fw-semibold">Interceptor Capacity:</small>
+            {{ ticket.interceptorCapacity }} {{ capacityUnit(ticket.interceptorCapacityType) }}
+        </div>
+        <div *ngIf="ticket.interceptorWasteRemovedAmountGallons">
+            <small class="fw-semibold">Waste Removed:</small>
+            {{ ticket.interceptorWasteRemovedAmountGallons }} Gallons
+        </div>
+    </div>
+</ng-template>
+
+<vp-section header="FOG Trip Tickets">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+        <div class="container mb-3">
+            <div class="row gap-2 justify-content-center mb-3">
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-half.png" text="Completed Pickup" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Completed Ticket" />
+                </div>
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-orange-on.png" text="Paid" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-orange-off.png" text="Unpaid" />
+                </div>
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-cyan-on.png" text="Approved" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-cyan-off.png" text="Disapproved" />
+                </div>
+            </div>
+        </div>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getTripTickets()"
+                  [(query)]="table.query"
+                  (queryChange)="getTripTickets()"
+                  (queryReset)="getTripTickets()"
+                  [canViewDetails]="true"
+                  (viewDetails)="viewTripTicket($event)" />
+    </div>
+</vp-section>

@@ -11,6 +11,7 @@ import { SiteCsiInspectionsComponent } from './edit/tabs/csi-inspections/site-cs
 import { SiteBackflowTestsComponent } from './edit/tabs/backflow-tests/site-backflow-tests.component';
 import { SiteBackflowOutOfServiceComponent } from './edit/tabs/backflow-out-of-service/site-backflow-out-of-service.component';
 import { SiteFogInspectionsComponent } from './edit/tabs/fog-inspections/site-fog-inspections.component';
+import { SiteFogTripTicketsComponent } from './edit/tabs/fog-trip-tickets/site-fog-trip-tickets.component';
 import { SiteLogHistoryComponent } from './edit/tabs/log-history/site-log-history.component';
 import { PropertyLogManagementComponent } from './reports/property-log-management/property-log-management.component';
 
@@ -23,6 +24,7 @@ import { PropertyLogManagementComponent } from './reports/property-log-managemen
         SiteBackflowTestsComponent,
         SiteBackflowOutOfServiceComponent,
         SiteFogInspectionsComponent,
+        SiteFogTripTicketsComponent,
         SiteLogHistoryComponent,
         PropertyLogManagementComponent
     ],

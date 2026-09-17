@@ -13,7 +13,9 @@ import { BackflowTestService } from "../../shared/services/backflow/backflow-tes
 import { BackflowOutOfServiceRequestService } from "../../shared/services/backflow/backflow-out-of-service-request.service";
 import { OutOfServiceRequestStatusFilter } from "../../shared/models/backflow/out-of-service-request-status-filter.enum";
 import { FogInspectionService } from "../../shared/services/fog/fog-inspection.service";
+import { FogTripTicketService } from "../../shared/services/fog/fog-trip-ticket.service";
 import { HelperService } from "../../shared/services/helpers/helper.service";
+import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import { UserService } from "../../shared/services/water-suppliers/user.service";
 import { FacilityType } from '../../shared/enums/facility-type.enum';
@@ -23,7 +25,7 @@ import { AuthService } from '../../shared/services/auth/auth.service';
 import { PermissionAction, PermissionType } from '../../shared/models/permission-type';
 import { FeatureType } from '../../shared/models/feature-type';
 
-type SiteTab = 'logHistory' | 'csi' | 'backflow' | 'outOfService' | 'fog' | 'recordLog';
+type SiteTab = 'logHistory' | 'csi' | 'backflow' | 'outOfService' | 'tripTickets' | 'fog' | 'recordLog';
 
 @Component({
     selector: 'app-edit-site-component',
@@ -38,11 +40,13 @@ export class EditSiteComponent implements OnInit {
     public canViewCsi: boolean = false;
     public canViewBackflow: boolean = false;
     public canViewOutOfService: boolean = false;
+    public canViewTripTickets: boolean = false;
     public canViewFog: boolean = false;
     public logHistoryInitialized: boolean = false;
     public csiInitialized: boolean = false;
     public backflowInitialized: boolean = false;
     public outOfServiceInitialized: boolean = false;
+    public tripTicketsInitialized: boolean = false;
     public fogInitialized: boolean = false;
     public recordLogs: RecordLog[] = [];
     public isLoadingRecordLogs: boolean = false;
@@ -50,6 +54,7 @@ export class EditSiteComponent implements OnInit {
     public csiCount: number = 0;
     public backflowCount: number = 0;
     public outOfServiceCount: number = 0;
+    public tripTicketCount: number = 0;
     public fogCount: number = 0;
 
     public site: Site = {
@@ -89,17 +94,22 @@ export class EditSiteComponent implements OnInit {
         private readonly _backflowTestService: BackflowTestService,
         private readonly _backflowOutOfServiceRequestService: BackflowOutOfServiceRequestService,
         private readonly _fogInspectionService: FogInspectionService,
+        private readonly _fogTripTicketService: FogTripTicketService,
         private readonly _stateService: LookupService,
         private readonly _acitvatedRoute: ActivatedRoute,
         private readonly _router: Router,
         private readonly _helper: HelperService,
         private readonly _userService: UserService,
         private readonly _toastService: ToastService,
-        private readonly _authService: AuthService
+        private readonly _authService: AuthService,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
     }
 
     public async ngOnInit(): Promise<void> {
+        // Full width: the sections get more room and the tab strip stays on one row.
+        this._containerHelper.setContainerVisibility(false);
+
         await this.loadPermissions();
         await this.loadStates();
         await this.getUsers();
@@ -152,6 +162,11 @@ export class EditSiteComponent implements OnInit {
                     .then(result => this.outOfServiceCount = result.pageInfo.totalItems ?? 0)
                 : Promise.resolve(),
 
+            this.canViewTripTickets
+                ? this._fogTripTicketService.getAll(countPageInfo, { sort: {}, filter: [siteFilter] })
+                    .then(result => this.tripTicketCount = result.pageInfo.totalItems ?? 0)
+                : Promise.resolve(),
+
             this.canViewFog
                 ? this._fogInspectionService.getAll(countPageInfo, { sort: {}, filter: [siteFilter] })
                     .then(result => this.fogCount = result.pageInfo.totalItems ?? 0)
@@ -174,6 +189,11 @@ export class EditSiteComponent implements OnInit {
         this.canViewOutOfService = await this._authService.hasAnyPermisison(
             PermissionAction.CanView, PermissionType.BackflowOutOfService);
 
+        const canViewTripTicketsPermission = await this._authService.hasAnyPermisison(
+            PermissionAction.CanView, PermissionType.FogTripTickets);
+        const hasFogTransportationFeature = await this._authService.hasAnyFeatures(FeatureType.FogTransportation);
+        this.canViewTripTickets = canViewTripTicketsPermission && hasFogTransportationFeature;
+
         const canViewFogPermission = await this._authService.hasAnyPermisison(
             PermissionAction.CanView, PermissionType.FogInspections);
         const hasFogFeature = await this._authService.hasAnyFeatures(FeatureType.FogInspection);
@@ -187,6 +207,8 @@ export class EditSiteComponent implements OnInit {
             this.setActiveTab('backflow');
         } else if (this.canViewOutOfService) {
             this.setActiveTab('outOfService');
+        } else if (this.canViewTripTickets) {
+            this.setActiveTab('tripTickets');
         } else if (this.canViewFog) {
             this.setActiveTab('fog');
         }
@@ -206,6 +228,8 @@ export class EditSiteComponent implements OnInit {
             this.backflowInitialized = true;
         } else if (this.activeTab === 'outOfService') {
             this.outOfServiceInitialized = true;
+        } else if (this.activeTab === 'tripTickets') {
+            this.tripTicketsInitialized = true;
         } else if (this.activeTab === 'fog') {
             this.fogInitialized = true;
         }

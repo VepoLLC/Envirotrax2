@@ -14,9 +14,6 @@ public class Notification : TenantModel<WaterSupplier>, ICreateAuditableModel<Ap
     [AppPrimaryKey(true)]
     public int Id { get; set; }
 
-    public int? ParentWaterSupplierId { get; set; }
-    public WaterSupplier? ParentWaterSupplier { get; set; }
-
     public int UserId { get; set; }
     public WaterSupplierUser? User { get; set; }
 

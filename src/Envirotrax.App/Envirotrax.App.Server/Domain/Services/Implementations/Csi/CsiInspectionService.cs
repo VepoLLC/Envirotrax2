@@ -4,7 +4,6 @@ using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Csi;
-using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
@@ -12,7 +11,6 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
-using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
@@ -31,7 +29,6 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
     private readonly ISiteService _siteService;
     private readonly IPdfTemplateService _pdfTemplateService;
     private readonly IAuthService _authService;
-    private readonly IRecordLogService _recordLogService;
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IProfessionalSupplierService _professionalSupplierService;
 
@@ -44,7 +41,6 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         ISiteService siteService,
         IPdfTemplateService pdfTemplateService,
         IAuthService authService,
-        IRecordLogService recordLogService,
         IGeneralSettingsService generalSettingsService,
         IProfessionalSupplierService professionalSupplierService)
         : base(mapper, repository)
@@ -56,7 +52,6 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         _siteService = siteService;
         _pdfTemplateService = pdfTemplateService;
         _authService = authService;
-        _recordLogService = recordLogService;
         _generalSettingsService = generalSettingsService;
         _professionalSupplierService = professionalSupplierService;
     }
@@ -191,34 +186,24 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
 
         var saved = await _repository.UpdateForProfessionalAsync(inspection, professionalId);
 
-        if (saved.Model == null)
+        if (saved == null)
         {
             return null;
         }
 
-        if (saved.Changes.Length > 0)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.CsiInspections, saved.Model.Id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes, professionalId);
-        }
-
-        return Mapper.Map<CsiInspectionDto>(saved.Model);
+        return Mapper.Map<CsiInspectionDto>(saved);
     }
 
     public async Task<CsiInspectionDto?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken)
     {
         var saved = await _repository.UpdateApprovalAsync(id, request, cancellationToken);
 
-        if (saved.Model == null)
+        if (saved == null)
         {
             return null;
         }
 
-        if (saved.Changes.Length > 0)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.CsiInspections, id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
-        }
-
-        return Mapper.Map<CsiInspectionDto>(saved.Model);
+        return Mapper.Map<CsiInspectionDto>(saved);
     }
 
     public async Task<CsiInspectionDto?> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request)
@@ -227,14 +212,9 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         {
             var saved = await _repository.UpdateForAdminAsync(id, request);
 
-            if (saved.Model == null)
+            if (saved == null)
             {
                 return null;
-            }
-
-            if (saved.Changes.Length > 0)
-            {
-                await _recordLogService.AddAsync(RecordLogTableNames.CsiInspections, id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
             }
 
             scope.Complete();

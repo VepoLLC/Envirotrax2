@@ -46,17 +46,12 @@ public class NotificationSettingService : Service<NotificationSetting, Notificat
         var model = MapToModel(dto)!;
         var saved = await _repository.UpdateSettingAsync(model);
 
-        if (saved.Model == null)
+        if (saved == null)
         {
             throw new InvalidOperationException($"Notification setting {dto.Id} not found.");
         }
 
-        if (saved.Changes.Length > 0)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.NotificationSettings, saved.Model.Id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
-        }
-
-        return MapToDto(saved.Model)!;
+        return MapToDto(saved)!;
     }
 
     public override async Task<NotificationSettingDto?> DeleteAsync(int id)
@@ -65,6 +60,7 @@ public class NotificationSettingService : Service<NotificationSetting, Notificat
 
         if (deleted != null)
         {
+            // recordLog manual
             await _recordLogService.AddAsync(RecordLogTableNames.NotificationSettings, deleted.Id, _tenantProvider.WaterSupplierId, RecordLogType.Delete,
                 $"Deleted notification setting — Description: '{deleted.Description}'");
         }

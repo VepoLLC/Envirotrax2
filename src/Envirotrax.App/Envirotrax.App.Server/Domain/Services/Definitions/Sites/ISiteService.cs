@@ -20,4 +20,5 @@ public interface ISiteService : IService<Site, SiteDto>
     Task<IPagedData<FogTripTicketComplianceSiteDto>> GetFogTripTicketComplianceAsync(PageInfo pageInfo, Query query, DateTime? dueDateFrom, DateTime? dueDateTo, bool sortDescending, CancellationToken cancellationToken);
     Task UpdateFogAssignmentAsync(int siteId, int? userId);
     Task<IEnumerable<SiteDto>> GetAllPendingRenewalAsync(int batchSize, CancellationToken cancellationToken);
+    Task<SiteTabCountsDto?> GetTabCountsAsync(int siteId, CancellationToken cancellationToken);
 }

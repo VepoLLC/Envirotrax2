@@ -81,15 +81,13 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         return await paginated.ToListAsync(cancellationToken);
     }
 
-    public async Task<UpdateResult<CsiInspection>> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request)
+    public async Task<CsiInspection?> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request)
     {
-        var result = new UpdateResult<CsiInspection>();
-
         var inspection = await Entity.SingleOrDefaultAsync(i => i.Id == id);
 
         if (inspection == null)
         {
-            return result;
+            return null;
         }
 
         inspection.PropertyType = request.PropertyType;
@@ -146,20 +144,16 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
 
         await SaveChangesAsync(logData: true);
 
-        result.Model = inspection;
-
-        return result;
+        return inspection;
     }
 
-    public async Task<UpdateResult<CsiInspection>> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken)
+    public async Task<CsiInspection?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken)
     {
-        var result = new UpdateResult<CsiInspection>();
-
         var inspection = await GetAsync(id, cancellationToken);
 
         if (inspection == null)
         {
-            return result;
+            return null;
         }
 
         // Attach BEFORE mutating so EF's change tracker captures the true pre-update values as
@@ -172,20 +166,16 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
 
         await SaveChangesAsync(logData: true, cancellationToken);
 
-        result.Model = inspection;
-
-        return result;
+        return inspection;
     }
 
-    public async Task<UpdateResult<CsiInspection>> UpdateForProfessionalAsync(CsiInspection model, int professionalId)
+    public async Task<CsiInspection?> UpdateForProfessionalAsync(CsiInspection model, int professionalId)
     {
-        var result = new UpdateResult<CsiInspection>();
-
         var inspection = await GetTrackedForUpdateAsync(model.Id, default);
 
         if (inspection == null || inspection.ProfessionalId != professionalId || !string.IsNullOrEmpty(inspection.TransactionId))
         {
-            return result;
+            return null;
         }
 
         inspection.InspectionDate = model.InspectionDate;
@@ -248,9 +238,7 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
 
         await SaveChangesAsync(logData: true);
 
-        result.Model = inspection;
-
-        return result;
+        return inspection;
     }
 
     public Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken)

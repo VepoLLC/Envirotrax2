@@ -422,7 +422,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             model, professionalId,
             newAssemblyPath, newSerialPath, newBypassAssemblyPath, newBypassSerialPath, newAirGapPath);
 
-        if (saved.Model == null)
+        if (saved == null)
         {
             return null;
         }
@@ -450,7 +450,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
         scope.Complete();
 
-        var result = MapToDto(saved.Model)!;
+        var result = MapToDto(saved)!;
         await PopulateImageUrlsAsync(result);
         return result;
     }
@@ -510,7 +510,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         {
             var saved = await _testRepository.UpdateForAdminAsync(id, request, _authService.UserId);
 
-            if (saved.Model == null)
+            if (saved == null)
             {
                 return null;
             }
@@ -815,14 +815,14 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
     // Shared tail for the 7 single-field toggle updates above. The Edit record log is written by the
     // repository save itself (SaveChangesAsync(logData: true)), so nothing is logged here.
-    private BackflowTestDto? MapToggleResult(UpdateResult<BackflowTest> saved)
+    private BackflowTestDto? MapToggleResult(BackflowTest? saved)
     {
-        if (saved.Model == null)
+        if (saved == null)
         {
             return null;
         }
 
-        return MapToDto(saved.Model);
+        return MapToDto(saved);
     }
 
     private static (bool RenewalRequired, DateTime? ExpirationDate) ComputeRenewal(

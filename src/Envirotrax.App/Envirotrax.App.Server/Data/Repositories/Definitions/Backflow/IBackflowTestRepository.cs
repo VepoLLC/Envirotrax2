@@ -17,26 +17,26 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
 
     // Process 1 — Site level
     Task<IEnumerable<BackflowTest>> GetAllCurrentBySiteIdAsync(int siteId, CancellationToken cancellationToken);
-    Task<UpdateResult<BackflowTest>> UpdateTestRenewalAsync(int testId, bool renewalRequired, DateTime? expirationDate);
+    Task<BackflowTest?> UpdateTestRenewalAsync(int testId, bool renewalRequired, DateTime? expirationDate);
 
     // Process 2 — Test level
     Task<IEnumerable<BackflowTest>> GetAllPendingRenewalByTestFlagAsync(int batchSize, CancellationToken cancellationToken);
-    Task<UpdateResult<BackflowTest>> UpdateTestRenewalAndClearFlagAsync(int testId, bool renewalRequired, DateTime? expirationDate, CancellationToken cancellationToken);
+    Task<BackflowTest?> UpdateTestRenewalAndClearFlagAsync(int testId, bool renewalRequired, DateTime? expirationDate, CancellationToken cancellationToken);
     Task ClearTestNeedsRenewalCheckAsync(int testId, CancellationToken cancellationToken);
 
     // Status updates
-    Task<UpdateResult<BackflowTest>> UpdateForAdminAsync(int id, BackflowTestAdminUpdateRequest request, int updatedById);
+    Task<BackflowTest?> UpdateForAdminAsync(int id, BackflowTestAdminUpdateRequest request, int updatedById);
 
-    Task<UpdateResult<BackflowTest>> UpdateRenewalRequiredAsync(int id, bool renewalRequired, int updatedById, CancellationToken cancellationToken);
-    Task<UpdateResult<BackflowTest>> UpdateScheduleMonthAsync(int id, int month, int updatedById, CancellationToken cancellationToken);
-    Task<UpdateResult<BackflowTest>> UpdateIsCurrentAsync(int id, bool isCurrent, int updatedById, CancellationToken cancellationToken);
-    Task<UpdateResult<BackflowTest>> UpdateOutOfServiceAsync(int id, bool outOfService, int updatedById, CancellationToken cancellationToken);
-    Task<UpdateResult<BackflowTest>> UpdateDisapprovalAsync(int id, bool disapproved, int updatedById, CancellationToken cancellationToken);
-    Task<UpdateResult<BackflowTest>> UpdateForceRenewalAsync(int id, bool forceRenewal, int forceRenewalYears, int updatedById, CancellationToken cancellationToken);
-    Task<UpdateResult<BackflowTest>> UpdateRejectionAsync(int id, bool rejected, string? rejectedReason, int updatedById, CancellationToken cancellationToken);
+    Task<BackflowTest?> UpdateRenewalRequiredAsync(int id, bool renewalRequired, int updatedById, CancellationToken cancellationToken);
+    Task<BackflowTest?> UpdateScheduleMonthAsync(int id, int month, int updatedById, CancellationToken cancellationToken);
+    Task<BackflowTest?> UpdateIsCurrentAsync(int id, bool isCurrent, int updatedById, CancellationToken cancellationToken);
+    Task<BackflowTest?> UpdateOutOfServiceAsync(int id, bool outOfService, int updatedById, CancellationToken cancellationToken);
+    Task<BackflowTest?> UpdateDisapprovalAsync(int id, bool disapproved, int updatedById, CancellationToken cancellationToken);
+    Task<BackflowTest?> UpdateForceRenewalAsync(int id, bool forceRenewal, int forceRenewalYears, int updatedById, CancellationToken cancellationToken);
+    Task<BackflowTest?> UpdateRejectionAsync(int id, bool rejected, string? rejectedReason, int updatedById, CancellationToken cancellationToken);
 
     // Professional edit-in-place (checkout "Edit" on an own, still-unpaid test)
-    Task<UpdateResult<BackflowTest>> UpdateForProfessionalAsync(
+    Task<BackflowTest?> UpdateForProfessionalAsync(
         BackflowTest model,
         int professionalId,
         string? newAssemblyImagePath,

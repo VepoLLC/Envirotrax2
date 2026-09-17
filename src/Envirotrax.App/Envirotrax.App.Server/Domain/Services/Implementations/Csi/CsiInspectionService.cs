@@ -154,24 +154,24 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
 
         var saved = await _repository.UpdateForProfessionalAsync(inspection, professionalId);
 
-        if (saved.Model == null)
+        if (saved == null)
         {
             return null;
         }
 
-        return Mapper.Map<CsiInspectionDto>(saved.Model);
+        return Mapper.Map<CsiInspectionDto>(saved);
     }
 
     public async Task<CsiInspectionDto?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken)
     {
         var saved = await _repository.UpdateApprovalAsync(id, request, cancellationToken);
 
-        if (saved.Model == null)
+        if (saved == null)
         {
             return null;
         }
 
-        return Mapper.Map<CsiInspectionDto>(saved.Model);
+        return Mapper.Map<CsiInspectionDto>(saved);
     }
 
     public async Task<CsiInspectionDto?> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request)
@@ -180,7 +180,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         {
             var saved = await _repository.UpdateForAdminAsync(id, request);
 
-            if (saved.Model == null)
+            if (saved == null)
             {
                 return null;
             }

@@ -9,7 +9,7 @@ public interface IFogInspectionRepository : IRepository<FogInspection>
         PageInfo pageInfo, Query query,
         bool latestOnly, CancellationToken cancellationToken);
 
-    Task<UpdateResult<FogInspection>> UpdateForProfessionalAsync(
+    Task<FogInspection?> UpdateForProfessionalAsync(
         FogInspection model,
         int professionalId,
         string? newExteriorImagePath,

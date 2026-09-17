@@ -115,16 +115,14 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
         return dbSupplier;
     }
 
-    public async Task<UpdateResult<WaterSupplier>> UpdateOwnAsync(WaterSupplier supplier)
+    public async Task<WaterSupplier?> UpdateOwnAsync(WaterSupplier supplier)
     {
-        var result = new UpdateResult<WaterSupplier>();
-
         var dbSupplier = await DbContext.WaterSuppliers
             .SingleOrDefaultAsync(x => x.Id == _tenantProvider.WaterSupplierId);
 
         if (dbSupplier == null)
         {
-            return result;
+            return null;
         }
 
         dbSupplier.Name = supplier.Name;
@@ -158,9 +156,7 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
 
         await SaveChangesAsync(logData: true);
 
-        result.Model = dbSupplier;
-
-        return result;
+        return dbSupplier;
     }
 
     public async Task<IEnumerable<WaterSupplier>> GetAllMySuppliersAsync(CancellationToken cancellationToken)

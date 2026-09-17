@@ -48,12 +48,12 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         var model = MapToModel(dto)!;
         var saved = await _gaugeRepository.UpdateGaugeAsync(model);
 
-        if (saved.Model == null)
+        if (saved == null)
         {
             throw new InvalidOperationException($"Gauge {dto.Id} not found.");
         }
 
-        return MapToDto(saved.Model)!;
+        return MapToDto(saved)!;
     }
 
     protected override BackflowGaugeDto? MapToDto(BackflowGauge? model)

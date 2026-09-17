@@ -45,12 +45,12 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
         var model = MapToModel(dto)!;
         var saved = await _userRepository.UpdateUserAsync(model);
 
-        if (saved.Model == null)
+        if (saved == null)
         {
             throw new InvalidOperationException($"User {dto.Id} not found.");
         }
 
-        return MapToDto(saved.Model)!;
+        return MapToDto(saved)!;
     }
 
     public override async Task<WaterSupplierUserDto> AddAsync(WaterSupplierUserDto dto)

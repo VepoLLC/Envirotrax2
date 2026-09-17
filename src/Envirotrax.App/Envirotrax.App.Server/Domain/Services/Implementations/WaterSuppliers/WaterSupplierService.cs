@@ -159,12 +159,12 @@ public class WaterSupplierService : Service<WaterSupplier, WaterSupplierDto>, IW
 
         var saved = await _repository.UpdateOwnAsync(model);
 
-        if (saved.Model == null)
+        if (saved == null)
         {
             return null;
         }
 
-        return MapToDto(saved.Model);
+        return MapToDto(saved);
     }
 
     public async Task<WaterSupplierDetailsDto?> UpdateDetailsAsync(int id, WaterSupplierDetailsDto details)

@@ -35,15 +35,13 @@ public class FogVehicleRepository : Repository<FogVehicle>, IFogVehicleRepositor
         return await paginated.ToListAsync(cancellationToken);
     }
 
-    public async Task<UpdateResult<FogVehicle>> UpdateVehicleAsync(FogVehicle model)
+    public async Task<FogVehicle?> UpdateVehicleAsync(FogVehicle model)
     {
-        var result = new UpdateResult<FogVehicle>();
-
         var vehicle = await GetTrackedForUpdateAsync(model.Id, default);
 
         if (vehicle == null)
         {
-            return result;
+            return null;
         }
 
         vehicle.LicensePlateNumber = model.LicensePlateNumber;
@@ -55,8 +53,6 @@ public class FogVehicleRepository : Repository<FogVehicle>, IFogVehicleRepositor
 
         await SaveChangesAsync(logData: true);
 
-        result.Model = vehicle;
-
-        return result;
+        return vehicle;
     }
 }

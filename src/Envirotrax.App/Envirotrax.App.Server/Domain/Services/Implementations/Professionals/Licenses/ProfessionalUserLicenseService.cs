@@ -145,7 +145,7 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
     public async Task<WaterSupplierLicenseDto> UpdateForWaterSupplierAsync(int id, UpdateWaterSupplierLicenseDto dto, CancellationToken cancellationToken)
     {
         var saved = await _licenseRepository.UpdateForWaterSupplierAsync(id, dto.LicenseNumber, dto.ContactName, dto.ExpirationDate, cancellationToken);
-        var license = saved.Model!;
+        var license = saved!;
 
         var now = _timeZoneHelper.GetUserLocalTime();
         return new WaterSupplierLicenseDto

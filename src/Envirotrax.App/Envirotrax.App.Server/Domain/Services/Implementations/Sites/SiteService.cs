@@ -206,7 +206,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         {
             var saved = await _siteRepository.UpdateForAdminAsync(siteId, dto);
 
-            if (saved.Model == null)
+            if (saved == null)
             {
                 return false;
             }

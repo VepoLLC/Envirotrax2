@@ -36,12 +36,12 @@ public class FogVehicleService : Service<FogVehicle, FogVehicleDto>, IFogVehicle
         var model = MapToModel(dto)!;
         var saved = await _vehicleRepository.UpdateVehicleAsync(model);
 
-        if (saved.Model == null)
+        if (saved == null)
         {
             throw new InvalidOperationException($"Vehicle {dto.Id} not found.");
         }
 
-        return MapToDto(saved.Model)!;
+        return MapToDto(saved)!;
     }
 
     public override async Task<FogVehicleDto?> DeleteAsync(int id)

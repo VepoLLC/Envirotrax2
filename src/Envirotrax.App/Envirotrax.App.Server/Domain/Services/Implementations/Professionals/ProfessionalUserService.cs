@@ -153,12 +153,12 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         var model = MapToModel(user);
         var saved = await _professionalUserRepository.UpdateNonSensitiveDataAsync(model!);
 
-        if (saved.Model == null)
+        if (saved == null)
         {
             return null;
         }
 
-        return MapToDto(saved.Model);
+        return MapToDto(saved);
     }
 
     public override async Task<ProfessionalUserDto> AddAsync(ProfessionalUserDto dto)
@@ -207,12 +207,12 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
     {
         var saved = await _professionalUserRepository.UpdateSubAccountAsync(professionalId, userId, contactName, jobTitle);
 
-        if (saved.Model == null)
+        if (saved == null)
         {
             return null;
         }
 
-        return MapToDto(saved.Model);
+        return MapToDto(saved);
     }
 
     public async Task<IPagedData<ProfessionalUserDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null)

@@ -283,7 +283,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
 
         var saved = await _repository.UpdateForProfessionalAsync(inspection, professionalId, newExteriorPath, newInteriorPath, newSignaturePath);
 
-        if (saved.Model == null)
+        if (saved == null)
         {
             return null;
         }
@@ -303,7 +303,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
 
         scope.Complete();
 
-        var dto = Mapper.Map<FogInspectionDto>(saved.Model);
+        var dto = Mapper.Map<FogInspectionDto>(saved);
         await PopulateImageUrlsAsync(dto);
         return dto;
     }

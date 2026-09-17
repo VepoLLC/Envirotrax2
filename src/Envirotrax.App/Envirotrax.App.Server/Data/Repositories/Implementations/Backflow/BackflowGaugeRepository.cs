@@ -27,15 +27,13 @@ public class BackflowGaugeRepository : Repository<BackflowGauge>, IBackflowGauge
         return await paginated.ToListAsync(cancellationToken);
     }
 
-    public async Task<UpdateResult<BackflowGauge>> UpdateGaugeAsync(BackflowGauge model)
+    public async Task<BackflowGauge?> UpdateGaugeAsync(BackflowGauge model)
     {
-        var result = new UpdateResult<BackflowGauge>();
-
         var gauge = await GetTrackedForUpdateAsync(model.Id, default);
 
         if (gauge == null)
         {
-            return result;
+            return null;
         }
 
         gauge.Manufacturer = model.Manufacturer;
@@ -47,8 +45,6 @@ public class BackflowGaugeRepository : Repository<BackflowGauge>, IBackflowGauge
 
         await SaveChangesAsync(logData: true);
 
-        result.Model = gauge;
-
-        return result;
+        return gauge;
     }
 }

@@ -266,15 +266,19 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
     // TestDate is the derived "overall test date" (mirrors V1's submit behavior): air-gap tests store
     // their date in InitialTestDate; otherwise the final (after-repairs) date wins over the initial one.
+    // AirGapTestDate is the same air-gap date kept under its V1 column name for the legacy API. Unlike
+    // V1, which stamped Date.Now onto every row, it stays null for non-air-gap devices.
     private static void DeriveTestDate(BackflowTestDto dto)
     {
         if (dto.DeviceType == nameof(BackflowDeviceType.AG))
         {
             dto.TestDate = dto.InitialTestDate;
+            dto.AirGapTestDate = dto.InitialTestDate;
         }
         else
         {
             dto.TestDate = dto.FinalTestDate ?? dto.InitialTestDate;
+            dto.AirGapTestDate = null;
         }
     }
 

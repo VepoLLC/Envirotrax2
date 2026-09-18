@@ -20,6 +20,8 @@ import {
 } from '../../../shared/models/fog/fog-inspection';
 import { PropertyType } from '../../../shared/models/sites/site';
 import { FogInspectionOptionsService } from '../../../shared/services/fog/fog-inspection-options.service';
+import { WindowService } from '../../../shared/services/window.service';
+import { FogInspectionDetailsComponent } from '../details/fog-inspection-details.component';
 import { FogInspectionService } from '../../../shared/services/fog/fog-inspection.service';
 import { WaterSupplierService } from '../../../shared/services/water-suppliers/water-supplier.service';
 
@@ -75,7 +77,8 @@ export class FogInspectionListComponent implements OnInit {
     constructor(
         private readonly _fogInspectionService: FogInspectionService,
         private readonly _fogOptions: FogInspectionOptionsService,
-        private readonly _waterSupplierService: WaterSupplierService
+        private readonly _waterSupplierService: WaterSupplierService,
+        private readonly _windowService: WindowService
     ) {
         this.facilityTypeOptions = this._fogOptions.facilityTypeOptions;
         this.interceptorTypeOptions = this._fogOptions.interceptorTypeOptions;
@@ -128,6 +131,19 @@ export class FogInspectionListComponent implements OnInit {
 
         this.showResults = true;
     }
+    public openDetails(inspection: FogInspectionRow): void {
+        this._windowService.addWindow(FogInspectionDetailsComponent, {
+            title: this.buildTitle(inspection),
+            model: inspection
+        });
+    }
+
+    private buildTitle(inspection: FogInspectionRow): string {
+        return [inspection.id, inspection.propertyAddress]
+            .filter(part => part)
+            .join(" - ");
+    }
+
 
     public async getInspections(): Promise<void> {
         try {

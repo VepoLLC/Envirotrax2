@@ -8,7 +8,7 @@ import { AuthService } from "../../../../../shared/services/auth/auth.service";
 import { FeatureType } from "../../../../../shared/models/feature-type";
 import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
-import { ToastService, CellTemplateData, ColumnType, ModalHelperService, TableColumn, TableCustomAction } from '@envirotrax/common-ui';
+import { ToastService, CellTemplateData, ColumnType, CurrencyCellComponent, ModalHelperService, TableColumn, TableCustomAction } from '@envirotrax/common-ui';
 import { CsiInspectorAddEditInsuranceComponent } from "../edit/add-edit-csi-inspector-insurance.component";
 import { CsiInspectorAddEditLicenseComponent } from "../edit/add-edit-csi-inspector-license.component";
 import { Professional } from "../../../../../shared/models/professionals/professional";
@@ -151,6 +151,12 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
                 field: 'insuranceNumber',
                 caption: 'Policy Number',
                 type: ColumnType.text
+            },
+            {
+                field: 'insuranceCoverage',
+                caption: 'Coverage',
+                cellComponent: CurrencyCellComponent,
+                type: ColumnType.number
             },
             {
                 field: 'expirationDate',

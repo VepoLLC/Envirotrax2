@@ -1,5 +1,5 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { WaterSupplierLicense, LicenseCounts } from '../shared/models/professionals/licenses/water-supplier-license';
 import { WaterSupplierLicenseService } from '../shared/services/licenses/water-supplier-license.service';
 import { TableViewModel } from '../shared/models/table-view-model';
@@ -21,6 +21,8 @@ export class LicenseManagementComponent implements OnInit {
 
     @ViewChild('actionsCell', { static: true })
     private actionsCell!: TemplateRef<CellTemplateData<WaterSupplierLicense>>;
+
+    private readonly _allowedFilters: string[] = ['unverified', 'expired', 'expiring'];
 
     public activeFilter: string = 'unverified';
     public counts: LicenseCounts = { unverifiedCount: 0, expiredCount: 0, expiringCount: 0 };
@@ -58,7 +60,8 @@ export class LicenseManagementComponent implements OnInit {
         private readonly _authService: AuthService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService,
-        private readonly _router: Router
+        private readonly _router: Router,
+        private readonly _activatedRoute: ActivatedRoute
     ) { }
 
     public async ngOnInit(): Promise<void> {
@@ -70,6 +73,13 @@ export class LicenseManagementComponent implements OnInit {
         }
         this.canModify = await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalLicenses)
             || await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.Licenses);
+
+        const requestedFilter = this._activatedRoute.snapshot.queryParamMap.get('filter');
+
+        if (requestedFilter && this._allowedFilters.includes(requestedFilter)) {
+            this.activeFilter = requestedFilter;
+        }
+
         this.table.columns = this.getColumns();
         await Promise.all([this.loadLicenses(), this.loadCounts()]);
     }

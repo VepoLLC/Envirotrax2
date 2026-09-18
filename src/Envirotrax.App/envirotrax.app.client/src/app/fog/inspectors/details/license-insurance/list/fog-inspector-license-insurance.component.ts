@@ -12,7 +12,7 @@ import { PermissionAction, PermissionType } from "../../../../../shared/models/p
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { EditFogInspectorLicenseComponent, FogLicenseModalData } from "../edit/edit-fog-inspector-license.component";
 import { EditFogInspectorInsuranceComponent, FogInsuranceModalData } from "../edit/edit-fog-inspector-insurance.component";
-import { CellTemplateData, ColumnType, ModalHelperService, TableColumn, TableCustomAction, ToastService } from "@envirotrax/common-ui";
+import { CellTemplateData, ColumnType, CurrencyCellComponent, ModalHelperService, TableColumn, TableCustomAction, ToastService } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'vp-fog-inspector-license-insurances',
@@ -149,6 +149,12 @@ export class FogInspectorLicenseInsuranceComponent implements OnInit {
                 field: 'insuranceNumber',
                 caption: 'Policy Number',
                 type: ColumnType.text
+            },
+            {
+                field: 'insuranceCoverage',
+                caption: 'Coverage',
+                cellComponent: CurrencyCellComponent,
+                type: ColumnType.number
             },
             {
                 field: 'expirationDate',

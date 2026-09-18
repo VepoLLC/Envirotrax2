@@ -51,8 +51,6 @@ public class ProfessionalDto : IDto
 
     public DateTime CreatedTime { get; set; }
 
-    public ExpirationType? InsuranceExpirationType { get; set; }
-
     public List<ProfessionalLicenseOrInsuranceRowDto>? LicensesAndInsurances { get; set; }
 
 

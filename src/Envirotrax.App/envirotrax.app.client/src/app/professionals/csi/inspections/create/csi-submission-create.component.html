@@ -94,11 +94,15 @@
                                           [required]="true" />
                             </div>
                         </div>
+                        <div class="col-md-6 ps-4" *ngIf="insuranceValidation">
+                            <span class="fw-semibold">Insurance Policy:</span>
+                            <span class="ms-1" [class.text-success]="insuranceDisplay.valid" [class.text-danger]="!insuranceDisplay.valid">{{ insuranceDisplay.message }}</span>
+                        </div>
                     </div>
                 </vp-section>
 
                 <!-- Water Supplier Information -->
-                <vp-section *ngIf="hasValidLicense" header="Water Supplier Information" class="mt-3 d-block">
+                <vp-section *ngIf="canSubmit" header="Water Supplier Information" class="mt-3 d-block">
                     <div *ngIf="selectedWaterSupplier">
                         <div class="row">
                             <div class="col-md-6">
@@ -133,7 +137,7 @@
                 </vp-section>
 
                 <!-- CSI Inspector -->
-                <vp-section *ngIf="hasValidLicense" header="CSI Inspector" class="mt-3 d-block">
+                <vp-section *ngIf="canSubmit" header="CSI Inspector" class="mt-3 d-block">
                     <div class="row">
                         <div class="col-md-6">
                             <dl class="row mb-0">
@@ -168,7 +172,7 @@
                 </vp-section>
 
                 <!-- Location / Property + Assembly Owner side by side -->
-                <div *ngIf="hasValidLicense" class="row mt-3">
+                <div *ngIf="canSubmit" class="row mt-3">
                     <div class="col-md-6">
                         <vp-section header="Location / Property Information">
                             <dl class="row mb-0">
@@ -210,7 +214,7 @@
                 </div>
 
                 <!-- Inspection Results -->
-                <vp-section *ngIf="hasValidLicense" header="Inspection Results" class="mt-3 d-block">
+                <vp-section *ngIf="canSubmit" header="Inspection Results" class="mt-3 d-block">
 
                     <!-- Reason + Date -->
                     <div class="row mb-3">
@@ -457,7 +461,7 @@
 
                 </vp-section>
 
-                <vp-section *ngIf="hasValidLicense" [header]="'Remarks (' + remarksLength + '/1000 Characters)'"
+                <vp-section *ngIf="canSubmit" [header]="'Remarks (' + remarksLength + '/1000 Characters)'"
                             class="mt-3 d-block">
                     <vp-input type="textarea"
                               name="comments"
@@ -467,17 +471,17 @@
                 </vp-section>
 
                 <!-- Footer note -->
-                <p *ngIf="hasValidLicense" class="text-center text-muted small mt-2">
+                <p *ngIf="canSubmit" class="text-center text-muted small mt-2">
                     A Customer Service Inspection Certificate should be on file for each connection in a public water
                     system to document compliance with 30 TAC &sect;290.44(h)/290.46(j).
                 </p>
 
                 <!-- Validation & Submit -->
-                <div *ngIf="hasValidLicense" class="mt-3">
+                <div *ngIf="canSubmit" class="mt-3">
                     <vp-validation-summary [form]="submitForm" [validationErrors]="validationErrors" />
                 </div>
 
-                <div *ngIf="hasValidLicense" class="mt-3 d-flex justify-content-center">
+                <div *ngIf="canSubmit" class="mt-3 d-flex justify-content-center">
                     <button type="submit" class="btn btn-primary vp-section-button">
                         Complete Submission
                     </button>

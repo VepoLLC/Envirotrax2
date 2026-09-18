@@ -10,11 +10,10 @@ import { ProfesionalUserService } from "../../../../shared/services/professional
 import { ProfessionalSupplierService } from "../../../../shared/services/professionals/professional-supplier.service";
 import { ProfessionalFogVehicleService } from "../../../../shared/services/fog/professional-fog-vehicle.service";
 import { ProfessionalFogDisposalSiteService } from "../../../../shared/services/fog/professional-fog-disposal-site.service";
-import { FogSettingsService } from "../../../../shared/services/fog/fog-settings.service";
 import { ProfessionalUserLicenseService } from "../../../../shared/services/professionals/professional-user-license.service";
 import { FogTripTicketService } from "../../../../shared/services/fog/fog-trip-ticket.service";
 import { Professional } from "../../../../shared/models/professionals/professional";
-import { ProfessionalUser, ExpirationType } from "../../../../shared/models/professionals/professional-user";
+import { ProfessionalUser } from "../../../../shared/models/professionals/professional-user";
 import { ProfessionalType, ExpirationType as LicenseExpirationType, ProfessionalUserLicense } from "../../../../shared/models/professionals/licenses/professional-user-license";
 import { FogVehicle } from "../../../../shared/models/fog/fog-vehicle";
 import { FogDisposalSite } from "../../../../shared/models/fog/fog-disposal-site";
@@ -25,7 +24,9 @@ import { WaterSupplier } from "../../../../shared/models/water-suppliers/water-s
 import { LookupService } from "../../../../shared/services/lookup/lookup.service";
 import { MAX_PAGE_SIZE } from "../../../../shared/models/page-info";
 import { InputOption, ModalHelperService } from "@envirotrax/common-ui";
-import { ProfessionalFogSettings } from "../../../../shared/models/fog/professional-fog-settings";
+import { InsuranceValidationService } from "../../../../shared/services/professionals/insurance-validation.service";
+import { InsuranceValidation } from "../../../../shared/models/professionals/insurance-validation";
+import { describeInsuranceStatus } from "../../../../shared/utils/insurance-status.util";
 
 interface VerificationCheck {
     label: string;
@@ -96,7 +97,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
 
     private _siteId = 0;
     private _transporterLicense?: ProfessionalUserLicense;
-    private _selectedSupplierSettings?: ProfessionalFogSettings;
+    private _insuranceValidation?: InsuranceValidation;
     private readonly _myWaterSuppliers = new Map<number, WaterSupplier>();
     private readonly _stateNamesById = new Map<number, string>();
 
@@ -107,7 +108,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         private readonly _professionalService: ProfesisonalService,
         private readonly _userService: ProfesionalUserService,
         private readonly _supplierService: ProfessionalSupplierService,
-        private readonly _fogSettingsService: FogSettingsService,
+        private readonly _insuranceValidationService: InsuranceValidationService,
         private readonly _vehicleService: ProfessionalFogVehicleService,
         private readonly _disposalSiteService: ProfessionalFogDisposalSiteService,
         private readonly _licenseService: ProfessionalUserLicenseService,
@@ -381,8 +382,8 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
             ? this._stateNamesById.get(stateId)
             : undefined;
 
-        this._selectedSupplierSettings = waterSupplierId != null
-            ? await this._fogSettingsService.getSettings(waterSupplierId)
+        this._insuranceValidation = waterSupplierId != null
+            ? await this._insuranceValidationService.validate(waterSupplierId, ProfessionalType.FogTransporter)
             : undefined;
     }
 
@@ -426,22 +427,9 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
 
     private buildInsuranceCheck(): VerificationCheck {
         const label = 'Insurance Policy';
+        const display = describeInsuranceStatus(this._insuranceValidation);
 
-        if (!this.requiresInsurance()) {
-            return { label, message: 'Insurance not required', valid: true };
-        }
-
-        const insuranceType = this.professional?.insuranceExpirationType;
-
-        if (insuranceType == null) {
-            return { label, message: 'No insurance policy found', valid: false };
-        }
-
-        if (insuranceType === ExpirationType.Expired) {
-            return { label, message: 'Insurance policy expired', valid: false };
-        }
-
-        return { label, message: 'Insurance policy valid', valid: true };
+        return { label, message: display.message, valid: display.valid };
     }
 
     private buildDisposalSiteCheck(): VerificationCheck {
@@ -484,9 +472,5 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         this.transporterSignatureUrl = this.selectedTransporter?.signaturePath && this.selectedTransporterUserId
             ? await this._userService.getSignatureUrl(this.selectedTransporterUserId)
             : null;
-    }
-
-    private requiresInsurance(): boolean {
-        return this._selectedSupplierSettings?.fogTransportersRequireInsurance ?? false;
     }
 }

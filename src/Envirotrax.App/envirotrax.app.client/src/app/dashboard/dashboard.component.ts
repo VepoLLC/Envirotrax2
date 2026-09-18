@@ -10,6 +10,7 @@ import { BackflowComplianceSnapshot } from "../shared/models/backflow/backflow-c
 import { FogInspectionSubmissionStats } from "../shared/models/water-suppliers/fog-inspection-submission-stats";
 import { FogTripTicketSubmissionStats } from "../shared/models/water-suppliers/fog-trip-ticket-submission-stats";
 import { FeatureType } from "../shared/models/feature-type";
+import { PropertyLogFilterType } from "../shared/models/sites/property-log-filter-type.enum";
 import { onThemeChange, readCssVar } from "../shared/utils/chart-theme.util";
 
 @Component({
@@ -31,6 +32,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     public fogTripTicketVm?: FogTripTicketStatsVm;
     public isLoading: boolean = false;
 
+    public readonly propertyLogFilterType = PropertyLogFilterType;
 
     public hasCsi: boolean = false;
     public hasBackflow: boolean = false;

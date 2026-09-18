@@ -23,8 +23,6 @@ export interface Professional {
     hasFogInspection?: boolean;
     hasFogTransportation?: boolean;
 
-    insuranceExpirationType?: ExpirationType;
-
     licensesAndInsurances?: ProfessionalLicenseOrInsuranceRow[];
 }
 

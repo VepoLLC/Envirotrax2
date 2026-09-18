@@ -5,6 +5,7 @@ using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Csi;
 using Envirotrax.App.Server.Data.Models.Logs;
+using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
@@ -34,6 +35,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
     private readonly IRecordLogService _recordLogService;
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IProfessionalSupplierService _professionalSupplierService;
+    private readonly IInsuranceValidationService _insuranceValidationService;
 
     public CsiInspectionService(
         IMapper mapper,
@@ -46,7 +48,8 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         IAuthService authService,
         IRecordLogService recordLogService,
         IGeneralSettingsService generalSettingsService,
-        IProfessionalSupplierService professionalSupplierService)
+        IProfessionalSupplierService professionalSupplierService,
+        IInsuranceValidationService insuranceValidationService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -59,6 +62,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         _recordLogService = recordLogService;
         _generalSettingsService = generalSettingsService;
         _professionalSupplierService = professionalSupplierService;
+        _insuranceValidationService = insuranceValidationService;
     }
 
     public override async Task<CsiInspectionDto?> DeleteAsync(int id)
@@ -81,6 +85,9 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         var siteId = request.Site!.Id.Value;
         var waterSupplierId = request.WaterSupplier!.Id.Value;
         var inspectorUserId = request.InspectorUser!.Id.Value;
+
+        // Server-side guard
+        await _insuranceValidationService.EnsureValidAsync(waterSupplierId, ProfessionalType.CsiInspector, cancellationToken);
 
         var site = await _siteService.GetAsync(siteId, cancellationToken);
         var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);

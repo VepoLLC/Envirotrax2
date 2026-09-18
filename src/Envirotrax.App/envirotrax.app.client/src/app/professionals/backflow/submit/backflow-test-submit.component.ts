@@ -701,6 +701,10 @@ export class BackflowTestSubmitComponent implements OnInit {
         this.model.model2 = test.model2;
         this.model.size2 = test.size2;
         this.model.serialNumber2 = test.serialNumber2;
+
+        // V1 carries the water meter number onto the next test for the assembly; the submit form
+        // posts it whether or not the setting is currently showing the field.
+        this.model.waterMeterNumber = test.waterMeterNumber;
     }
 
     // Checkout "Edit": full field load of an own, still-unpaid test — unlike loadData/populateFromPreviousTest,

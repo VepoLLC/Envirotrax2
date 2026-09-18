@@ -1837,11 +1837,14 @@
         </div>
 
         <!-- Additional Information -->
-        <div class="mt-3" *ngIf="additionalInfoSettings && (additionalInfoSettings.showRainSensor || additionalInfoSettings.showOSSF || additionalInfoSettings.showPermitNumber)">
+        <div class="mt-3" *ngIf="additionalInfoSettings && (additionalInfoSettings.showWaterMeterNumber || additionalInfoSettings.showRainSensor || additionalInfoSettings.showOSSF || additionalInfoSettings.showPermitNumber)">
             <vp-section header="Additional Information">
                 <div class="row">
                     <div class="col-md-4" *ngIf="additionalInfoSettings?.showPermitNumber">
                         <vp-input type="text" label="Permit number" name="permitNumber" [(ngModel)]="model.permitNumber" />
+                    </div>
+                    <div class="col-md-4" *ngIf="additionalInfoSettings?.showWaterMeterNumber">
+                        <vp-input type="text" label="Water meter number" name="waterMeterNumber" [maxLength]="50" [(ngModel)]="model.waterMeterNumber" />
                     </div>
                     <div class="col-md-4" *ngIf="additionalInfoSettings?.showOSSF">
                         <div class="form-check mt-4">

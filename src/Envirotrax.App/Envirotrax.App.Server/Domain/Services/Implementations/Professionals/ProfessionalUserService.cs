@@ -119,11 +119,6 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
 
         scope.Complete();
 
-        if (saved.Model != null && saved.Changes.Length > 0)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.ProfessionalUsers, saved.Model.UserId, null, RecordLogType.Edit, saved.Changes, professionalId: saved.Model.ProfessionalId);
-        }
-
         return await BuildSignatureUrlAsync(path);
     }
 
@@ -158,17 +153,12 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         var model = MapToModel(user);
         var saved = await _professionalUserRepository.UpdateNonSensitiveDataAsync(model!);
 
-        if (saved.Model == null)
+        if (saved == null)
         {
             return null;
         }
 
-        if (saved.Changes.Length > 0)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.ProfessionalUsers, saved.Model.UserId, null, RecordLogType.Edit, saved.Changes, professionalId: saved.Model.ProfessionalId);
-        }
-
-        return MapToDto(saved.Model);
+        return MapToDto(saved);
     }
 
     public override async Task<ProfessionalUserDto> AddAsync(ProfessionalUserDto dto)
@@ -191,6 +181,7 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
 
         if (deleted != null && user != null)
         {
+            // recordLog manual
             await _recordLogService.AddAsync(RecordLogTableNames.ProfessionalUsers, user.UserId, null, RecordLogType.Delete,
                 $"Deleted user — ContactName: '{user.ContactName}'", professionalId: user.ProfessionalId);
         }
@@ -216,17 +207,12 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
     {
         var saved = await _professionalUserRepository.UpdateSubAccountAsync(professionalId, userId, contactName, jobTitle);
 
-        if (saved.Model == null)
+        if (saved == null)
         {
             return null;
         }
 
-        if (saved.Changes.Length > 0)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.ProfessionalUsers, saved.Model.UserId, null, RecordLogType.Edit, saved.Changes, professionalId: saved.Model.ProfessionalId);
-        }
-
-        return MapToDto(saved.Model);
+        return MapToDto(saved);
     }
 
     public async Task<IPagedData<ProfessionalUserDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null)

@@ -4,6 +4,9 @@ using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Sites;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Data.Repositories.Definitions.GisAreas;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects;
@@ -23,6 +26,10 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     private readonly IGeocodingService _geocodingService;
     private readonly IGisAreaCoordinateRepository _coordinateRepository;
     private readonly ITimeZoneHelperService _timeZoneHelper;
+    private readonly ICsiInspectionRepository _csiInspectionRepository;
+    private readonly IBackflowTestRepository _backflowTestRepository;
+    private readonly IBackflowOutOfServiceRequestRepository _outOfServiceRequestRepository;
+    private readonly IFogInspectionRepository _fogInspectionRepository;
     private readonly ILogger<SiteService> _logger;
 
     public SiteService(
@@ -33,6 +40,10 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         IGeocodingService geocodingService,
         IGisAreaCoordinateRepository coordinateRepository,
         ITimeZoneHelperService timeZoneHelper,
+        ICsiInspectionRepository csiInspectionRepository,
+        IBackflowTestRepository backflowTestRepository,
+        IBackflowOutOfServiceRequestRepository outOfServiceRequestRepository,
+        IFogInspectionRepository fogInspectionRepository,
         ILogger<SiteService> logger)
         : base(mapper, repository)
     {
@@ -42,7 +53,36 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         _geocodingService = geocodingService;
         _coordinateRepository = coordinateRepository;
         _timeZoneHelper = timeZoneHelper;
+        _csiInspectionRepository = csiInspectionRepository;
+        _backflowTestRepository = backflowTestRepository;
+        _outOfServiceRequestRepository = outOfServiceRequestRepository;
+        _fogInspectionRepository = fogInspectionRepository;
         _logger = logger;
+    }
+
+    public async Task<SiteTabCountsDto?> GetTabCountsAsync(int siteId, CancellationToken cancellationToken)
+    {
+        var siteExists = await _siteRepository.ExistsAsync(siteId, cancellationToken);
+
+        if (!siteExists)
+        {
+            return null;
+        }
+
+        var logHistoryCount = await _siteLogService.CountBySiteAsync(siteId, cancellationToken);
+        var csiCount = await _csiInspectionRepository.CountBySiteAsync(siteId, cancellationToken);
+        var backflowCount = await _backflowTestRepository.CountCurrentInServiceBySiteAsync(siteId, cancellationToken);
+        var outOfServiceCount = await _outOfServiceRequestRepository.CountBySiteAsync(siteId, cancellationToken);
+        var fogCount = await _fogInspectionRepository.CountBySiteAsync(siteId, cancellationToken);
+
+        return new SiteTabCountsDto
+        {
+            LogHistoryCount = logHistoryCount,
+            CsiCount = csiCount,
+            BackflowCount = backflowCount,
+            OutOfServiceCount = outOfServiceCount,
+            FogCount = fogCount
+        };
     }
 
     // Mirrors V1's site_search.aspx.vb: creating a site always logs a fixed "New site record" entry
@@ -53,6 +93,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
         if (added.WaterSupplier?.Id is int waterSupplierId)
         {
+            // recordLog manual
             await _recordLogService.AddAsync(RecordLogTableNames.Sites, added.Id, waterSupplierId, RecordLogType.Add, "New site record");
         }
 
@@ -172,14 +213,9 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         {
             var saved = await _siteRepository.UpdateForAdminAsync(siteId, dto);
 
-            if (saved.Model == null)
+            if (saved == null)
             {
                 return false;
-            }
-
-            if (saved.Changes.Length > 0)
-            {
-                await _recordLogService.AddAsync(RecordLogTableNames.Sites, siteId, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
             }
 
             scope.Complete();
@@ -214,6 +250,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
         await _siteRepository.SaveChangesAsync();
 
+        // recordLog manual
         await _recordLogService.AddAsync(RecordLogTableNames.Sites, siteId, dto.WaterSupplierId, RecordLogType.Edit, $"Water Supplier changed from {previousWaterSupplierId} to {dto.WaterSupplierId}");
 
         return true;

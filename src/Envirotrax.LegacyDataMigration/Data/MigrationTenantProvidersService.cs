@@ -12,6 +12,7 @@ public class MigrationTenantProvidersService : ITenantProvidersService
     public int UserId => 0;
     public int ProfessionalId => 0;
     public int ParentProfessionalId => 0;
+    public string? IpAddress => null;
 
     public void SetWaterSupplierId(int supplierId)
     {

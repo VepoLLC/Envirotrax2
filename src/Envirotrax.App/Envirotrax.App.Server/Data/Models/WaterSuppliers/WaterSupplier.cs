@@ -1,3 +1,4 @@
+using Envirotrax.App.Server.Data.Models.Logs;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Envirotrax.App.Server.Data.Models.States;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Envirotrax.App.Server.Data.Models.WaterSuppliers;
 
+[RecordLogged(RecordLogTableNames.WaterSuppliers, WaterSupplierIdProperty = nameof(WaterSupplier.Id), ProfessionalSource = RecordLogIdSource.None)]
 public class WaterSupplier : TenantBase, IAuditableModel<AppUser>
 {
     // Original Vepo.dbo.WaterSuppliers.ID. Populated by the legacy import; null for records

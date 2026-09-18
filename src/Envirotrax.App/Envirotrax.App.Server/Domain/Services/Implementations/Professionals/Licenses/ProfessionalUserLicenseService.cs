@@ -145,12 +145,7 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
     public async Task<WaterSupplierLicenseDto> UpdateForWaterSupplierAsync(int id, UpdateWaterSupplierLicenseDto dto, CancellationToken cancellationToken)
     {
         var saved = await _licenseRepository.UpdateForWaterSupplierAsync(id, dto.LicenseNumber, dto.ContactName, dto.ExpirationDate, cancellationToken);
-        var license = saved.Model!;
-
-        if (saved.Changes.Length > 0)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.ProfessionalUserLicenses, license.Id, _authService.WaterSupplierId, RecordLogType.Edit, saved.Changes, professionalId: license.ProfessionalId);
-        }
+        var license = saved!;
 
         var now = _timeZoneHelper.GetUserLocalTime();
         return new WaterSupplierLicenseDto
@@ -178,6 +173,7 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
     {
         var license = await _licenseRepository.DeleteForWaterSupplierAsync(id, cancellationToken);
 
+        // recordLog manual
         await _recordLogService.AddAsync(RecordLogTableNames.ProfessionalUserLicenses, license.Id, _authService.WaterSupplierId, RecordLogType.Delete,
             $"Deleted license — LicenseNumber: '{license.LicenseNumber}', ExpirationDate: '{license.ExpirationDate:d}'", professionalId: license.ProfessionalId);
     }

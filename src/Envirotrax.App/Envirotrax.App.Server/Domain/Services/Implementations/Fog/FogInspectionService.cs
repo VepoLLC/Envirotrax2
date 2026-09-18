@@ -4,14 +4,12 @@ using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Fog;
-using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
-using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
@@ -33,7 +31,6 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
     private readonly IPdfTemplateService _pdfTemplateService;
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IProfessionalSupplierService _professionalSupplierService;
-    private readonly IRecordLogService _recordLogService;
 
     public FogInspectionService(
         IMapper mapper,
@@ -44,7 +41,6 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         IFileStorageService fileStorageService,
         IAuthService authService,
         IPdfTemplateService pdfTemplateService,
-        IRecordLogService recordLogService,
         IGeneralSettingsService generalSettingsService,
         IProfessionalSupplierService professionalSupplierService)
         : base(mapper, repository)
@@ -58,7 +54,6 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         _pdfTemplateService = pdfTemplateService;
         _generalSettingsService = generalSettingsService;
         _professionalSupplierService = professionalSupplierService;
-        _recordLogService = recordLogService;
     }
 
     public Task<byte[]> GeneratePdfAsync(FogInspectionDto inspection)
@@ -312,7 +307,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
 
         var saved = await _repository.UpdateForProfessionalAsync(inspection, professionalId, newExteriorPath, newInteriorPath, newSignaturePath);
 
-        if (saved.Model == null)
+        if (saved == null)
         {
             return null;
         }
@@ -330,14 +325,9 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
             await _fileStorageService.UploadAsync(newSignaturePath, signatureStream!);
         }
 
-        if (saved.Changes.Length > 0)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.FogInspections, saved.Model.Id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes, professionalId);
-        }
-
         scope.Complete();
 
-        var dto = Mapper.Map<FogInspectionDto>(saved.Model);
+        var dto = Mapper.Map<FogInspectionDto>(saved);
         await PopulateImageUrlsAsync(dto);
         return dto;
     }

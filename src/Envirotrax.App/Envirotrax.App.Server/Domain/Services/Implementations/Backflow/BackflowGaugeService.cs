@@ -48,17 +48,12 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         var model = MapToModel(dto)!;
         var saved = await _gaugeRepository.UpdateGaugeAsync(model);
 
-        if (saved.Model == null)
+        if (saved == null)
         {
             throw new InvalidOperationException($"Gauge {dto.Id} not found.");
         }
 
-        if (saved.Changes.Length > 0)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.BackflowGauges, saved.Model.Id, null, RecordLogType.Edit, saved.Changes, professionalId: saved.Model.ProfessionalId);
-        }
-
-        return MapToDto(saved.Model)!;
+        return MapToDto(saved)!;
     }
 
     protected override BackflowGaugeDto? MapToDto(BackflowGauge? model)
@@ -121,6 +116,7 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
 
         if (deleted != null)
         {
+            // recordLog manual
             await _recordLogService.AddAsync(RecordLogTableNames.BackflowGauges, deleted.Id, null, RecordLogType.Delete,
                 $"Deleted gauge — Manufacturer: '{deleted.Manufacturer}', SerialNumber: '{deleted.SerialNumber}'", professionalId: deleted.Professional?.Id);
         }

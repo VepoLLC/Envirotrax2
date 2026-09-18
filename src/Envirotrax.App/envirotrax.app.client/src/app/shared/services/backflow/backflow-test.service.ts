@@ -314,6 +314,7 @@ function buildBackflowTestFormData(test: BackflowTest): FormData {
     // Permit
     append('permitNumber', test.permitNumber);
     append('ossf', test.ossf);
+    append('waterMeterNumber', test.waterMeterNumber);
     append('rainFreezeSensorInstalled', test.rainFreezeSensorInstalled);
     append('rainFreezeSensorWorkingProperly', test.rainFreezeSensorWorkingProperly);
 

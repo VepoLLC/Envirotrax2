@@ -32,7 +32,11 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
             .Include(fi => fi.Site)
             .Include(fi => fi.WaterSupplier)
             .ThenInclude(ws => ws!.State)
+            // ReferencedProfessionalUserDto.EmailAddress maps from User.Email, so without this ThenInclude the
+            // inspector's Email Address renders blank on every FOG details view. CsiInspectionRepository already
+            // does this for its inspector.
             .Include(fi => fi.Inspector)
+            .ThenInclude(inspector => inspector!.User)
             .Include(fi => fi.PropertyState)
             .Include(fi => fi.MailingState);
     }

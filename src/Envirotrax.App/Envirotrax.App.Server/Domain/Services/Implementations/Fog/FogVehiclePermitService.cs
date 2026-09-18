@@ -52,18 +52,12 @@ public class FogVehiclePermitService : Service<FogVehiclePermit, FogVehiclePermi
         var permit = MapToModel(dto)!;
         permit.VehicleId = vehicleId;
 
-        var saved = await _permitRepository.SetPermitAsync(permit, cancellationToken);
+        var (saved, isNew) = await _permitRepository.SetPermitAsync(permit, cancellationToken);
 
-        if (saved.Model != null)
+        if (saved != null && isNew)
         {
-            if (saved.IsNew)
-            {
-                await _recordLogService.AddAsync(RecordLogTableNames.FogVehiclePermits, saved.Model.VehicleId, saved.Model.WaterSupplierId, RecordLogType.Add, "New vehicle permit record");
-            }
-            else if (saved.Changes.Length > 0)
-            {
-                await _recordLogService.AddAsync(RecordLogTableNames.FogVehiclePermits, saved.Model.VehicleId, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
-            }
+            // recordLog manual
+            await _recordLogService.AddAsync(RecordLogTableNames.FogVehiclePermits, saved.VehicleId, saved.WaterSupplierId, RecordLogType.Add, "New vehicle permit record");
         }
 
         var result = await _permitRepository.GetSearchResultByVehicleIdAsync(vehicleId, cancellationToken);

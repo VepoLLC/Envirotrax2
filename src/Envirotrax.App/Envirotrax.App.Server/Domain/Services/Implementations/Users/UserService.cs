@@ -45,17 +45,12 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
         var model = MapToModel(dto)!;
         var saved = await _userRepository.UpdateUserAsync(model);
 
-        if (saved.Model == null)
+        if (saved == null)
         {
             throw new InvalidOperationException($"User {dto.Id} not found.");
         }
 
-        if (saved.Changes.Length > 0)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.WaterSupplierUserAccounts, saved.Model.UserId, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
-        }
-
-        return MapToDto(saved.Model)!;
+        return MapToDto(saved)!;
     }
 
     public override async Task<WaterSupplierUserDto> AddAsync(WaterSupplierUserDto dto)
@@ -93,6 +88,7 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
 
         if (deleted != null)
         {
+            // recordLog manual
             await _recordLogService.AddAsync(RecordLogTableNames.WaterSupplierUserAccounts, deleted.Id, _authService.WaterSupplierId, RecordLogType.Delete,
                 $"Deleted user account — ContactName: '{deleted.ContactName}', EmailAddress: '{deleted.EmailAddress}'");
         }

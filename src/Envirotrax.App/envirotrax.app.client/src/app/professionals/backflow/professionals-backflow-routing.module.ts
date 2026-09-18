@@ -39,21 +39,21 @@ const routes: Routes = [
         data: { roles: [ROLE_DEFINITIONS.PROFESSIONAL] }
     },
     {
-        path: 'submit',
+        path: 'tests/submit',
         title: 'Submit Backflow Test',
         component: BackflowTestAssemblySearchComponent,
         canActivate: [RoleGuard],
         data: { roles: [ROLE_DEFINITIONS.PROFESSIONAL] }
     },
     {
-        path: 'submit/:testId',
+        path: 'tests/submit/:testId',
         title: 'Submit Backflow Test',
         component: BackflowTestSubmitComponent,
         canActivate: [RoleGuard],
         data: { roles: [ROLE_DEFINITIONS.PROFESSIONAL] }
     },
     {
-        path: 'submit/:testId/edit',
+        path: 'tests/:testId/edit',
         title: 'Edit Backflow Test',
         component: BackflowTestSubmitComponent,
         canActivate: [RoleGuard],

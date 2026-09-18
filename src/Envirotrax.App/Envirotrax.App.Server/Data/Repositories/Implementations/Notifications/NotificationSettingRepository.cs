@@ -24,15 +24,13 @@ public class NotificationSettingRepository : Repository<NotificationSetting>, IN
 
     }
 
-    public async Task<UpdateResult<NotificationSetting>> UpdateSettingAsync(NotificationSetting model)
+    public async Task<NotificationSetting?> UpdateSettingAsync(NotificationSetting model)
     {
-        var result = new UpdateResult<NotificationSetting>();
-
         var setting = await GetTrackedForUpdateAsync(model.Id, default);
 
         if (setting == null)
         {
-            return result;
+            return null;
         }
 
         // SetValues copies every scalar property in one shot (this entity has ~35 filter/hazard-type
@@ -46,13 +44,9 @@ public class NotificationSettingRepository : Repository<NotificationSetting>, IN
         setting.CreatedById = createdById;
         setting.CreatedTime = createdTime;
 
-        result.Changes = BuildChangeDescription(setting);
+        await SaveChangesAsync(logData: true);
 
-        await DbContext.SaveChangesAsync();
-
-        result.Model = setting;
-
-        return result;
+        return setting;
     }
 
     public async Task<List<NotificationSetting>> GetCandidateSettingsAsync(int waterSupplierId, CancellationToken cancellationToken)

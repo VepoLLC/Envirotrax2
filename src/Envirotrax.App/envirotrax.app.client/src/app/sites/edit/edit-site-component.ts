@@ -3,7 +3,6 @@ import { Site } from '../../shared/models/sites/site';
 import { NgForm } from "@angular/forms";
 import { State } from "../../shared/models/lookup/state";
 import { PageInfo } from "../../shared/models/page-info";
-import { ComparisonOperator, QueryProperty } from "../../shared/models/query";
 import { LookupService } from "../../shared/services/lookup/lookup.service";
 import { PropertyType } from "../../shared/enums/property-type.enum";
 import { SiteService } from "../../shared/services/sites/site.service";
@@ -127,6 +126,13 @@ export class EditSiteComponent implements OnInit {
     }
 
     private async loadTabCounts(siteId: number): Promise<void> {
+        const counts = await this._siteService.getTabCounts(siteId);
+
+        this.logHistoryCount = counts.logHistoryCount;
+        this.csiCount = counts.csiCount;
+        this.backflowCount = counts.backflowCount;
+        this.outOfServiceCount = counts.outOfServiceCount;
+        this.fogCount = counts.fogCount;
         const countPageInfo: PageInfo = { pageNumber: 1, pageSize: 1 };
         const siteFilter: QueryProperty = {
             columnName: 'site.id',

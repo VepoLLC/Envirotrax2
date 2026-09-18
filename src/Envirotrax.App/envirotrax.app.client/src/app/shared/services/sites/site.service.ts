@@ -10,6 +10,14 @@ import { Site } from "../../models/sites/site";
 import { DownloadEndpoint } from "../../models/download-config";
 import { RecordLog } from "@envirotrax/common-ui";
 
+export interface SiteTabCounts {
+    logHistoryCount: number;
+    csiCount: number;
+    backflowCount: number;
+    outOfServiceCount: number;
+    fogCount: number;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -180,6 +188,14 @@ export class SiteService {
 
         return lastValueFrom(
             this._http.get<RecordLog[]>(url)
+        );
+    }
+
+    public getTabCounts(id: number): Promise<SiteTabCounts> {
+        const url = this._urlResolver.resolveUrl(`/api/sites/${id}/tab-counts`);
+
+        return lastValueFrom(
+            this._http.get<SiteTabCounts>(url)
         );
     }
 

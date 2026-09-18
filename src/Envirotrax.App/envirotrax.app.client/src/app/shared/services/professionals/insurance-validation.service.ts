@@ -15,8 +15,6 @@ export class InsuranceValidationService {
     ) {
     }
 
-    // Deliberately uncached, unlike FogSettingsService/BackflowSettingsService: staff can validate a
-    // policy mid-session, and a stale "awaiting validation" is exactly the bug this feature fixes.
     public validate(waterSupplierId: number, professionalType: ProfessionalType): Promise<InsuranceValidation> {
         const url = this._urlResolver.resolveUrl('/api/professionals/insurance-status');
 

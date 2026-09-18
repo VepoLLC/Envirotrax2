@@ -20,7 +20,6 @@ public class ProfessionalInsuranceRepository : Repository<ProfessionalInsurance>
     {
         base.UpdateEntity(model);
 
-        // You cannot update the file path.
         DbContext.Entry(model).Property(i => i.FilePath).IsModified = false;
     }
 
@@ -45,10 +44,8 @@ public class ProfessionalInsuranceRepository : Repository<ProfessionalInsurance>
     }
 
     /// <summary>
-    /// Used for validating a specific professional's own policies at submission time, including a
-    /// sub-account's parent. ProfessionalInsurance carries the ProfessionalId query filter under
-    /// ProfessionalDbContext, which would silently rewrite "give me this professional's policies" into
-    /// "give me the CALLER's policies" - IgnoreQueryFilters() is load-bearing here, not decorative.
+    /// IgnoreQueryFilters is load-bearing: under ProfessionalDbContext the ProfessionalId filter would
+    /// rewrite this into "the caller's policies", breaking the sub-account lookup of its master's policies.
     /// </summary>
     public async Task<IReadOnlyList<ProfessionalInsurance>> GetAllForValidationAsync(int professionalId, CancellationToken cancellationToken)
     {
@@ -61,7 +58,7 @@ public class ProfessionalInsuranceRepository : Repository<ProfessionalInsurance>
 
     public async Task<IEnumerable<ProfessionalInsurance>> GetAllByWaterSupplierAsync(PageInfo pageInfo, Query query, string? insuranceFilter, CancellationToken cancellationToken)
     {
-        var baseQuery = ApplyInsuranceFilter(ScopedToWaterSupplier().Include(i => i.Professional), insuranceFilter);
+        var baseQuery = ApplyInsuranceFilter(ScopedInsurances().Include(i => i.Professional), insuranceFilter);
 
         if (query.Sort.IsNullOrEmpty())
         {
@@ -78,12 +75,12 @@ public class ProfessionalInsuranceRepository : Repository<ProfessionalInsurance>
 
     public async Task<int> GetCountByWaterSupplierAsync(string? insuranceFilter, CancellationToken cancellationToken)
     {
-        return await ApplyInsuranceFilter(ScopedToWaterSupplier(), insuranceFilter).CountAsync(cancellationToken);
+        return await ApplyInsuranceFilter(ScopedInsurances(), insuranceFilter).CountAsync(cancellationToken);
     }
 
     public async Task<ProfessionalInsurance> GetForWaterSupplierAsync(int id, CancellationToken cancellationToken)
     {
-        return await ScopedToWaterSupplier()
+        return await ScopedInsurances()
             .Include(i => i.Professional)
             .FirstOrDefaultAsync(i => i.Id == id, cancellationToken)
             ?? throw new InvalidOperationException($"Insurance policy {id} not found for current water supplier.");
@@ -92,9 +89,9 @@ public class ProfessionalInsuranceRepository : Repository<ProfessionalInsurance>
     public async Task<ProfessionalInsurance> UpdateForWaterSupplierAsync(int id, string insuranceNumber, DateTime? expirationDate, decimal? insuranceCoverage, CancellationToken cancellationToken)
     {
         var insurance = await DbContext.Set<ProfessionalInsurance>()
+            .ScopedToWaterSupplier(DbContext)
             .Include(i => i.Professional)
-            .FirstOrDefaultAsync(i => i.Id == id
-                && DbContext.ProfessionalWaterSuppliers.Any(pws => pws.ProfessionalId == i.ProfessionalId), cancellationToken)
+            .FirstOrDefaultAsync(i => i.Id == id, cancellationToken)
             ?? throw new InvalidOperationException($"Insurance policy {id} not found for current water supplier.");
 
         insurance.InsuranceNumber = insuranceNumber;
@@ -106,13 +103,6 @@ public class ProfessionalInsuranceRepository : Repository<ProfessionalInsurance>
         return insurance;
     }
 
-    /// <summary>
-    /// Insurance is held at company level, so a policy row carries no professional type of its own. The
-    /// "Manage" button needs one anyway, to know which per-type details page to send staff to. This reads
-    /// it off the professional's registration with the current water supplier (already tenant-scoped, see
-    /// ScopedToWaterSupplier), preferring Bpat first since that is the program the page was built against.
-    /// A professional registered for more than one program only ever gets the first match.
-    /// </summary>
     public async Task<Dictionary<int, ProfessionalType?>> GetProfessionalTypesAsync(IEnumerable<int> professionalIds, CancellationToken cancellationToken)
     {
         var flagsByProfessionalId = await DbContext.ProfessionalWaterSuppliers
@@ -151,22 +141,13 @@ public class ProfessionalInsuranceRepository : Repository<ProfessionalInsurance>
         });
     }
 
-    /// <summary>
-    /// ProfessionalInsurance is an IProfessionalModel, not an ITenantModel, so no WaterSupplierId filter
-    /// applies to it. ProfessionalWaterSupplier is a TenantModel, so joining through it borrows that
-    /// tenant filter and limits the result to professionals registered with the current water supplier.
-    /// </summary>
-    private IQueryable<ProfessionalInsurance> ScopedToWaterSupplier()
+    private IQueryable<ProfessionalInsurance> ScopedInsurances()
     {
         return DbContext.Set<ProfessionalInsurance>()
             .AsNoTracking()
-            .Where(i => DbContext.ProfessionalWaterSuppliers.Any(pws => pws.ProfessionalId == i.ProfessionalId));
+            .ScopedToWaterSupplier(DbContext);
     }
 
-    /// <summary>
-    /// The three Insurance Management tabs. Buckets match the License Management ones so both pages
-    /// answer "unverified / expired / expiring" the same way.
-    /// </summary>
     private static IQueryable<ProfessionalInsurance> ApplyInsuranceFilter(IQueryable<ProfessionalInsurance> query, string? insuranceFilter)
     {
         var now = DateTime.UtcNow;

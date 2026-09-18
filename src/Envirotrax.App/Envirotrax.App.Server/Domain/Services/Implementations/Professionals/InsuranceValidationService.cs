@@ -11,9 +11,9 @@ using Envirotrax.Common.Domain.Services.Defintions;
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Professionals;
 
 /// <summary>
-/// Ports V1's WaterSupplierLicensing.CheckInsurance. The three submission screens (backflow, CSI,
-/// FOG trip ticket) call this instead of each re-deriving the rule from GeneralSettings + the
-/// professional's policies, and the submit services call EnsureValidAsync as a server-side guard.
+/// Single source of truth for insurance eligibility, ported from V1's WaterSupplierLicensing.CheckInsurance.
+/// The submission screens read it through /api/professionals/insurance-status; the submit services enforce
+/// it through EnsureValidAsync.
 /// </summary>
 public class InsuranceValidationService : IInsuranceValidationService
 {
@@ -52,10 +52,8 @@ public class InsuranceValidationService : IInsuranceValidationService
 
         if (status != InsuranceStatus.Valid)
         {
-            // A sub-account with no policy of its own, or one that falls short, is still allowed to
-            // work off its master account's policy - matching V1, which checked the master exclusively
-            // for sub-accounts. Here the sub-account's own policy is checked first, so this can only
-            // ever be as permissive as V1, never more.
+            // A sub-account may fall back to its master account's policy, as in V1. Its own policy is
+            // checked first, so this is never stricter than V1.
             var professional = await _professionalRepository.GetAsync(professionalId, cancellationToken);
 
             if (professional?.ParentId != null)
@@ -84,10 +82,8 @@ public class InsuranceValidationService : IInsuranceValidationService
     }
 
     /// <summary>
-    /// Folds every policy a professional holds into the single most useful status. A professional can
-    /// have more than one insurance policy on file; if none of them are Valid, the most actionable
-    /// failure wins so staff and the contractor see the problem that is actually blocking them (a
-    /// missing coverage amount is more useful to know about than an unrelated expired policy).
+    /// A professional may hold several policies. If none qualify, the most actionable failure is returned
+    /// so the contractor sees what is actually blocking them rather than an unrelated expired policy.
     /// </summary>
     private async Task<InsuranceStatus> EvaluatePoliciesAsync(int professionalId, decimal requiredCoverage, CancellationToken cancellationToken)
     {
@@ -147,8 +143,7 @@ public class InsuranceValidationService : IInsuranceValidationService
 
     private static (bool Requires, decimal RequiredCoverage) GetRequirement(GeneralSettingsDto? settings, ProfessionalType professionalType)
     {
-        // Anything else, including FogInspector, is not required: V1 had this same check for FOG
-        // inspectors commented out entirely, so this stays an explicit choice rather than an omission.
+        // FOG inspectors and everything else: no requirement, matching V1 where that check was disabled.
         return professionalType switch
         {
             ProfessionalType.Bpat => (settings?.BpatsRequireInsurance ?? false, settings?.BpatsRequireInsuranceAmount ?? 0m),

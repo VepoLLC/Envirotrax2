@@ -14,37 +14,37 @@ public class WaterSupplierDashboardService : IWaterSupplierDashboardService
     private readonly IBackflowComplianceReportService _complianceReportService;
     private readonly IProfessionalUserLicenseService _licenseService;
     private readonly IProfessionalInsuranceService _insuranceService;
+    private readonly IBackflowGaugeService _gaugeService;
 
     public WaterSupplierDashboardService(
         IWaterSupplierDashboardRepository repository,
         IBackflowComplianceReportService complianceReportService,
         IProfessionalUserLicenseService licenseService,
-        IProfessionalInsuranceService insuranceService)
+        IProfessionalInsuranceService insuranceService,
+        IBackflowGaugeService gaugeService)
     {
         _repository = repository;
         _complianceReportService = complianceReportService;
         _licenseService = licenseService;
         _insuranceService = insuranceService;
+        _gaugeService = gaugeService;
     }
 
     public async Task<WaterSupplierDashboardStatsDto> GetStatsAsync(CancellationToken cancellationToken)
     {
         var stats = await _repository.GetStatsAsync(cancellationToken);
 
-        // The license badges link into the License Management page, so they have to be counted the way
-        // that page counts its tabs: expired last month, expiring this month, and only professionals
-        // linked to this water supplier.
         var licenseCounts = await _licenseService.GetCountsByWaterSupplierAsync(cancellationToken);
 
         stats.UnverifiedLicenseCount = licenseCounts.UnverifiedCount;
         stats.ExpiredLicenseCount = licenseCounts.ExpiredCount;
         stats.ExpiringLicenseCount = licenseCounts.ExpiringCount;
 
-        // Same reason for insurance: the badge opens the Insurance Management page on its Unverified tab,
-        // so it has to be that tab's number and not a count across every water supplier in the database.
         var insuranceCounts = await _insuranceService.GetCountsByWaterSupplierAsync(cancellationToken);
 
         stats.InsurancePolicyCount = insuranceCounts.UnverifiedCount;
+        stats.TestGaugeCount = await _gaugeService.GetUnverifiedCountByWaterSupplierAsync(cancellationToken);
+        stats.TransporterRegistrationCount = await _licenseService.GetUnverifiedRegistrationCountByWaterSupplierAsync(cancellationToken);
 
         return stats;
     }

@@ -96,27 +96,7 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
         var items = await _licenseRepository.GetAllByWaterSupplierAsync(pageInfo, query, licenseFilter, cancellationToken);
         var now = _timeZoneHelper.GetUserLocalTime();
 
-        var dtos = items.Select(l => new WaterSupplierLicenseDto
-        {
-            Id = l.Id,
-            ProfessionalId = l.ProfessionalId,
-            UserId = l.UserId,
-            UserEmail = l.User?.Email,
-            CompanyName = l.Professional?.Name,
-            ContactName = l.ProfessionalUser?.ContactName,
-            ProfessionalType = l.ProfessionalType,
-            LicenseTypeId = l.LicenseTypeId,
-            LicenseTypeName = l.LicenseType?.Name,
-            LicenseNumber = l.LicenseNumber,
-            ExpirationDate = l.ExpirationDate,
-            ExpirationType = l.ExpirationDate.HasValue
-                ? (l.ExpirationDate < now ? ExpirationType.Expired
-                    : l.ExpirationDate < now.AddDays(30) ? ExpirationType.AboutToExpire
-                    : ExpirationType.Valid)
-                : ExpirationType.Valid
-        });
-
-        return dtos.ToPagedData(pageInfo);
+        return items.Select(l => MapToWaterSupplierLicenseDto(l, now)).ToPagedData(pageInfo);
     }
 
     public async Task<LicenseCountsDto> GetCountsByWaterSupplierAsync(CancellationToken cancellationToken)
@@ -136,7 +116,30 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
     public async Task<WaterSupplierLicenseDto> UpdateForWaterSupplierAsync(int id, UpdateWaterSupplierLicenseDto dto, CancellationToken cancellationToken)
     {
         var license = await _licenseRepository.UpdateForWaterSupplierAsync(id, dto.LicenseNumber, dto.ContactName, dto.ExpirationDate, cancellationToken);
+
+        return MapToWaterSupplierLicenseDto(license, _timeZoneHelper.GetUserLocalTime());
+    }
+
+    public async Task DeleteForWaterSupplierAsync(int id, CancellationToken cancellationToken)
+    {
+        await _licenseRepository.DeleteForWaterSupplierAsync(id, cancellationToken);
+    }
+
+    public async Task<IPagedData<WaterSupplierLicenseDto>> GetUnverifiedRegistrationsByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var items = await _licenseRepository.GetUnverifiedRegistrationsByWaterSupplierAsync(pageInfo, query, cancellationToken);
         var now = _timeZoneHelper.GetUserLocalTime();
+
+        return items.Select(l => MapToWaterSupplierLicenseDto(l, now)).ToPagedData(pageInfo);
+    }
+
+    public async Task<int> GetUnverifiedRegistrationCountByWaterSupplierAsync(CancellationToken cancellationToken)
+    {
+        return await _licenseRepository.GetUnverifiedRegistrationCountByWaterSupplierAsync(cancellationToken);
+    }
+
+    private static WaterSupplierLicenseDto MapToWaterSupplierLicenseDto(ProfessionalUserLicense license, DateTime now)
+    {
         return new WaterSupplierLicenseDto
         {
             Id = license.Id,
@@ -156,10 +159,5 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
                     : ExpirationType.Valid)
                 : ExpirationType.Valid
         };
-    }
-
-    public async Task DeleteForWaterSupplierAsync(int id, CancellationToken cancellationToken)
-    {
-        await _licenseRepository.DeleteForWaterSupplierAsync(id, cancellationToken);
     }
 }

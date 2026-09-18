@@ -96,15 +96,8 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         return added;
     }
 
-    /// <summary>
-    /// Lets a contractor correct only the policy number they typed in themselves. The expiration date
-    /// and the coverage amount are transcribed off the certificate by water supplier staff, so a
-    /// contractor writing them would be self-validating and would walk straight past the review queue.
-    /// The inherited CRUD update binds the whole DTO, which is why it is deliberately bypassed here.
-    /// </summary>
     public async Task<ProfessionalInsuranceDto?> UpdateForProfessionalAsync(ProfessionalInsuranceDto insurance, CancellationToken cancellationToken)
     {
-        // The ProfessionalId query filter scopes this to the caller, so it doubles as the ownership check.
         var existing = await _insuranceRepository.GetTrackedForUpdateAsync(insurance.Id, cancellationToken);
 
         if (existing == null)
@@ -189,10 +182,9 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
 
     public async Task DeleteForWaterSupplierAsync(int id, CancellationToken cancellationToken)
     {
-        // Throws when the policy belongs to a professional this water supplier is not registered with.
         await _insuranceRepository.GetForWaterSupplierAsync(id, cancellationToken);
 
-        // Reused so the certificate file is removed in the same transaction as the row.
+        // Delegates so the certificate file is removed in the same transaction as the row.
         await DeleteAsync(id);
     }
 

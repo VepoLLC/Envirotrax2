@@ -9,8 +9,6 @@ export interface WaterSupplierInsurance {
     insuranceCoverage?: number;
     expirationDate?: string;
     expirationType?: ExpirationType;
-    // Not stored on the policy - resolved server-side from the professional's registered programs,
-    // purely so the Manage button knows which per-type details page to open.
     professionalType?: ProfessionalType;
 }
 

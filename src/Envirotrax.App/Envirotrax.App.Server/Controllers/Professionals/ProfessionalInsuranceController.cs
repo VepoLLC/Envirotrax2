@@ -40,8 +40,6 @@ public class ProfessionalInsuranceController : ProfessionalCrudController<Profes
     {
         insurance.Id = id;
 
-        // Not the inherited update: that one binds the whole DTO, which would let a contractor set its
-        // own expiration date and coverage amount and validate itself.
         var updated = await _insuranceService.UpdateForProfessionalAsync(insurance, CancellationToken.None);
 
         if (updated == null)

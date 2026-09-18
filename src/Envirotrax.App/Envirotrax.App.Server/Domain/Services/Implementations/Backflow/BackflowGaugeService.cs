@@ -91,4 +91,26 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         scope.Complete();
         return added;
     }
+
+    public async Task<IPagedData<WaterSupplierGaugeDto>> GetUnverifiedByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var items = await _gaugeRepository.GetUnverifiedByWaterSupplierAsync(pageInfo, query, cancellationToken);
+
+        return items.Select(g => new WaterSupplierGaugeDto
+        {
+            Id = g.Id,
+            ProfessionalId = g.ProfessionalId,
+            CompanyName = g.Professional?.Name,
+            CompanyEmail = g.Professional?.CompanyEmail,
+            Manufacturer = g.Manufacturer,
+            Model = g.Model,
+            SerialNumber = g.SerialNumber,
+            LastCalibrationDate = g.LastCalibrationDate
+        }).ToPagedData(pageInfo);
+    }
+
+    public async Task<int> GetUnverifiedCountByWaterSupplierAsync(CancellationToken cancellationToken)
+    {
+        return await _gaugeRepository.GetUnverifiedCountByWaterSupplierAsync(cancellationToken);
+    }
 }

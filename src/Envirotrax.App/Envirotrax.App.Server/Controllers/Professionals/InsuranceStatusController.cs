@@ -4,10 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers.Professionals;
 
-/// <summary>
-/// A separate controller from ProfessionalInsuranceController on purpose: that one is restricted to
-/// professional admins, but a BPAT/CSI/FOG transporter submitting work may not be one.
-/// </summary>
+
 [Route("api/professionals/insurance-status")]
 public class InsuranceStatusController : ProfessionalProtectedController
 {
@@ -24,8 +21,6 @@ public class InsuranceStatusController : ProfessionalProtectedController
         [FromQuery] ProfessionalType professionalType,
         CancellationToken cancellationToken)
     {
-        // The caller's own ProfessionalId only - there is no way to ask about another professional's
-        // insurance through this endpoint.
         var validation = await _insuranceValidationService.ValidateAsync(waterSupplierId, professionalType, cancellationToken);
 
         return Ok(validation);

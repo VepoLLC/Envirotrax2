@@ -11,9 +11,6 @@ const currencyFormatter = new Intl.NumberFormat('en-US', {
     maximumFractionDigits: 0
 });
 
-// Shared by the three submission screens so the status->message mapping lives in one place. The
-// `default` branch covers InsuranceStatus.NotFound and any value the client doesn't recognize, and
-// fails closed (valid: false) rather than silently letting an unmapped status through.
 export function describeInsuranceStatus(validation: InsuranceValidation | undefined): InsuranceStatusDisplay {
     if (!validation) {
         return { message: 'No insurance policy found', valid: false };

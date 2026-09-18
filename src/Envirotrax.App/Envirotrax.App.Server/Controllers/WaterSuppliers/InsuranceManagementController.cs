@@ -79,9 +79,6 @@ public class InsuranceManagementController : WaterSupplierProtectedController
         return NoContent();
     }
 
-    // Insurance rides on the licensing permission on purpose: PermissionType has no Insurances member,
-    // and adding one would seed with zero grants on every migrated role, silently taking the page away
-    // from staff who can already reach insurances through the per-professional tabs.
     private bool HasInsuranceAccess()
     {
         return _authService.HasAnyFeatures(FeatureType.ManageProfessionalInsurances) ||

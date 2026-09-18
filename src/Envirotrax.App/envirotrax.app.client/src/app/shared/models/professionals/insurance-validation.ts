@@ -1,7 +1,3 @@
-// Mirrors Envirotrax.App.Server InsuranceValidationDto/InsuranceStatus. Deliberately not the
-// ExpirationType enum: that one describes how close a date is to expiring and is shared with license
-// and gauge badges, this one answers "can this professional submit work", which InsufficientCoverage
-// and NotRequired have no ExpirationType equivalent for.
 export enum InsuranceStatus {
     NotFound = 0,
     AwaitingValidation = 1,

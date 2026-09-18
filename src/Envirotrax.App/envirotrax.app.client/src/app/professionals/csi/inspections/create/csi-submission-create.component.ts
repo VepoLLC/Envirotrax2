@@ -122,8 +122,6 @@ export class CsiSubmissionCreateComponent implements OnInit {
         await this.loadInsuranceValidation();
     }
 
-    // No insurance check existed on this screen before; the license status row this mirrors was the
-    // only gate. Company-level, so it depends on the water supplier, not which CSI user is selected.
     public get insuranceDisplay(): InsuranceStatusDisplay {
         return describeInsuranceStatus(this.insuranceValidation);
     }

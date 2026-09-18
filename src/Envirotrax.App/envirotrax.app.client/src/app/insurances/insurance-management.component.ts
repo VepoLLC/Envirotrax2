@@ -9,10 +9,6 @@ import { FeatureType } from '../shared/models/feature-type';
 import { PermissionAction, PermissionType } from '../shared/models/permission-type';
 import { CellTemplateData, ColumnType, TableColumn } from '@envirotrax/common-ui';
 
-// The three-tab View (unverified / expired / expiring) and in-place edit that License Management has
-// are not needed here yet: for now this page is only the review queue V1 had, and Manage sends staff
-// to the per-professional-type details page (which already has the expiration date and coverage
-// fields) to actually validate the policy.
 @Component({
     templateUrl: './insurance-management.component.html',
     standalone: false
@@ -82,9 +78,6 @@ export class InsuranceManagementComponent implements OnInit {
         }
     }
 
-    // Insurance is company-level and carries no professional type of its own, so the server resolves
-    // one from the professional's registered programs. Mirrors V1's isManagedBPAT/CSI/FOG functions,
-    // which opened a different account_management_*.aspx page depending on the row's type.
     public manage(insurance: WaterSupplierInsurance): void {
         const route = this.buildManageRoute(insurance);
 

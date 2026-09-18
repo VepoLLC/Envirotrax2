@@ -3,12 +3,6 @@ using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 
-/// <summary>
-/// A policy row as water supplier staff see it on the Insurance Management page. Insurance is held at
-/// company level, so unlike a license there is no user on the row; ProfessionalType is not stored on
-/// the policy either, it is resolved from the professional's registered programs purely to route the
-/// Manage button to the right per-type details page.
-/// </summary>
 public class WaterSupplierInsuranceDto : IDto
 {
     public int Id { get; set; }

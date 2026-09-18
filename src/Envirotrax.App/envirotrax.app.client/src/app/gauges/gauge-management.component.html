@@ -1,0 +1,28 @@
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+<ng-template #calibrationDateCell let-rowData="rowData">
+    <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
+         [class.text-bg-primary]="!rowData.lastCalibrationDate"
+         [class.text-bg-success]="rowData.lastCalibrationDate"
+         [attr.aria-label]="!rowData.lastCalibrationDate ? 'Validating' : 'Calibrated'">
+        {{ rowData.lastCalibrationDate ? (rowData.lastCalibrationDate | date) : 'Validating...' }}
+    </div>
+</ng-template>
+
+<ng-template #actionsCell let-rowData="rowData">
+    <div (click)="$event.stopPropagation()">
+        <button type="button" class="btn btn-primary" (click)="manage(rowData)">Manage</button>
+    </div>
+</ng-template>
+
+<vp-section header="Unverified Gauges">
+    <vp-table *ngIf="table.items"
+              [columns]="table.columns!"
+              [data]="table.items.data"
+              [(pageInfo)]="table.items.pageInfo"
+              (pageInfoChange)="loadGauges()"
+              [(query)]="table.query"
+              (queryChange)="loadGauges()"
+              (queryReset)="loadGauges()"
+              [freeTextSearch]="table.freeTextSearch" />
+</vp-section>

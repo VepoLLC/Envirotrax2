@@ -17,9 +17,6 @@ public class ProfessionalInsurance : IProfessionalModel, ICreateAuditableModel<A
 
     public DateTime? ExpirationDate { get; set; }
 
-    // Both of these are transcribed off the certificate by water supplier staff, never by the
-    // contractor. Null means the policy has not been validated yet, which is what puts it in the
-    // Insurance Management queue and blocks the contractor from submitting work.
     [Precision(19, 4)]
     public decimal? InsuranceCoverage { get; set; }
 

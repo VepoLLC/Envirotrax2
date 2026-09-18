@@ -92,6 +92,22 @@ const routes: Routes = [
         data: {
           roles: [ROLE_DEFINITIONS.WATER_SUPPLIER]
         }
+      },
+      {
+        path: 'gauges',
+        loadChildren: () => import('./gauges/gauges.module').then(m => m.GaugesModule),
+        canActivate: [RoleGuard],
+        data: {
+          roles: [ROLE_DEFINITIONS.WATER_SUPPLIER]
+        }
+      },
+      {
+        path: 'registrations',
+        loadChildren: () => import('./registrations/registrations.module').then(m => m.RegistrationsModule),
+        canActivate: [RoleGuard],
+        data: {
+          roles: [ROLE_DEFINITIONS.WATER_SUPPLIER]
+        }
       }
     ]
   },

@@ -166,8 +166,6 @@ export class BackflowTestSubmitComponent implements OnInit {
         return true;
     }
 
-    // BpatsRequireInsurance now lives in this check server-side, so unlike before this screen finally
-    // respects the water supplier's "requires insurance" setting instead of always enforcing it.
     public get insuranceDisplay(): InsuranceStatusDisplay {
         return describeInsuranceStatus(this.insuranceValidation);
     }

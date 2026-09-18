@@ -17,8 +17,6 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
 
     public async Task<WaterSupplierDashboardStatsDto> GetStatsAsync(CancellationToken cancellationToken)
     {
-        // Compared in UTC, and restricted to open reminders, so these badges agree with the Property Log
-        // Management page they link into - it sends its own reviewDate filter as a UTC instant.
         var now = DateTime.UtcNow;
         var in30Days = now.AddDays(30);
 
@@ -34,11 +32,6 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
             FogTransporterCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsFogTransporter, cancellationToken),
             FogInspectorCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsFogInspector, cancellationToken),
 
-            // InsurancePolicyCount is filled in by WaterSupplierDashboardService from the same source as the
-            // Insurance Management tabs. Counting it here would span every water supplier, because
-            // ProfessionalInsurances carries no tenant filter.
-            TestGaugeCount = await _context.BackflowGauges.CountAsync(g => g.LastCalibrationDate == null, cancellationToken),
-            TransporterRegistrationCount = await _context.ProfessionalUserLicenses.CountAsync(l => l.LicenseTypeId == 9 && l.ExpirationDate == null, cancellationToken)
         };
     }
 

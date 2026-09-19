@@ -1,17 +1,15 @@
-import { HttpContextToken, HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpStatusCode } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { Observable, throwError } from "rxjs";
-import { catchError } from "rxjs/operators";
+import { ErrorHandler, Injectable } from "@angular/core";
+import { HttpErrorResponse, HttpStatusCode } from "@angular/common/http";
 import { ModalHelperService, ToastService, ToastType } from "@envirotrax/common-ui";
 import { AuthService } from "../auth/auth.service";
 
-// Requests that already treat a particular status as expected control flow (e.g. a 404
-// meaning "no record yet") can list those statuses here to opt out of the global handling
-// just for them, while still getting the global handler for anything unexpected (e.g. 500).
-export const SKIP_ERROR_INTERCEPTOR = new HttpContextToken<number[]>(() => []);
-
+// Angular only calls handleError for errors nobody else caught - an Observable/Promise
+// error handled locally (a subscribe error callback, a try/catch) never reaches this class.
+// That is intentional: it lets call sites decide, case by case, whether a failure is
+// expected and should be swallowed or handled locally, without needing to opt out of a
+// global interceptor that would otherwise always run.
 @Injectable()
-export class HttpErrorInterceptor implements HttpInterceptor {
+export class GlobalErrorHandler implements ErrorHandler {
 
     constructor(
         private readonly _authService: AuthService,
@@ -19,25 +17,20 @@ export class HttpErrorInterceptor implements HttpInterceptor {
         private readonly _modalHelper: ModalHelperService) {
     }
 
-    public intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        return next.handle(req).pipe(
-            catchError((error: HttpErrorResponse) => {
-                if (!req.context.get(SKIP_ERROR_INTERCEPTOR).includes(error.status)) {
-                    this.handleError(error);
-                }
+    public handleError(error: unknown): void {
+        const httpError = this.asHttpErrorResponse(error);
 
-                return throwError(() => error);
-            })
-        );
-    }
+        if (!httpError) {
+            console.error(error);
+            return;
+        }
 
-    private handleError(error: HttpErrorResponse): void {
-        switch (error.status) {
-            case 401:
+        switch (httpError.status) {
+            case HttpStatusCode.Unauthorized:
                 this._authService.signIn(undefined, undefined, window.location.pathname + window.location.search + window.location.hash);
                 break;
 
-            case 403:
+            case HttpStatusCode.Forbidden:
                 this._toastService.show({
                     text: "You don't have permission to perform this action.",
                     type: ToastType.Error
@@ -53,9 +46,9 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 
                 break;
 
-            case 500: {
+            case HttpStatusCode.InternalServerError: {
                 const messages = ['An unexpected error occurred. Please try again.'];
-                const traceId = error.error?.traceId;
+                const traceId = httpError.error?.traceId;
 
                 if (traceId) {
                     messages.push(`If the problem continues, contact support and include this reference ID: ${traceId}`);
@@ -73,12 +66,12 @@ export class HttpErrorInterceptor implements HttpInterceptor {
             case HttpStatusCode.BadRequest: {
                 const messages: string[] = [];
 
-                if (typeof error.error === 'string') {
-                    messages.push(error.error);
-                } else if (error.error?.errors) {
-                    messages.push(...Object.values<string[]>(error.error.errors).flat());
-                } else if (error.error && typeof error.error === 'object') {
-                    const values = Object.values(error.error);
+                if (typeof httpError.error === 'string') {
+                    messages.push(httpError.error);
+                } else if (httpError.error?.errors) {
+                    messages.push(...Object.values<string[]>(httpError.error.errors).flat());
+                } else if (httpError.error && typeof httpError.error === 'object') {
+                    const values = Object.values(httpError.error);
                     if (values.length && values.every(value => Array.isArray(value))) {
                         messages.push(...(values as string[][]).flat());
                     }
@@ -95,5 +88,11 @@ export class HttpErrorInterceptor implements HttpInterceptor {
                 break;
             }
         }
+    }
+
+    private asHttpErrorResponse(error: unknown): HttpErrorResponse | undefined {
+        const candidate = (error as { rejection?: unknown })?.rejection ?? error;
+
+        return candidate instanceof HttpErrorResponse ? candidate : undefined;
     }
 }

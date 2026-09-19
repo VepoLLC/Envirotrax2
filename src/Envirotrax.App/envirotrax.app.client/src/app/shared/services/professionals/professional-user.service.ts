@@ -1,8 +1,7 @@
 import { Injectable } from "@angular/core";
 import { UrlResolverService } from "../helpers/url-resolver.service";
 import { QueryHelperService } from "../helpers/query-helper.service";
-import { HttpClient, HttpContext } from "@angular/common/http";
-import { SKIP_ERROR_INTERCEPTOR } from "../http/http-error.interceptor";
+import { HttpClient } from "@angular/common/http";
 import { ProfessionalUser } from "../../models/professionals/professional-user";
 import { lastValueFrom, Observable } from "rxjs";
 import { ProfesisonalService } from "./professional.service";
@@ -28,13 +27,11 @@ export class ProfesionalUserService {
         });
     }
 
-    public async getMyData(skipErrorInterceptorForStatuses: number[] = []): Promise<ProfessionalUser> {
+    public async getMyData(): Promise<ProfessionalUser> {
         const url = this._urlResolver.resolveUrl('/api/professionals/users/my');
 
         if (!this._currentUser$) {
-            this._currentUser$ = this._http.get<ProfessionalUser>(url, {
-                context: new HttpContext().set(SKIP_ERROR_INTERCEPTOR, skipErrorInterceptorForStatuses)
-            });
+            this._currentUser$ = this._http.get<ProfessionalUser>(url);
         }
 
         return lastValueFrom(this._currentUser$);

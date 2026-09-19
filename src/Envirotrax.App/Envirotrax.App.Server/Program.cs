@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using Azure.Identity;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
@@ -38,8 +39,15 @@ builder.Services.AddControllers(options =>
     options.OutputFormatters.Add(new XmlMediaTypeFormatter());
 });
 
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddProblemDetails();
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = context =>
+    {
+        var traceId = Activity.Current?.TraceId.ToString() ?? context.HttpContext.TraceIdentifier;
+
+        context.ProblemDetails.Extensions["traceId"] = traceId;
+    };
+});
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

@@ -30,6 +30,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     private readonly IBackflowTestRepository _backflowTestRepository;
     private readonly IBackflowOutOfServiceRequestRepository _outOfServiceRequestRepository;
     private readonly IFogInspectionRepository _fogInspectionRepository;
+    private readonly IFogTripTicketRepository _fogTripTicketRepository;
     private readonly ILogger<SiteService> _logger;
 
     public SiteService(
@@ -44,6 +45,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         IBackflowTestRepository backflowTestRepository,
         IBackflowOutOfServiceRequestRepository outOfServiceRequestRepository,
         IFogInspectionRepository fogInspectionRepository,
+        IFogTripTicketRepository fogTripTicketRepository,
         ILogger<SiteService> logger)
         : base(mapper, repository)
     {
@@ -57,6 +59,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         _backflowTestRepository = backflowTestRepository;
         _outOfServiceRequestRepository = outOfServiceRequestRepository;
         _fogInspectionRepository = fogInspectionRepository;
+        _fogTripTicketRepository = fogTripTicketRepository;
         _logger = logger;
     }
 
@@ -73,6 +76,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         var csiCount = await _csiInspectionRepository.CountBySiteAsync(siteId, cancellationToken);
         var backflowCount = await _backflowTestRepository.CountCurrentInServiceBySiteAsync(siteId, cancellationToken);
         var outOfServiceCount = await _outOfServiceRequestRepository.CountBySiteAsync(siteId, cancellationToken);
+        var tripTicketCount = await _fogTripTicketRepository.CountBySiteAsync(siteId, cancellationToken);
         var fogCount = await _fogInspectionRepository.CountBySiteAsync(siteId, cancellationToken);
 
         return new SiteTabCountsDto
@@ -81,6 +85,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
             CsiCount = csiCount,
             BackflowCount = backflowCount,
             OutOfServiceCount = outOfServiceCount,
+            TripTicketCount = tripTicketCount,
             FogCount = fogCount
         };
     }

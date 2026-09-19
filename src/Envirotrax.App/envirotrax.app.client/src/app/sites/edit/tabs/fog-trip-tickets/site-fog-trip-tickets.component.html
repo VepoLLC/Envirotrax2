@@ -22,14 +22,6 @@
     </div>
 </ng-template>
 
-<ng-template #removalDateTemplate let-ticket="rowData">
-    <span>{{ ticket.interceptorWasteRemovedDate | date:'dd.MM.yyyy HH:mm' }}</span>
-</ng-template>
-
-<ng-template #deliveryDateTemplate let-ticket="rowData">
-    <span>{{ ticket.receiverWasteDeliveredDate | date:'dd.MM.yyyy HH:mm' }}</span>
-</ng-template>
-
 <ng-template #transporterTemplate let-ticket="rowData">
     <div>
         <div *ngIf="ticket.transporterCompanyName" class="fw-semibold">{{ ticket.transporterCompanyName }}</div>

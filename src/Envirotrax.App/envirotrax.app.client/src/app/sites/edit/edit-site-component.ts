@@ -106,8 +106,6 @@ export class EditSiteComponent implements OnInit {
     }
 
     public async ngOnInit(): Promise<void> {
-        // Full width: the sections get more room and the tab strip stays on one row.
-        this._containerHelper.setContainerVisibility(false);
 
         await this.loadPermissions();
         await this.loadStates();
@@ -132,52 +130,8 @@ export class EditSiteComponent implements OnInit {
         this.csiCount = counts.csiCount;
         this.backflowCount = counts.backflowCount;
         this.outOfServiceCount = counts.outOfServiceCount;
+        this.tripTicketCount = counts.tripTicketCount;
         this.fogCount = counts.fogCount;
-        const countPageInfo: PageInfo = { pageNumber: 1, pageSize: 1 };
-        const siteFilter: QueryProperty = {
-            columnName: 'site.id',
-            value: siteId.toString(),
-            comparisonOperator: 'Eq' as ComparisonOperator
-        };
-
-        await Promise.all([
-            this.canViewLogHistory
-                ? this._siteLogService.getAll(siteId, countPageInfo, { sort: {}, filter: [] })
-                    .then(result => this.logHistoryCount = result.pageInfo.totalItems ?? 0)
-                : Promise.resolve(),
-
-            this.canViewCsi
-                ? this._csiInspectionService.getAll(countPageInfo, { sort: {}, filter: [siteFilter] })
-                    .then(result => this.csiCount = result.pageInfo.totalItems ?? 0)
-                : Promise.resolve(),
-
-            this.canViewBackflow
-                ? this._backflowTestService.getAll(countPageInfo, {
-                    sort: {},
-                    filter: [
-                        siteFilter,
-                        { columnName: 'isCurrent', value: 'true', comparisonOperator: 'Eq' as ComparisonOperator },
-                        { columnName: 'outOfService', value: 'false', comparisonOperator: 'Eq' as ComparisonOperator }
-                    ]
-                }).then(result => this.backflowCount = result.pageInfo.totalItems ?? 0)
-                : Promise.resolve(),
-
-            this.canViewOutOfService
-                ? this._backflowOutOfServiceRequestService.getAllForWaterSupplier(
-                    countPageInfo, { sort: {}, filter: [siteFilter] }, OutOfServiceRequestStatusFilter.All)
-                    .then(result => this.outOfServiceCount = result.pageInfo.totalItems ?? 0)
-                : Promise.resolve(),
-
-            this.canViewTripTickets
-                ? this._fogTripTicketService.getAll(countPageInfo, { sort: {}, filter: [siteFilter] })
-                    .then(result => this.tripTicketCount = result.pageInfo.totalItems ?? 0)
-                : Promise.resolve(),
-
-            this.canViewFog
-                ? this._fogInspectionService.getAll(countPageInfo, { sort: {}, filter: [siteFilter] })
-                    .then(result => this.fogCount = result.pageInfo.totalItems ?? 0)
-                : Promise.resolve()
-        ]);
     }
 
     private async loadPermissions(): Promise<void> {

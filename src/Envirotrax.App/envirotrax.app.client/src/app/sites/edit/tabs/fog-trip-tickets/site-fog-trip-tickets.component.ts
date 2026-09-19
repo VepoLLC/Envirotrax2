@@ -19,14 +19,8 @@ export class SiteFogTripTicketsComponent implements OnInit {
     @ViewChild('statusTemplate', { static: true })
     public statusTemplate!: TemplateRef<CellTemplateData<FogTripTicket>>;
 
-    @ViewChild('removalDateTemplate', { static: true })
-    public removalDateTemplate!: TemplateRef<CellTemplateData<FogTripTicket>>;
-
     @ViewChild('transporterTemplate', { static: true })
     public transporterTemplate!: TemplateRef<CellTemplateData<FogTripTicket>>;
-
-    @ViewChild('deliveryDateTemplate', { static: true })
-    public deliveryDateTemplate!: TemplateRef<CellTemplateData<FogTripTicket>>;
 
     @ViewChild('receiverTemplate', { static: true })
     public receiverTemplate!: TemplateRef<CellTemplateData<FogTripTicket>>;
@@ -111,8 +105,7 @@ export class SiteFogTripTicketsComponent implements OnInit {
             {
                 field: 'interceptorWasteRemovedDate',
                 caption: 'Waste Removal Date',
-                type: ColumnType.other,
-                cellTemplate: this.removalDateTemplate
+                type: ColumnType.dateTime
             },
             {
                 field: '',
@@ -124,8 +117,7 @@ export class SiteFogTripTicketsComponent implements OnInit {
             {
                 field: 'receiverWasteDeliveredDate',
                 caption: 'Waste Delivery Date',
-                type: ColumnType.other,
-                cellTemplate: this.deliveryDateTemplate
+                type: ColumnType.dateTime
             },
             {
                 field: '',

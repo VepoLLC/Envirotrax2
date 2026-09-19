@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { PagedData, PageInfo, Query, QueryHelperService, UrlResolverService } from "@envirotrax/common-ui";
+import { PagedData, PageInfo, Query, QueryHelperService, RecordLog, UrlResolverService } from "@envirotrax/common-ui";
 import { lastValueFrom } from "rxjs";
 import { FogInspection } from "../../models/fog/fog-inspection";
 
@@ -24,5 +24,17 @@ export class FogInspectionService {
         });
 
         return await lastValueFrom(observable);
+    }
+
+    public async get(id: number): Promise<FogInspection> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/inspections/${id}`);
+
+        return await lastValueFrom(this._http.get<FogInspection>(url));
+    }
+
+    public async getLogs(id: number): Promise<RecordLog[]> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/inspections/${id}/logs`);
+
+        return await lastValueFrom(this._http.get<RecordLog[]>(url));
     }
 }

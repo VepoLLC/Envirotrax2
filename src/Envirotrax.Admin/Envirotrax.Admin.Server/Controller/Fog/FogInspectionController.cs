@@ -21,4 +21,20 @@ public class FogInspectionController : AdminBaseController
 
         return Ok(inspections);
     }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
+    {
+        var inspection = await _inspectionService.GetAsync(id, cancellationToken);
+
+        return inspection == null ? NotFound() : Ok(inspection);
+    }
+
+    [HttpGet("{id}/logs")]
+    public async Task<IActionResult> GetLogsAsync(int id, CancellationToken cancellationToken)
+    {
+        var logs = await _inspectionService.GetLogsAsync(id, cancellationToken);
+
+        return Ok(logs);
+    }
 }

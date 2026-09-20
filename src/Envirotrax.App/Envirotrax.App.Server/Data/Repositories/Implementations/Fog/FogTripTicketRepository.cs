@@ -101,4 +101,9 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
 
         return ticket;
     }
+
+    public Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken)
+    {
+        return Entity.CountAsync(t => t.SiteId == siteId && t.DeletedTime == null, cancellationToken);
+    }
 }

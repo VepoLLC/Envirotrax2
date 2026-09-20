@@ -11,7 +11,7 @@
                 {{ inspection?.disapproved ? 'Disapproved' : 'Approved' }}
             </button>
         </div>
-        <div class="text-center mb-3 ms-auto me-auto">
+        <div class="text-center mb-1 ms-auto me-auto">
             <ul class="vp-tabs nav nav-pills settings-tabs d-inline-flex">
                 <li class="nav-item">
                     <a class="nav-link" [class.active]="selectedTab === 'main'" [routerLink]="['/csi', id, 'view']"

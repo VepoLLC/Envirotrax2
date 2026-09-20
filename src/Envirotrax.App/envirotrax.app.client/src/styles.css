@@ -458,12 +458,13 @@ input:-webkit-autofill:active {
 
 .vp-tabs .nav-link {
     border: 1px solid var(--bs-border-color);
-    margin: 0 6px;
+    margin: 0 3px;
     background-color: rgba(0, 143, 212, 0.63);
-    border-radius: 13px 13px 4px 4px;
-    min-width: 175px;
-    padding: 3px 25px;
+    border-radius: 8px 8px 3px 3px;
+    min-width: 135px;
+    padding: 2px 12px;
     font-weight: 600;
+    font-size: 0.85rem;
     cursor: pointer;
 }
 

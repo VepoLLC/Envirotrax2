@@ -15,6 +15,7 @@ export interface SiteTabCounts {
     csiCount: number;
     backflowCount: number;
     outOfServiceCount: number;
+    tripTicketCount: number;
     fogCount: number;
 }
 

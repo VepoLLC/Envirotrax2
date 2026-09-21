@@ -17,9 +17,6 @@ import { MAX_PAGE_SIZE } from '../../../../shared/models/page-info';
 import { ProfessionalSupplierService } from '../../../../shared/services/professionals/professional-supplier.service';
 import { CheckoutService } from '../../../../shared/services/professionals/checkout.service';
 import { ToastService, InputOption } from '@envirotrax/common-ui';
-import { InsuranceValidationService } from '../../../../shared/services/professionals/insurance-validation.service';
-import { InsuranceValidation } from '../../../../shared/models/professionals/insurance-validation';
-import { describeInsuranceStatus, InsuranceStatusDisplay } from '../../../../shared/utils/insurance-status.util';
 
 @Component({
     standalone: false,
@@ -75,7 +72,6 @@ export class CsiSubmissionCreateComponent implements OnInit {
     public hasValidLicense = false;
     public licenseStatusText = 'No license found';
     public licenseStatusClass = 'text-danger';
-    public insuranceValidation?: InsuranceValidation;
     public remarksLength = 0;
     public complianceIsInvalid = false;
     public serviceLineIsInvalid = false;
@@ -93,8 +89,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
         private readonly _inspectionService: CsiInspectionService,
         private readonly _professionalSupplierService: ProfessionalSupplierService,
         private readonly _toastService: ToastService,
-        private readonly _checkoutService: CheckoutService,
-        private readonly _insuranceValidationService: InsuranceValidationService
+        private readonly _checkoutService: CheckoutService
     ) { }
 
     public ngOnInit(): void {
@@ -115,19 +110,10 @@ export class CsiSubmissionCreateComponent implements OnInit {
         await this.loadLicense(value);
     }
 
-    public async onWaterSupplierChange(value: number): Promise<void> {
+    public onWaterSupplierChange(value: number): void {
         this.selectedWaterSupplierId = value;
         this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === value);
         this.model.waterSupplier = { id: value };
-        await this.loadInsuranceValidation();
-    }
-
-    public get insuranceDisplay(): InsuranceStatusDisplay {
-        return describeInsuranceStatus(this.insuranceValidation);
-    }
-
-    public get canSubmit(): boolean {
-        return this.hasValidLicense && this.insuranceDisplay.valid;
     }
 
     public onCommentsChange(value: string | undefined): void {
@@ -237,7 +223,6 @@ export class CsiSubmissionCreateComponent implements OnInit {
             this.buildDropdownOptions();
             await this.setDefaultCsiUser();
             this.setDefaultWaterSupplier(site);
-            await this.loadInsuranceValidation();
         } finally {
             this.isLoading = false;
         }
@@ -278,12 +263,6 @@ export class CsiSubmissionCreateComponent implements OnInit {
 
         this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === this.selectedWaterSupplierId);
         this.model.waterSupplier = { id: this.selectedWaterSupplierId };
-    }
-
-    private async loadInsuranceValidation(): Promise<void> {
-        this.insuranceValidation = this.selectedWaterSupplierId
-            ? await this._insuranceValidationService.validate(this.selectedWaterSupplierId, ProfessionalType.CsiInspector)
-            : undefined;
     }
 
     private async loadLicense(userId: number): Promise<void> {

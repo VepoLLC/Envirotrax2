@@ -78,12 +78,13 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
 
     public async Task<IEnumerable<ProfessionalUserLicense>> GetAllByWaterSupplierAsync(PageInfo pageInfo, Query query, string? licenseFilter, CancellationToken cancellationToken)
     {
-        IQueryable<ProfessionalUserLicense> baseQuery = ScopedLicenses()
-            .Where(l => l.ProfessionalType != ProfessionalType.FogTransporter)
+        var baseQuery = DbContext.ProfessionalUserLicenses
+            .AsNoTracking()
             .Include(l => l.LicenseType)
             .Include(l => l.User)
             .Include(l => l.Professional)
-            .Include(l => l.ProfessionalUser);
+            .Include(l => l.ProfessionalUser)
+            .Where(l => DbContext.ProfessionalWaterSuppliers.Any(pws => pws.ProfessionalId == l.ProfessionalId));
 
         baseQuery = ApplyLicenseFilter(baseQuery, licenseFilter);
 
@@ -100,48 +101,13 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
 
     public async Task<int> GetCountByWaterSupplierAsync(string? licenseFilter, CancellationToken cancellationToken)
     {
-        var baseQuery = ScopedLicenses()
-            .Where(l => l.ProfessionalType != ProfessionalType.FogTransporter);
+        var baseQuery = DbContext.ProfessionalUserLicenses
+            .AsNoTracking()
+            .Where(l => DbContext.ProfessionalWaterSuppliers.Any(pws => pws.ProfessionalId == l.ProfessionalId));
 
         baseQuery = ApplyLicenseFilter(baseQuery, licenseFilter);
 
         return await baseQuery.CountAsync(cancellationToken);
-    }
-
-    public async Task<IEnumerable<ProfessionalUserLicense>> GetUnverifiedRegistrationsByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
-    {
-        var baseQuery = ScopedLicenses()
-            .Where(l => l.ProfessionalType == ProfessionalType.FogTransporter && l.ExpirationDate == null)
-            .Include(l => l.LicenseType)
-            .Include(l => l.User)
-            .Include(l => l.Professional)
-            .Include(l => l.ProfessionalUser);
-
-        if (query.Sort.IsNullOrEmpty())
-        {
-            query.Sort[nameof(ProfessionalUserLicense.Id)] = SortOperator.Asc;
-        }
-
-        var paginated = await baseQuery
-            .Where(query.Filter)
-            .OrderBy(query.Sort)
-            .PaginateAsync(pageInfo, cancellationToken);
-
-        return await paginated.ToListAsync(cancellationToken);
-    }
-
-    public async Task<int> GetUnverifiedRegistrationCountByWaterSupplierAsync(CancellationToken cancellationToken)
-    {
-        return await ScopedLicenses()
-            .Where(l => l.ProfessionalType == ProfessionalType.FogTransporter && l.ExpirationDate == null)
-            .CountAsync(cancellationToken);
-    }
-
-    private IQueryable<ProfessionalUserLicense> ScopedLicenses()
-    {
-        return DbContext.ProfessionalUserLicenses
-            .AsNoTracking()
-            .ScopedToWaterSupplier(DbContext);
     }
 
     private static IQueryable<ProfessionalUserLicense> ApplyLicenseFilter(IQueryable<ProfessionalUserLicense> query, string? licenseFilter)

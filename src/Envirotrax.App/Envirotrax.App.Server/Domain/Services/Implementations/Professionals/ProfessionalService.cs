@@ -20,6 +20,8 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
     private readonly IProfessionalRepository _professionalRepository;
     private readonly IProfessionalUserRepository _professionalUserRepository;
     private readonly IAuthService _authService;
+    private readonly IProfessionalInsuranceRepository _insuranceRepository;
+    private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly IAuthorizeNetPaymentService _authorizeNetPaymentService;
 
     public ProfessionalService(
@@ -27,12 +29,16 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
         IProfessionalRepository repository,
         IProfessionalUserRepository professionalUserRepository,
         IAuthService authService,
+        IProfessionalInsuranceRepository insuranceRepository,
+        ITimeZoneHelperService timeZoneHelper,
         IAuthorizeNetPaymentService authorizeNetPaymentService)
         : base(mapper, repository)
     {
         _professionalRepository = repository;
         _professionalUserRepository = professionalUserRepository;
         _authService = authService;
+        _insuranceRepository = insuranceRepository;
+        _timeZoneHelper = timeZoneHelper;
         _authorizeNetPaymentService = authorizeNetPaymentService;
     }
 
@@ -54,7 +60,21 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
 
     public async Task<ProfessionalDto?> GetLoggedInProfessionalAsync(CancellationToken cancellationToken)
     {
-        return await GetAsync(_authService.ProfessionalId, cancellationToken);
+        var dto = await GetAsync(_authService.ProfessionalId, cancellationToken);
+        if (dto != null)
+        {
+            var insurance = await _insuranceRepository.GetCurrentForProfessionalAsync(_authService.ProfessionalId, cancellationToken);
+            if (insurance != null)
+            {
+                var localTime = _timeZoneHelper.GetUserLocalTime();
+                dto.InsuranceExpirationType = localTime > insurance.ExpirationDate
+                    ? ExpirationType.Expired
+                    : localTime.AddDays(30) >= insurance.ExpirationDate
+                        ? ExpirationType.AboutToExpire
+                        : ExpirationType.Valid;
+            }
+        }
+        return dto;
     }
 
     public async Task<IReadOnlyList<ProfessionalDto>> GetSubAccountsAsync(CancellationToken cancellationToken)

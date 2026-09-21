@@ -15,7 +15,4 @@ public interface IProfessionalUserLicenseRepository : IRepository<ProfessionalUs
     Task<int> GetCountByWaterSupplierAsync(string? licenseFilter, CancellationToken cancellationToken);
     Task<ProfessionalUserLicense> UpdateForWaterSupplierAsync(int id, string licenseNumber, string? contactName, DateTime? expirationDate, CancellationToken cancellationToken);
     Task DeleteForWaterSupplierAsync(int id, CancellationToken cancellationToken);
-
-    Task<IEnumerable<ProfessionalUserLicense>> GetUnverifiedRegistrationsByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
-    Task<int> GetUnverifiedRegistrationCountByWaterSupplierAsync(CancellationToken cancellationToken);
 }

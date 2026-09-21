@@ -2776,10 +2776,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal?>("InsuranceCoverage")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
-
                     b.Property<string>("InsuranceNumber")
                         .IsRequired()
                         .HasMaxLength(50)

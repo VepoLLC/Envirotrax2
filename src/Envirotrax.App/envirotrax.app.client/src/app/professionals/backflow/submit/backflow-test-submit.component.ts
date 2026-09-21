@@ -21,10 +21,6 @@ import { MAX_PAGE_SIZE } from '../../../shared/models/page-info';
 import { Site } from '../../../shared/models/sites/site';
 import { SiteService } from '../../../shared/services/sites/site.service';
 import { InputOption } from '@envirotrax/common-ui';
-import { InsuranceValidationService } from '../../../shared/services/professionals/insurance-validation.service';
-import { InsuranceValidation } from '../../../shared/models/professionals/insurance-validation';
-import { describeInsuranceStatus, InsuranceStatusDisplay } from '../../../shared/utils/insurance-status.util';
-import { ProfessionalType } from '../../../shared/models/professionals/licenses/professional-user-license';
 
 @Component({
     standalone: false,
@@ -58,7 +54,6 @@ export class BackflowTestSubmitComponent implements OnInit {
     public selectedGaugeId?: number;
 
     public additionalInfoSettings: BackflowTestingSettings | null = null;
-    public insuranceValidation?: InsuranceValidation;
 
     public readonly BackflowTestResult = BackflowTestResult;
     public readonly BackflowReasonForTest = BackflowReasonForTest;
@@ -157,17 +152,13 @@ export class BackflowTestSubmitComponent implements OnInit {
             return false;
         }
         if (this.selectedBpat?.bpatLicenseExpirationType === ExpirationType.Expired
-            || !this.insuranceDisplay.valid
+            || this.professional?.insuranceExpirationType === ExpirationType.Expired
             || this.selectedGauge?.expirationType === GaugeExpirationType.Expired
         ) {
             return false;
         }
 
         return true;
-    }
-
-    public get insuranceDisplay(): InsuranceStatusDisplay {
-        return describeInsuranceStatus(this.insuranceValidation);
     }
     public get isAirGap(): boolean { return this.model.deviceType === BackflowDeviceType.AG; }
     public get today(): Date { return new Date(); }
@@ -462,8 +453,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         private readonly _options: BackflowTestOptionsService,
         private readonly _settingsService: BackflowSettingsService,
         private readonly _siteService: SiteService,
-        private readonly _checkoutService: CheckoutService,
-        private readonly _insuranceValidationService: InsuranceValidationService
+        private readonly _checkoutService: CheckoutService
     ) {
         this.deviceTypeOptions = this._options.deviceTypeOptions;
         this.hazardTypeOptions = this._options.hazardTypeOptions;
@@ -542,10 +532,8 @@ export class BackflowTestSubmitComponent implements OnInit {
     private async loadAdditionalInfoSettings(): Promise<void> {
         if (this.selectedWaterSupplierId) {
             this.additionalInfoSettings = await this._settingsService.getTestingSettings(this.selectedWaterSupplierId);
-            this.insuranceValidation = await this._insuranceValidationService.validate(this.selectedWaterSupplierId, ProfessionalType.Bpat);
         } else {
             this.additionalInfoSettings = null;
-            this.insuranceValidation = undefined;
         }
     }
 

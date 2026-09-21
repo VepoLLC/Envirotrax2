@@ -12,8 +12,6 @@ public class ProfessionalInsuranceDto
 
     public DateTime? ExpirationDate { get; set; }
 
-    public decimal? InsuranceCoverage { get; set; }
-
     [Required]
     [StringLength(50)]
     public string InsuranceNumber { get; set; } = null!;

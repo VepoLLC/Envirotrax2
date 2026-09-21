@@ -101,8 +101,6 @@ export class App implements OnInit {
   private async createWaterSupplierMenuItems(): Promise<MenuItem[]> {
     const hasLicenseAccess = await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Licenses)
       || await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalLicenses);
-    const hasInsuranceAccess = await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Licenses)
-      || await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalInsurances);
 
     return [
       {
@@ -195,13 +193,6 @@ export class App implements OnInit {
             hasFeature: true
           },
           {
-            title: 'Insurance Management',
-            iconCss: 'fa-regular fa-umbrella',
-            routerLink: ['insurances'],
-            hasPermission: hasInsuranceAccess,
-            hasFeature: true
-          },
-          {
             title: 'Letter History',
             iconCss: 'fa-regular fa-envelope',
             routerLink: ['/'],
@@ -285,13 +276,6 @@ export class App implements OnInit {
             iconCss: 'fa-regular fa-id-card',
             routerLink: ['licenses'],
             hasPermission: hasLicenseAccess,
-            hasFeature: true
-          },
-          {
-            title: 'Insurance Management',
-            iconCss: 'fa-regular fa-umbrella',
-            routerLink: ['insurances'],
-            hasPermission: hasInsuranceAccess,
             hasFeature: true
           },
           {
@@ -413,13 +397,6 @@ export class App implements OnInit {
             iconCss: 'fa-regular fa-id-card',
             routerLink: ['licenses'],
             hasPermission: hasLicenseAccess,
-            hasFeature: true
-          },
-          {
-            title: 'Insurance Management',
-            iconCss: 'fa-regular fa-umbrella',
-            routerLink: ['insurances'],
-            hasPermission: hasInsuranceAccess,
             hasFeature: true
           },
           {

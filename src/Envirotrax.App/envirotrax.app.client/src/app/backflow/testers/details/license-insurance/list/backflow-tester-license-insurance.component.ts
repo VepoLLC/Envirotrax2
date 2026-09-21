@@ -9,7 +9,7 @@ import { AuthService } from "../../../../../shared/services/auth/auth.service";
 import { FeatureType } from "../../../../../shared/models/feature-type";
 import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
-import { ToastService, CellTemplateData, ColumnType, CurrencyCellComponent, ModalHelperService, TableColumn, TableCustomAction } from '@envirotrax/common-ui';
+import { ToastService, CellTemplateData, ColumnType, ModalHelperService, TableColumn, TableCustomAction } from '@envirotrax/common-ui';
 import { AddEditBackflowTesterInsuranceComponent } from "../edit/add-edit-backflow-tester-insurance.component";
 import { AddEditBackflowTesterLicenseComponent } from "../edit/add-edit-backflow-tester-license.component";
 import { DownloadService } from "../../../../../shared/services/download.service";
@@ -151,12 +151,6 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
                 field: 'insuranceNumber',
                 caption: 'Policy Number',
                 type: ColumnType.text
-            },
-            {
-                field: 'insuranceCoverage',
-                caption: 'Coverage',
-                cellComponent: CurrencyCellComponent,
-                type: ColumnType.number
             },
             {
                 field: 'expirationDate',

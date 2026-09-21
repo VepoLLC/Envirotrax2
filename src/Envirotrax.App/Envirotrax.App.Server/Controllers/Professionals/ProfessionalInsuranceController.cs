@@ -34,19 +34,4 @@ public class ProfessionalInsuranceController : ProfessionalCrudController<Profes
 
         return Ok(result);
     }
-
-    [HttpPut("{id}")]
-    public override async Task<IActionResult> UpdateAsync(int id, ProfessionalInsuranceDto insurance)
-    {
-        insurance.Id = id;
-
-        var updated = await _insuranceService.UpdateForProfessionalAsync(insurance, CancellationToken.None);
-
-        if (updated == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(updated);
-    }
 }

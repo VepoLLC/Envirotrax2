@@ -95,7 +95,6 @@ public static class ServiceRegistration
         services.AddTransient<IProfessionalUserLicenseService, ProfessionalUserLicenseService>();
         services.AddTransient<IProfessionalLicenseTypeService, ProfessionalLicenseTypeService>();
         services.AddTransient<IProfessionalInsuranceService, ProfessionalInsuranceService>();
-        services.AddTransient<IInsuranceValidationService, InsuranceValidationService>();
         services.AddTransient<IProfessionalDashboardService, ProfessionalDashboardService>();
 
         services.AddTransient<IGisAreaService, GisAreaService>();

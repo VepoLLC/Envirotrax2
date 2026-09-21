@@ -26,30 +26,4 @@ public class BackflowGaugeRepository : Repository<BackflowGauge>, IBackflowGauge
 
         return await paginated.ToListAsync(cancellationToken);
     }
-
-    public async Task<IEnumerable<BackflowGauge>> GetUnverifiedByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
-    {
-        var paginated = await ScopedGauges()
-            .Where(g => g.LastCalibrationDate == null)
-            .Include(g => g.Professional)
-            .Where(query.Filter)
-            .OrderBy(query.Sort)
-            .PaginateAsync(pageInfo, cancellationToken);
-
-        return await paginated.ToListAsync(cancellationToken);
-    }
-
-    public async Task<int> GetUnverifiedCountByWaterSupplierAsync(CancellationToken cancellationToken)
-    {
-        return await ScopedGauges()
-            .Where(g => g.LastCalibrationDate == null)
-            .CountAsync(cancellationToken);
-    }
-
-    private IQueryable<BackflowGauge> ScopedGauges()
-    {
-        return DbContext.BackflowGauges
-            .AsNoTracking()
-            .ScopedToWaterSupplier(DbContext);
-    }
 }

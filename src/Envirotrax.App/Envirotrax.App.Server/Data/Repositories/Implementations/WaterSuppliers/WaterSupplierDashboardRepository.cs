@@ -1,5 +1,4 @@
 using Envirotrax.App.Server.Data.DbContexts;
-using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
@@ -17,13 +16,13 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
 
     public async Task<WaterSupplierDashboardStatsDto> GetStatsAsync(CancellationToken cancellationToken)
     {
-        var now = DateTime.UtcNow;
+        var now = _timeZoneHelper.GetUserLocalTime();
         var in30Days = now.AddDays(30);
 
         return new WaterSupplierDashboardStatsDto
         {
-            PastDuePropertyLogCount = await _context.SiteLogs.CountAsync(pl => pl.LogType == SiteLogType.Reminder && pl.ReviewDate < now, cancellationToken),
-            ExpiringPropertyLogCount = await _context.SiteLogs.CountAsync(pl => pl.LogType == SiteLogType.Reminder && pl.ReviewDate >= now && pl.ReviewDate <= in30Days, cancellationToken),
+            PastDuePropertyLogCount = await _context.SiteLogs.CountAsync(pl => pl.ReviewDate <= now, cancellationToken),
+            ExpiringPropertyLogCount = await _context.SiteLogs.CountAsync(pl => pl.ReviewDate > now && pl.ReviewDate < in30Days, cancellationToken),
             AllPropertyLogCount = await _context.SiteLogs.CountAsync(cancellationToken),
 
             WiseGuyCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsWiseGuy, cancellationToken),
@@ -32,6 +31,13 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
             FogTransporterCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsFogTransporter, cancellationToken),
             FogInspectorCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsFogInspector, cancellationToken),
 
+            UnverifiedLicenseCount = await _context.ProfessionalUserLicenses.CountAsync(l => l.ExpirationDate == null, cancellationToken),
+            ExpiredLicenseCount = await _context.ProfessionalUserLicenses.CountAsync(l => l.ExpirationDate < now, cancellationToken),
+            ExpiringLicenseCount = await _context.ProfessionalUserLicenses.CountAsync(l => l.ExpirationDate >= now && l.ExpirationDate < in30Days, cancellationToken),
+
+            InsurancePolicyCount = await _context.ProfessionalInsurances.CountAsync(i => i.ExpirationDate == null, cancellationToken),
+            TestGaugeCount = await _context.BackflowGauges.CountAsync(g => g.LastCalibrationDate == null, cancellationToken),
+            TransporterRegistrationCount = await _context.ProfessionalUserLicenses.CountAsync(l => l.LicenseTypeId == 9 && l.ExpirationDate == null, cancellationToken)
         };
     }
 

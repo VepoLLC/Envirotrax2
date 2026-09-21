@@ -4,7 +4,6 @@ using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Fog;
-using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
@@ -35,7 +34,6 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
     private readonly IPdfTemplateService _pdfTemplateService;
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IProfessionalSupplierService _professionalSupplierService;
-    private readonly IInsuranceValidationService _insuranceValidationService;
 
     public FogTripTicketService(
         IMapper mapper,
@@ -49,8 +47,7 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         IFileStorageService fileStorageService,
         IPdfTemplateService pdfTemplateService,
         IGeneralSettingsService generalSettingsService,
-        IProfessionalSupplierService professionalSupplierService,
-        IInsuranceValidationService insuranceValidationService)
+        IProfessionalSupplierService professionalSupplierService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -64,7 +61,6 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         _pdfTemplateService = pdfTemplateService;
         _generalSettingsService = generalSettingsService;
         _professionalSupplierService = professionalSupplierService;
-        _insuranceValidationService = insuranceValidationService;
     }
 
     public override async Task<FogTripTicketDto?> DeleteAsync(int id)
@@ -149,9 +145,6 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         var siteId = request.Site!.Id!.Value;
         var waterSupplierId = request.WaterSupplier!.Id!.Value;
         var transporterUserId = request.Transporter!.Id!.Value;
-
-        // Server-side guard
-        await _insuranceValidationService.EnsureValidAsync(waterSupplierId, ProfessionalType.FogTransporter, cancellationToken);
 
         var site = await _siteService.GetAsync(siteId, cancellationToken);
         var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);

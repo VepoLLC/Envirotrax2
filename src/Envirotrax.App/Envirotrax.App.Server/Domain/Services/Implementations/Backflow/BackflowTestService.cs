@@ -5,7 +5,6 @@ using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Logs;
-using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
@@ -51,7 +50,6 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IProfessionalSupplierService _professionalSupplierService;
     private readonly IRecordLogService _recordLogService;
-    private readonly IInsuranceValidationService _insuranceValidationService;
     private readonly ILogger<BackflowTestService> _logger;
 
     public BackflowTestService(
@@ -71,7 +69,6 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         IGeneralSettingsService generalSettingsService,
         IProfessionalSupplierService professionalSupplierService,
         IRecordLogService recordLogService,
-        IInsuranceValidationService insuranceValidationService,
         ILogger<BackflowTestService> logger)
         : base(mapper, repository)
     {
@@ -90,7 +87,6 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         _generalSettingsService = generalSettingsService;
         _professionalSupplierService = professionalSupplierService;
         _recordLogService = recordLogService;
-        _insuranceValidationService = insuranceValidationService;
         _logger = logger;
     }
 
@@ -382,12 +378,6 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     {
         var professionalId = _authService.ProfessionalId;
         dto.Professional = new ReferencedProfessionalDto { Id = professionalId };
-
-        if (dto.WaterSupplier?.Id != null)
-        {
-            // Server-side guard
-            await _insuranceValidationService.EnsureValidAsync(dto.WaterSupplier.Id.Value, ProfessionalType.Bpat, cancellationToken);
-        }
 
         await PopulateBpatSnapshotAsync(dto);
         DeriveTestDate(dto);

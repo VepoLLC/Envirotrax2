@@ -9,7 +9,4 @@ public interface IBackflowGaugeService : IService<BackflowGaugeDto>
     Task<BackflowGaugeDto> AddWithFileAsync(Stream fileStream, string originalFileName, BackflowGaugeDto dto);
     Task<IPagedData<BackflowGaugeDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<Uri?> GenerateFileUrlAsync(int id, CancellationToken cancellationToken);
-
-    Task<IPagedData<WaterSupplierGaugeDto>> GetUnverifiedByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
-    Task<int> GetUnverifiedCountByWaterSupplierAsync(CancellationToken cancellationToken);
 }

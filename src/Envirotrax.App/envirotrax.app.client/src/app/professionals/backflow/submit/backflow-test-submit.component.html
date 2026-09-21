@@ -59,7 +59,7 @@
                     </div>
                 </div>
                 <!-- Right: status panel -->
-                <div class="col-md-6 border-start ps-3" *ngIf="selectedBpat?.bpatLicenseExpirationType != null || insuranceValidation || selectedGauge">
+                <div class="col-md-6 border-start ps-3" *ngIf="selectedBpat?.bpatLicenseExpirationType != null || professional?.insuranceExpirationType != null || selectedGauge">
                     <dl class="row mb-0 small">
                         <ng-container *ngIf="selectedBpat?.bpatLicenseExpirationType != null">
                             <dt class="col-5 text-nowrap fw-semibold">TCEQ - BPAT License:</dt>
@@ -72,12 +72,15 @@
                                    'License expired' }}
                             </dd>
                         </ng-container>
-                        <ng-container *ngIf="insuranceValidation">
+                        <ng-container *ngIf="professional?.insuranceExpirationType != null">
                             <dt class="col-5 text-nowrap fw-semibold">Insurance Policy:</dt>
                             <dd class="col-7 mb-1"
-                                [class.text-success]="insuranceDisplay.valid"
-                                [class.text-danger]="!insuranceDisplay.valid">
-                                {{ insuranceDisplay.message }}
+                                [class.text-success]="professional?.insuranceExpirationType === ExpirationType.Valid"
+                                [class.text-warning]="professional?.insuranceExpirationType === ExpirationType.AboutToExpire"
+                                [class.text-danger]="professional?.insuranceExpirationType === ExpirationType.Expired">
+                                {{ professional?.insuranceExpirationType === ExpirationType.Valid ? 'Insurance policy valid' :
+                                   professional?.insuranceExpirationType === ExpirationType.AboutToExpire ? 'Insurance policy about to expire' :
+                                   'Insurance policy expired' }}
                             </dd>
                         </ng-container>
                         <ng-container *ngIf="selectedGauge">

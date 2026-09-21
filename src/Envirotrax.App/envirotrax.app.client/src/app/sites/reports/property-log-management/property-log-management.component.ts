@@ -1,12 +1,10 @@
 import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { NgForm } from "@angular/forms";
-import { ActivatedRoute } from "@angular/router";
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from "@envirotrax/common-ui";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { SiteLog } from "../../../shared/models/sites/site-log";
 import { SiteLogType } from "../../../shared/models/sites/site-log-type.enum";
 import { SiteLogReviewDateStatus } from "../../../shared/models/sites/site-log-review-date-status.enum";
-import { PropertyLogFilterType } from "../../../shared/models/sites/property-log-filter-type.enum";
 import { PropertyType } from "../../../shared/enums/property-type.enum";
 import { ComparisonOperator, Query, QueryProperty } from "../../../shared/models/query";
 import { WaterSupplierUser } from "../../../shared/models/users/water-supplier-user";
@@ -20,6 +18,12 @@ import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 
 const EXPIRING_WINDOW_DAYS = 30;
+
+export enum PropertyLogFilterType {
+    AnyLogType = 0,
+    ExpiredReviews = 1,
+    ExpiringReviews = 2
+}
 
 export enum PropertyLogSortOrder {
     DateDescending = 0,
@@ -122,8 +126,7 @@ export class PropertyLogManagementComponent implements OnInit {
         private readonly _userService: UserService,
         private readonly _downloadService: DownloadService,
         private readonly _printService: PrintableTableService,
-        private readonly _containerHelper: AppContainerHelperService,
-        private readonly _activatedRoute: ActivatedRoute
+        private readonly _containerHelper: AppContainerHelperService
     ) {
         this.downloadConfig = {
             fileName: 'Property Logs',
@@ -139,8 +142,6 @@ export class PropertyLogManagementComponent implements OnInit {
         this.table.columns = this.getColumns();
 
         await this.loadUsers();
-
-        this.applyRequestedLogType();
 
         this.table.query = this.buildQuery();
         this.resultsHeaderPrefix = this.buildResultsHeaderPrefix();
@@ -212,16 +213,6 @@ export class PropertyLogManagementComponent implements OnInit {
             }
         } finally {
             this.table.isLoading = false;
-        }
-    }
-
-    // The account overview dashboard deep-links into a specific view (past due / expiring / all),
-    // so honor that log type on load instead of always starting on "Any log type".
-    private applyRequestedLogType(): void {
-        const requestedLogType = this._activatedRoute.snapshot.queryParamMap.get('logType');
-
-        if (requestedLogType && this.logTypeOptions.some(option => option.id === requestedLogType)) {
-            this.logType = requestedLogType;
         }
     }
 

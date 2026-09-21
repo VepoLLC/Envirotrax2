@@ -5,7 +5,6 @@ using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Professionals;
-using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions;
@@ -96,22 +95,6 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         return added;
     }
 
-    public async Task<ProfessionalInsuranceDto?> UpdateForProfessionalAsync(ProfessionalInsuranceDto insurance, CancellationToken cancellationToken)
-    {
-        var existing = await _insuranceRepository.GetTrackedForUpdateAsync(insurance.Id, cancellationToken);
-
-        if (existing == null)
-        {
-            return null;
-        }
-
-        existing.InsuranceNumber = insurance.InsuranceNumber;
-
-        await _insuranceRepository.SaveChangesAsync();
-
-        return MapToDto(existing);
-    }
-
     public override async Task<ProfessionalInsuranceDto?> DeleteAsync(int id)
     {
         using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
@@ -138,85 +121,5 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         }
 
         return null;
-    }
-
-    public async Task<IPagedData<WaterSupplierInsuranceDto>> GetAllByWaterSupplierAsync(PageInfo pageInfo, Query query, string? insuranceFilter, CancellationToken cancellationToken)
-    {
-        var items = (await _insuranceRepository.GetAllByWaterSupplierAsync(pageInfo, query, insuranceFilter, cancellationToken)).ToList();
-        var now = _timeZoneHelper.GetUserLocalTime();
-
-        var professionalTypes = await _insuranceRepository.GetProfessionalTypesAsync(
-            items.Select(i => i.ProfessionalId).Distinct(),
-            cancellationToken);
-
-        return items.Select(i => MapToWaterSupplierDto(i, now, professionalTypes.GetValueOrDefault(i.ProfessionalId))).ToPagedData(pageInfo);
-    }
-
-    public async Task<InsuranceCountsDto> GetCountsByWaterSupplierAsync(CancellationToken cancellationToken)
-    {
-        var unverified = await _insuranceRepository.GetCountByWaterSupplierAsync("unverified", cancellationToken);
-        var expired = await _insuranceRepository.GetCountByWaterSupplierAsync("expired", cancellationToken);
-        var expiring = await _insuranceRepository.GetCountByWaterSupplierAsync("expiring", cancellationToken);
-
-        return new InsuranceCountsDto
-        {
-            UnverifiedCount = unverified,
-            ExpiredCount = expired,
-            ExpiringCount = expiring
-        };
-    }
-
-    public async Task<WaterSupplierInsuranceDto> UpdateForWaterSupplierAsync(int id, UpdateWaterSupplierInsuranceDto insurance, CancellationToken cancellationToken)
-    {
-        var updated = await _insuranceRepository.UpdateForWaterSupplierAsync(
-            id,
-            insurance.InsuranceNumber,
-            insurance.ExpirationDate,
-            insurance.InsuranceCoverage,
-            cancellationToken);
-
-        var professionalTypes = await _insuranceRepository.GetProfessionalTypesAsync([updated.ProfessionalId], cancellationToken);
-
-        return MapToWaterSupplierDto(updated, _timeZoneHelper.GetUserLocalTime(), professionalTypes.GetValueOrDefault(updated.ProfessionalId));
-    }
-
-    public async Task DeleteForWaterSupplierAsync(int id, CancellationToken cancellationToken)
-    {
-        await _insuranceRepository.GetForWaterSupplierAsync(id, cancellationToken);
-
-        // Delegates so the certificate file is removed in the same transaction as the row.
-        await DeleteAsync(id);
-    }
-
-    public async Task<Uri?> GenerateFileUrlForWaterSupplierAsync(int id, CancellationToken cancellationToken)
-    {
-        var insurance = await _insuranceRepository.GetForWaterSupplierAsync(id, cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(insurance.FilePath))
-        {
-            return null;
-        }
-
-        return await _fileStorageService.GenerateSasUrlAsync(insurance.FilePath);
-    }
-
-    private static WaterSupplierInsuranceDto MapToWaterSupplierDto(ProfessionalInsurance insurance, DateTime now, ProfessionalType? professionalType)
-    {
-        return new WaterSupplierInsuranceDto
-        {
-            Id = insurance.Id,
-            ProfessionalId = insurance.ProfessionalId,
-            CompanyName = insurance.Professional?.Name,
-            CompanyEmail = insurance.Professional?.CompanyEmail,
-            InsuranceNumber = insurance.InsuranceNumber,
-            InsuranceCoverage = insurance.InsuranceCoverage,
-            ExpirationDate = insurance.ExpirationDate,
-            ExpirationType = insurance.ExpirationDate.HasValue
-                ? (insurance.ExpirationDate < now ? ExpirationType.Expired
-                    : insurance.ExpirationDate < now.AddDays(30) ? ExpirationType.AboutToExpire
-                    : ExpirationType.Valid)
-                : ExpirationType.Valid,
-            ProfessionalType = professionalType
-        };
     }
 }

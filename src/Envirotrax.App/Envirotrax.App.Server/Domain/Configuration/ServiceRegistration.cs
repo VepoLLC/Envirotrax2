@@ -1,3 +1,5 @@
+using Envirotrax.App.Server.Domain.Services.Definitions.Api;
+using Envirotrax.App.Server.Domain.Services.Implementations.Api;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
@@ -44,6 +46,12 @@ public static class ServiceRegistration
         });
 
         services.AddInternalApi<AuthApiOptions>(configuration.GetSection("AuthApi"));
+        services.AddKeyHashingService();
+        services.AddTransient<IApiAuthenticationService, ApiAuthenticationService>();
+        services.AddTransient<IApiSupplierScopeService, ApiSupplierScopeService>();
+        services.AddTransient<ILegacyFieldMapService, LegacyFieldMapService>();
+        services.AddTransient<ILegacySelectService, LegacySelectService>();
+        services.AddTransient<ILegacyResponseWriter, LegacyResponseWriter>();
         services.AddTransient<ITimeZoneHelperService, TimeZoneHelperService>();
 
         services.Configure<FileStorageOptions>(configuration.GetSection("FileStorage"));

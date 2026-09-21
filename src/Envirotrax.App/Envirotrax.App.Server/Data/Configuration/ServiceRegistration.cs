@@ -1,4 +1,6 @@
 using Envirotrax.App.Server.Data.DbContexts;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Api;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Api;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
@@ -113,6 +115,9 @@ public static class ServiceRegistration
 
         services.AddTransient<INotificationSettingRepository, NotificationSettingRepository>();
         services.AddTransient<INotificationRepository, NotificationRepository>();
+
+        services.AddTransient<IApiAccountRepository, ApiAccountRepository>();
+        services.AddTransient<ILegacyQueryRepository, LegacyQueryRepository>();
 
         services.AddTransient<IWaterSupplierDashboardRepository, WaterSupplierDashboardRepository>();
 

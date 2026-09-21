@@ -1,8 +1,12 @@
+using System.Transactions;
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Sites;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Data.Repositories.Definitions.GisAreas;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects;
@@ -22,6 +26,11 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     private readonly IGeocodingService _geocodingService;
     private readonly IGisAreaCoordinateRepository _coordinateRepository;
     private readonly ITimeZoneHelperService _timeZoneHelper;
+    private readonly ICsiInspectionRepository _csiInspectionRepository;
+    private readonly IBackflowTestRepository _backflowTestRepository;
+    private readonly IBackflowOutOfServiceRequestRepository _outOfServiceRequestRepository;
+    private readonly IFogInspectionRepository _fogInspectionRepository;
+    private readonly IFogTripTicketRepository _fogTripTicketRepository;
     private readonly ILogger<SiteService> _logger;
 
     public SiteService(
@@ -32,6 +41,11 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         IGeocodingService geocodingService,
         IGisAreaCoordinateRepository coordinateRepository,
         ITimeZoneHelperService timeZoneHelper,
+        ICsiInspectionRepository csiInspectionRepository,
+        IBackflowTestRepository backflowTestRepository,
+        IBackflowOutOfServiceRequestRepository outOfServiceRequestRepository,
+        IFogInspectionRepository fogInspectionRepository,
+        IFogTripTicketRepository fogTripTicketRepository,
         ILogger<SiteService> logger)
         : base(mapper, repository)
     {
@@ -41,7 +55,54 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         _geocodingService = geocodingService;
         _coordinateRepository = coordinateRepository;
         _timeZoneHelper = timeZoneHelper;
+        _csiInspectionRepository = csiInspectionRepository;
+        _backflowTestRepository = backflowTestRepository;
+        _outOfServiceRequestRepository = outOfServiceRequestRepository;
+        _fogInspectionRepository = fogInspectionRepository;
+        _fogTripTicketRepository = fogTripTicketRepository;
         _logger = logger;
+    }
+
+    public async Task<SiteTabCountsDto?> GetTabCountsAsync(int siteId, CancellationToken cancellationToken)
+    {
+        var siteExists = await _siteRepository.ExistsAsync(siteId, cancellationToken);
+
+        if (!siteExists)
+        {
+            return null;
+        }
+
+        var logHistoryCount = await _siteLogService.CountBySiteAsync(siteId, cancellationToken);
+        var csiCount = await _csiInspectionRepository.CountBySiteAsync(siteId, cancellationToken);
+        var backflowCount = await _backflowTestRepository.CountCurrentInServiceBySiteAsync(siteId, cancellationToken);
+        var outOfServiceCount = await _outOfServiceRequestRepository.CountBySiteAsync(siteId, cancellationToken);
+        var tripTicketCount = await _fogTripTicketRepository.CountBySiteAsync(siteId, cancellationToken);
+        var fogCount = await _fogInspectionRepository.CountBySiteAsync(siteId, cancellationToken);
+
+        return new SiteTabCountsDto
+        {
+            LogHistoryCount = logHistoryCount,
+            CsiCount = csiCount,
+            BackflowCount = backflowCount,
+            OutOfServiceCount = outOfServiceCount,
+            TripTicketCount = tripTicketCount,
+            FogCount = fogCount
+        };
+    }
+
+    // Mirrors V1's site_search.aspx.vb: creating a site always logs a fixed "New site record" entry
+    // (no field-level diff — V1 doesn't diff on create either, since there's no prior row to compare against).
+    public override async Task<SiteDto> AddAsync(SiteDto dto)
+    {
+        var added = await base.AddAsync(dto);
+
+        if (added.WaterSupplier?.Id is int waterSupplierId)
+        {
+            // recordLog manual
+            await _recordLogService.AddAsync(RecordLogTableNames.Sites, added.Id, waterSupplierId, RecordLogType.Add, "New site record");
+        }
+
+        return added;
     }
 
     public async Task<IPagedData<SiteDto>> SearchAsync(PageInfo pageInfo, Query query, FogCompliancyStatus? fogCompliancyStatus, CancellationToken cancellationToken)
@@ -75,15 +136,22 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
         foreach (var group in gisCoordiantesByArea)
         {
-            var gisPoints = group.Select(c => new CoordinateDto
-            {
-                Latitude = c.Latitude,
-                Longitude = c.Longitude
-            }).ToList();
+            // Only the outer edge decides whether the site falls into the area, exactly as V1 did
+            // (checkPointInArea in WaterSupplierGisArea.vb never looked at the inner polygons), so a
+            // site standing inside a hole still gets the area assigned.
+            var gisPoints = group
+                .Where(c => c.PolygonIndex == 0)
+                .OrderBy(c => c.Id)
+                .Select(c => new CoordinateDto
+                {
+                    Latitude = c.Latitude,
+                    Longitude = c.Longitude
+                }).ToList();
 
             if (_geocodingService.IsPointInArea(gisPoints, coordinates))
             {
                 site.GisAreaId = group.Key;
+                break;
             }
         }
     }
@@ -142,87 +210,23 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         await _siteRepository.UpdateManualGisDataAsync(siteId, dto.Latitude, dto.Longitude, dto.Status);
     }
 
+    // TODO(needs sign-off): this now writes a RecordLog entry on every normal site edit (mirroring the
+    // Backflow/CSI pattern), whereas before it wrote nothing. Confirm this is the desired behavior before merging.
     public async Task<bool> UpdateFromAdminAsync(int siteId, SiteDto dto, CancellationToken cancellationToken)
     {
-        var site = await _siteRepository.GetTrackedForUpdateAsync(siteId, cancellationToken);
-
-        if (site == null)
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            return false;
+            var saved = await _siteRepository.UpdateForAdminAsync(siteId, dto);
+
+            if (saved == null)
+            {
+                return false;
+            }
+
+            scope.Complete();
         }
-
-        ApplyAdminUpdate(site, dto);
-
-        await _siteRepository.SaveChangesAsync();
 
         return true;
-    }
-
-    /// <summary>
-    /// Copies the approved editable fields from a SiteDto onto the loaded (tracked) Site — a deliberate
-    /// ALLOWLIST, so protected DTO columns (WaterSupplier, GIS, audit, NeedsRenewalCheck, …) are ignored.
-    /// Runs on the freshly-loaded entity so the NeedsRenewalCheck compare below sees the pre-overwrite values.
-    /// </summary>
-    private static void ApplyAdminUpdate(Site site, SiteDto dto)
-    {
-        var renewalTriggerChanged =
-            site.PropertyType != dto.PropertyType
-            || site.HasOnSiteSewageFacility != dto.HasOnSiteSewageFacility
-            || site.HasAuxWaterSupply != dto.HasAuxWaterSupply;
-
-        if (renewalTriggerChanged)
-        {
-            site.NeedsRenewalCheck = true;
-        }
-
-        // Property Information
-        site.PropertyType = dto.PropertyType;
-        site.BusinessName = dto.BusinessName;
-        site.StreetNumber = dto.StreetNumber;
-        site.StreetName = dto.StreetName;
-        site.PropertyNumber = dto.PropertyNumber;
-        site.City = dto.City;
-        site.StateId = dto.State?.Id;
-        site.ZipCode = dto.ZipCode;
-
-        // Mailing Information
-        site.MailingCompanyName = dto.MailingCompanyName;
-        site.MailingContactName = dto.MailingContactName;
-        site.MailingStreetNumber = dto.MailingStreetNumber;
-        site.MailingStreetName = dto.MailingStreetName;
-        site.MailingNumber = dto.MailingNumber;
-        site.MailingCity = dto.MailingCity;
-        site.MailingStateId = dto.MailingState?.Id;
-        site.MailingZipCode = dto.MailingZipCode;
-        site.MailingPhoneNumber = dto.MailingPhoneNumber;
-        site.MailingEmailAddress = dto.MailingEmailAddress;
-
-        // Property Settings
-        site.AccountNumber = dto.AccountNumber;
-        site.Active = dto.Active;
-        site.InvalidMailingAddress = dto.InvalidMailingAddress;
-        site.OutOfArea = dto.OutOfArea;
-        site.IsFeeExempt = dto.IsFeeExempt;
-        site.BypassPropertyNumberValidation = dto.BypassPropertyNumberValidation;
-        site.BackflowScheduleMonth = dto.BackflowScheduleMonth;
-        site.NeedsCsiInspection = dto.NeedsCsiInspection;
-        site.CsiRenewalDate = dto.CsiRenewalDate;
-        site.NeedsFogInspection = dto.NeedsFogInspection;
-        site.FogInspectionExpirationDate = dto.FogInspectionExpirationDate;
-        site.NeedsFogPermit = dto.NeedsFogPermit;
-        site.FogPermitExpirationDate = dto.FogPermitExpirationDate;
-        site.LastTripTicketDate = dto.LastTripTicketDate;
-        site.TripTicketInterval = dto.TripTicketInterval;
-        site.FacilityType = dto.FacilityType;
-        site.GreaseTrapType = dto.GreaseTrapType;
-        site.HasOnSiteSewageFacility = dto.HasOnSiteSewageFacility;
-        site.HasAuxWaterSupply = dto.HasAuxWaterSupply;
-        site.HasFireSystem = dto.HasFireSystem;
-        site.FireSeparateWater = dto.FireSeparateWater;
-        site.HasGritTrap = dto.HasGritTrap;
-        site.HasIrrigation = dto.HasIrrigation;
-        site.IrrigationSeparateWater = dto.IrrigationSeparateWater;
-        site.HasDomesticPremisesIsolation = dto.HasDomesticPremisesIsolation;
     }
 
     public async Task<bool> UpdateWaterSupplierAsync(int siteId, UpdateSiteWaterSupplierDto dto)
@@ -251,6 +255,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
         await _siteRepository.SaveChangesAsync();
 
+        // recordLog manual
         await _recordLogService.AddAsync(RecordLogTableNames.Sites, siteId, dto.WaterSupplierId, RecordLogType.Edit, $"Water Supplier changed from {previousWaterSupplierId} to {dto.WaterSupplierId}");
 
         return true;

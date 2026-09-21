@@ -22,6 +22,79 @@ namespace Envirotrax.App.Server.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Api.ApiAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApiKeyHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<bool>("IsLive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("PermissionBackflowTests")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("PermissionCsiInspections")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("PermissionFogInspections")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("PermissionFogTripTickets")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("PermissionSites")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("PermissionWaterSuppliers")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("WaterSupplierId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("ApiAccounts");
+                });
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Backflow.BackflowComplianceSnapshot", b =>
                 {
                     b.Property<int>("WaterSupplierId")
@@ -159,6 +232,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<string>("AirGapImagePath")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("AirGapTestDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("AirGapValid")
                         .HasColumnType("bit");
@@ -434,6 +510,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<DateTime?>("InitialTestDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("InspectorId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("InstallationDate")
                         .HasColumnType("datetime2");
 
@@ -444,9 +523,16 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int?>("LegacyRecordId")
+                        .HasColumnType("int");
+
                     b.Property<string>("LocationDescription")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("MailingAddress")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("MailingCity")
                         .HasMaxLength(50)
@@ -750,6 +836,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("ValidationUnknownSerialNumber")
                         .HasColumnType("bit");
 
+                    b.Property<string>("WaterMeterNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.HasKey("WaterSupplierId", "Id");
 
                     b.HasIndex("BpatStateId");
@@ -757,6 +847,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("DeletedById");
+
+                    b.HasIndex("LegacyRecordId");
 
                     b.HasIndex("MailingStateId");
 
@@ -767,6 +859,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("UpdatedById");
 
                     b.HasIndex("ProfessionalId", "BpatId");
+
+                    b.HasIndex("ProfessionalId", "InspectorId");
 
                     b.HasIndex("WaterSupplierId", "ApprovedById");
 
@@ -2186,6 +2280,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<double>("Longitude")
                         .HasColumnType("float");
 
+                    b.Property<int>("PolygonIndex")
+                        .HasColumnType("int");
+
                     b.HasKey("WaterSupplierId", "Id");
 
                     b.HasIndex("WaterSupplierId", "AreaId");
@@ -2868,6 +2965,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<int>("WaterSupplierId")
                         .HasColumnType("int");
 
+                    b.Property<int>("ProfessionalId")
+                        .HasColumnType("int");
+
                     b.Property<decimal?>("BackflowCommercialTestFee")
                         .HasPrecision(19, 4)
                         .HasColumnType("decimal(19,4)");
@@ -2910,10 +3010,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("IsBanned")
                         .HasColumnType("bit");
 
-                    b.Property<int>("ProfessionalId")
-                        .HasColumnType("int");
-
-                    b.HasKey("WaterSupplierId");
+                    b.HasKey("WaterSupplierId", "ProfessionalId");
 
                     b.HasIndex("ProfessionalId");
 
@@ -3099,6 +3196,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<DateTime?>("LastTripTicketDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("LegacyRecordId")
+                        .HasColumnType("int");
+
                     b.Property<string>("MailingCity")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -3223,6 +3323,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("DeletedById");
+
+                    b.HasIndex("LegacyRecordId");
 
                     b.HasIndex("MailingStateId");
 
@@ -3987,6 +4089,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("LegacyRecordId")
+                        .HasColumnType("int");
+
                     b.Property<string>("LetterAddress")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -4080,6 +4185,8 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.HasIndex("DeletedById");
 
+                    b.HasIndex("LegacyRecordId");
+
                     b.HasIndex("LetterContactStateId");
 
                     b.HasIndex("LetterStateId");
@@ -4091,6 +4198,16 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("UpdatedById");
 
                     b.ToTable("WaterSuppliers");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Api.ApiAccount", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Backflow.BackflowComplianceSnapshot", b =>
@@ -4217,6 +4334,11 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasForeignKey("ProfessionalId", "BpatId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalUser", "Inspector")
+                        .WithMany()
+                        .HasForeignKey("ProfessionalId", "InspectorId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Envirotrax.App.Server.Data.Models.Users.WaterSupplierUser", "ApprovedBy")
                         .WithMany()
                         .HasForeignKey("WaterSupplierId", "ApprovedById")
@@ -4236,6 +4358,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("DeletedBy");
+
+                    b.Navigation("Inspector");
 
                     b.Navigation("MailingState");
 

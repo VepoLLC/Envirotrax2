@@ -4,7 +4,6 @@ using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Csi;
-using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
@@ -12,7 +11,6 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
-using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
@@ -31,7 +29,6 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
     private readonly ISiteService _siteService;
     private readonly IPdfTemplateService _pdfTemplateService;
     private readonly IAuthService _authService;
-    private readonly IRecordLogService _recordLogService;
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IProfessionalSupplierService _professionalSupplierService;
 
@@ -44,7 +41,6 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         ISiteService siteService,
         IPdfTemplateService pdfTemplateService,
         IAuthService authService,
-        IRecordLogService recordLogService,
         IGeneralSettingsService generalSettingsService,
         IProfessionalSupplierService professionalSupplierService)
         : base(mapper, repository)
@@ -56,7 +52,6 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         _siteService = siteService;
         _pdfTemplateService = pdfTemplateService;
         _authService = authService;
-        _recordLogService = recordLogService;
         _generalSettingsService = generalSettingsService;
         _professionalSupplierService = professionalSupplierService;
     }
@@ -146,10 +141,69 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         inspection.AmountShare = feeShare;
     }
 
+    // Checkout "Edit" on an own, still-unpaid inspection: mirrors SubmitAsync's field list and snapshot
+    // logic, but against an existing row. Ownership + payment-status guard lives in the repository
+    // (UpdateForProfessionalAsync returns Model == null for not-found/not-owned/already-paid).
+    public async Task<CsiInspectionDto?> UpdateForProfessionalAsync(int id, CsiInspectionDto request, CancellationToken cancellationToken)
+    {
+        var professionalId = _authService.ProfessionalId;
+        var siteId = request.Site!.Id!.Value;
+        var inspectorUserId = request.InspectorUser!.Id!.Value;
+
+        var site = await _siteService.GetAsync(siteId, cancellationToken);
+        var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
+        var inspectorUser = await _professionalUserService.GetAsync(inspectorUserId, cancellationToken);
+        var licenses = await _licenseService.GetAllAsync(inspectorUserId, new PageInfo(), new Query());
+
+        var csiLicense = licenses.Data.FirstOrDefault();
+
+        var inspection = new CsiInspection
+        {
+            Id = id,
+            InspectionDate = request.InspectionDate,
+            ReasonForInspection = request.ReasonForInspection,
+            Compliance1 = request.Compliance1,
+            Compliance2 = request.Compliance2,
+            Compliance3 = request.Compliance3,
+            Compliance4 = request.Compliance4,
+            Compliance5 = request.Compliance5,
+            Compliance6 = request.Compliance6,
+            MaterialServiceLineLead = request.MaterialServiceLineLead,
+            MaterialServiceLineCopper = request.MaterialServiceLineCopper,
+            MaterialServiceLinePVC = request.MaterialServiceLinePVC,
+            MaterialServiceLineOther = request.MaterialServiceLineOther,
+            MaterialServiceLineOtherDescription = request.MaterialServiceLineOtherDescription,
+            MaterialSolderLead = request.MaterialSolderLead,
+            MaterialSolderLeadFree = request.MaterialSolderLeadFree,
+            MaterialSolderSolventWeld = request.MaterialSolderSolventWeld,
+            MaterialSolderOther = request.MaterialSolderOther,
+            MaterialSolderOtherDescription = request.MaterialSolderOtherDescription,
+            Comments = request.Comments
+        };
+
+        ApplySiteSnapshot(inspection, site);
+        ApplyInspectorSnapshot(inspection, professional, inspectorUser, csiLicense, inspectorUserId);
+
+        var saved = await _repository.UpdateForProfessionalAsync(inspection, professionalId);
+
+        if (saved == null)
+        {
+            return null;
+        }
+
+        return Mapper.Map<CsiInspectionDto>(saved);
+    }
+
     public async Task<CsiInspectionDto?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken)
     {
-        var inspection = await _repository.UpdateApprovalAsync(id, request, cancellationToken);
-        return inspection == null ? null : Mapper.Map<CsiInspectionDto>(inspection);
+        var saved = await _repository.UpdateApprovalAsync(id, request, cancellationToken);
+
+        if (saved == null)
+        {
+            return null;
+        }
+
+        return Mapper.Map<CsiInspectionDto>(saved);
     }
 
     public async Task<CsiInspectionDto?> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request)
@@ -158,14 +212,9 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         {
             var saved = await _repository.UpdateForAdminAsync(id, request);
 
-            if (saved.Model == null)
+            if (saved == null)
             {
                 return null;
-            }
-
-            if (saved.Changes.Length > 0)
-            {
-                await _recordLogService.AddAsync(RecordLogTableNames.CsiInspections, id, saved.Model.WaterSupplierId, RecordLogType.Edit, saved.Changes);
             }
 
             scope.Complete();

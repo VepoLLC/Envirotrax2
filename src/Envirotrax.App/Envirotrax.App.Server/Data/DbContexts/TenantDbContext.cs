@@ -1,3 +1,4 @@
+using Envirotrax.App.Server.Data.Models.Api;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Csi;
 using Envirotrax.App.Server.Data.Models.Fog;
@@ -19,7 +20,8 @@ using Envirotrax.App.Server.Data.Models.Notifications;
 
 namespace Envirotrax.App.Server.Data.DbContexts;
 
-public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
+// Record logging lives in TenantDbContext.RecordLogging.cs.
+public partial class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
 {
     public DbSet<GeneralSettings> GeneralSettings { get; set; }
     public DbSet<CsiSettings> CsiSettings { get; set; }
@@ -39,6 +41,8 @@ public class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
 
     public DbSet<NotificationSetting> NotificationSettings { get; set; }
     public DbSet<Notification> Notifications { get; set; }
+
+    public DbSet<ApiAccount> ApiAccounts { get; set; }
 
     public DbSet<Professional> Professionals { get; set; }
     public DbSet<ProfessionalUser> ProfessionalUsers { get; set; }

@@ -15,13 +15,38 @@ public class NotificationSettingRepository : Repository<NotificationSetting>, IN
     protected override IQueryable<NotificationSetting> GetListQuery()
     {
         return base.GetListQuery().Include(setting => setting.User);
-           
+
     }
 
     protected override IQueryable<NotificationSetting> GetDetailsQuery()
     {
         return base.GetDetailsQuery().Include(setting => setting.User);
 
+    }
+
+    public async Task<NotificationSetting?> UpdateSettingAsync(NotificationSetting model)
+    {
+        var setting = await GetTrackedForUpdateAsync(model.Id, default);
+
+        if (setting == null)
+        {
+            return null;
+        }
+
+        // SetValues copies every scalar property in one shot (this entity has ~35 filter/hazard-type
+        // flags) — but it would also blank out CreatedById/CreatedTime, since those aren't on the DTO
+        // and so are never populated on `model`. Snapshot and restore them across the copy.
+        var createdById = setting.CreatedById;
+        var createdTime = setting.CreatedTime;
+
+        DbContext.Entry(setting).CurrentValues.SetValues(model);
+
+        setting.CreatedById = createdById;
+        setting.CreatedTime = createdTime;
+
+        await SaveChangesAsync(logData: true);
+
+        return setting;
     }
 
     public async Task<List<NotificationSetting>> GetCandidateSettingsAsync(int waterSupplierId, CancellationToken cancellationToken)

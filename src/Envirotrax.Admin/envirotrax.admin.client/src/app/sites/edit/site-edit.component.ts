@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
-import { HelperService, InputOption, ModalHelperService, ToastService, ToastType } from '@envirotrax/common-ui';
+import { HelperService, InputOption, ModalHelperService, RecordLog, ToastService, ToastType } from '@envirotrax/common-ui';
 import { FacilityType, GreaseTrapType, PropertyType } from '../../shared/models/sites/site';
 import { SiteDetail, SiteEditWindowModel } from '../../shared/models/sites/site-detail';
 import { SiteGisUpdate, SiteUpdate } from '../../shared/models/sites/site-update';
@@ -13,6 +13,8 @@ import { SharedComponentsModule } from '../../shared/components/shared.component
 import { WaterSupplierLookupComponent } from '../../shared/components/lookups/water-supplier-lookup.component';
 import { WindowReference } from '../../window/window-config';
 import { SiteEditSectionsModule } from './sections/site-edit-sections.module';
+
+type SiteEditTab = 'details' | 'logs';
 
 /**
  * Edit Site page/window coordinator.
@@ -38,6 +40,12 @@ export class SiteEditComponent implements OnInit {
 
     public isLoading: boolean = false;
     public isSaving: boolean = false;
+
+    public selectedTab: SiteEditTab = 'details';
+    public recordLogTabTitle: string = 'Record Log';
+
+    public recordLogs: RecordLog[] = [];
+    public isLoadingRecordLogs: boolean = false;
 
     public siteId?: number;
     public waterSupplierId?: number;
@@ -70,8 +78,29 @@ export class SiteEditComponent implements OnInit {
         this.siteId = model?.siteId;
         this.waterSupplierId = model?.waterSupplierId;
 
-        await this.loadStates();
-        await this.loadSite();
+        await Promise.all([
+            this.loadStates(),
+            this.loadSite(),
+            this.loadRecordLogs()
+        ]);
+    }
+
+    public onTabChange(tab: SiteEditTab): void {
+        this.selectedTab = tab;
+    }
+
+    private async loadRecordLogs(): Promise<void> {
+        if (this.siteId == null) {
+            return;
+        }
+
+        try {
+            this.isLoadingRecordLogs = true;
+            this.recordLogs = await this._siteService.getLogs(this.siteId);
+            this.recordLogTabTitle = `Record Log (${this.recordLogs.length})`;
+        } finally {
+            this.isLoadingRecordLogs = false;
+        }
     }
 
     private async loadStates(): Promise<void> {
@@ -121,6 +150,8 @@ export class SiteEditComponent implements OnInit {
         this.waterSupplierId = site.waterSupplier?.id ?? this.waterSupplierId;
 
         this.form?.form.markAsPristine();
+
+        await this.loadRecordLogs();
     }
 
     /**

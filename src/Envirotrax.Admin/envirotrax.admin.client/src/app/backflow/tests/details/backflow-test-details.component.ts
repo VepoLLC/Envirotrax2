@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { HelperService, InputOption } from '@envirotrax/common-ui';
+import { HelperService, InputOption, RecordLog } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import {
     BackflowTestDetails,
@@ -22,7 +22,6 @@ import { BackflowTestImagesComponent } from './images/backflow-test-images.compo
 import { BackflowTestMailingComponent } from './mailing/backflow-test-mailing.component';
 import { BackflowTestPropertyComponent } from './property/backflow-test-property.component';
 import { BackflowTestReadingsComponent } from './readings/backflow-test-readings.component';
-import { BackflowTestRecordLogComponent } from './record-log/backflow-test-record-log.component';
 import { BackflowTestRemarksComponent } from './remarks/backflow-test-remarks.component';
 import { BackflowTestResultsComponent } from './results/backflow-test-results.component';
 import { BackflowTestTransactionComponent } from './transaction/backflow-test-transaction.component';
@@ -52,14 +51,10 @@ const DaysInMillisecond = 1000 * 60 * 60 * 24;
         BackflowTestReadingsComponent,
         BackflowTestAdditionalInformationComponent,
         BackflowTestRemarksComponent,
-        BackflowTestImagesComponent,
-        BackflowTestRecordLogComponent
+        BackflowTestImagesComponent
     ]
 })
 export class BackflowTestDetailsComponent implements OnInit, OnDestroy {
-    @ViewChild(BackflowTestRecordLogComponent)
-    public recordLog?: BackflowTestRecordLogComponent;
-
     public id: number = 0;
     public waterSupplierId: number = 0;
     public idPrefix: string = 'backflow-test';
@@ -76,6 +71,9 @@ export class BackflowTestDetailsComponent implements OnInit, OnDestroy {
 
     public recordLogTabTitle: string = 'Record Log';
     public testResultsTabTitle: string = 'Test Results';
+
+    public recordLogs: RecordLog[] = [];
+    public isLoadingRecordLogs: boolean = false;
 
     public approvedByText: string = '';
     public rejectedByText: string = '';
@@ -111,7 +109,8 @@ export class BackflowTestDetailsComponent implements OnInit, OnDestroy {
         await Promise.all([
             this.loadStates(),
             this.loadTest(),
-            this.loadCounts()
+            this.loadCounts(),
+            this.loadRecordLogs()
         ]);
     }
 
@@ -215,7 +214,7 @@ export class BackflowTestDetailsComponent implements OnInit, OnDestroy {
         this.applyTestToEditors();
 
         await this.loadCounts();
-        await this.reloadRecordLog();
+        await this.loadRecordLogs();
 
         this.showSaveMessage();
 
@@ -269,12 +268,13 @@ export class BackflowTestDetailsComponent implements OnInit, OnDestroy {
         this._saveMessageTimeoutId = setTimeout(() => this.dismissSaveMessage(), SaveMessageDurationMs);
     }
 
-    private async reloadRecordLog(): Promise<void> {
-        if (this.recordLog == null) {
-            return;
+    private async loadRecordLogs(): Promise<void> {
+        try {
+            this.isLoadingRecordLogs = true;
+            this.recordLogs = await this._testService.getLogs(this.id);
+        } finally {
+            this.isLoadingRecordLogs = false;
         }
-
-        await this.recordLog.reload();
     }
 
     private async loadStates(): Promise<void> {

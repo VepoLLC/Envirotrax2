@@ -17,9 +17,8 @@ export class CreateProfessionalUserComponent {
     public selectedJobFunctions: string[] = [];
 
     public readonly jobFunctionOptions: InputOption[] = [
-        { id: 'isWiseGuy', text: 'Wise Guy' },
-        { id: 'isCsiInspector', text: 'CSI Inspector' },
         { id: 'isBackflowTester', text: 'Backflow Tester' },
+        { id: 'isCsiInspector', text: 'CSI Inspector' },
         { id: 'isFogInspector', text: 'FOG Inspector' },
         { id: 'isFogTransporter', text: 'FOG Transporter' }
     ];
@@ -56,9 +55,8 @@ export class CreateProfessionalUserComponent {
     }
 
     private applyJobFunctions(): void {
-        this.user.isWiseGuy = this.selectedJobFunctions.includes('isWiseGuy');
-        this.user.isCsiInspector = this.selectedJobFunctions.includes('isCsiInspector');
         this.user.isBackflowTester = this.selectedJobFunctions.includes('isBackflowTester');
+        this.user.isCsiInspector = this.selectedJobFunctions.includes('isCsiInspector');
         this.user.isFogInspector = this.selectedJobFunctions.includes('isFogInspector');
         this.user.isFogTransporter = this.selectedJobFunctions.includes('isFogTransporter');
     }

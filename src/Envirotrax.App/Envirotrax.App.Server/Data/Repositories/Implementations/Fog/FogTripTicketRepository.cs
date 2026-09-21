@@ -23,7 +23,8 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
         return base.GetListQuery()
             .Include(t => t.WaterSupplier)
             .Include(t => t.Site)
-            .Include(t => t.Professional);
+            .Include(t => t.Professional)
+            .Where(t => t.DeletedTime == null);
     }
 
     protected override IQueryable<FogTripTicket> GetDetailsQuery()

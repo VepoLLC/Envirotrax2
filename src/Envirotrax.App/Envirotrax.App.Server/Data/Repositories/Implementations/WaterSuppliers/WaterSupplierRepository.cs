@@ -8,6 +8,7 @@ using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.Common;
 using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
+using System.Transactions;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.WaterSuppliers;
 
@@ -27,6 +28,7 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
             .Include(supplier => supplier.Parent)
             .Include(supplier => supplier.State)
             .Include(supplier => supplier.GeneralSettings)
+            .Where(supplier => supplier.DeletedTime == null)
             .WhereIf(!_tenantProvider.HasScope(ScopeDefinitions.AdminInternal), supplier => supplier.ParentId == _tenantProvider.WaterSupplierId)
             .AsNoTracking();
     }
@@ -115,6 +117,142 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
         return dbSupplier;
     }
 
+    public override async Task<WaterSupplier?> DeleteAsync(int id)
+    {
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+        var supplier = await base.DeleteAsync(id);
+
+        if (supplier != null && supplier.DeletedTime != null)
+        {
+            await DeleteSupplierRecordsAsync(id, supplier.DeletedTime.Value, supplier.DeletedById);
+        }
+
+        scope.Complete();
+
+        return supplier;
+    }
+
+    public override async Task<WaterSupplier?> ReactivateAsync(int id)
+    {
+        var supplier = await GetAsync(id, default);
+
+        if (supplier == null || supplier.DeletedTime == null)
+        {
+            return supplier;
+        }
+
+        var deletedTime = supplier.DeletedTime.Value;
+
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+        await DbContext.WaterSuppliers
+            .IgnoreQueryFilters()
+            .Where(s => s.Id == id)
+            .ExecuteUpdateAsync(set => set
+                .SetProperty(s => s.DeletedTime, (DateTime?)null)
+                .SetProperty(s => s.DeletedById, (int?)null));
+
+        await RestoreSupplierRecordsAsync(id, deletedTime);
+
+        scope.Complete();
+
+        supplier.DeletedTime = null;
+        supplier.DeletedById = null;
+
+        return supplier;
+    }
+
+    private async Task DeleteSupplierRecordsAsync(int waterSupplierId, DateTime deletedTime, int? deletedById)
+    {
+        await DbContext.Sites
+            .IgnoreQueryFilters()
+            .Where(site => site.WaterSupplierId == waterSupplierId && site.DeletedTime == null)
+            .ExecuteUpdateAsync(set => set
+                .SetProperty(site => site.DeletedTime, (DateTime?)deletedTime)
+                .SetProperty(site => site.DeletedById, deletedById));
+
+        await DbContext.BackflowTests
+            .IgnoreQueryFilters()
+            .Where(test => test.WaterSupplierId == waterSupplierId && test.DeletedTime == null)
+            .ExecuteUpdateAsync(set => set
+                .SetProperty(test => test.DeletedTime, (DateTime?)deletedTime)
+                .SetProperty(test => test.DeletedById, deletedById));
+
+        await DbContext.CsiInspections
+            .IgnoreQueryFilters()
+            .Where(inspection => inspection.WaterSupplierId == waterSupplierId && inspection.DeletedTime == null)
+            .ExecuteUpdateAsync(set => set
+                .SetProperty(inspection => inspection.DeletedTime, (DateTime?)deletedTime)
+                .SetProperty(inspection => inspection.DeletedById, deletedById));
+
+        await DbContext.FogInspections
+            .IgnoreQueryFilters()
+            .Where(inspection => inspection.WaterSupplierId == waterSupplierId && inspection.DeletedTime == null)
+            .ExecuteUpdateAsync(set => set
+                .SetProperty(inspection => inspection.DeletedTime, (DateTime?)deletedTime)
+                .SetProperty(inspection => inspection.DeletedById, deletedById));
+
+        await DbContext.FogTripTickets
+            .IgnoreQueryFilters()
+            .Where(ticket => ticket.WaterSupplierId == waterSupplierId && ticket.DeletedTime == null)
+            .ExecuteUpdateAsync(set => set
+                .SetProperty(ticket => ticket.DeletedTime, (DateTime?)deletedTime)
+                .SetProperty(ticket => ticket.DeletedById, deletedById));
+
+        await DbContext.GisAreas
+            .IgnoreQueryFilters()
+            .Where(area => area.WaterSupplierId == waterSupplierId && area.DeletedTime == null)
+            .ExecuteUpdateAsync(set => set
+                .SetProperty(area => area.DeletedTime, (DateTime?)deletedTime)
+                .SetProperty(area => area.DeletedById, deletedById));
+    }
+
+    private async Task RestoreSupplierRecordsAsync(int waterSupplierId, DateTime deletedTime)
+    {
+        await DbContext.Sites
+            .IgnoreQueryFilters()
+            .Where(site => site.WaterSupplierId == waterSupplierId && site.DeletedTime == deletedTime)
+            .ExecuteUpdateAsync(set => set
+                .SetProperty(site => site.DeletedTime, (DateTime?)null)
+                .SetProperty(site => site.DeletedById, (int?)null));
+
+        await DbContext.BackflowTests
+            .IgnoreQueryFilters()
+            .Where(test => test.WaterSupplierId == waterSupplierId && test.DeletedTime == deletedTime)
+            .ExecuteUpdateAsync(set => set
+                .SetProperty(test => test.DeletedTime, (DateTime?)null)
+                .SetProperty(test => test.DeletedById, (int?)null));
+
+        await DbContext.CsiInspections
+            .IgnoreQueryFilters()
+            .Where(inspection => inspection.WaterSupplierId == waterSupplierId && inspection.DeletedTime == deletedTime)
+            .ExecuteUpdateAsync(set => set
+                .SetProperty(inspection => inspection.DeletedTime, (DateTime?)null)
+                .SetProperty(inspection => inspection.DeletedById, (int?)null));
+
+        await DbContext.FogInspections
+            .IgnoreQueryFilters()
+            .Where(inspection => inspection.WaterSupplierId == waterSupplierId && inspection.DeletedTime == deletedTime)
+            .ExecuteUpdateAsync(set => set
+                .SetProperty(inspection => inspection.DeletedTime, (DateTime?)null)
+                .SetProperty(inspection => inspection.DeletedById, (int?)null));
+
+        await DbContext.FogTripTickets
+            .IgnoreQueryFilters()
+            .Where(ticket => ticket.WaterSupplierId == waterSupplierId && ticket.DeletedTime == deletedTime)
+            .ExecuteUpdateAsync(set => set
+                .SetProperty(ticket => ticket.DeletedTime, (DateTime?)null)
+                .SetProperty(ticket => ticket.DeletedById, (int?)null));
+
+        await DbContext.GisAreas
+            .IgnoreQueryFilters()
+            .Where(area => area.WaterSupplierId == waterSupplierId && area.DeletedTime == deletedTime)
+            .ExecuteUpdateAsync(set => set
+                .SetProperty(area => area.DeletedTime, (DateTime?)null)
+                .SetProperty(area => area.DeletedById, (int?)null));
+    }
+
     public async Task<WaterSupplier?> UpdateOwnAsync(WaterSupplier supplier)
     {
         var dbSupplier = await DbContext.WaterSuppliers
@@ -195,6 +333,7 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
         return await suppliersQuery
             .Union(childSupplierQuery)
             .Union(grandChildrenQuery)
+            .Where(supplier => supplier.DeletedTime == null)
             .ToListAsync(cancellationToken);
     }
 }

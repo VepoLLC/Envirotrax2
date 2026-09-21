@@ -18,7 +18,8 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
     {
         return base.GetListQuery()
             .Include(fi => fi.Site)
-            .Include(fi => fi.WaterSupplier);
+            .Include(fi => fi.WaterSupplier)
+            .Where(fi => fi.DeletedTime == null);
     }
 
     protected override IQueryable<FogInspection> GetDetailsQuery()

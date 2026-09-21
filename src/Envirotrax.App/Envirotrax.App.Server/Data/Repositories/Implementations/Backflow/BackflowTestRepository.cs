@@ -28,7 +28,8 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             .Include(bt => bt.Bpat)
             .Include(bt => bt.BpatState)
             .Include(bt => bt.PropertyState)
-            .Include(bt => bt.MailingState);
+            .Include(bt => bt.MailingState)
+            .Where(bt => bt.DeletedTime == null);
     }
 
     protected override IQueryable<BackflowTest> GetDetailsQuery()
@@ -90,7 +91,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         var threeMonthsStart = thisMonthStart.AddMonths(3);
 
         var counts = await Entity
-            .Where(t => t.IsCurrent)
+            .Where(t => t.IsCurrent && t.DeletedTime == null)
             .GroupBy(t => 1)
             .Select(g => new BackflowTestExpiryCounts
             {

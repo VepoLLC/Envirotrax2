@@ -19,7 +19,8 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
     {
         return base.GetListQuery()
             .Include(c => c.Site)
-            .Include(c => c.WaterSupplier);
+            .Include(c => c.WaterSupplier)
+            .Where(c => c.DeletedTime == null);
     }
 
     protected override IQueryable<CsiInspection> GetDetailsQuery()

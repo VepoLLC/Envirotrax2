@@ -84,4 +84,21 @@ export class SupplierListComponent implements OnInit {
             relativeTo: this._activatedRoute
         });
     }
+
+    private async processDelete(supplier: WaterSupplier): Promise<void> {
+        try {
+            this.table.isLoading = true;
+            await this._waterSupplierService.delete(supplier.id!);
+        } finally {
+            this.table.isLoading = false;
+        }
+
+        await this.getSuppliers();
+    }
+
+    public delete(supplier: WaterSupplier): void {
+        this._modalHelper.showDeleteConfirmation()
+            .result()
+            .subscribe(() => this.processDelete(supplier));
+    }
 }

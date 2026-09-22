@@ -21,16 +21,27 @@ BEGIN TRY
             AND skipped.Reason = 'Master account of the company is missing in V1'
     )
 
-    ;WITH CompanyAggregates AS
+    -- A login can hold more than one row in the same V1 table, and V1 works off whichever row it reads
+    -- first: VepoUserAccount loads one, and the balance it shows is that row's. Adding them up would
+    -- invent money the professional never had, so each member counts once. The company stays in the
+    -- partition because the same login can be its own company in one row and somebody else's
+    -- sub-account in another, and both of those companies are real.
+    ;WITH AccountsWithoutDuplicates AS
+    (
+        SELECT accounts.*,
+            ROW_NUMBER() OVER (PARTITION BY accounts.LegacyCompanyUserId, accounts.LegacyUserId, accounts.LegacyUserType ORDER BY accounts.LegacyRecordId) AS AccountRank
+        FROM MigrationLegacyProfessionalAccounts AS accounts
+    ),
+    CompanyAggregates AS
     (
         SELECT LegacyCompanyUserId,
             MAX(CASE WHEN LegacyUserType = 2 THEN 1 ELSE 0 END) AS HasBackflowTesting,
             MAX(CASE WHEN LegacyUserType = 4 THEN 1 ELSE 0 END) AS HasCsiInspection,
             MAX(CASE WHEN LegacyUserType = 5 THEN 1 ELSE 0 END) AS HasFogTransportation,
             MAX(CASE WHEN LegacyUserType = 6 THEN 1 ELSE 0 END) AS HasFogInspection,
-            SUM(ISNULL(AccountBalance, 0)) AS AccountBalance,
+            SUM(CASE WHEN AccountRank = 1 THEN ISNULL(AccountBalance, 0) ELSE 0 END) AS AccountBalance,
             ISNULL(MIN(CreationDate), GETUTCDATE()) AS CreationDate
-        FROM MigrationLegacyProfessionalAccounts
+        FROM AccountsWithoutDuplicates
         GROUP BY LegacyCompanyUserId
     ),
     CompanyOwners AS
@@ -38,7 +49,7 @@ BEGIN TRY
         -- A company can hold a master account in several V1 tables at once. The company fields come from
         -- one of them, picked in this order: BPAT, CSI inspector, FOG transporter, FOG inspector.
         SELECT accounts.*,
-            ROW_NUMBER() OVER (PARTITION BY accounts.LegacyCompanyUserId ORDER BY accounts.SourcePriority) AS OwnerRank
+            ROW_NUMBER() OVER (PARTITION BY accounts.LegacyCompanyUserId ORDER BY accounts.SourcePriority, accounts.LegacyRecordId) AS OwnerRank
         FROM MigrationLegacyProfessionalAccounts AS accounts
         WHERE accounts.IsCompanyOwner = 1
     )

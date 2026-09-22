@@ -4,15 +4,15 @@ using Microsoft.Extensions.Logging;
 
 namespace Envirotrax.LegacyDataMigration.Services;
 
-public class ProfessionalService
+public class ProfessionalLicenseService
 {
-    private const string ScriptsFolder = "Scripts/Professionals";
+    private const string ScriptsFolder = "Scripts/ProfessionalLicenses";
 
-    private readonly ILogger<ProfessionalService> _logger;
+    private readonly ILogger<ProfessionalLicenseService> _logger;
     private readonly AppDbContext _appDbContext;
 
-    public ProfessionalService(
-        ILogger<ProfessionalService> logger,
+    public ProfessionalLicenseService(
+        ILogger<ProfessionalLicenseService> logger,
         AppDbContext appDbContext)
     {
         _logger = logger;
@@ -21,11 +21,11 @@ public class ProfessionalService
 
     public async Task MigrateAsync()
     {
-        _logger.LogInformation("--------- Starting migration of professionals ---------");
+        _logger.LogInformation("--------- Starting migration of professional licenses ---------");
 
         await ExecuteSqlScriptsAsync();
 
-        _logger.LogInformation("--------- Finished migration of professionals ---------");
+        _logger.LogInformation("--------- Finished migration of professional licenses ---------");
     }
 
     private async Task ExecuteSqlScriptsAsync()
@@ -40,7 +40,7 @@ public class ProfessionalService
             var sql = await File.ReadAllTextAsync(file);
 
             var addedRows = await _appDbContext.Database.ExecuteSqlRawAsync(sql);
-            _logger.LogInformation("Imported professional records. Count: {count}", addedRows);
+            _logger.LogInformation("Imported professional licenses. Count: {count}", addedRows);
         }
 
         _logger.LogInformation("Completed executing database scripts from {folderName}.", ScriptsFolder);

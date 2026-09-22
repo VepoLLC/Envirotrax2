@@ -22,31 +22,6 @@ BEGIN
     ADD LegacyUserId NVARCHAR(100) NULL;
 END
 
-IF COL_LENGTH('ProfessionalWaterSuppliers', 'LegacyRecordId') IS NULL
-BEGIN
-    ALTER TABLE ProfessionalWaterSuppliers
-    ADD LegacyRecordId INT NULL;
-END
-
-IF COL_LENGTH('ProfessionalUserLicenses', 'LegacyRecordId') IS NULL
-BEGIN
-    ALTER TABLE ProfessionalUserLicenses
-    ADD LegacyRecordId INT NULL;
-END
-
-IF COL_LENGTH('ProfessionalInsurances', 'LegacyRecordId') IS NULL
-BEGIN
-    ALTER TABLE ProfessionalInsurances
-    ADD LegacyRecordId INT NULL;
-END
-
--- Where the policy file sits on the legacy file server, until it is copied into Azure Storage.
-IF COL_LENGTH('ProfessionalInsurances', 'LegacyFilePath') IS NULL
-BEGIN
-    ALTER TABLE ProfessionalInsurances
-    ADD LegacyFilePath NVARCHAR(500) NULL;
-END
-
 IF OBJECT_ID('MigrationSkippedProfessionals', 'U') IS NULL
 BEGIN
     CREATE TABLE MigrationSkippedProfessionals (

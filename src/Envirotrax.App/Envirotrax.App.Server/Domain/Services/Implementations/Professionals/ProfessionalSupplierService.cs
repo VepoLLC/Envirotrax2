@@ -34,6 +34,7 @@ public class ProfessionalSupplierService : Service<ProfessionalWaterSupplier, Pr
         {
             var waterSupplierId = deleted.WaterSupplier.Id ?? id;
 
+            // recordLog manual
             await _recordLogService.AddAsync(RecordLogTableNames.ProfessionalWaterSupplierRegistrations, waterSupplierId, waterSupplierId, RecordLogType.Delete,
                 "Deleted water supplier registration", professionalId: deleted.Professional?.Id);
         }

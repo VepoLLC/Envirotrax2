@@ -102,6 +102,11 @@ public class Service<TModel, TDto, TKey> : IService<TModel, TDto, TKey>
         return MapToDto(model);
     }
 
+    public virtual Task<bool> ExistsAsync(TKey id, CancellationToken cancellationToken)
+    {
+        return Repository.ExistsAsync(id, cancellationToken);
+    }
+
     public virtual async Task<TDto?> GetAsync(TKey id, CancellationToken cancellationToken)
     {
         var model = await Repository.GetAsync(id, cancellationToken);

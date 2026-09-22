@@ -54,12 +54,25 @@ public class SiteController : WaterSupplierCrudController<SiteDto>
         return Ok();
     }
 
+    [HttpGet("{id}/tab-counts")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetTabCountsAsync(int id, CancellationToken cancellationToken)
+    {
+        var counts = await _siteService.GetTabCountsAsync(id, cancellationToken);
+        if (counts == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(counts);
+    }
+
     [HttpGet("{id}/record-logs")]
     [HasPermission(PermissionAction.CanView)]
     public async Task<IActionResult> GetLogsAsync(int id, CancellationToken cancellationToken)
     {
-        var site = await _siteService.GetAsync(id, cancellationToken);
-        if (site == null)
+        var exists = await _siteService.ExistsAsync(id, cancellationToken);
+        if (!exists)
         {
             return NotFound();
         }

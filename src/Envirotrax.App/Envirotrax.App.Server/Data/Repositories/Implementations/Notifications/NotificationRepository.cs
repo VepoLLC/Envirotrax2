@@ -12,11 +12,20 @@ public class NotificationRepository : Repository<Notification>, INotificationRep
     {
     }
 
-    public async Task MarkSentAsync(int id, CancellationToken cancellationToken)
+    public async Task<List<Notification>> AddRangeAsync(List<Notification> notifications)
+    {
+        Entity.AddRange(notifications);
+
+        await DbContext.SaveChangesAsync();
+
+        return notifications;
+    }
+
+    public async Task MarkSentAsync(IEnumerable<int> ids, CancellationToken cancellationToken)
     {
         await DbContext.Notifications
             .IgnoreQueryFilters()
-            .Where(notification => notification.Id == id)
+            .Where(notification => ids.Contains(notification.Id))
             .ExecuteUpdateAsync(s => s.SetProperty(notification => notification.SentTime, DateTime.UtcNow), cancellationToken);
     }
 }

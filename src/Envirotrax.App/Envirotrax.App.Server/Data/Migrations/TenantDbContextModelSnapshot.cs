@@ -2480,9 +2480,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<int>("ModuleType")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ParentWaterSupplierId")
-                        .HasColumnType("int");
-
                     b.Property<string>("PropertyDescription")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -2514,8 +2511,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasKey("WaterSupplierId", "Id");
 
                     b.HasIndex("CreatedById");
-
-                    b.HasIndex("ParentWaterSupplierId");
 
                     b.HasIndex("WaterSupplierId", "UserId");
 
@@ -4837,11 +4832,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "ParentWaterSupplier")
-                        .WithMany()
-                        .HasForeignKey("ParentWaterSupplierId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
                         .WithMany()
                         .HasForeignKey("WaterSupplierId")
@@ -4855,8 +4845,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
-
-                    b.Navigation("ParentWaterSupplier");
 
                     b.Navigation("User");
 

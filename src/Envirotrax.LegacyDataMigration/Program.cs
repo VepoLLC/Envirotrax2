@@ -64,6 +64,7 @@ services.AddTransient<ProfessionalInsuranceService>();
 services.AddTransient<GisAreaService>();
 services.AddTransient<SiteService>();
 services.AddTransient<SiteLogService>();
+services.AddTransient<BackflowGaugeService>();
 
 var provider = services.BuildServiceProvider();
 
@@ -99,3 +100,8 @@ await siteService.MigrateAsync();
 
 var siteLogService = provider.GetRequiredService<SiteLogService>();
 await siteLogService.MigrateAsync();
+
+// After the professionals: a gauge hangs off the company, and it is resolved through the staging table
+// that the professional migration builds.
+var backflowGaugeService = provider.GetRequiredService<BackflowGaugeService>();
+await backflowGaugeService.MigrateAsync();

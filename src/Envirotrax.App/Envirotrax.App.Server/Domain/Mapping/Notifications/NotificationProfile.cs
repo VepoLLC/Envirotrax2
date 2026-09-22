@@ -11,7 +11,6 @@ public class NotificationProfile : Profile
         CreateMap<Notification, NotificationDto>()
             .ReverseMap()
             .ForMember(notification => notification.User, opt => opt.Ignore())
-            .ForMember(notification => notification.ParentWaterSupplier, opt => opt.Ignore())
             .ForMember(notification => notification.CreatedBy, opt => opt.Ignore());
     }
 }

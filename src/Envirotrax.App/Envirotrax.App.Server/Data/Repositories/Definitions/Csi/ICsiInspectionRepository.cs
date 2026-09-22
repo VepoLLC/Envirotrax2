@@ -8,7 +8,8 @@ public interface ICsiInspectionRepository : IRepository<CsiInspection>
 {
     Task<IEnumerable<CsiInspection>> SearchForProfessionalAsync(PageInfo pageInfo, Query query, bool latestOnly, CancellationToken cancellationToken);
     Task<IEnumerable<CsiInspection>> SearchForAdminAsync(PageInfo pageInfo, Query query, CsiPaymentStatus? paymentStatus, CancellationToken cancellationToken);
-    Task<UpdateResult<CsiInspection>> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken);
-    Task<UpdateResult<CsiInspection>> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request);
-    Task<UpdateResult<CsiInspection>> UpdateForProfessionalAsync(CsiInspection model, int professionalId);
+    Task<CsiInspection?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken);
+    Task<CsiInspection?> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request);
+    Task<CsiInspection?> UpdateForProfessionalAsync(CsiInspection model, int professionalId);
+    Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken);
 }

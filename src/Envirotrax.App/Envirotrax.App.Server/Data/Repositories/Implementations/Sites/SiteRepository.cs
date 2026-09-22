@@ -15,26 +15,20 @@ public class SiteRepository : Repository<Site>, ISiteRepository
     {
     }
 
-    public async Task<UpdateResult<Site>> UpdateForAdminAsync(int id, SiteDto dto)
+    public async Task<Site?> UpdateForAdminAsync(int id, SiteDto dto)
     {
-        var result = new UpdateResult<Site>();
-
         var site = await GetTrackedForUpdateAsync(id, CancellationToken.None);
 
         if (site == null)
         {
-            return result;
+            return null;
         }
 
         ApplyAdminEditableFields(site, dto);
 
-        result.Changes = BuildChangeDescription(site);
+        await SaveChangesAsync(logData: true);
 
-        await DbContext.SaveChangesAsync();
-
-        result.Model = site;
-
-        return result;
+        return site;
     }
 
     /// <summary>

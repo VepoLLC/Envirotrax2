@@ -75,20 +75,18 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
         return await paginated.ToListAsync(cancellationToken);
     }
 
-    public async Task<UpdateResult<FogInspection>> UpdateForProfessionalAsync(
+    public async Task<FogInspection?> UpdateForProfessionalAsync(
         FogInspection model,
         int professionalId,
         string? newExteriorImagePath,
         string? newInteriorImagePath,
         string? newSignatureImagePath)
     {
-        var result = new UpdateResult<FogInspection>();
-
         var inspection = await GetTrackedForUpdateAsync(model.Id, default);
 
         if (inspection == null || inspection.ProfessionalId != professionalId || !string.IsNullOrEmpty(inspection.TransactionId))
         {
-            return result;
+            return null;
         }
 
         inspection.InspectionDate = model.InspectionDate;
@@ -187,12 +185,13 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
             inspection.SignatureDate = model.SignatureDate;
         }
 
-        result.Changes = BuildChangeDescription(inspection);
+        await SaveChangesAsync(logData: true);
 
-        await DbContext.SaveChangesAsync();
+        return inspection;
+    }
 
-        result.Model = inspection;
-
-        return result;
+    public Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken)
+    {
+        return Entity.CountAsync(f => f.SiteId == siteId && f.DeletedTime == null, cancellationToken);
     }
 }

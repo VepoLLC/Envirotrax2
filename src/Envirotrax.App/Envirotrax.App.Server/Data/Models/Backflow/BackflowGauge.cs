@@ -1,4 +1,5 @@
 
+using Envirotrax.App.Server.Data.Models.Logs;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Envirotrax.App.Server.Data.Models.Professionals;
@@ -9,6 +10,7 @@ using Envirotrax.Common.Data.Models;
 namespace Envirotrax.App.Server.Data.Models.Backflow;
 
 [Table("BackflowGauges")]
+[RecordLogged(RecordLogTableNames.BackflowGauges, ProfessionalSource = RecordLogIdSource.Entity)]
 public class BackflowGauge : IProfessionalModel, ICreateAuditableModel<AppUser>
 {
     [AppPrimaryKey(true)]

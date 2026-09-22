@@ -16,13 +16,13 @@ public class NotificationService : Service<Notification, NotificationDto>, INoti
         _repository = repository;
     }
 
-    public Task<Notification> AddAsync(Notification notification, CancellationToken cancellationToken)
+    public Task<List<Notification>> AddAsync(List<Notification> notifications, CancellationToken cancellationToken)
     {
-        return _repository.AddAsync(notification);
+        return _repository.AddRangeAsync(notifications);
     }
 
-    public Task MarkSentAsync(int id, CancellationToken cancellationToken)
+    public Task MarkSentAsync(IEnumerable<int> ids, CancellationToken cancellationToken)
     {
-        return _repository.MarkSentAsync(id, cancellationToken);
+        return _repository.MarkSentAsync(ids, cancellationToken);
     }
 }

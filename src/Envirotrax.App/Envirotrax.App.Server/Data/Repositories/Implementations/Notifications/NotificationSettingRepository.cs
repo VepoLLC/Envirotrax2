@@ -39,6 +39,8 @@ public class NotificationSettingRepository : Repository<NotificationSetting>, IN
         var createdById = setting.CreatedById;
         var createdTime = setting.CreatedTime;
 
+        model.WaterSupplierId = setting.WaterSupplierId;
+
         DbContext.Entry(setting).CurrentValues.SetValues(model);
 
         setting.CreatedById = createdById;

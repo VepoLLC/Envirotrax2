@@ -57,9 +57,14 @@ services.AddSingleton(new BlobStorageService(azureStorageAccountName, azureStora
 services.AddTransient<UserService>();
 services.AddTransient<WaterSupplierService>();
 services.AddTransient<WaterSupplierUserService>();
+services.AddTransient<ProfessionalService>();
+services.AddTransient<ProfessionalWaterSupplierService>();
+services.AddTransient<ProfessionalLicenseService>();
+services.AddTransient<ProfessionalInsuranceService>();
 services.AddTransient<GisAreaService>();
 services.AddTransient<SiteService>();
 services.AddTransient<SiteLogService>();
+services.AddTransient<BackflowGaugeService>();
 
 var provider = services.BuildServiceProvider();
 
@@ -75,6 +80,18 @@ await waterSupplierService.MigrateAsync();
 var supplierUserService = provider.GetRequiredService<WaterSupplierUserService>();
 await supplierUserService.MigrateAsync();
 
+var professionalService = provider.GetRequiredService<ProfessionalService>();
+await professionalService.MigrateAsync();
+
+var professionalWaterSupplierService = provider.GetRequiredService<ProfessionalWaterSupplierService>();
+await professionalWaterSupplierService.MigrateAsync();
+
+var professionalLicenseService = provider.GetRequiredService<ProfessionalLicenseService>();
+await professionalLicenseService.MigrateAsync();
+
+var professionalInsuranceService = provider.GetRequiredService<ProfessionalInsuranceService>();
+await professionalInsuranceService.MigrateAsync();
+
 var gisAreaService = provider.GetRequiredService<GisAreaService>();
 await gisAreaService.MigrateAsync();
 
@@ -83,3 +100,8 @@ await siteService.MigrateAsync();
 
 var siteLogService = provider.GetRequiredService<SiteLogService>();
 await siteLogService.MigrateAsync();
+
+// After the professionals: a gauge hangs off the company, and it is resolved through the staging table
+// that the professional migration builds.
+var backflowGaugeService = provider.GetRequiredService<BackflowGaugeService>();
+await backflowGaugeService.MigrateAsync();

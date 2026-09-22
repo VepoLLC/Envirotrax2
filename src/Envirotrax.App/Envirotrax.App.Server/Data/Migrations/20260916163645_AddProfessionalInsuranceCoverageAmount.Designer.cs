@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260916163645_AddProfessionalInsuranceCoverageAmount")]
+    partial class AddProfessionalInsuranceCoverageAmount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2480,6 +2483,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<int>("ModuleType")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ParentWaterSupplierId")
+                        .HasColumnType("int");
+
                     b.Property<string>("PropertyDescription")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -2511,6 +2517,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasKey("WaterSupplierId", "Id");
 
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("ParentWaterSupplierId");
 
                     b.HasIndex("WaterSupplierId", "UserId");
 
@@ -4832,6 +4840,11 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "ParentWaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("ParentWaterSupplierId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
                         .WithMany()
                         .HasForeignKey("WaterSupplierId")
@@ -4845,6 +4858,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("ParentWaterSupplier");
 
                     b.Navigation("User");
 

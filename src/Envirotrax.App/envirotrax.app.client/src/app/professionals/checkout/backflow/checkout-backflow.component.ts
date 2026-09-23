@@ -147,7 +147,7 @@ export class CheckoutBackflowComponent implements OnInit {
             return;
         }
 
-        this._router.navigate(['/professionals/backflow/submit', test.id, 'edit']);
+        this._router.navigate(['/professionals/backflow/tests', test.id, 'edit']);
     }
 
     public deleteTest(test: CheckoutBackflowTestVm): void {

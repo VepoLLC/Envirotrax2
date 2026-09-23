@@ -515,6 +515,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
         var model = MapToModel(dto)!;
 
+        await using var balanceLock = await AcquireBalanceLockAsync(professionalId, cancellationToken);
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
         var saved = await _testRepository.UpdateForProfessionalAsync(
@@ -648,17 +649,26 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
     public override async Task<BackflowTestDto?> DeleteAsync(int id)
     {
-        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        var professionalId = _authService.ProfessionalId;
 
-        var deleted = await _testRepository.DeleteAsync(id);
+        await using var balanceLock = await AcquireBalanceLockAsync(professionalId, CancellationToken.None);
 
-        if (deleted == null || deleted.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(deleted.TransactionId))
+        var test = await _testRepository.GetNoIncludesAsync(id, CancellationToken.None);
+
+        if (test == null || test.ProfessionalId != professionalId || !string.IsNullOrEmpty(test.TransactionId))
         {
             return null;
         }
 
-        scope.Complete();
+        var deleted = await _testRepository.DeleteAsync(id);
+
         return MapToDto(deleted);
+    }
+
+    private async Task<IAsyncDisposable> AcquireBalanceLockAsync(int professionalId, CancellationToken cancellationToken)
+    {
+        return await _professionalRepository.TryAcquireBalanceLockAsync(professionalId, cancellationToken)
+            ?? throw new AppValidationException("Another payment for your company is in progress. Please try again in a minute.");
     }
 
     public async Task<BackflowTestDto?> UpdateImageAsync(int id, string imageType, Stream fileStream, string fileName, CancellationToken cancellationToken = default)

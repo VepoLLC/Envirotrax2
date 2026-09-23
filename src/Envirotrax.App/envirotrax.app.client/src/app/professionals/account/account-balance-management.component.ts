@@ -10,6 +10,7 @@ import { HelperService } from "../../shared/services/helpers/helper.service";
 import { InputOption, ToastService } from '@envirotrax/common-ui';
 import { CreditCardPaymentComponent, CreditCardToken } from "../../shared/components/credit-card-payment/credit-card-payment.component";
 import { ProfessionalAccountBalance } from "../../shared/models/professionals/professional-account-balance";
+import { createPaymentTransactionId } from "../../shared/utils/payment-transaction-id.util";
 
 @Component({
     standalone: false,
@@ -77,6 +78,7 @@ export class AccountBalanceManagementComponent implements OnInit {
                 this.isLoading = true;
 
                 const request: ProfessionalAccountBalance = {
+                    transactionId: createPaymentTransactionId(),
                     amountToAdd: amountEntered ? Number(this.amountToAdd) : 0,
                     dataDescriptor: this.cardToken!.dataDescriptor,
                     dataValue: this.cardToken!.dataValue,

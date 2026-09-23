@@ -18,6 +18,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
+using Envirotrax.App.Server.Domain.Services.Definitions.Payments;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
@@ -49,6 +50,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     private readonly IBackflowSettingsService _settingsService;
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IProfessionalSupplierService _professionalSupplierService;
+    private readonly IProfessionalPaymentService _paymentService;
     private readonly ILogger<BackflowTestService> _logger;
 
     public BackflowTestService(
@@ -67,6 +69,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         IBackflowSettingsService settingsService,
         IGeneralSettingsService generalSettingsService,
         IProfessionalSupplierService professionalSupplierService,
+        IProfessionalPaymentService paymentService,
         ILogger<BackflowTestService> logger)
         : base(mapper, repository)
     {
@@ -84,6 +87,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         _settingsService = settingsService;
         _generalSettingsService = generalSettingsService;
         _professionalSupplierService = professionalSupplierService;
+        _paymentService = paymentService;
         _logger = logger;
     }
 
@@ -515,7 +519,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
         var model = MapToModel(dto)!;
 
-        await using var balanceLock = await AcquireBalanceLockAsync(professionalId, cancellationToken);
+        await using var balanceLock = await _paymentService.AcquireBalanceLockAsync(cancellationToken);
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
         var saved = await _testRepository.UpdateForProfessionalAsync(
@@ -651,7 +655,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     {
         var professionalId = _authService.ProfessionalId;
 
-        await using var balanceLock = await AcquireBalanceLockAsync(professionalId, CancellationToken.None);
+        await using var balanceLock = await _paymentService.AcquireBalanceLockAsync(CancellationToken.None);
 
         var test = await _testRepository.GetNoIncludesAsync(id, CancellationToken.None);
 
@@ -663,12 +667,6 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         var deleted = await _testRepository.DeleteAsync(id);
 
         return MapToDto(deleted);
-    }
-
-    private async Task<IAsyncDisposable> AcquireBalanceLockAsync(int professionalId, CancellationToken cancellationToken)
-    {
-        return await _professionalRepository.TryAcquireBalanceLockAsync(professionalId, cancellationToken)
-            ?? throw new AppValidationException("Another payment for your company is in progress. Please try again in a minute.");
     }
 
     public async Task<BackflowTestDto?> UpdateImageAsync(int id, string imageType, Stream fileStream, string fileName, CancellationToken cancellationToken = default)

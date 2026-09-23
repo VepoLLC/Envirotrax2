@@ -73,6 +73,7 @@ public static class ServiceRegistration
         services.AddTransient<IFogInspectionService, FogInspectionService>();
         services.AddTransient<IBackflowTesterService, BackflowTesterService>();
         services.AddTransient<IBackflowTestService, BackflowTestService>();
+        services.AddTransient<IBackflowCheckoutService, BackflowCheckoutService>();
         services.AddTransient<IBackflowTestReportService, BackflowTestReportService>();
         services.AddTransient<IBackflowComplianceReportService, BackflowComplianceReportService>();
         services.AddTransient<IBackflowComplianceSnapshotService, BackflowComplianceSnapshotService>();
@@ -119,7 +120,8 @@ public static class ServiceRegistration
         services.AddHttpClient<IGeocodingService, GeocodingService>();
 
         services.Configure<AuthorizeNetOptions>(configuration.GetSection("AuthorizeNet"));
-        services.AddHttpClient<IAuthorizeNetPaymentService, AuthorizeNetPaymentService>();
+        services.AddHttpClient<IAuthorizeNetPaymentService, AuthorizeNetPaymentService>(client => client.Timeout = TimeSpan.FromSeconds(60));
+        services.AddTransient<IProfessionalPaymentService, ProfessionalPaymentService>();
 
         services.AddEmailService(configuration.GetSection("Email"), opts =>
         {

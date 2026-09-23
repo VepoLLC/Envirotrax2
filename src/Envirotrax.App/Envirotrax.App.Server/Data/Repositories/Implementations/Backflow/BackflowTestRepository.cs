@@ -1072,4 +1072,137 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             .Select(t => (int?)t.Id)
             .FirstOrDefaultAsync();
     }
+
+    public async Task<List<BackflowTest>> GetUnpaidForCheckoutAsync(IReadOnlyCollection<int> ids, int professionalId, int? bpatId, CancellationToken cancellationToken)
+    {
+        return await GetUnpaidForCheckoutQuery(ids, professionalId, bpatId)
+            .AsNoTracking()
+            .Include(t => t.WaterSupplier)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> MarkPaidAsync(
+        IReadOnlyCollection<int> ids,
+        int professionalId,
+        int? bpatId,
+        string transactionId,
+        DateTime transactionDate,
+        IReadOnlyCollection<int> emailPdfTestIds,
+        CancellationToken cancellationToken)
+    {
+        return await GetUnpaidForCheckoutQuery(ids, professionalId, bpatId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(t => t.TransactionId, transactionId)
+                .SetProperty(t => t.TransactionDate, transactionDate)
+                .SetProperty(t => t.EmailPdf, t => emailPdfTestIds.Contains(t.Id)), cancellationToken);
+    }
+
+    public async Task<decimal> SumAmountByTransactionIdAsync(string transactionId, CancellationToken cancellationToken)
+    {
+        return await DbContext.BackflowTests
+            .IgnoreQueryFilters()
+            .Where(t => t.TransactionId == transactionId)
+            .SumAsync(t => t.Amount, cancellationToken);
+    }
+
+    public async Task<List<BackflowTest>> GetByTransactionIdAsync(string transactionId, int professionalId, CancellationToken cancellationToken)
+    {
+        return await GetListQuery()
+            .IgnoreQueryFilters()
+            .Where(t => t.TransactionId == transactionId && t.ProfessionalId == professionalId)
+            .OrderBy(t => t.CreatedTime)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<BackflowTest?> FindPreviousCurrentTestAsync(BackflowTest test, CancellationToken cancellationToken)
+    {
+        var serialNumber = test.SerialNumber ?? string.Empty;
+
+        if (!BackflowSerialNumber.IsValid(serialNumber))
+        {
+            return null;
+        }
+
+        var candidates = GetPreviousCurrentTestCandidates(test);
+
+        var matches = await candidates
+            .Where(t => t.SerialNumber == serialNumber)
+            .ToListAsync(cancellationToken);
+
+        if (matches.Count == 0)
+        {
+            var letterWildcardPattern = BackflowSerialNumber.ToLetterWildcardPattern(serialNumber);
+
+            matches = await candidates
+                .Where(t => EF.Functions.Like(t.SerialNumber!, letterWildcardPattern))
+                .ToListAsync(cancellationToken);
+        }
+
+        if (matches.Count == 0)
+        {
+            var baseNumberPattern = $"%{BackflowSerialNumber.ToBaseNumber(serialNumber)}%";
+
+            var baseNumberCandidates = await candidates
+                .Where(t => EF.Functions.Like(t.SerialNumber!, baseNumberPattern))
+                .ToListAsync(cancellationToken);
+
+            matches = [.. baseNumberCandidates.Where(t => BackflowSerialNumber.IsBaseNumberMatch(serialNumber, t.SerialNumber!))];
+        }
+
+        return SelectPreviousTest(test, matches);
+    }
+
+    public async Task SetIsCurrentAsync(int id, bool isCurrent, CancellationToken cancellationToken)
+    {
+        await DbContext.BackflowTests
+            .IgnoreQueryFilters()
+            .Where(t => t.Id == id)
+            .ExecuteUpdateAsync(setter => setter.SetProperty(t => t.IsCurrent, isCurrent), cancellationToken);
+    }
+
+    private IQueryable<BackflowTest> GetUnpaidForCheckoutQuery(IReadOnlyCollection<int> ids, int professionalId, int? bpatId)
+    {
+        return DbContext.BackflowTests
+            .IgnoreQueryFilters()
+            .Where(t => ids.Contains(t.Id)
+                && t.ProfessionalId == professionalId
+                && (bpatId == null || t.BpatId == bpatId)
+                && (t.TransactionId == null || t.TransactionId == string.Empty)
+                && t.DeletedTime == null);
+    }
+
+    private IQueryable<BackflowTest> GetPreviousCurrentTestCandidates(BackflowTest test)
+    {
+        var parentWaterSupplierId = test.WaterSupplier?.ParentId;
+
+        return DbContext.BackflowTests
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Where(t => (t.WaterSupplierId == test.WaterSupplierId
+                    || (parentWaterSupplierId != null && t.WaterSupplier!.ParentId == parentWaterSupplierId))
+                && t.Id != test.Id
+                && t.Manufacturer == test.Manufacturer
+                && t.CreatedTime < test.CreatedTime
+                && t.IsCurrent
+                && t.TransactionId != null && t.TransactionId != string.Empty
+                && t.DeletedTime == null
+                && !t.Rejected)
+            .OrderByDescending(t => t.ExpirationDate);
+    }
+
+    private static BackflowTest? SelectPreviousTest(BackflowTest test, List<BackflowTest> matches)
+    {
+        if (matches.Count == 1)
+        {
+            var match = matches[0];
+            var isSameStreetNumber = (match.PropertyStreetNumber ?? string.Empty).Trim() == (test.PropertyStreetNumber ?? string.Empty).Trim();
+
+            return isSameStreetNumber || match.SiteId == test.SiteId ? match : null;
+        }
+
+        var sameSiteMatches = matches.Where(match => match.SiteId == test.SiteId);
+        var sameStreetNumberMatches = matches.Where(match => (match.PropertyStreetNumber ?? string.Empty) == (test.PropertyStreetNumber ?? string.Empty));
+
+        return sameSiteMatches.Concat(sameStreetNumberMatches).FirstOrDefault();
+    }
 }

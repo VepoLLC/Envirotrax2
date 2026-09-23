@@ -61,7 +61,7 @@ export class CreditCardPaymentComponent implements OnInit {
 
         window.acceptUiResponseHandler = (response) => this._ngZone.run(() => this.handleResponse(response));
 
-        await this._authorizeNetService.ensureAcceptUiScriptLoaded();
+        await this._authorizeNetService.reloadAcceptUiScript();
 
         this.isReady = true;
     }

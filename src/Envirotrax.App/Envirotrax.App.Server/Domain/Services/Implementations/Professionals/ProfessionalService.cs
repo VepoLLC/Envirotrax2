@@ -22,7 +22,8 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
     private readonly IAuthService _authService;
     private readonly IProfessionalInsuranceRepository _insuranceRepository;
     private readonly ITimeZoneHelperService _timeZoneHelper;
-    private readonly IAuthorizeNetPaymentService _authorizeNetPaymentService;
+    private readonly IProfessionalTransactionRepository _transactionRepository;
+    private readonly IProfessionalPaymentService _paymentService;
 
     public ProfessionalService(
         IMapper mapper,
@@ -31,7 +32,8 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
         IAuthService authService,
         IProfessionalInsuranceRepository insuranceRepository,
         ITimeZoneHelperService timeZoneHelper,
-        IAuthorizeNetPaymentService authorizeNetPaymentService)
+        IProfessionalTransactionRepository transactionRepository,
+        IProfessionalPaymentService paymentService)
         : base(mapper, repository)
     {
         _professionalRepository = repository;
@@ -39,7 +41,8 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
         _authService = authService;
         _insuranceRepository = insuranceRepository;
         _timeZoneHelper = timeZoneHelper;
-        _authorizeNetPaymentService = authorizeNetPaymentService;
+        _transactionRepository = transactionRepository;
+        _paymentService = paymentService;
     }
 
     public async Task<IPagedData<ProfessionalDto>> GetAllMyAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
@@ -85,47 +88,48 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
 
     public async Task<ProfessionalDto> UpdateMyAccountBalanceAsync(ProfessionalAccountBalanceDto dto, CancellationToken cancellationToken)
     {
-        var professional = await _professionalRepository.GetTrackedForUpdateAsync(_authService.ProfessionalId, cancellationToken)
-            ?? throw new InvalidOperationException("Professional not found.");
+        var professionalId = _authService.ProfessionalId;
+        var amountToAdd = Math.Round(dto.AmountToAdd, 2, MidpointRounding.AwayFromZero);
 
-        if (dto.AmountToAdd > 0)
+        if (amountToAdd == 0)
         {
-            var chargeResult = await _authorizeNetPaymentService.ChargeAsync(
-                dto.DataDescriptor,
-                dto.DataValue,
-                dto.AmountToAdd,
-                new AuthorizeNetBillingInfo
-                {
-                    FirstName = dto.BillingFirstName,
-                    LastName = dto.BillingLastName,
-                    Address = dto.BillingAddress,
-                    City = dto.BillingCity,
-                    State = dto.BillingState.Code,
-                    Zip = dto.BillingZipCode
-                },
-                cancellationToken);
-
-            if (!chargeResult.IsApproved)
-            {
-                throw new AppValidationException($"Your card was declined: {chargeResult.ErrorMessage}");
-            }
-
-            professional.AccountBalance += dto.AmountToAdd;
+            await _paymentService.SaveBillingInfoAsync(dto, cancellationToken);
+            return (await GetAsync(professionalId, cancellationToken))!;
         }
 
-        var professionalUser = await _professionalUserRepository.GetTrackedForUpdateAsync(_authService.UserId, cancellationToken)
-            ?? throw new InvalidOperationException("Professional user not found.");
+        await using var balanceLock = await _paymentService.AcquireBalanceLockAsync(cancellationToken);
 
-        professionalUser.BillingFirstName = dto.BillingFirstName;
-        professionalUser.BillingLastName = dto.BillingLastName;
-        professionalUser.BillingAddress = dto.BillingAddress;
-        professionalUser.BillingCity = dto.BillingCity;
-        professionalUser.BillingStateId = dto.BillingState.Id;
-        professionalUser.BillingZipCode = dto.BillingZipCode;
+        if (await _paymentService.GetProcessedTransactionAsync(dto.TransactionId, cancellationToken) != null)
+        {
+            return (await GetAsync(professionalId, cancellationToken))!;
+        }
 
-        await _professionalRepository.SaveChangesAsync();
+        var charge = await _paymentService.ChargeCardAsync(dto, amountToAdd, dto.TransactionId);
 
-        return MapToDto(professional)!;
+        await _paymentService.RecordPaymentAsync(dto.TransactionId, charge, amountToAdd, () => RecordBalanceTopUpAsync(dto, amountToAdd, charge));
+
+        return (await GetAsync(professionalId, CancellationToken.None))!;
+    }
+
+    private async Task RecordBalanceTopUpAsync(ProfessionalAccountBalanceDto dto, decimal amount, AuthorizeNetChargeResult charge)
+    {
+        await _professionalRepository.CreditBalanceAsync(_authService.ProfessionalId, amount, CancellationToken.None);
+
+        await _transactionRepository.AddAsync(new ProfessionalTransaction
+        {
+            TransactionDate = DateTime.UtcNow,
+            ProfessionalId = _authService.ProfessionalId,
+            UserId = _authService.UserId,
+            TransactionId = dto.TransactionId,
+            TransactionType = ProfessionalTransactionType.BalanceAdjustment,
+            BalanceAdjustment = amount,
+            CcCharge = amount,
+            Amount = amount,
+            CCNameOnCard = $"{dto.BillingFirstName} {dto.BillingLastName}",
+            CCNumber = charge.CardNumber
+        });
+
+        await _paymentService.SaveBillingInfoAsync(dto, CancellationToken.None);
     }
 
     public async Task<ProfessionalDto> AddMyAsync(CreateProfessionalDto createProfessional)

@@ -1,6 +1,7 @@
 import { State } from "../lookup/state";
 
 export interface ProfessionalAccountBalance {
+    transactionId: string;
     amountToAdd: number;
     dataDescriptor: string;
     dataValue: string;

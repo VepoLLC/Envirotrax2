@@ -1,7 +1,6 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
-using Envirotrax.App.Server.Domain.Services.Definitions.Notifications;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -16,14 +15,14 @@ namespace Envirotrax.App.Server.Controllers.Professionals.Backflow;
 public class BackflowTestController : ProfessionalProtectedController
 {
     private readonly IBackflowTestService _backflowTestService;
-    private readonly IBackflowTestNotificationService _notificationService;
+    private readonly IBackflowCheckoutService _checkoutService;
 
     public BackflowTestController(
         IBackflowTestService backflowTestService,
-        IBackflowTestNotificationService notificationService)
+        IBackflowCheckoutService checkoutService)
     {
         _backflowTestService = backflowTestService;
-        _notificationService = notificationService;
+        _checkoutService = checkoutService;
     }
 
     [HttpGet]
@@ -144,10 +143,14 @@ public class BackflowTestController : ProfessionalProtectedController
     }
 
     [HttpPost("checkout")]
-    public async Task<IActionResult> CheckoutAsync([FromBody] List<int> testIds, CancellationToken cancellationToken)
+    public async Task<IActionResult> CheckoutAsync([FromBody] BackflowCheckoutRequestDto request, CancellationToken cancellationToken)
     {
-        await _notificationService.StartCheckingNotificationsAsync(testIds, cancellationToken);
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
 
-        return Ok();
+        var receipt = await _checkoutService.CheckoutAsync(request, cancellationToken);
+        return Ok(receipt);
     }
 }

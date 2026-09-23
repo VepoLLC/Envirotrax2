@@ -10,6 +10,8 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Payments;
 
 public class AuthorizeNetPaymentService : IAuthorizeNetPaymentService
 {
+    private const string ApprovedResponseCode = "1";
+
     private readonly HttpClient _http;
     private readonly AuthorizeNetOptions _options;
 
@@ -21,7 +23,69 @@ public class AuthorizeNetPaymentService : IAuthorizeNetPaymentService
         _http.BaseAddress = new(_options.BaseUrl);
     }
 
-    public async Task<AuthorizeNetChargeResult> ChargeAsync(string dataDescriptor, string dataValue, decimal amount, AuthorizeNetBillingInfo billingInfo, CancellationToken cancellationToken)
+    public async Task<AuthorizeNetChargeResult> ChargeAsync(string dataDescriptor, string dataValue, decimal amount, string invoiceNumber, AuthorizeNetBillingInfo billingInfo, CancellationToken cancellationToken)
+    {
+        var transactionRequest = new
+        {
+            transactionType = "authCaptureTransaction",
+            amount = amount.ToString("F2", CultureInfo.InvariantCulture),
+            payment = new
+            {
+                opaqueData = new
+                {
+                    dataDescriptor,
+                    dataValue
+                }
+            },
+            order = new
+            {
+                invoiceNumber
+            },
+            billTo = new
+            {
+                firstName = billingInfo.FirstName,
+                lastName = billingInfo.LastName,
+                address = billingInfo.Address,
+                city = billingInfo.City,
+                state = billingInfo.State,
+                zip = billingInfo.Zip
+            }
+        };
+
+        var response = await SendTransactionAsync(transactionRequest, cancellationToken);
+
+        if (response.TransactionResponse?.ResponseCode == ApprovedResponseCode)
+        {
+            return new AuthorizeNetChargeResult
+            {
+                IsApproved = true,
+                TransactionId = response.TransactionResponse.TransId,
+                CardNumber = response.TransactionResponse.AccountNumber,
+                CardType = response.TransactionResponse.AccountType
+            };
+        }
+
+        return new AuthorizeNetChargeResult
+        {
+            IsApproved = false,
+            ErrorMessage = GetErrorMessage(response) ?? "The card was declined."
+        };
+    }
+
+    public async Task<bool> VoidAsync(string gatewayTransactionId, CancellationToken cancellationToken)
+    {
+        var transactionRequest = new
+        {
+            transactionType = "voidTransaction",
+            refTransId = gatewayTransactionId
+        };
+
+        var response = await SendTransactionAsync(transactionRequest, cancellationToken);
+
+        return response.TransactionResponse?.ResponseCode == ApprovedResponseCode;
+    }
+
+    private async Task<TransactionResponseEnvelope> SendTransactionAsync(object transactionRequest, CancellationToken cancellationToken)
     {
         var request = new
         {
@@ -32,28 +96,7 @@ public class AuthorizeNetPaymentService : IAuthorizeNetPaymentService
                     name = _options.ApiLoginId,
                     transactionKey = _options.TransactionKey
                 },
-                transactionRequest = new
-                {
-                    transactionType = "authCaptureTransaction",
-                    amount = amount.ToString("F2", CultureInfo.InvariantCulture),
-                    payment = new
-                    {
-                        opaqueData = new
-                        {
-                            dataDescriptor,
-                            dataValue
-                        }
-                    },
-                    billTo = new
-                    {
-                        firstName = billingInfo.FirstName,
-                        lastName = billingInfo.LastName,
-                        address = billingInfo.Address,
-                        city = billingInfo.City,
-                        state = billingInfo.State,
-                        zip = billingInfo.Zip
-                    }
-                }
+                transactionRequest
             }
         };
 
@@ -68,30 +111,17 @@ public class AuthorizeNetPaymentService : IAuthorizeNetPaymentService
         // Authorize.Net's JSON API prepends a UTF-8 BOM to the response body, which breaks strict JSON parsing.
         json = json.TrimStart((char)0xFEFF);
 
-        var response = JsonSerializer.Deserialize<ChargeResponse>(json)
+        return JsonSerializer.Deserialize<TransactionResponseEnvelope>(json)
             ?? throw new InvalidOperationException($"Unable to parse Authorize.Net response: {json}");
-
-        if (response.TransactionResponse?.ResponseCode == "1")
-        {
-            return new AuthorizeNetChargeResult
-            {
-                IsApproved = true,
-                TransactionId = response.TransactionResponse.TransId
-            };
-        }
-
-        var errorMessage = response.TransactionResponse?.Errors?.FirstOrDefault()?.ErrorText
-            ?? response.Messages?.Message?.FirstOrDefault()?.Text
-            ?? "The card was declined.";
-
-        return new AuthorizeNetChargeResult
-        {
-            IsApproved = false,
-            ErrorMessage = errorMessage
-        };
     }
 
-    class ChargeResponse
+    private static string? GetErrorMessage(TransactionResponseEnvelope response)
+    {
+        return response.TransactionResponse?.Errors?.FirstOrDefault()?.ErrorText
+            ?? response.Messages?.Message?.FirstOrDefault()?.Text;
+    }
+
+    class TransactionResponseEnvelope
     {
         [JsonPropertyName("transactionResponse")]
         public TransactionResponse? TransactionResponse { get; set; }
@@ -107,6 +137,12 @@ public class AuthorizeNetPaymentService : IAuthorizeNetPaymentService
 
         [JsonPropertyName("transId")]
         public string? TransId { get; set; }
+
+        [JsonPropertyName("accountNumber")]
+        public string? AccountNumber { get; set; }
+
+        [JsonPropertyName("accountType")]
+        public string? AccountType { get; set; }
 
         [JsonPropertyName("errors")]
         public List<TransactionError>? Errors { get; set; }

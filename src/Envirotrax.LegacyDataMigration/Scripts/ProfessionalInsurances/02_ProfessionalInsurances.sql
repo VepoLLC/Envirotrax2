@@ -21,15 +21,15 @@ BEGIN TRY
                 AND skipped.SourceTable = 'SaveLicenses'
         )
 
-    -- A policy file lives on the legacy file server only when ImageStored is 1. V1 can also serve one
-    -- out of SaveLicenses.FileData (water_suppliers/license_view.aspx.vb), but that column is empty
-    -- throughout, so the rest of the policies have no document at all - in V1 either. They still
-    -- migrate; this records that they arrive without a file, rather than leaving it to be noticed later.
+    -- FileType is the only sign that V1 ever had a file: ImageStored does not predict one - policies
+    -- with it set are missing from the file server and policies without it are present - and
+    -- SaveLicenses.FileData is empty throughout. A policy with no FileType has no document at all,
+    -- in V1 either; the ones that do are tried against the file server, which decides.
     INSERT INTO MigrationSkippedProfessionals (LegacyRecordId, LegacyUserId, SourceTable, Reason)
     SELECT licenses.ID, licenses.UserID, 'SaveLicenses', 'Policy has no file in V1'
     FROM Vepo.dbo.SaveLicenses AS licenses
     WHERE licenses.Type = 'Insurance Policy'
-        AND (ISNULL(licenses.ImageStored, 0) = 0 OR ISNULL(licenses.FileType, '') = '')
+        AND ISNULL(licenses.FileType, '') = ''
         AND NOT EXISTS
         (
             SELECT 1
@@ -60,7 +60,7 @@ BEGIN TRY
         '',
         -- V1 stored policy files in folders derived from the record id: licenses/<ID rounded down to 10000>/<ID>.<pdf|jpg>.
         CASE
-            WHEN licenses.ImageStored = 1 AND ISNULL(licenses.FileType, '') <> ''
+            WHEN ISNULL(licenses.FileType, '') <> ''
             THEN CONCAT('licenses/', CAST(FLOOR(licenses.ID / 10000) * 10000 AS VARCHAR(20)), '/', CAST(licenses.ID AS VARCHAR(20)),
                         CASE WHEN licenses.FileType = '.pdf' THEN '.pdf' ELSE '.jpg' END)
         END,

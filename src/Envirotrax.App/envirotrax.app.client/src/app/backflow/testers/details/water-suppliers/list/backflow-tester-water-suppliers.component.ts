@@ -61,7 +61,7 @@ export class BackflowTesterWaterSuppliersComponent implements OnInit {
                 type: ColumnType.text
             },
             {
-                field: 'isBanned',
+                field: 'isBackflowTestingSuspended',
                 caption: 'Suspended',
                 cellComponent: CheckboxCellComponent,
                 type: ColumnType.text

@@ -5,18 +5,18 @@
         <vp-filter-panel (filterChange)="onFilterChange($event)">
 
             <!-- Main Search Criteria -->
-            <vp-section header="Search criteria">
+            <vp-section header="Search Criteria">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-2">
                             <vp-filter-panel-field fieldName="site.accountNumber"
-                                                   label="Account number"
+                                                   label="Account Number"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-2">
                             <vp-filter-panel-field fieldName="facilityType"
-                                                   label="Facility type"
+                                                   label="Facility Type"
                                                    labelStyle="horizontal"
                                                    type="multi-select"
                                                    [options]="facilityTypeOptions"
@@ -24,7 +24,7 @@
                         </div>
                         <div class="mb-2">
                             <vp-filter-panel-field fieldName="interceptorType"
-                                                   label="Interceptor type"
+                                                   label="Interceptor Type"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [options]="interceptorTypeOptions"
@@ -32,7 +32,7 @@
                         </div>
                         <div class="mb-2">
                             <vp-filter-panel-field fieldName="totalCapacityPercent"
-                                                   label="Total capacity %"
+                                                   label="Total Capacity %"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [options]="totalCapacityPercentOptions"
@@ -40,7 +40,7 @@
                         </div>
                         <div class="mb-2">
                             <vp-filter-panel-field fieldName="inspectionResult"
-                                                   label="Inspection result"
+                                                   label="Inspection Result"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [options]="inspectionResultOptions"
@@ -49,7 +49,7 @@
                         </div>
                         <div class="mb-2">
                             <vp-filter-panel-field fieldName="paymentStatus"
-                                                   label="Payment status"
+                                                   label="Payment Status"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [options]="paymentStatusOptions"
@@ -60,26 +60,26 @@
                     <div class="col-md-6">
                         <div class="mb-2">
                             <vp-filter-panel-field fieldName="inspectorCompanyName"
-                                                   label="Inspector company name"
+                                                   label="Inspector Company Name"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-2">
                             <vp-filter-panel-field fieldName="inspectorContactName"
-                                                   label="Inspector contact name"
+                                                   label="Inspector Contact Name"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-2">
                             <vp-filter-panel-field fieldName="createdTime"
-                                                   label="Record creation date"
+                                                   label="Record Creation Date"
                                                    labelStyle="horizontal"
                                                    type="daterange"
                                                    [form]="searchForm" />
                         </div>
                         <div class="mb-2">
                             <vp-filter-panel-field fieldName="inspectionDate"
-                                                   label="Inspection date"
+                                                   label="Inspection Date"
                                                    labelStyle="horizontal"
                                                    type="daterange"
                                                    [form]="searchForm" />
@@ -91,11 +91,11 @@
             <!-- Location / Property + Contact / Mailing side by side -->
             <div class="row mt-3">
                 <div class="col-md-6">
-                    <vp-section header="Location / property criteria">
+                    <vp-section header="Location / Property Criteria">
                         <div>
                             <div class="mb-2">
                                 <vp-filter-panel-field fieldName="propertyType"
-                                                       label="Property type"
+                                                       label="Property Type"
                                                        labelStyle="horizontal"
                                                        type="select"
                                                        [options]="propertyTypeOptions"
@@ -103,7 +103,7 @@
                             </div>
                             <div class="mb-2">
                                 <vp-filter-panel-field fieldName="propertyBusinessName"
-                                                       label="Business name"
+                                                       label="Business Name"
                                                        labelStyle="horizontal"
                                                        [form]="searchForm" />
                             </div>
@@ -123,7 +123,7 @@
 
                                     <div class="mb-2">
                                         <vp-filter-panel-field fieldName="propertyStreetName"
-                                                               label="Street name"
+                                                               label="Street Name"
                                                                [form]="searchForm" />
                                     </div>
 
@@ -146,17 +146,17 @@
                 </div>
 
                 <div class="col-md-6 mt-3 mt-md-0">
-                    <vp-section header="Contact / mailing criteria">
+                    <vp-section header="Contact / Mailing Criteria">
                         <div>
                             <div class="mb-2">
                                 <vp-filter-panel-field fieldName="mailingCompanyName"
-                                                       label="Company name"
+                                                       label="Company Name"
                                                        labelStyle="horizontal"
                                                        [form]="searchForm" />
                             </div>
                             <div class="mb-2">
                                 <vp-filter-panel-field fieldName="mailingContactName"
-                                                       label="Contact name"
+                                                       label="Contact Name"
                                                        labelStyle="horizontal"
                                                        [form]="searchForm" />
                             </div>
@@ -176,7 +176,7 @@
 
                                     <div class="mb-2">
                                         <vp-filter-panel-field fieldName="mailingStreetName"
-                                                               label="Street name"
+                                                               label="Street Name"
                                                                [form]="searchForm" />
                                     </div>
 
@@ -276,7 +276,7 @@
         </button>
     </div>
 
-    <vp-section header="FOG inspection search results">
+    <vp-section header="FOG Inspection Search Results">
         <div class="container mb-3">
             <div class="row gap-2 justify-content-center mb-3">
                 <div class="col-auto mb-2">

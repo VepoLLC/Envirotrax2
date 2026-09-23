@@ -42,7 +42,7 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account.Manage
         {
             [Required]
             [DataType(DataType.Text)]
-            [Display(Name = "Verification code")]
+            [Display(Name = "Verification Code")]
             public string Code { get; set; }
         }
 

@@ -29,7 +29,7 @@ public class AcceptInvitationModel : PageModel
 
     [BindProperty]
     [DataType(DataType.Password)]
-    [Display(Name = "Confirm password")]
+    [Display(Name = "Confirm Password")]
     [Compare(nameof(Password), ErrorMessage = "The password and confirmation password do not match.")]
     public string ConfirmPassword { get; set; } = null!;
 

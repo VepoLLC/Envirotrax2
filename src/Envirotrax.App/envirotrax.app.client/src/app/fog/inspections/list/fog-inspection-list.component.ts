@@ -158,35 +158,35 @@ export class FogInspectionListComponent implements OnInit, OnDestroy {
             },
             {
                 field: 'inspectionDate',
-                caption: 'Inspection date',
+                caption: 'Inspection Date',
                 type: ColumnType.date
             },
             {
                 field: 'propertyBusinessName',
-                caption: 'Generator information',
+                caption: 'Generator Information',
                 type: ColumnType.text,
                 cellTemplate: this.generatorCell
             },
             {
                 field: 'interceptorType',
-                caption: 'Interceptor information',
+                caption: 'Interceptor Information',
                 type: ColumnType.text,
                 cellTemplate: this.interceptorCell
             },
             {
                 field: 'inspectorCompanyName',
-                caption: 'Inspector information',
+                caption: 'Inspector Information',
                 type: ColumnType.text,
                 cellTemplate: this.inspectorCell
             },
             {
                 field: 'totalCapacityPercent',
-                caption: 'Total capacity %',
+                caption: 'Total Capacity %',
                 type: ColumnType.text
             },
             {
                 field: 'inspectionResult',
-                caption: 'Inspection result',
+                caption: 'Inspection Result',
                 type: ColumnType.text,
                 cellTemplate: this.resultCell
             }

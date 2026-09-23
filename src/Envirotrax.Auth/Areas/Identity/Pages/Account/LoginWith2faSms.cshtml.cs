@@ -37,10 +37,10 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
         {
             [Required]
             [DataType(DataType.Text)]
-            [Display(Name = "Verification code")]
+            [Display(Name = "Verification Code")]
             public string TwoFactorCode { get; set; }
 
-            [Display(Name = "Remember this machine")]
+            [Display(Name = "Remember This Machine")]
             public bool RememberMachine { get; set; }
         }
 

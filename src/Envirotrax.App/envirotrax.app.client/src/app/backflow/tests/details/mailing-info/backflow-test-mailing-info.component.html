@@ -2,12 +2,12 @@
     <form #mailingForm="ngForm" dp-spinner-parent>
         <dp-loading-spinner *ngIf="saving"></dp-loading-spinner>
         <div class="mb-3">
-            <vp-input name="mailingCompanyName" label="Company name" [maxLength]="100"
+            <vp-input name="mailingCompanyName" label="Company Name" [maxLength]="100"
                       [form]="mailingForm" [disabled]="!canModify"
                       [(ngModel)]="test.mailingCompanyName" />
         </div>
         <div class="mb-3">
-            <vp-input name="mailingContactName" label="Contact name" [maxLength]="100"
+            <vp-input name="mailingContactName" label="Contact Name" [maxLength]="100"
                       [form]="mailingForm" [disabled]="!canModify"
                       [(ngModel)]="test.mailingContactName" />
         </div>
@@ -24,7 +24,7 @@
                           [(ngModel)]="test.mailingStreetNumber" />
             </div>
             <div class="col-md-5 mb-3">
-                <vp-input name="mailingStreetName" label="Street name"
+                <vp-input name="mailingStreetName" label="Street Name"
                           [form]="mailingForm" [disabled]="!canModify"
                           [(ngModel)]="test.mailingStreetName" />
             </div>
@@ -51,12 +51,12 @@
             </div>
         </div>
         <div class="mb-3">
-            <vp-input name="mailingPhoneNumber" label="Phone number"
+            <vp-input name="mailingPhoneNumber" label="Phone Number"
                       [form]="mailingForm" [disabled]="!canModify"
                       [(ngModel)]="test.mailingPhoneNumber" />
         </div>
         <div class="mb-3">
-            <vp-input name="mailingEmailAddress" label="Email address" type="email"
+            <vp-input name="mailingEmailAddress" label="Email Address" type="email"
                       [form]="mailingForm" [disabled]="!canModify"
                       [(ngModel)]="test.mailingEmailAddress" />
         </div>

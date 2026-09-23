@@ -9,7 +9,7 @@
     <form #form="ngForm" (ngSubmit)="save(form)">
         <div class="mb-3">
             <vp-input name="permitNumber"
-                      label="Permit number"
+                      label="Permit Number"
                       [(ngModel)]="permit.permitNumber"
                       [required]="true"
                       [maxLength]="50"
@@ -19,7 +19,7 @@
         <div class="mb-3">
             <vp-input type="date"
                       name="inspectionDueDate"
-                      label="Inspection due date"
+                      label="Inspection Due Date"
                       [(ngModel)]="permit.inspectionDueDate"
                       [form]="form" />
         </div>

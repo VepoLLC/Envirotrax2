@@ -179,29 +179,29 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
             },
             {
                 field: 'inspectionDate',
-                caption: 'Inspection date',
+                caption: 'Inspection Date',
                 type: ColumnType.date
             },
             {
                 field: 'site.accountNumber',
-                caption: 'Account number',
+                caption: 'Account Number',
                 type: ColumnType.text
             },
             {
                 field: 'propertyBusinessName',
-                caption: 'Generator information',
+                caption: 'Generator Information',
                 type: ColumnType.text,
                 cellTemplate: this.generatorCell
             },
             {
                 field: 'interceptorType',
-                caption: 'Interceptor information',
+                caption: 'Interceptor Information',
                 type: ColumnType.text,
                 cellTemplate: this.interceptorCell
             },
             {
                 field: 'inspectionResult',
-                caption: 'Inspection result',
+                caption: 'Inspection Result',
                 type: ColumnType.text,
                 cellTemplate: this.resultCell
             }

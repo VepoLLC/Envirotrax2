@@ -39,13 +39,13 @@
                                     <input class="form-check-input" type="checkbox"
                                            [(ngModel)]="settings.privacyRequired"
                                            name="privacyRequired" id="privacyRequired">
-                                    <label class="form-check-label" for="privacyRequired">Privacy required</label>
+                                    <label class="form-check-label" for="privacyRequired">Privacy Required</label>
                                 </div>
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox"
                                            [(ngModel)]="settings.newSitesLocked"
                                            name="newSitesLocked" id="newSitesLocked">
-                                    <label class="form-check-label" for="newSitesLocked">New sites locked</label>
+                                    <label class="form-check-label" for="newSitesLocked">New Sites Locked</label>
                                 </div>
                             </div>
                             <div class="col-6">
@@ -53,7 +53,7 @@
                                     <input class="form-check-input" type="checkbox"
                                            [(ngModel)]="settings.administrativeOnly"
                                            name="administrativeOnly" id="administrativeOnly">
-                                    <label class="form-check-label" for="administrativeOnly">Administrative only</label>
+                                    <label class="form-check-label" for="administrativeOnly">Administrative Only</label>
                                 </div>
                             </div>
                         </div>
@@ -71,21 +71,21 @@
                                    [(ngModel)]="settings.backflowTesting"
                                    (ngModelChange)="showProgramUpdateWarning = true"
                                    name="backflowTesting" id="backflowTesting">
-                            <label class="form-check-label" for="backflowTesting">Backflow testing</label>
+                            <label class="form-check-label" for="backflowTesting">Backflow Testing</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox"
                                    [(ngModel)]="settings.csiInspections"
                                    (ngModelChange)="showProgramUpdateWarning = true"
                                    name="csiInspections" id="csiInspections">
-                            <label class="form-check-label" for="csiInspections">CSI inspections</label>
+                            <label class="form-check-label" for="csiInspections">CSI Inspections</label>
                         </div>
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox"
                                    [(ngModel)]="settings.fogProgram"
                                    (ngModelChange)="showProgramUpdateWarning = true"
                                    name="fogProgram" id="fogProgram">
-                            <label class="form-check-label" for="fogProgram">FOG program</label>
+                            <label class="form-check-label" for="fogProgram">FOG Program</label>
                         </div>
 
                         <div *ngIf="showProgramUpdateWarning"
@@ -107,8 +107,8 @@
                                 <input class="form-check-input" type="checkbox"
                                        [(ngModel)]="settings.bpatsRequireInsurance"
                                        name="bpatsRequireInsurance" id="bpatsRequireInsurance">
-                                <label class="form-check-label" for="bpatsRequireInsurance">BPATs require
-                                    insurance</label>
+                                <label class="form-check-label" for="bpatsRequireInsurance">BPATs Require
+                                    Insurance</label>
                             </div>
                             <div class="input-group input-group-sm" style="width: 140px;">
                                 <span class="input-group-text">$</span>
@@ -122,8 +122,8 @@
                             <input class="form-check-input" type="checkbox"
                                    [(ngModel)]="settings.bpatsRequireIrrigationLicense"
                                    name="bpatsRequireIrrigationLicense" id="bpatsRequireIrrigationLicense">
-                            <label class="form-check-label" for="bpatsRequireIrrigationLicense">BPATs require irrigation
-                                license</label>
+                            <label class="form-check-label" for="bpatsRequireIrrigationLicense">BPATs Require Irrigation
+                                License</label>
                         </div>
 
                         <div class="d-flex align-items-center mb-1">
@@ -131,8 +131,8 @@
                                 <input class="form-check-input" type="checkbox"
                                        [(ngModel)]="settings.csiInspectorsRequireInsurance"
                                        name="csiInspectorsRequireInsurance" id="csiInspectorsRequireInsurance">
-                                <label class="form-check-label" for="csiInspectorsRequireInsurance">CSI inspectors
-                                    require insurance</label>
+                                <label class="form-check-label" for="csiInspectorsRequireInsurance">CSI Inspectors
+                                    Require Insurance</label>
                             </div>
                             <div class="input-group input-group-sm" style="width: 140px;">
                                 <span class="input-group-text">$</span>
@@ -147,8 +147,8 @@
                                 <input class="form-check-input" type="checkbox"
                                        [(ngModel)]="settings.fogTransportersRequireInsurance"
                                        name="fogTransportersRequireInsurance" id="fogTransportersRequireInsurance">
-                                <label class="form-check-label" for="fogTransportersRequireInsurance">FOG transporters
-                                    require insurance</label>
+                                <label class="form-check-label" for="fogTransportersRequireInsurance">FOG Transporters
+                                    Require Insurance</label>
                             </div>
                             <div class="input-group input-group-sm" style="width: 140px;">
                                 <span class="input-group-text">$</span>
@@ -162,16 +162,16 @@
                             <input class="form-check-input" type="checkbox"
                                    [(ngModel)]="settings.fogVehiclesRequirePermit"
                                    name="fogVehiclesRequirePermit" id="fogVehiclesRequirePermit">
-                            <label class="form-check-label" for="fogVehiclesRequirePermit">FOG vehicles require
-                                permit</label>
+                            <label class="form-check-label" for="fogVehiclesRequirePermit">FOG Vehicles Require
+                                Permit</label>
                         </div>
 
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox"
                                    [(ngModel)]="settings.fogVehiclesRequireInspection"
                                    name="fogVehiclesRequireInspection" id="fogVehiclesRequireInspection">
-                            <label class="form-check-label" for="fogVehiclesRequireInspection">FOG vehicles require
-                                inspection</label>
+                            <label class="form-check-label" for="fogVehiclesRequireInspection">FOG Vehicles Require
+                                Inspection</label>
                         </div>
 
                         <!-- Lock Registration Options -->
@@ -179,27 +179,27 @@
                             <input class="form-check-input" type="checkbox"
                                    [(ngModel)]="settings.lockBpatRegistrations"
                                    name="lockBpatRegistrations" id="lockBpatRegistrations">
-                            <label class="form-check-label" for="lockBpatRegistrations">Lock BPAT registrations</label>
+                            <label class="form-check-label" for="lockBpatRegistrations">Lock BPAT Registrations</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox"
                                    [(ngModel)]="settings.lockCsiRegistrations"
                                    name="lockCsiRegistrations" id="lockCsiRegistrations">
-                            <label class="form-check-label" for="lockCsiRegistrations">Lock CSI registrations</label>
+                            <label class="form-check-label" for="lockCsiRegistrations">Lock CSI Registrations</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox"
                                    [(ngModel)]="settings.lockFogInspectorRegistrations"
                                    name="lockFogInspectorRegistrations" id="lockFogInspectorRegistrations">
-                            <label class="form-check-label" for="lockFogInspectorRegistrations">Lock FOG inspector
-                                registrations</label>
+                            <label class="form-check-label" for="lockFogInspectorRegistrations">Lock FOG Inspector
+                                Registrations</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox"
                                    [(ngModel)]="settings.lockFogTransporterRegistrations"
                                    name="lockFogTransporterRegistrations" id="lockFogTransporterRegistrations">
-                            <label class="form-check-label" for="lockFogTransporterRegistrations">Lock FOG transporter
-                                registrations</label>
+                            <label class="form-check-label" for="lockFogTransporterRegistrations">Lock FOG Transporter
+                                Registrations</label>
                         </div>
                     </vp-section>
                 </div>

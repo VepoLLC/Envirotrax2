@@ -4,7 +4,7 @@
     <form #form="ngForm" (ngSubmit)="save(form)">
         <div class="mb-3">
             <vp-input type="textarea"
-                      label="Disapproval reason"
+                      label="Disapproval Reason"
                       name="disapprovedReason"
                       [(ngModel)]="disapprovedReason"
                       [required]="false"
@@ -16,7 +16,7 @@
             <input class="form-check-input" type="checkbox"
                 [(ngModel)]="sendEmailNotification"
                 name="emailCheckbox" id="emailCheckbox">
-            <label class="form-check-label" for="emailCheckbox">Email notice of disapproval to the CSI</label>
+            <label class="form-check-label" for="emailCheckbox">Email Notice of Disapproval to the CSI</label>
         </div>
 
         <vp-validation-summary [form]="form" [validationErrors]="validationErrors" />

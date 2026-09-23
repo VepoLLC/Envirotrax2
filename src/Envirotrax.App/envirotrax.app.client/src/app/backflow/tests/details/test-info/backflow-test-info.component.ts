@@ -68,7 +68,7 @@ export class BackflowTestInfoComponent implements OnChanges {
         {
             index: 3, group: 'main', header: 'Relief Valve',
             initialVerb: 'Opened at', initialValue: 'initRVOpenedPSID',
-            initialChecks: [{ label: 'Did not open', field: 'initRVDidNotOpen' }],
+            initialChecks: [{ label: 'Did Not Open', field: 'initRVDidNotOpen' }],
             repairField: 'repairRV', repairDetailsField: 'repairRVDetails',
             finalVerb: 'Opened at', finalValue: 'finalRVOpenedPSID',
             finalChecks: []
@@ -92,7 +92,7 @@ export class BackflowTestInfoComponent implements OnChanges {
         {
             index: 6, group: 'bypass', header: 'Relief Valve',
             initialVerb: 'Opened at', initialValue: 'initRVOpenedPSID2',
-            initialChecks: [{ label: 'Did not open', field: 'initRVDidNotOpen2' }],
+            initialChecks: [{ label: 'Did Not Open', field: 'initRVDidNotOpen2' }],
             repairField: 'repairRV2', repairDetailsField: 'repairRVDetails2',
             finalVerb: 'Opened at', finalValue: 'finalRVOpenedPSID2',
             finalChecks: []
@@ -108,9 +108,9 @@ export class BackflowTestInfoComponent implements OnChanges {
         {
             index: 8, group: 'main', header: 'Air Inlet',
             initialVerb: 'Opened at', initialValue: 'initPvbAirInletOpenedPSID',
-            initialChecks: [{ label: 'Did not open', field: 'initPvbAirInletDidNotOpen' }, { label: 'Did it fully open', field: 'initPvbAirInletFullyOpened' }],
+            initialChecks: [{ label: 'Did Not Open', field: 'initPvbAirInletDidNotOpen' }, { label: 'Did It Fully Open', field: 'initPvbAirInletFullyOpened' }],
             finalVerb: 'Opened at', finalValue: 'finalPvbAirInletOpenedPSID',
-            finalChecks: [{ label: 'Did it fully open', field: 'finalPvbAirInletFullyOpened' }]
+            finalChecks: [{ label: 'Did It Fully Open', field: 'finalPvbAirInletFullyOpened' }]
         },
         {
             index: 9, group: 'main', header: 'Check Valve',

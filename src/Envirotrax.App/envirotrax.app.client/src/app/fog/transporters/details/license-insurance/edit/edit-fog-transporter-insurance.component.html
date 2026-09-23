@@ -4,7 +4,7 @@
     <form #form="ngForm" (ngSubmit)="save(form)">
         <div class="mb-3">
             <vp-input name="insuranceNumber"
-                      label="Policy number"
+                      label="Policy Number"
                       [(ngModel)]="insurance.insuranceNumber"
                       [required]="true"
                       [maxLength]="50"
@@ -22,7 +22,7 @@
 
         <div class="mb-3">
             <vp-input name="expirationDate"
-                      label="Expiration date"
+                      label="Expiration Date"
                       type="date"
                       [(ngModel)]="insurance.expirationDate"
                       [form]="form" />

@@ -327,7 +327,7 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
             },
             {
                 field: '',
-                caption: 'status',
+                caption: 'Status',
                 type: ColumnType.other,
                 queryColumnExcluded: true,
                 cellTemplate: this.statusTemplate

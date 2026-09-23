@@ -1,14 +1,6 @@
-import { State } from "../lookup/state";
+import { CreditCardPayment } from "../payments/credit-card-payment";
 
-export interface ProfessionalAccountBalance {
+export interface ProfessionalAccountBalance extends CreditCardPayment {
     transactionId: string;
     amountToAdd: number;
-    dataDescriptor: string;
-    dataValue: string;
-    billingFirstName: string;
-    billingLastName: string;
-    billingAddress: string;
-    billingCity: string;
-    billingState: State;
-    billingZipCode: string;
 }

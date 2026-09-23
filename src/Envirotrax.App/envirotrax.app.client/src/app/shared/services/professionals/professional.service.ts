@@ -44,6 +44,11 @@ export class ProfesisonalService {
         return lastValueFrom(this._currentProfessional$);
     }
 
+    public reloadLoggedInProfessional(): Promise<Professional> {
+        this._currentProfessional$ = undefined;
+        return this.getLoggedInProfessional();
+    }
+
     public async addMyData(createProfessional: CreateProfessional): Promise<Professional> {
         const url = this._urlResolver.resolveUrl('/api/professionals/my');
 

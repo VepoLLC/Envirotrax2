@@ -24,6 +24,7 @@ public class BackflowCheckoutService : IBackflowCheckoutService
     private readonly IProfessionalTransactionRepository _transactionRepository;
     private readonly IProfessionalPaymentService _paymentService;
     private readonly IBackflowTestNotificationService _notificationService;
+    private readonly IBackflowCheckoutEmailService _checkoutEmailService;
 
     public BackflowCheckoutService(
         IMapper mapper,
@@ -32,7 +33,8 @@ public class BackflowCheckoutService : IBackflowCheckoutService
         IProfessionalRepository professionalRepository,
         IProfessionalTransactionRepository transactionRepository,
         IProfessionalPaymentService paymentService,
-        IBackflowTestNotificationService notificationService)
+        IBackflowTestNotificationService notificationService,
+        IBackflowCheckoutEmailService checkoutEmailService)
     {
         _mapper = mapper;
         _authService = authService;
@@ -41,6 +43,7 @@ public class BackflowCheckoutService : IBackflowCheckoutService
         _transactionRepository = transactionRepository;
         _paymentService = paymentService;
         _notificationService = notificationService;
+        _checkoutEmailService = checkoutEmailService;
     }
 
     public async Task<BackflowCheckoutReceiptDto> CheckoutAsync(BackflowCheckoutRequestDto request, CancellationToken cancellationToken)
@@ -53,13 +56,19 @@ public class BackflowCheckoutService : IBackflowCheckoutService
         }
 
         var (transaction, isNewPayment) = await PayUnderBalanceLockAsync(request, testIds, cancellationToken);
+        var receipt = await BuildReceiptAsync(transaction, CancellationToken.None);
 
         if (isNewPayment)
         {
             await _notificationService.StartCheckingNotificationsAsync(testIds, CancellationToken.None);
+
+            var emailPdfTestIds = request.Tests.Where(test => test.EmailPdf).Select(test => test.Id).ToHashSet();
+            var testsToEmail = receipt.Tests.Where(test => emailPdfTestIds.Contains(test.Id));
+
+            receipt.EmailResults = await _checkoutEmailService.SendTestReportsAsync(testsToEmail, transaction.TransactionId);
         }
 
-        return await BuildReceiptAsync(transaction, CancellationToken.None);
+        return receipt;
     }
 
     private async Task<(ProfessionalTransaction Transaction, bool IsNewPayment)> PayUnderBalanceLockAsync(

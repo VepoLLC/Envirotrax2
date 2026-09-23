@@ -42,6 +42,8 @@ export class CreditCardPaymentComponent implements OnInit {
     public apiLoginId: string = '';
     public publicClientKey: string = '';
 
+    private _isAwaitingResponse: boolean = false;
+
     constructor(
         private readonly _authorizeNetService: AuthorizeNetService,
         private readonly _ngZone: NgZone,
@@ -75,9 +77,16 @@ export class CreditCardPaymentComponent implements OnInit {
         // Clear the previous attempt's result so a repeat click doesn't keep showing a stale
         // success/error message from an earlier, already-used token.
         this.reset();
+        this._isAwaitingResponse = true;
     }
 
     private handleResponse(response: AcceptUiResponse): void {
+        // Every AcceptUI.js load registers its own response listener, so a single card entry can arrive more than once.
+        if (!this._isAwaitingResponse) {
+            return;
+        }
+
+        this._isAwaitingResponse = false;
         this.errors = [];
 
         if (response.messages.resultCode === 'Error') {

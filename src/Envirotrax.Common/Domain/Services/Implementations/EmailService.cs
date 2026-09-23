@@ -86,6 +86,11 @@ public class EmailService : IEmailService
                 content: new EmailContent(email.Subject ?? string.Empty) { Html = body },
                 recipients: new EmailRecipients(GetToAddresses(email.Recipients).Select(address => new EmailAddress(address))));
 
+            foreach (var attachment in email.Attachments)
+            {
+                message.Attachments.Add(new EmailAttachment(attachment.Name, attachment.ContentType, BinaryData.FromBytes(attachment.Content)));
+            }
+
             // Started, not Completed: Completed keeps polling Azure until the message reaches a terminal
             // delivery status, which takes tens of seconds per email and blocks the caller for all of it.
             // Accept-time failures (bad address, authentication, throttling) still surface here — the only

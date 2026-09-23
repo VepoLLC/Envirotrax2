@@ -17,4 +17,6 @@ public class BackflowCheckoutReceiptDto
     public string? CCNumber { get; set; }
 
     public List<BackflowTestDto> Tests { get; set; } = [];
+
+    public List<BackflowCheckoutEmailResultDto> EmailResults { get; set; } = [];
 }

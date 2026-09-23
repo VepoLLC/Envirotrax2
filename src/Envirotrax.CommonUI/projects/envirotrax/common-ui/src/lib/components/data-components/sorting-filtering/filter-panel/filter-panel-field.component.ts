@@ -7,6 +7,13 @@ import { DateRange, InputOption } from "../../../input/input.component";
     selector: 'vp-filter-panel-field',
     templateUrl: './filter-panel-field.component.html',
     standalone: false,
+    styles: `
+        @media (min-width: 1200px) {
+            :host-context(vp-field-grid) {
+                display: contents;
+            }
+        }
+    `,
     viewProviders: [
         {
             provide: ControlContainer,

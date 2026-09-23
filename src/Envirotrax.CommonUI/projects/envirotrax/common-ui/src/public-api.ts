@@ -22,6 +22,7 @@ export * from './lib/components/data-components/sorting-filtering/filter-panel/f
 export * from './lib/components/data-components/sorting-filtering/filter-panel/filter-panel-field.component';
 export * from './lib/components/dropdown/dropdown.component';
 export * from './lib/components/dropdown/dropdown-option.component';
+export * from './lib/components/field-grid/field-grid.component';
 export * from './lib/components/input/input.component';
 export * from './lib/components/input/input-option.component';
 export * from './lib/components/input/input-add-on.component';

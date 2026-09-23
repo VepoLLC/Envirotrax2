@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Source/Vepo/Envirotrax2/**)",
+      "Read(//c/Source/Vepo/Envirotrax2/src/Envirotrax.CommonUI/projects/envirotrax/common-ui/src/**)"
+    ],
+    "additionalDirectories": [
+      "c:\\Source\\Vepo\\Envirotrax2\\src\\Envirotrax.CommonUI\\projects\\envirotrax\\common-ui\\src\\lib\\components\\input",
+      "c:\\Source\\Vepo\\Envirotrax2\\src\\Envirotrax.CommonUI\\projects\\envirotrax\\common-ui\\src\\lib\\components\\data-components\\sorting-filtering\\filter-panel"
+    ]
+  }
+}

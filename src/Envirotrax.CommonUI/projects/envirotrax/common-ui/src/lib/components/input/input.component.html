@@ -1,16 +1,15 @@
 <div class="vp-input-container flex-column"
      [class.d-flex]="flexFill"
      [class.flex-fill]="flexFill">
-    <div [class.row]="labelStyle == 'horizontal'">
-        <div [class.col-xl-5]="labelStyle == 'horizontal'"
-             [class.text-xl-end]="labelStyle == 'horizontal'">
+    <div [class.vp-input-row]="labelStyle == 'horizontal'">
+        <div [class.vp-input-label-col]="labelStyle == 'horizontal'">
             <label *ngIf="label" [attr.for]="id" class="col-form-label">
                 {{label}}
                 <span *ngIf="required" class="text-danger">*</span>
             </label>
         </div>
 
-        <div [class.col-xl]="labelStyle == 'horizontal'"
+        <div [class.vp-input-control-col]="labelStyle == 'horizontal'"
              [class.input-group]="isInputGroup">
             <input *ngIf="type != 'textarea' && type != 'select' && type != 'multi-select' && type != 'date' && type != 'datetime' && type != 'daterange'"
                    [attr.id]="id"
@@ -101,7 +100,8 @@
         </div>
     </div>
 
-    <div [class.d-xl-flex]="labelStyle == 'horizontal'" class="justify-content-end">
+    <div [class.vp-input-validation-row]="labelStyle == 'horizontal'"
+         class="justify-content-end">
         <vp-validation-field *ngIf="form" [form]="form" [fieldName]="name" [fieldLabel]="label" />
     </div>
 </div>

@@ -9,6 +9,13 @@ import { FilterPanelComponent, FilterPanelFieldComponent, InputOption, ModalHelp
     selector: 'app-gis-area-lookup',
     standalone: false,
     templateUrl: './gis-area-lookup.component.html',
+    styles: `
+        @media (min-width: 1200px) {
+            :host-context(vp-field-grid) {
+                display: contents;
+            }
+        }
+    `,
     providers: [
         { provide: FilterPanelFieldComponent, useExisting: forwardRef(() => GisAreaLookupComponent) }
     ],

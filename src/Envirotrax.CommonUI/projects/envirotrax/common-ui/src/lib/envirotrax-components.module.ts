@@ -16,6 +16,7 @@ import { CheckboxCellComponent } from "./components/data-components/table/table-
 import { CurrencyCellComponent } from "./components/data-components/table/table-cells/currency-cell.component";
 import { DropdownComponent } from "./components/dropdown/dropdown.component";
 import { DropdownOptionComponent } from "./components/dropdown/dropdown-option.component";
+import { FieldGridComponent } from "./components/field-grid/field-grid.component";
 import { InputComponent } from "./components/input/input.component";
 import { InputOptionComponent } from "./components/input/input-option.component";
 import { ConfirmModalComponent } from "./components/modals/confirm-modal.component";
@@ -49,6 +50,7 @@ import { RecordLogListComponent } from "./components/record-log/record-log-list.
         CurrencyCellComponent,
         DropdownComponent,
         DropdownOptionComponent,
+        FieldGridComponent,
         InputComponent,
         InputOptionComponent,
         InputAddOnComponent,
@@ -84,6 +86,7 @@ import { RecordLogListComponent } from "./components/record-log/record-log-list.
         CurrencyCellComponent,
         DropdownComponent,
         DropdownOptionComponent,
+        FieldGridComponent,
         InputComponent,
         InputOptionComponent,
         InputAddOnComponent,

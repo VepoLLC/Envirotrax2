@@ -5,8 +5,10 @@ using Envirotrax.Auth.Data;
 using Envirotrax.Auth.Data.Configuration;
 using Envirotrax.Auth.Data.Models;
 using Envirotrax.Auth.Domain.Configuration;
+using Envirotrax.Auth.Domain.Security;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -77,6 +79,28 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// A user with an expired password (e.g. a legacy-migrated account) is fully authenticated by
+// the cookie but must not be able to reach anything else - including the OpenIddict /connect/authorize
+// endpoint the client apps use to mint tokens - until they set a new password. Enforced here, on every
+// request, rather than only at the login form, so there is no page or deep link that bypasses it.
+app.Use(async (context, next) =>
+{
+    var endpoint = context.GetEndpoint();
+    var isPageOrControllerEndpoint = endpoint?.Metadata.GetMetadata<ActionDescriptor>() != null;
+    var isExemptFromExpiredPasswordCheck = endpoint?.Metadata.GetMetadata<AllowExpiredPasswordAttribute>() != null;
+
+    if (isPageOrControllerEndpoint
+        && !isExemptFromExpiredPasswordCheck
+        && context.User.HasClaim(AppClaimTypes.PasswordExpired, "true"))
+    {
+        var returnUrl = context.Request.Path + context.Request.QueryString;
+        context.Response.Redirect($"/Identity/Account/ChangeExpiredPassword?ReturnUrl={Uri.EscapeDataString(returnUrl)}");
+        return;
+    }
+
+    await next();
+});
 
 app.MapStaticAssets();
 app.MapRazorPages()

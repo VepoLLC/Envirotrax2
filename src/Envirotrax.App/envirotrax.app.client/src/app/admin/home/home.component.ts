@@ -58,28 +58,28 @@ export class HomeComponent implements OnInit {
                 title: 'CSI Settings',
                 iconCss: 'fa-solid fa-magnifying-glass-chart',
                 routerLink: ['settings', 'csi-settings'],
-                hasPermission: true,
+                hasPermission: canViewSettings,
                 description: 'Configure CSI inspection program settings, automated letter notification schedules, and letter header appearance.'
             },
             {
                 title: 'Backflow Testing Settings',
                 iconCss: 'fa-solid fa-magnifying-glass-waveform',
                 routerLink: ['settings', 'backflow-testing-settings'],
-                hasPermission: true,
+                hasPermission: canViewSettings,
                 description: 'Configure backflow testing program settings, automated letter notification schedules, and letter header appearance.'
             },
             {
                 title: 'CSI Letter Message Setup',
                 iconCss: 'fa-solid fa-envelope-open-text',
                 routerLink: ['settings', 'csi-letter-message-settings'],
-                hasPermission: true,
+                hasPermission: canViewSettings,
                 description: 'Configure CSI letter message content including fonts, titles, and messages for each letter type.'
             },
             {
                 title: 'Backflow Letter Message Setup',
                 iconCss: 'fa-solid fa-envelope-open-text',
                 routerLink: ['settings', 'backflow-letter-message-settings'],
-                hasPermission: true,
+                hasPermission: canViewSettings,
                 description: 'Configure backflow letter message content including fonts, titles, and messages for each letter type.'
             },
             {

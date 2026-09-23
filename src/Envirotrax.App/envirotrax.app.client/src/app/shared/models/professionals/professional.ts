@@ -11,9 +11,11 @@ export interface Professional {
     companyEmail?: string;
     phoneNumber?: string;
     faxNumber?: string;
-    websiteUrl?: string;
+    webSiteUrl?: string;
     hidePublicListing?: boolean;
     createdTime?: string;
+
+    accountBalance?: number;
 
     hasWiseGuys?: boolean;
     hasBackflowTesting?: boolean;
@@ -22,6 +24,15 @@ export interface Professional {
     hasFogTransportation?: boolean;
 
     insuranceExpirationType?: ExpirationType;
+
+    licensesAndInsurances?: ProfessionalLicenseOrInsuranceRow[];
+}
+
+export interface ProfessionalLicenseOrInsuranceRow {
+    licenseType?: string;
+    number?: string;
+    expirationDate?: string;
+    expirationType?: ExpirationType;
 }
 
 export interface CreateProfessional {

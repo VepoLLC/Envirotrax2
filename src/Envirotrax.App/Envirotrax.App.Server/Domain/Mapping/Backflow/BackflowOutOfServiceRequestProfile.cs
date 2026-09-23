@@ -11,6 +11,8 @@ public class BackflowOutOfServiceRequestProfile : Profile
         CreateMap<BackflowOutOfServiceRequest, BackflowOutOfServiceRequestDto>()
             .ForMember(dto => dto.WaterSupplier, opt => opt.Ignore())
             .ForMember(dto => dto.Professional, opt => opt.Ignore())
+            .ForMember(dto => dto.Test, opt => opt.MapFrom(m => m.Test))
+            .ForMember(dto => dto.ReplacementAssemblyTest, opt => opt.MapFrom(m => m.ReplacementAssemblyTest))
             .AfterMap((model, dto) =>
             {
                 dto.WaterSupplier ??= new()

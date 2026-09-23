@@ -43,6 +43,12 @@ public static class FeatureSeedData
             Id = FeatureType.ManageProfessionalUsers,
             Name = "Manage Professional Users",
             Description = "Allows adding, editing, and deleting sub-accounts of registered professionals."
+        },
+        new()
+        {
+            Id = FeatureType.BackflowTestForceRenewal,
+            Name = "Backflow Test Force Renewal",
+            Description = "Allows forcing renewal of backflow tests."
         }
     ];
 }

@@ -26,6 +26,15 @@ public class SiteLogController : WaterSupplierProtectedController
         return Ok(result);
     }
 
+    [HttpGet("{id}/attachment")]
+    [HasPermission(PermissionAction.CanView, AllowedPermissions = new[] { PermissionType.Sites, PermissionType.CsiReports, PermissionType.BackflowReports, PermissionType.FogReports })]
+    public async Task<IActionResult> GetAttachmentUrlAsync(int siteId, int id, CancellationToken cancellationToken)
+    {
+        var url = await _service.GetAttachmentUrlAsync(id, cancellationToken);
+
+        return url == null ? NotFound() : Ok(new { url });
+    }
+
     [HttpPost]
     [HasPermission(PermissionAction.CanModify)]
     public async Task<IActionResult> AddAsync(int siteId, [FromForm] SiteLogDto dto, [FromForm] IFormFile? file)

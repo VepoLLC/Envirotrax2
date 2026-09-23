@@ -7,8 +7,11 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { BackflowTest, BackflowExpiryCounts } from "../../models/backflow/backflow-test";
+import { BackflowPaymentStatus } from "../../models/backflow/backflow-test-enums";
+import { BackflowCompliance } from "../../models/backflow/backflow-compliance";
 import { BackflowTestImages } from "../../models/backflow/backflow-test-images";
 import { DownloadEndpoint } from "../../models/download-config";
+import { RecordLog } from "@envirotrax/common-ui";
 
 export type BackflowExpiryRangeKey = 'expired' | 'thismonth' | 'nextmonth' | 'twomonths';
 
@@ -38,12 +41,16 @@ export class BackflowTestService {
     ) {
     }
 
-    public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<BackflowTest>> {
+    public async getAll(pageInfo: PageInfo, query: Query, paymentStatus?: BackflowPaymentStatus | null): Promise<PagedData<BackflowTest>> {
         const url = this._urlResolver.resolveUrl('/api/backflow/tests');
 
-        const observable = this._http.get<PagedData<BackflowTest>>(url, {
-            params: this._queryHelper.buildQuery(pageInfo, query)
-        });
+        let params = this._queryHelper.buildQuery(pageInfo, query);
+
+        if (paymentStatus != null) {
+            params = params.append('paymentStatus', String(paymentStatus));
+        }
+
+        const observable = this._http.get<PagedData<BackflowTest>>(url, { params });
 
         return await lastValueFrom(observable);
     }
@@ -59,6 +66,23 @@ export class BackflowTestService {
         return {
             method: 'GET',
             url: this._urlResolver.resolveUrl('/api/backflow/tests/pdf')
+        };
+    }
+
+    public async getBackflowCompliance(pageInfo: PageInfo, query: Query): Promise<PagedData<BackflowCompliance>> {
+        const url = this._urlResolver.resolveUrl('/api/backflow/compliance');
+
+        const observable = this._http.get<PagedData<BackflowCompliance>>(url, {
+            params: this._queryHelper.buildQuery(pageInfo, query)
+        });
+
+        return await lastValueFrom(observable);
+    }
+
+    public getBackflowComplianceEndpoint(): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/backflow/compliance')
         };
     }
 
@@ -103,9 +127,27 @@ export class BackflowTestService {
         return await lastValueFrom(this._http.post<BackflowTest>(url, formData));
     }
 
+    public async updateForProfessional(id: number, test: BackflowTest, images: BackflowTestImages = {}): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/backflow/tests/${id}`);
+        const formData = buildBackflowTestFormData(test);
+
+        if (images.assemblyImage) { formData.append('assemblyImage', images.assemblyImage); }
+        if (images.serialNumberImage) { formData.append('serialNumberImage', images.serialNumberImage); }
+        if (images.bypassAssemblyImage) { formData.append('bypassAssemblyImage', images.bypassAssemblyImage); }
+        if (images.bypassSerialNumberImage) { formData.append('bypassSerialNumberImage', images.bypassSerialNumberImage); }
+        if (images.airGapImage) { formData.append('airGapImage', images.airGapImage); }
+
+        return await lastValueFrom(this._http.put<BackflowTest>(url, formData));
+    }
+
     public async get(id: number): Promise<BackflowTest> {
         const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}`);
         return await lastValueFrom(this._http.get<BackflowTest>(url));
+    }
+
+    public async getLogs(id: number): Promise<RecordLog[]> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/logs`);
+        return await lastValueFrom(this._http.get<RecordLog[]>(url));
     }
 
     public async getPdf(id: number): Promise<Blob> {
@@ -133,6 +175,51 @@ export class BackflowTestService {
     public async getPdfForProfessional(id: number): Promise<Blob> {
         const url = this._urlResolver.resolveUrl(`/api/professionals/backflow/tests/${id}/pdf`);
         return await lastValueFrom(this._http.get(url, { responseType: 'blob' }));
+    }
+
+    public async deleteForProfessional(id: number): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/backflow/tests/${id}`);
+        return await lastValueFrom(this._http.delete<BackflowTest>(url));
+    }
+
+    public async checkout(testIds: number[]): Promise<void> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/backflow/tests/checkout');
+        await lastValueFrom(this._http.post<void>(url, testIds));
+    }
+
+    public async updateRenewalRequired(id: number, renewalRequired: boolean): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/renewal-required`);
+        return await lastValueFrom(this._http.put<BackflowTest>(url, renewalRequired));
+    }
+
+    public async updateScheduleMonth(id: number, month: number): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/schedule-month`);
+        return await lastValueFrom(this._http.put<BackflowTest>(url, { month }));
+    }
+
+    public async updateIsCurrent(id: number, isCurrent: boolean): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/is-current`);
+        return await lastValueFrom(this._http.put<BackflowTest>(url, isCurrent));
+    }
+
+    public async updateOutOfService(id: number, outOfService: boolean): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/out-of-service`);
+        return await lastValueFrom(this._http.put<BackflowTest>(url, outOfService));
+    }
+
+    public async updateDisapproval(id: number, disapproved: boolean): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/disapproval`);
+        return await lastValueFrom(this._http.put<BackflowTest>(url, disapproved));
+    }
+
+    public async updateRejection(id: number, request: { rejected: boolean; rejectedReason?: string | null }): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/rejection`);
+        return await lastValueFrom(this._http.put<BackflowTest>(url, request));
+    }
+
+    public async updateForceRenewal(id: number, request: { forceRenewal: boolean; forceRenewalYears?: number | null }): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/force-renewal`);
+        return await lastValueFrom(this._http.put<BackflowTest>(url, request));
     }
 }
 
@@ -227,6 +314,7 @@ function buildBackflowTestFormData(test: BackflowTest): FormData {
     // Permit
     append('permitNumber', test.permitNumber);
     append('ossf', test.ossf);
+    append('waterMeterNumber', test.waterMeterNumber);
     append('rainFreezeSensorInstalled', test.rainFreezeSensorInstalled);
     append('rainFreezeSensorWorkingProperly', test.rainFreezeSensorWorkingProperly);
 

@@ -19,6 +19,42 @@ public interface IBackflowTestService : IService<BackflowTest, BackflowTestDto>
 
     Task<BackflowTestExpiryCountsDto> GetExpiryCountsAsync(CancellationToken cancellationToken = default);
 
+    Task<IPagedData<BackflowComplianceDto>> GetComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+
+    Task<IPagedData<BackflowTestDto>> SearchAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken);
+
+    Task<BackflowTestAdminDetailsDto?> GetForAdminAsync(int id, CancellationToken cancellationToken);
+
+    Task<BackflowTestAdminDetailsDto?> UpdateForAdminAsync(int id, BackflowTestAdminUpdateRequest request);
+
     Task<byte[]> GeneratePdfAsync(BackflowTestDto test);
     Task<byte[]> GeneratePdfAsync(IEnumerable<BackflowTestDto> tests);
+    Task<byte[]> GeneratePdfForProfessionalAsync(BackflowTestDto test);
+
+    Task ProcessSiteRenewalAsync(int siteId, CancellationToken cancellationToken);
+    Task ProcessTestRenewalAsync(int testId, CancellationToken cancellationToken);
+    Task<IEnumerable<BackflowTestDto>> GetAllPendingTestsForRenewalAsync(int batchSize, CancellationToken cancellationToken);
+
+    Task<BackflowTestDto?> UpdateRenewalRequiredAsync(int id, bool renewalRequired, CancellationToken cancellationToken = default);
+    Task<BackflowTestDto?> UpdateScheduleMonthAsync(int id, int month, CancellationToken cancellationToken = default);
+    Task<BackflowTestDto?> UpdateIsCurrentAsync(int id, bool isCurrent, CancellationToken cancellationToken = default);
+    Task<BackflowTestDto?> UpdateOutOfServiceAsync(int id, bool outOfService, CancellationToken cancellationToken = default);
+    Task<BackflowTestDto?> UpdateDisapprovalAsync(int id, bool disapproved, CancellationToken cancellationToken = default);
+    Task<BackflowTestDto?> UpdateForceRenewalAsync(int id, BackflowTestForceRenewalRequest request, CancellationToken cancellationToken = default);
+    Task<BackflowTestDto?> UpdateRejectionAsync(int id, BackflowTestRejectionRequest request, CancellationToken cancellationToken = default);
+
+    Task<IPagedData<BackflowReplacementDto>> GetReplacementsAsync(PageInfo pageInfo, Query query, bool onHold, CancellationToken cancellationToken);
+    Task<BackflowReplacementDto?> GetReplacedAssemblyAsync(int id, CancellationToken cancellationToken);
+    Task<BackflowReplacementDto?> UpdateReplacementHoldAsync(int id, bool onHold);
+    Task<BackflowReplacementDto?> UpdateReplacementClearedAsync(int id, bool cleared);
+
+    Task<BackflowTestDto?> UpdateForProfessionalAsync(
+        int id,
+        BackflowTestDto dto,
+        Stream? assemblyStream, string? assemblyFileName,
+        Stream? serialStream, string? serialFileName,
+        Stream? bypassAssemblyStream, string? bypassAssemblyFileName,
+        Stream? bypassSerialStream, string? bypassSerialFileName,
+        Stream? airGapStream, string? airGapFileName,
+        CancellationToken cancellationToken = default);
 }

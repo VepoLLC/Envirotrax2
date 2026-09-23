@@ -1,4 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
@@ -7,6 +7,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Envirotrax.Auth.Data.Models;
+using Envirotrax.Common.Domain.DataTransferObjects;
+using Envirotrax.Common.Domain.Services.Defintions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -17,13 +19,16 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly ISmsService _smsService;
 
         public IndexModel(
             UserManager<AppUser> userManager,
-            SignInManager<AppUser> signInManager)
+            SignInManager<AppUser> signInManager,
+            ISmsService smsService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _smsService = smsService;
         }
 
         /// <summary>
@@ -38,6 +43,8 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account.Manage
         /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
+
+        public bool PhoneNumberConfirmed { get; set; }
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -67,6 +74,7 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account.Manage
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
             Username = userName;
+            PhoneNumberConfirmed = await _userManager.IsPhoneNumberConfirmedAsync(user);
 
             Input = new InputModel
             {
@@ -101,13 +109,32 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account.Manage
             }
 
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            if (Input.PhoneNumber != phoneNumber)
+            var isPhoneNumberConfirmed = await _userManager.IsPhoneNumberConfirmedAsync(user);
+
+            if (!isPhoneNumberConfirmed || Input.PhoneNumber != phoneNumber)
             {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
+                if (string.IsNullOrWhiteSpace(Input.PhoneNumber))
                 {
-                    StatusMessage = "Unexpected error when trying to set phone number.";
-                    return RedirectToPage();
+                    // Removing the phone number doesn't need verification.
+                    var removePhoneResult = await _userManager.SetPhoneNumberAsync(user, null);
+                    if (!removePhoneResult.Succeeded)
+                    {
+                        StatusMessage = "Unexpected error when trying to remove phone number.";
+                        return RedirectToPage();
+                    }
+                }
+                else
+                {
+                    // A new/changed phone number must be verified via SMS before it's confirmed for SMS MFA use.
+                    var code = await _userManager.GenerateChangePhoneNumberTokenAsync(user, Input.PhoneNumber);
+
+                    await _smsService.SendAsync(new SmsDto
+                    {
+                        To = Input.PhoneNumber,
+                        Body = $"Your Envirotrax phone verification code is {code}"
+                    });
+
+                    return RedirectToPage("./VerifyPhoneNumber", new { phoneNumber = Input.PhoneNumber });
                 }
             }
 

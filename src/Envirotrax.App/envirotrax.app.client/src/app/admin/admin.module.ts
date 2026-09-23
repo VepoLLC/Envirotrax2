@@ -7,12 +7,14 @@ import { AdminRoutingModule } from "./admin-routing.module";
 import { RouterModule } from "@angular/router";
 import { GisAreaListComponent } from "./gis-areas/list/gis-area-list.component";
 import { CreateEditGisAreaComponent } from "./gis-areas/create-edit/create-edit-gis-area.component";
+import { AccountContactInformationComponent } from "./account/account-contact-information.component";
 
 @NgModule({
     declarations: [
         HomeComponent,
         GisAreaListComponent,
-        CreateEditGisAreaComponent
+        CreateEditGisAreaComponent,
+        AccountContactInformationComponent
     ],
     imports: [
         CommonModule,

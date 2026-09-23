@@ -1,0 +1,25 @@
+<ng-template #capacityTypeCell let-vehicle="rowData">
+    {{ getCapacityTypeLabel(vehicle.capacityType) }}
+</ng-template>
+
+<vp-section header="Vehicle Management">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="loadVehicles()"
+                  [(query)]="table.query"
+                  (queryChange)="loadVehicles()"
+                  (queryReset)="loadVehicles()"
+                  [showActionLabels]="false"
+                  [canAdd]="canManage"
+                  (add)="addVehicle()"
+                  [canEdit]="canManage"
+                  (edit)="editVehicle($event)"
+                  [canDelete]="canManage"
+                  (delete)="deleteVehicle($event)" />
+    </div>
+</vp-section>

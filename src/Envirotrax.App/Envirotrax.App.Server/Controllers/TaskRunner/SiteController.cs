@@ -21,6 +21,13 @@ public class SiteController : TaskRunnerBaseContoller
         return Ok(sites);
     }
 
+    [HttpGet("renewal/pending")]
+    public async Task<IActionResult> GetAllPendingRenewalAsync([FromQuery] int batchSize, CancellationToken cancellationToken)
+    {
+        var sites = await _siteService.GetAllPendingRenewalAsync(batchSize, cancellationToken);
+        return Ok(sites);
+    }
+
     [HttpPost("{siteId}/geocode")]
     public async Task<IActionResult> GeocodeAsync(int siteId, [FromQuery] bool assignGisArea, CancellationToken cancellationToken)
     {

@@ -32,6 +32,8 @@ export class WindowComponent implements OnInit, OnDestroy {
 
     public ngOnInit(): void {
         const reference = new WindowReference<any>(this.config);
+        reference.setCloseHandler(() => this.onClose());
+
         const map = new WeakMap<any, any>();
 
         map.set(WindowReference, reference);

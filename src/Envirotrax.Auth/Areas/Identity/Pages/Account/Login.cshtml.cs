@@ -116,6 +116,10 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+
+                    // If the account's password has expired, the sign-in principal carries a
+                    // password_expired claim and the enforcement middleware in Program.cs will
+                    // redirect this request to ./ChangeExpiredPassword before it reaches returnUrl.
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

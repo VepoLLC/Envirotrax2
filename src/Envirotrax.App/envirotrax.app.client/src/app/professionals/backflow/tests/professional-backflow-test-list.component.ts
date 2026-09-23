@@ -13,6 +13,7 @@ import { DownloadConfig } from '../../../shared/models/download-config';
 import { DownloadService } from '../../../shared/services/download.service';
 import { PrintableTableService } from '../../../shared/services/printable-table.service';
 import { PropertyType } from '../../../shared/enums/property-type.enum';
+import { AppContainerHelperService } from '../../../shared/services/helpers/app-contaner-helper.service';
 
 @Component({
     standalone: false,
@@ -58,6 +59,7 @@ export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy 
             ]
         }
     };
+    
 
     public waterSupplierScopeOptions: InputOption[] = [
         { id: '', text: 'My test history only' }
@@ -65,7 +67,7 @@ export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy 
 
     public testHistoryOptions: InputOption[] = [
         { id: 'true', text: 'Latest test only' },
-        { id: 'false', text: 'Complete test history' }
+        { id: '', text: 'Complete test history' }
     ];
 
     public propertyTypeOptions: InputOption[] = [
@@ -80,8 +82,11 @@ export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy 
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
         private readonly _downloadService: DownloadService,
-        private readonly _printService: PrintableTableService
+        private readonly _printService: PrintableTableService,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
+        this.table.query.filter = [this.paidFilter()];          
+
         this.downloadConfig = {
             fileName: 'Backflow Tests',
             endpoint: this._backflowTestService.getAllForProfessionalEndpoint(),
@@ -159,7 +164,7 @@ export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy 
             if (expiring === 'expired' || expiring === 'thismonth' || expiring === 'nextmonth' || expiring === 'twomonths') {
                 this.applyExpiringFilter(expiring);
                 await this.getTests();
-                this.showResults = true;
+                this.setShowResults(true);
             }
         });
     }
@@ -178,10 +183,14 @@ export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy 
     }
 
     private async loadWaterSupplierScopeOptions(): Promise<void> {
-        const suppliers = await this._supplierService.getAllMy(false, true);
+        const suppliers = await this._supplierService.getAllMy({
+            hasBackflowTesting: true
+        });
+
         const supplierOptions: InputOption[] = suppliers.data
             .filter(s => s.waterSupplier?.id)
             .map(s => ({ id: String(s.waterSupplier!.id!), text: s.waterSupplier!.name ?? '' }));
+
         this.waterSupplierScopeOptions = [
             { id: '', text: 'My test history only' },
             ...supplierOptions
@@ -267,8 +276,17 @@ export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy 
         }
     }
 
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
+    }
+
     public onFilterChange(queryProperties: QueryProperty[]): void {
-        this.table.query.filter = queryProperties;
+        this.table.query.filter = [...queryProperties, this.paidFilter()];
+    }
+
+    private paidFilter(): QueryProperty {
+        return { columnName: 'transactionId', isValueNull: true, comparisonOperator: 'NotEq', logicalOperator: 'And' };
     }
 
     public async search(searchForm: NgForm): Promise<void> {
@@ -277,7 +295,7 @@ export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy 
             // so reusing the array after "Search Again" leaves a stale View handler (dead until refresh).
             this.setupColumns();
             await this.getTests();
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 }

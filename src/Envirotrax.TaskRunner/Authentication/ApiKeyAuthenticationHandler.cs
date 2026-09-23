@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using Envirotrax.TaskRunner.Domain.Services.Definitions;
+using Envirotrax.Common.Domain.Services.Defintions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;

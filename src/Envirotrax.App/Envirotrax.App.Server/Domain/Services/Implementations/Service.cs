@@ -80,10 +80,31 @@ public class Service<TModel, TDto, TKey> : IService<TModel, TDto, TKey>
             .ToPagedData(pageInfo);
     }
 
+    public virtual Task<int> CountAsync(CancellationToken cancellationToken)
+    {
+        return Repository.CountAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Returns how many records match <paramref name="query"/>, without reading them.
+    /// Use this instead of calling GetAllAsync and taking PageInfo.TotalItems.
+    /// </summary>
+    public virtual Task<int> CountAsync(Query query, CancellationToken cancellationToken)
+    {
+        query.Filter = query.ConvertFilterProperties<TModel, TDto>(Mapper);
+
+        return Repository.CountAsync(query, cancellationToken);
+    }
+
     public virtual async Task<TDto?> GetNoIncludesAsync(TKey id, CancellationToken cancellationToken)
     {
         var model = await Repository.GetNoIncludesAsync(id, cancellationToken);
         return MapToDto(model);
+    }
+
+    public virtual Task<bool> ExistsAsync(TKey id, CancellationToken cancellationToken)
+    {
+        return Repository.ExistsAsync(id, cancellationToken);
     }
 
     public virtual async Task<TDto?> GetAsync(TKey id, CancellationToken cancellationToken)

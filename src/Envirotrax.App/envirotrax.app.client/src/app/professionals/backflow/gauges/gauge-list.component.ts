@@ -1,14 +1,13 @@
 import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { BackflowGauge, GaugeExpirationType } from "../../../shared/models/backflow/backflow-gauge";
 import { BackflowGaugeService } from "../../../shared/services/backflow/backflow-gauge.service";
-import { ToastService, ToastType } from "../../../shared/services/toast.service";
+import { ToastService, ToastType, CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { ProfesisonalService } from "../../../shared/services/professionals/professional.service";
 import { NgForm } from "@angular/forms";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { EditGaugeComponent } from "./edit/edit-gauge.component";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
-import { CellTemplateData, ColumnType, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 
 @Component({
     standalone: false,
@@ -87,14 +86,14 @@ export class GaugeListComponent implements OnInit {
                 type: ColumnType.text
             },
             {
-                field: 'isPortable',
-                caption: 'Type',
-                cellTemplate: this.typeCellTemplate,
+                field: 'serialNumber',
+                caption: 'Serial number',
                 type: ColumnType.text
             },
             {
-                field: 'serialNumber',
-                caption: 'Serial number',
+                field: 'isPortable',
+                caption: 'Type',
+                cellTemplate: this.typeCellTemplate,
                 type: ColumnType.text
             },
             {

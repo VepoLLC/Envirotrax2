@@ -4,4 +4,6 @@ export interface ProfessionalDashboardStats {
     licenseCount?: number;
     insuranceCount?: number;
     gaugeCount?: number;
+    vehicleCount?: number;
+    disposalSiteCount?: number;
 }

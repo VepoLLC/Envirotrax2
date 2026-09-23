@@ -4,7 +4,7 @@ import { ModalReference } from '@developer-partners/ngx-modal-dialog';
 import { WaterSupplierLicense, UpdateWaterSupplierLicense } from '../../shared/models/professionals/licenses/water-supplier-license';
 import { WaterSupplierLicenseService } from '../../shared/services/licenses/water-supplier-license.service';
 import { HelperService } from '../../shared/services/helpers/helper.service';
-import { ToastService } from '../../shared/services/toast.service';
+import { ToastService } from '@envirotrax/common-ui';
 
 export interface WaterSupplierLicenseModalData {
     license: WaterSupplierLicense;

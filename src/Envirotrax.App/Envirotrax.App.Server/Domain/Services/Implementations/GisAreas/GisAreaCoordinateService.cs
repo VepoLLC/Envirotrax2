@@ -28,6 +28,12 @@ public class GisAreaCoordinateService : Service<GisAreaCoordinate, GisAreaCoordi
         return Mapper.Map<IEnumerable<GisAreaCoordinate>, IEnumerable<GisAreaCoordinateDto>>(models);
     }
 
+    public async Task<IEnumerable<GisAreaCoordinateDto>> GetAllBySupplierAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        var models = await _coordinateRepository.GetAllBySupplierAsync(waterSupplierId, cancellationToken);
+        return Mapper.Map<IEnumerable<GisAreaCoordinate>, IEnumerable<GisAreaCoordinateDto>>(models);
+    }
+
     public async Task<IEnumerable<GisAreaCoordinateDto>> AddOrUpdateAsync(int areaId, IEnumerable<GisAreaCoordinateDto> coordinates)
     {
         var model = Mapper.Map<IEnumerable<GisAreaCoordinateDto>, IEnumerable<GisAreaCoordinate>>(coordinates);

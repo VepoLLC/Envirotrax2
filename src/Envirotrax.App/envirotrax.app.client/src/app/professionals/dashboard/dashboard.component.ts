@@ -9,20 +9,25 @@ import { FogInspectionResult } from '../../shared/models/fog/fog-inspection-enum
 import { FeatureType } from '../../shared/models/feature-type';
 import { ROLE_DEFINITIONS } from '../../shared/models/role-definitions';
 import { ProfesionalUserService } from '../../shared/services/professionals/professional-user.service';
-import { ProfessionalUserLicenseService } from '../../shared/services/professionals/professional-user-license.service';
-import { ProfessionalInsuranceService } from '../../shared/services/professionals/professional-insurance.service';
 import { BackflowGaugeService } from '../../shared/services/backflow/backflow-gauge.service';
 import { BackflowTestService, BackflowExpiryRangeKey } from '../../shared/services/backflow/backflow-test.service';
 import { BackflowTest } from '../../shared/models/backflow/backflow-test';
 import { BackflowTestResult } from '../../shared/models/backflow/backflow-test-enums';
 import { ProfessionalDashboardService } from '../../shared/services/professionals/professional-dashboard.service';
 import { ProfessionalUser } from '../../shared/models/professionals/professional-user';
-import { ProfessionalUserLicense, ExpirationType } from '../../shared/models/professionals/licenses/professional-user-license';
-import { ProfessionalInsurance } from '../../shared/models/professionals/professional-insurance';
+import { ProfessionalDashboardLicenseInsurance, ExpirationType } from '../../shared/models/professionals/professional-dashboard-license-insurance';
 import { BackflowGauge, GaugeExpirationType } from '../../shared/models/backflow/backflow-gauge';
+import { ProfessionalFogVehicleService } from '../../shared/services/fog/professional-fog-vehicle.service';
+import { ProfessionalFogDisposalSiteService } from '../../shared/services/fog/professional-fog-disposal-site.service';
+import { FogVehicle } from '../../shared/models/fog/fog-vehicle';
+import { FogDisposalSite } from '../../shared/models/fog/fog-disposal-site';
+import { FOG_VEHICLE_CAPACITY_TYPE_LABELS } from '../../shared/models/fog/fog-vehicle-enums';
+import { PHYSICAL_TYPE_LABELS } from '../../shared/models/fog/fog-disposal-site-enums';
 import { ProfessionalDashboardStats } from '../../shared/models/professionals/professional-dashboard-stats';
 import { TableViewModel } from '../../shared/models/table-view-model';
-import { CellTemplateData, ColumnType, FreeTextSearchSettings, TableColumn } from '@envirotrax/common-ui';
+import { CellTemplateData, ColumnType, FreeTextSearchSettings, TableColumn, ModalHelperService } from '@envirotrax/common-ui';
+import { ModalSize } from '@developer-partners/ngx-modal-dialog';
+import { FogSignaturePadModalComponent, FogSignatureModel } from '../fog/inspections/create/fog-signature-pad-modal.component';
 import { AppContainerHelperService } from '../../shared/services/helpers/app-contaner-helper.service';
 
 const VIEW_MODE_KEY = 'dashboardViewMode';
@@ -53,11 +58,8 @@ export class DashboardComponent implements OnInit {
     public fogMailingTemplate!: TemplateRef<CellTemplateData<FogInspection>>;
 
     // License & insurance cell templates
-    @ViewChild('licenseExpirationTemplate', { static: true })
-    public licenseExpirationTemplate!: TemplateRef<CellTemplateData<ProfessionalUserLicense>>;
-
-    @ViewChild('insuranceExpirationTemplate', { static: true })
-    public insuranceExpirationTemplate!: TemplateRef<CellTemplateData<ProfessionalInsurance>>;
+    @ViewChild('licenseInsuranceExpirationTemplate', { static: true })
+    public licenseInsuranceExpirationTemplate!: TemplateRef<CellTemplateData<ProfessionalDashboardLicenseInsurance>>;
 
     // Gauge cell templates
     @ViewChild('gaugeCellTemplate', { static: true })
@@ -90,7 +92,9 @@ export class DashboardComponent implements OnInit {
     public hasCsi = false;
     public hasFog = false;
     public hasBackflow = false;
+    public hasFogTransportation = false;
     public isAdmin = false;
+    public signatureUrl: string | null = null;
     public readonly FogInspectionResult = FogInspectionResult;
     public readonly BackflowTestResult = BackflowTestResult;
     public isLoading = true;
@@ -111,23 +115,16 @@ export class DashboardComponent implements OnInit {
         } as FreeTextSearchSettings
     };
 
-    public licensesTable: TableViewModel<ProfessionalUserLicense> = {
-        query: { sort: {}, filter: [] },
+    // Licenses and insurance policies are unioned into one grid server-side. Sorted by expiration so
+    // paging is deterministic (a UNION with no ORDER BY can repeat or drop rows across Skip/Take).
+    public licensesAndInsurancesTable: TableViewModel<ProfessionalDashboardLicenseInsurance> = {
+        query: { sort: { expirationDate: 'Asc' }, filter: [] },
         columns: [],
         freeTextSearch: {
             searchQuery: [
-                { field: 'licenseType.name' },
-                { field: 'licenseNumber' }
-            ]
-        } as FreeTextSearchSettings
-    };
-
-    public insurancesTable: TableViewModel<ProfessionalInsurance> = {
-        query: { sort: {}, filter: [] },
-        columns: [],
-        freeTextSearch: {
-            searchQuery: [
-                { field: 'insuranceNumber' }
+                { field: 'typeName' },
+                { field: 'number' },
+                { field: 'assignedTo' }
             ]
         } as FreeTextSearchSettings
     };
@@ -144,14 +141,20 @@ export class DashboardComponent implements OnInit {
         } as FreeTextSearchSettings
     };
 
+    // Sorted by id so paging is deterministic (Skip/Take with no ORDER BY can repeat or drop rows).
+    // V1's Account Overview orders these the same way — main.aspx.vb:444 "ORDER BY ID ASC".
+    public vehiclesTable: TableViewModel<FogVehicleRow> = {
+        query: { sort: { id: 'Asc' }, filter: [] },
+        columns: []
+    };
+
+    public disposalSitesTable: TableViewModel<FogDisposalSiteRow> = {
+        query: { sort: { county: 'Asc' }, filter: [] },
+        columns: []
+    };
+
     public readonly ExpirationType = ExpirationType;
     public readonly GaugeExpirationType = GaugeExpirationType;
-
-    public licenseInsuranceTab: 'licenses' | 'insurances' = 'licenses';
-
-    public setLicenseInsuranceTab(tab: 'licenses' | 'insurances'): void {
-        this.licenseInsuranceTab = tab;
-    }
 
     public get licenseAndInsuranceCount(): number {
         return (this.dashboardStats.licenseCount ?? 0) + (this.dashboardStats.insuranceCount ?? 0);
@@ -179,13 +182,14 @@ export class DashboardComponent implements OnInit {
         private readonly _inspectionService: CsiInspectionService,
         private readonly _fogInspectionService: ProfessionalFogInspectionService,
         private readonly _userService: ProfesionalUserService,
-        private readonly _licenseService: ProfessionalUserLicenseService,
-        private readonly _insuranceService: ProfessionalInsuranceService,
         private readonly _gaugeService: BackflowGaugeService,
         private readonly _backflowTestService: BackflowTestService,
         private readonly _dashboardService: ProfessionalDashboardService,
+        private readonly _vehicleService: ProfessionalFogVehicleService,
+        private readonly _disposalSiteService: ProfessionalFogDisposalSiteService,
         private readonly _router: Router,
-        private readonly _containerHelper: AppContainerHelperService
+        private readonly _containerHelper: AppContainerHelperService,
+        private readonly _modalHelper: ModalHelperService
     ) { }
 
     public async ngOnInit(): Promise<void> {
@@ -195,20 +199,23 @@ export class DashboardComponent implements OnInit {
         this.setupColumns();
 
         try {
-            const [hasCsi, hasFog, hasBackflow, isCsiInspector, isFogInspector, isBackflowTester, isAdmin] = await Promise.all([
+            const [hasCsi, hasFog, hasBackflow, hasFogTransportation, isCsiInspector, isFogInspector, isBackflowTester, isFogTransporter, isAdmin] = await Promise.all([
                 this._authService.hasAnyFeatures(FeatureType.CsiInspection),
                 this._authService.hasAnyFeatures(FeatureType.FogInspection),
                 this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
+                this._authService.hasAnyFeatures(FeatureType.FogTransportation),
                 this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.CSI_INSPECTOR),
                 this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.FOG_INSPECTOR),
                 this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.BACKFLOW_TESTER),
+                this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.FOG_TRANSPORTER),
                 this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.ADMIN)
             ]);
 
             this.isAdmin = isAdmin;
             this.hasCsi = hasCsi && (isCsiInspector || isAdmin);
-            this.hasFog = hasFog && isFogInspector;
+            this.hasFog = hasFog && (isFogInspector || isAdmin);
             this.hasBackflow = hasBackflow && (isBackflowTester || isAdmin);
+            this.hasFogTransportation = hasFogTransportation && (isFogTransporter || isAdmin);
 
             const promises: Promise<void>[] = [];
 
@@ -220,12 +227,22 @@ export class DashboardComponent implements OnInit {
                 promises.push(this.loadRecentFogInspections());
             }
 
+            if (this.hasFogTransportation) {
+                promises.push(this.loadSignature());
+                promises.push(this.loadVehicles());
+                promises.push(this.loadDisposalSites());
+            }
+
+            // The quick-view tiles read every count, so the stats are needed by any
+            // role that has at least one tile — not just admins.
+            if (this.isAdmin || this.hasBackflow || this.hasFogTransportation) {
+                promises.push(this.loadStats());
+            }
+
             if (this.isAdmin) {
                 promises.push(
-                    this.loadStats(),
                     this.loadSubAccounts(),
-                    this.loadLicenses(),
-                    this.loadInsurances()
+                    this.loadLicensesAndInsurances()
                 );
             }
             if (this.hasBackflow) {
@@ -240,14 +257,53 @@ export class DashboardComponent implements OnInit {
         }
     }
 
+    public openSignaturePad(): void {
+        this._modalHelper.show<FogSignatureModel, string>(
+            FogSignaturePadModalComponent,
+            {
+                title: 'Signature',
+                size: ModalSize.extraLarge,
+                model: { existingSignature: null }
+            }
+        ).result().subscribe((dataUrl: string) => {
+            if (dataUrl) {
+                this.saveSignature(dataUrl);
+            }
+        });
+    }
+
+    private async loadSignature(): Promise<void> {
+        const user = await this._userService.getMyData();
+        this.signatureUrl = user.signatureUrl ?? null;
+    }
+
+    private async saveSignature(dataUrl: string): Promise<void> {
+        const file = this.dataUrlToFile(dataUrl, 'transporter-signature.png');
+        this.signatureUrl = await this._userService.saveMySignature(file);
+    }
+
+    private dataUrlToFile(dataUrl: string, fileName: string): File {
+        const [header, base64] = dataUrl.split(',');
+        const mimeType = header.match(/:(.*?);/)?.[1] ?? 'image/png';
+        const binary = atob(base64);
+
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+
+        return new File([bytes], fileName, { type: mimeType });
+    }
+
     private setupColumns(): void {
         this.recentInspections.columns = this.buildInspectionColumns();
         this.recentFogInspections.columns = this.buildFogInspectionColumns();
         this.recentBackflowTests.columns = this.buildBackflowTestColumns();
         this.subAccountsTable.columns = this.buildSubAccountsColumns();
-        this.licensesTable.columns = this.buildLicensesColumns();
-        this.insurancesTable.columns = this.buildInsurancesColumns();
+        this.licensesAndInsurancesTable.columns = this.buildLicensesAndInsurancesColumns();
         this.gaugesTable.columns = this.buildGaugesColumns();
+        this.vehiclesTable.columns = this.buildVehiclesColumns();
+        this.disposalSitesTable.columns = this.buildDisposalSitesColumns();
     }
 
     public setViewMode(mode: 'quick' | 'full'): void {
@@ -367,27 +423,15 @@ export class DashboardComponent implements OnInit {
         }
     }
 
-    public async loadLicenses(): Promise<void> {
+    public async loadLicensesAndInsurances(): Promise<void> {
         try {
-            this.licensesTable.isLoading = true;
-            this.licensesTable.items = await this._licenseService.getAll(
-                this.licensesTable.items?.pageInfo || {},
-                this.licensesTable.query
+            this.licensesAndInsurancesTable.isLoading = true;
+            this.licensesAndInsurancesTable.items = await this._dashboardService.getLicensesAndInsurances(
+                this.licensesAndInsurancesTable.items?.pageInfo || {},
+                this.licensesAndInsurancesTable.query
             );
         } finally {
-            this.licensesTable.isLoading = false;
-        }
-    }
-
-    public async loadInsurances(): Promise<void> {
-        try {
-            this.insurancesTable.isLoading = true;
-            this.insurancesTable.items = await this._insuranceService.getAll(
-                this.insurancesTable.items?.pageInfo || {},
-                this.insurancesTable.query
-            );
-        } finally {
-            this.insurancesTable.isLoading = false;
+            this.licensesAndInsurancesTable.isLoading = false;
         }
     }
 
@@ -401,6 +445,62 @@ export class DashboardComponent implements OnInit {
         } finally {
             this.gaugesTable.isLoading = false;
         }
+    }
+
+    public async loadVehicles(): Promise<void> {
+        try {
+            this.vehiclesTable.isLoading = true;
+
+            const vehicles = await this._vehicleService.getAll(
+                this.vehiclesTable.items?.pageInfo || {},
+                this.vehiclesTable.query
+            );
+
+            this.vehiclesTable.items = {
+                pageInfo: vehicles.pageInfo,
+                data: vehicles.data.map(vehicle => ({
+                    ...vehicle,
+                    capacityDescription: this.buildCapacityDescription(vehicle)
+                }))
+            };
+        } finally {
+            this.vehiclesTable.isLoading = false;
+        }
+    }
+
+    public async loadDisposalSites(): Promise<void> {
+        try {
+            this.disposalSitesTable.isLoading = true;
+
+            const sites = await this._disposalSiteService.getRegistered(
+                this.disposalSitesTable.items?.pageInfo || {},
+                this.disposalSitesTable.query
+            );
+
+            this.disposalSitesTable.items = {
+                pageInfo: sites.pageInfo,
+                data: sites.data.map(site => ({
+                    ...site,
+                    wasteTypeDescription: site.physicalType == null
+                        ? ''
+                        : PHYSICAL_TYPE_LABELS[site.physicalType] ?? ''
+                }))
+            };
+        } finally {
+            this.disposalSitesTable.isLoading = false;
+        }
+    }
+
+    private buildCapacityDescription(vehicle: FogVehicle): string {
+        if (vehicle.capacity == null) {
+            return '';
+        }
+
+        const capacityType = vehicle.capacityType == null
+            ? ''
+            : FOG_VEHICLE_CAPACITY_TYPE_LABELS[vehicle.capacityType] ?? '';
+
+        return `${vehicle.capacity} ${capacityType}`.trim();
     }
 
     public viewInspection(inspection: CsiInspection): void {
@@ -554,27 +654,16 @@ export class DashboardComponent implements OnInit {
         ];
     }
 
-    private buildLicensesColumns(): TableColumn<ProfessionalUserLicense>[] {
+    private buildLicensesAndInsurancesColumns(): TableColumn<ProfessionalDashboardLicenseInsurance>[] {
         return [
-            { field: 'licenseType.name', caption: 'Type', type: ColumnType.text },
-            { field: 'licenseNumber', caption: 'License Number', type: ColumnType.text },
+            { field: 'typeName', caption: 'Type', type: ColumnType.text },
+            { field: 'number', caption: 'Number', type: ColumnType.text },
+            { field: 'assignedTo', caption: 'Assignee', type: ColumnType.text },
             {
                 field: 'expirationDate',
                 caption: 'Expiration Date',
                 type: ColumnType.date,
-                cellTemplate: this.licenseExpirationTemplate
-            }
-        ];
-    }
-
-    private buildInsurancesColumns(): TableColumn<ProfessionalInsurance>[] {
-        return [
-            { field: 'insuranceNumber', caption: 'Policy Number', type: ColumnType.text },
-            {
-                field: 'expirationDate',
-                caption: 'Expiration Date',
-                type: ColumnType.date,
-                cellTemplate: this.insuranceExpirationTemplate
+                cellTemplate: this.licenseInsuranceExpirationTemplate
             }
         ];
     }
@@ -603,4 +692,43 @@ export class DashboardComponent implements OnInit {
             }
         ];
     }
+
+    private buildVehiclesColumns(): TableColumn<FogVehicleRow>[] {
+        return [
+            { field: 'licensePlateNumber', caption: 'License Plate #', type: ColumnType.text },
+            { field: 'manufacturer', caption: 'Manufacturer', type: ColumnType.text },
+            { field: 'manufacturedYear', caption: 'Year', type: ColumnType.number },
+            {
+                field: 'capacityDescription',
+                caption: 'Capacity',
+                type: ColumnType.text,
+                queryColumnExcluded: true
+            },
+            { field: 'stickerNumber', caption: 'Sticker #', type: ColumnType.text }
+        ];
+    }
+
+    private buildDisposalSitesColumns(): TableColumn<FogDisposalSiteRow>[] {
+        return [
+            { field: 'name', caption: 'Disposal Facility', type: ColumnType.text },
+            { field: 'registrationNumber', caption: 'Registration Number', type: ColumnType.text },
+            { field: 'county', caption: 'County', type: ColumnType.text },
+            {
+                field: 'wasteTypeDescription',
+                caption: 'Waste Types',
+                type: ColumnType.text,
+                queryColumnExcluded: true
+            }
+        ];
+    }
+}
+
+// Display-only view models: the capacity and waste-type labels are pre-computed once
+// per load so the templates never call a component method per row.
+interface FogVehicleRow extends FogVehicle {
+    capacityDescription: string;
+}
+
+interface FogDisposalSiteRow extends FogDisposalSite {
+    wasteTypeDescription: string;
 }

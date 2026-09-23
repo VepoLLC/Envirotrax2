@@ -2,13 +2,12 @@ import { Component, Input, OnInit } from "@angular/core";
 import { ProfessionalUser } from "../../../../../shared/models/professionals/professional-user";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
 import { BackflowTesterUserService } from "../../../../../shared/services/backflow/backflow-tester-user.service";
-import { ToastService } from "../../../../../shared/services/toast.service";
+import { ToastService, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 import { AuthService } from "../../../../../shared/services/auth/auth.service";
 import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
 import { FeatureType } from "../../../../../shared/models/feature-type";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { AddEditBackflowTesterUserComponent, BackflowUserModalData } from "../edit/add-edit-backflow-tester-user.component";
-import { ColumnType, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'vp-backflow-tester-users',

@@ -3,6 +3,7 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Users;
 using Envirotrax.App.Server.Data.Services.Definitions;
+using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Users;
@@ -10,10 +11,12 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Users;
 public class UserReoleRepository : IUserRoleRepository
 {
     private readonly TenantDbContext _dbContext;
+    private readonly ITenantProvidersService _tenantProvider;
 
-    public UserReoleRepository(IDbContextSelector dbContextSelector)
+    public UserReoleRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider)
     {
         _dbContext = dbContextSelector.Current;
+        _tenantProvider = tenantProvider;
     }
 
     public async Task<IEnumerable<UserRole>> GetAllAsync(int userId)
@@ -47,5 +50,13 @@ public class UserReoleRepository : IUserRoleRepository
         }
 
         return userRole;
+    }
+
+    public async Task DeleteAllForUserAsync(int userId)
+    {
+        await _dbContext
+            .UserRoles
+            .Where(r => r.WaterSupplierId == _tenantProvider.WaterSupplierId && r.UserId == userId)
+            .ExecuteDeleteAsync();
     }
 }

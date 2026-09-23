@@ -3,6 +3,7 @@ using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Data.Services.Definitions;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Sites;
@@ -12,6 +13,89 @@ public class SiteRepository : Repository<Site>, ISiteRepository
     public SiteRepository(IDbContextSelector dbContextSelector)
         : base(dbContextSelector)
     {
+    }
+
+    public async Task<Site?> UpdateForAdminAsync(int id, SiteDto dto)
+    {
+        var site = await GetTrackedForUpdateAsync(id, CancellationToken.None);
+
+        if (site == null)
+        {
+            return null;
+        }
+
+        ApplyAdminEditableFields(site, dto);
+
+        await SaveChangesAsync(logData: true);
+
+        return site;
+    }
+
+    /// <summary>
+    /// Copies the approved editable fields from a SiteDto onto the loaded (tracked) Site — a deliberate
+    /// ALLOWLIST, so protected DTO columns (WaterSupplier, GIS, audit, NeedsRenewalCheck, …) are ignored.
+    /// Runs on the freshly-loaded entity so the NeedsRenewalCheck compare below sees the pre-overwrite values.
+    /// </summary>
+    private static void ApplyAdminEditableFields(Site site, SiteDto dto)
+    {
+        var renewalTriggerChanged =
+            site.PropertyType != dto.PropertyType
+            || site.HasOnSiteSewageFacility != dto.HasOnSiteSewageFacility
+            || site.HasAuxWaterSupply != dto.HasAuxWaterSupply;
+
+        if (renewalTriggerChanged)
+        {
+            site.NeedsRenewalCheck = true;
+        }
+
+        // Property Information
+        site.PropertyType = dto.PropertyType;
+        site.BusinessName = dto.BusinessName;
+        site.StreetNumber = dto.StreetNumber;
+        site.StreetName = dto.StreetName;
+        site.PropertyNumber = dto.PropertyNumber;
+        site.City = dto.City;
+        site.StateId = dto.State?.Id;
+        site.ZipCode = dto.ZipCode;
+
+        // Mailing Information
+        site.MailingCompanyName = dto.MailingCompanyName;
+        site.MailingContactName = dto.MailingContactName;
+        site.MailingStreetNumber = dto.MailingStreetNumber;
+        site.MailingStreetName = dto.MailingStreetName;
+        site.MailingNumber = dto.MailingNumber;
+        site.MailingCity = dto.MailingCity;
+        site.MailingStateId = dto.MailingState?.Id;
+        site.MailingZipCode = dto.MailingZipCode;
+        site.MailingPhoneNumber = dto.MailingPhoneNumber;
+        site.MailingEmailAddress = dto.MailingEmailAddress;
+
+        // Property Settings
+        site.AccountNumber = dto.AccountNumber;
+        site.Active = dto.Active;
+        site.InvalidMailingAddress = dto.InvalidMailingAddress;
+        site.OutOfArea = dto.OutOfArea;
+        site.IsFeeExempt = dto.IsFeeExempt;
+        site.BypassPropertyNumberValidation = dto.BypassPropertyNumberValidation;
+        site.BackflowScheduleMonth = dto.BackflowScheduleMonth;
+        site.NeedsCsiInspection = dto.NeedsCsiInspection;
+        site.CsiRenewalDate = dto.CsiRenewalDate;
+        site.NeedsFogInspection = dto.NeedsFogInspection;
+        site.FogInspectionExpirationDate = dto.FogInspectionExpirationDate;
+        site.NeedsFogPermit = dto.NeedsFogPermit;
+        site.FogPermitExpirationDate = dto.FogPermitExpirationDate;
+        site.LastTripTicketDate = dto.LastTripTicketDate;
+        site.TripTicketInterval = dto.TripTicketInterval;
+        site.FacilityType = dto.FacilityType;
+        site.GreaseTrapType = dto.GreaseTrapType;
+        site.HasOnSiteSewageFacility = dto.HasOnSiteSewageFacility;
+        site.HasAuxWaterSupply = dto.HasAuxWaterSupply;
+        site.HasFireSystem = dto.HasFireSystem;
+        site.FireSeparateWater = dto.FireSeparateWater;
+        site.HasGritTrap = dto.HasGritTrap;
+        site.HasIrrigation = dto.HasIrrigation;
+        site.IrrigationSeparateWater = dto.IrrigationSeparateWater;
+        site.HasDomesticPremisesIsolation = dto.HasDomesticPremisesIsolation;
     }
 
     protected override void UpdateEntity(Site model)
@@ -25,15 +109,45 @@ public class SiteRepository : Repository<Site>, ISiteRepository
         entry.Property(site => site.GisLatitude).IsModified = false;
         entry.Property(site => site.GisLongitude).IsModified = false;
         entry.Property(site => site.GisStatus).IsModified = false;
+
+        // WaterSupplierId is a normal writable column now that it is no longer part of the primary
+        // key. Normal Site editing must never reassign a Site; that is a separate, dedicated flow.
+        entry.Property(site => site.WaterSupplierId).IsModified = false;
     }
 
     protected override IQueryable<Site> GetListQuery()
     {
         return base.GetListQuery()
             .Include(s => s.UpdatedBy)
+            .Include(s => s.WaterSupplier)
             .Include(s => s.State)
             .Include(s => s.MailingState)
             .AsNoTracking();
+    }
+
+    public async Task<IEnumerable<Site>> SearchAsync(PageInfo pageInfo, Query query, bool? fogCompliant, CancellationToken cancellationToken)
+    {
+        var sites = GetListQuery().Where(query.Filter);
+
+        if (fogCompliant.HasValue)
+        {
+            var now = DateTime.UtcNow;
+
+            if (fogCompliant.Value)
+            {
+                sites = sites.Where(s => s.TripTicketInterval > 0 && s.LastTripTicketDate != null && s.LastTripTicketDate.Value.AddDays(s.TripTicketInterval) >= now);
+            }
+            else
+            {
+                sites = sites.Where(s => s.TripTicketInterval > 0 && s.LastTripTicketDate != null && s.LastTripTicketDate.Value.AddDays(s.TripTicketInterval) < now);
+            }
+        }
+
+        var paginated = await sites
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
     }
 
     protected override IQueryable<Site> GetDetailsQuery()
@@ -41,6 +155,7 @@ public class SiteRepository : Repository<Site>, ISiteRepository
         return base.GetDetailsQuery()
             .Include(s => s.State)
             .Include(s => s.MailingState)
+            .Include(s => s.UpdatedBy)
             .Include(s => s.WaterSupplier).ThenInclude(ws => ws!.State);
     }
 
@@ -98,6 +213,32 @@ public class SiteRepository : Repository<Site>, ISiteRepository
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    // FOG Inspection Compliance Management gate. Mirrors GetCsiComplianceAsync but keyed off the FOG
+    // inspection flag; the overdue date range and every other criterion arrive as the client's filter.
+    public async Task<IEnumerable<Site>> GetFogInspectionComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var paginated = await GetListQuery()
+            .Where(s => s.NeedsFogInspection && !s.OutOfArea)
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
+    // FOG Permit Compliance Management gate. Same shape as GetFogInspectionComplianceAsync, keyed off the
+    // FOG permit flag; the overdue date range and every other criterion arrive as the client's filter.
+    public async Task<IEnumerable<Site>> GetFogPermitComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var paginated = await GetListQuery()
+            .Where(s => s.NeedsFogPermit && !s.OutOfArea)
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
     public async Task UpdateCsiAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate)
     {
         await DbContext
@@ -106,5 +247,82 @@ public class SiteRepository : Repository<Site>, ISiteRepository
             .ExecuteUpdateAsync(setter => setter
                 .SetProperty(s => s.CsiAccountAssignmentId, userId)
                 .SetProperty(s => s.CsiAccountAssignmentDate, assignmentDate));
+    }
+
+    public async Task UpdateBackflowAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate)
+    {
+        await DbContext
+            .Sites
+            .Where(s => s.Id == siteId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(s => s.BackflowAccountAssignmentId, userId)
+                .SetProperty(s => s.BackflowAccountAssignmentDate, assignmentDate));
+    }
+
+    public async Task<IEnumerable<Site>> GetFogTripTicketComplianceAsync(PageInfo pageInfo, Query query, DateTime? dueDateFrom, DateTime? dueDateTo, bool sortDescending, CancellationToken cancellationToken)
+    {
+        var now = DateTime.UtcNow;
+
+        var sites = GetListQuery()
+            .Where(s => s.TripTicketInterval > 0 && s.LastTripTicketDate != null && !s.OutOfArea)
+            .Where(s => s.LastTripTicketDate!.Value.AddDays(s.TripTicketInterval) < now);
+
+        if (dueDateFrom.HasValue)
+        {
+            sites = sites.Where(s => s.LastTripTicketDate!.Value.AddDays(s.TripTicketInterval) >= dueDateFrom.Value);
+        }
+
+        if (dueDateTo.HasValue)
+        {
+            sites = sites.Where(s => s.LastTripTicketDate!.Value.AddDays(s.TripTicketInterval) <= dueDateTo.Value);
+        }
+
+        sites = sites.Where(query.Filter);
+
+        var sorted = sortDescending
+            ? sites.OrderByDescending(s => s.LastTripTicketDate!.Value.AddDays(s.TripTicketInterval))
+            : sites.OrderBy(s => s.LastTripTicketDate!.Value.AddDays(s.TripTicketInterval));
+
+        var paginated = await sorted.PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public async Task UpdateFogAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate)
+    {
+        await DbContext
+            .Sites
+            .Where(s => s.Id == siteId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(s => s.FogAccountAssignmentId, userId)
+                .SetProperty(s => s.FogAccountAssignmentDate, assignmentDate));
+    }
+
+    // Excludes soft-deleted rows on top of the base GetTrackedForUpdateAsync. Loaded via the query, not
+    // Attach/Entry, to preserve the row's real WaterSupplierId under AdminDbContext.
+    public override Task<Site?> GetTrackedForUpdateAsync(int siteId, CancellationToken cancellationToken)
+    {
+        return Entity.SingleOrDefaultAsync(s => s.Id == siteId && s.DeletedTime == null, cancellationToken);
+    }
+
+    public async Task ClearNeedsRenewalCheckAsync(int siteId)
+    {
+        await DbContext
+            .Sites
+            .Where(s => s.Id == siteId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(s => s.NeedsRenewalCheck, false));
+    }
+
+    public async Task<IEnumerable<Site>> GetAllPendingRenewalAsync(int batchSize)
+    {
+        return await DbContext.Sites
+            .IgnoreQueryFilters()
+            .Where(s => s.DeletedTime == null && s.NeedsRenewalCheck)
+            .OrderBy(s => s.Id)
+            .Take(batchSize)
+            .Select(s => new Site { Id = s.Id, WaterSupplierId = s.WaterSupplierId })
+            .AsNoTracking()
+            .ToListAsync();
     }
 }

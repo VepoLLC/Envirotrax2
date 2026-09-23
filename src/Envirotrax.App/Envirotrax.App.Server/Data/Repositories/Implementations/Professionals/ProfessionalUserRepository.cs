@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Professionals;
+using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.Common;
@@ -69,7 +70,22 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
             existing.ContactName = user.ContactName;
             existing.JobTitle = user.JobTitle;
 
-            await DbContext.SaveChangesAsync();
+            await SaveChangesAsync(logData: true);
+        }
+
+        return existing;
+    }
+
+    public async Task<ProfessionalUser?> UpdateSignaturePathAsync(int userId, string signaturePath)
+    {
+        var professionalId = _authService.ProfessionalId;
+        var existing = await DbContext.ProfessionalUsers.SingleOrDefaultAsync(u => u.ProfessionalId == professionalId && u.UserId == userId);
+
+        if (existing != null)
+        {
+            existing.SignaturePath = signaturePath;
+
+            await SaveChangesAsync(logData: true);
         }
 
         return existing;
@@ -84,7 +100,8 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         {
             existing.ContactName = contactName;
             existing.JobTitle = jobTitle;
-            await DbContext.SaveChangesAsync();
+
+            await SaveChangesAsync(logData: true);
         }
 
         return existing;
@@ -102,6 +119,50 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
 
         var paginated = await q
             .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<ProfessionalUser>> SearchAccountsAsync(PageInfo pageInfo, Query query, string? licenseNumber, string? insuranceNumber, Expression<Func<ProfessionalUserLicense, bool>> licenseFilter, Expression<Func<ProfessionalUser, bool>> roleFilter, CancellationToken cancellationToken)
+    {
+        var dbQuery = DbContext.ProfessionalUsers
+            .AsNoTracking()
+            .Include(proUser => proUser.User)
+            .Include(proUser => proUser.Professional)
+                .ThenInclude(professional => professional!.State)
+            .Where(roleFilter)
+            .Where(query.Filter);
+
+        if (!string.IsNullOrWhiteSpace(licenseNumber))
+        {
+            string license = licenseNumber;
+
+            var licenses = DbContext.ProfessionalUserLicenses
+                .Where(licenseFilter)
+                .Where(l => l.LicenseNumber.Contains(license));
+
+            dbQuery = dbQuery.Where(proUser => licenses.Any(l =>
+                l.ProfessionalId == proUser.ProfessionalId &&
+                l.UserId == proUser.UserId));
+        }
+
+        if (!string.IsNullOrWhiteSpace(insuranceNumber))
+        {
+            string insurance = insuranceNumber;
+
+            dbQuery = dbQuery.Where(proUser => DbContext.ProfessionalInsurances.Any(i =>
+                i.ProfessionalId == proUser.ProfessionalId &&
+                i.InsuranceNumber.Contains(insurance)));
+        }
+
+        if (query.Sort.IsNullOrEmpty())
+        {
+            query.Sort["Professional.Name"] = SortOperator.Asc;
+        }
+
+        var paginated = await dbQuery
             .OrderBy(query.Sort)
             .PaginateAsync(pageInfo, cancellationToken);
 

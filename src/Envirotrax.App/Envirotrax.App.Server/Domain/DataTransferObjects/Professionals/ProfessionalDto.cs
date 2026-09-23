@@ -8,6 +8,8 @@ public class ProfessionalDto : IDto
 {
     public int Id { get; set; }
 
+    public int? ParentId { get; set; }
+
     [Required]
     [StringLength(255)]
     public string Name { get; set; } = null!;
@@ -35,7 +37,6 @@ public class ProfessionalDto : IDto
     [StringLength(50)]
     public string? FaxNumber { get; set; }
 
-    [Url]
     [StringLength(255)]
     public string? WebSiteUrl { get; set; }
 
@@ -50,6 +51,11 @@ public class ProfessionalDto : IDto
     public DateTime CreatedTime { get; set; }
 
     public ExpirationType? InsuranceExpirationType { get; set; }
+
+    public List<ProfessionalLicenseOrInsuranceRowDto>? LicensesAndInsurances { get; set; }
+
+
+    public decimal AccountBalance { get; set; }
 }
 
 public class ReferencedProfessionalDto

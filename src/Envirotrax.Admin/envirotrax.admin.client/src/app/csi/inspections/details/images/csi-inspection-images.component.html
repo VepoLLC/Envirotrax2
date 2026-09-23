@@ -1,0 +1,29 @@
+<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+<div class="mb-3" *ngIf="!isLoading">
+    <vp-file-upload name="inspectionImage"
+                    accept=".jpg,.jpeg,.gif,.png,.bmp,.tiff"
+                    label="Choose an image or drag and drop here"
+                    (fileChange)="onFileChange($event)" />
+</div>
+
+<p class="text-center fs-4 fw-bold text-muted" *ngIf="!isLoading && images.length === 0">
+    No images
+</p>
+
+<div class="row">
+    <div class="col-md-6 mb-3" *ngFor="let image of images">
+        <div class="border rounded p-2">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-semibold small">{{ image.description }}</span>
+
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteImage(image)">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+
+            <img [src]="image.url" [alt]="image.description" class="img-fluid rounded w-100 object-fit-contain"
+                 style="max-height: 200px;" />
+        </div>
+    </div>
+</div>

@@ -1,11 +1,10 @@
 import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
-import { CellTemplateData, ColumnType, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
+import { CellTemplateData, ColumnType, ModalHelperService, TableColumn, ToastService } from '@envirotrax/common-ui';
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { BackflowRenewalRequirement } from "../../../shared/models/settings/backflow-renewal-requirement";
 import { BackflowRenewalRequirementService } from "../../../shared/services/settings/backflow-renewal-requirement.service";
 import { PropertyType } from "../../../shared/enums/property-type.enum";
-import { ToastService } from "../../../shared/services/toast.service";
 import { EditBackflowRenewalRequirementComponent } from "./edit/edit-backflow-renewal-requirement.component";
 
 @Component({

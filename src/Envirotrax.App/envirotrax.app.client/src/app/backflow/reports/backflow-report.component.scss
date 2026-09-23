@@ -1,0 +1,17 @@
+.vp-tabs .nav-link {
+    cursor: pointer;
+}
+
+// The four fixed-width pills need ~1050px+ to sit on one row, so below xl they wrap unevenly.
+// Stack them as full-width pills instead; xl+ keeps the centered horizontal row.
+@media (max-width: 1199.98px) {
+    .vp-tabs .nav-item {
+        width: 100%;
+    }
+
+    .vp-tabs .nav-link {
+        min-width: 0;
+        margin: 3px 0;
+        text-align: center;
+    }
+}

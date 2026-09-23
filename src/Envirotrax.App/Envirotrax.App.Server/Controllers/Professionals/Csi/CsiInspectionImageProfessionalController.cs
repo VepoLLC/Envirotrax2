@@ -8,7 +8,7 @@ namespace Envirotrax.App.Server.Controllers.Professionals.Csi;
 
 [Route("api/professionals/csi/inspections/{inspectionId}/images")]
 [HasFeature(FeatureType.CsiInspection)]
-[Authorize(Roles = RoleDefinitions.Professionals.CsiInspector)]
+[Authorize(Roles = $"{RoleDefinitions.Professionals.Admin},{RoleDefinitions.Professionals.CsiInspector}")]
 public class CsiInspectionImageProfessionalController : ProfessionalProtectedController
 {
     private readonly ICsiInspectionImageService _service;

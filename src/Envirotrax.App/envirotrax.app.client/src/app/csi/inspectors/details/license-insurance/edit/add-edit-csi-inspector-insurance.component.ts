@@ -4,7 +4,7 @@ import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { ProfessionalInsurance } from "../../../../../shared/models/professionals/professional-insurance";
 import { CsiInspectorInsurancesService } from "../../../../../shared/services/csi/csi-inspector-insurances.service";
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
-import { ToastService } from "../../../../../shared/services/toast.service";
+import { ToastService } from '@envirotrax/common-ui';
 
 export interface CsiInsuranceModalData {
     inspectorId: number;

@@ -58,6 +58,15 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<ProfessionalUserLicense>> GetAllByProfessionalIdsAsync(IEnumerable<int> professionalIds, ProfessionalType professionalType, CancellationToken cancellationToken)
+    {
+        return await DbContext.ProfessionalUserLicenses
+            .AsNoTracking()
+            .Include(l => l.LicenseType)
+            .Where(l => professionalIds.Contains(l.ProfessionalId) && l.ProfessionalType == professionalType)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<IEnumerable<ProfessionalUserLicense>> GetBpatLicensesForProfessionalAsync(int professionalId, CancellationToken cancellationToken)
     {
         return await DbContext.ProfessionalUserLicenses
@@ -117,7 +126,7 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
         };
     }
 
-    public async Task<ProfessionalUserLicense> UpdateForWaterSupplierAsync(int id, string licenseNumber, string? contactName, DateTime? expirationDate, CancellationToken cancellationToken)
+    public async Task<ProfessionalUserLicense?> UpdateForWaterSupplierAsync(int id, string licenseNumber, string? contactName, DateTime? expirationDate, CancellationToken cancellationToken)
     {
         var license = await DbContext.ProfessionalUserLicenses
             .Include(l => l.LicenseType)
@@ -134,11 +143,14 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
         if (license.ProfessionalUser != null)
             license.ProfessionalUser.ContactName = contactName;
 
-        await DbContext.SaveChangesAsync(cancellationToken);
+        // Both the license and the professional user are record logged, so this save writes a log row
+        // for each one that actually changed — the contact name edit used to go unlogged.
+        await SaveChangesAsync(logData: true, cancellationToken);
+
         return license;
     }
 
-    public async Task DeleteForWaterSupplierAsync(int id, CancellationToken cancellationToken)
+    public async Task<ProfessionalUserLicense> DeleteForWaterSupplierAsync(int id, CancellationToken cancellationToken)
     {
         var license = await DbContext.ProfessionalUserLicenses
             .FirstOrDefaultAsync(l => l.Id == id
@@ -147,5 +159,7 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
 
         DbContext.ProfessionalUserLicenses.Remove(license);
         await DbContext.SaveChangesAsync(cancellationToken);
+
+        return license;
     }
 }

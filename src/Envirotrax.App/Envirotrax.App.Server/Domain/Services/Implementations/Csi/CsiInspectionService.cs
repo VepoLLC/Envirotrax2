@@ -1,15 +1,21 @@
+using System.Transactions;
+using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Csi;
+using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Licenses;
+using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
+using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
+using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Csi;
@@ -22,6 +28,9 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
     private readonly IProfessionalUserLicenseService _licenseService;
     private readonly ISiteService _siteService;
     private readonly IPdfTemplateService _pdfTemplateService;
+    private readonly IAuthService _authService;
+    private readonly IGeneralSettingsService _generalSettingsService;
+    private readonly IProfessionalSupplierService _professionalSupplierService;
 
     public CsiInspectionService(
         IMapper mapper,
@@ -30,7 +39,10 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         IProfessionalUserService professionalUserService,
         IProfessionalUserLicenseService licenseService,
         ISiteService siteService,
-        IPdfTemplateService pdfTemplateService)
+        IPdfTemplateService pdfTemplateService,
+        IAuthService authService,
+        IGeneralSettingsService generalSettingsService,
+        IProfessionalSupplierService professionalSupplierService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -39,6 +51,24 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         _licenseService = licenseService;
         _siteService = siteService;
         _pdfTemplateService = pdfTemplateService;
+        _authService = authService;
+        _generalSettingsService = generalSettingsService;
+        _professionalSupplierService = professionalSupplierService;
+    }
+
+    public override async Task<CsiInspectionDto?> DeleteAsync(int id)
+    {
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+        var deleted = await _repository.DeleteAsync(id);
+
+        if (deleted == null || deleted.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(deleted.TransactionId))
+        {
+            return null;
+        }
+
+        scope.Complete();
+        return MapToDto(deleted);
     }
 
     public async Task<CsiInspectionDto> SubmitAsync(CsiInspectionDto request, CancellationToken cancellationToken)
@@ -82,15 +112,117 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
 
         ApplySiteSnapshot(inspection, site);
         ApplyInspectorSnapshot(inspection, professional, inspectorUser, csiLicense, inspectorUserId);
+        await ApplyAmountAsync(inspection, site.IsFeeExempt, cancellationToken);
 
         var added = await _repository.AddAsync(inspection);
         return Mapper.Map<CsiInspectionDto>(added);
     }
 
+    private async Task ApplyAmountAsync(CsiInspection inspection, bool siteIsFeeExempt, CancellationToken cancellationToken)
+    {
+        inspection.Amount = 0;
+        inspection.AmountShare = 0;
+
+        if (siteIsFeeExempt)
+        {
+            return;
+        }
+
+        var isResidential = inspection.PropertyType == PropertyType.Residential;
+
+        var settings = await _generalSettingsService.GetAsync(inspection.WaterSupplierId, cancellationToken);
+        var fee = isResidential ? settings?.CsiResidentialInspectionFee ?? 0 : settings?.CsiCommercialInspectionFee ?? 0;
+        var feeShare = isResidential ? settings?.CsiResidentialInspectionFeeWsShare ?? 0 : settings?.CsiCommercialInspectionFeeWsShare ?? 0;
+
+        var registration = await _professionalSupplierService.GetAsync(inspection.WaterSupplierId, cancellationToken);
+        var feeOverride = isResidential ? registration?.CsiResidentialInspectionFee : registration?.CsiCommercialInspectionFee;
+
+        inspection.Amount = feeOverride ?? fee;
+        inspection.AmountShare = feeShare;
+    }
+
+    // Checkout "Edit" on an own, still-unpaid inspection: mirrors SubmitAsync's field list and snapshot
+    // logic, but against an existing row. Ownership + payment-status guard lives in the repository
+    // (UpdateForProfessionalAsync returns Model == null for not-found/not-owned/already-paid).
+    public async Task<CsiInspectionDto?> UpdateForProfessionalAsync(int id, CsiInspectionDto request, CancellationToken cancellationToken)
+    {
+        var professionalId = _authService.ProfessionalId;
+        var siteId = request.Site!.Id!.Value;
+        var inspectorUserId = request.InspectorUser!.Id!.Value;
+
+        var site = await _siteService.GetAsync(siteId, cancellationToken);
+        var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
+        var inspectorUser = await _professionalUserService.GetAsync(inspectorUserId, cancellationToken);
+        var licenses = await _licenseService.GetAllAsync(inspectorUserId, new PageInfo(), new Query());
+
+        var csiLicense = licenses.Data.FirstOrDefault();
+
+        var inspection = new CsiInspection
+        {
+            Id = id,
+            InspectionDate = request.InspectionDate,
+            ReasonForInspection = request.ReasonForInspection,
+            Compliance1 = request.Compliance1,
+            Compliance2 = request.Compliance2,
+            Compliance3 = request.Compliance3,
+            Compliance4 = request.Compliance4,
+            Compliance5 = request.Compliance5,
+            Compliance6 = request.Compliance6,
+            MaterialServiceLineLead = request.MaterialServiceLineLead,
+            MaterialServiceLineCopper = request.MaterialServiceLineCopper,
+            MaterialServiceLinePVC = request.MaterialServiceLinePVC,
+            MaterialServiceLineOther = request.MaterialServiceLineOther,
+            MaterialServiceLineOtherDescription = request.MaterialServiceLineOtherDescription,
+            MaterialSolderLead = request.MaterialSolderLead,
+            MaterialSolderLeadFree = request.MaterialSolderLeadFree,
+            MaterialSolderSolventWeld = request.MaterialSolderSolventWeld,
+            MaterialSolderOther = request.MaterialSolderOther,
+            MaterialSolderOtherDescription = request.MaterialSolderOtherDescription,
+            Comments = request.Comments
+        };
+
+        ApplySiteSnapshot(inspection, site);
+        ApplyInspectorSnapshot(inspection, professional, inspectorUser, csiLicense, inspectorUserId);
+
+        var saved = await _repository.UpdateForProfessionalAsync(inspection, professionalId);
+
+        if (saved == null)
+        {
+            return null;
+        }
+
+        return Mapper.Map<CsiInspectionDto>(saved);
+    }
+
     public async Task<CsiInspectionDto?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken)
     {
-        var inspection = await _repository.UpdateApprovalAsync(id, request, cancellationToken);
-        return inspection == null ? null : Mapper.Map<CsiInspectionDto>(inspection);
+        var saved = await _repository.UpdateApprovalAsync(id, request, cancellationToken);
+
+        if (saved == null)
+        {
+            return null;
+        }
+
+        return Mapper.Map<CsiInspectionDto>(saved);
+    }
+
+    public async Task<CsiInspectionDto?> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request)
+    {
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            var saved = await _repository.UpdateForAdminAsync(id, request);
+
+            if (saved == null)
+            {
+                return null;
+            }
+
+            scope.Complete();
+        }
+
+        var updated = await _repository.GetAsync(id, default);
+
+        return Mapper.Map<CsiInspectionDto>(updated);
     }
 
     public async Task<IPagedData<CsiInspectionDto>> SearchForProfessionalAsync(PageInfo pageInfo, Query query, bool latestOnly, CancellationToken cancellationToken)
@@ -98,6 +230,16 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         query.Filter = query.ConvertFilterProperties<CsiInspection, CsiInspectionDto>(Mapper);
         query.Sort = query.ConvertSortProperties<CsiInspection, CsiInspectionDto>(Mapper);
         var inspections = await _repository.SearchForProfessionalAsync(pageInfo, query, latestOnly, cancellationToken);
+        return inspections.Select(m => Mapper.Map<CsiInspectionDto>(m)!).ToPagedData(pageInfo);
+    }
+
+    public async Task<IPagedData<CsiInspectionDto>> SearchForAdminAsync(PageInfo pageInfo, Query query, CsiPaymentStatus? paymentStatus, CancellationToken cancellationToken)
+    {
+        query.Filter = query.ConvertFilterProperties<CsiInspection, CsiInspectionDto>(Mapper);
+        query.Sort = query.ConvertSortProperties<CsiInspection, CsiInspectionDto>(Mapper);
+
+        var inspections = await _repository.SearchForAdminAsync(pageInfo, query, paymentStatus, cancellationToken);
+
         return inspections.Select(m => Mapper.Map<CsiInspectionDto>(m)!).ToPagedData(pageInfo);
     }
 
@@ -131,6 +273,16 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
     public Task<byte[]> GeneratePdfAsync(IEnumerable<CsiInspectionDto> inspections)
     {
         return _pdfTemplateService.GenerateAsync("Csi.CsiInspection", inspections);
+    }
+
+    public Task<byte[]> GeneratePdfForProfessionalAsync(CsiInspectionDto inspection)
+    {
+        if (inspection.TransactionId == null)
+        {
+            throw new AppValidationException("Report can't be downloaded until it's paid. Please go to checkout and pay for this transaction, then try downloading again.");
+        }
+
+        return GeneratePdfAsync(inspection);
     }
 
     private static void ApplyInspectorSnapshot(

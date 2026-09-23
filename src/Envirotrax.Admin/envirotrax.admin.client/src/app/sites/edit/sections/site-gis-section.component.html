@@ -1,0 +1,51 @@
+<vp-section header="GIS Data" class="d-block">
+    <div class="row mb-2">
+        <div class="col-md-6 mb-3">
+            <vp-input name="gisLatitude"
+                      label="Latitude"
+                      type="number"
+                      [(ngModel)]="site.gisLatitude"
+                      [form]="form">
+            </vp-input>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <vp-input name="gisLongitude"
+                      label="Longitude"
+                      type="number"
+                      [(ngModel)]="site.gisLongitude"
+                      [form]="form">
+            </vp-input>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <vp-input name="gisStatus"
+                      label="GIS Status"
+                      type="select"
+                      [(ngModel)]="site.gisStatus"
+                      [options]="gisStatusOptions"
+                      [form]="form">
+            </vp-input>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label class="form-label">GIS Date</label>
+            <div class="form-control-plaintext">{{ (site.gisDate | date:'M/d/yyyy') || '—' }}</div>
+        </div>
+    </div>
+
+    <div class="mb-2">
+        @if (site.gisLatitude != null && site.gisLongitude != null) {
+            <vp-map [latitude]="site.gisLatitude"
+                    [longitude]="site.gisLongitude"
+                    [zoom]="15"
+                    [showMarker]="true"
+                    height="400px">
+            </vp-map>
+        } @else {
+            <div class="d-flex align-items-center justify-content-center text-muted py-5">
+                <span>No location available</span>
+            </div>
+        }
+    </div>
+</vp-section>

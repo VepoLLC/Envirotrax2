@@ -4,6 +4,7 @@ import { HomeComponent } from "./home/home.component";
 import { GisAreaListComponent } from "./gis-areas/list/gis-area-list.component";
 import { PermissionGuard } from "../shared/guards/permission.guard";
 import { PermissionAction, PermissionType } from "../shared/models/permission-type";
+import { AccountContactInformationComponent } from "./account/account-contact-information.component";
 
 const routes: Routes = [
     {
@@ -12,16 +13,34 @@ const routes: Routes = [
         title: 'Administration'
     },
     {
+        path: 'account-information',
+        title: 'Account Contact Information',
+        component: AccountContactInformationComponent
+    },
+    {
         path: 'water-suppliers',
         loadChildren: () => import('./water-suppliers/water-supplier.module').then(m => m.WaterSupplierModule)
     },
     {
         path: 'settings',
-        loadChildren: () => import('./settings/settings.module').then(m => m.SettingsModule)
+        loadChildren: () => import('./settings/settings.module').then(m => m.SettingsModule),
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.Settings,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
     },
     {
         path: 'users',
         loadChildren: () => import('./users/user.module').then(m => m.UserModule)
+    },
+    {
+        path: 'notifications',
+        loadChildren: () => import('./notifications/notification.module').then(m => m.NotificationModule)
     },
     {
         path: 'gis-areas',

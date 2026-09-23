@@ -4,8 +4,7 @@ import { ProfessionalUser } from "../../../shared/models/professionals/professio
 import { ProfesionalUserService } from "../../../shared/services/professionals/professional-user.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import { CreateProfessionalUserComponent } from "../create/create-professional-user.component";
-import { ToastService } from "../../../shared/services/toast.service";
-import { ColumnType, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
+import { ToastService, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,

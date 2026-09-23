@@ -9,4 +9,5 @@ namespace Envirotrax.App.Server.Data.Models.Users;
 public class AppUser : AspNetUserBase
 {
     public string? Email { get; set; }
+    public string? PhoneNumber { get; set; }
 }

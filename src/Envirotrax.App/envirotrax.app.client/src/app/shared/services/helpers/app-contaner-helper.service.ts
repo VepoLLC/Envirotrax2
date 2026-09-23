@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
+import { asapScheduler, BehaviorSubject, Observable, observeOn } from "rxjs";
 import { NavigationStart, Router } from "@angular/router";
 
 @Injectable({
@@ -17,7 +17,10 @@ export class AppContainerHelperService {
     }
 
     public usContainer(): Observable<boolean> {
-        return this._useContainer$.asObservable();
+        // Pages call setContainerVisibility from ngOnInit, i.e. in the middle of a
+        // change detection pass. Deliver emissions on a microtask so subscribers
+        // (App calls detectChanges) never re-enter change detection mid-pass.
+        return this._useContainer$.pipe(observeOn(asapScheduler));
     }
 
     public setContainerVisibility(isVisible: boolean): void {

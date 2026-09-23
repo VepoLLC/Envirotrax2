@@ -1,7 +1,9 @@
 
 using AutoMapper;
+using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.App.Server.Domain.Mapping.WaterSuppliers;
@@ -27,12 +29,16 @@ public class WaterSupplierProfile : Profile
             .ReverseMap()
             .ForMember(supplier => supplier.Parent, opt => opt.Ignore())
             .ForMember(supplier => supplier.ParentId, opt => opt.MapFrom(supplier => supplier.Parent!.Id))
+            .ForMember(supplier => supplier.GeneralSettings, opt => opt.Ignore())
             .ForMember(supplier => supplier.State, opt => opt.Ignore())
             .ForMember(supplier => supplier.StateId, opt => opt.MapFrom(dto => dto.State != null ? dto.State.Id : (int?)null))
             .ForMember(supplier => supplier.LetterState, opt => opt.Ignore())
             .ForMember(supplier => supplier.LetterStateId, opt => opt.MapFrom(dto => dto.LetterState != null ? dto.LetterState.Id : (int?)null))
             .ForMember(supplier => supplier.LetterContactState, opt => opt.Ignore())
             .ForMember(supplier => supplier.LetterContactStateId, opt => opt.MapFrom(dto => dto.LetterContactState != null ? dto.LetterContactState.Id : (int?)null));
+
+        CreateMap<WaterSupplierUser, ReferencedWaterSupplierUserDto>()
+            .ForMember(d => d.Id, opt => opt.MapFrom(s => s.UserId));
 
         CreateMap<WaterSupplier, ReferencedWaterSupplierDto>()
             .AfterMap((ws, dto) =>

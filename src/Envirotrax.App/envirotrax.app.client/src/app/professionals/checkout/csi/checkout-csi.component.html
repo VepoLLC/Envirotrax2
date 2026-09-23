@@ -1,0 +1,100 @@
+<vp-section header="Unpaid Inspection Reports">
+    <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+    <ng-template #selectTemplate let-item="rowData">
+        <div class="text-center">
+            <input type="checkbox"
+                   class="form-check-input"
+                   [checked]="item.selected"
+                   (click)="$event.stopPropagation()"
+                   (change)="item.selected = !item.selected" />
+        </div>
+    </ng-template>
+
+    <ng-template #emailPdfTemplate let-item="rowData">
+        <div class="text-center">
+            <input type="checkbox"
+                   class="form-check-input"
+                   [checked]="item.emailPdf"
+                   (click)="$event.stopPropagation()"
+                   (change)="item.emailPdf = !item.emailPdf" />
+        </div>
+    </ng-template>
+
+    <ng-template #propertyAddressTemplate let-item="rowData">
+        <div>
+            {{ item.propertyStreetNumber }} {{ item.propertyStreetName }}
+            <span *ngIf="item.propertyNumber">#{{ item.propertyNumber }}</span>
+        </div>
+        <div>
+            {{ item.propertyCity }}<span *ngIf="item.propertyCity">, </span>{{ item.propertyState }} {{ item.propertyZip }}
+        </div>
+    </ng-template>
+
+    <ng-template #mailingAddressTemplate let-item="rowData">
+        <div>
+            {{ item.mailingStreetNumber }} {{ item.mailingStreetName }}
+            <span *ngIf="item.mailingNumber">#{{ item.mailingNumber }}</span>
+        </div>
+        <div>
+            {{ item.mailingCity }}<span *ngIf="item.mailingCity">, </span>{{ item.mailingState }} {{ item.mailingZip }}
+        </div>
+    </ng-template>
+
+    <div *ngIf="isAdmin" class="row mb-2">
+        <div class="p-2 text-end fw-bold col-md-3">List unpaid inspection reports for: </div>
+
+        <div class="col-md-4 pb-2">
+            <vp-input type="select"
+                      class=""
+                      name="reportFor"
+                      [options]="reportForOptions"
+                      [(ngModel)]="reportFor" />
+        </div>
+
+        <div class="col-md-5">
+            <button type="button" class="pb-1 btn btn-primary vp-section-button " (click)="getCsiInspections()">
+                Update List
+            </button>
+        </div>
+    </div>
+
+    @if (items.items && items.items.data && items.items.data.length > 0) {
+        <div class="vp-checkout-table-scroll">
+            <vp-table [columns]="items.columns!"
+                      [data]="items.items.data"
+                      [(query)]="items.query"
+                      [canViewDetails]="true"
+                      (viewDetails)="viewInspection($event)"
+                      [canEdit]="true"
+                      (edit)="editInspection($event)"
+                      [canDelete]="true"
+                      (delete)="deleteInspection($event)" />
+        </div>
+
+        <div class="row my-2">
+            <div class="col-md-2">
+                <button type="button" class="pb-1 btn btn-primary vp-section-button " (click)="recalculateSelectedTotal()">
+                    Update
+                </button>
+            </div>
+            <div class="p-2 text-end col-md-9">List unpaid inspection reports for: {{ selectedFeeTotal | currency }}</div>
+            <div class="col-md-1">
+
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="text-end col-md-11 pe-2">Available account balance: </div>
+        </div>
+        <div class="row mb-3">
+            <div class="text-end col-md-11 pe-2">Amount to be deducted from your available account balance: </div>
+        </div>
+        <div class="row mb-3 text-danger">
+            <div class="text-end col-md-11 pe-2">Amount needed to be charged to a credit card to complete the submission: </div>
+        </div>
+    } @else {
+        <div class="text-center text-muted py-5">
+            No unpaid inspection reports found.
+        </div>
+    }
+</vp-section>

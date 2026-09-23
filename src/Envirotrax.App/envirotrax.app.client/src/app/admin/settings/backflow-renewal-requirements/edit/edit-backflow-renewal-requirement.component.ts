@@ -1,12 +1,11 @@
 import { Component } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { ModalReference } from "@developer-partners/ngx-modal-dialog";
-import { InputOption } from "@envirotrax/common-ui";
+import { InputOption, ToastService } from '@envirotrax/common-ui';
 import { BackflowRenewalRequirement } from "../../../../shared/models/settings/backflow-renewal-requirement";
 import { BackflowRenewalRequirementService } from "../../../../shared/services/settings/backflow-renewal-requirement.service";
 import { PropertyType } from "../../../../shared/enums/property-type.enum";
 import { HelperService } from "../../../../shared/services/helpers/helper.service";
-import { ToastService } from "../../../../shared/services/toast.service";
 
 @Component({
     standalone: false,

@@ -1,0 +1,47 @@
+
+.col-num { width: 7%; }
+
+.col-bar { width: 11%; min-width: 80px; }
+
+/* Doughnut chart sizing (Compliant vs Non-Compliant, % drawn in the center). */
+.bf-pie-wrap {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    flex: 0 0 auto;
+}
+
+.bf-legend {
+    min-width: 320px;
+}
+
+.bf-legend-row {
+    display: flex;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--bs-border-color);
+
+    &:last-child {
+        border-bottom: 0;
+    }
+}
+
+/* Swatch size/layout only — the colors are bound in the template from the TS chart-color constants
+   (totalColor / compliantColor / nonCompliantColor) so the legend always matches the doughnut canvas. */
+.bf-swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    margin-right: 10px;
+    flex: 0 0 auto;
+}
+
+.bf-legend-text {
+    flex: 1 1 auto;
+}
+
+.bf-legend-num {
+    font-weight: 600;
+    margin-left: 12px;
+    white-space: nowrap;
+}

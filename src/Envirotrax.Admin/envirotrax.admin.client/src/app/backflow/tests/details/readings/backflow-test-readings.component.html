@@ -1,0 +1,617 @@
+<div *ngIf="visibility.showInitialAndFinal">
+    <vp-section [header]="initialTestHeader">
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <vp-input name="initialTestDate"
+                          type="date"
+                          label="Initial Test Date"
+                          [form]="form"
+                          [(ngModel)]="test.initialTestDate" />
+            </div>
+        </div>
+
+        <div class="border border-4 border-primary-subtle p-2 mb-3" *ngIf="visibility.showMainCv1 || visibility.showMainCv2 || visibility.showMainRv">
+            <div class="fw-semibold mb-2">Main Assembly</div>
+
+            <div class="row">
+                <div class="col-md-4 mb-2" *ngIf="visibility.showMainCv1">
+                    <div class="fw-semibold">Check Valve #1</div>
+
+                    <vp-input name="initCV1HeldPSID"
+                              type="number"
+                              label="Held at PSID"
+                              [form]="form"
+                              [decimals]="2"
+                              [(ngModel)]="test.initCV1HeldPSID" />
+
+                    <div class="form-check mt-1">
+                        <input class="form-check-input" type="checkbox"
+                               [attr.id]="idPrefix + '-init-cv1-closed-tight'"
+                               name="initCV1ClosedTight"
+                               [(ngModel)]="test.initCV1ClosedTight" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-init-cv1-closed-tight'">Closed Tight</label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox"
+                               [attr.id]="idPrefix + '-init-cv1-leaked'"
+                               name="initCV1Leaked"
+                               [(ngModel)]="test.initCV1Leaked" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-init-cv1-leaked'">Leaked</label>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-2" *ngIf="visibility.showMainCv2">
+                    <div class="fw-semibold">Check Valve #2</div>
+
+                    <vp-input name="initCV2HeldPSID"
+                              type="number"
+                              label="Held at PSID"
+                              [form]="form"
+                              [decimals]="2"
+                              [(ngModel)]="test.initCV2HeldPSID" />
+
+                    <div class="form-check mt-1">
+                        <input class="form-check-input" type="checkbox"
+                               [attr.id]="idPrefix + '-init-cv2-closed-tight'"
+                               name="initCV2ClosedTight"
+                               [(ngModel)]="test.initCV2ClosedTight" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-init-cv2-closed-tight'">Closed Tight</label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox"
+                               [attr.id]="idPrefix + '-init-cv2-leaked'"
+                               name="initCV2Leaked"
+                               [(ngModel)]="test.initCV2Leaked" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-init-cv2-leaked'">Leaked</label>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-2" *ngIf="visibility.showMainRv">
+                    <div class="fw-semibold">Relief Valve</div>
+
+                    <vp-input name="initRVOpenedPSID"
+                              type="number"
+                              label="Opened at PSID"
+                              [form]="form"
+                              [decimals]="2"
+                              [(ngModel)]="test.initRVOpenedPSID" />
+
+                    <div class="form-check mt-1">
+                        <input class="form-check-input" type="checkbox"
+                               [attr.id]="idPrefix + '-init-rv-did-not-open'"
+                               name="initRVDidNotOpen"
+                               [(ngModel)]="test.initRVDidNotOpen" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-init-rv-did-not-open'">Did not open</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="border border-4 border-success-subtle p-2 mb-3" *ngIf="visibility.hasBypassAssembly">
+            <div class="fw-semibold mb-2">Bypass Assembly</div>
+
+            <div class="row">
+                <div class="col-md-4 mb-2" *ngIf="visibility.showBypassCv1">
+                    <div class="fw-semibold">Check Valve #1</div>
+
+                    <vp-input name="initCV1HeldPSID2"
+                              type="number"
+                              label="Held at PSID"
+                              [form]="form"
+                              [decimals]="2"
+                              [(ngModel)]="test.initCV1HeldPSID2" />
+
+                    <div class="form-check mt-1">
+                        <input class="form-check-input" type="checkbox"
+                               [attr.id]="idPrefix + '-init-bypass-cv1-closed-tight'"
+                               name="initCV1ClosedTight2"
+                               [(ngModel)]="test.initCV1ClosedTight2" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-init-bypass-cv1-closed-tight'">Closed Tight</label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox"
+                               [attr.id]="idPrefix + '-init-bypass-cv1-leaked'"
+                               name="initCV1Leaked2"
+                               [(ngModel)]="test.initCV1Leaked2" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-init-bypass-cv1-leaked'">Leaked</label>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-2" *ngIf="visibility.showBypassCv2">
+                    <div class="fw-semibold">Check Valve #2</div>
+
+                    <vp-input name="initCV2HeldPSID2"
+                              type="number"
+                              label="Held at PSID"
+                              [form]="form"
+                              [decimals]="2"
+                              [(ngModel)]="test.initCV2HeldPSID2" />
+
+                    <div class="form-check mt-1">
+                        <input class="form-check-input" type="checkbox"
+                               [attr.id]="idPrefix + '-init-bypass-cv2-closed-tight'"
+                               name="initCV2ClosedTight2"
+                               [(ngModel)]="test.initCV2ClosedTight2" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-init-bypass-cv2-closed-tight'">Closed Tight</label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox"
+                               [attr.id]="idPrefix + '-init-bypass-cv2-leaked'"
+                               name="initCV2Leaked2"
+                               [(ngModel)]="test.initCV2Leaked2" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-init-bypass-cv2-leaked'">Leaked</label>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-2" *ngIf="visibility.showBypassRv">
+                    <div class="fw-semibold">Relief Valve</div>
+
+                    <vp-input name="initRVOpenedPSID2"
+                              type="number"
+                              label="Opened at PSID"
+                              [form]="form"
+                              [decimals]="2"
+                              [(ngModel)]="test.initRVOpenedPSID2" />
+
+                    <div class="form-check mt-1">
+                        <input class="form-check-input" type="checkbox"
+                               [attr.id]="idPrefix + '-init-bypass-rv-did-not-open'"
+                               name="initRVDidNotOpen2"
+                               [(ngModel)]="test.initRVDidNotOpen2" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-init-bypass-rv-did-not-open'">Did not open</label>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-2" *ngIf="visibility.showBypassCheck">
+                    <div class="fw-semibold">Bypass Check</div>
+
+                    <vp-input name="initBCHeldPSID"
+                              type="number"
+                              label="Held at PSID"
+                              [form]="form"
+                              [decimals]="2"
+                              [(ngModel)]="test.initBCHeldPSID" />
+
+                    <div class="form-check mt-1">
+                        <input class="form-check-input" type="checkbox"
+                               [attr.id]="idPrefix + '-init-bc-closed-tight'"
+                               name="initBCClosedTight"
+                               [(ngModel)]="test.initBCClosedTight" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-init-bc-closed-tight'">Closed Tight</label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox"
+                               [attr.id]="idPrefix + '-init-bc-leaked'"
+                               name="initBCLeaked"
+                               [(ngModel)]="test.initBCLeaked" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-init-bc-leaked'">Leaked</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="border border-4 border-primary-subtle p-2" *ngIf="visibility.showPvb">
+            <div class="fw-semibold mb-2">{{ pvbHeader }}</div>
+
+            <div class="row">
+                <div class="col-md-4 mb-2">
+                    <div class="fw-semibold">Check Valve #1</div>
+
+                    <vp-input name="initPvbAirInletOpenedPSID"
+                              type="number"
+                              label="Held at PSID"
+                              [form]="form"
+                              [decimals]="2"
+                              [(ngModel)]="test.initPvbAirInletOpenedPSID" />
+
+                    <div class="form-check mt-1">
+                        <input class="form-check-input" type="checkbox"
+                               [attr.id]="idPrefix + '-init-pvb-air-inlet-did-not-open'"
+                               name="initPvbAirInletDidNotOpen"
+                               [(ngModel)]="test.initPvbAirInletDidNotOpen" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-init-pvb-air-inlet-did-not-open'">Did not open</label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox"
+                               [attr.id]="idPrefix + '-init-pvb-air-inlet-fully-opened'"
+                               name="initPvbAirInletFullyOpened"
+                               [(ngModel)]="test.initPvbAirInletFullyOpened" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-init-pvb-air-inlet-fully-opened'">Did it fully open</label>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-2">
+                    <div class="fw-semibold">Check Valve #2</div>
+
+                    <vp-input name="initPvbCVHeldPSID"
+                              type="number"
+                              label="Held at PSID"
+                              [form]="form"
+                              [decimals]="2"
+                              [(ngModel)]="test.initPvbCVHeldPSID" />
+
+                    <div class="form-check mt-1">
+                        <input class="form-check-input" type="checkbox"
+                               [attr.id]="idPrefix + '-init-pvb-cv-leaked'"
+                               name="initPvbCVLeaked"
+                               [(ngModel)]="test.initPvbCVLeaked" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-init-pvb-cv-leaked'">Leaked</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </vp-section>
+
+    <div class="mt-3">
+        <vp-section header="Repairs and Materials Used" [isExpanded]="false">
+            <dl class="row mb-0">
+                <dt class="col-sm-5" *ngIf="visibility.showMainCv1">Main Assembly - Check Valve #1</dt>
+                <dd class="col-sm-7" *ngIf="visibility.showMainCv1">{{ test.repairCV1 }}</dd>
+
+                <dt class="col-sm-5" *ngIf="visibility.showMainCv2">Main Assembly - Check Valve #2</dt>
+                <dd class="col-sm-7" *ngIf="visibility.showMainCv2">{{ test.repairCV2 }}</dd>
+
+                <dt class="col-sm-5" *ngIf="visibility.showMainRv">Main Assembly - Relief Valve</dt>
+                <dd class="col-sm-7" *ngIf="visibility.showMainRv">{{ test.repairRV }}</dd>
+
+                <dt class="col-sm-5" *ngIf="visibility.showBypassCv1">Bypass Assembly - Check Valve #1</dt>
+                <dd class="col-sm-7" *ngIf="visibility.showBypassCv1">{{ test.repairCV12 }}</dd>
+
+                <dt class="col-sm-5" *ngIf="visibility.showBypassCv2">Bypass Assembly - Check Valve #2</dt>
+                <dd class="col-sm-7" *ngIf="visibility.showBypassCv2">{{ test.repairCV22 }}</dd>
+
+                <dt class="col-sm-5" *ngIf="visibility.showBypassRv">Bypass Assembly - Relief Valve</dt>
+                <dd class="col-sm-7" *ngIf="visibility.showBypassRv">{{ test.repairRV2 }}</dd>
+
+                <dt class="col-sm-5" *ngIf="visibility.showBypassCheck">Bypass Check</dt>
+                <dd class="col-sm-7" *ngIf="visibility.showBypassCheck">{{ test.repairBC }}</dd>
+
+                <dt class="col-sm-5" *ngIf="visibility.showPvb">Air Inlet</dt>
+                <dd class="col-sm-7" *ngIf="visibility.showPvb">{{ test.repairPvbAirInlet }}</dd>
+
+                <dt class="col-sm-5" *ngIf="visibility.showPvb">Check Valve</dt>
+                <dd class="col-sm-7" *ngIf="visibility.showPvb">{{ test.repairPvbCV }}</dd>
+            </dl>
+        </vp-section>
+    </div>
+
+    <div class="mt-3">
+        <vp-section header="Repair Details" [isExpanded]="false">
+            <div class="row">
+                <div class="col-md-4 mb-2" *ngIf="visibility.showMainCv1">
+                    <vp-input name="repairCV1Details"
+                              label="Main Assembly - Check Valve #1"
+                              [form]="form"
+                              [maxLength]="100"
+                              [(ngModel)]="test.repairCV1Details" />
+                </div>
+
+                <div class="col-md-4 mb-2" *ngIf="visibility.showMainCv2">
+                    <vp-input name="repairCV2Details"
+                              label="Main Assembly - Check Valve #2"
+                              [form]="form"
+                              [maxLength]="100"
+                              [(ngModel)]="test.repairCV2Details" />
+                </div>
+
+                <div class="col-md-4 mb-2" *ngIf="visibility.showMainRv">
+                    <vp-input name="repairRVDetails"
+                              label="Main Assembly - Relief Valve"
+                              [form]="form"
+                              [maxLength]="100"
+                              [(ngModel)]="test.repairRVDetails" />
+                </div>
+
+                <div class="col-md-4 mb-2" *ngIf="visibility.showBypassCv1">
+                    <vp-input name="repairCV1Details2"
+                              label="Bypass Assembly - Check Valve #1"
+                              [form]="form"
+                              [maxLength]="100"
+                              [(ngModel)]="test.repairCV1Details2" />
+                </div>
+
+                <div class="col-md-4 mb-2" *ngIf="visibility.showBypassCv2">
+                    <vp-input name="repairCV2Details2"
+                              label="Bypass Assembly - Check Valve #2"
+                              [form]="form"
+                              [maxLength]="100"
+                              [(ngModel)]="test.repairCV2Details2" />
+                </div>
+
+                <div class="col-md-4 mb-2" *ngIf="visibility.showBypassRv">
+                    <vp-input name="repairRVDetails2"
+                              label="Bypass Assembly - Relief Valve"
+                              [form]="form"
+                              [maxLength]="100"
+                              [(ngModel)]="test.repairRVDetails2" />
+                </div>
+
+                <div class="col-md-4 mb-2" *ngIf="visibility.showBypassCheck">
+                    <vp-input name="repairBCDetails"
+                              label="Bypass Check"
+                              [form]="form"
+                              [maxLength]="100"
+                              [(ngModel)]="test.repairBCDetails" />
+                </div>
+
+                <div class="col-md-4 mb-2" *ngIf="visibility.showPvb">
+                    <vp-input name="repairPvbAirInletDetails"
+                              label="Air Inlet"
+                              [form]="form"
+                              [maxLength]="100"
+                              [(ngModel)]="test.repairPvbAirInletDetails" />
+                </div>
+
+                <div class="col-md-4 mb-2" *ngIf="visibility.showPvb">
+                    <vp-input name="repairPvbCVDetails"
+                              label="Check Valve"
+                              [form]="form"
+                              [maxLength]="100"
+                              [(ngModel)]="test.repairPvbCVDetails" />
+                </div>
+            </div>
+        </vp-section>
+    </div>
+
+    <div class="mt-3">
+        <vp-section header="Final Test">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <vp-input name="repairTestDate"
+                              type="date"
+                              label="Final Test Date"
+                              [form]="form"
+                              [(ngModel)]="test.repairTestDate" />
+                </div>
+            </div>
+
+            <div class="border border-4 border-primary-subtle p-2 mb-3" *ngIf="visibility.showMainCv1 || visibility.showMainCv2 || visibility.showMainRv">
+                <div class="fw-semibold mb-2">Main Assembly</div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-2" *ngIf="visibility.showMainCv1">
+                        <div class="fw-semibold">Check Valve #1</div>
+
+                        <vp-input name="finalCV1HeldPSID"
+                                  type="number"
+                                  label="Held at PSID"
+                                  [form]="form"
+                                  [decimals]="2"
+                                  [(ngModel)]="test.finalCV1HeldPSID" />
+
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox"
+                                   [attr.id]="idPrefix + '-final-cv1-closed-tight'"
+                                   name="finalCV1ClosedTight"
+                                   [(ngModel)]="test.finalCV1ClosedTight" />
+                            <label class="form-check-label" [attr.for]="idPrefix + '-final-cv1-closed-tight'">Closed Tight</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-2" *ngIf="visibility.showMainCv2">
+                        <div class="fw-semibold">Check Valve #2</div>
+
+                        <vp-input name="finalCV2HeldPSID"
+                                  type="number"
+                                  label="Held at PSID"
+                                  [form]="form"
+                                  [decimals]="2"
+                                  [(ngModel)]="test.finalCV2HeldPSID" />
+
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox"
+                                   [attr.id]="idPrefix + '-final-cv2-closed-tight'"
+                                   name="finalCV2ClosedTight"
+                                   [(ngModel)]="test.finalCV2ClosedTight" />
+                            <label class="form-check-label" [attr.for]="idPrefix + '-final-cv2-closed-tight'">Closed Tight</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-2" *ngIf="visibility.showMainRv">
+                        <div class="fw-semibold">Relief Valve</div>
+
+                        <vp-input name="finalRVOpenedPSID"
+                                  type="number"
+                                  label="Opened at PSID"
+                                  [form]="form"
+                                  [decimals]="2"
+                                  [(ngModel)]="test.finalRVOpenedPSID" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-4 border-success-subtle p-2" *ngIf="visibility.hasBypassAssembly">
+                <div class="fw-semibold mb-2">Bypass Assembly</div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-2" *ngIf="visibility.showBypassCv1">
+                        <div class="fw-semibold">Check Valve #1</div>
+
+                        <vp-input name="finalCV1HeldPSID2"
+                                  type="number"
+                                  label="Held at PSID"
+                                  [form]="form"
+                                  [decimals]="2"
+                                  [(ngModel)]="test.finalCV1HeldPSID2" />
+
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox"
+                                   [attr.id]="idPrefix + '-final-bypass-cv1-closed-tight'"
+                                   name="finalCV1ClosedTight2"
+                                   [(ngModel)]="test.finalCV1ClosedTight2" />
+                            <label class="form-check-label" [attr.for]="idPrefix + '-final-bypass-cv1-closed-tight'">Closed Tight</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-2" *ngIf="visibility.showBypassCv2">
+                        <div class="fw-semibold">Check Valve #2</div>
+
+                        <vp-input name="finalCV2HeldPSID2"
+                                  type="number"
+                                  label="Held at PSID"
+                                  [form]="form"
+                                  [decimals]="2"
+                                  [(ngModel)]="test.finalCV2HeldPSID2" />
+
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox"
+                                   [attr.id]="idPrefix + '-final-bypass-cv2-closed-tight'"
+                                   name="finalCV2ClosedTight2"
+                                   [(ngModel)]="test.finalCV2ClosedTight2" />
+                            <label class="form-check-label" [attr.for]="idPrefix + '-final-bypass-cv2-closed-tight'">Closed Tight</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-2" *ngIf="visibility.showBypassRv">
+                        <div class="fw-semibold">Relief Valve</div>
+
+                        <vp-input name="finalRVOpenedPSID2"
+                                  type="number"
+                                  label="Opened at PSID"
+                                  [form]="form"
+                                  [decimals]="2"
+                                  [(ngModel)]="test.finalRVOpenedPSID2" />
+                    </div>
+
+                    <div class="col-md-4 mb-2" *ngIf="visibility.showBypassCheck">
+                        <div class="fw-semibold">Bypass Check</div>
+
+                        <vp-input name="finalBCHeldPSID"
+                                  type="number"
+                                  label="Held at PSID"
+                                  [form]="form"
+                                  [decimals]="2"
+                                  [(ngModel)]="test.finalBCHeldPSID" />
+
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox"
+                                   [attr.id]="idPrefix + '-final-bc-closed-tight'"
+                                   name="finalBCClosedTight"
+                                   [(ngModel)]="test.finalBCClosedTight" />
+                            <label class="form-check-label" [attr.for]="idPrefix + '-final-bc-closed-tight'">Closed Tight</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-4 border-primary-subtle p-2" *ngIf="visibility.showPvb">
+                <div class="fw-semibold mb-2">{{ pvbHeader }}</div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-2">
+                        <div class="fw-semibold">Check Valve #1</div>
+
+                        <vp-input name="finalPvbAirInletOpenedPSID"
+                                  type="number"
+                                  label="Held at PSID"
+                                  [form]="form"
+                                  [decimals]="2"
+                                  [(ngModel)]="test.finalPvbAirInletOpenedPSID" />
+
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox"
+                                   [attr.id]="idPrefix + '-final-pvb-air-inlet-fully-opened'"
+                                   name="finalPvbAirInletFullyOpened"
+                                   [(ngModel)]="test.finalPvbAirInletFullyOpened" />
+                            <label class="form-check-label" [attr.for]="idPrefix + '-final-pvb-air-inlet-fully-opened'">Did it fully open</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-2">
+                        <div class="fw-semibold">Check Valve #2</div>
+
+                        <vp-input name="finalPvbCVHeldPSID"
+                                  type="number"
+                                  label="Held at PSID"
+                                  [form]="form"
+                                  [decimals]="2"
+                                  [(ngModel)]="test.finalPvbCVHeldPSID" />
+                    </div>
+                </div>
+            </div>
+        </vp-section>
+    </div>
+</div>
+
+<div class="mt-3" *ngIf="visibility.showMeterTest">
+    <vp-section header="Bypass Meter Test">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <vp-input name="meterNumber"
+                          label="Bypass Meter Number"
+                          [form]="form"
+                          [maxLength]="50"
+                          [(ngModel)]="test.meterNumber" />
+            </div>
+
+            <div class="col-md-3 mb-2">
+                <div class="form-check mt-4">
+                    <input class="form-check-input" type="checkbox"
+                           [attr.id]="idPrefix + '-meter-registers'"
+                           name="meterRegisters"
+                           [(ngModel)]="test.meterRegisters" />
+                    <label class="form-check-label" [attr.for]="idPrefix + '-meter-registers'">Bypass Meter registers a flow?</label>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-2">
+                <vp-input name="meterReadingBefore"
+                          type="number"
+                          label="Meter reading prior to test"
+                          [form]="form"
+                          [decimals]="2"
+                          [(ngModel)]="test.meterReadingBefore" />
+            </div>
+
+            <div class="col-md-3 mb-2">
+                <vp-input name="meterReadingAfter"
+                          type="number"
+                          label="Meter reading upon completion"
+                          [form]="form"
+                          [decimals]="2"
+                          [(ngModel)]="test.meterReadingAfter" />
+            </div>
+        </div>
+    </vp-section>
+</div>
+
+<div class="mt-3" *ngIf="visibility.showAirGap">
+    <vp-section header="Air Gap">
+        <p class="mb-2">
+            Do you certify that the air gap between the potable water supply and the overflow rim of the
+            containment vessel complies with the requirements of an approved air gap and has not been
+            bypassed, or otherwise made ineffective?
+        </p>
+
+        <div class="d-flex gap-3 mb-2">
+            <div class="form-check mb-0">
+                <input class="form-check-input" type="radio"
+                       [attr.id]="idPrefix + '-air-gap-valid-yes'"
+                       name="airGapValid"
+                       [value]="true"
+                       [(ngModel)]="test.airGapValid" />
+                <label class="form-check-label" [attr.for]="idPrefix + '-air-gap-valid-yes'">Yes</label>
+            </div>
+
+            <div class="form-check mb-0">
+                <input class="form-check-input" type="radio"
+                       [attr.id]="idPrefix + '-air-gap-valid-no'"
+                       name="airGapValid"
+                       [value]="false"
+                       [(ngModel)]="test.airGapValid" />
+                <label class="form-check-label" [attr.for]="idPrefix + '-air-gap-valid-no'">No</label>
+            </div>
+        </div>
+
+        <p class="mb-0 fst-italic">
+            (An approved air gap shall be at least twice the diameter of the supply pipe measured vertically
+            above the overflow rim of the receiving vessel, and in no case less than 1 inch.)
+        </p>
+    </vp-section>
+</div>

@@ -1,5 +1,6 @@
 
 using System.ComponentModel.DataAnnotations;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 
@@ -18,6 +19,10 @@ public class ProfessionalUserDto : IDto
     [StringLength(150)]
     public string? JobTitle { get; set; }
 
+    public string? SignaturePath { get; set; }
+
+    public string? SignatureUrl { get; set; }
+
     public bool IsAdmin { get; set; }
 
     public bool IsWiseGuy { get; set; }
@@ -30,6 +35,23 @@ public class ProfessionalUserDto : IDto
     public string? BpatLicenseTypeName { get; set; }
     public DateTime? BpatLicenseExpirationDate { get; set; }
     public ExpirationType? BpatLicenseExpirationType { get; set; }
+
+    [StringLength(255)]
+    public string? BillingFirstName { get; set; }
+
+    [StringLength(255)]
+    public string? BillingLastName { get; set; }
+
+    [StringLength(255)]
+    public string? BillingAddress { get; set; }
+
+    [StringLength(255)]
+    public string? BillingCity { get; set; }
+
+    public ReferencedStateDto? BillingState { get; set; }
+
+    [StringLength(25)]
+    public string? BillingZipCode { get; set; }
 }
 
 public class ReferencedProfessionalUserDto

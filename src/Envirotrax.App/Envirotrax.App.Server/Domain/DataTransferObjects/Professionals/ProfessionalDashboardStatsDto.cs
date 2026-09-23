@@ -8,4 +8,6 @@ public class ProfessionalDashboardStatsDto
     public int LicenseCount { get; set; }
     public int InsuranceCount { get; set; }
     public int GaugeCount { get; set; }
+    public int VehicleCount { get; set; }
+    public int DisposalSiteCount { get; set; }
 }

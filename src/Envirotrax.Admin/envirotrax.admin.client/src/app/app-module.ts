@@ -1,5 +1,5 @@
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ErrorHandler, NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing-module';
@@ -10,6 +10,7 @@ import { SharedComponentsModule } from './shared/components/shared.components.mo
 import { AuthInterceptor } from './shared/services/auth/auth.iterceptor';
 import { WindowContainerComponent } from './window/window-container.component';
 import { WindowComponent } from './window/window.component';
+import { GlobalErrorHandler } from './shared/services/http/global-error-handler';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { WindowComponent } from './window/window.component';
     provideBrowserGlobalErrorListeners(),
     provideHttpClient(withInterceptorsFromDi()),
     { provide: API_BASE_URL, useValue: environment.apiUrl },
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

@@ -3,12 +3,15 @@ using System.Linq.Expressions;
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
+using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Professionals.Licenses;
 
@@ -16,15 +19,21 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
 {
     private readonly IProfessionalUserLicenseRepository _licenseRepository;
     private readonly ITimeZoneHelperService _timeZoneHelper;
+    private readonly IAuthService _authService;
+    private readonly IRecordLogService _recordLogService;
 
     public ProfessionalUserLicenseService(
         IMapper mapper,
         IProfessionalUserLicenseRepository repository,
-        ITimeZoneHelperService timeZoneHelper)
+        ITimeZoneHelperService timeZoneHelper,
+        IAuthService authService,
+        IRecordLogService recordLogService)
         : base(mapper, repository)
     {
         _licenseRepository = repository;
         _timeZoneHelper = timeZoneHelper;
+        _authService = authService;
+        _recordLogService = recordLogService;
     }
 
     protected override ProfessionalUserLicenseDto? MapToDto(ProfessionalUserLicense? model)
@@ -56,6 +65,12 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
         var items = await _licenseRepository.GetAllByProfessionalAsync(professionalId, pageInfo, query, cancellationToken, filter);
 
         return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
+    }
+
+    public async Task<ILookup<int, ProfessionalUserLicenseDto>> GetAllByProfessionalIdsAsync(IEnumerable<int> professionalIds, ProfessionalType professionalType, CancellationToken cancellationToken)
+    {
+        var items = await _licenseRepository.GetAllByProfessionalIdsAsync(professionalIds, professionalType, cancellationToken);
+        return items.ToLookup(l => l.ProfessionalId, l => MapToDto(l)!);
     }
 
     public async Task<ProfessionalUserLicenseDto> AddForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto)
@@ -129,7 +144,9 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
 
     public async Task<WaterSupplierLicenseDto> UpdateForWaterSupplierAsync(int id, UpdateWaterSupplierLicenseDto dto, CancellationToken cancellationToken)
     {
-        var license = await _licenseRepository.UpdateForWaterSupplierAsync(id, dto.LicenseNumber, dto.ContactName, dto.ExpirationDate, cancellationToken);
+        var saved = await _licenseRepository.UpdateForWaterSupplierAsync(id, dto.LicenseNumber, dto.ContactName, dto.ExpirationDate, cancellationToken);
+        var license = saved!;
+
         var now = _timeZoneHelper.GetUserLocalTime();
         return new WaterSupplierLicenseDto
         {
@@ -154,6 +171,10 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
 
     public async Task DeleteForWaterSupplierAsync(int id, CancellationToken cancellationToken)
     {
-        await _licenseRepository.DeleteForWaterSupplierAsync(id, cancellationToken);
+        var license = await _licenseRepository.DeleteForWaterSupplierAsync(id, cancellationToken);
+
+        // recordLog manual
+        await _recordLogService.AddAsync(RecordLogTableNames.ProfessionalUserLicenses, license.Id, _authService.WaterSupplierId, RecordLogType.Delete,
+            $"Deleted license — LicenseNumber: '{license.LicenseNumber}', ExpirationDate: '{license.ExpirationDate:d}'", professionalId: license.ProfessionalId);
     }
 }

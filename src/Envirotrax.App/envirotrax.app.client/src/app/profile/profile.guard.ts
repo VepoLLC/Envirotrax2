@@ -14,6 +14,8 @@ export class ProfileGuard implements CanActivate {
     }
 
     public async canActivate(): Promise<boolean | UrlTree> {
+        await this._authService.ensureSynced();
+
         if (await this._authService.isAuthenticated(false)) {
             const supplierId = await this._authService.getWaterSupplierId();
 

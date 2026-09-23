@@ -88,6 +88,7 @@ export interface BackflowTest {
     meterReadingAfter?: number;
     permitNumber?: string;
     ossf?: boolean;
+    waterMeterNumber?: string;
     rainFreezeSensorInstalled?: boolean;
     rainFreezeSensorWorkingProperly?: boolean;
     comments?: string;
@@ -103,6 +104,10 @@ export interface BackflowTest {
     rejectedBy?: WaterSupplierUser | null;
     rejectedDate?: string;
     rejectedReason?: string;
+    renewalRequired?: boolean;
+    backflowScheduleMonth?: number;
+    forceRenewal?: boolean;
+    forceRenewalYears?: number;
     needsValidation?: boolean;
     assemblyImagePath?: string;
     serialNumberImagePath?: string;
@@ -133,6 +138,7 @@ export interface BackflowTest {
     initPvbCVHeldPSID?: number;
     initPvbCVLeaked?: boolean;
     airGapValid?: boolean;
+    airGapTestDate?: string;
 
     // Repairs
     repairCV1?: string;

@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { SharedComponentsModule } from '../shared/components/shared.components.module';
 import { WaterSupplierRoutingModule } from './water-supplier-routing.module';
 import { WaterSupplierListComponent } from './list/water-supplier-list.component';
@@ -10,6 +11,7 @@ import { WaterSupplierListComponent } from './list/water-supplier-list.component
     ],
     imports: [
         CommonModule,
+        FormsModule,
         SharedComponentsModule,
         WaterSupplierRoutingModule,
     ],

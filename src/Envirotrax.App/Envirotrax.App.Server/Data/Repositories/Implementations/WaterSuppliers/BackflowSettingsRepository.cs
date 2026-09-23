@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.WaterSuppliers;
 
-public class BackflowSettingsRepository : Repository<BackflowSettings>, IBackflowSettingsRepository
+public class BackflowSettingsRepository : TenantSettingsRepository<BackflowSettings>, IBackflowSettingsRepository
 {
     private readonly IAuthService _authService;
 
@@ -29,6 +29,23 @@ public class BackflowSettingsRepository : Repository<BackflowSettings>, IBackflo
                 && registration.ProfessionalId == professionalId
             select new BackflowTestingSettingsDto
             {
+                ShowWaterMeterNumber = settings.ShowWaterMeterNumber,
+                ShowRainSensor = settings.ShowRainSensor,
+                ShowOSSF = settings.ShowOSSF,
+                ShowPermitNumber = settings.ShowPermitNumber
+            };
+
+        return await query.SingleOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<BackflowTestingSettingsDto?> GetTestingSettingsByWaterSupplierAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        var query =
+            from settings in Entity
+            where settings.WaterSupplierId == waterSupplierId
+            select new BackflowTestingSettingsDto
+            {
+                ShowWaterMeterNumber = settings.ShowWaterMeterNumber,
                 ShowRainSensor = settings.ShowRainSensor,
                 ShowOSSF = settings.ShowOSSF,
                 ShowPermitNumber = settings.ShowPermitNumber

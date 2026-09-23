@@ -1,7 +1,7 @@
 import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { ExpirationType, ProfessionalType, ProfessionalUserLicense, professionalTypeLabels } from "../../shared/models/professionals/licenses/professional-user-license";
 import { ProfessionalUserLicenseService } from "../../shared/services/professionals/professional-user-license.service";
-import { ToastService, ToastType } from "../../shared/services/toast.service";
+import { ToastService, ToastType, CellTemplateData, ColumnType, InputOption, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 import { TableViewModel } from "../../shared/models/table-view-model";
 import { CreateEditLicenseComponent } from "../users/edit/licenses/create-edit/create-edit-license.component";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
@@ -10,7 +10,6 @@ import { ProfessionalLicenseType } from "../../shared/models/professionals/licen
 import { ProfesisonalService } from "../../shared/services/professionals/professional.service";
 import { ProfessionalUser } from "../../shared/models/professionals/professional-user";
 import { ProfessionalUserLookupComponent } from "../../shared/components/lookups/professional-user-lookup/professional-user-lookup.component";
-import { CellTemplateData, ColumnType, InputOption, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'vp-license-list',

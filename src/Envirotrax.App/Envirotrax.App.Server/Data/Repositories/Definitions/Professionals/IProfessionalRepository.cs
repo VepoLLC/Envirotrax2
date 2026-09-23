@@ -7,4 +7,6 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 public interface IProfessionalRepository : IRepository<Professional>
 {
     Task<IEnumerable<Professional>> GetAllMyAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+
+    Task<IEnumerable<Professional>> GetSubAccountsAsync(CancellationToken cancellationToken);
 }

@@ -1,0 +1,37 @@
+using Envirotrax.Common.Domain.Services.Defintions;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Envirotrax.App.Server.Controllers;
+
+[AllowAnonymous]
+[ApiController]
+[Route("api/keys")]
+public class KeyGenerationController : ControllerBase
+{
+    private readonly IKeyHashingService _keyService;
+    private readonly IHostEnvironment _environment;
+
+    public KeyGenerationController(IKeyHashingService keyService, IHostEnvironment environment)
+    {
+        _keyService = keyService;
+        _environment = environment;
+    }
+
+    [HttpPost]
+    public IActionResult GenerateKey()
+    {
+        if (_environment.IsDevelopment())
+        {
+            var key = _keyService.GenerateApiKey();
+
+            return Ok(new
+            {
+                PlainTextKey = key,
+                HashedKey = _keyService.HashText(key)
+            });
+        }
+
+        return Unauthorized();
+    }
+}

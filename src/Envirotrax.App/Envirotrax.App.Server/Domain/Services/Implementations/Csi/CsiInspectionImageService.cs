@@ -6,6 +6,7 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
+using Envirotrax.Common;
 using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Csi;
@@ -63,12 +64,13 @@ public class CsiInspectionImageService : ICsiInspectionImageService
         string fileName,
         CancellationToken cancellationToken)
     {
-        var professionalId = _authService.ProfessionalId;
-
         var inspection = await _inspectionRepository.GetAsync(inspectionId, cancellationToken)
             ?? throw new ValidationException("Inspection not found.");
 
-        if (inspection.ProfessionalId != professionalId)
+        var isAdmin = _authService.HasScope(ScopeDefinitions.AdminInternal);
+        var professionalId = isAdmin ? inspection.ProfessionalId : _authService.ProfessionalId;
+
+        if (!isAdmin && inspection.ProfessionalId != professionalId)
             throw new ValidationException("Access denied.");
 
         var count = await _imageRepository.GetCountByInspectionAsync(inspectionId, cancellationToken);
@@ -107,7 +109,7 @@ public class CsiInspectionImageService : ICsiInspectionImageService
             return false;
         }
 
-        if (image.ProfessionalId != _authService.ProfessionalId)
+        if (!_authService.HasScope(ScopeDefinitions.AdminInternal) && image.ProfessionalId != _authService.ProfessionalId)
             return false;
 
         var filePath = image.FilePath;

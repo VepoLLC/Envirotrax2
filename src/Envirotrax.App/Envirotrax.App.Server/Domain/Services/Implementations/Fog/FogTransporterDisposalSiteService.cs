@@ -30,6 +30,18 @@ public class FogTransporterDisposalSiteService : Service<FogTransporterDisposalS
             .ToPagedData(pageInfo);
     }
 
+    public Task<int> CountRegisteredDisposalSitesAsync(CancellationToken cancellationToken)
+    {
+        return CountRegisteredDisposalSitesAsync(new Query(), cancellationToken);
+    }
+
+    public Task<int> CountRegisteredDisposalSitesAsync(Query query, CancellationToken cancellationToken)
+    {
+        query.Filter = query.ConvertFilterProperties<FogDisposalSite, FogDisposalSiteDto>(Mapper);
+
+        return _repository.CountRegisteredDisposalSitesAsync(query, cancellationToken);
+    }
+
     public async Task<FogTransporterDisposalSiteDto> SetRegistrationAsync(int disposalSiteId, bool isActive, CancellationToken cancellationToken)
     {
         var registration = new FogTransporterDisposalSite

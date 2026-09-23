@@ -1,0 +1,187 @@
+<vp-section header="Property Settings" class="d-block">
+    <div class="mb-3">
+        <div class="mb-1"><strong>Creation Date: </strong>{{ (site.createdTime | date:'M/d/yyyy h:mm a') || '—' }}</div>
+        <div class="row">
+            <div class="col-md-6"><strong>Last Modified: </strong>{{ (site.updatedTime | date:'M/d/yyyy h:mm a') || '—' }}</div>
+            <div class="col-md-6"><strong>Last Modified By: </strong>{{ site.updatedBy?.email || 'System' }}</div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Column 1 -->
+        <div class="col-lg-4 mb-3">
+            <div class="mb-2">
+                <label class="form-label mb-1">Site ID</label>
+                <input type="text" class="form-control" [value]="site.id" readonly />
+            </div>
+
+            <div class="mb-3">
+                <vp-input name="accountNumber"
+                          label="Account Number"
+                          [(ngModel)]="site.accountNumber"
+                          [required]="true"
+                          [maxLength]="20"
+                          [form]="form">
+                </vp-input>
+            </div>
+
+            <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="site.active" name="active">
+                <label class="form-check-label">Active</label>
+            </div>
+            <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="site.invalidMailingAddress" name="invalidMailingAddress">
+                <label class="form-check-label">Invalid Mailing Address</label>
+            </div>
+            <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="site.outOfArea" name="outOfArea">
+                <label class="form-check-label">Out of Area</label>
+            </div>
+            <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="site.isFeeExempt" name="isFeeExempt">
+                <label class="form-check-label">Is Fee Exempt</label>
+            </div>
+            <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="site.bypassPropertyNumberValidation" name="bypassPropertyNumberValidation">
+                <label class="form-check-label">Bypass Property Suite/Bldg# Validation</label>
+            </div>
+        </div>
+
+        <!-- Column 2 -->
+        <div class="col-lg-4 mb-3">
+            <div class="mb-3">
+                <vp-input name="backflowScheduleMonth"
+                          label="Backflow Schedule Month"
+                          type="select"
+                          [(ngModel)]="site.backflowScheduleMonth"
+                          [options]="backflowScheduleMonths"
+                          [form]="form">
+                </vp-input>
+            </div>
+
+            <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="site.needsCsiInspection" name="needsCsiInspection">
+                <label class="form-check-label">Needs CSI Inspection</label>
+            </div>
+            @if (site.needsCsiInspection) {
+                <div class="mb-3">
+                    <vp-input name="csiRenewalDate"
+                              label="CSI Renewal Date"
+                              type="date"
+                              [(ngModel)]="site.csiRenewalDate"
+                              [form]="form">
+                    </vp-input>
+                </div>
+            }
+
+            <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="site.needsFogInspection" name="needsFogInspection">
+                <label class="form-check-label">Needs FOG Inspection</label>
+            </div>
+            @if (site.needsFogInspection) {
+                <div class="mb-3">
+                    <vp-input name="fogInspectionExpirationDate"
+                              label="FOG Inspection Expiration Date"
+                              type="date"
+                              [(ngModel)]="site.fogInspectionExpirationDate"
+                              [form]="form">
+                    </vp-input>
+                </div>
+            }
+
+            <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="site.needsFogPermit" name="needsFogPermit">
+                <label class="form-check-label">Needs FOG Permit</label>
+            </div>
+            @if (site.needsFogPermit) {
+                <div class="mb-3">
+                    <vp-input name="fogPermitExpirationDate"
+                              label="Permit Expiration Date"
+                              type="date"
+                              [(ngModel)]="site.fogPermitExpirationDate"
+                              [form]="form">
+                    </vp-input>
+                </div>
+            }
+
+            <div class="mb-2">
+                <vp-input name="lastTripTicketDate"
+                          label="Last Trip Ticket Date"
+                          type="date"
+                          [(ngModel)]="site.lastTripTicketDate"
+                          [form]="form">
+                </vp-input>
+            </div>
+            <div class="mb-2">
+                <vp-input name="tripTicketInterval"
+                          label="Trip Ticket Interval (Days)"
+                          type="number"
+                          [(ngModel)]="site.tripTicketInterval"
+                          [form]="form">
+                </vp-input>
+                @if (form.controls['tripTicketInterval']; as intervalControl) {
+                    @if ((intervalControl.touched || form.submitted) && intervalControl.hasError('interval')) {
+                        <div class="text-danger">
+                            The Trip Ticket Interval field must be a whole number of days (0 or greater).
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+
+        <!-- Column 3 -->
+        <div class="col-lg-4 mb-3">
+            <div class="mb-3">
+                <vp-input name="facilityType"
+                          label="Facility Type"
+                          type="select"
+                          [(ngModel)]="site.facilityType"
+                          [options]="facilityTypes"
+                          [form]="form">
+                </vp-input>
+            </div>
+            <div class="mb-3">
+                <vp-input name="greaseTrapType"
+                          label="Grease Trap"
+                          type="select"
+                          [(ngModel)]="site.greaseTrapType"
+                          [options]="greaseTrapTypes"
+                          [form]="form">
+                </vp-input>
+            </div>
+
+            <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="site.hasOnSiteSewageFacility" name="hasOnSiteSewageFacility">
+                <label class="form-check-label">Has On Site Sewage Facility</label>
+            </div>
+            <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="site.hasAuxWaterSupply" name="hasAuxWaterSupply">
+                <label class="form-check-label">Has Auxiliary Water Supply</label>
+            </div>
+            <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="site.hasFireSystem" name="hasFireSystem">
+                <label class="form-check-label">Has Fire System</label>
+            </div>
+            <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="site.fireSeparateWater" name="fireSeparateWater">
+                <label class="form-check-label">Fire System on Separate Water Supply</label>
+            </div>
+            <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="site.hasGritTrap" name="hasGritTrap">
+                <label class="form-check-label">Has Sand and Grit Trap</label>
+            </div>
+            <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="site.hasIrrigation" name="hasIrrigation">
+                <label class="form-check-label">Has Irrigation System</label>
+            </div>
+            <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="site.irrigationSeparateWater" name="irrigationSeparateWater">
+                <label class="form-check-label">Irrigation on Separate Water Supply</label>
+            </div>
+            <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="site.hasDomesticPremisesIsolation" name="hasDomesticPremisesIsolation">
+                <label class="form-check-label">Has Domestic/Premises Isolation</label>
+            </div>
+        </div>
+    </div>
+</vp-section>

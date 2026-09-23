@@ -1,4 +1,5 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, TemplateRef, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { FogInspectionService } from '../../../shared/services/fog/fog-inspection.service';
@@ -10,12 +11,14 @@ import { FacilityType } from '../../../shared/enums/facility-type.enum';
 import { InterceptorType } from '../../../shared/enums/interceptor-type.enum';
 import { PropertyType } from '../../../shared/enums/property-type.enum';
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from '@envirotrax/common-ui';
+import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 
 @Component({
     standalone: false,
     templateUrl: './fog-inspection-list.component.html'
 })
-export class FogInspectionListComponent implements OnInit {
+export class FogInspectionListComponent implements OnInit, OnDestroy {
+    private _queryParamSub?: Subscription;
     public showResults: boolean = false;
 
     public readonly FogInspectionResult = FogInspectionResult;
@@ -101,24 +104,47 @@ export class FogInspectionListComponent implements OnInit {
     constructor(
         private readonly _fogInspectionService: FogInspectionService,
         private readonly _router: Router,
-        private readonly _activatedRoute: ActivatedRoute
+        private readonly _activatedRoute: ActivatedRoute,
+        private readonly _containerHelper: AppContainerHelperService
     ) { }
 
-    public async ngOnInit(): Promise<void> {
+    public ngOnInit(): void {
         this.table.columns = this.getColumns();
 
-        const dateParam = this._activatedRoute.snapshot.queryParamMap.get('date');
-        if (dateParam) {
-            this.table.query.filter = [{
-                columnName: 'inspectionDate',
-                children: [
-                    { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Gte', logicalOperator: 'And' },
-                    { columnName: 'inspectionDate', value: dateParam, comparisonOperator: 'Lte', logicalOperator: 'And' }
-                ]
-            }];
-            await this.getInspections();
-            this.showResults = (this.table.items?.pageInfo?.totalItems ?? 0) > 0;
-        }
+        this._queryParamSub = this._activatedRoute.queryParamMap.subscribe(async params => {
+            const dateParam = params.get('date');
+            if (dateParam) {
+                this.applyDateFilter(dateParam);
+                await this.getInspections();
+                this.setShowResults(true);
+                return;
+            }
+
+            // Dashboard "View" on a sub account lands here already authenticated as that water
+            // supplier (via /auth/login-redirect); this just carries over the same last-10-days
+            // window shown on the dashboard so the results match what was clicked.
+            const startDateParam = params.get('startDate');
+            const endDateParam = params.get('endDate');
+            if (startDateParam && endDateParam) {
+                this.applyDateFilter(startDateParam, endDateParam);
+                await this.getInspections();
+                this.setShowResults(true);
+            }
+        });
+    }
+
+    private applyDateFilter(startDate: string, endDate: string = startDate): void {
+        this.table.query.filter = [{
+            columnName: 'inspectionDate',
+            children: [
+                { columnName: 'inspectionDate', value: startDate, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                { columnName: 'inspectionDate', value: endDate, comparisonOperator: 'Lte', logicalOperator: 'And' }
+            ]
+        }];
+    }
+
+    public ngOnDestroy(): void {
+        this._queryParamSub?.unsubscribe();
     }
 
     private getColumns(): TableColumn<FogInspection>[] {
@@ -192,10 +218,15 @@ export class FogInspectionListComponent implements OnInit {
         });
     }
 
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
+    }
+
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
             await this.getInspections();
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 

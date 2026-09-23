@@ -7,4 +7,5 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 
 public interface IGeneralSettingsService : IService<GeneralSettings, GeneralSettingsDto>
 {
+    Task<GeneralSettingsDto> AddOrUpdateAsync(int waterSupplierId, GeneralSettingsDto settings);
 }

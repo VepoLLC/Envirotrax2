@@ -7,13 +7,14 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Envirotrax.Auth.Data.Models;
+using Envirotrax.Auth.Domain.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 namespace Envirotrax.Auth.Areas.Identity.Pages.Account
 {
-    public class LoginWithRecoveryCodeModel : PageModel
+    public class LoginWithRecoveryCodeModel : TwoFactorLoginPageModel
     {
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UserManager<AppUser> _userManager;
@@ -65,7 +66,7 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
             {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+                return RedirectToExpiredLogin(returnUrl);
             }
 
             ReturnUrl = returnUrl;
@@ -83,7 +84,7 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
             {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+                return RedirectToExpiredLogin(returnUrl);
             }
 
             var recoveryCode = Input.RecoveryCode.Replace(" ", string.Empty);
@@ -95,7 +96,15 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
             if (result.Succeeded)
             {
                 _logger.LogInformation("User with ID '{UserId}' logged in with a recovery code.", user.Id);
-                return LocalRedirect(returnUrl ?? Url.Content("~/"));
+
+                returnUrl ??= Url.Content("~/");
+
+                if (!await _userManager.IsPhoneNumberConfirmedAsync(user))
+                {
+                    return RedirectToPage("./SecuritySuggestion", new { type = SecuritySuggestionType.PhoneNumber, returnUrl });
+                }
+
+                return LocalRedirect(returnUrl);
             }
             if (result.IsLockedOut)
             {

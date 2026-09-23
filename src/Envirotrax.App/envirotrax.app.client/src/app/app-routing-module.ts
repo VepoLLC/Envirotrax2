@@ -88,6 +88,12 @@ const routes: Routes = [
     ]
   },
   {
+    // Public directory the marketing site links to. Must stay outside the AuthGuard branch above.
+    path: 'registered-professionals',
+    title: '',
+    loadChildren: () => import('./registered-professionals/registered-professionals.module').then(m => m.RegisteredProfessionalsModule)
+  },
+  {
     path: 'auth',
     title: '',
     loadChildren: () => import('./auth/auth.module').then(m => m.AppAuthModule)

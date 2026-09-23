@@ -68,6 +68,12 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
     }
 
+    public async Task<ILookup<int, ProfessionalInsuranceDto>> GetAllByProfessionalIdsAsync(IEnumerable<int> professionalIds, CancellationToken cancellationToken)
+    {
+        var items = await _insuranceRepository.GetAllByProfessionalIdsAsync(professionalIds, cancellationToken);
+        return items.ToLookup(i => i.ProfessionalId, i => MapToDto(i)!);
+    }
+
     public async Task<ProfessionalInsuranceDto> AddAsync(Stream fileStream, string originalFileName, ProfessionalInsuranceDto dto)
     {
         var fileExtension = Path.GetExtension(originalFileName);

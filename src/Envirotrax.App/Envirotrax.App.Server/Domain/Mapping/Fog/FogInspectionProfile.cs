@@ -13,13 +13,17 @@ public class FogInspectionProfile : Profile
         CreateMap<FogInspection, FogInspectionDto>()
             .ForMember(dest => dest.Site, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())
-            .ForMember(dest => dest.Professional, opt => opt.Ignore())
             .ForMember(dest => dest.ExteriorImageUrl, opt => opt.Ignore())
             .ForMember(dest => dest.InteriorImageUrl, opt => opt.Ignore())
             .ForMember(dest => dest.SignatureImageUrl, opt => opt.Ignore())
             .AfterMap((model, dto) =>
             {
-                dto.Site ??= new ReferencedSiteDto { Id = model.SiteId };
+                dto.Site ??= new ReferencedSiteDto
+                {
+                    Id = model.SiteId,
+                    AccountNumber = model.Site?.AccountNumber,
+                    BusinessName = model.Site?.BusinessName
+                };
 
                 if (model.PropertyStateId.HasValue)
                 {

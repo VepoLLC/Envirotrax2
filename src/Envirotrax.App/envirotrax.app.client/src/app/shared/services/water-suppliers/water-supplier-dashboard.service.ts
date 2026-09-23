@@ -5,7 +5,9 @@ import { UrlResolverService } from "../helpers/url-resolver.service";
 import { WaterSupplierDashboardStats } from "../../models/water-suppliers/water-supplier-dashboard-stats";
 import { CsiSubmissionStats } from "../../models/water-suppliers/csi-submission-stats";
 import { BackflowSubmissionStats } from "../../models/water-suppliers/backflow-submission-stats";
+import { BackflowComplianceSnapshot } from "../../models/backflow/backflow-compliance-snapshot";
 import { FogInspectionSubmissionStats } from "../../models/water-suppliers/fog-inspection-submission-stats";
+import { FogTripTicketSubmissionStats } from "../../models/water-suppliers/fog-trip-ticket-submission-stats";
 
 @Injectable({
     providedIn: 'root'
@@ -31,8 +33,18 @@ export class WaterSupplierDashboardService {
         return lastValueFrom(this._http.get<BackflowSubmissionStats>(url));
     }
 
+    public getBackflowCompliance(): Promise<BackflowComplianceSnapshot | null> {
+        const url = this._urlResolver.resolveUrl('/api/water-suppliers/dashboard/backflow-compliance');
+        return lastValueFrom(this._http.get<BackflowComplianceSnapshot | null>(url));
+    }
+
     public getFogInspectionSubmissionStats(): Promise<FogInspectionSubmissionStats> {
         const url = this._urlResolver.resolveUrl('/api/water-suppliers/dashboard/fog-inspection-submission-stats');
         return lastValueFrom(this._http.get<FogInspectionSubmissionStats>(url));
+    }
+
+    public getFogTripTicketSubmissionStats(): Promise<FogTripTicketSubmissionStats> {
+        const url = this._urlResolver.resolveUrl('/api/water-suppliers/dashboard/fog-trip-ticket-submission-stats');
+        return lastValueFrom(this._http.get<FogTripTicketSubmissionStats>(url));
     }
 }

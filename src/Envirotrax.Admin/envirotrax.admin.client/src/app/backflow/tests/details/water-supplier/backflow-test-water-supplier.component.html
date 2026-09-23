@@ -1,0 +1,32 @@
+<vp-section [header]="header">
+    <div class="row">
+        <div class="col-md-6">
+            <dl class="row mb-0">
+                <dt class="col-sm-5">Name</dt>
+                <dd class="col-sm-7">{{ test.waterSupplier?.name }}</dd>
+
+                <dt class="col-sm-5">Contact Name</dt>
+                <dd class="col-sm-7">{{ test.waterSupplier?.contactName }}</dd>
+
+                <dt class="col-sm-5">Address</dt>
+                <dd class="col-sm-7">{{ test.waterSupplier?.address }}</dd>
+
+                <dt class="col-sm-5"></dt>
+                <dd class="col-sm-7">{{ cityStateZip }}</dd>
+            </dl>
+        </div>
+
+        <div class="col-md-6">
+            <dl class="row mb-0">
+                <dt class="col-sm-5">PWS ID</dt>
+                <dd class="col-sm-7">{{ test.waterSupplier?.pwsId }}</dd>
+
+                <dt class="col-sm-5">Phone Number</dt>
+                <dd class="col-sm-7">{{ test.waterSupplier?.phoneNumber }}</dd>
+
+                <dt class="col-sm-5">Email Address</dt>
+                <dd class="col-sm-7">{{ test.waterSupplier?.emailAddress }}</dd>
+            </dl>
+        </div>
+    </div>
+</vp-section>

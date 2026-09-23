@@ -5,7 +5,7 @@ import { AuthGuard } from './shared/guards/auth.guard';
 const routes: Routes = [
   {
     path: '',
-    title: '',
+    title: 'Envirotrax Admin',
     canActivate: [AuthGuard],
     children: [
       // regular routes go here.
@@ -20,6 +20,26 @@ const routes: Routes = [
     path: 'water-suppliers',
     title: 'Water Suppliers',
     loadChildren: () => import('./water-suppliers/water-supplier.module').then(m => m.WaterSupplierModule)
+  },
+  {
+    path: 'sites',
+    title: 'Property Search',
+    loadChildren: () => import('./sites/site.module').then(m => m.SiteModule)
+  },
+  {
+    path: 'csi',
+    title: 'CSI Management',
+    loadChildren: () => import('./csi/csi.module').then(m => m.CsiModule)
+  },
+  {
+    path: 'backflow',
+    title: 'Backflow Management',
+    loadChildren: () => import('./backflow/backflow.module').then(m => m.BackflowModule)
+  },
+  {
+    path: 'fog',
+    title: 'FOG Management',
+    loadChildren: () => import('./fog/fog.module').then(m => m.FogModule)
   },
 ];
 

@@ -4,10 +4,9 @@ import { SiteLogType } from '../../../../shared/models/sites/site-log-type.enum'
 import { SiteLogReviewDateStatus } from '../../../../shared/models/sites/site-log-review-date-status.enum';
 import { SiteLogService } from '../../../../shared/services/sites/site-log.service';
 import { TableViewModel } from '../../../../shared/models/table-view-model';
-import { ToastService } from '../../../../shared/services/toast.service';
+import { ToastService, CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 import { AuthService } from '../../../../shared/services/auth/auth.service';
 import { PermissionAction, PermissionType } from '../../../../shared/models/permission-type';
-import { CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
 import { SiteLogEditComponent, SiteLogEditModel } from '../../../../shared/components/site-log/site-log-edit.component';
 
@@ -77,6 +76,18 @@ export class SiteLogHistoryComponent implements OnInit, OnChanges {
             );
         } finally {
             this.table.isLoading = false;
+        }
+    }
+
+    public async openAttachment(log: SiteLog): Promise<void> {
+        if (!this.siteId || log.id == null) {
+            return;
+        }
+
+        const url = await this._siteLogService.getAttachmentUrl(this.siteId, log.id);
+
+        if (url) {
+            window.open(url, '_blank');
         }
     }
 

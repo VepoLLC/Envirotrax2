@@ -1,0 +1,15 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="table.isLoading" />
+
+    <vp-table *ngIf="!table.isLoading && table.items"
+              [columns]="table.columns!"
+              [data]="table.items.data"
+              [canSelect]="true"
+              (select)="select($event)"
+              [(pageInfo)]="table.items.pageInfo"
+              (pageInfoChange)="getSuppliers()"
+              [(query)]="table.query"
+              (queryChange)="getSuppliers()"
+              (queryReset)="getSuppliers()"
+              [freeTextSearch]="table.freeTextSearch" />
+</div>

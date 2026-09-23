@@ -3,6 +3,13 @@ import { AuthService } from './shared/services/auth/auth.service';
 import { createPopper } from '@popperjs/core';
 import { WindowService } from './shared/services/window.service';
 import { WaterSupplierListComponent } from './water-suppliers/list/water-supplier-list.component';
+import { SiteListComponent } from './sites/list/site-list.component';
+import { CsiInspectionListComponent } from './csi/inspections/list/csi-inspection-list.component';
+import { CsiInspectorListComponent } from './csi/inspectors/list/csi-inspector-list.component';
+import { BackflowTestListComponent } from './backflow/tests/list/backflow-test-list.component';
+import { BackflowTesterListComponent } from './backflow/testers/list/backflow-tester-list.component';
+import { BackflowReplacementListComponent } from './backflow/replacements/list/backflow-replacement-list.component';
+import { FogInspectionListComponent } from './fog/inspections/list/fog-inspection-list.component';
 
 @Component({
   selector: 'app-root',
@@ -35,9 +42,62 @@ export class App implements OnInit {
   private createMenuItems(): MenuItem[] {
     return [
       {
+        title: 'Property Search',
+        iconCss: 'fa-solid fa-house',
+        onClick: this.showPropertySearch.bind(this)
+      },
+      {
         title: 'Water Suppliers',
         iconCss: 'fa-solid fa-droplet',
         onClick: this.showWaterSuppliers.bind(this)
+      },
+      {
+        title: 'CSI Management',
+        iconCss: 'fa-solid fa-clipboard-check',
+        children: [
+          {
+            title: 'Inspection Search',
+            iconCss: 'fa-solid fa-magnifying-glass',
+            onClick: this.showCsiInspectionSearch.bind(this)
+          },
+          {
+            title: 'Inspector Search',
+            iconCss: 'fa-solid fa-user',
+            onClick: this.showCsiInspectorSearch.bind(this)
+          }
+        ]
+      },
+      {
+        title: 'Backflow Management',
+        iconCss: 'fa-solid fa-gauge',
+        children: [
+          {
+            title: 'Backflow Test Search',
+            iconCss: 'fa-solid fa-magnifying-glass',
+            onClick: this.showBackflowTestSearch.bind(this)
+          },
+          {
+            title: 'BPAT Search',
+            iconCss: 'fa-solid fa-user',
+            onClick: this.showBackflowTesterSearch.bind(this)
+          },
+          {
+            title: 'Replaced Assemblies',
+            iconCss: 'fa-solid fa-right-left',
+            onClick: this.showBackflowReplacements.bind(this)
+          }
+        ]
+      },
+      {
+        title: 'FOG Management',
+        iconCss: 'fa-solid fa-truck-droplet',
+        children: [
+          {
+            title: 'Inspection Search',
+            iconCss: 'fa-solid fa-magnifying-glass',
+            onClick: this.showFogInspectionSearch.bind(this)
+          }
+        ]
       }
     ];
   }
@@ -78,6 +138,48 @@ export class App implements OnInit {
       model: {
         name: 'Test'
       }
+    });
+  }
+
+  public showPropertySearch(): void {
+    this._windowService.addWindow(SiteListComponent, {
+      title: 'Property Search'
+    });
+  }
+
+  public showCsiInspectionSearch(): void {
+    this._windowService.addWindow(CsiInspectionListComponent, {
+      title: 'CSI Search'
+    });
+  }
+
+  public showCsiInspectorSearch(): void {
+    this._windowService.addWindow(CsiInspectorListComponent, {
+      title: 'CSI Inspector Search'
+    });
+  }
+
+  public showBackflowTestSearch(): void {
+    this._windowService.addWindow(BackflowTestListComponent, {
+      title: 'Backflow Test Search'
+    });
+  }
+
+  public showBackflowTesterSearch(): void {
+    this._windowService.addWindow(BackflowTesterListComponent, {
+      title: 'Backflow Tester Search'
+    });
+  }
+
+  public showBackflowReplacements(): void {
+    this._windowService.addWindow(BackflowReplacementListComponent, {
+      title: 'Backflow Replacements'
+    });
+  }
+
+  public showFogInspectionSearch(): void {
+    this._windowService.addWindow(FogInspectionListComponent, {
+      title: 'FOG Inspection Search'
     });
   }
 }

@@ -40,4 +40,13 @@ public class ProfessionalRepository : Repository<Professional>, IProfessionalRep
 
         return await paginated.ToListAsync(cancellationToken);
     }
+
+    public async Task<IEnumerable<Professional>> GetSubAccountsAsync(CancellationToken cancellationToken)
+    {
+        return await DbContext.Set<Professional>()
+            .IgnoreQueryFilters()
+            .Where(p => p.ParentId == _tenantProvider.ProfessionalId && p.DeletedTime == null)
+            .OrderBy(p => p.Name)
+            .ToListAsync(cancellationToken);
+    }
 }

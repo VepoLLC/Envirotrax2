@@ -1,9 +1,9 @@
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { QueryHelperService } from "./helpers/query-helper.service";
 import { lastValueFrom } from "rxjs";
 import { MAX_PAGE_SIZE } from "../models/page-info";
-import { DownloadConfig, FileFormat } from "../models/download-config";
+import { DownloadConfig, DownloadEndpoint, FileFormat } from "../models/download-config";
 import { Query } from "../models/query";
 import { DownloadManagerComponent } from "../components/data-components/download-manager/download-manager.component";
 import { ModalHelperService } from "@envirotrax/common-ui";
@@ -66,11 +66,21 @@ export class DownloadService {
         return match ? decodeURIComponent(match[1].trim()) : fallback;
     }
 
+    private buildEndpointParams(endpoint: DownloadEndpoint): HttpParams {
+        let params = this._queryHelper.buildQuery(endpoint.pageInfo || { pageSize: MAX_PAGE_SIZE }, endpoint.query || {});
+
+        for (const key of Object.keys(endpoint.additionalParams ?? {})) {
+            params = params.append(key, endpoint.additionalParams![key]);
+        }
+
+        return params;
+    }
+
     private async downloadPdf(config: DownloadConfig): Promise<void> {
         const observable = this._http.request(config.pdfEndpoint!.method || 'GET', config.pdfEndpoint!.url, {
             responseType: 'blob',
             observe: 'response',
-            params: this._queryHelper.buildQuery(config.pdfEndpoint!.pageInfo || { pageSize: MAX_PAGE_SIZE }, config.pdfEndpoint!.query || {})
+            params: this.buildEndpointParams(config.pdfEndpoint!)
         });
 
         const response = await lastValueFrom(observable);
@@ -112,7 +122,7 @@ export class DownloadService {
                 headers: headers,
                 responseType: 'blob',
                 observe: 'response',
-                params: this._queryHelper.buildQuery(config.endpoint.pageInfo || { pageSize: MAX_PAGE_SIZE }, config.endpoint.query || {})
+                params: this.buildEndpointParams(config.endpoint)
             });
 
             const response = await lastValueFrom(observable);

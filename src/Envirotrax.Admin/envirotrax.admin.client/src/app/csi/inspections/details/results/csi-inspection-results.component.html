@@ -1,0 +1,176 @@
+<div class="row">
+    <div class="col-md-8 mb-2">
+        <vp-input name="reasonForInspection"
+                  type="select"
+                  label="Reason for Inspection"
+                  [form]="form"
+                  [options]="reasonOptions"
+                  [ngModel]="reasonForInspectionId"
+                  (ngModelChange)="reasonForInspectionIdChange.emit($event)" />
+    </div>
+
+    <div class="col-md-4 mb-2">
+        <vp-input name="inspectionDate"
+                  type="datetime"
+                  label="Inspection Date"
+                  [form]="form"
+                  [ngModel]="inspectionDate"
+                  (ngModelChange)="inspectionDateChange.emit($event)" />
+    </div>
+</div>
+
+<div class="border border-4 border-secondary-subtle p-2 mt-3">
+    <table class="table table-borderless table-sm mb-0">
+        <tbody>
+            <tr>
+                <td></td>
+                <td></td>
+                <td class="text-center text-nowrap fw-semibold">Compliance</td>
+                <td class="text-center text-nowrap fw-semibold">Non-compliance</td>
+            </tr>
+
+            <tr *ngFor="let item of complianceItems">
+                <td class="align-top fw-semibold">{{ item.number }}.)</td>
+                <td class="align-top">{{ item.text }}</td>
+                <td class="align-top text-center">
+                    <input class="form-check-input"
+                           type="radio"
+                           [attr.id]="idPrefix + '-compliance-' + item.number"
+                           [name]="'compliance-' + item.number"
+                           [value]="true"
+                           [(ngModel)]="item.isCompliant" />
+                </td>
+                <td class="align-top text-center">
+                    <input class="form-check-input"
+                           type="radio"
+                           [attr.id]="idPrefix + '-non-compliance-' + item.number"
+                           [name]="'compliance-' + item.number"
+                           [value]="false"
+                           [(ngModel)]="item.isCompliant" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<p class="mt-3 mb-2">
+    I further certify that the following materials were used in the installation of the private water
+    distribution facilities:
+</p>
+
+<div class="row align-items-center mb-2">
+    <div class="col-md-2 fw-semibold">Service Lines</div>
+
+    <div class="col-md-10">
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+            <div class="form-check mb-0">
+                <input class="form-check-input" type="checkbox"
+                       [attr.id]="idPrefix + '-service-line-lead'"
+                       name="materialServiceLineLead"
+                       [(ngModel)]="inspection.materialServiceLineLead" />
+                <label class="form-check-label" [attr.for]="idPrefix + '-service-line-lead'">Lead</label>
+            </div>
+
+            <div class="form-check mb-0">
+                <input class="form-check-input" type="checkbox"
+                       [attr.id]="idPrefix + '-service-line-copper'"
+                       name="materialServiceLineCopper"
+                       [(ngModel)]="inspection.materialServiceLineCopper" />
+                <label class="form-check-label" [attr.for]="idPrefix + '-service-line-copper'">Copper</label>
+            </div>
+
+            <div class="form-check mb-0">
+                <input class="form-check-input" type="checkbox"
+                       [attr.id]="idPrefix + '-service-line-pvc'"
+                       name="materialServiceLinePVC"
+                       [(ngModel)]="inspection.materialServiceLinePVC" />
+                <label class="form-check-label" [attr.for]="idPrefix + '-service-line-pvc'">PVC</label>
+            </div>
+
+            <div class="form-check mb-0">
+                <input class="form-check-input" type="checkbox"
+                       [attr.id]="idPrefix + '-service-line-other'"
+                       name="materialServiceLineOther"
+                       [(ngModel)]="inspection.materialServiceLineOther" />
+                <label class="form-check-label" [attr.for]="idPrefix + '-service-line-other'">Other</label>
+            </div>
+
+            <div class="flex-fill" *ngIf="inspection.materialServiceLineOther">
+                <vp-input name="materialServiceLineOtherDescription"
+                          placeholder="Other description"
+                          [form]="form"
+                          [maxLength]="200"
+                          [(ngModel)]="inspection.materialServiceLineOtherDescription" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row align-items-center mb-2">
+    <div class="col-md-2 fw-semibold">Solder</div>
+
+    <div class="col-md-10">
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+            <div class="form-check mb-0">
+                <input class="form-check-input" type="checkbox"
+                       [attr.id]="idPrefix + '-solder-lead'"
+                       name="materialSolderLead"
+                       [(ngModel)]="inspection.materialSolderLead" />
+                <label class="form-check-label" [attr.for]="idPrefix + '-solder-lead'">Lead</label>
+            </div>
+
+            <div class="form-check mb-0">
+                <input class="form-check-input" type="checkbox"
+                       [attr.id]="idPrefix + '-solder-lead-free'"
+                       name="materialSolderLeadFree"
+                       [(ngModel)]="inspection.materialSolderLeadFree" />
+                <label class="form-check-label" [attr.for]="idPrefix + '-solder-lead-free'">Lead Free</label>
+            </div>
+
+            <div class="form-check mb-0">
+                <input class="form-check-input" type="checkbox"
+                       [attr.id]="idPrefix + '-solder-solvent-weld'"
+                       name="materialSolderSolventWeld"
+                       [(ngModel)]="inspection.materialSolderSolventWeld" />
+                <label class="form-check-label" [attr.for]="idPrefix + '-solder-solvent-weld'">Solvent Weld</label>
+            </div>
+
+            <div class="form-check mb-0">
+                <input class="form-check-input" type="checkbox"
+                       [attr.id]="idPrefix + '-solder-other'"
+                       name="materialSolderOther"
+                       [(ngModel)]="inspection.materialSolderOther" />
+                <label class="form-check-label" [attr.for]="idPrefix + '-solder-other'">Other</label>
+            </div>
+
+            <div class="flex-fill" *ngIf="inspection.materialSolderOther">
+                <vp-input name="materialSolderOtherDescription"
+                          placeholder="Other description"
+                          [form]="form"
+                          [maxLength]="200"
+                          [(ngModel)]="inspection.materialSolderOtherDescription" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="form-check mt-3">
+    <input class="form-check-input" type="checkbox"
+           [attr.id]="idPrefix + '-legal-acknowledgment'"
+           [checked]="true"
+           disabled />
+    <label class="form-check-label" [attr.for]="idPrefix + '-legal-acknowledgment'">
+        I recognize that this document shall be retained by the aforementioned Public Water System for a
+        minimum of ten years and that I am legally responsible for the validity of the information I have
+        provided.
+    </label>
+</div>
+
+<div class="mt-3">
+    <vp-input name="comments"
+              type="textarea"
+              label="Remarks"
+              [rows]="4"
+              [form]="form"
+              [(ngModel)]="inspection.comments" />
+</div>

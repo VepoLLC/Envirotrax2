@@ -3,7 +3,7 @@ import { GeneralSettings } from "../../../shared/models/settings/general-setting
 import { GeneralSettingsService } from "../../../shared/services/settings/general-settings.service";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { NgForm } from "@angular/forms";
-import { ToastService } from "../../../shared/services/toast.service";
+import { ToastService } from '@envirotrax/common-ui';
 
 @Component({
     templateUrl: './general-settings.component.html',

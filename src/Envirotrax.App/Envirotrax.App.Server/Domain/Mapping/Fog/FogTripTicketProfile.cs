@@ -1,0 +1,63 @@
+using AutoMapper;
+using Envirotrax.App.Server.Data.Models.Fog;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
+using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
+
+namespace Envirotrax.App.Server.Domain.Mapping.Fog;
+
+public class FogTripTicketProfile : Profile
+{
+    public FogTripTicketProfile()
+    {
+        CreateMap<FogTripTicket, FogTripTicketDto>()
+            .ForMember(dest => dest.Site, opt => opt.Ignore())
+            .ForMember(dest => dest.PropertyState, opt => opt.Ignore())
+            .ForMember(dest => dest.GeneratorSignatureUrl, opt => opt.Ignore())
+            .ForMember(dest => dest.ReceiverSignatureUrl, opt => opt.Ignore())
+            .ForMember(dest => dest.TransporterSignatureUrl, opt => opt.Ignore())
+            .AfterMap((model, dto) =>
+            {
+                dto.WaterSupplier ??= new ReferencedWaterSupplierDto { Id = model.WaterSupplierId };
+
+                dto.Site ??= new ReferencedSiteDto { Id = model.SiteId };
+                dto.Professional ??= new ReferencedProfessionalDto { Id = model.ProfessionalId };
+
+                if (model.TransporterId.HasValue)
+                {
+                    dto.Transporter ??= model.Transporter != null
+                        ? new ReferencedProfessionalUserDto { Id = model.Transporter.UserId, ContactName = model.Transporter.ContactName }
+                        : new ReferencedProfessionalUserDto { Id = model.TransporterId };
+                }
+
+                if (model.PropertyStateId.HasValue)
+                {
+                    dto.PropertyState ??= new ReferencedStateDto { Id = model.PropertyStateId.Value };
+                }
+
+                if (model.ApprovedById.HasValue)
+                {
+                    dto.ApprovedBy ??= new() { Id = model.ApprovedById.Value };
+                }
+            })
+            .ReverseMap()
+            .ForMember(m => m.Site, opt => opt.Ignore())
+            .ForMember(m => m.SiteId, opt => opt.MapFrom(dto => dto.Site != null ? dto.Site.Id : (int?)null))
+            .ForMember(m => m.Professional, opt => opt.Ignore())
+            .ForMember(m => m.ProfessionalId, opt => opt.MapFrom(dto => dto.Professional != null ? dto.Professional.Id ?? 0 : 0))
+            .ForMember(m => m.Transporter, opt => opt.Ignore())
+            .ForMember(m => m.TransporterId, opt => opt.MapFrom(dto => dto.Transporter != null ? dto.Transporter.Id : (int?)null))
+            .ForMember(m => m.PropertyState, opt => opt.Ignore())
+            .ForMember(m => m.PropertyStateId, opt => opt.MapFrom(dto => dto.PropertyState != null ? dto.PropertyState.Id : (int?)null))
+            .ForMember(m => m.Vehicle, opt => opt.Ignore())
+            .ForMember(m => m.ReceiverDisposalSite, opt => opt.Ignore())
+            .ForMember(m => m.WaterSupplier, opt => opt.Ignore())
+            .ForMember(m => m.ApprovedBy, opt => opt.Ignore())
+            .ForMember(m => m.ApprovedById, opt => opt.MapFrom(dto => dto.ApprovedBy != null ? dto.ApprovedBy.Id : (int?)null))
+            .ForMember(m => m.CreatedBy, opt => opt.Ignore())
+            .ForMember(m => m.UpdatedBy, opt => opt.Ignore())
+            .ForMember(m => m.DeletedBy, opt => opt.Ignore());
+    }
+}

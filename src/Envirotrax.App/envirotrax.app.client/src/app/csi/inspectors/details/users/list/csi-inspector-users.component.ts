@@ -2,13 +2,12 @@
 import { ProfessionalUser } from "../../../../../shared/models/professionals/professional-user";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
 import { CsiInspectorSubAccountsService } from "../../../../../shared/services/csi/csi-inspector-user.service";
-import { ToastService } from "../../../../../shared/services/toast.service";
+import { ToastService, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 import { AuthService } from "../../../../../shared/services/auth/auth.service";
 import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
 import { FeatureType } from "../../../../../shared/models/feature-type";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { AddEditCsiInspectorUserComponent, CsiUserModalData } from "../edit/add-edit-csi-inspector-user.component";
-import { ColumnType, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'vp-csi-inspector-users',

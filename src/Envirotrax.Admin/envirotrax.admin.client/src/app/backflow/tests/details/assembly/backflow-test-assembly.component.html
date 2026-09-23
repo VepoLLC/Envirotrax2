@@ -1,0 +1,120 @@
+<vp-section header="Assembly Information">
+    <div class="row">
+        <div class="col-md-3 mb-2">
+            <vp-input name="deviceType"
+                      type="select"
+                      label="Backflow Method"
+                      [form]="form"
+                      [options]="deviceTypeOptions"
+                      [(ngModel)]="test.deviceType"
+                      (ngModelChange)="onDeviceTypeChange()" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 mb-2">
+            <vp-input name="manufacturer"
+                      type="select"
+                      label="Main Assembly Manufacturer"
+                      [form]="form"
+                      [required]="true"
+                      [options]="manufacturerOptions"
+                      [(ngModel)]="test.manufacturer" />
+        </div>
+
+        <div class="col-md-3 mb-2">
+            <vp-input name="model"
+                      label="Model"
+                      [form]="form"
+                      [maxLength]="100"
+                      [(ngModel)]="test.model" />
+        </div>
+
+        <div class="col-md-3 mb-2">
+            <vp-input name="size"
+                      type="select"
+                      label="Size"
+                      [form]="form"
+                      [options]="sizeOptions"
+                      [(ngModel)]="test.size" />
+        </div>
+
+        <div class="col-md-3 mb-2">
+            <vp-input name="serialNumber"
+                      label="Serial Number"
+                      [form]="form"
+                      [maxLength]="100"
+                      [(ngModel)]="test.serialNumber" />
+        </div>
+    </div>
+
+    <div class="row" *ngIf="visibility.hasBypassAssembly">
+        <div class="col-md-3 mb-2">
+            <vp-input name="manufacturer2"
+                      type="select"
+                      label="Bypass Assembly Manufacturer"
+                      [form]="form"
+                      [required]="true"
+                      [options]="manufacturerOptions"
+                      [(ngModel)]="test.manufacturer2" />
+        </div>
+
+        <div class="col-md-3 mb-2">
+            <vp-input name="model2"
+                      label="Model"
+                      [form]="form"
+                      [required]="true"
+                      [maxLength]="100"
+                      [(ngModel)]="test.model2" />
+        </div>
+
+        <div class="col-md-3 mb-2">
+            <vp-input name="size2"
+                      type="select"
+                      label="Size"
+                      [form]="form"
+                      [required]="true"
+                      [options]="sizeOptions"
+                      [(ngModel)]="test.size2" />
+        </div>
+
+        <div class="col-md-3 mb-2">
+            <vp-input name="serialNumber2"
+                      label="Serial Number"
+                      [form]="form"
+                      [required]="true"
+                      [maxLength]="100"
+                      [(ngModel)]="test.serialNumber2" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-2">
+            <vp-input name="locationDescription"
+                      label="Location Description"
+                      [form]="form"
+                      [maxLength]="200"
+                      [(ngModel)]="test.locationDescription" />
+        </div>
+
+        <div class="col-md-6 mb-2">
+            <vp-input name="hazardType"
+                      type="select"
+                      label="Hazard Type"
+                      [form]="form"
+                      [options]="hazardTypeOptions"
+                      [(ngModel)]="test.hazardType"
+                      (ngModelChange)="onHazardTypeChange()" />
+        </div>
+    </div>
+
+    <div class="row" *ngIf="isHazardTypeOther">
+        <div class="col-md-6 mb-2">
+            <vp-input name="hazardTypeOtherDescription"
+                      label="Other Description"
+                      [form]="form"
+                      [maxLength]="200"
+                      [(ngModel)]="test.hazardTypeOtherDescription" />
+        </div>
+    </div>
+</vp-section>

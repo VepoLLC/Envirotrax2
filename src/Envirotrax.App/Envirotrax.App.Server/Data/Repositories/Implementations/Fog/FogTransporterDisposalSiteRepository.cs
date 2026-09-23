@@ -21,18 +21,28 @@ public class FogTransporterDisposalSiteRepository : Repository<FogTransporterDis
             query.Sort[nameof(FogDisposalSite.County)] = SortOperator.Asc;
         }
 
-        var sites = Entity
-            .AsNoTracking()
-            .Where(r => r.IsActive)
-            .Select(r => r.DisposalSite!)
-            .Where(s => s.DeletedTime == null);
-
-        var paginated = await sites
+        var paginated = await GetRegisteredDisposalSitesQuery()
             .Where(query.Filter)
             .OrderBy(query.Sort)
             .PaginateAsync(pageInfo, cancellationToken);
 
         return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public Task<int> CountRegisteredDisposalSitesAsync(Query query, CancellationToken cancellationToken)
+    {
+        return GetRegisteredDisposalSitesQuery()
+            .Where(query.Filter)
+            .CountAsync(cancellationToken);
+    }
+
+    private IQueryable<FogDisposalSite> GetRegisteredDisposalSitesQuery()
+    {
+        return Entity
+            .AsNoTracking()
+            .Where(r => r.IsActive)
+            .Select(r => r.DisposalSite!)
+            .Where(s => s.DeletedTime == null);
     }
 
     // A professional links a disposal site at most once (composite PK), so there is a single registration

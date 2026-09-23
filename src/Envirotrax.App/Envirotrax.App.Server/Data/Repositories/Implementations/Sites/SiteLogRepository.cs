@@ -18,7 +18,9 @@ public class SiteLogRepository : Repository<SiteLog>, ISiteLogRepository
     {
         return base.GetListQuery()
             .Include(sl => sl.CreatedBy)
-            .Include(sl => sl.Assembly);
+            .Include(sl => sl.Assembly)
+            .Include(sl => sl.Site).ThenInclude(s => s!.State)
+            .Include(sl => sl.Site).ThenInclude(s => s!.MailingState);
     }
 
     protected override IQueryable<SiteLog> GetDetailsQuery()
@@ -51,6 +53,11 @@ public class SiteLogRepository : Repository<SiteLog>, ISiteLogRepository
             .PaginateAsync(pageInfo, cancellationToken);
 
         return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken)
+    {
+        return Entity.CountAsync(sl => sl.SiteId == siteId, cancellationToken);
     }
 
     public async Task<IEnumerable<SiteLog>> GetBySiteIdsAsync(IEnumerable<int> siteIds, CancellationToken cancellationToken)

@@ -12,6 +12,8 @@ using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
+using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
+using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Fog;
@@ -25,6 +27,10 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
     private readonly IProfessionalUserService _professionalUserService;
     private readonly ISiteService _siteService;
     private readonly IFileStorageService _fileStorageService;
+    private readonly IAuthService _authService;
+    private readonly IPdfTemplateService _pdfTemplateService;
+    private readonly IGeneralSettingsService _generalSettingsService;
+    private readonly IProfessionalSupplierService _professionalSupplierService;
 
     public FogInspectionService(
         IMapper mapper,
@@ -32,7 +38,11 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         IProfessionalService professionalService,
         IProfessionalUserService professionalUserService,
         ISiteService siteService,
-        IFileStorageService fileStorageService)
+        IFileStorageService fileStorageService,
+        IAuthService authService,
+        IPdfTemplateService pdfTemplateService,
+        IGeneralSettingsService generalSettingsService,
+        IProfessionalSupplierService professionalSupplierService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -40,6 +50,45 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         _professionalUserService = professionalUserService;
         _siteService = siteService;
         _fileStorageService = fileStorageService;
+        _authService = authService;
+        _pdfTemplateService = pdfTemplateService;
+        _generalSettingsService = generalSettingsService;
+        _professionalSupplierService = professionalSupplierService;
+    }
+
+    public Task<byte[]> GeneratePdfAsync(FogInspectionDto inspection)
+    {
+        return GeneratePdfAsync([inspection]);
+    }
+
+    public Task<byte[]> GeneratePdfAsync(IEnumerable<FogInspectionDto> inspections)
+    {
+        return _pdfTemplateService.GenerateAsync("Fog.FogInspection", inspections);
+    }
+
+    public Task<byte[]> GeneratePdfForProfessionalAsync(FogInspectionDto inspection)
+    {
+        if (inspection.TransactionId == null)
+        {
+            throw new AppValidationException("Report can't be downloaded until it's paid. Please go to checkout and pay for this transaction, then try downloading again.");
+        }
+
+        return GeneratePdfAsync(inspection);
+    }
+
+    public override async Task<FogInspectionDto?> DeleteAsync(int id)
+    {
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+        var deleted = await _repository.DeleteAsync(id);
+
+        if (deleted == null || deleted.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(deleted.TransactionId))
+        {
+            return null;
+        }
+
+        scope.Complete();
+        return MapToDto(deleted);
     }
 
     public async Task<FogInspectionDto> SubmitAsync(
@@ -112,6 +161,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
 
         ApplySiteSnapshot(inspection, site);
         ApplyInspectorSnapshot(inspection, professional, inspectorUser, inspectorUserId);
+        await ApplyAmountAsync(inspection, site.IsFeeExempt, cancellationToken);
 
         // Set image paths before AddAsync so they persist with the initial insert (both optional).
         if (exteriorStream != null && exteriorFileName != null)
@@ -146,6 +196,140 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
 
         scope.Complete();
         return Mapper.Map<FogInspectionDto>(added);
+    }
+
+    private async Task ApplyAmountAsync(FogInspection inspection, bool siteIsFeeExempt, CancellationToken cancellationToken)
+    {
+        inspection.Amount = 0;
+        inspection.AmountShare = 0;
+
+        if (siteIsFeeExempt)
+        {
+            return;
+        }
+
+        var settings = await _generalSettingsService.GetAsync(inspection.WaterSupplierId, cancellationToken);
+        var registration = await _professionalSupplierService.GetAsync(inspection.WaterSupplierId, cancellationToken);
+
+        inspection.Amount = registration?.FogInspectorFee ?? settings?.FogInspectorFee ?? 0;
+    }
+
+    // Checkout "Edit" on an own, still-unpaid inspection: mirrors SubmitAsync's field list and snapshot
+    // logic, but against an existing row. Ownership + payment-status guard lives in the repository
+    // (UpdateForProfessionalAsync returns Model == null for not-found/not-owned/already-paid).
+    public async Task<FogInspectionDto?> UpdateForProfessionalAsync(
+        int id,
+        FogInspectionDto request,
+        Stream? exteriorStream, string? exteriorFileName,
+        Stream? interiorStream, string? interiorFileName,
+        Stream? signatureStream, string? signatureFileName,
+        CancellationToken cancellationToken)
+    {
+        var professionalId = _authService.ProfessionalId;
+        var siteId = request.Site!.Id!.Value;
+        var inspectorUserId = request.Inspector!.Id!.Value;
+
+        var site = await _siteService.GetAsync(siteId, cancellationToken);
+        var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
+        var inspectorUser = await _professionalUserService.GetAsync(inspectorUserId, cancellationToken);
+
+        var inspection = new FogInspection
+        {
+            Id = id,
+            InspectionDate = request.InspectionDate,
+            FacilityType = request.FacilityType,
+            ReasonForInspection = request.ReasonForInspection,
+
+            InterceptorType = request.InterceptorType,
+            InterceptorOtherDescription = request.InterceptorOtherDescription,
+            InterceptorCapacity = request.InterceptorCapacity,
+            InterceptorCapacityType = request.InterceptorCapacityType,
+            InterceptorLocationDescription = request.InterceptorLocationDescription,
+            InterceptorLatitude = request.InterceptorLatitude,
+            InterceptorLongitude = request.InterceptorLongitude,
+            InterceptorComments = request.InterceptorComments,
+
+            Maintained = request.Maintained,
+            Accessible = request.Accessible,
+            PastOverflow = request.PastOverflow,
+
+            InletChamberWettingHeight = request.InletChamberWettingHeight,
+            InletChamberGreaseBlanket = request.InletChamberGreaseBlanket,
+            InletChamberSediments = request.InletChamberSediments,
+            OutletChamberWettingHeight = request.OutletChamberWettingHeight,
+            OutletChamberGreaseBlanket = request.OutletChamberGreaseBlanket,
+            OutletChamberSediments = request.OutletChamberSediments,
+            InletTeeIntact = request.InletTeeIntact,
+            OutletTeeIntact = request.OutletTeeIntact,
+            InletTeeVisible = request.InletTeeVisible,
+            OutletTeeVisible = request.OutletTeeVisible,
+
+            SampledFrom = request.SampledFrom,
+            SamplingPointAccessible = request.SamplingPointAccessible,
+            SamplingPointClean = request.SamplingPointClean,
+
+            InletTotalCapacityPercent = request.InletTotalCapacityPercent,
+            OutletTotalCapacityPercent = request.OutletTotalCapacityPercent,
+            TotalCapacityPercent = request.TotalCapacityPercent,
+
+            InspectionResult = request.InspectionResult,
+
+            SignatureContactName = request.SignatureContactName,
+            SignatureDate = request.SignatureDate,
+
+            Comments = request.Comments,
+
+            FogGeneratorPhoneNumber = request.FogGeneratorPhoneNumber,
+            FogGeneratorEmailAddress = request.FogGeneratorEmailAddress
+        };
+
+        ApplySiteSnapshot(inspection, site);
+        ApplyInspectorSnapshot(inspection, professional, inspectorUser, inspectorUserId);
+
+        string? newExteriorPath = null;
+        string? newInteriorPath = null;
+        string? newSignaturePath = null;
+
+        if (exteriorStream != null && exteriorFileName != null)
+        {
+            newExteriorPath = $"professionals/{professional.Id}/fog-inspections/exterior/{Guid.NewGuid()}{ValidateAndGetExtension(exteriorFileName)}";
+        }
+        if (interiorStream != null && interiorFileName != null)
+        {
+            newInteriorPath = $"professionals/{professional.Id}/fog-inspections/interior/{Guid.NewGuid()}{ValidateAndGetExtension(interiorFileName)}";
+        }
+        if (signatureStream != null && signatureFileName != null)
+        {
+            newSignaturePath = $"professionals/{professional.Id}/fog-inspections/signature/{Guid.NewGuid()}{ValidateAndGetExtension(signatureFileName)}";
+        }
+
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+        var saved = await _repository.UpdateForProfessionalAsync(inspection, professionalId, newExteriorPath, newInteriorPath, newSignaturePath);
+
+        if (saved == null)
+        {
+            return null;
+        }
+
+        if (newExteriorPath != null)
+        {
+            await _fileStorageService.UploadAsync(newExteriorPath, exteriorStream!);
+        }
+        if (newInteriorPath != null)
+        {
+            await _fileStorageService.UploadAsync(newInteriorPath, interiorStream!);
+        }
+        if (newSignaturePath != null)
+        {
+            await _fileStorageService.UploadAsync(newSignaturePath, signatureStream!);
+        }
+
+        scope.Complete();
+
+        var dto = Mapper.Map<FogInspectionDto>(saved);
+        await PopulateImageUrlsAsync(dto);
+        return dto;
     }
 
     public override async Task<FogInspectionDto?> GetAsync(int id, CancellationToken cancellationToken)

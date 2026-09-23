@@ -1,0 +1,93 @@
+name: Envirotrax.Admin - Test - Deploy
+
+env:
+  WEBAPP_PACKAGE_PATH: 'src/Envirotrax.Admin/Envirotrax.Admin.Server'
+  WEBAPP_PROJECT_NAME: 'Envirotrax.Admin'
+  DOTNET_VERSION: '10'
+  ARTIFACT_PATH: './artifacts/Envirotrax.Admin'
+  IIS_SITE_PATH: 'C:\inetpub\wwwroot\Envirotrax2-Admin-Test'
+
+on:
+  push:
+    branches: [ "test" ]
+    paths:
+      - "src/Envirotrax.Admin/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Set up dependency caching for faster builds
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build CommonUI package
+        working-directory: src/Envirotrax.CommonUI
+        run: |
+          npm install
+          npm run build-package
+
+      - name: Install admin client dependencies
+        working-directory: src/Envirotrax.Admin/envirotrax.admin.client
+        run: |
+          npm run common-ui:update
+          npm install
+
+      - name: dotnet publish
+        working-directory: ${{ env.WEBAPP_PACKAGE_PATH }}
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/${{env.WEBAPP_PROJECT_NAME}} /p:AngularEnvironment=test
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/${{env.WEBAPP_PROJECT_NAME}}
+
+  deploy:
+    runs-on: [self-hosted, test]
+    needs: build
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: .net-app
+          path: ${{ env.ARTIFACT_PATH }}
+
+      - name: Take app offline
+        shell: powershell
+        run: |
+          New-Item -Path "${{ env.IIS_SITE_PATH }}\app_offline.htm" -ItemType File -Force
+          Start-Sleep -Seconds 10
+
+      - name: Deploy files to IIS site
+        shell: powershell
+        run: |
+          robocopy "${{ env.ARTIFACT_PATH }}" "${{ env.IIS_SITE_PATH }}" /MIR /NP /NFL /NDL /XF app_offline.htm
+          if ($LASTEXITCODE -ge 8) { exit $LASTEXITCODE }
+          exit 0
+
+      - name: Bring app online
+        shell: powershell
+        run: Remove-Item -Path "${{ env.IIS_SITE_PATH }}\app_offline.htm" -Force

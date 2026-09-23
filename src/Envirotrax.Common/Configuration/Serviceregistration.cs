@@ -26,6 +26,12 @@ public static class ServiceRegistrations
             .AddTransient<IAuthService, AuthService>();
     }
 
+    public static IServiceCollection AddKeyHashingService(this IServiceCollection services)
+    {
+        return services
+            .AddTransient<IKeyHashingService, KeyHashingService>();
+    }
+
     public static IServiceCollection AddHtmlTemplateService(this IServiceCollection services, Action<HtmlTemplateOptions> templateConfigAction)
     {
         services
@@ -55,7 +61,25 @@ public static class ServiceRegistrations
         services.AddHtmlTemplateService(templateConfigAction);
 
         services.Configure<EmailOptions>(emailConfigSection);
-        services.AddTransient<IEmailService, EmailService>();
+        services.AddSingleton<IEmailService, EmailService>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddSmsService(this IServiceCollection services, IConfigurationSection smsConfigSection)
+    {
+        services.AddHttpClient();
+        services.Configure<SmsOptions>(smsConfigSection);
+        services.AddTransient<ISmsService, SmsService>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddRecaptchaService(this IServiceCollection services, IConfigurationSection recaptchaConfigSection)
+    {
+        services.AddHttpClient();
+        services.Configure<RecaptchaOptions>(recaptchaConfigSection);
+        services.AddTransient<IRecaptchaVerificationService, RecaptchaVerificationService>();
 
         return services;
     }

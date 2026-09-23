@@ -10,7 +10,7 @@ namespace Envirotrax.App.Server.Controllers.Professionals.Fog;
 
 [Route("api/professionals/fog/inspections")]
 [HasFeature(FeatureType.FogInspection)]
-[Authorize(Roles = RoleDefinitions.Professionals.FogInspector)]
+[Authorize(Roles = $"{RoleDefinitions.Professionals.Admin},{RoleDefinitions.Professionals.FogInspector}")]
 public class ProfessionalFogInspectionController : ProfessionalProtectedController
 {
     private readonly IFogInspectionService _fogInspectionService;
@@ -29,6 +29,16 @@ public class ProfessionalFogInspectionController : ProfessionalProtectedControll
         return Ok(result);
     }
 
+    [HttpGet("pdf")]
+    public async Task<IActionResult> GetAllPdfAsync(
+        [FromQuery] PageInfo pageInfo, [FromQuery] Query query,
+        [FromQuery] bool latestOnly = true, CancellationToken cancellationToken = default)
+    {
+        var inspections = await _fogInspectionService.SearchForProfessionalAsync(pageInfo, query, latestOnly, cancellationToken);
+        var pdf = await _fogInspectionService.GeneratePdfAsync(inspections.Data);
+        return File(pdf, "application/pdf");
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
     {
@@ -39,6 +49,19 @@ public class ProfessionalFogInspectionController : ProfessionalProtectedControll
         }
 
         return Ok(result);
+    }
+
+    [HttpGet("{id}/pdf")]
+    public async Task<IActionResult> GetPdfAsync(int id, CancellationToken cancellationToken)
+    {
+        var inspection = await _fogInspectionService.GetAsync(id, cancellationToken);
+        if (inspection == null)
+        {
+            return NotFound();
+        }
+
+        var pdf = await _fogInspectionService.GeneratePdfForProfessionalAsync(inspection);
+        return File(pdf, "application/pdf");
     }
 
     [HttpPost]
@@ -67,5 +90,40 @@ public class ProfessionalFogInspectionController : ProfessionalProtectedControll
             cancellationToken);
 
         return Ok(result);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAsync(
+        int id,
+        [FromForm] FogInspectionDto dto,
+        [FromForm] IFormFile? exteriorImage,
+        [FromForm] IFormFile? interiorImage,
+        [FromForm] IFormFile? signatureImage,
+        CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
+
+        await using var exteriorStream = exteriorImage?.OpenReadStream();
+        await using var interiorStream = interiorImage?.OpenReadStream();
+        await using var signatureStream = signatureImage?.OpenReadStream();
+
+        var result = await _fogInspectionService.UpdateForProfessionalAsync(
+            id, dto,
+            exteriorStream, exteriorImage?.FileName,
+            interiorStream, interiorImage?.FileName,
+            signatureStream, signatureImage?.FileName,
+            cancellationToken);
+
+        return result == null ? NotFound() : Ok(result);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync(int id)
+    {
+        var result = await _fogInspectionService.DeleteAsync(id);
+        return result == null ? NotFound() : Ok(result);
     }
 }

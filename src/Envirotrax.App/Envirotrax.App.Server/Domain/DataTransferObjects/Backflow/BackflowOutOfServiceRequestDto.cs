@@ -16,11 +16,15 @@ public class BackflowOutOfServiceRequestDto : IDto
 
     public int TestId { get; set; }
 
+    public BackflowTestDto? Test { get; set; }
+
     public OutOfServiceType Type { get; set; }
 
     public string? Description { get; set; }
 
     public int? ReplacementAssemblyTestId { get; set; }
+
+    public BackflowTestDto? ReplacementAssemblyTest { get; set; }
 
     public DateTime? OutOfServiceDate { get; set; }
 

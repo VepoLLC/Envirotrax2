@@ -10,6 +10,7 @@ public class BackflowDailyStatsDto
 
 public class BackflowSubAccountStatsDto
 {
+    public int WaterSupplierId { get; set; }
     public string WaterSupplierName { get; set; } = "";
     public List<BackflowDailyStatsDto> DailyStats { get; set; } = new();
 }

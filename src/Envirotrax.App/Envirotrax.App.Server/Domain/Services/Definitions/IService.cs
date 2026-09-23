@@ -28,7 +28,17 @@ public interface IServiceBase<TDto, TKey>
     Task<IPagedData<TDto>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<IPagedData<TDto>> GetAllAsync(PageInfo pageInfo, Query query, int maxPageSize, CancellationToken cancellationToken);
 
+    Task<int> CountAsync(CancellationToken cancellationToken);
+    Task<int> CountAsync(Query query, CancellationToken cancellationToken);
+
     Task<TDto?> GetAsync(TKey id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Returns whether a record with this id exists, without reading it. Use this instead of calling
+    /// <see cref="GetAsync"/> and null-checking the result when the record itself isn't needed.
+    /// </summary>
+    Task<bool> ExistsAsync(TKey id, CancellationToken cancellationToken);
+
     Task<TDto> AddAsync(TDto dto);
     Task<TDto> UpdateAsync(TDto dto);
     Task<TDto?> DeleteAsync(TKey id);

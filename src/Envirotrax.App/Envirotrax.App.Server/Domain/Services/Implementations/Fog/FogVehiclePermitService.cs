@@ -1,0 +1,92 @@
+using AutoMapper;
+using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.AutoMapper;
+using Envirotrax.App.Server.Data.Models.Fog;
+using Envirotrax.App.Server.Data.Models.Logs;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
+using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
+using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
+
+namespace Envirotrax.App.Server.Domain.Services.Implementations.Fog;
+
+public class FogVehiclePermitService : Service<FogVehiclePermit, FogVehiclePermitDto>, IFogVehiclePermitService
+{
+    private readonly IFogVehiclePermitRepository _permitRepository;
+    private readonly ITimeZoneHelperService _timeZoneHelper;
+    private readonly IRecordLogService _recordLogService;
+
+    public FogVehiclePermitService(
+        IMapper mapper,
+        IFogVehiclePermitRepository repository,
+        ITimeZoneHelperService timeZoneHelper,
+        IRecordLogService recordLogService)
+        : base(mapper, repository)
+    {
+        _permitRepository = repository;
+        _timeZoneHelper = timeZoneHelper;
+        _recordLogService = recordLogService;
+    }
+
+    public async Task<IPagedData<FogVehiclePermitSearchDto>> SearchAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Filter = query.ConvertFilterProperties<FogVehicle, FogVehiclePermitSearchDto>(Mapper);
+        query.Sort = query.ConvertSortProperties<FogVehicle, FogVehiclePermitSearchDto>(Mapper);
+
+        var results = await _permitRepository.SearchAsync(pageInfo, query, cancellationToken);
+
+        var now = _timeZoneHelper.GetUserLocalTime();
+        var dtos = results.Select(result => MapToDto(result, now)).ToList();
+
+        return dtos.ToPagedData(pageInfo);
+    }
+
+    public async Task<FogVehiclePermitSearchDto?> SetPermitAsync(int vehicleId, FogVehiclePermitDto dto, CancellationToken cancellationToken)
+    {
+        if (!await _permitRepository.HasVehicleInScopeAsync(vehicleId, cancellationToken))
+        {
+            return null;
+        }
+
+        var permit = MapToModel(dto)!;
+        permit.VehicleId = vehicleId;
+
+        var (saved, isNew) = await _permitRepository.SetPermitAsync(permit, cancellationToken);
+
+        if (saved != null && isNew)
+        {
+            // recordLog manual
+            await _recordLogService.AddAsync(RecordLogTableNames.FogVehiclePermits, saved.VehicleId, saved.WaterSupplierId, RecordLogType.Add, "New vehicle permit record");
+        }
+
+        var result = await _permitRepository.GetSearchResultByVehicleIdAsync(vehicleId, cancellationToken);
+
+        return result != null
+            ? MapToDto(result, _timeZoneHelper.GetUserLocalTime())
+            : null;
+    }
+
+    private FogVehiclePermitSearchDto MapToDto(FogVehicle vehicle, DateTime now)
+    {
+        var dto = Mapper.Map<FogVehiclePermitSearchDto>(vehicle)!;
+        dto.InspectionDueStatus = ComputeInspectionDueStatus(dto.Permit?.InspectionDueDate, now);
+
+        return dto;
+    }
+
+    private static FogVehicleInspectionDueStatus ComputeInspectionDueStatus(DateTime? inspectionDueDate, DateTime now)
+    {
+        if (!inspectionDueDate.HasValue)
+        {
+            return FogVehicleInspectionDueStatus.None;
+        }
+
+        if (inspectionDueDate.Value < now)
+        {
+            return FogVehicleInspectionDueStatus.PastDue;
+        }
+
+        return FogVehicleInspectionDueStatus.Current;
+    }
+}

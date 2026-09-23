@@ -1,0 +1,95 @@
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox"
+                   [attr.id]="idPrefix + '-ai-ossf'"
+                   name="aiOssf"
+                   [(ngModel)]="inspection.aiOssf" />
+            <label class="form-check-label" [attr.for]="idPrefix + '-ai-ossf'">
+                Does the property have an on-site sewage facility?
+            </label>
+        </div>
+
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox"
+                   [attr.id]="idPrefix + '-ai-water-well'"
+                   name="aiWaterWell"
+                   [(ngModel)]="inspection.aiWaterWell" />
+            <label class="form-check-label" [attr.for]="idPrefix + '-ai-water-well'">
+                Does a water well exist on the property?
+            </label>
+        </div>
+
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox"
+                   [attr.id]="idPrefix + '-ai-fire-system'"
+                   name="aiFireSystem"
+                   [(ngModel)]="inspection.aiFireSystem" />
+            <label class="form-check-label" [attr.for]="idPrefix + '-ai-fire-system'">
+                Is there a fire system at this property location?
+            </label>
+        </div>
+
+        <div class="form-check ms-4">
+            <input class="form-check-input" type="checkbox"
+                   [attr.id]="idPrefix + '-ai-fire-system-2'"
+                   name="aiFireSystem2"
+                   [(ngModel)]="inspection.aiFireSystem2" />
+            <label class="form-check-label" [attr.for]="idPrefix + '-ai-fire-system-2'">
+                If there is a fire system, is it on a separate water supply?
+            </label>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox"
+                   [attr.id]="idPrefix + '-ai-grease-trap'"
+                   name="aiGreaseTrap"
+                   [(ngModel)]="inspection.aiGreaseTrap" />
+            <label class="form-check-label" [attr.for]="idPrefix + '-ai-grease-trap'">
+                Is there a grease trap?
+            </label>
+        </div>
+
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox"
+                   [attr.id]="idPrefix + '-ai-sand-grit'"
+                   name="aiSandGrit"
+                   [(ngModel)]="inspection.aiSandGrit" />
+            <label class="form-check-label" [attr.for]="idPrefix + '-ai-sand-grit'">
+                Is there a sand &amp; grit trap?
+            </label>
+        </div>
+
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox"
+                   [attr.id]="idPrefix + '-ai-reclaimed-water'"
+                   name="aiReclaimedWater"
+                   [(ngModel)]="inspection.aiReclaimedWater" />
+            <label class="form-check-label" [attr.for]="idPrefix + '-ai-reclaimed-water'">
+                Does the property have reclaimed water?
+            </label>
+        </div>
+
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox"
+                   [attr.id]="idPrefix + '-ai-irrigation-system'"
+                   name="aiIrrigationSystem"
+                   [(ngModel)]="inspection.aiIrrigationSystem" />
+            <label class="form-check-label" [attr.for]="idPrefix + '-ai-irrigation-system'">
+                Is there an irrigation system on the property?
+            </label>
+        </div>
+
+        <div class="form-check ms-4">
+            <input class="form-check-input" type="checkbox"
+                   [attr.id]="idPrefix + '-ai-irrigation-system-2'"
+                   name="aiIrrigationSystem2"
+                   [(ngModel)]="inspection.aiIrrigationSystem2" />
+            <label class="form-check-label" [attr.for]="idPrefix + '-ai-irrigation-system-2'">
+                If there is an irrigation system, is it on a separate water supply?
+            </label>
+        </div>
+    </div>
+</div>

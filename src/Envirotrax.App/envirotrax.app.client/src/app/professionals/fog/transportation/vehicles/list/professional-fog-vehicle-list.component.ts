@@ -6,8 +6,7 @@ import { FogVehicleCapacityType, FOG_VEHICLE_CAPACITY_TYPE_LABELS } from "../../
 import { ProfessionalFogVehicleService } from "../../../../../shared/services/fog/professional-fog-vehicle.service";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
 import { EditFogVehicleComponent } from "../edit/edit-fog-vehicle.component";
-import { CellTemplateData, ColumnType, HelperService, InputOption, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
-import { ToastService } from "../../../../../shared/services/toast.service";
+import { CellTemplateData, ColumnType, HelperService, InputOption, ModalHelperService, TableColumn, ToastService } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,

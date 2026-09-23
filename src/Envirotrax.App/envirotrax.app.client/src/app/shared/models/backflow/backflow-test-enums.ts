@@ -4,6 +4,11 @@ export enum BackflowTestResult {
     PassAfterRepairs = 2
 }
 
+export enum BackflowPaymentStatus {
+    Paid = 1,
+    Unpaid = 2
+}
+
 export enum BackflowReasonForTest {
     AnnualTest = 0,
     NewInstallation = 1,

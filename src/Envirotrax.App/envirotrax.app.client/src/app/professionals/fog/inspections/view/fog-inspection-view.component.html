@@ -180,7 +180,7 @@
                     <dt class="col-7 fw-normal">Is there evidence of past overflow?</dt>
                     <dd class="col-5 mb-1">
                         <div class="form-check form-check-inline">
-                            <input class="form-check-inpu readonly-checkboxt" type="radio" disabled
+                            <input class="form-check-input readonly-checkbox" type="radio" disabled
                                    [checked]="inspection.pastOverflow === true" />
                             <label class="form-check-label ms-1">Yes</label>
                         </div>
@@ -374,5 +374,17 @@
             </div>
         </div>
     </vp-section>
+
+    <div class="d-flex flex-column align-items-center gap-2 mt-3">
+        <div class="d-flex justify-content-center gap-2 flex-wrap">
+            <button type="button" class="btn btn-primary vp-section-button" (click)="exportPdf()"
+                    [disabled]="!inspection.transactionId">
+                Export Inspection to Printable Document
+            </button>
+        </div>
+        <div *ngIf="!inspection.transactionId" class="text-danger text-center small">
+            Report can't be downloaded until it's paid. Please go to checkout and pay for this transaction, then try downloading again.
+        </div>
+    </div>
 
 </div>

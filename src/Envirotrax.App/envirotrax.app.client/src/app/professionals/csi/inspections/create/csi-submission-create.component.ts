@@ -15,8 +15,8 @@ import { Site } from '../../../../shared/models/sites/site';
 import { CsiInspectionReason, csiInspectionReasonLabels } from '../../../../shared/enums/csi-inspection-reason.enum';
 import { MAX_PAGE_SIZE } from '../../../../shared/models/page-info';
 import { ProfessionalSupplierService } from '../../../../shared/services/professionals/professional-supplier.service';
-import { ToastService } from '../../../../shared/services/toast.service';
-import { InputOption } from '@envirotrax/common-ui';
+import { CheckoutService } from '../../../../shared/services/professionals/checkout.service';
+import { ToastService, InputOption } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,
@@ -32,6 +32,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
 
     public site?: Site;
     public professional?: Professional;
+    public editingId: number | null = null;
 
     private csiUsers: ProfessionalUser[] = [];
     private waterSuppliers: ProfessionalWaterSupplier[] = [];
@@ -88,11 +89,20 @@ export class CsiSubmissionCreateComponent implements OnInit {
         private readonly _siteService: SiteService,
         private readonly _inspectionService: CsiInspectionService,
         private readonly _professionalSupplierService: ProfessionalSupplierService,
-        private readonly _toastService: ToastService
+        private readonly _toastService: ToastService,
+        private readonly _checkoutService: CheckoutService
     ) { }
 
     public ngOnInit(): void {
         this._activatedRoute.paramMap.subscribe(async params => {
+            const editIdParam = params.get('editId');
+
+            if (editIdParam) {
+                this.editingId = Number(editIdParam);
+                await this.loadForEdit(this.editingId);
+                return;
+            }
+
             const idParam = params.get('siteId');
             this._siteId = this._siteId = idParam ? Number(idParam) : 0;
 
@@ -164,7 +174,11 @@ export class CsiSubmissionCreateComponent implements OnInit {
 
         this.isLoading = true;
         try {
-            const result = await this._inspectionService.submit({ ...this.model, site: { id: this._siteId } });
+            const payload = { ...this.model, site: { id: this._siteId } };
+            const result = this.editingId
+                ? await this._inspectionService.updateForProfessional(this.editingId, payload)
+                : await this._inspectionService.submit(payload);
+
             let imagesFailed = false;
             for (const img of this.pendingImages) {
                 try {
@@ -177,6 +191,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
                 this._toastService.failedToSave('One or more images');
             }
             this.submitSuccess = true;
+            this._checkoutService.refresh();
         } finally {
             this.isLoading = false;
         }
@@ -215,12 +230,52 @@ export class CsiSubmissionCreateComponent implements OnInit {
             this.csiUsers = usersPage.data ?? [];
             this.site = site;
 
-            const waterSuppliersPage = await this._professionalSupplierService.getAllMy(true);
+            const waterSuppliersPage = await this._professionalSupplierService.getAllMy({ hasCsiInspection: true });
             this.waterSuppliers = waterSuppliersPage.data ?? [];
 
             this.buildDropdownOptions();
             await this.setDefaultCsiUser();
             this.setDefaultWaterSupplier(site);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    // Checkout "Edit": full field load of an own, still-unpaid inspection — unlike loadData, which builds a
+    // blank form pre-scoped only to a site id.
+    private async loadForEdit(id: number): Promise<void> {
+        try {
+            this.isLoading = true;
+
+            const inspection = await this._inspectionService.getProfessionalInspection(id);
+            this._siteId = inspection.site?.id ?? 0;
+
+            const [professional, usersPage, site] = await Promise.all([
+                this._professionalService.getLoggedInProfessional(),
+                this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isCsiInspector', comparisonOperator: 'Eq', value: 'true' }] }),
+                this._siteService.getForProfessional(this._siteId)
+            ]);
+
+            this.professional = professional;
+            this.csiUsers = usersPage.data ?? [];
+            this.site = site;
+
+            const waterSuppliersPage = await this._professionalSupplierService.getAllMy({ hasCsiInspection: true });
+            this.waterSuppliers = waterSuppliersPage.data ?? [];
+
+            this.buildDropdownOptions();
+
+            this.model = { ...inspection };
+            this.remarksLength = this.model.comments?.length ?? 0;
+
+            this.selectedWaterSupplierId = inspection.waterSupplier?.id;
+            this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === inspection.waterSupplier?.id);
+
+            this.selectedCsiUserId = inspection.inspectorUser?.id ?? 0;
+            this.selectedCsiUser = this.csiUsers.find(u => u.id === this.selectedCsiUserId);
+            if (this.selectedCsiUserId) {
+                await this.loadLicense(this.selectedCsiUserId);
+            }
         } finally {
             this.isLoading = false;
         }

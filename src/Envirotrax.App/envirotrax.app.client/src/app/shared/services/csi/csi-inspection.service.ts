@@ -9,6 +9,7 @@ import { PagedData } from "../../models/paged-data";
 import { CsiInspection } from "../../models/csi/csi-inspection";
 import { CsiInspectionImage } from "../../models/csi/csi-inspection-image";
 import { DownloadEndpoint } from "../../models/download-config";
+import { RecordLog } from "@envirotrax/common-ui";
 
 @Injectable({
     providedIn: 'root'
@@ -24,9 +25,9 @@ export class CsiInspectionService {
     public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<CsiInspection>> {
         const url = this._urlResolver.resolveUrl('/api/csi/inspections');
 
-        const observable = this._http.get<PagedData<CsiInspection>>(url, {
-            params: this._queryHelper.buildQuery(pageInfo, query)
-        });
+        const params = this._queryHelper.buildQuery(pageInfo, query);
+
+        const observable = this._http.get<PagedData<CsiInspection>>(url, { params });
 
         return await lastValueFrom(observable);
     }
@@ -54,6 +55,14 @@ export class CsiInspectionService {
 
         return lastValueFrom(
             this._http.get<CsiInspection>(url)
+        );
+    }
+
+    public getLogs(id: number): Promise<RecordLog[]> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${id}/logs`);
+
+        return lastValueFrom(
+            this._http.get<RecordLog[]>(url)
         );
     }
 
@@ -91,6 +100,11 @@ export class CsiInspectionService {
         return lastValueFrom(this._http.post<CsiInspection>(url, inspection));
     }
 
+    public updateForProfessional(id: number, inspection: CsiInspection): Promise<CsiInspection> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${id}`);
+        return lastValueFrom(this._http.put<CsiInspection>(url, inspection));
+    }
+
     public updateApproval(id: number, request: { disapproved: boolean; disapprovedReason?: string | null }): Promise<CsiInspection> {
         const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${id}/approval`);
         return lastValueFrom(this._http.put<CsiInspection>(url, request));
@@ -108,6 +122,16 @@ export class CsiInspectionService {
         let params: HttpParams = this._queryHelper.buildQuery(pageInfo, query);
         params = params.append('latestOnly', String(latestOnly));
         return lastValueFrom(this._http.get<PagedData<CsiInspection>>(url, { params }));
+    }
+
+    public deleteForProfessional(id: number): Promise<CsiInspection> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${id}`);
+        return lastValueFrom(this._http.delete<CsiInspection>(url));
+    }
+
+    public getPdfForProfessional(id: number): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${id}/pdf`);
+        return lastValueFrom(this._http.get(url, { responseType: 'blob' }));
     }
 
     public getImages(inspectionId: number): Promise<CsiInspectionImage[]> {

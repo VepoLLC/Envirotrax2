@@ -1,9 +1,12 @@
-
 using AutoMapper;
+using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.AutoMapper;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Users;
 using Envirotrax.App.Server.Domain.Configuration;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 using Envirotrax.Common.Domain.Services.Defintions;
@@ -13,22 +16,41 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Users;
 public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUserService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IUserRoleRepository _userRoleRepository;
     private readonly IAuthService _authService;
     private readonly IInternalApiClientService<AuthApiOptions> _authApiClient;
     private readonly IWaterSupplierService _waterSupplierService;
+    private readonly IRecordLogService _recordLogService;
 
     public UserService(
         IMapper mapper,
         IUserRepository repository,
+        IUserRoleRepository userRoleRepository,
         IAuthService authService,
         IInternalApiClientService<AuthApiOptions> authApiClient,
-        IWaterSupplierService waterSupplierService)
+        IWaterSupplierService waterSupplierService,
+        IRecordLogService recordLogService)
         : base(mapper, repository)
     {
         _userRepository = repository;
+        _userRoleRepository = userRoleRepository;
         _authService = authService;
         _authApiClient = authApiClient;
         _waterSupplierService = waterSupplierService;
+        _recordLogService = recordLogService;
+    }
+
+    public override async Task<WaterSupplierUserDto> UpdateAsync(WaterSupplierUserDto dto)
+    {
+        var model = MapToModel(dto)!;
+        var saved = await _userRepository.UpdateUserAsync(model);
+
+        if (saved == null)
+        {
+            throw new InvalidOperationException($"User {dto.Id} not found.");
+        }
+
+        return MapToDto(saved)!;
     }
 
     public override async Task<WaterSupplierUserDto> AddAsync(WaterSupplierUserDto dto)
@@ -59,7 +81,19 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
     public override async Task<WaterSupplierUserDto?> DeleteAsync(int id)
     {
         await _authApiClient.DeleteAsync<object>(_authService.WaterSupplierId, _authService.UserId, $"/api/users/{id}/invitations", CancellationToken.None);
-        return await base.DeleteAsync(id);
+
+        await _userRoleRepository.DeleteAllForUserAsync(id);
+
+        var deleted = await base.DeleteAsync(id);
+
+        if (deleted != null)
+        {
+            // recordLog manual
+            await _recordLogService.AddAsync(RecordLogTableNames.WaterSupplierUserAccounts, deleted.Id, _authService.WaterSupplierId, RecordLogType.Delete,
+                $"Deleted user account — ContactName: '{deleted.ContactName}', EmailAddress: '{deleted.EmailAddress}'");
+        }
+
+        return deleted;
     }
 
     public async Task<WaterSupplierUserDto?> ResendInvitationAsync(int id, CancellationToken cancellationToken)
@@ -84,6 +118,18 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
         }
 
         return MapToDto(user);
+    }
+
+    public async Task<IPagedData<WaterSupplierUserDto>> GetAllForWaterSupplierAsync(int waterSupplierId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<WaterSupplierUser, WaterSupplierUserDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<WaterSupplierUser, WaterSupplierUserDto>(Mapper);
+
+        var users = await _userRepository.GetAllForWaterSupplierAsync(waterSupplierId, pageInfo, query, cancellationToken);
+
+        return users
+            .Select(user => MapToDto(user)!)
+            .ToPagedData(pageInfo);
     }
 }
 class UserInvitationDto

@@ -1,5 +1,6 @@
 
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
+using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ namespace Envirotrax.App.Server.Data.Models.Professionals;
 
 public class ProfessionalWaterSupplier : TenantModel<WaterSupplier>, IProfessionalModel
 {
+    [AppPrimaryKey(false)]
     public int ProfessionalId { get; set; }
     public Professional? Professional { get; set; }
 
@@ -70,4 +72,6 @@ public class AvailableWaterSupplier
 
     public decimal? FogTransportFee { get; set; }
     public decimal? FogInspectorFee { get; set; }
+
+    public bool IsActive { get; set; }
 }

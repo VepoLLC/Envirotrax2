@@ -4,8 +4,7 @@ import { GisAreaService } from "../../../shared/services/gis-areas/gis-area.serv
 import { GisAreaCoordinateService } from "../../../shared/services/gis-areas/gis-area-coordinate.service";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { NgForm } from "@angular/forms";
-import { ToastService } from "../../../shared/services/toast.service";
-import { MapPolygon, ModalHelperService } from "@envirotrax/common-ui";
+import { ToastService, MapPolygon, ModalHelperService } from '@envirotrax/common-ui';
 
 
 @Component({
@@ -47,6 +46,7 @@ export class CreateEditGisAreaComponent implements OnInit, OnChanges {
             if (this.polygon?.data) {
                 this.polygon.data.coordinates = this._helper.copy(newPolygon.data?.coordinates ?? []);
                 this.polygon.coordinates = [...newPolygon.coordinates];
+                this.polygon.holes = this._helper.copy(newPolygon.holes ?? []);
             }
             this.setCoordinatesText();
         });
@@ -59,28 +59,68 @@ export class CreateEditGisAreaComponent implements OnInit, OnChanges {
         }
     }
 
+    // The text area keeps the same format the area editor used in V1: one "longitude, latitude" per
+    // line, and a "0, 0" line wherever one ring ends and the next begins. Everything before the first
     private setCoordinatesText(): void {
-        if (this.polygon?.data?.coordinates?.length) {
-            this.coordinatesText = this.polygon
-                .data
-                .coordinates
-                .map(c => `${c.longitude}, ${c.latitude}`)
-                .join('\n');
-        } else {
+        const coordinates = this.polygon?.data?.coordinates;
+
+        if (!coordinates?.length) {
             this.coordinatesText = '';
+            return;
         }
+
+        const lines: string[] = [];
+        let currentPolygonIndex = 0;
+
+        for (const coordinate of coordinates) {
+            const polygonIndex = coordinate.polygonIndex ?? 0;
+
+            // This point belongs to a later ring, so close the ones before it with separators.
+            while (currentPolygonIndex < polygonIndex) {
+                lines.push('0, 0');
+                currentPolygonIndex++;
+            }
+
+            lines.push(`${coordinate.longitude}, ${coordinate.latitude}`);
+        }
+
+        this.coordinatesText = lines.join('\n');
     }
 
-    private getCoordinatesModel(): GisAreaCoordinate[] {
-        return this.coordinatesText.split('\n')
-            .map(coordinate => {
-                const parts = coordinate.split(',');
+    // Reverse of setCoordinatesText: every "0, 0" line starts the next ring, so the ring number grows
+    // by one and the following points are saved with it.
+    private parseCoordinatesText(): GisAreaCoordinate[] {
+        const coordinates: GisAreaCoordinate[] = [];
+        let polygonIndex = 0;
 
-                return {
-                    longitude: +(parts[0].trim()),
-                    latitude: +(parts[1].trim())
-                };
+        for (const line of this.coordinatesText.split('\n')) {
+            const parts = line.split(',');
+
+            // Blank and malformed lines are dropped: the user types into this box by hand.
+            if (parts.length < 2) {
+                continue;
+            }
+
+            const longitude = +(parts[0].trim());
+            const latitude = +(parts[1].trim());
+
+            if (isNaN(longitude) || isNaN(latitude)) {
+                continue;
+            }
+
+            if (longitude === 0 && latitude === 0) {
+                polygonIndex++;
+                continue;
+            }
+
+            coordinates.push({
+                polygonIndex: polygonIndex,
+                longitude: longitude,
+                latitude: latitude
             });
+        }
+
+        return coordinates;
     }
 
     public async save(form: NgForm): Promise<void> {
@@ -89,7 +129,7 @@ export class CreateEditGisAreaComponent implements OnInit, OnChanges {
                 this.isLoading = true;
                 this.validationErrors = [];
 
-                const coordiantes = this.getCoordinatesModel();
+                const coordiantes = this.parseCoordinatesText();
 
                 const result = !this.polygon.data!.area.id
                     ? await this._gisAreaService.add(this.polygon.data!.area)

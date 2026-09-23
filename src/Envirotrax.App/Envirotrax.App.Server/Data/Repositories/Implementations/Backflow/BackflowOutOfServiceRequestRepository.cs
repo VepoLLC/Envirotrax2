@@ -1,4 +1,5 @@
 using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Services.Definitions;
@@ -15,9 +16,15 @@ public class BackflowOutOfServiceRequestRepository : Repository<BackflowOutOfSer
 
     protected override IQueryable<BackflowOutOfServiceRequest> GetListQuery()
     {
+        // The request itself is not soft-deletable, but one whose test was deleted points at a record
+        // nothing else shows any more — so it is filtered here, where both the lists and the site tab
+        // count read from, and the two cannot drift apart.
         return base.GetListQuery()
+            .Where(r => r.Test!.DeletedTime == null)
             .Include(r => r.Test)
+                .ThenInclude(t => t!.PropertyState)
             .Include(r => r.ReplacementAssemblyTest)
+                .ThenInclude(t => t!.PropertyState)
             .Include(r => r.Bpat);
     }
 
@@ -25,7 +32,9 @@ public class BackflowOutOfServiceRequestRepository : Repository<BackflowOutOfSer
     {
         return base.GetDetailsQuery()
             .Include(r => r.Test)
+                .ThenInclude(t => t!.PropertyState)
             .Include(r => r.ReplacementAssemblyTest)
+                .ThenInclude(t => t!.PropertyState)
             .Include(r => r.Bpat);
     }
 
@@ -82,6 +91,65 @@ public class BackflowOutOfServiceRequestRepository : Repository<BackflowOutOfSer
             .Where(t => t.Id == testId)
             .Select(t => (int?)t.WaterSupplierId)
             .SingleOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<BackflowOutOfServiceRequest>> GetForWaterSupplierAsync(
+        PageInfo pageInfo, Query query, OutOfServiceRequestStatusFilter status,
+        OutOfServiceType? type, CancellationToken cancellationToken)
+    {
+        // Tenant scoping (WaterSupplierId == current) is applied automatically by TenantDbContext.
+        var q = GetListQuery();
+
+        switch (status)
+        {
+            case OutOfServiceRequestStatusFilter.AllUncleared:
+                q = q.Where(r => r.OutOfServiceDate == null && r.ClearedDate == null);
+                break;
+            case OutOfServiceRequestStatusFilter.MarkedOutOfService:
+                q = q.Where(r => r.OutOfServiceDate != null);
+                break;
+            case OutOfServiceRequestStatusFilter.Cleared:
+                q = q.Where(r => r.ClearedDate != null);
+                break;
+            case OutOfServiceRequestStatusFilter.All:
+            default:
+                break;
+        }
+
+        if (type.HasValue)
+        {
+            q = q.Where(r => r.Type == type.Value);
+        }
+
+        var paginated = await q
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public async Task<bool> ClearAsync(int id, CancellationToken cancellationToken)
+    {
+        // Tenant-scoped, so only the supplier's own rows are visible.
+        var request = await DbContext.BackflowOutOfServiceRequests
+            .SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
+
+        if (request == null)
+        {
+            return false;
+        }
+
+        request.ClearedDate = DateTime.UtcNow;
+
+        await DbContext.SaveChangesAsync(cancellationToken);
+
+        return true;
+    }
+
+    public Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken)
+    {
+        return GetListQuery().CountAsync(r => r.Test!.SiteId == siteId, cancellationToken);
     }
 
     private static bool SerialNumbersMatch(string? first, string? second)

@@ -1,4 +1,4 @@
-import { HttpErrorResponse } from "@angular/common/http";
+import { HttpErrorResponse, HttpStatusCode } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 
 @Injectable({
@@ -12,7 +12,7 @@ export class HelperService {
 
     public parseValidationErrors(e: any, validationErrors: string[]): boolean {
         if (e instanceof HttpErrorResponse) {
-            if (e.status == 400) {
+            if (e.status == HttpStatusCode.BadRequest) {
                 if (typeof e.error.error == 'string') {
                     validationErrors.push(e.error.error);
                 }
@@ -36,7 +36,7 @@ export class HelperService {
 
     public isNotFoundError(error: any): boolean {
         if (error instanceof HttpErrorResponse) {
-            if (error.status == 404) {
+            if (error.status == HttpStatusCode.NotFound) {
                 return true;
             }
         }
@@ -68,5 +68,23 @@ export class HelperService {
 
     public isDefined(value: any): boolean {
         return value != undefined && value != null;
+    }
+
+    public toNumberOrUndefined(value: unknown): number | undefined {
+        if (value === null || value === undefined || value === '') {
+            return undefined;
+        }
+
+        const parsed = Number(value);
+
+        return Number.isNaN(parsed) ? undefined : parsed;
+    }
+
+    public toTextOrUndefined(value: unknown): string | undefined {
+        if (value === null || value === undefined || value === '') {
+            return undefined;
+        }
+
+        return String(value);
     }
 }

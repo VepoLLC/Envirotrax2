@@ -15,6 +15,8 @@ public class WaterSupplierDto
     [StringLength(50)]
     public string Domain { get; set; } = null!;
 
+    public bool IsActive { get; set; }
+
     public string ContactName { get; set; } = null!;
     public string? PwsId { get; set; } = null!;
 
@@ -49,6 +51,8 @@ public class WaterSupplierDto
     public double? GisCenterZoom { get; set; }
 
     public ReferencedWaterSupplierDto? Parent { get; set; }
+
+    public ReferencedGeneralSettingsDto? GeneralSettings { get; set; }
 }
 
 public class ReferencedWaterSupplierDto

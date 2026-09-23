@@ -1,4 +1,5 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { WaterSupplierLicense, LicenseCounts } from '../shared/models/professionals/licenses/water-supplier-license';
 import { WaterSupplierLicenseService } from '../shared/services/licenses/water-supplier-license.service';
 import { TableViewModel } from '../shared/models/table-view-model';
@@ -7,9 +8,8 @@ import { AuthService } from '../shared/services/auth/auth.service';
 import { FeatureType } from '../shared/models/feature-type';
 import { PermissionAction, PermissionType } from '../shared/models/permission-type';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
-import { ToastService } from '../shared/services/toast.service';
+import { ToastService, CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 import { EditWaterSupplierLicenseComponent, WaterSupplierLicenseModalData } from './edit/edit-water-supplier-license.component';
-import { CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 
 @Component({
     templateUrl: './license-management.component.html',
@@ -57,10 +57,17 @@ export class LicenseManagementComponent implements OnInit {
         private readonly _licenseService: WaterSupplierLicenseService,
         private readonly _authService: AuthService,
         private readonly _modalHelper: ModalHelperService,
-        private readonly _toastService: ToastService
+        private readonly _toastService: ToastService,
+        private readonly _router: Router
     ) { }
 
     public async ngOnInit(): Promise<void> {
+        const hasLicenseAccess = await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalLicenses)
+            || await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Licenses);
+        if (!hasLicenseAccess) {
+            await this._router.navigate(['auth', 'unauthorized']);
+            return;
+        }
         this.canModify = await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalLicenses)
             || await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.Licenses);
         this.table.columns = this.getColumns();

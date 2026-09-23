@@ -1,0 +1,43 @@
+<div class="mb-3" *ngFor="let group of groups">
+    <vp-section [header]="group.header">
+        <div dp-spinner-parent>
+            <dp-loading-spinner *ngIf="group.isSaving"></dp-loading-spinner>
+
+            <div class="row">
+                <div class="col-md-6 mb-2" *ngFor="let slot of group.slots">
+                    <div class="border rounded p-3 h-100">
+                        <div class="text-center fw-semibold mb-2">{{ slot.label }}</div>
+
+                        <vp-file-upload [name]="slot.type"
+                                        [accept]="accept"
+                                        label="Choose an image or drag and drop here"
+                                        [file]="slot.stagedFile"
+                                        (fileChange)="onImageFileChange($event, group, slot)" />
+
+                        <div class="text-center mt-2" *ngIf="slot.stagedPreview">
+                            <img [src]="slot.stagedPreview" [alt]="slot.alt"
+                                 class="rounded img-fluid" style="max-height: 350px;" />
+                        </div>
+
+                        <div class="text-center mt-2" *ngIf="!slot.stagedPreview && slot.url">
+                            <a [href]="slot.url" target="_blank" rel="noopener">
+                                <img [src]="slot.url" [alt]="slot.alt"
+                                     class="rounded img-fluid" style="max-height: 350px;" />
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end mt-2">
+                <button type="button"
+                        class="btn btn-primary vp-section-button"
+                        [disabled]="group.isSaving || !group.hasStagedImages"
+                        (click)="saveImages(group)">
+                    <i class="fa-solid fa-floppy-disk me-1"></i>
+                    Save Images
+                </button>
+            </div>
+        </div>
+    </vp-section>
+</div>

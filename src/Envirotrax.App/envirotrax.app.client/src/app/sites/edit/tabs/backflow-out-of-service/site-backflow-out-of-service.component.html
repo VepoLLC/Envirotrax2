@@ -1,0 +1,94 @@
+<ng-template #statusTemplate let-request="rowData">
+    <div class="d-flex gap-1 flex-wrap">
+        <vp-status-icon [imageSrc]="request.isCurrent ? '/images/icons/bstatus-green-on.png' : '/images/icons/bstatus-green-off.png'"
+                        [text]="request.isCurrent ? 'Current Test' : 'Previous Test History'"
+                        [showText]="false" />
+        <vp-status-icon [imageSrc]="request.passed ? '/images/icons/bstatus-magenta-on.png' : '/images/icons/bstatus-magenta-off.png'"
+                        [text]="request.passed ? 'Passed Test' : 'Failed Test'"
+                        [showText]="false" />
+        <vp-status-icon [imageSrc]="request.outOfService ? '/images/icons/bstatus-blue-off.png' : '/images/icons/bstatus-blue-on.png'"
+                        [text]="request.outOfService ? 'Out of Service' : 'In Service'"
+                        [showText]="false" />
+    </div>
+</ng-template>
+
+<ng-template #bpatTemplate let-request="rowData">
+    <a *ngIf="request.showBpatLink; else plainBpat"
+       [routerLink]="['/backflow', 'testers', 'details', request.professionalId]">
+        <div *ngIf="request.bpatCompanyName" class="fw-semibold">{{ request.bpatCompanyName }}</div>
+        <div *ngIf="request.bpatContactName">{{ request.bpatContactName }}</div>
+        <div *ngIf="request.bpatAddress">{{ request.bpatAddress }}</div>
+        <div *ngIf="request.bpatCityStateZip">{{ request.bpatCityStateZip }}</div>
+    </a>
+    <ng-template #plainBpat>
+        <div *ngIf="request.bpatCompanyName" class="fw-semibold">{{ request.bpatCompanyName }}</div>
+        <div *ngIf="request.bpatContactName">{{ request.bpatContactName }}</div>
+        <div *ngIf="request.bpatAddress">{{ request.bpatAddress }}</div>
+        <div *ngIf="request.bpatCityStateZip">{{ request.bpatCityStateZip }}</div>
+    </ng-template>
+</ng-template>
+
+<ng-template #serialTemplate let-request="rowData">
+    <div *ngIf="request.isBypassDevice; else plainSerial">
+        <div><strong>Main:</strong> {{ request.serialNumber }}</div>
+        <div><strong>Bypass:</strong> {{ request.bypassSerialNumber }}</div>
+    </div>
+    <ng-template #plainSerial>
+        {{ request.serialNumber }}
+    </ng-template>
+</ng-template>
+
+<ng-template #assemblyTemplate let-request="rowData">
+    <div *ngIf="request.isBypassDevice; else plainAssembly">
+        <div><strong>Main Assembly:</strong> {{ request.assemblyDescription }}</div>
+        <div><strong>Bypass Assembly:</strong> {{ request.bypassAssemblyDescription }}</div>
+        <div><strong>Hazard Type:</strong> {{ request.hazardLabel }}</div>
+        <div><strong>Location Desc:</strong> {{ request.locationDescription }}</div>
+    </div>
+    <ng-template #plainAssembly>
+        <div>
+            <strong>Assembly Desc:</strong>
+            {{ request.assemblyDescription }}
+        </div>
+        <div><strong>Hazard Type:</strong> {{ request.hazardLabel }}</div>
+        <div><strong>Location Desc:</strong> {{ request.locationDescription }}</div>
+    </ng-template>
+</ng-template>
+
+<ng-template #deviceDescriptionTemplate let-request="rowData">
+    {{ request.assemblyDescription }}
+</ng-template>
+
+<vp-section header="Out of Service Requests">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+        <div class="container mb-3">
+            <div class="row gap-2 justify-content-center mb-3">
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Current Test" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Previous Test History" />
+                </div>
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-magenta-on.png" text="Passed Test" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-magenta-off.png" text="Failed Test" />
+                </div>
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-blue-on.png" text="In Service" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-blue-off.png" text="Out of Service" />
+                </div>
+            </div>
+        </div>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getRequests()"
+                  [(query)]="table.query"
+                  (queryChange)="getRequests()"
+                  (queryReset)="getRequests()"
+                  [canViewDetails]="true"
+                  (viewDetails)="viewTest($event)" />
+    </div>
+</vp-section>

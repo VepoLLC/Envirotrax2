@@ -3,7 +3,7 @@ import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { AvailableWaterSupplier, ProfessionalWaterSupplier } from "../../../shared/models/professionals/professional-water-supplier";
 import { ProfessionalSupplierService } from "../../../shared/services/professionals/professional-supplier.service";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
-import { ToastService } from "../../../shared/services/toast.service";
+import { ToastService } from '@envirotrax/common-ui';
 
 export interface WaterSupplierRegistrationVm {
     availableSupplier: AvailableWaterSupplier;

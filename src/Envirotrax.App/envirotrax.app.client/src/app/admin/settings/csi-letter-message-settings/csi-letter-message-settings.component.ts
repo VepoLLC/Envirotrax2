@@ -4,7 +4,7 @@ import { CsiSettings } from "../../../shared/models/settings/csi-settings";
 import { CsiImpendingType, CsiNonCompliantType, CsiPastDueType } from "../../../shared/models/settings/csi-settings-enums";
 import { CsiSettingsService } from "../../../shared/services/settings/csi-settings.service";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
-import { ToastService } from "../../../shared/services/toast.service";
+import { ToastService } from '@envirotrax/common-ui';
 
 @Component({
     templateUrl: './csi-letter-message-settings.component.html',

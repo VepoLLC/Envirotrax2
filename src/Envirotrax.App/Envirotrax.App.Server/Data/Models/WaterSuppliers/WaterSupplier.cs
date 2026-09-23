@@ -1,13 +1,21 @@
+using Envirotrax.App.Server.Data.Models.Logs;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Envirotrax.App.Server.Data.Models.States;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.Common.Data.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Envirotrax.App.Server.Data.Models.WaterSuppliers;
 
+[RecordLogged(RecordLogTableNames.WaterSuppliers, WaterSupplierIdProperty = nameof(WaterSupplier.Id), ProfessionalSource = RecordLogIdSource.None)]
 public class WaterSupplier : TenantBase, IAuditableModel<AppUser>
 {
+    // Original Vepo.dbo.WaterSuppliers.ID. Populated by the legacy import; null for records
+    // created in V2.
+    public int? LegacyRecordId { get; set; }
+
     [Required]
     [StringLength(255)]
     public string Name { get; set; } = null!;
@@ -92,6 +100,10 @@ public class WaterSupplier : TenantBase, IAuditableModel<AppUser>
     [ForeignKey(nameof(ParentId))]
     public WaterSupplier? Parent { get; set; }
 
+    public bool IsActive { get; set; } = true;
+
+    public GeneralSettings? GeneralSettings { get; set; }
+
     public int? CreatedById { get; set; }
     public AppUser? CreatedBy { get; set; }
     public DateTime CreatedTime { get; set; }
@@ -104,4 +116,16 @@ public class WaterSupplier : TenantBase, IAuditableModel<AppUser>
 
     [NotMapped]
     public const string EnvirotraxAdminDomain = "vepollc";
+}
+
+public class WaterSupplierConfiguration : IEntityTypeConfiguration<WaterSupplier>
+{
+    public void Configure(EntityTypeBuilder<WaterSupplier> builder)
+    {
+        builder.HasOne(ws => ws.GeneralSettings)
+            .WithOne(gs => gs.WaterSupplier)
+            .HasForeignKey<GeneralSettings>(gs => gs.WaterSupplierId);
+
+        builder.HasIndex(supplier => supplier.LegacyRecordId);
+    }
 }

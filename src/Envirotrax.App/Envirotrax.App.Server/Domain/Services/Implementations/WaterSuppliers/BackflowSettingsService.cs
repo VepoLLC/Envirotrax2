@@ -23,4 +23,19 @@ public class BackflowSettingsService : Service<BackflowSettings, BackflowSetting
 
         return settings ?? new BackflowTestingSettingsDto();
     }
+
+    public async Task<BackflowTestingSettingsDto> GetTestingSettingsByWaterSupplierAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        var settings = await _repository.GetTestingSettingsByWaterSupplierAsync(waterSupplierId, cancellationToken);
+
+        return settings ?? new BackflowTestingSettingsDto();
+    }
+
+    public async Task<BackflowSettingsDto> AddOrUpdateAsync(int waterSupplierId, BackflowSettingsDto settings)
+    {
+        var model = MapToModel(settings)!;
+        var saved = await _repository.AddOrUpdateAsync(waterSupplierId, model);
+
+        return MapToDto(saved)!;
+    }
 }

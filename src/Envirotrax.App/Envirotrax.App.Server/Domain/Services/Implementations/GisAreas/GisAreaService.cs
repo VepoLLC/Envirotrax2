@@ -22,9 +22,27 @@ public class GisAreaService : Service<GisArea, GisAreaDto>, IGisAreaService
         return Mapper.Map<IEnumerable<GisAreaDto>>(areas);
     }
 
+    public async Task<IEnumerable<GisAreaDto>> GetAllActiveBySupplierAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        var areas = await _gisAreaRepository.GetAllActiveBySupplierAsync(waterSupplierId, cancellationToken);
+        return Mapper.Map<IEnumerable<GisAreaDto>>(areas);
+    }
+
     public async Task<DefaultGiisMapViewDto> GetDefaultMapViewAsync(CancellationToken cancellationToken)
     {
         var mapView = await _gisAreaRepository.GetDefaultMapViewAsync(cancellationToken);
+
+        return new DefaultGiisMapViewDto
+        {
+            GisCenterLatitude = mapView.GisCenterLatitude,
+            GisCenterLongitude = mapView.GisCenterLongitude,
+            GisCenterZoom = mapView.GisCenterZoom
+        };
+    }
+
+    public async Task<DefaultGiisMapViewDto> GetDefaultMapViewBySupplierAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        var mapView = await _gisAreaRepository.GetDefaultMapViewBySupplierAsync(waterSupplierId, cancellationToken);
 
         return new DefaultGiisMapViewDto
         {

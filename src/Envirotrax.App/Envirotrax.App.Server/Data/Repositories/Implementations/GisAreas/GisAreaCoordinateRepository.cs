@@ -14,11 +14,25 @@ public class GisAreaCoordinateRepository : Repository<GisAreaCoordinate, long>, 
     {
     }
 
+    // Order matters: the shape of an area is the order of its vertices. PolygonIndex groups them into
     public async Task<IEnumerable<GisAreaCoordinate>> GetByAreaIdAsync(int areaId, CancellationToken cancellationToken)
     {
         return await DbContext.GisAreaCoordinates
             .AsNoTracking()
             .Where(c => c.AreaId == areaId)
+            .OrderBy(c => c.PolygonIndex)
+            .ThenBy(c => c.Id)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<GisAreaCoordinate>> GetAllBySupplierAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        return await DbContext.GisAreaCoordinates
+            .AsNoTracking()
+            .Where(c => c.WaterSupplierId == waterSupplierId)
+            .OrderBy(c => c.AreaId)
+            .ThenBy(c => c.PolygonIndex)
+            .ThenBy(c => c.Id)
             .ToListAsync(cancellationToken);
     }
 

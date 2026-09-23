@@ -1,0 +1,14 @@
+.col-num { width: 7%; }
+
+/* Charts scroll horizontally when there are many months. */
+.bf-chart-scroll {
+    overflow-x: auto;
+    padding: 0.5rem 1rem 1rem;
+}
+
+.bf-chart-canvas {
+    height: 300px;
+    // Fill the panel width when there are few months (matches V1's full-width chart); the px value
+    // is a min-width, so with many months it grows past the panel and scrolls horizontally instead.
+    width: 100%;
+}

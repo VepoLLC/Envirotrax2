@@ -1,3 +1,4 @@
+import { Site } from './site';
 import { SiteLogType } from './site-log-type.enum';
 import { SiteLogReviewDateStatus } from './site-log-review-date-status.enum';
 
@@ -17,7 +18,7 @@ export interface SiteLogCreatedBy {
 
 export interface SiteLog {
     id?: number;
-    site?: { id?: number };
+    site?: Site;
     logType?: SiteLogType;
     noteText?: string;
     reviewDate?: string | null;

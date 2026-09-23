@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using Azure.Identity;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
@@ -31,11 +32,23 @@ builder.Services.AddControllers(options =>
     options.Filters.Add(typeof(CheckFeaturesFilter));
     options.Filters.Add(typeof(CheckPermissionFilter));
     options.Filters.Add(typeof(QueryFilter));
+    options.Filters.Add(typeof(ApiExceptionFilter));
 
     options.OutputFormatters.Add(new CsvMediaTypeFormatter());
     options.OutputFormatters.Add(new ExcelMediaTypeFormatter());
     options.OutputFormatters.Add(new XmlMediaTypeFormatter());
 });
+
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = context =>
+    {
+        var traceId = Activity.Current?.TraceId.ToString() ?? context.HttpContext.TraceIdentifier;
+
+        context.ProblemDetails.Extensions["traceId"] = traceId;
+    };
+});
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -50,6 +63,11 @@ app.MapStaticAssets();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseExceptionHandler();
 }
 
 app.UseRequestLocalization(new RequestLocalizationOptions

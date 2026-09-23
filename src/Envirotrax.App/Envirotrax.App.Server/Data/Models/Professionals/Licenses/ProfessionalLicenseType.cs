@@ -19,6 +19,8 @@ public class ProfessionalLicenseType
 
     public ProfessionalType ProfessionalType { get; set; }
 
+    public bool IsFireLicense { get; set; }
+
     public int? StateId { get; set; }
     public State? State { get; set; }
 }

@@ -1,8 +1,14 @@
 using Envirotrax.App.Server.Data.DbContexts;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Api;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Api;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Data.Repositories.Definitions.GisAreas;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Logs;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Notifications;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Logs;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Notifications;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Users;
 using Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
@@ -49,6 +55,7 @@ public static class ServiceRegistration
         AddDbContext<TenantDbContext>(services, configuration, environment);
         AddDbContext<ProfessionalDbContext>(services, configuration, environment);
         AddDbContext<AdminDbContext>(services, configuration, environment);
+        AddDbContext<PublicDbContext>(services, configuration, environment);
         services.AddScoped<IDbContextSelector, DbContextSelector>();
 
         services.AddTenantProvider();
@@ -61,12 +68,19 @@ public static class ServiceRegistration
         services.AddTransient<ISiteLogRepository, SiteLogRepository>();
         services.AddTransient<ICsiInspectionRepository, CsiInspectionRepository>();
         services.AddTransient<ICsiInspectionImageRepository, CsiInspectionImageRepository>();
+        services.AddTransient<ICsiInspectionAssemblyRepository, CsiInspectionAssemblyRepository>();
+        services.AddTransient<IRecordLogRepository, RecordLogRepository>();
         services.AddTransient<ICsiInspectorRepository, CsiInspectorRepository>();
         services.AddTransient<ICsiSystemReportRepository, CsiSystemReportRepository>();
         services.AddTransient<IFogInspectorRepository, FogInspectorRepository>();
+        services.AddTransient<IFogTransporterRepository, FogTransporterRepository>();
         services.AddTransient<IFogInspectionRepository, FogInspectionRepository>();
         services.AddTransient<IBackflowTesterRepository, BackflowTesterRepository>();
         services.AddTransient<IBackflowTestRepository, BackflowTestRepository>();
+        services.AddTransient<IBackflowTestReportRepository, BackflowTestReportRepository>();
+        services.AddTransient<IBackflowComplianceReportRepository, BackflowComplianceReportRepository>();
+        services.AddTransient<IBackflowComplianceSnapshotRepository, BackflowComplianceSnapshotRepository>();
+        services.AddTransient<IBackflowNewRemovedReportRepository, BackflowNewRemovedReportRepository>();
         services.AddTransient<IBackflowOutOfServiceRequestRepository, BackflowOutOfServiceRequestRepository>();
         services.AddTransient<LookupRepository>();
 
@@ -79,18 +93,31 @@ public static class ServiceRegistration
         services.AddTransient<IUserRoleRepository, UserReoleRepository>();
 
         services.AddTransient<IProfessionalRepository, ProfessionalRepository>();
+        services.AddTransient<IRegisteredProfessionalRepository, RegisteredProfessionalRepository>();
         services.AddTransient<IProfessionalUserRepository, ProfessionalUserRepository>();
         services.AddTransient<IProfessionalSupplierRepository, ProfessionalSupplierRepository>();
         services.AddTransient<IProfessionalUserLicenseRepository, ProfessionalUserLicenseRepository>();
         services.AddTransient<IProfessionalLicenseTypeRepository, ProfessionalLicenseTypeRepository>();
         services.AddTransient<IProfessionalInsuranceRepository, ProfessionalInsuranceRepository>();
+        services.AddTransient<IProfessionalDashboardRepository, ProfessionalDashboardRepository>();
         services.AddTransient<IBackflowGaugeRepository, BackflowGaugeRepository>();
         services.AddTransient<IFogVehicleRepository, FogVehicleRepository>();
+        services.AddTransient<IFogVehiclePermitRepository, FogVehiclePermitRepository>();
         services.AddTransient<IFogTransporterDisposalSiteRepository, FogTransporterDisposalSiteRepository>();
         services.AddTransient<IFogDisposalSiteRepository, FogDisposalSiteRepository>();
+        services.AddTransient<IFogTripTicketRepository, FogTripTicketRepository>();
+        services.AddTransient<IFogSettingsRepository, FogSettingsRepository>();
+        services.AddTransient<IFogTripTicketReportRepository, FogTripTicketReportRepository>();
+        services.AddTransient<IFogInspectionReportRepository, FogInspectionReportRepository>();
 
         services.AddTransient<IGisAreaRepository, GisAreaRepository>();
         services.AddTransient<IGisAreaCoordinateRepository, GisAreaCoordinateRepository>();
+
+        services.AddTransient<INotificationSettingRepository, NotificationSettingRepository>();
+        services.AddTransient<INotificationRepository, NotificationRepository>();
+
+        services.AddTransient<IApiAccountRepository, ApiAccountRepository>();
+        services.AddTransient<ILegacyQueryRepository, LegacyQueryRepository>();
 
         services.AddTransient<IWaterSupplierDashboardRepository, WaterSupplierDashboardRepository>();
 

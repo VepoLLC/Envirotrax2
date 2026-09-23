@@ -1,0 +1,86 @@
+<ng-template #statusTemplate let-inspection="rowData">
+    <div class="d-flex gap-1">
+        <vp-status-icon *ngIf="inspection.inspectionResult === 0"
+                        imageSrc="/images/icons/bstatus-green-on.png"
+                        text="Passed inspection"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="inspection.inspectionResult !== 0"
+                        imageSrc="/images/icons/bstatus-green-off.png"
+                        text="Failed inspection"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="inspection.transactionId"
+                        imageSrc="/images/icons/bstatus-orange-on.png"
+                        text="Paid"
+                        [showText]="false" />
+        <vp-status-icon *ngIf="!inspection.transactionId"
+                        imageSrc="/images/icons/bstatus-orange-off.png"
+                        text="Unpaid"
+                        [showText]="false" />
+    </div>
+</ng-template>
+
+<ng-template #inspectionDateTemplate let-inspection="rowData">
+    <span>{{ inspection.inspectionDate | date:'dd.MM.yyyy HH:mm' }}</span>
+</ng-template>
+
+<ng-template #generatorTemplate let-inspection="rowData">
+    <div>
+        <div *ngIf="inspection.propertyBusinessName" class="fw-semibold">{{ inspection.propertyBusinessName }}</div>
+        <div *ngIf="inspection.propertyStreetNumber || inspection.propertyStreetName">
+            {{ inspection.propertyStreetNumber }} {{ inspection.propertyStreetName }}
+        </div>
+        <div *ngIf="inspection.propertyCity || inspection.propertyState?.code || inspection.propertyZip">
+            {{ inspection.propertyCity }}<span *ngIf="inspection.propertyCity && (inspection.propertyState?.code || inspection.propertyZip)">, </span>{{ inspection.propertyState?.code }} {{ inspection.propertyZip }}
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #interceptorTemplate let-inspection="rowData">
+    <div>
+        <div *ngIf="inspection.interceptorType">
+            {{ inspection.interceptorType }}<span *ngIf="inspection.interceptorType === 'Other'"> - {{ inspection.interceptorOtherDescription }}</span><span *ngIf="inspection.interceptorCapacity"> {{ inspection.interceptorCapacity }} Gallons</span>
+        </div>
+        <div *ngIf="inspection.interceptorLocationDescription">{{ inspection.interceptorLocationDescription }}</div>
+    </div>
+</ng-template>
+
+<ng-template #inspectorTemplate let-inspection="rowData">
+    <div>
+        <div *ngIf="inspection.inspectorCompanyName" class="fw-semibold">{{ inspection.inspectorCompanyName }}</div>
+        <div *ngIf="inspection.inspectorContactName">{{ inspection.inspectorContactName }}</div>
+        <div *ngIf="inspection.inspectorAddress">{{ inspection.inspectorAddress }}</div>
+        <div *ngIf="inspection.inspectorCity || inspection.inspectorState || inspection.inspectorZip">
+            {{ inspection.inspectorCity }}<span *ngIf="inspection.inspectorCity && (inspection.inspectorState || inspection.inspectorZip)">, </span>{{ inspection.inspectorState }} {{ inspection.inspectorZip }}
+        </div>
+    </div>
+</ng-template>
+
+<vp-section header="FOG Inspections">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+        <div class="container mb-3">
+            <div class="row gap-2 justify-content-center mb-3">
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Passed inspection" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Failed inspection" />
+                </div>
+                <div class="col-auto mb-2">
+                    <vp-status-icon imageSrc="/images/icons/bstatus-orange-on.png" text="Paid" />
+                    <vp-status-icon imageSrc="/images/icons/bstatus-orange-off.png" text="Unpaid" />
+                </div>
+            </div>
+        </div>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getInspections()"
+                  [(query)]="table.query"
+                  (queryChange)="getInspections()"
+                  (queryReset)="getInspections()"
+                  [canViewDetails]="true"
+                  (viewDetails)="viewInspection($event)" />
+    </div>
+</vp-section>

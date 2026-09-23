@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Models.States;
@@ -13,10 +14,15 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Envirotrax.App.Server.Data.Models.Backflow;
 
 [Table("BackflowTests")]
+[RecordLogged(RecordLogTableNames.BackflowTests)]
 public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }
+
+    // Original Vepo.dbo.SaveBackflowDeviceTests.ID. Populated by the legacy import; null for
+    // records created in V2.
+    public int? LegacyRecordId { get; set; }
 
     public int? SiteId { get; set; }
     public Site? Site { get; set; }
@@ -28,9 +34,16 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public string? JobNumber { get; set; }
 
     // BPAT (Backflow Prevention Assembly Tester)
-    public int? ProfessionalId { get; set; }
+    public int ProfessionalId { get; set; }
+    public Professional? Professional { get; set; }
     public int? BpatId { get; set; }
     public ProfessionalUser? Bpat { get; set; }
+
+    // CSI inspector. Populated only when the record originates from a CSI inspection's visually
+    // identified assembly; BPAT submissions leave it null. V1 never set InspectorID and BpatID on
+    // the same row, so both relationships share ProfessionalId as their pairing column.
+    public int? InspectorId { get; set; }
+    public ProfessionalUser? Inspector { get; set; }
 
     [StringLength(50)]
     public string? BpatLicenseNumber { get; set; }
@@ -119,6 +132,11 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     [StringLength(100)]
     public string? MailingEmailAddress { get; set; }
 
+    // The single mailing address string V1 stored alongside the components above. Preserved
+    // verbatim from the legacy record because it is not reliably reconstructable from them.
+    [StringLength(100)]
+    public string? MailingAddress { get; set; }
+
     // Device info
     [StringLength(50)]
     public string? DeviceType { get; set; }
@@ -204,6 +222,11 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 
     public bool Ossf { get; set; }
 
+    // The property's water meter (shown when the BackflowSettings.ShowWaterMeterNumber setting is
+    // enabled). Distinct from MeterNumber above, which is the bypass/detector meter.
+    [StringLength(50)]
+    public string? WaterMeterNumber { get; set; }
+
     // Rain/Freeze sensor (shown when the BackflowSettings.ShowRainSensor setting is enabled)
     public bool RainFreezeSensorInstalled { get; set; }
     public bool RainFreezeSensorWorkingProperly { get; set; }
@@ -251,6 +274,12 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public bool ValidationUnknownSerialNumber { get; set; }
     public bool ValidationDeviceInformationChanged { get; set; }
 
+    [StringLength(255)]
+    public string? ValidationNotes { get; set; }
+
+    public bool ValidationReplacementOnHold { get; set; }
+    public bool ValidationReplacementCleared { get; set; }
+
     // Initial test readings - main assembly
     [Precision(5, 2)]
     public decimal? InitCV1HeldPSID { get; set; }
@@ -282,6 +311,7 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 
     // Air gap
     public bool AirGapValid { get; set; }
+    public DateTime? AirGapTestDate { get; set; }
 
     // Repairs (stored as comma-separated text, e.g. "Cleaned, Replaced Disc, Replaced Spring")
     [StringLength(200)]
@@ -413,6 +443,11 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public int? DeletedById { get; set; }
     public AppUser? DeletedBy { get; set; }
     public DateTime? DeletedTime { get; set; }
+    public bool NeedsRenewalCheck { get; set; }
+    public bool RenewalRequired { get; set; }
+    public int BackflowScheduleMonth { get; set; }
+    public bool ForceRenewal { get; set; }
+    public int ForceRenewalYears { get; set; }
 }
 
 public class BackflowTestExpiryCounts
@@ -423,13 +458,33 @@ public class BackflowTestExpiryCounts
     public int TwoMonths { get; set; }
 }
 
+public class BackflowComplianceCounts
+{
+    public int Total { get; set; }
+    public int Compliant { get; set; }
+}
+
 public class BackflowTestConfiguration : IEntityTypeConfiguration<BackflowTest>
 {
     public void Configure(EntityTypeBuilder<BackflowTest> builder)
     {
+        builder.HasOne(bt => bt.Professional)
+            .WithMany()
+            .HasForeignKey(bt => bt.ProfessionalId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasOne<ProfessionalUser>(bt => bt.Bpat)
             .WithMany()
             .HasForeignKey(bt => new { bt.ProfessionalId, bt.BpatId })
             .HasPrincipalKey(pu => new { pu.ProfessionalId, pu.UserId });
+
+        // Shares ProfessionalId with the Bpat relationship above. A record carries either a BPAT
+        // or a CSI inspector, never both, so one professional column serves whichever owns it.
+        builder.HasOne<ProfessionalUser>(bt => bt.Inspector)
+            .WithMany()
+            .HasForeignKey(bt => new { bt.ProfessionalId, bt.InspectorId })
+            .HasPrincipalKey(pu => new { pu.ProfessionalId, pu.UserId });
+
+        builder.HasIndex(test => test.LegacyRecordId);
     }
 }

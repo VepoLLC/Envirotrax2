@@ -14,6 +14,8 @@ export class AuthGuard implements CanActivate {
     }
 
     public async canActivate(_route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean | UrlTree> {
+        await this._authService.ensureSynced();
+
         if (await this._authService.isAuthenticated(false)) {
             const [supplierId, professionalId] = await Promise.all([
                 this._authService.getWaterSupplierId(),
@@ -33,7 +35,7 @@ export class AuthGuard implements CanActivate {
             return true;
         }
 
-        this._authService.signIn();
+        await this._authService.signIn(undefined, undefined, state.url);
 
         return false;
     }

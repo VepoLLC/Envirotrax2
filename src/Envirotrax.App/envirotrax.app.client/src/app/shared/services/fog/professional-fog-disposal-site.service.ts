@@ -3,10 +3,10 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { lastValueFrom } from "rxjs";
 import { UrlResolverService } from "../helpers/url-resolver.service";
 import { QueryHelperService } from "../helpers/query-helper.service";
-import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { FogDisposalSite } from "../../models/fog/fog-disposal-site";
+import { InputOption, MAX_PAGE_SIZE, PageInfo } from "@envirotrax/common-ui";
 
 @Injectable({
     providedIn: 'root'
@@ -33,6 +33,22 @@ export class ProfessionalFogDisposalSiteService {
         return lastValueFrom(this._http.get<PagedData<FogDisposalSite>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));
+    }
+
+    public async getAllRegisteredAsOptions(includeEmpty: Boolean, emptyOptionText: string): Promise<InputOption<FogDisposalSite>[]> {
+        const disposalSites = await this.getAll({ pageSize: MAX_PAGE_SIZE }, {});
+
+        const options: InputOption<FogDisposalSite>[] = disposalSites.data.map(v => ({
+            id: v.id,
+            text: v.name ?? '',
+            data: v
+        }));
+
+        if (includeEmpty) {
+            options.splice(0, 0, { id: '', text: emptyOptionText ?? '' });
+        }
+
+        return options;
     }
 
     public setRegistration(disposalSiteId: number, isActive: boolean): Promise<void> {

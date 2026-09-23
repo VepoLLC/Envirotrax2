@@ -1,6 +1,7 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
+using Envirotrax.App.Server.Domain.Services.Definitions.Notifications;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -11,14 +12,18 @@ namespace Envirotrax.App.Server.Controllers.Professionals.Backflow;
 
 [Route("api/professionals/backflow/tests")]
 [HasFeature(FeatureType.BackflowTesting)]
-[Authorize(Roles = RoleDefinitions.Professionals.BackflowTester)]
+[Authorize(Roles = $"{RoleDefinitions.Professionals.Admin},{RoleDefinitions.Professionals.BackflowTester}")]
 public class BackflowTestController : ProfessionalProtectedController
 {
     private readonly IBackflowTestService _backflowTestService;
+    private readonly IBackflowTestNotificationService _notificationService;
 
-    public BackflowTestController(IBackflowTestService backflowTestService)
+    public BackflowTestController(
+        IBackflowTestService backflowTestService,
+        IBackflowTestNotificationService notificationService)
     {
         _backflowTestService = backflowTestService;
+        _notificationService = notificationService;
     }
 
     [HttpGet]
@@ -59,7 +64,7 @@ public class BackflowTestController : ProfessionalProtectedController
             return NotFound();
         }
 
-        var pdf = await _backflowTestService.GeneratePdfAsync(test);
+        var pdf = await _backflowTestService.GeneratePdfForProfessionalAsync(test);
         return File(pdf, "application/pdf");
     }
 
@@ -95,5 +100,54 @@ public class BackflowTestController : ProfessionalProtectedController
             cancellationToken);
 
         return Ok(result);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAsync(
+        int id,
+        [FromForm] BackflowTestDto dto,
+        [FromForm] IFormFile? assemblyImage,
+        [FromForm] IFormFile? serialNumberImage,
+        [FromForm] IFormFile? bypassAssemblyImage,
+        [FromForm] IFormFile? bypassSerialNumberImage,
+        [FromForm] IFormFile? airGapImage,
+        CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
+
+        await using var assemblyStream = assemblyImage?.OpenReadStream();
+        await using var serialStream = serialNumberImage?.OpenReadStream();
+        await using var bypassAssemblyStream = bypassAssemblyImage?.OpenReadStream();
+        await using var bypassSerialStream = bypassSerialNumberImage?.OpenReadStream();
+        await using var airGapStream = airGapImage?.OpenReadStream();
+
+        var result = await _backflowTestService.UpdateForProfessionalAsync(
+            id, dto,
+            assemblyStream, assemblyImage?.FileName,
+            serialStream, serialNumberImage?.FileName,
+            bypassAssemblyStream, bypassAssemblyImage?.FileName,
+            bypassSerialStream, bypassSerialNumberImage?.FileName,
+            airGapStream, airGapImage?.FileName,
+            cancellationToken);
+
+        return result == null ? NotFound() : Ok(result);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync(int id)
+    {
+        var result = await _backflowTestService.DeleteAsync(id);
+        return result == null ? NotFound() : Ok(result);
+    }
+
+    [HttpPost("checkout")]
+    public async Task<IActionResult> CheckoutAsync([FromBody] List<int> testIds, CancellationToken cancellationToken)
+    {
+        await _notificationService.StartCheckingNotificationsAsync(testIds, cancellationToken);
+
+        return Ok();
     }
 }

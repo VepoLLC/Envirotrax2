@@ -4,8 +4,7 @@ import { ProfesionalUserService } from "../../../shared/services/professionals/p
 import { ActivatedRoute } from "@angular/router";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { NgForm } from "@angular/forms";
-import { ToastService } from "../../../shared/services/toast.service";
-import { InputOption, ModalHelperService } from "@envirotrax/common-ui";
+import { ToastService, InputOption, ModalHelperService } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,
@@ -18,9 +17,8 @@ export class EditProfessionalUserComponent implements OnInit {
     public selectedJobFunctions: string[] = [];
 
     public readonly jobFunctionOptions: InputOption[] = [
-        { id: 'isWiseGuy', text: 'Wise Guy' },
-        { id: 'isCsiInspector', text: 'CSI Inspector' },
         { id: 'isBackflowTester', text: 'Backflow Tester' },
+        { id: 'isCsiInspector', text: 'CSI Inspector' },
         { id: 'isFogInspector', text: 'FOG Inspector' },
         { id: 'isFogTransporter', text: 'FOG Transporter' }
     ];
@@ -92,18 +90,29 @@ export class EditProfessionalUserComponent implements OnInit {
 
     private getJobFunctionsFromUser(user: ProfessionalUser): string[] {
         const selected: string[] = [];
-        if (user.isWiseGuy) selected.push('isWiseGuy');
-        if (user.isCsiInspector) selected.push('isCsiInspector');
-        if (user.isBackflowTester) selected.push('isBackflowTester');
-        if (user.isFogInspector) selected.push('isFogInspector');
-        if (user.isFogTransporter) selected.push('isFogTransporter');
+
+        if (user.isBackflowTester) {
+            selected.push('isBackflowTester');
+        }
+
+        if (user.isCsiInspector) {
+            selected.push('isCsiInspector');
+        }
+
+        if (user.isFogInspector) {
+            selected.push('isFogInspector');
+        }
+
+        if (user.isFogTransporter) {
+            selected.push('isFogTransporter');
+        }
+
         return selected;
     }
 
     private applyJobFunctions(): void {
-        this.user.isWiseGuy = this.selectedJobFunctions.includes('isWiseGuy');
-        this.user.isCsiInspector = this.selectedJobFunctions.includes('isCsiInspector');
         this.user.isBackflowTester = this.selectedJobFunctions.includes('isBackflowTester');
+        this.user.isCsiInspector = this.selectedJobFunctions.includes('isCsiInspector');
         this.user.isFogInspector = this.selectedJobFunctions.includes('isFogInspector');
         this.user.isFogTransporter = this.selectedJobFunctions.includes('isFogTransporter');
     }

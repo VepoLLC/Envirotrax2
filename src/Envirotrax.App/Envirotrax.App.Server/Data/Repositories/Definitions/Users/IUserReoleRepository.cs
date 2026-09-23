@@ -10,4 +10,6 @@ public interface IUserRoleRepository
     Task<UserRole> AddAsync(UserRole userRole);
 
     Task<UserRole?> DeleteAsync(int userId, int roleId);
+
+    Task DeleteAllForUserAsync(int userId);
 }

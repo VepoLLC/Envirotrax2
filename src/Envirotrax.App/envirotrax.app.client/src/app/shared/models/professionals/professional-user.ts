@@ -1,9 +1,12 @@
+import { State } from "../lookup/state";
 
 export interface ProfessionalUser {
     id?: number;
     emailAddress?: string;
     contactName?: string;
     jobTitle?: string;
+    signaturePath?: string;
+    signatureUrl?: string;
     isAdmin?: boolean;
     isWiseGuy?: boolean;
     isCsiInspector?: boolean;
@@ -15,6 +18,13 @@ export interface ProfessionalUser {
     bpatLicenseTypeName?: string;
     bpatLicenseExpirationDate?: string;
     bpatLicenseExpirationType?: ExpirationType;
+
+    billingFirstName?: string;
+    billingLastName?: string;
+    billingAddress?: string;
+    billingCity?: string;
+    billingState?: State;
+    billingZipCode?: string;
 }
 
 export enum ExpirationType {

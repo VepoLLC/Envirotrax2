@@ -3,7 +3,11 @@
         {{cellData | date: 'mediumDate'}}
     </div>
 
-    <div *ngIf="column.type != 'date'">
+    <div *ngIf="column.type == 'dateTime'">
+        {{cellData | date: 'MMM d, y, h:mm a'}}
+    </div>
+
+    <div *ngIf="column.type != 'date' && column.type != 'dateTime'">
         {{cellData}}
     </div>
 </ng-container>

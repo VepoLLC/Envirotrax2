@@ -13,6 +13,20 @@ public interface IFogInspectionService : IService<FogInspection, FogInspectionDt
         Stream? signatureStream, string? signatureFileName,
         CancellationToken cancellationToken);
 
+    Task<FogInspectionDto?> UpdateForProfessionalAsync(
+        int id,
+        FogInspectionDto request,
+        Stream? exteriorStream, string? exteriorFileName,
+        Stream? interiorStream, string? interiorFileName,
+        Stream? signatureStream, string? signatureFileName,
+        CancellationToken cancellationToken);
+
     Task<IPagedData<FogInspectionDto>> SearchForProfessionalAsync(
         PageInfo pageInfo, Query query, bool latestOnly, CancellationToken cancellationToken);
+
+    Task<byte[]> GeneratePdfAsync(FogInspectionDto inspection);
+
+    Task<byte[]> GeneratePdfAsync(IEnumerable<FogInspectionDto> inspections);
+
+    Task<byte[]> GeneratePdfForProfessionalAsync(FogInspectionDto inspection);
 }

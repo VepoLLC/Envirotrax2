@@ -1,6 +1,7 @@
-import { Component, ElementRef, OnInit, ViewChild, TemplateRef } from '@angular/core';
+import { Component, ElementRef, OnInit, OnDestroy, ViewChild, TemplateRef } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { BackflowTestService } from '../../shared/services/backflow/backflow-test.service';
 import { BackflowTestOptionsService } from '../../shared/services/backflow/backflow-test-options.service';
 import { GisAreaService } from '../../shared/services/gis-areas/gis-area.service';
@@ -12,17 +13,21 @@ import { BackflowTest } from '../../shared/models/backflow/backflow-test';
 import { GisArea } from '../../shared/models/gis-areas/gis-area';
 import { FacilityType } from '../../shared/enums/facility-type.enum';
 import { CellTemplateData, ColumnType, InputOption, MapMarker, MapPolygon } from '@envirotrax/common-ui';
-import { BackflowTestResult } from '../../shared/models/backflow/backflow-test-enums';
+import { BackflowPaymentStatus, BackflowTestResult } from '../../shared/models/backflow/backflow-test-enums';
 import { DownloadConfig } from '../../shared/models/download-config';
 import { DownloadService } from '../../shared/services/download.service';
 import { PrintableTableService } from '../../shared/services/printable-table.service';
 import { PropertyType } from '../../shared/enums/property-type.enum';
+import { BackflowComplianceParams } from '../../shared/models/backflow/backflow-compliance-params';
+import { AppContainerHelperService } from '../../shared/services/helpers/app-contaner-helper.service';
 
 @Component({
     standalone: false,
     templateUrl: './backflow-test-list.component.html'
 })
-export class BackflowTestListComponent implements OnInit {
+export class BackflowTestListComponent implements OnInit, OnDestroy {
+    private _queryParamSub?: Subscription;
+
     @ViewChild('statusTemplate', { static: true })
     public statusTemplate!: TemplateRef<CellTemplateData<BackflowTest>>;
 
@@ -93,6 +98,8 @@ export class BackflowTestListComponent implements OnInit {
 
     public testResultOptions: InputOption[];
     public paymentStatusOptions: InputOption[];
+
+    public paymentStatus: string = '';
     public approvalStatusOptions: InputOption[];
     public reasonForTestOptions: InputOption[];
 
@@ -144,7 +151,8 @@ export class BackflowTestListComponent implements OnInit {
         private readonly _gisMapService: GisMapService,
         private readonly _options: BackflowTestOptionsService,
         private readonly _downloadService: DownloadService,
-        private readonly _printService: PrintableTableService
+        private readonly _printService: PrintableTableService,
+        private readonly _containerHelper: AppContainerHelperService
     ) {
         this.testResultOptions = this._options.testResultOptions;
         this.paymentStatusOptions = this._options.paymentStatusOptions;
@@ -218,21 +226,57 @@ export class BackflowTestListComponent implements OnInit {
         };
     }
 
-    public async ngOnInit(): Promise<void> {
+    public ngOnInit(): void {
         this.setupColumns();
+        this.subscribeToQueryParams();
+    }
 
-        const dateParam = this._activatedRoute.snapshot.queryParamMap.get('date');
-        if (dateParam) {
-            this.table.query.filter = [{
-                columnName: 'testDate',
-                children: [
-                    { columnName: 'testDate', value: dateParam, comparisonOperator: 'Gte', logicalOperator: 'And' },
-                    { columnName: 'testDate', value: dateParam, comparisonOperator: 'Lte', logicalOperator: 'And' }
-                ]
-            }];
-            await this.getTests();
-            this.showResults = (this.table.items?.pageInfo?.totalItems ?? 0) > 0;
-        }
+    public ngOnDestroy(): void {
+        this._queryParamSub?.unsubscribe();
+    }
+
+    // Both drill-down entry points arrive as query params on this list: the dashboard "date" click
+    // (a single-day test-date range) and the Tab 2 (Current Compliance Status) "View" link (the
+    // non-compliant assemblies behind a requirement row). Apply the matching preset filter and run
+    // the search automatically.
+    private subscribeToQueryParams(): void {
+        this._queryParamSub = this._activatedRoute.queryParamMap.subscribe(async params => {
+            const dateParam = params.get('date');
+            if (dateParam) {
+                this.applyDateFilter(dateParam);
+                await this.getTests();
+                this.setShowResults(true);
+                return;
+            }
+
+            if (params.get(BackflowComplianceParams.mode)) {
+                this.applyComplianceFilter(params);
+                await this.getTests();
+                this.setShowResults(true);
+                return;
+            }
+
+            // Dashboard "View" on a sub account lands here already authenticated as that water
+            // supplier (via /auth/login-redirect); this just carries over the same last-10-days
+            // window shown on the dashboard so the results match what was clicked.
+            const startDateParam = params.get('startDate');
+            const endDateParam = params.get('endDate');
+            if (startDateParam && endDateParam) {
+                this.applyDateFilter(startDateParam, endDateParam);
+                await this.getTests();
+                this.setShowResults(true);
+            }
+        });
+    }
+
+    private applyDateFilter(startDate: string, endDate: string = startDate): void {
+        this.table.query.filter = [{
+            columnName: 'testDate',
+            children: [
+                { columnName: 'testDate', value: startDate, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                { columnName: 'testDate', value: endDate, comparisonOperator: 'Lte', logicalOperator: 'And' }
+            ]
+        }];
     }
 
     public viewDetails(test: BackflowTest): void {
@@ -240,7 +284,18 @@ export class BackflowTestListComponent implements OnInit {
     }
 
     public showDownloadManager(): void {
+        const additionalParams = this.paymentStatus
+            ? { paymentStatus: this.paymentStatus }
+            : undefined;
+
+        this.downloadConfig.endpoint.additionalParams = additionalParams;
+        this.downloadConfig.pdfEndpoint!.additionalParams = additionalParams;
+
         this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
+    }
+
+    private getPaymentStatus(): BackflowPaymentStatus | null {
+        return this.paymentStatus ? Number(this.paymentStatus) as BackflowPaymentStatus : null;
     }
 
     public viewPrintableTable(): void {
@@ -341,7 +396,8 @@ export class BackflowTestListComponent implements OnInit {
             this.table.isLoading = true;
             const result = await this._backflowTestService.getAll(
                 this.table.items?.pageInfo || {},
-                this.table.query
+                this.table.query,
+                this.getPaymentStatus()
             );
             const startIndex = ((result.pageInfo.pageNumber ?? 1) - 1) * (result.pageInfo.pageSize ?? 10);
             result.data.forEach((item, i) => (item as any)['_rowNumber'] = startIndex + i + 1);
@@ -351,15 +407,62 @@ export class BackflowTestListComponent implements OnInit {
         }
     }
 
+    public setShowResults(visible: boolean): void {
+        this.showResults = visible;
+        this._containerHelper.setContainerVisibility(!visible);
+    }
+
     public onFilterChange(queryProperties: QueryProperty[]): void {
         this.table.query.filter = queryProperties;
+    }
+
+    // Builds the preset filter for a Tab 2 (Current Compliance Status) View drill-down: the non-compliant
+    // assemblies behind a requirement row — current, in-service assemblies whose expiration has passed the
+    // cutoff, matching the site property/hazard/OSSF/aux-water filters of the compliance report row.
+    private applyComplianceFilter(params: ParamMap): void {
+        const filter: QueryProperty[] = [
+            { columnName: 'isCurrent', value: 'true', comparisonOperator: 'Eq' },
+            { columnName: 'outOfService', value: 'false', comparisonOperator: 'Eq' }
+        ];
+
+        const propertyType = params.get(BackflowComplianceParams.propertyType);
+        if (propertyType) {
+            filter.push({ columnName: 'propertyType', value: propertyType, comparisonOperator: 'Eq' });
+        }
+
+        const deviceType = params.get(BackflowComplianceParams.deviceType);
+        if (deviceType) {
+            filter.push({ columnName: 'deviceType', value: deviceType, comparisonOperator: 'Eq' });
+        }
+
+        const hazardType = params.get(BackflowComplianceParams.hazardType);
+        if (hazardType) {
+            filter.push({ columnName: 'hazardType', value: hazardType, comparisonOperator: 'Eq' });
+        }
+
+        if (params.get(BackflowComplianceParams.ossf) === 'true') {
+            filter.push({ columnName: 'site.hasOnSiteSewageFacility', value: 'true', comparisonOperator: 'Eq' });
+        }
+
+        if (params.get(BackflowComplianceParams.auxWater) === 'true') {
+            filter.push({ columnName: 'site.hasAuxWaterSupply', value: 'true', comparisonOperator: 'Eq' });
+        }
+
+        // Non-compliant = expired as of the cutoff (today, or 30 days earlier when ignoring the last 30 days).
+        const cutoff = new Date();
+        if (params.get(BackflowComplianceParams.ignoreLast30Days) === 'true') {
+            cutoff.setDate(cutoff.getDate() - 30);
+        }
+        filter.push({ columnName: 'expirationDate', value: cutoff.toISOString(), comparisonOperator: 'Lte' });
+
+        this.table.query.filter = filter;
     }
 
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
             this.showMapResults = false;
             await this.getTests();
-            this.showResults = true;
+            this.setShowResults(true);
         }
     }
 
@@ -369,11 +472,11 @@ export class BackflowTestListComponent implements OnInit {
         }
         try {
             this.isMapLoading = true;
-            this.showResults = false;
+            this.setShowResults(false);
             this.showMapResults = false;
 
             const [testsPage, areas, coordinates, defaultView] = await Promise.all([
-                this._backflowTestService.getAll({ pageSize: 10000, pageNumber: 1 }, this.table.query),
+                this._backflowTestService.getAll({ pageSize: 10000, pageNumber: 1 }, this.table.query, this.getPaymentStatus()),
                 this._gisAreaService.getAllAreas(),
                 this._coordinateService.getAll(),
                 this._gisAreaService.getDefaultView()

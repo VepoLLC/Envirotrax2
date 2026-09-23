@@ -35,8 +35,6 @@ public class QueueWorkerBase<TWorker, TMessage> : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            _logger.LogInformation("Receiving queue messages for {QueueName}", _options.QueueName);
-
             try
             {
                 var messages = await _queueClient.ReceiveMessagesAsync(_options.MaxMessages, _options.VisibilityTimeout, stoppingToken);
@@ -47,12 +45,13 @@ public class QueueWorkerBase<TWorker, TMessage> : BackgroundService
                     continue;
                 }
 
+                _logger.LogInformation("Received queue messages for {QueueName}. Message Count: {MessageCount}.", _options.QueueName, messages.Length);
                 await Task.WhenAll(messages.Select(msg => ProcessMessageAsync(msg, stoppingToken)));
             }
             catch (OperationCanceledException) { break; }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed while receiveing queue messages. Queue name: {QueueName}", _options.QueueName);
+                _logger.LogError(ex, "Failed while receiving queue messages. Queue name: {QueueName}", _options.QueueName);
                 await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken);
             }
         }

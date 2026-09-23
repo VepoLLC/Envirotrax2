@@ -8,12 +8,11 @@ import { AuthService } from "../../../../../shared/services/auth/auth.service";
 import { FeatureType } from "../../../../../shared/models/feature-type";
 import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
-import { ToastService } from "../../../../../shared/services/toast.service";
+import { ToastService, CellTemplateData, ColumnType, ModalHelperService, TableColumn, TableCustomAction } from '@envirotrax/common-ui';
 import { CsiInspectorAddEditInsuranceComponent } from "../edit/add-edit-csi-inspector-insurance.component";
 import { CsiInspectorAddEditLicenseComponent } from "../edit/add-edit-csi-inspector-license.component";
 import { Professional } from "../../../../../shared/models/professionals/professional";
 import { DownloadService } from "../../../../../shared/services/download.service";
-import { CellTemplateData, ColumnType, ModalHelperService, TableColumn, TableCustomAction } from "@envirotrax/common-ui";
 
 
 @Component({

@@ -36,6 +36,13 @@ public class GisAreaRepository : Repository<GisArea>, IGisAreaRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<GisArea>> GetAllActiveBySupplierAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        return await GetListQuery()
+            .Where(a => a.WaterSupplierId == waterSupplierId && a.DeletedTime == null)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<DefaultGisMapView> GetDefaultMapViewAsync(CancellationToken cancellationToken)
     {
         return await DbContext
@@ -47,6 +54,21 @@ public class GisAreaRepository : Repository<GisArea>, IGisAreaRepository
                 GisCenterLongitude = s.GisCenterLongitude,
                 GisCenterZoom = s.GisCenterZoom
             }).SingleAsync(cancellationToken);
+    }
+
+    public async Task<DefaultGisMapView> GetDefaultMapViewBySupplierAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        var mapView = await DbContext
+            .WaterSuppliers
+            .Where(s => s.Id == waterSupplierId)
+            .Select(s => new DefaultGisMapView
+            {
+                GisCenterLatitude = s.GisCenterLatitude,
+                GisCenterLongitude = s.GisCenterLongitude,
+                GisCenterZoom = s.GisCenterZoom
+            }).SingleOrDefaultAsync(cancellationToken);
+
+        return mapView ?? new DefaultGisMapView();
     }
 
     public async Task<DefaultGisMapView> UpdateDefaultMapViewAsync(DefaultGisMapView mapView)

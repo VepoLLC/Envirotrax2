@@ -5,7 +5,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <BuildCommand>npm run start</BuildCommand>
-    <BuildCommand Condition="'$(AngularEnvironment)' == 'test'">npm run build-test</BuildCommand>
+    <BuildCommand Condition="'$(AngularEnvironment)' == 'test'">npm run build:test</BuildCommand>
   </PropertyGroup>
   <PropertyGroup>
     <StartupCommand>npm start</StartupCommand>

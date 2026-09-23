@@ -58,6 +58,9 @@ services.AddTransient<UserService>();
 services.AddTransient<WaterSupplierService>();
 services.AddTransient<WaterSupplierUserService>();
 services.AddTransient<ProfessionalService>();
+services.AddTransient<ProfessionalWaterSupplierService>();
+services.AddTransient<ProfessionalLicenseService>();
+services.AddTransient<ProfessionalInsuranceService>();
 services.AddTransient<GisAreaService>();
 services.AddTransient<SiteService>();
 services.AddTransient<SiteLogService>();
@@ -79,6 +82,15 @@ await supplierUserService.MigrateAsync();
 
 var professionalService = provider.GetRequiredService<ProfessionalService>();
 await professionalService.MigrateAsync();
+
+var professionalWaterSupplierService = provider.GetRequiredService<ProfessionalWaterSupplierService>();
+await professionalWaterSupplierService.MigrateAsync();
+
+var professionalLicenseService = provider.GetRequiredService<ProfessionalLicenseService>();
+await professionalLicenseService.MigrateAsync();
+
+var professionalInsuranceService = provider.GetRequiredService<ProfessionalInsuranceService>();
+await professionalInsuranceService.MigrateAsync();
 
 var gisAreaService = provider.GetRequiredService<GisAreaService>();
 await gisAreaService.MigrateAsync();

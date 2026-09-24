@@ -13,7 +13,6 @@ IF EXISTS
         AND accounts.LegacyUserType = registrations.UserType
     WHERE registrations.Active = 1
         AND registrations.UserType = 6
-        AND registrations.Banned = 0
         AND registrations.UserID = accounts.LegacyCompanyUserId
         AND NOT
         (

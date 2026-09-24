@@ -146,21 +146,21 @@ public class RegisteredProfessionalRepository : Repository<Professional, int, Pu
         };
     }
 
-    /// <summary>
-    /// Active, non-banned registrations of the given water supplier for the given professional type.
-    /// </summary>
+
+    /// Active registrations of the given water supplier for the given professional type that the
+    /// supplier has not suspended for that service.
     private IQueryable<ProfessionalWaterSupplier> GetRegistrationsQuery(int waterSupplierId, ProfessionalType professionalType)
     {
         var registrations = DbContext.ProfessionalWaterSuppliers
             .AsNoTracking()
-            .Where(registration => registration.WaterSupplierId == waterSupplierId && !registration.IsBanned);
+            .Where(registration => registration.WaterSupplierId == waterSupplierId);
 
         return professionalType switch
         {
-            ProfessionalType.Bpat => registrations.Where(registration => registration.HasBackflowTesting),
-            ProfessionalType.CsiInspector => registrations.Where(registration => registration.HasCsiInpection),
-            ProfessionalType.FogInspector => registrations.Where(registration => registration.HasFogInspection),
-            ProfessionalType.FogTransporter => registrations.Where(registration => registration.HasFogTransportation),
+            ProfessionalType.Bpat => registrations.Where(registration => registration.HasBackflowTesting && !registration.IsBackflowTestingSuspended),
+            ProfessionalType.CsiInspector => registrations.Where(registration => registration.HasCsiInpection && !registration.IsCsiInspectionSuspended),
+            ProfessionalType.FogInspector => registrations.Where(registration => registration.HasFogInspection && !registration.IsFogInspectionSuspended),
+            ProfessionalType.FogTransporter => registrations.Where(registration => registration.HasFogTransportation && !registration.IsFogTransportationSuspended),
             _ => registrations.Where(registration => false)
         };
     }

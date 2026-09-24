@@ -65,7 +65,7 @@ export class CsiInspectorWaterSuppliersComponent implements OnInit {
                 type: ColumnType.text
             },
             {
-                field: 'isBanned',
+                field: 'isCsiInspectionSuspended',
                 caption: 'Suspended',
                 cellComponent: CheckboxCellComponent,
                 type: ColumnType.text

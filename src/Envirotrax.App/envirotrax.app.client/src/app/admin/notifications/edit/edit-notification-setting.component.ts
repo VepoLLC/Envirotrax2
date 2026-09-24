@@ -77,6 +77,12 @@ export class EditNotificationSettingComponent implements OnInit {
         }
     }
 
+    public onPropertyTypeChanged(): void {
+        if (this.setting.propertyTypeResidential || this.setting.propertyTypeCommercial) {
+            this.setting.propertyTypeAny = false;
+        }
+    }
+
     public onFilterAnyChanged(): void {
         if (this.setting.filterAny) {
             this.setting.filterFailedTest = false;
@@ -97,6 +103,12 @@ export class EditNotificationSettingComponent implements OnInit {
         }
     }
 
+    public onFilterChanged(isChecked: boolean): void {
+        if (isChecked) {
+            this.setting.filterAny = false;
+        }
+    }
+
     public onHazardTypeAnyChanged(): void {
         if (this.setting.hazardTypeAny) {
             this.setting.hazardTypeAgriculturalFeedLot = false;
@@ -114,6 +126,12 @@ export class EditNotificationSettingComponent implements OnInit {
             this.setting.hazardTypeFountainsGardenPondsWaterFeatures = false;
             this.setting.hazardTypeWaterSoftener = false;
             this.setting.hazardTypeOther = false;
+        }
+    }
+
+    public onHazardTypeChanged(isChecked: boolean): void {
+        if (isChecked) {
+            this.setting.hazardTypeAny = false;
         }
     }
 

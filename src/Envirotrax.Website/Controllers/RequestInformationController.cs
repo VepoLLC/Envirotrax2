@@ -10,18 +10,28 @@ namespace Envirotrax.Website.Controllers;
 public class RequestInformationController : ControllerBase
 {
     private readonly IEmailService _emailService;
+    private readonly IRecaptchaVerificationService _recaptchaVerificationService;
 
-    public RequestInformationController(IEmailService emailService)
+    public RequestInformationController(IEmailService emailService, IRecaptchaVerificationService recaptchaVerificationService)
     {
         _emailService = emailService;
+        _recaptchaVerificationService = recaptchaVerificationService;
     }
 
     [HttpPost("submit")]
-    public async Task<IActionResult> Submit([FromBody] RequestInformationVm submission)
+    public async Task<IActionResult> Submit([FromBody] RequestInformationSubmissionVm submission)
     {
         if (string.IsNullOrWhiteSpace(submission.CompanyName) ||
             string.IsNullOrWhiteSpace(submission.ContactName) ||
             string.IsNullOrWhiteSpace(submission.InformationType))
+        {
+            return BadRequest();
+        }
+
+        var remoteIp = HttpContext.Connection.RemoteIpAddress?.ToString();
+        var recaptchaVerified = await _recaptchaVerificationService.VerifyAsync(submission.RecaptchaToken, remoteIp);
+
+        if (!recaptchaVerified)
         {
             return BadRequest();
         }

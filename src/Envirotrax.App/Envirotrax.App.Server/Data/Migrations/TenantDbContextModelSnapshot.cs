@@ -2860,6 +2860,10 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal?>("CoverageAmount")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("decimal(19,4)");
+
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
@@ -3007,7 +3011,16 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("HasWiseGuys")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsBanned")
+                    b.Property<bool>("IsBackflowTestingSuspended")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsCsiInspectionSuspended")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsFogInspectionSuspended")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsFogTransportationSuspended")
                         .HasColumnType("bit");
 
                     b.HasKey("WaterSupplierId", "ProfessionalId");

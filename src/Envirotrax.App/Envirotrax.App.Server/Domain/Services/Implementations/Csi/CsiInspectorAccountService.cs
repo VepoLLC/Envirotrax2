@@ -139,7 +139,7 @@ public class CsiInspectorAccountService : Service<ProfessionalUser, CsiInspector
 
             var isUnchanged =
                 registration.HasCsiInspection == original.HasCsiInspection &&
-                registration.IsBanned == original.IsBanned &&
+                registration.IsCsiInspectionSuspended == original.IsCsiInspectionSuspended &&
                 registration.CsiCommercialInspectionFee == original.CsiCommercialInspectionFee &&
                 registration.CsiResidentialInspectionFee == original.CsiResidentialInspectionFee;
 

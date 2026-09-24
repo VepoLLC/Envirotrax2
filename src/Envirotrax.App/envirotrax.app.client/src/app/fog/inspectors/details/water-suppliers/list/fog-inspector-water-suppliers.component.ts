@@ -59,7 +59,7 @@ export class FogInspectorWaterSuppliersComponent implements OnInit {
                 type: ColumnType.text
             },
             {
-                field: 'isBanned',
+                field: 'isFogInspectionSuspended',
                 caption: 'Suspended',
                 cellComponent: CheckboxCellComponent,
                 type: ColumnType.text

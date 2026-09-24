@@ -3,6 +3,7 @@ import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { GisArea, GisAreaCoordinate } from "../../../models/gis-areas/gis-area";
 import { GisAreaService } from "../../../services/gis-areas/gis-area.service";
 import { GisAreaCoordinateService } from "../../../services/gis-areas/gis-area-coordinate.service";
+import { GisMapService } from "../../../services/gis-areas/gis-map.service";
 import { MapPolygon } from "@envirotrax/common-ui";
 
 export interface GisAreaSelectionModel {
@@ -27,7 +28,8 @@ export class GisAreaSelectionModalComponent implements OnInit {
     constructor(
         private readonly _modalReference: ModalReference<GisAreaSelectionModel, string>,
         private readonly _gisAreaService: GisAreaService,
-        private readonly _coordinateService: GisAreaCoordinateService
+        private readonly _coordinateService: GisAreaCoordinateService,
+        private readonly _gisMapService: GisMapService
     ) { }
 
     public async ngOnInit(): Promise<void> {
@@ -72,11 +74,10 @@ export class GisAreaSelectionModalComponent implements OnInit {
     private buildPolygons(): MapPolygon<GisArea>[] {
         return this._areas
             .map((area): MapPolygon<GisArea> | null => {
-                const coords = this._coordinates
-                    .filter(c => c.area?.id === area.id)
-                    .map(c => ({ lat: c.latitude!, lng: c.longitude! }));
+                const areaCoordinates = this._coordinates.filter(c => c.area?.id === area.id);
+                const rings = this._gisMapService.buildPolygonRings(areaCoordinates);
 
-                if (coords.length === 0) {
+                if (!rings.outer.length) {
                     return null;
                 }
 
@@ -84,7 +85,8 @@ export class GisAreaSelectionModalComponent implements OnInit {
                 return {
                     name: area.name,
                     color: isSelected ? '#0d0772' : (area.color ?? '#000000'), // Highlight selected area
-                    coordinates: coords,
+                    coordinates: rings.outer,
+                    holes: rings.holes,
                     onClick: (polygon) => this.onPolygonClick(polygon),
                     data: area
                 };

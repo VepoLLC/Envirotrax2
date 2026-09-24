@@ -6,7 +6,7 @@ import { CsiInspectionService } from "../../../shared/services/csi/csi-inspectio
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { DisapproveCsiInspectionComponent } from "./disapprove/disapprove-csi-inspection.component";
 import { DownloadService } from "../../../shared/services/download.service";
-import { ModalHelperService } from "@envirotrax/common-ui";
+import { ModalHelperService, RecordLog } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'app-csi-inspection-details',
@@ -20,6 +20,8 @@ export class CsiInspectionDetailsComponent implements OnInit {
     public selectedTab: string = 'main';
     public images: CsiInspectionImage[] = [];
     public isLoadingImages: boolean = false;
+    public recordLogs: RecordLog[] = [];
+    public isLoadingRecordLogs: boolean = false;
 
     private imagesLoaded = false;
 
@@ -47,7 +49,10 @@ export class CsiInspectionDetailsComponent implements OnInit {
 
             if (id) {
                 this.id = +id;
-                await this.loadInspection();
+                await Promise.all([
+                    this.loadInspection(),
+                    this.loadRecordLogs()
+                ]);
             }
         });
     }
@@ -72,6 +77,15 @@ export class CsiInspectionDetailsComponent implements OnInit {
         }
     }
 
+    private async loadRecordLogs(): Promise<void> {
+        try {
+            this.isLoadingRecordLogs = true;
+            this.recordLogs = await this._inspectionService.getLogs(this.id);
+        } finally {
+            this.isLoadingRecordLogs = false;
+        }
+    }
+
     public onTabChange(tab: string): void {
         this.selectedTab = tab;
         if (tab === 'images' && !this.imagesLoaded) {
@@ -91,6 +105,7 @@ export class CsiInspectionDetailsComponent implements OnInit {
                 model: this.inspection
             }).result().subscribe(updated => {
                 this.inspection = updated;
+                this.loadRecordLogs();
             });
         }
     }
@@ -99,6 +114,7 @@ export class CsiInspectionDetailsComponent implements OnInit {
         try {
             this.isLoading = true;
             this.inspection = await this._inspectionService.updateApproval(this.inspection!.id!, { disapproved: false });
+            await this.loadRecordLogs();
         } finally {
             this.isLoading = false;
         }

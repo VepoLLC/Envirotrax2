@@ -3,6 +3,18 @@
         min-width: 34px;
     }
 
+    .compliance-chart {
+        position: relative;
+        width: 150px;
+        height: 150px;
+    }
+
+    .compliance-swatch {
+        width: 16px;
+        height: 16px;
+        flex: 0 0 auto;
+    }
+
     a {
         border: 1px solid transparent;
         transition: background-color 0.15s ease, border-color 0.15s ease;

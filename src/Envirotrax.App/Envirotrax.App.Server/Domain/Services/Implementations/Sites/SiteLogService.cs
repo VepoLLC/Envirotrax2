@@ -49,6 +49,11 @@ public class SiteLogService : ISiteLogService
         return dtos.ToPagedData(pageInfo);
     }
 
+    public Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken)
+    {
+        return _repository.CountBySiteAsync(siteId, cancellationToken);
+    }
+
     public async Task<IEnumerable<SiteLogDto>> GetBySitesAsync(IEnumerable<int> siteIds, CancellationToken cancellationToken)
     {
         var results = await _repository.GetBySiteIdsAsync(siteIds, cancellationToken);

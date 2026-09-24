@@ -12,6 +12,23 @@ BEGIN TRY
     WHERE WaterSuppliers.Id IS NULL
         AND alreadySkipped.SiteId IS NULL
 
+    INSERT INTO MigrationSkippedSites (SiteId, SourceTable, Reason)
+    SELECT legacySites.ID, 'CsiBackflowSites',
+        CASE
+            WHEN GisAreas.Id IS NULL THEN 'GIS area not found'
+            ELSE 'GIS area belongs to another water supplier'
+        END
+    FROM Vepo.dbo.CsiBackflowSites AS legacySites
+    INNER JOIN WaterSuppliers
+        ON WaterSuppliers.LegacyRecordId = legacySites.WaterSupplierID
+    LEFT JOIN GisAreas
+        ON GisAreas.LegacyRecordId = legacySites.GisAreaID
+    LEFT JOIN MigrationSkippedSites AS alreadySkipped
+        ON alreadySkipped.SiteId = legacySites.ID AND alreadySkipped.SourceTable = 'CsiBackflowSites'
+    WHERE ISNULL(legacySites.GisAreaID, 0) <> 0
+        AND (GisAreas.Id IS NULL OR GisAreas.WaterSupplierId <> WaterSuppliers.Id)
+        AND alreadySkipped.SiteId IS NULL
+
     INSERT INTO Sites
         (LegacyRecordId, WaterSupplierId, SubArea, AccountNumber, BusinessName, PropertyType,
          StreetNumber, StreetName, PropertyNumber, City, StateId, ZipCode,
@@ -60,7 +77,7 @@ BEGIN TRY
             ELSE 0
         END,
         legacySites.FacilityMap, legacySites.BackflowScheduleMonth,
-        legacySites.GisLatitude, legacySites.GisLongitude, legacySites.GisStatus, legacySites.GisDate, legacySites.GisAreaID, legacySites.GisOutOfArea, legacySites.GisOutOfAreaCheckDate,
+        legacySites.GisLatitude, legacySites.GisLongitude, legacySites.GisStatus, legacySites.GisDate, ISNULL(gisAreas.Id, 0), legacySites.GisOutOfArea, legacySites.GisOutOfAreaCheckDate,
         legacySites.ImportSiteID, legacySites.ImportSiteID2, legacySites.ImportID,
         legacySites.ExcludeFromBackflowMailing, legacySites.ExcludeFromCsiMailing, legacySites.NeedsValidation, legacySites.ValidationOnHold, legacySites.BypassPropertyNumberValidation,
         legacySites.UnknownAssemblyLettersSent, legacySites.UnknownAssembliesLetterCount, legacySites.UnknownAssembliesLetterStartDate,
@@ -77,6 +94,8 @@ BEGIN TRY
         ON propertyStates.Code = legacySites.PropertyState
     LEFT JOIN States AS mailingStates
         ON mailingStates.Code = legacySites.MailingState
+    LEFT JOIN GisAreas AS gisAreas
+        ON gisAreas.LegacyRecordId = legacySites.GisAreaID AND gisAreas.WaterSupplierId = waterSuppliers.Id
     LEFT JOIN AspNetUsers AS userAccountAssignmentAppUsers
         ON userAccountAssignmentAppUsers.Email = legacySites.UserAccountAssignment
     LEFT JOIN WaterSupplierUsers AS userAccountAssignmentUsers

@@ -16,7 +16,11 @@ public class BackflowOutOfServiceRequestRepository : Repository<BackflowOutOfSer
 
     protected override IQueryable<BackflowOutOfServiceRequest> GetListQuery()
     {
+        // The request itself is not soft-deletable, but one whose test was deleted points at a record
+        // nothing else shows any more — so it is filtered here, where both the lists and the site tab
+        // count read from, and the two cannot drift apart.
         return base.GetListQuery()
+            .Where(r => r.Test!.DeletedTime == null)
             .Include(r => r.Test)
                 .ThenInclude(t => t!.PropertyState)
             .Include(r => r.ReplacementAssemblyTest)
@@ -141,6 +145,11 @@ public class BackflowOutOfServiceRequestRepository : Repository<BackflowOutOfSer
         await DbContext.SaveChangesAsync(cancellationToken);
 
         return true;
+    }
+
+    public Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken)
+    {
+        return GetListQuery().CountAsync(r => r.Test!.SiteId == siteId, cancellationToken);
     }
 
     private static bool SerialNumbersMatch(string? first, string? second)

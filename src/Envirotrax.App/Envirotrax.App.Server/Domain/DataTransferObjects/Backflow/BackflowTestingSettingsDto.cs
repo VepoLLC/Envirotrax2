@@ -6,6 +6,7 @@ namespace Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 /// </summary>
 public class BackflowTestingSettingsDto
 {
+    public bool ShowWaterMeterNumber { get; set; }
     public bool ShowRainSensor { get; set; }
     public bool ShowOSSF { get; set; }
     public bool ShowPermitNumber { get; set; }

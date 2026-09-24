@@ -11,9 +11,11 @@ export interface Professional {
     companyEmail?: string;
     phoneNumber?: string;
     faxNumber?: string;
-    websiteUrl?: string;
+    webSiteUrl?: string;
     hidePublicListing?: boolean;
     createdTime?: string;
+
+    accountBalance?: number;
 
     hasWiseGuys?: boolean;
     hasBackflowTesting?: boolean;

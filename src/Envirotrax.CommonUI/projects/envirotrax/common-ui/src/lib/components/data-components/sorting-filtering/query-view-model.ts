@@ -18,6 +18,7 @@ export enum ColumnType {
     text = 'text',
     number = 'number',
     date = 'date',
+    dateTime = 'dateTime',
     other = 'other'
 }
 

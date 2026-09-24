@@ -37,7 +37,6 @@ public class ProfessionalDto
     [StringLength(50)]
     public string? FaxNumber { get; set; }
 
-    [Url]
     [StringLength(255)]
     public string? WebSiteUrl { get; set; }
 

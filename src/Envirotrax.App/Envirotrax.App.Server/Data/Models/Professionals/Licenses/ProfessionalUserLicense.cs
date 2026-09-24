@@ -1,4 +1,5 @@
 
+using Envirotrax.App.Server.Data.Models.Logs;
 using System.ComponentModel.DataAnnotations;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Models.Users;
@@ -9,6 +10,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 
+[RecordLogged(RecordLogTableNames.ProfessionalUserLicenses, WaterSupplierSource = RecordLogIdSource.Ambient, ProfessionalSource = RecordLogIdSource.Entity)]
 public class ProfessionalUserLicense : IProfessionalModel, ICreateAuditableModel<AppUser>
 {
     [AppPrimaryKey(true)]

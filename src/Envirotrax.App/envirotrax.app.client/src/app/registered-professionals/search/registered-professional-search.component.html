@@ -97,14 +97,6 @@
 
 <div *ngIf="showResults && !table.isLoading">
     <div class="d-flex justify-content-between mb-3 flex-wrap gap-2">
-        <button *ngIf="table.items?.data?.length"
-                type="button"
-                class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
-                (click)="showDownloadManager()">
-            <i class="fa-regular fa-file-export me-1"></i>
-            Export Results
-        </button>
-
         <button type="button"
                 class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0 ms-auto"
                 (click)="searchAgain()">

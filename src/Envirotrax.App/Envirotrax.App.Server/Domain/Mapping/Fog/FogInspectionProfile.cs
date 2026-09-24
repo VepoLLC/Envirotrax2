@@ -18,7 +18,12 @@ public class FogInspectionProfile : Profile
             .ForMember(dest => dest.SignatureImageUrl, opt => opt.Ignore())
             .AfterMap((model, dto) =>
             {
-                dto.Site ??= new ReferencedSiteDto { Id = model.SiteId };
+                dto.Site ??= new ReferencedSiteDto
+                {
+                    Id = model.SiteId,
+                    AccountNumber = model.Site?.AccountNumber,
+                    BusinessName = model.Site?.BusinessName
+                };
 
                 if (model.PropertyStateId.HasValue)
                 {

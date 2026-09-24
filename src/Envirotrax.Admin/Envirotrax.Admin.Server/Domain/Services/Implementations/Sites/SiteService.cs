@@ -1,5 +1,6 @@
 
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.Admin.Server.Domain.DataTransferObjects.Logs;
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.Admin.Server.Domain.Services.Definitions;
 using Envirotrax.Admin.Server.Domain.Services.Definitions.Sites;
@@ -45,5 +46,10 @@ public class SiteService : ISiteService
     public Task UpdateWaterSupplierAsync(int siteId, int waterSupplierId, SiteWaterSupplierUpdateDto dto, CancellationToken cancellationToken)
     {
         return _apiClient.PutAsync<SiteWaterSupplierUpdateDto, object>(waterSupplierId, $"/api/admin/sites/{siteId}/water-supplier", dto, cancellationToken);
+    }
+
+    public Task<List<RecordLogDto>?> GetLogsAsync(int siteId, CancellationToken cancellationToken)
+    {
+        return _apiClient.GetAsync<List<RecordLogDto>>($"/api/admin/sites/{siteId}/logs", cancellationToken);
     }
 }

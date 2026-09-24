@@ -13,8 +13,8 @@
     <link rel="stylesheet" href="~/css/header.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/footer.css" asp-append-version="true" /> *@
 
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="~/css/dark-theme.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dark-theme.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/font-awesome/css/all.min.css" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -28,6 +28,13 @@
         }
         })();
     </script>
+    <div id="divLoadingSpinner" class="vp-loading-overlay">
+        <div class="vp-loading-card">
+            <div class="vp-loader"></div>
+            <p>Loading Data...</p>
+        </div>
+    </div>
+
     <nav class="navbar navbar-expand-lg bg-primary bg-gradient" data-bs-theme="dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">

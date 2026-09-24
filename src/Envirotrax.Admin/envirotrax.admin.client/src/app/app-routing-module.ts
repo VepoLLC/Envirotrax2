@@ -36,6 +36,11 @@ const routes: Routes = [
     title: 'Backflow Management',
     loadChildren: () => import('./backflow/backflow.module').then(m => m.BackflowModule)
   },
+  {
+    path: 'fog',
+    title: 'FOG Management',
+    loadChildren: () => import('./fog/fog.module').then(m => m.FogModule)
+  },
 ];
 
 @NgModule({

@@ -478,6 +478,13 @@ export class App implements OnInit {
             hasFeature: true
           },
           {
+            title: 'Account Balance Management',
+            iconCss: 'fa-solid fa-wallet',
+            routerLink: ['professionals/account-balance'],
+            hasPermission: isAdmin,
+            hasFeature: true
+          },
+          {
             title: 'User Accounts',
             iconCss: 'fa-solid fa-users',
             routerLink: ['professionals/users'],
@@ -573,7 +580,7 @@ export class App implements OnInit {
           {
             title: 'Submit Backflow Test',
             iconCss: 'fa-regular fa-file-plus',
-            routerLink: ['professionals/backflow/submit'],
+            routerLink: ['professionals/backflow/tests/submit'],
             hasPermission: isBackflowTester,
             hasFeature: true
           }

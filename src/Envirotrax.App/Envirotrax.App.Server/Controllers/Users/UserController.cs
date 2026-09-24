@@ -1,4 +1,5 @@
 
+using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Users;
@@ -22,6 +23,12 @@ public class UserController : WaterSupplierCrudController<WaterSupplierUserDto>
     {
         _userService = userService;
         _authService = authService;
+    }
+
+    [HasPermission(PermissionAction.CanView, AllowedPermissions = new[] { PermissionType.Users, PermissionType.Notifications })]
+    public override Task<IActionResult> GetAllAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
+    {
+        return base.GetAllAsync(pageInfo, query, cancellationToken);
     }
 
     [HttpPost("{id}/invitations")]

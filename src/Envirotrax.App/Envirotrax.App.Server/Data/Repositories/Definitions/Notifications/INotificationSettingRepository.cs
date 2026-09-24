@@ -4,4 +4,6 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Notifications;
 
 public interface INotificationSettingRepository : IRepository<NotificationSetting>
 {
+    Task<NotificationSetting?> UpdateSettingAsync(NotificationSetting model);
+    Task<List<NotificationSetting>> GetCandidateSettingsAsync(int waterSupplierId, CancellationToken cancellationToken);
 }

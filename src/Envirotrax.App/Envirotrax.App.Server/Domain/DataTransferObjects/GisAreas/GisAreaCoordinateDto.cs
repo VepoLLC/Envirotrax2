@@ -11,6 +11,8 @@ public class GisAreaCoordinateDto
     [Required]
     public ReferencedGisAreaDto Area { get; set; } = null!;
 
+    public int PolygonIndex { get; set; }
+
     public double Latitude { get; set; }
     public double Longitude { get; set; }
 }

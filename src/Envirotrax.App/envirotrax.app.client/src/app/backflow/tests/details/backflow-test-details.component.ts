@@ -17,6 +17,7 @@ import { BackflowSettings } from "../../../shared/models/settings/backflow-setti
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { BackflowTestRejectComponent } from "./reject/backflow-test-reject.component";
 import { BackflowTestForceRenewalComponent } from "./force-renewal/backflow-test-force-renewal.component";
+import { RecordLog } from '@envirotrax/common-ui';
 
 @Component({
     selector: 'app-backflow-test-details',
@@ -34,6 +35,8 @@ export class BackflowTestDetailsComponent implements OnInit {
     public states: InputOption<State>[] = [];
     public validationErrors: string[] = [];
     public settings: BackflowSettings | null = null;
+    public recordLogs: RecordLog[] = [];
+    public isLoadingRecordLogs: boolean = false;
 
     public readonly scheduleMonthOptions = [
         { id: 0, text: 'Not Applicable' },
@@ -95,7 +98,10 @@ export class BackflowTestDetailsComponent implements OnInit {
 
             if (id) {
                 this.id = +id;
-                await this.loadTest();
+                await Promise.all([
+                    this.loadTest(),
+                    this.loadRecordLogs()
+                ]);
             }
         });
     }
@@ -106,6 +112,15 @@ export class BackflowTestDetailsComponent implements OnInit {
             this.test = await this._testService.get(this.id);
         } finally {
             this.isLoading = false;
+        }
+    }
+
+    private async loadRecordLogs(): Promise<void> {
+        try {
+            this.isLoadingRecordLogs = true;
+            this.recordLogs = await this._testService.getLogs(this.id);
+        } finally {
+            this.isLoadingRecordLogs = false;
         }
     }
 
@@ -159,6 +174,7 @@ export class BackflowTestDetailsComponent implements OnInit {
         try {
             this.isLoading = true;
             this.test = await this._testService.updateRenewalRequired(this.test.id, !this.test.renewalRequired);
+            await this.loadRecordLogs();
         } finally {
             this.isLoading = false;
         }
@@ -172,6 +188,7 @@ export class BackflowTestDetailsComponent implements OnInit {
         try {
             this.isLoading = true;
             this.test = await this._testService.updateScheduleMonth(this.test.id, this.test.backflowScheduleMonth ?? 0);
+            await this.loadRecordLogs();
         } finally {
             this.isLoading = false;
         }
@@ -185,6 +202,7 @@ export class BackflowTestDetailsComponent implements OnInit {
         try {
             this.isLoading = true;
             this.test = await this._testService.updateIsCurrent(this.test.id, !this.test.isCurrent);
+            await this.loadRecordLogs();
         } finally {
             this.isLoading = false;
         }
@@ -198,6 +216,7 @@ export class BackflowTestDetailsComponent implements OnInit {
         try {
             this.isLoading = true;
             this.test = await this._testService.updateOutOfService(this.test.id, !this.test.outOfService);
+            await this.loadRecordLogs();
         } finally {
             this.isLoading = false;
         }
@@ -211,6 +230,7 @@ export class BackflowTestDetailsComponent implements OnInit {
         try {
             this.isLoading = true;
             this.test = await this._testService.updateDisapproval(this.test.id, !this.test.disapproved);
+            await this.loadRecordLogs();
         } finally {
             this.isLoading = false;
         }
@@ -230,6 +250,7 @@ export class BackflowTestDetailsComponent implements OnInit {
                 model: this.test
             }).result().subscribe(updated => {
                 this.test = updated;
+                this.loadRecordLogs();
             });
         }
     }
@@ -238,6 +259,7 @@ export class BackflowTestDetailsComponent implements OnInit {
         try {
             this.isLoading = true;
             this.test = await this._testService.updateRejection(this.test!.id, { rejected: false });
+            await this.loadRecordLogs();
         } finally {
             this.isLoading = false;
         }
@@ -254,6 +276,7 @@ export class BackflowTestDetailsComponent implements OnInit {
             model: this.test
         }).result().subscribe(updated => {
             this.test = updated;
+            this.loadRecordLogs();
         });
     }
 }

@@ -59,6 +59,13 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
         return Ok(result);
     }
 
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAsync(int id, [FromBody] CsiInspectionDto request, CancellationToken cancellationToken)
+    {
+        var result = await _inspectionService.UpdateForProfessionalAsync(id, request, cancellationToken);
+        return result == null ? NotFound() : Ok(result);
+    }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {

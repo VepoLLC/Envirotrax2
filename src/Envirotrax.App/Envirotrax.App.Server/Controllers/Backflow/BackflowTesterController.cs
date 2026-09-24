@@ -1,4 +1,5 @@
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Filters;
@@ -22,9 +23,9 @@ namespace Envirotrax.App.Server.Controllers.Backflow
 
         [HttpGet("search")]
         [HasPermission(PermissionAction.CanView)]
-        public async Task<IActionResult> SearchAsync([FromQuery] PageInfo pageInfo, [FromQuery] string? bpatLicenseNumber, [FromQuery] string? fireLicenseNumber, [FromQuery] string? insurancePolicyNumber, CancellationToken cancellationToken)
+        public async Task<IActionResult> SearchAsync([FromQuery] BackflowTesterSearchDto criteria, [FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
         {
-            var result = await _testerService.SearchAsync(bpatLicenseNumber, fireLicenseNumber, insurancePolicyNumber, pageInfo, cancellationToken);
+            var result = await _testerService.SearchAsync(criteria, pageInfo, query, cancellationToken);
             return Ok(result);
         }
     }

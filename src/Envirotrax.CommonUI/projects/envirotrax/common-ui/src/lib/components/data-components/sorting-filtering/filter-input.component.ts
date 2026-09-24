@@ -58,6 +58,10 @@ export class FilterInputComponent implements OnInit {
                     this.selectedColumn.searchTypes = this.options.dateAndNumberOptions;
                     this.selectedColumn.inputType = 'date';
                     break;
+                case ColumnType.dateTime:
+                    this.selectedColumn.searchTypes = this.options.dateAndNumberOptions;
+                    this.selectedColumn.inputType = 'date';
+                    break;
                 default:
                     this.selectedColumn.searchTypes = this.options.otherOptions;
 

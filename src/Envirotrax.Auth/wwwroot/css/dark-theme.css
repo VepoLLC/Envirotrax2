@@ -283,3 +283,10 @@ body.vp-dark-theme button[type=submit].red:hover {
     background-color: #c01a1a !important;
     border-color: #c01a1a !important;
 }
+
+/* Loading spinner backdrop */
+
+body.vp-dark-theme .vp-loading-overlay {
+    background-color: #1a1a2e;
+    color: #e0e0e0;
+}

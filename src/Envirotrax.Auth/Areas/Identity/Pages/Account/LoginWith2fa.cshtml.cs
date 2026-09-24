@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Envirotrax.Auth.Areas.Identity.Pages.Account
 {
-    public class LoginWith2faModel : PageModel
+    public class LoginWith2faModel : TwoFactorLoginPageModel
     {
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UserManager<AppUser> _userManager;
@@ -43,7 +43,12 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnGetAsync(bool rememberMe, string returnUrl = null)
         {
-            var user = await GetTwoFactorUserAsync();
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+
+            if (user == null)
+            {
+                return RedirectToExpiredLogin(returnUrl);
+            }
 
             ReturnUrl = returnUrl;
             RememberMe = rememberMe;
@@ -56,7 +61,12 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostSendEmailAsync(bool rememberMe, string returnUrl = null)
         {
-            var user = await GetTwoFactorUserAsync();
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+
+            if (user == null)
+            {
+                return RedirectToExpiredLogin(returnUrl);
+            }
 
             var code = await _userManager.GenerateTwoFactorTokenAsync(user, "Email");
 
@@ -76,7 +86,12 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostSendSmsAsync(bool rememberMe, string returnUrl = null)
         {
-            var user = await GetTwoFactorUserAsync();
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+
+            if (user == null)
+            {
+                return RedirectToExpiredLogin(returnUrl);
+            }
 
             var code = await _userManager.GenerateTwoFactorTokenAsync(user, "Phone");
 
@@ -87,19 +102,6 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
             });
 
             return RedirectToPage("./LoginWith2faSms", new { returnUrl, rememberMe });
-        }
-
-        private async Task<AppUser> GetTwoFactorUserAsync()
-        {
-            // Ensure the user has gone through the username & password screen first
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
-
-            if (user == null)
-            {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
-            }
-
-            return user;
         }
     }
 }

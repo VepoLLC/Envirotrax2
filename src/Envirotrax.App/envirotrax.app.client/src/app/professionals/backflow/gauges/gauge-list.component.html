@@ -16,7 +16,7 @@
     </ng-template>
 
     <ng-template #typeCell let-gauge="rowData">
-        {{ gauge.isPortable ? 'Portable' : 'Non-portable' }}
+        {{ gauge.isPortable ? 'Potable' : 'Non-Potable' }}
     </ng-template>
 
     <vp-section header="Gauges">
@@ -46,30 +46,23 @@
 <div class="mt-3">
     <vp-section header="Register new gauge">
         <p class="text-center text-danger fw-bold">
-            Please read the following important information on how to register and manage your gauges
+            Please read the following important information on how to register and manage your gauges.
         </p>
 
         <h3 class="text-bg-light p-2 border h6">Register your gauge</h3>
         <div class="mx-1">
             <p>
+                Please enter the manufacturer, model, serial number, and select whether the gauge will be used on potable or non-potable water systems. 
+                You must upload an electronic copy of the Test for Accuracy (TFA) report to your account by clicking on the <strong>Choose File</strong> button and selecting the TFA file to upload, or drag and drop the file into the box. 
                 Click the <strong>Register New Gauge</strong> button below to register a new gauge with your account.
-                A new blank gauge will be added to the Gauge Management section above. Please enter the gauge's
-                Manufacturer, Model, Serial Number, and click the OK button. This will complete the registration,
-                however,
-                your gauge will still need to be validated by Vepo personnel before it can be used.
             </p>
         </div>
 
         <h3 class="text-bg-light p-2 border h6">Gauge validation</h3>
         <div class="mx-1">
             <p>
-                For Test for Accuracy Reports (TFA) you must upload an electronic copy of your Test for Accuracy Report
-                to your account by clicking on the <strong>Choose File</strong> button and selecting the TFA file to
-                upload.
-                The gauge will not be available for use until the test for accuracy expiration date is entered by Vepo
-                personnel into the system. Test for accuracy reports are normally validated within an hour, but could
-                take
-                as long as one business day on rare occasions.
+                The gauge will not be available for use until the test for accuracy expiration date is entered by Envirotrax® personnel into the system.
+                Test for accuracy reports are normally validated within an hour but could take as long as one business day on rare occasions.
             </p>
         </div>
 
@@ -104,6 +97,41 @@
                 </div>
 
                 <div class="mb-3">
+                    <label class="col-form-label"
+                           [class.text-danger]="form.submitted && newGauge.isPortable == null">
+                        For use on what type of water system
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <div class="d-flex">
+                        <div class="form-check form-check-inline">
+                            <input id="water-system-potable"
+                                   type="radio"
+                                   class="form-check-input"
+                                   name="isPortable"
+                                   [value]="true"
+                                   [(ngModel)]="newGauge.isPortable"
+                                   required>
+                            <label for="water-system-potable" class="form-check-label">
+                                Potable
+                            </label>
+                        </div>
+
+                        <div class="form-check form-check-inline ms-4">
+                            <input id="water-system-non-potable"
+                                   type="radio"
+                                   class="form-check-input"
+                                   name="isPortable"
+                                   [value]="false"
+                                   [(ngModel)]="newGauge.isPortable">
+                            <label for="water-system-non-potable" class="form-check-label">
+                                Non-Potable
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
                     <p>
                         Please click on the Choose File button below and select the Test for Accuracy Report (TFA) you
                         wish to upload.
@@ -114,17 +142,6 @@
                                     [required]="true"
                                     accept=".jpg, .jpeg, .gif, .png, .bmp, .pdf"
                                     [form]="form" />
-                </div>
-
-                <div class="form-check mb-3">
-                    <input id="is-portable"
-                           type="checkbox"
-                           class="form-check-input"
-                           [(ngModel)]="newGauge.isPortable"
-                           name="isPortable">
-                    <label for="is-portable" class="form-check-label">
-                        Portable gauge
-                    </label>
                 </div>
 
                 <div class="form-check mb-3">

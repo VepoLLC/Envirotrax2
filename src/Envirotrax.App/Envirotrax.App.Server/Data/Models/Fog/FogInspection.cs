@@ -1,3 +1,4 @@
+using Envirotrax.App.Server.Data.Models.Logs;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Envirotrax.App.Server.Data.Models.Fog;
 
 [Table("FogInspections")]
-public class FogInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IProfessionalModel
+[RecordLogged(RecordLogTableNames.FogInspections)]
+public class FogInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }

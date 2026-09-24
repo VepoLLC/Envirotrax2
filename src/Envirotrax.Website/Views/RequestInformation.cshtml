@@ -1,6 +1,8 @@
+@using Envirotrax.Common.Configuration
 @using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.RequestInformation>
 @using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
+@inject Microsoft.Extensions.Options.IOptions<RecaptchaOptions> RecaptchaOptions
 @{
 	Layout = "master.cshtml";
 
@@ -197,7 +199,9 @@
 																				</div>
 																			</div>
 
-																			<div class="text-center  mt-3">
+																			<div id="recaptchaContainer"></div>
+
+															<div class="text-center  mt-3">
 																				<button type="button" id="btnSubmit" class="link-button">Submit Request</button>
 																			</div>
 																		</div>
@@ -219,7 +223,32 @@
 
 																		@section Scripts
 																		{
+																			<script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaApiLoad&render=explicit" async defer></script>
 																			<script>
+																				var recaptchaWidgetId = null;
+
+																				function onRecaptchaApiLoad() {
+																					recaptchaWidgetId = grecaptcha.render("recaptchaContainer", {
+																						sitekey: "@RecaptchaOptions.Value.SiteKey",
+																						size: "invisible",
+																						callback: onRecaptchaVerified,
+																						"error-callback": onRecaptchaError
+																					});
+																				}
+
+																				function onRecaptchaVerified(token) {
+																					submitRequestInformation(token);
+																				}
+
+																				function onRecaptchaError() {
+																					var divError = document.getElementById("divError");
+																					var btnSubmit = document.getElementById("btnSubmit");
+
+																					divError.textContent = "There was a problem submitting your request. Please try again or contact us directly.";
+																					divError.classList.remove("d-none");
+																					btnSubmit.disabled = false;
+																				}
+
 																				function setInformationType(index) {
 																					var contactHeader = document.getElementById("contactHeader");
 																					var divMailing = document.getElementById("divMailing");
@@ -262,36 +291,24 @@
 																					}
 																				}
 
-																				document.getElementById("btnSubmit").addEventListener("click", function () {
+																				function submitRequestInformation(recaptchaToken) {
 																					var divError = document.getElementById("divError");
-																					var companyName = document.getElementById("companyName").value.trim();
-																					var contactName = document.getElementById("txtContactName").value.trim();
-																					var informationType = document.getElementById("informationType").value;
-
-																					divError.classList.add("d-none");
-
-																					if (!companyName || !contactName || !informationType) {
-																						divError.textContent = "Please complete the required fields before submitting.";
-																						divError.classList.remove("d-none");
-																						return;
-																					}
+																					var btnSubmit = document.getElementById("btnSubmit");
 
 																					var submission = {
 																						programType: document.getElementById("programType").value,
-																						companyName: companyName,
-																						contactName: contactName,
-																						informationType: informationType,
+																						companyName: document.getElementById("companyName").value.trim(),
+																						contactName: document.getElementById("txtContactName").value.trim(),
+																						informationType: document.getElementById("informationType").value,
 																						mailingAddress: document.getElementById("txtMailingAddress").value,
 																						mailingCity: document.getElementById("txtMailingCity").value,
 																						mailingState: document.getElementById("cmbMailingState").value,
 																						mailingZip: document.getElementById("txtMailingZip").value,
 																						phoneNumber: document.getElementById("txtPhoneNumber").value,
 																						emailAddress: document.getElementById("txtEmailAddress").value,
-																						comments: document.getElementById("txtComments").value
+																						comments: document.getElementById("txtComments").value,
+																						recaptchaToken: recaptchaToken
 																					};
-
-																					var btnSubmit = document.getElementById("btnSubmit");
-																					btnSubmit.disabled = true;
 
 																					fetch("/api/request-information/submit", {
 																						method: "POST",
@@ -312,7 +329,28 @@
 																						})
 																						.finally(function () {
 																							btnSubmit.disabled = false;
+																							grecaptcha.reset(recaptchaWidgetId);
 																						});
+																				}
+
+																				document.getElementById("btnSubmit").addEventListener("click", function () {
+																					var divError = document.getElementById("divError");
+																					var companyName = document.getElementById("companyName").value.trim();
+																					var contactName = document.getElementById("txtContactName").value.trim();
+																					var informationType = document.getElementById("informationType").value;
+
+																					divError.classList.add("d-none");
+
+																					if (!companyName || !contactName || !informationType) {
+																						divError.textContent = "Please complete the required fields before submitting.";
+																						divError.classList.remove("d-none");
+																						return;
+																					}
+
+																					var btnSubmit = document.getElementById("btnSubmit");
+																					btnSubmit.disabled = true;
+
+																					grecaptcha.execute(recaptchaWidgetId);
 																				});
 																			</script>
 																		}

@@ -39,7 +39,7 @@ export class ProfessionalSupplierService {
             ...suppliers.data
                 .filter(s => s.waterSupplier?.id)
                 .map(s => ({
-                    id: s.waterSupplier!.id!,
+                    id: String(s.waterSupplier!.id),
                     text: s.waterSupplier!.name ?? '',
                     data: s
                 }))

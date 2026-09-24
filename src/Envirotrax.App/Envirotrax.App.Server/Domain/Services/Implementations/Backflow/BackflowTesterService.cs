@@ -1,7 +1,9 @@
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 
@@ -17,9 +19,13 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Backflow
             _testerRepository = repository;
         }
 
-        public async Task<IPagedData<ProfessionalDto>> SearchAsync(string? bpatLicenseNumber, string? fireLicenseNumber, string? insurancePolicyNumber, PageInfo pageInfo, CancellationToken cancellationToken)
+        public async Task<IPagedData<ProfessionalDto>> SearchAsync(BackflowTesterSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
         {
-            var items = await _testerRepository.SearchAsync(bpatLicenseNumber, fireLicenseNumber, insurancePolicyNumber, pageInfo, cancellationToken);
+            query.Filter = query.ConvertFilterProperties<Professional, ProfessionalDto>(Mapper);
+            query.Sort = query.ConvertSortProperties<Professional, ProfessionalDto>(Mapper);
+
+            var items = await _testerRepository.SearchAsync(criteria, pageInfo, query, cancellationToken);
+
             return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
         }
     }

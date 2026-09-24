@@ -79,6 +79,14 @@ namespace Envirotrax.Common.Data.Services.Implementations
             }
         }
 
+        public string? IpAddress
+        {
+            get
+            {
+                return _contextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
+            }
+        }
+
         public TenantProviderService(IHttpContextAccessor contextAccessor)
         {
             _contextAccessor = contextAccessor;

@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { PagedData, PageInfo, Query, QueryHelperService, UrlResolverService } from "@envirotrax/common-ui";
+import { PagedData, PageInfo, Query, QueryHelperService, RecordLog, UrlResolverService } from "@envirotrax/common-ui";
 import {
     CsiInspection,
     CsiInspectionAssembly,
@@ -9,7 +9,6 @@ import {
     CsiInspectionImage,
     CsiPaymentStatus
 } from "../../models/csi/csi-inspection";
-import { RecordLog } from "../../models/logs/record-log";
 import { lastValueFrom } from "rxjs";
 
 @Injectable({

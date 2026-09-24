@@ -7,6 +7,9 @@ import { SiteListComponent } from './sites/list/site-list.component';
 import { CsiInspectionListComponent } from './csi/inspections/list/csi-inspection-list.component';
 import { CsiInspectorListComponent } from './csi/inspectors/list/csi-inspector-list.component';
 import { BackflowTestListComponent } from './backflow/tests/list/backflow-test-list.component';
+import { BackflowTesterListComponent } from './backflow/testers/list/backflow-tester-list.component';
+import { BackflowReplacementListComponent } from './backflow/replacements/list/backflow-replacement-list.component';
+import { FogInspectionListComponent } from './fog/inspections/list/fog-inspection-list.component';
 
 @Component({
   selector: 'app-root',
@@ -72,6 +75,27 @@ export class App implements OnInit {
             title: 'Backflow Test Search',
             iconCss: 'fa-solid fa-magnifying-glass',
             onClick: this.showBackflowTestSearch.bind(this)
+          },
+          {
+            title: 'BPAT Search',
+            iconCss: 'fa-solid fa-user',
+            onClick: this.showBackflowTesterSearch.bind(this)
+          },
+          {
+            title: 'Replaced Assemblies',
+            iconCss: 'fa-solid fa-right-left',
+            onClick: this.showBackflowReplacements.bind(this)
+          }
+        ]
+      },
+      {
+        title: 'FOG Management',
+        iconCss: 'fa-solid fa-truck-droplet',
+        children: [
+          {
+            title: 'Inspection Search',
+            iconCss: 'fa-solid fa-magnifying-glass',
+            onClick: this.showFogInspectionSearch.bind(this)
           }
         ]
       }
@@ -138,6 +162,24 @@ export class App implements OnInit {
   public showBackflowTestSearch(): void {
     this._windowService.addWindow(BackflowTestListComponent, {
       title: 'Backflow Test Search'
+    });
+  }
+
+  public showBackflowTesterSearch(): void {
+    this._windowService.addWindow(BackflowTesterListComponent, {
+      title: 'Backflow Tester Search'
+    });
+  }
+
+  public showBackflowReplacements(): void {
+    this._windowService.addWindow(BackflowReplacementListComponent, {
+      title: 'Backflow Replacements'
+    });
+  }
+
+  public showFogInspectionSearch(): void {
+    this._windowService.addWindow(FogInspectionListComponent, {
+      title: 'FOG Inspection Search'
     });
   }
 }

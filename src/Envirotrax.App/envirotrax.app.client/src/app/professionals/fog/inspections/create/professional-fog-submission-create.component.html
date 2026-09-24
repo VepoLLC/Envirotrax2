@@ -1,4 +1,4 @@
-<h1 class="text-center h2">FOG Inspection Submission</h1>
+<h1 class="text-center h2">{{ editingId ? 'Edit FOG Inspection' : 'FOG Inspection Submission' }}</h1>
 
 <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
 
@@ -7,7 +7,7 @@
     <div *ngIf="site">
 
         <!-- Tabs -->
-        <ul class="nav vp-tabs justify-content-center mb-3">
+        <ul class="nav vp-tabs justify-content-center mb-1">
             <li class="nav-item">
                 <a class="nav-link" [class.active]="activeTab === 'main'" (click)="activeTab = 'main'" role="button">
                     FOG Inspection Main Form
@@ -38,7 +38,7 @@
                 <div class="d-flex justify-content-center gap-2 mt-3">
                     <button type="button" class="btn btn-primary vp-section-button"
                             (click)="returnToAccountOverview()">Return to Account Overview</button>
-                    <button type="button" class="btn btn-primary vp-section-button" (click)="submitAnother()">Submit
+                    <button type="button" class="btn btn-primary vp-section-button" *ngIf="!editingId" (click)="submitAnother()">Submit
                         Another Inspection</button>
                     <button type="button" class="btn btn-primary vp-section-button">Checkout</button>
                 </div>

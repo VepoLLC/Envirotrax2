@@ -1,7 +1,9 @@
 
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
 using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
 using Envirotrax.Common.Data.Services.Definitions;
@@ -344,10 +346,79 @@ namespace Envirotrax.Common.Data.DbContexts
 
         }
 
+        /// <summary>
+        /// Builds the field-by-field change description for an entry: one "Name >> 'old' >> 'new'"
+        /// line per property the caller actually changed, and an empty string when nothing changed.
+        /// </summary>
+        /// <remarks>
+        /// Only meaningful BEFORE the entry is saved — afterwards every property is unchanged and
+        /// OriginalValue equals CurrentValue.
+        /// </remarks>
+        public virtual string BuildChangeDescription(EntityEntry entry)
+        {
+            var changes = new StringBuilder();
+
+            foreach (var property in entry.Properties)
+            {
+                if (!property.IsModified || IsChangeDescriptionSkipped(property.Metadata.Name))
+                {
+                    continue;
+                }
+
+                var oldValue = FormatChangeValue(property.OriginalValue);
+                var newValue = FormatChangeValue(property.CurrentValue);
+
+                if (oldValue == newValue)
+                {
+                    continue;
+                }
+
+                changes.AppendLine($"{property.Metadata.Name} >> '{oldValue}' >> '{newValue}'");
+            }
+
+            return changes.ToString().TrimEnd();
+        }
+
+        /// <summary>
+        /// Properties that never belong in a change description. Override to add more.
+        /// </summary>
+        protected virtual bool IsChangeDescriptionSkipped(string propertyName)
+        {
+            // The audit columns this class stamps itself — they change on every save and say
+            // nothing about what the user did.
+            return propertyName is
+                nameof(ICreateAuditableModel<AspNetUserBase>.CreatedById) or
+                nameof(ICreateAuditableModel<AspNetUserBase>.CreatedTime) or
+                nameof(IUpdateAuditableModel<AspNetUserBase>.UpdatedById) or
+                nameof(IUpdateAuditableModel<AspNetUserBase>.UpdatedTime) or
+                nameof(IDeleteAutitableModel<AspNetUserBase>.DeletedById) or
+                nameof(IDeleteAutitableModel<AspNetUserBase>.DeletedTime);
+        }
+
+        private static string FormatChangeValue(object? value)
+        {
+            if (value == null)
+            {
+                return "NULL";
+            }
+
+            return Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
+        }
+
+        /// <summary>
+        /// Runs at the one point in the save where the change tracker still reflects exactly what the
+        /// caller did: tenant ids are already final, but <see cref="AuditEntities"/> has not yet
+        /// rewritten soft deletes from Deleted to Modified or stamped the audit columns.
+        /// </summary>
+        protected virtual void OnSavingChanges()
+        {
+        }
+
         public override int SaveChanges()
         {
             EnforceReadOnlyTables();
             SetSecurityProperties();
+            OnSavingChanges();
             AuditEntities();
 
             try
@@ -365,6 +436,7 @@ namespace Envirotrax.Common.Data.DbContexts
         {
             EnforceReadOnlyTables();
             SetSecurityProperties();
+            OnSavingChanges();
             AuditEntities();
 
             try

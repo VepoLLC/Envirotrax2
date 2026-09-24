@@ -8,4 +8,13 @@ public interface IFogInspectionRepository : IRepository<FogInspection>
     Task<IEnumerable<FogInspection>> SearchForProfessionalAsync(
         PageInfo pageInfo, Query query,
         bool latestOnly, CancellationToken cancellationToken);
+
+    Task<FogInspection?> UpdateForProfessionalAsync(
+        FogInspection model,
+        int professionalId,
+        string? newExteriorImagePath,
+        string? newInteriorImagePath,
+        string? newSignatureImagePath);
+
+    Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken);
 }

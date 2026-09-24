@@ -9,6 +9,7 @@ import { PagedData } from "../../models/paged-data";
 import { CsiInspection } from "../../models/csi/csi-inspection";
 import { CsiInspectionImage } from "../../models/csi/csi-inspection-image";
 import { DownloadEndpoint } from "../../models/download-config";
+import { RecordLog } from "@envirotrax/common-ui";
 
 @Injectable({
     providedIn: 'root'
@@ -57,6 +58,14 @@ export class CsiInspectionService {
         );
     }
 
+    public getLogs(id: number): Promise<RecordLog[]> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${id}/logs`);
+
+        return lastValueFrom(
+            this._http.get<RecordLog[]>(url)
+        );
+    }
+
     public add(inspection: CsiInspection): Promise<CsiInspection> {
         const url = this._urlResolver.resolveUrl('/api/csi/inspections');
 
@@ -89,6 +98,11 @@ export class CsiInspectionService {
     public submit(inspection: CsiInspection): Promise<CsiInspection> {
         const url = this._urlResolver.resolveUrl('/api/professionals/csi/inspections/submit');
         return lastValueFrom(this._http.post<CsiInspection>(url, inspection));
+    }
+
+    public updateForProfessional(id: number, inspection: CsiInspection): Promise<CsiInspection> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${id}`);
+        return lastValueFrom(this._http.put<CsiInspection>(url, inspection));
     }
 
     public updateApproval(id: number, request: { disapproved: boolean; disapprovedReason?: string | null }): Promise<CsiInspection> {

@@ -13,6 +13,7 @@ export interface ReferencedGisArea {
 export interface GisAreaCoordinate {
     id?: number;
     area?: ReferencedGisArea;
+    polygonIndex?: number;
     latitude?: number;
     longitude?: number;
 }

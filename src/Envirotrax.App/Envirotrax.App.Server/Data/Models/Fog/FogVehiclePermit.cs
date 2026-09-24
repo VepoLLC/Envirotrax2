@@ -1,3 +1,4 @@
+using Envirotrax.App.Server.Data.Models.Logs;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Envirotrax.App.Server.Data.Models.Users;
@@ -8,6 +9,7 @@ using Envirotrax.Common.Data.Models;
 namespace Envirotrax.App.Server.Data.Models.Fog;
 
 [Table("FogVehiclePermits")]
+[RecordLogged(RecordLogTableNames.FogVehiclePermits, ProfessionalSource = RecordLogIdSource.None)]
 public class FogVehiclePermit : TenantModel<WaterSupplier>, ICreateAuditableModel<AppUser>
 {
     [AppPrimaryKey(false)]

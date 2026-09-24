@@ -196,6 +196,9 @@ public class BackflowTestDto : IDto
 
     public bool Ossf { get; set; }
 
+    [StringLength(50)]
+    public string? WaterMeterNumber { get; set; }
+
     public bool RainFreezeSensorInstalled { get; set; }
     public bool RainFreezeSensorWorkingProperly { get; set; }
 
@@ -230,6 +233,10 @@ public class BackflowTestDto : IDto
 
     // Air gap
     public bool AirGapValid { get; set; }
+
+    // Derived by DeriveTestDate from InitialTestDate for air-gap devices, null for every other
+    // device type. Never bound from the client.
+    public DateTime? AirGapTestDate { get; set; }
 
     // Repairs (stored as comma-separated text, e.g. "Cleaned, Replaced Disc, Replaced Spring")
     [StringLength(200)]

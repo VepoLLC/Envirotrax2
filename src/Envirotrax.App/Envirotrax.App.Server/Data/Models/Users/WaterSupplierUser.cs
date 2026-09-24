@@ -1,4 +1,5 @@
 
+using Envirotrax.App.Server.Data.Models.Logs;
 using System.ComponentModel.DataAnnotations;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
@@ -9,6 +10,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Envirotrax.App.Server.Data.Models.Users;
 
+[RecordLogged(RecordLogTableNames.WaterSupplierUserAccounts, ProfessionalSource = RecordLogIdSource.None)]
 public class WaterSupplierUser : TenantModel<WaterSupplier>
 {
     [AppPrimaryKey(false)]

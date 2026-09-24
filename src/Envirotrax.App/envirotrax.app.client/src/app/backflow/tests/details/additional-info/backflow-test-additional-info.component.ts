@@ -11,6 +11,7 @@ export class BackflowTestAdditionalInfoComponent {
     @Input() public test!: BackflowTest;
     @Input() public canModify: boolean = false;
     @Input() public saving: boolean = false;
+    @Input() public showWaterMeterNumber: boolean = false;
     @Input() public showRainSensor: boolean = false;
     @Input() public showOSSF: boolean = false;
     @Input() public showPermitNumber: boolean = false;

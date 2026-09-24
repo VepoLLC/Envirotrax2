@@ -13,9 +13,21 @@ public class ProfessionalUserProfile : Profile
         CreateMap<ProfessionalUser, ProfessionalUserDto>()
             .ForMember(proUser => proUser.Id, opt => opt.MapFrom(proUser => proUser.UserId))
             .ForMember(proUser => proUser.EmailAddress, opt => opt.MapFrom(proUser => proUser.User!.Email))
+            .AfterMap((model, dto) =>
+            {
+                if (model.BillingStateId.HasValue)
+                {
+                    dto.BillingState ??= new()
+                    {
+                        Id = model.BillingStateId.Value
+                    };
+                }
+            })
             .ReverseMap()
             .ForMember(proUser => proUser.User, opt => opt.Ignore())
-            .ForMember(proUser => proUser.UserId, opt => opt.MapFrom(proUser => proUser.Id));
+            .ForMember(proUser => proUser.UserId, opt => opt.MapFrom(proUser => proUser.Id))
+            .ForMember(proUser => proUser.BillingState, opt => opt.Ignore())
+            .ForMember(proUser => proUser.BillingStateId, opt => opt.MapFrom(proUser => proUser.BillingState!.Id));
 
         CreateMap<AppUser, ReferencedProfessionalUserDto>()
                .ForMember(d => d.EmailAddress, opt => opt.MapFrom(s => s.Email))

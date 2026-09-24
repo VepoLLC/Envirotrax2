@@ -150,6 +150,7 @@
         <vp-backflow-test-additional-info
             [test]="test"
             [canModify]="canModify"
+            [showWaterMeterNumber]="settings?.showWaterMeterNumber ?? false"
             [showRainSensor]="settings?.showRainSensor ?? false"
             [showOSSF]="settings?.showOSSF ?? false"
             [showPermitNumber]="settings?.showPermitNumber ?? false"
@@ -169,6 +170,12 @@
             <vp-backflow-test-history
                 [test]="test"
                 [canViewTesters]="canViewTesters" />
+        </div>
+
+        <div class="row mt-3">
+            <vp-section header="Record Log">
+                <vp-record-log-list [logs]="recordLogs" [isLoading]="isLoadingRecordLogs" [recordLabel]="'backflow test'" />
+            </vp-section>
         </div>
 
         <div class="d-flex justify-content-center mt-3">

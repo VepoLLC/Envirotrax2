@@ -95,8 +95,7 @@ export class CheckoutFogInspectionComponent implements OnInit {
             this.isLoading = true;
 
             const filter: QueryProperty[] = [
-                { columnName: 'transactionId', isValueNull: true },
-                { columnName: 'amount', comparisonOperator: 'Gt', value: '0' }
+                { columnName: 'transactionId', isValueNull: true }
             ];
 
             if (this.reportFor !== '') {
@@ -133,6 +132,14 @@ export class CheckoutFogInspectionComponent implements OnInit {
         }
 
         this._router.navigate(['/professionals/fog/inspections', inspection.id]);
+    }
+
+    public editInspection(inspection: CheckoutFogInspectionVm): void {
+        if (inspection?.id == null) {
+            return;
+        }
+
+        this._router.navigate(['/professionals/fog/inspections/edit', inspection.id]);
     }
 
     public deleteInspection(inspection: CheckoutFogInspectionVm): void {

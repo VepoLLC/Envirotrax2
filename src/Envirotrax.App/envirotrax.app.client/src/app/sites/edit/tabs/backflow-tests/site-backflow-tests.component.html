@@ -67,7 +67,7 @@
     <form #searchForm="ngForm" (ngSubmit)="update(searchForm)">
         <vp-filter-panel (filterChange)="onFilterChange($event)">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-4 pe-0">
                     <div class="mb-3">
                         <vp-filter-panel-field fieldName="isCurrent"
                                                label="View type"
@@ -98,7 +98,7 @@
                                                borderColor="#0d6efd" />
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 pe-0">
                     <div class="mb-3">
                         <vp-filter-panel-field fieldName="disapproved"
                                                label="Approval status"

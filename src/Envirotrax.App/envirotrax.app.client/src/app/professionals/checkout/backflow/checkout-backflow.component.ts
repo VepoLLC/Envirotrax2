@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, MAX_PAGE_SIZE, ModalHelperService, TableColumn, ToastService } from '@envirotrax/common-ui';
+import { CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, MAX_PAGE_SIZE, ModalHelperService, TableColumn, ToastService, ToastType } from '@envirotrax/common-ui';
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { BackflowTest } from "../../../shared/models/backflow/backflow-test";
@@ -101,8 +101,7 @@ export class CheckoutBackflowComponent implements OnInit {
             this.isLoading = true;
 
             const filter: QueryProperty[] = [
-                { columnName: 'transactionId', isValueNull: true },
-                { columnName: 'amount', comparisonOperator: 'Gt', value: '0' }
+                { columnName: 'transactionId', isValueNull: true }
             ];
 
             if (this.reportFor !== '') {
@@ -148,7 +147,7 @@ export class CheckoutBackflowComponent implements OnInit {
             return;
         }
 
-        this._router.navigate(['/professionals/backflow/submit', test.id]);
+        this._router.navigate(['/professionals/backflow/submit', test.id, 'edit']);
     }
 
     public deleteTest(test: CheckoutBackflowTestVm): void {
@@ -167,6 +166,28 @@ export class CheckoutBackflowComponent implements OnInit {
             await this._backflowTestService.deleteForProfessional(test.id);
 
             this._toastService.successFullyDeleted('Test Report');
+            this._checkoutService.refresh();
+        } finally {
+            this.isLoading = false;
+        }
+
+        await this.getBackflowTests();
+    }
+
+    public async completePayment(): Promise<void> {
+        const testIds = (this.items.items?.data || [])
+            .filter(test => test.selected && test.id != null)
+            .map(test => test.id!);
+
+        if (testIds.length === 0) {
+            return;
+        }
+
+        try {
+            this.isLoading = true;
+            await this._backflowTestService.checkout(testIds);
+
+            this._toastService.show({ text: 'Submission completed.', type: ToastType.Success });
             this._checkoutService.refresh();
         } finally {
             this.isLoading = false;

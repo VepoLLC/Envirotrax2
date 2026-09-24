@@ -1,5 +1,5 @@
 
-using Envirotrax.TaskRunner.Domain.Services.Definitions;
+using Envirotrax.Common.Domain.Services.Defintions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

@@ -86,7 +86,11 @@ public class EmailService : IEmailService
                 content: new EmailContent(email.Subject ?? string.Empty) { Html = body },
                 recipients: new EmailRecipients(GetToAddresses(email.Recipients).Select(address => new EmailAddress(address))));
 
-            await _emailClient.SendAsync(Azure.WaitUntil.Completed, message);
+            // Started, not Completed: Completed keeps polling Azure until the message reaches a terminal
+            // delivery status, which takes tens of seconds per email and blocks the caller for all of it.
+            // Accept-time failures (bad address, authentication, throttling) still surface here — the only
+            // thing given up is the final delivery status, which nothing acts on anyway.
+            await _emailClient.SendAsync(Azure.WaitUntil.Started, message);
         }
         catch (Exception ex)
         {

@@ -1,3 +1,4 @@
+using Envirotrax.App.Server.Data.Models.Logs;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Envirotrax.App.Server.Data.Models.Professionals;
@@ -10,6 +11,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Envirotrax.App.Server.Data.Models.Fog;
 
 [Table("FogVehicles")]
+[RecordLogged(RecordLogTableNames.FogVehicles, ProfessionalSource = RecordLogIdSource.Entity)]
 public class FogVehicle : IProfessionalModel, ICreateAuditableModel<AppUser>, IDeleteAutitableModel<AppUser>
 {
     [AppPrimaryKey(true)]

@@ -31,19 +31,45 @@
 
         <div class="mb-3">
             <vp-input name="lastCalibrationDate"
-                      label="Calibration date"
+                      label="Test for Accuracy Date"
                       type="date"
                       [(ngModel)]="gauge.lastCalibrationDate"
                       [form]="form" />
         </div>
 
-        <div class="mb-3 form-check">
-            <input type="checkbox"
-                   class="form-check-input"
-                   id="isPortable"
-                   name="isPortable"
-                   [(ngModel)]="gauge.isPortable" />
-            <label class="form-check-label" for="isPortable">Portable</label>
+        <div class="mb-3">
+            <label class="col-form-label"
+                   [class.text-danger]="form.submitted && gauge.isPortable == null">
+                For use on what type of water system
+                <span class="text-danger">*</span>
+            </label>
+
+            <div class="d-flex">
+                <div class="form-check form-check-inline">
+                    <input id="tester-gauge-water-system-potable"
+                           type="radio"
+                           class="form-check-input"
+                           name="isPortable"
+                           [value]="true"
+                           [(ngModel)]="gauge.isPortable"
+                           required>
+                    <label for="tester-gauge-water-system-potable" class="form-check-label">
+                        Potable
+                    </label>
+                </div>
+
+                <div class="form-check form-check-inline ms-4">
+                    <input id="tester-gauge-water-system-non-potable"
+                           type="radio"
+                           class="form-check-input"
+                           name="isPortable"
+                           [value]="false"
+                           [(ngModel)]="gauge.isPortable">
+                    <label for="tester-gauge-water-system-non-potable" class="form-check-label">
+                        Non-Potable
+                    </label>
+                </div>
+            </div>
         </div>
 
         <div *ngIf="!isEditMode" class="mb-3">

@@ -29,6 +29,7 @@ public class BackflowSettingsRepository : TenantSettingsRepository<BackflowSetti
                 && registration.ProfessionalId == professionalId
             select new BackflowTestingSettingsDto
             {
+                ShowWaterMeterNumber = settings.ShowWaterMeterNumber,
                 ShowRainSensor = settings.ShowRainSensor,
                 ShowOSSF = settings.ShowOSSF,
                 ShowPermitNumber = settings.ShowPermitNumber
@@ -44,6 +45,7 @@ public class BackflowSettingsRepository : TenantSettingsRepository<BackflowSetti
             where settings.WaterSupplierId == waterSupplierId
             select new BackflowTestingSettingsDto
             {
+                ShowWaterMeterNumber = settings.ShowWaterMeterNumber,
                 ShowRainSensor = settings.ShowRainSensor,
                 ShowOSSF = settings.ShowOSSF,
                 ShowPermitNumber = settings.ShowPermitNumber

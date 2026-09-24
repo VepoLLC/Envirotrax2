@@ -1,6 +1,8 @@
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
 using Microsoft.AspNetCore.Mvc;
@@ -14,12 +16,14 @@ public class CsiInspectionController : WaterSupplierCrudController<CsiInspection
 {
     private readonly ICsiInspectionService _inspectionService;
     private readonly ICsiInspectionImageService _imageService;
+    private readonly IRecordLogService _recordLogService;
 
-    public CsiInspectionController(ICsiInspectionService service, ICsiInspectionImageService imageService)
+    public CsiInspectionController(ICsiInspectionService service, ICsiInspectionImageService imageService, IRecordLogService recordLogService)
         : base(service)
     {
         _inspectionService = service;
         _imageService = imageService;
+        _recordLogService = recordLogService;
     }
 
     [HttpGet("pdf")]
@@ -49,6 +53,17 @@ public class CsiInspectionController : WaterSupplierCrudController<CsiInspection
 
         var pdfBytes = await _inspectionService.GeneratePdfAsync(inspection);
         return File(pdfBytes, "application/pdf");
+    }
+
+    [HttpGet("{id}/logs")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetLogsAsync(int id, CancellationToken cancellationToken)
+    {
+        var inspection = await _inspectionService.GetAsync(id, cancellationToken);
+        if (inspection == null) return NotFound();
+
+        var logs = await _recordLogService.GetByRecordAsync(RecordLogTableNames.CsiInspections, id, cancellationToken);
+        return Ok(logs);
     }
 
     [HttpGet("{id}/images")]

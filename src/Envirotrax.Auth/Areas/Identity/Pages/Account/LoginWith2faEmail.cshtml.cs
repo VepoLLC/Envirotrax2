@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Envirotrax.Auth.Areas.Identity.Pages.Account
 {
-    public class LoginWith2faEmailModel : PageModel
+    public class LoginWith2faEmailModel : TwoFactorLoginPageModel
     {
         private readonly SignInManager<AppUser> _signInManager;
         private readonly ILogger<LoginWith2faEmailModel> _logger;
@@ -52,7 +52,7 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
 
             if (user == null)
             {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+                return RedirectToExpiredLogin(returnUrl);
             }
 
             ReturnUrl = returnUrl;
@@ -73,7 +73,7 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
             {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+                return RedirectToExpiredLogin(returnUrl);
             }
 
             var code = Input.TwoFactorCode.Replace(" ", string.Empty);

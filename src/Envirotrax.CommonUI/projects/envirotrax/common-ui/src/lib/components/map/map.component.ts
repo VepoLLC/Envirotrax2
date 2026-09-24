@@ -4,6 +4,10 @@ import { lastValueFrom, Observable, shareReplay } from "rxjs";
 import { UrlResolverService } from "../../services/helpers/url-resolver.service";
 import { importLibrary, setOptions } from "@googlemaps/js-api-loader";
 
+const MIN_POLYGON_VERTICES = 3;
+const COORDINATE_EPSILON = 1e-9;
+const VERTEX_ICON_PATH = 'M -5,0 a 5,5 0 1,0 10,0 a 5,5 0 1,0 -10,0';
+
 @Component({
     standalone: false,
     selector: 'vp-map',
@@ -15,11 +19,15 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
     private _polygonInstances: any[] = [];
     private _markerInstances: any[] = [];
     private _infoWindow: any;
-    private _drawingManager: any;
+
+    private _drawingPolygon?: MapPolygon<any>;
+    private _drawingPath: { lat: number, lng: number }[] = [];
+    private _drawingLine: any;
+    private _drawingVertexMarkers: any[] = [];
+    private _drawingListeners: any[] = [];
 
     private static _apiKey$?: Observable<ApiKey>;
     private static _mapsLibrary?: any;
-    private static _drawingLibrary?: any;
     private static _markerLibrary?: any;
 
     public autoSetHeight?: string;
@@ -82,9 +90,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
         const apiKey = await this.getApiKey();
         setOptions({ key: apiKey.apiKey });
 
-        // Load the Maps, Drawing, and Marker libraries.
+        // Load the Maps and Marker libraries.
         MapComponent._mapsLibrary ??= await importLibrary('maps');
-        MapComponent._drawingLibrary ??= await importLibrary('drawing');
         MapComponent._markerLibrary ??= await importLibrary('marker');
         const { Map } = MapComponent._mapsLibrary;
 
@@ -193,37 +200,37 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
         this._polygonInstances.forEach(p => p.setMap(null));
         this._polygonInstances = [];
 
-        if (this._drawingManager) {
-            this._drawingManager.setMap(null);
-            this._drawingManager = null;
-        }
+        this.stopPolygonDrawing();
 
         if (!this.polygons?.length) {
             return;
         }
 
         const { Polygon } = MapComponent._mapsLibrary as any;
+        const drawingPolygon = this.polygons.find(p => p.onDrawComplete);
 
         for (const polygon of this.polygons) {
-            if (polygon.onDrawComplete) {
-                this.activateDrawingManager(polygon);
+            if (polygon === drawingPolygon) {
                 continue;
             }
 
+            // Google Maps draws the first path as the outer edge and every path after it as a hole.
+            const paths: MapPoint[][] = [polygon.coordinates, ...(polygon.holes ?? [])];
+
             const instance = new Polygon({
-                paths: polygon.coordinates,
+                paths: paths,
                 strokeColor: polygon.color,
                 strokeOpacity: 0.8,
                 strokeWeight: 1,
                 fillColor: polygon.color,
                 fillOpacity: 0.2,
                 editable: !!polygon.onEdit,
-                clickable: !!polygon.onClick
+                clickable: !!polygon.onClick && !drawingPolygon
             });
             instance.setMap(this._map);
             this._polygonInstances.push(instance);
 
-            if (polygon.onClick) {
+            if (polygon.onClick && !drawingPolygon) {
                 instance.addListener('click', () => {
                     this._ngZone.run(() => {
                         if (polygon.onClick) {
@@ -233,68 +240,187 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
                 })
             }
 
+            // Each ring is a separate editable path, so every one needs its own listeners —
+            // otherwise dragging a vertex of a hole would never reach the view model.
             if (polygon.onEdit) {
-                const path = instance.getPath();
-                if (path) {
-                    path.addListener("set_at", () => this._ngZone.run(() => this.onPolygonEdit(polygon, instance)));
-                    path.addListener("insert_at", () => this._ngZone.run(() => this.onPolygonEdit(polygon, instance)));
+                const editablePaths = instance.getPaths();
+
+                if (editablePaths) {
+                    for (let pathIndex = 0; pathIndex < editablePaths.getLength(); pathIndex++) {
+                        const path = editablePaths.getAt(pathIndex);
+
+                        path.addListener("set_at", () => this._ngZone.run(() => this.onPolygonEdit(polygon, instance)));
+                        path.addListener("insert_at", () => this._ngZone.run(() => this.onPolygonEdit(polygon, instance)));
+                        path.addListener("remove_at", () => this._ngZone.run(() => this.onPolygonEdit(polygon, instance)));
+                    }
                 }
             }
         }
+
+        if (drawingPolygon) {
+            this.startPolygonDrawing(drawingPolygon);
+        }
     }
 
-    private activateDrawingManager(polygon: MapPolygon<any>): void {
-        const { DrawingManager } = MapComponent._drawingLibrary as any;
+    private startPolygonDrawing(polygon: MapPolygon<any>): void {
+        const { Polyline } = MapComponent._mapsLibrary as any;
 
-        this._drawingManager = new DrawingManager({
-            drawingMode: 'polygon',
-            drawingControl: false,
-            polygonOptions: {
-                strokeColor: polygon.color,
-                fillColor: polygon.color,
-                strokeOpacity: 0.8,
-                strokeWeight: 1,
-                fillOpacity: 0.2,
-            }
+        this._drawingPolygon = polygon;
+        this._drawingPath = [];
+
+        this._drawingLine = new Polyline({
+            map: this._map,
+            path: [],
+            strokeColor: polygon.color,
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            clickable: false
         });
-        this._drawingManager.setMap(this._map);
 
-        this._drawingManager.addListener('polygoncomplete', (polygonInstance: any) => {
-            polygonInstance.setMap(null);
-            this._drawingManager.setMap(null);
-            this._drawingManager = null;
+        this._map.setOptions({ draggableCursor: 'crosshair', disableDoubleClickZoom: true });
 
-            polygon.coordinates = [];
+        this._ngZone.runOutsideAngular(() => {
+            this._drawingListeners.push(this._map.addListener('click', (event: any) => {
+                this.addDrawingVertex(event.latLng.lat(), event.latLng.lng());
+            }));
 
-            const path = polygonInstance.getPath();
+            this._drawingListeners.push(this._map.addListener('mousemove', (event: any) => {
+                this.updateDrawingLine({ lat: event.latLng.lat(), lng: event.latLng.lng() });
+            }));
 
-            for (let i = 0; i < path.getLength(); i++) {
-                const point = path.getAt(i);
-                polygon.coordinates.push({ lat: point.lat(), lng: point.lng() });
-            }
-
-            this._ngZone.run(() => {
-                if (polygon.onDrawComplete) {
-                    polygon.onDrawComplete(polygon);
-                }
-            });
+            this._drawingListeners.push(this._map.addListener('dblclick', () => {
+                this.completePolygonDrawing();
+            }));
         });
     }
 
+    private addDrawingVertex(lat: number, lng: number): void {
+        const { Marker } = MapComponent._markerLibrary as any;
+        const isFirstVertex = this._drawingPath.length === 0;
+
+        this._drawingPath.push({ lat: lat, lng: lng });
+        this.updateDrawingLine();
+
+        const marker = new Marker({
+            position: { lat: lat, lng: lng },
+            map: this._map,
+            clickable: isFirstVertex,
+            cursor: isFirstVertex ? 'pointer' : undefined,
+            icon: {
+                path: VERTEX_ICON_PATH,
+                fillColor: '#ffffff',
+                fillOpacity: 1,
+                strokeColor: this._drawingPolygon!.color,
+                strokeWeight: 2
+            }
+        });
+
+        this._drawingVertexMarkers.push(marker);
+
+        if (isFirstVertex) {
+            this._drawingListeners.push(marker.addListener('click', () => this.completePolygonDrawing()));
+        }
+    }
+
+    private updateDrawingLine(cursorPosition?: { lat: number, lng: number }): void {
+        if (!this._drawingLine) {
+            return;
+        }
+
+        const path = [...this._drawingPath];
+
+        if (cursorPosition && path.length) {
+            path.push(cursorPosition);
+        }
+
+        this._drawingLine.setPath(path);
+    }
+
+    private completePolygonDrawing(): void {
+        const polygon = this._drawingPolygon;
+
+        if (!polygon) {
+            return;
+        }
+
+        this.removeDuplicatedLastVertex();
+
+        if (this._drawingPath.length < MIN_POLYGON_VERTICES) {
+            return;
+        }
+
+        polygon.coordinates = this._drawingPath.map(point => ({ lat: point.lat, lng: point.lng }));
+
+        this.stopPolygonDrawing();
+
+        this._ngZone.run(() => {
+            if (polygon.onDrawComplete) {
+                polygon.onDrawComplete(polygon);
+            }
+        });
+    }
+
+    private removeDuplicatedLastVertex(): void {
+        if (this._drawingPath.length < 2) {
+            return;
+        }
+
+        const last = this._drawingPath[this._drawingPath.length - 1];
+        const previous = this._drawingPath[this._drawingPath.length - 2];
+
+        const isSamePoint = Math.abs(last.lat - previous.lat) < COORDINATE_EPSILON &&
+            Math.abs(last.lng - previous.lng) < COORDINATE_EPSILON;
+
+        if (isSamePoint) {
+            this._drawingPath.pop();
+            this._drawingVertexMarkers.pop()?.setMap(null);
+        }
+    }
+
+    private stopPolygonDrawing(): void {
+        this._drawingListeners.forEach(listener => listener.remove());
+        this._drawingListeners = [];
+
+        this._drawingVertexMarkers.forEach(marker => marker.setMap(null));
+        this._drawingVertexMarkers = [];
+
+        if (this._drawingLine) {
+            this._drawingLine.setMap(null);
+            this._drawingLine = null;
+        }
+
+        this._drawingPath = [];
+        this._drawingPolygon = undefined;
+
+        if (this._map) {
+            this._map.setOptions({ draggableCursor: null, disableDoubleClickZoom: false });
+        }
+    }
+
+    // Google Maps returns one path per ring, in the order they were passed in: the outer edge
+    // first, then the holes. Copy them back so the caller can persist the edited shape.
     private onPolygonEdit(polygonVm: MapPolygon<any>, polygonInstance: any): void {
-        const coordinates: { lat: number; lng: number }[] = [];
-        const vertices = polygonInstance.getPath();
+        const paths = polygonInstance.getPaths();
+        const rings: MapPoint[][] = [];
 
-        for (let i = 0; i < vertices.getLength(); i++) {
-            const xy = vertices.getAt(i);
+        for (let pathIndex = 0; pathIndex < paths.getLength(); pathIndex++) {
+            const vertices = paths.getAt(pathIndex);
+            const ring: MapPoint[] = [];
 
-            coordinates.push({
-                lat: xy.lat(),
-                lng: xy.lng()
-            });
+            for (let vertexIndex = 0; vertexIndex < vertices.getLength(); vertexIndex++) {
+                const vertex = vertices.getAt(vertexIndex);
+
+                ring.push({
+                    lat: vertex.lat(),
+                    lng: vertex.lng()
+                });
+            }
+
+            rings.push(ring);
         }
 
-        polygonVm.coordinates = coordinates;
+        polygonVm.coordinates = rings.length ? rings[0] : [];
+        polygonVm.holes = rings.slice(1);
 
         if (polygonVm.onEdit) {
             polygonVm.onEdit(polygonVm);
@@ -311,10 +437,19 @@ interface ApiKey {
     apiKey: string;
 }
 
+export interface MapPoint {
+    lat: number;
+    lng: number;
+}
+
+// A polygon is one outer ring with any number of holes cut out of it — a doughnut shape, where
+// "coordinates" is the outer edge and each entry of "holes" is a piece removed from the middle.
+// Google Maps renders them as a single shape, so a point inside a hole falls outside the polygon.
 export interface MapPolygon<TData extends any> {
     name?: string;
     color: string;
-    coordinates: { lat: number; lng: number }[];
+    coordinates: MapPoint[];
+    holes?: MapPoint[][];
     onClick?: (polygon: MapPolygon<TData>) => void;
     onEdit?: (polygon: MapPolygon<TData>) => void;
     onDrawComplete?: (polygon: MapPolygon<TData>) => void;

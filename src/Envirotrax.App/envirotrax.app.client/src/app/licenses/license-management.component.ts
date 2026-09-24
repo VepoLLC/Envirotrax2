@@ -99,7 +99,7 @@ export class LicenseManagementComponent implements OnInit {
             }
         ];
         if (this.canModify) {
-            cols.push({ field: 'id', caption: '', type: ColumnType.text, cellTemplate: this.actionsCell });
+            cols.push({ field: 'id', caption: '', type: ColumnType.text, cellTemplate: this.actionsCell, queryColumnExcluded: true });
         }
         return cols;
     }

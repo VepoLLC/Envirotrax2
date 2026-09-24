@@ -74,6 +74,57 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         return items.ToLookup(i => i.ProfessionalId, i => MapToDto(i)!);
     }
 
+    public async Task<IPagedData<WaterSupplierInsuranceDto>> GetUnverifiedByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<ProfessionalInsurance, WaterSupplierInsuranceDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<ProfessionalInsurance, WaterSupplierInsuranceDto>(Mapper);
+
+        var items = (await _insuranceRepository.GetUnverifiedByWaterSupplierAsync(pageInfo, query, cancellationToken)).ToList();
+        var professionalIds = items.Select(i => i.ProfessionalId).Distinct().ToList();
+
+        var professionalTypes = await _insuranceRepository.GetProfessionalTypesAsync(professionalIds, cancellationToken);
+        var professionalUsers = (await _insuranceRepository.GetProfessionalUsersAsync(professionalIds, cancellationToken)).ToList();
+
+        var byAccount = professionalUsers.ToDictionary(pu => (pu.ProfessionalId, pu.UserId));
+        var admins = professionalUsers
+            .Where(pu => pu.IsAdmin)
+            .GroupBy(pu => pu.ProfessionalId)
+            .ToDictionary(group => group.Key, group => group.First());
+
+        var dtos = items.Select(i =>
+        {
+            var submitter = ResolveSubmitter(i, byAccount, admins);
+
+            return new WaterSupplierInsuranceDto
+            {
+                Id = i.Id,
+                ProfessionalId = i.ProfessionalId,
+                SubmittedOn = i.CreatedTime,
+                UserEmail = i.CreatedBy?.Email,
+                CompanyName = i.Professional?.Name,
+                ContactName = submitter?.ContactName,
+                InsuranceNumber = i.InsuranceNumber,
+                ExpirationDate = i.ExpirationDate,
+                ProfessionalType = professionalTypes.GetValueOrDefault(i.ProfessionalId)
+            };
+        });
+
+        return dtos.ToPagedData(pageInfo);
+    }
+
+    private static ProfessionalUser? ResolveSubmitter(
+        ProfessionalInsurance insurance,
+        IReadOnlyDictionary<(int ProfessionalId, int UserId), ProfessionalUser> byAccount,
+        IReadOnlyDictionary<int, ProfessionalUser> admins)
+    {
+        if (insurance.CreatedById != null && byAccount.TryGetValue((insurance.ProfessionalId, insurance.CreatedById.Value), out var submitter))
+        {
+            return submitter;
+        }
+
+        return admins.GetValueOrDefault(insurance.ProfessionalId);
+    }
+
     public async Task<ProfessionalInsuranceDto> AddAsync(Stream fileStream, string originalFileName, ProfessionalInsuranceDto dto)
     {
         var fileExtension = Path.GetExtension(originalFileName);

@@ -1,0 +1,33 @@
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+<ng-template #expirationDateCell>
+    <div class="border border-secondary d-inline-block px-2 py-1 rounded-3 text-bg-primary" aria-label="Validating">
+        Validating...
+    </div>
+</ng-template>
+
+<ng-template #actionsCell let-rowData="rowData">
+    <div class="d-flex gap-1" (click)="$event.stopPropagation()">
+        <button type="button" class="btn btn-primary" (click)="manage(rowData)">
+            Manage
+        </button>
+    </div>
+</ng-template>
+
+<div class="text-center mb-3">
+    <h1 class="h2">
+        Insurance Management
+    </h1>
+</div>
+
+<vp-section header="Unverified Insurance">
+    <vp-table *ngIf="table.items"
+              [columns]="table.columns!"
+              [data]="table.items.data"
+              [(pageInfo)]="table.items.pageInfo"
+              (pageInfoChange)="loadInsurances()"
+              [(query)]="table.query"
+              (queryChange)="loadInsurances()"
+              (queryReset)="loadInsurances()"
+              [freeTextSearch]="table.freeTextSearch" />
+</vp-section>

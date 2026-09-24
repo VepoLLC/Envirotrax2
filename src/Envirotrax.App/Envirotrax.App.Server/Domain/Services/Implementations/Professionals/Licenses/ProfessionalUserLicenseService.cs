@@ -102,6 +102,9 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
 
     public async Task<IPagedData<WaterSupplierLicenseDto>> GetAllByWaterSupplierAsync(PageInfo pageInfo, Query query, string? licenseFilter, CancellationToken cancellationToken)
     {
+        query.Sort = query.ConvertSortProperties<ProfessionalUserLicense, WaterSupplierLicenseDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<ProfessionalUserLicense, WaterSupplierLicenseDto>(Mapper);
+
         var items = await _licenseRepository.GetAllByWaterSupplierAsync(pageInfo, query, licenseFilter, cancellationToken);
         var now = _timeZoneHelper.GetUserLocalTime();
 

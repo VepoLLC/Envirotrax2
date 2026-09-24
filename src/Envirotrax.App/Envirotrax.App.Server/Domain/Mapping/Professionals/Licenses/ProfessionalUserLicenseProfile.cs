@@ -29,5 +29,14 @@ public class ProfessionalUserLicenseProfile : Profile
             .ForMember(l => l.CreatedBy, opt => opt.Ignore())
             .ForMember(l => l.LicenseType, opt => opt.Ignore())
             .ForMember(l => l.LicenseTypeId, opt => opt.MapFrom(l => l.LicenseType.Id));
+
+        // Sorting and filtering are resolved against the entity, so every flat column name on the
+        // management grid needs a member path here. ExpirationType is computed and stays unsortable.
+        CreateMap<ProfessionalUserLicense, WaterSupplierLicenseDto>()
+            .ForMember(dto => dto.UserEmail, opt => opt.MapFrom(l => l.User!.Email))
+            .ForMember(dto => dto.CompanyName, opt => opt.MapFrom(l => l.Professional!.Name))
+            .ForMember(dto => dto.ContactName, opt => opt.MapFrom(l => l.ProfessionalUser!.ContactName))
+            .ForMember(dto => dto.LicenseTypeName, opt => opt.MapFrom(l => l.LicenseType!.Name))
+            .ForMember(dto => dto.ExpirationType, opt => opt.Ignore());
     }
 }

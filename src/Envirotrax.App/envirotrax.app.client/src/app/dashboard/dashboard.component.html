@@ -132,21 +132,24 @@
                         <vp-section header="Licensing">
                             <div class="d-flex flex-column gap-2">
 
-                                <a routerLink="/"
+                                <a routerLink="/licenses"
+                                   [queryParams]="{filter: 'unverified'}"
                                    class="d-flex align-items-center justify-content-between text-dark text-decoration-none px-3 py-2 rounded-3">
                                     <i class="fa-regular fa-id-card me-2 fs-4" [ngClass]="getThresholdTextClass(stats?.unverifiedLicenseCount ?? 0)"></i>
                                     <span class="flex-fill ms-2">Unverified Licenses</span>
                                     <span class="badge" [ngClass]="getThresholdBgClass(stats?.unverifiedLicenseCount ?? 0)">{{stats?.unverifiedLicenseCount ?? 0}}</span>
                                 </a>
 
-                                <a routerLink="/"
+                                <a routerLink="/licenses"
+                                   [queryParams]="{filter: 'expired'}"
                                    class="d-flex align-items-center justify-content-between text-dark text-decoration-none px-3 py-2 rounded-3">
                                     <i class="fa-regular fa-id-card me-2 fs-4" [ngClass]="getThresholdTextClass(stats?.expiredLicenseCount ?? 0)"></i>
                                     <span class="flex-fill ms-2">Expired Licenses</span>
                                     <span class="badge" [ngClass]="getThresholdBgClass(stats?.expiredLicenseCount ?? 0)">{{stats?.expiredLicenseCount ?? 0}}</span>
                                 </a>
 
-                                <a routerLink="/"
+                                <a routerLink="/licenses"
+                                   [queryParams]="{filter: 'expiring'}"
                                    class="d-flex align-items-center justify-content-between text-dark text-decoration-none px-3 py-2 rounded-3">
                                     <i class="fa-regular fa-id-card me-2 fs-4" [ngClass]="getThresholdTextClass(stats?.expiringLicenseCount ?? 0)"></i>
                                     <span class="flex-fill ms-2">Expiring Licenses</span>

@@ -31,10 +31,6 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
             FogTransporterCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsFogTransporter, cancellationToken),
             FogInspectorCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsFogInspector, cancellationToken),
 
-            UnverifiedLicenseCount = await _context.ProfessionalUserLicenses.CountAsync(l => l.ExpirationDate == null, cancellationToken),
-            ExpiredLicenseCount = await _context.ProfessionalUserLicenses.CountAsync(l => l.ExpirationDate < now, cancellationToken),
-            ExpiringLicenseCount = await _context.ProfessionalUserLicenses.CountAsync(l => l.ExpirationDate >= now && l.ExpirationDate < in30Days, cancellationToken),
-
             InsurancePolicyCount = await _context.ProfessionalInsurances.CountAsync(i => i.ExpirationDate == null, cancellationToken),
             TestGaugeCount = await _context.BackflowGauges.CountAsync(g => g.LastCalibrationDate == null, cancellationToken),
             TransporterRegistrationCount = await _context.ProfessionalUserLicenses.CountAsync(l => l.LicenseTypeId == 9 && l.ExpirationDate == null, cancellationToken)

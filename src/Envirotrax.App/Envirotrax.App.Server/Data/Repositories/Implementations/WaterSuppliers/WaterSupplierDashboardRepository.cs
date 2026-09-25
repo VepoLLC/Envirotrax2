@@ -1,4 +1,5 @@
 using Envirotrax.App.Server.Data.DbContexts;
+using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
@@ -21,8 +22,9 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
 
         return new WaterSupplierDashboardStatsDto
         {
-            PastDuePropertyLogCount = await _context.SiteLogs.CountAsync(pl => pl.ReviewDate <= now, cancellationToken),
-            ExpiringPropertyLogCount = await _context.SiteLogs.CountAsync(pl => pl.ReviewDate > now && pl.ReviewDate < in30Days, cancellationToken),
+            PastDuePropertyLogCount = await _context.SiteLogs.CountAsync(pl => pl.LogType == SiteLogType.Reminder && pl.ReviewDate < now, cancellationToken),
+            ExpiringPropertyLogCount = await _context.SiteLogs.CountAsync(pl => pl.LogType == SiteLogType.Reminder
+                && pl.ReviewDate >= now && pl.ReviewDate <= in30Days, cancellationToken),
             AllPropertyLogCount = await _context.SiteLogs.CountAsync(cancellationToken),
 
             WiseGuyCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsWiseGuy, cancellationToken),

@@ -19,9 +19,9 @@ public class PropertyLogManagementController : WaterSupplierProtectedController
 
     [HttpGet]
     [HasPermission(PermissionAction.CanView)]
-    public async Task<IActionResult> GetAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, [FromQuery] string? logTypeFilter, CancellationToken cancellationToken)
     {
-        var result = await _siteLogService.GetForManagementAsync(pageInfo, query, cancellationToken);
+        var result = await _siteLogService.GetForManagementAsync(pageInfo, query, logTypeFilter, cancellationToken);
 
         return Ok(result);
     }

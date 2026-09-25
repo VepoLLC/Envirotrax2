@@ -1,5 +1,6 @@
 import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { NgForm } from "@angular/forms";
+import { ActivatedRoute } from "@angular/router";
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from "@envirotrax/common-ui";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { SiteLog } from "../../../shared/models/sites/site-log";
@@ -16,8 +17,6 @@ import { PrintableTableService } from "../../../shared/services/printable-table.
 import { DownloadColumn, DownloadConfig } from "../../../shared/models/download-config";
 import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
-
-const EXPIRING_WINDOW_DAYS = 30;
 
 export enum PropertyLogFilterType {
     AnyLogType = 0,
@@ -126,7 +125,8 @@ export class PropertyLogManagementComponent implements OnInit {
         private readonly _userService: UserService,
         private readonly _downloadService: DownloadService,
         private readonly _printService: PrintableTableService,
-        private readonly _containerHelper: AppContainerHelperService
+        private readonly _containerHelper: AppContainerHelperService,
+        private readonly _route: ActivatedRoute
     ) {
         this.downloadConfig = {
             fileName: 'Property Logs',
@@ -138,6 +138,12 @@ export class PropertyLogManagementComponent implements OnInit {
 
     public async ngOnInit(): Promise<void> {
         this._containerHelper.setContainerVisibility(false);
+
+        const requestedLogType = this._route.snapshot.queryParamMap.get('logType');
+
+        if (requestedLogType && this.logTypeOptions.some(option => option.id === requestedLogType)) {
+            this.logType = requestedLogType;
+        }
 
         this.table.columns = this.getColumns();
 
@@ -172,6 +178,9 @@ export class PropertyLogManagementComponent implements OnInit {
     public exportResults(): void {
         this.downloadConfig.columns = this.buildDownloadColumns();
 
+        const logTypeFilter = this.buildLogTypeFilter();
+        this.downloadConfig.endpoint.additionalParams = logTypeFilter ? { logTypeFilter } : {};
+
         this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
     }
 
@@ -184,7 +193,8 @@ export class PropertyLogManagementComponent implements OnInit {
             this.table.isLoading = true;
             this.table.items = await this._propertyLogService.getAll(
                 this.table.items?.pageInfo || {},
-                this.table.query
+                this.table.query,
+                this.buildLogTypeFilter()
             );
 
             const pageInfo = this.table.items?.pageInfo;
@@ -264,7 +274,6 @@ export class PropertyLogManagementComponent implements OnInit {
     private buildQuery(): Query {
         const filter = [
             ...this.panelFilters,
-            ...this.buildLogTypeFilter(),
             ...this.buildAccountFilter(),
             ...this.buildAccountNumberFilter(),
             ...this.buildStreetFilter()
@@ -292,25 +301,16 @@ export class PropertyLogManagementComponent implements OnInit {
         return 'Property Logs';
     }
 
-    private buildLogTypeFilter(): QueryProperty[] {
+    private buildLogTypeFilter(): string | undefined {
         if (this.logType === String(PropertyLogFilterType.ExpiredReviews)) {
-            return [
-                this.eqFilter('logType', String(SiteLogType.Reminder)),
-                this.rangeFilter('reviewDate', [{ value: this.nowIso(), op: 'Lt' }])
-            ];
+            return 'expired';
         }
 
         if (this.logType === String(PropertyLogFilterType.ExpiringReviews)) {
-            return [
-                this.eqFilter('logType', String(SiteLogType.Reminder)),
-                this.rangeFilter('reviewDate', [
-                    { value: this.nowIso(), op: 'Gte' },
-                    { value: this.plusDaysIso(EXPIRING_WINDOW_DAYS), op: 'Lte' }
-                ])
-            ];
+            return 'expiring';
         }
 
-        return [];
+        return undefined;
     }
 
     private buildAccountFilter(): QueryProperty[] {
@@ -427,14 +427,4 @@ export class PropertyLogManagementComponent implements OnInit {
         };
     }
 
-    private nowIso(): string {
-        return new Date().toISOString();
-    }
-
-    private plusDaysIso(days: number): string {
-        const date = new Date();
-        date.setDate(date.getDate() + days);
-
-        return date.toISOString();
-    }
 }

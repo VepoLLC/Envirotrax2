@@ -27,12 +27,16 @@ export class PropertyLogService {
         };
     }
 
-    public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<SiteLog>> {
+    public async getAll(pageInfo: PageInfo, query: Query, logTypeFilter?: string): Promise<PagedData<SiteLog>> {
         const url = this._urlResolver.resolveUrl('/api/sites/logs');
 
-        const observable = this._http.get<PagedData<SiteLog>>(url, {
-            params: this._queryHelper.buildQuery(pageInfo, query)
-        });
+        let params = this._queryHelper.buildQuery(pageInfo, query);
+
+        if (logTypeFilter) {
+            params = params.append('logTypeFilter', logTypeFilter);
+        }
+
+        const observable = this._http.get<PagedData<SiteLog>>(url, { params });
 
         return await lastValueFrom(observable);
     }

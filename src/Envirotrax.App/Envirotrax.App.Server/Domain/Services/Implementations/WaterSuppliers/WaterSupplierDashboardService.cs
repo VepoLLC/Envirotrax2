@@ -12,12 +12,18 @@ public class WaterSupplierDashboardService : IWaterSupplierDashboardService
     private readonly IWaterSupplierDashboardRepository _repository;
     private readonly IBackflowComplianceReportService _complianceReportService;
     private readonly IProfessionalUserLicenseService _licenseService;
+    private readonly IBackflowGaugeService _gaugeService;
 
-    public WaterSupplierDashboardService(IWaterSupplierDashboardRepository repository, IBackflowComplianceReportService complianceReportService, IProfessionalUserLicenseService licenseService)
+    public WaterSupplierDashboardService(
+        IWaterSupplierDashboardRepository repository,
+        IBackflowComplianceReportService complianceReportService,
+        IProfessionalUserLicenseService licenseService,
+        IBackflowGaugeService gaugeService)
     {
         _repository = repository;
         _complianceReportService = complianceReportService;
         _licenseService = licenseService;
+        _gaugeService = gaugeService;
     }
 
     public async Task<WaterSupplierDashboardStatsDto> GetStatsAsync(CancellationToken cancellationToken)
@@ -28,6 +34,7 @@ public class WaterSupplierDashboardService : IWaterSupplierDashboardService
         stats.UnverifiedLicenseCount = licenseCounts.UnverifiedCount;
         stats.ExpiredLicenseCount = licenseCounts.ExpiredCount;
         stats.ExpiringLicenseCount = licenseCounts.ExpiringCount;
+        stats.TestGaugeCount = await _gaugeService.GetUnverifiedCountByWaterSupplierAsync(cancellationToken);
 
         return stats;
     }

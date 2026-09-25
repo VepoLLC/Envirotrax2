@@ -8,6 +8,7 @@ public class WaterSupplierLicenseDto : IDto
     public int Id { get; set; }
     public int ProfessionalId { get; set; }
     public int UserId { get; set; }
+    public DateTime SubmittedOn { get; set; }
     public string? UserEmail { get; set; }
     public string? CompanyName { get; set; }
     public string? ContactName { get; set; }

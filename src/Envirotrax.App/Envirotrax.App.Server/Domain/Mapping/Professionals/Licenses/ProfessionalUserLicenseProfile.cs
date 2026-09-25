@@ -33,6 +33,7 @@ public class ProfessionalUserLicenseProfile : Profile
         // Sorting and filtering are resolved against the entity, so every flat column name on the
         // management grid needs a member path here. ExpirationType is computed and stays unsortable.
         CreateMap<ProfessionalUserLicense, WaterSupplierLicenseDto>()
+            .ForMember(dto => dto.SubmittedOn, opt => opt.MapFrom(l => l.CreatedTime))
             .ForMember(dto => dto.UserEmail, opt => opt.MapFrom(l => l.User!.Email))
             .ForMember(dto => dto.CompanyName, opt => opt.MapFrom(l => l.Professional!.Name))
             .ForMember(dto => dto.ContactName, opt => opt.MapFrom(l => l.ProfessionalUser!.ContactName))

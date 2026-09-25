@@ -13,6 +13,8 @@ public interface IProfessionalUserLicenseRepository : IRepository<ProfessionalUs
     Task<IEnumerable<ProfessionalUserLicense>> GetBpatLicensesForProfessionalAsync(int professionalId, CancellationToken cancellationToken);
     Task<IEnumerable<ProfessionalUserLicense>> GetAllByWaterSupplierAsync(PageInfo pageInfo, Query query, string? licenseFilter, CancellationToken cancellationToken);
     Task<int> GetCountByWaterSupplierAsync(string? licenseFilter, CancellationToken cancellationToken);
+    Task<IEnumerable<ProfessionalUserLicense>> GetUnverifiedRegistrationsByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<int> GetUnverifiedRegistrationCountByWaterSupplierAsync(CancellationToken cancellationToken);
     Task<ProfessionalUserLicense?> UpdateForWaterSupplierAsync(int id, string licenseNumber, string? contactName, DateTime? expirationDate, CancellationToken cancellationToken);
     Task<ProfessionalUserLicense> DeleteForWaterSupplierAsync(int id, CancellationToken cancellationToken);
 }

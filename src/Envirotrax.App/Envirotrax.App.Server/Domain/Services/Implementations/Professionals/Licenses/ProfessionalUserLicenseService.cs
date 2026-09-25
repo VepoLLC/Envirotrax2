@@ -108,25 +108,7 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
         var items = await _licenseRepository.GetAllByWaterSupplierAsync(pageInfo, query, licenseFilter, cancellationToken);
         var now = _timeZoneHelper.GetUserLocalTime();
 
-        var dtos = items.Select(l => new WaterSupplierLicenseDto
-        {
-            Id = l.Id,
-            ProfessionalId = l.ProfessionalId,
-            UserId = l.UserId,
-            UserEmail = l.User?.Email,
-            CompanyName = l.Professional?.Name,
-            ContactName = l.ProfessionalUser?.ContactName,
-            ProfessionalType = l.ProfessionalType,
-            LicenseTypeId = l.LicenseTypeId,
-            LicenseTypeName = l.LicenseType?.Name,
-            LicenseNumber = l.LicenseNumber,
-            ExpirationDate = l.ExpirationDate,
-            ExpirationType = l.ExpirationDate.HasValue
-                ? (l.ExpirationDate < now ? ExpirationType.Expired
-                    : l.ExpirationDate < now.AddDays(30) ? ExpirationType.AboutToExpire
-                    : ExpirationType.Valid)
-                : ExpirationType.Valid
-        });
+        var dtos = items.Select(l => MapToWaterSupplierDto(l, now));
 
         return dtos.ToPagedData(pageInfo);
     }
@@ -151,11 +133,44 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
         var license = saved!;
 
         var now = _timeZoneHelper.GetUserLocalTime();
+        return MapToWaterSupplierDto(license, now);
+    }
+
+    public async Task DeleteForWaterSupplierAsync(int id, CancellationToken cancellationToken)
+    {
+        var license = await _licenseRepository.DeleteForWaterSupplierAsync(id, cancellationToken);
+
+        // recordLog manual
+        await _recordLogService.AddAsync(RecordLogTableNames.ProfessionalUserLicenses, license.Id, _authService.WaterSupplierId, RecordLogType.Delete,
+            $"Deleted license — LicenseNumber: '{license.LicenseNumber}', ExpirationDate: '{license.ExpirationDate:d}'", professionalId: license.ProfessionalId);
+    }
+
+    public async Task<IPagedData<WaterSupplierLicenseDto>> GetUnverifiedRegistrationsByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<ProfessionalUserLicense, WaterSupplierLicenseDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<ProfessionalUserLicense, WaterSupplierLicenseDto>(Mapper);
+
+        var items = await _licenseRepository.GetUnverifiedRegistrationsByWaterSupplierAsync(pageInfo, query, cancellationToken);
+        var now = _timeZoneHelper.GetUserLocalTime();
+
+        var dtos = items.Select(l => MapToWaterSupplierDto(l, now));
+
+        return dtos.ToPagedData(pageInfo);
+    }
+
+    public Task<int> GetUnverifiedRegistrationCountByWaterSupplierAsync(CancellationToken cancellationToken)
+    {
+        return _licenseRepository.GetUnverifiedRegistrationCountByWaterSupplierAsync(cancellationToken);
+    }
+
+    private static WaterSupplierLicenseDto MapToWaterSupplierDto(ProfessionalUserLicense license, DateTime now)
+    {
         return new WaterSupplierLicenseDto
         {
             Id = license.Id,
             ProfessionalId = license.ProfessionalId,
             UserId = license.UserId,
+            SubmittedOn = license.CreatedTime,
             UserEmail = license.User?.Email,
             CompanyName = license.Professional?.Name,
             ContactName = license.ProfessionalUser?.ContactName,
@@ -170,14 +185,5 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
                     : ExpirationType.Valid)
                 : ExpirationType.Valid
         };
-    }
-
-    public async Task DeleteForWaterSupplierAsync(int id, CancellationToken cancellationToken)
-    {
-        var license = await _licenseRepository.DeleteForWaterSupplierAsync(id, cancellationToken);
-
-        // recordLog manual
-        await _recordLogService.AddAsync(RecordLogTableNames.ProfessionalUserLicenses, license.Id, _authService.WaterSupplierId, RecordLogType.Delete,
-            $"Deleted license — LicenseNumber: '{license.LicenseNumber}', ExpirationDate: '{license.ExpirationDate:d}'", professionalId: license.ProfessionalId);
     }
 }

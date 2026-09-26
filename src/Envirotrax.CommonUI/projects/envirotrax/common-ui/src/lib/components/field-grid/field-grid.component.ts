@@ -10,7 +10,7 @@ import { Component } from "@angular/core";
     host: {
         // d-xl-grid overrides d-flex at the xl breakpoint (Bootstrap generates its responsive
         // display utilities after the base ones, so the later rule wins the cascade tie).
-        class: 'd-flex flex-column gap-2 d-xl-grid align-items-xl-start'
+        class: 'd-flex flex-column gap-1 d-xl-grid align-items-xl-start'
     },
     styleUrl: './field-grid.component.css'
 })

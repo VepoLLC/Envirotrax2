@@ -6,43 +6,39 @@
             <div class="row">
                 <div class="col-md-6">
                     <vp-section header="Search By Vehicle">
-                        <div class="mb-2">
+                        <vp-field-grid>
                             <vp-filter-panel-field fieldName="professional.name"
                                                    label="Transporter Company Name"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
-                        </div>
-                        <div class="mb-2">
+
                             <vp-filter-panel-field fieldName="licensePlateNumber"
                                                    label="Vehicle License Plate #"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
-                        </div>
-                        <div class="mb-2">
+
                             <vp-filter-panel-field fieldName="stickerNumber"
                                                    label="Vehicle Sticker #"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
-                        </div>
+                        </vp-field-grid>
                     </vp-section>
                 </div>
 
                 <div class="col-md-6 mt-3 mt-md-0">
                     <vp-section header="Search By Permit">
-                        <div class="mb-2">
+                        <vp-field-grid>
                             <vp-filter-panel-field fieldName="permit.permitNumber"
                                                    label="Permit #"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
-                        </div>
-                        <div class="mb-2">
+
                             <vp-filter-panel-field fieldName="permit.inspectionDueDate"
                                                    label="Inspection Due Date"
                                                    labelStyle="horizontal"
                                                    type="daterange"
                                                    [form]="searchForm" />
-                        </div>
-                        <div class="mb-2">
+
                             <vp-filter-panel-field fieldName="permit.isActive"
                                                    label="Active"
                                                    labelStyle="horizontal"
@@ -50,7 +46,7 @@
                                                    [options]="activeOptions"
                                                    [form]="searchForm"
                                                    borderColor="#00a000" />
-                        </div>
+                        </vp-field-grid>
                     </vp-section>
                 </div>
             </div>

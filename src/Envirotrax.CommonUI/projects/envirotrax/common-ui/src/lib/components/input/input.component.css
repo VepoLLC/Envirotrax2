@@ -12,8 +12,11 @@
     grid-template-columns: max-content 1fr;
 }
 
+/* max-width caps how far the shared column can grow for a long label; a shorter label still
+   shrinks the column to fit (max-content), it just can't push it past 12rem before wrapping. */
 .vp-input-label-col {
     grid-column: 1;
+    max-width: 12rem;
 }
 
 .vp-input-control-col {

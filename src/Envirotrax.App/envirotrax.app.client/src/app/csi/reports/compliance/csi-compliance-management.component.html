@@ -90,23 +90,21 @@
             <vp-filter-panel (filterChange)="onFilterChange($event)">
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="mb-3">
+                        <vp-field-grid>
                             <vp-input type="select"
                                       label="Days Overdue"
                                       name="daysOverdue"
                                       labelStyle="horizontal"
                                       [(ngModel)]="daysOverdue"
                                       [options]="daysOverdueOptions" />
-                        </div>
 
-                        <div class="mb-3">
                             <vp-input type="select"
                                       label="Sort By"
                                       name="sortBy"
                                       labelStyle="horizontal"
                                       [(ngModel)]="sortBy"
                                       [options]="sortOptions" />
-                        </div>
+                        </vp-field-grid>
 
                         <div class="d-xl-flex justify-content-end">
                             <div>
@@ -133,69 +131,59 @@
                     </div>
 
                     <div class="col-md-4">
-                        <div class="mb-3">
+                        <vp-field-grid>
                             <vp-filter-panel-field fieldName="csiAccountAssignmentId"
                                                    label="User Account Assignment"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="userOptions" />
-                        </div>
 
-                        <div class="mb-3">
                             <app-gis-area-lookup [form]="searchForm" labelStyle="horizontal" />
-                        </div>
 
-                        <div class="mb-3">
                             <vp-filter-panel-field fieldName="propertyType"
                                                    label="Property Type"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="propertyTypes" />
-                        </div>
 
-                        <div class="mb-3">
                             <vp-filter-panel-field fieldName="facilityType"
                                                    label="Facility Type"
                                                    type="select" labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="facilityTypes" />
-                        </div>
+                        </vp-field-grid>
                     </div>
 
                     <div class="col-md-4">
-                        <div class="mb-3">
+                        <vp-field-grid>
                             <vp-input label="Property Street Name"
                                       name="propertyStreetName"
                                       labelStyle="horizontal"
                                       [(ngModel)]="propertyStreet" />
-                        </div>
 
-                        <div class="mb-3">
                             <vp-filter-panel-field fieldName="hasOnSiteSewageFacility"
                                                    label="Has On-Site Sewage Facility"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="yesNoOptions" />
-                        </div>
 
-                        <div class="mb-3">
                             <vp-filter-panel-field fieldName="hasAuxWaterSupply"
                                                    label="Has Auxiliary Water Supply"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="yesNoOptions" />
-                        </div>
+                        </vp-field-grid>
                     </div>
                 </div>
             </vp-filter-panel>
 
             <vp-validation-summary [form]="searchForm" />
 
-            <div class="d-flex justify-content-center mb-3">
+            <div class="d-flex justify-content-center my-3">
                 <button type="submit" class="btn btn-primary vp-section-button">
                     <i class="fa-solid fa-rotate me-1"></i>
                     Refresh Compliance Records

@@ -82,14 +82,15 @@
             <span *ngIf="!data.expirationDate" class="text-muted">—</span>
         </div>
         <div class="mt-1" *ngIf="data.daysExpired != null">
-            <span class="badge rounded-pill" [ngClass]="severityClasses[data.expiredSeverity]">{{ data.daysExpired }} Days</span>
+            <span class="badge rounded-pill" [ngClass]="severityClasses[data.expiredSeverity]">{{ data.daysExpired }}
+                Days</span>
         </div>
     </div>
 </ng-template>
 
 <ng-template #serialTemplate let-data="rowData">
     <ng-container
-        *ngIf="data.deviceType === 'DCD' || data.deviceType === 'DCD2' || data.deviceType === 'RPPD' || data.deviceType === 'RPPD2'; else singleSerial">
+                  *ngIf="data.deviceType === 'DCD' || data.deviceType === 'DCD2' || data.deviceType === 'RPPD' || data.deviceType === 'RPPD2'; else singleSerial">
         <div><span class="fw-semibold">Main:</span> {{ data.serialNumber }}</div>
         <div><span class="fw-semibold">Bypass:</span> {{ data.serialNumber2 }}</div>
     </ng-container>
@@ -112,7 +113,7 @@
             <span class="ms-1 text-muted">{{ data.locationDescription }}</span>
         </div>
         <div
-            *ngIf="data.deviceType === 'DCD' || data.deviceType === 'DCD2' || data.deviceType === 'RPPD' || data.deviceType === 'RPPD2'">
+             *ngIf="data.deviceType === 'DCD' || data.deviceType === 'DCD2' || data.deviceType === 'RPPD' || data.deviceType === 'RPPD2'">
             <span class="fw-semibold">Bypass:</span>
             <span class="ms-1 text-muted">{{ data.manufacturer2 }} {{ data.model2 }} {{ data.size2 }}</span>
         </div>
@@ -228,90 +229,76 @@
 
                     <!-- Column 2: assignment, area, property -->
                     <div class="col-md-4">
-                        <div class="mb-3">
+                        <vp-field-grid>
                             <vp-filter-panel-field fieldName="site.backflowAccountAssignmentId"
                                                    label="User Account Assignment"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="userOptions" />
-                        </div>
 
-                        <div class="mb-3">
                             <app-gis-area-lookup fieldName="site.gisAreaId" label="GIS Area" labelStyle="horizontal"
                                                  [form]="searchForm" />
-                        </div>
 
-                        <div class="mb-3">
                             <vp-filter-panel-field fieldName="propertyType"
                                                    label="Property Type"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="propertyTypes" />
-                        </div>
 
-                        <div class="mb-3">
                             <vp-input label="Property Street Name"
                                       name="propertyStreet"
                                       labelStyle="horizontal"
                                       [(ngModel)]="propertyStreet" />
-                        </div>
 
-                        <div class="mb-3">
                             <vp-filter-panel-field fieldName="site.facilityType"
                                                    label="Facility Type"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="facilityTypes" />
-                        </div>
+                        </vp-field-grid>
                     </div>
 
                     <!-- Column 3: assembly / hazard / site attributes -->
                     <div class="col-md-4">
-                        <div class="mb-3">
+                        <vp-field-grid>
                             <vp-filter-panel-field fieldName="deviceType"
                                                    label="Assembly Type"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="deviceTypeOptions" />
-                        </div>
 
-                        <div class="mb-3">
                             <vp-filter-panel-field fieldName="hazardType"
                                                    label="Hazard Type"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="hazardTypeOptions" />
-                        </div>
 
-                        <div class="mb-3">
                             <vp-filter-panel-field fieldName="site.hasOnSiteSewageFacility"
                                                    label="Has On-Site Sewage Facility"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="yesNoOptions" />
-                        </div>
 
-                        <div class="mb-3">
                             <vp-filter-panel-field fieldName="site.hasAuxWaterSupply"
                                                    label="Has Auxiliary Water Supply"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="yesNoOptions" />
-                        </div>
+                        </vp-field-grid>
                     </div>
                 </div>
             </vp-filter-panel>
 
             <vp-validation-summary [form]="searchForm" />
 
-            <div class="d-flex justify-content-center mb-3">
+            <div class="d-flex justify-content-center my-3">
                 <button type="submit" class="btn btn-primary vp-section-button">
                     <i class="fa-solid fa-rotate me-1"></i>
                     Refresh Compliance Records

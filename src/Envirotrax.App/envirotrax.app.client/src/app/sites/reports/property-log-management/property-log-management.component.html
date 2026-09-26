@@ -94,23 +94,21 @@
             <vp-filter-panel (filterChange)="onFilterChange($event)">
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="mb-3">
+                        <vp-field-grid>
                             <vp-input type="select"
                                       label="Log Type"
                                       name="logType"
                                       labelStyle="horizontal"
                                       [(ngModel)]="logType"
                                       [options]="logTypeOptions" />
-                        </div>
 
-                        <div class="mb-3">
                             <vp-input type="select"
                                       label="Sort By"
                                       name="sortBy"
                                       labelStyle="horizontal"
                                       [(ngModel)]="sortBy"
                                       [options]="sortOptions" />
-                        </div>
+                        </vp-field-grid>
 
                         <div class="d-xl-flex justify-content-end">
                             <div class="form-check mb-2">
@@ -125,52 +123,44 @@
                     </div>
 
                     <div class="col-md-4">
-                        <div class="mb-3">
+                        <vp-field-grid>
                             <vp-input type="select"
                                       label="User Account Type"
                                       name="userAccountType"
                                       labelStyle="horizontal"
                                       [(ngModel)]="userAccountType"
                                       [options]="userAccountTypeOptions" />
-                        </div>
 
-                        <div class="mb-3">
                             <vp-input type="select"
                                       label="User Account"
                                       name="accountId"
                                       labelStyle="horizontal"
                                       [(ngModel)]="accountId"
                                       [options]="accountOptions" />
-                        </div>
 
-                        <div class="mb-3">
                             <app-gis-area-lookup fieldName="site.gisAreaId" [form]="searchForm" labelStyle="horizontal" />
-                        </div>
+                        </vp-field-grid>
                     </div>
 
                     <div class="col-md-4">
-                        <div class="mb-3">
+                        <vp-field-grid>
                             <vp-input label="Account Number"
                                       name="accountNumber"
                                       labelStyle="horizontal"
                                       [(ngModel)]="accountNumber" />
-                        </div>
 
-                        <div class="mb-3">
                             <vp-filter-panel-field fieldName="site.propertyType"
                                                    label="Property Type"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="propertyTypes" />
-                        </div>
 
-                        <div class="mb-3">
                             <vp-input label="Property Street Name"
                                       name="propertyStreetName"
                                       labelStyle="horizontal"
                                       [(ngModel)]="propertyStreet" />
-                        </div>
+                        </vp-field-grid>
                     </div>
                 </div>
             </vp-filter-panel>

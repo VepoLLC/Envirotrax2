@@ -6,48 +6,44 @@
             <vp-section header="Transporter Account Search Criteria">
                 <div class="row">
                     <div class="col-md-5">
-                        <div class="mb-3">
+                        <vp-field-grid>
                             <vp-filter-panel-field fieldName="companyEmail"
                                                    label="Company Email:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
-                        </div>
-                        <div class="mb-3">
+
                             <vp-filter-panel-field fieldName="name"
                                                    label="Company Name:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
-                        </div>                   
-                        <div class="mb-3">
+
                             <vp-filter-panel-field fieldName="address"
                                                    label="Address:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
-                        </div>
-                        <div class="mb-3">
+
                             <vp-filter-panel-field fieldName="phoneNumber"
                                                    label="Phone #:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
-                        </div>
+                        </vp-field-grid>
                     </div>
 
                     <div class="col-md-2 d-flex justify-content-center align-items-center">
                         Or
                     </div>
                     <div class="col-md-5">
-                        <div class="mb-3">
+                        <vp-field-grid>
                             <vp-filter-panel-field fieldName="registrationNumber"
                                                    label="Registration Number:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
-                        </div>
-                        <div class="mb-3">
+
                             <vp-filter-panel-field fieldName="insurancePolicyNumber"
                                                    label="Insurance Policy Number:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
-                        </div>
+                        </vp-field-grid>
                     </div>
                     <div class="d-flex justify-content-center">
                         <button type="submit" class="btn btn-primary vp-section-button">

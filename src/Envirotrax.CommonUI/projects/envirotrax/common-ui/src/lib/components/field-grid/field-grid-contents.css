@@ -1,0 +1,4 @@
+/* No Bootstrap utility exists for display:contents. */
+:host {
+    display: contents;
+}

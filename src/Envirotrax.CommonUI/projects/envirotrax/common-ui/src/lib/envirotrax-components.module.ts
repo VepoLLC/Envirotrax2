@@ -17,6 +17,9 @@ import { CurrencyCellComponent } from "./components/data-components/table/table-
 import { DropdownComponent } from "./components/dropdown/dropdown.component";
 import { DropdownOptionComponent } from "./components/dropdown/dropdown-option.component";
 import { FieldGridComponent } from "./components/field-grid/field-grid.component";
+import { FieldGridRowComponent } from "./components/field-grid/field-grid-row.component";
+import { FieldGridLabelComponent } from "./components/field-grid/field-grid-label.component";
+import { FieldGridControlComponent } from "./components/field-grid/field-grid-control.component";
 import { InputComponent } from "./components/input/input.component";
 import { InputOptionComponent } from "./components/input/input-option.component";
 import { ConfirmModalComponent } from "./components/modals/confirm-modal.component";
@@ -51,6 +54,9 @@ import { RecordLogListComponent } from "./components/record-log/record-log-list.
         DropdownComponent,
         DropdownOptionComponent,
         FieldGridComponent,
+        FieldGridRowComponent,
+        FieldGridLabelComponent,
+        FieldGridControlComponent,
         InputComponent,
         InputOptionComponent,
         InputAddOnComponent,
@@ -87,6 +93,9 @@ import { RecordLogListComponent } from "./components/record-log/record-log-list.
         DropdownComponent,
         DropdownOptionComponent,
         FieldGridComponent,
+        FieldGridRowComponent,
+        FieldGridLabelComponent,
+        FieldGridControlComponent,
         InputComponent,
         InputOptionComponent,
         InputAddOnComponent,

@@ -194,32 +194,24 @@
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
-                            <div class="row" style="grid-column: 1 / -1;">
-                                <div class="col-xl-5 text-xl-end d-flex align-items-center">
-                                    <div class="w-100">
-                                        Address
-                                    </div>
-                                </div>
-                                <div class="col-xl d-xl-flex gap-1">
-                                    <div class="mb-2">
+                            <vp-field-grid-row>
+                                <vp-field-grid-label>Address</vp-field-grid-label>
+                                <vp-field-grid-control>
+                                    <div class="d-flex gap-1">
                                         <vp-filter-panel-field fieldName="streetNumber"
                                                                label="Street #"
                                                                [form]="searchForm" />
-                                    </div>
 
-                                    <div class="mb-2">
                                         <vp-filter-panel-field fieldName="streetName"
                                                                label="Street Name"
                                                                [form]="searchForm" />
-                                    </div>
 
-                                    <div class="mb-2">
                                         <vp-filter-panel-field fieldName="propertyNumber"
                                                                label="Suite/Apt #"
                                                                [form]="searchForm" />
                                     </div>
-                                </div>
-                            </div>
+                                </vp-field-grid-control>
+                            </vp-field-grid-row>
 
                             <vp-filter-panel-field fieldName="zipCode"
                                                    label="ZIP"
@@ -242,32 +234,24 @@
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
-                            <div class="row" style="grid-column: 1 / -1;">
-                                <div class="col-xl-5 text-xl-end d-flex align-items-center">
-                                    <div class="w-100">
-                                        Address
-                                    </div>
-                                </div>
-                                <div class="col-xl d-xl-flex gap-1">
-                                    <div class="mb-2">
+                            <vp-field-grid-row>
+                                <vp-field-grid-label>Address</vp-field-grid-label>
+                                <vp-field-grid-control>
+                                    <div class="d-flex gap-1">
                                         <vp-filter-panel-field fieldName="mailingStreetNumber"
                                                                label="Street #"
                                                                [form]="searchForm" />
-                                    </div>
 
-                                    <div class="mb-2">
                                         <vp-filter-panel-field fieldName="mailingStreetName"
                                                                label="Street Name"
                                                                [form]="searchForm" />
-                                    </div>
 
-                                    <div class="mb-2">
                                         <vp-filter-panel-field fieldName="mailingNumber"
                                                                label="Suite/Apt #"
                                                                [form]="searchForm" />
                                     </div>
-                                </div>
-                            </div>
+                                </vp-field-grid-control>
+                            </vp-field-grid-row>
 
                             <vp-filter-panel-field fieldName="mailingZipCode"
                                                    label="ZIP"

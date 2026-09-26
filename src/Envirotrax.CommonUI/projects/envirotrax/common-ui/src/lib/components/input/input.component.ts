@@ -21,43 +21,7 @@ import { Instance } from "flatpickr/dist/types/instance";
         },
         DatePipe
     ],
-    styles: `
-        .form-floating > textarea.form-control {
-            height: auto;
-        }
-        ::ng-deep ng-select.has-custom-border .ng-select-container {
-            border-color: var(--vp-select-border-color) !important;
-            border-width: 2px !important;
-        }
-
-        @media (min-width: 1200px) {
-            .vp-input-row {
-                display: grid;
-                grid-template-columns: max-content 1fr;
-                column-gap: .75rem;
-                align-items: start;
-            }
-            .vp-input-label-col {
-                grid-column: 1;
-                text-align: end;
-            }
-            .vp-input-control-col {
-                grid-column: 2;
-            }
-            .vp-input-validation-row {
-                grid-column: 1 / -1;
-            }
-
-            /* Inside <vp-field-grid>, pass through into its shared column tracks instead of using our own. */
-            :host-context(vp-field-grid) {
-                display: contents;
-            }
-            :host-context(vp-field-grid) .vp-input-container,
-            :host-context(vp-field-grid) .vp-input-row {
-                display: contents;
-            }
-        }
-    `
+    styleUrl: './input.component.css'
 })
 export class InputComponent implements ControlValueAccessor, Validator, OnInit, AfterViewInit {
     private _onChanged: (value: any) => void = null!;

@@ -23,6 +23,9 @@ export * from './lib/components/data-components/sorting-filtering/filter-panel/f
 export * from './lib/components/dropdown/dropdown.component';
 export * from './lib/components/dropdown/dropdown-option.component';
 export * from './lib/components/field-grid/field-grid.component';
+export * from './lib/components/field-grid/field-grid-row.component';
+export * from './lib/components/field-grid/field-grid-label.component';
+export * from './lib/components/field-grid/field-grid-control.component';
 export * from './lib/components/input/input.component';
 export * from './lib/components/input/input-option.component';
 export * from './lib/components/input/input-add-on.component';

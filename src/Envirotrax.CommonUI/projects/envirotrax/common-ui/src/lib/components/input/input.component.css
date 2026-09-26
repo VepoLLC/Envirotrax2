@@ -1,0 +1,37 @@
+.form-floating > textarea.form-control {
+    height: auto;
+}
+
+::ng-deep ng-select.has-custom-border .ng-select-container {
+    border-color: var(--vp-select-border-color) !important;
+    border-width: 2px !important;
+}
+
+/* No Bootstrap utility exists for an auto-sized (max-content) grid column, or for spanning both. */
+.vp-input-row.d-xl-grid {
+    grid-template-columns: max-content 1fr;
+}
+
+.vp-input-label-col {
+    grid-column: 1;
+}
+
+.vp-input-control-col {
+    grid-column: 2;
+}
+
+.vp-input-validation-row {
+    grid-column: 1 / -1;
+}
+
+/* Inside <vp-field-grid>, pass through into its shared column tracks instead of using our own.
+   !important is required to beat Bootstrap's own !important d-xl-grid/d-xl-flex utility classes. */
+@media (min-width: 1200px) {
+    :host-context(vp-field-grid) {
+        display: contents !important;
+    }
+    :host-context(vp-field-grid) .vp-input-container,
+    :host-context(vp-field-grid) .vp-input-row {
+        display: contents !important;
+    }
+}

@@ -1,0 +1,4 @@
+/* No Bootstrap utility exists for an auto-sized (max-content) grid column. */
+:host {
+    grid-template-columns: max-content 1fr;
+}

@@ -1,8 +1,12 @@
 <div class="vp-input-container flex-column"
      [class.d-flex]="flexFill"
      [class.flex-fill]="flexFill">
-    <div [class.vp-input-row]="labelStyle == 'horizontal'">
-        <div [class.vp-input-label-col]="labelStyle == 'horizontal'">
+    <div [class.vp-input-row]="labelStyle == 'horizontal'"
+         [class.d-xl-grid]="labelStyle == 'horizontal'"
+         [class.gap-xl-2]="labelStyle == 'horizontal'"
+         [class.align-items-xl-start]="labelStyle == 'horizontal'">
+        <div [class.vp-input-label-col]="labelStyle == 'horizontal'"
+             [class.text-xl-end]="labelStyle == 'horizontal'">
             <label *ngIf="label" [attr.for]="id" class="col-form-label">
                 {{label}}
                 <span *ngIf="required" class="text-danger">*</span>

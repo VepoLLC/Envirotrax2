@@ -5,7 +5,7 @@ export interface BackflowCheckoutRequest {
     transactionId: string;
     tests: BackflowCheckoutTest[];
     expectedTotal: number;
-    expectedCcCharge: number;
+    expectedCardCharge: number;
     card?: CreditCardPayment;
 }
 
@@ -19,9 +19,9 @@ export interface BackflowCheckoutReceipt {
     transactionDate: string;
     amount: number;
     balanceAdjustment: number;
-    ccCharge: number;
-    ccNameOnCard?: string;
-    ccNumber?: string;
+    cardCharge: number;
+    nameOnCard?: string;
+    cardNumber?: string;
     tests: BackflowTest[];
     emailResults: BackflowCheckoutEmailResult[];
 }

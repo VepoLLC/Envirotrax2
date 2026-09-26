@@ -15,7 +15,6 @@ public class ProfessionalTransactionRepository : Repository<ProfessionalTransact
     public async Task<ProfessionalTransaction?> GetByTransactionIdAsync(string transactionId, CancellationToken cancellationToken)
     {
         return await Entity
-            .IgnoreQueryFilters()
             .AsNoTracking()
             .SingleOrDefaultAsync(transaction => transaction.TransactionId == transactionId, cancellationToken);
     }

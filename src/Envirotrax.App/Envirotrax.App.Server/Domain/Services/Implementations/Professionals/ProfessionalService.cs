@@ -99,7 +99,7 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
 
         await using var balanceLock = await _paymentService.AcquireBalanceLockAsync(cancellationToken);
 
-        if (await _paymentService.GetProcessedTransactionAsync(dto.TransactionId, cancellationToken) != null)
+        if (await _transactionRepository.GetByTransactionIdAsync(dto.TransactionId, cancellationToken) != null)
         {
             return (await GetAsync(professionalId, cancellationToken))!;
         }
@@ -123,10 +123,10 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
             TransactionId = dto.TransactionId,
             TransactionType = ProfessionalTransactionType.BalanceAdjustment,
             BalanceAdjustment = amount,
-            CcCharge = amount,
+            CardCharge = amount,
             Amount = amount,
-            CCNameOnCard = $"{dto.BillingFirstName} {dto.BillingLastName}",
-            CCNumber = charge.CardNumber
+            NameOnCard = $"{dto.BillingFirstName} {dto.BillingLastName}",
+            CardNumber = charge.CardNumber
         });
 
         await _paymentService.SaveBillingInfoAsync(dto, CancellationToken.None);

@@ -171,11 +171,6 @@ new[] { ("Closed Tight","FinalCV2ClosedTight") }),
                 margin-top: 8px;
             }
 
-            .test-wrapper {
-                display: flex;
-                flex-direction: column;
-            }
-
             .test-wrapper:not(:last-of-type) {
                 break-after: page;
             }
@@ -579,27 +574,30 @@ new[] { ("Closed Tight","FinalCV2ClosedTight") }),
                     }
 
                     <script>
-                        // Pins each report's certification note to the bottom of that report's last page, like V1.
-                        // The page height and the 702px body width must match the Letter size and 1.5cm margins in PdfTemplateService.
-                        window.addEventListener('load', function () {
-                            var cssPixelsPerInch = 96;
-                            var pageMargin = 1.5 / 2.54 * cssPixelsPerInch;
-                            var printablePageHeight = 11 * cssPixelsPerInch - 2 * pageMargin;
-                            var roundingAllowance = 20;
+                            // Pins each report's certification note to the bottom of that report's last page, like V1.
+                            // The page height and the 702px body width must match the Letter size and 1.5cm margins in PdfTemplateService.
+                            window.addEventListener('load', function () {
+                                var cssPixelsPerInch = 96;
+                                var pageMargin = 1.5 / 2.54 * cssPixelsPerInch;
+                                var printablePageHeight = 11 * cssPixelsPerInch - 2 * pageMargin;
+                                var roundingAllowance = 20;
 
-                            document.querySelectorAll('.test-wrapper').forEach(function (wrapper) {
-                                var note = wrapper.querySelector('.footer-note');
-                                var noteHeight = note.getBoundingClientRect().height;
-                                var contentHeight = note.getBoundingClientRect().top - wrapper.getBoundingClientRect().top;
+                                document.querySelectorAll('.test-wrapper').forEach(function (wrapper) {
+                                    var note = wrapper.querySelector('.footer-note');
+                                    var noteHeight = note.getBoundingClientRect().height;
+                                    var contentHeight = note.getBoundingClientRect().top - wrapper.getBoundingClientRect().top;
 
-                                var freeSpaceOnLastPage = printablePageHeight - contentHeight % printablePageHeight;
-                                var spaceBeforeNote = freeSpaceOnLastPage >= noteHeight
-                                    ? freeSpaceOnLastPage - noteHeight
-                                    : freeSpaceOnLastPage + printablePageHeight - noteHeight;
+                                    var freeSpaceOnLastPage = printablePageHeight - contentHeight % printablePageHeight;
+                                    var neededSpace = noteHeight + roundingAllowance;
+                                    var spaceBeforeNote = freeSpaceOnLastPage >= neededSpace
+                                        ? freeSpaceOnLastPage - neededSpace
+                                        : freeSpaceOnLastPage + printablePageHeight - neededSpace;
 
-                                note.style.marginTop = Math.max(0, spaceBeforeNote - roundingAllowance) + 'px';
+                                    var spacer = document.createElement('div');
+                                    spacer.style.height = spaceBeforeNote + 'px';
+                                    note.parentNode.insertBefore(spacer, note);
+                                });
                             });
-                        });
                     </script>
                 </body>
 

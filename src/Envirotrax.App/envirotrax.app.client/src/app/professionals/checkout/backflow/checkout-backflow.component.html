@@ -78,12 +78,12 @@
                 </div>
                 <div class="d-flex justify-content-between">
                     <span>Charged to credit card:</span>
-                    <span>{{ receipt.ccCharge | currency }}</span>
+                    <span>{{ receipt.cardCharge | currency }}</span>
                 </div>
-                @if (receipt.ccCharge > 0) {
+                @if (receipt.cardCharge > 0) {
                     <div class="d-flex justify-content-between">
                         <span>Card:</span>
-                        <span>{{ receipt.ccNameOnCard }} {{ receipt.ccNumber }}</span>
+                        <span>{{ receipt.nameOnCard }} {{ receipt.cardNumber }}</span>
                     </div>
                 }
             </div>

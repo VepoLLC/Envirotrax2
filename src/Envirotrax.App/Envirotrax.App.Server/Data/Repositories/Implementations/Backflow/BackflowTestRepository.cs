@@ -1097,18 +1097,16 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
                 .SetProperty(t => t.EmailPdf, t => emailPdfTestIds.Contains(t.Id)), cancellationToken);
     }
 
-    public async Task<decimal> SumAmountByTransactionIdAsync(string transactionId, CancellationToken cancellationToken)
+    public async Task<decimal> SumAmountByTransactionIdAsync(string transactionId, int professionalId, CancellationToken cancellationToken)
     {
         return await DbContext.BackflowTests
-            .IgnoreQueryFilters()
-            .Where(t => t.TransactionId == transactionId)
+            .Where(t => t.TransactionId == transactionId && t.ProfessionalId == professionalId)
             .SumAsync(t => t.Amount, cancellationToken);
     }
 
     public async Task<List<BackflowTest>> GetByTransactionIdAsync(string transactionId, int professionalId, CancellationToken cancellationToken)
     {
         return await GetListQuery()
-            .IgnoreQueryFilters()
             .Where(t => t.TransactionId == transactionId && t.ProfessionalId == professionalId)
             .OrderBy(t => t.CreatedTime)
             .ToListAsync(cancellationToken);
@@ -1155,7 +1153,6 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
     public async Task SetIsCurrentAsync(int id, bool isCurrent, CancellationToken cancellationToken)
     {
         await DbContext.BackflowTests
-            .IgnoreQueryFilters()
             .Where(t => t.Id == id)
             .ExecuteUpdateAsync(setter => setter.SetProperty(t => t.IsCurrent, isCurrent), cancellationToken);
     }
@@ -1163,7 +1160,6 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
     private IQueryable<BackflowTest> GetUnpaidForCheckoutQuery(IReadOnlyCollection<int> ids, int professionalId, int? bpatId)
     {
         return DbContext.BackflowTests
-            .IgnoreQueryFilters()
             .Where(t => ids.Contains(t.Id)
                 && t.ProfessionalId == professionalId
                 && (bpatId == null || t.BpatId == bpatId)
@@ -1176,7 +1172,6 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         var parentWaterSupplierId = test.WaterSupplier?.ParentId;
 
         return DbContext.BackflowTests
-            .IgnoreQueryFilters()
             .AsNoTracking()
             .Where(t => (t.WaterSupplierId == test.WaterSupplierId
                     || (parentWaterSupplierId != null && t.WaterSupplier!.ParentId == parentWaterSupplierId))

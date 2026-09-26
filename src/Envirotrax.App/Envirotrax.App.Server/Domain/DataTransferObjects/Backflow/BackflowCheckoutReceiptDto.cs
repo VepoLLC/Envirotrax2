@@ -10,11 +10,11 @@ public class BackflowCheckoutReceiptDto
 
     public decimal BalanceAdjustment { get; set; }
 
-    public decimal CcCharge { get; set; }
+    public decimal CardCharge { get; set; }
 
-    public string? CCNameOnCard { get; set; }
+    public string? NameOnCard { get; set; }
 
-    public string? CCNumber { get; set; }
+    public string? CardNumber { get; set; }
 
     public List<BackflowTestDto> Tests { get; set; } = [];
 

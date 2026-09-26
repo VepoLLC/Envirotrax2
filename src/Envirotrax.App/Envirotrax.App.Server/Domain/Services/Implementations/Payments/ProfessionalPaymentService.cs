@@ -1,5 +1,4 @@
 using System.Transactions;
-using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Payments;
 using Envirotrax.App.Server.Domain.Services.Definitions.Payments;
@@ -39,18 +38,6 @@ public class ProfessionalPaymentService : IProfessionalPaymentService
     {
         return await _professionalRepository.TryAcquireBalanceLockAsync(_authService.ProfessionalId, cancellationToken)
             ?? throw new AppValidationException("Another payment for your company is in progress. Please try again in a minute.");
-    }
-
-    public async Task<ProfessionalTransaction?> GetProcessedTransactionAsync(string transactionId, CancellationToken cancellationToken)
-    {
-        var transaction = await _transactionRepository.GetByTransactionIdAsync(transactionId, cancellationToken);
-
-        if (transaction != null && transaction.ProfessionalId != _authService.ProfessionalId)
-        {
-            throw new AppValidationException("This payment could not be processed. Please try again.");
-        }
-
-        return transaction;
     }
 
     public async Task<AuthorizeNetChargeResult> ChargeCardAsync(CreditCardPaymentDto card, decimal amount, string transactionId)

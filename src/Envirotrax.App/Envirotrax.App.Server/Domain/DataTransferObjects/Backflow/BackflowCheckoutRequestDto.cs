@@ -16,7 +16,7 @@ public class BackflowCheckoutRequestDto
 
     public decimal ExpectedTotal { get; set; }
 
-    public decimal ExpectedCcCharge { get; set; }
+    public decimal ExpectedCardCharge { get; set; }
 
     public CreditCardPaymentDto? Card { get; set; }
 }

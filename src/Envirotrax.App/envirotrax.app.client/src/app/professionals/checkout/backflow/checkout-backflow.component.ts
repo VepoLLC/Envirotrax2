@@ -256,7 +256,7 @@ export class CheckoutBackflowComponent implements OnInit {
             transactionId: createPaymentTransactionId(),
             tests: selectedTests.map(test => ({ id: test.id, emailPdf: !!test.emailPdf })),
             expectedTotal: this.amounts.total,
-            expectedCcCharge: this.amounts.cardCharge,
+            expectedCardCharge: this.amounts.cardCharge,
             card
         };
 

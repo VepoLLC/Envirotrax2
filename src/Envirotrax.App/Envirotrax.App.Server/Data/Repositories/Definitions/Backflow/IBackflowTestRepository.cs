@@ -61,7 +61,7 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
     // Checkout
     Task<List<BackflowTest>> GetUnpaidForCheckoutAsync(IReadOnlyCollection<int> ids, int professionalId, int? bpatId, CancellationToken cancellationToken);
     Task<int> MarkPaidAsync(IReadOnlyCollection<int> ids, int professionalId, int? bpatId, string transactionId, DateTime transactionDate, IReadOnlyCollection<int> emailPdfTestIds, CancellationToken cancellationToken);
-    Task<decimal> SumAmountByTransactionIdAsync(string transactionId, CancellationToken cancellationToken);
+    Task<decimal> SumAmountByTransactionIdAsync(string transactionId, int professionalId, CancellationToken cancellationToken);
     Task<List<BackflowTest>> GetByTransactionIdAsync(string transactionId, int professionalId, CancellationToken cancellationToken);
     Task<BackflowTest?> FindPreviousCurrentTestAsync(BackflowTest test, CancellationToken cancellationToken);
     Task SetIsCurrentAsync(int id, bool isCurrent, CancellationToken cancellationToken);

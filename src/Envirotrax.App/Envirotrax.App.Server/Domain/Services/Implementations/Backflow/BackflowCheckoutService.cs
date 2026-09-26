@@ -65,7 +65,7 @@ public class BackflowCheckoutService : IBackflowCheckoutService
             var emailPdfTestIds = request.Tests.Where(test => test.EmailPdf).Select(test => test.Id).ToHashSet();
             var testsToEmail = receipt.Tests.Where(test => emailPdfTestIds.Contains(test.Id));
 
-            receipt.EmailResults = await _checkoutEmailService.SendTestReportsAsync(testsToEmail, transaction.TransactionId);
+            receipt.EmailResults = await _checkoutEmailService.SendTestReportsAsync(testsToEmail, request.TransactionId);
         }
 
         return receipt;
@@ -78,7 +78,7 @@ public class BackflowCheckoutService : IBackflowCheckoutService
     {
         await using var balanceLock = await _paymentService.AcquireBalanceLockAsync(cancellationToken);
 
-        var processedTransaction = await _paymentService.GetProcessedTransactionAsync(request.TransactionId, cancellationToken);
+        var processedTransaction = await _transactionRepository.GetByTransactionIdAsync(request.TransactionId, cancellationToken);
 
         if (processedTransaction != null)
         {
@@ -95,18 +95,18 @@ public class BackflowCheckoutService : IBackflowCheckoutService
 
         var amounts = await CalculateAmountsAsync(tests, cancellationToken);
 
-        if (amounts.Total != RoundToCents(request.ExpectedTotal) || amounts.CcCharge != RoundToCents(request.ExpectedCcCharge))
+        if (amounts.Total != RoundToCents(request.ExpectedTotal) || amounts.CardCharge != RoundToCents(request.ExpectedCardCharge))
         {
             throw new AppValidationException(AmountsChangedMessage);
         }
 
-        var charge = amounts.CcCharge > 0 ? await ChargeCardAsync(request, amounts.CcCharge) : null;
+        var charge = amounts.CardCharge > 0 ? await ChargeCardAsync(request, amounts.CardCharge) : null;
         var transaction = BuildTransaction(request, amounts, charge);
 
         await _paymentService.RecordPaymentAsync(
             request.TransactionId,
             charge,
-            amounts.CcCharge,
+            amounts.CardCharge,
             () => RecordCheckoutAsync(request, tests, bpatId, amounts, transaction));
 
         return (transaction, true);
@@ -145,11 +145,11 @@ public class BackflowCheckoutService : IBackflowCheckoutService
             TransactionId = request.TransactionId,
             TransactionType = ProfessionalTransactionType.BackflowTestPayment,
             BalanceAdjustment = -amounts.FromBalance,
-            CcCharge = amounts.CcCharge,
+            CardCharge = amounts.CardCharge,
             Amount = amounts.Total,
             AmountShare = amounts.TotalShare,
-            CCNameOnCard = charge != null ? $"{request.Card!.BillingFirstName} {request.Card.BillingLastName}" : null,
-            CCNumber = charge?.CardNumber
+            NameOnCard = charge != null ? $"{request.Card!.BillingFirstName} {request.Card.BillingLastName}" : null,
+            CardNumber = charge?.CardNumber
         };
     }
 
@@ -171,9 +171,9 @@ public class BackflowCheckoutService : IBackflowCheckoutService
         var emailPdfTestIds = request.Tests.Where(test => test.EmailPdf).Select(test => test.Id).ToList();
 
         var paidCount = await _testRepository.MarkPaidAsync(
-            testIds, professionalId, bpatId, transaction.TransactionId, transaction.TransactionDate, emailPdfTestIds, CancellationToken.None);
+            testIds, professionalId, bpatId, request.TransactionId, transaction.TransactionDate, emailPdfTestIds, CancellationToken.None);
 
-        var paidTotal = RoundToCents(await _testRepository.SumAmountByTransactionIdAsync(transaction.TransactionId, CancellationToken.None));
+        var paidTotal = RoundToCents(await _testRepository.SumAmountByTransactionIdAsync(request.TransactionId, professionalId, CancellationToken.None));
 
         if (paidCount != tests.Count || paidTotal != amounts.Total)
         {
@@ -212,17 +212,17 @@ public class BackflowCheckoutService : IBackflowCheckoutService
 
     private async Task<BackflowCheckoutReceiptDto> BuildReceiptAsync(ProfessionalTransaction transaction, CancellationToken cancellationToken)
     {
-        var tests = await _testRepository.GetByTransactionIdAsync(transaction.TransactionId, transaction.ProfessionalId, cancellationToken);
+        var tests = await _testRepository.GetByTransactionIdAsync(transaction.TransactionId!, transaction.ProfessionalId, cancellationToken);
 
         return new BackflowCheckoutReceiptDto
         {
-            TransactionId = transaction.TransactionId,
+            TransactionId = transaction.TransactionId!,
             TransactionDate = transaction.TransactionDate,
             Amount = transaction.Amount,
             BalanceAdjustment = transaction.BalanceAdjustment,
-            CcCharge = transaction.CcCharge,
-            CCNameOnCard = transaction.CCNameOnCard,
-            CCNumber = transaction.CCNumber,
+            CardCharge = transaction.CardCharge,
+            NameOnCard = transaction.NameOnCard,
+            CardNumber = transaction.CardNumber,
             Tests = _mapper.Map<List<BackflowTestDto>>(tests)
         };
     }
@@ -232,5 +232,5 @@ public class BackflowCheckoutService : IBackflowCheckoutService
         return Math.Round(amount, 2, MidpointRounding.AwayFromZero);
     }
 
-    private record CheckoutAmounts(decimal Total, decimal TotalShare, decimal FromBalance, decimal CcCharge);
+    private record CheckoutAmounts(decimal Total, decimal TotalShare, decimal FromBalance, decimal CardCharge);
 }

@@ -56,6 +56,28 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<WaterSupplier?> GetUnscopedAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        return await DbContext
+            .WaterSuppliers
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Where(supplier => supplier.DeletedTime == null)
+            .FirstOrDefaultAsync(supplier => supplier.Id == waterSupplierId, cancellationToken);
+    }
+
+    public async Task<IEnumerable<int>> GetChildSupplierIdsAsync(int parentWaterSupplierId, CancellationToken cancellationToken)
+    {
+        return await DbContext
+            .WaterSuppliers
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Where(supplier => supplier.DeletedTime == null)
+            .Where(supplier => supplier.ParentId == parentWaterSupplierId)
+            .Select(supplier => supplier.Id)
+            .ToListAsync(cancellationToken);
+    }
+
     public override Task<WaterSupplier> AddAsync(WaterSupplier supplier)
     {
         supplier.ParentId = _tenantProvider.WaterSupplierId;
@@ -292,7 +314,8 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
         dbSupplier.LetterContactFaxNumber = supplier.LetterContactFaxNumber;
         dbSupplier.LetterContactEmailAddress = supplier.LetterContactEmailAddress;
 
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
+
         return dbSupplier;
     }
 

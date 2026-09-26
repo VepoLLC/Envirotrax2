@@ -1,5 +1,6 @@
 
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
+using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ namespace Envirotrax.App.Server.Data.Models.Professionals;
 
 public class ProfessionalWaterSupplier : TenantModel<WaterSupplier>, IProfessionalModel
 {
+    [AppPrimaryKey(false)]
     public int ProfessionalId { get; set; }
     public Professional? Professional { get; set; }
 
@@ -16,7 +18,10 @@ public class ProfessionalWaterSupplier : TenantModel<WaterSupplier>, IProfession
     public bool HasFogInspection { get; set; }
     public bool HasFogTransportation { get; set; }
 
-    public bool IsBanned { get; set; }
+    public bool IsBackflowTestingSuspended { get; set; }
+    public bool IsCsiInspectionSuspended { get; set; }
+    public bool IsFogInspectionSuspended { get; set; }
+    public bool IsFogTransportationSuspended { get; set; }
 
     [Precision(19, 4)]
     public decimal? BackflowResidentialTestFee { get; set; }

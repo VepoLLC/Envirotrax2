@@ -6,6 +6,12 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 
 public interface IBackflowTestRepository : IRepository<BackflowTest>
 {
+    Task<List<BackflowTest>> GetByIdsAsync(IEnumerable<int> ids, CancellationToken cancellationToken);
+
+    // Resolved for the whole batch in one query, keyed by test id. Tests without an earlier
+    // match are simply absent from the result.
+    Task<Dictionary<int, BackflowTest>> FindPreviousTestsAsync(IReadOnlyCollection<BackflowTest> tests, CancellationToken cancellationToken);
+
     Task<BackflowTest> UpdateImagePathAsync(BackflowTest model, string imagePathPropertyName);
 
     Task<BackflowTestExpiryCounts> GetExpiryCountsAsync(CancellationToken cancellationToken);
@@ -17,15 +23,15 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
 
     // Process 1 — Site level
     Task<IEnumerable<BackflowTest>> GetAllCurrentBySiteIdAsync(int siteId, CancellationToken cancellationToken);
-    Task UpdateTestRenewalAsync(int testId, bool renewalRequired, DateTime? expirationDate);
+    Task<BackflowTest?> UpdateTestRenewalAsync(int testId, bool renewalRequired, DateTime? expirationDate);
 
     // Process 2 — Test level
     Task<IEnumerable<BackflowTest>> GetAllPendingRenewalByTestFlagAsync(int batchSize, CancellationToken cancellationToken);
-    Task UpdateTestRenewalAndClearFlagAsync(int testId, bool renewalRequired, DateTime? expirationDate, CancellationToken cancellationToken);
+    Task<BackflowTest?> UpdateTestRenewalAndClearFlagAsync(int testId, bool renewalRequired, DateTime? expirationDate, CancellationToken cancellationToken);
     Task ClearTestNeedsRenewalCheckAsync(int testId, CancellationToken cancellationToken);
 
     // Status updates
-    Task<AdminUpdateResult<BackflowTest>> UpdateForAdminAsync(int id, BackflowTestAdminUpdateRequest request, int updatedById);
+    Task<BackflowTest?> UpdateForAdminAsync(int id, BackflowTestAdminUpdateRequest request, int updatedById);
 
     Task<BackflowTest?> UpdateRenewalRequiredAsync(int id, bool renewalRequired, int updatedById, CancellationToken cancellationToken);
     Task<BackflowTest?> UpdateScheduleMonthAsync(int id, int month, int updatedById, CancellationToken cancellationToken);
@@ -34,4 +40,21 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
     Task<BackflowTest?> UpdateDisapprovalAsync(int id, bool disapproved, int updatedById, CancellationToken cancellationToken);
     Task<BackflowTest?> UpdateForceRenewalAsync(int id, bool forceRenewal, int forceRenewalYears, int updatedById, CancellationToken cancellationToken);
     Task<BackflowTest?> UpdateRejectionAsync(int id, bool rejected, string? rejectedReason, int updatedById, CancellationToken cancellationToken);
+
+    // Professional edit-in-place (checkout "Edit" on an own, still-unpaid test)
+    Task<BackflowTest?> UpdateForProfessionalAsync(
+        BackflowTest model,
+        int professionalId,
+        string? newAssemblyImagePath,
+        string? newSerialNumberImagePath,
+        string? newBypassAssemblyImagePath,
+        string? newBypassSerialNumberImagePath,
+        string? newAirGapImagePath);
+
+    Task<IEnumerable<BackflowTest>> GetReplacementsAsync(PageInfo pageInfo, Query query, bool onHold, CancellationToken cancellationToken);
+    Task<BackflowTest?> GetReplacedAssemblyAsync(int id, CancellationToken cancellationToken);
+    Task<BackflowTest?> UpdateReplacementHoldAsync(int id, bool onHold);
+    Task<BackflowTest?> UpdateReplacementClearedAsync(int id, bool cleared);
+
+    Task<int> CountCurrentInServiceBySiteAsync(int siteId, CancellationToken cancellationToken);
 }

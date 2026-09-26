@@ -157,8 +157,14 @@ public class WaterSupplierService : Service<WaterSupplier, WaterSupplierDto>, IW
             LetterContactEmailAddress = dto.LetterContactEmailAddress
         };
 
-        var updated = await _repository.UpdateOwnAsync(model);
-        return MapToDto(updated);
+        var saved = await _repository.UpdateOwnAsync(model);
+
+        if (saved == null)
+        {
+            return null;
+        }
+
+        return MapToDto(saved);
     }
 
     public async Task<WaterSupplierDetailsDto?> UpdateDetailsAsync(int id, WaterSupplierDetailsDto details)

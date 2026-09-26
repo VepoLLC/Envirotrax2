@@ -12,8 +12,7 @@ import { FeatureType } from "../../models/feature-type";
 import { ROLE_DEFINITIONS } from "../../models/role-definitions";
 
 const UNPAID_FILTER: QueryProperty[] = [
-    { columnName: 'transactionId', isValueNull: true },
-    { columnName: 'amount', comparisonOperator: 'Gt', value: '0' }
+    { columnName: 'transactionId', isValueNull: true }
 ];
 
 const COUNT_PAGE_INFO: PageInfo = { pageNumber: 1, pageSize: 1 };

@@ -1,0 +1,42 @@
+@using RazorLight
+@using Envirotrax.App.Server.Templates.Emails.Notifications
+@inherits TemplatePage<BackflowTestNotificationVm>
+
+@{
+    Layout = "Templates.Emails._EmailLayout";
+}
+
+<div>
+    <p style="margin-top: 0;">
+        The following backflow tests matched your notification settings.
+    </p>
+
+    @foreach (var notificationGroup in Model.Groups)
+    {
+        <div style="border-left: 4px solid @notificationGroup.Color; padding-left: 14px; margin-bottom: 28px;">
+            <p style="margin: 0 0 14px 0;">
+                <strong>@notificationGroup.Description</strong>
+                <span style="color: #6c757d;">(@notificationGroup.Items.Count)</span>
+            </p>
+
+            @foreach (var entry in notificationGroup.Items)
+            {
+                var testUrl = $"{ViewBag.BaseUrl}/backflow/tests/{entry.TestId}/view";
+
+                <div style="margin-bottom: 14px;">
+                    <a href="@testUrl" target="_blank" style="font-weight: bold;">@entry.Title</a>
+
+                    @if (!string.IsNullOrEmpty(entry.Details))
+                    {
+                        <div style="color: #6c757d; font-size: 13px;">@entry.Details</div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(entry.LocationDescription))
+                    {
+                        <div style="color: #6c757d; font-size: 13px;">@entry.LocationDescription</div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>

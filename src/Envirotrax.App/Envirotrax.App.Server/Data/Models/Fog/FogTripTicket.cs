@@ -13,7 +13,7 @@ using Envirotrax.Common.Data.Models;
 namespace Envirotrax.App.Server.Data.Models.Fog;
 
 [Table("FogTripTickets")]
-public class FogTripTicket : TenantModel<WaterSupplier>, IProfessionalModel, IAuditableModel<AppUser>
+public class FogTripTicket : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }
@@ -58,7 +58,7 @@ public class FogTripTicket : TenantModel<WaterSupplier>, IProfessionalModel, IAu
     [StringLength(50)]
     public string? FogGeneratorContactName { get; set; }
 
-    // Transporter — ProfessionalId/Professional satisfy IProfessionalModel
+    // Transporter
     public int ProfessionalId { get; set; }
     public Professional? Professional { get; set; }
 

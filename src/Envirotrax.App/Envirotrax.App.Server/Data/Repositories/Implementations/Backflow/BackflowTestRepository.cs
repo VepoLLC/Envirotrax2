@@ -6,7 +6,9 @@ using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Services.Definitions;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
+using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow;
@@ -15,9 +17,12 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
 {
     private const string HazardTypeOther = "Other";
 
-    public BackflowTestRepository(IDbContextSelector dbContextSelector)
+    private readonly ITenantProvidersService _tenantProvider;
+
+    public BackflowTestRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider)
         : base(dbContextSelector)
     {
+        _tenantProvider = tenantProvider;
     }
 
     protected override IQueryable<BackflowTest> GetListQuery()
@@ -54,7 +59,78 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         {
             query.Sort[nameof(BackflowTest.Id)] = SortOperator.Asc;
         }
+
+        ProfessionalRecordScope.ApplyToProfessionalSearch(query, _tenantProvider.ProfessionalId, nameof(BackflowTest.ProfessionalId));
+
         return base.GetAllAsync(pageInfo, query, cancellationToken);
+    }
+
+    // Deliberately not GetListQuery: this feeds notification matching, which only needs the site flags
+    // it filters on and the supplier chain a notification is attributed to. The other list includes
+    // (Bpat, BpatState, PropertyState, MailingState) would only widen the join.
+    public async Task<List<BackflowTest>> GetByIdsAsync(IEnumerable<int> ids, CancellationToken cancellationToken)
+    {
+        return await Entity
+            .AsNoTracking()
+            .Include(t => t.WaterSupplier)
+                .ThenInclude(ws => ws!.Parent)
+            .Include(t => t.Site)
+            .Where(t => ids.Contains(t.Id))
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<Dictionary<int, BackflowTest>> FindPreviousTestsAsync(
+        IReadOnlyCollection<BackflowTest> tests, CancellationToken cancellationToken)
+    {
+        if (tests.Count == 0)
+        {
+            return [];
+        }
+
+        var waterSupplierIds = tests.Select(t => t.WaterSupplierId).Distinct().ToList();
+        var siteIds = tests.Select(t => t.SiteId).Where(siteId => siteId != null).Distinct().ToList();
+        var includeMissingSite = tests.Any(t => t.SiteId == null);
+
+        // One query for the whole batch instead of a lookup per test. Supplier and site narrow it down in
+        // SQL — both are foreign keys, so they are indexed, unlike the serial number. The exact key match
+        // (including manufacturer and serial) and the "most recent earlier test" pick happen in memory
+        // below, which also keeps the null-matching semantics the per-test query relied on.
+        var candidates = await DbContext.BackflowTests
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Where(t => t.DeletedTime == null
+                && !t.Rejected
+                && waterSupplierIds.Contains(t.WaterSupplierId)
+                && (siteIds.Contains(t.SiteId) || (includeMissingSite && t.SiteId == null)))
+            .ToListAsync(cancellationToken);
+
+        var candidatesByKey = candidates
+            .GroupBy(BuildPreviousTestKey)
+            .ToDictionary(group => group.Key, group => group.OrderByDescending(t => t.CreatedTime).ToList());
+
+        var previousTests = new Dictionary<int, BackflowTest>();
+
+        foreach (var test in tests)
+        {
+            if (!candidatesByKey.TryGetValue(BuildPreviousTestKey(test), out var matching))
+            {
+                continue;
+            }
+
+            var previousTest = matching.FirstOrDefault(candidate => candidate.CreatedTime < test.CreatedTime);
+
+            if (previousTest != null)
+            {
+                previousTests[test.Id] = previousTest;
+            }
+        }
+
+        return previousTests;
+    }
+
+    private static (int, int?, string?, string?) BuildPreviousTestKey(BackflowTest test)
+    {
+        return (test.WaterSupplierId, test.SiteId, test.Manufacturer, test.SerialNumber);
     }
 
     // Image paths are owned by the dedicated image flow (UpdateImagePathAsync),
@@ -69,6 +145,14 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         entry.Property(m => m.BypassAssemblyImagePath).IsModified = false;
         entry.Property(m => m.BypassSerialNumberImagePath).IsModified = false;
         entry.Property(m => m.AirGapImagePath).IsModified = false;
+        entry.Property(m => m.ValidationReplacementOnHold).IsModified = false;
+        entry.Property(m => m.ValidationReplacementCleared).IsModified = false;
+
+        // Legacy-import columns, owned by the V1 migration. BackflowTestDto does not carry them, so
+        // an ordinary update would write nulls over the values an imported row came in with.
+        entry.Property(m => m.LegacyRecordId).IsModified = false;
+        entry.Property(m => m.InspectorId).IsModified = false;
+        entry.Property(m => m.MailingAddress).IsModified = false;
     }
 
     public async Task<BackflowTest> UpdateImagePathAsync(BackflowTest model, string imagePathPropertyName)
@@ -90,8 +174,12 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         var twoMonthsStart = thisMonthStart.AddMonths(2);
         var threeMonthsStart = thisMonthStart.AddMonths(3);
 
+        var professionalId = _tenantProvider.ProfessionalId;
+
         var counts = await Entity
-            .Where(t => t.IsCurrent && t.DeletedTime == null)
+            .Where(t => t.IsCurrent
+                && t.DeletedTime == null
+                && (professionalId <= 0 || t.ProfessionalId == professionalId))
             .GroupBy(t => 1)
             .Select(g => new BackflowTestExpiryCounts
             {
@@ -147,6 +235,59 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<BackflowTest>> GetReplacementsAsync(PageInfo pageInfo, Query query, bool onHold, CancellationToken cancellationToken)
+    {
+        if (query.Sort.IsNullOrEmpty())
+        {
+            query.Sort[nameof(BackflowTest.Id)] = SortOperator.Desc;
+        }
+
+        var backflowProgramWaterSupplierIds = DbContext.GeneralSettings
+            .Where(gs => gs.BackflowTesting)
+            .Select(gs => gs.WaterSupplierId);
+
+        var vepoManagedWaterSupplierIds = DbContext.BackflowSettings
+            .Where(bs => bs.OutOfServiceType == BackflowOutOfServiceType.VepoManaged)
+            .Select(bs => bs.WaterSupplierId);
+
+        var dbQuery = GetListQuery()
+            .Where(t => t.ReasonForTest == BackflowReasonForTest.Replacement
+                && t.TransactionId != null
+                && t.TransactionId != string.Empty
+                && t.ReplacementAssembly != null
+                && t.ReplacementAssembly != string.Empty
+                && !t.ValidationReplacementCleared
+                && t.ValidationReplacementOnHold == onHold
+                && t.Site != null
+                && backflowProgramWaterSupplierIds.Contains(t.WaterSupplierId)
+                && vepoManagedWaterSupplierIds.Contains(t.WaterSupplierId));
+
+        var paginated = await dbQuery
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public async Task<BackflowTest?> GetReplacedAssemblyAsync(int id, CancellationToken cancellationToken)
+    {
+        var replacement = await GetNoIncludesAsync(id, cancellationToken);
+
+        if (replacement == null || string.IsNullOrWhiteSpace(replacement.ReplacementAssembly))
+        {
+            return null;
+        }
+
+        var waterSupplierId = replacement.WaterSupplierId;
+        var serialNumber = replacement.ReplacementAssembly;
+
+        return await GetListQuery()
+            .Where(t => t.WaterSupplierId == waterSupplierId && t.SerialNumber == serialNumber)
+            .OrderByDescending(t => t.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<IEnumerable<BackflowTest>> GetAllCurrentBySiteIdAsync(int siteId, CancellationToken cancellationToken)
     {
         return await DbContext.BackflowTests
@@ -169,21 +310,30 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             .ToListAsync(cancellationToken);
     }
 
-    public async Task UpdateTestRenewalAsync(int testId, bool renewalRequired, DateTime? expirationDate)
+    public async Task<BackflowTest?> UpdateTestRenewalAsync(int testId, bool renewalRequired, DateTime? expirationDate)
     {
+        // IgnoreQueryFilters: this runs from the TaskRunner queue-worker pipeline, not a normal
+        // tenant-scoped request, so the usual WaterSupplier query filter must be bypassed here —
+        // same as the bulk-update this replaces.
+        var test = await DbContext.BackflowTests
+            .IgnoreQueryFilters()
+            .SingleOrDefaultAsync(t => t.Id == testId);
+
+        if (test == null)
+        {
+            return null;
+        }
+
+        test.RenewalRequired = renewalRequired;
+
         if (expirationDate.HasValue)
         {
-            await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
-                .ExecuteUpdateAsync(s => s
-                    .SetProperty(x => x.RenewalRequired, renewalRequired)
-                    .SetProperty(x => x.ExpirationDate, expirationDate.Value));
+            test.ExpirationDate = expirationDate.Value;
         }
-        else
-        {
-            await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
-                .ExecuteUpdateAsync(s => s
-                    .SetProperty(x => x.RenewalRequired, renewalRequired));
-        }
+
+        await SaveChangesAsync(logData: true);
+
+        return test;
     }
 
     public async Task<IEnumerable<BackflowTest>> GetAllPendingRenewalByTestFlagAsync(int batchSize, CancellationToken cancellationToken)
@@ -210,23 +360,29 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             .ToListAsync(cancellationToken);
     }
 
-    public async Task UpdateTestRenewalAndClearFlagAsync(int testId, bool renewalRequired, DateTime? expirationDate, CancellationToken cancellationToken)
+    public async Task<BackflowTest?> UpdateTestRenewalAndClearFlagAsync(int testId, bool renewalRequired, DateTime? expirationDate, CancellationToken cancellationToken)
     {
+        var test = await DbContext.BackflowTests
+            .IgnoreQueryFilters()
+            .SingleOrDefaultAsync(t => t.Id == testId, cancellationToken);
+
+        if (test == null)
+        {
+            return null;
+        }
+
+        test.RenewalRequired = renewalRequired;
+
         if (expirationDate.HasValue)
         {
-            await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
-                .ExecuteUpdateAsync(s => s
-                    .SetProperty(x => x.RenewalRequired, renewalRequired)
-                    .SetProperty(x => x.ExpirationDate, expirationDate.Value)
-                    .SetProperty(x => x.NeedsRenewalCheck, false), cancellationToken);
+            test.ExpirationDate = expirationDate.Value;
         }
-        else
-        {
-            await DbContext.BackflowTests.IgnoreQueryFilters().Where(t => t.Id == testId)
-                .ExecuteUpdateAsync(s => s
-                    .SetProperty(x => x.RenewalRequired, renewalRequired)
-                    .SetProperty(x => x.NeedsRenewalCheck, false), cancellationToken);
-        }
+
+        test.NeedsRenewalCheck = false;
+
+        await SaveChangesAsync(logData: true, cancellationToken);
+
+        return test;
     }
 
     public async Task ClearTestNeedsRenewalCheckAsync(int testId, CancellationToken cancellationToken)
@@ -236,15 +392,13 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
                 .SetProperty(x => x.NeedsRenewalCheck, false), CancellationToken.None);
     }
 
-    public async Task<AdminUpdateResult<BackflowTest>> UpdateForAdminAsync(int id, BackflowTestAdminUpdateRequest request, int updatedById)
+    public async Task<BackflowTest?> UpdateForAdminAsync(int id, BackflowTestAdminUpdateRequest request, int updatedById)
     {
-        var result = new AdminUpdateResult<BackflowTest>();
-
         var test = await Entity.SingleOrDefaultAsync(t => t.Id == id);
 
         if (test == null)
         {
-            return result;
+            return null;
         }
 
         var wasRejected = test.Rejected;
@@ -267,9 +421,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             test.NeedsRenewalCheck = true;
         }
 
-        result.Changes = BuildChangeDescription(test);
-
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         if (test.Rejected && !wasRejected)
         {
@@ -288,9 +440,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             await ReassignIsCurrentForDeviceAsync(test, CancellationToken.None);
         }
 
-        result.Model = test;
-
-        return result;
+        return test;
     }
 
     private static void ApplyAdminEditableFields(BackflowTest test, BackflowTestAdminUpdateRequest request)
@@ -520,7 +670,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         DbContext.Attach(test);
         test.RenewalRequired = renewalRequired;
 
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         return test;
     }
@@ -537,7 +687,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         DbContext.Attach(test);
         test.BackflowScheduleMonth = month;
 
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         return test;
     }
@@ -554,7 +704,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         DbContext.Attach(test);
         test.IsCurrent = isCurrent;
 
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         return test;
     }
@@ -582,7 +732,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             }
         }
 
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         return test;
     }
@@ -610,7 +760,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             }
         }
 
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         return test;
     }
@@ -638,7 +788,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             test.ExpirationDate = newExpiration;
         }
 
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         return test;
     }
@@ -661,8 +811,11 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             test.RejectedById = updatedById;
             test.RejectedDate = DateTime.UtcNow;
             test.RejectedReason = rejectedReason;
+        }
 
-            await DbContext.SaveChangesAsync();
+        if (rejected)
+        {
+            await SaveChangesAsync(logData: true);
 
             var previousId = await FindPreviousTestIdAsync(test);
 
@@ -676,10 +829,44 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         }
         else
         {
-            await DbContext.SaveChangesAsync();
+            await SaveChangesAsync(logData: true);
 
             await ReassignIsCurrentForDeviceAsync(test, cancellationToken);
         }
+
+        return test;
+    }
+
+    public async Task<BackflowTest?> UpdateReplacementHoldAsync(int id, bool onHold)
+    {
+        var test = await GetNoIncludesAsync(id, CancellationToken.None);
+
+        if (test == null)
+        {
+            return null;
+        }
+
+        DbContext.Attach(test);
+        test.ValidationReplacementOnHold = onHold;
+
+        await DbContext.SaveChangesAsync();
+
+        return test;
+    }
+
+    public async Task<BackflowTest?> UpdateReplacementClearedAsync(int id, bool cleared)
+    {
+        var test = await GetNoIncludesAsync(id, CancellationToken.None);
+
+        if (test == null)
+        {
+            return null;
+        }
+
+        DbContext.Attach(test);
+        test.ValidationReplacementCleared = cleared;
+
+        await DbContext.SaveChangesAsync();
 
         return test;
     }
@@ -753,6 +940,106 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
     private static string NormalizeSerialNumber(string serial)
     {
         return string.Concat(serial.Where(char.IsDigit)).TrimStart('0');
+    }
+
+    public async Task<BackflowTest?> UpdateForProfessionalAsync(
+        BackflowTest model,
+        int professionalId,
+        string? newAssemblyImagePath,
+        string? newSerialNumberImagePath,
+        string? newBypassAssemblyImagePath,
+        string? newBypassSerialNumberImagePath,
+        string? newAirGapImagePath)
+    {
+        var test = await GetTrackedForUpdateAsync(model.Id, default);
+
+        if (test == null || test.ProfessionalId != professionalId || !string.IsNullOrEmpty(test.TransactionId))
+        {
+            return null;
+        }
+
+        // Snapshot everything a professional edit must never be able to touch — admin review/workflow
+        // state, payment state, tenancy, and audit stamps — before the bulk SetValues below, then restore
+        // it afterward (same technique as NotificationSettingRepository.UpdateSettingAsync, just a longer
+        // protect-list, since BackflowTest's professional-editable surface is nearly the whole entity).
+        var createdById = test.CreatedById;
+        var createdTime = test.CreatedTime;
+        var professionalIdSnapshot = test.ProfessionalId;
+        var siteId = test.SiteId;
+        var waterSupplierId = test.WaterSupplierId;
+        var isCurrent = test.IsCurrent;
+        var disapproved = test.Disapproved;
+        var approvalDate = test.ApprovalDate;
+        var approvedById = test.ApprovedById;
+        var rejected = test.Rejected;
+        var rejectedById = test.RejectedById;
+        var rejectedDate = test.RejectedDate;
+        var rejectedReason = test.RejectedReason;
+        var transactionId = test.TransactionId;
+        var transactionDate = test.TransactionDate;
+        var amount = test.Amount;
+        var amountShare = test.AmountShare;
+        var needsRenewalCheck = test.NeedsRenewalCheck;
+        var backflowScheduleMonth = test.BackflowScheduleMonth;
+        var forceRenewal = test.ForceRenewal;
+        var forceRenewalYears = test.ForceRenewalYears;
+        var outOfService = test.OutOfService;
+        var outOfServiceDate = test.OutOfServiceDate;
+        var assemblyImagePath = test.AssemblyImagePath;
+        var serialNumberImagePath = test.SerialNumberImagePath;
+        var bypassAssemblyImagePath = test.BypassAssemblyImagePath;
+        var bypassSerialNumberImagePath = test.BypassSerialNumberImagePath;
+        var airGapImagePath = test.AirGapImagePath;
+
+        // Legacy-import columns. No V2 flow populates these, so BackflowTestDto does not carry them
+        // and SetValues would null out whatever the V1 migration preserved on an imported row.
+        var legacyRecordId = test.LegacyRecordId;
+        var inspectorId = test.InspectorId;
+        var mailingAddress = test.MailingAddress;
+
+        DbContext.Entry(test).CurrentValues.SetValues(model);
+
+        test.CreatedById = createdById;
+        test.CreatedTime = createdTime;
+        test.ProfessionalId = professionalIdSnapshot;
+        test.SiteId = siteId;
+        test.WaterSupplierId = waterSupplierId;
+        test.IsCurrent = isCurrent;
+        test.Disapproved = disapproved;
+        test.ApprovalDate = approvalDate;
+        test.ApprovedById = approvedById;
+        test.Rejected = rejected;
+        test.RejectedById = rejectedById;
+        test.RejectedDate = rejectedDate;
+        test.RejectedReason = rejectedReason;
+        test.TransactionId = transactionId;
+        test.TransactionDate = transactionDate;
+        test.Amount = amount;
+        test.AmountShare = amountShare;
+        test.NeedsRenewalCheck = needsRenewalCheck;
+        test.BackflowScheduleMonth = backflowScheduleMonth;
+        test.ForceRenewal = forceRenewal;
+        test.ForceRenewalYears = forceRenewalYears;
+        test.OutOfService = outOfService;
+        test.OutOfServiceDate = outOfServiceDate;
+        test.AssemblyImagePath = newAssemblyImagePath ?? assemblyImagePath;
+        test.SerialNumberImagePath = newSerialNumberImagePath ?? serialNumberImagePath;
+        test.BypassAssemblyImagePath = newBypassAssemblyImagePath ?? bypassAssemblyImagePath;
+        test.BypassSerialNumberImagePath = newBypassSerialNumberImagePath ?? bypassSerialNumberImagePath;
+        test.AirGapImagePath = newAirGapImagePath ?? airGapImagePath;
+
+        test.LegacyRecordId = legacyRecordId;
+        test.InspectorId = inspectorId;
+        test.MailingAddress = mailingAddress;
+
+        await SaveChangesAsync(logData: true);
+
+        return test;
+    }
+
+    public Task<int> CountCurrentInServiceBySiteAsync(int siteId, CancellationToken cancellationToken)
+    {
+        return Entity.CountAsync(t => t.SiteId == siteId && t.DeletedTime == null && t.IsCurrent && !t.OutOfService, cancellationToken);
     }
 
     private async Task<int?> FindPreviousTestIdAsync(BackflowTest fromTest)

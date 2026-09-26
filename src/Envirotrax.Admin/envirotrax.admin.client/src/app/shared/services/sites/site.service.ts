@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { PagedData, PageInfo, Query, QueryHelperService, UrlResolverService } from "@envirotrax/common-ui";
+import { PagedData, PageInfo, Query, QueryHelperService, RecordLog, UrlResolverService } from "@envirotrax/common-ui";
 import { FogCompliancyStatus, Site } from "../../models/sites/site";
 import { SiteDetail } from "../../models/sites/site-detail";
 import { SiteGisUpdate, SiteUpdate, SiteWaterSupplierUpdate } from "../../models/sites/site-update";
@@ -64,5 +64,13 @@ export class SiteService {
         const observable = this._http.put<void>(url, payload);
 
         await lastValueFrom(observable);
+    }
+
+    public async getLogs(siteId: number): Promise<RecordLog[]> {
+        const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}/logs`);
+
+        const observable = this._http.get<RecordLog[]>(url);
+
+        return await lastValueFrom(observable);
     }
 }

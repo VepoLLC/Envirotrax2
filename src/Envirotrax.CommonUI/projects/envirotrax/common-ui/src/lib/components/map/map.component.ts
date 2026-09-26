@@ -214,8 +214,11 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
                 continue;
             }
 
+            // Google Maps draws the first path as the outer edge and every path after it as a hole.
+            const paths: MapPoint[][] = [polygon.coordinates, ...(polygon.holes ?? [])];
+
             const instance = new Polygon({
-                paths: polygon.coordinates,
+                paths: paths,
                 strokeColor: polygon.color,
                 strokeOpacity: 0.8,
                 strokeWeight: 1,
@@ -237,11 +240,19 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
                 })
             }
 
+            // Each ring is a separate editable path, so every one needs its own listeners —
+            // otherwise dragging a vertex of a hole would never reach the view model.
             if (polygon.onEdit) {
-                const path = instance.getPath();
-                if (path) {
-                    path.addListener("set_at", () => this._ngZone.run(() => this.onPolygonEdit(polygon, instance)));
-                    path.addListener("insert_at", () => this._ngZone.run(() => this.onPolygonEdit(polygon, instance)));
+                const editablePaths = instance.getPaths();
+
+                if (editablePaths) {
+                    for (let pathIndex = 0; pathIndex < editablePaths.getLength(); pathIndex++) {
+                        const path = editablePaths.getAt(pathIndex);
+
+                        path.addListener("set_at", () => this._ngZone.run(() => this.onPolygonEdit(polygon, instance)));
+                        path.addListener("insert_at", () => this._ngZone.run(() => this.onPolygonEdit(polygon, instance)));
+                        path.addListener("remove_at", () => this._ngZone.run(() => this.onPolygonEdit(polygon, instance)));
+                    }
                 }
             }
         }
@@ -386,20 +397,30 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges {
         }
     }
 
+    // Google Maps returns one path per ring, in the order they were passed in: the outer edge
+    // first, then the holes. Copy them back so the caller can persist the edited shape.
     private onPolygonEdit(polygonVm: MapPolygon<any>, polygonInstance: any): void {
-        const coordinates: { lat: number; lng: number }[] = [];
-        const vertices = polygonInstance.getPath();
+        const paths = polygonInstance.getPaths();
+        const rings: MapPoint[][] = [];
 
-        for (let i = 0; i < vertices.getLength(); i++) {
-            const xy = vertices.getAt(i);
+        for (let pathIndex = 0; pathIndex < paths.getLength(); pathIndex++) {
+            const vertices = paths.getAt(pathIndex);
+            const ring: MapPoint[] = [];
 
-            coordinates.push({
-                lat: xy.lat(),
-                lng: xy.lng()
-            });
+            for (let vertexIndex = 0; vertexIndex < vertices.getLength(); vertexIndex++) {
+                const vertex = vertices.getAt(vertexIndex);
+
+                ring.push({
+                    lat: vertex.lat(),
+                    lng: vertex.lng()
+                });
+            }
+
+            rings.push(ring);
         }
 
-        polygonVm.coordinates = coordinates;
+        polygonVm.coordinates = rings.length ? rings[0] : [];
+        polygonVm.holes = rings.slice(1);
 
         if (polygonVm.onEdit) {
             polygonVm.onEdit(polygonVm);
@@ -416,10 +437,19 @@ interface ApiKey {
     apiKey: string;
 }
 
+export interface MapPoint {
+    lat: number;
+    lng: number;
+}
+
+// A polygon is one outer ring with any number of holes cut out of it — a doughnut shape, where
+// "coordinates" is the outer edge and each entry of "holes" is a piece removed from the middle.
+// Google Maps renders them as a single shape, so a point inside a hole falls outside the polygon.
 export interface MapPolygon<TData extends any> {
     name?: string;
     color: string;
-    coordinates: { lat: number; lng: number }[];
+    coordinates: MapPoint[];
+    holes?: MapPoint[][];
     onClick?: (polygon: MapPolygon<TData>) => void;
     onEdit?: (polygon: MapPolygon<TData>) => void;
     onDrawComplete?: (polygon: MapPolygon<TData>) => void;

@@ -9,7 +9,10 @@ export interface ProfessionalWaterSupplier {
     hasFogInspection?: boolean;
     hasFogTransportation?: boolean;
 
-    isBanned?: boolean;
+    isBackflowTestingSuspended?: boolean;
+    isCsiInspectionSuspended?: boolean;
+    isFogInspectionSuspended?: boolean;
+    isFogTransportationSuspended?: boolean;
 
     backflowResidentialTestFee?: number;
     backflowCommercialTestFee?: number;

@@ -1,11 +1,14 @@
 
+using Envirotrax.App.Server.Data.Models.Logs;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.Contracts;
+using Envirotrax.App.Server.Data.Models.States;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.Common.Data.Attributes;
 
 namespace Envirotrax.App.Server.Data.Models.Professionals;
 
+[RecordLogged(RecordLogTableNames.ProfessionalUsers, ProfessionalSource = RecordLogIdSource.Entity)]
 public class ProfessionalUser : IProfessionalModel
 {
     [AppPrimaryKey(false, IsShadowKey = true)]
@@ -32,4 +35,22 @@ public class ProfessionalUser : IProfessionalModel
     public bool IsBackflowTester { get; set; }
     public bool IsFogInspector { get; set; }
     public bool IsFogTransporter { get; set; }
+
+    [StringLength(255)]
+    public string? BillingFirstName { get; set; }
+
+    [StringLength(255)]
+    public string? BillingLastName { get; set; }
+
+    [StringLength(255)]
+    public string? BillingAddress { get; set; }
+
+    [StringLength(255)]
+    public string? BillingCity { get; set; }
+
+    public int? BillingStateId { get; set; }
+    public State? BillingState { get; set; }
+
+    [StringLength(25)]
+    public string? BillingZipCode { get; set; }
 }

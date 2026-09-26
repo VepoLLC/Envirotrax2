@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Azure.Identity;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Envirotrax.Admin.Server.Configuration;
@@ -27,8 +28,15 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<ApiExceptionFilter>();
 });
 
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddProblemDetails();
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = context =>
+    {
+        var traceId = Activity.Current?.TraceId.ToString() ?? context.HttpContext.TraceIdentifier;
+
+        context.ProblemDetails.Extensions["traceId"] = traceId;
+    };
+});
 
 builder.Services.AddApplicationServices(builder.Configuration, builder.Environment);
 

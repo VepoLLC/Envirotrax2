@@ -1,4 +1,4 @@
-<h1 class="text-center h2">Backflow Test Submission</h1>
+<h1 class="text-center h2">{{ editingTestId ? 'Edit Backflow Test' : 'Backflow Test Submission' }}</h1>
 
 <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
 
@@ -7,11 +7,11 @@
     <!-- Confirmation Screen -->
     <div *ngIf="submitSuccess">
         <vp-section header="Backflow Test Submission Confirmation" class="text-center">
-            <p class="text-center fw-bold text-success">Your backflow test has been submitted successfully.</p>
+            <p class="text-center fw-bold text-success">{{ editingTestId ? 'Your backflow test has been updated successfully.' : 'Your backflow test has been submitted successfully.' }}</p>
             <p>The test record has been recorded in the system. The water supplier may review the submission for approval.</p>
             <div class="d-flex justify-content-center gap-2 mt-3">
                 <button type="button" class="btn btn-primary vp-section-button" (click)="returnToAccountOverview()">Return to Account Overview</button>
-                <button type="button" class="btn btn-primary vp-section-button" (click)="submitAnother()">Submit Another Test</button>
+                <button type="button" class="btn btn-primary vp-section-button" *ngIf="!editingTestId" (click)="submitAnother()">Submit Another Test</button>
             </div>
         </vp-section>
     </div>
@@ -1837,11 +1837,14 @@
         </div>
 
         <!-- Additional Information -->
-        <div class="mt-3" *ngIf="additionalInfoSettings && (additionalInfoSettings.showRainSensor || additionalInfoSettings.showOSSF || additionalInfoSettings.showPermitNumber)">
+        <div class="mt-3" *ngIf="additionalInfoSettings && (additionalInfoSettings.showWaterMeterNumber || additionalInfoSettings.showRainSensor || additionalInfoSettings.showOSSF || additionalInfoSettings.showPermitNumber)">
             <vp-section header="Additional Information">
                 <div class="row">
                     <div class="col-md-4" *ngIf="additionalInfoSettings?.showPermitNumber">
                         <vp-input type="text" label="Permit number" name="permitNumber" [(ngModel)]="model.permitNumber" />
+                    </div>
+                    <div class="col-md-4" *ngIf="additionalInfoSettings?.showWaterMeterNumber">
+                        <vp-input type="text" label="Water meter number" name="waterMeterNumber" [maxLength]="50" [(ngModel)]="model.waterMeterNumber" />
                     </div>
                     <div class="col-md-4" *ngIf="additionalInfoSettings?.showOSSF">
                         <div class="form-check mt-4">

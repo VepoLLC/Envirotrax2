@@ -1,0 +1,116 @@
+<h1 class="text-center h2">Account Balance Management</h1>
+
+<form #form="ngForm" (ngSubmit)="save(form)">
+    <div class="mb-4">
+        <vp-section header="Account Balance">
+            <dp-loading-spinner *ngIf="isLoading" />
+
+            <div dp-spinner-parent>
+                <div class="mx-auto w-50 mb-3">
+                    <vp-input name="currentBalance"
+                              label="Current Account Balance: $"
+                              labelStyle="horizontal"
+                              type="number"
+                              [decimals]="2"
+                              [readonly]="true"
+                              [ngModel]="professional.accountBalance" />
+                </div>
+                <div class="mx-auto w-50">
+                    <vp-input name="amountToAdd"
+                              label="Amount to Add: $"
+                              labelStyle="horizontal"
+                              type="number"
+                              [required]="true"
+                              [decimals]="2"
+                              [min]="0.01"
+                              [step]="0.01"
+                              [form]="form"
+                              [(ngModel)]="amountToAdd" />
+                </div>
+            </div>
+        </vp-section>
+    </div>
+
+    <div class="mb-4">
+        <vp-section header="Billing Information">
+            <dp-loading-spinner *ngIf="isLoading" />
+
+            <div dp-spinner-parent>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <vp-input name="billingFirstName"
+                                label="First Name:"
+                                labelStyle="horizontal"
+                                [required]="true"
+                                [maxLength]="255"
+                                [form]="form"
+                                [(ngModel)]="professionalUser.billingFirstName" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-input name="billingLastName"
+                                label="Last Name:"
+                                labelStyle="horizontal"
+                                [required]="true"
+                                [maxLength]="255"
+                                [form]="form"
+                                [(ngModel)]="professionalUser.billingLastName" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-input name="billingAddress"
+                                label="Address:"
+                                labelStyle="horizontal"
+                                [required]="true"
+                                [maxLength]="255"
+                                [form]="form"
+                                [(ngModel)]="professionalUser.billingAddress" />
+                        </div>                                       
+                    </div>
+                    <div class="col-md-6">
+                        
+                        <div class="mb-3">
+                            <vp-input name="billingCity"
+                                label="City:"
+                                labelStyle="horizontal"
+                                [required]="true"
+                                [maxLength]="255"
+                                [form]="form"
+                                [(ngModel)]="professionalUser.billingCity" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-input name="billingStateId"
+                                label="State:"
+                                labelStyle="horizontal"
+                                type="select"
+                                [required]="true"
+                                [form]="form"
+                                [ngModel]="professionalUser.billingState?.id"
+                                [options]="states"
+                                (ngModelChange)="stateChanged($event)" />
+                        </div>
+                        <div class="mb-3">
+                            <vp-input name="billingZipCode"
+                                label="ZIP/Postal Code:"
+                                labelStyle="horizontal"
+                                [required]="true"
+                                [maxLength]="25"
+                                [form]="form"
+                                [(ngModel)]="professionalUser.billingZipCode" />
+                        </div>    
+                    </div>
+                </div>
+
+                <div class="mt-4 text-center">
+                    <p class="text-muted fst-italic mb-2">
+                        Click Continue to securely enter your card details and complete this transaction.
+                    </p>
+                    <app-credit-card-payment [disabled]="!!form.invalid" (tokenCaptured)="onTokenCaptured($event, form)" />
+                </div>
+            </div>
+        </vp-section>
+    </div>
+
+    <div class="mt-3">
+        <vp-validation-summary [form]="form" [validationErrors]="validationErrors" />
+    </div>
+</form>

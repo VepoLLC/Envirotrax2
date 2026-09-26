@@ -1,6 +1,9 @@
 
 using Envirotrax.Common.Data.DbContexts;
 using Envirotrax.Common.Data.Services.Definitions;
+using Envirotrax.LegacyDataMigration.Data.Backflow;
+using Envirotrax.LegacyDataMigration.Data.Professionals;
+using Envirotrax.LegacyDataMigration.Data.Sites;
 using Envirotrax.LegacyDataMigration.Data.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -14,6 +17,9 @@ public class AppDbContext : TenantDbContextBase<WaterSupplier>
     public DbSet<RolePermission> RolePermissions { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
     public DbSet<WaterSupplierUser> WaterSupplierUsers { get; set; }
+    public DbSet<SiteLog> SiteLogs { get; set; }
+    public DbSet<ProfessionalInsurance> ProfessionalInsurances { get; set; }
+    public DbSet<BackflowGauge> BackflowGauges { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options, ILogger<AppDbContext> logger, ITenantProvidersService tenantProvider)
         : base(options, logger, tenantProvider)

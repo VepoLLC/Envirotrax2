@@ -1,6 +1,8 @@
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
 using Microsoft.AspNetCore.Http;
@@ -13,11 +15,13 @@ namespace Envirotrax.App.Server.Controllers.Backflow;
 public class BackflowTestController : WaterSupplierCrudController<BackflowTestDto>
 {
     private readonly IBackflowTestService _testService;
+    private readonly IRecordLogService _recordLogService;
 
-    public BackflowTestController(IBackflowTestService service)
+    public BackflowTestController(IBackflowTestService service, IRecordLogService recordLogService)
         : base(service)
     {
         _testService = service;
+        _recordLogService = recordLogService;
     }
 
     protected override Task<IPagedData<BackflowTestDto>> ProcessGetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
@@ -55,6 +59,20 @@ public class BackflowTestController : WaterSupplierCrudController<BackflowTestDt
 
         var pdf = await _testService.GeneratePdfAsync(test);
         return File(pdf, "application/pdf");
+    }
+
+    [HttpGet("{id}/logs")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetLogsAsync(int id, CancellationToken cancellationToken)
+    {
+        var test = await _testService.GetAsync(id, cancellationToken);
+        if (test == null)
+        {
+            return NotFound();
+        }
+
+        var logs = await _recordLogService.GetByRecordAsync(RecordLogTableNames.BackflowTests, id, cancellationToken);
+        return Ok(logs);
     }
 
     [HttpPut("{id}/renewal-required")]

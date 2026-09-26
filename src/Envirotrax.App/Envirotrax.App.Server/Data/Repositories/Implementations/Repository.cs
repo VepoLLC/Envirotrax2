@@ -1,14 +1,12 @@
 
 
-using System.Globalization;
-using System.Reflection;
-using System.Text;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.DbContexts;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Repositories.Definitions;
 using Envirotrax.App.Server.Data.Services.Definitions;
-using Envirotrax.Common.Data.Attributes;
+using Envirotrax.Common.Data.Extensions;
 using Envirotrax.Common.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,20 +30,13 @@ public abstract class Repository<TModel, TKey> : Repository<TModel, TKey, Tenant
     }
 }
 
+// TDbContext is constrained to TenantDbContext rather than DbContext so repositories can reach the
+// record logging save (SaveChangesAndLogAsync). Every context in the app derives from it.
 public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel, TKey>
     where TModel : class
-    where TDbContext : DbContext
+    where TDbContext : TenantDbContext
 {
-    private static readonly string[] ChangeDescriptionSkippedProperties = new[]
-    {
-        "CreatedById",
-        "CreatedTime",
-        "UpdatedById",
-        "UpdatedTime",
-        "DeletedById",
-        "DeletedTime",
-        "SubmissionId"
-    };
+    private static readonly bool SupportsSoftDelete = ImplementsInterface(typeof(TModel), typeof(IDeleteAutitableModel<>));
 
     private readonly string _primaryKeyName;
 
@@ -71,15 +62,7 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
 
     protected virtual string GetPrimaryColumnName()
     {
-        var entityType = DbContext.Model.FindEntityType(typeof(TModel))!;
-        var primaryKey = entityType.FindPrimaryKey()!;
-
-        var property = primaryKey.Properties
-            .FirstOrDefault(p =>
-                p.PropertyInfo?.GetCustomAttribute<AppPrimaryKeyAttribute>()?.IsShadowKey == false);
-
-        return property?.Name
-               ?? primaryKey.Properties.First().Name;
+        return AppEntityKeys.GetPrimaryKeyName(DbContext.Model.FindEntityType(typeof(TModel))!);
     }
 
     /// <summary>
@@ -135,15 +118,37 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
     /// </summary>
     /// <remarks>
     /// This builds on <see cref="GetListQuery"/> so that every filter a repository applies there —
-    /// soft deletes, tenant scoping, business rules — is honoured by the count too. Sorting and
-    /// pagination are skipped because they cannot change a count, and EF Core drops the includes
-    /// it doesn't need, so this is a single COUNT query rather than the two a paged read costs.
+    /// tenant scoping, business rules — is honoured by the count too. Sorting and pagination are
+    /// skipped because they cannot change a count, and EF Core drops the includes it doesn't need,
+    /// so this is a single COUNT query rather than the two a paged read costs.
+    ///
+    /// Soft-deleted rows are left out the same way a list endpoint leaves them out: by filtering on
+    /// DeletedTime. A query that already filters on DeletedTime — one model-bound from a request, or
+    /// one that deliberately asks for deleted rows — is left as the caller built it.
     /// </remarks>
     public virtual Task<int> CountAsync(Query query, CancellationToken cancellationToken)
     {
+        if (SupportsSoftDelete)
+        {
+            query.ExcludeDeleted();
+        }
+
         return GetListQuery()
             .Where(query.Filter)
             .CountAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Checks for the row's existence with a single EXISTS query, without reading or materializing it.
+    /// </summary>
+    /// <remarks>
+    /// This deliberately matches what <see cref="GetAsync"/> can find — the entity's query filters apply,
+    /// but soft-deleted rows still count as existing — so it is a drop-in replacement for a GetAsync call
+    /// that only exists to null-check.
+    /// </remarks>
+    public virtual Task<bool> ExistsAsync(TKey id, CancellationToken cancellationToken)
+    {
+        return Entity.AnyAsync(m => EF.Property<TKey>(m, _primaryKeyName)!.Equals(id), cancellationToken);
     }
 
     public virtual async Task<TModel?> GetNoIncludesAsync(TKey id, CancellationToken cancellationToken)
@@ -158,6 +163,36 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
         return await GetDetailsQuery()
             .AsNoTracking()
             .SingleOrDefaultAsync(m => EF.Property<TKey>(m, _primaryKeyName)!.Equals(id), cancellationToken);
+    }
+
+    public virtual async Task<TModel?> GetTrackedForUpdateAsync(TKey id, CancellationToken cancellationToken)
+    {
+        return await Entity.SingleOrDefaultAsync(m => EF.Property<TKey>(m, _primaryKeyName)!.Equals(id), cancellationToken);
+    }
+
+    public virtual Task SaveChangesAsync()
+    {
+        return DbContext.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Saves and, when <paramref name="logData"/> is true, writes the field-level record log for the
+    /// changed entities in the same transaction — replacing a manual BuildChangeDescription call
+    /// plus a RecordLogService.AddAsync call at the service layer.
+    /// </summary>
+    /// <remarks>
+    /// Deliberately a separate method rather than an overload of the context's SaveChangesAsync:
+    /// EF already owns SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken), and a
+    /// second bool overload there would be resolved silently and mean something else entirely.
+    ///
+    /// Logging only covers entities marked with <see cref="RecordLoggedAttribute"/>, and only edits.
+    /// Adds, deletes and any log that needs a written message still go through IRecordLogService.
+    /// </remarks>
+    protected virtual Task<int> SaveChangesAsync(bool logData, CancellationToken cancellationToken = default)
+    {
+        return logData
+            ? DbContext.SaveChangesAndLogAsync(cancellationToken)
+            : DbContext.SaveChangesAsync(cancellationToken);
     }
 
     public virtual async Task<TModel> AddAsync(TModel model)
@@ -235,38 +270,4 @@ public abstract class Repository<TModel, TKey, TDbContext> : IRepository<TModel,
         return await ReactivateAsync(model);
     }
 
-    protected string BuildChangeDescription(TModel model)
-    {
-        var changes = new StringBuilder();
-
-        foreach (var property in DbContext.Entry(model).Properties)
-        {
-            if (!property.IsModified || ChangeDescriptionSkippedProperties.Contains(property.Metadata.Name))
-            {
-                continue;
-            }
-
-            var oldValue = FormatChangeValue(property.OriginalValue);
-            var newValue = FormatChangeValue(property.CurrentValue);
-
-            if (oldValue == newValue)
-            {
-                continue;
-            }
-
-            changes.AppendLine($"{property.Metadata.Name} >> '{oldValue}' >> '{newValue}'");
-        }
-
-        return changes.ToString().TrimEnd();
-    }
-
-    private static string FormatChangeValue(object? value)
-    {
-        if (value == null)
-        {
-            return "NULL";
-        }
-
-        return Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
-    }
 }

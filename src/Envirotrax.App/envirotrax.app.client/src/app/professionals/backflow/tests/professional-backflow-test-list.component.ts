@@ -67,7 +67,7 @@ export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy 
 
     public testHistoryOptions: InputOption[] = [
         { id: 'true', text: 'Latest test only' },
-        { id: 'false', text: 'Complete test history' }
+        { id: '', text: 'Complete test history' }
     ];
 
     public propertyTypeOptions: InputOption[] = [

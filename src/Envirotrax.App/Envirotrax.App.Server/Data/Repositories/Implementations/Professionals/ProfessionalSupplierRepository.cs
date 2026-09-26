@@ -32,7 +32,7 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
         return base.GetListQuery()
             .Include(pws => pws.WaterSupplier)
             .Where(pws => pws.WaterSupplier!.DeletedTime == null)
-            .WhereIf(_tenantProvider.ProfessionalId > 0, pws => !pws.IsBanned && !pws.WaterSupplier!.GeneralSettings!.AdministrativeOnly)
+            .WhereIf(_tenantProvider.ProfessionalId > 0, GetProfessionalVisibilityFilter())
             .AsNoTracking();
     }
 
@@ -41,8 +41,21 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
         return base.GetDetailsQuery()
             .Include(pws => pws.WaterSupplier)
             .Where(pws => pws.WaterSupplier!.DeletedTime == null)
-            .WhereIf(_tenantProvider.ProfessionalId > 0, pws => !pws.IsBanned && !pws.WaterSupplier!.GeneralSettings!.AdministrativeOnly)
+            .WhereIf(_tenantProvider.ProfessionalId > 0, GetProfessionalVisibilityFilter())
             .AsNoTracking();
+    }
+
+    private static Expression<Func<ProfessionalWaterSupplier, bool>> GetProfessionalVisibilityFilter()
+    {
+        return pws => !pws.WaterSupplier!.GeneralSettings!.AdministrativeOnly
+            && ((pws.HasBackflowTesting && !pws.IsBackflowTestingSuspended)
+                || (pws.HasCsiInpection && !pws.IsCsiInspectionSuspended)
+                || (pws.HasFogInspection && !pws.IsFogInspectionSuspended)
+                || (pws.HasFogTransportation && !pws.IsFogTransportationSuspended)
+                || (!pws.HasBackflowTesting
+                    && !pws.HasCsiInpection
+                    && !pws.HasFogInspection
+                    && !pws.HasFogTransportation));
     }
 
     public override Task<IEnumerable<ProfessionalWaterSupplier>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)

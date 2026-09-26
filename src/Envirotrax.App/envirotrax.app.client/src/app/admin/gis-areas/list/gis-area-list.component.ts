@@ -9,6 +9,7 @@ import { FeatureType } from "../../../shared/models/feature-type";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
 import { MapPolygon } from "@envirotrax/common-ui";
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
+import { GisMapService } from "../../../shared/services/gis-areas/gis-map.service";
 
 @Component({
     standalone: false,
@@ -34,7 +35,8 @@ export class GisAreaListComponent implements OnInit {
         private readonly _gisAreaService: GisAreaService,
         private readonly _gisAreaCoordinateService: GisAreaCoordinateService,
         private readonly _authService: AuthService,
-        private readonly _containerHelper: AppContainerHelperService
+        private readonly _containerHelper: AppContainerHelperService,
+        private readonly _gisMapService: GisMapService
     ) {
 
     }
@@ -111,19 +113,22 @@ export class GisAreaListComponent implements OnInit {
                 this._gisAreaCoordinateService.getAll()
             ]);
 
-            this.polygons = areas.data.map(area => ({
-                name: area.name,
-                color: area.color || '#000000',
-                onClick: this.edit.bind(this),
-                coordinates: allCoordinates
-                    .filter(c => c.area?.id === area.id)
-                    .map(c => ({ lat: c.latitude!, lng: c.longitude! })),
-                data: {
-                    area: area,
-                    coordinates: allCoordinates.filter(c => c.area?.id === area.id),
-                },
+            this.polygons = areas.data.map(area => {
+                const areaCoordinates = allCoordinates.filter(c => c.area?.id === area.id);
+                const rings = this._gisMapService.buildPolygonRings(areaCoordinates);
 
-            } satisfies MapPolygon<GisAreaVm>));
+                return {
+                    name: area.name,
+                    color: area.color || '#000000',
+                    onClick: this.edit.bind(this),
+                    coordinates: rings.outer,
+                    holes: rings.holes,
+                    data: {
+                        area: area,
+                        coordinates: areaCoordinates,
+                    },
+                } satisfies MapPolygon<GisAreaVm>;
+            });
         } finally {
             this.isLoading = false;
             this.loadingMessage = '';
@@ -145,10 +150,7 @@ export class GisAreaListComponent implements OnInit {
             onDrawComplete: (newPalygon: MapPolygon<GisAreaVm>) => {
                 newPalygon.onDrawComplete = undefined;
 
-                newPalygon.data!.coordinates = newPalygon.coordinates.map(c => ({
-                    latitude: c.lat,
-                    longitude: c.lng
-                }));
+                newPalygon.data!.coordinates = this._gisMapService.buildFlatCoordinates(newPalygon);
 
                 newPalygon.onEdit = this.createOnEditHandler();
 
@@ -181,10 +183,7 @@ export class GisAreaListComponent implements OnInit {
 
     private createOnEditHandler(): (polygon: MapPolygon<GisAreaVm>) => void {
         return (polygon) => {
-            polygon.data!.coordinates = polygon.coordinates.map(c => ({
-                latitude: c.lat,
-                longitude: c.lng
-            }));
+            polygon.data!.coordinates = this._gisMapService.buildFlatCoordinates(polygon);
             this.polygonChanged?.emit(polygon);
         };
     }

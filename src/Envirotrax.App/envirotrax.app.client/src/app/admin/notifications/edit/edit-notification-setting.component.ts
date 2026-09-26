@@ -1,15 +1,13 @@
 import { Component, OnInit } from "@angular/core";
 import { NgForm } from "@angular/forms";
-import { ModalReference } from "@developer-partners/ngx-modal-dialog";
-import { InputOption, ToastService } from "@envirotrax/common-ui";
+import { ModalReference, ModalSize } from "@developer-partners/ngx-modal-dialog";
+import { InputOption, ModalHelperService, ToastService } from "@envirotrax/common-ui";
 import { NotificationSetting } from "../../../shared/models/notifications/notification-setting";
 import { NotificationSettingService } from "../../../shared/services/notifications/notification-setting.service";
 import { NotificationOptionsService } from "../../../shared/services/notifications/notification-options.service";
-import { UserService } from "../../../shared/services/water-suppliers/user.service";
-import { AuthService } from "../../../shared/services/auth/auth.service";
+import { WaterSupplierUser } from "../../../shared/models/users/water-supplier-user";
+import { WaterSupplierUserLookupComponent } from "../../../shared/components/lookups/water-supplier-user-lookup/water-supplier-user-lookup.component";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
-import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
-import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
 
 @Component({
     standalone: false,
@@ -20,9 +18,6 @@ export class EditNotificationSettingComponent implements OnInit {
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
 
-    public canSelectAccount: boolean = false;
-    public accountOptions: InputOption[] = [];
-
     public readonly reasonForTestOptions: InputOption[];
     public readonly intervalOptions: InputOption[];
     public readonly deliveryTypeOptions: InputOption[];
@@ -30,8 +25,7 @@ export class EditNotificationSettingComponent implements OnInit {
 
     constructor(
         private readonly _service: NotificationSettingService,
-        private readonly _userService: UserService,
-        private readonly _authService: AuthService,
+        private readonly _modalHelper: ModalHelperService,
         private readonly _modalReference: ModalReference<NotificationSetting>,
         private readonly _helper: HelperService,
         private readonly _toastService: ToastService,
@@ -46,26 +40,30 @@ export class EditNotificationSettingComponent implements OnInit {
     }
 
     public async ngOnInit(): Promise<void> {
-        this.canSelectAccount = await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Users);
-
-        if (this.canSelectAccount) {
-            await this.getAccounts();
+        if (this.setting.id) {
+            await this.getSetting(this.setting.id);
         }
     }
 
-    private async getAccounts(): Promise<void> {
+    private async getSetting(id: number): Promise<void> {
         try {
             this.isLoading = true;
 
-            const users = await this._userService.getAll({ pageNumber: 1, pageSize: MAX_PAGE_SIZE }, {});
-
-            this.accountOptions = users.data.map(user => ({
-                id: user.id,
-                text: user.emailAddress
-            }));
+            this.setting = await this._service.get(id);
         } finally {
             this.isLoading = false;
         }
+    }
+
+    public lookupAccount(): void {
+        this._modalHelper.show<WaterSupplierUser>(WaterSupplierUserLookupComponent, {
+            title: 'Accounts',
+            size: ModalSize.large
+        }).result()
+            .subscribe(user => {
+                this.setting.userId = user.id;
+                this.setting.user = user;
+            });
     }
 
     public setColor(color: string): void {

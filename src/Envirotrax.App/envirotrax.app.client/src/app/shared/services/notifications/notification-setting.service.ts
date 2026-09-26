@@ -29,6 +29,11 @@ export class NotificationSettingService {
         return lastValueFrom(observable);
     }
 
+    public get(id: number): Promise<NotificationSetting> {
+        const url = this._urlResolver.resolveUrl(`/api/notification-settings/${id}`);
+        return lastValueFrom(this._http.get<NotificationSetting>(url));
+    }
+
     public add(setting: NotificationSetting): Promise<NotificationSetting> {
         const url = this._urlResolver.resolveUrl('/api/notification-settings');
         return lastValueFrom(this._http.post<NotificationSetting>(url, setting));

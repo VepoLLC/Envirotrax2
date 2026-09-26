@@ -1,32 +1,90 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { BaseChartDirective } from "ng2-charts";
+import { ChartConfiguration, ChartData, Plugin } from "chart.js";
 import { AuthService } from "../shared/services/auth/auth.service";
 import { WaterSupplierDashboardService } from "../shared/services/water-suppliers/water-supplier-dashboard.service";
 import { WaterSupplierDashboardStats } from "../shared/models/water-suppliers/water-supplier-dashboard-stats";
 import { CsiSubmissionStats } from "../shared/models/water-suppliers/csi-submission-stats";
 import { BackflowSubmissionStats } from "../shared/models/water-suppliers/backflow-submission-stats";
+import { BackflowComplianceSnapshot } from "../shared/models/backflow/backflow-compliance-snapshot";
 import { FogInspectionSubmissionStats } from "../shared/models/water-suppliers/fog-inspection-submission-stats";
 import { FogTripTicketSubmissionStats } from "../shared/models/water-suppliers/fog-trip-ticket-submission-stats";
 import { FeatureType } from "../shared/models/feature-type";
+import { onThemeChange, readCssVar } from "../shared/utils/chart-theme.util";
 
 @Component({
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.scss'],
     standalone: false
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
+    @ViewChild(BaseChartDirective) private _complianceChart?: BaseChartDirective;
+
+    private _disposeThemeObserver?: () => void;
+
     public waterSupplierId?: number;
     public stats?: WaterSupplierDashboardStats;
     public csiVm?: CsiStatsVm;
     public backflowVm?: BackflowStatsVm;
+    public backflowComplianceVm: BackflowComplianceVm | null = null;
     public fogInspectionVm?: FogInspectionStatsVm;
     public fogTripTicketVm?: FogTripTicketStatsVm;
     public isLoading: boolean = false;
 
-    
+
     public hasCsi: boolean = false;
     public hasBackflow: boolean = false;
     public hasFogInspection: boolean = false;
     public hasFogTransportation: boolean = false;
+
+    public readonly complianceTotalColor = '#adb5bd';
+    public readonly complianceCompliantColor = '#20a845';
+    public readonly complianceNonCompliantColor = '#dc3545';
+
+    private readonly compliancePercentFont = '700 1.4rem sans-serif';
+    private readonly complianceLabelFont = '400 0.75rem sans-serif';
+    private readonly compliancePercentOffsetY = -7;
+    private readonly complianceLabelOffsetY = 14;
+
+    public readonly complianceDoughnutType = 'doughnut' as const;
+    public readonly complianceDoughnutOptions: ChartConfiguration<'doughnut'>['options'] = {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '62%',
+        plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false }
+        }
+    };
+
+    public readonly complianceDoughnutPlugins: Plugin<'doughnut'>[] = [{
+        id: 'dashboardComplianceCenterText',
+        afterDraw: chart => {
+            const arc = chart.getDatasetMeta(0).data[0] as unknown as { x: number; y: number } | undefined;
+
+            if (!arc) {
+                return;
+            }
+
+            const percentColor = readCssVar('--bf-doughnut-percent-color', '#212529');
+            const labelColor = readCssVar('--bf-doughnut-label-color', '#6c757d');
+            const ctx = chart.ctx;
+
+            ctx.save();
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            ctx.fillStyle = percentColor;
+            ctx.font = this.compliancePercentFont;
+            ctx.fillText(`${this.backflowComplianceVm?.compliantPercentage ?? 0}%`, arc.x, arc.y + this.compliancePercentOffsetY);
+
+            ctx.fillStyle = labelColor;
+            ctx.font = this.complianceLabelFont;
+            ctx.fillText('Compliant', arc.x, arc.y + this.complianceLabelOffsetY);
+
+            ctx.restore();
+        }
+    }];
 
     public get hasAnyProgram(): boolean {
         return this.hasCsi || this.hasBackflow || this.hasFogInspection || this.hasFogTransportation;
@@ -38,6 +96,8 @@ export class DashboardComponent implements OnInit {
     ) { }
 
     public async ngOnInit(): Promise<void> {
+        this._disposeThemeObserver = onThemeChange(() => this._complianceChart?.update());
+
         [
             this.waterSupplierId,
             this.hasCsi,
@@ -57,6 +117,10 @@ export class DashboardComponent implements OnInit {
         }
     }
 
+    public ngOnDestroy(): void {
+        this._disposeThemeObserver?.();
+    }
+
     public async loadPageData(): Promise<void> {
         try {
             this.isLoading = true;
@@ -68,6 +132,7 @@ export class DashboardComponent implements OnInit {
 
             if (this.hasBackflow) {
                 requests.push(this._dashboardService.getBackflowSubmissionStats().then(s => this.backflowVm = this.buildBackflowVm(s)));
+                requests.push(this._dashboardService.getBackflowCompliance().then(c => this.backflowComplianceVm = this.buildBackflowComplianceVm(c)));
             }
 
             if (this.hasFogInspection) {
@@ -183,6 +248,28 @@ export class DashboardComponent implements OnInit {
             subAccountTotalPaidTests: subAccountStats.reduce((s, sub) => s + sub.totalPaidTests, 0),
             rangeStartDate: dailyStats[0]?.date,
             rangeEndDate: dailyStats[dailyStats.length - 1]?.date
+        };
+    }
+
+    private buildBackflowComplianceVm(snapshot: BackflowComplianceSnapshot | null): BackflowComplianceVm | null {
+        if (!snapshot) {
+            return null;
+        }
+
+        return {
+            reportDate: snapshot.reportDate,
+            total: snapshot.total,
+            compliant: snapshot.compliant,
+            nonCompliant: snapshot.nonCompliant,
+            compliantPercentage: snapshot.compliantPercentage,
+            doughnutData: {
+                labels: ['Compliant', 'Non-Compliant'],
+                datasets: [{
+                    data: [snapshot.compliant, snapshot.nonCompliant],
+                    backgroundColor: [this.complianceCompliantColor, this.complianceNonCompliantColor],
+                    borderWidth: 0
+                }]
+            }
         };
     }
 
@@ -319,6 +406,15 @@ interface BackflowStatsVm {
     subAccountTotalPaidTests: number;
     rangeStartDate: string;
     rangeEndDate: string;
+}
+
+interface BackflowComplianceVm {
+    reportDate: string;
+    total: number;
+    compliant: number;
+    nonCompliant: number;
+    compliantPercentage: number;
+    doughnutData: ChartData<'doughnut'>;
 }
 
 interface FogInspectionDailyStatsVm {

@@ -1,4 +1,6 @@
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
+using Envirotrax.App.Server.Filters;
+using Envirotrax.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers.WaterSuppliers;
@@ -36,6 +38,15 @@ public class WaterSupplierDashboardController : WaterSupplierProtectedController
         var stats = await _dashboardService.GetBackflowSubmissionStatsAsync(cancellationToken);
 
         return Ok(stats);
+    }
+
+    [HttpGet("backflow-compliance")]
+    [HasFeature(FeatureType.BackflowTesting)]
+    public async Task<IActionResult> GetBackflowComplianceAsync(CancellationToken cancellationToken)
+    {
+        var compliance = await _dashboardService.GetBackflowComplianceAsync(cancellationToken);
+
+        return Ok(compliance);
     }
 
     [HttpGet("fog-inspection-submission-stats")]

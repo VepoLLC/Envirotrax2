@@ -10,6 +10,7 @@ import { PermissionAction, PermissionType } from "../../../shared/models/permiss
 import { NotificationInterval } from "../../../shared/enums/notification-interval.enum";
 import { NotificationDeliveryType } from "../../../shared/enums/notification-delivery-type.enum";
 import { EditNotificationSettingComponent } from "../edit/edit-notification-setting.component";
+import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 
 @Component({
     standalone: false,
@@ -46,10 +47,13 @@ export class NotificationSettingListComponent implements OnInit {
         private readonly _options: NotificationOptionsService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService,
-        private readonly _authService: AuthService
+        private readonly _authService: AuthService,
+        private readonly _containerHelper: AppContainerHelperService
     ) { }
 
     public async ngOnInit(): Promise<void> {
+        this._containerHelper.setContainerVisibility(false);
+
         this.canModify = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.Notifications);
 
         this.table.columns = this.getColumns();
@@ -153,7 +157,7 @@ export class NotificationSettingListComponent implements OnInit {
     }
 
     public edit(row: NotificationSettingRow): void {
-        this.showEditModal('Edit Notification', row.setting);
+        this.showEditModal('Edit Notification', { id: row.setting.id });
     }
 
     private showEditModal(title: string, setting: NotificationSetting): void {

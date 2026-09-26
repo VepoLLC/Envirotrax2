@@ -13,14 +13,14 @@
                               [(ngModel)]="setting.description" />
                 </div>
 
-                <div *ngIf="canSelectAccount" class="mb-3">
-                    <vp-input type="select"
-                              name="userId"
-                              label="Account"
-                              [options]="accountOptions"
-                              [required]="true"
-                              [form]="form"
-                              [(ngModel)]="setting.userId" />
+                <div class="mb-3">
+                    <vp-lookup-field name="userId"
+                                     label="Account"
+                                     [canSearch]="true"
+                                     [required]="true"
+                                     [form]="form"
+                                     [displayText]="setting.user?.emailAddress"
+                                     (search)="lookupAccount()" />
                 </div>
 
                 <div class="mb-3">

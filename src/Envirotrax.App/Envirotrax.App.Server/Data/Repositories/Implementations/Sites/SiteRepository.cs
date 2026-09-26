@@ -122,7 +122,6 @@ public class SiteRepository : Repository<Site>, ISiteRepository
             .Include(s => s.WaterSupplier)
             .Include(s => s.State)
             .Include(s => s.MailingState)
-            .Where(s => s.DeletedTime == null)
             .AsNoTracking();
     }
 

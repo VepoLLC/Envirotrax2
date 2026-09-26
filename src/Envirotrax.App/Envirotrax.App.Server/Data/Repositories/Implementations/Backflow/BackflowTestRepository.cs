@@ -33,8 +33,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             .Include(bt => bt.Bpat)
             .Include(bt => bt.BpatState)
             .Include(bt => bt.PropertyState)
-            .Include(bt => bt.MailingState)
-            .Where(bt => bt.DeletedTime == null);
+            .Include(bt => bt.MailingState);
     }
 
     protected override IQueryable<BackflowTest> GetDetailsQuery()

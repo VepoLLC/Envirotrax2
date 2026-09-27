@@ -97,8 +97,6 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
             return (await GetAsync(professionalId, cancellationToken))!;
         }
 
-        await using var balanceLock = await _paymentService.AcquireBalanceLockAsync(cancellationToken);
-
         if (await _transactionRepository.GetByTransactionIdAsync(dto.TransactionId, cancellationToken) != null)
         {
             return (await GetAsync(professionalId, cancellationToken))!;

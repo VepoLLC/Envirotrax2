@@ -12,7 +12,6 @@ public class ProfessionalPaymentService : IProfessionalPaymentService
     private const string ContactSupportMessage = "Your payment was received but could not be recorded. Please contact support.";
 
     private readonly IAuthService _authService;
-    private readonly IProfessionalRepository _professionalRepository;
     private readonly IProfessionalUserRepository _professionalUserRepository;
     private readonly IProfessionalTransactionRepository _transactionRepository;
     private readonly IAuthorizeNetPaymentService _authorizeNetPaymentService;
@@ -20,24 +19,16 @@ public class ProfessionalPaymentService : IProfessionalPaymentService
 
     public ProfessionalPaymentService(
         IAuthService authService,
-        IProfessionalRepository professionalRepository,
         IProfessionalUserRepository professionalUserRepository,
         IProfessionalTransactionRepository transactionRepository,
         IAuthorizeNetPaymentService authorizeNetPaymentService,
         ILogger<ProfessionalPaymentService> logger)
     {
         _authService = authService;
-        _professionalRepository = professionalRepository;
         _professionalUserRepository = professionalUserRepository;
         _transactionRepository = transactionRepository;
         _authorizeNetPaymentService = authorizeNetPaymentService;
         _logger = logger;
-    }
-
-    public async Task<IAsyncDisposable> AcquireBalanceLockAsync(CancellationToken cancellationToken)
-    {
-        return await _professionalRepository.TryAcquireBalanceLockAsync(_authService.ProfessionalId, cancellationToken)
-            ?? throw new AppValidationException("Another payment for your company is in progress. Please try again in a minute.");
     }
 
     public async Task<AuthorizeNetChargeResult> ChargeCardAsync(CreditCardPaymentDto card, decimal amount, string transactionId)

@@ -55,7 +55,7 @@ public class BackflowCheckoutService : IBackflowCheckoutService
             throw new AppValidationException("Each test can only be paid once.");
         }
 
-        var (transaction, isNewPayment) = await PayUnderBalanceLockAsync(request, testIds, cancellationToken);
+        var (transaction, isNewPayment) = await PayAsync(request, testIds, cancellationToken);
         var receipt = await BuildReceiptAsync(transaction, CancellationToken.None);
 
         if (isNewPayment)
@@ -71,13 +71,11 @@ public class BackflowCheckoutService : IBackflowCheckoutService
         return receipt;
     }
 
-    private async Task<(ProfessionalTransaction Transaction, bool IsNewPayment)> PayUnderBalanceLockAsync(
+    private async Task<(ProfessionalTransaction Transaction, bool IsNewPayment)> PayAsync(
         BackflowCheckoutRequestDto request,
         List<int> testIds,
         CancellationToken cancellationToken)
     {
-        await using var balanceLock = await _paymentService.AcquireBalanceLockAsync(cancellationToken);
-
         var processedTransaction = await _transactionRepository.GetByTransactionIdAsync(request.TransactionId, cancellationToken);
 
         if (processedTransaction != null)

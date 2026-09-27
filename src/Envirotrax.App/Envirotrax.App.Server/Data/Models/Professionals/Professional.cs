@@ -64,8 +64,6 @@ public class Professional : IAuditableModel<AppUser>
     public DateTime? DeletedTime { get; set; }
     [Precision(19, 4)]
     public decimal AccountBalance { get; set; }
-
-    public DateTime? BalanceLockedUntil { get; set; }
 }
 
 public class ProfessionalConfiguration : IEntityTypeConfiguration<Professional>

@@ -24,8 +24,7 @@ public class ProfessionalProfile : Profile
             .ForMember(pro => pro.State, opt => opt.Ignore())
             .ForMember(pro => pro.StateId, opt => opt.MapFrom(pro => pro.State!.Id))
             .ForMember(pro => pro.CreatedTime, opt => opt.Ignore())
-            .ForMember(pro => pro.AccountBalance, opt => opt.Ignore())
-            .ForMember(pro => pro.BalanceLockedUntil, opt => opt.Ignore());
+            .ForMember(pro => pro.AccountBalance, opt => opt.Ignore());
 
         CreateMap<Professional, ReferencedProfessionalDto>();
     }

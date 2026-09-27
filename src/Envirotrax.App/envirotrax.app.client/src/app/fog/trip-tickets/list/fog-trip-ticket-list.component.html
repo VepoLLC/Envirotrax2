@@ -96,46 +96,50 @@
             <!-- Generator Criteria -->
             <div class="row mt-3">
                 <vp-section header="Generator Criteria">
-                    <vp-field-grid>
-                        <vp-filter-panel-field fieldName="propertyType"
-                                               label="Property Type"
-                                               labelStyle="horizontal"
-                                               type="select"
-                                               [options]="propertyTypeOptions"
-                                               [form]="searchForm" />
+                    <div class="d-flex justify-content-center">
+                        <div class="col-md-6">
+                            <vp-field-grid>
+                                <vp-filter-panel-field fieldName="propertyType"
+                                                       label="Property Type"
+                                                       labelStyle="horizontal"
+                                                       type="select"
+                                                       [options]="propertyTypeOptions"
+                                                       [form]="searchForm" />
 
-                        <vp-filter-panel-field fieldName="propertyBusinessName"
-                                               label="Business Name"
-                                               labelStyle="horizontal"
-                                               [form]="searchForm" />
+                                <vp-filter-panel-field fieldName="propertyBusinessName"
+                                                       label="Business Name"
+                                                       labelStyle="horizontal"
+                                                       [form]="searchForm" />
 
-                        <vp-field-grid-row>
-                            <vp-field-grid-label>Address</vp-field-grid-label>
-                            <vp-field-grid-control>
-                                <div class="d-flex gap-1">
-                                    <vp-filter-panel-field fieldName="propertyStreetNumber"
-                                                           label="Street #"
-                                                           [form]="searchForm"
-                                                           class="flex-fill" />
+                                <vp-field-grid-row>
+                                    <vp-field-grid-label>Address</vp-field-grid-label>
+                                    <vp-field-grid-control>
+                                        <div class="d-flex gap-1">
+                                            <vp-filter-panel-field fieldName="propertyStreetNumber"
+                                                                   label="Street #"
+                                                                   [form]="searchForm"
+                                                                   class="flex-fill" />
 
-                                    <vp-filter-panel-field fieldName="propertyStreetName"
-                                                           label="Street Name"
-                                                           [form]="searchForm"
-                                                           class="flex-fill" />
+                                            <vp-filter-panel-field fieldName="propertyStreetName"
+                                                                   label="Street Name"
+                                                                   [form]="searchForm"
+                                                                   class="flex-fill" />
 
-                                    <vp-filter-panel-field fieldName="propertyNumber"
-                                                           label="Suite/Apt #"
-                                                           [form]="searchForm"
-                                                           class="flex-fill" />
-                                </div>
-                            </vp-field-grid-control>
-                        </vp-field-grid-row>
+                                            <vp-filter-panel-field fieldName="propertyNumber"
+                                                                   label="Suite/Apt #"
+                                                                   [form]="searchForm"
+                                                                   class="flex-fill" />
+                                        </div>
+                                    </vp-field-grid-control>
+                                </vp-field-grid-row>
 
-                        <vp-filter-panel-field fieldName="propertyZip"
-                                               label="ZIP"
-                                               labelStyle="horizontal"
-                                               [form]="searchForm" />
-                    </vp-field-grid>
+                                <vp-filter-panel-field fieldName="propertyZip"
+                                                       label="ZIP"
+                                                       labelStyle="horizontal"
+                                                       [form]="searchForm" />
+                            </vp-field-grid>
+                        </div>
+                    </div>
                 </vp-section>
             </div>
 

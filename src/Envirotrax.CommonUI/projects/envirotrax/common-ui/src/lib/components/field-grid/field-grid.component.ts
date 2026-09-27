@@ -10,7 +10,11 @@ import { Component } from "@angular/core";
     host: {
         // d-xl-grid overrides d-flex at the xl breakpoint (Bootstrap generates its responsive
         // display utilities after the base ones, so the later rule wins the cascade tie).
-        class: 'd-flex flex-column gap-1 d-xl-grid align-items-xl-start'
+        // row-gap-xl-1/column-gap-xl-3 likewise override the base gap-1 once this becomes a grid,
+        // since this is the actual grid that ends up placing every field's label/control (they're
+        // pass-through display:contents down to here) so the label-control gap must live here, not
+        // on .vp-input-row.
+        class: 'd-flex flex-column gap-1 d-xl-grid align-items-xl-start row-gap-xl-1 column-gap-xl-3'
     },
     styleUrl: './field-grid.component.css'
 })

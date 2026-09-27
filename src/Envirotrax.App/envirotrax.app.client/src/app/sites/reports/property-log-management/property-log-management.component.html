@@ -27,7 +27,8 @@
             {{ data.site?.mailingStreetNumber }} {{ data.site?.mailingStreetName }}
             <span *ngIf="data.site?.mailingNumber">#{{ data.site?.mailingNumber }}</span>
         </div>
-        <div>{{ data.site?.mailingCity }}<span *ngIf="data.site?.mailingCity">, </span>{{ data.site?.mailingState?.code }}
+        <div>{{ data.site?.mailingCity }}<span *ngIf="data.site?.mailingCity">,
+            </span>{{ data.site?.mailingState?.code }}
             {{ data.site?.mailingZipCode }}
         </div>
     </div>
@@ -46,7 +47,8 @@
 
         <p class="mb-0 mt-1 ps-3" *ngIf="data.assemblyId">
             <span class="fw-semibold">Tagged Assembly:</span>
-            <a class="ms-1" [routerLink]="['/backflow/tests', data.assemblyId, 'view']" target="_blank">Tagged Assembly</a>
+            <a class="ms-1" [routerLink]="['/backflow/tests', data.assemblyId, 'view']" target="_blank">Tagged
+                Assembly</a>
         </p>
 
         <p class="mb-0 mt-1 ps-3" *ngIf="data.fileAttachmentName">
@@ -138,7 +140,8 @@
                                       [(ngModel)]="accountId"
                                       [options]="accountOptions" />
 
-                            <app-gis-area-lookup fieldName="site.gisAreaId" [form]="searchForm" labelStyle="horizontal" />
+                            <app-gis-area-lookup fieldName="site.gisAreaId" [form]="searchForm"
+                                                 labelStyle="horizontal" />
                         </vp-field-grid>
                     </div>
 
@@ -167,7 +170,7 @@
 
             <vp-validation-summary [form]="searchForm" />
 
-            <div class="d-flex justify-content-center mb-3">
+            <div class="d-flex justify-content-center my-3">
                 <button type="submit" class="btn btn-primary vp-section-button">
                     <i class="fa-solid fa-rotate me-1"></i>
                     Refresh Property Log Records

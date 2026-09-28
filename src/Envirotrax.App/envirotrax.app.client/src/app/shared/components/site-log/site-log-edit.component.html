@@ -3,7 +3,7 @@
     <form #logForm="ngForm" (ngSubmit)="save(logForm)">
         <div class="mb-3">
             <vp-input name="logType"
-                      label="Log record type"
+                      label="Log Record Type"
                       type="select"
                       [(ngModel)]="editingLog.logType"
                       [options]="logTypeOptions"
@@ -13,7 +13,7 @@
 
         <div class="mb-3" *ngIf="showReviewDate">
             <vp-input name="reviewDate"
-                      label="Review date"
+                      label="Review Date"
                       type="date"
                       [(ngModel)]="editingLog.reviewDate"
                       [form]="logForm" />
@@ -38,7 +38,7 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label">File attachment</label>
+            <label class="form-label">File Attachment</label>
             <vp-file-upload
                 [file]="selectedFile"
                 (fileChange)="onFileChange($event)"

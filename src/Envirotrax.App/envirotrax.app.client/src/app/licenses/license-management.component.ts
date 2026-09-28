@@ -77,13 +77,13 @@ export class LicenseManagementComponent implements OnInit {
     private getColumns(): TableColumn<WaterSupplierLicense>[] {
         const cols: TableColumn<WaterSupplierLicense>[] = [
             { field: 'userEmail', caption: 'User ID', type: ColumnType.text },
-            { field: 'companyName', caption: 'Company name', type: ColumnType.text },
-            { field: 'contactName', caption: 'Contact name', type: ColumnType.text },
+            { field: 'companyName', caption: 'Company Name', type: ColumnType.text },
+            { field: 'contactName', caption: 'Contact Name', type: ColumnType.text },
             { field: 'licenseTypeName', caption: 'Type', type: ColumnType.text },
-            { field: 'licenseNumber', caption: 'License number', type: ColumnType.text },
+            { field: 'licenseNumber', caption: 'License Number', type: ColumnType.text },
             {
                 field: 'expirationDate',
-                caption: 'Expiration date',
+                caption: 'Expiration Date',
                 type: ColumnType.date,
                 cellTemplate: this.expirationDateCell
             }

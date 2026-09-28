@@ -4,6 +4,8 @@ BEGIN
     ADD LegacyRecordId INT NULL;
 END
 
+--  It stops the run when V1 holds a value V2 has nowhere to put.
+
 IF EXISTS
 (
     SELECT 1

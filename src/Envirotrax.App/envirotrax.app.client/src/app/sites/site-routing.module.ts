@@ -45,7 +45,7 @@ const routes: Routes = [
     },
     {
         path: ':id/edit',
-        title: 'Edit site',
+        title: 'Edit Site',
         component: EditSiteComponent,
         canActivate: [PermissionGuard],
         data: {

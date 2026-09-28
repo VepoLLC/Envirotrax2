@@ -87,7 +87,7 @@ export class GaugeListComponent implements OnInit {
             },
             {
                 field: 'serialNumber',
-                caption: 'Serial number',
+                caption: 'Serial Number',
                 type: ColumnType.text
             },
             {
@@ -98,7 +98,7 @@ export class GaugeListComponent implements OnInit {
             },
             {
                 field: 'lastCalibrationDate',
-                caption: 'Test date',
+                caption: 'Test Date',
                 cellTemplate: this.dateCellTemplate,
                 type: ColumnType.date
             }

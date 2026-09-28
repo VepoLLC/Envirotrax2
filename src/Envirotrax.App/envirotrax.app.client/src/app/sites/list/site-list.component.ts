@@ -298,7 +298,7 @@ export class SiteListComponent implements OnInit {
 
     public add(): void {
         this._modalHelper.show<Site>(CreateSiteComponent, {
-            title: 'Location / Property information',
+            title: 'Location / Property Information',
         }).result()
             .subscribe(_ => this.getSites());
     }

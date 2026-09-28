@@ -20,15 +20,13 @@
             <vp-section header="General Information">
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="mb-2">
+                        <vp-field-grid>
                             <vp-input [ngModel]="supplier.id"
                                       name="id"
                                       label="Water Supplier ID"
                                       labelStyle="horizontal"
                                       [readonly]="true" />
-                        </div>
 
-                        <div class="mb-2">
                             <vp-input [(ngModel)]="supplier.name"
                                       name="name"
                                       label="Name"
@@ -36,27 +34,21 @@
                                       [required]="true"
                                       [maxLength]="255"
                                       [form]="generalForm" />
-                        </div>
 
-                        <div class="mb-2">
                             <vp-input [(ngModel)]="supplier.address"
                                       name="address"
                                       label="Address"
                                       labelStyle="horizontal"
                                       [maxLength]="100"
                                       [form]="generalForm" />
-                        </div>
 
-                        <div class="mb-2">
                             <vp-input [(ngModel)]="supplier.city"
                                       name="city"
                                       label="City"
                                       labelStyle="horizontal"
                                       [maxLength]="50"
                                       [form]="generalForm" />
-                        </div>
 
-                        <div class="mb-2">
                             <vp-input [ngModel]="supplier.state?.id"
                                       (ngModelChange)="supplier.state = $event ? { id: $event } : undefined"
                                       name="stateId"
@@ -65,53 +57,45 @@
                                       type="select"
                                       [options]="states"
                                       [form]="generalForm" />
-                        </div>
 
-                        <div class="mb-2">
                             <vp-input [(ngModel)]="supplier.zipCode"
                                       name="zipCode"
                                       label="ZIP"
                                       labelStyle="horizontal"
                                       [maxLength]="50"
                                       [form]="generalForm" />
-                        </div>
+                        </vp-field-grid>
                     </div>
 
                     <div class="col-md-6">
-                        <div class="mb-2">
+                        <vp-field-grid>
                             <vp-input [ngModel]="supplier.pwsId"
                                       name="pwsId"
                                       label="PWS ID"
                                       labelStyle="horizontal"
                                       [readonly]="true" />
-                        </div>
 
-                        <div class="mb-2">
                             <vp-input [(ngModel)]="supplier.contactName"
                                       name="contactName"
                                       label="Contact Name"
                                       labelStyle="horizontal"
                                       [maxLength]="100"
                                       [form]="generalForm" />
-                        </div>
 
-                        <div class="mb-2">
                             <vp-input [(ngModel)]="supplier.phoneNumber"
                                       name="phoneNumber"
                                       label="Phone Number"
                                       labelStyle="horizontal"
                                       [maxLength]="25"
                                       [form]="generalForm" />
-                        </div>
 
-                        <div class="mb-2">
                             <vp-input [(ngModel)]="supplier.faxNumber"
                                       name="faxNumber"
                                       label="Fax Number"
                                       labelStyle="horizontal"
                                       [maxLength]="25"
                                       [form]="generalForm" />
-                        </div>
+                        </vp-field-grid>
                     </div>
                 </div>
             </vp-section>

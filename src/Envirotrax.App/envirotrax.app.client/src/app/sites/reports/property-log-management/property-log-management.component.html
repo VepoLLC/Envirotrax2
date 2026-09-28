@@ -27,7 +27,8 @@
             {{ data.site?.mailingStreetNumber }} {{ data.site?.mailingStreetName }}
             <span *ngIf="data.site?.mailingNumber">#{{ data.site?.mailingNumber }}</span>
         </div>
-        <div>{{ data.site?.mailingCity }}<span *ngIf="data.site?.mailingCity">, </span>{{ data.site?.mailingState?.code }}
+        <div>{{ data.site?.mailingCity }}<span *ngIf="data.site?.mailingCity">,
+            </span>{{ data.site?.mailingState?.code }}
             {{ data.site?.mailingZipCode }}
         </div>
     </div>
@@ -46,7 +47,8 @@
 
         <p class="mb-0 mt-1 ps-3" *ngIf="data.assemblyId">
             <span class="fw-semibold">Tagged Assembly:</span>
-            <a class="ms-1" [routerLink]="['/backflow/tests', data.assemblyId, 'view']" target="_blank">Tagged Assembly</a>
+            <a class="ms-1" [routerLink]="['/backflow/tests', data.assemblyId, 'view']" target="_blank">Tagged
+                Assembly</a>
         </p>
 
         <p class="mb-0 mt-1 ps-3" *ngIf="data.fileAttachmentName">
@@ -94,23 +96,21 @@
             <vp-filter-panel (filterChange)="onFilterChange($event)">
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="mb-3">
+                        <vp-field-grid>
                             <vp-input type="select"
                                       label="Log Type"
                                       name="logType"
                                       labelStyle="horizontal"
                                       [(ngModel)]="logType"
                                       [options]="logTypeOptions" />
-                        </div>
 
-                        <div class="mb-3">
                             <vp-input type="select"
                                       label="Sort By"
                                       name="sortBy"
                                       labelStyle="horizontal"
                                       [(ngModel)]="sortBy"
                                       [options]="sortOptions" />
-                        </div>
+                        </vp-field-grid>
 
                         <div class="d-xl-flex justify-content-end">
                             <div class="form-check mb-2">
@@ -119,65 +119,58 @@
                                        id="showMailing"
                                        name="showMailing"
                                        [(ngModel)]="showMailing" />
-                                <label class="form-check-label" for="showMailing">Show mailing information</label>
+                                <label class="form-check-label" for="showMailing">Show Mailing Information</label>
                             </div>
                         </div>
                     </div>
 
                     <div class="col-md-4">
-                        <div class="mb-3">
+                        <vp-field-grid>
                             <vp-input type="select"
                                       label="User Account Type"
                                       name="userAccountType"
                                       labelStyle="horizontal"
                                       [(ngModel)]="userAccountType"
                                       [options]="userAccountTypeOptions" />
-                        </div>
 
-                        <div class="mb-3">
                             <vp-input type="select"
                                       label="User Account"
                                       name="accountId"
                                       labelStyle="horizontal"
                                       [(ngModel)]="accountId"
                                       [options]="accountOptions" />
-                        </div>
 
-                        <div class="mb-3">
-                            <app-gis-area-lookup fieldName="site.gisAreaId" [form]="searchForm" labelStyle="horizontal" />
-                        </div>
+                            <app-gis-area-lookup fieldName="site.gisAreaId" [form]="searchForm"
+                                                 labelStyle="horizontal" />
+                        </vp-field-grid>
                     </div>
 
                     <div class="col-md-4">
-                        <div class="mb-3">
+                        <vp-field-grid>
                             <vp-input label="Account Number"
                                       name="accountNumber"
                                       labelStyle="horizontal"
                                       [(ngModel)]="accountNumber" />
-                        </div>
 
-                        <div class="mb-3">
                             <vp-filter-panel-field fieldName="site.propertyType"
                                                    label="Property Type"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="propertyTypes" />
-                        </div>
 
-                        <div class="mb-3">
                             <vp-input label="Property Street Name"
                                       name="propertyStreetName"
                                       labelStyle="horizontal"
                                       [(ngModel)]="propertyStreet" />
-                        </div>
+                        </vp-field-grid>
                     </div>
                 </div>
             </vp-filter-panel>
 
             <vp-validation-summary [form]="searchForm" />
 
-            <div class="d-flex justify-content-center mb-3">
+            <div class="d-flex justify-content-center my-3">
                 <button type="submit" class="btn btn-primary vp-section-button">
                     <i class="fa-solid fa-rotate me-1"></i>
                     Refresh Property Log Records

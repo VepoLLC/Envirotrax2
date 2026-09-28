@@ -1,3 +1,5 @@
+import { State } from "../lookup/state";
+
 export interface ReferencedWaterSupplier {
     id?: number;
     name?: string | null;
@@ -29,7 +31,7 @@ export interface CsiInspection {
     propertyStreetName?: string | null;
     propertyNumber?: string | null;
     propertyCity?: string | null;
-    propertyState?: string | null;
+    propertyState?: State | null;
     propertyZip?: string | null;
 
     // Mailing / Contact
@@ -39,7 +41,7 @@ export interface CsiInspection {
     mailingStreetName?: string | null;
     mailingNumber?: string | null;
     mailingCity?: string | null;
-    mailingState?: string | null;
+    mailingState?: State | null;
     mailingZip?: string | null;
     mailingPhoneNumber?: string | null;
     mailingEmailAddress?: string | null;

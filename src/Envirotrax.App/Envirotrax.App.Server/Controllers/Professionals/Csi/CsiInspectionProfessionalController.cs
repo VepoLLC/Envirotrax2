@@ -14,10 +14,12 @@ namespace Envirotrax.App.Server.Controllers.Professionals.Csi;
 public class CsiInspectionProfessionalController : ProfessionalProtectedController
 {
     private readonly ICsiInspectionService _inspectionService;
+    private readonly ICsiCheckoutService _checkoutService;
 
-    public CsiInspectionProfessionalController(ICsiInspectionService inspectionService)
+    public CsiInspectionProfessionalController(ICsiInspectionService inspectionService, ICsiCheckoutService checkoutService)
     {
         _inspectionService = inspectionService;
+        _checkoutService = checkoutService;
     }
 
     [HttpGet("{id}")]
@@ -71,5 +73,17 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
     {
         var result = await _inspectionService.DeleteAsync(id);
         return result == null ? NotFound() : Ok(result);
+    }
+
+    [HttpPost("checkout")]
+    public async Task<IActionResult> CheckoutAsync([FromBody] CsiCheckoutRequestDto request, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
+
+        var receipt = await _checkoutService.CheckoutAsync(request, cancellationToken);
+        return Ok(receipt);
     }
 }

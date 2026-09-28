@@ -7,6 +7,7 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { CsiInspection } from "../../models/csi/csi-inspection";
+import { CsiCheckoutReceipt, CsiCheckoutRequest } from "../../models/csi/csi-checkout";
 import { CsiInspectionImage } from "../../models/csi/csi-inspection-image";
 import { DownloadEndpoint } from "../../models/download-config";
 import { RecordLog } from "@envirotrax/common-ui";
@@ -132,6 +133,11 @@ export class CsiInspectionService {
     public getPdfForProfessional(id: number): Promise<Blob> {
         const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${id}/pdf`);
         return lastValueFrom(this._http.get(url, { responseType: 'blob' }));
+    }
+
+    public checkout(request: CsiCheckoutRequest): Promise<CsiCheckoutReceipt> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/csi/inspections/checkout');
+        return lastValueFrom(this._http.post<CsiCheckoutReceipt>(url, request));
     }
 
     public getImages(inspectionId: number): Promise<CsiInspectionImage[]> {

@@ -314,6 +314,25 @@ public class SiteRepository : Repository<Site>, ISiteRepository
                 .SetProperty(s => s.NeedsRenewalCheck, false));
     }
 
+    public async Task ClearNeedsCsiInspectionAsync(IReadOnlyCollection<int> siteIds)
+    {
+        var sites = await Entity
+            .Where(s => siteIds.Contains(s.Id) && s.NeedsCsiInspection)
+            .ToListAsync();
+
+        if (sites.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var site in sites)
+        {
+            site.NeedsCsiInspection = false;
+        }
+
+        await SaveChangesAsync(logData: true);
+    }
+
     public async Task<IEnumerable<Site>> GetAllPendingRenewalAsync(int batchSize)
     {
         return await DbContext.Sites

@@ -20,5 +20,6 @@ public interface ISiteRepository : IRepository<Site>
     Task<IEnumerable<Site>> GetFogTripTicketComplianceAsync(PageInfo pageInfo, Query query, DateTime? dueDateFrom, DateTime? dueDateTo, bool sortDescending, CancellationToken cancellationToken);
     Task UpdateFogAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate);
     Task ClearNeedsRenewalCheckAsync(int siteId);
+    Task ClearNeedsCsiInspectionAsync(IReadOnlyCollection<int> siteIds);
     Task<IEnumerable<Site>> GetAllPendingRenewalAsync(int batchSize);
 }

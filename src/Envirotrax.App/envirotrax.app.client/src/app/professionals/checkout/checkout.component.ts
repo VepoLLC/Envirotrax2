@@ -1,4 +1,5 @@
 import { Component, OnInit } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
 import { AuthService } from "../../shared/services/auth/auth.service";
 import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
 import { FeatureType } from "../../shared/models/feature-type";
@@ -49,7 +50,8 @@ export class CheckoutComponent implements OnInit {
 
     constructor(
         private readonly _authService: AuthService,
-        private readonly _containerHelper: AppContainerHelperService
+        private readonly _containerHelper: AppContainerHelperService,
+        private readonly _activatedRoute: ActivatedRoute
     ) {
 
     }
@@ -87,7 +89,11 @@ export class CheckoutComponent implements OnInit {
         this.canViewFogInspection = hasFogInspection && (isFogInspector || isAdmin);
         this.canViewFogTransportation = hasFogTransportation && (isFogTransporter || isAdmin);
 
-        if (this.canViewBackflowTesting) {
+        const requestedTab = this._activatedRoute.snapshot.queryParamMap.get('tab');
+
+        if (requestedTab === 'csi' && this.canViewCsiInspection) {
+            this.activeTab = 'csi';
+        } else if (this.canViewBackflowTesting) {
             this.activeTab = 'backflow';
         } else if (this.canViewCsiInspection) {
             this.activeTab = 'csi';

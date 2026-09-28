@@ -66,7 +66,7 @@ public class FogVehiclePermitRepository : Repository<FogVehiclePermit>, IFogVehi
     private IQueryable<int> GetRegisteredTransporterIdsQuery()
     {
         return DbContext.ProfessionalWaterSuppliers
-            .Where(pws => pws.HasFogTransportation && !pws.IsBanned)
+            .Where(pws => pws.HasFogTransportation && !pws.IsFogTransportationSuspended)
             .Select(pws => pws.ProfessionalId);
     }
 

@@ -9,7 +9,7 @@
         <div class="mb-3">
             <vp-input type="number"
                       name="backflowCommercialTestFee"
-                      label="Commercial fee"
+                      label="Commercial Fee"
                       [(ngModel)]="supplier.backflowCommercialTestFee"
                       [form]="form" />
         </div>
@@ -17,7 +17,7 @@
         <div class="mb-3">
             <vp-input type="number"
                       name="backflowResidentialTestFee"
-                      label="Residential fee"
+                      label="Residential Fee"
                       [(ngModel)]="supplier.backflowResidentialTestFee"
                       [form]="form" />
         </div>
@@ -42,10 +42,10 @@
         <div class="mb-3 form-check">
             <input type="checkbox"
                    class="form-check-input"
-                   id="isBanned"
-                   name="isBanned"
-                   [(ngModel)]="supplier.isBanned" />
-            <label class="form-check-label" for="isBanned">Suspended</label>
+                   id="isBackflowTestingSuspended"
+                   name="isBackflowTestingSuspended"
+                   [(ngModel)]="supplier.isBackflowTestingSuspended" />
+            <label class="form-check-label" for="isBackflowTestingSuspended">Suspended</label>
         </div>
 
         <div class="mt-3">

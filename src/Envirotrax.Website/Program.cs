@@ -1,5 +1,10 @@
+using Azure.Identity;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddAzureKeyVault(
+    vaultUri: new Uri(builder.Configuration["KeyVault:Url"] ?? throw new InvalidOperationException()),
+    credential: new DefaultAzureCredential());
 
 builder.CreateUmbracoBuilder()
     .AddBackOffice()

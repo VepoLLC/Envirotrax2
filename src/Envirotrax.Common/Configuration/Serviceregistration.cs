@@ -75,6 +75,15 @@ public static class ServiceRegistrations
         return services;
     }
 
+    public static IServiceCollection AddRecaptchaService(this IServiceCollection services, IConfigurationSection recaptchaConfigSection)
+    {
+        services.AddHttpClient();
+        services.Configure<RecaptchaOptions>(recaptchaConfigSection);
+        services.AddTransient<IRecaptchaVerificationService, RecaptchaVerificationService>();
+
+        return services;
+    }
+
     public static IServiceCollection AddInternalApi<TOptions>(this IServiceCollection services, IConfigurationSection configuration)
         where TOptions : InternalApiOptions
     {

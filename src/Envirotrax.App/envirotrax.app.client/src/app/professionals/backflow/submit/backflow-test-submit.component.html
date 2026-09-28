@@ -244,10 +244,10 @@
                         <vp-input type="text" label="Size" name="size" [(ngModel)]="model.size" />
                     </div>
                     <div class="col-md-4">
-                        <vp-input type="text" label="Serial number" name="serialNumber" [(ngModel)]="model.serialNumber" [required]="!model.unknownSerialNumber" [form]="submitForm" />
+                        <vp-input type="text" label="Serial Number" name="serialNumber" [(ngModel)]="model.serialNumber" [required]="!model.unknownSerialNumber" [form]="submitForm" />
                         <div class="form-check mt-1">
                             <input class="form-check-input" type="checkbox" id="unknownSN" name="unknownSN" [(ngModel)]="model.unknownSerialNumber" />
-                            <label class="form-check-label" for="unknownSN">Unknown serial number</label>
+                            <label class="form-check-label" for="unknownSN">Unknown Serial Number</label>
                         </div>
                     </div>
                 </div>
@@ -265,14 +265,14 @@
                         <vp-input type="text" label="Size" name="size2" [(ngModel)]="model.size2" />
                     </div>
                     <div class="col-md-4">
-                        <vp-input type="text" label="Serial number" name="serialNumber2" [(ngModel)]="model.serialNumber2" />
+                        <vp-input type="text" label="Serial Number" name="serialNumber2" [(ngModel)]="model.serialNumber2" />
                     </div>
                 </div>
 
                 <!-- Location description -->
                 <div class="row mb-3">
                     <div class="col-md-12">
-                        <vp-input type="text" label="Location description" name="locationDescription" [(ngModel)]="model.locationDescription" />
+                        <vp-input type="text" label="Location Description" name="locationDescription" [(ngModel)]="model.locationDescription" />
                     </div>
                 </div>
             </vp-section>
@@ -297,12 +297,12 @@
                                 <label class="form-check-label" for="resultFail">Failed</label>
                             </div>
                         </div>
-                        <vp-input type="select" label="Reason for test" name="reasonForTest" [(ngModel)]="model.reasonForTest"
+                        <vp-input type="select" label="Reason for Test" name="reasonForTest" [(ngModel)]="model.reasonForTest"
                                   [options]="reasonOptions" [required]="true" [form]="submitForm"
                                   [placeholder]="'Select reason'" />
                     </div>
                     <div class="col-md-6">
-                        <vp-input type="text" label="Job number" name="jobNumber" [(ngModel)]="model.jobNumber" />
+                        <vp-input type="text" label="Job Number" name="jobNumber" [(ngModel)]="model.jobNumber" />
                         <span class="form-text text-muted">(Optional)</span>
                     </div>
                 </div>
@@ -310,7 +310,7 @@
                 <!-- Replacement assembly -->
                 <div class="row mb-3" *ngIf="model.reasonForTest === BackflowReasonForTest.Replacement">
                     <div class="col-md-6">
-                        <vp-input type="text" label="Old model / serial #" name="replacementAssembly" [(ngModel)]="model.replacementAssembly" />
+                        <vp-input type="text" label="Old Model / Serial #" name="replacementAssembly" [(ngModel)]="model.replacementAssembly" />
                     </div>
                 </div>
 
@@ -348,7 +348,7 @@
                 <ng-container *ngIf="isAirGap">
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <vp-input type="datetime" label="Test date and time" name="airGapDate" [(ngModel)]="model.initialTestDate" [required]="true" [form]="submitForm" />
+                            <vp-input type="datetime" label="Test Date and Time" name="airGapDate" [(ngModel)]="model.initialTestDate" [required]="true" [form]="submitForm" />
                         </div>
                         <div class="col-md-6">
                             <div class="d-flex align-items-center gap-3 mt-3">
@@ -1040,7 +1040,7 @@
                                         </div>
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="initRVDidNotOpen" name="initRVDidNotOpen" [(ngModel)]="model.initRVDidNotOpen" />
-                                            <label class="form-check-label" for="initRVDidNotOpen">Did not open</label>
+                                            <label class="form-check-label" for="initRVDidNotOpen">Did Not Open</label>
                                         </div>
                                     </td>
                                 </tr>
@@ -1235,7 +1235,7 @@
                                         </div>
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="initRVDidNotOpen" name="initRVDidNotOpen" [(ngModel)]="model.initRVDidNotOpen" />
-                                            <label class="form-check-label" for="initRVDidNotOpen">Did not open</label>
+                                            <label class="form-check-label" for="initRVDidNotOpen">Did Not Open</label>
                                         </div>
                                     </td>
 
@@ -1272,7 +1272,7 @@
                                         </div>
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="initRVDidNotOpen2" name="initRVDidNotOpen2" [(ngModel)]="model.initRVDidNotOpen2" />
-                                            <label class="form-check-label" for="initRVDidNotOpen2">Did not open</label>
+                                            <label class="form-check-label" for="initRVDidNotOpen2">Did Not Open</label>
                                         </div>
                                     </td>
                                 </tr>
@@ -1535,7 +1535,7 @@
                                         </div>
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="initRVDidNotOpen" name="initRVDidNotOpen" [(ngModel)]="model.initRVDidNotOpen" />
-                                            <label class="form-check-label" for="initRVDidNotOpen">Did not open</label>
+                                            <label class="form-check-label" for="initRVDidNotOpen">Did Not Open</label>
                                         </div>
                                     </td>
 
@@ -1727,11 +1727,11 @@
                                             Opened at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initPvbAirInletOpenedPSID" [(ngModel)]="model.initPvbAirInletOpenedPSID" step="0.1" min="0" max="15" /> PSID </div>
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="initPvbAirInletDidNotOpen" name="initPvbAirInletDidNotOpen" [(ngModel)]="model.initPvbAirInletDidNotOpen" />
-                                            <label class="form-check-label" for="initPvbAirInletDidNotOpen">Did not open</label>
+                                            <label class="form-check-label" for="initPvbAirInletDidNotOpen">Did Not Open</label>
                                         </div>
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="initPvbAirInletFullyOpened" name="initPvbAirInletFullyOpened" [(ngModel)]="model.initPvbAirInletFullyOpened" />
-                                            <label class="form-check-label" for="initPvbAirInletFullyOpened">Did it fully open</label>
+                                            <label class="form-check-label" for="initPvbAirInletFullyOpened">Did It Fully Open</label>
                                         </div>
                                     </td>
                                     <td [class.table-success]="isPvbCVCellValid(model.initPvbCVHeldPSID, model.initPvbCVLeaked)"
@@ -1821,10 +1821,10 @@
                         <vp-input type="text" label="Bypass Meter Number" name="meterNumber" [(ngModel)]="model.meterNumber" />
                     </div>
                     <div class="col-md-3">
-                        <vp-input type="number" label="Meter reading prior to test" name="meterReadingBefore" [(ngModel)]="model.meterReadingBefore" />
+                        <vp-input type="number" label="Meter Reading Prior to Test" name="meterReadingBefore" [(ngModel)]="model.meterReadingBefore" />
                     </div>
                     <div class="col-md-3">
-                        <vp-input type="number" label="Meter reading upon completion" name="meterReadingAfter" [(ngModel)]="model.meterReadingAfter" />
+                        <vp-input type="number" label="Meter Reading Upon Completion" name="meterReadingAfter" [(ngModel)]="model.meterReadingAfter" />
                     </div>
                     <div class="col-md-3">
                         <div class="form-check mt-4">
@@ -1841,10 +1841,10 @@
             <vp-section header="Additional Information">
                 <div class="row">
                     <div class="col-md-4" *ngIf="additionalInfoSettings?.showPermitNumber">
-                        <vp-input type="text" label="Permit number" name="permitNumber" [(ngModel)]="model.permitNumber" />
+                        <vp-input type="text" label="Permit Number" name="permitNumber" [(ngModel)]="model.permitNumber" />
                     </div>
                     <div class="col-md-4" *ngIf="additionalInfoSettings?.showWaterMeterNumber">
-                        <vp-input type="text" label="Water meter number" name="waterMeterNumber" [maxLength]="50" [(ngModel)]="model.waterMeterNumber" />
+                        <vp-input type="text" label="Water Meter Number" name="waterMeterNumber" [maxLength]="50" [(ngModel)]="model.waterMeterNumber" />
                     </div>
                     <div class="col-md-4" *ngIf="additionalInfoSettings?.showOSSF">
                         <div class="form-check mt-4">

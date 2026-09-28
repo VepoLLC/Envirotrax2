@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Models.Professionals;
 
@@ -19,6 +20,9 @@ public class ProfessionalInsurance : IProfessionalModel, ICreateAuditableModel<A
     [Required]
     [StringLength(50)]
     public string InsuranceNumber { get; set; } = null!;
+
+    [Precision(19, 4)]
+    public decimal? CoverageAmount { get; set; }
 
     [Required]
     public string FilePath { get; set; } = null!;

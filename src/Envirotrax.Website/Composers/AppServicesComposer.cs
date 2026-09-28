@@ -1,12 +1,15 @@
 
+using System.Reflection;
 using Azure.Identity;
 using Azure.Storage.Blobs;
+using Envirotrax.Common.Configuration;
+using Envirotrax.Website.Configuration;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.StorageProviders.AzureBlob.IO;
 
 namespace Envirotrax.Website.Composers;
 
-public class AzureBlobFileSystemComposer : IComposer
+public class AppServicesComposer : IComposer
 {
     public void Compose(IUmbracoBuilder builder)
     {
@@ -19,5 +22,15 @@ public class AzureBlobFileSystemComposer : IComposer
             options.ContainerName = containerName;
             options.TryCreateBlobContainerClientUsingUri(uri => new BlobContainerClient(uri, new DefaultAzureCredential(), options.ConfigureRetry(new BlobClientOptions())));
         });
+
+        builder.Services.Configure<LegacyUrlRedirectOptions>(builder.Config.GetSection("LegacyUrlRedirects"));
+
+        builder.Services.AddEmailService(builder.Config.GetSection("Email"), options =>
+        {
+            options.Assembly = Assembly.GetExecutingAssembly();
+            options.Namespace = "Envirotrax.Website";
+        });
+
+        builder.Services.AddRecaptchaService(builder.Config.GetSection("Recaptcha"));
     }
 }

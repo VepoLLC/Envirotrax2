@@ -41,7 +41,6 @@ BEGIN TRY
                 AND masterRegistrations.UserID = accounts.LegacyCompanyUserId
                 AND masterRegistrations.UserType = registrations.UserType
                 AND masterRegistrations.Active = 1
-                AND masterRegistrations.Banned = 0
         )
         AND NOT EXISTS
         (
@@ -88,14 +87,17 @@ BEGIN TRY
             -- one per professional type, so this names the pair rather than any single fee - the fees
             -- below each come from the registration of their own type.
             MAX(ID) AS LegacyRecordId,
-            MAX(CASE WHEN Active = 1 AND Banned = 0 AND UserType = 2 THEN 1 ELSE 0 END) AS HasBackflowTesting,
-            MAX(CASE WHEN Active = 1 AND Banned = 0 AND UserType = 4 THEN 1 ELSE 0 END) AS HasCsiInpection,
-            MAX(CASE WHEN Active = 1 AND Banned = 0 AND UserType = 5 THEN 1 ELSE 0 END) AS HasFogTransportation,
-            MAX(CASE WHEN Active = 1 AND Banned = 0 AND UserType = 6 THEN 1 ELSE 0 END) AS HasFogInspection,
-            CASE WHEN MAX(CASE WHEN Banned = 1 THEN 1 ELSE 0 END) = 1
-                      AND MAX(CASE WHEN Active = 1 AND Banned = 0 THEN 1 ELSE 0 END) = 0
-                 THEN 1 ELSE 0
-            END AS IsBanned,
+            MAX(CASE WHEN Active = 1 AND UserType = 2 THEN 1 ELSE 0 END) AS HasBackflowTesting,
+            MAX(CASE WHEN Active = 1 AND UserType = 4 THEN 1 ELSE 0 END) AS HasCsiInpection,
+            MAX(CASE WHEN Active = 1 AND UserType = 5 THEN 1 ELSE 0 END) AS HasFogTransportation,
+            MAX(CASE WHEN Active = 1 AND UserType = 6 THEN 1 ELSE 0 END) AS HasFogInspection,
+            -- A ban in V1 sits on one registration, so it stops one service at one water supplier and
+            -- leaves the company's other services there alone. V2 keeps a suspension flag per service
+            -- for the same reason, and each one is filled from the registration of its own type.
+            MAX(CASE WHEN Banned = 1 AND UserType = 2 THEN 1 ELSE 0 END) AS IsBackflowTestingSuspended,
+            MAX(CASE WHEN Banned = 1 AND UserType = 4 THEN 1 ELSE 0 END) AS IsCsiInspectionSuspended,
+            MAX(CASE WHEN Banned = 1 AND UserType = 5 THEN 1 ELSE 0 END) AS IsFogTransportationSuspended,
+            MAX(CASE WHEN Banned = 1 AND UserType = 6 THEN 1 ELSE 0 END) AS IsFogInspectionSuspended,
             -- V1 stores -1 when the professional has no fee of their own and the water supplier's fee
             -- applies (the `wsReg.CommercialFee >= 0` check in backflow_test_submit.aspx.vb). In V2 that
             -- is NULL, while zero stays a real override meaning the work is free. FOG keeps one fee here
@@ -104,18 +106,19 @@ BEGIN TRY
             -- (inspection_submit.aspx.vb:1192), but V2 has no column for it, so 01_BeforeMigration stops the
             -- run if any registration charges a residential fee that would be dropped here.
             -- SaveWaterSupplierRegistrations.FogFee is only ever written, never read.
-            MAX(CASE WHEN Active = 1 AND Banned = 0 AND UserType = 2 AND CommercialFee >= 0 THEN CommercialFee END) AS BackflowCommercialTestFee,
-            MAX(CASE WHEN Active = 1 AND Banned = 0 AND UserType = 2 AND ResidentialFee >= 0 THEN ResidentialFee END) AS BackflowResidentialTestFee,
-            MAX(CASE WHEN Active = 1 AND Banned = 0 AND UserType = 4 AND CommercialFee >= 0 THEN CommercialFee END) AS CsiCommercialInspectionFee,
-            MAX(CASE WHEN Active = 1 AND Banned = 0 AND UserType = 4 AND ResidentialFee >= 0 THEN ResidentialFee END) AS CsiResidentialInspectionFee,
-            MAX(CASE WHEN Active = 1 AND Banned = 0 AND UserType = 5 AND CommercialFee >= 0 THEN CommercialFee END) AS FogTransportFee,
-            MAX(CASE WHEN Active = 1 AND Banned = 0 AND UserType = 6 AND CommercialFee >= 0 THEN CommercialFee END) AS FogInspectorFee
+            MAX(CASE WHEN Active = 1 AND UserType = 2 AND CommercialFee >= 0 THEN CommercialFee END) AS BackflowCommercialTestFee,
+            MAX(CASE WHEN Active = 1 AND UserType = 2 AND ResidentialFee >= 0 THEN ResidentialFee END) AS BackflowResidentialTestFee,
+            MAX(CASE WHEN Active = 1 AND UserType = 4 AND CommercialFee >= 0 THEN CommercialFee END) AS CsiCommercialInspectionFee,
+            MAX(CASE WHEN Active = 1 AND UserType = 4 AND ResidentialFee >= 0 THEN ResidentialFee END) AS CsiResidentialInspectionFee,
+            MAX(CASE WHEN Active = 1 AND UserType = 5 AND CommercialFee >= 0 THEN CommercialFee END) AS FogTransportFee,
+            MAX(CASE WHEN Active = 1 AND UserType = 6 AND CommercialFee >= 0 THEN CommercialFee END) AS FogInspectorFee
         FROM Registrations
         GROUP BY WaterSupplierID, LegacyCompanyUserId
     )
     INSERT INTO ProfessionalWaterSuppliers
         (WaterSupplierId, ProfessionalId, LegacyRecordId,
-         HasWiseGuys, HasBackflowTesting, HasCsiInpection, HasFogInspection, HasFogTransportation, IsBanned,
+         HasWiseGuys, HasBackflowTesting, HasCsiInpection, HasFogInspection, HasFogTransportation,
+         IsBackflowTestingSuspended, IsCsiInspectionSuspended, IsFogInspectionSuspended, IsFogTransportationSuspended,
          BackflowCommercialTestFee, BackflowResidentialTestFee,
          CsiCommercialInspectionFee, CsiResidentialInspectionFee,
          FogTransportFee, FogInspectorFee)
@@ -128,7 +131,10 @@ BEGIN TRY
         companyRegistrations.HasCsiInpection,
         companyRegistrations.HasFogInspection,
         companyRegistrations.HasFogTransportation,
-        companyRegistrations.IsBanned,
+        companyRegistrations.IsBackflowTestingSuspended,
+        companyRegistrations.IsCsiInspectionSuspended,
+        companyRegistrations.IsFogInspectionSuspended,
+        companyRegistrations.IsFogTransportationSuspended,
         companyRegistrations.BackflowCommercialTestFee,
         companyRegistrations.BackflowResidentialTestFee,
         companyRegistrations.CsiCommercialInspectionFee,

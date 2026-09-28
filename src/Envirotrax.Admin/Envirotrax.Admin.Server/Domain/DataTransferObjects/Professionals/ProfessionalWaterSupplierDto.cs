@@ -17,7 +17,10 @@ public class ProfessionalWaterSupplierDto
     public bool HasFogInspection { get; set; }
     public bool HasFogTransportation { get; set; }
 
-    public bool IsBanned { get; set; }
+    public bool IsBackflowTestingSuspended { get; set; }
+    public bool IsCsiInspectionSuspended { get; set; }
+    public bool IsFogInspectionSuspended { get; set; }
+    public bool IsFogTransportationSuspended { get; set; }
 
     public decimal? BackflowResidentialTestFee { get; set; }
     public decimal? BackflowCommercialTestFee { get; set; }

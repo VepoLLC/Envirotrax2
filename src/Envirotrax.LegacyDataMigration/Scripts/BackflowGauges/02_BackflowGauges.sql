@@ -2,6 +2,38 @@ BEGIN TRAN
 
 BEGIN TRY
 
+    -- One-time cleanup for databases loaded by the first version of this script, which only filled
+    -- LegacyFilePath in when SaveBpatGauges.ImageStored was 1. Nothing in V1 ever writes that column:
+    -- it is only ever read, when deciding whether to redirect to the file server or fall back to the
+    -- FileData bytes (water_suppliers/gauge_view.aspx.vb). Both pages that add or re-calibrate a gauge
+    -- write the report to the shared drive and set FileType, and neither touches ImageStored or
+    -- FileData (save_bpats/gauges.aspx.vb), so the flag is set on a minority of old rows while the
+    -- report of every other gauge is on the file server all the same. Without this the INSERT below
+    -- would skip those rows forever, because their LegacyRecordId already exists.
+    -- Self-disabling: it only touches rows whose LegacyFilePath is still NULL.
+    UPDATE BackflowGauges
+    SET LegacyFilePath = CONCAT('gauges/', CAST(FLOOR(gauges.ID / 10000) * 10000 AS VARCHAR(20)), '/', CAST(gauges.ID AS VARCHAR(20)),
+                                CASE WHEN LOWER(LTRIM(RTRIM(gauges.FileType))) = '.pdf' THEN '.pdf' ELSE '.jpg' END)
+    FROM BackflowGauges
+    INNER JOIN Vepo.dbo.SaveBpatGauges AS gauges
+        ON gauges.ID = BackflowGauges.LegacyRecordId
+    WHERE BackflowGauges.LegacyRecordId IS NOT NULL
+        AND BackflowGauges.LegacyFilePath IS NULL
+        -- A gauge whose file has already been uploaded through V2 keeps it: FilePath is only ever
+        -- filled in once the blob is really there, so a row that has one is not waiting for anything.
+        AND BackflowGauges.FilePath IS NULL
+        AND NULLIF(LTRIM(RTRIM(gauges.FileType)), '') IS NOT NULL
+
+    -- The same run also clears the entries the first version wrote for those gauges, because they are
+    -- now known to be wrong: the report was never missing, only unreachable behind the ImageStored gate.
+    DELETE FROM MigrationSkippedBackflowGauges
+    FROM MigrationSkippedBackflowGauges
+    INNER JOIN Vepo.dbo.SaveBpatGauges AS gauges
+        ON gauges.ID = MigrationSkippedBackflowGauges.LegacyRecordId
+    WHERE MigrationSkippedBackflowGauges.SourceTable = 'SaveBpatGauges'
+        AND MigrationSkippedBackflowGauges.Reason = 'Gauge has no file on the legacy file server'
+        AND NULLIF(LTRIM(RTRIM(gauges.FileType)), '') IS NOT NULL
+
     INSERT INTO MigrationSkippedBackflowGauges (LegacyRecordId, LegacyUserId, SourceTable, Reason)
     SELECT gauges.ID, gauges.BpatID, 'SaveBpatGauges', 'No professional account for the gauge'
     FROM Vepo.dbo.SaveBpatGauges AS gauges
@@ -20,14 +52,14 @@ BEGIN TRY
             AND skipped.SourceTable = 'SaveBpatGauges'
     )
 
-    -- A report lives on the legacy file server only when ImageStored is 1. V1 can also serve one out of
-    -- SaveBpatGauges.FileData (water_suppliers/gauge_view.aspx.vb), which this migration does not read,
-    -- so those gauges arrive without a document. They still migrate; this records that they come across
-    -- without a file, rather than leaving it to be noticed later.
+    -- FileType is what says a report was uploaded: V1 writes it in the same statement that creates the
+    -- gauge, and writes the file to the shared drive straight after. ImageStored is deliberately not
+    -- tested here - see the cleanup above. Whether the file is still on that server is settled when
+    -- BackflowGaugeService tries to fetch it, which records the ones that are gone.
     INSERT INTO MigrationSkippedBackflowGauges (LegacyRecordId, LegacyUserId, SourceTable, Reason)
     SELECT gauges.ID, gauges.BpatID, 'SaveBpatGauges', 'Gauge has no file on the legacy file server'
     FROM Vepo.dbo.SaveBpatGauges AS gauges
-    WHERE (ISNULL(gauges.ImageStored, 0) = 0 OR NULLIF(LTRIM(RTRIM(gauges.FileType)), '') IS NULL)
+    WHERE NULLIF(LTRIM(RTRIM(gauges.FileType)), '') IS NULL
         AND NOT EXISTS
         (
             SELECT 1
@@ -72,7 +104,7 @@ BEGIN TRY
         -- 10000>/<ID>.<pdf|jpg>, and anything that was not a PDF was converted to a JPG on upload
         -- (save_bpats/gauges.aspx.vb, water_suppliers/gauge_view.aspx.vb).
         CASE
-            WHEN gauges.ImageStored = 1 AND NULLIF(LTRIM(RTRIM(gauges.FileType)), '') IS NOT NULL
+            WHEN NULLIF(LTRIM(RTRIM(gauges.FileType)), '') IS NOT NULL
             THEN CONCAT('gauges/', CAST(FLOOR(gauges.ID / 10000) * 10000 AS VARCHAR(20)), '/', CAST(gauges.ID AS VARCHAR(20)),
                         -- Trimmed and lowered before the comparison: a stray space would otherwise send
                         -- a PDF down the image branch and name the blob .jpg, which is the wrong file.

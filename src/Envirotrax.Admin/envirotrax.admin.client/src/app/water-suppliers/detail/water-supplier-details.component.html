@@ -355,7 +355,7 @@
                                     </div>
                                 </div>
 
-                                <div class="row gx-2 align-items-center">
+                                <div class="row gx-2 align-items-center mb-2">
                                     <div class="col-6">FOG Transport Fee</div>
                                     <div class="col-3">
                                         <vp-input type="number" [decimals]="2"
@@ -367,6 +367,22 @@
                                         <vp-input type="number" [decimals]="2"
                                                   [(ngModel)]="generalSettings.fogTransportFeeWsShare"
                                                   name="fogTransportFeeWsShare"
+                                                  [form]="generalForm" />
+                                    </div>
+                                </div>
+
+                                <div class="row gx-2 align-items-center">
+                                    <div class="col-6">FOG Inspection Fee</div>
+                                    <div class="col-3">
+                                        <vp-input type="number" [decimals]="2"
+                                                  [(ngModel)]="generalSettings.fogInspectorFee"
+                                                  name="fogInspectorFee"
+                                                  [form]="generalForm" />
+                                    </div>
+                                    <div class="col-3">
+                                        <vp-input type="number" [decimals]="2"
+                                                  [(ngModel)]="generalSettings.fogInspectorFeeWsShare"
+                                                  name="fogInspectorFeeWsShare"
                                                   [form]="generalForm" />
                                     </div>
                                 </div>

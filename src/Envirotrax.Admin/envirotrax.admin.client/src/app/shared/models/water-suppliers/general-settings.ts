@@ -41,4 +41,6 @@ export class GeneralSettings {
     csiResidentialInspectionFeeWsShare?: number;
     fogTransportFee?: number;
     fogTransportFeeWsShare?: number;
+    fogInspectorFee?: number;
+    fogInspectorFeeWsShare?: number;
 }

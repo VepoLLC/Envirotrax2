@@ -28,7 +28,6 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
             .Include(supplier => supplier.Parent)
             .Include(supplier => supplier.State)
             .Include(supplier => supplier.GeneralSettings)
-            .Where(supplier => supplier.DeletedTime == null)
             .WhereIf(!_tenantProvider.HasScope(ScopeDefinitions.AdminInternal), supplier => supplier.ParentId == _tenantProvider.WaterSupplierId)
             .AsNoTracking();
     }

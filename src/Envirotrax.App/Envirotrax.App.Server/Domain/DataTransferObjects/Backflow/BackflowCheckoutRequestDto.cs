@@ -3,27 +3,9 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Payments;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 
-public class BackflowCheckoutRequestDto
+public class BackflowCheckoutRequestDto : ProfessionalCheckoutRequestDto
 {
-    [Required]
-    [StringLength(20)]
-    [RegularExpression("^[A-Za-z0-9-]+$")]
-    public string TransactionId { get; set; } = null!;
-
     [Required]
     [MinLength(1)]
-    public List<BackflowCheckoutTestDto> Tests { get; set; } = [];
-
-    public decimal ExpectedTotal { get; set; }
-
-    public decimal ExpectedCardCharge { get; set; }
-
-    public CreditCardPaymentDto? Card { get; set; }
-}
-
-public class BackflowCheckoutTestDto
-{
-    public int Id { get; set; }
-
-    public bool EmailPdf { get; set; }
+    public List<CheckoutItemDto> Tests { get; set; } = [];
 }

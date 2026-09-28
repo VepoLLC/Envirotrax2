@@ -1,0 +1,9 @@
+<div class="row mb-3">
+    <div class="text-end col-md-11 pe-2">Available account balance: {{ accountBalance | currency }}</div>
+</div>
+<div class="row mb-3">
+    <div class="text-end col-md-11 pe-2">Amount to be deducted from your available account balance: {{ amounts.fromBalance | currency }}</div>
+</div>
+<div class="row mb-3 text-danger">
+    <div class="text-end col-md-11 pe-2">Amount needed to be charged to a credit card to complete the submission: {{ amounts.cardCharge | currency }}</div>
+</div>

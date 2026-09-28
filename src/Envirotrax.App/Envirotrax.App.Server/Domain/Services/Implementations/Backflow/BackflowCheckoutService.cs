@@ -4,27 +4,25 @@ using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Payments;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Notifications;
 using Envirotrax.App.Server.Domain.Services.Definitions.Payments;
+using Envirotrax.App.Server.Domain.Services.Implementations.Payments;
 using Envirotrax.Common;
-using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Backflow;
 
-public class BackflowCheckoutService : IBackflowCheckoutService
+public class BackflowCheckoutService
+    : ProfessionalCheckoutService<BackflowTest, BackflowCheckoutRequestDto, BackflowCheckoutReceiptDto>, IBackflowCheckoutService
 {
-    private const string AmountsChangedMessage = "The amounts have changed. Please refresh the page and try again.";
-
     private readonly IMapper _mapper;
-    private readonly IAuthService _authService;
     private readonly IBackflowTestRepository _testRepository;
-    private readonly IProfessionalRepository _professionalRepository;
-    private readonly IProfessionalTransactionRepository _transactionRepository;
-    private readonly IProfessionalPaymentService _paymentService;
     private readonly IBackflowTestNotificationService _notificationService;
     private readonly IBackflowCheckoutEmailService _checkoutEmailService;
+
+    protected override ProfessionalTransactionType TransactionType => ProfessionalTransactionType.BackflowTestPayment;
 
     public BackflowCheckoutService(
         IMapper mapper,
@@ -35,160 +33,38 @@ public class BackflowCheckoutService : IBackflowCheckoutService
         IProfessionalPaymentService paymentService,
         IBackflowTestNotificationService notificationService,
         IBackflowCheckoutEmailService checkoutEmailService)
+        : base(authService, professionalRepository, transactionRepository, paymentService)
     {
         _mapper = mapper;
-        _authService = authService;
         _testRepository = testRepository;
-        _professionalRepository = professionalRepository;
-        _transactionRepository = transactionRepository;
-        _paymentService = paymentService;
         _notificationService = notificationService;
         _checkoutEmailService = checkoutEmailService;
     }
 
-    public async Task<BackflowCheckoutReceiptDto> CheckoutAsync(BackflowCheckoutRequestDto request, CancellationToken cancellationToken)
+    protected override List<CheckoutItemDto> GetItems(BackflowCheckoutRequestDto request)
     {
-        var testIds = request.Tests.Select(test => test.Id).ToList();
-
-        if (testIds.Distinct().Count() != testIds.Count)
-        {
-            throw new AppValidationException("Each test can only be paid once.");
-        }
-
-        var (transaction, isNewPayment) = await PayAsync(request, testIds, cancellationToken);
-        var receipt = await BuildReceiptAsync(transaction, CancellationToken.None);
-
-        if (isNewPayment)
-        {
-            await _notificationService.StartCheckingNotificationsAsync(testIds, CancellationToken.None);
-
-            var emailPdfTestIds = request.Tests.Where(test => test.EmailPdf).Select(test => test.Id).ToHashSet();
-            var testsToEmail = receipt.Tests.Where(test => emailPdfTestIds.Contains(test.Id));
-
-            receipt.EmailResults = await _checkoutEmailService.SendTestReportsAsync(testsToEmail, request.TransactionId);
-        }
-
-        return receipt;
+        return request.Tests;
     }
 
-    private async Task<(ProfessionalTransaction Transaction, bool IsNewPayment)> PayAsync(
-        BackflowCheckoutRequestDto request,
-        List<int> testIds,
-        CancellationToken cancellationToken)
+    protected override Task<List<BackflowTest>> GetUnpaidItemsAsync(List<int> ids, CancellationToken cancellationToken)
     {
-        var processedTransaction = await _transactionRepository.GetByTransactionIdAsync(request.TransactionId, cancellationToken);
-
-        if (processedTransaction != null)
-        {
-            return (processedTransaction, false);
-        }
-
-        var bpatId = _authService.HasAnyRole(RoleDefinitions.Professionals.Admin) ? (int?)null : _authService.UserId;
-        var tests = await _testRepository.GetUnpaidForCheckoutAsync(testIds, _authService.ProfessionalId, bpatId, cancellationToken);
-
-        if (tests.Count != testIds.Count)
-        {
-            throw new AppValidationException(AmountsChangedMessage);
-        }
-
-        var amounts = await CalculateAmountsAsync(tests, cancellationToken);
-
-        if (amounts.Total != RoundToCents(request.ExpectedTotal) || amounts.CardCharge != RoundToCents(request.ExpectedCardCharge))
-        {
-            throw new AppValidationException(AmountsChangedMessage);
-        }
-
-        var charge = amounts.CardCharge > 0 ? await ChargeCardAsync(request, amounts.CardCharge) : null;
-        var transaction = BuildTransaction(request, amounts, charge);
-
-        await _paymentService.RecordPaymentAsync(
-            request.TransactionId,
-            charge,
-            amounts.CardCharge,
-            () => RecordCheckoutAsync(request, tests, bpatId, amounts, transaction));
-
-        return (transaction, true);
+        return _testRepository.GetUnpaidForCheckoutAsync(ids, AuthService.ProfessionalId, GetBpatId(), cancellationToken);
     }
 
-    private async Task<CheckoutAmounts> CalculateAmountsAsync(List<BackflowTest> tests, CancellationToken cancellationToken)
+    protected override Task<int> MarkItemsPaidAsync(List<BackflowTest> tests, ProfessionalTransaction transaction, List<int> emailPdfIds)
     {
-        var professional = await _professionalRepository.GetNoIncludesAsync(_authService.ProfessionalId, cancellationToken)
-            ?? throw new InvalidOperationException("Professional not found.");
-
-        var total = RoundToCents(tests.Sum(test => test.Amount));
-        var totalShare = RoundToCents(tests.Sum(test => test.AmountShare));
-        var availableBalance = Math.Round(professional.AccountBalance, 2, MidpointRounding.ToZero);
-        var fromBalance = Math.Min(availableBalance, total);
-
-        return new CheckoutAmounts(total, totalShare, fromBalance, total - fromBalance);
-    }
-
-    private async Task<AuthorizeNetChargeResult> ChargeCardAsync(BackflowCheckoutRequestDto request, decimal amount)
-    {
-        if (request.Card == null)
-        {
-            throw new AppValidationException("Credit card information is required.");
-        }
-
-        return await _paymentService.ChargeCardAsync(request.Card, amount, request.TransactionId);
-    }
-
-    private ProfessionalTransaction BuildTransaction(BackflowCheckoutRequestDto request, CheckoutAmounts amounts, AuthorizeNetChargeResult? charge)
-    {
-        return new ProfessionalTransaction
-        {
-            TransactionDate = DateTime.UtcNow,
-            ProfessionalId = _authService.ProfessionalId,
-            UserId = _authService.UserId,
-            TransactionId = request.TransactionId,
-            TransactionType = ProfessionalTransactionType.BackflowTestPayment,
-            BalanceAdjustment = -amounts.FromBalance,
-            CardCharge = amounts.CardCharge,
-            Amount = amounts.Total,
-            AmountShare = amounts.TotalShare,
-            NameOnCard = charge != null ? $"{request.Card!.BillingFirstName} {request.Card.BillingLastName}" : null,
-            CardNumber = charge?.CardNumber
-        };
-    }
-
-    private async Task RecordCheckoutAsync(
-        BackflowCheckoutRequestDto request,
-        List<BackflowTest> tests,
-        int? bpatId,
-        CheckoutAmounts amounts,
-        ProfessionalTransaction transaction)
-    {
-        var professionalId = _authService.ProfessionalId;
-
-        if (amounts.FromBalance > 0 && !await _professionalRepository.TryDebitBalanceAsync(professionalId, amounts.FromBalance, CancellationToken.None))
-        {
-            throw new AppValidationException(AmountsChangedMessage);
-        }
-
         var testIds = tests.Select(test => test.Id).ToList();
-        var emailPdfTestIds = request.Tests.Where(test => test.EmailPdf).Select(test => test.Id).ToList();
 
-        var paidCount = await _testRepository.MarkPaidAsync(
-            testIds, professionalId, bpatId, request.TransactionId, transaction.TransactionDate, emailPdfTestIds, CancellationToken.None);
-
-        var paidTotal = RoundToCents(await _testRepository.SumAmountByTransactionIdAsync(request.TransactionId, professionalId, CancellationToken.None));
-
-        if (paidCount != tests.Count || paidTotal != amounts.Total)
-        {
-            throw new AppValidationException(AmountsChangedMessage);
-        }
-
-        await UpdateIsCurrentAsync(tests);
-
-        await _transactionRepository.AddAsync(transaction);
-
-        if (request.Card != null)
-        {
-            await _paymentService.SaveBillingInfoAsync(request.Card, CancellationToken.None);
-        }
+        return _testRepository.MarkPaidAsync(
+            testIds, transaction.ProfessionalId, GetBpatId(), transaction.TransactionId!, transaction.TransactionDate, emailPdfIds, CancellationToken.None);
     }
 
-    private async Task UpdateIsCurrentAsync(List<BackflowTest> tests)
+    protected override Task<decimal> SumPaidAmountAsync(ProfessionalTransaction transaction)
+    {
+        return _testRepository.SumAmountByTransactionIdAsync(transaction.TransactionId!, transaction.ProfessionalId, CancellationToken.None);
+    }
+
+    protected override async Task OnItemsPaidAsync(List<BackflowTest> tests)
     {
         foreach (var test in tests.OrderBy(test => test.CreatedTime))
         {
@@ -208,27 +84,28 @@ public class BackflowCheckoutService : IBackflowCheckoutService
         }
     }
 
-    private async Task<BackflowCheckoutReceiptDto> BuildReceiptAsync(ProfessionalTransaction transaction, CancellationToken cancellationToken)
+    protected override async Task<BackflowCheckoutReceiptDto> BuildReceiptAsync(ProfessionalTransaction transaction, CancellationToken cancellationToken)
     {
         var tests = await _testRepository.GetByTransactionIdAsync(transaction.TransactionId!, transaction.ProfessionalId, cancellationToken);
+        var receipt = CreateReceipt(transaction);
 
-        return new BackflowCheckoutReceiptDto
-        {
-            TransactionId = transaction.TransactionId!,
-            TransactionDate = transaction.TransactionDate,
-            Amount = transaction.Amount,
-            BalanceAdjustment = transaction.BalanceAdjustment,
-            CardCharge = transaction.CardCharge,
-            NameOnCard = transaction.NameOnCard,
-            CardNumber = transaction.CardNumber,
-            Tests = _mapper.Map<List<BackflowTestDto>>(tests)
-        };
+        receipt.Tests = _mapper.Map<List<BackflowTestDto>>(tests);
+
+        return receipt;
     }
 
-    private static decimal RoundToCents(decimal amount)
+    protected override async Task OnPaymentCompletedAsync(BackflowCheckoutRequestDto request, BackflowCheckoutReceiptDto receipt)
     {
-        return Math.Round(amount, 2, MidpointRounding.AwayFromZero);
+        await _notificationService.StartCheckingNotificationsAsync(request.Tests.Select(test => test.Id), CancellationToken.None);
+
+        var emailPdfTestIds = request.Tests.Where(test => test.EmailPdf).Select(test => test.Id).ToHashSet();
+        var testsToEmail = receipt.Tests.Where(test => emailPdfTestIds.Contains(test.Id));
+
+        receipt.EmailResults = await _checkoutEmailService.SendTestReportsAsync(testsToEmail, request.TransactionId);
     }
 
-    private record CheckoutAmounts(decimal Total, decimal TotalShare, decimal FromBalance, decimal CardCharge);
+    private int? GetBpatId()
+    {
+        return AuthService.HasAnyRole(RoleDefinitions.Professionals.Admin) ? null : AuthService.UserId;
+    }
 }

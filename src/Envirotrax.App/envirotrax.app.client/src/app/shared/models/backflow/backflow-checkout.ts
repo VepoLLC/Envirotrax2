@@ -1,32 +1,10 @@
-import { CreditCardPayment } from "../payments/credit-card-payment";
+import { CheckoutItem, ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../payments/professional-checkout";
 import { BackflowTest } from "./backflow-test";
 
-export interface BackflowCheckoutRequest {
-    transactionId: string;
-    tests: BackflowCheckoutTest[];
-    expectedTotal: number;
-    expectedCardCharge: number;
-    card?: CreditCardPayment;
+export interface BackflowCheckoutRequest extends ProfessionalCheckoutRequest {
+    tests: CheckoutItem[];
 }
 
-export interface BackflowCheckoutTest {
-    id: number;
-    emailPdf: boolean;
-}
-
-export interface BackflowCheckoutReceipt {
-    transactionId: string;
-    transactionDate: string;
-    amount: number;
-    balanceAdjustment: number;
-    cardCharge: number;
-    nameOnCard?: string;
-    cardNumber?: string;
+export interface BackflowCheckoutReceipt extends ProfessionalCheckoutReceipt {
     tests: BackflowTest[];
-    emailResults: BackflowCheckoutEmailResult[];
-}
-
-export interface BackflowCheckoutEmailResult {
-    description: string;
-    isSent: boolean;
 }

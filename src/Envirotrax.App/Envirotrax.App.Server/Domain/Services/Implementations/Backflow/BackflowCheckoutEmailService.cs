@@ -1,5 +1,6 @@
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Payments;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Templates.Emails.Backflow;
 using Envirotrax.Common.Domain.DataTransferObjects;
@@ -29,7 +30,7 @@ public class BackflowCheckoutEmailService : IBackflowCheckoutEmailService
         _logger = logger;
     }
 
-    public async Task<List<BackflowCheckoutEmailResultDto>> SendTestReportsAsync(IEnumerable<BackflowTestDto> tests, string transactionId)
+    public async Task<List<CheckoutEmailResultDto>> SendTestReportsAsync(IEnumerable<BackflowTestDto> tests, string transactionId)
     {
         var testsBySite = tests.GroupBy(test => test.Site?.Id).ToList();
 
@@ -47,7 +48,7 @@ public class BackflowCheckoutEmailService : IBackflowCheckoutEmailService
             return [];
         }
 
-        var results = new List<BackflowCheckoutEmailResultDto>();
+        var results = new List<CheckoutEmailResultDto>();
 
         foreach (var siteTests in testsBySite)
         {
@@ -57,7 +58,7 @@ public class BackflowCheckoutEmailService : IBackflowCheckoutEmailService
         return results;
     }
 
-    private async Task<BackflowCheckoutEmailResultDto> SendSiteReportAsync(string recipient, List<BackflowTestDto> siteTests, string transactionId)
+    private async Task<CheckoutEmailResultDto> SendSiteReportAsync(string recipient, List<BackflowTestDto> siteTests, string transactionId)
     {
         var vm = BuildEmailVm(siteTests);
         var description = string.IsNullOrWhiteSpace(vm.PropertyBusinessName)
@@ -85,13 +86,13 @@ public class BackflowCheckoutEmailService : IBackflowCheckoutEmailService
                 ]
             });
 
-            return new BackflowCheckoutEmailResultDto { Description = description, IsSent = true };
+            return new CheckoutEmailResultDto { Description = description, IsSent = true };
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to email backflow test reports for payment {TransactionId}.", transactionId);
 
-            return new BackflowCheckoutEmailResultDto { Description = description, IsSent = false };
+            return new CheckoutEmailResultDto { Description = description, IsSent = false };
         }
     }
 

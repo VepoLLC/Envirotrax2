@@ -16,7 +16,7 @@ export class BackflowTestForceRenewalComponent {
     public validationErrors: string[] = [];
 
     public readonly yearOptions: { label: string; value: number | null }[] = [
-        { label: '6 months', value: 0},
+        { label: '6 Months', value: 0},
         { label: '1 Year', value: 1 },
         { label: '2 Years', value: 2 },
         { label: '3 Years', value: 3 },

@@ -6,26 +6,27 @@
             <dp-loading-spinner *ngIf="isLoading" />
 
             <div dp-spinner-parent>
-                <div class="mx-auto w-50 mb-3">
-                    <vp-input name="currentBalance"
-                              label="Current Account Balance: $"
-                              labelStyle="horizontal"
-                              type="number"
-                              [decimals]="2"
-                              [readonly]="true"
-                              [ngModel]="professional.accountBalance" />
-                </div>
                 <div class="mx-auto w-50">
-                    <vp-input name="amountToAdd"
-                              label="Amount to Add: $"
-                              labelStyle="horizontal"
-                              type="number"
-                              [required]="true"
-                              [decimals]="2"
-                              [min]="0.01"
-                              [step]="0.01"
-                              [form]="form"
-                              [(ngModel)]="amountToAdd" />
+                    <vp-field-grid>
+                        <vp-input name="currentBalance"
+                                  label="Current Account Balance: $"
+                                  labelStyle="horizontal"
+                                  type="number"
+                                  [decimals]="2"
+                                  [readonly]="true"
+                                  [ngModel]="professional.accountBalance" />
+
+                        <vp-input name="amountToAdd"
+                                  label="Amount to Add: $"
+                                  labelStyle="horizontal"
+                                  type="number"
+                                  [required]="true"
+                                  [decimals]="2"
+                                  [min]="0.01"
+                                  [step]="0.01"
+                                  [form]="form"
+                                  [(ngModel)]="amountToAdd" />
+                    </vp-field-grid>
                 </div>
             </div>
         </vp-section>
@@ -38,7 +39,7 @@
             <div dp-spinner-parent>
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="mb-3">
+                        <vp-field-grid>
                             <vp-input name="billingFirstName"
                                 label="First Name:"
                                 labelStyle="horizontal"
@@ -46,8 +47,7 @@
                                 [maxLength]="255"
                                 [form]="form"
                                 [(ngModel)]="professionalUser.billingFirstName" />
-                        </div>
-                        <div class="mb-3">
+
                             <vp-input name="billingLastName"
                                 label="Last Name:"
                                 labelStyle="horizontal"
@@ -55,8 +55,7 @@
                                 [maxLength]="255"
                                 [form]="form"
                                 [(ngModel)]="professionalUser.billingLastName" />
-                        </div>
-                        <div class="mb-3">
+
                             <vp-input name="billingAddress"
                                 label="Address:"
                                 labelStyle="horizontal"
@@ -64,11 +63,10 @@
                                 [maxLength]="255"
                                 [form]="form"
                                 [(ngModel)]="professionalUser.billingAddress" />
-                        </div>                                       
+                        </vp-field-grid>
                     </div>
                     <div class="col-md-6">
-                        
-                        <div class="mb-3">
+                        <vp-field-grid>
                             <vp-input name="billingCity"
                                 label="City:"
                                 labelStyle="horizontal"
@@ -76,8 +74,7 @@
                                 [maxLength]="255"
                                 [form]="form"
                                 [(ngModel)]="professionalUser.billingCity" />
-                        </div>
-                        <div class="mb-3">
+
                             <vp-input name="billingStateId"
                                 label="State:"
                                 labelStyle="horizontal"
@@ -87,8 +84,7 @@
                                 [ngModel]="professionalUser.billingState?.id"
                                 [options]="states"
                                 (ngModelChange)="stateChanged($event)" />
-                        </div>
-                        <div class="mb-3">
+
                             <vp-input name="billingZipCode"
                                 label="ZIP/Postal Code:"
                                 labelStyle="horizontal"
@@ -96,7 +92,7 @@
                                 [maxLength]="25"
                                 [form]="form"
                                 [(ngModel)]="professionalUser.billingZipCode" />
-                        </div>    
+                        </vp-field-grid>
                     </div>
                 </div>
 

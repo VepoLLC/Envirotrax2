@@ -16,22 +16,7 @@ export class AuthGuard implements CanActivate {
     public async canActivate(_route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean | UrlTree> {
         await this._authService.ensureSynced();
 
-        if (await this._authService.isAuthenticated(false)) {
-            const [supplierId, professionalId] = await Promise.all([
-                this._authService.getWaterSupplierId(),
-                this._authService.getProfessionalId()
-            ]);
-
-            if (supplierId) {
-                return true;
-            }
-
-            // If user is logged in, but they don't have a supplierId, they are a professional
-            // Let's navigate to profile page to collect the missing information
-            if (!professionalId) {
-                return this._router.createUrlTree(['/profile']);
-            }
-
+        if (await this._authService.isAuthenticated(true)) {
             return true;
         }
 

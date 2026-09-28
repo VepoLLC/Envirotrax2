@@ -3,13 +3,13 @@
 
     <form #form="ngForm" (ngSubmit)="save(form)">
         <div class="mb-3">
-            <label class="form-label">Company name</label>
+            <label class="form-label">Company Name</label>
             <input class="form-control" [value]="license.companyName" readonly />
         </div>
 
         <div class="mb-3">
             <vp-input name="contactName"
-                      label="Contact name"
+                      label="Contact Name"
                       [(ngModel)]="model.contactName"
                       [maxLength]="255"
                       [form]="form" />
@@ -31,7 +31,7 @@
 
         <div class="mb-3">
             <vp-input name="licenseNumber"
-                      label="License number"
+                      label="License Number"
                       [(ngModel)]="model.licenseNumber"
                       [required]="true"
                       [maxLength]="50"
@@ -41,7 +41,7 @@
         <div class="mb-3">
             <vp-input type="date"
                       name="expirationDate"
-                      label="Expiration date"
+                      label="Expiration Date"
                       [(ngModel)]="model.expirationDate"
                       [form]="form" />
         </div>

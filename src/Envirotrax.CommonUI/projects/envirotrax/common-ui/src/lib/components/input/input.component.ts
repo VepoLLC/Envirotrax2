@@ -21,15 +21,7 @@ import { Instance } from "flatpickr/dist/types/instance";
         },
         DatePipe
     ],
-    styles: `
-        .form-floating > textarea.form-control {
-            height: auto;
-        }
-        ::ng-deep ng-select.has-custom-border .ng-select-container {
-            border-color: var(--vp-select-border-color) !important;
-            border-width: 2px !important;
-        }
-    `
+    styleUrl: './input.component.css'
 })
 export class InputComponent implements ControlValueAccessor, Validator, OnInit, AfterViewInit {
     private _onChanged: (value: any) => void = null!;

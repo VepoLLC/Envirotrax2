@@ -93,6 +93,8 @@ export class CheckoutComponent implements OnInit {
 
         if (requestedTab === 'csi' && this.canViewCsiInspection) {
             this.activeTab = 'csi';
+        } else if (requestedTab === 'fogInspection' && this.canViewFogInspection) {
+            this.activeTab = 'fogInspection';
         } else if (this.canViewBackflowTesting) {
             this.activeTab = 'backflow';
         } else if (this.canViewCsiInspection) {

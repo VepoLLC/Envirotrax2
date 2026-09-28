@@ -19,5 +19,12 @@ public class ProfessionalInsuranceProfile : Profile
             }).ReverseMap()
             .ForMember(i => i.Professional, opt => opt.Ignore())
             .ForMember(i => i.ProfessionalId, opt => opt.MapFrom(i => i.Professional!.Id));
+
+        CreateMap<ProfessionalInsurance, WaterSupplierInsuranceDto>()
+            .ForMember(dto => dto.SubmittedOn, opt => opt.MapFrom(i => i.CreatedTime))
+            .ForMember(dto => dto.UserEmail, opt => opt.MapFrom(i => i.CreatedBy!.Email))
+            .ForMember(dto => dto.CompanyName, opt => opt.MapFrom(i => i.Professional!.Name))
+            .ForMember(dto => dto.ContactName, opt => opt.Ignore())
+            .ForMember(dto => dto.ProfessionalType, opt => opt.Ignore());
     }
 }

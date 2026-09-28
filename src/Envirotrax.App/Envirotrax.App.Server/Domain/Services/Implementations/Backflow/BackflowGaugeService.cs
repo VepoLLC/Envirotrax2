@@ -7,6 +7,7 @@ using DeveloperPartners.SortingFiltering.AutoMapper;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Logs;
+using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions;
@@ -122,5 +123,54 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         }
 
         return deleted;
+    }
+
+    public async Task<IPagedData<WaterSupplierGaugeDto>> GetUnverifiedByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<BackflowGauge, WaterSupplierGaugeDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<BackflowGauge, WaterSupplierGaugeDto>(Mapper);
+
+        var items = (await _gaugeRepository.GetUnverifiedByWaterSupplierAsync(pageInfo, query, cancellationToken)).ToList();
+        var professionalIds = items.Select(g => g.ProfessionalId).Distinct().ToList();
+
+        var professionalUsers = (await _gaugeRepository.GetProfessionalUsersAsync(professionalIds, cancellationToken)).ToList();
+        var byAccount = professionalUsers.ToDictionary(pu => (pu.ProfessionalId, pu.UserId));
+        var admins = professionalUsers
+            .Where(pu => pu.IsAdmin)
+            .GroupBy(pu => pu.ProfessionalId)
+            .ToDictionary(group => group.Key, group => group.First());
+
+        var dtos = items.Select(g => new WaterSupplierGaugeDto
+        {
+            Id = g.Id,
+            ProfessionalId = g.ProfessionalId,
+            SubmittedOn = g.CreatedTime,
+            UserEmail = g.CreatedBy?.Email ?? ResolveSubmitter(g, byAccount, admins)?.User?.Email,
+            CompanyName = g.Professional?.Name,
+            Manufacturer = g.Manufacturer,
+            Model = g.Model,
+            SerialNumber = g.SerialNumber,
+            IsPortable = g.IsPortable
+        });
+
+        return dtos.ToPagedData(pageInfo);
+    }
+
+    public Task<int> GetUnverifiedCountByWaterSupplierAsync(CancellationToken cancellationToken)
+    {
+        return _gaugeRepository.GetUnverifiedCountByWaterSupplierAsync(cancellationToken);
+    }
+
+    private static ProfessionalUser? ResolveSubmitter(
+        BackflowGauge gauge,
+        IReadOnlyDictionary<(int ProfessionalId, int UserId), ProfessionalUser> byAccount,
+        IReadOnlyDictionary<int, ProfessionalUser> admins)
+    {
+        if (gauge.CreatedById != null && byAccount.TryGetValue((gauge.ProfessionalId, gauge.CreatedById.Value), out var submitter))
+        {
+            return submitter;
+        }
+
+        return admins.GetValueOrDefault(gauge.ProfessionalId);
     }
 }

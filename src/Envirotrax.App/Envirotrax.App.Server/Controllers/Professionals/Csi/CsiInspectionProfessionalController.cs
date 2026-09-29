@@ -1,5 +1,6 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Payments;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -76,7 +77,7 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
     }
 
     [HttpPost("checkout")]
-    public async Task<IActionResult> CheckoutAsync([FromBody] CsiCheckoutRequestDto request, CancellationToken cancellationToken)
+    public async Task<IActionResult> CheckoutAsync([FromBody] ProfessionalCheckoutRequestDto request, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {

@@ -9,6 +9,10 @@ public class ProfessionalCheckoutRequestDto
     [RegularExpression("^[A-Za-z0-9-]+$")]
     public string TransactionId { get; set; } = null!;
 
+    [Required]
+    [MinLength(1)]
+    public List<CheckoutItemDto> Items { get; set; } = [];
+
     public decimal ExpectedTotal { get; set; }
 
     public decimal ExpectedCardCharge { get; set; }

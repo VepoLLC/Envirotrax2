@@ -1,8 +1,9 @@
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Payments;
 
 namespace Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 
 public interface ICsiCheckoutService
 {
-    Task<CsiCheckoutReceiptDto> CheckoutAsync(CsiCheckoutRequestDto request, CancellationToken cancellationToken);
+    Task<ProfessionalCheckoutReceiptDto<CsiInspectionDto>> CheckoutAsync(ProfessionalCheckoutRequestDto request, CancellationToken cancellationToken);
 }

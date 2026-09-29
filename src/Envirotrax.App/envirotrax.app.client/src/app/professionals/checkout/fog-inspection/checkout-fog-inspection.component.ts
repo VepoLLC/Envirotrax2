@@ -3,7 +3,7 @@ import { CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, MAX_P
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { FogInspection } from "../../../shared/models/fog/fog-inspection";
-import { FogInspectionCheckoutReceipt, FogInspectionCheckoutRequest } from "../../../shared/models/fog/fog-inspection-checkout";
+import { ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../../../shared/models/payments/professional-checkout";
 import { CreditCardPayment } from "../../../shared/models/payments/credit-card-payment";
 import { ProfessionalFogInspectionService } from "../../../shared/services/fog/professional-fog-inspection.service";
 import { ProfesionalUserService } from "../../../shared/services/professionals/professional-user.service";
@@ -39,7 +39,7 @@ export class CheckoutFogInspectionComponent implements OnInit {
     public reportFor = '';
 
     public validationErrors: string[] = [];
-    public receipt?: FogInspectionCheckoutReceipt;
+    public receipt?: ProfessionalCheckoutReceipt<FogInspection>;
 
     private _currentUserId?: number;
     private _professionalName?: string;
@@ -207,9 +207,9 @@ export class CheckoutFogInspectionComponent implements OnInit {
             return;
         }
 
-        const request: FogInspectionCheckoutRequest = {
+        const request: ProfessionalCheckoutRequest = {
             transactionId: createPaymentTransactionId(),
-            inspections: selectedInspections.map(inspection => ({ id: inspection.id, emailPdf: false })),
+            items: selectedInspections.map(inspection => ({ id: inspection.id, emailPdf: false })),
             expectedTotal: this.amounts.total,
             expectedCardCharge: this.amounts.cardCharge,
             card

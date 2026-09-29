@@ -3,7 +3,7 @@ import { CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, MAX_P
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { FogTripTicket } from "../../../shared/models/fog/fog-trip-ticket";
-import { FogTripTicketCheckoutReceipt, FogTripTicketCheckoutRequest } from "../../../shared/models/fog/fog-trip-ticket-checkout";
+import { ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../../../shared/models/payments/professional-checkout";
 import { CreditCardPayment } from "../../../shared/models/payments/credit-card-payment";
 import { FogTripTicketService } from "../../../shared/services/fog/fog-trip-ticket.service";
 import { ProfesionalUserService } from "../../../shared/services/professionals/professional-user.service";
@@ -39,7 +39,7 @@ export class CheckoutFogTransportComponent implements OnInit {
     public reportFor = '';
 
     public validationErrors: string[] = [];
-    public receipt?: FogTripTicketCheckoutReceipt;
+    public receipt?: ProfessionalCheckoutReceipt<FogTripTicket>;
 
     private _currentUserId?: number;
     private _professionalName?: string;
@@ -209,9 +209,9 @@ export class CheckoutFogTransportComponent implements OnInit {
             return;
         }
 
-        const request: FogTripTicketCheckoutRequest = {
+        const request: ProfessionalCheckoutRequest = {
             transactionId: createPaymentTransactionId(),
-            tickets: selectedTickets.map(ticket => ({ id: ticket.id, emailPdf: !!ticket.emailPdf })),
+            items: selectedTickets.map(ticket => ({ id: ticket.id, emailPdf: !!ticket.emailPdf })),
             expectedTotal: this.amounts.total,
             expectedCardCharge: this.amounts.cardCharge,
             card

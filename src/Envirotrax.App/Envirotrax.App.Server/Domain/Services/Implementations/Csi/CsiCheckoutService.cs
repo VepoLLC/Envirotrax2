@@ -15,7 +15,7 @@ using Envirotrax.Common.Domain.Services.Defintions;
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Csi;
 
 public class CsiCheckoutService
-    : ProfessionalCheckoutService<CsiInspection, CsiCheckoutRequestDto, CsiCheckoutReceiptDto>, ICsiCheckoutService
+    : ProfessionalCheckoutService<CsiInspection, CsiInspectionDto>, ICsiCheckoutService
 {
     private readonly IMapper _mapper;
     private readonly ICsiInspectionRepository _inspectionRepository;
@@ -39,11 +39,6 @@ public class CsiCheckoutService
         _inspectionRepository = inspectionRepository;
         _siteRepository = siteRepository;
         _checkoutEmailService = checkoutEmailService;
-    }
-
-    protected override List<CheckoutItemDto> GetItems(CsiCheckoutRequestDto request)
-    {
-        return request.Inspections;
     }
 
     protected override Task<List<CsiInspection>> GetUnpaidItemsAsync(List<int> ids, CancellationToken cancellationToken)
@@ -71,20 +66,20 @@ public class CsiCheckoutService
         return _siteRepository.ClearNeedsCsiInspectionAsync(siteIds);
     }
 
-    protected override async Task<CsiCheckoutReceiptDto> BuildReceiptAsync(ProfessionalTransaction transaction, CancellationToken cancellationToken)
+    protected override async Task<ProfessionalCheckoutReceiptDto<CsiInspectionDto>> BuildReceiptAsync(ProfessionalTransaction transaction, CancellationToken cancellationToken)
     {
         var inspections = await _inspectionRepository.GetByTransactionIdAsync(transaction.TransactionId!, transaction.ProfessionalId, cancellationToken);
         var receipt = CreateReceipt(transaction);
 
-        receipt.Inspections = _mapper.Map<List<CsiInspectionDto>>(inspections);
+        receipt.Items = _mapper.Map<List<CsiInspectionDto>>(inspections);
 
         return receipt;
     }
 
-    protected override async Task OnPaymentCompletedAsync(CsiCheckoutRequestDto request, CsiCheckoutReceiptDto receipt)
+    protected override async Task OnPaymentCompletedAsync(ProfessionalCheckoutRequestDto request, ProfessionalCheckoutReceiptDto<CsiInspectionDto> receipt)
     {
-        var emailPdfInspectionIds = request.Inspections.Where(inspection => inspection.EmailPdf).Select(inspection => inspection.Id).ToHashSet();
-        var inspectionsToEmail = receipt.Inspections.Where(inspection => emailPdfInspectionIds.Contains(inspection.Id));
+        var emailPdfInspectionIds = request.Items.Where(item => item.EmailPdf).Select(item => item.Id).ToHashSet();
+        var inspectionsToEmail = receipt.Items.Where(inspection => emailPdfInspectionIds.Contains(inspection.Id));
 
         receipt.EmailResults = await _checkoutEmailService.SendInspectionReportsAsync(inspectionsToEmail, request.TransactionId);
     }

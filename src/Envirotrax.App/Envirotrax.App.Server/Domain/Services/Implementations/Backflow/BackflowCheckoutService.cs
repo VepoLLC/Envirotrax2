@@ -15,7 +15,7 @@ using Envirotrax.Common.Domain.Services.Defintions;
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Backflow;
 
 public class BackflowCheckoutService
-    : ProfessionalCheckoutService<BackflowTest, BackflowCheckoutRequestDto, BackflowCheckoutReceiptDto>, IBackflowCheckoutService
+    : ProfessionalCheckoutService<BackflowTest, BackflowTestDto>, IBackflowCheckoutService
 {
     private readonly IMapper _mapper;
     private readonly IBackflowTestRepository _testRepository;
@@ -39,11 +39,6 @@ public class BackflowCheckoutService
         _testRepository = testRepository;
         _notificationService = notificationService;
         _checkoutEmailService = checkoutEmailService;
-    }
-
-    protected override List<CheckoutItemDto> GetItems(BackflowCheckoutRequestDto request)
-    {
-        return request.Tests;
     }
 
     protected override Task<List<BackflowTest>> GetUnpaidItemsAsync(List<int> ids, CancellationToken cancellationToken)
@@ -84,22 +79,22 @@ public class BackflowCheckoutService
         }
     }
 
-    protected override async Task<BackflowCheckoutReceiptDto> BuildReceiptAsync(ProfessionalTransaction transaction, CancellationToken cancellationToken)
+    protected override async Task<ProfessionalCheckoutReceiptDto<BackflowTestDto>> BuildReceiptAsync(ProfessionalTransaction transaction, CancellationToken cancellationToken)
     {
         var tests = await _testRepository.GetByTransactionIdAsync(transaction.TransactionId!, transaction.ProfessionalId, cancellationToken);
         var receipt = CreateReceipt(transaction);
 
-        receipt.Tests = _mapper.Map<List<BackflowTestDto>>(tests);
+        receipt.Items = _mapper.Map<List<BackflowTestDto>>(tests);
 
         return receipt;
     }
 
-    protected override async Task OnPaymentCompletedAsync(BackflowCheckoutRequestDto request, BackflowCheckoutReceiptDto receipt)
+    protected override async Task OnPaymentCompletedAsync(ProfessionalCheckoutRequestDto request, ProfessionalCheckoutReceiptDto<BackflowTestDto> receipt)
     {
-        await _notificationService.StartCheckingNotificationsAsync(request.Tests.Select(test => test.Id), CancellationToken.None);
+        await _notificationService.StartCheckingNotificationsAsync(request.Items.Select(item => item.Id), CancellationToken.None);
 
-        var emailPdfTestIds = request.Tests.Where(test => test.EmailPdf).Select(test => test.Id).ToHashSet();
-        var testsToEmail = receipt.Tests.Where(test => emailPdfTestIds.Contains(test.Id));
+        var emailPdfTestIds = request.Items.Where(item => item.EmailPdf).Select(item => item.Id).ToHashSet();
+        var testsToEmail = receipt.Items.Where(test => emailPdfTestIds.Contains(test.Id));
 
         receipt.EmailResults = await _checkoutEmailService.SendTestReportsAsync(testsToEmail, request.TransactionId);
     }

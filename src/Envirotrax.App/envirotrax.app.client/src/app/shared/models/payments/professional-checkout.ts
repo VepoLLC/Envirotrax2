@@ -1,18 +1,19 @@
 import { CreditCardPayment } from "./credit-card-payment";
 
-export interface ProfessionalCheckoutRequest {
-    transactionId: string;
-    expectedTotal: number;
-    expectedCardCharge: number;
-    card?: CreditCardPayment;
-}
-
 export interface CheckoutItem {
     id: number;
     emailPdf: boolean;
 }
 
-export interface ProfessionalCheckoutReceipt {
+export interface ProfessionalCheckoutRequest {
+    transactionId: string;
+    items: CheckoutItem[];
+    expectedTotal: number;
+    expectedCardCharge: number;
+    card?: CreditCardPayment;
+}
+
+export interface ProfessionalCheckoutReceipt<TItem> {
     transactionId: string;
     transactionDate: string;
     amount: number;
@@ -21,6 +22,7 @@ export interface ProfessionalCheckoutReceipt {
     nameOnCard?: string;
     cardNumber?: string;
     emailResults: CheckoutEmailResult[];
+    items: TItem[];
 }
 
 export interface CheckoutEmailResult {

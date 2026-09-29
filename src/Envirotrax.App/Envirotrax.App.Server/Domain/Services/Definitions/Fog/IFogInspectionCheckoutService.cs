@@ -1,8 +1,9 @@
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Payments;
 
 namespace Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 
 public interface IFogInspectionCheckoutService
 {
-    Task<FogInspectionCheckoutReceiptDto> CheckoutAsync(FogInspectionCheckoutRequestDto request, CancellationToken cancellationToken);
+    Task<ProfessionalCheckoutReceiptDto<FogInspectionDto>> CheckoutAsync(ProfessionalCheckoutRequestDto request, CancellationToken cancellationToken);
 }

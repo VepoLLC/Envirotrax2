@@ -7,10 +7,8 @@ using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Payments;
 
-public abstract class ProfessionalCheckoutService<TItem, TRequest, TReceipt>
+public abstract class ProfessionalCheckoutService<TItem, TItemDto>
     where TItem : IPayableModel
-    where TRequest : ProfessionalCheckoutRequestDto
-    where TReceipt : ProfessionalCheckoutReceiptDto, new()
 {
     private const string AmountsChangedMessage = "The amounts have changed. Please refresh the page and try again.";
 
@@ -34,9 +32,9 @@ public abstract class ProfessionalCheckoutService<TItem, TRequest, TReceipt>
         _paymentService = paymentService;
     }
 
-    public async Task<TReceipt> CheckoutAsync(TRequest request, CancellationToken cancellationToken)
+    public async Task<ProfessionalCheckoutReceiptDto<TItemDto>> CheckoutAsync(ProfessionalCheckoutRequestDto request, CancellationToken cancellationToken)
     {
-        var itemIds = GetItems(request).Select(item => item.Id).ToList();
+        var itemIds = request.Items.Select(item => item.Id).ToList();
 
         if (itemIds.Distinct().Count() != itemIds.Count)
         {
@@ -54,29 +52,27 @@ public abstract class ProfessionalCheckoutService<TItem, TRequest, TReceipt>
         return receipt;
     }
 
-    protected abstract List<CheckoutItemDto> GetItems(TRequest request);
-
     protected abstract Task<List<TItem>> GetUnpaidItemsAsync(List<int> ids, CancellationToken cancellationToken);
 
     protected abstract Task<int> MarkItemsPaidAsync(List<TItem> items, ProfessionalTransaction transaction, List<int> emailPdfIds);
 
     protected abstract Task<decimal> SumPaidAmountAsync(ProfessionalTransaction transaction);
 
-    protected abstract Task<TReceipt> BuildReceiptAsync(ProfessionalTransaction transaction, CancellationToken cancellationToken);
+    protected abstract Task<ProfessionalCheckoutReceiptDto<TItemDto>> BuildReceiptAsync(ProfessionalTransaction transaction, CancellationToken cancellationToken);
 
     protected virtual Task OnItemsPaidAsync(List<TItem> items)
     {
         return Task.CompletedTask;
     }
 
-    protected virtual Task OnPaymentCompletedAsync(TRequest request, TReceipt receipt)
+    protected virtual Task OnPaymentCompletedAsync(ProfessionalCheckoutRequestDto request, ProfessionalCheckoutReceiptDto<TItemDto> receipt)
     {
         return Task.CompletedTask;
     }
 
-    protected TReceipt CreateReceipt(ProfessionalTransaction transaction)
+    protected ProfessionalCheckoutReceiptDto<TItemDto> CreateReceipt(ProfessionalTransaction transaction)
     {
-        return new TReceipt
+        return new ProfessionalCheckoutReceiptDto<TItemDto>
         {
             TransactionId = transaction.TransactionId!,
             TransactionDate = transaction.TransactionDate,
@@ -89,7 +85,7 @@ public abstract class ProfessionalCheckoutService<TItem, TRequest, TReceipt>
     }
 
     private async Task<(ProfessionalTransaction Transaction, bool IsNewPayment)> PayAsync(
-        TRequest request,
+        ProfessionalCheckoutRequestDto request,
         List<int> itemIds,
         CancellationToken cancellationToken)
     {
@@ -144,7 +140,7 @@ public abstract class ProfessionalCheckoutService<TItem, TRequest, TReceipt>
         return new CheckoutAmounts(total, totalShare, fromBalance, total - fromBalance);
     }
 
-    private async Task<AuthorizeNetChargeResult> ChargeCardAsync(TRequest request, decimal amount)
+    private async Task<AuthorizeNetChargeResult> ChargeCardAsync(ProfessionalCheckoutRequestDto request, decimal amount)
     {
         if (request.Card == null)
         {
@@ -154,7 +150,7 @@ public abstract class ProfessionalCheckoutService<TItem, TRequest, TReceipt>
         return await _paymentService.ChargeCardAsync(request.Card, amount, request.TransactionId);
     }
 
-    private ProfessionalTransaction BuildTransaction(TRequest request, CheckoutAmounts amounts, AuthorizeNetChargeResult? charge)
+    private ProfessionalTransaction BuildTransaction(ProfessionalCheckoutRequestDto request, CheckoutAmounts amounts, AuthorizeNetChargeResult? charge)
     {
         return new ProfessionalTransaction
         {
@@ -172,14 +168,14 @@ public abstract class ProfessionalCheckoutService<TItem, TRequest, TReceipt>
         };
     }
 
-    private async Task RecordCheckoutAsync(TRequest request, List<TItem> items, CheckoutAmounts amounts, ProfessionalTransaction transaction)
+    private async Task RecordCheckoutAsync(ProfessionalCheckoutRequestDto request, List<TItem> items, CheckoutAmounts amounts, ProfessionalTransaction transaction)
     {
         if (amounts.FromBalance > 0 && !await _professionalRepository.TryDebitBalanceAsync(transaction.ProfessionalId, amounts.FromBalance, CancellationToken.None))
         {
             throw new AppValidationException(AmountsChangedMessage);
         }
 
-        var emailPdfIds = GetItems(request).Where(item => item.EmailPdf).Select(item => item.Id).ToList();
+        var emailPdfIds = request.Items.Where(item => item.EmailPdf).Select(item => item.Id).ToList();
 
         var paidCount = await MarkItemsPaidAsync(items, transaction, emailPdfIds);
         var paidTotal = RoundToCents(await SumPaidAmountAsync(transaction));

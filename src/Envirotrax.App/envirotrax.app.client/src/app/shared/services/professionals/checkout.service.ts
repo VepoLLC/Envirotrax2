@@ -67,12 +67,12 @@ export class CheckoutService {
             this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.FOG_TRANSPORTER)
         ]);
 
-        // Having the feature enabled isn't enough - the professional also needs the matching role,
-        // same as dashboard.component.ts, otherwise the backend correctly 403s these calls.
-        const canViewBackflow = hasBackflowTesting && isBackflowTester;
-        const canViewCsi = hasCsiInspection && isCsiInspector ;
-        const canViewFog = hasFogInspection && isFogInspector;
-        const canViewFogTransportation = hasFogTransportation && isFogTransporter;
+        // Having the feature enabled isn't enough - the professional also needs the matching role
+        // or to be an admin, same as checkout.component.ts, otherwise the backend correctly 403s these calls.
+        const canViewBackflow = hasBackflowTesting && (isBackflowTester || isAdmin);
+        const canViewCsi = hasCsiInspection && (isCsiInspector || isAdmin);
+        const canViewFog = hasFogInspection && (isFogInspector || isAdmin);
+        const canViewFogTransportation = hasFogTransportation && (isFogTransporter || isAdmin);
 
         const buildQuery = (ownerColumnName: string): Query => ({
             sort: {},

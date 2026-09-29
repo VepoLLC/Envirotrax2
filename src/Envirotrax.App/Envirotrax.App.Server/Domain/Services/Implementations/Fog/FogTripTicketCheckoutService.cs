@@ -15,7 +15,7 @@ using Envirotrax.Common.Domain.Services.Defintions;
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Fog;
 
 public class FogTripTicketCheckoutService
-    : ProfessionalCheckoutService<FogTripTicket, FogTripTicketCheckoutRequestDto, FogTripTicketCheckoutReceiptDto>, IFogTripTicketCheckoutService
+    : ProfessionalCheckoutService<FogTripTicket, FogTripTicketDto>, IFogTripTicketCheckoutService
 {
     private readonly IMapper _mapper;
     private readonly IFogTripTicketRepository _ticketRepository;
@@ -39,11 +39,6 @@ public class FogTripTicketCheckoutService
         _ticketRepository = ticketRepository;
         _siteRepository = siteRepository;
         _checkoutEmailService = checkoutEmailService;
-    }
-
-    protected override List<CheckoutItemDto> GetItems(FogTripTicketCheckoutRequestDto request)
-    {
-        return request.Tickets;
     }
 
     protected override Task<List<FogTripTicket>> GetUnpaidItemsAsync(List<int> ids, CancellationToken cancellationToken)
@@ -74,20 +69,20 @@ public class FogTripTicketCheckoutService
         return _siteRepository.UpdateLastTripTicketDatesAsync(lastTripTicketDates);
     }
 
-    protected override async Task<FogTripTicketCheckoutReceiptDto> BuildReceiptAsync(ProfessionalTransaction transaction, CancellationToken cancellationToken)
+    protected override async Task<ProfessionalCheckoutReceiptDto<FogTripTicketDto>> BuildReceiptAsync(ProfessionalTransaction transaction, CancellationToken cancellationToken)
     {
         var tickets = await _ticketRepository.GetByTransactionIdAsync(transaction.TransactionId!, transaction.ProfessionalId, cancellationToken);
         var receipt = CreateReceipt(transaction);
 
-        receipt.Tickets = _mapper.Map<List<FogTripTicketDto>>(tickets);
+        receipt.Items = _mapper.Map<List<FogTripTicketDto>>(tickets);
 
         return receipt;
     }
 
-    protected override async Task OnPaymentCompletedAsync(FogTripTicketCheckoutRequestDto request, FogTripTicketCheckoutReceiptDto receipt)
+    protected override async Task OnPaymentCompletedAsync(ProfessionalCheckoutRequestDto request, ProfessionalCheckoutReceiptDto<FogTripTicketDto> receipt)
     {
-        var emailPdfTicketIds = request.Tickets.Where(ticket => ticket.EmailPdf).Select(ticket => ticket.Id).ToHashSet();
-        var ticketsToEmail = receipt.Tickets.Where(ticket => emailPdfTicketIds.Contains(ticket.Id));
+        var emailPdfTicketIds = request.Items.Where(item => item.EmailPdf).Select(item => item.Id).ToHashSet();
+        var ticketsToEmail = receipt.Items.Where(ticket => emailPdfTicketIds.Contains(ticket.Id));
 
         receipt.EmailResults = await _checkoutEmailService.SendTripTicketReportsAsync(ticketsToEmail, request.TransactionId);
     }

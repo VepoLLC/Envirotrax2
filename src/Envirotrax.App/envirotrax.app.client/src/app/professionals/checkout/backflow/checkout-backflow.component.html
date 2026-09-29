@@ -46,7 +46,7 @@
                 </tr>
             </thead>
             <tbody>
-                @for (test of receipt.tests; track test.id) {
+                @for (test of receipt.items; track test.id) {
                     <tr>
                         <td>{{ test.testDate | date: 'MM/dd/yyyy' }}</td>
                         <td>{{ test.waterSupplier?.name }}</td>

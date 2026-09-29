@@ -7,7 +7,7 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { CsiInspection } from "../../models/csi/csi-inspection";
-import { CsiCheckoutReceipt, CsiCheckoutRequest } from "../../models/csi/csi-checkout";
+import { ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../../models/payments/professional-checkout";
 import { CsiInspectionImage } from "../../models/csi/csi-inspection-image";
 import { DownloadEndpoint } from "../../models/download-config";
 import { RecordLog } from "@envirotrax/common-ui";
@@ -135,9 +135,9 @@ export class CsiInspectionService {
         return lastValueFrom(this._http.get(url, { responseType: 'blob' }));
     }
 
-    public checkout(request: CsiCheckoutRequest): Promise<CsiCheckoutReceipt> {
+    public checkout(request: ProfessionalCheckoutRequest): Promise<ProfessionalCheckoutReceipt<CsiInspection>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/csi/inspections/checkout');
-        return lastValueFrom(this._http.post<CsiCheckoutReceipt>(url, request));
+        return lastValueFrom(this._http.post<ProfessionalCheckoutReceipt<CsiInspection>>(url, request));
     }
 
     public getImages(inspectionId: number): Promise<CsiInspectionImage[]> {

@@ -1,6 +1,6 @@
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Payments;
 
-public class ProfessionalCheckoutReceiptDto
+public class ProfessionalCheckoutReceiptDto<TItem>
 {
     public string TransactionId { get; set; } = null!;
 
@@ -17,4 +17,6 @@ public class ProfessionalCheckoutReceiptDto
     public string? CardNumber { get; set; }
 
     public List<CheckoutEmailResultDto> EmailResults { get; set; } = [];
+
+    public List<TItem> Items { get; set; } = [];
 }

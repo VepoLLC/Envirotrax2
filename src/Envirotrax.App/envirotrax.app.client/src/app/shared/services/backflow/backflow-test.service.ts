@@ -10,7 +10,7 @@ import { BackflowTest, BackflowExpiryCounts } from "../../models/backflow/backfl
 import { BackflowPaymentStatus } from "../../models/backflow/backflow-test-enums";
 import { BackflowCompliance } from "../../models/backflow/backflow-compliance";
 import { BackflowTestImages } from "../../models/backflow/backflow-test-images";
-import { BackflowCheckoutReceipt, BackflowCheckoutRequest } from "../../models/backflow/backflow-checkout";
+import { ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../../models/payments/professional-checkout";
 import { DownloadEndpoint } from "../../models/download-config";
 import { RecordLog } from "@envirotrax/common-ui";
 
@@ -183,9 +183,9 @@ export class BackflowTestService {
         return await lastValueFrom(this._http.delete<BackflowTest>(url));
     }
 
-    public async checkout(request: BackflowCheckoutRequest): Promise<BackflowCheckoutReceipt> {
+    public async checkout(request: ProfessionalCheckoutRequest): Promise<ProfessionalCheckoutReceipt<BackflowTest>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/backflow/tests/checkout');
-        return await lastValueFrom(this._http.post<BackflowCheckoutReceipt>(url, request));
+        return await lastValueFrom(this._http.post<ProfessionalCheckoutReceipt<BackflowTest>>(url, request));
     }
 
     public async updateRenewalRequired(id: number, renewalRequired: boolean): Promise<BackflowTest> {

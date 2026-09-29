@@ -1,5 +1,6 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Payments;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -130,7 +131,7 @@ public class ProfessionalFogInspectionController : ProfessionalProtectedControll
     }
 
     [HttpPost("checkout")]
-    public async Task<IActionResult> CheckoutAsync([FromBody] FogInspectionCheckoutRequestDto request, CancellationToken cancellationToken)
+    public async Task<IActionResult> CheckoutAsync([FromBody] ProfessionalCheckoutRequestDto request, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {

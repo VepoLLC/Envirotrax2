@@ -14,7 +14,7 @@ using Envirotrax.Common.Domain.Services.Defintions;
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Fog;
 
 public class FogInspectionCheckoutService
-    : ProfessionalCheckoutService<FogInspection, FogInspectionCheckoutRequestDto, FogInspectionCheckoutReceiptDto>, IFogInspectionCheckoutService
+    : ProfessionalCheckoutService<FogInspection, FogInspectionDto>, IFogInspectionCheckoutService
 {
     private readonly IMapper _mapper;
     private readonly IFogInspectionRepository _inspectionRepository;
@@ -32,11 +32,6 @@ public class FogInspectionCheckoutService
     {
         _mapper = mapper;
         _inspectionRepository = inspectionRepository;
-    }
-
-    protected override List<CheckoutItemDto> GetItems(FogInspectionCheckoutRequestDto request)
-    {
-        return request.Inspections;
     }
 
     protected override Task<List<FogInspection>> GetUnpaidItemsAsync(List<int> ids, CancellationToken cancellationToken)
@@ -57,12 +52,12 @@ public class FogInspectionCheckoutService
         return _inspectionRepository.SumAmountByTransactionIdAsync(transaction.TransactionId!, transaction.ProfessionalId, CancellationToken.None);
     }
 
-    protected override async Task<FogInspectionCheckoutReceiptDto> BuildReceiptAsync(ProfessionalTransaction transaction, CancellationToken cancellationToken)
+    protected override async Task<ProfessionalCheckoutReceiptDto<FogInspectionDto>> BuildReceiptAsync(ProfessionalTransaction transaction, CancellationToken cancellationToken)
     {
         var inspections = await _inspectionRepository.GetByTransactionIdAsync(transaction.TransactionId!, transaction.ProfessionalId, cancellationToken);
         var receipt = CreateReceipt(transaction);
 
-        receipt.Inspections = _mapper.Map<List<FogInspectionDto>>(inspections);
+        receipt.Items = _mapper.Map<List<FogInspectionDto>>(inspections);
 
         return receipt;
     }

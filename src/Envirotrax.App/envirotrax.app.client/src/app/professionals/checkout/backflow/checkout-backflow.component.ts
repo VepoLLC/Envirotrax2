@@ -3,7 +3,7 @@ import { CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, MAX_P
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { BackflowTest } from "../../../shared/models/backflow/backflow-test";
-import { BackflowCheckoutReceipt, BackflowCheckoutRequest } from "../../../shared/models/backflow/backflow-checkout";
+import { ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../../../shared/models/payments/professional-checkout";
 import { CreditCardPayment } from "../../../shared/models/payments/credit-card-payment";
 import { BackflowTestService } from "../../../shared/services/backflow/backflow-test.service";
 import { ProfesionalUserService } from "../../../shared/services/professionals/professional-user.service";
@@ -39,7 +39,7 @@ export class CheckoutBackflowComponent implements OnInit {
     public reportFor = '';
 
     public validationErrors: string[] = [];
-    public receipt?: BackflowCheckoutReceipt;
+    public receipt?: ProfessionalCheckoutReceipt<BackflowTest>;
 
     private _currentUserId?: number;
     private _professionalName?: string;
@@ -217,9 +217,9 @@ export class CheckoutBackflowComponent implements OnInit {
             return;
         }
 
-        const request: BackflowCheckoutRequest = {
+        const request: ProfessionalCheckoutRequest = {
             transactionId: createPaymentTransactionId(),
-            tests: selectedTests.map(test => ({ id: test.id, emailPdf: !!test.emailPdf })),
+            items: selectedTests.map(test => ({ id: test.id, emailPdf: !!test.emailPdf })),
             expectedTotal: this.amounts.total,
             expectedCardCharge: this.amounts.cardCharge,
             card

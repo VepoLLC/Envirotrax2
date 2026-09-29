@@ -3,7 +3,7 @@ import { CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, MAX_P
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { CsiInspection } from "../../../shared/models/csi/csi-inspection";
-import { CsiCheckoutReceipt, CsiCheckoutRequest } from "../../../shared/models/csi/csi-checkout";
+import { ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../../../shared/models/payments/professional-checkout";
 import { CreditCardPayment } from "../../../shared/models/payments/credit-card-payment";
 import { CsiInspectionService } from "../../../shared/services/csi/csi-inspection.service";
 import { ProfesionalUserService } from "../../../shared/services/professionals/professional-user.service";
@@ -39,7 +39,7 @@ export class CheckoutCsiComponent implements OnInit {
     public reportFor = '';
 
     public validationErrors: string[] = [];
-    public receipt?: CsiCheckoutReceipt;
+    public receipt?: ProfessionalCheckoutReceipt<CsiInspection>;
 
     private _currentUserId?: number;
     private _professionalName?: string;
@@ -217,9 +217,9 @@ export class CheckoutCsiComponent implements OnInit {
             return;
         }
 
-        const request: CsiCheckoutRequest = {
+        const request: ProfessionalCheckoutRequest = {
             transactionId: createPaymentTransactionId(),
-            inspections: selectedInspections.map(inspection => ({ id: inspection.id!, emailPdf: !!inspection.emailPdf })),
+            items: selectedInspections.map(inspection => ({ id: inspection.id!, emailPdf: !!inspection.emailPdf })),
             expectedTotal: this.amounts.total,
             expectedCardCharge: this.amounts.cardCharge,
             card

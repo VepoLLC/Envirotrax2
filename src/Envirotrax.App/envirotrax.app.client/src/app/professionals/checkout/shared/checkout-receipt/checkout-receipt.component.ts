@@ -7,8 +7,8 @@ import { ProfessionalCheckoutReceipt } from "../../../../shared/models/payments/
     standalone: false,
     templateUrl: './checkout-receipt.component.html'
 })
-export class CheckoutReceiptComponent {
-    @Input({ required: true }) public receipt!: ProfessionalCheckoutReceipt;
+export class CheckoutReceiptComponent<TItem> {
+    @Input({ required: true }) public receipt!: ProfessionalCheckoutReceipt<TItem>;
 
     constructor(private readonly _router: Router) {
 

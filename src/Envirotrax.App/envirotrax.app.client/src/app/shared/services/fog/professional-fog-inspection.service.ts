@@ -7,7 +7,7 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { FogInspection } from "../../models/fog/fog-inspection";
-import { FogInspectionCheckoutReceipt, FogInspectionCheckoutRequest } from "../../models/fog/fog-inspection-checkout";
+import { ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../../models/payments/professional-checkout";
 import { FogInspectionImages } from "../../models/fog/fog-inspection-images";
 import { DownloadEndpoint } from "../../models/download-config";
 
@@ -59,9 +59,9 @@ export class ProfessionalFogInspectionService {
         return lastValueFrom(this._http.delete<FogInspection>(url));
     }
 
-    public checkout(request: FogInspectionCheckoutRequest): Promise<FogInspectionCheckoutReceipt> {
+    public checkout(request: ProfessionalCheckoutRequest): Promise<ProfessionalCheckoutReceipt<FogInspection>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/fog/inspections/checkout');
-        return lastValueFrom(this._http.post<FogInspectionCheckoutReceipt>(url, request));
+        return lastValueFrom(this._http.post<ProfessionalCheckoutReceipt<FogInspection>>(url, request));
     }
 
     public submit(inspection: FogInspection, images: FogInspectionImages = {}): Promise<FogInspection> {

@@ -45,6 +45,28 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
             .AsNoTracking();
     }
 
+    protected override void UpdateEntity(ProfessionalWaterSupplier model)
+    {
+        base.UpdateEntity(model);
+
+        if (_tenantProvider.ProfessionalId > 0)
+        {
+            var entry = DbContext.Entry(model);
+
+            entry.Property(m => m.IsBackflowTestingSuspended).IsModified = false;
+            entry.Property(m => m.IsCsiInspectionSuspended).IsModified = false;
+            entry.Property(m => m.IsFogInspectionSuspended).IsModified = false;
+            entry.Property(m => m.IsFogTransportationSuspended).IsModified = false;
+
+            entry.Property(m => m.BackflowResidentialTestFee).IsModified = false;
+            entry.Property(m => m.BackflowCommercialTestFee).IsModified = false;
+            entry.Property(m => m.CsiCommercialInspectionFee).IsModified = false;
+            entry.Property(m => m.CsiResidentialInspectionFee).IsModified = false;
+            entry.Property(m => m.FogTransportFee).IsModified = false;
+            entry.Property(m => m.FogInspectorFee).IsModified = false;
+        }
+    }
+
     private static Expression<Func<ProfessionalWaterSupplier, bool>> GetProfessionalVisibilityFilter()
     {
         return pws => !pws.WaterSupplier!.GeneralSettings!.AdministrativeOnly

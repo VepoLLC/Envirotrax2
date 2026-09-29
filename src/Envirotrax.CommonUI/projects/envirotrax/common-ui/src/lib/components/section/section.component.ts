@@ -9,6 +9,11 @@ import { Component, Input } from "@angular/core";
         h2 {
             font-weight: 500
         }
+
+        .vp-section-action-container .btn,
+        .vp-section-action-container button {
+            font-size: 0.875rem;
+        }
     `
 })
 export class SectionComponent {

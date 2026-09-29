@@ -7,7 +7,7 @@
 <div>
     <form #accountForm="ngForm" (ngSubmit)="save(accountForm)">
 
-        <vp-section header="Main Account Information" class="mb-3">
+        <vp-section header="Main Account Information">
             <div class="row">
                 <div class="col-md-6">
                     <vp-field-grid>
@@ -104,7 +104,7 @@
             </div>
         </vp-section>
 
-        <div class="row mt-3 mb-3">
+        <div class="row mt-3">
             <div class="col-md-6">
                 <vp-section header="Letter Return Address Information">
                     <vp-field-grid>
@@ -161,7 +161,7 @@
                 </vp-section>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-6 mt-3 mt-md-0">
                 <vp-section header="Letter Contact Information">
                     <vp-field-grid>
                         <vp-input [(ngModel)]="supplier.letterContactCompanyName"

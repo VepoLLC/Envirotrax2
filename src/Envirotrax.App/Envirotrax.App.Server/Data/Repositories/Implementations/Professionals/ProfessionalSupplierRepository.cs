@@ -31,6 +31,7 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
     {
         return base.GetListQuery()
             .Include(pws => pws.WaterSupplier)
+            .Where(pws => pws.WaterSupplier!.DeletedTime == null)
             .WhereIf(_tenantProvider.ProfessionalId > 0, GetProfessionalVisibilityFilter())
             .AsNoTracking();
     }
@@ -39,6 +40,7 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
     {
         return base.GetDetailsQuery()
             .Include(pws => pws.WaterSupplier)
+            .Where(pws => pws.WaterSupplier!.DeletedTime == null)
             .WhereIf(_tenantProvider.ProfessionalId > 0, GetProfessionalVisibilityFilter())
             .AsNoTracking();
     }
@@ -71,7 +73,7 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
         var q = DbContext.ProfessionalWaterSuppliers
             .AsNoTracking()
             .Include(pws => pws.WaterSupplier)
-            .Where(pws => pws.ProfessionalId == professionalId);
+            .Where(pws => pws.ProfessionalId == professionalId && pws.WaterSupplier!.DeletedTime == null);
 
         if (filter != null)
             q = q.Where(filter);
@@ -90,7 +92,7 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
                              join settings in DbContext.GeneralSettings
                              on supplier.Id equals settings.WaterSupplierId into settingsJoin
                              from settings in settingsJoin.DefaultIfEmpty()
-                             where !settings.AdministrativeOnly
+                             where supplier.DeletedTime == null && !settings.AdministrativeOnly
                              select new AvailableWaterSupplier
                              {
                                  Id = supplier.Id,

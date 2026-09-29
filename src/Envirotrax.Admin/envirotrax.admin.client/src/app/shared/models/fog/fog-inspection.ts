@@ -25,17 +25,15 @@ export const interceptorCapacityTypeLabels: Record<InterceptorCapacityType, stri
 };
 
 export enum FogReasonForInspection {
-    Unscheduled = 0,
-    Scheduled = 1,
-    Complaint = 2,
-    FollowUp = 3
+    Scheduled = 0,
+    Unscheduled = 1,
+    Complaint = 2
 }
 
 export const fogReasonForInspectionLabels: Record<FogReasonForInspection, string> = {
-    [FogReasonForInspection.Unscheduled]: 'Unscheduled',
     [FogReasonForInspection.Scheduled]: 'Scheduled',
-    [FogReasonForInspection.Complaint]: 'Complaint',
-    [FogReasonForInspection.FollowUp]: 'Follow Up'
+    [FogReasonForInspection.Unscheduled]: 'Unscheduled',
+    [FogReasonForInspection.Complaint]: 'Complaint'
 };
 
 /** Mirrors the server ReferencedWaterSupplierDto - only the members this window renders. */
@@ -43,12 +41,18 @@ export interface ReferencedWaterSupplier {
     id?: number;
     name?: string;
     contactName?: string;
+    pwsId?: string;
     address?: string;
     city?: string;
     state?: State;
     zipCode?: string;
     phoneNumber?: string;
     emailAddress?: string;
+}
+
+export interface ReferencedFogSite {
+    id?: number;
+    accountNumber?: string;
 }
 
 /** Mirrors the server ReferencedProfessionalUserDto. */
@@ -87,6 +91,7 @@ export class FogInspection {
 
     // Detail members - populated by GET api/fog/inspections/{id}, absent on search rows.
     waterSupplier?: ReferencedWaterSupplier;
+    site?: ReferencedFogSite;
     submissionId?: string;
 
     mailingCompanyName?: string;
@@ -157,4 +162,53 @@ export interface FogInspectionRow extends FogInspection {
     propertyAddress: string;
     propertyCityStateZip: string;
     interceptorDescription: string;
+}
+
+export interface FogInspectionUpdateRequest {
+    propertyType?: PropertyType;
+    propertyBusinessName?: string;
+    propertyStreetNumber?: string;
+    propertyStreetName?: string;
+    propertyNumber?: string;
+    propertyCity?: string;
+    propertyState?: State;
+    propertyZip?: string;
+
+    mailingCompanyName?: string;
+    mailingContactName?: string;
+    mailingStreetNumber?: string;
+    mailingStreetName?: string;
+    mailingNumber?: string;
+    mailingCity?: string;
+    mailingState?: State;
+    mailingZip?: string;
+
+    interceptorType?: string;
+    interceptorOtherDescription?: string;
+    interceptorCapacity?: number;
+    interceptorCapacityType?: InterceptorCapacityType;
+    interceptorLocationDescription?: string;
+
+    inspectionDate?: string;
+    reasonForInspection?: FogReasonForInspection;
+    facilityType?: number;
+    maintained?: boolean;
+    accessible?: boolean;
+    pastOverflow?: boolean;
+    samplingPointAccessible?: boolean;
+    samplingPointClean?: boolean;
+    sampledFrom?: string;
+    inletTeeIntact?: boolean;
+    outletTeeIntact?: boolean;
+    inletChamberWettingHeight?: string;
+    inletChamberGreaseBlanket?: string;
+    inletChamberSediments?: string;
+    outletChamberWettingHeight?: string;
+    outletChamberGreaseBlanket?: string;
+    outletChamberSediments?: string;
+    inletTotalCapacityPercent?: number;
+    outletTotalCapacityPercent?: number;
+    totalCapacityPercent?: number;
+    inspectionResult?: FogInspectionResult;
+    comments?: string;
 }

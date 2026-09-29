@@ -4,6 +4,7 @@ export interface WaterSupplierLicense {
     id?: number;
     professionalId?: number;
     userId?: number;
+    submittedOn?: string;
     userEmail?: string;
     companyName?: string;
     contactName?: string;

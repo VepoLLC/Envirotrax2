@@ -38,12 +38,12 @@ public class SiteLogService : ISiteLogService
         return dtos.ToPagedData(pageInfo);
     }
 
-    public async Task<IPagedData<SiteLogDto>> GetForManagementAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public async Task<IPagedData<SiteLogDto>> GetForManagementAsync(PageInfo pageInfo, Query query, string? logTypeFilter, CancellationToken cancellationToken)
     {
         query.Filter = query.ConvertFilterProperties<SiteLog, SiteLogDto>(_mapper);
         query.Sort = query.ConvertSortProperties<SiteLog, SiteLogDto>(_mapper);
 
-        var results = await _repository.GetAllAsync(pageInfo, query, cancellationToken);
+        var results = await _repository.GetForManagementAsync(pageInfo, query, logTypeFilter, cancellationToken);
         var dtos = results.Select(MapToDto).ToList();
 
         return dtos.ToPagedData(pageInfo);

@@ -1,0 +1,35 @@
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+<ng-template #gaugeCell let-rowData="rowData">
+    {{ rowData.manufacturer }} {{ rowData.model }}
+</ng-template>
+
+<ng-template #typeCell let-rowData="rowData">
+    {{ rowData.isPortable ? 'Potable' : 'Non-Potable' }}
+</ng-template>
+
+<ng-template #actionsCell let-rowData="rowData">
+    <div class="d-flex gap-1" (click)="$event.stopPropagation()">
+        <button type="button" class="btn btn-primary" (click)="manage(rowData)">
+            Manage
+        </button>
+    </div>
+</ng-template>
+
+<div class="text-center mb-3">
+    <h1 class="h2">
+        Gauge Management
+    </h1>
+</div>
+
+<vp-section header="Unverified Gauges">
+    <vp-table *ngIf="table.items"
+              [columns]="table.columns!"
+              [data]="table.items.data"
+              [(pageInfo)]="table.items.pageInfo"
+              (pageInfoChange)="loadGauges()"
+              [(query)]="table.query"
+              (queryChange)="loadGauges()"
+              (queryReset)="loadGauges()"
+              [freeTextSearch]="table.freeTextSearch" />
+</vp-section>

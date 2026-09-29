@@ -16,6 +16,7 @@
                   [canEdit]="canEdit"
                   (edit)="edit($event)"
                   [canDelete]="canDelete"
+                  (delete)="delete($event)"
                   [(pageInfo)]="table.items.pageInfo"
                   (pageInfoChange)="getSuppliers()"
                   [(query)]="table.query"

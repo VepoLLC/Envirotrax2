@@ -176,7 +176,9 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         var professionalId = _tenantProvider.ProfessionalId;
 
         var counts = await Entity
-            .Where(t => t.IsCurrent && (professionalId <= 0 || t.ProfessionalId == professionalId))
+            .Where(t => t.IsCurrent
+                && t.DeletedTime == null
+                && (professionalId <= 0 || t.ProfessionalId == professionalId))
             .GroupBy(t => 1)
             .Select(g => new BackflowTestExpiryCounts
             {

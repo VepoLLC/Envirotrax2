@@ -31,6 +31,7 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
     {
         return base.GetListQuery()
             .Include(pws => pws.WaterSupplier)
+            .Where(pws => pws.WaterSupplier!.DeletedTime == null)
             .WhereIf(_tenantProvider.ProfessionalId > 0, GetProfessionalVisibilityFilter())
             .AsNoTracking();
     }
@@ -39,8 +40,31 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
     {
         return base.GetDetailsQuery()
             .Include(pws => pws.WaterSupplier)
+            .Where(pws => pws.WaterSupplier!.DeletedTime == null)
             .WhereIf(_tenantProvider.ProfessionalId > 0, GetProfessionalVisibilityFilter())
             .AsNoTracking();
+    }
+
+    protected override void UpdateEntity(ProfessionalWaterSupplier model)
+    {
+        base.UpdateEntity(model);
+
+        if (_tenantProvider.ProfessionalId > 0)
+        {
+            var entry = DbContext.Entry(model);
+
+            entry.Property(m => m.IsBackflowTestingSuspended).IsModified = false;
+            entry.Property(m => m.IsCsiInspectionSuspended).IsModified = false;
+            entry.Property(m => m.IsFogInspectionSuspended).IsModified = false;
+            entry.Property(m => m.IsFogTransportationSuspended).IsModified = false;
+
+            entry.Property(m => m.BackflowResidentialTestFee).IsModified = false;
+            entry.Property(m => m.BackflowCommercialTestFee).IsModified = false;
+            entry.Property(m => m.CsiCommercialInspectionFee).IsModified = false;
+            entry.Property(m => m.CsiResidentialInspectionFee).IsModified = false;
+            entry.Property(m => m.FogTransportFee).IsModified = false;
+            entry.Property(m => m.FogInspectorFee).IsModified = false;
+        }
     }
 
     private static Expression<Func<ProfessionalWaterSupplier, bool>> GetProfessionalVisibilityFilter()
@@ -71,7 +95,7 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
         var q = DbContext.ProfessionalWaterSuppliers
             .AsNoTracking()
             .Include(pws => pws.WaterSupplier)
-            .Where(pws => pws.ProfessionalId == professionalId);
+            .Where(pws => pws.ProfessionalId == professionalId && pws.WaterSupplier!.DeletedTime == null);
 
         if (filter != null)
             q = q.Where(filter);
@@ -90,7 +114,7 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
                              join settings in DbContext.GeneralSettings
                              on supplier.Id equals settings.WaterSupplierId into settingsJoin
                              from settings in settingsJoin.DefaultIfEmpty()
-                             where !settings.AdministrativeOnly
+                             where supplier.DeletedTime == null && !settings.AdministrativeOnly
                              select new AvailableWaterSupplier
                              {
                                  Id = supplier.Id,

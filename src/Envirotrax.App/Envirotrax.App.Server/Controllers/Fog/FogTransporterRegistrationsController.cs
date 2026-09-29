@@ -4,21 +4,21 @@ using Envirotrax.Common;
 using Envirotrax.Common.Domain.Services.Defintions;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Envirotrax.App.Server.Controllers.WaterSuppliers;
+namespace Envirotrax.App.Server.Controllers.Fog;
 
-[Route("api/registrations")]
-public class RegistrationManagementController : WaterSupplierProtectedController
+[Route("api/fog/transporters")]
+public class FogTransporterRegistrationsController : WaterSupplierProtectedController
 {
     private readonly IProfessionalUserLicenseService _licenseService;
     private readonly IAuthService _authService;
 
-    public RegistrationManagementController(IProfessionalUserLicenseService licenseService, IAuthService authService)
+    public FogTransporterRegistrationsController(IProfessionalUserLicenseService licenseService, IAuthService authService)
     {
         _licenseService = licenseService;
         _authService = authService;
     }
 
-    [HttpGet]
+    [HttpGet("registrations")]
     public async Task<IActionResult> GetUnverifiedRegistrationsAsync(
         [FromQuery] PageInfo pageInfo,
         [FromQuery] Query query,

@@ -1,12 +1,12 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { CellTemplateData, ColumnType, TableColumn } from '@envirotrax/common-ui';
-import { WaterSupplierLicense } from '../shared/models/professionals/licenses/water-supplier-license';
-import { WaterSupplierLicenseService } from '../shared/services/licenses/water-supplier-license.service';
-import { TableViewModel } from '../shared/models/table-view-model';
-import { AuthService } from '../shared/services/auth/auth.service';
-import { FeatureType } from '../shared/models/feature-type';
-import { PermissionAction, PermissionType } from '../shared/models/permission-type';
+import { WaterSupplierLicense } from '../../../shared/models/professionals/licenses/water-supplier-license';
+import { WaterSupplierLicenseService } from '../../../shared/services/licenses/water-supplier-license.service';
+import { TableViewModel } from '../../../shared/models/table-view-model';
+import { AuthService } from '../../../shared/services/auth/auth.service';
+import { FeatureType } from '../../../shared/models/feature-type';
+import { PermissionAction, PermissionType } from '../../../shared/models/permission-type';
 
 @Component({
     templateUrl: './registration-management.component.html',

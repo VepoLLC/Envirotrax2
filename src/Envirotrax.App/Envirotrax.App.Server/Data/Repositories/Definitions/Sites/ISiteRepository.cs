@@ -21,5 +21,6 @@ public interface ISiteRepository : IRepository<Site>
     Task UpdateFogAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate);
     Task ClearNeedsRenewalCheckAsync(int siteId);
     Task ClearNeedsCsiInspectionAsync(IReadOnlyCollection<int> siteIds);
+    Task UpdateLastTripTicketDatesAsync(IReadOnlyDictionary<int, DateTime> lastTripTicketDates);
     Task<IEnumerable<Site>> GetAllPendingRenewalAsync(int batchSize);
 }

@@ -14,10 +14,12 @@ namespace Envirotrax.App.Server.Controllers.Professionals.Fog;
 public class ProfessionalFogTripTicketController : ProfessionalProtectedController
 {
     private readonly IFogTripTicketService _fogService;
+    private readonly IFogTripTicketCheckoutService _checkoutService;
 
-    public ProfessionalFogTripTicketController(IFogTripTicketService fogService)
+    public ProfessionalFogTripTicketController(IFogTripTicketService fogService, IFogTripTicketCheckoutService checkoutService)
     {
         _fogService = fogService;
+        _checkoutService = checkoutService;
     }
 
     [HttpGet]
@@ -89,5 +91,17 @@ public class ProfessionalFogTripTicketController : ProfessionalProtectedControll
             ct);
 
         return Ok(result);
+    }
+
+    [HttpPost("checkout")]
+    public async Task<IActionResult> CheckoutAsync([FromBody] FogTripTicketCheckoutRequestDto request, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
+
+        var receipt = await _checkoutService.CheckoutAsync(request, cancellationToken);
+        return Ok(receipt);
     }
 }

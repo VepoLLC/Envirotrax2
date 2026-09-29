@@ -106,4 +106,53 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
     {
         return Entity.CountAsync(t => t.SiteId == siteId && t.DeletedTime == null, cancellationToken);
     }
+
+    public async Task<List<FogTripTicket>> GetUnpaidForCheckoutAsync(IReadOnlyCollection<int> ids, int professionalId, int? transporterId, CancellationToken cancellationToken)
+    {
+        return await GetUnpaidForCheckoutQuery(ids, professionalId, transporterId)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> MarkPaidAsync(
+        IReadOnlyCollection<int> ids,
+        int professionalId,
+        int? transporterId,
+        string transactionId,
+        DateTime transactionDate,
+        IReadOnlyCollection<int> emailPdfTicketIds,
+        CancellationToken cancellationToken)
+    {
+        return await GetUnpaidForCheckoutQuery(ids, professionalId, transporterId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(t => t.TransactionId, transactionId)
+                .SetProperty(t => t.TransactionDate, transactionDate)
+                .SetProperty(t => t.EmailPdf, t => emailPdfTicketIds.Contains(t.Id)), cancellationToken);
+    }
+
+    public async Task<decimal> SumAmountByTransactionIdAsync(string transactionId, int professionalId, CancellationToken cancellationToken)
+    {
+        return await DbContext.FogTripTickets
+            .Where(t => t.TransactionId == transactionId && t.ProfessionalId == professionalId)
+            .SumAsync(t => t.Amount, cancellationToken);
+    }
+
+    public async Task<List<FogTripTicket>> GetByTransactionIdAsync(string transactionId, int professionalId, CancellationToken cancellationToken)
+    {
+        return await GetDetailsQuery()
+            .Where(t => t.TransactionId == transactionId && t.ProfessionalId == professionalId)
+            .OrderBy(t => t.CreatedTime)
+            .ToListAsync(cancellationToken);
+    }
+
+    private IQueryable<FogTripTicket> GetUnpaidForCheckoutQuery(IReadOnlyCollection<int> ids, int professionalId, int? transporterId)
+    {
+        return DbContext.FogTripTickets
+            .Where(t => ids.Contains(t.Id)
+                && t.ProfessionalId == professionalId
+                && (transporterId == null || t.TransporterId == transporterId)
+                && (t.TransactionId == null || t.TransactionId == string.Empty)
+                && t.Completed
+                && t.DeletedTime == null);
+    }
 }

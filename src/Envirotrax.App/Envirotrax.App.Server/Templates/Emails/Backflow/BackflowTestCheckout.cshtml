@@ -1,0 +1,46 @@
+@using RazorLight
+@using Envirotrax.App.Server.Templates.Emails.Backflow
+@inherits TemplatePage<BackflowTestCheckoutVm>
+
+@{
+    Layout = "Templates.Emails._EmailLayout";
+}
+
+<div>
+    <p style="margin-top: 0;">
+        The backflow test reports for the following property are attached.
+    </p>
+
+    <div style="border-left: 4px solid #4aa3d6; padding-left: 14px; margin-bottom: 28px;">
+        @if (!string.IsNullOrEmpty(Model.PropertyBusinessName))
+        {
+            <div style="font-weight: bold;">@Model.PropertyBusinessName</div>
+        }
+
+        <div>@Model.PropertyAddress</div>
+
+        @if (!string.IsNullOrEmpty(Model.PropertyCityStateZip))
+        {
+            <div>@Model.PropertyCityStateZip</div>
+        }
+    </div>
+
+    <table cellpadding="6" cellspacing="0" style="width: 100%; border-collapse: collapse; font-size: 14px;">
+        <tr style="background-color: #f2f3f8; text-align: left;">
+            <th>Test Date</th>
+            <th>Assembly</th>
+            <th>Serial Number</th>
+            <th>Tested By</th>
+        </tr>
+
+        @foreach (var test in Model.Tests)
+        {
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td>@test.TestDate</td>
+                <td>@test.AssemblyDescription</td>
+                <td>@test.SerialNumber</td>
+                <td>@test.TestedBy</td>
+            </tr>
+        }
+    </table>
+</div>

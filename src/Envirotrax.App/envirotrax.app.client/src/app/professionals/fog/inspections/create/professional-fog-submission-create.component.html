@@ -40,7 +40,7 @@
                             (click)="returnToAccountOverview()">Return to Account Overview</button>
                     <button type="button" class="btn btn-primary vp-section-button" *ngIf="!editingId" (click)="submitAnother()">Submit
                         Another Inspection</button>
-                    <button type="button" class="btn btn-primary vp-section-button">Checkout</button>
+                    <button type="button" class="btn btn-primary vp-section-button" (click)="goToCheckout()">Checkout</button>
                 </div>
             </vp-section>
         </div>

@@ -12,4 +12,10 @@ public interface ICsiInspectionRepository : IRepository<CsiInspection>
     Task<CsiInspection?> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request);
     Task<CsiInspection?> UpdateForProfessionalAsync(CsiInspection model, int professionalId);
     Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken);
+
+    // Checkout
+    Task<List<CsiInspection>> GetUnpaidForCheckoutAsync(IReadOnlyCollection<int> ids, int professionalId, int? inspectorId, CancellationToken cancellationToken);
+    Task<int> MarkPaidAsync(IReadOnlyCollection<int> ids, int professionalId, int? inspectorId, string transactionId, DateTime transactionDate, IReadOnlyCollection<int> emailPdfInspectionIds, CancellationToken cancellationToken);
+    Task<decimal> SumAmountByTransactionIdAsync(string transactionId, int professionalId, CancellationToken cancellationToken);
+    Task<List<CsiInspection>> GetByTransactionIdAsync(string transactionId, int professionalId, CancellationToken cancellationToken);
 }

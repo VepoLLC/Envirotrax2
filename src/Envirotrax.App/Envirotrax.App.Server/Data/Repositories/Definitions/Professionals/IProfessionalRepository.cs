@@ -9,4 +9,8 @@ public interface IProfessionalRepository : IRepository<Professional>
     Task<IEnumerable<Professional>> GetAllMyAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
 
     Task<IEnumerable<Professional>> GetSubAccountsAsync(CancellationToken cancellationToken);
+
+    Task<bool> TryDebitBalanceAsync(int professionalId, decimal amount, CancellationToken cancellationToken);
+
+    Task CreditBalanceAsync(int professionalId, decimal amount, CancellationToken cancellationToken);
 }

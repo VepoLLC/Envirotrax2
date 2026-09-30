@@ -11,4 +11,10 @@ public interface IFogTripTicketRepository : IRepository<FogTripTicket>
     Task<FogTripTicket?> UpdateApprovalAsync(int id, bool disapproved, int? approvedById, CancellationToken cancellationToken);
 
     Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken);
+
+    // Checkout
+    Task<List<FogTripTicket>> GetUnpaidForCheckoutAsync(IReadOnlyCollection<int> ids, int professionalId, int? transporterId, CancellationToken cancellationToken);
+    Task<int> MarkPaidAsync(IReadOnlyCollection<int> ids, int professionalId, int? transporterId, string transactionId, DateTime transactionDate, IReadOnlyCollection<int> emailPdfTicketIds, CancellationToken cancellationToken);
+    Task<decimal> SumAmountByTransactionIdAsync(string transactionId, int professionalId, CancellationToken cancellationToken);
+    Task<List<FogTripTicket>> GetByTransactionIdAsync(string transactionId, int professionalId, CancellationToken cancellationToken);
 }

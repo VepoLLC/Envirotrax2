@@ -13,7 +13,7 @@ using Envirotrax.Common.Data.Models;
 namespace Envirotrax.App.Server.Data.Models.Fog;
 
 [Table("FogTripTickets")]
-public class FogTripTicket : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
+public class FogTripTicket : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IPayableModel
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }

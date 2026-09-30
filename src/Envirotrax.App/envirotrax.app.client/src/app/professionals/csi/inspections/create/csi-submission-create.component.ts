@@ -205,6 +205,10 @@ export class CsiSubmissionCreateComponent implements OnInit {
         this._router.navigate(['..'], { relativeTo: this._activatedRoute });
     }
 
+    public goToCheckout(): void {
+        this._router.navigate(['/professionals/checkout'], { queryParams: { tab: 'csi' } });
+    }
+
     private initializeSiteId(): boolean {
         const idParam = this._activatedRoute.snapshot.paramMap.get('siteId');
         this._siteId = idParam ? Number(idParam) : 0;

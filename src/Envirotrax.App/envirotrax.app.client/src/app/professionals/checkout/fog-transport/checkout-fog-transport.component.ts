@@ -1,12 +1,18 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, MAX_PAGE_SIZE, ModalHelperService, TableColumn, ToastService } from '@envirotrax/common-ui';
+import { CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, MAX_PAGE_SIZE, ModalHelperService, TableColumn, ToastService, ToastType } from '@envirotrax/common-ui';
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { FogTripTicket } from "../../../shared/models/fog/fog-trip-ticket";
+import { ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../../../shared/models/payments/professional-checkout";
+import { CreditCardPayment } from "../../../shared/models/payments/credit-card-payment";
 import { FogTripTicketService } from "../../../shared/services/fog/fog-trip-ticket.service";
 import { ProfesionalUserService } from "../../../shared/services/professionals/professional-user.service";
 import { ProfesisonalService } from "../../../shared/services/professionals/professional.service";
 import { CheckoutService } from "../../../shared/services/professionals/checkout.service";
+import { HelperService } from "../../../shared/services/helpers/helper.service";
+import { createPaymentTransactionId } from "../../../shared/utils/payment-transaction-id.util";
+import { calculateCheckoutAmounts, CheckoutAmounts } from "../../../shared/utils/checkout-amounts.util";
+import { CheckoutPaymentComponent } from "../shared/checkout-payment/checkout-payment.component";
 import { Router } from "@angular/router";
 
 @Component({
@@ -27,12 +33,19 @@ export class CheckoutFogTransportComponent implements OnInit {
     public items: TableViewModel<CheckoutFogTripTicketVm> = {
         query: { sort: {}, filter: [] }
     };
-    public selectedFeeTotal = 0;
+    public amounts: CheckoutAmounts = { total: 0, fromBalance: 0, cardCharge: 0 };
+    public accountBalance = 0;
     public reportForOptions: InputOption[] = [];
     public reportFor = '';
 
+    public validationErrors: string[] = [];
+    public receipt?: ProfessionalCheckoutReceipt<FogTripTicket>;
+
     private _currentUserId?: number;
     private _professionalName?: string;
+
+    @ViewChild(CheckoutPaymentComponent)
+    public checkoutPayment?: CheckoutPaymentComponent;
 
     @ViewChild('selectTemplate', { static: true })
     public selectTemplate?: TemplateRef<CellTemplateData<CheckoutFogTripTicketVm>>;
@@ -50,6 +63,7 @@ export class CheckoutFogTransportComponent implements OnInit {
         private readonly _fogTripTicketService: FogTripTicketService,
         private readonly _professionalUserService: ProfesionalUserService,
         private readonly _professionalService: ProfesisonalService,
+        private readonly _helper: HelperService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService,
         private readonly _checkoutService: CheckoutService,
@@ -111,28 +125,43 @@ export class CheckoutFogTransportComponent implements OnInit {
 
             this.items.query.filter = filter;
 
-            this.items.items = await this._fogTripTicketService.searchForProfessional(
-                { pageSize: MAX_PAGE_SIZE },
-                this.items.query
-            );
+            const [tickets, professional] = await Promise.all([
+                this._fogTripTicketService.searchForProfessional({ pageSize: MAX_PAGE_SIZE }, this.items.query),
+                this._professionalService.reloadLoggedInProfessional()
+            ]);
+
+            this.items.items = tickets;
+            this.accountBalance = professional.accountBalance ?? 0;
 
             this.items.items.data.forEach(ticket => {
                 ticket.selected = true;
                 ticket.emailPdf = true;
             });
-            this.recalculateSelectedTotal();
+            this.recalculateAmounts();
         } finally {
             this.isLoading = false;
         }
     }
 
-    public recalculateSelectedTotal(): void {
+    public removeUnselectedTickets(): void {
         if (this.items.items) {
             this.items.items.data = this.items.items.data.filter(ticket => ticket.selected);
         }
 
-        this.selectedFeeTotal = (this.items.items?.data || [])
-            .reduce((total, ticket) => total + (ticket.amount || 0), 0);
+        this.recalculateAmounts();
+    }
+
+    public toggleSelected(ticket: CheckoutFogTripTicketVm): void {
+        ticket.selected = !ticket.selected;
+        this.recalculateAmounts();
+    }
+
+    private recalculateAmounts(): void {
+        this.amounts = calculateCheckoutAmounts(this.getSelectedTickets().map(ticket => ticket.amount || 0), this.accountBalance);
+    }
+
+    private getSelectedTickets(): CheckoutFogTripTicketVm[] {
+        return (this.items.items?.data || []).filter(ticket => ticket.selected);
     }
 
     public viewTripTicket(ticket: CheckoutFogTripTicketVm): void {
@@ -165,6 +194,47 @@ export class CheckoutFogTransportComponent implements OnInit {
         }
 
         await this.getFogTripTickets();
+    }
+
+    public async completePayment(card?: CreditCardPayment): Promise<void> {
+        if (this.isLoading) {
+            return;
+        }
+
+        this.recalculateAmounts();
+
+        const selectedTickets = this.getSelectedTickets();
+
+        if (selectedTickets.length === 0) {
+            return;
+        }
+
+        const request: ProfessionalCheckoutRequest = {
+            transactionId: createPaymentTransactionId(),
+            items: selectedTickets.map(ticket => ({ id: ticket.id, emailPdf: !!ticket.emailPdf })),
+            expectedTotal: this.amounts.total,
+            expectedCardCharge: this.amounts.cardCharge,
+            card
+        };
+
+        this.validationErrors = [];
+
+        try {
+            this.isLoading = true;
+            this.receipt = await this._fogTripTicketService.checkout(request);
+
+            this._toastService.show({ text: 'Payment completed.', type: ToastType.Success });
+            this._checkoutService.refresh();
+        } catch (error) {
+            if (!this._helper.parseValidationErrors(error, this.validationErrors)) {
+                throw error;
+            }
+
+            this.checkoutPayment?.reset();
+            await this.getFogTripTickets();
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     private getColumns(): TableColumn<CheckoutFogTripTicketVm>[] {

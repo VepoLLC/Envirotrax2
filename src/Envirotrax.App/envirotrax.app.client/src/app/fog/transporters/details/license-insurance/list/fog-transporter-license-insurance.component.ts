@@ -163,7 +163,8 @@ export class FogTransporterLicenseInsuranceComponent implements OnInit {
         this._modalHelper.show<FogLicenseModalData, ProfessionalUserLicense>(EditFogTransporterLicenseComponent, {
             title: 'Add License',
             model: { transporterId: this.transporterId, license: {} },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadLicenses());
     }
 
@@ -171,7 +172,8 @@ export class FogTransporterLicenseInsuranceComponent implements OnInit {
         this._modalHelper.show<FogLicenseModalData, ProfessionalUserLicense>(EditFogTransporterLicenseComponent, {
             title: 'Edit License',
             model: { transporterId: this.transporterId, license },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadLicenses());
     }
 
@@ -179,7 +181,8 @@ export class FogTransporterLicenseInsuranceComponent implements OnInit {
         this._modalHelper.show<FogInsuranceModalData, ProfessionalInsurance>(EditFogTransporterInsuranceComponent, {
             title: 'Add Insurance Policy',
             model: { transporterId: this.transporterId, insurance: {} },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadInsurances());
     }
 
@@ -187,7 +190,8 @@ export class FogTransporterLicenseInsuranceComponent implements OnInit {
         this._modalHelper.show<FogInsuranceModalData, ProfessionalInsurance>(EditFogTransporterInsuranceComponent, {
             title: 'Edit Insurance Policy',
             model: { transporterId: this.transporterId, insurance },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadInsurances());
     }
 

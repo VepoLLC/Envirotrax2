@@ -9,6 +9,7 @@ import { PagedData } from "../../models/paged-data";
 import { CsiInspection } from "../../models/csi/csi-inspection";
 import { ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../../models/payments/professional-checkout";
 import { CsiInspectionImage } from "../../models/csi/csi-inspection-image";
+import { InsuranceCheck } from "../../models/professionals/insurance-check";
 import { DownloadEndpoint } from "../../models/download-config";
 import { RecordLog } from "@envirotrax/common-ui";
 
@@ -94,6 +95,11 @@ export class CsiInspectionService {
     public getProfessionalInspection(id: number): Promise<CsiInspection> {
         const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${id}`);
         return lastValueFrom(this._http.get<CsiInspection>(url));
+    }
+
+    public getInsuranceCheck(waterSupplierId: number): Promise<InsuranceCheck> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/csi/inspections/insurance-check');
+        return lastValueFrom(this._http.get<InsuranceCheck>(url, { params: { waterSupplierId } }));
     }
 
     public submit(inspection: CsiInspection): Promise<CsiInspection> {

@@ -184,7 +184,8 @@ export class LicenseListComponent implements OnInit {
         this._modalHelper.show<ProfessionalUserLicense, ProfessionalUserLicense>(CreateEditLicenseComponent, {
             title: 'Edit License',
             model: license,
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.getLicenses());
     }
 

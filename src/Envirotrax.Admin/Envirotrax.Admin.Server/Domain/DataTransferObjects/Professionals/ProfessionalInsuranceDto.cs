@@ -14,6 +14,8 @@ public class ProfessionalInsuranceDto
     [StringLength(50)]
     public string InsuranceNumber { get; set; } = null!;
 
+    public decimal? CoverageAmount { get; set; }
+
     public string? FilePath { get; set; }
 
     public ExpirationType ExpirationType { get; set; }

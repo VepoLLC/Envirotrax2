@@ -103,7 +103,8 @@ export class BackflowTesterGaugeComponent implements OnInit {
         this._modalHelper.show<BackflowGaugeModalData, BackflowGauge>(AddEditBackflowTesterGaugeComponent, {
             title: 'Add Gauge',
             model: { testerId: this.testerId, gauge: {} },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadGauge());
     }
 
@@ -111,7 +112,8 @@ export class BackflowTesterGaugeComponent implements OnInit {
         this._modalHelper.show<BackflowGaugeModalData, BackflowGauge>(AddEditBackflowTesterGaugeComponent, {
             title: 'Edit Gauge',
             model: { testerId: this.testerId, gauge },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadGauge());
     }
 

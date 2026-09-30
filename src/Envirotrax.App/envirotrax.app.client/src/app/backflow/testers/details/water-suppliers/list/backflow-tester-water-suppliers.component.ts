@@ -86,7 +86,8 @@ export class BackflowTesterWaterSuppliersComponent implements OnInit {
         this._modalHelper.show<EditBackflowWaterSupplierModalData, ProfessionalWaterSupplier>(EditBackflowTesterWaterSupplierComponent, {
             title: 'Edit Water Supplier Registration',
             model: { testerId: this.testerId, supplier },
-            size: ModalSize.medium
+            size: ModalSize.medium,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadWaterSuppliers());
     }
 }

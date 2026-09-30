@@ -69,7 +69,8 @@ export class FogInspectorUsersComponent implements OnInit {
         this._modalHelper.show<FogUserModalData, ProfessionalUser>(EditFogInspectorUserComponent, {
             title: 'Add Sub Account',
             model: { inspectorId: this.inspectorId, user: {} },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadSubAccounts());
     }
 
@@ -77,7 +78,8 @@ export class FogInspectorUsersComponent implements OnInit {
         this._modalHelper.show<FogUserModalData, ProfessionalUser>(EditFogInspectorUserComponent, {
             title: 'Edit Sub Account',
             model: { inspectorId: this.inspectorId, user },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadSubAccounts());
     }
 

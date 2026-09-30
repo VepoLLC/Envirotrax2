@@ -165,7 +165,8 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
         this._modalHelper.show<any, ProfessionalInsurance>(CsiInspectorAddEditInsuranceComponent, {
             title: 'Add Insurance Policy',
             model: { inspectorId: this.inspectorId, insurance: {} },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadInsurances());
     }
 
@@ -173,7 +174,8 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
         this._modalHelper.show<any, ProfessionalUserLicense>(CsiInspectorAddEditLicenseComponent, {
             title: 'Add License',
             model: { inspectorId: this.inspectorId, license: {} },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadLicenses());
     }
 
@@ -181,7 +183,8 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
         this._modalHelper.show<any, ProfessionalUserLicense>(CsiInspectorAddEditLicenseComponent, {
             title: 'Edit License',
             model: { inspectorId: this.inspectorId, license },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadLicenses());
     }
 
@@ -202,7 +205,8 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
         this._modalHelper.show<any, ProfessionalInsurance>(CsiInspectorAddEditInsuranceComponent, {
             title: 'Edit Insurance Policy',
             model: { inspectorId: this.inspectorId, insurance },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadInsurances());
     }
 

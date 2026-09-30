@@ -76,16 +76,11 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
 
     public async setActiveTab(tab: 'insurances' | 'licenses'): Promise<void> {
         this.activeTab = tab;
-        if (tab === 'licenses') {
-            this.licensesTable.columns = this.getLicenseColumns();
-            if (!this.licensesTable.items) {
-                await this.loadLicenses();
-            }
-        } else if (tab === 'insurances') {
-            this.insurancesTable.columns = this.getInsuranceColumns();
-            if (!this.insurancesTable.items) {
-                await this.loadInsurances();
-            }
+
+        if (tab === 'licenses' && !this.licensesTable.items) {
+            await this.loadLicenses();
+        } else if (tab === 'insurances' && !this.insurancesTable.items) {
+            await this.loadInsurances();
         }
     }
 
@@ -165,7 +160,8 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
         this._modalHelper.show<any, ProfessionalInsurance>(AddEditBackflowTesterInsuranceComponent, {
             title: 'Add Insurance Policy',
             model: { testerId: this.testerId, insurance: {} },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadInsurances(false));
     }
 
@@ -173,7 +169,8 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
         this._modalHelper.show<any, ProfessionalUserLicense>(AddEditBackflowTesterLicenseComponent, {
             title: 'Add License',
             model: { testerId: this.testerId, license: {} },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadLicenses(false));
     }
 
@@ -181,7 +178,8 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
         this._modalHelper.show<any, ProfessionalUserLicense>(AddEditBackflowTesterLicenseComponent, {
             title: 'Edit License',
             model: { testerId: this.testerId, license },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadLicenses(false));
     }
 
@@ -202,7 +200,8 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
         this._modalHelper.show<any, ProfessionalInsurance>(AddEditBackflowTesterInsuranceComponent, {
             title: 'Edit Insurance Policy',
             model: { testerId: this.testerId, insurance },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadInsurances(false));
     }
 

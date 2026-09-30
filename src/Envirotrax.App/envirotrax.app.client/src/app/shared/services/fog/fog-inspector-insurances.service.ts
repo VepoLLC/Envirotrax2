@@ -33,6 +33,10 @@ export class FogInspectorInsurancesService {
         formData.append('professional.id', inspectorId.toString());
         formData.append('insuranceNumber', insurance.insuranceNumber ?? '');
 
+        if (insurance.coverageAmount != null) {
+            formData.append('coverageAmount', insurance.coverageAmount.toString());
+        }
+
         if (insurance.expirationDate) {
             formData.append('expirationDate', insurance.expirationDate.toString());
         }

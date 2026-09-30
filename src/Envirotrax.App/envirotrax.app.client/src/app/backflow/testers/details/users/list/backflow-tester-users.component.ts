@@ -66,7 +66,8 @@ export class BackflowTesterUsersComponent implements OnInit {
         this._modalHelper.show<BackflowUserModalData, ProfessionalUser>(AddEditBackflowTesterUserComponent, {
             title: 'Add Sub Account',
             model: { testerId: this.testerId, user: {} },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadSubAccounts());
     }
 
@@ -74,7 +75,8 @@ export class BackflowTesterUsersComponent implements OnInit {
         this._modalHelper.show<BackflowUserModalData, ProfessionalUser>(AddEditBackflowTesterUserComponent, {
             title: 'Edit Sub Account',
             model: { testerId: this.testerId, user },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadSubAccounts());
     }
 

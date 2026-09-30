@@ -69,7 +69,8 @@ export class FogTransporterUsersComponent implements OnInit {
         this._modalHelper.show<FogUserModalData, ProfessionalUser>(EditFogTransporterUserComponent, {
             title: 'Add Sub Account',
             model: { transporterId: this.transporterId, user: {} },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadSubAccounts());
     }
 
@@ -77,7 +78,8 @@ export class FogTransporterUsersComponent implements OnInit {
         this._modalHelper.show<FogUserModalData, ProfessionalUser>(EditFogTransporterUserComponent, {
             title: 'Edit Sub Account',
             model: { transporterId: this.transporterId, user },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadSubAccounts());
     }
 

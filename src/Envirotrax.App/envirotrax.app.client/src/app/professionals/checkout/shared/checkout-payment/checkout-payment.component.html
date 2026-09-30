@@ -3,7 +3,7 @@
         <vp-section header="Billing Information">
             <div class="row">
                 <div class="col-md-6">
-                    <div class="mb-3">
+                    <vp-field-grid>
                         <vp-input name="billingFirstName"
                                   label="First Name:"
                                   labelStyle="horizontal"
@@ -11,8 +11,7 @@
                                   [maxLength]="255"
                                   [form]="form"
                                   [(ngModel)]="professionalUser.billingFirstName" />
-                    </div>
-                    <div class="mb-3">
+
                         <vp-input name="billingLastName"
                                   label="Last Name:"
                                   labelStyle="horizontal"
@@ -20,8 +19,7 @@
                                   [maxLength]="255"
                                   [form]="form"
                                   [(ngModel)]="professionalUser.billingLastName" />
-                    </div>
-                    <div class="mb-3">
+
                         <vp-input name="billingAddress"
                                   label="Address:"
                                   labelStyle="horizontal"
@@ -29,10 +27,10 @@
                                   [maxLength]="255"
                                   [form]="form"
                                   [(ngModel)]="professionalUser.billingAddress" />
-                    </div>
+                    </vp-field-grid>
                 </div>
                 <div class="col-md-6">
-                    <div class="mb-3">
+                    <vp-field-grid>
                         <vp-input name="billingCity"
                                   label="City:"
                                   labelStyle="horizontal"
@@ -40,8 +38,7 @@
                                   [maxLength]="255"
                                   [form]="form"
                                   [(ngModel)]="professionalUser.billingCity" />
-                    </div>
-                    <div class="mb-3">
+
                         <vp-input name="billingStateId"
                                   label="State:"
                                   labelStyle="horizontal"
@@ -51,8 +48,7 @@
                                   [ngModel]="professionalUser.billingState?.id"
                                   [options]="states"
                                   (ngModelChange)="stateChanged($event)" />
-                    </div>
-                    <div class="mb-3">
+
                         <vp-input name="billingZipCode"
                                   label="ZIP/Postal Code:"
                                   labelStyle="horizontal"
@@ -60,7 +56,7 @@
                                   [maxLength]="25"
                                   [form]="form"
                                   [(ngModel)]="professionalUser.billingZipCode" />
-                    </div>
+                    </vp-field-grid>
                 </div>
             </div>
 
@@ -68,12 +64,14 @@
                 <p class="text-muted fst-italic mb-2">
                     Click Continue to securely enter your card details and complete this payment.
                 </p>
-                <app-credit-card-payment [disabled]="!!form.invalid || isLoading" (tokenCaptured)="onCardTokenCaptured($event, form)" />
+                <app-credit-card-payment [disabled]="!!form.invalid || isLoading"
+                                         (tokenCaptured)="onCardTokenCaptured($event, form)" />
             </div>
         </vp-section>
     } @else {
         <div class="text-center">
-            <button type="button" class="btn btn-primary vp-section-button" [disabled]="isLoading" (click)="completeSubmission()">
+            <button type="button" class="btn btn-primary vp-section-button" [disabled]="isLoading"
+                    (click)="completeSubmission()">
                 Complete Submission
             </button>
         </div>

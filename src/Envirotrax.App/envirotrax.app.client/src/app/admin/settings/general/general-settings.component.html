@@ -207,7 +207,7 @@
                 <!-- Submission Fees Section -->
                 <div class="col-md-6 mb-3">
                     <vp-section header="Submission Fees">
-                        <table class="table table-sm table-borderless">
+                        <table class="table table-sm table-borderless align-middle">
                             <thead>
                                 <tr>
                                     <th></th>
@@ -268,7 +268,9 @@
                                     <td class="text-end pe-2 text-nowrap"><strong>FOG Inspection Fees:</strong></td>
                                     <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.fogInspectorFee"
                                                   name="fogInspectorFee" /></td>
-                                    <td></td>
+                                    <td><vp-input type="number" [decimals]="2"
+                                                  [(ngModel)]="settings.fogInspectorFeeWsShare"
+                                                  name="fogInspectorFeeWsShare" /></td>
                                 </tr>
                             </tbody>
                         </table>

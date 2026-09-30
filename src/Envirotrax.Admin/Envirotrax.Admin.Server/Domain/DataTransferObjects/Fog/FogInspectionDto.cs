@@ -15,6 +15,8 @@ public class FogInspectionDto
 
     public ReferencedWaterSupplierDto? WaterSupplier { get; set; }
 
+    public ReferencedFogSiteDto? Site { get; set; }
+
     public DateTime? InspectionDate { get; set; }
 
     public string? SubmissionId { get; set; }
@@ -160,4 +162,11 @@ public class FogInspectionDto
     public string? SignatureImageUrl { get; set; }
 
     public DateTime CreatedTime { get; set; }
+}
+
+public class ReferencedFogSiteDto
+{
+    public int? Id { get; set; }
+
+    public string? AccountNumber { get; set; }
 }

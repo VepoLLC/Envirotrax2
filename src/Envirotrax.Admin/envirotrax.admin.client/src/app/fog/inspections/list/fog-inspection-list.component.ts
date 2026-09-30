@@ -80,8 +80,8 @@ export class FogInspectionListComponent implements OnInit {
         private readonly _waterSupplierService: WaterSupplierService,
         private readonly _windowService: WindowService
     ) {
-        this.facilityTypeOptions = this._fogOptions.facilityTypeOptions;
-        this.interceptorTypeOptions = this._fogOptions.interceptorTypeOptions;
+        this.facilityTypeOptions = this._fogOptions.facilityTypeFilterOptions;
+        this.interceptorTypeOptions = this._fogOptions.interceptorTypeFilterOptions;
         this.totalCapacityOptions = this._fogOptions.totalCapacityOptions;
         this.inspectionResultOptions = this._fogOptions.inspectionResultOptions;
         this.paymentStatusOptions = this._fogOptions.paymentStatusOptions;

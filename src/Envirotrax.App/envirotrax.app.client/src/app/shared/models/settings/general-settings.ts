@@ -41,4 +41,5 @@ export interface GeneralSettings {
     fogTransportFee?: number;
     fogTransportFeeWsShare?: number;
     fogInspectorFee?: number;
+    fogInspectorFeeWsShare?: number;
 }

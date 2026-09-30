@@ -256,6 +256,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             if (bpatUser != null)
             {
                 dto.BpatContactName = bpatUser.ContactName;
+                dto.BpatCellNumber = bpatUser.User?.PhoneNumber;
             }
         }
     }

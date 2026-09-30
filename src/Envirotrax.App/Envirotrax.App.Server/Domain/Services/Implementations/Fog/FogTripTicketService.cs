@@ -319,6 +319,7 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         ticket.TransporterState = professional.State?.Name;
         ticket.TransporterZip = professional.ZipCode;
         ticket.TransporterWorkNumber = professional.PhoneNumber;
+        ticket.TransporterCellNumber = transporterUser?.PhoneNumber;
         ticket.TransporterFaxNumber = professional.FaxNumber;
         ticket.TransporterEmailAddress = transporterUser?.EmailAddress ?? professional.CompanyEmail;
 

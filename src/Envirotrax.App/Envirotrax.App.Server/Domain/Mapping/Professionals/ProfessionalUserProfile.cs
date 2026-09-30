@@ -13,6 +13,7 @@ public class ProfessionalUserProfile : Profile
         CreateMap<ProfessionalUser, ProfessionalUserDto>()
             .ForMember(proUser => proUser.Id, opt => opt.MapFrom(proUser => proUser.UserId))
             .ForMember(proUser => proUser.EmailAddress, opt => opt.MapFrom(proUser => proUser.User!.Email))
+            .ForMember(proUser => proUser.PhoneNumber, opt => opt.MapFrom(proUser => proUser.User!.PhoneNumber))
             .AfterMap((model, dto) =>
             {
                 if (model.BillingStateId.HasValue)

@@ -302,6 +302,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         inspection.InspectorState = professional.State?.Name;
         inspection.InspectorZip = professional.ZipCode;
         inspection.InspectorWorkNumber = professional.PhoneNumber;
+        inspection.InspectorCellNumber = inspectorUser?.PhoneNumber;
         inspection.InspectorFaxNumber = professional.FaxNumber;
         inspection.InspectorLicenseNumber = csiLicense?.LicenseNumber;
         inspection.InspectorLicenseType = csiLicense?.LicenseType?.Name;

@@ -42,6 +42,9 @@ public class Professional : IAuditableModel<AppUser>
     [StringLength(50)]
     public string? FaxNumber { get; set; }
 
+    [StringLength(50)]
+    public string? CellPhoneNumber { get; set; }
+
     [StringLength(255)]
     public string? WebSiteUrl { get; set; }
 

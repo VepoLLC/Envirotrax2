@@ -519,6 +519,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         inspection.InspectorState = professional.State?.Name;
         inspection.InspectorZip = professional.ZipCode;
         inspection.InspectorWorkNumber = professional.PhoneNumber;
+        inspection.InspectorCellNumber = inspectorUser?.PhoneNumber;
         inspection.InspectorFaxNumber = professional.FaxNumber;
     }
 }

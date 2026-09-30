@@ -37,6 +37,10 @@ public class ProfessionalDto : IDto
     [StringLength(50)]
     public string? FaxNumber { get; set; }
 
+    [Phone]
+    [StringLength(50)]
+    public string? CellPhoneNumber { get; set; }
+
     [StringLength(255)]
     public string? WebSiteUrl { get; set; }
 

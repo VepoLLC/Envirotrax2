@@ -1,11 +1,14 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Models.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 
 namespace Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 
 public interface IFogTripTicketService : IService<FogTripTicket, FogTripTicketDto>
 {
+    Task<InsuranceCheckDto> GetInsuranceCheckAsync(int waterSupplierId, CancellationToken cancellationToken);
+
     Task<IPagedData<FogTripTicketDto>> SearchForProfessionalAsync(PageInfo pageInfo, Query query, int? waterSupplierId, CancellationToken cancelationToken);
 
     Task<FogTripTicketDto> SubmitAsync(

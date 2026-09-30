@@ -4,6 +4,7 @@ using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Backflow;
+using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
@@ -49,6 +50,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     private readonly IBackflowSettingsService _settingsService;
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IProfessionalSupplierService _professionalSupplierService;
+    private readonly IProfessionalInsuranceService _insuranceService;
     private readonly ILogger<BackflowTestService> _logger;
 
     public BackflowTestService(
@@ -67,6 +69,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         IBackflowSettingsService settingsService,
         IGeneralSettingsService generalSettingsService,
         IProfessionalSupplierService professionalSupplierService,
+        IProfessionalInsuranceService insuranceService,
         ILogger<BackflowTestService> logger)
         : base(mapper, repository)
     {
@@ -84,6 +87,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         _settingsService = settingsService;
         _generalSettingsService = generalSettingsService;
         _professionalSupplierService = professionalSupplierService;
+        _insuranceService = insuranceService;
         _logger = logger;
     }
 
@@ -380,6 +384,8 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         var professionalId = _authService.ProfessionalId;
         dto.Professional = new ReferencedProfessionalDto { Id = professionalId };
 
+        await EnsureInsuranceAllowsSubmitAsync(dto, cancellationToken);
+
         await PopulateBpatSnapshotAsync(dto);
         DeriveTestDate(dto);
 
@@ -565,6 +571,21 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             NextMonth = counts.NextMonth,
             TwoMonths = counts.TwoMonths
         };
+    }
+
+    public Task<InsuranceCheckDto> GetInsuranceCheckAsync(int waterSupplierId, CancellationToken cancellationToken = default)
+    {
+        return _insuranceService.CheckForWaterSupplierAsync(_authService.ProfessionalId, waterSupplierId, ProfessionalType.Bpat, cancellationToken);
+    }
+
+    private async Task EnsureInsuranceAllowsSubmitAsync(BackflowTestDto dto, CancellationToken cancellationToken)
+    {
+        if (dto.WaterSupplier?.Id is not int waterSupplierId)
+        {
+            return;
+        }
+
+        await _insuranceService.EnsureSatisfiedForWaterSupplierAsync(_authService.ProfessionalId, waterSupplierId, ProfessionalType.Bpat, cancellationToken);
     }
 
     public override async Task<BackflowTestDto?> GetAsync(int id, CancellationToken cancellationToken)

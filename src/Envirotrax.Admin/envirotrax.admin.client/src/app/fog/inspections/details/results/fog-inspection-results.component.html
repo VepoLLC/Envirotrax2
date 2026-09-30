@@ -1,0 +1,335 @@
+<vp-section header="Inspection Results">
+    <div class="row">
+        <div class="col-md-4 col-lg-3 mb-3">
+            <vp-input name="inspectionDate"
+                      type="datetime"
+                      label="Inspection Date"
+                      [form]="form"
+                      [(ngModel)]="inspection.inspectionDate" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-2">
+                <vp-input name="reasonForInspection"
+                          type="select"
+                          label="Reason for Inspection"
+                          [form]="form"
+                          [options]="reasonOptions"
+                          [(ngModel)]="reasonId"
+                          (ngModelChange)="onReasonChange($event)" />
+            </div>
+
+            <div class="row align-items-center mb-2">
+                <div class="col-7">Is it properly maintained?</div>
+                <div class="col-5 d-flex gap-3">
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio"
+                               [attr.id]="idPrefix + '-maintained-yes'"
+                               name="maintained" [value]="true"
+                               [(ngModel)]="inspection.maintained" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-maintained-yes'">Yes</label>
+                    </div>
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio"
+                               [attr.id]="idPrefix + '-maintained-no'"
+                               name="maintained" [value]="false"
+                               [(ngModel)]="inspection.maintained" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-maintained-no'">No</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row align-items-center mb-2">
+                <div class="col-7">Is it accessible?</div>
+                <div class="col-5 d-flex gap-3">
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio"
+                               [attr.id]="idPrefix + '-accessible-yes'"
+                               name="accessible" [value]="true"
+                               [(ngModel)]="inspection.accessible" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-accessible-yes'">Yes</label>
+                    </div>
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio"
+                               [attr.id]="idPrefix + '-accessible-no'"
+                               name="accessible" [value]="false"
+                               [(ngModel)]="inspection.accessible" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-accessible-no'">No</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row align-items-center mb-2">
+                <div class="col-7">Is there evidence of past overflow?</div>
+                <div class="col-5 d-flex gap-3">
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio"
+                               [attr.id]="idPrefix + '-past-overflow-yes'"
+                               name="pastOverflow" [value]="true"
+                               [(ngModel)]="inspection.pastOverflow" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-past-overflow-yes'">Yes</label>
+                    </div>
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio"
+                               [attr.id]="idPrefix + '-past-overflow-no'"
+                               name="pastOverflow" [value]="false"
+                               [(ngModel)]="inspection.pastOverflow" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-past-overflow-no'">No</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mt-3 mt-md-0">
+            <div class="mb-2">
+                <vp-input name="facilityType"
+                          type="select"
+                          label="Facility Type"
+                          [form]="form"
+                          [options]="facilityTypeOptions"
+                          [(ngModel)]="facilityTypeId"
+                          (ngModelChange)="onFacilityTypeChange($event)" />
+            </div>
+
+            <p class="fw-semibold mb-1 mt-3">Sampling Point</p>
+
+            <div class="row align-items-center mb-2">
+                <div class="col-7">Is it accessible?</div>
+                <div class="col-5 d-flex gap-3">
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio"
+                               [attr.id]="idPrefix + '-sampling-accessible-yes'"
+                               name="samplingPointAccessible" [value]="true"
+                               [(ngModel)]="inspection.samplingPointAccessible" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-sampling-accessible-yes'">Yes</label>
+                    </div>
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio"
+                               [attr.id]="idPrefix + '-sampling-accessible-no'"
+                               name="samplingPointAccessible" [value]="false"
+                               [(ngModel)]="inspection.samplingPointAccessible" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-sampling-accessible-no'">No</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row align-items-center mb-2">
+                <div class="col-7">Does it need to be cleaned?</div>
+                <div class="col-5 d-flex gap-3">
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio"
+                               [attr.id]="idPrefix + '-sampling-clean-yes'"
+                               name="samplingPointClean" [value]="true"
+                               [(ngModel)]="inspection.samplingPointClean" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-sampling-clean-yes'">Yes</label>
+                    </div>
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio"
+                               [attr.id]="idPrefix + '-sampling-clean-no'"
+                               name="samplingPointClean" [value]="false"
+                               [(ngModel)]="inspection.samplingPointClean" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-sampling-clean-no'">No</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-2">
+                <vp-input name="sampledFrom"
+                          type="select"
+                          label="Sampled From"
+                          [form]="form"
+                          [options]="sampledFromOptions"
+                          [(ngModel)]="inspection.sampledFrom" />
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <p class="fw-semibold mb-1">Inlet Chamber</p>
+
+            <div class="row align-items-center mb-2">
+                <div class="col-7">Is the inlet tee intact?</div>
+                <div class="col-5 d-flex gap-3">
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio"
+                               [attr.id]="idPrefix + '-inlet-tee-yes'"
+                               name="inletTeeIntact" [value]="true"
+                               [(ngModel)]="inspection.inletTeeIntact" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-inlet-tee-yes'">Yes</label>
+                    </div>
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio"
+                               [attr.id]="idPrefix + '-inlet-tee-no'"
+                               name="inletTeeIntact" [value]="false"
+                               [(ngModel)]="inspection.inletTeeIntact" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-inlet-tee-no'">No</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row align-items-center mb-2">
+                <div class="col-7">Wetted Height in Inches</div>
+                <div class="col-5" [class.vp-field-invalid]="isInvalidChamberValue(inspection.inletChamberWettingHeight)">
+                    <vp-input name="inletChamberWettingHeight"
+                              [form]="form"
+                              [maxLength]="50"
+                              [ngModel]="inspection.inletChamberWettingHeight"
+                              (ngModelChange)="inspection.inletChamberWettingHeight = $event; recalcCapacity()" />
+                </div>
+            </div>
+
+            <div class="row align-items-center mb-2">
+                <div class="col-7">Grease Blanket in Inches</div>
+                <div class="col-5" [class.vp-field-invalid]="isInvalidChamberValue(inspection.inletChamberGreaseBlanket)">
+                    <vp-input name="inletChamberGreaseBlanket"
+                              [form]="form"
+                              [maxLength]="50"
+                              [ngModel]="inspection.inletChamberGreaseBlanket"
+                              (ngModelChange)="inspection.inletChamberGreaseBlanket = $event; recalcCapacity()" />
+                </div>
+            </div>
+
+            <div class="row align-items-center mb-2">
+                <div class="col-7">Sediments in Inches</div>
+                <div class="col-5" [class.vp-field-invalid]="isInvalidChamberValue(inspection.inletChamberSediments)">
+                    <vp-input name="inletChamberSediments"
+                              [form]="form"
+                              [maxLength]="50"
+                              [ngModel]="inspection.inletChamberSediments"
+                              (ngModelChange)="inspection.inletChamberSediments = $event; recalcCapacity()" />
+                </div>
+            </div>
+
+            <dl class="row mb-0 mt-3">
+                <dt class="col-7 fw-normal">Grease Layer %</dt>
+                <dd class="col-5 mb-1">{{ inletGreaseLayerPercent }}%</dd>
+                <dt class="col-7 fw-normal">Sediment Layer %</dt>
+                <dd class="col-5 mb-1">{{ inletSedimentLayerPercent }}%</dd>
+                <dt class="col-7 fw-normal">Total Inlet Chamber %</dt>
+                <dd class="col-5 mb-1">{{ inspection.inletTotalCapacityPercent }}%</dd>
+            </dl>
+        </div>
+
+        <div class="col-md-6 mt-3 mt-md-0">
+            <p class="fw-semibold mb-1">Outlet Chamber</p>
+
+            <div class="row align-items-center mb-2">
+                <div class="col-7">Is the outlet tee intact?</div>
+                <div class="col-5 d-flex gap-3">
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio"
+                               [attr.id]="idPrefix + '-outlet-tee-yes'"
+                               name="outletTeeIntact" [value]="true"
+                               [(ngModel)]="inspection.outletTeeIntact" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-outlet-tee-yes'">Yes</label>
+                    </div>
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio"
+                               [attr.id]="idPrefix + '-outlet-tee-no'"
+                               name="outletTeeIntact" [value]="false"
+                               [(ngModel)]="inspection.outletTeeIntact" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-outlet-tee-no'">No</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row align-items-center mb-2">
+                <div class="col-7">Wetted Height in Inches</div>
+                <div class="col-5" [class.vp-field-invalid]="isInvalidChamberValue(inspection.outletChamberWettingHeight)">
+                    <vp-input name="outletChamberWettingHeight"
+                              [form]="form"
+                              [maxLength]="50"
+                              [ngModel]="inspection.outletChamberWettingHeight"
+                              (ngModelChange)="inspection.outletChamberWettingHeight = $event; recalcCapacity()" />
+                </div>
+            </div>
+
+            <div class="row align-items-center mb-2">
+                <div class="col-7">Grease Blanket in Inches</div>
+                <div class="col-5" [class.vp-field-invalid]="isInvalidChamberValue(inspection.outletChamberGreaseBlanket)">
+                    <vp-input name="outletChamberGreaseBlanket"
+                              [form]="form"
+                              [maxLength]="50"
+                              [ngModel]="inspection.outletChamberGreaseBlanket"
+                              (ngModelChange)="inspection.outletChamberGreaseBlanket = $event; recalcCapacity()" />
+                </div>
+            </div>
+
+            <div class="row align-items-center mb-2">
+                <div class="col-7">Sediments in Inches</div>
+                <div class="col-5" [class.vp-field-invalid]="isInvalidChamberValue(inspection.outletChamberSediments)">
+                    <vp-input name="outletChamberSediments"
+                              [form]="form"
+                              [maxLength]="50"
+                              [ngModel]="inspection.outletChamberSediments"
+                              (ngModelChange)="inspection.outletChamberSediments = $event; recalcCapacity()" />
+                </div>
+            </div>
+
+            <dl class="row mb-0 mt-3">
+                <dt class="col-7 fw-normal">Grease Layer %</dt>
+                <dd class="col-5 mb-1">{{ outletGreaseLayerPercent }}%</dd>
+                <dt class="col-7 fw-normal">Sediment Layer %</dt>
+                <dd class="col-5 mb-1">{{ outletSedimentLayerPercent }}%</dd>
+                <dt class="col-7 fw-normal">Total Outlet Chamber %</dt>
+                <dd class="col-5 mb-1">{{ inspection.outletTotalCapacityPercent }}%</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <div class="row align-items-center mb-2">
+                <div class="col-7">Total Capacity %</div>
+                <div class="col-5">{{ inspection.totalCapacityPercent }}%</div>
+            </div>
+
+            <div class="row align-items-center mb-2">
+                <div class="col-7">Inspection Result</div>
+                <div class="col-5 d-flex gap-3">
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio"
+                               [attr.id]="idPrefix + '-result-passed'"
+                               name="inspectionResult" [value]="FogInspectionResult.Passed"
+                               [(ngModel)]="inspection.inspectionResult" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-result-passed'">Passed</label>
+                    </div>
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio"
+                               [attr.id]="idPrefix + '-result-failed'"
+                               name="inspectionResult" [value]="FogInspectionResult.Failed"
+                               [(ngModel)]="inspection.inspectionResult" />
+                        <label class="form-check-label" [attr.for]="idPrefix + '-result-failed'">Failed</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <vp-input name="comments"
+                  type="textarea"
+                  label="Remarks"
+                  [form]="form"
+                  [rows]="4"
+                  [(ngModel)]="inspection.comments" />
+    </div>
+
+    <div class="mt-3" *ngIf="inspection.signatureContactName || inspection.signatureImageUrl">
+        <p class="fw-semibold mb-1">Signature:</p>
+        <dl class="row mb-0">
+            <dt class="col-md-2 fw-normal">Signed By:</dt>
+            <dd class="col-md-4 mb-1">{{ inspection.signatureContactName }}</dd>
+            <dt class="col-md-2 fw-normal">Date:</dt>
+            <dd class="col-md-4 mb-1">{{ inspection.signatureDate | date: 'MM/dd/yyyy' }}</dd>
+        </dl>
+        <img *ngIf="inspection.signatureImageUrl"
+             [src]="inspection.signatureImageUrl"
+             alt="Signature"
+             class="img-fluid border mt-2"
+             style="max-height: 150px;" />
+    </div>
+</vp-section>

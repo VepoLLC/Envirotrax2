@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { PagedData, PageInfo, Query, QueryHelperService, RecordLog, UrlResolverService } from "@envirotrax/common-ui";
 import { lastValueFrom } from "rxjs";
-import { FogInspection } from "../../models/fog/fog-inspection";
+import { FogInspection, FogInspectionUpdateRequest } from "../../models/fog/fog-inspection";
 
 @Injectable({
     providedIn: 'root'
@@ -30,6 +30,21 @@ export class FogInspectionService {
         const url = this._urlResolver.resolveUrl(`/api/fog/inspections/${id}`);
 
         return await lastValueFrom(this._http.get<FogInspection>(url));
+    }
+
+    public async update(id: number, waterSupplierId: number, request: FogInspectionUpdateRequest): Promise<FogInspection> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/inspections/${id}?waterSupplierId=${waterSupplierId}`);
+
+        return await lastValueFrom(this._http.put<FogInspection>(url, request));
+    }
+
+    public async uploadImage(id: number, waterSupplierId: number, imageType: string, file: File): Promise<FogInspection> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/inspections/${id}/images/${imageType}?waterSupplierId=${waterSupplierId}`);
+
+        const formData = new FormData();
+        formData.append('file', file, file.name);
+
+        return await lastValueFrom(this._http.post<FogInspection>(url, formData));
     }
 
     public async getLogs(id: number): Promise<RecordLog[]> {

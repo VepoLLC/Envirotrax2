@@ -1,0 +1,49 @@
+<vp-section header="Trap Information">
+    <div class="row">
+        <div class="col-md-6 mb-2">
+            <vp-input name="interceptorType"
+                      type="select"
+                      label="Waste Trap or Tank Type"
+                      [form]="form"
+                      [options]="interceptorTypeOptions"
+                      [(ngModel)]="inspection.interceptorType" />
+        </div>
+
+        <div class="col-md-6 mb-2" *ngIf="inspection.interceptorType === InterceptorType.Other">
+            <vp-input name="interceptorOtherDescription"
+                      label="Other Description"
+                      [form]="form"
+                      [maxLength]="200"
+                      [(ngModel)]="inspection.interceptorOtherDescription" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-2">
+            <vp-input name="interceptorCapacity"
+                      type="number"
+                      label="Waste Trap or Tank Capacity"
+                      [form]="form"
+                      [(ngModel)]="inspection.interceptorCapacity" />
+        </div>
+
+        <div class="col-md-6 mb-2">
+            <vp-input name="interceptorCapacityType"
+                      type="select"
+                      label="Capacity Type"
+                      [form]="form"
+                      [options]="capacityTypeOptions"
+                      [(ngModel)]="inspection.interceptorCapacityType" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 mb-2">
+            <vp-input name="interceptorLocationDescription"
+                      label="Location Description"
+                      [form]="form"
+                      [maxLength]="200"
+                      [(ngModel)]="inspection.interceptorLocationDescription" />
+        </div>
+    </div>
+</vp-section>

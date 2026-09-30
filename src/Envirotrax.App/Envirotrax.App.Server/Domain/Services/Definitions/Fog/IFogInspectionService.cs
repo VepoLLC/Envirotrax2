@@ -21,6 +21,10 @@ public interface IFogInspectionService : IService<FogInspection, FogInspectionDt
         Stream? signatureStream, string? signatureFileName,
         CancellationToken cancellationToken);
 
+    Task<FogInspectionDto?> UpdateForAdminAsync(int id, FogInspectionAdminUpdateRequest request);
+
+    Task<FogInspectionDto?> UpdateImageForAdminAsync(int id, string imageType, Stream fileStream, string fileName);
+
     Task<IPagedData<FogInspectionDto>> SearchForProfessionalAsync(
         PageInfo pageInfo, Query query, bool latestOnly, CancellationToken cancellationToken);
 

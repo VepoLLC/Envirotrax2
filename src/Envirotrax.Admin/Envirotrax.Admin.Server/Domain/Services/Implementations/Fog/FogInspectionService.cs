@@ -27,6 +27,18 @@ public class FogInspectionService : IFogInspectionService
         return _apiClient.GetAsync<FogInspectionDto>($"{BaseUrl}/{id}", cancellationToken);
     }
 
+    public Task<FogInspectionDto?> UpdateAsync(int id, int waterSupplierId, FogInspectionUpdateRequest request, CancellationToken cancellationToken)
+    {
+        return _apiClient.PutAsync<FogInspectionUpdateRequest, FogInspectionDto>(waterSupplierId, $"{BaseUrl}/{id}", request, cancellationToken);
+    }
+
+    public Task<FogInspectionDto?> UploadImageAsync(int id, int waterSupplierId, string imageType, Stream fileStream, string fileName, CancellationToken cancellationToken)
+    {
+        var formFields = new Dictionary<string, string>();
+
+        return _apiClient.PostFileAsync<FogInspectionDto>(waterSupplierId, $"{BaseUrl}/{id}/images/{imageType}", fileStream, fileName, "file", formFields, cancellationToken);
+    }
+
     public Task<List<RecordLogDto>?> GetLogsAsync(int id, CancellationToken cancellationToken)
     {
         return _apiClient.GetAsync<List<RecordLogDto>>($"{BaseUrl}/{id}/logs", cancellationToken);

@@ -1,13 +1,5 @@
 <dp-loading-spinner [hidden]="!isLoading && !isSaving"></dp-loading-spinner>
 
-<div class="alert alert-success alert-dismissible d-flex align-items-center mb-3 sticky-top"
-     role="alert"
-     *ngIf="saveSuccessMessage">
-    <i class="fa-solid fa-circle-check me-2"></i>
-    {{ saveSuccessMessage }}
-    <button type="button" class="btn-close" aria-label="Close" (click)="dismissSaveMessage()"></button>
-</div>
-
 <form #detailsForm="ngForm" (ngSubmit)="save()" *ngIf="!isLoading">
     <vp-section [header]="waterSupplierHeader">
         <div class="row">

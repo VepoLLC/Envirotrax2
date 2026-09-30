@@ -17,6 +17,8 @@ namespace Envirotrax.App.Server.Controllers.Api.V1;
 [Route("api/v1")]
 public class LegacyApiController : ControllerBase
 {
+    private const string ReferenceResourcePrefix = "Envirotrax.App.Server.Templates.Api.Reference.";
+
     private readonly IApiAuthenticationService _apiAuthenticationService;
     private readonly IApiSupplierScopeService _apiSupplierScopeService;
     private readonly ILegacySelectService _legacySelectService;
@@ -63,6 +65,46 @@ public class LegacyApiController : ControllerBase
         }
 
         return LegacyApiErrorCode.RequestSelectCriteriaFieldInvalid;
+    }
+
+    [HttpGet("reference")]
+    public IActionResult GetReference()
+    {
+        return ReferencePage("index.html");
+    }
+
+    [HttpGet("reference/select")]
+    public IActionResult GetReferenceSelect()
+    {
+        return ReferencePage("select.html");
+    }
+
+    [HttpGet("reference/responses")]
+    public IActionResult GetReferenceResponses()
+    {
+        return ReferencePage("responses.html");
+    }
+
+    [HttpGet("reference/tables")]
+    public IActionResult GetReferenceTables()
+    {
+        return ReferencePage("tables.html");
+    }
+
+    [HttpGet("reference/sample")]
+    public IActionResult GetReferenceSample()
+    {
+        return ReferencePage("sample.html");
+    }
+
+    private FileStreamResult ReferencePage(string fileName)
+    {
+        var resourceName = ReferenceResourcePrefix + fileName;
+
+        var stream = typeof(LegacyApiController).Assembly.GetManifestResourceStream(resourceName)
+            ?? throw new InvalidOperationException($"API reference embedded resource '{resourceName}' was not found.");
+
+        return File(stream, "text/html; charset=utf-8");
     }
 
     [HttpPost("run")]

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Table and Fields - Envirotrax API</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px 16px;
+            background: #f4f5f7;
+            color: #333333;
+            font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .page {
+            max-width: 1450px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 1px solid #c9ced6;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .page-title {
+            margin: 0;
+            padding: 10px 16px;
+            background: #4682b4;
+            color: #ffffff;
+            font-size: 26px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 4px 32px;
+            padding: 12px 16px;
+            background: #f2f2f2;
+            border-bottom: 2px solid #d5d5d5;
+        }
+
+        .tabs a {
+            color: #4682b4;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .tabs a:hover {
+            text-decoration: underline;
+        }
+
+        .tabs a.active {
+            color: #000000;
+            font-size: 17px;
+        }
+
+        .version {
+            padding: 8px 12px 0;
+            text-align: right;
+            font-size: 13px;
+        }
+
+        .version span {
+            margin-left: 28px;
+        }
+
+        .content {
+            padding: 8px 12px 32px;
+        }
+
+        h2 {
+            margin: 28px 0 14px;
+            padding-bottom: 4px;
+            color: #4682b4;
+            font-size: 21px;
+            font-weight: 600;
+            border-bottom: 5px solid #707070;
+        }
+
+        h3 {
+            margin: 22px 0 8px;
+            color: #4682b4;
+            font-size: 16px;
+        }
+
+        .section {
+            padding: 0 30px;
+        }
+
+        a {
+            color: #4682b4;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .endpoint-link {
+            color: #000000;
+            text-decoration: underline;
+        }
+
+        code {
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 13px;
+        }
+
+        pre {
+            margin: 10px 0;
+            padding: 12px 14px;
+            background: #f7f7f7;
+            border: 1px solid #cccccc;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .code-label {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 3px 28px;
+            background: #d9d9d9;
+            border: 1px solid #aaaaaa;
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+            font-size: 13px;
+        }
+
+        .code-label + pre {
+            margin-top: 0;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            margin: 10px 0 16px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 6px 10px;
+            border: 1px solid #cccccc;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #e8eef5;
+            font-weight: 600;
+        }
+
+        .field-tables {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+            padding: 0 30px;
+        }
+
+        .field-table-title {
+            color: #1f4e79;
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .field-table {
+            margin-top: 2px;
+            font-size: 13px;
+        }
+
+        .field-table th {
+            background: #d9d9d9;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .field-table tr:nth-child(odd) td {
+            background: #f7f7f7;
+        }
+
+        .site-field {
+            color: #008000;
+            font-weight: 700;
+        }
+
+        .note {
+            margin: 14px 0;
+            padding: 10px 14px;
+            background: #f2f6fb;
+            border-left: 4px solid #4682b4;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 16px 8px;
+            }
+
+            .section {
+                padding: 0 8px;
+            }
+
+            .tabs {
+                gap: 4px 16px;
+            }
+
+            .field-tables {
+                grid-template-columns: 1fr;
+                padding: 0 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <h1 class="page-title">Table and Fields</h1>
+
+        <nav class="tabs">
+            <a href="/api/v1/reference">API Home</a>
+            <a href="/api/v1/reference/select">SELECT Request</a>
+            <a href="/api/v1/reference/responses">API Responses</a>
+            <a href="/api/v1/reference/tables" class="active">Tables &amp; Field Names</a>
+            <a href="/api/v1/reference/sample">Sample Code</a>
+        </nav>
+
+        <div class="version">
+            <strong>API version:</strong> 24.4.30.0
+            <span><strong>Server:</strong> IO API 1</span>
+        </div>
+
+        <div class="content">
+            <h2>Database Tables and Allowable Fields</h2>
+
+            <div class="section">
+                <p>
+                    Your API account has access to the following database tables and fields. All of the fields listed can be returned
+                    by a SELECT [RequestType] by adding them to the [SelectFields] parameter.
+                </p>
+
+                <p>
+                    <span class="site-field">Fields shown in green</span> are Site table fields INNER JOINED with the report's fields.
+                    In a BackflowTests recordset they are returned with the <code>Site.</code> prefix, all other fields with the
+                    <code>Test.</code> prefix.
+                </p>
+            </div>
+
+            <div class="field-tables">
+                <div>
+                    <div class="field-table-title">Sites</div>
+
+                    <table class="field-table">
+                        <tr>
+                            <th>Field Name</th>
+                            <th>Data Type</th>
+                        </tr>
+                        <tr><td>ID</td><td>int</td></tr>
+                        <tr><td>CreationDate</td><td>date</td></tr>
+                        <tr><td>LastModifiedDate</td><td>date</td></tr>
+                        <tr><td>AccountNumber</td><td>string</td></tr>
+                        <tr><td>PropertyBusinessName</td><td>string</td></tr>
+                        <tr><td>PropertyType</td><td>int<br />0 = residential<br />1 = commercial</td></tr>
+                        <tr><td>PropertyStreetNumber</td><td>string</td></tr>
+                        <tr><td>PropertyStreetName</td><td>string</td></tr>
+                        <tr><td>PropertyNumber</td><td>string</td></tr>
+                        <tr><td>PropertyCity</td><td>string</td></tr>
+                        <tr><td>PropertyState</td><td>string</td></tr>
+                        <tr><td>PropertyZIP</td><td>string</td></tr>
+                        <tr><td>GisLatitude</td><td>double</td></tr>
+                        <tr><td>GisLongitude</td><td>double</td></tr>
+                        <tr><td>GisStatus</td><td>int<br />-1 = Failed<br />0 = Not set<br />1 = Geocoded</td></tr>
+                        <tr><td>GisDate</td><td>date</td></tr>
+                    </table>
+                </div>
+
+                <div>
+                    <div class="field-table-title">BackflowTests</div>
+
+                    <table class="field-table">
+                        <tr>
+                            <th>Field Name</th>
+                            <th>Data Type</th>
+                        </tr>
+                        <tr><td>ID</td><td>int</td></tr>
+                        <tr><td>CreationDate</td><td>date</td></tr>
+                        <tr><td>LastModifiedDate</td><td>date</td></tr>
+                        <tr><td>MasterWaterSupplierID</td><td>int</td></tr>
+                        <tr><td>MasterWaterSupplierID2</td><td>int</td></tr>
+                        <tr><td>WaterSupplierID</td><td>int</td></tr>
+                        <tr><td>LastModifiedBy</td><td>string</td></tr>
+                        <tr><td>JobNumber</td><td>string</td></tr>
+                        <tr><td>InspectorID</td><td>string</td></tr>
+                        <tr><td>MasterBpatID</td><td>string</td></tr>
+                        <tr><td>BpatID</td><td>string</td></tr>
+                        <tr><td>SiteID</td><td>int</td></tr>
+                        <tr><td class="site-field">PropertyBusinessName</td><td>string</td></tr>
+                        <tr><td class="site-field">PropertyType</td><td>int<br />0 = residential<br />1 = commercial</td></tr>
+                        <tr><td class="site-field">PropertyStreetNumber</td><td>string</td></tr>
+                        <tr><td class="site-field">PropertyStreetName</td><td>string</td></tr>
+                        <tr><td class="site-field">PropertyNumber</td><td>string</td></tr>
+                        <tr><td class="site-field">PropertyCity</td><td>string</td></tr>
+                        <tr><td class="site-field">PropertyState</td><td>string</td></tr>
+                        <tr><td class="site-field">PropertyZIP</td><td>string</td></tr>
+                        <tr><td class="site-field">MailingCompanyName</td><td>string</td></tr>
+                        <tr><td class="site-field">MailingContactName</td><td>string</td></tr>
+                        <tr><td class="site-field">MailingStreetNumber</td><td>string</td></tr>
+                        <tr><td class="site-field">MailingStreetName</td><td>string</td></tr>
+                        <tr><td class="site-field">MailingNumber</td><td>string</td></tr>
+                        <tr><td class="site-field">MailingCity</td><td>string</td></tr>
+                        <tr><td class="site-field">MailingState</td><td>string</td></tr>
+                        <tr><td class="site-field">MailingZIP</td><td>string</td></tr>
+                        <tr><td class="site-field">MailingPhoneNumber</td><td>string</td></tr>
+                        <tr><td class="site-field">MailingEmailAddress</td><td>string</td></tr>
+                        <tr><td class="site-field">GisLatitude</td><td>double</td></tr>
+                        <tr><td class="site-field">GisLongitude</td><td>double</td></tr>
+                        <tr><td class="site-field">GisStatus</td><td>int<br />-1 = Failed<br />0 = Not set<br />1 = Geocoded</td></tr>
+                        <tr><td class="site-field">GisDate</td><td>date</td></tr>
+                        <tr><td>MailingAddress</td><td>string</td></tr>
+                        <tr><td>LocationDescription</td><td>string</td></tr>
+                        <tr><td>DeviceType</td><td>string<br />DC, DCD, DCD2, RP, RPPD, RPPD2, PVB, SVB</td></tr>
+                        <tr><td>Manufacturer</td><td>string</td></tr>
+                        <tr><td>Model</td><td>string</td></tr>
+                        <tr><td>Size</td><td>string</td></tr>
+                        <tr><td>SerialNumber</td><td>string</td></tr>
+                        <tr><td>Manufacturer2</td><td>string</td></tr>
+                        <tr><td>Model2</td><td>string</td></tr>
+                        <tr><td>Size2</td><td>string</td></tr>
+                        <tr><td>SerialNumber2</td><td>string</td></tr>
+                        <tr><td>UnknownSerialNumber</td><td>bit</td></tr>
+                        <tr><td>HazardType</td><td>string</td></tr>
+                        <tr><td>HazardTypeOtherDescription</td><td>string</td></tr>
+                        <tr><td>MeterNumber</td><td>string</td></tr>
+                        <tr><td>WaterMeterNumber</td><td>string</td></tr>
+                        <tr><td>InitialTestDate</td><td>date</td></tr>
+                        <tr><td>RepairTestDate</td><td>date</td></tr>
+                        <tr><td>FinalTestDate</td><td>date</td></tr>
+                        <tr><td>AirGapTestDate</td><td>date</td></tr>
+                        <tr><td>TestDate</td><td>date</td></tr>
+                        <tr><td>RenewalRequired</td><td>bit</td></tr>
+                        <tr><td>ExpirationDate</td><td>date</td></tr>
+                        <tr><td>SiteScheduleMonth</td><td>int</td></tr>
+                        <tr><td>TestResult</td><td>int<br />0 = Passed<br />1 = Failed</td></tr>
+                        <tr><td>IsCurrent</td><td>bit</td></tr>
+                        <tr><td>OutOfService</td><td>bit</td></tr>
+                        <tr><td>OutOfServiceDate</td><td>date</td></tr>
+                        <tr><td>Active</td><td>bit</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>API Responses - Envirotrax API</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px 16px;
+            background: #f4f5f7;
+            color: #333333;
+            font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .page {
+            max-width: 1450px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 1px solid #c9ced6;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .page-title {
+            margin: 0;
+            padding: 10px 16px;
+            background: #4682b4;
+            color: #ffffff;
+            font-size: 26px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 4px 32px;
+            padding: 12px 16px;
+            background: #f2f2f2;
+            border-bottom: 2px solid #d5d5d5;
+        }
+
+        .tabs a {
+            color: #4682b4;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .tabs a:hover {
+            text-decoration: underline;
+        }
+
+        .tabs a.active {
+            color: #000000;
+            font-size: 17px;
+        }
+
+        .version {
+            padding: 8px 12px 0;
+            text-align: right;
+            font-size: 13px;
+        }
+
+        .version span {
+            margin-left: 28px;
+        }
+
+        .content {
+            padding: 8px 12px 32px;
+        }
+
+        h2 {
+            margin: 28px 0 14px;
+            padding-bottom: 4px;
+            color: #4682b4;
+            font-size: 21px;
+            font-weight: 600;
+            border-bottom: 5px solid #707070;
+        }
+
+        h3 {
+            margin: 22px 0 8px;
+            color: #4682b4;
+            font-size: 16px;
+        }
+
+        .section {
+            padding: 0 30px;
+        }
+
+        a {
+            color: #4682b4;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .endpoint-link {
+            color: #000000;
+            text-decoration: underline;
+        }
+
+        code {
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 13px;
+        }
+
+        pre {
+            margin: 10px 0;
+            padding: 12px 14px;
+            background: #f7f7f7;
+            border: 1px solid #cccccc;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .code-label {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 3px 28px;
+            background: #d9d9d9;
+            border: 1px solid #aaaaaa;
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+            font-size: 13px;
+        }
+
+        .code-label + pre {
+            margin-top: 0;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            margin: 10px 0 16px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 6px 10px;
+            border: 1px solid #cccccc;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #e8eef5;
+            font-weight: 600;
+        }
+
+        .field-tables {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+            padding: 0 30px;
+        }
+
+        .field-table-title {
+            color: #1f4e79;
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .field-table {
+            margin-top: 2px;
+            font-size: 13px;
+        }
+
+        .field-table th {
+            background: #d9d9d9;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .field-table tr:nth-child(odd) td {
+            background: #f7f7f7;
+        }
+
+        .site-field {
+            color: #008000;
+            font-weight: 700;
+        }
+
+        .note {
+            margin: 14px 0;
+            padding: 10px 14px;
+            background: #f2f6fb;
+            border-left: 4px solid #4682b4;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 16px 8px;
+            }
+
+            .section {
+                padding: 0 8px;
+            }
+
+            .tabs {
+                gap: 4px 16px;
+            }
+
+            .field-tables {
+                grid-template-columns: 1fr;
+                padding: 0 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <h1 class="page-title">API Responses</h1>
+
+        <nav class="tabs">
+            <a href="/api/v1/reference">API Home</a>
+            <a href="/api/v1/reference/select">SELECT Request</a>
+            <a href="/api/v1/reference/responses" class="active">API Responses</a>
+            <a href="/api/v1/reference/tables">Tables &amp; Field Names</a>
+            <a href="/api/v1/reference/sample">Sample Code</a>
+        </nav>
+
+        <div class="version">
+            <strong>API version:</strong> 24.4.30.0
+            <span><strong>Server:</strong> IO API 1</span>
+        </div>
+
+        <div class="content">
+            <h2>API Responses</h2>
+
+            <div class="section">
+                <p>
+                    The API always answers with HTTP status 200. All API responses use <strong>&lt;EnvirotraxApiResponse&gt;</strong>
+                    as the root XML node, containing:
+                </p>
+
+                <ul>
+                    <li><strong>&lt;ApiVersion&gt;</strong></li>
+                    <li><strong>&lt;ServerName&gt;</strong></li>
+                    <li><strong>&lt;ResponseUtcDate&gt;</strong></li>
+                    <li><strong>&lt;ResponseStatus&gt;</strong> – <code>OK</code> or <code>ERROR</code></li>
+                </ul>
+            </div>
+
+            <h2>ERROR Response Status</h2>
+
+            <div class="section">
+                <p>
+                    Error responses include an <strong>&lt;Errors&gt;</strong> element with an <strong>&lt;Error&gt;</strong> element
+                    containing <strong>&lt;ErrorNumber&gt;</strong>, <strong>&lt;ErrorType&gt;</strong> and <strong>&lt;ErrorMessage&gt;</strong>.
+                </p>
+
+<pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;EnvirotraxApiResponse&gt;
+  &lt;ApiVersion&gt;24.4.30.0&lt;/ApiVersion&gt;
+  &lt;ServerName&gt;IO API 1&lt;/ServerName&gt;
+  &lt;ResponseUtcDate&gt;9/28/2026 2:30:00 PM&lt;/ResponseUtcDate&gt;
+  &lt;ResponseStatus&gt;ERROR&lt;/ResponseStatus&gt;
+  &lt;Errors&gt;
+    &lt;Error&gt;
+      &lt;ErrorNumber&gt;201&lt;/ErrorNumber&gt;
+      &lt;ErrorType&gt;AuthorizationFailed&lt;/ErrorType&gt;
+      &lt;ErrorMessage&gt;Authorization Failed:  Invalid API credentials.&lt;/ErrorMessage&gt;
+    &lt;/Error&gt;
+  &lt;/Errors&gt;
+&lt;/EnvirotraxApiResponse&gt;</code></pre>
+
+                <h3>Error Codes</h3>
+
+                <div class="table-wrap">
+                    <table>
+                        <tr>
+                            <th>ErrorNumber</th>
+                            <th>ErrorType</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr><td>100</td><td><code>Unknown</code></td><td>An unexpected error occurred while processing the request. Also returned for <code>RequestType=UPDATE</code>, which is not supported.</td></tr>
+                        <tr><td>102</td><td><code>NoParameters</code></td><td>No request parameters were sent.</td></tr>
+                        <tr><td>200</td><td><code>CredentialsUnspecified</code></td><td><code>UserID</code> or <code>ApiKey</code> was not provided.</td></tr>
+                        <tr><td>201</td><td><code>AuthorizationFailed</code></td><td>The API credentials are invalid, or the water supplier of the API account does not exist.</td></tr>
+                        <tr><td>209</td><td><code>FormatTypeInvalid</code></td><td><code>FormatType</code> is not <code>XML</code> or <code>JSON</code>.</td></tr>
+                        <tr><td>210</td><td><code>RequestTypeNotSpecified</code></td><td><code>RequestType</code> was not provided.</td></tr>
+                        <tr><td>211</td><td><code>RequestTypeInvalid</code></td><td><code>RequestType</code> has an unknown value.</td></tr>
+                        <tr><td>220</td><td><code>TableNameNotSpecified</code></td><td><code>TableName</code> was not provided.</td></tr>
+                        <tr><td>221</td><td><code>TableNameInvalid</code></td><td><code>TableName</code> has an unknown value.</td></tr>
+                        <tr><td>222</td><td><code>TablePermission</code></td><td>The API account is not allowed to read the requested table.</td></tr>
+                        <tr><td>300</td><td><code>RequestSelectFieldsNotSpecified</code></td><td><code>SelectFields</code> was not provided.</td></tr>
+                        <tr><td>301</td><td><code>RequestSelectFieldInvalid</code></td><td>A field in <code>SelectFields</code> is not an allowed field.</td></tr>
+                        <tr><td>311</td><td><code>RequestSelectCriteriaFieldInvalid</code></td><td>A criterion value cannot be read as the expected type or is out of range.</td></tr>
+                        <tr><td>313</td><td><code>RequestSelectOrderByError</code></td><td><code>OrderBy</code> is not an allowed field, or <code>OrderByDirection</code> is not <code>ASC</code> or <code>DESC</code>.</td></tr>
+                        <tr><td>315</td><td><code>RequestSelectCriteriaPostValidation</code></td><td>SELECT criteria has not been specified.</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <h2>OK Response Status - SELECT</h2>
+
+            <div class="section">
+                <p>
+                    A successful SELECT response includes <strong>&lt;RequestSqlParameters&gt;</strong> with TableName, SelectFields,
+                    SelectCriteria (including the water supplier restriction of the API account) and SelectOrder, plus
+                    <strong>&lt;Recordset&gt;</strong> containing <strong>&lt;RecordCount&gt;</strong> and a <strong>&lt;Record&gt;</strong>
+                    element per record. A field without a value is returned as an empty element, bit fields as <code>True</code> or
+                    <code>False</code>, and dates in the <code>M/d/yyyy h:mm:ss tt</code> format.
+                </p>
+
+<pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;EnvirotraxApiResponse&gt;
+  &lt;ApiVersion&gt;24.4.30.0&lt;/ApiVersion&gt;
+  &lt;ServerName&gt;IO API 1&lt;/ServerName&gt;
+  &lt;ResponseUtcDate&gt;9/28/2026 2:30:00 PM&lt;/ResponseUtcDate&gt;
+  &lt;ResponseStatus&gt;OK&lt;/ResponseStatus&gt;
+  &lt;RequestSqlParameters&gt;
+    &lt;TableName&gt;BackflowTests&lt;/TableName&gt;
+    &lt;SelectFields&gt;ID, SiteID, TestDate, TestResult, PropertyCity&lt;/SelectFields&gt;
+    &lt;SelectCriteria&gt;
+      &lt;WaterSupplierID&gt;WaterSupplierID = 1234&lt;/WaterSupplierID&gt;
+      &lt;LastModifiedDate&gt;LastModifiedDate &amp;lt; 9/1/2026 12:00:00 AM&lt;/LastModifiedDate&gt;
+    &lt;/SelectCriteria&gt;
+    &lt;SelectOrder&gt;
+      &lt;OrderBy&gt;ID&lt;/OrderBy&gt;
+      &lt;OrderByDirection&gt;ASC&lt;/OrderByDirection&gt;
+    &lt;/SelectOrder&gt;
+  &lt;/RequestSqlParameters&gt;
+  &lt;Recordset&gt;
+    &lt;RecordCount&gt;2&lt;/RecordCount&gt;
+    &lt;Record&gt;
+      &lt;Test.ID&gt;500123&lt;/Test.ID&gt;
+      &lt;Test.SiteID&gt;88001&lt;/Test.SiteID&gt;
+      &lt;Test.TestDate&gt;8/14/2026 12:00:00 AM&lt;/Test.TestDate&gt;
+      &lt;Test.TestResult&gt;1&lt;/Test.TestResult&gt;
+      &lt;Site.PropertyCity&gt;Austin&lt;/Site.PropertyCity&gt;
+    &lt;/Record&gt;
+    &lt;Record&gt;
+      &lt;Test.ID&gt;500124&lt;/Test.ID&gt;
+      &lt;Test.SiteID&gt;88002&lt;/Test.SiteID&gt;
+      &lt;Test.TestDate&gt;8/20/2026 12:00:00 AM&lt;/Test.TestDate&gt;
+      &lt;Test.TestResult&gt;2&lt;/Test.TestResult&gt;
+      &lt;Site.PropertyCity&gt;Round Rock&lt;/Site.PropertyCity&gt;
+    &lt;/Record&gt;
+  &lt;/Recordset&gt;
+&lt;/EnvirotraxApiResponse&gt;</code></pre>
+
+                <p>For a master water supplier account the restriction is echoed as <strong>&lt;MasterWaterSupplierID&gt;</strong>.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

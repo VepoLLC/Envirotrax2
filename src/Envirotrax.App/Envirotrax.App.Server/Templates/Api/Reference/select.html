@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SELECT API Request - Envirotrax API</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px 16px;
+            background: #f4f5f7;
+            color: #333333;
+            font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .page {
+            max-width: 1450px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 1px solid #c9ced6;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .page-title {
+            margin: 0;
+            padding: 10px 16px;
+            background: #4682b4;
+            color: #ffffff;
+            font-size: 26px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 4px 32px;
+            padding: 12px 16px;
+            background: #f2f2f2;
+            border-bottom: 2px solid #d5d5d5;
+        }
+
+        .tabs a {
+            color: #4682b4;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .tabs a:hover {
+            text-decoration: underline;
+        }
+
+        .tabs a.active {
+            color: #000000;
+            font-size: 17px;
+        }
+
+        .version {
+            padding: 8px 12px 0;
+            text-align: right;
+            font-size: 13px;
+        }
+
+        .version span {
+            margin-left: 28px;
+        }
+
+        .content {
+            padding: 8px 12px 32px;
+        }
+
+        h2 {
+            margin: 28px 0 14px;
+            padding-bottom: 4px;
+            color: #4682b4;
+            font-size: 21px;
+            font-weight: 600;
+            border-bottom: 5px solid #707070;
+        }
+
+        h3 {
+            margin: 22px 0 8px;
+            color: #4682b4;
+            font-size: 16px;
+        }
+
+        .section {
+            padding: 0 30px;
+        }
+
+        a {
+            color: #4682b4;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .endpoint-link {
+            color: #000000;
+            text-decoration: underline;
+        }
+
+        code {
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 13px;
+        }
+
+        pre {
+            margin: 10px 0;
+            padding: 12px 14px;
+            background: #f7f7f7;
+            border: 1px solid #cccccc;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .code-label {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 3px 28px;
+            background: #d9d9d9;
+            border: 1px solid #aaaaaa;
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+            font-size: 13px;
+        }
+
+        .code-label + pre {
+            margin-top: 0;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            margin: 10px 0 16px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 6px 10px;
+            border: 1px solid #cccccc;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #e8eef5;
+            font-weight: 600;
+        }
+
+        .field-tables {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+            padding: 0 30px;
+        }
+
+        .field-table-title {
+            color: #1f4e79;
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .field-table {
+            margin-top: 2px;
+            font-size: 13px;
+        }
+
+        .field-table th {
+            background: #d9d9d9;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .field-table tr:nth-child(odd) td {
+            background: #f7f7f7;
+        }
+
+        .site-field {
+            color: #008000;
+            font-weight: 700;
+        }
+
+        .note {
+            margin: 14px 0;
+            padding: 10px 14px;
+            background: #f2f6fb;
+            border-left: 4px solid #4682b4;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 16px 8px;
+            }
+
+            .section {
+                padding: 0 8px;
+            }
+
+            .tabs {
+                gap: 4px 16px;
+            }
+
+            .field-tables {
+                grid-template-columns: 1fr;
+                padding: 0 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <h1 class="page-title">SELECT API Request</h1>
+
+        <nav class="tabs">
+            <a href="/api/v1/reference">API Home</a>
+            <a href="/api/v1/reference/select" class="active">SELECT Request</a>
+            <a href="/api/v1/reference/responses">API Responses</a>
+            <a href="/api/v1/reference/tables">Tables &amp; Field Names</a>
+            <a href="/api/v1/reference/sample">Sample Code</a>
+        </nav>
+
+        <div class="version">
+            <strong>API version:</strong> 24.4.30.0
+            <span><strong>Server:</strong> IO API 1</span>
+        </div>
+
+        <div class="content">
+            <h2>SELECT Request</h2>
+
+            <div class="section">
+                <p>
+                    Submit the request as an HTTP POST with <strong>application/x-www-form-urlencoded</strong> content to
+                    <strong class="endpoint-link endpoint">/api/v1/run</strong>. The response is returned as
+                    <strong>text/xml</strong>.
+                </p>
+            </div>
+
+            <h2>Required Request Parameters</h2>
+
+            <div class="section">
+                <div class="table-wrap">
+                    <table>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Acceptable Values</th>
+                        </tr>
+                        <tr>
+                            <td><code>UserID</code></td>
+                            <td>[Your API User ID]</td>
+                        </tr>
+                        <tr>
+                            <td><code>ApiKey</code></td>
+                            <td>[Your API Key]</td>
+                        </tr>
+                        <tr>
+                            <td><code>RequestType</code></td>
+                            <td><code>SELECT</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>TableName</code></td>
+                            <td><code>Sites</code>, <code>BackflowTests</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>SelectFields</code></td>
+                            <td>
+                                Comma-separated list of field names, see <a href="/api/v1/reference/tables">Tables &amp; Field Names</a>. Field names are
+                                case-sensitive and are returned in the order listed. Example:
+                                <code>ID, CreationDate, PropertyType, PropertyBusinessName, PropertyStreetNumber, PropertyStreetName, PropertyNumber, PropertyCity, PropertyState, PropertyZIP</code>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="note">
+                    <strong>Relational data.</strong> Sites and backflow tests are relational and joined by the SiteID. When
+                    <code>BackflowTests</code> recordset data is returned, field names will be prefixed with table origin:
+                    <code>&lt;Test.ID&gt;123456&lt;/Test.ID&gt;</code>, <code>&lt;Site.PropertyCity&gt;Austin&lt;/Site.PropertyCity&gt;</code>.
+                    Field names in a <code>Sites</code> recordset are not prefixed.
+                </div>
+            </div>
+
+            <h2>Query Criteria</h2>
+
+            <div class="section">
+                <p>
+                    At least one criterion must be specified; a request without criteria returns error <a href="/api/v1/reference/responses">315</a>.
+                    When several criteria are sent, a record must match all of them. Parameters that are not criteria of the requested
+                    table are ignored. Date values use the <code>M/d/yyyy</code> or <code>M/d/yyyy h:mm:ss tt</code> format, for example
+                    <code>9/28/2026</code> or <code>9/28/2026 2:30:00 PM</code>.
+                </p>
+
+                <h3>Sites</h3>
+
+                <div class="table-wrap">
+                    <table>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Operator</th>
+                        </tr>
+                        <tr><td><code>WhereId</code></td><td><code>ID</code></td><td>int</td><td><code>=</code></td></tr>
+                        <tr><td><code>WhereCreationDateFrom</code></td><td><code>CreationDate</code></td><td>date</td><td><code>&gt;=</code></td></tr>
+                        <tr><td><code>WhereLastModifiedDateTo</code></td><td><code>LastModifiedDate</code></td><td>date</td><td><code>&lt;</code></td></tr>
+                        <tr><td><code>WhereGisStatus</code></td><td><code>GisStatus</code></td><td>int</td><td><code>=</code></td></tr>
+                        <tr><td><code>WhereGisDateFrom</code></td><td><code>GisDate</code></td><td>date</td><td><code>&gt;=</code></td></tr>
+                    </table>
+                </div>
+
+                <h3>BackflowTests</h3>
+
+                <div class="table-wrap">
+                    <table>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Operator</th>
+                        </tr>
+                        <tr><td><code>WhereId</code></td><td><code>Test.ID</code></td><td>int</td><td><code>=</code></td></tr>
+                        <tr><td><code>WhereCreationDateFrom</code></td><td><code>Test.CreationDate</code></td><td>date</td><td><code>&gt;=</code></td></tr>
+                        <tr><td><code>WhereLastModifiedDateTo</code></td><td><code>Test.LastModifiedDate</code></td><td>date</td><td><code>&lt;</code></td></tr>
+                        <tr><td><code>WhereIsCurrent</code></td><td><code>Test.IsCurrent</code></td><td>int (<code>0</code> or <code>1</code>)</td><td><code>=</code></td></tr>
+                        <tr><td><code>WhereGisStatus</code></td><td><code>Site.GisStatus</code></td><td>int</td><td><code>=</code></td></tr>
+                        <tr><td><code>WhereGisDateFrom</code></td><td><code>Site.GisDate</code></td><td>date</td><td><code>&gt;=</code></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <h2>Optional Recordset Ordering</h2>
+
+            <div class="section">
+                <div class="table-wrap">
+                    <table>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Acceptable Values</th>
+                        </tr>
+                        <tr>
+                            <td><code>OrderBy</code></td>
+                            <td>Any allowable field name of the requested table. Default: <code>ID</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>OrderByDirection</code></td>
+                            <td><code>ASC</code> (default) or <code>DESC</code></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var endpoint = window.location.origin + "/api/v1/run";
+
+        document.querySelectorAll(".endpoint").forEach(function (element) {
+            element.textContent = endpoint;
+        });
+    </script>
+</body>
+</html>

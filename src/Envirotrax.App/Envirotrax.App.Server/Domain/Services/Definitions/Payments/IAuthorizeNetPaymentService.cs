@@ -3,13 +3,17 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Payments;
 
 public interface IAuthorizeNetPaymentService
 {
-    Task<AuthorizeNetChargeResult> ChargeAsync(string dataDescriptor, string dataValue, decimal amount, AuthorizeNetBillingInfo billingInfo, CancellationToken cancellationToken);
+    Task<AuthorizeNetChargeResult> ChargeAsync(string dataDescriptor, string dataValue, decimal amount, string invoiceNumber, AuthorizeNetBillingInfo billingInfo, CancellationToken cancellationToken);
+
+    Task<bool> VoidAsync(string gatewayTransactionId, CancellationToken cancellationToken);
 }
 
 public class AuthorizeNetChargeResult
 {
     public bool IsApproved { get; set; }
     public string? TransactionId { get; set; }
+    public string? CardNumber { get; set; }
+    public string? CardType { get; set; }
     public string? ErrorMessage { get; set; }
 }
 

@@ -1,0 +1,50 @@
+@using RazorLight
+@using Envirotrax.App.Server.Templates.Emails.Fog
+@inherits TemplatePage<FogTripTicketCheckoutVm>
+
+@{
+    Layout = "Templates.Emails._EmailLayout";
+}
+
+<div>
+    <p style="margin-top: 0;">
+        The trip tickets for the following generator are attached.
+    </p>
+
+    <div style="border-left: 4px solid #4aa3d6; padding-left: 14px; margin-bottom: 28px;">
+        @if (!string.IsNullOrEmpty(Model.PropertyBusinessName))
+        {
+            <div style="font-weight: bold;">@Model.PropertyBusinessName</div>
+        }
+
+        <div>@Model.PropertyAddress</div>
+
+        @if (!string.IsNullOrEmpty(Model.PropertyCityStateZip))
+        {
+            <div>@Model.PropertyCityStateZip</div>
+        }
+    </div>
+
+    <table cellpadding="6" cellspacing="0" style="width: 100%; border-collapse: collapse; font-size: 14px;">
+        <tr style="background-color: #f2f3f8; text-align: left;">
+            <th>Transporter</th>
+            <th>Waste Removed</th>
+            <th>Receiver</th>
+        </tr>
+
+        @foreach (var ticket in Model.Tickets)
+        {
+            <tr style="border-bottom: 1px solid #e5e7eb; vertical-align: top;">
+                <td>
+                    <div>@ticket.TransporterName</div>
+                    <div>@ticket.Vehicle</div>
+                </td>
+                <td>
+                    <div>@ticket.WasteRemoved</div>
+                    <div>@ticket.WasteRemovedDate</div>
+                </td>
+                <td>@ticket.Receiver</td>
+            </tr>
+        }
+    </table>
+</div>

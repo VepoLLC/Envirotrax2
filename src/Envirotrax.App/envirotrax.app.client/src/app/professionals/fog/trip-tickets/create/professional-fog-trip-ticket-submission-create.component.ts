@@ -6,6 +6,7 @@ import { FogSignaturePadModalComponent, FogSignatureModel } from "../../inspecti
 import { SiteService } from "../../../../shared/services/sites/site.service";
 import { Site } from "../../../../shared/models/sites/site";
 import { ProfesisonalService } from "../../../../shared/services/professionals/professional.service";
+import { CheckoutService } from "../../../../shared/services/professionals/checkout.service";
 import { ProfesionalUserService } from "../../../../shared/services/professionals/professional-user.service";
 import { ProfessionalSupplierService } from "../../../../shared/services/professionals/professional-supplier.service";
 import { ProfessionalFogVehicleService } from "../../../../shared/services/fog/professional-fog-vehicle.service";
@@ -113,7 +114,8 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         private readonly _licenseService: ProfessionalUserLicenseService,
         private readonly _tripTicketService: FogTripTicketService,
         private readonly _lookupService: LookupService,
-        private readonly _modalHelper: ModalHelperService
+        private readonly _modalHelper: ModalHelperService,
+        private readonly _checkoutService: CheckoutService
     ) { }
 
     public ngOnInit(): void {
@@ -208,6 +210,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
             await this._tripTicketService.submit(ticket, this.images);
 
             this.submitSuccess = true;
+            this._checkoutService.refresh();
         } finally {
             this.isLoading = false;
         }

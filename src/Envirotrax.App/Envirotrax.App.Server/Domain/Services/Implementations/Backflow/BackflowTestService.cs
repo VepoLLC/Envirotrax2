@@ -648,16 +648,16 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
     public override async Task<BackflowTestDto?> DeleteAsync(int id)
     {
-        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        var professionalId = _authService.ProfessionalId;
+        var test = await _testRepository.GetNoIncludesAsync(id, CancellationToken.None);
 
-        var deleted = await _testRepository.DeleteAsync(id);
-
-        if (deleted == null || deleted.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(deleted.TransactionId))
+        if (test == null || test.ProfessionalId != professionalId || !string.IsNullOrEmpty(test.TransactionId))
         {
             return null;
         }
 
-        scope.Complete();
+        var deleted = await _testRepository.DeleteAsync(id);
+
         return MapToDto(deleted);
     }
 

@@ -88,6 +88,16 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         return _pdfTemplateService.GenerateAsync("Fog.FogTripTicket", tickets);
     }
 
+    public async Task<byte[]> GeneratePdfWithSignaturesAsync(List<FogTripTicketDto> tickets)
+    {
+        foreach (var ticket in tickets)
+        {
+            await PopulateSignatureUrlsAsync(ticket);
+        }
+
+        return await GeneratePdfAsync(tickets);
+    }
+
     public override async Task<FogTripTicketDto?> GetAsync(int id, CancellationToken cancellationToken)
     {
         var dto = await base.GetAsync(id, cancellationToken);

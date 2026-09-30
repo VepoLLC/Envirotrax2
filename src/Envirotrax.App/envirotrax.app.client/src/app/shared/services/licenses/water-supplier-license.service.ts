@@ -23,7 +23,7 @@ export class WaterSupplierLicenseService {
     }
 
     public getUnverifiedRegistrations(pageInfo: PageInfo, query: Query): Promise<PagedData<WaterSupplierLicense>> {
-        const url = this._urlResolver.resolveUrl('/api/registrations');
+        const url = this._urlResolver.resolveUrl('/api/fog/transporters/registrations');
         const params = this._queryHelper.buildQuery(pageInfo, query);
         return lastValueFrom(this._http.get<PagedData<WaterSupplierLicense>>(url, { params }));
     }

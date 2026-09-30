@@ -198,4 +198,50 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
     {
         return Entity.CountAsync(f => f.SiteId == siteId && f.DeletedTime == null, cancellationToken);
     }
+
+    public async Task<List<FogInspection>> GetUnpaidForCheckoutAsync(IReadOnlyCollection<int> ids, int professionalId, int? inspectorId, CancellationToken cancellationToken)
+    {
+        return await GetUnpaidForCheckoutQuery(ids, professionalId, inspectorId)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> MarkPaidAsync(
+        IReadOnlyCollection<int> ids,
+        int professionalId,
+        int? inspectorId,
+        string transactionId,
+        DateTime transactionDate,
+        CancellationToken cancellationToken)
+    {
+        return await GetUnpaidForCheckoutQuery(ids, professionalId, inspectorId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(f => f.TransactionId, transactionId)
+                .SetProperty(f => f.TransactionDate, transactionDate), cancellationToken);
+    }
+
+    public async Task<decimal> SumAmountByTransactionIdAsync(string transactionId, int professionalId, CancellationToken cancellationToken)
+    {
+        return await DbContext.FogInspections
+            .Where(f => f.TransactionId == transactionId && f.ProfessionalId == professionalId)
+            .SumAsync(f => f.Amount, cancellationToken);
+    }
+
+    public async Task<List<FogInspection>> GetByTransactionIdAsync(string transactionId, int professionalId, CancellationToken cancellationToken)
+    {
+        return await GetDetailsQuery()
+            .Where(f => f.TransactionId == transactionId && f.ProfessionalId == professionalId)
+            .OrderBy(f => f.CreatedTime)
+            .ToListAsync(cancellationToken);
+    }
+
+    private IQueryable<FogInspection> GetUnpaidForCheckoutQuery(IReadOnlyCollection<int> ids, int professionalId, int? inspectorId)
+    {
+        return DbContext.FogInspections
+            .Where(f => ids.Contains(f.Id)
+                && f.ProfessionalId == professionalId
+                && (inspectorId == null || f.InspectorId == inspectorId)
+                && (f.TransactionId == null || f.TransactionId == string.Empty)
+                && f.DeletedTime == null);
+    }
 }

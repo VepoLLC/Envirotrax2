@@ -17,4 +17,10 @@ public interface IFogInspectionRepository : IRepository<FogInspection>
         string? newSignatureImagePath);
 
     Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken);
+
+    // Checkout
+    Task<List<FogInspection>> GetUnpaidForCheckoutAsync(IReadOnlyCollection<int> ids, int professionalId, int? inspectorId, CancellationToken cancellationToken);
+    Task<int> MarkPaidAsync(IReadOnlyCollection<int> ids, int professionalId, int? inspectorId, string transactionId, DateTime transactionDate, CancellationToken cancellationToken);
+    Task<decimal> SumAmountByTransactionIdAsync(string transactionId, int professionalId, CancellationToken cancellationToken);
+    Task<List<FogInspection>> GetByTransactionIdAsync(string transactionId, int professionalId, CancellationToken cancellationToken);
 }

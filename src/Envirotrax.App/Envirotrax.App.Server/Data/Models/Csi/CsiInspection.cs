@@ -15,7 +15,7 @@ namespace Envirotrax.App.Server.Data.Models.Csi;
 
 [Table("CsiInspections")]
 [RecordLogged(RecordLogTableNames.CsiInspections)]
-public class CsiInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
+public class CsiInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IPayableModel
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }

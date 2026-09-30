@@ -42,6 +42,7 @@
     <EmbeddedResource Include="Templates\**\*.cshtml" />
     <EmbeddedResource Include="Templates\**\*.xlsx" />
     <EmbeddedResource Include="Templates\**\*.docx" />
+    <EmbeddedResource Include="Templates\**\*.html" />
   </ItemGroup>
 
   <ItemGroup>

@@ -25,6 +25,15 @@ public class ProfessionalRepository : Repository<Professional>, IProfessionalRep
 
         // We are not going to update HasWiseGuys from API. If needed, it will only be updated from the database.
         DbContext.Entry(model).Property(p => p.HasWiseGuys).IsModified = false;
+        DbContext.Entry(model).Property(p => p.AccountBalance).IsModified = false;
+    }
+
+    public override async Task<Professional?> UpdateAsync(Professional model)
+    {
+        await base.UpdateAsync(model);
+        await DbContext.Entry(model).ReloadAsync();
+
+        return model;
     }
 
     public async Task<IEnumerable<Professional>> GetAllMyAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
@@ -48,5 +57,28 @@ public class ProfessionalRepository : Repository<Professional>, IProfessionalRep
             .Where(p => p.ParentId == _tenantProvider.ProfessionalId && p.DeletedTime == null)
             .OrderBy(p => p.Name)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<bool> TryDebitBalanceAsync(int professionalId, decimal amount, CancellationToken cancellationToken)
+    {
+        var updatedCount = await DbContext.Professionals
+            .Where(professional => professional.Id == professionalId && professional.AccountBalance >= amount)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(professional => professional.AccountBalance, professional => professional.AccountBalance - amount), cancellationToken);
+
+        return updatedCount == 1;
+    }
+
+    public async Task CreditBalanceAsync(int professionalId, decimal amount, CancellationToken cancellationToken)
+    {
+        var updatedCount = await DbContext.Professionals
+            .Where(professional => professional.Id == professionalId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(professional => professional.AccountBalance, professional => professional.AccountBalance + amount), cancellationToken);
+
+        if (updatedCount != 1)
+        {
+            throw new InvalidOperationException($"Professional {professionalId} not found.");
+        }
     }
 }

@@ -15,7 +15,7 @@ namespace Envirotrax.App.Server.Data.Models.Backflow;
 
 [Table("BackflowTests")]
 [RecordLogged(RecordLogTableNames.BackflowTests)]
-public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
+public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IPayableModel
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }

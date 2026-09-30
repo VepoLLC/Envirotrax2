@@ -8,6 +8,9 @@ import { CheckoutBackflowComponent } from "./backflow/checkout-backflow.componen
 import { CheckoutCsiComponent } from "./csi/checkout-csi.component";
 import { CheckoutFogInspectionComponent } from "./fog-inspection/checkout-fog-inspection.component";
 import { CheckoutFogTransportComponent } from "./fog-transport/checkout-fog-transport.component";
+import { CheckoutAmountsComponent } from "./shared/checkout-amounts/checkout-amounts.component";
+import { CheckoutPaymentComponent } from "./shared/checkout-payment/checkout-payment.component";
+import { CheckoutReceiptComponent } from "./shared/checkout-receipt/checkout-receipt.component";
 
 @NgModule({
     declarations: [
@@ -15,7 +18,10 @@ import { CheckoutFogTransportComponent } from "./fog-transport/checkout-fog-tran
         CheckoutBackflowComponent,
         CheckoutCsiComponent,
         CheckoutFogInspectionComponent,
-        CheckoutFogTransportComponent
+        CheckoutFogTransportComponent,
+        CheckoutAmountsComponent,
+        CheckoutPaymentComponent,
+        CheckoutReceiptComponent
     ],
     imports: [
         CommonModule,

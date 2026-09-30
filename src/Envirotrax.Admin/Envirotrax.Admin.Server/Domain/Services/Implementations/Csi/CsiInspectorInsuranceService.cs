@@ -34,6 +34,11 @@ public class CsiInspectorInsuranceService : ICsiInspectorInsuranceService
             ["insuranceNumber"] = insurance.InsuranceNumber
         };
 
+        if (insurance.CoverageAmount.HasValue)
+        {
+            formFields["coverageAmount"] = insurance.CoverageAmount.Value.ToString(CultureInfo.InvariantCulture);
+        }
+
         if (insurance.ExpirationDate.HasValue)
         {
             formFields["expirationDate"] = insurance.ExpirationDate.Value.ToString("O", CultureInfo.InvariantCulture);

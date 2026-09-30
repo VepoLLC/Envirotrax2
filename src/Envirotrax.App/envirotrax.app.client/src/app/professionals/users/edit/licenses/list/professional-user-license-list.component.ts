@@ -100,7 +100,8 @@ export class ProfessionalUserLicenseListComponent implements OnInit {
         this._modalHelper.show<ProfessionalUserLicense, ProfessionalUserLicense>(CreateEditLicenseComponent, {
             title: 'Add License',
             model: { user: { id: this.userId } },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => {
             this.getLicenses();
         });
@@ -110,7 +111,8 @@ export class ProfessionalUserLicenseListComponent implements OnInit {
         this._modalHelper.show<ProfessionalUserLicense, ProfessionalUserLicense>(CreateEditLicenseComponent, {
             title: 'Edit License',
             model: license,
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => {
             this.getLicenses();
         });

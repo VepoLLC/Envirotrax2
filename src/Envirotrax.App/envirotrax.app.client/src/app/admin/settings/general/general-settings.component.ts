@@ -4,6 +4,8 @@ import { GeneralSettingsService } from "../../../shared/services/settings/genera
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { NgForm } from "@angular/forms";
 import { ToastService } from '@envirotrax/common-ui';
+import { SettingsSection } from "../../../shared/models/settings/settings-section";
+import { SettingsCopyService } from "../../../shared/services/settings/settings-copy.service";
 
 @Component({
     templateUrl: './general-settings.component.html',
@@ -26,16 +28,20 @@ export class GeneralSettingsComponent implements OnInit {
 
     public showProgramUpdateWarning: boolean = false;
 
+    public canCopyFromParent: boolean = false;
+
     constructor(
         private readonly _generalSettingsService: GeneralSettingsService,
         private readonly _helper: HelperService,
-        private readonly _toastService: ToastService
+        private readonly _toastService: ToastService,
+        private readonly _settingsCopyService: SettingsCopyService
     ) {
 
     }
 
     public async ngOnInit(): Promise<void> {
         await this.getSettings();
+        this.canCopyFromParent = await this._settingsCopyService.canCopyFromParent();
     }
 
     private async getSettings(): Promise<void> {
@@ -45,6 +51,17 @@ export class GeneralSettingsComponent implements OnInit {
             this.settings = await this._generalSettingsService.get();
         } finally {
             this.isLoading = false;
+        }
+    }
+
+    public async copyFromParent(): Promise<void> {
+        const copied = await this._settingsCopyService.confirmAndCopyFromParent(SettingsSection.General);
+
+        if (copied) {
+            this.validationErrors = [];
+            this.showProgramUpdateWarning = false;
+
+            await this.getSettings();
         }
     }
 

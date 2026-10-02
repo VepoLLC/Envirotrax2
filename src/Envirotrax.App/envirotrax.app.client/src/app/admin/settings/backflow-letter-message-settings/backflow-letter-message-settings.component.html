@@ -112,8 +112,12 @@
             <div class="mt-3">
                 <vp-validation-summary [form]="settingsForm" [validationErrors]="validationErrors" />
 
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary vp-section-button">
+                <div class="d-flex">
+                    <button *ngIf="canCopyFromParent" type="button" class="btn btn-primary vp-section-button" (click)="copyFromParent()">
+                        Copy from Parent
+                    </button>
+
+                    <button type="submit" class="btn btn-primary vp-section-button ms-auto">
                         Save
                     </button>
                 </div>

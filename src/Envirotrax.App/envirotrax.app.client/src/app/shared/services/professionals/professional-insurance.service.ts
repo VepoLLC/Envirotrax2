@@ -44,6 +44,7 @@ export class ProfessionalInsuranceService {
         if (insurance.id) formData.append('id', insurance.id.toString());
         if (insurance.professional?.id) formData.append('professional.id', insurance.professional.id.toString());
         if (insurance.insuranceNumber) formData.append('insuranceNumber', insurance.insuranceNumber);
+        if (insurance.coverageAmount != null) formData.append('coverageAmount', insurance.coverageAmount.toString());
         if (insurance.expirationDate) formData.append('expirationDate', insurance.expirationDate.toISOString());
 
         return lastValueFrom(this._http.post<ProfessionalInsurance>(url, formData));

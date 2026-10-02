@@ -239,6 +239,7 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         inspection.InspectorState = model.InspectorState;
         inspection.InspectorZip = model.InspectorZip;
         inspection.InspectorWorkNumber = model.InspectorWorkNumber;
+        inspection.InspectorCellNumber = model.InspectorCellNumber;
         inspection.InspectorFaxNumber = model.InspectorFaxNumber;
         inspection.InspectorLicenseNumber = model.InspectorLicenseNumber;
         inspection.InspectorLicenseType = model.InspectorLicenseType;

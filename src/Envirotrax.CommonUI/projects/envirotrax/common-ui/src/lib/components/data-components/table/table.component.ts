@@ -115,17 +115,20 @@ export class TableComponent implements OnChanges {
         const actionsColumn = this.columns.find(c => c.tag?.specialColumn == SpecialColumnType.ActionsColumn);
 
         if (this.canHaveAction() && !actionsColumn) {
-            this.columns.push({
-                field: '',
-                caption: 'Actions',
-                type: ColumnType.other,
-                queryColumnExcluded: true,
-                cellTemplate: this.actionsTemplate,
-                isDownloadExcluded: true,
-                tag: {
-                    specialColumn: SpecialColumnType.ActionsColumn
+            this.columns = [
+                ...this.columns,
+                {
+                    field: '',
+                    caption: 'Actions',
+                    type: ColumnType.other,
+                    queryColumnExcluded: true,
+                    cellTemplate: this.actionsTemplate,
+                    isDownloadExcluded: true,
+                    tag: {
+                        specialColumn: SpecialColumnType.ActionsColumn
+                    }
                 }
-            });
+            ];
         } else {
             if (!this.canHaveAction()) {
                 this.columns = this.columns.filter(c => c != actionsColumn);

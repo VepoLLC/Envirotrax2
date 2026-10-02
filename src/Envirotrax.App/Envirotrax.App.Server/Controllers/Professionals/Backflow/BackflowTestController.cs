@@ -40,6 +40,13 @@ public class BackflowTestController : ProfessionalProtectedController
         return Ok(result);
     }
 
+    [HttpGet("insurance-check")]
+    public async Task<IActionResult> GetInsuranceCheckAsync([FromQuery] int waterSupplierId, CancellationToken cancellationToken)
+    {
+        var result = await _backflowTestService.GetInsuranceCheckAsync(waterSupplierId, cancellationToken);
+        return Ok(result);
+    }
+
     [HttpGet("pdf")]
     public async Task<IActionResult> GetAllPdfAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
     {

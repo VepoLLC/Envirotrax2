@@ -113,7 +113,8 @@ export class CsiInspectorLicenseListComponent implements OnInit {
         this._modalHelper.show<CsiInspectorLicenseModalData, ProfessionalUserLicense>(AddEditCsiInspectorLicenseComponent, {
             title,
             model: { professionalId: this.professionalId, license },
-            size: ModalSize.medium
+            size: ModalSize.medium,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.getLicenses());
     }
 

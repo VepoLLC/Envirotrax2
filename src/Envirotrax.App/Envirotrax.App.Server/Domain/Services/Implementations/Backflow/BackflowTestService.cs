@@ -622,7 +622,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
     private static void ValidateAdminUpdate(BackflowTestAdminUpdateRequest request)
     {
-        if (!HasBypassAssembly(request.DeviceType))
+        if (!BackflowDeviceTypes.HasBypassAssembly(request.DeviceType))
         {
             return;
         }
@@ -636,14 +636,6 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         {
             throw new AppValidationException("Bypass Assembly Manufacturer, Model, Size and Serial Number are required for this backflow method.");
         }
-    }
-
-    private static bool HasBypassAssembly(string? deviceType)
-    {
-        return deviceType == nameof(BackflowDeviceType.DCD)
-            || deviceType == nameof(BackflowDeviceType.DCD2)
-            || deviceType == nameof(BackflowDeviceType.RPPD)
-            || deviceType == nameof(BackflowDeviceType.RPPD2);
     }
 
     public override async Task<BackflowTestDto?> DeleteAsync(int id)
@@ -854,6 +846,21 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         var (renewalRequired, newExpirationDate) = ComputeRenewal(test, requirements);
 
         await _testRepository.UpdateTestRenewalAndClearFlagAsync(testId, renewalRequired, newExpirationDate, cancellationToken);
+    }
+
+    // The RenewalRequired half of ComputeRenewal, for records whose expiration is not driven by a
+    // test result — a CSI visually identified assembly expires on the inspection date. test.Site
+    // must carry HasAuxWaterSupply for the aux-water-supply requirements to match.
+    public async Task<bool> IsRenewalRequiredAsync(BackflowTest test, CancellationToken cancellationToken)
+    {
+        if (test.OutOfService || (!string.IsNullOrEmpty(test.DeviceType) && SkippedDeviceTypes.Contains(test.DeviceType)))
+        {
+            return false;
+        }
+
+        var requirements = await _renewalRequirementService.GetAllByWaterSupplierIdAsync(test.WaterSupplierId, cancellationToken);
+
+        return requirements.Any(requirement => DoesTestMatchRequirement(test, requirement));
     }
 
     private static readonly HashSet<string> SkippedDeviceTypes = new(StringComparer.OrdinalIgnoreCase)

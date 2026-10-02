@@ -33,6 +33,7 @@ public interface IBackflowTestService : IService<BackflowTest, BackflowTestDto>
 
     Task ProcessSiteRenewalAsync(int siteId, CancellationToken cancellationToken);
     Task ProcessTestRenewalAsync(int testId, CancellationToken cancellationToken);
+    Task<bool> IsRenewalRequiredAsync(BackflowTest test, CancellationToken cancellationToken);
     Task<IEnumerable<BackflowTestDto>> GetAllPendingTestsForRenewalAsync(int batchSize, CancellationToken cancellationToken);
 
     Task<BackflowTestDto?> UpdateRenewalRequiredAsync(int id, bool renewalRequired, CancellationToken cancellationToken = default);

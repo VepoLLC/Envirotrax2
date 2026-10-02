@@ -57,4 +57,7 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
     Task<BackflowTest?> UpdateReplacementClearedAsync(int id, bool cleared);
 
     Task<int> CountCurrentInServiceBySiteAsync(int siteId, CancellationToken cancellationToken);
+
+    // Full current test rows at a site, for seeding a CSI inspection's visually identified assemblies.
+    Task<List<BackflowTest>> GetCurrentBySiteAsync(int siteId, CancellationToken cancellationToken);
 }

@@ -7,11 +7,13 @@ import { CsiSubmissionPropertySearchComponent } from "./inspections/create/csi-s
 import { CsiSubmissionCreateComponent } from "./inspections/create/csi-submission-create.component";
 import { CsiInspectionListComponent } from "./inspections/list/professional-csi-inspection-list.component";
 import { CsiInspectionViewComponent } from "./inspections/view/csi-inspection-view.component";
+import { AddCsiInspectionAssemblyComponent } from "./inspections/create/add-csi-inspection-assembly.component";
 
 @NgModule({
     declarations: [
         CsiSubmissionPropertySearchComponent,
         CsiSubmissionCreateComponent,
+        AddCsiInspectionAssemblyComponent,
         CsiInspectionListComponent,
         CsiInspectionViewComponent
     ],

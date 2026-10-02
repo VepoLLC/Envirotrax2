@@ -16,7 +16,7 @@
             <li class="nav-item">
                 <a class="nav-link" [class.active]="activeTab === 'assemblies'" (click)="activeTab = 'assemblies'"
                    role="button">
-                    Assemblies at this Location (0)
+                    Assemblies at This Location ({{ assemblies.length }})
                 </a>
             </li>
             <li class="nav-item">
@@ -483,6 +483,103 @@
                     </button>
                 </div>
             </form>
+        </div>
+
+        <!-- Assemblies Tab -->
+        <div *ngIf="activeTab === 'assemblies' && !submitSuccess">
+            <vp-section header="Assemblies at This Location" class="mt-3 d-block">
+                <div class="d-flex flex-wrap gap-4 justify-content-center mb-3">
+                    <span><i class="fa-solid fa-square text-success me-1"></i>Current Test</span>
+                    <span><i class="fa-regular fa-square text-success me-1"></i>Previous Test History</span>
+                    <span><i class="fa-solid fa-square text-primary me-1"></i>Passed Test</span>
+                    <span><i class="fa-regular fa-square text-primary me-1"></i>Failed Test</span>
+                    <span><i class="fa-solid fa-square text-info me-1"></i>In Service</span>
+                    <span><i class="fa-regular fa-square text-info me-1"></i>Out of Service</span>
+                </div>
+
+                <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
+                    <button type="button" class="btn btn-primary btn-sm" (click)="addAssembly()">+ Add Assembly</button>
+                    <button type="button" class="btn btn-primary btn-sm" [disabled]="assemblies.length === 0"
+                            (click)="markAllAssembliesVisuallyIdentified()">
+                        Mark All Assemblies as Visually Identified
+                    </button>
+                </div>
+
+                <p *ngIf="assemblies.length === 0" class="text-muted text-center">
+                    Click the + Add Assembly button above to add an assembly record for this location.
+                </p>
+
+                <div *ngIf="assemblies.length > 0" class="table-responsive">
+                    <table class="table table-sm table-striped align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th class="text-center">Status</th>
+                                <th>Test/Exp Date</th>
+                                <th>Serial Number</th>
+                                <th>Assembly Description</th>
+                                <th class="text-center">Visually Identified</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let row of assemblies; let i = index">
+                                <td class="text-center">{{ i + 1 }}</td>
+                                <td class="text-center text-nowrap">
+                                    <i class="fa-square text-success me-1"
+                                       [class.fa-solid]="row.isCurrent" [class.fa-regular]="!row.isCurrent"
+                                       [attr.title]="row.isCurrent ? 'Current Test' : 'Previous Test History'"></i>
+                                    <i class="fa-square text-primary me-1"
+                                       [class.fa-solid]="row.isPassing" [class.fa-regular]="!row.isPassing"
+                                       [attr.title]="row.isPassing ? 'Passed Test' : 'Failed Test'"></i>
+                                    <i class="fa-square text-info"
+                                       [class.fa-solid]="row.inService" [class.fa-regular]="!row.inService"
+                                       [attr.title]="row.inService ? 'In Service' : 'Out of Service'"></i>
+                                </td>
+                                <td class="text-nowrap">
+                                    {{ row.testDate | date:'MM/dd/yyyy' }}<br>
+                                    {{ row.expirationDate | date:'MM/dd/yyyy' }}
+                                </td>
+                                <td>
+                                    <ng-container *ngIf="row.hasBypass; else singleSerial">
+                                        <span class="fw-semibold">Main:</span> {{ row.serialNumber }}<br>
+                                        <span class="fw-semibold">Bypass:</span> {{ row.serialNumber2 }}
+                                    </ng-container>
+                                    <ng-template #singleSerial>{{ row.serialNumber }}</ng-template>
+                                </td>
+                                <td>
+                                    <ng-container *ngIf="row.hasBypass; else singleAssembly">
+                                        <div><span class="fw-semibold">Main Assembly:</span> {{ row.assemblyDescription }}</div>
+                                        <div><span class="fw-semibold">Bypass Assembly:</span> {{ row.assemblyDescription2 }}</div>
+                                    </ng-container>
+                                    <ng-template #singleAssembly>
+                                        <div><span class="fw-semibold">Assembly Desc:</span> {{ row.assemblyDescription }}</div>
+                                    </ng-template>
+                                    <div><span class="fw-semibold">Hazard Type:</span> {{ row.hazardDescription }}</div>
+                                    <div><span class="fw-semibold">Location Desc:</span> {{ row.locationDescription }}</div>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" class="form-check-input"
+                                           [attr.aria-label]="'Visually identified ' + (i + 1)"
+                                           [(ngModel)]="row.request.visuallyIdentified"
+                                           [ngModelOptions]="{standalone: true}" />
+                                </td>
+                                <td class="text-end">
+                                    <button type="button" class="btn btn-danger btn-sm" (click)="deleteAssembly(row)">
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </vp-section>
+
+            <div class="mt-3 d-flex justify-content-center">
+                <button type="button" class="btn btn-primary vp-section-button" (click)="activeTab = 'main'">
+                    Back to Main Form
+                </button>
+            </div>
         </div>
 
         <!-- Images Tab -->

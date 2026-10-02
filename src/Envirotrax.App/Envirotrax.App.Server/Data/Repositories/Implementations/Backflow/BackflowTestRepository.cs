@@ -1041,6 +1041,17 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return Entity.CountAsync(t => t.SiteId == siteId && t.DeletedTime == null && t.IsCurrent && !t.OutOfService, cancellationToken);
     }
 
+    // Unlike GetAllCurrentBySiteIdAsync (a slim projection for the renewal job, which also bypasses
+    // the tenant filter), this returns whole rows under the caller's normal query filters.
+    public Task<List<BackflowTest>> GetCurrentBySiteAsync(int siteId, CancellationToken cancellationToken)
+    {
+        return Entity
+            .AsNoTracking()
+            .Where(t => t.SiteId == siteId && t.DeletedTime == null && t.IsCurrent)
+            .OrderBy(t => t.SerialNumber)
+            .ToListAsync(cancellationToken);
+    }
+
     private async Task<int?> FindPreviousTestIdAsync(BackflowTest fromTest)
     {
         if (string.IsNullOrWhiteSpace(fromTest.SerialNumber))

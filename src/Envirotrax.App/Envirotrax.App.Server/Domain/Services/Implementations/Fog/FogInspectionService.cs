@@ -218,6 +218,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         var registration = await _professionalSupplierService.GetAsync(inspection.WaterSupplierId, cancellationToken);
 
         inspection.Amount = registration?.FogInspectorFee ?? settings?.FogInspectorFee ?? 0;
+        inspection.AmountShare = settings?.FogInspectorFeeWsShare ?? 0;
     }
 
     // Checkout "Edit" on an own, still-unpaid inspection: mirrors SubmitAsync's field list and snapshot

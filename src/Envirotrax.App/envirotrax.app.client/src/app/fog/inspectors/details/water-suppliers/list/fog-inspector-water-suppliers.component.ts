@@ -84,7 +84,8 @@ export class FogInspectorWaterSuppliersComponent implements OnInit {
         this._modalHelper.show<EditWaterSupplierModalData, ProfessionalWaterSupplier>(EditFogInspectorWaterSupplierComponent, {
             title: 'Edit Water Supplier Registration',
             model: { inspectorId: this.inspectorId, supplier },
-            size: ModalSize.medium
+            size: ModalSize.medium,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadWaterSuppliers());
     }
 }

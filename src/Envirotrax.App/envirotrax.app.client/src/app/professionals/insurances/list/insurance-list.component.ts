@@ -99,7 +99,8 @@ export class InsuranceListComponent implements OnInit {
         this._modalHelper.show<ProfessionalInsurance>(EditInsuranceComponent, {
             title: 'Edit Insurance Policy',
             model: insurance,
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.getInsurances());
     }
 

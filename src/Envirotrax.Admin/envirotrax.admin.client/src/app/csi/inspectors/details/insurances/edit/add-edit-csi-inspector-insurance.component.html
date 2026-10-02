@@ -11,6 +11,16 @@
                       [form]="form" />
         </div>
 
+        <div class="mb-3">
+            <vp-input [(ngModel)]="insurance.coverageAmount"
+                      name="coverageAmount"
+                      type="number"
+                      [decimals]="2"
+                      label="Coverage $"
+                      [required]="true"
+                      [form]="form" />
+        </div>
+
         <div class="mb-3" *ngIf="!isEditMode">
             <vp-file-upload [(ngModel)]="certificateFile"
                             name="certificateFile"

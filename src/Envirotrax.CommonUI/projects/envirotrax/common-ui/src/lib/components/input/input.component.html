@@ -89,6 +89,8 @@
                        [multiple]="type == 'multi-select'"
                        (change)="onChanged()"
                        (blur)="onTouched($event)"
+                       (open)="onSelectOpened()"
+                       (close)="onSelectClosed()"
                        [attr.value]="value"
                        bindLabel="text"
                        bindValue="id"

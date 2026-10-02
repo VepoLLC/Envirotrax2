@@ -34,6 +34,13 @@ public class ProfessionalFogTripTicketController : ProfessionalProtectedControll
         return Ok(result);
     }
 
+    [HttpGet("insurance-check")]
+    public async Task<IActionResult> GetInsuranceCheckAsync([FromQuery] int waterSupplierId, CancellationToken ct)
+    {
+        var result = await _fogService.GetInsuranceCheckAsync(waterSupplierId, ct);
+        return Ok(result);
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAsync(int id, CancellationToken ct)
     {

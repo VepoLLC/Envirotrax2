@@ -70,7 +70,8 @@ export class CsiInspectorUsersComponent implements OnInit {
         this._modalHelper.show<CsiUserModalData, ProfessionalUser>(AddEditCsiInspectorUserComponent, {
             title: 'Add Sub Account',
             model: { inspectorId: this.inspectorId, user: {} },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadSubAccounts());
     }
 
@@ -78,7 +79,8 @@ export class CsiInspectorUsersComponent implements OnInit {
         this._modalHelper.show<CsiUserModalData, ProfessionalUser>(AddEditCsiInspectorUserComponent, {
             title: 'Edit Sub Account',
             model: { inspectorId: this.inspectorId, user },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadSubAccounts());
     }
 

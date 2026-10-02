@@ -1,5 +1,6 @@
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.Lookup;
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.Professionals;
+using Envirotrax.Admin.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.Admin.Server.Domain.DataTransferObjects.Fog;
@@ -15,7 +16,7 @@ public class FogInspectionDto
 
     public ReferencedWaterSupplierDto? WaterSupplier { get; set; }
 
-    public ReferencedFogSiteDto? Site { get; set; }
+    public ReferencedSiteDto? Site { get; set; }
 
     public DateTime? InspectionDate { get; set; }
 
@@ -162,11 +163,4 @@ public class FogInspectionDto
     public string? SignatureImageUrl { get; set; }
 
     public DateTime CreatedTime { get; set; }
-}
-
-public class ReferencedFogSiteDto
-{
-    public int? Id { get; set; }
-
-    public string? AccountNumber { get; set; }
 }

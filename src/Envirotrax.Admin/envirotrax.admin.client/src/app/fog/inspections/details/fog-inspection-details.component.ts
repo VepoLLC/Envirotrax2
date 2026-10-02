@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { InputOption, RecordLog } from '@envirotrax/common-ui';
+import { InputOption, RecordLog, ToastService, ToastType } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import {
     FogInspection,
@@ -20,8 +20,6 @@ import { FogInspectionResultsComponent, isInvalidChamberValue } from './results/
 import { FogInspectionTrapComponent } from './trap/fog-inspection-trap.component';
 
 type FogInspectionTab = 'results' | 'images' | 'logs';
-
-const SaveMessageDurationMs = 5000;
 
 /**
  * Water Supplier, FOG Inspector, Trap and Inspection Results are still read-only; Property and Mailing are
@@ -53,10 +51,7 @@ export class FogInspectionDetailsComponent implements OnInit {
     public isLoadingRecordLogs: boolean = false;
     public isSaving: boolean = false;
 
-    public saveSuccessMessage: string = '';
     public validationErrors: string[] = [];
-
-    private _saveMessageTimeoutId?: ReturnType<typeof setTimeout>;
 
     public inspection: FogInspection = {};
     public recordLogs: RecordLog[] = [];
@@ -76,7 +71,8 @@ export class FogInspectionDetailsComponent implements OnInit {
         private readonly _windowReference: WindowReference<{ id?: number }>,
         private readonly _inspectionService: FogInspectionService,
         private readonly _lookupService: LookupService,
-        private readonly _windowService: WindowService
+        private readonly _windowService: WindowService,
+        private readonly _toastService: ToastService
     ) {
 
     }
@@ -93,8 +89,6 @@ export class FogInspectionDetailsComponent implements OnInit {
     }
 
     public async save(): Promise<void> {
-        this.dismissSaveMessage();
-
         if (!this.collectValidationErrors()) {
             return;
         }
@@ -107,12 +101,23 @@ export class FogInspectionDetailsComponent implements OnInit {
                 this.inspection.waterSupplier?.id ?? 0,
                 this.buildUpdateRequest());
 
-            await this.refreshQuietly();
+            const refreshFailed = await this.refreshQuietly();
+
+            this.reportSaveResult(refreshFailed);
         } finally {
             this.isSaving = false;
         }
+    }
 
-        this.showSaveMessage();
+    private reportSaveResult(refreshFailed: boolean): void {
+        if (refreshFailed) {
+            this._toastService.show({
+                text: 'The inspection was saved, but the latest data could not be reloaded. Please reload or reopen the window.',
+                type: ToastType.Warning
+            });
+        } else {
+            this._toastService.successfullySaved();
+        }
     }
 
     private async refreshAfterSave(): Promise<void> {
@@ -128,11 +133,13 @@ export class FogInspectionDetailsComponent implements OnInit {
         await this.loadRecordLogs();
     }
 
-    private async refreshQuietly(): Promise<void> {
+    private async refreshQuietly(): Promise<boolean> {
         try {
             await this.refreshAfterSave();
+
+            return false;
         } catch {
-            // Intentionally swallowed: the record is saved; only the follow-up read did not complete.
+            return true;
         }
     }
 
@@ -150,15 +157,6 @@ export class FogInspectionDetailsComponent implements OnInit {
                 waterSupplierId: this.inspection.waterSupplier?.id
             }
         });
-    }
-
-    public dismissSaveMessage(): void {
-        this.saveSuccessMessage = '';
-
-        if (this._saveMessageTimeoutId != null) {
-            clearTimeout(this._saveMessageTimeoutId);
-            this._saveMessageTimeoutId = undefined;
-        }
     }
 
     private collectValidationErrors(): boolean {
@@ -231,12 +229,6 @@ export class FogInspectionDetailsComponent implements OnInit {
             inspectionResult: inspection.inspectionResult,
             comments: inspection.comments
         };
-    }
-
-    private showSaveMessage(): void {
-        this.saveSuccessMessage = 'Inspection saved successfully.';
-
-        this._saveMessageTimeoutId = setTimeout(() => this.dismissSaveMessage(), SaveMessageDurationMs);
     }
 
     private async loadStates(): Promise<void> {

@@ -126,14 +126,28 @@ export class CsiSubmissionCreateComponent implements OnInit {
         this.selectedCsiUserId = value;
         this.selectedCsiUser = this.csiUsers.find(u => u.id === value);
         this.model.inspectorUser = { id: value };
-        await this.loadLicense(value);
+
+        this.isLoading = true;
+
+        try {
+            await this.loadLicense(value);
+        } finally {
+            this.isLoading = false;
+        }
     }
 
-    public onWaterSupplierChange(value: number): void {
+    public async onWaterSupplierChange(value: number): Promise<void> {
         this.selectedWaterSupplierId = value;
         this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === value);
         this.model.waterSupplier = { id: value };
-        this.loadInsuranceCheck();
+
+        this.isLoading = true;
+
+        try {
+            await this.loadInsuranceCheck();
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public onCommentsChange(value: string | undefined): void {

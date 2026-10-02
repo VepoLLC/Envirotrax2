@@ -546,11 +546,21 @@ export class BackflowTestSubmitComponent implements OnInit {
         this.model.bpatLicenseExpiration = this.selectedBpat?.bpatLicenseExpirationDate;
     }
 
-    public onWaterSupplierChange(value: number): void {
+    public async onWaterSupplierChange(value: number): Promise<void> {
         this.selectedWaterSupplierId = value;
         this.selectedWaterSupplier = this._waterSuppliers.find(s => s.waterSupplier?.id === value);
-        this.loadAdditionalInfoSettings();
-        this.loadInsuranceCheck();
+
+        this.isLoading = true;
+
+        try {
+            await this.loadSupplierData();
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    private async loadSupplierData(): Promise<void> {
+        await Promise.all([this.loadAdditionalInfoSettings(), this.loadInsuranceCheck()]);
     }
 
     private async loadAdditionalInfoSettings(): Promise<void> {
@@ -662,7 +672,7 @@ export class BackflowTestSubmitComponent implements OnInit {
             await this.setDefaults();
 
             if (this.site) {
-                this.applySiteWaterSupplier(this.site);
+                await this.applySiteWaterSupplier(this.site);
             }
         } finally {
             this.isLoading = false;
@@ -689,8 +699,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         if (this._waterSuppliers.length === 1) {
             this.selectedWaterSupplierId = this._waterSuppliers[0].waterSupplier?.id;
             this.selectedWaterSupplier = this._waterSuppliers[0];
-            await this.loadAdditionalInfoSettings();
-            await this.loadInsuranceCheck();
+            await this.loadSupplierData();
         }
         const validGauges = this._gauges.filter(g => g.expirationType !== GaugeExpirationType.Expired);
         if (validGauges.length === 1) {
@@ -762,7 +771,7 @@ export class BackflowTestSubmitComponent implements OnInit {
 
             const test = await this._backflowTestService.getForProfessional(testId);
             this.editingTestId = testId;
-            this.populateForEdit(test);
+            await this.populateForEdit(test);
 
             if (test.site?.id) {
                 this.site = await this._siteService.getForProfessional(test.site.id);
@@ -772,7 +781,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         }
     }
 
-    private populateForEdit(test: BackflowTest): void {
+    private async populateForEdit(test: BackflowTest): Promise<void> {
         this.model = { ...test };
 
         this.selectedBpatId = test.bpat?.id;
@@ -780,10 +789,6 @@ export class BackflowTestSubmitComponent implements OnInit {
 
         this.selectedWaterSupplierId = test.waterSupplier?.id;
         this.selectedWaterSupplier = this._waterSuppliers.find(ws => ws.waterSupplier?.id === test.waterSupplier?.id);
-        if (this.selectedWaterSupplierId) {
-            this.loadAdditionalInfoSettings();
-            this.loadInsuranceCheck();
-        }
 
         this.selectedGauge = this._gauges.find(g =>
             g.manufacturer === test.gaugeManufacturer &&
@@ -806,6 +811,10 @@ export class BackflowTestSubmitComponent implements OnInit {
         this.repairRV2 = this.deserializeRV(test.repairRV2);
         this.repairPvbAirInlet = this.deserializePvb(test.repairPvbAirInlet);
         this.repairPvbCV = this.deserializePvb(test.repairPvbCV);
+
+        if (this.selectedWaterSupplierId) {
+            await this.loadSupplierData();
+        }
     }
 
     private deserializeCV(text: string | undefined): typeof this.repairCV1 {
@@ -847,14 +856,14 @@ export class BackflowTestSubmitComponent implements OnInit {
         };
     }
 
-    private applySiteWaterSupplier(site: Site): void {
+    private async applySiteWaterSupplier(site: Site): Promise<void> {
         const siteWsId = site.waterSupplier?.id;
 
         if (siteWsId && this._waterSuppliers.some(ws => ws.waterSupplier?.id === siteWsId)) {
             this.selectedWaterSupplierId = siteWsId;
             this.selectedWaterSupplier = this._waterSuppliers.find(s => s.waterSupplier?.id === siteWsId);
-            this.loadAdditionalInfoSettings();
-            this.loadInsuranceCheck();
+
+            await this.loadSupplierData();
         }
     }
 

@@ -2,16 +2,18 @@ BEGIN TRAN
 
 BEGIN TRY
 
+    SET IDENTITY_INSERT WaterSuppliers ON;
+
     -- Insert water suppliers that don't have parents
     INSERT INTO WaterSuppliers
-        ([Name], Domain, LegacyRecordId, ParentId,
+        (Id, [Name], Domain, LegacyRecordId, ParentId,
          PwsId, ContactName, Address, City, StateId, ZipCode, PhoneNumber, FaxNumber, EmailAddress,
          LetterCompanyName, LetterContactName, LetterAddress, LetterCity, LetterStateId, LetterZipCode,
          LetterContactCompanyName, LetterContactContactName, LetterContactAddress, LetterContactCity,
          LetterContactStateId, LetterContactZipCode, LetterContactPhoneNumber, LetterContactFaxNumber, LetterContactEmailAddress,
          GisCenterLatitude, GisCenterLongitude, GisCenterZoom, IsActive, CreatedTime)
     SELECT
-        legacyWaterSuppliers.[Name], legacyWaterSuppliers.Subdomain, legacyWaterSuppliers.ID, NULL,
+        legacyWaterSuppliers.ID, legacyWaterSuppliers.[Name], legacyWaterSuppliers.Subdomain, legacyWaterSuppliers.ID, NULL,
         legacyWaterSuppliers.PwsID, legacyWaterSuppliers.ContactName, legacyWaterSuppliers.Address, legacyWaterSuppliers.City, states.Id, legacyWaterSuppliers.ZIP,
         legacyWaterSuppliers.PhoneNumber, legacyWaterSuppliers.FaxNumber, legacyWaterSuppliers.EmailAddress,
         legacyWaterSuppliers.LetterCompanyName, legacyWaterSuppliers.LetterContactName, legacyWaterSuppliers.LetterAddress, legacyWaterSuppliers.LetterCity,
@@ -40,14 +42,14 @@ BEGIN TRY
     WHILE @@ROWCOUNT > 0
     BEGIN
         INSERT INTO WaterSuppliers
-            ([Name], Domain, LegacyRecordId, ParentId,
+            (Id, [Name], Domain, LegacyRecordId, ParentId,
              PwsId, ContactName, Address, City, StateId, ZipCode, PhoneNumber, FaxNumber, EmailAddress,
              LetterCompanyName, LetterContactName, LetterAddress, LetterCity, LetterStateId, LetterZipCode,
              LetterContactCompanyName, LetterContactContactName, LetterContactAddress, LetterContactCity,
              LetterContactStateId, LetterContactZipCode, LetterContactPhoneNumber, LetterContactFaxNumber, LetterContactEmailAddress,
              GisCenterLatitude, GisCenterLongitude, GisCenterZoom, IsActive, CreatedTime)
         SELECT
-            legacyWaterSuppliers.[Name], legacyWaterSuppliers.Subdomain, legacyWaterSuppliers.ID, parents.Id,
+            legacyWaterSuppliers.ID, legacyWaterSuppliers.[Name], legacyWaterSuppliers.Subdomain, legacyWaterSuppliers.ID, parents.Id,
             legacyWaterSuppliers.PwsID, legacyWaterSuppliers.ContactName, legacyWaterSuppliers.Address, legacyWaterSuppliers.City, states.Id, legacyWaterSuppliers.ZIP,
             legacyWaterSuppliers.PhoneNumber, legacyWaterSuppliers.FaxNumber, legacyWaterSuppliers.EmailAddress,
             legacyWaterSuppliers.LetterCompanyName, legacyWaterSuppliers.LetterContactName, legacyWaterSuppliers.LetterAddress, legacyWaterSuppliers.LetterCity,
@@ -71,6 +73,8 @@ BEGIN TRY
             WHERE alreadyInserted.LegacyRecordId = legacyWaterSuppliers.ID
         )
     END
+
+    SET IDENTITY_INSERT WaterSuppliers OFF;
 
     COMMIT TRAN
 

@@ -2,6 +2,9 @@ import { Injectable } from "@angular/core";
 import { InputOption } from "@envirotrax/common-ui";
 import {
     FogInspectionResult,
+    fogReasonForInspectionLabels,
+    FogReasonForInspection,
+    InterceptorCapacityType,
     InterceptorType
 } from "../../models/fog/fog-inspection";
 import { FacilityType, PropertyType } from "../../models/sites/site";
@@ -11,7 +14,6 @@ import { FacilityType, PropertyType } from "../../models/sites/site";
 })
 export class FogInspectionOptionsService {
     public readonly facilityTypeOptions: InputOption[] = [
-        { id: '', text: 'Any Type' },
         { id: String(FacilityType.Restaurant), text: 'Restaurant' },
         { id: String(FacilityType.FastFoodEstablishment), text: 'Fast Food Establishment' },
         { id: String(FacilityType.HotelMotel), text: 'Hotel/Motel' },
@@ -26,13 +28,50 @@ export class FogInspectionOptionsService {
         { id: String(FacilityType.Other), text: 'Other' }
     ];
 
-    public readonly interceptorTypeOptions: InputOption[] = [
+    public readonly facilityTypeFilterOptions: InputOption[] = [
         { id: '', text: 'Any Type' },
+        ...this.facilityTypeOptions
+    ];
+
+    public readonly reasonOptions: InputOption[] = [
+        {
+            id: String(FogReasonForInspection.Scheduled),
+            text: fogReasonForInspectionLabels[FogReasonForInspection.Scheduled]
+        },
+        {
+            id: String(FogReasonForInspection.Unscheduled),
+            text: fogReasonForInspectionLabels[FogReasonForInspection.Unscheduled]
+        },
+        {
+            id: String(FogReasonForInspection.Complaint),
+            text: fogReasonForInspectionLabels[FogReasonForInspection.Complaint]
+        }
+    ];
+
+    public readonly sampledFromOptions: InputOption[] = [
+        { id: 'Inlet Chamber', text: 'Inlet Chamber' },
+        { id: 'Outlet Chamber', text: 'Outlet Chamber' },
+        { id: 'Sampling Well', text: 'Sampling Well' },
+        { id: 'Clean-Out', text: 'Clean-Out' },
+        { id: 'Outfall Tee', text: 'Outfall Tee' }
+    ];
+
+    public readonly interceptorTypeOptions: InputOption[] = [
         { id: InterceptorType.GreaseTrap, text: 'Grease Trap' },
         { id: InterceptorType.GritTrap, text: 'Grit Trap' },
         { id: InterceptorType.SepticTank, text: 'Septic Tank' },
         { id: InterceptorType.ChemicalToilet, text: 'Chemical Toilet' },
         { id: InterceptorType.Other, text: 'Other' }
+    ];
+
+    public readonly interceptorTypeFilterOptions: InputOption[] = [
+        { id: '', text: 'Any Type' },
+        ...this.interceptorTypeOptions
+    ];
+
+    public readonly capacityTypeOptions: InputOption[] = [
+        { id: InterceptorCapacityType.Gallons, text: 'Gallons' },
+        { id: InterceptorCapacityType.CubicYards, text: 'Cubic Yards' }
     ];
 
     public readonly totalCapacityOptions: InputOption[] = [

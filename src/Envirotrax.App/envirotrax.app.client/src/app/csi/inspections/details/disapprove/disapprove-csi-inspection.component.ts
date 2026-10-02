@@ -61,7 +61,7 @@ export class DisapproveCsiInspectionComponent {
         });
 
         const nl = '%0D%0A';
-        const cityStateZip = [updated.propertyCity, updated.propertyState, updated.propertyZip]
+        const cityStateZip = [updated.propertyCity, updated.propertyState?.code, updated.propertyZip]
             .filter(Boolean).join(' ');
 
         const body = `The following CSI certificate has been disapproved by ${wsName} on ${dateStr}.${nl}${nl}` +

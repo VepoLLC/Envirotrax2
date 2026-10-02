@@ -15,6 +15,7 @@ import { CheckoutService } from '../../../shared/services/professionals/checkout
 import { Professional } from '../../../shared/models/professionals/professional';
 import { ExpirationType, ProfessionalUser } from '../../../shared/models/professionals/professional-user';
 import { ProfessionalWaterSupplier } from '../../../shared/models/professionals/professional-water-supplier';
+import { InsuranceCheck, InsuranceCheckResult } from '../../../shared/models/professionals/insurance-check';
 import { BackflowGauge, GaugeExpirationType } from '../../../shared/models/backflow/backflow-gauge';
 import { BackflowTestResult, BackflowReasonForTest, BackflowDeviceType } from '../../../shared/models/backflow/backflow-test-enums';
 import { MAX_PAGE_SIZE } from '../../../shared/models/page-info';
@@ -36,6 +37,7 @@ export class BackflowTestSubmitComponent implements OnInit {
     public selectedBpat?: ProfessionalUser;
     public selectedWaterSupplier?: ProfessionalWaterSupplier;
     public selectedGauge?: BackflowGauge;
+    public insuranceCheck?: InsuranceCheck;
     public previousTest?: BackflowTest;
 
     public site: Site | null = null;
@@ -153,14 +155,27 @@ export class BackflowTestSubmitComponent implements OnInit {
         if (!this.selectedBpatId || !this.selectedWaterSupplierId || (!this.isAirGap && !this.selectedGaugeId)) {
             return false;
         }
+
+        if (!this.insuranceCheck?.isSatisfied) {
+            return false;
+        }
+
         if (this.selectedBpat?.bpatLicenseExpirationType === ExpirationType.Expired
-            || this.professional?.insuranceExpirationType === ExpirationType.Expired
             || this.selectedGauge?.expirationType === GaugeExpirationType.Expired
         ) {
             return false;
         }
 
         return true;
+    }
+
+    public get showInsuranceRow(): boolean {
+        return !!this.insuranceCheck && this.insuranceCheck.result !== InsuranceCheckResult.NotRequired;
+    }
+
+    public get insuranceAboutToExpire(): boolean {
+        return this.insuranceCheck?.result === InsuranceCheckResult.Valid
+            && this.professional?.insuranceExpirationType === ExpirationType.AboutToExpire;
     }
     public get isAirGap(): boolean { return this.model.deviceType === BackflowDeviceType.AG; }
     public get today(): Date { return new Date(); }
@@ -531,10 +546,21 @@ export class BackflowTestSubmitComponent implements OnInit {
         this.model.bpatLicenseExpiration = this.selectedBpat?.bpatLicenseExpirationDate;
     }
 
-    public onWaterSupplierChange(value: number): void {
+    public async onWaterSupplierChange(value: number): Promise<void> {
         this.selectedWaterSupplierId = value;
         this.selectedWaterSupplier = this._waterSuppliers.find(s => s.waterSupplier?.id === value);
-        this.loadAdditionalInfoSettings();
+
+        this.isLoading = true;
+
+        try {
+            await this.loadSupplierData();
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    private async loadSupplierData(): Promise<void> {
+        await Promise.all([this.loadAdditionalInfoSettings(), this.loadInsuranceCheck()]);
     }
 
     private async loadAdditionalInfoSettings(): Promise<void> {
@@ -542,6 +568,22 @@ export class BackflowTestSubmitComponent implements OnInit {
             this.additionalInfoSettings = await this._settingsService.getTestingSettings(this.selectedWaterSupplierId);
         } else {
             this.additionalInfoSettings = null;
+        }
+    }
+
+    private async loadInsuranceCheck(): Promise<void> {
+        const waterSupplierId = this.selectedWaterSupplierId;
+
+        this.insuranceCheck = undefined;
+
+        if (!waterSupplierId) {
+            return;
+        }
+
+        const check = await this._backflowTestService.getInsuranceCheck(waterSupplierId);
+
+        if (this.selectedWaterSupplierId === waterSupplierId) {
+            this.insuranceCheck = check;
         }
     }
 
@@ -630,7 +672,7 @@ export class BackflowTestSubmitComponent implements OnInit {
             await this.setDefaults();
 
             if (this.site) {
-                this.applySiteWaterSupplier(this.site);
+                await this.applySiteWaterSupplier(this.site);
             }
         } finally {
             this.isLoading = false;
@@ -657,7 +699,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         if (this._waterSuppliers.length === 1) {
             this.selectedWaterSupplierId = this._waterSuppliers[0].waterSupplier?.id;
             this.selectedWaterSupplier = this._waterSuppliers[0];
-            await this.loadAdditionalInfoSettings();
+            await this.loadSupplierData();
         }
         const validGauges = this._gauges.filter(g => g.expirationType !== GaugeExpirationType.Expired);
         if (validGauges.length === 1) {
@@ -729,7 +771,7 @@ export class BackflowTestSubmitComponent implements OnInit {
 
             const test = await this._backflowTestService.getForProfessional(testId);
             this.editingTestId = testId;
-            this.populateForEdit(test);
+            await this.populateForEdit(test);
 
             if (test.site?.id) {
                 this.site = await this._siteService.getForProfessional(test.site.id);
@@ -739,7 +781,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         }
     }
 
-    private populateForEdit(test: BackflowTest): void {
+    private async populateForEdit(test: BackflowTest): Promise<void> {
         this.model = { ...test };
 
         this.selectedBpatId = test.bpat?.id;
@@ -747,9 +789,6 @@ export class BackflowTestSubmitComponent implements OnInit {
 
         this.selectedWaterSupplierId = test.waterSupplier?.id;
         this.selectedWaterSupplier = this._waterSuppliers.find(ws => ws.waterSupplier?.id === test.waterSupplier?.id);
-        if (this.selectedWaterSupplierId) {
-            this.loadAdditionalInfoSettings();
-        }
 
         this.selectedGauge = this._gauges.find(g =>
             g.manufacturer === test.gaugeManufacturer &&
@@ -772,6 +811,10 @@ export class BackflowTestSubmitComponent implements OnInit {
         this.repairRV2 = this.deserializeRV(test.repairRV2);
         this.repairPvbAirInlet = this.deserializePvb(test.repairPvbAirInlet);
         this.repairPvbCV = this.deserializePvb(test.repairPvbCV);
+
+        if (this.selectedWaterSupplierId) {
+            await this.loadSupplierData();
+        }
     }
 
     private deserializeCV(text: string | undefined): typeof this.repairCV1 {
@@ -813,13 +856,14 @@ export class BackflowTestSubmitComponent implements OnInit {
         };
     }
 
-    private applySiteWaterSupplier(site: Site): void {
+    private async applySiteWaterSupplier(site: Site): Promise<void> {
         const siteWsId = site.waterSupplier?.id;
 
         if (siteWsId && this._waterSuppliers.some(ws => ws.waterSupplier?.id === siteWsId)) {
             this.selectedWaterSupplierId = siteWsId;
             this.selectedWaterSupplier = this._waterSuppliers.find(s => s.waterSupplier?.id === siteWsId);
-            this.loadAdditionalInfoSettings();
+
+            await this.loadSupplierData();
         }
     }
 

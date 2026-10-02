@@ -1,15 +1,20 @@
 
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Transactions;
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Professionals;
+using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
+using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
+using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
+using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Professionals;
@@ -18,23 +23,34 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
 {
     private static readonly string[] AllowedFileExtensions = [".jpg", ".jpeg", ".gif", ".png", ".bmp", ".pdf"];
 
+    private static readonly InsuranceCheckResult[] PolicyResultPriority =
+    [
+        InsuranceCheckResult.Valid,
+        InsuranceCheckResult.InvalidCoverage,
+        InsuranceCheckResult.Unverified,
+        InsuranceCheckResult.Expired
+    ];
+
     private readonly IProfessionalInsuranceRepository _insuranceRepository;
     private readonly IFileStorageService _fileStorageService;
     private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly IAuthService _authService;
+    private readonly IGeneralSettingsService _generalSettingsService;
 
     public ProfessionalInsuranceService(
         IMapper mapper,
         IProfessionalInsuranceRepository repository,
         IFileStorageService fileStorageService,
         ITimeZoneHelperService timeZoneHelper,
-        IAuthService authService)
+        IAuthService authService,
+        IGeneralSettingsService generalSettingsService)
         : base(mapper, repository)
     {
         _insuranceRepository = repository;
         _fileStorageService = fileStorageService;
         _timeZoneHelper = timeZoneHelper;
         _authService = authService;
+        _generalSettingsService = generalSettingsService;
     }
 
     protected override ProfessionalInsuranceDto? MapToDto(ProfessionalInsurance? model)
@@ -123,6 +139,104 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         }
 
         return admins.GetValueOrDefault(insurance.ProfessionalId);
+    }
+
+    public async Task<InsuranceCheckDto> CheckForWaterSupplierAsync(int professionalId, int waterSupplierId, ProfessionalType professionalType, CancellationToken cancellationToken)
+    {
+        var settings = await _generalSettingsService.GetAsync(waterSupplierId, cancellationToken);
+        var (isRequired, requiredAmount) = GetInsuranceRequirement(settings, professionalType);
+
+        if (!isRequired)
+        {
+            return CreateInsuranceCheck(InsuranceCheckResult.NotRequired, requiredAmount);
+        }
+
+        var insurances = await GetAllByProfessionalIdsAsync([professionalId], cancellationToken);
+
+        var policyResults = insurances[professionalId]
+            .Select(insurance => GetPolicyResult(insurance, requiredAmount))
+            .ToList();
+
+        return CreateInsuranceCheck(SummarizePolicyResults(policyResults), requiredAmount);
+    }
+
+    public async Task EnsureSatisfiedForWaterSupplierAsync(int professionalId, int waterSupplierId, ProfessionalType professionalType, CancellationToken cancellationToken)
+    {
+        var check = await CheckForWaterSupplierAsync(professionalId, waterSupplierId, professionalType, cancellationToken);
+
+        if (!check.IsSatisfied)
+        {
+            throw new AppValidationException(check.Message!);
+        }
+    }
+
+    private static (bool IsRequired, decimal Amount) GetInsuranceRequirement(GeneralSettingsDto? settings, ProfessionalType professionalType)
+    {
+        if (settings == null)
+        {
+            return (false, 0);
+        }
+
+        return professionalType switch
+        {
+            ProfessionalType.Bpat => (settings.BpatsRequireInsurance, settings.BpatsRequireInsuranceAmount),
+            ProfessionalType.CsiInspector => (settings.CsiInspectorsRequireInsurance, settings.CsiInspectorsRequireInsuranceAmount),
+            ProfessionalType.FogTransporter => (settings.FogTransportersRequireInsurance, settings.FogTransportersRequireInsuranceAmount),
+            _ => (false, 0)
+        };
+    }
+
+    private static InsuranceCheckResult GetPolicyResult(ProfessionalInsuranceDto insurance, decimal requiredAmount)
+    {
+        if (insurance.ExpirationDate == null)
+        {
+            return InsuranceCheckResult.Unverified;
+        }
+
+        if (insurance.ExpirationType == ExpirationType.Expired)
+        {
+            return InsuranceCheckResult.Expired;
+        }
+
+        return (insurance.CoverageAmount ?? 0) >= requiredAmount
+            ? InsuranceCheckResult.Valid
+            : InsuranceCheckResult.InvalidCoverage;
+    }
+
+    private static InsuranceCheckResult SummarizePolicyResults(IReadOnlyCollection<InsuranceCheckResult> policyResults)
+    {
+        foreach (var result in PolicyResultPriority)
+        {
+            if (policyResults.Contains(result))
+            {
+                return result;
+            }
+        }
+
+        return InsuranceCheckResult.NotFound;
+    }
+
+    private static InsuranceCheckDto CreateInsuranceCheck(InsuranceCheckResult result, decimal requiredAmount)
+    {
+        return new InsuranceCheckDto
+        {
+            Result = result,
+            RequiredAmount = requiredAmount,
+            Message = GetInsuranceCheckMessage(result, requiredAmount)
+        };
+    }
+
+    private static string? GetInsuranceCheckMessage(InsuranceCheckResult result, decimal requiredAmount)
+    {
+        return result switch
+        {
+            InsuranceCheckResult.NotFound => "No insurance policy found",
+            InsuranceCheckResult.Unverified => "Insurance policy awaiting validation...",
+            InsuranceCheckResult.Expired => "Expired insurance policy",
+            InsuranceCheckResult.InvalidCoverage => $"Requires ${requiredAmount.ToString("#,0", CultureInfo.InvariantCulture)} in insurance coverage",
+            InsuranceCheckResult.Valid => "Insurance policy valid",
+            _ => null
+        };
     }
 
     public async Task<ProfessionalInsuranceDto> AddAsync(Stream fileStream, string originalFileName, ProfessionalInsuranceDto dto)

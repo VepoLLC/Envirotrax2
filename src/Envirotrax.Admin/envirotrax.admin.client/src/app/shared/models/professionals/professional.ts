@@ -11,6 +11,7 @@ export interface Professional {
     zipCode?: string;
     phoneNumber?: string;
     faxNumber?: string;
+    cellPhoneNumber?: string;
     webSiteUrl?: string;
     hidePublicListing?: boolean;
     hasWiseGuys?: boolean;

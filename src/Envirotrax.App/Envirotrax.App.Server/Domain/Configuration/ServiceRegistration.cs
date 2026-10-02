@@ -64,6 +64,8 @@ public static class ServiceRegistration
         services.AddTransient<ICsiInspectionService, CsiInspectionService>();
         services.AddTransient<ICsiInspectionImageService, CsiInspectionImageService>();
         services.AddTransient<ICsiInspectionAssemblyService, CsiInspectionAssemblyService>();
+        services.AddTransient<ICsiCheckoutService, CsiCheckoutService>();
+        services.AddTransient<ICsiCheckoutEmailService, CsiCheckoutEmailService>();
         services.AddTransient<IRecordLogService, RecordLogService>();
         services.AddTransient<ICsiInspectorService, CsiInspectorService>();
         services.AddTransient<ICsiInspectorAccountService, CsiInspectorAccountService>();
@@ -71,8 +73,11 @@ public static class ServiceRegistration
         services.AddTransient<IFogInspectorService, FogInspectorService>();
         services.AddTransient<IFogTransporterService, FogTransporterService>();
         services.AddTransient<IFogInspectionService, FogInspectionService>();
+        services.AddTransient<IFogInspectionCheckoutService, FogInspectionCheckoutService>();
         services.AddTransient<IBackflowTesterService, BackflowTesterService>();
         services.AddTransient<IBackflowTestService, BackflowTestService>();
+        services.AddTransient<IBackflowCheckoutService, BackflowCheckoutService>();
+        services.AddTransient<IBackflowCheckoutEmailService, BackflowCheckoutEmailService>();
         services.AddTransient<IBackflowTestReportService, BackflowTestReportService>();
         services.AddTransient<IBackflowComplianceReportService, BackflowComplianceReportService>();
         services.AddTransient<IBackflowComplianceSnapshotService, BackflowComplianceSnapshotService>();
@@ -84,6 +89,8 @@ public static class ServiceRegistration
         services.AddTransient<IFogTransporterDisposalSiteService, FogTransporterDisposalSiteService>();
         services.AddTransient<IFogDisposalSiteService, FogDisposalSiteService>();
         services.AddTransient<IFogTripTicketService, FogTripTicketService>();
+        services.AddTransient<IFogTripTicketCheckoutService, FogTripTicketCheckoutService>();
+        services.AddTransient<IFogTripTicketCheckoutEmailService, FogTripTicketCheckoutEmailService>();
         services.AddTransient<IFogSettingsService, FogSettingsService>();
         services.AddTransient<IFogSystemReportService, FogSystemReportService>();
         services.AddTransient<ILookupService, LookupService>();
@@ -91,6 +98,7 @@ public static class ServiceRegistration
         services.AddTransient<ICsiSettingsService, CsiSettingsService>();
         services.AddTransient<IBackflowSettingsService, BackflowSettingsService>();
         services.AddTransient<IBackflowRenewalRequirementService, BackflowRenewalRequirementService>();
+        services.AddTransient<ISettingsCopyService, SettingsCopyService>();
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IUserRoleService, UserRoleService>();
         services.AddTransient<IRolePermissionService, RolePermissionService>();
@@ -119,7 +127,8 @@ public static class ServiceRegistration
         services.AddHttpClient<IGeocodingService, GeocodingService>();
 
         services.Configure<AuthorizeNetOptions>(configuration.GetSection("AuthorizeNet"));
-        services.AddHttpClient<IAuthorizeNetPaymentService, AuthorizeNetPaymentService>();
+        services.AddHttpClient<IAuthorizeNetPaymentService, AuthorizeNetPaymentService>(client => client.Timeout = TimeSpan.FromSeconds(60));
+        services.AddTransient<IProfessionalPaymentService, ProfessionalPaymentService>();
 
         services.AddEmailService(configuration.GetSection("Email"), opts =>
         {

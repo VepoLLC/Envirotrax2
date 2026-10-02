@@ -7,7 +7,9 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { CsiInspection } from "../../models/csi/csi-inspection";
+import { ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../../models/payments/professional-checkout";
 import { CsiInspectionImage } from "../../models/csi/csi-inspection-image";
+import { InsuranceCheck } from "../../models/professionals/insurance-check";
 import { CsiInspectionAssembly, CsiInspectionAssemblyRequest } from "../../models/csi/csi-inspection-assembly";
 import { DownloadEndpoint } from "../../models/download-config";
 import { RecordLog } from "@envirotrax/common-ui";
@@ -96,6 +98,11 @@ export class CsiInspectionService {
         return lastValueFrom(this._http.get<CsiInspection>(url));
     }
 
+    public getInsuranceCheck(waterSupplierId: number): Promise<InsuranceCheck> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/csi/inspections/insurance-check');
+        return lastValueFrom(this._http.get<InsuranceCheck>(url, { params: { waterSupplierId } }));
+    }
+
     public submit(inspection: CsiInspection): Promise<CsiInspection> {
         const url = this._urlResolver.resolveUrl('/api/professionals/csi/inspections/submit');
         return lastValueFrom(this._http.post<CsiInspection>(url, inspection));
@@ -133,6 +140,11 @@ export class CsiInspectionService {
     public getPdfForProfessional(id: number): Promise<Blob> {
         const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${id}/pdf`);
         return lastValueFrom(this._http.get(url, { responseType: 'blob' }));
+    }
+
+    public checkout(request: ProfessionalCheckoutRequest): Promise<ProfessionalCheckoutReceipt<CsiInspection>> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/csi/inspections/checkout');
+        return lastValueFrom(this._http.post<ProfessionalCheckoutReceipt<CsiInspection>>(url, request));
     }
 
     public getImages(inspectionId: number): Promise<CsiInspectionImage[]> {

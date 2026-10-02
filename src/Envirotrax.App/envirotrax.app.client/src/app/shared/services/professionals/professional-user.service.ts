@@ -3,7 +3,7 @@ import { UrlResolverService } from "../helpers/url-resolver.service";
 import { QueryHelperService } from "../helpers/query-helper.service";
 import { HttpClient } from "@angular/common/http";
 import { ProfessionalUser } from "../../models/professionals/professional-user";
-import { lastValueFrom, Observable } from "rxjs";
+import { lastValueFrom, Observable, shareReplay } from "rxjs";
 import { ProfesisonalService } from "./professional.service";
 import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
@@ -31,7 +31,7 @@ export class ProfesionalUserService {
         const url = this._urlResolver.resolveUrl('/api/professionals/users/my');
 
         if (!this._currentUser$) {
-            this._currentUser$ = this._http.get<ProfessionalUser>(url);
+            this._currentUser$ = this._http.get<ProfessionalUser>(url).pipe(shareReplay(1));
         }
 
         return lastValueFrom(this._currentUser$);

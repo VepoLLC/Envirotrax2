@@ -1,5 +1,6 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Models.Logs;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Microsoft.AspNetCore.Mvc;
@@ -36,6 +37,29 @@ public class FogInspectionController : AdminBaseController
     public async Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
     {
         var inspection = await _inspectionService.GetAsync(id, cancellationToken);
+
+        return inspection == null ? NotFound() : Ok(inspection);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAsync(int id, [FromBody] FogInspectionAdminUpdateRequest request)
+    {
+        var inspection = await _inspectionService.UpdateForAdminAsync(id, request);
+
+        return inspection == null ? NotFound() : Ok(inspection);
+    }
+
+    [HttpPost("{id}/images/{imageType}")]
+    public async Task<IActionResult> UploadImageAsync(int id, string imageType, [FromForm] IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest("No file provided.");
+        }
+
+        await using var stream = file.OpenReadStream();
+
+        var inspection = await _inspectionService.UpdateImageForAdminAsync(id, imageType, stream, file.FileName);
 
         return inspection == null ? NotFound() : Ok(inspection);
     }

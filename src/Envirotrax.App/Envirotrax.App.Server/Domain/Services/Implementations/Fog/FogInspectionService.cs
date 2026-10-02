@@ -22,6 +22,12 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
 {
     private static readonly string[] AllowedFileExtensions = [".jpg", ".jpeg", ".gif", ".png", ".bmp", ".tiff"];
 
+    private static readonly HashSet<string> ValidImageTypes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "exterior",
+        "interior"
+    };
+
     private readonly IFogInspectionRepository _repository;
     private readonly IProfessionalService _professionalService;
     private readonly IProfessionalUserService _professionalUserService;
@@ -212,6 +218,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         var registration = await _professionalSupplierService.GetAsync(inspection.WaterSupplierId, cancellationToken);
 
         inspection.Amount = registration?.FogInspectorFee ?? settings?.FogInspectorFee ?? 0;
+        inspection.AmountShare = settings?.FogInspectorFeeWsShare ?? 0;
     }
 
     // Checkout "Edit" on an own, still-unpaid inspection: mirrors SubmitAsync's field list and snapshot
@@ -415,6 +422,88 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         inspection.MailingEmailAddress = site.MailingEmailAddress;
     }
 
+
+    public async Task<FogInspectionDto?> UpdateForAdminAsync(int id, FogInspectionAdminUpdateRequest request)
+    {
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            var saved = await _repository.UpdateForAdminAsync(id, request);
+
+            if (saved == null)
+            {
+                return null;
+            }
+
+            scope.Complete();
+        }
+
+        var updated = await _repository.GetAsync(id, default);
+
+        var dto = Mapper.Map<FogInspectionDto>(updated);
+        await PopulateImageUrlsAsync(dto);
+
+        return dto;
+    }
+
+    public async Task<FogInspectionDto?> UpdateImageForAdminAsync(int id, string imageType, Stream fileStream, string fileName)
+    {
+        if (!ValidImageTypes.Contains(imageType))
+        {
+            throw new ValidationException("Invalid image type.");
+        }
+
+        var existing = await _repository.GetAsync(id, default);
+
+        if (existing == null)
+        {
+            return null;
+        }
+
+        var oldPath = GetImagePath(existing, imageType);
+
+        var newPath = $"fog-inspections/{id}/{imageType.ToLowerInvariant()}/{Guid.NewGuid()}{ValidateAndGetExtension(fileName)}";
+
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            var saved = await _repository.UpdateImagePathAsync(id, GetImagePathPropertyName(imageType), newPath);
+
+            if (saved == null)
+            {
+                return null;
+            }
+
+            await _fileStorageService.UploadAsync(newPath, fileStream);
+
+            scope.Complete();
+        }
+
+        if (!string.IsNullOrWhiteSpace(oldPath))
+        {
+            await _fileStorageService.DeleteAsync(oldPath);
+        }
+
+        var updated = await _repository.GetAsync(id, default);
+
+        var dto = Mapper.Map<FogInspectionDto>(updated);
+        await PopulateImageUrlsAsync(dto);
+
+        return dto;
+    }
+
+    private static string? GetImagePath(FogInspection inspection, string imageType) => imageType.ToLowerInvariant() switch
+    {
+        "exterior" => inspection.ExteriorImagePath,
+        "interior" => inspection.InteriorImagePath,
+        _ => null
+    };
+
+    private static string GetImagePathPropertyName(string imageType) => imageType.ToLowerInvariant() switch
+    {
+        "exterior" => nameof(FogInspection.ExteriorImagePath),
+        "interior" => nameof(FogInspection.InteriorImagePath),
+        _ => throw new ValidationException("Invalid image type.")
+    };
+
     private static void ApplyInspectorSnapshot(
         FogInspection inspection,
         ProfessionalDto professional,
@@ -431,6 +520,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         inspection.InspectorState = professional.State?.Name;
         inspection.InspectorZip = professional.ZipCode;
         inspection.InspectorWorkNumber = professional.PhoneNumber;
+        inspection.InspectorCellNumber = inspectorUser?.PhoneNumber;
         inspection.InspectorFaxNumber = professional.FaxNumber;
     }
 }

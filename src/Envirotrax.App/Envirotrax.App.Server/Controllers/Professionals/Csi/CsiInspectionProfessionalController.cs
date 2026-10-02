@@ -1,5 +1,6 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Payments;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -14,10 +15,19 @@ namespace Envirotrax.App.Server.Controllers.Professionals.Csi;
 public class CsiInspectionProfessionalController : ProfessionalProtectedController
 {
     private readonly ICsiInspectionService _inspectionService;
+    private readonly ICsiCheckoutService _checkoutService;
 
-    public CsiInspectionProfessionalController(ICsiInspectionService inspectionService)
+    public CsiInspectionProfessionalController(ICsiInspectionService inspectionService, ICsiCheckoutService checkoutService)
     {
         _inspectionService = inspectionService;
+        _checkoutService = checkoutService;
+    }
+
+    [HttpGet("insurance-check")]
+    public async Task<IActionResult> GetInsuranceCheckAsync([FromQuery] int waterSupplierId, CancellationToken cancellationToken)
+    {
+        var result = await _inspectionService.GetInsuranceCheckAsync(waterSupplierId, cancellationToken);
+        return Ok(result);
     }
 
     [HttpGet("{id}")]
@@ -71,5 +81,17 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
     {
         var result = await _inspectionService.DeleteAsync(id);
         return result == null ? NotFound() : Ok(result);
+    }
+
+    [HttpPost("checkout")]
+    public async Task<IActionResult> CheckoutAsync([FromBody] ProfessionalCheckoutRequestDto request, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
+
+        var receipt = await _checkoutService.CheckoutAsync(request, cancellationToken);
+        return Ok(receipt);
     }
 }

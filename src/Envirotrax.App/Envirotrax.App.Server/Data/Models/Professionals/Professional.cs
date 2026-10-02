@@ -5,6 +5,7 @@ using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Envirotrax.App.Server.Data.Models.Professionals;
 
@@ -41,6 +42,9 @@ public class Professional : IAuditableModel<AppUser>
     [StringLength(50)]
     public string? FaxNumber { get; set; }
 
+    [StringLength(50)]
+    public string? CellPhoneNumber { get; set; }
+
     [StringLength(255)]
     public string? WebSiteUrl { get; set; }
 
@@ -63,4 +67,12 @@ public class Professional : IAuditableModel<AppUser>
     public DateTime? DeletedTime { get; set; }
     [Precision(19, 4)]
     public decimal AccountBalance { get; set; }
+}
+
+public class ProfessionalConfiguration : IEntityTypeConfiguration<Professional>
+{
+    public void Configure(EntityTypeBuilder<Professional> builder)
+    {
+        builder.ToTable(table => table.HasCheckConstraint("CK_Professionals_AccountBalance_NonNegative", "[AccountBalance] >= 0"));
+    }
 }

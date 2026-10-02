@@ -45,6 +45,7 @@ namespace Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers
         public decimal FogTransportFee { get; set; }
         public decimal FogTransportFeeWsShare { get; set; }
         public decimal FogInspectorFee { get; set; }
+        public decimal FogInspectorFeeWsShare { get; set; }
 
         public bool RequireBackflowTestImages { get; set; }
         public bool RequireCsiInspectionImages { get; set; }

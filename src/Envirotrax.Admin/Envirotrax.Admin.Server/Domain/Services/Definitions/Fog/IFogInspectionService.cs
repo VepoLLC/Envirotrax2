@@ -10,5 +10,9 @@ public interface IFogInspectionService
 
     Task<FogInspectionDto?> GetAsync(int id, CancellationToken cancellationToken);
 
+    Task<FogInspectionDto?> UpdateAsync(int id, int waterSupplierId, FogInspectionUpdateRequest request, CancellationToken cancellationToken);
+
+    Task<FogInspectionDto?> UploadImageAsync(int id, int waterSupplierId, string imageType, Stream fileStream, string fileName, CancellationToken cancellationToken);
+
     Task<List<RecordLogDto>?> GetLogsAsync(int id, CancellationToken cancellationToken);
 }

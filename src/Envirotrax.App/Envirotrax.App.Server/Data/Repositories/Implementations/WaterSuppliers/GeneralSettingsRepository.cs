@@ -10,4 +10,16 @@ public class GeneralSettingsRepository : TenantSettingsRepository<GeneralSetting
         : base(dbContextSelector)
     {
     }
+
+    protected override void CopyValues(GeneralSettings source, GeneralSettings target, SettingsSection section)
+    {
+        if (section != SettingsSection.General)
+        {
+            throw new ArgumentOutOfRangeException(nameof(section), section, null);
+        }
+
+        source.WaterSupplierId = target.WaterSupplierId;
+
+        DbContext.Entry(target).CurrentValues.SetValues(source);
+    }
 }

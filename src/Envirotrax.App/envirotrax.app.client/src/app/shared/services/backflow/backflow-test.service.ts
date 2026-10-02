@@ -10,6 +10,8 @@ import { BackflowTest, BackflowExpiryCounts } from "../../models/backflow/backfl
 import { BackflowPaymentStatus } from "../../models/backflow/backflow-test-enums";
 import { BackflowCompliance } from "../../models/backflow/backflow-compliance";
 import { BackflowTestImages } from "../../models/backflow/backflow-test-images";
+import { InsuranceCheck } from "../../models/professionals/insurance-check";
+import { ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../../models/payments/professional-checkout";
 import { DownloadEndpoint } from "../../models/download-config";
 import { RecordLog } from "@envirotrax/common-ui";
 
@@ -114,6 +116,12 @@ export class BackflowTestService {
         return await lastValueFrom(this._http.get<BackflowExpiryCounts>(url));
     }
 
+    public async getInsuranceCheck(waterSupplierId: number): Promise<InsuranceCheck> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/backflow/tests/insurance-check');
+
+        return await lastValueFrom(this._http.get<InsuranceCheck>(url, { params: { waterSupplierId } }));
+    }
+
     public async submit(test: BackflowTest, images: BackflowTestImages = {}): Promise<BackflowTest> {
         const url = this._urlResolver.resolveUrl('/api/professionals/backflow/tests');
         const formData = buildBackflowTestFormData(test);
@@ -182,9 +190,9 @@ export class BackflowTestService {
         return await lastValueFrom(this._http.delete<BackflowTest>(url));
     }
 
-    public async checkout(testIds: number[]): Promise<void> {
+    public async checkout(request: ProfessionalCheckoutRequest): Promise<ProfessionalCheckoutReceipt<BackflowTest>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/backflow/tests/checkout');
-        await lastValueFrom(this._http.post<void>(url, testIds));
+        return await lastValueFrom(this._http.post<ProfessionalCheckoutReceipt<BackflowTest>>(url, request));
     }
 
     public async updateRenewalRequired(id: number, renewalRequired: boolean): Promise<BackflowTest> {

@@ -15,7 +15,7 @@ namespace Envirotrax.App.Server.Data.Models.Fog;
 
 [Table("FogInspections")]
 [RecordLogged(RecordLogTableNames.FogInspections)]
-public class FogInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
+public class FogInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IPayableModel
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }

@@ -1,5 +1,6 @@
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.Lookup;
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.Professionals;
+using Envirotrax.Admin.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.Admin.Server.Domain.DataTransferObjects.Backflow;
@@ -10,7 +11,7 @@ public class BackflowTestDetailsDto
 
     public ReferencedWaterSupplierDto? WaterSupplier { get; set; }
 
-    public ReferencedBackflowSiteDto? Site { get; set; }
+    public ReferencedSiteDto? Site { get; set; }
 
     public ReferencedProfessionalUserDto? Bpat { get; set; }
 
@@ -198,13 +199,6 @@ public class BackflowTestDetailsDto
     public bool ShowRainSensor { get; set; }
     public bool ShowOSSF { get; set; }
     public bool ShowPermitNumber { get; set; }
-}
-
-public class ReferencedBackflowSiteDto
-{
-    public int? Id { get; set; }
-
-    public string? AccountNumber { get; set; }
 }
 
 public class ReferencedBackflowReviewerDto

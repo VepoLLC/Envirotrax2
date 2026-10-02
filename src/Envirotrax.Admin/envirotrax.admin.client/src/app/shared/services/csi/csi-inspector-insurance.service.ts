@@ -30,6 +30,10 @@ export class CsiInspectorInsuranceService {
         const formData = new FormData();
         formData.append('insuranceNumber', insurance.insuranceNumber ?? '');
 
+        if (insurance.coverageAmount != null) {
+            formData.append('coverageAmount', insurance.coverageAmount.toString());
+        }
+
         if (insurance.expirationDate) {
             formData.append('expirationDate', insurance.expirationDate);
         }

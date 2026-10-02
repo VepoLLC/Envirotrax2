@@ -4,6 +4,7 @@ using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Fog;
+using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
@@ -34,6 +35,7 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
     private readonly IPdfTemplateService _pdfTemplateService;
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IProfessionalSupplierService _professionalSupplierService;
+    private readonly IProfessionalInsuranceService _insuranceService;
 
     public FogTripTicketService(
         IMapper mapper,
@@ -47,7 +49,8 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         IFileStorageService fileStorageService,
         IPdfTemplateService pdfTemplateService,
         IGeneralSettingsService generalSettingsService,
-        IProfessionalSupplierService professionalSupplierService)
+        IProfessionalSupplierService professionalSupplierService,
+        IProfessionalInsuranceService insuranceService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -61,6 +64,7 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         _pdfTemplateService = pdfTemplateService;
         _generalSettingsService = generalSettingsService;
         _professionalSupplierService = professionalSupplierService;
+        _insuranceService = insuranceService;
     }
 
     public override async Task<FogTripTicketDto?> DeleteAsync(int id)
@@ -86,6 +90,16 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
     public Task<byte[]> GeneratePdfAsync(IEnumerable<FogTripTicketDto> tickets)
     {
         return _pdfTemplateService.GenerateAsync("Fog.FogTripTicket", tickets);
+    }
+
+    public async Task<byte[]> GeneratePdfWithSignaturesAsync(List<FogTripTicketDto> tickets)
+    {
+        foreach (var ticket in tickets)
+        {
+            await PopulateSignatureUrlsAsync(ticket);
+        }
+
+        return await GeneratePdfAsync(tickets);
     }
 
     public override async Task<FogTripTicketDto?> GetAsync(int id, CancellationToken cancellationToken)
@@ -136,6 +150,11 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         return tickets.Select(Mapper.Map<FogTripTicketDto>).ToPagedData(pageInfo);
     }
 
+    public Task<InsuranceCheckDto> GetInsuranceCheckAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        return _insuranceService.CheckForWaterSupplierAsync(_authService.ProfessionalId, waterSupplierId, ProfessionalType.FogTransporter, cancellationToken);
+    }
+
     public async Task<FogTripTicketDto> SubmitAsync(
         FogTripTicketDto request,
         Stream? generatorSignatureStream, string? generatorSignatureFileName,
@@ -145,6 +164,8 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         var siteId = request.Site!.Id!.Value;
         var waterSupplierId = request.WaterSupplier!.Id!.Value;
         var transporterUserId = request.Transporter!.Id!.Value;
+
+        await _insuranceService.EnsureSatisfiedForWaterSupplierAsync(_authService.ProfessionalId, waterSupplierId, ProfessionalType.FogTransporter, cancellationToken);
 
         var site = await _siteService.GetAsync(siteId, cancellationToken);
         var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
@@ -309,6 +330,7 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         ticket.TransporterState = professional.State?.Name;
         ticket.TransporterZip = professional.ZipCode;
         ticket.TransporterWorkNumber = professional.PhoneNumber;
+        ticket.TransporterCellNumber = transporterUser?.PhoneNumber;
         ticket.TransporterFaxNumber = professional.FaxNumber;
         ticket.TransporterEmailAddress = transporterUser?.EmailAddress ?? professional.CompanyEmail;
 

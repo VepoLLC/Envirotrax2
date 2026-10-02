@@ -11,6 +11,7 @@ import { FogTripTicketViewComponent } from "./trip-tickets/view/fog-trip-ticket-
 import { FogTransporterListComponent } from "./transporters/list/fog-transporter-list.component";
 import { FogTransporterDetailsComponent } from "./transporters/details/fog-transporter-details.component";
 import { FogVehiclePermitListComponent } from "./transporters/vehicles/list/fog-vehicle-permit-list.component";
+import { RegistrationManagementComponent } from "./transporters/registrations/registration-management.component";
 
 const routes: Routes = [
     {
@@ -123,6 +124,11 @@ const routes: Routes = [
                 }
             ]
         }
+    },
+    {
+        path: 'transporters/registrations',
+        title: 'Registration Management',
+        component: RegistrationManagementComponent
     },
     {
         path: 'transporters/details/:id',

@@ -7,7 +7,9 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { FogTripTicket } from "../../models/fog/fog-trip-ticket";
+import { ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../../models/payments/professional-checkout";
 import { FogTripTicketImages } from "../../models/fog/fog-trip-ticket-images";
+import { InsuranceCheck } from "../../models/professionals/insurance-check";
 
 @Injectable({
     providedIn: 'root'
@@ -40,6 +42,11 @@ export class FogTripTicketService {
         return lastValueFrom(this._http.get<FogTripTicket>(url));
     }
 
+    public getInsuranceCheck(waterSupplierId: number): Promise<InsuranceCheck> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/fog/trip-tickets/insurance-check');
+        return lastValueFrom(this._http.get<InsuranceCheck>(url, { params: { waterSupplierId } }));
+    }
+
     public updateApproval(id: number, disapproved: boolean): Promise<FogTripTicket> {
         const url = this._urlResolver.resolveUrl(`/api/fog/trip-tickets/${id}/approval`);
         return lastValueFrom(this._http.put<FogTripTicket>(url, disapproved));
@@ -64,6 +71,11 @@ export class FogTripTicketService {
     public deleteForProfessional(id: number): Promise<FogTripTicket> {
         const url = this._urlResolver.resolveUrl(`/api/professionals/fog/trip-tickets/${id}`);
         return lastValueFrom(this._http.delete<FogTripTicket>(url));
+    }
+
+    public checkout(request: ProfessionalCheckoutRequest): Promise<ProfessionalCheckoutReceipt<FogTripTicket>> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/fog/trip-tickets/checkout');
+        return lastValueFrom(this._http.post<ProfessionalCheckoutReceipt<FogTripTicket>>(url, request));
     }
 
     public getPdfForProfessional(id: number): Promise<Blob> {

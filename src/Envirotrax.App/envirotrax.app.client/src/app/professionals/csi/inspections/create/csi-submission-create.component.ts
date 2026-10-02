@@ -11,6 +11,7 @@ import { Professional } from '../../../../shared/models/professionals/profession
 import { ProfessionalUser } from '../../../../shared/models/professionals/professional-user';
 import { ProfessionalUserLicense, ExpirationType, ProfessionalType } from '../../../../shared/models/professionals/licenses/professional-user-license';
 import { ProfessionalWaterSupplier } from '../../../../shared/models/professionals/professional-water-supplier';
+import { InsuranceCheck, InsuranceCheckResult } from '../../../../shared/models/professionals/insurance-check';
 import { Site } from '../../../../shared/models/sites/site';
 import { CsiInspectionReason, csiInspectionReasonLabels } from '../../../../shared/enums/csi-inspection-reason.enum';
 import { MAX_PAGE_SIZE } from '../../../../shared/models/page-info';
@@ -62,6 +63,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
     public selectedWaterSupplierId?: number;
     public currentLicense?: ProfessionalUserLicense;
     public isLoadingLicense = false;
+    public insuranceCheck?: InsuranceCheck;
 
     public csiAccountOptions: InputOption[] = [];
     public waterSupplierOptions: InputOption[] = [];
@@ -102,6 +104,14 @@ export class CsiSubmissionCreateComponent implements OnInit {
 
     private _siteId!: number;
 
+    public get verificationPassed(): boolean {
+        return this.hasValidLicense && !!this.insuranceCheck?.isSatisfied;
+    }
+
+    public get showInsuranceRow(): boolean {
+        return !!this.insuranceCheck && this.insuranceCheck.result !== InsuranceCheckResult.NotRequired;
+    }
+
     constructor(
         private readonly _activatedRoute: ActivatedRoute,
         private readonly _router: Router,
@@ -139,13 +149,28 @@ export class CsiSubmissionCreateComponent implements OnInit {
         this.selectedCsiUserId = value;
         this.selectedCsiUser = this.csiUsers.find(u => u.id === value);
         this.model.inspectorUser = { id: value };
-        await this.loadLicense(value);
+
+        this.isLoading = true;
+
+        try {
+            await this.loadLicense(value);
+        } finally {
+            this.isLoading = false;
+        }
     }
 
-    public onWaterSupplierChange(value: number): void {
+    public async onWaterSupplierChange(value: number): Promise<void> {
         this.selectedWaterSupplierId = value;
         this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === value);
         this.model.waterSupplier = { id: value };
+
+        this.isLoading = true;
+
+        try {
+            await this.loadInsuranceCheck();
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public onCommentsChange(value: string | undefined): void {
@@ -261,6 +286,10 @@ export class CsiSubmissionCreateComponent implements OnInit {
         this._router.navigate(['..'], { relativeTo: this._activatedRoute });
     }
 
+    public goToCheckout(): void {
+        this._router.navigate(['/professionals/checkout'], { queryParams: { tab: 'csi' } });
+    }
+
     private initializeSiteId(): boolean {
         const idParam = this._activatedRoute.snapshot.paramMap.get('siteId');
         this._siteId = idParam ? Number(idParam) : 0;
@@ -293,7 +322,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
 
             this.buildDropdownOptions();
             await this.setDefaultCsiUser();
-            this.setDefaultWaterSupplier(site);
+            await this.setDefaultWaterSupplier(site);
         } finally {
             this.isLoading = false;
         }
@@ -330,6 +359,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
 
             this.selectedWaterSupplierId = inspection.waterSupplier?.id;
             this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === inspection.waterSupplier?.id);
+            await this.loadInsuranceCheck();
 
             this.selectedCsiUserId = inspection.inspectorUser?.id ?? 0;
             this.selectedCsiUser = this.csiUsers.find(u => u.id === this.selectedCsiUserId);
@@ -364,7 +394,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
         }
     }
 
-    private setDefaultWaterSupplier(site: Site): void {
+    private async setDefaultWaterSupplier(site: Site): Promise<void> {
         if (this.waterSuppliers.length === 1) {
             this.selectedWaterSupplierId = this.waterSuppliers[0].waterSupplier?.id;
         }
@@ -376,6 +406,24 @@ export class CsiSubmissionCreateComponent implements OnInit {
 
         this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === this.selectedWaterSupplierId);
         this.model.waterSupplier = { id: this.selectedWaterSupplierId };
+
+        await this.loadInsuranceCheck();
+    }
+
+    private async loadInsuranceCheck(): Promise<void> {
+        const waterSupplierId = this.selectedWaterSupplierId;
+
+        this.insuranceCheck = undefined;
+
+        if (!waterSupplierId) {
+            return;
+        }
+
+        const check = await this._inspectionService.getInsuranceCheck(waterSupplierId);
+
+        if (this.selectedWaterSupplierId === waterSupplierId) {
+            this.insuranceCheck = check;
+        }
     }
 
     private async loadLicense(userId: number): Promise<void> {

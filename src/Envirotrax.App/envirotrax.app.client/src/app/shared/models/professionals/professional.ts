@@ -11,6 +11,7 @@ export interface Professional {
     companyEmail?: string;
     phoneNumber?: string;
     faxNumber?: string;
+    cellPhoneNumber?: string;
     webSiteUrl?: string;
     hidePublicListing?: boolean;
     createdTime?: string;

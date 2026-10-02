@@ -15,14 +15,10 @@ namespace Envirotrax.App.Server.Data.Models.Backflow;
 
 [Table("BackflowTests")]
 [RecordLogged(RecordLogTableNames.BackflowTests)]
-public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
+public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IPayableModel
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }
-
-    // Original Vepo.dbo.SaveBackflowDeviceTests.ID. Populated by the legacy import; null for
-    // records created in V2.
-    public int? LegacyRecordId { get; set; }
 
     public int? SiteId { get; set; }
     public Site? Site { get; set; }
@@ -484,7 +480,5 @@ public class BackflowTestConfiguration : IEntityTypeConfiguration<BackflowTest>
             .WithMany()
             .HasForeignKey(bt => new { bt.ProfessionalId, bt.InspectorId })
             .HasPrincipalKey(pu => new { pu.ProfessionalId, pu.UserId });
-
-        builder.HasIndex(test => test.LegacyRecordId);
     }
 }

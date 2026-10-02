@@ -1,10 +1,13 @@
 import { BackflowExpiredType, BackflowExpiringType, BackflowNonCompliantType, BackflowOutOfServiceType, BackflowTestingMethodType } from '../../../shared/models/settings/backflow-testing-settings-enum';
 import { BackflowSettings } from '../../../shared/models/settings/backflow-settings';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ToastService } from '@envirotrax/common-ui';
 import { HelperService } from '../../../shared/services/helpers/helper.service';
 import { BackflowTestingSettingsService } from '../../../shared/services/settings/backflow-testing-settings.service';
+import { SettingsSection } from '../../../shared/models/settings/settings-section';
+import { SettingsCopyService } from '../../../shared/services/settings/settings-copy.service';
+import { BackflowRenewalRequirementsComponent } from '../backflow-renewal-requirements/backflow-renewal-requirements.component';
 
 @Component({
   standalone: false,
@@ -35,6 +38,11 @@ export class BackflowTestingSettings implements OnInit {
 
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
+
+    public canCopyFromParent: boolean = false;
+
+    @ViewChild(BackflowRenewalRequirementsComponent)
+    private renewalRequirements?: BackflowRenewalRequirementsComponent;
 
       public readonly testingMethodOptions = [
           { id: BackflowTestingMethodType.USC, text: 'USC' },
@@ -79,10 +87,12 @@ export class BackflowTestingSettings implements OnInit {
     private readonly _backflowSettingsService: BackflowTestingSettingsService,
     private readonly _helper: HelperService,
     private readonly _toastService: ToastService,
+    private readonly _settingsCopyService: SettingsCopyService,
   ) {}
 
   public async ngOnInit(): Promise<void> {
       await this.getSettings();
+      this.canCopyFromParent = await this._settingsCopyService.canCopyFromParent();
   }
 
   private async getSettings(): Promise<void> {
@@ -92,6 +102,19 @@ export class BackflowTestingSettings implements OnInit {
           this.settings = await this._backflowSettingsService.get();
       } finally {
           this.isLoading = false;
+      }
+  }
+
+  public async copyFromParent(): Promise<void> {
+      const copied = await this._settingsCopyService.confirmAndCopyFromParent(SettingsSection.Backflow);
+
+      if (copied) {
+          this.validationErrors = [];
+
+          await Promise.all([
+              this.getSettings(),
+              this.renewalRequirements?.getRequirements()
+          ]);
       }
   }
 

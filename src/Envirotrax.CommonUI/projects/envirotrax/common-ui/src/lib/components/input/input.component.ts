@@ -1,6 +1,7 @@
 import { DatePipe } from "@angular/common";
-import { AfterViewInit, Component, ElementRef, forwardRef, input, Input, OnInit, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, forwardRef, input, Input, NgZone, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { AbstractControl, ControlValueAccessor, NgForm, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from "@angular/forms";
+import { NgSelectComponent } from "@ng-select/ng-select";
 import flatpickr from "flatpickr";
 import { Instance } from "flatpickr/dist/types/instance";
 
@@ -23,11 +24,13 @@ import { Instance } from "flatpickr/dist/types/instance";
     ],
     styleUrl: './input.component.css'
 })
-export class InputComponent implements ControlValueAccessor, Validator, OnInit, AfterViewInit {
+export class InputComponent implements ControlValueAccessor, Validator, OnInit, AfterViewInit, OnDestroy {
     private _onChanged: (value: any) => void = null!;
     private _onTouched: (event: FocusEvent) => void = null!;
 
     private _flatpickerInstance?: Instance
+
+    private readonly _onScroll = () => this.select?.dropdownPanel()?.adjustPosition();
 
     private static _counter: number = 0;
 
@@ -96,8 +99,28 @@ export class InputComponent implements ControlValueAccessor, Validator, OnInit, 
     @ViewChild('flatpickr')
     public flatpickr?: ElementRef<HTMLElement>;
 
-    constructor(private readonly _datePipe: DatePipe) {
+    @ViewChild(NgSelectComponent)
+    public select?: NgSelectComponent;
 
+    constructor(
+        private readonly _datePipe: DatePipe,
+        private readonly _zone: NgZone
+    ) {
+
+    }
+
+    public ngOnDestroy(): void {
+        this.onSelectClosed();
+    }
+
+    public onSelectOpened(): void {
+        this._zone.runOutsideAngular(() => {
+            window.addEventListener('scroll', this._onScroll, true);
+        });
+    }
+
+    public onSelectClosed(): void {
+        window.removeEventListener('scroll', this._onScroll, true);
     }
 
     public ngAfterViewInit(): void {

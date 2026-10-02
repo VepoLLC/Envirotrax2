@@ -1,5 +1,6 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Payments;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -14,10 +15,12 @@ namespace Envirotrax.App.Server.Controllers.Professionals.Fog;
 public class ProfessionalFogTripTicketController : ProfessionalProtectedController
 {
     private readonly IFogTripTicketService _fogService;
+    private readonly IFogTripTicketCheckoutService _checkoutService;
 
-    public ProfessionalFogTripTicketController(IFogTripTicketService fogService)
+    public ProfessionalFogTripTicketController(IFogTripTicketService fogService, IFogTripTicketCheckoutService checkoutService)
     {
         _fogService = fogService;
+        _checkoutService = checkoutService;
     }
 
     [HttpGet]
@@ -28,6 +31,13 @@ public class ProfessionalFogTripTicketController : ProfessionalProtectedControll
         CancellationToken ct)
     {
         var result = await _fogService.SearchForProfessionalAsync(pageInfo, query, waterSupplierId, ct);
+        return Ok(result);
+    }
+
+    [HttpGet("insurance-check")]
+    public async Task<IActionResult> GetInsuranceCheckAsync([FromQuery] int waterSupplierId, CancellationToken ct)
+    {
+        var result = await _fogService.GetInsuranceCheckAsync(waterSupplierId, ct);
         return Ok(result);
     }
 
@@ -89,5 +99,17 @@ public class ProfessionalFogTripTicketController : ProfessionalProtectedControll
             ct);
 
         return Ok(result);
+    }
+
+    [HttpPost("checkout")]
+    public async Task<IActionResult> CheckoutAsync([FromBody] ProfessionalCheckoutRequestDto request, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
+
+        var receipt = await _checkoutService.CheckoutAsync(request, cancellationToken);
+        return Ok(receipt);
     }
 }

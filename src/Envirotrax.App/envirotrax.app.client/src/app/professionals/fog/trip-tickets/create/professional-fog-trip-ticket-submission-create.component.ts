@@ -6,15 +6,16 @@ import { FogSignaturePadModalComponent, FogSignatureModel } from "../../inspecti
 import { SiteService } from "../../../../shared/services/sites/site.service";
 import { Site } from "../../../../shared/models/sites/site";
 import { ProfesisonalService } from "../../../../shared/services/professionals/professional.service";
+import { CheckoutService } from "../../../../shared/services/professionals/checkout.service";
 import { ProfesionalUserService } from "../../../../shared/services/professionals/professional-user.service";
 import { ProfessionalSupplierService } from "../../../../shared/services/professionals/professional-supplier.service";
 import { ProfessionalFogVehicleService } from "../../../../shared/services/fog/professional-fog-vehicle.service";
 import { ProfessionalFogDisposalSiteService } from "../../../../shared/services/fog/professional-fog-disposal-site.service";
-import { FogSettingsService } from "../../../../shared/services/fog/fog-settings.service";
 import { ProfessionalUserLicenseService } from "../../../../shared/services/professionals/professional-user-license.service";
 import { FogTripTicketService } from "../../../../shared/services/fog/fog-trip-ticket.service";
 import { Professional } from "../../../../shared/models/professionals/professional";
-import { ProfessionalUser, ExpirationType } from "../../../../shared/models/professionals/professional-user";
+import { ProfessionalUser } from "../../../../shared/models/professionals/professional-user";
+import { InsuranceCheck, InsuranceCheckResult } from "../../../../shared/models/professionals/insurance-check";
 import { ProfessionalType, ExpirationType as LicenseExpirationType, ProfessionalUserLicense } from "../../../../shared/models/professionals/licenses/professional-user-license";
 import { FogVehicle } from "../../../../shared/models/fog/fog-vehicle";
 import { FogDisposalSite } from "../../../../shared/models/fog/fog-disposal-site";
@@ -25,7 +26,6 @@ import { WaterSupplier } from "../../../../shared/models/water-suppliers/water-s
 import { LookupService } from "../../../../shared/services/lookup/lookup.service";
 import { MAX_PAGE_SIZE } from "../../../../shared/models/page-info";
 import { InputOption, ModalHelperService } from "@envirotrax/common-ui";
-import { ProfessionalFogSettings } from "../../../../shared/models/fog/professional-fog-settings";
 
 interface VerificationCheck {
     label: string;
@@ -96,7 +96,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
 
     private _siteId = 0;
     private _transporterLicense?: ProfessionalUserLicense;
-    private _selectedSupplierSettings?: ProfessionalFogSettings;
+    private _insuranceCheck?: InsuranceCheck;
     private readonly _myWaterSuppliers = new Map<number, WaterSupplier>();
     private readonly _stateNamesById = new Map<number, string>();
 
@@ -107,13 +107,13 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         private readonly _professionalService: ProfesisonalService,
         private readonly _userService: ProfesionalUserService,
         private readonly _supplierService: ProfessionalSupplierService,
-        private readonly _fogSettingsService: FogSettingsService,
         private readonly _vehicleService: ProfessionalFogVehicleService,
         private readonly _disposalSiteService: ProfessionalFogDisposalSiteService,
         private readonly _licenseService: ProfessionalUserLicenseService,
         private readonly _tripTicketService: FogTripTicketService,
         private readonly _lookupService: LookupService,
-        private readonly _modalHelper: ModalHelperService
+        private readonly _modalHelper: ModalHelperService,
+        private readonly _checkoutService: CheckoutService
     ) { }
 
     public ngOnInit(): void {
@@ -129,29 +129,53 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         this.selectedTransporterUserId = value;
         this.selectedTransporter = this.transporterOptions.find(o => o.id === value)?.data;
 
-        await this.loadTransporterSignatureUrl();
-        await this.computeVerification();
+        this.isLoading = true;
+
+        try {
+            await this.loadTransporterSignatureUrl();
+            await this.computeVerification();
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public async onWaterSupplierChange(value: number): Promise<void> {
         this.selectedWaterSupplierId = value;
-        await this.applySelectedWaterSupplier(value);
 
-        await this.computeVerification();
+        this.isLoading = true;
+
+        try {
+            await this.applySelectedWaterSupplier(value);
+            await this.computeVerification();
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public async onDisposalSiteChange(value: number): Promise<void> {
         this.selectedDisposalSiteId = value;
         this.selectedDisposalSite = this.disposalSiteOptions.find(o => o.id === value)?.data;
 
-        await this.computeVerification();
+        this.isLoading = true;
+
+        try {
+            await this.computeVerification();
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public async onVehicleChange(value: number): Promise<void> {
         this.selectedVehicleId = value;
         this.selectedVehicle = this.vehicleOptions.find(o => o.id === value)?.data;
 
-        await this.computeVerification();
+        this.isLoading = true;
+
+        try {
+            await this.computeVerification();
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public onCommentsChange(value: string | undefined): void {
@@ -208,6 +232,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
             await this._tripTicketService.submit(ticket, this.images);
 
             this.submitSuccess = true;
+            this._checkoutService.refresh();
         } finally {
             this.isLoading = false;
         }
@@ -372,7 +397,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
     }
 
     private async applySelectedWaterSupplier(waterSupplierId?: number): Promise<void> {
-        this.selectedWaterSupplier = waterSupplierId != null
+        this.selectedWaterSupplier = waterSupplierId
             ? this._myWaterSuppliers.get(waterSupplierId)
             : undefined;
 
@@ -381,8 +406,8 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
             ? this._stateNamesById.get(stateId)
             : undefined;
 
-        this._selectedSupplierSettings = waterSupplierId != null
-            ? await this._fogSettingsService.getSettings(waterSupplierId)
+        this._insuranceCheck = waterSupplierId
+            ? await this._tripTicketService.getInsuranceCheck(waterSupplierId)
             : undefined;
     }
 
@@ -427,21 +452,11 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
     private buildInsuranceCheck(): VerificationCheck {
         const label = 'Insurance Policy';
 
-        if (!this.requiresInsurance()) {
+        if (!this._insuranceCheck || this._insuranceCheck.result === InsuranceCheckResult.NotRequired) {
             return { label, message: 'Insurance not required', valid: true };
         }
 
-        const insuranceType = this.professional?.insuranceExpirationType;
-
-        if (insuranceType == null) {
-            return { label, message: 'No insurance policy found', valid: false };
-        }
-
-        if (insuranceType === ExpirationType.Expired) {
-            return { label, message: 'Insurance policy expired', valid: false };
-        }
-
-        return { label, message: 'Insurance policy valid', valid: true };
+        return { label, message: this._insuranceCheck.message ?? '', valid: this._insuranceCheck.isSatisfied };
     }
 
     private buildDisposalSiteCheck(): VerificationCheck {
@@ -484,9 +499,5 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         this.transporterSignatureUrl = this.selectedTransporter?.signaturePath && this.selectedTransporterUserId
             ? await this._userService.getSignatureUrl(this.selectedTransporterUserId)
             : null;
-    }
-
-    private requiresInsurance(): boolean {
-        return this._selectedSupplierSettings?.fogTransportersRequireInsurance ?? false;
     }
 }

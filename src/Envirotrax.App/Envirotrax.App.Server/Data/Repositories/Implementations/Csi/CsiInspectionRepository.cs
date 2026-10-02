@@ -239,6 +239,7 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         inspection.InspectorState = model.InspectorState;
         inspection.InspectorZip = model.InspectorZip;
         inspection.InspectorWorkNumber = model.InspectorWorkNumber;
+        inspection.InspectorCellNumber = model.InspectorCellNumber;
         inspection.InspectorFaxNumber = model.InspectorFaxNumber;
         inspection.InspectorLicenseNumber = model.InspectorLicenseNumber;
         inspection.InspectorLicenseType = model.InspectorLicenseType;
@@ -251,6 +252,54 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
     public Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken)
     {
         return Entity.CountAsync(c => c.SiteId == siteId && c.DeletedTime == null, cancellationToken);
+    }
+
+    public async Task<List<CsiInspection>> GetUnpaidForCheckoutAsync(IReadOnlyCollection<int> ids, int professionalId, int? inspectorId, CancellationToken cancellationToken)
+    {
+        return await GetUnpaidForCheckoutQuery(ids, professionalId, inspectorId)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> MarkPaidAsync(
+        IReadOnlyCollection<int> ids,
+        int professionalId,
+        int? inspectorId,
+        string transactionId,
+        DateTime transactionDate,
+        IReadOnlyCollection<int> emailPdfInspectionIds,
+        CancellationToken cancellationToken)
+    {
+        return await GetUnpaidForCheckoutQuery(ids, professionalId, inspectorId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(c => c.TransactionId, transactionId)
+                .SetProperty(c => c.TransactionDate, transactionDate)
+                .SetProperty(c => c.EmailPdf, c => emailPdfInspectionIds.Contains(c.Id)), cancellationToken);
+    }
+
+    public async Task<decimal> SumAmountByTransactionIdAsync(string transactionId, int professionalId, CancellationToken cancellationToken)
+    {
+        return await DbContext.CsiInspections
+            .Where(c => c.TransactionId == transactionId && c.ProfessionalId == professionalId)
+            .SumAsync(c => c.Amount, cancellationToken);
+    }
+
+    public async Task<List<CsiInspection>> GetByTransactionIdAsync(string transactionId, int professionalId, CancellationToken cancellationToken)
+    {
+        return await GetDetailsQuery()
+            .Where(c => c.TransactionId == transactionId && c.ProfessionalId == professionalId)
+            .OrderBy(c => c.CreatedTime)
+            .ToListAsync(cancellationToken);
+    }
+
+    private IQueryable<CsiInspection> GetUnpaidForCheckoutQuery(IReadOnlyCollection<int> ids, int professionalId, int? inspectorId)
+    {
+        return DbContext.CsiInspections
+            .Where(c => ids.Contains(c.Id)
+                && c.ProfessionalId == professionalId
+                && (inspectorId == null || c.InspectorId == inspectorId)
+                && (c.TransactionId == null || c.TransactionId == string.Empty)
+                && c.DeletedTime == null);
     }
 
     private static async Task<IQueryable<CsiInspection>> ApplyLatestOnlyFilterAsync(IQueryable<CsiInspection> query, bool latestOnly, CancellationToken cancellationToken)

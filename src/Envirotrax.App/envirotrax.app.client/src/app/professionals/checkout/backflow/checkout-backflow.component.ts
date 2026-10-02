@@ -3,10 +3,16 @@ import { CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, MAX_P
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { BackflowTest } from "../../../shared/models/backflow/backflow-test";
+import { ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../../../shared/models/payments/professional-checkout";
+import { CreditCardPayment } from "../../../shared/models/payments/credit-card-payment";
 import { BackflowTestService } from "../../../shared/services/backflow/backflow-test.service";
 import { ProfesionalUserService } from "../../../shared/services/professionals/professional-user.service";
 import { ProfesisonalService } from "../../../shared/services/professionals/professional.service";
 import { CheckoutService } from "../../../shared/services/professionals/checkout.service";
+import { HelperService } from "../../../shared/services/helpers/helper.service";
+import { createPaymentTransactionId } from "../../../shared/utils/payment-transaction-id.util";
+import { calculateCheckoutAmounts, CheckoutAmounts } from "../../../shared/utils/checkout-amounts.util";
+import { CheckoutPaymentComponent } from "../shared/checkout-payment/checkout-payment.component";
 import { Router } from "@angular/router";
 
 @Component({
@@ -27,12 +33,19 @@ export class CheckoutBackflowComponent implements OnInit {
     public items: TableViewModel<CheckoutBackflowTestVm> = {
         query: { sort: {}, filter: [] }
     };
-    public selectedFeeTotal = 0;
+    public amounts: CheckoutAmounts = { total: 0, fromBalance: 0, cardCharge: 0 };
+    public accountBalance = 0;
     public reportForOptions: InputOption[] = [];
     public reportFor = '';
 
+    public validationErrors: string[] = [];
+    public receipt?: ProfessionalCheckoutReceipt<BackflowTest>;
+
     private _currentUserId?: number;
     private _professionalName?: string;
+
+    @ViewChild(CheckoutPaymentComponent)
+    public checkoutPayment?: CheckoutPaymentComponent;
 
     @ViewChild('selectTemplate', { static: true })
     public selectTemplate?: TemplateRef<CellTemplateData<CheckoutBackflowTestVm>>;
@@ -50,6 +63,7 @@ export class CheckoutBackflowComponent implements OnInit {
         private readonly _backflowTestService: BackflowTestService,
         private readonly _professionalUserService: ProfesionalUserService,
         private readonly _professionalService: ProfesisonalService,
+        private readonly _helper: HelperService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService,
         private readonly _checkoutService: CheckoutService,
@@ -64,6 +78,7 @@ export class CheckoutBackflowComponent implements OnInit {
             this.items.columns = this.getColumns();
 
             const currentUser = await this._professionalUserService.getMyData();
+
             this._currentUserId = currentUser.id;
             this.reportFor = this.isAdmin ? '' : String(this._currentUserId);
 
@@ -81,7 +96,7 @@ export class CheckoutBackflowComponent implements OnInit {
             await this.getBackflowTests();
         }finally {
             this.isLoading = false;
-        }       
+        }
     }
 
     private buildReportForOptions(otherUsers: { id?: number; contactName?: string }[]): InputOption[] {
@@ -110,28 +125,43 @@ export class CheckoutBackflowComponent implements OnInit {
 
             this.items.query.filter = filter;
 
-            this.items.items = await this._backflowTestService.getAllForProfessional(
-                { pageSize: MAX_PAGE_SIZE },
-                this.items.query
-            );
+            const [tests, professional] = await Promise.all([
+                this._backflowTestService.getAllForProfessional({ pageSize: MAX_PAGE_SIZE }, this.items.query),
+                this._professionalService.reloadLoggedInProfessional()
+            ]);
+
+            this.items.items = tests;
+            this.accountBalance = professional.accountBalance ?? 0;
 
             this.items.items.data.forEach(test => {
                 test.selected = true;
                 test.emailPdf = true;
             });
-            this.recalculateSelectedTotal();
+            this.recalculateAmounts();
         } finally {
             this.isLoading = false;
         }
     }
 
-    public recalculateSelectedTotal(): void {
+    public removeUnselectedTests(): void {
         if (this.items.items) {
             this.items.items.data = this.items.items.data.filter(test => test.selected);
         }
 
-        this.selectedFeeTotal = (this.items.items?.data || [])
-            .reduce((total, test) => total + (test.amount || 0), 0);
+        this.recalculateAmounts();
+    }
+
+    public toggleSelected(test: CheckoutBackflowTestVm): void {
+        test.selected = !test.selected;
+        this.recalculateAmounts();
+    }
+
+    private recalculateAmounts(): void {
+        this.amounts = calculateCheckoutAmounts(this.getSelectedTests().map(test => test.amount || 0), this.accountBalance);
+    }
+
+    private getSelectedTests(): CheckoutBackflowTestVm[] {
+        return (this.items.items?.data || []).filter(test => test.selected);
     }
 
     public viewTest(test: CheckoutBackflowTestVm): void {
@@ -147,7 +177,7 @@ export class CheckoutBackflowComponent implements OnInit {
             return;
         }
 
-        this._router.navigate(['/professionals/backflow/submit', test.id, 'edit']);
+        this._router.navigate(['/professionals/backflow/tests', test.id, 'edit']);
     }
 
     public deleteTest(test: CheckoutBackflowTestVm): void {
@@ -174,26 +204,45 @@ export class CheckoutBackflowComponent implements OnInit {
         await this.getBackflowTests();
     }
 
-    public async completePayment(): Promise<void> {
-        const testIds = (this.items.items?.data || [])
-            .filter(test => test.selected && test.id != null)
-            .map(test => test.id!);
-
-        if (testIds.length === 0) {
+    public async completePayment(card?: CreditCardPayment): Promise<void> {
+        if (this.isLoading) {
             return;
         }
 
+        this.recalculateAmounts();
+
+        const selectedTests = this.getSelectedTests();
+
+        if (selectedTests.length === 0) {
+            return;
+        }
+
+        const request: ProfessionalCheckoutRequest = {
+            transactionId: createPaymentTransactionId(),
+            items: selectedTests.map(test => ({ id: test.id, emailPdf: !!test.emailPdf })),
+            expectedTotal: this.amounts.total,
+            expectedCardCharge: this.amounts.cardCharge,
+            card
+        };
+
+        this.validationErrors = [];
+
         try {
             this.isLoading = true;
-            await this._backflowTestService.checkout(testIds);
+            this.receipt = await this._backflowTestService.checkout(request);
 
-            this._toastService.show({ text: 'Submission completed.', type: ToastType.Success });
+            this._toastService.show({ text: 'Payment completed.', type: ToastType.Success });
             this._checkoutService.refresh();
+        } catch (error) {
+            if (!this._helper.parseValidationErrors(error, this.validationErrors)) {
+                throw error;
+            }
+
+            this.checkoutPayment?.reset();
+            await this.getBackflowTests();
         } finally {
             this.isLoading = false;
         }
-
-        await this.getBackflowTests();
     }
 
     private getColumns(): TableColumn<CheckoutBackflowTestVm>[] {

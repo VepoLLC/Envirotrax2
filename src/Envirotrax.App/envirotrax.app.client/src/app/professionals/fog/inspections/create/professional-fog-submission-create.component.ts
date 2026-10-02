@@ -238,6 +238,10 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
         this._router.navigate(['..'], { relativeTo: this._activatedRoute });
     }
 
+    public goToCheckout(): void {
+        this._router.navigate(['/professionals/checkout'], { queryParams: { tab: 'fogInspection' } });
+    }
+
     private collectValidationErrors(): void {
         if (this.model.inspectionDate && new Date(this.model.inspectionDate) > new Date()) {
             this.validationErrors.push('Inspection Date cannot be in the future.');

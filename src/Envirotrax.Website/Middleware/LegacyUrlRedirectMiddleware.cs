@@ -24,9 +24,16 @@ public class LegacyUrlRedirectMiddleware
         IDocumentUrlService documentUrlService,
         IPublishedUrlProvider publishedUrlProvider,
         IOptionsMonitor<LegacyUrlRedirectOptions> options,
+        IConfiguration configuration,
         ILogger<LegacyUrlRedirectMiddleware> logger)
     {
         var rawPath = context.Request.Path.Value ?? string.Empty;
+        var requestPath = LegacyUrlResolver.Normalize(rawPath);
+
+        if (TryRedirectToPublicSearch(context, requestPath, configuration, options.CurrentValue))
+        {
+            return;
+        }
 
         if (!LegacyUrlResolver.IsLegacyRequest(rawPath))
         {
@@ -40,7 +47,6 @@ public class LegacyUrlRedirectMiddleware
             return;
         }
 
-        var requestPath = LegacyUrlResolver.Normalize(rawPath);
         var targetPath = LegacyUrlResolver.ResolveCandidateTarget(requestPath, options.CurrentValue.Overrides);
 
         // UmbracoRequestMiddleware skips creating IUmbracoContext for any path with a file extension
@@ -77,5 +83,40 @@ public class LegacyUrlRedirectMiddleware
         }
 
         context.Response.Redirect(redirectUrl, permanent: true);
+    }
+
+    private static bool TryRedirectToPublicSearch(
+        HttpContext context,
+        string requestPath,
+        IConfiguration configuration,
+        LegacyUrlRedirectOptions options)
+    {
+        var appUrl = configuration["Envirotrax:AppUrl"];
+
+        if (string.IsNullOrWhiteSpace(appUrl))
+        {
+            return false;
+        }
+
+        var subdomain = LegacyUrlResolver.ExtractSubdomain(
+            context.Request.Host.Host,
+            options.SubdomainBaseDomain,
+            options.ReservedSubdomains);
+
+        if (LegacyUrlResolver.IsPublicSearchRequest(requestPath))
+        {
+            context.Response.Redirect(LegacyUrlResolver.BuildPublicSearchUrl(appUrl, subdomain), permanent: true);
+
+            return true;
+        }
+
+        if (subdomain != null && requestPath == "/")
+        {
+            context.Response.Redirect(LegacyUrlResolver.BuildPublicSearchUrl(appUrl, subdomain), permanent: false);
+
+            return true;
+        }
+
+        return false;
     }
 }

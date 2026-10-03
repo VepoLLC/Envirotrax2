@@ -25,11 +25,23 @@ public class PublicSearchService : IPublicSearchService
     public async Task<PublicSearchWaterSuppliersDto> GetWaterSuppliersAsync(string? domain, CancellationToken cancellationToken)
     {
         var suppliers = (await _publicSearchRepository.GetWaterSuppliersAsync(cancellationToken)).ToList();
+        var normalizedDomain = NormalizeText(domain);
+
+        if (normalizedDomain == null)
+        {
+            return new PublicSearchWaterSuppliersDto
+            {
+                Suppliers = _mapper.Map<List<PublicSearchWaterSupplierDto>>(suppliers)
+            };
+        }
+
+        var selectedSupplier = FindSupplierByDomain(suppliers, normalizedDomain);
+        var visibleSuppliers = suppliers.Where(supplier => supplier.Id == selectedSupplier?.Id).ToList();
 
         return new PublicSearchWaterSuppliersDto
         {
-            Suppliers = _mapper.Map<List<PublicSearchWaterSupplierDto>>(suppliers),
-            SelectedWaterSupplierId = FindSupplierIdByDomain(suppliers, domain)
+            Suppliers = _mapper.Map<List<PublicSearchWaterSupplierDto>>(visibleSuppliers),
+            SelectedWaterSupplierId = selectedSupplier?.Id
         };
     }
 
@@ -97,19 +109,11 @@ public class PublicSearchService : IPublicSearchService
         return criteria;
     }
 
-    private static int? FindSupplierIdByDomain(IEnumerable<PublicSearchWaterSupplier> suppliers, string? domain)
+    private static PublicSearchWaterSupplier? FindSupplierByDomain(IEnumerable<PublicSearchWaterSupplier> suppliers, string normalizedDomain)
     {
-        var normalizedDomain = NormalizeText(domain);
-
-        if (normalizedDomain == null)
-        {
-            return null;
-        }
-
         return suppliers
             .Where(supplier => string.Equals(supplier.Domain.Trim(), normalizedDomain, StringComparison.OrdinalIgnoreCase))
             .OrderBy(supplier => supplier.Id)
-            .Select(supplier => (int?)supplier.Id)
             .FirstOrDefault();
     }
 

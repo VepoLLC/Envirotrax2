@@ -29,3 +29,6 @@ export enum BackflowDeviceType {
     SVB = 'SVB',
     AG = 'AG'
 }
+
+// Detector assemblies, which carry a second (bypass) assembly with its own manufacturer, model, size and serial number.
+export const BYPASS_DEVICE_TYPES: string[] = [BackflowDeviceType.DCD, BackflowDeviceType.DCD2, BackflowDeviceType.RPPD, BackflowDeviceType.RPPD2];

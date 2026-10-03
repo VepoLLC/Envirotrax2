@@ -6,6 +6,7 @@ export interface ProfessionalInsurance {
     professional?: ReferencedProfessional;
     expirationDate?: string;
     insuranceNumber?: string;
+    coverageAmount?: number;
     filePath?: string;
     expirationType?: ExpirationType;
 }

@@ -12,6 +12,8 @@ public class ProfessionalUserDto : IDto
     [StringLength(100)]
     public string EmailAddress { get; set; } = null!;
 
+    public string? PhoneNumber { get; set; }
+
     [Required]
     [StringLength(255)]
     public string? ContactName { get; set; }

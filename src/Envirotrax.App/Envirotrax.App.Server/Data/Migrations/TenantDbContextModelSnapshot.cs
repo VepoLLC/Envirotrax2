@@ -523,9 +523,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("LegacyRecordId")
-                        .HasColumnType("int");
-
                     b.Property<string>("LocationDescription")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -847,8 +844,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("DeletedById");
-
-                    b.HasIndex("LegacyRecordId");
 
                     b.HasIndex("MailingStateId");
 
@@ -2765,6 +2760,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<string>("Address")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("CellPhoneNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("City")
                         .HasMaxLength(255)

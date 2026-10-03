@@ -32,3 +32,10 @@ public class SiteDto
 
     public bool IsFeeExempt { get; set; }
 }
+
+public class ReferencedSiteDto
+{
+    public int? Id { get; set; }
+
+    public string? AccountNumber { get; set; }
+}

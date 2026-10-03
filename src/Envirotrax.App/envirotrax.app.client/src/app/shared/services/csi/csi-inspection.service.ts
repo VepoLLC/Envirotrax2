@@ -9,6 +9,8 @@ import { PagedData } from "../../models/paged-data";
 import { CsiInspection } from "../../models/csi/csi-inspection";
 import { ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../../models/payments/professional-checkout";
 import { CsiInspectionImage } from "../../models/csi/csi-inspection-image";
+import { InsuranceCheck } from "../../models/professionals/insurance-check";
+import { CsiInspectionAssembly, CsiInspectionAssemblyRequest } from "../../models/csi/csi-inspection-assembly";
 import { DownloadEndpoint } from "../../models/download-config";
 import { RecordLog } from "@envirotrax/common-ui";
 
@@ -96,6 +98,11 @@ export class CsiInspectionService {
         return lastValueFrom(this._http.get<CsiInspection>(url));
     }
 
+    public getInsuranceCheck(waterSupplierId: number): Promise<InsuranceCheck> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/csi/inspections/insurance-check');
+        return lastValueFrom(this._http.get<InsuranceCheck>(url, { params: { waterSupplierId } }));
+    }
+
     public submit(inspection: CsiInspection): Promise<CsiInspection> {
         const url = this._urlResolver.resolveUrl('/api/professionals/csi/inspections/submit');
         return lastValueFrom(this._http.post<CsiInspection>(url, inspection));
@@ -161,6 +168,21 @@ export class CsiInspectionService {
         if (description) formData.append('description', description);
         formData.append('image', file);
         return lastValueFrom(this._http.post<CsiInspectionImage>(url, formData));
+    }
+
+    public getSiteAssemblies(siteId: number): Promise<CsiInspectionAssembly[]> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/site-assemblies/${siteId}`);
+        return lastValueFrom(this._http.get<CsiInspectionAssembly[]>(url));
+    }
+
+    public getProfessionalAssemblies(inspectionId: number): Promise<CsiInspectionAssembly[]> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${inspectionId}/assemblies`);
+        return lastValueFrom(this._http.get<CsiInspectionAssembly[]>(url));
+    }
+
+    public saveAssemblies(inspectionId: number, assemblies: CsiInspectionAssemblyRequest[]): Promise<CsiInspectionAssembly[]> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${inspectionId}/assemblies`);
+        return lastValueFrom(this._http.put<CsiInspectionAssembly[]>(url, assemblies));
     }
 
     public deleteProfessionalImage(inspectionId: number, imageId: number): Promise<void> {

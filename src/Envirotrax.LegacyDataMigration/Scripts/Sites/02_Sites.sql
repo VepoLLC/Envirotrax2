@@ -29,8 +29,10 @@ BEGIN TRY
         AND (GisAreas.Id IS NULL OR GisAreas.WaterSupplierId <> WaterSuppliers.Id)
         AND alreadySkipped.SiteId IS NULL
 
+    SET IDENTITY_INSERT Sites ON;
+
     INSERT INTO Sites
-        (LegacyRecordId, WaterSupplierId, SubArea, AccountNumber, BusinessName, PropertyType,
+        (Id, LegacyRecordId, WaterSupplierId, SubArea, AccountNumber, BusinessName, PropertyType,
          StreetNumber, StreetName, PropertyNumber, City, StateId, ZipCode,
          MailingCompanyName, MailingContactName, MailingStreetNumber, MailingStreetName, MailingNumber, MailingCity, MailingStateId, MailingZipCode,
          MailingPhoneNumber, MailingEmailAddress, FogGeneratorPhoneNumber, FogGeneratorEmailAddress, Comments,
@@ -50,7 +52,7 @@ BEGIN TRY
          NeedsRenewalCheck, CsiAccountAssignmentDate, BackflowAccountAssignmentDate, FogAccountAssignmentDate,
          Active, CreatedById, CreatedTime, UpdatedById, UpdatedTime)
     SELECT
-        legacySites.ID, waterSuppliers.Id, legacySites.SubArea, legacySites.AccountNumber, legacySites.PropertyBusinessName, legacySites.PropertyType,
+        legacySites.ID, legacySites.ID, waterSuppliers.Id, legacySites.SubArea, legacySites.AccountNumber, legacySites.PropertyBusinessName, legacySites.PropertyType,
         legacySites.PropertyStreetNumber, legacySites.PropertyStreetName, legacySites.PropertyNumber, legacySites.PropertyCity, propertyStates.Id, legacySites.PropertyZIP,
         legacySites.MailingCompanyName, legacySites.MailingContactName, legacySites.MailingStreetNumber, legacySites.MailingStreetName, legacySites.MailingNumber, legacySites.MailingCity, mailingStates.Id, legacySites.MailingZIP,
         legacySites.MailingPhoneNumber, legacySites.MailingEmailAddress, legacySites.FogGeneratorPhoneNumber, legacySites.FogGeneratorEmailAddress, legacySites.Comments,
@@ -119,6 +121,8 @@ BEGIN TRY
         FROM Sites AS alreadyInserted
         WHERE alreadyInserted.LegacyRecordId = legacySites.ID
     )
+
+    SET IDENTITY_INSERT Sites OFF;
 
     COMMIT TRAN
 

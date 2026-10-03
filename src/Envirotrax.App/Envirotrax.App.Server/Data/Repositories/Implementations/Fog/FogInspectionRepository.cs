@@ -170,6 +170,7 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
         inspection.InspectorState = model.InspectorState;
         inspection.InspectorZip = model.InspectorZip;
         inspection.InspectorWorkNumber = model.InspectorWorkNumber;
+        inspection.InspectorCellNumber = model.InspectorCellNumber;
         inspection.InspectorFaxNumber = model.InspectorFaxNumber;
 
         if (newExteriorImagePath != null)

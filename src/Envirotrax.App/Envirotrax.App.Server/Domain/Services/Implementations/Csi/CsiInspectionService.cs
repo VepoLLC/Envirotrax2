@@ -4,6 +4,7 @@ using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Csi;
+using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
@@ -31,6 +32,8 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
     private readonly IAuthService _authService;
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IProfessionalSupplierService _professionalSupplierService;
+    private readonly IProfessionalInsuranceService _insuranceService;
+    private readonly ICsiInspectionAssemblyService _assemblyService;
 
     public CsiInspectionService(
         IMapper mapper,
@@ -42,7 +45,9 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         IPdfTemplateService pdfTemplateService,
         IAuthService authService,
         IGeneralSettingsService generalSettingsService,
-        IProfessionalSupplierService professionalSupplierService)
+        IProfessionalSupplierService professionalSupplierService,
+        IProfessionalInsuranceService insuranceService,
+        ICsiInspectionAssemblyService assemblyService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -54,6 +59,8 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         _authService = authService;
         _generalSettingsService = generalSettingsService;
         _professionalSupplierService = professionalSupplierService;
+        _insuranceService = insuranceService;
+        _assemblyService = assemblyService;
     }
 
     public override async Task<CsiInspectionDto?> DeleteAsync(int id)
@@ -67,8 +74,15 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
             return null;
         }
 
+        await _assemblyService.DeleteForInspectionAsync(id, deleted.SubmissionId, default);
+
         scope.Complete();
         return MapToDto(deleted);
+    }
+
+    public Task<InsuranceCheckDto> GetInsuranceCheckAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        return _insuranceService.CheckForWaterSupplierAsync(_authService.ProfessionalId, waterSupplierId, ProfessionalType.CsiInspector, cancellationToken);
     }
 
     public async Task<CsiInspectionDto> SubmitAsync(CsiInspectionDto request, CancellationToken cancellationToken)
@@ -76,6 +90,8 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         var siteId = request.Site!.Id.Value;
         var waterSupplierId = request.WaterSupplier!.Id.Value;
         var inspectorUserId = request.InspectorUser!.Id.Value;
+
+        await _insuranceService.EnsureSatisfiedForWaterSupplierAsync(_authService.ProfessionalId, waterSupplierId, ProfessionalType.CsiInspector, cancellationToken);
 
         var site = await _siteService.GetAsync(siteId, cancellationToken);
         var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
@@ -107,7 +123,11 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
             MaterialSolderOther = request.MaterialSolderOther,
             MaterialSolderOtherDescription = request.MaterialSolderOtherDescription,
             Comments = request.Comments,
-            NeedsValidation = true
+            NeedsValidation = true,
+
+            // Ties the inspection to the placeholder backflow tests its visually identified
+            // assemblies create, as V1's SubmissionID did.
+            SubmissionId = Guid.NewGuid().ToString("N")
         };
 
         ApplySiteSnapshot(inspection, site);
@@ -302,6 +322,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         inspection.InspectorState = professional.State?.Name;
         inspection.InspectorZip = professional.ZipCode;
         inspection.InspectorWorkNumber = professional.PhoneNumber;
+        inspection.InspectorCellNumber = inspectorUser?.PhoneNumber;
         inspection.InspectorFaxNumber = professional.FaxNumber;
         inspection.InspectorLicenseNumber = csiLicense?.LicenseNumber;
         inspection.InspectorLicenseType = csiLicense?.LicenseType?.Name;

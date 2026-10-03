@@ -144,7 +144,8 @@ export class CsiInspectorInsuranceListComponent implements OnInit {
         this._modalHelper.show<CsiInspectorInsuranceModalData, ProfessionalInsurance>(AddEditCsiInspectorInsuranceComponent, {
             title,
             model: { professionalId: this.professionalId, insurance },
-            size: ModalSize.medium
+            size: ModalSize.medium,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.getInsurances());
     }
 

@@ -9,6 +9,7 @@ import { PagedData } from "../../models/paged-data";
 import { FogTripTicket } from "../../models/fog/fog-trip-ticket";
 import { ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../../models/payments/professional-checkout";
 import { FogTripTicketImages } from "../../models/fog/fog-trip-ticket-images";
+import { InsuranceCheck } from "../../models/professionals/insurance-check";
 
 @Injectable({
     providedIn: 'root'
@@ -39,6 +40,11 @@ export class FogTripTicketService {
     public getByIdForProfessional(id: number): Promise<FogTripTicket> {
         const url = this._urlResolver.resolveUrl(`/api/professionals/fog/trip-tickets/${id}`);
         return lastValueFrom(this._http.get<FogTripTicket>(url));
+    }
+
+    public getInsuranceCheck(waterSupplierId: number): Promise<InsuranceCheck> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/fog/trip-tickets/insurance-check');
+        return lastValueFrom(this._http.get<InsuranceCheck>(url, { params: { waterSupplierId } }));
     }
 
     public updateApproval(id: number, disapproved: boolean): Promise<FogTripTicket> {

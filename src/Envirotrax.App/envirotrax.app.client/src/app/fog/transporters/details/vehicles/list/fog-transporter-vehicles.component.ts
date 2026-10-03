@@ -87,7 +87,8 @@ export class FogTransporterVehiclesComponent implements OnInit {
         this._modalHelper.show<FogVehicleModalData, FogVehicle>(EditFogTransporterVehicleComponent, {
             title: 'Add Vehicle',
             model: { transporterId: this.transporterId, vehicle: {} },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadVehicles());
     }
 
@@ -95,7 +96,8 @@ export class FogTransporterVehiclesComponent implements OnInit {
         this._modalHelper.show<FogVehicleModalData, FogVehicle>(EditFogTransporterVehicleComponent, {
             title: 'Edit Vehicle',
             model: { transporterId: this.transporterId, vehicle },
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadVehicles());
     }
 

@@ -218,6 +218,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         var registration = await _professionalSupplierService.GetAsync(inspection.WaterSupplierId, cancellationToken);
 
         inspection.Amount = registration?.FogInspectorFee ?? settings?.FogInspectorFee ?? 0;
+        inspection.AmountShare = settings?.FogInspectorFeeWsShare ?? 0;
     }
 
     // Checkout "Edit" on an own, still-unpaid inspection: mirrors SubmitAsync's field list and snapshot
@@ -519,6 +520,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         inspection.InspectorState = professional.State?.Name;
         inspection.InspectorZip = professional.ZipCode;
         inspection.InspectorWorkNumber = professional.PhoneNumber;
+        inspection.InspectorCellNumber = inspectorUser?.PhoneNumber;
         inspection.InspectorFaxNumber = professional.FaxNumber;
     }
 }

@@ -4,6 +4,7 @@ using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Backflow;
+using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
@@ -49,6 +50,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     private readonly IBackflowSettingsService _settingsService;
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IProfessionalSupplierService _professionalSupplierService;
+    private readonly IProfessionalInsuranceService _insuranceService;
     private readonly ILogger<BackflowTestService> _logger;
 
     public BackflowTestService(
@@ -67,6 +69,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         IBackflowSettingsService settingsService,
         IGeneralSettingsService generalSettingsService,
         IProfessionalSupplierService professionalSupplierService,
+        IProfessionalInsuranceService insuranceService,
         ILogger<BackflowTestService> logger)
         : base(mapper, repository)
     {
@@ -84,6 +87,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         _settingsService = settingsService;
         _generalSettingsService = generalSettingsService;
         _professionalSupplierService = professionalSupplierService;
+        _insuranceService = insuranceService;
         _logger = logger;
     }
 
@@ -256,6 +260,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             if (bpatUser != null)
             {
                 dto.BpatContactName = bpatUser.ContactName;
+                dto.BpatCellNumber = bpatUser.User?.PhoneNumber;
             }
         }
     }
@@ -379,6 +384,8 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     {
         var professionalId = _authService.ProfessionalId;
         dto.Professional = new ReferencedProfessionalDto { Id = professionalId };
+
+        await EnsureInsuranceAllowsSubmitAsync(dto, cancellationToken);
 
         await PopulateBpatSnapshotAsync(dto);
         DeriveTestDate(dto);
@@ -567,6 +574,21 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         };
     }
 
+    public Task<InsuranceCheckDto> GetInsuranceCheckAsync(int waterSupplierId, CancellationToken cancellationToken = default)
+    {
+        return _insuranceService.CheckForWaterSupplierAsync(_authService.ProfessionalId, waterSupplierId, ProfessionalType.Bpat, cancellationToken);
+    }
+
+    private async Task EnsureInsuranceAllowsSubmitAsync(BackflowTestDto dto, CancellationToken cancellationToken)
+    {
+        if (dto.WaterSupplier?.Id is not int waterSupplierId)
+        {
+            return;
+        }
+
+        await _insuranceService.EnsureSatisfiedForWaterSupplierAsync(_authService.ProfessionalId, waterSupplierId, ProfessionalType.Bpat, cancellationToken);
+    }
+
     public override async Task<BackflowTestDto?> GetAsync(int id, CancellationToken cancellationToken)
     {
         var dto = await base.GetAsync(id, cancellationToken);
@@ -622,7 +644,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
     private static void ValidateAdminUpdate(BackflowTestAdminUpdateRequest request)
     {
-        if (!HasBypassAssembly(request.DeviceType))
+        if (!BackflowDeviceTypes.HasBypassAssembly(request.DeviceType))
         {
             return;
         }
@@ -636,14 +658,6 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         {
             throw new AppValidationException("Bypass Assembly Manufacturer, Model, Size and Serial Number are required for this backflow method.");
         }
-    }
-
-    private static bool HasBypassAssembly(string? deviceType)
-    {
-        return deviceType == nameof(BackflowDeviceType.DCD)
-            || deviceType == nameof(BackflowDeviceType.DCD2)
-            || deviceType == nameof(BackflowDeviceType.RPPD)
-            || deviceType == nameof(BackflowDeviceType.RPPD2);
     }
 
     public override async Task<BackflowTestDto?> DeleteAsync(int id)
@@ -854,6 +868,21 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         var (renewalRequired, newExpirationDate) = ComputeRenewal(test, requirements);
 
         await _testRepository.UpdateTestRenewalAndClearFlagAsync(testId, renewalRequired, newExpirationDate, cancellationToken);
+    }
+
+    // The RenewalRequired half of ComputeRenewal, for records whose expiration is not driven by a
+    // test result — a CSI visually identified assembly expires on the inspection date. test.Site
+    // must carry HasAuxWaterSupply for the aux-water-supply requirements to match.
+    public async Task<bool> IsRenewalRequiredAsync(BackflowTest test, CancellationToken cancellationToken)
+    {
+        if (test.OutOfService || (!string.IsNullOrEmpty(test.DeviceType) && SkippedDeviceTypes.Contains(test.DeviceType)))
+        {
+            return false;
+        }
+
+        var requirements = await _renewalRequirementService.GetAllByWaterSupplierIdAsync(test.WaterSupplierId, cancellationToken);
+
+        return requirements.Any(requirement => DoesTestMatchRequirement(test, requirement));
     }
 
     private static readonly HashSet<string> SkippedDeviceTypes = new(StringComparer.OrdinalIgnoreCase)

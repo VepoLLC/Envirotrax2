@@ -1,4 +1,5 @@
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.Lookup;
+using Envirotrax.Admin.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.Admin.Server.Domain.DataTransferObjects.Backflow;
@@ -9,7 +10,7 @@ public class BackflowReplacementDto
 
     public ReferencedWaterSupplierDto? WaterSupplier { get; set; }
 
-    public ReferencedBackflowSiteDto? Site { get; set; }
+    public ReferencedSiteDto? Site { get; set; }
 
     public bool ValidationReplacementOnHold { get; set; }
 

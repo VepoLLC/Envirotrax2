@@ -23,6 +23,13 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
         _checkoutService = checkoutService;
     }
 
+    [HttpGet("insurance-check")]
+    public async Task<IActionResult> GetInsuranceCheckAsync([FromQuery] int waterSupplierId, CancellationToken cancellationToken)
+    {
+        var result = await _inspectionService.GetInsuranceCheckAsync(waterSupplierId, cancellationToken);
+        return Ok(result);
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
     {

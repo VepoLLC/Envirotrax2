@@ -6,4 +6,5 @@ public interface ICsiInspectionAssemblyRepository : IRepository<CsiInspectionVis
 {
     Task<List<CsiInspectionVisuallyIdentifiedAssembly>> GetByInspectionAsync(int inspectionId, CancellationToken cancellationToken);
     Task<int> GetCountByInspectionAsync(int inspectionId, CancellationToken cancellationToken);
+    Task SaveForInspectionAsync(int inspectionId, string? submissionId, IReadOnlyCollection<CsiInspectionVisuallyIdentifiedAssembly> assemblies, CancellationToken cancellationToken);
 }

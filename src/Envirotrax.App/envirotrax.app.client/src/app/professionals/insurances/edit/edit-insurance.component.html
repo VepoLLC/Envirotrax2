@@ -11,6 +11,16 @@
                       [form]="form" />
         </div>
 
+        <div class="mb-3">
+            <vp-input name="coverageAmount"
+                      label="Coverage $"
+                      type="number"
+                      [decimals]="2"
+                      [(ngModel)]="insurance.coverageAmount"
+                      [required]="true"
+                      [form]="form" />
+        </div>
+
         <div class="mt-3">
             <vp-validation-summary [form]="form" [validationErrors]="validationErrors" />
 

@@ -32,6 +32,8 @@ using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Implementations.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Payments;
 using Envirotrax.App.Server.Domain.Services.Implementations.Payments;
+using Envirotrax.App.Server.Domain.Services.Definitions.PublicSearch;
+using Envirotrax.App.Server.Domain.Services.Implementations.PublicSearch;
 
 namespace Envirotrax.App.Server.Domain.Configuration;
 
@@ -105,6 +107,7 @@ public static class ServiceRegistration
 
         services.AddTransient<IProfessionalService, ProfessionalService>();
         services.AddTransient<IRegisteredProfessionalService, RegisteredProfessionalService>();
+        services.AddTransient<IPublicSearchService, PublicSearchService>();
         services.AddTransient<IProfessionalUserService, ProfessionalUserService>();
         services.AddTransient<IProfessionalSupplierService, ProfessionalSupplierService>();
         services.AddTransient<IProfessionalUserLicenseService, ProfessionalUserLicenseService>();

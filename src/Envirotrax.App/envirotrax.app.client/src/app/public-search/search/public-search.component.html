@@ -1,0 +1,180 @@
+<ng-template #rowNumberCell let-row="rowData">
+    {{row.rowNumber}}
+</ng-template>
+
+<ng-template #testDatesCell let-row="rowData">
+    <div><span class="fw-semibold">Tested On:</span>&nbsp;{{row.testedOn}}</div>
+    <div>
+        <span class="fw-semibold">Expires:</span>&nbsp;<span class="badge"
+              [ngClass]="row.expirationBadgeClass">{{row.expiresOn}}</span>
+    </div>
+</ng-template>
+
+<ng-template #deviceCell let-row="rowData">
+    <div><span class="fw-semibold">Device Desc:</span>&nbsp;{{row.deviceDescription}}</div>
+    <div><span class="fw-semibold">Serial #:</span>&nbsp;{{row.serialNumber}}</div>
+    <div><span class="fw-semibold">Hazard Type:</span>&nbsp;{{row.hazardType}}</div>
+</ng-template>
+
+<ng-template #propertyCell let-row="rowData">
+    <div *ngIf="row.propertyBusinessName">{{row.propertyBusinessName}}</div>
+    <div>{{row.propertyAddress}}</div>
+    <div>{{row.propertyCityStateZip}}</div>
+</ng-template>
+
+<ng-template #inspectionDateCell let-row="rowData">
+    {{row.inspectionDate}}
+</ng-template>
+
+<ng-template #inspectorCell let-row="rowData">
+    <div *ngIf="row.inspectorCompanyName">{{row.inspectorCompanyName}}</div>
+    <div *ngIf="row.inspectorContactName">{{row.inspectorContactName}}</div>
+    <div>{{row.inspectorAddress}}</div>
+    <div>{{row.inspectorCityStateZip}}</div>
+</ng-template>
+
+<h1 class="text-center h2">Public Search</h1>
+
+<dp-loading-spinner *ngIf="isSuppliersLoading || backflowTable.isLoading || csiTable.isLoading"></dp-loading-spinner>
+
+<div *ngIf="isSuppliersLoaded && !hasWaterSuppliers" class="alert alert-danger text-center">
+    No water supplier is available for public record searching.
+</div>
+
+<div [hidden]="showResults">
+    <form *ngIf="hasWaterSuppliers" #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+        <vp-section header="Search Backflow Assembly Tests and CSI's by Property Address">
+            <div class="text-center p-3">
+                <p class="fw-bold">When entering the Property Street Name <u>DO NOT INCLUDE</u> street prefixes and
+                    suffixes.</p>
+
+                <div class="d-flex justify-content-center text-start">
+                    <ul>
+                        <li>Do not include prefixes such as: N, S, E, W, NE, NW or North, South, East, West, etc</li>
+                        <li>Do not include street suffixes such as: Street, St, Circle, Cir, Court, Ct, Blvd, etc</li>
+                    </ul>
+                </div>
+
+                <p class="mb-0">
+                    Prefixes and suffixes can be entered inconsistently and will effect the accuracy of your search.<br />
+                    For example, a test may be entered as "East Smith Boulevard" but you may search for "E Smith Blvd"<br />
+                    and no results will be found. For the most accurate results just enter the main part of the street
+                    name, "Smith".
+                </p>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-xl-8 col-xxl-6">
+                    <vp-field-grid>
+                        <vp-input name="waterSupplier"
+                                  label="Water Supplier:"
+                                  labelStyle="horizontal"
+                                  type="select"
+                                  [options]="waterSupplierOptions"
+                                  [(ngModel)]="selectedWaterSupplierId"
+                                  [required]="true"
+                                  [form]="searchForm" />
+
+                        <vp-input name="propertyBusinessName"
+                                  label="Property Business Name:"
+                                  labelStyle="horizontal"
+                                  [maxLength]="100"
+                                  [(ngModel)]="propertyBusinessName"
+                                  [form]="searchForm" />
+
+                        <vp-input name="propertyStreetNumber"
+                                  label="Property Street Number:"
+                                  labelStyle="horizontal"
+                                  [(ngModel)]="propertyStreetNumber"
+                                  [form]="searchForm" />
+
+                        <vp-field-grid-row>
+                            <vp-field-grid-label>Property Street Name:</vp-field-grid-label>
+                            <vp-field-grid-control>
+                                <vp-input name="propertyStreetName"
+                                          [(ngModel)]="propertyStreetName"
+                                          [form]="searchForm" />
+
+                                <small class="text-muted d-block">
+                                    Example: Enter "E Smith Blvd" as "Smith". Do not include the "E" prefix and "Blvd"
+                                    suffix.
+                                </small>
+                            </vp-field-grid-control>
+                        </vp-field-grid-row>
+
+                        <vp-input name="propertyNumber"
+                                  label="Property Suite/Apt #:"
+                                  labelStyle="horizontal"
+                                  [(ngModel)]="propertyNumber"
+                                  [form]="searchForm" />
+                    </vp-field-grid>
+                </div>
+            </div>
+        </vp-section>
+
+        <div class="mt-3">
+            <div *ngIf="errorMessage" class="alert alert-danger mb-2 text-center">{{errorMessage}}</div>
+
+            <vp-validation-summary [form]="searchForm" />
+
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>
+                    Search
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div *ngIf="showResults && !backflowTable.isLoading && !csiTable.isLoading">
+    <div class="text-center mb-3">
+        <ul class="vp-tabs nav nav-pills d-inline-flex flex-wrap justify-content-center">
+            <li class="nav-item">
+                <a class="nav-link" role="button" (click)="searchAgain()">Return to Search</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" role="button"
+                   [class.active]="activeTab === 'backflow'"
+                   (click)="setActiveTab('backflow')">
+                    Backflow Test Results ({{backflowTable.items?.pageInfo?.totalItems || 0}})
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" role="button"
+                   [class.active]="activeTab === 'csi'"
+                   (click)="setActiveTab('csi')">
+                    CSI Inspection Results ({{csiTable.items?.pageInfo?.totalItems || 0}})
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div [hidden]="activeTab !== 'backflow'">
+        <vp-section
+                    header="Backflow Device Tests Matching the Search Filter - {{backflowTable.items?.pageInfo?.totalItems || 0}} Results">
+            <div *ngIf="!backflowTable.items?.data?.length" class="alert alert-info mb-0">No results found</div>
+
+            <vp-table *ngIf="backflowTable.items?.data?.length"
+                      [columns]="backflowTable.columns!"
+                      [data]="backflowTable.items!.data"
+                      [(pageInfo)]="backflowTable.items!.pageInfo"
+                      (pageInfoChange)="getBackflowTests()"
+                      [(query)]="backflowTable.query" />
+        </vp-section>
+    </div>
+
+    <div [hidden]="activeTab !== 'csi'">
+        <vp-section
+                    header="CSI's Matching the Search Filter - {{csiTable.items?.pageInfo?.totalItems || 0}} Results">
+            <div *ngIf="!csiTable.items?.data?.length" class="alert alert-info mb-0">No results found</div>
+
+            <vp-table *ngIf="csiTable.items?.data?.length"
+                      [columns]="csiTable.columns!"
+                      [data]="csiTable.items!.data"
+                      [(pageInfo)]="csiTable.items!.pageInfo"
+                      (pageInfoChange)="getCsiInspections()"
+                      [(query)]="csiTable.query" />
+        </vp-section>
+    </div>
+</div>

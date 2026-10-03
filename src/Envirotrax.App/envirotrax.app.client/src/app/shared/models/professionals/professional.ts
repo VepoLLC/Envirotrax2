@@ -14,6 +14,7 @@ export interface Professional {
     cellPhoneNumber?: string;
     webSiteUrl?: string;
     hidePublicListing?: boolean;
+    hideCellPhoneNumber?: boolean;
     createdTime?: string;
 
     accountBalance?: number;

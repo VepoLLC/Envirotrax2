@@ -264,7 +264,7 @@ public class RegisteredProfessionalRepository : Repository<Professional, int, Pu
                 State = row.Professional.State != null ? row.Professional.State.Name : null,
                 ZipCode = row.Professional.ZipCode,
                 WorkNumber = row.Professional.PhoneNumber,
-                CellNumber = row.Contact != null ? row.Contact.PhoneNumber : null,
+                CellNumber = row.Professional.HideCellPhoneNumber ? null : row.Professional.CellPhoneNumber ?? (row.Contact != null ? row.Contact.PhoneNumber : null),
                 FaxNumber = row.Professional.FaxNumber,
                 EmailAddress = row.Professional.CompanyEmail ?? (row.Contact != null ? row.Contact.EmailAddress : null),
                 WebsiteUrl = row.Professional.WebSiteUrl,

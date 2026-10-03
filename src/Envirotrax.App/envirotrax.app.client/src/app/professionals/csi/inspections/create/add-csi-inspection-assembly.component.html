@@ -1,0 +1,75 @@
+<form #form="ngForm" (ngSubmit)="add(form)">
+    <div class="mb-3">
+        <vp-input type="select"
+                  label="Backflow Method"
+                  name="deviceType"
+                  [ngModel]="model.deviceType"
+                  (ngModelChange)="onDeviceTypeChange($event)"
+                  [options]="deviceTypeOptions"
+                  [placeholder]="'Select a backflow method'"
+                  [required]="true"
+                  [form]="form" />
+    </div>
+
+    <div *ngIf="showMainAssembly" class="row mb-3">
+        <div class="col-md-4">
+            <vp-input label="Main Assembly Manufacturer" name="manufacturer" [(ngModel)]="model.manufacturer" [maxLength]="50" [required]="true" [form]="form" />
+        </div>
+        <div class="col-md-3">
+            <vp-input label="Model" name="model" [(ngModel)]="model.model" [maxLength]="50" [required]="true" [form]="form" />
+        </div>
+        <div class="col-md-2">
+            <vp-input label="Size" name="size" [(ngModel)]="model.size" [maxLength]="20" [required]="true" [form]="form" />
+        </div>
+        <div class="col-md-3">
+            <vp-input label="Serial Number" name="serialNumber" [(ngModel)]="model.serialNumber" [maxLength]="50" [required]="true" [form]="form" />
+        </div>
+    </div>
+
+    <div *ngIf="showBypassAssembly" class="row mb-3">
+        <div class="col-md-4">
+            <vp-input label="Bypass Assembly Manufacturer" name="manufacturer2" [(ngModel)]="model.manufacturer2" [maxLength]="50" [required]="true" [form]="form" />
+        </div>
+        <div class="col-md-3">
+            <vp-input label="Model" name="model2" [(ngModel)]="model.model2" [maxLength]="50" [required]="true" [form]="form" />
+        </div>
+        <div class="col-md-2">
+            <vp-input label="Size" name="size2" [(ngModel)]="model.size2" [maxLength]="20" [required]="true" [form]="form" />
+        </div>
+        <div class="col-md-3">
+            <vp-input label="Serial Number" name="serialNumber2" [(ngModel)]="model.serialNumber2" [maxLength]="50" [required]="true" [form]="form" />
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <vp-input type="select"
+                      label="Hazard Type"
+                      name="hazardType"
+                      [ngModel]="model.hazardType"
+                      (ngModelChange)="onHazardTypeChange($event)"
+                      [options]="hazardTypeOptions"
+                      [placeholder]="'Select a hazard type'"
+                      [required]="true"
+                      [form]="form" />
+        </div>
+        <div *ngIf="showHazardTypeOtherDescription" class="col-md-6">
+            <vp-input label="Other Description" name="hazardTypeOtherDescription" [(ngModel)]="model.hazardTypeOtherDescription" [maxLength]="200" [required]="true" [form]="form" />
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <vp-input label="Location Description" name="locationDescription" [(ngModel)]="model.locationDescription" [maxLength]="200" [form]="form" />
+    </div>
+
+    <div class="mb-3">
+        <vp-input type="textarea" label="Comments" name="comments" [(ngModel)]="model.comments" [form]="form" />
+    </div>
+
+    <vp-validation-summary [form]="form" />
+
+    <div class="d-flex justify-content-center gap-2">
+        <button type="submit" class="btn btn-primary w-100">Add Assembly</button>
+        <button type="button" class="btn btn-primary w-100" (click)="cancel()">Cancel</button>
+    </div>
+</form>

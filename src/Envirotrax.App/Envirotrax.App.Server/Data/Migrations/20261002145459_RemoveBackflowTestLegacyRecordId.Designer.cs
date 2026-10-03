@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261002145459_RemoveBackflowTestLegacyRecordId")]
+    partial class RemoveBackflowTestLegacyRecordId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2761,10 +2764,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("CellPhoneNumber")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<string>("City")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -2848,10 +2847,7 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Professionals", t =>
-                        {
-                            t.HasCheckConstraint("CK_Professionals_AccountBalance_NonNegative", "[AccountBalance] >= 0");
-                        });
+                    b.ToTable("Professionals");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalInsurance", b =>
@@ -2894,69 +2890,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("ProfessionalId");
 
                     b.ToTable("ProfessionalInsurances");
-                });
-
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalTransaction", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
-
-                    b.Property<decimal>("AmountShare")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
-
-                    b.Property<decimal>("BalanceAdjustment")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
-
-                    b.Property<decimal>("CardCharge")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
-
-                    b.Property<string>("CardNumber")
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
-
-                    b.Property<string>("NameOnCard")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int>("ProfessionalId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ReferenceDescription")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<DateTime>("TransactionDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("TransactionId")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("TransactionType")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProfessionalId", "TransactionId")
-                        .IsUnique()
-                        .HasFilter("[TransactionId] IS NOT NULL");
-
-                    b.HasIndex("ProfessionalId", "UserId");
-
-                    b.ToTable("ProfessionalTransactions");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalUser", b =>
@@ -4053,10 +3986,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasPrecision(19, 4)
                         .HasColumnType("decimal(19,4)");
 
-                    b.Property<decimal>("FogInspectorFeeWsShare")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
-
                     b.Property<bool>("FogProgram")
                         .HasColumnType("bit");
 
@@ -5061,25 +4990,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Professional");
-                });
-
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalTransaction", b =>
-                {
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
-                        .WithMany()
-                        .HasForeignKey("ProfessionalId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalUser", "User")
-                        .WithMany()
-                        .HasForeignKey("ProfessionalId", "UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Professional");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalUser", b =>

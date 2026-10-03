@@ -146,10 +146,6 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         entry.Property(m => m.AirGapImagePath).IsModified = false;
         entry.Property(m => m.ValidationReplacementOnHold).IsModified = false;
         entry.Property(m => m.ValidationReplacementCleared).IsModified = false;
-
-        // Legacy-import columns, owned by the V1 migration. BackflowTestDto does not carry them, so
-        // an ordinary update would write nulls over the values an imported row came in with.
-        entry.Property(m => m.LegacyRecordId).IsModified = false;
         entry.Property(m => m.InspectorId).IsModified = false;
         entry.Property(m => m.MailingAddress).IsModified = false;
     }
@@ -989,10 +985,6 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         var bypassAssemblyImagePath = test.BypassAssemblyImagePath;
         var bypassSerialNumberImagePath = test.BypassSerialNumberImagePath;
         var airGapImagePath = test.AirGapImagePath;
-
-        // Legacy-import columns. No V2 flow populates these, so BackflowTestDto does not carry them
-        // and SetValues would null out whatever the V1 migration preserved on an imported row.
-        var legacyRecordId = test.LegacyRecordId;
         var inspectorId = test.InspectorId;
         var mailingAddress = test.MailingAddress;
 
@@ -1026,8 +1018,6 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         test.BypassAssemblyImagePath = newBypassAssemblyImagePath ?? bypassAssemblyImagePath;
         test.BypassSerialNumberImagePath = newBypassSerialNumberImagePath ?? bypassSerialNumberImagePath;
         test.AirGapImagePath = newAirGapImagePath ?? airGapImagePath;
-
-        test.LegacyRecordId = legacyRecordId;
         test.InspectorId = inspectorId;
         test.MailingAddress = mailingAddress;
 
@@ -1039,6 +1029,17 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
     public Task<int> CountCurrentInServiceBySiteAsync(int siteId, CancellationToken cancellationToken)
     {
         return Entity.CountAsync(t => t.SiteId == siteId && t.DeletedTime == null && t.IsCurrent && !t.OutOfService, cancellationToken);
+    }
+
+    // Unlike GetAllCurrentBySiteIdAsync (a slim projection for the renewal job, which also bypasses
+    // the tenant filter), this returns whole rows under the caller's normal query filters.
+    public Task<List<BackflowTest>> GetCurrentBySiteAsync(int siteId, CancellationToken cancellationToken)
+    {
+        return Entity
+            .AsNoTracking()
+            .Where(t => t.SiteId == siteId && t.DeletedTime == null && t.IsCurrent)
+            .OrderBy(t => t.SerialNumber)
+            .ToListAsync(cancellationToken);
     }
 
     private async Task<int?> FindPreviousTestIdAsync(BackflowTest fromTest)

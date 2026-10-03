@@ -5,6 +5,8 @@ import { CsiImpendingType, CsiNonCompliantType, CsiPastDueType } from "../../../
 import { CsiSettingsService } from "../../../shared/services/settings/csi-settings.service";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { ToastService } from '@envirotrax/common-ui';
+import { SettingsSection } from "../../../shared/models/settings/settings-section";
+import { SettingsCopyService } from "../../../shared/services/settings/settings-copy.service";
 
 @Component({
     templateUrl: './csi-settings.component.html',
@@ -31,6 +33,8 @@ export class CsiSettingsComponent implements OnInit {
     };
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
+
+    public canCopyFromParent: boolean = false;
 
     // None, 1-7 days
     public readonly gracePeriodOptions = [
@@ -86,11 +90,13 @@ export class CsiSettingsComponent implements OnInit {
         private readonly _csiSettingsService: CsiSettingsService,
         private readonly _helper: HelperService,
         private readonly _toastService: ToastService,
+        private readonly _settingsCopyService: SettingsCopyService,
     ) {
     }
 
     public async ngOnInit(): Promise<void> {
         await this.getSettings();
+        this.canCopyFromParent = await this._settingsCopyService.canCopyFromParent();
     }
 
     private async getSettings(): Promise<void> {
@@ -100,6 +106,16 @@ export class CsiSettingsComponent implements OnInit {
             this.settings = await this._csiSettingsService.get();
         } finally {
             this.isLoading = false;
+        }
+    }
+
+    public async copyFromParent(): Promise<void> {
+        const copied = await this._settingsCopyService.confirmAndCopyFromParent(SettingsSection.Csi);
+
+        if (copied) {
+            this.validationErrors = [];
+
+            await this.getSettings();
         }
     }
 

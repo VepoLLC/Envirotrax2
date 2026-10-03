@@ -129,29 +129,53 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         this.selectedTransporterUserId = value;
         this.selectedTransporter = this.transporterOptions.find(o => o.id === value)?.data;
 
-        await this.loadTransporterSignatureUrl();
-        await this.computeVerification();
+        this.isLoading = true;
+
+        try {
+            await this.loadTransporterSignatureUrl();
+            await this.computeVerification();
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public async onWaterSupplierChange(value: number): Promise<void> {
         this.selectedWaterSupplierId = value;
-        await this.applySelectedWaterSupplier(value);
 
-        await this.computeVerification();
+        this.isLoading = true;
+
+        try {
+            await this.applySelectedWaterSupplier(value);
+            await this.computeVerification();
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public async onDisposalSiteChange(value: number): Promise<void> {
         this.selectedDisposalSiteId = value;
         this.selectedDisposalSite = this.disposalSiteOptions.find(o => o.id === value)?.data;
 
-        await this.computeVerification();
+        this.isLoading = true;
+
+        try {
+            await this.computeVerification();
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public async onVehicleChange(value: number): Promise<void> {
         this.selectedVehicleId = value;
         this.selectedVehicle = this.vehicleOptions.find(o => o.id === value)?.data;
 
-        await this.computeVerification();
+        this.isLoading = true;
+
+        try {
+            await this.computeVerification();
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public onCommentsChange(value: string | undefined): void {
@@ -373,7 +397,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
     }
 
     private async applySelectedWaterSupplier(waterSupplierId?: number): Promise<void> {
-        this.selectedWaterSupplier = waterSupplierId != null
+        this.selectedWaterSupplier = waterSupplierId
             ? this._myWaterSuppliers.get(waterSupplierId)
             : undefined;
 
@@ -382,7 +406,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
             ? this._stateNamesById.get(stateId)
             : undefined;
 
-        this._insuranceCheck = waterSupplierId != null
+        this._insuranceCheck = waterSupplierId
             ? await this._tripTicketService.getInsuranceCheck(waterSupplierId)
             : undefined;
     }

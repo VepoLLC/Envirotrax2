@@ -35,18 +35,8 @@ public class LegacyFieldMapService : ILegacyFieldMapService
     private static readonly string MasterBpatCompanyEmailPath =
         $"{nameof(BackflowTest.Professional)}.{nameof(Professional.CompanyEmail)}";
 
-    // V1 Test.SiteID is the legacy site identifier held on the test row. V2 stores only its own
-    // foreign key, so the V1 value is read through the joined site's preserved legacy id.
-    private static readonly string SiteLegacyRecordIdPath =
-        $"{nameof(BackflowTest.Site)}.{nameof(Site.LegacyRecordId)}";
-
-    // Every supplier identifier on the wire is a V1 id read through the supplier's preserved
-    // legacy id. V2's internal WaterSupplier.Id and ParentId are never exposed.
-    private static readonly string WaterSupplierLegacyRecordIdPath =
-        $"{nameof(BackflowTest.WaterSupplier)}.{nameof(WaterSupplier.LegacyRecordId)}";
-
-    private static readonly string MasterWaterSupplierLegacyRecordIdPath =
-        $"{nameof(BackflowTest.WaterSupplier)}.{nameof(WaterSupplier.Parent)}.{nameof(WaterSupplier.LegacyRecordId)}";
+    private static readonly string MasterWaterSupplierIdPath =
+        $"{nameof(BackflowTest.WaterSupplier)}.{nameof(WaterSupplier.ParentId)}";
 
     // V1 InspectorID holds the CSI inspector's login string, recovered the same way as BpatID.
     // Only records created from a CSI inspection carry one, so it is empty for BPAT submissions
@@ -102,9 +92,7 @@ public class LegacyFieldMapService : ILegacyFieldMapService
     {
         return new List<LegacyFieldDescriptor>
         {
-            // The V1 identity, preserved by the legacy import. Null on rows created in V2, which
-            // have no V1 identity - the internal Id is never exposed in its place.
-            Primary("ID", nameof(Site.LegacyRecordId), LegacyValueKind.Int),
+            Primary("ID", nameof(Site.Id), LegacyValueKind.Int),
             Primary("AccountNumber", nameof(Site.AccountNumber), LegacyValueKind.String),
             Primary("CreationDate", nameof(Site.CreatedTime), LegacyValueKind.DateTime),
             Primary("LastModifiedDate", nameof(Site.UpdatedTime), LegacyValueKind.DateTime),
@@ -128,26 +116,22 @@ public class LegacyFieldMapService : ILegacyFieldMapService
         var fields = new List<LegacyFieldDescriptor>
         {
             // Columns on the test row itself.
+            Primary("ID", nameof(BackflowTest.Id), LegacyValueKind.Int),
+            Primary("SiteID", nameof(BackflowTest.SiteId), LegacyValueKind.Int),
 
-            // Both identities are the V1 values preserved by the legacy import, null on rows
-            // created in V2. SiteID stays a Primary field so it renders as Test.SiteID like V1,
-            // even though its value comes through the joined site.
-            Primary("ID", nameof(BackflowTest.LegacyRecordId), LegacyValueKind.Int),
-            Primary("SiteID", SiteLegacyRecordIdPath, LegacyValueKind.Int),
-
-            Primary("WaterSupplierID", WaterSupplierLegacyRecordIdPath, LegacyValueKind.Int),
+            Primary("WaterSupplierID", nameof(BackflowTest.WaterSupplierId), LegacyValueKind.Int),
 
             // V1 stores 0 when a supplier has no parent, so an absent parent collapses to 0 here
             // rather than rendering empty.
             Derived(
                 "MasterWaterSupplierID",
-                MasterWaterSupplierLegacyRecordIdPath,
+                MasterWaterSupplierIdPath,
                 LegacyValueKind.Int,
-                parentLegacyId => Expression.Coalesce(parentLegacyId, Expression.Constant(0))),
+                parentId => Expression.Coalesce(parentId, Expression.Constant(0))),
 
             // V1 data holds 0 here, but the team directed us to return the regular supplier id.
             // This is the one field that deliberately differs from V1's stored value.
-            Primary("MasterWaterSupplierID2", WaterSupplierLegacyRecordIdPath, LegacyValueKind.Int),
+            Primary("MasterWaterSupplierID2", nameof(BackflowTest.WaterSupplierId), LegacyValueKind.Int),
 
             Primary("CreationDate", nameof(BackflowTest.CreatedTime), LegacyValueKind.DateTime),
             Primary("LastModifiedDate", nameof(BackflowTest.UpdatedTime), LegacyValueKind.DateTime),
@@ -238,9 +222,7 @@ public class LegacyFieldMapService : ILegacyFieldMapService
     {
         return new List<LegacyCriterionDescriptor>
         {
-            // Matches the preserved V1 identity. A row created in V2 has a null LegacyRecordId and
-            // therefore matches no WhereId value, which is correct: it has no V1 identity.
-            new("WhereId", "ID", LegacyFieldSource.Primary, nameof(Site.LegacyRecordId), LegacyCriterionOperator.Equals, LegacyValueKind.Int),
+            new("WhereId", "ID", LegacyFieldSource.Primary, nameof(Site.Id), LegacyCriterionOperator.Equals, LegacyValueKind.Int),
 
             new("WhereCreationDateFrom", "CreationDate", LegacyFieldSource.Primary, nameof(Site.CreatedTime), LegacyCriterionOperator.GreaterThanOrEqual, LegacyValueKind.DateTime),
             new("WhereLastModifiedDateTo", "LastModifiedDate", LegacyFieldSource.Primary, nameof(Site.UpdatedTime), LegacyCriterionOperator.LessThan, LegacyValueKind.DateTime),
@@ -253,7 +235,7 @@ public class LegacyFieldMapService : ILegacyFieldMapService
     {
         return new List<LegacyCriterionDescriptor>
         {
-            new("WhereId", "ID", LegacyFieldSource.Primary, nameof(BackflowTest.LegacyRecordId), LegacyCriterionOperator.Equals, LegacyValueKind.Int),
+            new("WhereId", "ID", LegacyFieldSource.Primary, nameof(BackflowTest.Id), LegacyCriterionOperator.Equals, LegacyValueKind.Int),
 
             new("WhereCreationDateFrom", "CreationDate", LegacyFieldSource.Primary, nameof(BackflowTest.CreatedTime), LegacyCriterionOperator.GreaterThanOrEqual, LegacyValueKind.DateTime),
             new("WhereLastModifiedDateTo", "LastModifiedDate", LegacyFieldSource.Primary, nameof(BackflowTest.UpdatedTime), LegacyCriterionOperator.LessThan, LegacyValueKind.DateTime),

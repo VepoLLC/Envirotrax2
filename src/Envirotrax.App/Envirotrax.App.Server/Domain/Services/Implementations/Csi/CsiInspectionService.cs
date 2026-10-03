@@ -33,6 +33,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IProfessionalSupplierService _professionalSupplierService;
     private readonly IProfessionalInsuranceService _insuranceService;
+    private readonly ICsiInspectionAssemblyService _assemblyService;
 
     public CsiInspectionService(
         IMapper mapper,
@@ -45,7 +46,8 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         IAuthService authService,
         IGeneralSettingsService generalSettingsService,
         IProfessionalSupplierService professionalSupplierService,
-        IProfessionalInsuranceService insuranceService)
+        IProfessionalInsuranceService insuranceService,
+        ICsiInspectionAssemblyService assemblyService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -58,6 +60,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         _generalSettingsService = generalSettingsService;
         _professionalSupplierService = professionalSupplierService;
         _insuranceService = insuranceService;
+        _assemblyService = assemblyService;
     }
 
     public override async Task<CsiInspectionDto?> DeleteAsync(int id)
@@ -70,6 +73,8 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         {
             return null;
         }
+
+        await _assemblyService.DeleteForInspectionAsync(id, deleted.SubmissionId, default);
 
         scope.Complete();
         return MapToDto(deleted);
@@ -118,7 +123,11 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
             MaterialSolderOther = request.MaterialSolderOther,
             MaterialSolderOtherDescription = request.MaterialSolderOtherDescription,
             Comments = request.Comments,
-            NeedsValidation = true
+            NeedsValidation = true,
+
+            // Ties the inspection to the placeholder backflow tests its visually identified
+            // assemblies create, as V1's SubmissionID did.
+            SubmissionId = Guid.NewGuid().ToString("N")
         };
 
         ApplySiteSnapshot(inspection, site);

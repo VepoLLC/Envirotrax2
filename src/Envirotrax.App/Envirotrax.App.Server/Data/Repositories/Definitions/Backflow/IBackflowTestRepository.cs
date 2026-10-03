@@ -65,4 +65,7 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
     Task<List<BackflowTest>> GetByTransactionIdAsync(string transactionId, int professionalId, CancellationToken cancellationToken);
     Task<BackflowTest?> FindPreviousCurrentTestAsync(BackflowTest test, CancellationToken cancellationToken);
     Task SetIsCurrentAsync(int id, bool isCurrent, CancellationToken cancellationToken);
+
+    // Full current test rows at a site, for seeding a CSI inspection's visually identified assemblies.
+    Task<List<BackflowTest>> GetCurrentBySiteAsync(int siteId, CancellationToken cancellationToken);
 }

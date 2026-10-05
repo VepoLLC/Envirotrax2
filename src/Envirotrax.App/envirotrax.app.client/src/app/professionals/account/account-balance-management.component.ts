@@ -69,9 +69,6 @@ export class AccountBalanceManagementComponent implements OnInit {
         this.validationErrors = [];
 
         const amountEntered = this.amountToAdd != null && (this.amountToAdd as unknown as string) !== '';
-        if (amountEntered && !this.isPositiveNumber(this.amountToAdd)) {
-            this.validationErrors.push('Adding amount must be a positive number.');
-        }
 
         if (form.valid && !this.validationErrors.length) {
             try {
@@ -116,10 +113,5 @@ export class AccountBalanceManagementComponent implements OnInit {
                 this.isLoading = false;
             }
         }
-    }
-
-    private isPositiveNumber(value: unknown): boolean {
-        const parsed = Number(value);
-        return !isNaN(parsed) && parsed > 0;
     }
 }

@@ -16,7 +16,7 @@ import { WindowService } from '../../../shared/services/window.service';
 import { FogInspectionImagesComponent } from './images/fog-inspection-images.component';
 import { FogInspectionMailingComponent } from './mailing/fog-inspection-mailing.component';
 import { FogInspectionPropertyComponent } from './property/fog-inspection-property.component';
-import { FogInspectionResultsComponent, isInvalidChamberValue } from './results/fog-inspection-results.component';
+import { FogInspectionResultsComponent } from './results/fog-inspection-results.component';
 import { FogInspectionTrapComponent } from './trap/fog-inspection-trap.component';
 
 type FogInspectionTab = 'results' | 'images' | 'logs';
@@ -50,8 +50,6 @@ export class FogInspectionDetailsComponent implements OnInit {
     public isLoading: boolean = false;
     public isLoadingRecordLogs: boolean = false;
     public isSaving: boolean = false;
-
-    public validationErrors: string[] = [];
 
     public inspection: FogInspection = {};
     public recordLogs: RecordLog[] = [];
@@ -89,7 +87,7 @@ export class FogInspectionDetailsComponent implements OnInit {
     }
 
     public async save(): Promise<void> {
-        if (!this.collectValidationErrors()) {
+        if (!this.validateForSave()) {
             return;
         }
 
@@ -159,23 +157,8 @@ export class FogInspectionDetailsComponent implements OnInit {
         });
     }
 
-    private collectValidationErrors(): boolean {
-        this.validationErrors = [];
-
-        const chamberValues = [
-            this.inspection.inletChamberWettingHeight,
-            this.inspection.inletChamberGreaseBlanket,
-            this.inspection.inletChamberSediments,
-            this.inspection.outletChamberWettingHeight,
-            this.inspection.outletChamberGreaseBlanket,
-            this.inspection.outletChamberSediments
-        ];
-
-        if (chamberValues.some(value => isInvalidChamberValue(value))) {
-            this.validationErrors.push('Chamber readings (wetted height, grease blanket, sediments) must be numbers of 0 or greater, or left blank.');
-        }
-
-        return this.validationErrors.length === 0;
+    private validateForSave(): boolean {
+        return !this.detailsForm?.invalid;
     }
 
     private buildUpdateRequest(): FogInspectionUpdateRequest {

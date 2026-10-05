@@ -12,10 +12,6 @@ namespace Envirotrax.App.Server.Data.Models.WaterSuppliers;
 [RecordLogged(RecordLogTableNames.WaterSuppliers, WaterSupplierIdProperty = nameof(WaterSupplier.Id), ProfessionalSource = RecordLogIdSource.None)]
 public class WaterSupplier : TenantBase, IAuditableModel<AppUser>
 {
-    // Original Vepo.dbo.WaterSuppliers.ID. Populated by the legacy import; null for records
-    // created in V2.
-    public int? LegacyRecordId { get; set; }
-
     [Required]
     [StringLength(255)]
     public string Name { get; set; } = null!;
@@ -126,6 +122,6 @@ public class WaterSupplierConfiguration : IEntityTypeConfiguration<WaterSupplier
             .WithOne(gs => gs.WaterSupplier)
             .HasForeignKey<GeneralSettings>(gs => gs.WaterSupplierId);
 
-        builder.HasIndex(supplier => supplier.LegacyRecordId);
+        builder.HasIndex(supplier => supplier.Domain);
     }
 }

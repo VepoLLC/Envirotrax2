@@ -110,6 +110,11 @@ const routes: Routes = [
     loadChildren: () => import('./registered-professionals/registered-professionals.module').then(m => m.RegisteredProfessionalsModule)
   },
   {
+    path: 'public-search',
+    title: '',
+    loadChildren: () => import('./public-search/public-search.module').then(m => m.PublicSearchModule)
+  },
+  {
     path: 'auth',
     title: '',
     loadChildren: () => import('./auth/auth.module').then(m => m.AppAuthModule)

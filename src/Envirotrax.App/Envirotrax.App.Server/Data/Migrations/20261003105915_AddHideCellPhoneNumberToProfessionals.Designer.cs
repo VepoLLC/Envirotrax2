@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261003105915_AddHideCellPhoneNumberToProfessionals")]
+    partial class AddHideCellPhoneNumberToProfessionals
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -523,6 +526,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int?>("LegacyRecordId")
+                        .HasColumnType("int");
+
                     b.Property<string>("LocationDescription")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -844,6 +850,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("DeletedById");
+
+                    b.HasIndex("LegacyRecordId");
 
                     b.HasIndex("MailingStateId");
 
@@ -1244,7 +1252,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int?>("InspectionId")
+                    b.Property<int>("InspectionId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsCurrent")
@@ -4174,6 +4182,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("LegacyRecordId")
+                        .HasColumnType("int");
+
                     b.Property<string>("LetterAddress")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -4267,7 +4278,7 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.HasIndex("DeletedById");
 
-                    b.HasIndex("Domain");
+                    b.HasIndex("LegacyRecordId");
 
                     b.HasIndex("LetterContactStateId");
 
@@ -4566,7 +4577,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasOne("Envirotrax.App.Server.Data.Models.Csi.CsiInspection", "Inspection")
                         .WithMany()
                         .HasForeignKey("WaterSupplierId", "InspectionId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Envirotrax.App.Server.Data.Models.Backflow.BackflowTest", "Test")
                         .WithMany()

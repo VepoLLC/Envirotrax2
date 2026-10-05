@@ -319,7 +319,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
     // Fee-exempt sites, failed tests, and air-gap devices are never charged; otherwise the water supplier's fee schedule applies,
     // optionally overridden per-BPAT. The fee share always comes from the fee schedule, never the override.
-    private async Task ApplyAmountAsync(BackflowTestDto dto, bool siteIsFeeExempt, CancellationToken cancellationToken)
+    private async Task ApplyAmountAsync(BackflowTestDto dto, bool siteIsFeeExempt, PropertyType propertyType, CancellationToken cancellationToken)
     {
         dto.Amount = 0;
         dto.AmountShare = 0;
@@ -336,7 +336,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             return;
         }
 
-        var isResidential = (PropertyType)dto.PropertyType == PropertyType.Residential;
+        var isResidential = propertyType == PropertyType.Residential;
 
         var settings = await _generalSettingsService.GetAsync(waterSupplierId, cancellationToken);
         var testFee = isResidential ? settings?.BackflowResidentialTestFee ?? 0 : settings?.BackflowCommercialTestFee ?? 0;
@@ -349,28 +349,102 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         dto.AmountShare = testFeeShare;
     }
 
-    private static void ApplySiteSnapshot(BackflowTestDto dto, SiteDto site)
+    private static bool HasSiteInformationChanged(BackflowTestDto dto, SiteDto site)
     {
-        dto.AccountNumber = site.AccountNumber;
-        dto.PropertyBusinessName = site.BusinessName;
-        dto.PropertyType = (int)site.PropertyType;
-        dto.PropertyStreetNumber = site.StreetNumber;
-        dto.PropertyStreetName = site.StreetName;
-        dto.PropertyNumber = site.PropertyNumber;
-        dto.PropertyCity = site.City;
-        dto.PropertyState = site.State;
-        dto.PropertyZip = site.ZipCode;
+        if (dto.PropertyType != (int)site.PropertyType)
+        {
+            return true;
+        }
 
-        dto.MailingCompanyName = site.MailingCompanyName;
-        dto.MailingContactName = site.MailingContactName;
-        dto.MailingStreetNumber = site.MailingStreetNumber;
-        dto.MailingStreetName = site.MailingStreetName;
-        dto.MailingNumber = site.MailingNumber;
-        dto.MailingCity = site.MailingCity;
-        dto.MailingState = site.MailingState;
-        dto.MailingZip = site.MailingZipCode;
-        dto.MailingPhoneNumber = site.MailingPhoneNumber;
-        dto.MailingEmailAddress = site.MailingEmailAddress;
+        if (GetStateId(dto.PropertyState) != GetStateId(site.State))
+        {
+            return true;
+        }
+
+        if (GetStateId(dto.MailingState) != GetStateId(site.MailingState))
+        {
+            return true;
+        }
+
+        var textFields = new List<(string? TestValue, string? SiteValue)>
+        {
+            (dto.PropertyBusinessName, site.BusinessName),
+            (dto.PropertyStreetNumber, site.StreetNumber),
+            (dto.PropertyStreetName, site.StreetName),
+            (dto.PropertyNumber, site.PropertyNumber),
+            (dto.PropertyCity, site.City),
+            (dto.PropertyZip, site.ZipCode),
+            (dto.MailingCompanyName, site.MailingCompanyName),
+            (dto.MailingContactName, site.MailingContactName),
+            (dto.MailingStreetNumber, site.MailingStreetNumber),
+            (dto.MailingStreetName, site.MailingStreetName),
+            (dto.MailingNumber, site.MailingNumber),
+            (dto.MailingCity, site.MailingCity),
+            (dto.MailingZip, site.MailingZipCode),
+            (dto.MailingPhoneNumber, site.MailingPhoneNumber),
+            (dto.MailingEmailAddress, site.MailingEmailAddress)
+        };
+
+        foreach (var field in textFields)
+        {
+            var testValue = NormalizeText(field.TestValue);
+            var siteValue = NormalizeText(field.SiteValue);
+
+            if (!string.Equals(testValue, siteValue, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static int? GetStateId(ReferencedStateDto? state)
+    {
+        if (state == null)
+        {
+            return null;
+        }
+
+        return state.Id;
+    }
+
+    private static string NormalizeText(string? value)
+    {
+        if (value == null)
+        {
+            return string.Empty;
+        }
+
+        return value.Trim();
+    }
+
+    private async Task<SiteDto?> ApplySiteValidationAsync(BackflowTestDto dto, CancellationToken cancellationToken)
+    {
+        dto.ValidationNewSite = false;
+        dto.ValidationSiteInformationChanged = false;
+        dto.NeedsValidation = false;
+
+        if (dto.Site == null || dto.Site.Id == null)
+        {
+            dto.ValidationNewSite = true;
+            dto.NeedsValidation = true;
+
+            return null;
+        }
+
+        var site = await _siteService.GetAsync(dto.Site.Id.Value, cancellationToken);
+
+        if (site == null)
+        {
+            return null;
+        }
+
+        dto.AccountNumber = site.AccountNumber;
+        dto.ValidationSiteInformationChanged = HasSiteInformationChanged(dto, site);
+        dto.NeedsValidation = dto.ValidationSiteInformationChanged;
+
+        return site;
     }
 
     public async Task<BackflowTestDto> SubmitWithImagesAsync(
@@ -390,23 +464,21 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         await PopulateBpatSnapshotAsync(dto);
         DeriveTestDate(dto);
 
-        bool hasAuxWaterSupply = false;
-        bool siteIsFeeExempt = false;
+        var site = await ApplySiteValidationAsync(dto, cancellationToken);
 
-        if (dto.Site?.Id != null)
+        var hasAuxWaterSupply = false;
+        var siteIsFeeExempt = false;
+        var feePropertyType = (PropertyType)dto.PropertyType;
+
+        if (site != null)
         {
-            var site = await _siteService.GetAsync(dto.Site.Id.Value, cancellationToken);
-
-            if (site != null)
-            {
-                ApplySiteSnapshot(dto, site);
-                hasAuxWaterSupply = site.HasAuxWaterSupply;
-                siteIsFeeExempt = site.IsFeeExempt;
-            }
+            hasAuxWaterSupply = site.HasAuxWaterSupply;
+            siteIsFeeExempt = site.IsFeeExempt;
+            feePropertyType = site.PropertyType;
         }
 
         await ApplyRenewalAsync(dto, hasAuxWaterSupply, cancellationToken);
-        await ApplyAmountAsync(dto, siteIsFeeExempt, cancellationToken);
+        await ApplyAmountAsync(dto, siteIsFeeExempt, feePropertyType, cancellationToken);
 
         // Set paths before AddAsync to avoid a second EF update (double-tracking conflict)
         if (assemblyStream != null && assemblyFileName != null)
@@ -478,17 +550,13 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         await PopulateBpatSnapshotAsync(dto);
         DeriveTestDate(dto);
 
-        bool hasAuxWaterSupply = false;
+        var site = await ApplySiteValidationAsync(dto, cancellationToken);
 
-        if (dto.Site?.Id != null)
+        var hasAuxWaterSupply = false;
+
+        if (site != null)
         {
-            var site = await _siteService.GetAsync(dto.Site.Id.Value, cancellationToken);
-
-            if (site != null)
-            {
-                ApplySiteSnapshot(dto, site);
-                hasAuxWaterSupply = site.HasAuxWaterSupply;
-            }
+            hasAuxWaterSupply = site.HasAuxWaterSupply;
         }
 
         await ApplyRenewalAsync(dto, hasAuxWaterSupply, cancellationToken);

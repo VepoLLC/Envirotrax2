@@ -106,15 +106,21 @@ export class BackflowTestingSettings implements OnInit {
   }
 
   public async copyFromParent(): Promise<void> {
-      const copied = await this._settingsCopyService.confirmAndCopyFromParent(SettingsSection.Backflow);
+      try {
+          this.isLoading = true;
 
-      if (copied) {
-          this.validationErrors = [];
+          const copied = await this._settingsCopyService.confirmAndCopyFromParent(SettingsSection.Backflow);
 
-          await Promise.all([
-              this.getSettings(),
-              this.renewalRequirements?.getRequirements()
-          ]);
+          if (copied) {
+              this.validationErrors = [];
+
+              await Promise.all([
+                  this.getSettings(),
+                  this.renewalRequirements?.getRequirements()
+              ]);
+          }
+      } finally {
+          this.isLoading = false;
       }
   }
 

@@ -4,8 +4,6 @@ public class BackflowTestAdminDetailsDto : BackflowTestDto
 {
     public string? BpatJobTitle { get; set; }
 
-    public bool ValidationNewSite { get; set; }
-    public bool ValidationSiteInformationChanged { get; set; }
     public bool ValidationUnknownSerialNumber { get; set; }
     public bool ValidationDeviceInformationChanged { get; set; }
     public string? ValidationNotes { get; set; }

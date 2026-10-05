@@ -170,23 +170,20 @@
         <!-- Main test form — only visible after BPAT + water supplier are selected (matches V1 divTest reveal) -->
         <ng-container *ngIf="verificationComplete">
 
-        <!-- Location / Property + Assembly Owner side by side.
-             Shown from the site's current record (CSI/FOG pattern; the server saves the same values);
-             falls back to the model for legacy retests whose previous test has no linked site. -->
-        <div class="row mt-3">
+        <div class="row mt-3" *ngIf="!isLocationEditing">
             <div class="col-md-6">
                 <vp-section header="Location / Property Information">
+                    <vp-section-actions>
+                        <button type="button" (click)="requestLocationModification()">Request Modification</button>
+                    </vp-section-actions>
+
                     <dl class="row mb-0">
                         <dt class="col-5">Property Type:</dt>
-                        <dd class="col-7 mb-1">{{ (site ? site.propertyType : model.propertyType) === 0 ? 'Residential' : 'Commercial' }}</dd>
+                        <dd class="col-7 mb-1">{{ isResidential ? 'Residential' : 'Commercial' }}</dd>
                         <dt class="col-5">Business Name:</dt>
-                        <dd class="col-7 mb-1">{{ site ? site.businessName : model.propertyBusinessName }}</dd>
+                        <dd class="col-7 mb-1">{{ model.propertyBusinessName }}</dd>
                         <dt class="col-5">Property Address:</dt>
-                        <dd class="col-7 mb-1" *ngIf="site">
-                            {{ site.streetNumber }} {{ site.streetName }}<span *ngIf="site.propertyNumber"> #{{ site.propertyNumber }}</span><br>
-                            {{ site.city }}<span *ngIf="site.city && site.state?.name">, </span>{{ site.state?.name }} {{ site.zipCode }}
-                        </dd>
-                        <dd class="col-7 mb-1" *ngIf="!site">
+                        <dd class="col-7 mb-1">
                             {{ model.propertyStreetNumber }} {{ model.propertyStreetName }}<span *ngIf="model.propertyNumber"> #{{ model.propertyNumber }}</span><br>
                             {{ model.propertyCity }}<span *ngIf="model.propertyCity && model.propertyState?.name">, </span>{{ model.propertyState?.name }} {{ model.propertyZip }}
                         </dd>
@@ -195,25 +192,235 @@
             </div>
             <div class="col-md-6">
                 <vp-section header="Assembly Owner's Contact Information">
+                    <vp-section-actions>
+                        <button type="button" (click)="requestLocationModification()">Request Modification</button>
+                    </vp-section-actions>
+
                     <dl class="row mb-0">
                         <dt class="col-5">Company Name:</dt>
-                        <dd class="col-7 mb-1">{{ site ? site.mailingCompanyName : model.mailingCompanyName }}</dd>
+                        <dd class="col-7 mb-1">{{ model.mailingCompanyName }}</dd>
                         <dt class="col-5">Contact Name:</dt>
-                        <dd class="col-7 mb-1">{{ site ? site.mailingContactName : model.mailingContactName }}</dd>
+                        <dd class="col-7 mb-1">{{ model.mailingContactName }}</dd>
                         <dt class="col-5">Mailing Address:</dt>
-                        <dd class="col-7 mb-1" *ngIf="site">
-                            {{ site.mailingStreetNumber }} {{ site.mailingStreetName }}<span *ngIf="site.mailingNumber"> #{{ site.mailingNumber }}</span><br>
-                            {{ site.mailingCity }}<span *ngIf="site.mailingCity && site.mailingState?.name">, </span>{{ site.mailingState?.name }} {{ site.mailingZipCode }}
-                        </dd>
-                        <dd class="col-7 mb-1" *ngIf="!site">
+                        <dd class="col-7 mb-1">
                             {{ model.mailingStreetNumber }} {{ model.mailingStreetName }}<span *ngIf="model.mailingNumber"> #{{ model.mailingNumber }}</span><br>
                             {{ model.mailingCity }}<span *ngIf="model.mailingCity && model.mailingState?.name">, </span>{{ model.mailingState?.name }} {{ model.mailingZip }}
                         </dd>
                         <dt class="col-5">Phone Number:</dt>
-                        <dd class="col-7 mb-1">{{ site ? site.mailingPhoneNumber : model.mailingPhoneNumber }}</dd>
+                        <dd class="col-7 mb-1">{{ model.mailingPhoneNumber }}</dd>
                         <dt class="col-5">Email Address:</dt>
-                        <dd class="col-7 mb-1">{{ site ? site.mailingEmailAddress : model.mailingEmailAddress }}</dd>
+                        <dd class="col-7 mb-1">{{ model.mailingEmailAddress }}</dd>
                     </dl>
+                </vp-section>
+            </div>
+        </div>
+
+        <div class="row mt-3" *ngIf="isLocationEditing">
+            <div class="col-md-6">
+                <vp-section header="Location / Property Information">
+                    <vp-section-actions>
+                        <button *ngIf="!isNewProperty" type="button" (click)="cancelLocationModification()">Cancel</button>
+                    </vp-section-actions>
+
+                    <div class="row mb-2">
+                        <div class="col-xl-4 col-form-label fw-bold">Property Type: <span class="text-danger">*</span></div>
+                        <div class="col-xl-8">
+                            <vp-input type="select"
+                                      name="propertyType"
+                                      [ngModel]="model.propertyType"
+                                      (ngModelChange)="onPropertyTypeChange($event)"
+                                      [options]="propertyTypeOptions"
+                                      [required]="true" />
+                            <vp-validation-field [form]="submitForm" fieldName="propertyType" fieldLabel="Property Type" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-xl-4 col-form-label fw-bold">Business Name:</div>
+                        <div class="col-xl-8">
+                            <vp-input name="propertyBusinessName"
+                                      [(ngModel)]="model.propertyBusinessName"
+                                      [disabled]="isResidential"
+                                      [maxLength]="100" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-xl-4 fw-bold d-xl-flex align-items-xl-center">Address:</div>
+                        <div class="col-xl-8">
+                            <div class="row g-2">
+                                <div class="col-3">
+                                    <vp-input name="propertyStreetNumber"
+                                              label="Street #:"
+                                              [(ngModel)]="model.propertyStreetNumber"
+                                              [required]="true"
+                                              [maxLength]="50"
+                                              [form]="submitForm" />
+                                </div>
+                                <div class="col-6">
+                                    <vp-input name="propertyStreetName"
+                                              label="Street Name:"
+                                              [(ngModel)]="model.propertyStreetName"
+                                              [required]="true"
+                                              [maxLength]="100"
+                                              [form]="submitForm" />
+                                </div>
+                                <div class="col-3">
+                                    <vp-input name="propertyNumber"
+                                              label="Suite/Apt #:"
+                                              [(ngModel)]="model.propertyNumber"
+                                              [maxLength]="50"
+                                              [form]="submitForm" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-xl-4 col-form-label fw-bold">City: <span class="text-danger">*</span></div>
+                        <div class="col-xl-8">
+                            <vp-input name="propertyCity"
+                                      [(ngModel)]="model.propertyCity"
+                                      [required]="true"
+                                      [maxLength]="50" />
+                            <vp-validation-field [form]="submitForm" fieldName="propertyCity" fieldLabel="City" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-xl-4 col-form-label fw-bold">State:</div>
+                        <div class="col-xl-8">
+                            <vp-input type="select"
+                                      name="propertyStateId"
+                                      [ngModel]="model.propertyState?.id"
+                                      (ngModelChange)="model.propertyState = $event ? { id: $event } : undefined"
+                                      [options]="stateOptions" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-xl-4 col-form-label fw-bold">ZIP: <span class="text-danger">*</span></div>
+                        <div class="col-xl-8">
+                            <vp-input name="propertyZip"
+                                      [(ngModel)]="model.propertyZip"
+                                      [required]="true"
+                                      [maxLength]="20" />
+                            <vp-validation-field [form]="submitForm" fieldName="propertyZip" fieldLabel="ZIP" />
+                        </div>
+                    </div>
+                </vp-section>
+            </div>
+            <div class="col-md-6">
+                <vp-section header="Assembly Owner's Contact / Mailing Information">
+                    <vp-section-actions>
+                        <button *ngIf="!isNewProperty" type="button" (click)="cancelLocationModification()">Cancel</button>
+                    </vp-section-actions>
+
+                    <p *ngIf="isResidential" class="mb-2">Leave Company Name blank if this is a residence not owned or managed by a business.</p>
+                    <p class="text-danger mb-2">Do not enter your company's information for the mailing contact name or address.</p>
+
+                    <div class="row mb-2">
+                        <div class="col-xl-4 col-form-label fw-bold">Company Name:</div>
+                        <div class="col-xl-8">
+                            <vp-input name="mailingCompanyName"
+                                      [(ngModel)]="model.mailingCompanyName"
+                                      [maxLength]="100" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-xl-4 col-form-label fw-bold">Contact Name:</div>
+                        <div class="col-xl-8">
+                            <vp-input name="mailingContactName"
+                                      [(ngModel)]="model.mailingContactName"
+                                      [maxLength]="100" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-xl-4 fw-bold d-xl-flex align-items-xl-center">Address:</div>
+                        <div class="col-xl-8">
+                            <button type="button" class="btn btn-primary vp-section-button mt-2" (click)="copyPropertyAddress()">
+                                Copy from Property Address
+                            </button>
+
+                            <div class="row g-2">
+                                <div class="col-3">
+                                    <vp-input name="mailingStreetNumber"
+                                              label="Street #:"
+                                              [(ngModel)]="model.mailingStreetNumber"
+                                              [maxLength]="50"
+                                              [form]="submitForm" />
+                                </div>
+                                <div class="col-6">
+                                    <vp-input name="mailingStreetName"
+                                              label="Street Name:"
+                                              [(ngModel)]="model.mailingStreetName"
+                                              [required]="true"
+                                              [maxLength]="100"
+                                              [form]="submitForm" />
+                                </div>
+                                <div class="col-3">
+                                    <vp-input name="mailingNumber"
+                                              label="Suite/Apt #:"
+                                              [(ngModel)]="model.mailingNumber"
+                                              [maxLength]="50"
+                                              [form]="submitForm" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-xl-4 col-form-label fw-bold">City: <span class="text-danger">*</span></div>
+                        <div class="col-xl-8">
+                            <vp-input name="mailingCity"
+                                      [(ngModel)]="model.mailingCity"
+                                      [required]="true"
+                                      [maxLength]="50" />
+                            <vp-validation-field [form]="submitForm" fieldName="mailingCity" fieldLabel="City" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-xl-4 col-form-label fw-bold">State:</div>
+                        <div class="col-xl-8">
+                            <vp-input type="select"
+                                      name="mailingStateId"
+                                      [ngModel]="model.mailingState?.id"
+                                      (ngModelChange)="model.mailingState = $event ? { id: $event } : undefined"
+                                      [options]="stateOptions" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-xl-4 col-form-label fw-bold">ZIP: <span class="text-danger">*</span></div>
+                        <div class="col-xl-8">
+                            <vp-input name="mailingZip"
+                                      [(ngModel)]="model.mailingZip"
+                                      [required]="true"
+                                      [maxLength]="20" />
+                            <vp-validation-field [form]="submitForm" fieldName="mailingZip" fieldLabel="ZIP" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-xl-4 col-form-label fw-bold">Phone Number:</div>
+                        <div class="col-xl-8">
+                            <vp-input name="mailingPhoneNumber"
+                                      [(ngModel)]="model.mailingPhoneNumber"
+                                      [maxLength]="50" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-xl-4 col-form-label fw-bold">Email Address:</div>
+                        <div class="col-xl-8">
+                            <vp-input name="mailingEmailAddress"
+                                      [(ngModel)]="model.mailingEmailAddress"
+                                      [maxLength]="100" />
+                        </div>
+                    </div>
                 </vp-section>
             </div>
         </div>

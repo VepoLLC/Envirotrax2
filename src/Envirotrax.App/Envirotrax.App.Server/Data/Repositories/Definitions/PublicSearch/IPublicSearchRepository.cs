@@ -10,7 +10,7 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.PublicSearch;
 /// </summary>
 public interface IPublicSearchRepository
 {
-    Task<IEnumerable<PublicSearchWaterSupplier>> GetWaterSuppliersAsync(CancellationToken cancellationToken);
+    Task<IEnumerable<PublicSearchWaterSupplier>> GetWaterSuppliersAsync(string? domain, CancellationToken cancellationToken);
 
     Task<IEnumerable<PublicBackflowTestResult>> SearchBackflowTestsAsync(
         PublicSearchCriteria criteria,

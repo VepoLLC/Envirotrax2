@@ -69,4 +69,8 @@ export class AccountContactInformationComponent implements OnInit {
             this.isLoading = false;
         }
     }
+
+    public openSecuritySettings(): void {
+        this._authService.navigateToSecuritySettings();
+    }
 }

@@ -13,7 +13,9 @@ using Envirotrax.Common.Data.Models;
 namespace Envirotrax.App.Server.Data.Models.Fog;
 
 [Table("FogTripTickets")]
-public class FogTripTicket : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IPayableModel
+// ISharedProfessionalModel: trip tickets are visible to every professional, but only the professional
+// that recorded one can change or delete it. See ProfessionalDbContext.SetSecurityProperties.
+public class FogTripTicket : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IPayableModel, ISharedProfessionalModel
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }

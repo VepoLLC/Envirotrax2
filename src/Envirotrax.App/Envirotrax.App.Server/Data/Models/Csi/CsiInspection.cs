@@ -15,7 +15,9 @@ namespace Envirotrax.App.Server.Data.Models.Csi;
 
 [Table("CsiInspections")]
 [RecordLogged(RecordLogTableNames.CsiInspections)]
-public class CsiInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IPayableModel
+// ISharedProfessionalModel: inspections are visible to every professional, but only the professional
+// that submitted one can change or delete it. See ProfessionalDbContext.SetSecurityProperties.
+public class CsiInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IPayableModel, ISharedProfessionalModel
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }

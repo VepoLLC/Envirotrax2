@@ -74,7 +74,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
             return null;
         }
 
-        await _assemblyService.DeleteByInspectionAsync(id, default);
+        await _assemblyService.DeleteByInspectionAsync(id, deleted.ProfessionalId, default);
 
         scope.Complete();
         return MapToDto(deleted);

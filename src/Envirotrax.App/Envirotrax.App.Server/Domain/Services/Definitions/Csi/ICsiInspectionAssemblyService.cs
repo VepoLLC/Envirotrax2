@@ -10,5 +10,5 @@ public interface ICsiInspectionAssemblyService
     Task<List<CsiInspectionAssemblyDto>> GetForFormAsync(int siteId, int? inspectionId, CancellationToken cancellationToken);
     Task SaveForInspectionAsync(CsiInspection inspection, CreateCsiInspectionDto request, CancellationToken cancellationToken);
     Task MarkPaidAsync(IEnumerable<CsiInspection> inspections, string transactionId, DateTime transactionDate, CancellationToken cancellationToken);
-    Task DeleteByInspectionAsync(int inspectionId, CancellationToken cancellationToken);
+    Task DeleteByInspectionAsync(int inspectionId, int professionalId, CancellationToken cancellationToken);
 }

@@ -96,7 +96,7 @@ public class CsiInspectionAssemblyService : ICsiInspectionAssemblyService
                 .Select(assembly => assembly.Id!.Value)
                 .ToList();
 
-            await _repository.UpdateVisuallyIdentifiedAsync(inspection.Id, visuallyIdentifiedIds, cancellationToken);
+            await _repository.UpdateVisuallyIdentifiedAsync(inspection.Id, inspection.ProfessionalId, visuallyIdentifiedIds, cancellationToken);
         }
 
         var added = await BuildSiteTestAssembliesAsync(inspection, saved, request.Assemblies, cancellationToken);
@@ -114,13 +114,13 @@ public class CsiInspectionAssemblyService : ICsiInspectionAssemblyService
         foreach (var inspection in inspections)
         {
             await _testRepository.MarkCsiInspectionTestsPaidAsync(inspection, transactionId, transactionDate, cancellationToken);
-            await _repository.MarkPaidAsync(inspection.Id, transactionId, cancellationToken);
+            await _repository.MarkPaidAsync(inspection.Id, inspection.ProfessionalId, transactionId, cancellationToken);
         }
     }
 
-    public Task DeleteByInspectionAsync(int inspectionId, CancellationToken cancellationToken)
+    public Task DeleteByInspectionAsync(int inspectionId, int professionalId, CancellationToken cancellationToken)
     {
-        return _repository.DeleteByInspectionAsync(inspectionId, cancellationToken);
+        return _repository.DeleteByInspectionAsync(inspectionId, professionalId, cancellationToken);
     }
 
     // Site tests the inspector kept that the inspection does not list yet. The form listed them as current

@@ -7,10 +7,12 @@ using Envirotrax.Common.Data.Models;
 
 namespace Envirotrax.App.Server.Data.Models.Csi;
 
-// IProfessionalModel: in the professional context every query and bulk update/delete is limited to the
-// logged-in professional's rows, and new rows get its ProfessionalId (V1 let only the inspection's
-// inspector or master account change them).
-public class CsiInspectionVisuallyIdentifiedAssembly : TenantModel<WaterSupplier>, IProfessionalModel
+// ISharedProfessionalModel: assemblies at a site are visible to every professional (a site's test
+// history is shared), but only the professional whose inspection added the row can change or delete
+// it (V1 let only the inspection's inspector or master account change them). ExecuteUpdateAsync/
+// ExecuteDeleteAsync calls bypass that check, so CsiInspectionAssemblyRepository filters those by
+// ProfessionalId itself.
+public class CsiInspectionVisuallyIdentifiedAssembly : TenantModel<WaterSupplier>, ISharedProfessionalModel
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }

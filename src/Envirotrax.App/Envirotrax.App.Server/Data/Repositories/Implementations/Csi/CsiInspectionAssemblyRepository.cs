@@ -41,18 +41,22 @@ public class CsiInspectionAssemblyRepository : Repository<CsiInspectionVisuallyI
         await DbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public Task UpdateVisuallyIdentifiedAsync(int inspectionId, IReadOnlyCollection<int> visuallyIdentifiedIds, CancellationToken cancellationToken)
+    // ExecuteUpdateAsync bypasses SaveChanges, so ISharedProfessionalModel's ownership check never runs
+    // for it — the ProfessionalId check below is this method's only protection against touching another
+    // professional's assemblies.
+    public Task UpdateVisuallyIdentifiedAsync(int inspectionId, int professionalId, IReadOnlyCollection<int> visuallyIdentifiedIds, CancellationToken cancellationToken)
     {
         return Entity
-            .Where(assembly => assembly.InspectionId == inspectionId)
+            .Where(assembly => assembly.InspectionId == inspectionId && assembly.ProfessionalId == professionalId)
             .ExecuteUpdateAsync(setter => setter
                 .SetProperty(assembly => assembly.VisuallyIdentified, assembly => visuallyIdentifiedIds.Contains(assembly.Id)), cancellationToken);
     }
 
-    public Task MarkPaidAsync(int inspectionId, string transactionId, CancellationToken cancellationToken)
+    // See UpdateVisuallyIdentifiedAsync: ExecuteUpdateAsync needs its own ProfessionalId check.
+    public Task MarkPaidAsync(int inspectionId, int professionalId, string transactionId, CancellationToken cancellationToken)
     {
         return Entity
-            .Where(assembly => assembly.InspectionId == inspectionId && (assembly.TransactionId == null || assembly.TransactionId == ""))
+            .Where(assembly => assembly.InspectionId == inspectionId && assembly.ProfessionalId == professionalId && (assembly.TransactionId == null || assembly.TransactionId == ""))
             .ExecuteUpdateAsync(setter => setter
                 .SetProperty(assembly => assembly.TransactionId, transactionId), cancellationToken);
     }
@@ -79,11 +83,12 @@ public class CsiInspectionAssemblyRepository : Repository<CsiInspectionVisuallyI
         await DbContext.SaveChangesAsync(cancellationToken);
     }
 
-    // V1 checkout delete of an unpaid inspection: its rows go, the tests it added stay.
-    public Task DeleteByInspectionAsync(int inspectionId, CancellationToken cancellationToken)
+    // V1 checkout delete of an unpaid inspection: its rows go, the tests it added stay. See
+    // UpdateVisuallyIdentifiedAsync: ExecuteDeleteAsync needs its own ProfessionalId check.
+    public Task DeleteByInspectionAsync(int inspectionId, int professionalId, CancellationToken cancellationToken)
     {
         return Entity
-            .Where(assembly => assembly.InspectionId == inspectionId)
+            .Where(assembly => assembly.InspectionId == inspectionId && assembly.ProfessionalId == professionalId)
             .ExecuteDeleteAsync(cancellationToken);
     }
 }

@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using Envirotrax.App.Server.Data.Models.Professionals;
+using Envirotrax.Common.Data;
 using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -81,7 +81,7 @@ namespace Envirotrax.App.Server.Data.DbContexts
 
             if (entry.State is EntityState.Modified or EntityState.Deleted && professionalProperty.OriginalValue != professionalId)
             {
-                throw new ValidationException("Access denied.");
+                throw new AppValidationException("Access denied.");
             }
         }
 

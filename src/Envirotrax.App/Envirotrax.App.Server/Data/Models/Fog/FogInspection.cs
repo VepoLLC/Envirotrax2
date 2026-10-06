@@ -15,7 +15,9 @@ namespace Envirotrax.App.Server.Data.Models.Fog;
 
 [Table("FogInspections")]
 [RecordLogged(RecordLogTableNames.FogInspections)]
-public class FogInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IPayableModel
+// ISharedProfessionalModel: inspections are visible to every professional, but only the professional
+// that submitted one can change or delete it. See ProfessionalDbContext.SetSecurityProperties.
+public class FogInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IPayableModel, ISharedProfessionalModel
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }

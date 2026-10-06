@@ -69,7 +69,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
 
         var deleted = await _repository.DeleteAsync(id);
 
-        if (deleted == null || deleted.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(deleted.TransactionId))
+        if (deleted == null || !string.IsNullOrEmpty(deleted.TransactionId))
         {
             return null;
         }
@@ -163,11 +163,10 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
     }
 
     // Checkout "Edit" on an own, still-unpaid inspection: mirrors SubmitAsync's field list and snapshot
-    // logic, but against an existing row. Ownership + payment-status guard lives in the repository
-    // (UpdateForProfessionalAsync returns Model == null for not-found/not-owned/already-paid).
+    // logic, but against an existing row. Ownership is enforced by ProfessionalDbContext (CsiInspection
+    // is an ISharedProfessionalModel); the repository's own guard only covers not-found/already-paid.
     public async Task<CsiInspectionDto?> UpdateForProfessionalAsync(int id, CreateCsiInspectionDto request, CancellationToken cancellationToken)
     {
-        var professionalId = _authService.ProfessionalId;
         var siteId = request.Site!.Id!.Value;
         var inspectorUserId = request.InspectorUser!.Id!.Value;
 
@@ -207,7 +206,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
 
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        var saved = await _repository.UpdateForProfessionalAsync(inspection, professionalId);
+        var saved = await _repository.UpdateForProfessionalAsync(inspection);
 
         if (saved == null)
         {

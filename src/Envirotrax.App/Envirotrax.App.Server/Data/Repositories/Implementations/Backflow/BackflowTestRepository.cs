@@ -947,9 +947,10 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return string.Concat(serial.Where(char.IsDigit)).TrimStart('0');
     }
 
+    // Ownership is enforced by ProfessionalDbContext (BackflowTest is an ISharedProfessionalModel); a
+    // non-owner's save throws rather than returning null here. Only the not-found/already-paid guard is ours.
     public async Task<BackflowTest?> UpdateForProfessionalAsync(
         BackflowTest model,
-        int professionalId,
         string? newAssemblyImagePath,
         string? newSerialNumberImagePath,
         string? newBypassAssemblyImagePath,
@@ -958,7 +959,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
     {
         var test = await GetTrackedForUpdateAsync(model.Id, default);
 
-        if (test == null || test.ProfessionalId != professionalId || !string.IsNullOrEmpty(test.TransactionId))
+        if (test == null || !string.IsNullOrEmpty(test.TransactionId))
         {
             return null;
         }

@@ -88,7 +88,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
 
         var deleted = await _repository.DeleteAsync(id);
 
-        if (deleted == null || deleted.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(deleted.TransactionId))
+        if (deleted == null || !string.IsNullOrEmpty(deleted.TransactionId))
         {
             return null;
         }
@@ -222,8 +222,8 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
     }
 
     // Checkout "Edit" on an own, still-unpaid inspection: mirrors SubmitAsync's field list and snapshot
-    // logic, but against an existing row. Ownership + payment-status guard lives in the repository
-    // (UpdateForProfessionalAsync returns Model == null for not-found/not-owned/already-paid).
+    // logic, but against an existing row. Ownership is enforced by ProfessionalDbContext (FogInspection
+    // is an ISharedProfessionalModel); the repository's own guard only covers not-found/already-paid.
     public async Task<FogInspectionDto?> UpdateForProfessionalAsync(
         int id,
         FogInspectionDto request,
@@ -232,7 +232,6 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         Stream? signatureStream, string? signatureFileName,
         CancellationToken cancellationToken)
     {
-        var professionalId = _authService.ProfessionalId;
         var siteId = request.Site!.Id!.Value;
         var inspectorUserId = request.Inspector!.Id!.Value;
 
@@ -312,7 +311,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
 
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        var saved = await _repository.UpdateForProfessionalAsync(inspection, professionalId, newExteriorPath, newInteriorPath, newSignaturePath);
+        var saved = await _repository.UpdateForProfessionalAsync(inspection, newExteriorPath, newInteriorPath, newSignaturePath);
 
         if (saved == null)
         {

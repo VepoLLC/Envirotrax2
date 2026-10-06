@@ -176,11 +176,13 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         return inspection;
     }
 
-    public async Task<CsiInspection?> UpdateForProfessionalAsync(CsiInspection model, int professionalId)
+    // Ownership is enforced by ProfessionalDbContext (CsiInspection is an ISharedProfessionalModel); a
+    // non-owner's save throws rather than returning null here. Only the not-found/already-paid guard is ours.
+    public async Task<CsiInspection?> UpdateForProfessionalAsync(CsiInspection model)
     {
         var inspection = await GetTrackedForUpdateAsync(model.Id, default);
 
-        if (inspection == null || inspection.ProfessionalId != professionalId || !string.IsNullOrEmpty(inspection.TransactionId))
+        if (inspection == null || !string.IsNullOrEmpty(inspection.TransactionId))
         {
             return null;
         }

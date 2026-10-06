@@ -12,7 +12,6 @@ public interface IFogInspectionRepository : IRepository<FogInspection>
 
     Task<FogInspection?> UpdateForProfessionalAsync(
         FogInspection model,
-        int professionalId,
         string? newExteriorImagePath,
         string? newInteriorImagePath,
         string? newSignatureImagePath);

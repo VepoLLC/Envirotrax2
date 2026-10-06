@@ -80,16 +80,17 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    // Ownership is enforced by ProfessionalDbContext (FogInspection is an ISharedProfessionalModel); a
+    // non-owner's save throws rather than returning null here. Only the not-found/already-paid guard is ours.
     public async Task<FogInspection?> UpdateForProfessionalAsync(
         FogInspection model,
-        int professionalId,
         string? newExteriorImagePath,
         string? newInteriorImagePath,
         string? newSignatureImagePath)
     {
         var inspection = await GetTrackedForUpdateAsync(model.Id, default);
 
-        if (inspection == null || inspection.ProfessionalId != professionalId || !string.IsNullOrEmpty(inspection.TransactionId))
+        if (inspection == null || !string.IsNullOrEmpty(inspection.TransactionId))
         {
             return null;
         }

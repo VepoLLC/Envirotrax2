@@ -45,7 +45,6 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
     // Professional edit-in-place (checkout "Edit" on an own, still-unpaid test)
     Task<BackflowTest?> UpdateForProfessionalAsync(
         BackflowTest model,
-        int professionalId,
         string? newAssemblyImagePath,
         string? newSerialNumberImagePath,
         string? newBypassAssemblyImagePath,

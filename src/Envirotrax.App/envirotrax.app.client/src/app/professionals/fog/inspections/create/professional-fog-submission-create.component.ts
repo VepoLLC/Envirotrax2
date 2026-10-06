@@ -270,26 +270,6 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
                 this.validationErrors.push('Waste Trap or Tank Capacity must be a whole number of 0 or greater.');
             }
         }
-        const chamberValues = [
-            this.model.inletChamberWettingHeight,
-            this.model.inletChamberGreaseBlanket,
-            this.model.inletChamberSediments,
-            this.model.outletChamberWettingHeight,
-            this.model.outletChamberGreaseBlanket,
-            this.model.outletChamberSediments
-        ];
-        if (chamberValues.some(v => this.isInvalidChamberValue(v))) {
-            this.validationErrors.push('Chamber readings (wetted height, grease blanket, sediments) must be numbers of 0 or greater.');
-        }
-    }
-
-    // A chamber reading is required and must be a non-negative number (decimals allowed).
-    public isInvalidChamberValue(value: string | undefined): boolean {
-        if (value == null || value.trim() === '') {
-            return true;
-        }
-        const parsed = Number(value);
-        return isNaN(parsed) || parsed < 0;
     }
 
     public recalcCapacity(): void {

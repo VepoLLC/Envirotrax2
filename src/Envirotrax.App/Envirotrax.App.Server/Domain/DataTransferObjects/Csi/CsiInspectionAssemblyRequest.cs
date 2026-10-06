@@ -2,23 +2,19 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 
-// One row of the inspection's "Assemblies at this Location" list, as it stands when the inspector
-// completes the submission. The row kind follows from which ids are set:
-//   Id set             → a row already saved against the inspection
-//   TestId set, no Id  → a current test at the site, not yet saved against the inspection
-//   neither            → an assembly the inspector added, which becomes a new BackflowTest
+// An assembly the inspector adds on the inspection form ("+ Add Assembly"). It is saved straight away,
+// under the form's SubmissionId, and linked to the inspection when the inspection is submitted.
 public class CsiInspectionAssemblyRequest
 {
-    public int? Id { get; set; }
-
-    public int? TestId { get; set; }
-
-    public bool VisuallyIdentified { get; set; }
-
-    // New assembly only. Manufacturer, model and size are kept short enough that the
-    // "{manufacturer} {model} {size} - {device type}" description fits AssemblyDescription.
+    [Required]
     [MaxLength(50)]
-    public string? DeviceType { get; set; }
+    public string SubmissionId { get; set; } = null!;
+
+    public int SiteId { get; set; }
+
+    [Required]
+    [MaxLength(50)]
+    public string DeviceType { get; set; } = null!;
 
     [MaxLength(50)]
     public string? Manufacturer { get; set; }
@@ -26,7 +22,7 @@ public class CsiInspectionAssemblyRequest
     [MaxLength(50)]
     public string? Model { get; set; }
 
-    [MaxLength(20)]
+    [MaxLength(50)]
     public string? Size { get; set; }
 
     [MaxLength(50)]
@@ -38,14 +34,15 @@ public class CsiInspectionAssemblyRequest
     [MaxLength(50)]
     public string? Model2 { get; set; }
 
-    [MaxLength(20)]
+    [MaxLength(50)]
     public string? Size2 { get; set; }
 
     [MaxLength(50)]
     public string? SerialNumber2 { get; set; }
 
+    [Required]
     [MaxLength(50)]
-    public string? HazardType { get; set; }
+    public string HazardType { get; set; } = null!;
 
     [MaxLength(200)]
     public string? HazardTypeOtherDescription { get; set; }

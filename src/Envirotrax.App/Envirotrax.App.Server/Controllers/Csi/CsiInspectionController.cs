@@ -17,13 +17,19 @@ public class CsiInspectionController : WaterSupplierCrudController<CsiInspection
     private readonly ICsiInspectionService _inspectionService;
     private readonly ICsiInspectionImageService _imageService;
     private readonly IRecordLogService _recordLogService;
+    private readonly ICsiInspectionAssemblyService _assemblyService;
 
-    public CsiInspectionController(ICsiInspectionService service, ICsiInspectionImageService imageService, IRecordLogService recordLogService)
+    public CsiInspectionController(
+        ICsiInspectionService service,
+        ICsiInspectionImageService imageService,
+        IRecordLogService recordLogService,
+        ICsiInspectionAssemblyService assemblyService)
         : base(service)
     {
         _inspectionService = service;
         _imageService = imageService;
         _recordLogService = recordLogService;
+        _assemblyService = assemblyService;
     }
 
     [HttpGet("pdf")]
@@ -64,6 +70,14 @@ public class CsiInspectionController : WaterSupplierCrudController<CsiInspection
 
         var logs = await _recordLogService.GetByRecordAsync(RecordLogTableNames.CsiInspections, id, cancellationToken);
         return Ok(logs);
+    }
+
+    [HttpGet("{id}/assemblies")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetAssembliesAsync(int id, CancellationToken cancellationToken)
+    {
+        var assemblies = await _assemblyService.GetByInspectionAsync(id, cancellationToken);
+        return Ok(assemblies);
     }
 
     [HttpGet("{id}/images")]

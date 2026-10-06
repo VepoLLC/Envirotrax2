@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { HelperService, InputOption, RecordLog } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
@@ -55,6 +55,8 @@ const DaysInMillisecond = 1000 * 60 * 60 * 24;
     ]
 })
 export class BackflowTestDetailsComponent implements OnInit, OnDestroy {
+    @ViewChild('detailsForm') public detailsForm?: NgForm;
+
     public id: number = 0;
     public waterSupplierId: number = 0;
     public idPrefix: string = 'backflow-test';
@@ -201,8 +203,16 @@ export class BackflowTestDetailsComponent implements OnInit, OnDestroy {
         }
     }
 
+    private validateForSave(): boolean {
+        return !this.detailsForm?.invalid;
+    }
+
     private async saveTest(): Promise<boolean> {
         this.dismissSaveMessage();
+
+        if (!this.validateForSave()) {
+            return false;
+        }
 
         try {
             this.isSaving = true;

@@ -39,7 +39,6 @@ export class SettingsCopyService {
     };
 
     private _parentAvailability$: Observable<boolean> | null = null;
-    private _isCopying: boolean = false;
 
     constructor(
         private readonly _urlResolver: UrlResolverService,
@@ -62,10 +61,6 @@ export class SettingsCopyService {
     }
 
     public async confirmAndCopyFromParent(section: SettingsSection): Promise<boolean> {
-        if (this._isCopying) {
-            return false;
-        }
-
         const description = SettingsCopyService.descriptions[section];
         const confirmed = await this.confirm(description);
 
@@ -74,8 +69,6 @@ export class SettingsCopyService {
         }
 
         try {
-            this._isCopying = true;
-
             await this.copyFromParent(section);
 
             this._toastService.show({ text: this.buildSuccessMessage(description), type: ToastType.Success });
@@ -91,8 +84,6 @@ export class SettingsCopyService {
             this._toastService.show({ text: validationErrors[0], type: ToastType.Error });
 
             return false;
-        } finally {
-            this._isCopying = false;
         }
     }
 

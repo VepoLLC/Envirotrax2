@@ -1,0 +1,85 @@
+<div class="d-flex flex-wrap gap-4 justify-content-center mb-3">
+    <span><i class="fa-solid fa-square text-success me-1"></i>Current Test</span>
+    <span><i class="fa-regular fa-square text-success me-1"></i>Previous Test History</span>
+    <span><i class="fa-solid fa-square text-primary me-1"></i>Passed Test</span>
+    <span><i class="fa-regular fa-square text-primary me-1"></i>Failed Test</span>
+    <span><i class="fa-solid fa-square text-info me-1"></i>In Service</span>
+    <span><i class="fa-regular fa-square text-info me-1"></i>Out of Service</span>
+</div>
+
+<ng-content></ng-content>
+
+<p *ngIf="rows.length === 0" class="text-muted text-center">
+    There are no assembly records for this location.
+</p>
+
+<div *ngIf="rows.length > 0" class="table-responsive">
+    <table class="table table-sm table-striped align-middle mb-0">
+        <thead>
+            <tr>
+                <th class="text-center">#</th>
+                <th class="text-center">Status</th>
+                <th>Test/Exp Date</th>
+                <th>Serial Number</th>
+                <th>Assembly Description</th>
+                <th class="text-center">Visually Identified</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let row of rows; let i = index">
+                <td class="text-center">{{ i + 1 }}</td>
+                <td class="text-center text-nowrap">
+                    <i class="fa-square text-success me-1"
+                       [class.fa-solid]="row.isCurrent" [class.fa-regular]="!row.isCurrent"
+                       [attr.title]="row.isCurrent ? 'Current Test' : 'Previous Test History'"></i>
+                    <i class="fa-square text-primary me-1"
+                       [class.fa-solid]="row.isPassing" [class.fa-regular]="!row.isPassing"
+                       [attr.title]="row.isPassing ? 'Passed Test' : 'Failed Test'"></i>
+                    <i class="fa-square text-info"
+                       [class.fa-solid]="row.inService" [class.fa-regular]="!row.inService"
+                       [attr.title]="row.inService ? 'In Service' : 'Out of Service'"></i>
+                </td>
+                <td class="text-nowrap">
+                    {{ row.assembly.testDate | date:'MM/dd/yyyy' }}<br>
+                    {{ row.assembly.expirationDate | date:'MM/dd/yyyy' }}
+                </td>
+                <td>
+                    <ng-container *ngIf="row.hasBypass; else singleSerial">
+                        <span class="fw-semibold">Main:</span> {{ row.assembly.serialNumber }}<br>
+                        <span class="fw-semibold">Bypass:</span> {{ row.assembly.serialNumber2 }}
+                    </ng-container>
+                    <ng-template #singleSerial>{{ row.assembly.serialNumber }}</ng-template>
+                </td>
+                <td>
+                    <ng-container *ngIf="row.hasBypass; else singleAssembly">
+                        <div><span class="fw-semibold">Main Assembly:</span> {{ row.assembly.assemblyDescription }}</div>
+                        <div><span class="fw-semibold">Bypass Assembly:</span> {{ row.assembly.assemblyDescription2 }}</div>
+                    </ng-container>
+                    <ng-template #singleAssembly>
+                        <div><span class="fw-semibold">Assembly Desc:</span> {{ row.assembly.assemblyDescription }}</div>
+                    </ng-template>
+                    <div><span class="fw-semibold">Hazard Type:</span> {{ row.hazardDescription }}</div>
+                    <div><span class="fw-semibold">Location Desc:</span> {{ row.assembly.locationDescription }}</div>
+                </td>
+                <td class="text-center">
+                    <input type="checkbox" class="form-check-input"
+                           [attr.aria-label]="'Visually identified ' + (i + 1)"
+                           [disabled]="!editable"
+                           [(ngModel)]="row.assembly.visuallyIdentified"
+                           [ngModelOptions]="{standalone: true}" />
+                </td>
+                <td class="text-end">
+                    <button *ngIf="editable && !row.isPaid" type="button" class="btn btn-danger btn-sm"
+                            (click)="delete.emit(row.assembly)">
+                        Delete
+                    </button>
+                    <a *ngIf="!editable && row.isPaid && row.assembly.testId" class="btn btn-primary btn-sm"
+                       [routerLink]="['/backflow/tests', row.assembly.testId, 'view']">
+                        View
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

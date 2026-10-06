@@ -12,6 +12,7 @@ import { ProfessionalUserLicenseListComponent } from "./users/edit/licenses/list
 import { CreateEditLicenseComponent } from "./users/edit/licenses/create-edit/create-edit-license.component";
 import { SiteListComponent } from "./sites/site-list.component";
 import { SiteDetailsComponent } from "./sites/details/site-details.component";
+import { EditSiteScheduleComponent } from "./sites/schedule/edit-site-schedule.component";
 import { SiteBackflowTestsComponent } from "./sites/details/site-backflow-tests.component";
 import { SiteCsiInspectionsComponent } from "./sites/details/site-csi-inspections.component";
 import { InsuranceListComponent } from "./insurances/list/insurance-list.component";
@@ -35,6 +36,7 @@ import { AccountBalanceManagementComponent } from "./account/account-balance-man
         CreateEditLicenseComponent,
         SiteListComponent,
         SiteDetailsComponent,
+        EditSiteScheduleComponent,
         SiteBackflowTestsComponent,
         SiteCsiInspectionsComponent,
         InsuranceListComponent,

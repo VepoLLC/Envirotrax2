@@ -114,7 +114,10 @@
                                 <span class="input-group-text">$</span>
                                 <vp-input type="number" [decimals]="2"
                                           [(ngModel)]="settings.bpatsRequireInsuranceAmount"
-                                          name="bpatsRequireInsuranceAmount" />
+                                          name="bpatsRequireInsuranceAmount"
+                                          [min]="0"
+                                          validationLabel="Amount"
+                                          [form]="settingsForm" />
                             </div>
                         </div>
 
@@ -138,7 +141,10 @@
                                 <span class="input-group-text">$</span>
                                 <vp-input type="number" [decimals]="2"
                                           [(ngModel)]="settings.csiInspectorsRequireInsuranceAmount"
-                                          name="csiInspectorsRequireInsuranceAmount" />
+                                          name="csiInspectorsRequireInsuranceAmount"
+                                          [min]="0"
+                                          validationLabel="Amount"
+                                          [form]="settingsForm" />
                             </div>
                         </div>
 
@@ -154,7 +160,10 @@
                                 <span class="input-group-text">$</span>
                                 <vp-input type="number" [decimals]="2"
                                           [(ngModel)]="settings.fogTransportersRequireInsuranceAmount"
-                                          name="fogTransportersRequireInsuranceAmount" />
+                                          name="fogTransportersRequireInsuranceAmount"
+                                          [min]="0"
+                                          validationLabel="Amount"
+                                          [form]="settingsForm" />
                             </div>
                         </div>
 
@@ -221,56 +230,92 @@
                                             Fees:</strong></td>
                                     <td><vp-input type="number" [decimals]="2"
                                                   [(ngModel)]="settings.backflowCommercialTestFee"
-                                                  name="backflowCommercialTestFee" /></td>
+                                                  name="backflowCommercialTestFee"
+                                                  [min]="0"
+                                                  validationLabel="Total Fee"
+                                                  [form]="settingsForm" /></td>
                                     <td><vp-input type="number" [decimals]="2"
                                                   [(ngModel)]="settings.backflowCommercialTestFeeWsShare"
-                                                  name="backflowCommercialTestFeeWsShare" /></td>
+                                                  name="backflowCommercialTestFeeWsShare"
+                                                  [min]="0"
+                                                  validationLabel="WS Share"
+                                                  [form]="settingsForm" /></td>
                                 </tr>
                                 <tr>
                                     <td class="text-end pe-2 text-nowrap"><strong>Backflow Residential Test
                                             Fees:</strong></td>
                                     <td><vp-input type="number" [decimals]="2"
                                                   [(ngModel)]="settings.backflowResidentialTestFee"
-                                                  name="backflowResidentialTestFee" /></td>
+                                                  name="backflowResidentialTestFee"
+                                                  [min]="0"
+                                                  validationLabel="Total Fee"
+                                                  [form]="settingsForm" /></td>
                                     <td><vp-input type="number" [decimals]="2"
                                                   [(ngModel)]="settings.backflowResidentialTestFeeWsShare"
-                                                  name="backflowResidentialTestFeeWsShare" /></td>
+                                                  name="backflowResidentialTestFeeWsShare"
+                                                  [min]="0"
+                                                  validationLabel="WS Share"
+                                                  [form]="settingsForm" /></td>
                                 </tr>
                                 <tr>
                                     <td class="text-end pe-2 text-nowrap"><strong>CSI Commercial Inspection
                                             Fees:</strong></td>
                                     <td><vp-input type="number" [decimals]="2"
                                                   [(ngModel)]="settings.csiCommercialInspectionFee"
-                                                  name="csiCommercialInspectionFee" /></td>
+                                                  name="csiCommercialInspectionFee"
+                                                  [min]="0"
+                                                  validationLabel="Total Fee"
+                                                  [form]="settingsForm" /></td>
                                     <td><vp-input type="number" [decimals]="2"
                                                   [(ngModel)]="settings.csiCommercialInspectionFeeWsShare"
-                                                  name="csiCommercialInspectionFeeWsShare" /></td>
+                                                  name="csiCommercialInspectionFeeWsShare"
+                                                  [min]="0"
+                                                  validationLabel="WS Share"
+                                                  [form]="settingsForm" /></td>
                                 </tr>
                                 <tr>
                                     <td class="text-end pe-2 text-nowrap"><strong>CSI Residential Inspection
                                             Fees:</strong></td>
                                     <td><vp-input type="number" [decimals]="2"
                                                   [(ngModel)]="settings.csiResidentialInspectionFee"
-                                                  name="csiResidentialInspectionFee" /></td>
+                                                  name="csiResidentialInspectionFee"
+                                                  [min]="0"
+                                                  validationLabel="Total Fee"
+                                                  [form]="settingsForm" /></td>
                                     <td><vp-input type="number" [decimals]="2"
                                                   [(ngModel)]="settings.csiResidentialInspectionFeeWsShare"
-                                                  name="csiResidentialInspectionFeeWsShare" /></td>
+                                                  name="csiResidentialInspectionFeeWsShare"
+                                                  [min]="0"
+                                                  validationLabel="WS Share"
+                                                  [form]="settingsForm" /></td>
                                 </tr>
                                 <tr>
                                     <td class="text-end pe-2 text-nowrap"><strong>FOG Transport Fees:</strong></td>
                                     <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.fogTransportFee"
-                                                  name="fogTransportFee" /></td>
+                                                  name="fogTransportFee"
+                                                  [min]="0"
+                                                  validationLabel="Total Fee"
+                                                  [form]="settingsForm" /></td>
                                     <td><vp-input type="number" [decimals]="2"
                                                   [(ngModel)]="settings.fogTransportFeeWsShare"
-                                                  name="fogTransportFeeWsShare" /></td>
+                                                  name="fogTransportFeeWsShare"
+                                                  [min]="0"
+                                                  validationLabel="WS Share"
+                                                  [form]="settingsForm" /></td>
                                 </tr>
                                 <tr>
                                     <td class="text-end pe-2 text-nowrap"><strong>FOG Inspection Fees:</strong></td>
                                     <td><vp-input type="number" [decimals]="2" [(ngModel)]="settings.fogInspectorFee"
-                                                  name="fogInspectorFee" /></td>
+                                                  name="fogInspectorFee"
+                                                  [min]="0"
+                                                  validationLabel="Total Fee"
+                                                  [form]="settingsForm" /></td>
                                     <td><vp-input type="number" [decimals]="2"
                                                   [(ngModel)]="settings.fogInspectorFeeWsShare"
-                                                  name="fogInspectorFeeWsShare" /></td>
+                                                  name="fogInspectorFeeWsShare"
+                                                  [min]="0"
+                                                  validationLabel="WS Share"
+                                                  [form]="settingsForm" /></td>
                                 </tr>
                             </tbody>
                         </table>

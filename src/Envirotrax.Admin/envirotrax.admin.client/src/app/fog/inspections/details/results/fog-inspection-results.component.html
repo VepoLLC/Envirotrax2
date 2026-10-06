@@ -172,8 +172,11 @@
 
             <div class="row align-items-center mb-2">
                 <div class="col-7">Wetted Height in Inches</div>
-                <div class="col-5" [class.vp-field-invalid]="isInvalidChamberValue(inspection.inletChamberWettingHeight)">
+                <div class="col-5">
                     <vp-input name="inletChamberWettingHeight"
+                              [numeric]="true"
+                              [min]="0"
+                              validationLabel="Inlet Wetted Height"
                               [form]="form"
                               [maxLength]="50"
                               [ngModel]="inspection.inletChamberWettingHeight"
@@ -183,8 +186,11 @@
 
             <div class="row align-items-center mb-2">
                 <div class="col-7">Grease Blanket in Inches</div>
-                <div class="col-5" [class.vp-field-invalid]="isInvalidChamberValue(inspection.inletChamberGreaseBlanket)">
+                <div class="col-5">
                     <vp-input name="inletChamberGreaseBlanket"
+                              [numeric]="true"
+                              [min]="0"
+                              validationLabel="Inlet Grease Blanket"
                               [form]="form"
                               [maxLength]="50"
                               [ngModel]="inspection.inletChamberGreaseBlanket"
@@ -194,8 +200,11 @@
 
             <div class="row align-items-center mb-2">
                 <div class="col-7">Sediments in Inches</div>
-                <div class="col-5" [class.vp-field-invalid]="isInvalidChamberValue(inspection.inletChamberSediments)">
+                <div class="col-5">
                     <vp-input name="inletChamberSediments"
+                              [numeric]="true"
+                              [min]="0"
+                              validationLabel="Inlet Sediments"
                               [form]="form"
                               [maxLength]="50"
                               [ngModel]="inspection.inletChamberSediments"
@@ -238,8 +247,11 @@
 
             <div class="row align-items-center mb-2">
                 <div class="col-7">Wetted Height in Inches</div>
-                <div class="col-5" [class.vp-field-invalid]="isInvalidChamberValue(inspection.outletChamberWettingHeight)">
+                <div class="col-5">
                     <vp-input name="outletChamberWettingHeight"
+                              [numeric]="true"
+                              [min]="0"
+                              validationLabel="Outlet Wetted Height"
                               [form]="form"
                               [maxLength]="50"
                               [ngModel]="inspection.outletChamberWettingHeight"
@@ -249,8 +261,11 @@
 
             <div class="row align-items-center mb-2">
                 <div class="col-7">Grease Blanket in Inches</div>
-                <div class="col-5" [class.vp-field-invalid]="isInvalidChamberValue(inspection.outletChamberGreaseBlanket)">
+                <div class="col-5">
                     <vp-input name="outletChamberGreaseBlanket"
+                              [numeric]="true"
+                              [min]="0"
+                              validationLabel="Outlet Grease Blanket"
                               [form]="form"
                               [maxLength]="50"
                               [ngModel]="inspection.outletChamberGreaseBlanket"
@@ -260,8 +275,11 @@
 
             <div class="row align-items-center mb-2">
                 <div class="col-7">Sediments in Inches</div>
-                <div class="col-5" [class.vp-field-invalid]="isInvalidChamberValue(inspection.outletChamberSediments)">
+                <div class="col-5">
                     <vp-input name="outletChamberSediments"
+                              [numeric]="true"
+                              [min]="0"
+                              validationLabel="Outlet Sediments"
                               [form]="form"
                               [maxLength]="50"
                               [ngModel]="inspection.outletChamberSediments"

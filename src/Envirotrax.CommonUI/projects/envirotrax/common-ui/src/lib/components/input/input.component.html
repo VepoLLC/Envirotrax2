@@ -108,6 +108,6 @@
 
     <div [class.vp-input-validation-row]="labelStyle == 'horizontal'"
          class="justify-content-end">
-        <vp-validation-field *ngIf="form" [form]="form" [fieldName]="name" [fieldLabel]="label" />
+        <vp-validation-field *ngIf="form" [form]="form" [fieldName]="name" [fieldLabel]="validationLabel || label" />
     </div>
 </div>

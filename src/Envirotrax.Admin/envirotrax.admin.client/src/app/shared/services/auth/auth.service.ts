@@ -84,4 +84,15 @@ export class AuthService {
         const user = await this._userManager.getUser();
         return user?.profile?.email;
     }
+
+    public async hasAnyRoles(...roles: string[]): Promise<boolean> {
+        const userRoles = await this.getProfileField('role');
+
+        if (!userRoles) {
+            return false;
+        }
+
+        const rolesArray = Array.isArray(userRoles) ? userRoles : [userRoles];
+        return roles.some(role => rolesArray.includes(role));
+    }
 }

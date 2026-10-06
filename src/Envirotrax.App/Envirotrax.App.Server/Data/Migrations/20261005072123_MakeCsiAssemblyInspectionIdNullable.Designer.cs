@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261005072123_MakeCsiAssemblyInspectionIdNullable")]
+    partial class MakeCsiAssemblyInspectionIdNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2804,9 +2807,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("HasWiseGuys")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("HideCellPhoneNumber")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("HidePublicListing")
                         .HasColumnType("bit");
 
@@ -4174,6 +4174,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("LegacyRecordId")
+                        .HasColumnType("int");
+
                     b.Property<string>("LetterAddress")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -4267,7 +4270,7 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.HasIndex("DeletedById");
 
-                    b.HasIndex("Domain");
+                    b.HasIndex("LegacyRecordId");
 
                     b.HasIndex("LetterContactStateId");
 

@@ -19,8 +19,8 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" [class.active]="selectedTab === 'assemblies'"
-                       [routerLink]="['/csi', id, 'view']" (click)="onTabChange('assemblies')">Assemblies At This
-                        Location</a>
+                       [routerLink]="['/csi', id, 'view']" (click)="onTabChange('assemblies')">Assemblies at This
+                        Location ({{ assemblies.length }})</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" [class.active]="selectedTab === 'additional'"
@@ -295,6 +295,12 @@
                 A Customer Service Inspection Certificate should be on file for each connection in a public water system
                 to document compliance with 30 TAC §290.44(h)/290.46(j).
             </div>
+        </div>
+
+        <div *ngIf="selectedTab === 'assemblies'" class="row mt-3">
+            <vp-section header="Assemblies at This Location">
+                <vp-csi-inspection-assembly-table [assemblies]="assemblies" />
+            </vp-section>
         </div>
 
         <div *ngIf="selectedTab === 'images'" class="row mt-3">

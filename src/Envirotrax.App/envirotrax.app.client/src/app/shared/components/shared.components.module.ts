@@ -11,6 +11,8 @@ import { SiteLogEditComponent } from "./site-log/site-log-edit.component";
 import { CreditCardPaymentComponent } from "./credit-card-payment/credit-card-payment.component";
 import { FormsModule } from "@angular/forms";
 import { CommonModule } from "@angular/common";
+import { RouterModule } from "@angular/router";
+import { CsiInspectionAssemblyTableComponent } from "./csi/csi-inspection-assembly-table.component";
 
 @NgModule({
     declarations: [
@@ -22,12 +24,14 @@ import { CommonModule } from "@angular/common";
         DownloadManagerComponent,
         PropertyLogCellComponent,
         SiteLogEditComponent,
-        CreditCardPaymentComponent
+        CreditCardPaymentComponent,
+        CsiInspectionAssemblyTableComponent
     ],
     imports: [
         EnvirotraxComponentsModule,
         FormsModule,
-        CommonModule
+        CommonModule,
+        RouterModule
     ],
     exports: [
         EnvirotraxComponentsModule,
@@ -36,7 +40,8 @@ import { CommonModule } from "@angular/common";
         ProfessionalUserLookupComponent,
         WaterSupplierUserLookupComponent,
         DownloadManagerComponent,
-        CreditCardPaymentComponent
+        CreditCardPaymentComponent,
+        CsiInspectionAssemblyTableComponent
     ]
 })
 export class SharedComponentsModule {

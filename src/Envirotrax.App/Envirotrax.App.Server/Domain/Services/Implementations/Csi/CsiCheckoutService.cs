@@ -21,6 +21,7 @@ public class CsiCheckoutService
     private readonly ICsiInspectionRepository _inspectionRepository;
     private readonly ISiteRepository _siteRepository;
     private readonly ICsiCheckoutEmailService _checkoutEmailService;
+    private readonly ICsiInspectionAssemblyService _assemblyService;
 
     protected override ProfessionalTransactionType TransactionType => ProfessionalTransactionType.CsiInspection;
 
@@ -32,13 +33,15 @@ public class CsiCheckoutService
         IProfessionalRepository professionalRepository,
         IProfessionalTransactionRepository transactionRepository,
         IProfessionalPaymentService paymentService,
-        ICsiCheckoutEmailService checkoutEmailService)
+        ICsiCheckoutEmailService checkoutEmailService,
+        ICsiInspectionAssemblyService assemblyService)
         : base(authService, professionalRepository, transactionRepository, paymentService)
     {
         _mapper = mapper;
         _inspectionRepository = inspectionRepository;
         _siteRepository = siteRepository;
         _checkoutEmailService = checkoutEmailService;
+        _assemblyService = assemblyService;
     }
 
     protected override Task<List<CsiInspection>> GetUnpaidItemsAsync(List<int> ids, CancellationToken cancellationToken)
@@ -46,12 +49,16 @@ public class CsiCheckoutService
         return _inspectionRepository.GetUnpaidForCheckoutAsync(ids, AuthService.ProfessionalId, GetInspectorId(), cancellationToken);
     }
 
-    protected override Task<int> MarkItemsPaidAsync(List<CsiInspection> inspections, ProfessionalTransaction transaction, List<int> emailPdfIds)
+    protected override async Task<int> MarkItemsPaidAsync(List<CsiInspection> inspections, ProfessionalTransaction transaction, List<int> emailPdfIds)
     {
         var inspectionIds = inspections.Select(inspection => inspection.Id).ToList();
 
-        return _inspectionRepository.MarkPaidAsync(
+        var paidCount = await _inspectionRepository.MarkPaidAsync(
             inspectionIds, transaction.ProfessionalId, GetInspectorId(), transaction.TransactionId!, transaction.TransactionDate, emailPdfIds, CancellationToken.None);
+
+        await _assemblyService.MarkPaidAsync(inspections, transaction.TransactionId!, transaction.TransactionDate, CancellationToken.None);
+
+        return paidCount;
     }
 
     protected override Task<decimal> SumPaidAmountAsync(ProfessionalTransaction transaction)

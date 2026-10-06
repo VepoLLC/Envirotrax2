@@ -170,19 +170,31 @@ export class CsiInspectionService {
         return lastValueFrom(this._http.post<CsiInspectionImage>(url, formData));
     }
 
-    public getSiteAssemblies(siteId: number): Promise<CsiInspectionAssembly[]> {
-        const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/site-assemblies/${siteId}`);
+    public getAssemblies(inspectionId: number): Promise<CsiInspectionAssembly[]> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${inspectionId}/assemblies`);
         return lastValueFrom(this._http.get<CsiInspectionAssembly[]>(url));
     }
 
-    public getProfessionalAssemblies(inspectionId: number): Promise<CsiInspectionAssembly[]> {
-        const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${inspectionId}/assemblies`);
-        return lastValueFrom(this._http.get<CsiInspectionAssembly[]>(url));
+    public initializeAssemblies(siteId: number, submissionId: string): Promise<CsiInspectionAssembly[]> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/csi/inspections/assemblies/initialize');
+        const params = new HttpParams().set('siteId', siteId).set('submissionId', submissionId);
+        return lastValueFrom(this._http.post<CsiInspectionAssembly[]>(url, null, { params }));
     }
 
-    public saveAssemblies(inspectionId: number, assemblies: CsiInspectionAssemblyRequest[]): Promise<CsiInspectionAssembly[]> {
-        const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${inspectionId}/assemblies`);
-        return lastValueFrom(this._http.put<CsiInspectionAssembly[]>(url, assemblies));
+    public addAssembly(request: CsiInspectionAssemblyRequest): Promise<CsiInspectionAssembly> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/csi/inspections/assemblies');
+        return lastValueFrom(this._http.post<CsiInspectionAssembly>(url, request));
+    }
+
+    public deleteAssembly(id: number, submissionId: string): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/assemblies/${id}`);
+        const params = new HttpParams().set('submissionId', submissionId);
+        return lastValueFrom(this._http.delete<void>(url, { params }));
+    }
+
+    public updateVisuallyIdentified(submissionId: string, visuallyIdentifiedIds: number[]): Promise<void> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/csi/inspections/assemblies/visually-identified');
+        return lastValueFrom(this._http.put<void>(url, { submissionId, visuallyIdentifiedIds }));
     }
 
     public deleteProfessionalImage(inspectionId: number, imageId: number): Promise<void> {

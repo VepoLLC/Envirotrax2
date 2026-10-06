@@ -19,15 +19,15 @@ public class PublicSearchRepository : Repository<WaterSupplier, int, PublicDbCon
     {
     }
 
-    public async Task<IEnumerable<PublicSearchWaterSupplier>> GetWaterSuppliersAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<PublicSearchWaterSupplier>> GetWaterSuppliersAsync(string? domain, CancellationToken cancellationToken)
     {
         return await GetEligibleSuppliersQuery()
+            .WhereIf(domain != null, supplier => supplier.Domain == domain)
             .OrderBy(supplier => supplier.Name)
             .Select(supplier => new PublicSearchWaterSupplier
             {
                 Id = supplier.Id,
-                Name = supplier.Name,
-                Domain = supplier.Domain
+                Name = supplier.Name
             })
             .ToListAsync(cancellationToken);
     }

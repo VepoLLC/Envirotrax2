@@ -23,6 +23,16 @@ export class BackflowTestOptionsService {
         ...this.deviceTypeOptions
     ];
 
+    // V1's assembly manufacturer and size lists (csi_inspection_submit.aspx "Add Backflow Device").
+    public readonly manufacturerOptions: InputOption[] = [
+        'Ames', 'Apollo', 'ARI', 'Buckner', 'Cash Acme', 'Cla-Val', 'Conbraco', 'Backflow Direct',
+        'Febco', 'Flomatic', 'Hersey', 'Neptune', 'Watts', 'Wilkins', 'Other'
+    ].map(manufacturer => ({ id: manufacturer, text: manufacturer }));
+
+    public readonly sizeOptions: InputOption[] = [
+        '3/8', '1/2', '3/4', '1', '1 1/4', '1 1/2', '2', '2 1/2', '3', '4', '6', '8', '10', '12', '14', '16'
+    ].map(size => ({ id: size, text: `${size}"` }));
+
     public readonly hazardTypeOptions: InputOption[] = [
         { id: 'Agricultural/Feed Lot', text: 'Agricultural/Feed Lot' },
         { id: 'Domestic/Premises Isolation', text: 'Domestic/Premises Isolation' },

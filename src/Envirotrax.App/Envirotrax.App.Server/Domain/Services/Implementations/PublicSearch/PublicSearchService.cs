@@ -24,8 +24,8 @@ public class PublicSearchService : IPublicSearchService
 
     public async Task<PublicSearchWaterSuppliersDto> GetWaterSuppliersAsync(string? domain, CancellationToken cancellationToken)
     {
-        var suppliers = (await _publicSearchRepository.GetWaterSuppliersAsync(cancellationToken)).ToList();
-        var normalizedDomain = NormalizeText(domain);
+        var normalizedDomain = NormalizeText(domain)?.ToLowerInvariant();
+        var suppliers = (await _publicSearchRepository.GetWaterSuppliersAsync(normalizedDomain, cancellationToken)).ToList();
 
         if (normalizedDomain == null)
         {
@@ -35,8 +35,8 @@ public class PublicSearchService : IPublicSearchService
             };
         }
 
-        var selectedSupplier = FindSupplierByDomain(suppliers, normalizedDomain);
-        var visibleSuppliers = suppliers.Where(supplier => supplier.Id == selectedSupplier?.Id).ToList();
+        var selectedSupplier = suppliers.OrderBy(supplier => supplier.Id).FirstOrDefault();
+        var visibleSuppliers = selectedSupplier == null ? [] : new List<PublicSearchWaterSupplier> { selectedSupplier };
 
         return new PublicSearchWaterSuppliersDto
         {
@@ -107,14 +107,6 @@ public class PublicSearchService : IPublicSearchService
         }
 
         return criteria;
-    }
-
-    private static PublicSearchWaterSupplier? FindSupplierByDomain(IEnumerable<PublicSearchWaterSupplier> suppliers, string normalizedDomain)
-    {
-        return suppliers
-            .Where(supplier => string.Equals(supplier.Domain.Trim(), normalizedDomain, StringComparison.OrdinalIgnoreCase))
-            .OrderBy(supplier => supplier.Id)
-            .FirstOrDefault();
     }
 
     private static string? NormalizeText(string? value)

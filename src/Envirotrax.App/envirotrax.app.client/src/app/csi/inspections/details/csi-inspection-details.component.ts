@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { CsiInspection } from "../../../shared/models/csi/csi-inspection";
 import { CsiInspectionImage } from "../../../shared/models/csi/csi-inspection-image";
+import { CsiInspectionAssembly } from "../../../shared/models/csi/csi-inspection-assembly";
 import { CsiInspectionService } from "../../../shared/services/csi/csi-inspection.service";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { DisapproveCsiInspectionComponent } from "./disapprove/disapprove-csi-inspection.component";
@@ -20,6 +21,7 @@ export class CsiInspectionDetailsComponent implements OnInit {
     public selectedTab: string = 'main';
     public images: CsiInspectionImage[] = [];
     public isLoadingImages: boolean = false;
+    public assemblies: CsiInspectionAssembly[] = [];
     public recordLogs: RecordLog[] = [];
     public isLoadingRecordLogs: boolean = false;
 
@@ -51,6 +53,7 @@ export class CsiInspectionDetailsComponent implements OnInit {
                 this.id = +id;
                 await Promise.all([
                     this.loadInspection(),
+                    this.loadAssemblies(),
                     this.loadRecordLogs()
                 ]);
             }
@@ -75,6 +78,11 @@ export class CsiInspectionDetailsComponent implements OnInit {
         } finally {
             this.isLoading = false;
         }
+    }
+
+    // Loaded with the inspection so the tab can show the count, as V1 did.
+    private async loadAssemblies(): Promise<void> {
+        this.assemblies = await this._inspectionService.getAssemblies(this.id);
     }
 
     private async loadRecordLogs(): Promise<void> {

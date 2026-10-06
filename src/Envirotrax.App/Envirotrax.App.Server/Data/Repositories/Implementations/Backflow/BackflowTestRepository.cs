@@ -1,6 +1,7 @@
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Backflow;
+using Envirotrax.App.Server.Data.Models.Csi;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
@@ -27,13 +28,22 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
 
     protected override IQueryable<BackflowTest> GetListQuery()
     {
-        return base.GetListQuery()
+        var query = base.GetListQuery()
             .Include(bt => bt.WaterSupplier)
             .Include(bt => bt.Site)
             .Include(bt => bt.Bpat)
             .Include(bt => bt.BpatState)
             .Include(bt => bt.PropertyState)
             .Include(bt => bt.MailingState);
+
+        // An assembly added on a CSI inspection is paid for with that inspection, so until then it must not
+        // show up as one of the professional's own backflow tests (lists, dashboard, backflow checkout cart).
+        if (_tenantProvider.ProfessionalId > 0)
+        {
+            return query.Where(bt => bt.InspectorId == null || (bt.TransactionId != null && bt.TransactionId != string.Empty));
+        }
+
+        return query;
     }
 
     protected override IQueryable<BackflowTest> GetDetailsQuery()
@@ -1031,6 +1041,52 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return Entity.CountAsync(t => t.SiteId == siteId && t.DeletedTime == null && t.IsCurrent && !t.OutOfService, cancellationToken);
     }
 
+    // V1 setBackflowRecords: the tests added on a CSI inspection form are created without a site, and
+    // take the inspection's site, inspector and date when the inspection is submitted.
+    public Task ApplyCsiInspectionAsync(CsiInspection inspection, CancellationToken cancellationToken)
+    {
+        var inspectionDate = inspection.InspectionDate;
+
+        return Entity
+            .Where(t => t.SubmissionId == inspection.SubmissionId && t.SiteId == null && t.DeletedTime == null)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(t => t.SiteId, inspection.SiteId)
+                .SetProperty(t => t.InspectorId, inspection.InspectorId)
+                .SetProperty(t => t.PropertyType, (int)inspection.PropertyType)
+                .SetProperty(t => t.PropertyBusinessName, inspection.PropertyBusinessName)
+                .SetProperty(t => t.PropertyStreetNumber, inspection.PropertyStreetNumber)
+                .SetProperty(t => t.PropertyStreetName, inspection.PropertyStreetName)
+                .SetProperty(t => t.PropertyNumber, inspection.PropertyNumber)
+                .SetProperty(t => t.PropertyCity, inspection.PropertyCity)
+                .SetProperty(t => t.PropertyStateId, inspection.PropertyStateId)
+                .SetProperty(t => t.PropertyZip, inspection.PropertyZip)
+                .SetProperty(t => t.MailingCompanyName, inspection.MailingCompanyName)
+                .SetProperty(t => t.MailingContactName, inspection.MailingContactName)
+                .SetProperty(t => t.MailingStreetNumber, inspection.MailingStreetNumber)
+                .SetProperty(t => t.MailingStreetName, inspection.MailingStreetName)
+                .SetProperty(t => t.MailingNumber, inspection.MailingNumber)
+                .SetProperty(t => t.MailingCity, inspection.MailingCity)
+                .SetProperty(t => t.MailingStateId, inspection.MailingStateId)
+                .SetProperty(t => t.MailingZip, inspection.MailingZip)
+                .SetProperty(t => t.MailingPhoneNumber, inspection.MailingPhoneNumber)
+                .SetProperty(t => t.MailingEmailAddress, inspection.MailingEmailAddress)
+                .SetProperty(t => t.InitialTestDate, inspectionDate)
+                .SetProperty(t => t.RepairTestDate, inspectionDate)
+                .SetProperty(t => t.FinalTestDate, inspectionDate)
+                .SetProperty(t => t.AirGapTestDate, inspectionDate)
+                .SetProperty(t => t.TestDate, inspectionDate)
+                .SetProperty(t => t.ExpirationDate, inspectionDate), cancellationToken);
+    }
+
+    public Task MarkCsiInspectionTestsPaidAsync(int siteId, string submissionId, string transactionId, DateTime transactionDate, CancellationToken cancellationToken)
+    {
+        return Entity
+            .Where(t => t.SiteId == siteId && t.SubmissionId == submissionId && (t.TransactionId == null || t.TransactionId == ""))
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(t => t.TransactionId, transactionId)
+                .SetProperty(t => t.TransactionDate, transactionDate), cancellationToken);
+    }
+
     // Unlike GetAllCurrentBySiteIdAsync (a slim projection for the renewal job, which also bypasses
     // the tenant filter), this returns whole rows under the caller's normal query filters.
     public Task<List<BackflowTest>> GetCurrentBySiteAsync(int siteId, CancellationToken cancellationToken)
@@ -1165,6 +1221,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return DbContext.BackflowTests
             .Where(t => ids.Contains(t.Id)
                 && t.ProfessionalId == professionalId
+                && t.InspectorId == null
                 && (bpatId == null || t.BpatId == bpatId)
                 && (t.TransactionId == null || t.TransactionId == string.Empty)
                 && t.DeletedTime == null);

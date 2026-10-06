@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261005082147_AddDomainIndexAndRemoveLegacyRecordId")]
+    partial class AddDomainIndexAndRemoveLegacyRecordId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1244,7 +1247,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int?>("InspectionId")
+                    b.Property<int>("InspectionId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsCurrent")
@@ -4566,7 +4569,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasOne("Envirotrax.App.Server.Data.Models.Csi.CsiInspection", "Inspection")
                         .WithMany()
                         .HasForeignKey("WaterSupplierId", "InspectionId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Envirotrax.App.Server.Data.Models.Backflow.BackflowTest", "Test")
                         .WithMany()

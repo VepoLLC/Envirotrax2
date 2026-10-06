@@ -589,15 +589,15 @@
                             </thead>
 
                             <tbody>
-                                <tr *ngIf="initialTestFailed">
+                                <tr *ngIf="showInitialTestMessages">
                                     <td class="py-1 border-start-0 border-end-0">
                                         <span *ngIf="initialTestDateError" class="badge bg-warning text-dark">{{ initialTestDateError }}</span>
                                     </td>
                                     <td class="py-1 border-start-0 border-end-0">
-                                        <span *ngIf="cvPsidMessage(model.initCV1HeldPSID)" class="badge bg-warning text-dark">{{ cvPsidMessage(model.initCV1HeldPSID) }}</span>
+                                        <span *ngIf="!isFailedResult && cvPsidMessage(model.initCV1HeldPSID)" class="badge bg-warning text-dark">{{ cvPsidMessage(model.initCV1HeldPSID) }}</span>
                                     </td>
                                     <td class="py-1 border-start-0 border-end-0">
-                                        <span *ngIf="cvPsidMessage(model.initCV2HeldPSID)" class="badge bg-warning text-dark">{{ cvPsidMessage(model.initCV2HeldPSID) }}</span>
+                                        <span *ngIf="!isFailedResult && cvPsidMessage(model.initCV2HeldPSID)" class="badge bg-warning text-dark">{{ cvPsidMessage(model.initCV2HeldPSID) }}</span>
                                     </td>
                                 </tr>
 
@@ -608,8 +608,8 @@
                                         <strong>Date and Time:</strong><br>
                                         <vp-input type="datetime" name="initialTestDate" [(ngModel)]="model.initialTestDate" [required]="true" [max]="today" [form]="submitForm" />
                                     </td>
-                                    <td [class.table-success]="isCVCellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked)"
-                                        [class.table-danger]="!isCVCellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked)">
+                                    <td [class.table-success]="!isFailedResult && isCVCellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked)"
+                                        [class.table-danger]="!isFailedResult && !isCVCellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked)">
                                         <div class="mb-3">
                                             Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initCV1PSID" [(ngModel)]="model.initCV1HeldPSID" step="0.1" min="0" max="15" /> PSID 
                                         </div>
@@ -622,8 +622,8 @@
                                             <label class="form-check-label" for="initCV1L">Leaked</label>
                                         </div>
                                     </td>
-                                    <td [class.table-success]="isCVCellValid(model.initCV2HeldPSID, model.initCV2ClosedTight, model.initCV2Leaked)"
-                                        [class.table-danger]="!isCVCellValid(model.initCV2HeldPSID, model.initCV2ClosedTight, model.initCV2Leaked)">
+                                    <td [class.table-success]="!isFailedResult && isCVCellValid(model.initCV2HeldPSID, model.initCV2ClosedTight, model.initCV2Leaked)"
+                                        [class.table-danger]="!isFailedResult && !isCVCellValid(model.initCV2HeldPSID, model.initCV2ClosedTight, model.initCV2Leaked)">
                                         <div class="mb-3">
                                             Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initCV2PSID" [(ngModel)]="model.initCV2HeldPSID" step="0.1" min="0" max="15" /> PSID 
                                         </div>
@@ -677,7 +677,7 @@
                                     </td>
                                 </tr>
 
-                                <tr *ngIf="finalTestFailed">
+                                <tr *ngIf="showFinalTestMessages">
                                         <td class="py-1 border-start-0 border-end-0">
                                             <span *ngIf="finalTestDateError" class="badge bg-warning text-dark">{{ finalTestDateError }}</span>
                                         </td>
@@ -690,22 +690,22 @@
                                     </tr>
 
                                     <tr>
-                                        <td [class.table-success]="!finalTestDateError"
-                                            [class.table-danger]="!!finalTestDateError">
+                                        <td [class.table-success]="!isFailedResult && !finalTestDateError"
+                                            [class.table-danger]="!isFailedResult && !!finalTestDateError">
                                             <div class="fw-bold mb-3 text-center">Test After Repair</div>
                                             <strong>Date and Time:</strong><br>
                                             <vp-input type="datetime" name="finalTestDate" [(ngModel)]="model.finalTestDate" [required]="true" [max]="today" [form]="submitForm" />
                                         </td>
-                                        <td [class.table-success]="isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)"
-                                            [class.table-danger]="!isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)">
+                                        <td [class.table-success]="!isFailedResult && isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)"
+                                            [class.table-danger]="!isFailedResult && !isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)">
                                             <div class="mb-3">Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalCV1PSID" [(ngModel)]="model.finalCV1HeldPSID" step="0.1" min="0" max="15" /> PSID </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="finalCV1CT" name="finalCV1CT" [(ngModel)]="model.finalCV1ClosedTight" />
                                                 <label class="form-check-label" for="finalCV1CT">Closed Tight</label>
                                             </div>
                                         </td>
-                                        <td [class.table-success]="isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)"
-                                            [class.table-danger]="!isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)">
+                                        <td [class.table-success]="!isFailedResult && isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)"
+                                            [class.table-danger]="!isFailedResult && !isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)">
                                             <div class="mb-3">Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalCV2PSID" [(ngModel)]="model.finalCV2HeldPSID" step="0.1" min="0" max="15" /> PSID </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="finalCV2CT" name="finalCV2CT" [(ngModel)]="model.finalCV2ClosedTight" />
@@ -743,21 +743,21 @@
                             </thead>
 
                             <tbody>
-                                <tr *ngIf="initialTestFailed">
+                                <tr *ngIf="showInitialTestMessages">
                                     <td class="py-1 border-start-0 border-end-0">
                                         <span *ngIf="initialTestDateError" class="badge bg-warning text-dark">{{ initialTestDateError }}</span>
                                     </td>
                                     <td class="py-1 border-start-0 border-end-0">
-                                        <span *ngIf="cvPsidMessage(model.initCV1HeldPSID)" class="badge bg-warning text-dark">{{ cvPsidMessage(model.initCV1HeldPSID) }}</span>
+                                        <span *ngIf="!isFailedResult && cvPsidMessage(model.initCV1HeldPSID)" class="badge bg-warning text-dark">{{ cvPsidMessage(model.initCV1HeldPSID) }}</span>
                                     </td>
                                     <td class="py-1 border-start-0 border-end-0">
-                                        <span *ngIf="cvPsidMessage(model.initCV2HeldPSID)" class="badge bg-warning text-dark">{{ cvPsidMessage(model.initCV2HeldPSID) }}</span>
+                                        <span *ngIf="!isFailedResult && cvPsidMessage(model.initCV2HeldPSID)" class="badge bg-warning text-dark">{{ cvPsidMessage(model.initCV2HeldPSID) }}</span>
                                     </td>
                                     <td class="py-1 border-start-0 border-end-0">
-                                        <span *ngIf="cvPsidMessage(model.initCV1HeldPSID2)" class="badge bg-warning text-dark">{{ cvPsidMessage(model.initCV1HeldPSID2) }}</span>
+                                        <span *ngIf="!isFailedResult && cvPsidMessage(model.initCV1HeldPSID2)" class="badge bg-warning text-dark">{{ cvPsidMessage(model.initCV1HeldPSID2) }}</span>
                                     </td>
                                     <td class="py-1 border-start-0 border-end-0">
-                                        <span *ngIf="cvPsidMessage(model.initCV2HeldPSID2)" class="badge bg-warning text-dark">{{ cvPsidMessage(model.initCV2HeldPSID2) }}</span>
+                                        <span *ngIf="!isFailedResult && cvPsidMessage(model.initCV2HeldPSID2)" class="badge bg-warning text-dark">{{ cvPsidMessage(model.initCV2HeldPSID2) }}</span>
                                     </td>
                                 </tr>
 
@@ -769,8 +769,8 @@
                                         <vp-input type="datetime" name="initialTestDate" [(ngModel)]="model.initialTestDate" [required]="true" [max]="today" [form]="submitForm" />
                                     </td>
 
-                                    <td [class.table-success]="isCVCellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked)"
-                                        [class.table-danger]="!isCVCellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked)">
+                                    <td [class.table-success]="!isFailedResult && isCVCellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked)"
+                                        [class.table-danger]="!isFailedResult && !isCVCellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked)">
                                         <div class="mb-3">
                                             Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initCV1PSID" [(ngModel)]="model.initCV1HeldPSID" step="0.1" min="0" max="15" /> PSID 
                                         </div>
@@ -784,8 +784,8 @@
                                         </div>
                                     </td>
 
-                                    <td [class.table-success]="isCVCellValid(model.initCV2HeldPSID, model.initCV2ClosedTight, model.initCV2Leaked)"
-                                        [class.table-danger]="!isCVCellValid(model.initCV2HeldPSID, model.initCV2ClosedTight, model.initCV2Leaked)">
+                                    <td [class.table-success]="!isFailedResult && isCVCellValid(model.initCV2HeldPSID, model.initCV2ClosedTight, model.initCV2Leaked)"
+                                        [class.table-danger]="!isFailedResult && !isCVCellValid(model.initCV2HeldPSID, model.initCV2ClosedTight, model.initCV2Leaked)">
                                         <div class="mb-3">
                                             Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initCV2PSID" [(ngModel)]="model.initCV2HeldPSID" step="0.1" min="0" max="15" /> PSID 
                                         </div>
@@ -800,8 +800,8 @@
                                     </td>
 
 
-                                    <td [class.table-success]="isCVCellValid(model.initCV1HeldPSID2, model.initCV1ClosedTight2, model.initCV1Leaked2)"
-                                        [class.table-danger]="!isCVCellValid(model.initCV1HeldPSID2, model.initCV1ClosedTight2, model.initCV1Leaked2)">
+                                    <td [class.table-success]="!isFailedResult && isCVCellValid(model.initCV1HeldPSID2, model.initCV1ClosedTight2, model.initCV1Leaked2)"
+                                        [class.table-danger]="!isFailedResult && !isCVCellValid(model.initCV1HeldPSID2, model.initCV1ClosedTight2, model.initCV1Leaked2)">
                                         <div class="mb-3">
                                             Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initCV1PSID2" [(ngModel)]="model.initCV1HeldPSID2" step="0.1" min="0" max="15" /> PSID 
                                         </div>
@@ -814,8 +814,8 @@
                                             <label class="form-check-label" for="initCV1Leaked2">Leaked</label>
                                         </div>
                                     </td>
-                                    <td [class.table-success]="isCVCellValid(model.initCV2HeldPSID2, model.initCV2ClosedTight2, model.initCV2Leaked2)"
-                                        [class.table-danger]="!isCVCellValid(model.initCV2HeldPSID2, model.initCV2ClosedTight2, model.initCV2Leaked2)">
+                                    <td [class.table-success]="!isFailedResult && isCVCellValid(model.initCV2HeldPSID2, model.initCV2ClosedTight2, model.initCV2Leaked2)"
+                                        [class.table-danger]="!isFailedResult && !isCVCellValid(model.initCV2HeldPSID2, model.initCV2ClosedTight2, model.initCV2Leaked2)">
                                         <div class="mb-3">
                                             Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initCV2PSID2" [(ngModel)]="model.initCV2HeldPSID2" step="0.1" min="0" max="15" /> PSID 
                                         </div>
@@ -898,7 +898,7 @@
                                     </td>
                                 </tr>
 
-                                    <tr *ngIf="finalTestFailed">
+                                    <tr *ngIf="showFinalTestMessages">
                                         <td class="py-1 border-start-0 border-end-0">
                                             <span class="badge bg-warning text-dark">{{ finalTestDateError }}</span>
                                         </td>
@@ -917,23 +917,23 @@
                                     </tr>
 
                                     <tr>
-                                        <td [class.table-success]="!finalTestDateError"
-                                            [class.table-danger]="!!finalTestDateError">
+                                        <td [class.table-success]="!isFailedResult && !finalTestDateError"
+                                            [class.table-danger]="!isFailedResult && !!finalTestDateError">
                                             <div class="fw-bold mb-3 text-center">Test After Repair</div>
                                             <strong>Date and Time:</strong><br>
                                             <vp-input type="datetime" name="finalTestDate" [(ngModel)]="model.finalTestDate" [required]="true" [max]="today" [form]="submitForm" />
                                         </td>
 
-                                        <td [class.table-success]="isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)"
-                                            [class.table-danger]="!isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)">
+                                        <td [class.table-success]="!isFailedResult && isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)"
+                                            [class.table-danger]="!isFailedResult && !isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)">
                                             <div class="mb-3">Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalCV1PSID" [(ngModel)]="model.finalCV1HeldPSID" step="0.1" min="0" max="15" /> PSID </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="finalCV1CT" name="finalCV1CT" [(ngModel)]="model.finalCV1ClosedTight" />
                                                 <label class="form-check-label" for="finalCV1CT">Closed Tight</label>
                                             </div>
                                         </td>
-                                        <td [class.table-success]="isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)"
-                                            [class.table-danger]="!isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)">
+                                        <td [class.table-success]="!isFailedResult && isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)"
+                                            [class.table-danger]="!isFailedResult && !isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)">
                                             <div class="mb-3">Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalCV2PSID" [(ngModel)]="model.finalCV2HeldPSID" step="0.1" min="0" max="15" /> PSID </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="finalCV2CT" name="finalCV2CT" [(ngModel)]="model.finalCV2ClosedTight" />
@@ -941,16 +941,16 @@
                                             </div>
                                         </td>
 
-                                        <td [class.table-success]="isCVCellValid(model.finalCV1HeldPSID2, model.finalCV1ClosedTight2, undefined)"
-                                            [class.table-danger]="!isCVCellValid(model.finalCV1HeldPSID2, model.finalCV1ClosedTight2, undefined)">
+                                        <td [class.table-success]="!isFailedResult && isCVCellValid(model.finalCV1HeldPSID2, model.finalCV1ClosedTight2, undefined)"
+                                            [class.table-danger]="!isFailedResult && !isCVCellValid(model.finalCV1HeldPSID2, model.finalCV1ClosedTight2, undefined)">
                                             <div class="mb-3">Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalCV1PSID2" [(ngModel)]="model.finalCV1HeldPSID2" step="0.1" min="0" max="15" /> PSID </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="finalCV1CT2" name="finalCV1CT2" [(ngModel)]="model.finalCV1ClosedTight2" />
                                                 <label class="form-check-label" for="finalCV1CT2">Closed Tight</label>
                                             </div>
                                         </td>
-                                        <td [class.table-success]="isCVCellValid(model.finalCV2HeldPSID2, model.finalCV2ClosedTight2, undefined)"
-                                            [class.table-danger]="!isCVCellValid(model.finalCV2HeldPSID2, model.finalCV2ClosedTight2, undefined)">
+                                        <td [class.table-success]="!isFailedResult && isCVCellValid(model.finalCV2HeldPSID2, model.finalCV2ClosedTight2, undefined)"
+                                            [class.table-danger]="!isFailedResult && !isCVCellValid(model.finalCV2HeldPSID2, model.finalCV2ClosedTight2, undefined)">
                                             <div class="mb-3">Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalCV2PSID2" [(ngModel)]="model.finalCV2HeldPSID2" step="0.1" min="0" max="15" /> PSID </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="finalCV2CT2" name="finalCV2CT2" [(ngModel)]="model.finalCV2ClosedTight2" />
@@ -990,18 +990,18 @@
                             </thead>
 
                             <tbody>
-                                <tr *ngIf="initialTestFailed">
+                                <tr *ngIf="showInitialTestMessages">
                                     <td class="py-1 border-start-0 border-end-0">
                                         <span class="badge bg-warning text-dark">{{ initialTestDateError }}</span>
                                     </td>
                                     <td class="py-1 border-start-0 border-end-0">
-                                        <span *ngIf="cvPsidMessage(model.initCV1HeldPSID)" class="badge bg-warning text-dark">{{ cvPsidMessage(model.initCV1HeldPSID) }}</span>
+                                        <span *ngIf="!isFailedResult && cvPsidMessage(model.initCV1HeldPSID)" class="badge bg-warning text-dark">{{ cvPsidMessage(model.initCV1HeldPSID) }}</span>
                                     </td>
                                     <td class="py-1 border-start-0 border-end-0">
-                                        <span *ngIf="cvPsidMessage(model.initCV2HeldPSID)" class="badge bg-warning text-dark">{{ cvPsidMessage(model.initCV2HeldPSID) }}</span>
+                                        <span *ngIf="!isFailedResult && cvPsidMessage(model.initCV2HeldPSID)" class="badge bg-warning text-dark">{{ cvPsidMessage(model.initCV2HeldPSID) }}</span>
                                     </td>
                                     <td class="py-1 border-start-0 border-end-0">
-                                        <span *ngIf="cvPsidMessage(model.initBCHeldPSID)" class="badge bg-warning text-dark">{{ cvPsidMessage(model.initBCHeldPSID) }}</span>
+                                        <span *ngIf="!isFailedResult && cvPsidMessage(model.initBCHeldPSID)" class="badge bg-warning text-dark">{{ cvPsidMessage(model.initBCHeldPSID) }}</span>
                                     </td>
                                 </tr>
 
@@ -1013,8 +1013,8 @@
                                         <vp-input type="datetime" name="initialTestDate" [(ngModel)]="model.initialTestDate" [required]="true" [max]="today" [form]="submitForm" />
                                     </td>
 
-                                    <td [class.table-success]="isCVCellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked)"
-                                        [class.table-danger]="!isCVCellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked)">
+                                    <td [class.table-success]="!isFailedResult && isCVCellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked)"
+                                        [class.table-danger]="!isFailedResult && !isCVCellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked)">
                                         <div class="mb-3">
                                             Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initCV1PSID" [(ngModel)]="model.initCV1HeldPSID" step="0.1" min="0" max="15" /> PSID 
                                         </div>
@@ -1028,8 +1028,8 @@
                                         </div>
                                     </td>
 
-                                    <td [class.table-success]="isCVCellValid(model.initCV2HeldPSID, model.initCV2ClosedTight, model.initCV2Leaked)"
-                                        [class.table-danger]="!isCVCellValid(model.initCV2HeldPSID, model.initCV2ClosedTight, model.initCV2Leaked)">
+                                    <td [class.table-success]="!isFailedResult && isCVCellValid(model.initCV2HeldPSID, model.initCV2ClosedTight, model.initCV2Leaked)"
+                                        [class.table-danger]="!isFailedResult && !isCVCellValid(model.initCV2HeldPSID, model.initCV2ClosedTight, model.initCV2Leaked)">
                                         <div class="mb-3">
                                             Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initCV2PSID" [(ngModel)]="model.initCV2HeldPSID" step="0.1" min="0" max="15" /> PSID 
                                         </div>
@@ -1044,8 +1044,8 @@
                                     </td>
 
 
-                                    <td [class.table-success]="isCVCellValid(model.initBCHeldPSID, model.initBCClosedTight, model.initBCLeaked)"
-                                        [class.table-danger]="!isCVCellValid(model.initBCHeldPSID, model.initBCClosedTight, model.initBCLeaked)">
+                                    <td [class.table-success]="!isFailedResult && isCVCellValid(model.initBCHeldPSID, model.initBCClosedTight, model.initBCLeaked)"
+                                        [class.table-danger]="!isFailedResult && !isCVCellValid(model.initBCHeldPSID, model.initBCClosedTight, model.initBCLeaked)">
                                         <div class="mb-3">
                                             Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initBCPSID" [(ngModel)]="model.initBCHeldPSID" step="0.1" min="0" max="15" /> PSID 
                                         </div>
@@ -1117,7 +1117,7 @@
 
                                 </tr>
 
-                                <tr *ngIf="finalTestFailed">
+                                <tr *ngIf="showFinalTestMessages">
                                         <td class="py-1 border-start-0 border-end-0">
                                             <span class="badge bg-warning text-dark">{{ finalTestDateError }}</span>
                                         </td>
@@ -1133,23 +1133,23 @@
                                     </tr>
 
                                     <tr>
-                                        <td [class.table-success]="!finalTestDateError"
-                                            [class.table-danger]="!!finalTestDateError">
+                                        <td [class.table-success]="!isFailedResult && !finalTestDateError"
+                                            [class.table-danger]="!isFailedResult && !!finalTestDateError">
                                             <div class="fw-bold mb-3 text-center">Test After Repair</div>
                                             <strong>Date and Time:</strong><br>
                                             <vp-input type="datetime" name="finalTestDate" [(ngModel)]="model.finalTestDate" [required]="true" [max]="today" [form]="submitForm" />
                                         </td>
 
-                                        <td [class.table-success]="isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)"
-                                            [class.table-danger]="!isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)">
+                                        <td [class.table-success]="!isFailedResult && isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)"
+                                            [class.table-danger]="!isFailedResult && !isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)">
                                             <div class="mb-3">Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalCV1PSID" [(ngModel)]="model.finalCV1HeldPSID" step="0.1" min="0" max="15" /> PSID </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="finalCV1CT" name="finalCV1CT" [(ngModel)]="model.finalCV1ClosedTight" />
                                                 <label class="form-check-label" for="finalCV1CT">Closed Tight</label>
                                             </div>
                                         </td>
-                                        <td [class.table-success]="isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)"
-                                            [class.table-danger]="!isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)">
+                                        <td [class.table-success]="!isFailedResult && isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)"
+                                            [class.table-danger]="!isFailedResult && !isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)">
                                             <div class="mb-3">Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalCV2PSID" [(ngModel)]="model.finalCV2HeldPSID" step="0.1" min="0" max="15" /> PSID </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="finalCV2CT" name="finalCV2CT" [(ngModel)]="model.finalCV2ClosedTight" />
@@ -1157,8 +1157,8 @@
                                             </div>
                                         </td>
 
-                                        <td [class.table-success]="isCVCellValid(model.finalBCHeldPSID, model.finalBCClosedTight, undefined)"
-                                            [class.table-danger]="!isCVCellValid(model.finalBCHeldPSID, model.finalBCClosedTight, undefined)">
+                                        <td [class.table-success]="!isFailedResult && isCVCellValid(model.finalBCHeldPSID, model.finalBCClosedTight, undefined)"
+                                            [class.table-danger]="!isFailedResult && !isCVCellValid(model.finalBCHeldPSID, model.finalBCClosedTight, undefined)">
                                             <div class="mb-3">Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalBCHeldPSID" [(ngModel)]="model.finalBCHeldPSID" step="0.1" min="0" max="15" /> PSID </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="finalBCT" name="finalBCT" [(ngModel)]="model.finalBCClosedTight" />
@@ -1193,16 +1193,16 @@
                             </thead>
 
                             <tbody>
-                                <tr *ngIf="initialTestFailed">
+                                <tr *ngIf="showInitialTestMessages">
                                     <td class="py-1 border-start-0 border-end-0">
                                         <span *ngIf="initialTestDateError" class="badge bg-warning text-dark">{{ initialTestDateError }}</span>
                                     </td>
                                     <td class="py-1 border-start-0 border-end-0">
-                                        <span *ngIf="rpCV1PsidMessage(model.initCV1HeldPSID, model.initRVOpenedPSID)" class="badge bg-warning text-dark">{{ rpCV1PsidMessage(model.initCV1HeldPSID, model.initRVOpenedPSID) }}</span>
+                                        <span *ngIf="!isFailedResult && rpCV1PsidMessage(model.initCV1HeldPSID, model.initRVOpenedPSID)" class="badge bg-warning text-dark">{{ rpCV1PsidMessage(model.initCV1HeldPSID, model.initRVOpenedPSID) }}</span>
                                     </td>
                                     <td class="border-start-0 border-end-0"></td>
                                     <td class="py-1 border-start-0 border-end-0">
-                                        <span *ngIf="rvPsidMessage(model.initRVOpenedPSID)" class="badge bg-warning text-dark">{{ rvPsidMessage(model.initRVOpenedPSID) }}</span>
+                                        <span *ngIf="!isFailedResult && rvPsidMessage(model.initRVOpenedPSID)" class="badge bg-warning text-dark">{{ rvPsidMessage(model.initRVOpenedPSID) }}</span>
                                     </td>
                                 </tr>
 
@@ -1213,8 +1213,8 @@
                                         <strong>Date and Time:</strong><br>
                                         <vp-input type="datetime" name="initialTestDate" [(ngModel)]="model.initialTestDate" [required]="true" [max]="today" [form]="submitForm" />
                                     </td>
-                                    <td [class.table-success]="isRPCV1CellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked, model.initRVOpenedPSID)"
-                                        [class.table-danger]="!isRPCV1CellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked, model.initRVOpenedPSID)">
+                                    <td [class.table-success]="!isFailedResult && isRPCV1CellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked, model.initRVOpenedPSID)"
+                                        [class.table-danger]="!isFailedResult && !isRPCV1CellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked, model.initRVOpenedPSID)">
                                         <div class="mb-3">
                                             Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initCV1PSID" [(ngModel)]="model.initCV1HeldPSID" step="0.1" min="5" max="15" /> PSID
                                         </div>
@@ -1227,8 +1227,8 @@
                                             <label class="form-check-label" for="initCV1L">Leaked</label>
                                         </div>
                                     </td>
-                                    <td [class.table-success]="model.initCV2ClosedTight"
-                                        [class.table-danger]="!model.initCV2ClosedTight">
+                                    <td [class.table-success]="!isFailedResult && model.initCV2ClosedTight"
+                                        [class.table-danger]="!isFailedResult && !model.initCV2ClosedTight">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="initCV2CT" name="initCV2CT" [(ngModel)]="model.initCV2ClosedTight" />
                                             <label class="form-check-label" for="initCV2CT">Closed Tight</label>
@@ -1238,8 +1238,8 @@
                                             <label class="form-check-label" for="initCV2L">Leaked</label>
                                         </div>
                                     </td>
-                                    <td [class.table-success]="isRVCellValid(model.initRVOpenedPSID, model.initRVDidNotOpen)"
-                                        [class.table-danger]="!isRVCellValid(model.initRVOpenedPSID, model.initRVDidNotOpen)">
+                                    <td [class.table-success]="!isFailedResult && isRVCellValid(model.initRVOpenedPSID, model.initRVDidNotOpen)"
+                                        [class.table-danger]="!isFailedResult && !isRVCellValid(model.initRVOpenedPSID, model.initRVDidNotOpen)">
                                         <div class="mb-3">
                                             Opened at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initRVOpenedPSID" [(ngModel)]="model.initRVOpenedPSID" step="0.1" min="2" max="15" /> PSID
                                         </div>
@@ -1304,7 +1304,7 @@
                                     </td>
                                 </tr>
 
-                                    <tr *ngIf="finalTestFailed">
+                                    <tr *ngIf="showFinalTestMessages">
                                         <td class="py-1 border-start-0 border-end-0">
                                             <span class="badge bg-warning text-dark">{{ finalTestDateError }}</span>
                                         </td>
@@ -1318,30 +1318,30 @@
                                     </tr>
 
                                     <tr>
-                                        <td [class.table-success]="!finalTestDateError"
-                                            [class.table-danger]="!!finalTestDateError">
+                                        <td [class.table-success]="!isFailedResult && !finalTestDateError"
+                                            [class.table-danger]="!isFailedResult && !!finalTestDateError">
                                             <div class="fw-bold mb-3 text-center">Test After Repair</div>
                                             <strong>Date and Time:</strong><br>
                                             <vp-input type="datetime" name="finalTestDate" [(ngModel)]="model.finalTestDate" [required]="true" [max]="today" [form]="submitForm" />
                                         </td>
-                                        <td [class.table-success]="isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)"
-                                            [class.table-danger]="!isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)">
+                                        <td [class.table-success]="!isFailedResult && isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)"
+                                            [class.table-danger]="!isFailedResult && !isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)">
                                             <div class="mb-3">Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalCV1PSID" [(ngModel)]="model.finalCV1HeldPSID" step="0.1" min="0" max="15" /> PSID </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="finalCV1CT" name="finalCV1CT" [(ngModel)]="model.finalCV1ClosedTight" />
                                                 <label class="form-check-label" for="finalCV1CT">Closed Tight</label>
                                             </div>
                                         </td>
-                                        <td [class.table-success]="isRPCV2CellValid(model.finalCV2ClosedTight, undefined)"
-                                            [class.table-danger]="!isRPCV2CellValid(model.finalCV2ClosedTight, undefined)">
+                                        <td [class.table-success]="!isFailedResult && isRPCV2CellValid(model.finalCV2ClosedTight, undefined)"
+                                            [class.table-danger]="!isFailedResult && !isRPCV2CellValid(model.finalCV2ClosedTight, undefined)">
                                             
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="finalCV2CT" name="finalCV2CT" [(ngModel)]="model.finalCV2ClosedTight" />
                                                 <label class="form-check-label" for="finalCV2CT">Closed Tight</label>
                                             </div>
                                         </td>
-                                        <td [class.table-success]="isRVCellValid(model.finalRVOpenedPSID, undefined)"
-                                            [class.table-danger]="!isRVCellValid(model.finalRVOpenedPSID, undefined)">
+                                        <td [class.table-success]="!isFailedResult && isRVCellValid(model.finalRVOpenedPSID, undefined)"
+                                            [class.table-danger]="!isFailedResult && !isRVCellValid(model.finalRVOpenedPSID, undefined)">
                                             <div class="mb-3">Opened at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalRVOpenedPSID" [(ngModel)]="model.finalRVOpenedPSID" step="0.1" min="0" max="15" /> PSID </div>
                                         </td>
                                     </tr>
@@ -1377,23 +1377,23 @@
                             </thead>
 
                             <tbody>
-                                <tr *ngIf="initialTestFailed">
+                                <tr *ngIf="showInitialTestMessages">
                                     <td class="py-1 border-start-0 border-end-0">
                                         <span class="badge bg-warning text-dark">{{ initialTestDateError }}</span>
                                     </td>
                                     <td class="py-1 border-start-0 border-end-0">
-                                        <span *ngIf="rpCV1PsidMessage(model.initCV1HeldPSID, model.initRVOpenedPSID)" class="badge bg-warning text-dark ms-1">{{ rpCV1PsidMessage(model.initCV1HeldPSID, model.initRVOpenedPSID) }}</span>
+                                        <span *ngIf="!isFailedResult && rpCV1PsidMessage(model.initCV1HeldPSID, model.initRVOpenedPSID)" class="badge bg-warning text-dark ms-1">{{ rpCV1PsidMessage(model.initCV1HeldPSID, model.initRVOpenedPSID) }}</span>
                                     </td>
                                     <td class="py-1 border-start-0 border-end-0"></td>
                                     <td class="py-1 border-start-0 border-end-0">
-                                        <span *ngIf="rvPsidMessage(model.initRVOpenedPSID)" class="badge bg-warning text-dark ms-1">{{ rvPsidMessage(model.initRVOpenedPSID) }}</span>
+                                        <span *ngIf="!isFailedResult && rvPsidMessage(model.initRVOpenedPSID)" class="badge bg-warning text-dark ms-1">{{ rvPsidMessage(model.initRVOpenedPSID) }}</span>
                                     </td>
                                     <td class="py-1 border-start-0 border-end-0">
-                                        <span *ngIf="rpCV1PsidMessage(model.initCV1HeldPSID2, model.initRVOpenedPSID2)" class="badge bg-warning text-dark ms-1">{{ rpCV1PsidMessage(model.initCV1HeldPSID2, model.initRVOpenedPSID2) }}</span>
+                                        <span *ngIf="!isFailedResult && rpCV1PsidMessage(model.initCV1HeldPSID2, model.initRVOpenedPSID2)" class="badge bg-warning text-dark ms-1">{{ rpCV1PsidMessage(model.initCV1HeldPSID2, model.initRVOpenedPSID2) }}</span>
                                     </td>
                                     <td class="py-1 border-start-0 border-end-0"></td>
                                     <td class="py-1 border-start-0 border-end-0">
-                                        <span *ngIf="rvPsidMessage(model.initRVOpenedPSID2)" class="badge bg-warning text-dark ms-1">{{ rvPsidMessage(model.initRVOpenedPSID2) }}</span>
+                                        <span *ngIf="!isFailedResult && rvPsidMessage(model.initRVOpenedPSID2)" class="badge bg-warning text-dark ms-1">{{ rvPsidMessage(model.initRVOpenedPSID2) }}</span>
                                     </td>
                                 </tr>
 
@@ -1405,8 +1405,8 @@
                                         <vp-input type="datetime" name="initialTestDate" [(ngModel)]="model.initialTestDate" [required]="true" [max]="today" [form]="submitForm" />
                                     </td>
 
-                                    <td [class.table-success]="isRPCV1CellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked, model.initRVOpenedPSID)"
-                                        [class.table-danger]="!isRPCV1CellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked, model.initRVOpenedPSID)">
+                                    <td [class.table-success]="!isFailedResult && isRPCV1CellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked, model.initRVOpenedPSID)"
+                                        [class.table-danger]="!isFailedResult && !isRPCV1CellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked, model.initRVOpenedPSID)">
                                         <div class="mb-3">
                                             Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initCV1PSID" [(ngModel)]="model.initCV1HeldPSID" step="0.1" min="0" max="15" /> PSID 
                                         </div>
@@ -1420,8 +1420,8 @@
                                         </div>
                                     </td>
 
-                                    <td [class.table-success]="model.initCV2ClosedTight"
-                                        [class.table-danger]="!model.initCV2ClosedTight">
+                                    <td [class.table-success]="!isFailedResult && model.initCV2ClosedTight"
+                                        [class.table-danger]="!isFailedResult && !model.initCV2ClosedTight">
 
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="initCV2CT" name="initCV2CT" [(ngModel)]="model.initCV2ClosedTight" />
@@ -1433,8 +1433,8 @@
                                         </div>
                                     </td>
 
-                                    <td [class.table-success]="isRVCellValid(model.initRVOpenedPSID, model.initRVDidNotOpen)"
-                                        [class.table-danger]="!isRVCellValid(model.initRVOpenedPSID, model.initRVDidNotOpen)">
+                                    <td [class.table-success]="!isFailedResult && isRVCellValid(model.initRVOpenedPSID, model.initRVDidNotOpen)"
+                                        [class.table-danger]="!isFailedResult && !isRVCellValid(model.initRVOpenedPSID, model.initRVDidNotOpen)">
                                         <div class="mb-3">
                                             Opened at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initRVOpenedPSID" [(ngModel)]="model.initRVOpenedPSID" step="0.1" min="0" max="15" /> PSID 
                                         </div>
@@ -1444,8 +1444,8 @@
                                         </div>
                                     </td>
 
-                                    <td [class.table-success]="isCVCellValid(model.initCV1HeldPSID2, model.initCV1ClosedTight2, model.initCV1Leaked2)"
-                                        [class.table-danger]="!isCVCellValid(model.initCV1HeldPSID2, model.initCV1ClosedTight2, model.initCV1Leaked2)">
+                                    <td [class.table-success]="!isFailedResult && isCVCellValid(model.initCV1HeldPSID2, model.initCV1ClosedTight2, model.initCV1Leaked2)"
+                                        [class.table-danger]="!isFailedResult && !isCVCellValid(model.initCV1HeldPSID2, model.initCV1ClosedTight2, model.initCV1Leaked2)">
                                         <div class="mb-3">
                                             Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initCV1PSID2" [(ngModel)]="model.initCV1HeldPSID2" step="0.1" min="0" max="15" /> PSID 
                                         </div>
@@ -1458,8 +1458,8 @@
                                             <label class="form-check-label" for="initCV1Leaked2">Leaked</label>
                                         </div>
                                     </td>
-                                    <td [class.table-success]="model.initCV2ClosedTight2"
-                                        [class.table-danger]="!model.initCV2ClosedTight2">
+                                    <td [class.table-success]="!isFailedResult && model.initCV2ClosedTight2"
+                                        [class.table-danger]="!isFailedResult && !model.initCV2ClosedTight2">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="initCV2ClosedTight2" name="initCV2ClosedTight2" [(ngModel)]="model.initCV2ClosedTight2" />
                                             <label class="form-check-label" for="initCV2ClosedTight2">Closed Tight</label>
@@ -1470,8 +1470,8 @@
                                         </div>
                                     </td>
 
-                                    <td [class.table-success]="isRVCellValid(model.initRVOpenedPSID2, model.initRVDidNotOpen2)"
-                                        [class.table-danger]="!isRVCellValid(model.initRVOpenedPSID2, model.initRVDidNotOpen2)">
+                                    <td [class.table-success]="!isFailedResult && isRVCellValid(model.initRVOpenedPSID2, model.initRVDidNotOpen2)"
+                                        [class.table-danger]="!isFailedResult && !isRVCellValid(model.initRVOpenedPSID2, model.initRVDidNotOpen2)">
                                         <div class="mb-3">
                                             Opened at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initRVOpenedPSID2" [(ngModel)]="model.initRVOpenedPSID2" step="0.1" min="0" max="15" /> PSID 
                                         </div>
@@ -1582,7 +1582,7 @@
                                     </td>
                                 </tr>
 
-                                <tr *ngIf="finalTestFailed" >
+                                <tr *ngIf="showFinalTestMessages">
                                         <td class="py-1 border-start-0 border-end-0">
                                             <span class="badge bg-warning text-dark">{{ finalTestDateError }}</span>
                                         </td>
@@ -1603,50 +1603,50 @@
                                     </tr>
 
                                     <tr>
-                                        <td [class.table-success]="!finalTestDateError"
-                                            [class.table-danger]="!!finalTestDateError">
+                                        <td [class.table-success]="!isFailedResult && !finalTestDateError"
+                                            [class.table-danger]="!isFailedResult && !!finalTestDateError">
                                             <div class="fw-bold mb-3 text-center">Test After Repair</div>
                                             <strong>Date and Time:</strong><br>
                                             <vp-input type="datetime" name="finalTestDate" [(ngModel)]="model.finalTestDate" [required]="true" [max]="today" [form]="submitForm" />
                                         </td>
 
-                                        <td [class.table-success]="isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)"
-                                            [class.table-danger]="!isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)">
+                                        <td [class.table-success]="!isFailedResult && isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)"
+                                            [class.table-danger]="!isFailedResult && !isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)">
                                             <div class="mb-3">Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalCV1PSID" [(ngModel)]="model.finalCV1HeldPSID" step="0.1" min="0" max="15" /> PSID </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="finalCV1CT" name="finalCV1CT" [(ngModel)]="model.finalCV1ClosedTight" />
                                                 <label class="form-check-label" for="finalCV1CT">Closed Tight</label>
                                             </div>
                                         </td>
-                                        <td [class.table-success]="model.finalCV2ClosedTight"
-                                            [class.table-danger]="!model.finalCV2ClosedTight">
+                                        <td [class.table-success]="!isFailedResult && model.finalCV2ClosedTight"
+                                            [class.table-danger]="!isFailedResult && !model.finalCV2ClosedTight">
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="finalCV2CT" name="finalCV2CT" [(ngModel)]="model.finalCV2ClosedTight" />
                                                 <label class="form-check-label" for="finalCV2CT">Closed Tight</label>
                                             </div>
                                         </td>
-                                        <td [class.table-success]="isRVCellValid(model.finalRVOpenedPSID, undefined)"
-                                            [class.table-danger]="!isRVCellValid(model.finalRVOpenedPSID, undefined)">
+                                        <td [class.table-success]="!isFailedResult && isRVCellValid(model.finalRVOpenedPSID, undefined)"
+                                            [class.table-danger]="!isFailedResult && !isRVCellValid(model.finalRVOpenedPSID, undefined)">
                                             <div class="mb-3">Opened at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalRVOpenedPSID" [(ngModel)]="model.finalRVOpenedPSID" step="0.1" min="0" max="15" /> PSID </div>
                                         </td>
 
-                                        <td [class.table-success]="isRPCV1CellValid(model.finalCV1HeldPSID2, model.finalCV1ClosedTight2, undefined, model.finalRVOpenedPSID2)"
-                                            [class.table-danger]="!isRPCV1CellValid(model.finalCV1HeldPSID2, model.finalCV1ClosedTight2, undefined, model.finalRVOpenedPSID2)">
+                                        <td [class.table-success]="!isFailedResult && isRPCV1CellValid(model.finalCV1HeldPSID2, model.finalCV1ClosedTight2, undefined, model.finalRVOpenedPSID2)"
+                                            [class.table-danger]="!isFailedResult && !isRPCV1CellValid(model.finalCV1HeldPSID2, model.finalCV1ClosedTight2, undefined, model.finalRVOpenedPSID2)">
                                             <div class="mb-3">Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalCV1PSID2" [(ngModel)]="model.finalCV1HeldPSID2" step="0.1" min="0" max="15" /> PSID </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="finalCV1CT2" name="finalCV1CT2" [(ngModel)]="model.finalCV1ClosedTight2" />
                                                 <label class="form-check-label" for="finalCV1CT2">Closed Tight</label>
                                             </div>
                                         </td>
-                                        <td [class.table-success]="model.finalCV2ClosedTight2"
-                                            [class.table-danger]="!model.finalCV2ClosedTight2">
+                                        <td [class.table-success]="!isFailedResult && model.finalCV2ClosedTight2"
+                                            [class.table-danger]="!isFailedResult && !model.finalCV2ClosedTight2">
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="finalCV2CT2" name="finalCV2CT2" [(ngModel)]="model.finalCV2ClosedTight2" />
                                                 <label class="form-check-label" for="finalCV2CT2">Closed Tight</label>
                                             </div>
                                         </td>
-                                        <td [class.table-success]="isRVCellValid(model.finalRVOpenedPSID2, undefined)"
-                                            [class.table-danger]="!isRVCellValid(model.finalRVOpenedPSID2, undefined)">
+                                        <td [class.table-success]="!isFailedResult && isRVCellValid(model.finalRVOpenedPSID2, undefined)"
+                                            [class.table-danger]="!isFailedResult && !isRVCellValid(model.finalRVOpenedPSID2, undefined)">
                                             <div class="mb-3">Opened at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalRVOpenedPSID2" [(ngModel)]="model.finalRVOpenedPSID2" step="0.1" min="0" max="15" /> PSID </div>
                                         </td>
                                     </tr>
@@ -1682,19 +1682,19 @@
                             </thead>
 
                             <tbody>
-                                <tr *ngIf="initialTestFailed">
+                                <tr *ngIf="showInitialTestMessages">
                                     <td class="py-1 border-start-0 border-end-0">
                                         <span class="badge bg-warning text-dark">{{ initialTestDateError }}</span>
                                     </td>
                                     <td class="py-1 border-start-0 border-end-0">
-                                        <span *ngIf="rpCV1PsidMessage(model.initCV1HeldPSID, model.initRVOpenedPSID)" class="badge bg-warning text-dark ms-1">{{ rpCV1PsidMessage(model.initCV1HeldPSID, model.initRVOpenedPSID) }}</span>
+                                        <span *ngIf="!isFailedResult && rpCV1PsidMessage(model.initCV1HeldPSID, model.initRVOpenedPSID)" class="badge bg-warning text-dark ms-1">{{ rpCV1PsidMessage(model.initCV1HeldPSID, model.initRVOpenedPSID) }}</span>
                                     </td>
                                     <td class="py-1 border-start-0 border-end-0"></td>
                                     <td class="py-1 border-start-0 border-end-0"> 
-                                        <span *ngIf="rvPsidMessage(model.initRVOpenedPSID)" class="badge bg-warning text-dark ms-1">{{ rvPsidMessage(model.initRVOpenedPSID) }}</span>
+                                        <span *ngIf="!isFailedResult && rvPsidMessage(model.initRVOpenedPSID)" class="badge bg-warning text-dark ms-1">{{ rvPsidMessage(model.initRVOpenedPSID) }}</span>
                                     </td>
                                     <td class="py-1 border-start-0 border-end-0">
-                                        <span *ngIf="cvPsidMessage(model.initBCHeldPSID)" class="badge bg-warning text-dark ms-1">{{ cvPsidMessage(model.initBCHeldPSID) }}</span>
+                                        <span *ngIf="!isFailedResult && cvPsidMessage(model.initBCHeldPSID)" class="badge bg-warning text-dark ms-1">{{ cvPsidMessage(model.initBCHeldPSID) }}</span>
                                     </td>
                                 </tr>
 
@@ -1706,8 +1706,8 @@
                                         <vp-input type="datetime" name="initialTestDate" [(ngModel)]="model.initialTestDate" [required]="true" [max]="today" [form]="submitForm" />
                                     </td>
 
-                                    <td [class.table-success]="isRPCV1CellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked, model.initRVOpenedPSID)"
-                                        [class.table-danger]="!isRPCV1CellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked, model.initRVOpenedPSID)">
+                                    <td [class.table-success]="!isFailedResult && isRPCV1CellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked, model.initRVOpenedPSID)"
+                                        [class.table-danger]="!isFailedResult && !isRPCV1CellValid(model.initCV1HeldPSID, model.initCV1ClosedTight, model.initCV1Leaked, model.initRVOpenedPSID)">
                                         <div class="mb-3">
                                             Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initCV1PSID" [(ngModel)]="model.initCV1HeldPSID" step="0.1" min="0" max="15" /> PSID 
                                         </div>
@@ -1721,8 +1721,8 @@
                                         </div>
                                     </td>
 
-                                    <td [class.table-success]="model.initCV2ClosedTight"
-                                        [class.table-danger]="!model.initCV2ClosedTight">
+                                    <td [class.table-success]="!isFailedResult && model.initCV2ClosedTight"
+                                        [class.table-danger]="!isFailedResult && !model.initCV2ClosedTight">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="initCV2CT" name="initCV2CT" [(ngModel)]="model.initCV2ClosedTight" />
                                             <label class="form-check-label" for="initCV2CT">Closed Tight</label>
@@ -1733,8 +1733,8 @@
                                         </div>
                                     </td>
 
-                                    <td [class.table-success]="isRVCellValid(model.initRVOpenedPSID, model.initRVDidNotOpen)"
-                                        [class.table-danger]="!isRVCellValid(model.initRVOpenedPSID, model.initRVDidNotOpen)">
+                                    <td [class.table-success]="!isFailedResult && isRVCellValid(model.initRVOpenedPSID, model.initRVDidNotOpen)"
+                                        [class.table-danger]="!isFailedResult && !isRVCellValid(model.initRVOpenedPSID, model.initRVDidNotOpen)">
                                         <div class="mb-3">
                                             Opened at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initRVOpenedPSID" [(ngModel)]="model.initRVOpenedPSID" step="0.1" min="0" max="15" /> PSID 
                                         </div>
@@ -1744,8 +1744,8 @@
                                         </div>
                                     </td>
 
-                                    <td [class.table-success]="isCVCellValid(model.initBCHeldPSID, model.initBCClosedTight, model.initBCLeaked)"
-                                        [class.table-danger]="!isCVCellValid(model.initBCHeldPSID, model.initBCClosedTight, model.initBCLeaked)">
+                                    <td [class.table-success]="!isFailedResult && isCVCellValid(model.initBCHeldPSID, model.initBCClosedTight, model.initBCLeaked)"
+                                        [class.table-danger]="!isFailedResult && !isCVCellValid(model.initBCHeldPSID, model.initBCClosedTight, model.initBCLeaked)">
                                         <div class="mb-3">
                                             Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initBCPSID" [(ngModel)]="model.initBCHeldPSID" step="0.1" min="0" max="15" /> PSID 
                                         </div>
@@ -1830,7 +1830,7 @@
                                     </td>                                   
                                 </tr>
 
-                                <tr *ngIf="finalTestFailed">
+                                <tr *ngIf="showFinalTestMessages">
                                         <td class="py-1 border-start-0 border-end-0">
                                             <span class="badge bg-warning text-dark">{{ finalTestDateError }}</span>
                                         </td>
@@ -1847,35 +1847,35 @@
                                     </tr>
 
                                     <tr>
-                                        <td [class.table-success]="!finalTestDateError"
-                                            [class.table-danger]="!!finalTestDateError">
+                                        <td [class.table-success]="!isFailedResult && !finalTestDateError"
+                                            [class.table-danger]="!isFailedResult && !!finalTestDateError">
                                             <div class="fw-bold mb-3 text-center">Test After Repair</div>
                                             <strong>Date and Time:</strong><br>
                                             <vp-input type="datetime" name="finalTestDate" [(ngModel)]="model.finalTestDate" [required]="true" [max]="today" [form]="submitForm" />
                                         </td>
 
-                                        <td [class.table-success]="isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)"
-                                            [class.table-danger]="!isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)">
+                                        <td [class.table-success]="!isFailedResult && isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)"
+                                            [class.table-danger]="!isFailedResult && !isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)">
                                             <div class="mb-3">Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalCV1PSID" [(ngModel)]="model.finalCV1HeldPSID" step="0.1" min="0" max="15" /> PSID </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="finalCV1CT" name="finalCV1CT" [(ngModel)]="model.finalCV1ClosedTight" />
                                                 <label class="form-check-label" for="finalCV1CT">Closed Tight</label>
                                             </div>
                                         </td>
-                                        <td [class.table-success]="model.finalCV2ClosedTight"
-                                            [class.table-danger]="!model.finalCV2ClosedTight">
+                                        <td [class.table-success]="!isFailedResult && model.finalCV2ClosedTight"
+                                            [class.table-danger]="!isFailedResult && !model.finalCV2ClosedTight">
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="finalCV2CT" name="finalCV2CT" [(ngModel)]="model.finalCV2ClosedTight" />
                                                 <label class="form-check-label" for="finalCV2CT">Closed Tight</label>
                                             </div>
                                         </td>
-                                        <td [class.table-success]="isRVCellValid(model.finalRVOpenedPSID, undefined)"
-                                            [class.table-danger]="!isRVCellValid(model.finalRVOpenedPSID, undefined)">
+                                        <td [class.table-success]="!isFailedResult && isRVCellValid(model.finalRVOpenedPSID, undefined)"
+                                            [class.table-danger]="!isFailedResult && !isRVCellValid(model.finalRVOpenedPSID, undefined)">
                                             <div class="mb-3">Opened at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalRVOpenedPSID" [(ngModel)]="model.finalRVOpenedPSID" step="0.1" min="0" max="15" /> PSID </div>
                                         </td>
 
-                                        <td [class.table-success]="isCVCellValid(model.finalBCHeldPSID, model.finalBCClosedTight, undefined)"
-                                            [class.table-danger]="!isCVCellValid(model.finalBCHeldPSID, model.finalBCClosedTight, undefined)">
+                                        <td [class.table-success]="!isFailedResult && isCVCellValid(model.finalBCHeldPSID, model.finalBCClosedTight, undefined)"
+                                            [class.table-danger]="!isFailedResult && !isCVCellValid(model.finalBCHeldPSID, model.finalBCClosedTight, undefined)">
                                             <div class="mb-3">Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalBCHeldPSID" [(ngModel)]="model.finalBCHeldPSID" step="0.1" min="0" max="15" /> PSID </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="finalBCT" name="finalBCT" [(ngModel)]="model.finalBCClosedTight" />
@@ -1907,15 +1907,15 @@
                             </thead>
 
                             <tbody>
-                                <tr *ngIf="initialTestFailed">
+                                <tr *ngIf="showInitialTestMessages">
                                     <td class="py-1 border-start-0 border-end-0">
                                         <span class="badge bg-warning text-dark">{{ initialTestDateError }}</span>
                                     </td>
                                     <td class="py-1 border-start-0 border-end-0">
-                                        <span *ngIf="cvPsidMessage(model.initPvbAirInletOpenedPSID)" class="badge bg-warning text-dark ms-1">{{ cvPsidMessage(model.initPvbAirInletOpenedPSID) }}</span>                                       
+                                        <span *ngIf="!isFailedResult && cvPsidMessage(model.initPvbAirInletOpenedPSID)" class="badge bg-warning text-dark ms-1">{{ cvPsidMessage(model.initPvbAirInletOpenedPSID) }}</span>                                       
                                     </td>
                                     <td class="py-1 border-start-0 border-end-0">
-                                        <span *ngIf="cvPsidMessage(model.initPvbCVHeldPSID)" class="badge bg-warning text-dark ms-1">{{ cvPsidMessage(model.initPvbCVHeldPSID) }}</span>
+                                        <span *ngIf="!isFailedResult && cvPsidMessage(model.initPvbCVHeldPSID)" class="badge bg-warning text-dark ms-1">{{ cvPsidMessage(model.initPvbCVHeldPSID) }}</span>
                                     </td>
                                 </tr>
 
@@ -1926,8 +1926,8 @@
                                         <strong>Date and Time:</strong><br>
                                         <vp-input type="datetime" name="initialTestDate" [(ngModel)]="model.initialTestDate" [required]="true" [max]="today" [form]="submitForm" />
                                     </td>
-                                    <td [class.table-success]="isAirInletCellValid(model.initPvbAirInletOpenedPSID, model.initPvbAirInletDidNotOpen, model.initPvbAirInletFullyOpened)"
-                                        [class.table-danger]="!isAirInletCellValid(model.initPvbAirInletOpenedPSID, model.initPvbAirInletDidNotOpen, model.initPvbAirInletFullyOpened)">
+                                    <td [class.table-success]="!isFailedResult && isAirInletCellValid(model.initPvbAirInletOpenedPSID, model.initPvbAirInletDidNotOpen, model.initPvbAirInletFullyOpened)"
+                                        [class.table-danger]="!isFailedResult && !isAirInletCellValid(model.initPvbAirInletOpenedPSID, model.initPvbAirInletDidNotOpen, model.initPvbAirInletFullyOpened)">
                                         <div class="mb-3">
                                             Opened at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initPvbAirInletOpenedPSID" [(ngModel)]="model.initPvbAirInletOpenedPSID" step="0.1" min="0" max="15" /> PSID </div>
                                         <div class="form-check">
@@ -1939,8 +1939,8 @@
                                             <label class="form-check-label" for="initPvbAirInletFullyOpened">Did It Fully Open</label>
                                         </div>
                                     </td>
-                                    <td [class.table-success]="isPvbCVCellValid(model.initPvbCVHeldPSID, model.initPvbCVLeaked)"
-                                        [class.table-danger]="!isPvbCVCellValid(model.initPvbCVHeldPSID, model.initPvbCVLeaked)">
+                                    <td [class.table-success]="!isFailedResult && isPvbCVCellValid(model.initPvbCVHeldPSID, model.initPvbCVLeaked)"
+                                        [class.table-danger]="!isFailedResult && !isPvbCVCellValid(model.initPvbCVHeldPSID, model.initPvbCVLeaked)">
                                         <div class="mb-3">
                                             Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="initPvbCVHeldPSID" [(ngModel)]="model.initPvbCVHeldPSID" step="0.1" min="0" max="15" /> PSID 
                                         </div>
@@ -1978,7 +1978,7 @@
                                     </td>
                                 </tr>
 
-                                <tr *ngIf="finalTestFailed">
+                                <tr *ngIf="showFinalTestMessages">
                                         <td class="py-1 border-start-0 border-end-0">
                                             <span class="badge bg-warning text-dark">{{ finalTestDateError }}</span>
                                         </td>
@@ -1991,22 +1991,22 @@
                                     </tr>
 
                                     <tr>
-                                        <td [class.table-success]="!finalTestDateError"
-                                            [class.table-danger]="!!finalTestDateError">
+                                        <td [class.table-success]="!isFailedResult && !finalTestDateError"
+                                            [class.table-danger]="!isFailedResult && !!finalTestDateError">
                                             <div class="fw-bold mb-3 text-center">Test After Repair</div>
                                             <strong>Date and Time:</strong><br>
                                             <vp-input type="datetime" name="finalTestDate" [(ngModel)]="model.finalTestDate" [required]="true" [max]="today" [form]="submitForm" />
                                         </td>
-                                        <td [class.table-success]="isAirInletCellValid(model.finalPvbAirInletOpenedPSID, undefined, model.finalPvbAirInletFullyOpened)"
-                                            [class.table-danger]="!isAirInletCellValid(model.finalPvbAirInletOpenedPSID, undefined, model.finalPvbAirInletFullyOpened)">
+                                        <td [class.table-success]="!isFailedResult && isAirInletCellValid(model.finalPvbAirInletOpenedPSID, undefined, model.finalPvbAirInletFullyOpened)"
+                                            [class.table-danger]="!isFailedResult && !isAirInletCellValid(model.finalPvbAirInletOpenedPSID, undefined, model.finalPvbAirInletFullyOpened)">
                                             <div class="mb-3">Opened at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalPvbAirInletOpenedPSID" [(ngModel)]="model.finalPvbAirInletOpenedPSID" step="0.1" min="0" max="15" /> PSID </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="finalPvbAirInletFullyOpened" name="finalPvbAirInletFullyOpened" [(ngModel)]="model.finalPvbAirInletFullyOpened" />
                                                 <label class="form-check-label" for="finalPvbAirInletFullyOpened">Fully Opened</label>
                                             </div>
                                         </td>
-                                        <td [class.table-success]="isPvbCVCellValid(model.finalPvbCVHeldPSID, undefined)"
-                                            [class.table-danger]="!isPvbCVCellValid(model.finalPvbCVHeldPSID, undefined)">
+                                        <td [class.table-success]="!isFailedResult && isPvbCVCellValid(model.finalPvbCVHeldPSID, undefined)"
+                                            [class.table-danger]="!isFailedResult && !isPvbCVCellValid(model.finalPvbCVHeldPSID, undefined)">
                                             <div class="mb-3">Held at <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px;" name="finalPvbCVHeldPSID" [(ngModel)]="model.finalPvbCVHeldPSID" step="0.1" min="0" max="15" /> PSID </div>
                                         </td>
                                     </tr>

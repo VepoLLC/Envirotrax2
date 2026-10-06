@@ -191,6 +191,7 @@ export class BackflowTestSubmitComponent implements OnInit {
             && this.professional?.insuranceExpirationType === ExpirationType.AboutToExpire;
     }
     public get isAirGap(): boolean { return this.model.deviceType === BackflowDeviceType.AG; }
+    public get isFailedResult(): boolean { return this.model.testResult === BackflowTestResult.Fail; }
     public get today(): Date { return new Date(); }
     public get deviceTypeLabel(): string {
         return this.deviceTypeOptions.find(o => o.id === this.model.deviceType)?.text ?? '';
@@ -406,6 +407,22 @@ export class BackflowTestSubmitComponent implements OnInit {
         if (this.model.deviceType === BackflowDeviceType.RPPD2) return this.finalTestFailedRppd2;
         if (this.isPVB) return this.finalTestFailedPvb;
         return false;
+    }
+
+    public get showInitialTestMessages(): boolean {
+        if (this.isFailedResult) {
+            return this.initialTestDateError !== null;
+        }
+
+        return this.initialTestFailed;
+    }
+
+    public get showFinalTestMessages(): boolean {
+        if (this.isFailedResult) {
+            return false;
+        }
+
+        return this.finalTestFailed;
     }
 
     public get isOtherHazardType(): boolean { return this.model.hazardType === 'Other'; }

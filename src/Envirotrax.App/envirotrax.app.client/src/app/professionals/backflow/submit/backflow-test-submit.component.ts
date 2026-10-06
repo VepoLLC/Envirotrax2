@@ -79,6 +79,8 @@ export class BackflowTestSubmitComponent implements OnInit {
     public readonly PropertyType = PropertyType;
 
     public readonly deviceTypeOptions: InputOption[];
+    public readonly manufacturerOptions: InputOption[];
+    public readonly sizeOptions: InputOption[];
     public readonly hazardTypeOptions: InputOption[];
     public readonly reasonOptions: InputOption[];
 
@@ -199,6 +201,7 @@ export class BackflowTestSubmitComponent implements OnInit {
     public get isDC(): boolean { return [BackflowDeviceType.DC, BackflowDeviceType.DCD, BackflowDeviceType.DCD2].includes(this.model.deviceType as BackflowDeviceType); }
     public get isRP(): boolean { return [BackflowDeviceType.RP, BackflowDeviceType.RPPD, BackflowDeviceType.RPPD2].includes(this.model.deviceType as BackflowDeviceType); }
     public get isPVB(): boolean { return [BackflowDeviceType.PVB, BackflowDeviceType.SVB].includes(this.model.deviceType as BackflowDeviceType); }
+    public get hasAssembly(): boolean { return !!this.model.deviceType && !this.isAirGap; }
     public get hasBypassCV(): boolean { return [BackflowDeviceType.DCD, BackflowDeviceType.RPPD].includes(this.model.deviceType as BackflowDeviceType); }
     public get hasBypassBC(): boolean { return [BackflowDeviceType.DCD2, BackflowDeviceType.RPPD2].includes(this.model.deviceType as BackflowDeviceType); }
 
@@ -429,6 +432,14 @@ export class BackflowTestSubmitComponent implements OnInit {
     public get isResidential(): boolean { return this.model.propertyType === PropertyType.Residential; }
     public get remarksLength(): number { return this.model.comments?.length ?? 0; }
 
+    public get locationDescriptionLength(): number {
+        if (!this.model.locationDescription) {
+            return 0;
+        }
+
+        return this.model.locationDescription.length;
+    }
+
     public get initialTestDateError(): string | null {
         if (!this.model.initialTestDate) { return 'Please enter a test date and time.'; }
         if (new Date(this.model.initialTestDate) > new Date()) {
@@ -505,6 +516,8 @@ export class BackflowTestSubmitComponent implements OnInit {
         private readonly _lookupService: LookupService
     ) {
         this.deviceTypeOptions = this._options.deviceTypeOptions;
+        this.manufacturerOptions = this._options.manufacturerOptions;
+        this.sizeOptions = this._options.sizeOptions;
         this.hazardTypeOptions = this._options.hazardTypeOptions;
         this.reasonOptions = this._options.reasonOptions;
     }
@@ -1058,7 +1071,7 @@ export class BackflowTestSubmitComponent implements OnInit {
             this.validationErrors.push('Please select a test gauge.');
         }
         if (!this.model.deviceType) {
-            this.validationErrors.push('Please select a device type.');
+            this.validationErrors.push('Please select a backflow method.');
         }
 
         if (!this.isLocationEditing && this.hasMissingLocationFields()) {

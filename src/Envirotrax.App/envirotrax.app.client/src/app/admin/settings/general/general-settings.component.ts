@@ -55,13 +55,19 @@ export class GeneralSettingsComponent implements OnInit {
     }
 
     public async copyFromParent(): Promise<void> {
-        const copied = await this._settingsCopyService.confirmAndCopyFromParent(SettingsSection.General);
+        try {
+            this.isLoading = true;
 
-        if (copied) {
-            this.validationErrors = [];
-            this.showProgramUpdateWarning = false;
+            const copied = await this._settingsCopyService.confirmAndCopyFromParent(SettingsSection.General);
 
-            await this.getSettings();
+            if (copied) {
+                this.validationErrors = [];
+                this.showProgramUpdateWarning = false;
+
+                await this.getSettings();
+            }
+        } finally {
+            this.isLoading = false;
         }
     }
 

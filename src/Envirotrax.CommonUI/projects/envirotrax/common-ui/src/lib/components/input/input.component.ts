@@ -74,7 +74,13 @@ export class InputComponent implements ControlValueAccessor, Validator, OnInit, 
     public decimals?: number;
 
     @Input()
+    public numeric: boolean = false;
+
+    @Input()
     public label: string = null!;
+
+    @Input()
+    public validationLabel?: string;
 
     @Input()
     public form?: NgForm;
@@ -190,7 +196,30 @@ export class InputComponent implements ControlValueAccessor, Validator, OnInit, 
                 return { email: true };
             }
         }
+
+        const isNumericField = this.type === 'number' || this.numeric;
+
+        if (isNumericField && !this.isBlank(control.value)) {
+            const parsed = Number(control.value);
+
+            if (isNaN(parsed)) {
+                return { number: true };
+            }
+
+            if (typeof this.min === 'number' && parsed < this.min) {
+                return { min: { min: this.min, actual: parsed } };
+            }
+
+            if (typeof this.max === 'number' && parsed > this.max) {
+                return { max: { max: this.max, actual: parsed } };
+            }
+        }
+
         return null;
+    }
+
+    private isBlank(value: any): boolean {
+        return value == null || (typeof value === 'string' && value.trim() === '');
     }
 
     public ngOnInit(): void {

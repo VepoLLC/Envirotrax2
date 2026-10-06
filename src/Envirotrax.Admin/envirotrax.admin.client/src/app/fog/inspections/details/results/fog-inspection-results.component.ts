@@ -11,25 +11,9 @@ import {
 import { FacilityType } from '../../../../shared/models/sites/site';
 import { FogInspectionOptionsService } from '../../../../shared/services/fog/fog-inspection-options.service';
 
-export function isInvalidChamberValue(value: string | undefined): boolean {
-    if (value == null || value.trim() === '') {
-        return false;
-    }
-
-    const parsed = Number(value);
-
-    return isNaN(parsed) || parsed < 0;
-}
-
 @Component({
     selector: 'vp-fog-inspection-results',
     templateUrl: './fog-inspection-results.component.html',
-    styles: [`
-        .vp-field-invalid {
-            border: 1px solid var(--bs-danger, #dc3545);
-            border-radius: 0.25rem;
-        }
-    `],
     imports: [CommonModule, FormsModule, SharedComponentsModule],
     viewProviders: [
         {
@@ -59,8 +43,6 @@ export class FogInspectionResultsComponent implements OnInit {
     public inletSedimentLayerPercent: number = 0;
     public outletGreaseLayerPercent: number = 0;
     public outletSedimentLayerPercent: number = 0;
-
-    public readonly isInvalidChamberValue = isInvalidChamberValue;
 
     constructor(private readonly _options: FogInspectionOptionsService) {
         this.reasonOptions = this._options.reasonOptions;

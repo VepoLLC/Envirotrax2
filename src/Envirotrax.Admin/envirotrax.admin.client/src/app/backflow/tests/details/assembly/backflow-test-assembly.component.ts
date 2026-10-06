@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms';
+import { Component, EventEmitter, Input, OnInit, Optional, Output, SkipSelf } from '@angular/core';
+import { ControlContainer, FormsModule, NgForm } from '@angular/forms';
 import { InputOption } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../../shared/components/shared.components.module';
 import { BackflowTestDetails } from '../../../../shared/models/backflow/backflow-test';
@@ -12,7 +12,14 @@ const HazardTypeOther = 'Other';
 @Component({
     selector: 'vp-backflow-test-assembly',
     templateUrl: './backflow-test-assembly.component.html',
-    imports: [CommonModule, FormsModule, SharedComponentsModule]
+    imports: [CommonModule, FormsModule, SharedComponentsModule],
+    viewProviders: [
+        {
+            provide: ControlContainer,
+            useFactory: (container: ControlContainer) => container,
+            deps: [[new SkipSelf(), new Optional(), ControlContainer]]
+        }
+    ]
 })
 export class BackflowTestAssemblyComponent implements OnInit {
     @Input() public test: BackflowTestDetails = {};

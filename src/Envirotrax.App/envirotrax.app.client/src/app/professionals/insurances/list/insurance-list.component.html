@@ -104,6 +104,7 @@
                           label="Coverage $"
                           type="number"
                           [decimals]="2"
+                          [min]="0"
                           [(ngModel)]="newInsurance.coverageAmount"
                           [required]="true"
                           [form]="form" />

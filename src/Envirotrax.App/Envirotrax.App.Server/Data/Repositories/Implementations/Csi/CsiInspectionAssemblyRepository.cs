@@ -32,49 +32,67 @@ public class CsiInspectionAssemblyRepository : Repository<CsiInspectionVisuallyI
             .CountAsync(assembly => assembly.InspectionId == inspectionId, cancellationToken);
     }
 
-    // Makes the inspection's rows match `assemblies` in one save: rows with an Id keep their snapshot
-    // and only take the new VisuallyIdentified flag, rows without one are inserted (together with a
-    // new Test when one is attached), and saved rows missing from the list are removed. A removed
-    // row's test goes with it only when this submission created it and it is still unpaid — the V1
-    // rule, which leaves the site's real test history alone.
-    public async Task SaveForInspectionAsync(
-        int inspectionId,
-        string? submissionId,
-        IReadOnlyCollection<CsiInspectionVisuallyIdentifiedAssembly> assemblies,
-        CancellationToken cancellationToken)
+    public async Task<List<CsiInspectionVisuallyIdentifiedAssembly>> GetBySubmissionAsync(string submissionId, CancellationToken cancellationToken)
     {
-        var saved = await Entity
-            .Include(assembly => assembly.Test)
-            .Where(assembly => assembly.InspectionId == inspectionId)
+        return await GetListQuery()
+            .Where(assembly => assembly.SubmissionId == submissionId)
+            .OrderBy(assembly => assembly.Id)
             .ToListAsync(cancellationToken);
+    }
 
-        var keptById = assemblies
-            .Where(assembly => assembly.Id > 0)
-            .ToDictionary(assembly => assembly.Id);
+    // Only an unpaid row of this submission can be deleted. Its test goes with it only when this
+    // submission created that test, so the site's real test history is never touched.
+    public async Task<bool> DeleteForSubmissionAsync(int id, string submissionId, CancellationToken cancellationToken)
+    {
+        var assembly = await Entity
+            .Include(assembly => assembly.Test)
+            .SingleOrDefaultAsync(assembly => assembly.Id == id && assembly.SubmissionId == submissionId && (assembly.TransactionId == null || assembly.TransactionId == ""), cancellationToken);
 
-        foreach (var assembly in saved)
+        if (assembly == null)
         {
-            if (keptById.TryGetValue(assembly.Id, out var kept))
-            {
-                assembly.VisuallyIdentified = kept.VisuallyIdentified;
-                continue;
-            }
-
-            Entity.Remove(assembly);
-
-            var createdBySubmission = assembly.Test != null
-                && !string.IsNullOrEmpty(submissionId)
-                && assembly.Test.SubmissionId == submissionId
-                && string.IsNullOrEmpty(assembly.Test.TransactionId);
-
-            if (createdBySubmission)
-            {
-                DbContext.BackflowTests.Remove(assembly.Test!);
-            }
+            return false;
         }
 
-        Entity.AddRange(assemblies.Where(assembly => assembly.Id == 0));
+        Entity.Remove(assembly);
+
+        if (assembly.Test != null && assembly.Test.SubmissionId == submissionId && string.IsNullOrEmpty(assembly.Test.TransactionId))
+        {
+            DbContext.BackflowTests.Remove(assembly.Test);
+        }
 
         await DbContext.SaveChangesAsync(cancellationToken);
+
+        return true;
+    }
+
+    public Task UpdateVisuallyIdentifiedAsync(string submissionId, IReadOnlyCollection<int> visuallyIdentifiedIds, CancellationToken cancellationToken)
+    {
+        return Entity
+            .Where(assembly => assembly.SubmissionId == submissionId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(assembly => assembly.VisuallyIdentified, assembly => visuallyIdentifiedIds.Contains(assembly.Id)), cancellationToken);
+    }
+
+    public Task LinkToInspectionAsync(int inspectionId, string submissionId, CancellationToken cancellationToken)
+    {
+        return Entity
+            .Where(assembly => assembly.SubmissionId == submissionId && assembly.InspectionId == null)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(assembly => assembly.InspectionId, inspectionId), cancellationToken);
+    }
+
+    public Task MarkPaidAsync(int inspectionId, string submissionId, string transactionId, CancellationToken cancellationToken)
+    {
+        return Entity
+            .Where(assembly => assembly.InspectionId == inspectionId && assembly.SubmissionId == submissionId && (assembly.TransactionId == null || assembly.TransactionId == ""))
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(assembly => assembly.TransactionId, transactionId), cancellationToken);
+    }
+
+    public Task DeleteByInspectionAsync(int inspectionId, CancellationToken cancellationToken)
+    {
+        return Entity
+            .Where(assembly => assembly.InspectionId == inspectionId)
+            .ExecuteDeleteAsync(cancellationToken);
     }
 }

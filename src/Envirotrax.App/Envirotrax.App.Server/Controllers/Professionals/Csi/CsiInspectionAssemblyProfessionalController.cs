@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers.Professionals.Csi;
 
-[Route("api/professionals/csi/inspections")]
+[Route("api/professionals/csi/inspections/assemblies")]
 [HasFeature(FeatureType.CsiInspection)]
 [Authorize(Roles = $"{RoleDefinitions.Professionals.Admin},{RoleDefinitions.Professionals.CsiInspector}")]
 public class CsiInspectionAssemblyProfessionalController : ProfessionalProtectedController
@@ -19,27 +19,35 @@ public class CsiInspectionAssemblyProfessionalController : ProfessionalProtected
         _assemblyService = assemblyService;
     }
 
-    [HttpGet("site-assemblies/{siteId}")]
-    public async Task<IActionResult> GetForSiteAsync(int siteId, CancellationToken cancellationToken)
+    [HttpPost("initialize")]
+    public async Task<IActionResult> InitializeAsync([FromQuery] int siteId, [FromQuery] string submissionId, CancellationToken cancellationToken)
     {
-        var assemblies = await _assemblyService.GetForSiteAsync(siteId, cancellationToken);
+        var assemblies = await _assemblyService.InitializeAsync(siteId, submissionId, cancellationToken);
 
         return Ok(assemblies);
     }
 
-    [HttpGet("{inspectionId}/assemblies")]
-    public async Task<IActionResult> GetByInspectionAsync(int inspectionId, CancellationToken cancellationToken)
+    [HttpPost]
+    public async Task<IActionResult> AddAsync([FromBody] CsiInspectionAssemblyRequest request, CancellationToken cancellationToken)
     {
-        var assemblies = await _assemblyService.GetByInspectionAsync(inspectionId, cancellationToken);
+        var assembly = await _assemblyService.AddAsync(request, cancellationToken);
 
-        return Ok(assemblies);
+        return Ok(assembly);
     }
 
-    [HttpPut("{inspectionId}/assemblies")]
-    public async Task<IActionResult> SaveAsync(int inspectionId, [FromBody] List<CsiInspectionAssemblyRequest> requests, CancellationToken cancellationToken)
+    [HttpPut("visually-identified")]
+    public async Task<IActionResult> UpdateVisuallyIdentifiedAsync([FromBody] CsiInspectionVisuallyIdentifiedRequest request, CancellationToken cancellationToken)
     {
-        var assemblies = await _assemblyService.SaveForProfessionalAsync(inspectionId, requests, cancellationToken);
+        await _assemblyService.UpdateVisuallyIdentifiedAsync(request, cancellationToken);
 
-        return assemblies == null ? NotFound() : Ok(assemblies);
+        return Ok();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync(int id, [FromQuery] string submissionId, CancellationToken cancellationToken)
+    {
+        var deleted = await _assemblyService.DeleteAsync(id, submissionId, cancellationToken);
+
+        return deleted ? Ok() : NotFound();
     }
 }

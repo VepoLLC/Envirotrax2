@@ -71,6 +71,5 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
     Task<List<BackflowTest>> GetCurrentBySiteAsync(int siteId, CancellationToken cancellationToken);
 
     // CSI inspection visually identified assemblies
-    Task ApplyCsiInspectionAsync(CsiInspection inspection, CancellationToken cancellationToken);
-    Task MarkCsiInspectionTestsPaidAsync(int siteId, string submissionId, string transactionId, DateTime transactionDate, CancellationToken cancellationToken);
+    Task MarkCsiInspectionTestsPaidAsync(CsiInspection inspection, string transactionId, DateTime transactionDate, CancellationToken cancellationToken);
 }

@@ -1041,47 +1041,17 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return Entity.CountAsync(t => t.SiteId == siteId && t.DeletedTime == null && t.IsCurrent && !t.OutOfService, cancellationToken);
     }
 
-    // V1 setBackflowRecords: the tests added on a CSI inspection form are created without a site, and
-    // take the inspection's site, inspector and date when the inspection is submitted.
-    public Task ApplyCsiInspectionAsync(CsiInspection inspection, CancellationToken cancellationToken)
-    {
-        var inspectionDate = inspection.InspectionDate;
-
-        return Entity
-            .Where(t => t.SubmissionId == inspection.SubmissionId && t.SiteId == null && t.DeletedTime == null)
-            .ExecuteUpdateAsync(setter => setter
-                .SetProperty(t => t.SiteId, inspection.SiteId)
-                .SetProperty(t => t.InspectorId, inspection.InspectorId)
-                .SetProperty(t => t.PropertyType, (int)inspection.PropertyType)
-                .SetProperty(t => t.PropertyBusinessName, inspection.PropertyBusinessName)
-                .SetProperty(t => t.PropertyStreetNumber, inspection.PropertyStreetNumber)
-                .SetProperty(t => t.PropertyStreetName, inspection.PropertyStreetName)
-                .SetProperty(t => t.PropertyNumber, inspection.PropertyNumber)
-                .SetProperty(t => t.PropertyCity, inspection.PropertyCity)
-                .SetProperty(t => t.PropertyStateId, inspection.PropertyStateId)
-                .SetProperty(t => t.PropertyZip, inspection.PropertyZip)
-                .SetProperty(t => t.MailingCompanyName, inspection.MailingCompanyName)
-                .SetProperty(t => t.MailingContactName, inspection.MailingContactName)
-                .SetProperty(t => t.MailingStreetNumber, inspection.MailingStreetNumber)
-                .SetProperty(t => t.MailingStreetName, inspection.MailingStreetName)
-                .SetProperty(t => t.MailingNumber, inspection.MailingNumber)
-                .SetProperty(t => t.MailingCity, inspection.MailingCity)
-                .SetProperty(t => t.MailingStateId, inspection.MailingStateId)
-                .SetProperty(t => t.MailingZip, inspection.MailingZip)
-                .SetProperty(t => t.MailingPhoneNumber, inspection.MailingPhoneNumber)
-                .SetProperty(t => t.MailingEmailAddress, inspection.MailingEmailAddress)
-                .SetProperty(t => t.InitialTestDate, inspectionDate)
-                .SetProperty(t => t.RepairTestDate, inspectionDate)
-                .SetProperty(t => t.FinalTestDate, inspectionDate)
-                .SetProperty(t => t.AirGapTestDate, inspectionDate)
-                .SetProperty(t => t.TestDate, inspectionDate)
-                .SetProperty(t => t.ExpirationDate, inspectionDate), cancellationToken);
-    }
-
-    public Task MarkCsiInspectionTestsPaidAsync(int siteId, string submissionId, string transactionId, DateTime transactionDate, CancellationToken cancellationToken)
+    // V1 checkout: the tests an inspection added ("+ Add Assembly") are paid with that inspection.
+    public Task MarkCsiInspectionTestsPaidAsync(CsiInspection inspection, string transactionId, DateTime transactionDate, CancellationToken cancellationToken)
     {
         return Entity
-            .Where(t => t.SiteId == siteId && t.SubmissionId == submissionId && (t.TransactionId == null || t.TransactionId == ""))
+            .Where(t => t.ProfessionalId == inspection.ProfessionalId
+                && (t.TransactionId == null || t.TransactionId == "")
+                && DbContext.CsiInspectionVisuallyIdentifiedAssemblies.Any(assembly =>
+                    assembly.InspectionId == inspection.Id
+                    && assembly.AddedOnInspection
+                    && assembly.WaterSupplierId == t.WaterSupplierId
+                    && assembly.TestId == t.Id))
             .ExecuteUpdateAsync(setter => setter
                 .SetProperty(t => t.TransactionId, transactionId)
                 .SetProperty(t => t.TransactionDate, transactionDate), cancellationToken);

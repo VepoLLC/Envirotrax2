@@ -19,7 +19,8 @@ import { ProfessionalSupplierService } from '../../../../shared/services/profess
 import { CheckoutService } from '../../../../shared/services/professionals/checkout.service';
 import { ToastService, InputOption, ModalHelperService } from '@envirotrax/common-ui';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
-import { CsiInspectionAssembly, CsiInspectionAssemblyRequest } from '../../../../shared/models/csi/csi-inspection-assembly';
+import { CreateCsiInspection, CsiInspectionAssembly, CsiInspectionNewAssembly } from '../../../../shared/models/csi/csi-inspection-assembly';
+import { BackflowTestResult, BYPASS_DEVICE_TYPES } from '../../../../shared/models/backflow/backflow-test-enums';
 import { AddCsiInspectionAssemblyComponent } from './add-csi-inspection-assembly.component';
 
 @Component({
@@ -53,6 +54,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
     public legalAcknowledgment = false;
     public pendingImages: { file: File; description: string; previewUrl: string }[] = [];
     public assemblies: CsiInspectionAssembly[] = [];
+    private readonly _newAssemblies = new Map<CsiInspectionAssembly, CsiInspectionNewAssembly>();
 
     public model: CsiInspection = {
         site: {},
@@ -194,23 +196,26 @@ export class CsiSubmissionCreateComponent implements OnInit {
         this.pendingImages.splice(index, 1);
     }
 
+    // Added assemblies stay on the form until the inspection is submitted; the row shows it in the table.
     public addAssembly(): void {
-        this._modalHelper.show<CsiInspectionAssemblyRequest, CsiInspectionAssembly>(AddCsiInspectionAssemblyComponent, {
+        this._modalHelper.show<CsiInspectionNewAssembly>(AddCsiInspectionAssemblyComponent, {
             title: 'Add Backflow Device',
-            size: ModalSize.large,
-            model: { submissionId: this.model.submissionId!, siteId: this._siteId }
-        }).result().subscribe(assembly => {
-            this.assemblies = [...this.assemblies, assembly];
+            size: ModalSize.large
+        }).result().subscribe(newAssembly => {
+            const row = this.buildNewAssemblyRow(newAssembly);
+
+            this._newAssemblies.set(row, newAssembly);
+            this.assemblies = [...this.assemblies, row];
         });
     }
 
+    // Removed from the form only; the inspection's submit/update deletes a saved row.
     public deleteAssembly(assembly: CsiInspectionAssembly): void {
         this._modalHelper.confirm({
             title: 'Confirm Assembly Deletion',
             messages: ['Are you sure you want to delete the record for the following assembly?', assembly.assemblyDescription ?? '']
-        }).result().subscribe(async () => {
-            await this._inspectionService.deleteAssembly(assembly.id!, this.model.submissionId!);
-
+        }).result().subscribe(() => {
+            this._newAssemblies.delete(assembly);
             this.assemblies = this.assemblies.filter(listed => listed !== assembly);
         });
     }
@@ -219,7 +224,11 @@ export class CsiSubmissionCreateComponent implements OnInit {
     public markAllAssembliesVisuallyIdentified(): void {
         const visuallyIdentified = !this.assemblies.every(assembly => assembly.visuallyIdentified);
 
-        this.assemblies = this.assemblies.map(assembly => ({ ...assembly, visuallyIdentified }));
+        for (const assembly of this.assemblies) {
+            assembly.visuallyIdentified = visuallyIdentified;
+        }
+
+        this.assemblies = [...this.assemblies];
     }
 
     public async submit(submitForm: NgForm): Promise<void> {
@@ -232,10 +241,17 @@ export class CsiSubmissionCreateComponent implements OnInit {
 
         this.isLoading = true;
         try {
-            const visuallyIdentifiedIds = this.assemblies.filter(assembly => assembly.visuallyIdentified).map(assembly => assembly.id!);
-            await this._inspectionService.updateVisuallyIdentified(this.model.submissionId!, visuallyIdentifiedIds);
+            const payload: CreateCsiInspection = {
+                ...this.model,
+                site: { id: this._siteId },
+                assemblies: this.assemblies
+                    .filter(assembly => !this._newAssemblies.has(assembly))
+                    .map(assembly => ({ id: assembly.id || undefined, testId: assembly.testId, visuallyIdentified: !!assembly.visuallyIdentified })),
+                newAssemblies: this.assemblies
+                    .filter(assembly => this._newAssemblies.has(assembly))
+                    .map(assembly => ({ ...this._newAssemblies.get(assembly), visuallyIdentified: !!assembly.visuallyIdentified }))
+            };
 
-            const payload = { ...this.model, site: { id: this._siteId } };
             const result = this.editingId
                 ? await this._inspectionService.updateForProfessional(this.editingId, payload)
                 : await this._inspectionService.submit(payload);
@@ -285,14 +301,11 @@ export class CsiSubmissionCreateComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            const submissionId = this.newSubmissionId();
-            this.model.submissionId = submissionId;
-
             const [professional, usersPage, site, assemblies] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isCsiInspector', comparisonOperator: 'Eq', value: 'true' }] }),
                 this._siteService.getForProfessional(this._siteId),
-                this._inspectionService.initializeAssemblies(this._siteId, submissionId)
+                this._inspectionService.getAssembliesForForm(this._siteId)
             ]);
 
             this.professional = professional;
@@ -320,15 +333,11 @@ export class CsiSubmissionCreateComponent implements OnInit {
             const inspection = await this._inspectionService.getProfessionalInspection(id);
             this._siteId = inspection.site?.id ?? 0;
 
-            // Inspections submitted before assemblies existed have no submission id yet.
-            const submissionId = inspection.submissionId || this.newSubmissionId();
-            inspection.submissionId = submissionId;
-
             const [professional, usersPage, site, assemblies] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isCsiInspector', comparisonOperator: 'Eq', value: 'true' }] }),
                 this._siteService.getForProfessional(this._siteId),
-                this._inspectionService.initializeAssemblies(this._siteId, submissionId)
+                this._inspectionService.getAssembliesForForm(this._siteId, id)
             ]);
 
             this.professional = professional;
@@ -434,9 +443,25 @@ export class CsiSubmissionCreateComponent implements OnInit {
         }
     }
 
-    // Keys everything saved from this form until the inspection is submitted (V1 SubmissionID).
-    private newSubmissionId(): string {
-        return crypto.randomUUID().replace(/-/g, '');
+    // How an added assembly shows until the inspection is saved: a current, in-service test. The server
+    // stores the same "{manufacturer} {model} {size} - {device type}" description.
+    private buildNewAssemblyRow(newAssembly: CsiInspectionNewAssembly): CsiInspectionAssembly {
+        const hasBypass = BYPASS_DEVICE_TYPES.includes(newAssembly.deviceType ?? '');
+
+        return {
+            deviceType: newAssembly.deviceType,
+            assemblyDescription: `${newAssembly.manufacturer ?? ''} ${newAssembly.model ?? ''} ${newAssembly.size ?? ''} - ${newAssembly.deviceType}`,
+            serialNumber: newAssembly.serialNumber,
+            assemblyDescription2: hasBypass ? `${newAssembly.manufacturer2} ${newAssembly.model2} ${newAssembly.size2} - ${newAssembly.deviceType}` : undefined,
+            serialNumber2: hasBypass ? newAssembly.serialNumber2 : undefined,
+            hazardType: newAssembly.hazardType,
+            hazardTypeOtherDescription: newAssembly.hazardTypeOtherDescription,
+            locationDescription: newAssembly.locationDescription,
+            isCurrent: true,
+            testResult: BackflowTestResult.Pass,
+            outOfService: false,
+            visuallyIdentified: false
+        };
     }
 
     private resetValidation(): void {

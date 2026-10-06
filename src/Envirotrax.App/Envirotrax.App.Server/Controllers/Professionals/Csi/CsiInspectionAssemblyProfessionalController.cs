@@ -1,4 +1,3 @@
-using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -19,35 +18,12 @@ public class CsiInspectionAssemblyProfessionalController : ProfessionalProtected
         _assemblyService = assemblyService;
     }
 
-    [HttpPost("initialize")]
-    public async Task<IActionResult> InitializeAsync([FromQuery] int siteId, [FromQuery] string submissionId, CancellationToken cancellationToken)
+    // The rows the inspection form starts with; they are saved with the inspection's submit/update.
+    [HttpGet]
+    public async Task<IActionResult> GetForFormAsync([FromQuery] int siteId, [FromQuery] int? inspectionId, CancellationToken cancellationToken)
     {
-        var assemblies = await _assemblyService.InitializeAsync(siteId, submissionId, cancellationToken);
+        var assemblies = await _assemblyService.GetForFormAsync(siteId, inspectionId, cancellationToken);
 
         return Ok(assemblies);
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> AddAsync([FromBody] CsiInspectionAssemblyRequest request, CancellationToken cancellationToken)
-    {
-        var assembly = await _assemblyService.AddAsync(request, cancellationToken);
-
-        return Ok(assembly);
-    }
-
-    [HttpPut("visually-identified")]
-    public async Task<IActionResult> UpdateVisuallyIdentifiedAsync([FromBody] CsiInspectionVisuallyIdentifiedRequest request, CancellationToken cancellationToken)
-    {
-        await _assemblyService.UpdateVisuallyIdentifiedAsync(request, cancellationToken);
-
-        return Ok();
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAsync(int id, [FromQuery] string submissionId, CancellationToken cancellationToken)
-    {
-        var deleted = await _assemblyService.DeleteAsync(id, submissionId, cancellationToken);
-
-        return deleted ? Ok() : NotFound();
     }
 }

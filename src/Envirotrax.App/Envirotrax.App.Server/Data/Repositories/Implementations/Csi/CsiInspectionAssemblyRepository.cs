@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Csi;
 
+// The rows are an IProfessionalModel, so in the professional context every query and ExecuteUpdate/ExecuteDelete
+// below touches only the logged-in professional's rows.
 public class CsiInspectionAssemblyRepository : Repository<CsiInspectionVisuallyIdentifiedAssembly>, ICsiInspectionAssemblyRepository
 {
     public CsiInspectionAssemblyRepository(IDbContextSelector dbContextSelector)
@@ -32,63 +34,52 @@ public class CsiInspectionAssemblyRepository : Repository<CsiInspectionVisuallyI
             .CountAsync(assembly => assembly.InspectionId == inspectionId, cancellationToken);
     }
 
-    public async Task<List<CsiInspectionVisuallyIdentifiedAssembly>> GetBySubmissionAsync(string submissionId, CancellationToken cancellationToken)
+    public async Task AddRangeAsync(IEnumerable<CsiInspectionVisuallyIdentifiedAssembly> assemblies, CancellationToken cancellationToken)
     {
-        return await GetListQuery()
-            .Where(assembly => assembly.SubmissionId == submissionId)
-            .OrderBy(assembly => assembly.Id)
-            .ToListAsync(cancellationToken);
-    }
-
-    // Only an unpaid row of this submission can be deleted. Its test goes with it only when this
-    // submission created that test, so the site's real test history is never touched.
-    public async Task<bool> DeleteForSubmissionAsync(int id, string submissionId, CancellationToken cancellationToken)
-    {
-        var assembly = await Entity
-            .Include(assembly => assembly.Test)
-            .SingleOrDefaultAsync(assembly => assembly.Id == id && assembly.SubmissionId == submissionId && (assembly.TransactionId == null || assembly.TransactionId == ""), cancellationToken);
-
-        if (assembly == null)
-        {
-            return false;
-        }
-
-        Entity.Remove(assembly);
-
-        if (assembly.Test != null && assembly.Test.SubmissionId == submissionId && string.IsNullOrEmpty(assembly.Test.TransactionId))
-        {
-            DbContext.BackflowTests.Remove(assembly.Test);
-        }
+        Entity.AddRange(assemblies);
 
         await DbContext.SaveChangesAsync(cancellationToken);
-
-        return true;
     }
 
-    public Task UpdateVisuallyIdentifiedAsync(string submissionId, IReadOnlyCollection<int> visuallyIdentifiedIds, CancellationToken cancellationToken)
+    public Task UpdateVisuallyIdentifiedAsync(int inspectionId, IReadOnlyCollection<int> visuallyIdentifiedIds, CancellationToken cancellationToken)
     {
         return Entity
-            .Where(assembly => assembly.SubmissionId == submissionId)
+            .Where(assembly => assembly.InspectionId == inspectionId)
             .ExecuteUpdateAsync(setter => setter
                 .SetProperty(assembly => assembly.VisuallyIdentified, assembly => visuallyIdentifiedIds.Contains(assembly.Id)), cancellationToken);
     }
 
-    public Task LinkToInspectionAsync(int inspectionId, string submissionId, CancellationToken cancellationToken)
+    public Task MarkPaidAsync(int inspectionId, string transactionId, CancellationToken cancellationToken)
     {
         return Entity
-            .Where(assembly => assembly.SubmissionId == submissionId && assembly.InspectionId == null)
-            .ExecuteUpdateAsync(setter => setter
-                .SetProperty(assembly => assembly.InspectionId, inspectionId), cancellationToken);
-    }
-
-    public Task MarkPaidAsync(int inspectionId, string submissionId, string transactionId, CancellationToken cancellationToken)
-    {
-        return Entity
-            .Where(assembly => assembly.InspectionId == inspectionId && assembly.SubmissionId == submissionId && (assembly.TransactionId == null || assembly.TransactionId == ""))
+            .Where(assembly => assembly.InspectionId == inspectionId && (assembly.TransactionId == null || assembly.TransactionId == ""))
             .ExecuteUpdateAsync(setter => setter
                 .SetProperty(assembly => assembly.TransactionId, transactionId), cancellationToken);
     }
 
+    // V1 csi_inspection_submit_worker: a removed row takes its test with it only when this inspection added
+    // that test and it is unpaid, so the site's real test history is never touched.
+    public async Task DeleteFromInspectionAsync(int inspectionId, IReadOnlyCollection<int> ids, CancellationToken cancellationToken)
+    {
+        var assemblies = await Entity
+            .Include(assembly => assembly.Test)
+            .Where(assembly => assembly.InspectionId == inspectionId && ids.Contains(assembly.Id))
+            .ToListAsync(cancellationToken);
+
+        foreach (var assembly in assemblies.Where(assembly => assembly.AddedOnInspection && assembly.Test != null))
+        {
+            if (string.IsNullOrEmpty(assembly.Test!.TransactionId))
+            {
+                DbContext.BackflowTests.Remove(assembly.Test);
+            }
+        }
+
+        Entity.RemoveRange(assemblies);
+
+        await DbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    // V1 checkout delete of an unpaid inspection: its rows go, the tests it added stay.
     public Task DeleteByInspectionAsync(int inspectionId, CancellationToken cancellationToken)
     {
         return Entity

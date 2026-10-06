@@ -7,11 +7,8 @@ public interface ICsiInspectionAssemblyService
 {
     Task<List<CsiInspectionAssemblyDto>> GetByInspectionAsync(int inspectionId, CancellationToken cancellationToken);
     Task<int> GetCountByInspectionAsync(int inspectionId, CancellationToken cancellationToken);
-    Task<List<CsiInspectionAssemblyDto>> InitializeAsync(int siteId, string submissionId, CancellationToken cancellationToken);
-    Task<CsiInspectionAssemblyDto> AddAsync(CsiInspectionAssemblyRequest request, CancellationToken cancellationToken);
-    Task<bool> DeleteAsync(int id, string submissionId, CancellationToken cancellationToken);
-    Task UpdateVisuallyIdentifiedAsync(CsiInspectionVisuallyIdentifiedRequest request, CancellationToken cancellationToken);
-    Task LinkToInspectionAsync(CsiInspection inspection, CancellationToken cancellationToken);
+    Task<List<CsiInspectionAssemblyDto>> GetForFormAsync(int siteId, int? inspectionId, CancellationToken cancellationToken);
+    Task SaveForInspectionAsync(CsiInspection inspection, CreateCsiInspectionDto request, CancellationToken cancellationToken);
     Task MarkPaidAsync(IEnumerable<CsiInspection> inspections, string transactionId, DateTime transactionDate, CancellationToken cancellationToken);
     Task DeleteByInspectionAsync(int inspectionId, CancellationToken cancellationToken);
 }

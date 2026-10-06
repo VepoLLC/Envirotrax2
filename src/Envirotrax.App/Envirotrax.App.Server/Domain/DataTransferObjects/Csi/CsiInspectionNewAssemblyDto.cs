@@ -2,16 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 
-// An assembly the inspector adds on the inspection form ("+ Add Assembly"). It is saved straight away,
-// under the form's SubmissionId, and linked to the inspection when the inspection is submitted.
-public class CsiInspectionAssemblyRequest
+// An assembly the inspector added on the inspection form ("+ Add Assembly"). It is saved with the
+// inspection as a new BackflowTest at the inspection's site, together with its assembly row.
+public class CsiInspectionNewAssemblyDto
 {
-    [Required]
-    [MaxLength(50)]
-    public string SubmissionId { get; set; } = null!;
-
-    public int SiteId { get; set; }
-
     [Required]
     [MaxLength(50)]
     public string DeviceType { get; set; } = null!;
@@ -51,4 +45,6 @@ public class CsiInspectionAssemblyRequest
     public string? LocationDescription { get; set; }
 
     public string? Comments { get; set; }
+
+    public bool VisuallyIdentified { get; set; }
 }

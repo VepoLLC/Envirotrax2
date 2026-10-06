@@ -15,6 +15,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
+using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Sites;
 
@@ -31,6 +32,8 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     private readonly IBackflowOutOfServiceRequestRepository _outOfServiceRequestRepository;
     private readonly IFogInspectionRepository _fogInspectionRepository;
     private readonly IFogTripTicketRepository _fogTripTicketRepository;
+    private readonly ISiteScheduleService _siteScheduleService;
+    private readonly IAuthService _authService;
     private readonly ILogger<SiteService> _logger;
 
     public SiteService(
@@ -46,6 +49,8 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         IBackflowOutOfServiceRequestRepository outOfServiceRequestRepository,
         IFogInspectionRepository fogInspectionRepository,
         IFogTripTicketRepository fogTripTicketRepository,
+        ISiteScheduleService siteScheduleService,
+        IAuthService authService,
         ILogger<SiteService> logger)
         : base(mapper, repository)
     {
@@ -60,6 +65,8 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         _outOfServiceRequestRepository = outOfServiceRequestRepository;
         _fogInspectionRepository = fogInspectionRepository;
         _fogTripTicketRepository = fogTripTicketRepository;
+        _siteScheduleService = siteScheduleService;
+        _authService = authService;
         _logger = logger;
     }
 
@@ -121,6 +128,39 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
         return sites
             .Select(s => MapToDto(s)!)
+            .ToPagedData(pageInfo);
+    }
+
+    public async Task<IPagedData<ProfessionalSiteDto>> SearchForProfessionalAsync(ProfessionalSiteSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<Site, SiteDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<Site, SiteDto>(Mapper);
+
+        var professionalType = await _siteScheduleService.GetMyProfessionalTypeAsync(cancellationToken);
+
+        var sites = (await _siteRepository.SearchForProfessionalAsync(
+            criteria,
+            pageInfo,
+            query,
+            _authService.ProfessionalId,
+            _authService.UserId,
+            professionalType,
+            cancellationToken)).ToList();
+
+        var schedules = professionalType == null
+            ? []
+            : await _siteScheduleService.GetMyBySiteIdsAsync(sites.Select(s => s.Id), professionalType.Value, cancellationToken);
+
+        var schedulesBySiteId = schedules.ToDictionary(s => s.SiteId);
+
+        return sites
+            .Select(site =>
+            {
+                var dto = Mapper.Map<ProfessionalSiteDto>(site);
+                dto.Schedule = schedulesBySiteId.GetValueOrDefault(site.Id);
+
+                return dto;
+            })
             .ToPagedData(pageInfo);
     }
 

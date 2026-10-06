@@ -29,6 +29,8 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals.Licenses
 using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
+using Envirotrax.App.Server.Data.Repositories.Definitions.PublicSearch;
+using Envirotrax.App.Server.Data.Repositories.Implementations.PublicSearch;
 
 namespace Envirotrax.App.Server.Data.Configuration;
 
@@ -94,6 +96,7 @@ public static class ServiceRegistration
 
         services.AddTransient<IProfessionalRepository, ProfessionalRepository>();
         services.AddTransient<IRegisteredProfessionalRepository, RegisteredProfessionalRepository>();
+        services.AddTransient<IPublicSearchRepository, PublicSearchRepository>();
         services.AddTransient<IProfessionalUserRepository, ProfessionalUserRepository>();
         services.AddTransient<IProfessionalSupplierRepository, ProfessionalSupplierRepository>();
         services.AddTransient<IProfessionalUserLicenseRepository, ProfessionalUserLicenseRepository>();

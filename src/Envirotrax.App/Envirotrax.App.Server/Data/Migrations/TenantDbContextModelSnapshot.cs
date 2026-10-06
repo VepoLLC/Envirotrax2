@@ -1244,7 +1244,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("InspectionId")
+                    b.Property<int?>("InspectionId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsCurrent")
@@ -2804,6 +2804,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("HasWiseGuys")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("HideCellPhoneNumber")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("HidePublicListing")
                         .HasColumnType("bit");
 
@@ -4171,9 +4174,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("LegacyRecordId")
-                        .HasColumnType("int");
-
                     b.Property<string>("LetterAddress")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -4267,7 +4267,7 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.HasIndex("DeletedById");
 
-                    b.HasIndex("LegacyRecordId");
+                    b.HasIndex("Domain");
 
                     b.HasIndex("LetterContactStateId");
 
@@ -4566,8 +4566,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasOne("Envirotrax.App.Server.Data.Models.Csi.CsiInspection", "Inspection")
                         .WithMany()
                         .HasForeignKey("WaterSupplierId", "InspectionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Envirotrax.App.Server.Data.Models.Backflow.BackflowTest", "Test")
                         .WithMany()

@@ -46,6 +46,8 @@ public class ProfessionalDto
 
     public bool HidePublicListing { get; set; }
 
+    public bool HideCellPhoneNumber { get; set; }
+
     public bool HasWiseGuys { get; set; }
     public bool HasBackflowTesting { get; set; }
     public bool HasCsiInspection { get; set; }

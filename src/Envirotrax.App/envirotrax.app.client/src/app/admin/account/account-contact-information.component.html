@@ -243,13 +243,26 @@
             </div>
         </div>
 
-        <div class="mt-3" *ngIf="canModify">
-            <vp-validation-summary [form]="accountForm" [validationErrors]="validationErrors" />
+        <div class="mt-3">
+            <vp-validation-summary *ngIf="canModify" [form]="accountForm" [validationErrors]="validationErrors" />
 
-            <div class="d-flex justify-content-center">
-                <button type="submit" class="btn btn-primary vp-section-button">
+            <div class="d-flex justify-content-center gap-2">
+                <button type="button"
+                        class="btn btn-primary px-4"
+                        (click)="openSecuritySettings()">
+                    Security Settings
+                </button>
+
+                <button type="submit"
+                        class="btn btn-primary"
+                        *ngIf="canModify">
                     Update Account
                 </button>
+            </div>
+
+            <div class="mt-2 text-center">
+                Click here to configure your account security such as email address, password,
+                and Multi-Factor Authentication (MFA) settings.
             </div>
         </div>
     </form>

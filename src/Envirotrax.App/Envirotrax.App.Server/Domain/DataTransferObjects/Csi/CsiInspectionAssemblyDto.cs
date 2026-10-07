@@ -6,7 +6,7 @@ public class CsiInspectionAssemblyDto : IDto
 {
     public int Id { get; set; }
 
-    public int InspectionId { get; set; }
+    public int? InspectionId { get; set; }
 
     public int? TestId { get; set; }
 

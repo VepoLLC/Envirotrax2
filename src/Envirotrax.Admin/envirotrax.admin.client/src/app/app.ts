@@ -10,6 +10,9 @@ import { BackflowTestListComponent } from './backflow/tests/list/backflow-test-l
 import { BackflowTesterListComponent } from './backflow/testers/list/backflow-tester-list.component';
 import { BackflowReplacementListComponent } from './backflow/replacements/list/backflow-replacement-list.component';
 import { FogInspectionListComponent } from './fog/inspections/list/fog-inspection-list.component';
+import { NavigationEnd, Router } from '@angular/router';
+import { ROLE_DEFINITIONS } from './shared/models/role-definitions';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -21,19 +24,32 @@ export class App implements OnInit {
   public isAuthenticated: boolean = false;
   public isNavbarVisible: boolean = false;
   public menuItems: MenuItem[] = [];
+  public showWindowContainer: boolean = true;
 
   constructor(
     private readonly _authService: AuthService,
-    private readonly _windowService: WindowService
+    private readonly _windowService: WindowService,
+    private readonly _router: Router
   ) {
 
   }
 
   public ngOnInit(): void {
+    this._router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe(event => {
+        this.showWindowContainer = !event.urlAfterRedirects.startsWith('/auth');
+      });
+
     this._authService.onLoggedIn().subscribe(async isLoggedIn => {
       this.isAuthenticated = isLoggedIn;
 
       if (this.isAuthenticated) {
+        if (!await this._authService.hasAnyRoles(ROLE_DEFINITIONS.SUPER_USER)) {
+          this._router.navigate(['auth/unauthorized']);
+          return;
+        }
+
         this.menuItems = this.createMenuItems();
       }
     });

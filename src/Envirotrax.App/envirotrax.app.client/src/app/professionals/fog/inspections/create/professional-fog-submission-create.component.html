@@ -335,24 +335,39 @@
                             </div>
                             <div class="row align-items-center mb-2">
                                 <div class="col-8">Wetted Height in Inches:</div>
-                                <div class="col-4" [class.field-invalid]="submitted && isInvalidChamberValue(model.inletChamberWettingHeight)">
+                                <div class="col-4">
                                     <vp-input type="text" name="inletChamberWettingHeight"
+                                              [numeric]="true"
+                                              [min]="0"
+                                              [required]="true"
+                                              validationLabel="Inlet Wetted Height"
+                                              [form]="submitForm"
                                               [ngModel]="model.inletChamberWettingHeight"
                                               (ngModelChange)="model.inletChamberWettingHeight = $event; recalcCapacity()" />
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
                                 <div class="col-8">Grease Blanket in Inches:</div>
-                                <div class="col-4" [class.field-invalid]="submitted && isInvalidChamberValue(model.inletChamberGreaseBlanket)">
+                                <div class="col-4">
                                     <vp-input type="text" name="inletChamberGreaseBlanket"
+                                              [numeric]="true"
+                                              [min]="0"
+                                              [required]="true"
+                                              validationLabel="Inlet Grease Blanket"
+                                              [form]="submitForm"
                                               [ngModel]="model.inletChamberGreaseBlanket"
                                               (ngModelChange)="model.inletChamberGreaseBlanket = $event; recalcCapacity()" />
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
                                 <div class="col-8">Sediments in Inches:</div>
-                                <div class="col-4" [class.field-invalid]="submitted && isInvalidChamberValue(model.inletChamberSediments)">
+                                <div class="col-4">
                                     <vp-input type="text" name="inletChamberSediments"
+                                              [numeric]="true"
+                                              [min]="0"
+                                              [required]="true"
+                                              validationLabel="Inlet Sediments"
+                                              [form]="submitForm"
                                               [ngModel]="model.inletChamberSediments"
                                               (ngModelChange)="model.inletChamberSediments = $event; recalcCapacity()" />
                                 </div>
@@ -424,24 +439,39 @@
                             </div>
                             <div class="row align-items-center mb-2">
                                 <div class="col-8">Wetted Height in Inches:</div>
-                                <div class="col-4" [class.field-invalid]="submitted && isInvalidChamberValue(model.outletChamberWettingHeight)">
+                                <div class="col-4">
                                     <vp-input type="text" name="outletChamberWettingHeight"
+                                              [numeric]="true"
+                                              [min]="0"
+                                              [required]="true"
+                                              validationLabel="Outlet Wetted Height"
+                                              [form]="submitForm"
                                               [ngModel]="model.outletChamberWettingHeight"
                                               (ngModelChange)="model.outletChamberWettingHeight = $event; recalcCapacity()" />
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
                                 <div class="col-8">Grease Blanket in Inches:</div>
-                                <div class="col-4" [class.field-invalid]="submitted && isInvalidChamberValue(model.outletChamberGreaseBlanket)">
+                                <div class="col-4">
                                     <vp-input type="text" name="outletChamberGreaseBlanket"
+                                              [numeric]="true"
+                                              [min]="0"
+                                              [required]="true"
+                                              validationLabel="Outlet Grease Blanket"
+                                              [form]="submitForm"
                                               [ngModel]="model.outletChamberGreaseBlanket"
                                               (ngModelChange)="model.outletChamberGreaseBlanket = $event; recalcCapacity()" />
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
                                 <div class="col-8">Sediments in Inches:</div>
-                                <div class="col-4" [class.field-invalid]="submitted && isInvalidChamberValue(model.outletChamberSediments)">
+                                <div class="col-4">
                                     <vp-input type="text" name="outletChamberSediments"
+                                              [numeric]="true"
+                                              [min]="0"
+                                              [required]="true"
+                                              validationLabel="Outlet Sediments"
+                                              [form]="submitForm"
                                               [ngModel]="model.outletChamberSediments"
                                               (ngModelChange)="model.outletChamberSediments = $event; recalcCapacity()" />
                                 </div>

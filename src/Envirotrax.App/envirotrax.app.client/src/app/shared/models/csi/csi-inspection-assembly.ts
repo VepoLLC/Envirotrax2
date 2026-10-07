@@ -3,7 +3,7 @@ import { BackflowTestResult } from "../backflow/backflow-test-enums";
 // A visually identified assembly row: a snapshot of the backflow test as it stood at inspection time.
 export interface CsiInspectionAssembly {
     id?: number;
-    inspectionId?: number;
+    inspectionId?: number | null;
     testId?: number | null;
     visuallyIdentified?: boolean;
     deviceType?: string;
@@ -24,12 +24,10 @@ export interface CsiInspectionAssembly {
     rejected?: boolean;
 }
 
-// One row of the list sent when the submission is saved. `id` marks a saved row, `testId` alone a
-// current test at the site, and neither an assembly the inspector added (which carries the device fields).
+// An assembly the inspector adds on the inspection form ("+ Add Assembly").
 export interface CsiInspectionAssemblyRequest {
-    id?: number;
-    testId?: number | null;
-    visuallyIdentified: boolean;
+    submissionId: string;
+    siteId: number;
     deviceType?: string;
     manufacturer?: string;
     model?: string;

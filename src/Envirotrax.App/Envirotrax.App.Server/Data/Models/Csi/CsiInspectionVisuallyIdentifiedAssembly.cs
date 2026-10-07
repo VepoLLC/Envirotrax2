@@ -11,7 +11,9 @@ public class CsiInspectionVisuallyIdentifiedAssembly : TenantModel<WaterSupplier
     [AppPrimaryKey(true)]
     public int Id { get; set; }
 
-    public int InspectionId { get; set; }
+    // Null while the inspection is still being filled in (V1 stored 0). Rows are found by SubmissionId
+    // until the inspection is submitted and links them.
+    public int? InspectionId { get; set; }
     public CsiInspection? Inspection { get; set; }
 
     public int? TestId { get; set; }

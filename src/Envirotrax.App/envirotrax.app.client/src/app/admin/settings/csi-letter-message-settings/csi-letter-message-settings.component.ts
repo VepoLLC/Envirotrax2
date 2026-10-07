@@ -82,12 +82,18 @@ export class CsiLetterMessageSettingsComponent implements OnInit {
     }
 
     public async copyFromParent(): Promise<void> {
-        const copied = await this._settingsCopyService.confirmAndCopyFromParent(SettingsSection.CsiLetterMessage);
+        try {
+            this.isLoading = true;
 
-        if (copied) {
-            this.validationErrors = [];
+            const copied = await this._settingsCopyService.confirmAndCopyFromParent(SettingsSection.CsiLetterMessage);
 
-            await this.getSettings();
+            if (copied) {
+                this.validationErrors = [];
+
+                await this.getSettings();
+            }
+        } finally {
+            this.isLoading = false;
         }
     }
 

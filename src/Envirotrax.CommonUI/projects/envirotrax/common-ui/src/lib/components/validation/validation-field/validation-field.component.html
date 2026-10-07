@@ -6,4 +6,13 @@
     <div *ngIf="form?.controls![fieldName]?.errors!['email']">
         The {{fieldLabel}} field is not valid.
     </div>
+    <div *ngIf="form?.controls![fieldName]?.errors!['number']">
+        The {{fieldLabel}} field must be a number.
+    </div>
+    <div *ngIf="form?.controls![fieldName]?.errors!['min']">
+        The {{fieldLabel}} field must be {{form?.controls![fieldName]?.errors!['min'].min}} or greater.
+    </div>
+    <div *ngIf="form?.controls![fieldName]?.errors!['max']">
+        The {{fieldLabel}} field must be {{form?.controls![fieldName]?.errors!['max'].max}} or less.
+    </div>
 </div>

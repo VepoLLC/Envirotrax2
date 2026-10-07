@@ -13,9 +13,10 @@ import { ProfesionalUserService } from '../../../shared/services/professionals/p
 import { ProfessionalSupplierService } from '../../../shared/services/professionals/professional-supplier.service';
 import { CheckoutService } from '../../../shared/services/professionals/checkout.service';
 import { Professional } from '../../../shared/models/professionals/professional';
-import { ExpirationType, ProfessionalUser } from '../../../shared/models/professionals/professional-user';
+import { ProfessionalUser } from '../../../shared/models/professionals/professional-user';
 import { ProfessionalWaterSupplier } from '../../../shared/models/professionals/professional-water-supplier';
 import { InsuranceCheck, InsuranceCheckResult } from '../../../shared/models/professionals/insurance-check';
+import { BpatLicenseCheck, LicenseCheck, LicenseCheckResult } from '../../../shared/models/professionals/license-check';
 import { BackflowGauge, GaugeExpirationType } from '../../../shared/models/backflow/backflow-gauge';
 import { BackflowTestResult, BackflowReasonForTest, BackflowDeviceType } from '../../../shared/models/backflow/backflow-test-enums';
 import { MAX_PAGE_SIZE } from '../../../shared/models/page-info';
@@ -24,6 +25,14 @@ import { SiteService } from '../../../shared/services/sites/site.service';
 import { LookupService } from '../../../shared/services/lookup/lookup.service';
 import { PropertyType } from '../../../shared/enums/property-type.enum';
 import { InputOption } from '@envirotrax/common-ui';
+
+const FIRE_SYSTEM_HAZARD_TYPE = 'Fire System';
+
+interface VerificationCheck {
+    label: string;
+    message: string;
+    valid: boolean;
+}
 
 @Component({
     standalone: false,
@@ -40,6 +49,7 @@ export class BackflowTestSubmitComponent implements OnInit {
     public selectedWaterSupplier?: ProfessionalWaterSupplier;
     public selectedGauge?: BackflowGauge;
     public insuranceCheck?: InsuranceCheck;
+    public licenseCheck?: BpatLicenseCheck;
     public previousTest?: BackflowTest;
 
     public site: Site | null = null;
@@ -50,6 +60,9 @@ export class BackflowTestSubmitComponent implements OnInit {
 
     public isNewProperty = false;
     public isLocationEditing = false;
+    public isVerificationPassed = false;
+    public verificationChecks: VerificationCheck[] = [];
+    public selectedGaugeText = '';
 
     private _bpats: ProfessionalUser[] = [];
     private _waterSuppliers: ProfessionalWaterSupplier[] = [];
@@ -74,8 +87,6 @@ export class BackflowTestSubmitComponent implements OnInit {
     public readonly BackflowTestResult = BackflowTestResult;
     public readonly BackflowReasonForTest = BackflowReasonForTest;
     public readonly BackflowDeviceType = BackflowDeviceType;
-    public readonly ExpirationType = ExpirationType;
-    public readonly GaugeExpirationType = GaugeExpirationType;
     public readonly PropertyType = PropertyType;
 
     public readonly deviceTypeOptions: InputOption[];
@@ -159,8 +170,6 @@ export class BackflowTestSubmitComponent implements OnInit {
     public locationDescriptionLength = 0;
     public remarksLength = 0;
     public deviceTypeLabel = '';
-    public showInsuranceRow = false;
-    public insuranceAboutToExpire = false;
     public readonly today = new Date();
 
     // Repair checkboxes (serialized to text strings in the model)
@@ -174,24 +183,6 @@ export class BackflowTestSubmitComponent implements OnInit {
     public repairPvbAirInlet = { cleaned: false, disc: false, spring: false };
     public repairPvbCV = { cleaned: false, disc: false, spring: false };
 
-
-    public get verificationComplete(): boolean {
-        if (!this.selectedBpatId || !this.selectedWaterSupplierId || (this.model.deviceType !== BackflowDeviceType.AG && !this.selectedGaugeId)) {
-            return false;
-        }
-
-        if (!this.insuranceCheck?.isSatisfied) {
-            return false;
-        }
-
-        if (this.selectedBpat?.bpatLicenseExpirationType === ExpirationType.Expired
-            || this.selectedGauge?.expirationType === GaugeExpirationType.Expired
-        ) {
-            return false;
-        }
-
-        return true;
-    }
 
     //Initial Test Validation
     public get initialTestFailedDc(): boolean {
@@ -534,6 +525,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         this.model.deviceType = value;
         this.updateHasAssembly();
         this.updateDeviceTypeLabel();
+        this.updateVerification();
 
         // Reset all test readings so stale values from a previous device type aren't submitted
         this.model.initialTestDate = undefined;
@@ -578,11 +570,23 @@ export class BackflowTestSubmitComponent implements OnInit {
         this.model.repairPvbCVDetails = undefined;
     }
 
-    public onBpatChange(value: number): void {
+    public async onBpatChange(value: number): Promise<void> {
         this.selectedBpatId = value;
         this.selectedBpat = this._bpats.find(u => u.id === value);
-        this.model.bpatLicenseNumber = this.selectedBpat?.bpatLicenseNumber;
-        this.model.bpatLicenseExpiration = this.selectedBpat?.bpatLicenseExpirationDate;
+
+        this.isLoading = true;
+
+        try {
+            await this.loadLicenseCheck();
+            this.updateVerification();
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    public onHazardTypeChange(value: string): void {
+        this.model.hazardType = value;
+        this.updateVerification();
     }
 
     public async onWaterSupplierChange(value: number): Promise<void> {
@@ -600,7 +604,9 @@ export class BackflowTestSubmitComponent implements OnInit {
     }
 
     private async loadSupplierData(): Promise<void> {
-        await Promise.all([this.loadAdditionalInfoSettings(), this.loadInsuranceCheck()]);
+        await Promise.all([this.loadAdditionalInfoSettings(), this.loadInsuranceCheck(), this.loadLicenseCheck()]);
+
+        this.updateVerification();
     }
 
     private async loadAdditionalInfoSettings(): Promise<void> {
@@ -615,7 +621,6 @@ export class BackflowTestSubmitComponent implements OnInit {
         const waterSupplierId = this.selectedWaterSupplierId;
 
         this.insuranceCheck = undefined;
-        this.updateInsuranceFlags();
 
         if (!waterSupplierId) {
             return;
@@ -625,13 +630,33 @@ export class BackflowTestSubmitComponent implements OnInit {
 
         if (this.selectedWaterSupplierId === waterSupplierId) {
             this.insuranceCheck = check;
-            this.updateInsuranceFlags();
+        }
+    }
+
+    private async loadLicenseCheck(): Promise<void> {
+        const waterSupplierId = this.selectedWaterSupplierId;
+        const bpatUserId = this.selectedBpatId;
+
+        this.licenseCheck = undefined;
+
+        if (!waterSupplierId || !bpatUserId) {
+            return;
+        }
+
+        const check = await this._backflowTestService.getLicenseCheck(waterSupplierId, bpatUserId);
+
+        if (this.selectedWaterSupplierId === waterSupplierId && this.selectedBpatId === bpatUserId) {
+            this.licenseCheck = check;
+            this.model.bpatLicenseNumber = check.license.licenseNumber;
+            this.model.bpatLicenseExpiration = check.license.expirationDate;
         }
     }
 
     public onGaugeChange(value: number): void {
         this.selectedGaugeId = value;
         this.selectedGauge = this._gauges.find(g => g.id === value);
+
+        this.updateVerification();
     }
 
     public onPropertyTypeChange(value: number): void {
@@ -755,6 +780,8 @@ export class BackflowTestSubmitComponent implements OnInit {
             if (this.site) {
                 await this.applySiteWaterSupplier(this.site);
             }
+
+            this.updateVerification();
         } finally {
             this.isLoading = false;
         }
@@ -765,28 +792,26 @@ export class BackflowTestSubmitComponent implements OnInit {
         this.waterSupplierOptions = this._waterSuppliers.map(ws => ({ id: ws.waterSupplier?.id, text: ws.waterSupplier?.name ?? '' }));
         this.gaugeOptions = this._gauges
             .filter(g => g.expirationType !== GaugeExpirationType.Expired)
-            .map(g => ({ id: g.id, text: `${g.manufacturer} ${g.model} ${g.serialNumber}` }));
+            .map(g => ({ id: g.id, text: this.buildGaugeText(g) }));
+    }
+
+    private buildGaugeText(gauge: BackflowGauge): string {
+        const text = `${gauge.manufacturer} ${gauge.model} ${gauge.serialNumber}`;
+
+        if (gauge.isPortable == null) {
+            return text;
+        }
+
+        return gauge.isPortable ? `${text} (Potable)` : `${text} (Non-potable)`;
     }
 
     private async setDefaults(): Promise<void> {
         const myUser = await this._userService.getMyData();
         const defaultBpat = this._bpats.find(u => u.id === myUser.id) ?? this._bpats[0];
+
         if (defaultBpat?.id != null) {
             this.selectedBpatId = defaultBpat.id;
             this.selectedBpat = defaultBpat;
-            this.model.bpatLicenseNumber = defaultBpat.bpatLicenseNumber;
-            this.model.bpatLicenseExpiration = defaultBpat.bpatLicenseExpirationDate;
-        }
-        if (this._waterSuppliers.length === 1) {
-            this.selectedWaterSupplierId = this._waterSuppliers[0].waterSupplier?.id;
-            this.selectedWaterSupplier = this._waterSuppliers[0];
-            this.applyWaterSupplierState();
-            await this.loadSupplierData();
-        }
-        const validGauges = this._gauges.filter(g => g.expirationType !== GaugeExpirationType.Expired);
-        if (validGauges.length === 1) {
-            this.selectedGaugeId = validGauges[0].id;
-            this.selectedGauge = validGauges[0];
         }
     }
 
@@ -851,20 +876,58 @@ export class BackflowTestSubmitComponent implements OnInit {
         this.remarksLength = this.model.comments.length;
     }
 
-    private updateInsuranceFlags(): void {
-        this.showInsuranceRow = false;
-        this.insuranceAboutToExpire = false;
+    private updateVerification(): void {
+        this.selectedGaugeText = this.selectedGauge ? this.buildGaugeText(this.selectedGauge) : '';
+        this.verificationChecks = this.buildVerificationChecks();
 
-        if (!this.insuranceCheck) {
-            return;
+        this.isVerificationPassed = !!this.selectedBpatId
+            && !!this.selectedWaterSupplierId
+            && !!this.model.hazardType
+            && !!this.licenseCheck
+            && !!this.insuranceCheck
+            && this.verificationChecks.every(check => check.valid);
+    }
+
+    private buildVerificationChecks(): VerificationCheck[] {
+        if (!this.selectedWaterSupplierId) {
+            return [];
         }
 
-        this.showInsuranceRow = this.insuranceCheck.result !== InsuranceCheckResult.NotRequired;
+        const checks: VerificationCheck[] = [];
 
-        if (this.professional) {
-            this.insuranceAboutToExpire = this.insuranceCheck.result === InsuranceCheckResult.Valid
-                && this.professional.insuranceExpirationType === ExpirationType.AboutToExpire;
+        if (this.licenseCheck) {
+            checks.push(this.toVerificationCheck(this.licenseCheck.license));
         }
+
+        if (this.insuranceCheck && this.insuranceCheck.result !== InsuranceCheckResult.NotRequired) {
+            checks.push({ label: 'Insurance Policy', message: this.insuranceCheck.message ?? '', valid: this.insuranceCheck.isSatisfied });
+        }
+
+        if (this.licenseCheck
+            && this.model.hazardType === FIRE_SYSTEM_HAZARD_TYPE
+            && this.licenseCheck.fireLicense.result !== LicenseCheckResult.NotRequired) {
+            checks.push(this.toVerificationCheck(this.licenseCheck.fireLicense));
+        }
+
+        if (this.model.deviceType !== BackflowDeviceType.AG) {
+            checks.push(this.buildGaugeCheck());
+        }
+
+        return checks;
+    }
+
+    private toVerificationCheck(check: LicenseCheck): VerificationCheck {
+        return { label: check.label ?? '', message: check.message ?? '', valid: check.isSatisfied };
+    }
+
+    private buildGaugeCheck(): VerificationCheck {
+        const label = 'Test Gauge';
+
+        if (!this.selectedGauge) {
+            return { label, message: 'Select a test gauge', valid: false };
+        }
+
+        return { label, message: this.selectedGaugeText, valid: this.selectedGauge.expirationType !== GaugeExpirationType.Expired };
     }
 
     // Checkout "Edit": full field load of an own, still-unpaid test — unlike loadData/populateFromPreviousTest,

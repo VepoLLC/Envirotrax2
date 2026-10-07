@@ -47,6 +47,13 @@ public class BackflowTestController : ProfessionalProtectedController
         return Ok(result);
     }
 
+    [HttpGet("license-check")]
+    public async Task<IActionResult> GetLicenseCheckAsync([FromQuery] int waterSupplierId, [FromQuery] int bpatUserId, CancellationToken cancellationToken)
+    {
+        var result = await _backflowTestService.GetLicenseCheckAsync(waterSupplierId, bpatUserId, cancellationToken);
+        return Ok(result);
+    }
+
     [HttpGet("pdf")]
     public async Task<IActionResult> GetAllPdfAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
     {

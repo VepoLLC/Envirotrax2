@@ -26,7 +26,8 @@
             <vp-section header="FOG Inspection Submission Confirmation">
                 <p class="text-center fw-bold text-danger">Completion of the checkout process is required for this
                     inspection to be valid within the system.</p>
-                <p class="fw-bold">Please read the following information on Inspection submission and the checkout process:</p>
+                <p class="fw-bold">Please read the following information on Inspection submission and the checkout
+                    process:</p>
                 <ol>
                     <li class="mb-2">To finalize the procedure and conclude the submission of the inspection, you must
                         complete the checkout process on the Checkout page. Click on the Checkout button below or click
@@ -38,9 +39,11 @@
                 <div class="d-flex justify-content-center gap-2 mt-3">
                     <button type="button" class="btn btn-primary vp-section-button"
                             (click)="returnToAccountOverview()">Return to Account Overview</button>
-                    <button type="button" class="btn btn-primary vp-section-button" *ngIf="!editingId" (click)="submitAnother()">Submit
+                    <button type="button" class="btn btn-primary vp-section-button" *ngIf="!editingId"
+                            (click)="submitAnother()">Submit
                         Another Inspection</button>
-                    <button type="button" class="btn btn-primary vp-section-button" (click)="goToCheckout()">Checkout</button>
+                    <button type="button" class="btn btn-primary vp-section-button"
+                            (click)="goToCheckout()">Checkout</button>
                 </div>
             </vp-section>
         </div>
@@ -152,18 +155,24 @@
                     <div class="col-md-6">
                         <vp-section header="Location / Property Information">
                             <vp-section-actions>
-                                <button type="button" (click)="requestLocationModification()">Request Modification</button>
+                                <button type="button" class="btn-primary"
+                                        (click)="requestLocationModification()">Request Modification</button>
                             </vp-section-actions>
 
                             <dl class="row mb-0">
                                 <dt class="col-5">Property Type:</dt>
-                                <dd class="col-7 mb-1">{{ model.propertyType === PropertyType.Residential ? 'Residential' : 'Commercial' }}</dd>
+                                <dd class="col-7 mb-1">
+                                    {{ model.propertyType === PropertyType.Residential ? 'Residential' : 'Commercial' }}
+                                </dd>
                                 <dt class="col-5">Business Name:</dt>
                                 <dd class="col-7 mb-1">{{ model.propertyBusinessName }}</dd>
                                 <dt class="col-5">Property Address:</dt>
                                 <dd class="col-7 mb-1">
-                                    {{ model.propertyStreetNumber }} {{ model.propertyStreetName }}<span *ngIf="model.propertyNumber"> #{{ model.propertyNumber }}</span><br>
-                                    {{ model.propertyCity }}<span *ngIf="model.propertyCity && model.propertyState?.name">, </span>{{ model.propertyState?.name }} {{ model.propertyZip }}
+                                    {{ model.propertyStreetNumber }} {{ model.propertyStreetName }}<span
+                                          *ngIf="model.propertyNumber"> #{{ model.propertyNumber }}</span><br>
+                                    {{ model.propertyCity }}<span
+                                          *ngIf="model.propertyCity && model.propertyState?.name">,
+                                    </span>{{ model.propertyState?.name }} {{ model.propertyZip }}
                                 </dd>
                             </dl>
                         </vp-section>
@@ -171,7 +180,8 @@
                     <div class="col-md-6">
                         <vp-section header="Contact / Mailing Information">
                             <vp-section-actions>
-                                <button type="button" (click)="requestLocationModification()">Request Modification</button>
+                                <button type="button" class="btn-primary"
+                                        (click)="requestLocationModification()">Request Modification</button>
                             </vp-section-actions>
 
                             <dl class="row mb-0">
@@ -181,8 +191,10 @@
                                 <dd class="col-7 mb-1">{{ model.mailingContactName }}</dd>
                                 <dt class="col-5">Mailing Address:</dt>
                                 <dd class="col-7 mb-1">
-                                    {{ model.mailingStreetNumber }} {{ model.mailingStreetName }}<span *ngIf="model.mailingNumber"> #{{ model.mailingNumber }}</span><br>
-                                    {{ model.mailingCity }}<span *ngIf="model.mailingCity && model.mailingState?.name">, </span>{{ model.mailingState?.name }} {{ model.mailingZip }}
+                                    {{ model.mailingStreetNumber }} {{ model.mailingStreetName }}<span
+                                          *ngIf="model.mailingNumber"> #{{ model.mailingNumber }}</span><br>
+                                    {{ model.mailingCity }}<span *ngIf="model.mailingCity && model.mailingState?.name">,
+                                    </span>{{ model.mailingState?.name }} {{ model.mailingZip }}
                                 </dd>
                                 <dt class="col-5">Phone Number:</dt>
                                 <dd class="col-7 mb-1">{{ model.mailingPhoneNumber }}</dd>
@@ -197,11 +209,13 @@
                     <div class="col-md-6">
                         <vp-section header="Location / Property Information">
                             <vp-section-actions>
-                                <button type="button" (click)="cancelLocationModification()">Cancel</button>
+                                <button type="button" class="btn-primary"
+                                        (click)="cancelLocationModification()">Cancel</button>
                             </vp-section-actions>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">Property Type: <span class="text-danger">*</span></div>
+                                <div class="col-xl-4 col-form-label fw-bold">Property Type: <span
+                                          class="text-danger">*</span></div>
                                 <div class="col-xl-8">
                                     <vp-input type="select"
                                               name="propertyType"
@@ -209,7 +223,8 @@
                                               (ngModelChange)="onPropertyTypeChange($event)"
                                               [options]="propertyTypeOptions"
                                               [required]="true" />
-                                    <vp-validation-field [form]="submitForm" fieldName="propertyType" fieldLabel="Property Type" />
+                                    <vp-validation-field [form]="submitForm" fieldName="propertyType"
+                                                         fieldLabel="Property Type" />
                                 </div>
                             </div>
 
@@ -255,13 +270,15 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">City: <span class="text-danger">*</span></div>
+                                <div class="col-xl-4 col-form-label fw-bold">City: <span class="text-danger">*</span>
+                                </div>
                                 <div class="col-xl-8">
                                     <vp-input name="propertyCity"
                                               [(ngModel)]="model.propertyCity"
                                               [required]="true"
                                               [maxLength]="50" />
-                                    <vp-validation-field [form]="submitForm" fieldName="propertyCity" fieldLabel="City" />
+                                    <vp-validation-field [form]="submitForm" fieldName="propertyCity"
+                                                         fieldLabel="City" />
                                 </div>
                             </div>
 
@@ -277,7 +294,8 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">ZIP: <span class="text-danger">*</span></div>
+                                <div class="col-xl-4 col-form-label fw-bold">ZIP: <span class="text-danger">*</span>
+                                </div>
                                 <div class="col-xl-8">
                                     <vp-input name="propertyZip"
                                               [(ngModel)]="model.propertyZip"
@@ -291,11 +309,14 @@
                     <div class="col-md-6">
                         <vp-section header="Contact / Mailing Information">
                             <vp-section-actions>
-                                <button type="button" (click)="cancelLocationModification()">Cancel</button>
+                                <button type="button" class="btn-primary"
+                                        (click)="cancelLocationModification()">Cancel</button>
                             </vp-section-actions>
 
-                            <p *ngIf="model.propertyType === PropertyType.Residential" class="mb-2">Leave Company Name blank if this is a residence not owned or managed by a business.</p>
-                            <p class="text-danger mb-2">Do not enter your company's information for the mailing contact name or address.</p>
+                            <p *ngIf="model.propertyType === PropertyType.Residential" class="mb-2">Leave Company Name
+                                blank if this is a residence not owned or managed by a business.</p>
+                            <p class="text-danger mb-2">Do not enter your company's information for the mailing contact
+                                name or address.</p>
 
                             <div class="row mb-2">
                                 <div class="col-xl-4 col-form-label fw-bold">Company Name:</div>
@@ -318,7 +339,8 @@
                             <div class="row mb-2">
                                 <div class="col-xl-4 fw-bold d-xl-flex align-items-xl-center">Address:</div>
                                 <div class="col-xl-8">
-                                    <button type="button" class="btn btn-primary vp-section-button mt-2" (click)="copyPropertyAddress()">
+                                    <button type="button" class="btn btn-primary vp-section-button mt-2"
+                                            (click)="copyPropertyAddress()">
                                         Copy from Property Address
                                     </button>
 
@@ -350,13 +372,15 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">City: <span class="text-danger">*</span></div>
+                                <div class="col-xl-4 col-form-label fw-bold">City: <span class="text-danger">*</span>
+                                </div>
                                 <div class="col-xl-8">
                                     <vp-input name="mailingCity"
                                               [(ngModel)]="model.mailingCity"
                                               [required]="true"
                                               [maxLength]="50" />
-                                    <vp-validation-field [form]="submitForm" fieldName="mailingCity" fieldLabel="City" />
+                                    <vp-validation-field [form]="submitForm" fieldName="mailingCity"
+                                                         fieldLabel="City" />
                                 </div>
                             </div>
 
@@ -372,7 +396,8 @@
                             </div>
 
                             <div class="row mb-4">
-                                <div class="col-xl-4 col-form-label fw-bold">ZIP: <span class="text-danger">*</span></div>
+                                <div class="col-xl-4 col-form-label fw-bold">ZIP: <span class="text-danger">*</span>
+                                </div>
                                 <div class="col-xl-8">
                                     <vp-input name="mailingZip"
                                               [(ngModel)]="model.mailingZip"
@@ -502,29 +527,36 @@
                         <div class="col-md-6">
                             <div class="row align-items-center mb-2">
                                 <div class="col-8">Is it properly maintained?</div>
-                                <div class="col-4 text-nowrap" [class.radio-group-invalid]="submitted && model.maintained == null">
+                                <div class="col-4 text-nowrap"
+                                     [class.radio-group-invalid]="submitted && model.maintained == null">
                                     <label class="me-2"><input type="radio" name="maintained" [value]="true"
-                                               [(ngModel)]="model.maintained" class="form-check-input me-1" />Yes</label>
+                                               [(ngModel)]="model.maintained"
+                                               class="form-check-input me-1" />Yes</label>
                                     <label><input type="radio" name="maintained" [value]="false"
                                                [(ngModel)]="model.maintained" class="form-check-input me-1" />No</label>
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
                                 <div class="col-8">Is it accessible?</div>
-                                <div class="col-4 text-nowrap" [class.radio-group-invalid]="submitted && model.accessible == null">
+                                <div class="col-4 text-nowrap"
+                                     [class.radio-group-invalid]="submitted && model.accessible == null">
                                     <label class="me-2"><input type="radio" name="accessible" [value]="true"
-                                               [(ngModel)]="model.accessible" class="form-check-input me-1" />Yes</label>
+                                               [(ngModel)]="model.accessible"
+                                               class="form-check-input me-1" />Yes</label>
                                     <label><input type="radio" name="accessible" [value]="false"
                                                [(ngModel)]="model.accessible" class="form-check-input me-1" />No</label>
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
                                 <div class="col-8">Is there evidence of past overflow?</div>
-                                <div class="col-4 text-nowrap" [class.radio-group-invalid]="submitted && model.pastOverflow == null">
+                                <div class="col-4 text-nowrap"
+                                     [class.radio-group-invalid]="submitted && model.pastOverflow == null">
                                     <label class="me-2"><input type="radio" name="pastOverflow" [value]="true"
-                                               [(ngModel)]="model.pastOverflow" class="form-check-input me-1" />Yes</label>
+                                               [(ngModel)]="model.pastOverflow"
+                                               class="form-check-input me-1" />Yes</label>
                                     <label><input type="radio" name="pastOverflow" [value]="false"
-                                               [(ngModel)]="model.pastOverflow" class="form-check-input me-1" />No</label>
+                                               [(ngModel)]="model.pastOverflow"
+                                               class="form-check-input me-1" />No</label>
                                 </div>
                             </div>
 
@@ -533,18 +565,22 @@
                                 <div class="col-8">Is the inlet tee visible?</div>
                                 <div class="col-4 text-nowrap">
                                     <label class="me-2"><input type="radio" name="inletTeeVisible" [value]="true"
-                                               [(ngModel)]="model.inletTeeVisible" class="form-check-input me-1" />Yes</label>
+                                               [(ngModel)]="model.inletTeeVisible"
+                                               class="form-check-input me-1" />Yes</label>
                                     <label><input type="radio" name="inletTeeVisible" [value]="false"
-                                               [(ngModel)]="model.inletTeeVisible" class="form-check-input me-1" />No</label>
+                                               [(ngModel)]="model.inletTeeVisible"
+                                               class="form-check-input me-1" />No</label>
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
                                 <div class="col-8">Is the inlet tee intact?</div>
                                 <div class="col-4 text-nowrap">
                                     <label class="me-2"><input type="radio" name="inletTeeIntact" [value]="true"
-                                               [(ngModel)]="model.inletTeeIntact" class="form-check-input me-1" />Yes</label>
+                                               [(ngModel)]="model.inletTeeIntact"
+                                               class="form-check-input me-1" />Yes</label>
                                     <label><input type="radio" name="inletTeeIntact" [value]="false"
-                                               [(ngModel)]="model.inletTeeIntact" class="form-check-input me-1" />No</label>
+                                               [(ngModel)]="model.inletTeeIntact"
+                                               class="form-check-input me-1" />No</label>
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
@@ -605,20 +641,27 @@
                             <h6>Sampling Point:</h6>
                             <div class="row align-items-center mb-2">
                                 <div class="col-8">Is it accessible?</div>
-                                <div class="col-4 text-nowrap" [class.radio-group-invalid]="submitted && model.samplingPointAccessible == null">
-                                    <label class="me-2"><input type="radio" name="samplingPointAccessible" [value]="true"
-                                               [(ngModel)]="model.samplingPointAccessible" class="form-check-input me-1" />Yes</label>
+                                <div class="col-4 text-nowrap"
+                                     [class.radio-group-invalid]="submitted && model.samplingPointAccessible == null">
+                                    <label class="me-2"><input type="radio" name="samplingPointAccessible"
+                                               [value]="true"
+                                               [(ngModel)]="model.samplingPointAccessible"
+                                               class="form-check-input me-1" />Yes</label>
                                     <label><input type="radio" name="samplingPointAccessible" [value]="false"
-                                               [(ngModel)]="model.samplingPointAccessible" class="form-check-input me-1" />No</label>
+                                               [(ngModel)]="model.samplingPointAccessible"
+                                               class="form-check-input me-1" />No</label>
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
                                 <div class="col-8">Does it need to be cleaned?</div>
-                                <div class="col-4 text-nowrap" [class.radio-group-invalid]="submitted && model.samplingPointClean == null">
+                                <div class="col-4 text-nowrap"
+                                     [class.radio-group-invalid]="submitted && model.samplingPointClean == null">
                                     <label class="me-2"><input type="radio" name="samplingPointClean" [value]="true"
-                                               [(ngModel)]="model.samplingPointClean" class="form-check-input me-1" />Yes</label>
+                                               [(ngModel)]="model.samplingPointClean"
+                                               class="form-check-input me-1" />Yes</label>
                                     <label><input type="radio" name="samplingPointClean" [value]="false"
-                                               [(ngModel)]="model.samplingPointClean" class="form-check-input me-1" />No</label>
+                                               [(ngModel)]="model.samplingPointClean"
+                                               class="form-check-input me-1" />No</label>
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
@@ -637,18 +680,22 @@
                                 <div class="col-8">Is the outfall tee visible?</div>
                                 <div class="col-4 text-nowrap">
                                     <label class="me-2"><input type="radio" name="outletTeeVisible" [value]="true"
-                                               [(ngModel)]="model.outletTeeVisible" class="form-check-input me-1" />Yes</label>
+                                               [(ngModel)]="model.outletTeeVisible"
+                                               class="form-check-input me-1" />Yes</label>
                                     <label><input type="radio" name="outletTeeVisible" [value]="false"
-                                               [(ngModel)]="model.outletTeeVisible" class="form-check-input me-1" />No</label>
+                                               [(ngModel)]="model.outletTeeVisible"
+                                               class="form-check-input me-1" />No</label>
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
                                 <div class="col-8">Is the outfall tee intact?</div>
                                 <div class="col-4 text-nowrap">
                                     <label class="me-2"><input type="radio" name="outletTeeIntact" [value]="true"
-                                               [(ngModel)]="model.outletTeeIntact" class="form-check-input me-1" />Yes</label>
+                                               [(ngModel)]="model.outletTeeIntact"
+                                               class="form-check-input me-1" />Yes</label>
                                     <label><input type="radio" name="outletTeeIntact" [value]="false"
-                                               [(ngModel)]="model.outletTeeIntact" class="form-check-input me-1" />No</label>
+                                               [(ngModel)]="model.outletTeeIntact"
+                                               class="form-check-input me-1" />No</label>
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
@@ -714,13 +761,16 @@
                             </div>
                             <div class="row align-items-center">
                                 <div class="col-5 fw-semibold">Inspection Result:</div>
-                                <div class="col-7 text-nowrap" [class.radio-group-invalid]="submitted && model.inspectionResult == null">
+                                <div class="col-7 text-nowrap"
+                                     [class.radio-group-invalid]="submitted && model.inspectionResult == null">
                                     <label class="me-2"><input type="radio" name="inspectionResult"
                                                [value]="FogInspectionResult.Passed"
-                                               [(ngModel)]="model.inspectionResult" class="form-check-input me-1" />Passed</label>
+                                               [(ngModel)]="model.inspectionResult"
+                                               class="form-check-input me-1" />Passed</label>
                                     <label><input type="radio" name="inspectionResult"
                                                [value]="FogInspectionResult.Failed"
-                                               [(ngModel)]="model.inspectionResult" class="form-check-input me-1" />Failed</label>
+                                               [(ngModel)]="model.inspectionResult"
+                                               class="form-check-input me-1" />Failed</label>
                                 </div>
                             </div>
                         </div>
@@ -784,12 +834,14 @@
                                                 (fileChange)="onExteriorImageChange($event)" />
 
                                 <div *ngIf="exteriorImagePreview" class="text-center mb-2">
-                                    <div class="d-flex justify-content-between align-items-center mb-2 px-3 py-2 border rounded bg-success-subtle">
+                                    <div
+                                         class="d-flex justify-content-between align-items-center mb-2 px-3 py-2 border rounded bg-success-subtle">
                                         <button type="button" class="btn btn-sm btn-primary"
                                                 (click)="exteriorFileInput.click()">Choose File</button>
                                         <span class="fw-semibold small">{{ images.exteriorImage?.name }}</span>
                                         <button type="button" class="btn btn-sm btn-primary"
-                                                (click)="onExteriorImageChange(null)"><i class="fa fa-trash"></i></button>
+                                                (click)="onExteriorImageChange(null)"><i
+                                               class="fa fa-trash"></i></button>
                                     </div>
                                     <img [src]="exteriorImagePreview" alt="Trap or Tank Exterior"
                                          class="rounded img-fluid image-preview" />
@@ -815,12 +867,14 @@
                                                 (fileChange)="onInteriorImageChange($event)" />
 
                                 <div *ngIf="interiorImagePreview" class="text-center mb-2">
-                                    <div class="d-flex justify-content-between align-items-center mb-2 px-3 py-2 border rounded bg-success-subtle">
+                                    <div
+                                         class="d-flex justify-content-between align-items-center mb-2 px-3 py-2 border rounded bg-success-subtle">
                                         <button type="button" class="btn btn-sm btn-primary"
                                                 (click)="interiorFileInput.click()">Choose File</button>
                                         <span class="fw-semibold small">{{ images.interiorImage?.name }}</span>
                                         <button type="button" class="btn btn-sm btn-primary"
-                                                (click)="onInteriorImageChange(null)"><i class="fa fa-trash"></i></button>
+                                                (click)="onInteriorImageChange(null)"><i
+                                               class="fa fa-trash"></i></button>
                                     </div>
                                     <img [src]="interiorImagePreview" alt="Trap or Tank Interior"
                                          class="rounded img-fluid image-preview" />

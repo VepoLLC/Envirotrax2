@@ -21,7 +21,8 @@
 
         <vp-section header="Verification">
 
-            <p class="text-center">Please complete the following fields to continue with your trip ticket submission.</p>
+            <p class="text-center">Please complete the following fields to continue with your trip ticket submission.
+            </p>
 
             <div class="row">
 
@@ -118,21 +119,27 @@
             <!-- Generator Information -->
             <vp-section header="Generator Information" class="mt-3 d-block">
                 <vp-section-actions *ngIf="site">
-                    <button *ngIf="!isLocationEditing" type="button" (click)="requestLocationModification()">Request Modification</button>
-                    <button *ngIf="isLocationEditing" type="button" (click)="cancelLocationModification()">Cancel</button>
+                    <button *ngIf="!isLocationEditing" type="button" class="btn-primary"
+                            (click)="requestLocationModification()">Request Modification</button>
+                    <button *ngIf="isLocationEditing" type="button" class="btn-primary"
+                            (click)="cancelLocationModification()">Cancel</button>
                 </vp-section-actions>
 
                 <div class="row">
                     <div class="col-md-6">
                         <dl class="row mb-0" *ngIf="site && !isLocationEditing">
                             <dt class="col-5">Property Type:</dt>
-                            <dd class="col-7 mb-1">{{ model.propertyType === PropertyType.Residential ? 'Residential' : 'Commercial' }}</dd>
+                            <dd class="col-7 mb-1">
+                                {{ model.propertyType === PropertyType.Residential ? 'Residential' : 'Commercial' }}
+                            </dd>
                             <dt class="col-5">Business Name:</dt>
                             <dd class="col-7 mb-1">{{ model.propertyBusinessName }}</dd>
                             <dt class="col-5">Address:</dt>
                             <dd class="col-7 mb-1">
-                                {{ model.propertyStreetNumber }} {{ model.propertyStreetName }}<span *ngIf="model.propertyNumber"> #{{ model.propertyNumber }}</span><br>
-                                {{ model.propertyCity }}<span *ngIf="model.propertyCity && model.propertyState?.name">, </span>{{ model.propertyState?.name }} {{ model.propertyZip }}
+                                {{ model.propertyStreetNumber }} {{ model.propertyStreetName }}<span
+                                      *ngIf="model.propertyNumber"> #{{ model.propertyNumber }}</span><br>
+                                {{ model.propertyCity }}<span *ngIf="model.propertyCity && model.propertyState?.name">,
+                                </span>{{ model.propertyState?.name }} {{ model.propertyZip }}
                             </dd>
                             <dt class="col-5">Phone Number:</dt>
                             <dd class="col-7 mb-1">{{ model.fogGeneratorPhoneNumber }}</dd>
@@ -142,7 +149,8 @@
 
                         <ng-container *ngIf="isLocationEditing">
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">Property Type: <span class="text-danger">*</span></div>
+                                <div class="col-xl-4 col-form-label fw-bold">Property Type: <span
+                                          class="text-danger">*</span></div>
                                 <div class="col-xl-8">
                                     <vp-input type="select"
                                               name="propertyType"
@@ -150,7 +158,8 @@
                                               (ngModelChange)="onPropertyTypeChange($event)"
                                               [options]="propertyTypeOptions"
                                               [required]="true" />
-                                    <vp-validation-field [form]="submitForm" fieldName="propertyType" fieldLabel="Property Type" />
+                                    <vp-validation-field [form]="submitForm" fieldName="propertyType"
+                                                         fieldLabel="Property Type" />
                                 </div>
                             </div>
 
@@ -196,13 +205,15 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">City: <span class="text-danger">*</span></div>
+                                <div class="col-xl-4 col-form-label fw-bold">City: <span class="text-danger">*</span>
+                                </div>
                                 <div class="col-xl-8">
                                     <vp-input name="propertyCity"
                                               [(ngModel)]="model.propertyCity"
                                               [required]="true"
                                               [maxLength]="50" />
-                                    <vp-validation-field [form]="submitForm" fieldName="propertyCity" fieldLabel="City" />
+                                    <vp-validation-field [form]="submitForm" fieldName="propertyCity"
+                                                         fieldLabel="City" />
                                 </div>
                             </div>
 
@@ -218,7 +229,8 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">ZIP: <span class="text-danger">*</span></div>
+                                <div class="col-xl-4 col-form-label fw-bold">ZIP: <span class="text-danger">*</span>
+                                </div>
                                 <div class="col-xl-8">
                                     <vp-input name="propertyZip"
                                               [(ngModel)]="model.propertyZip"
@@ -323,7 +335,11 @@
                 <div class="row mt-2">
                     <div class="col-12">
                         <p class="mb-0">
-                            As the generator or generator's authorized representative, I certify that the above information is correct. I further certify that this trap or tank contains no chemical or hazardous waste material and is being transported to a facility that is authorized to receive this waste. I am aware that falsification of this trip ticket may result in fines levied by water purveyor, city, state or federal authorities.
+                            As the generator or generator's authorized representative, I certify that the above
+                            information is correct. I further certify that this trap or tank contains no chemical or
+                            hazardous waste material and is being transported to a facility that is authorized to
+                            receive this waste. I am aware that falsification of this trip ticket may result in fines
+                            levied by water purveyor, city, state or federal authorities.
                         </p>
                     </div>
                 </div>
@@ -339,9 +355,11 @@
                     <div class="col-md-6 text-center">
                         <div class="fw-semibold mb-2">Generator Signature:</div>
                         <div *ngIf="generatorSignaturePreview" class="mb-2">
-                            <img [src]="generatorSignaturePreview" alt="Generator Signature" class="img-fluid border rounded" style="max-width: 400px" />
+                            <img [src]="generatorSignaturePreview" alt="Generator Signature"
+                                 class="img-fluid border rounded" style="max-width: 400px" />
                         </div>
-                        <button type="button" class="btn btn-primary vp-section-button" (click)="openGeneratorSignature()">
+                        <button type="button" class="btn btn-primary vp-section-button"
+                                (click)="openGeneratorSignature()">
                             Get Generator Signature
                         </button>
                     </div>
@@ -379,7 +397,8 @@
                     <div class="col-md-6">
                         <dl class="row mb-0" *ngIf="selectedVehicle">
                             <dt class="col-5">Vehicle:</dt>
-                            <dd class="col-7 mb-1">{{ selectedVehicle.manufacturedYear }} {{ selectedVehicle.manufacturer }}</dd>
+                            <dd class="col-7 mb-1">{{ selectedVehicle.manufacturedYear }}
+                                {{ selectedVehicle.manufacturer }}</dd>
                             <dt class="col-5">License Plate:</dt>
                             <dd class="col-7 mb-1">{{ selectedVehicle.licensePlateNumber }}</dd>
                             <dt class="col-5">Sticker Number:</dt>
@@ -396,14 +415,18 @@
                 <div class="row mt-3">
                     <div class="col-12">
                         <p class="mb-0">
-                            I certify that the information provided above is correct and that only the waste certified for removal by the generator is contained in this waste transport vehicle. I am aware that falsification of this trip ticket may result in revocation of my waste transportation permit, criminal prosecution, and/or civil penalties.
+                            I certify that the information provided above is correct and that only the waste certified
+                            for removal by the generator is contained in this waste transport vehicle. I am aware that
+                            falsification of this trip ticket may result in revocation of my waste transportation
+                            permit, criminal prosecution, and/or civil penalties.
                         </p>
                     </div>
                 </div>
 
                 <div class="text-center mt-3">
                     <div class="fw-semibold mb-1">Transporter Signature:</div>
-                    <img *ngIf="transporterSignatureUrl" [src]="transporterSignatureUrl" alt="Transporter Signature" class="img-fluid border rounded" style="max-width: 400px" />
+                    <img *ngIf="transporterSignatureUrl" [src]="transporterSignatureUrl" alt="Transporter Signature"
+                         class="img-fluid border rounded" style="max-width: 400px" />
                 </div>
             </vp-section>
 
@@ -448,22 +471,28 @@
 
                 <div class="row mt-3">
                     <div class="col-12">
-                        As the representative of this business, I certify that each of the following statements are true:
+                        As the representative of this business, I certify that each of the following statements are
+                        true:
                         <ul class="mb-0 mt-2">
-                            <li>The Texas Commission on Environmental Quality has authorized this business to accept the waste specified under "Generator Information" above.</li>
+                            <li>The Texas Commission on Environmental Quality has authorized this business to accept the
+                                waste specified under "Generator Information" above.</li>
                             <li>
                                 The transporter named above delivered
-                                <b>{{ model.interceptorWasteRemovedAmount }} {{ model.interceptorWasteRemovedType === FogVehicleCapacityType.Gallons ? 'Gallons' : 'Cubic Yards' }}</b>
-                                of waste to this business<span *ngIf="model.receiverWasteDeliveredDate"> on {{ model.receiverWasteDeliveredDate | date }}</span>.
+                                <b>{{ model.interceptorWasteRemovedAmount }}
+                                    {{ model.interceptorWasteRemovedType === FogVehicleCapacityType.Gallons ? 'Gallons' : 'Cubic Yards' }}</b>
+                                of waste to this business<span *ngIf="model.receiverWasteDeliveredDate"> on
+                                    {{ model.receiverWasteDeliveredDate | date }}</span>.
                             </li>
-                            <li>The waste has been recycled or disposed of as required by the TCEQ authorization for this business.</li>
+                            <li>The waste has been recycled or disposed of as required by the TCEQ authorization for
+                                this business.</li>
                         </ul>
                     </div>
                 </div>
 
                 <div class="text-center mt-3">
                     <div *ngIf="receiverSignaturePreview" class="mb-2">
-                        <img [src]="receiverSignaturePreview" alt="Receiver Signature" class="img-fluid border rounded" style="max-width: 400px" />
+                        <img [src]="receiverSignaturePreview" alt="Receiver Signature" class="img-fluid border rounded"
+                             style="max-width: 400px" />
                     </div>
                     <button type="button" class="btn btn-primary vp-section-button" (click)="openReceiverSignature()">
                         Get Receiver Signature

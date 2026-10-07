@@ -13,18 +13,12 @@ public class SiteScheduleRepository : Repository<SiteSchedule>, ISiteScheduleRep
     {
     }
 
-    public Task<SiteSchedule?> GetMyAsync(int siteId, int userId, ProfessionalType professionalType, CancellationToken cancellationToken)
-    {
-        return Entity
-            .AsNoTracking()
-            .SingleOrDefaultAsync(s => s.SiteId == siteId && s.UserId == userId && s.ProfessionalType == professionalType, cancellationToken);
-    }
-
-    public async Task<IEnumerable<SiteSchedule>> GetMyBySiteIdsAsync(IEnumerable<int> siteIds, int userId, ProfessionalType professionalType, CancellationToken cancellationToken)
+    public async Task<IEnumerable<SiteSchedule>> GetMyBySiteIdsAsync(IEnumerable<int> siteIds, int userId, CancellationToken cancellationToken)
     {
         return await Entity
             .AsNoTracking()
-            .Where(s => siteIds.Contains(s.SiteId) && s.UserId == userId && s.ProfessionalType == professionalType)
+            .Where(s => siteIds.Contains(s.SiteId) && s.UserId == userId)
+            .OrderBy(s => s.ScheduleDate)
             .ToListAsync(cancellationToken);
     }
 
@@ -49,10 +43,12 @@ public class SiteScheduleRepository : Repository<SiteSchedule>, ISiteScheduleRep
 
     public async Task<bool> ClearAsync(int siteId, int userId, ProfessionalType professionalType)
     {
-        var deletedCount = await Entity
+        var schedules = await Entity
             .Where(s => s.SiteId == siteId && s.UserId == userId && s.ProfessionalType == professionalType)
-            .ExecuteDeleteAsync();
+            .ToListAsync();
 
-        return deletedCount > 0;
+        Entity.RemoveRange(schedules);
+
+        return await DbContext.SaveChangesAsync() > 0;
     }
 }

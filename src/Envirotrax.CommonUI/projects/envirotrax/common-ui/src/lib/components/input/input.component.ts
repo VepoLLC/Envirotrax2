@@ -4,6 +4,7 @@ import { AbstractControl, ControlValueAccessor, NgForm, NG_VALIDATORS, NG_VALUE_
 import { NgSelectComponent } from "@ng-select/ng-select";
 import flatpickr from "flatpickr";
 import { Instance } from "flatpickr/dist/types/instance";
+import confirmDatePlugin from "flatpickr/dist/plugins/confirmDate/confirmDate";
 
 @Component({
     selector: 'vp-input',
@@ -136,6 +137,9 @@ export class InputComponent implements ControlValueAccessor, Validator, OnInit, 
                 mode: this.type == 'daterange'
                     ? 'range'
                     : 'single',
+                plugins: this.type == 'datetime'
+                    ? [confirmDatePlugin({ confirmText: 'Select', confirmIcon: '' })]
+                    : [],
 
                 onChange: (selectedDates: any[]) => {
                     if (this.type == 'datetime') {

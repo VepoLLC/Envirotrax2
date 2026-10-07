@@ -21,6 +21,8 @@ import { BackflowTestResult, BackflowReasonForTest, BackflowDeviceType } from '.
 import { MAX_PAGE_SIZE } from '../../../shared/models/page-info';
 import { Site } from '../../../shared/models/sites/site';
 import { SiteService } from '../../../shared/services/sites/site.service';
+import { LookupService } from '../../../shared/services/lookup/lookup.service';
+import { PropertyType } from '../../../shared/enums/property-type.enum';
 import { InputOption } from '@envirotrax/common-ui';
 
 @Component({
@@ -42,8 +44,12 @@ export class BackflowTestSubmitComponent implements OnInit {
 
     public site: Site | null = null;
     public editingTestId: number | null = null;
+    private _editingTest: BackflowTest | null = null;
     private _siteId = 0;
     private editMode = false;
+
+    public isNewProperty = false;
+    public isLocationEditing = false;
 
     private _bpats: ProfessionalUser[] = [];
     private _waterSuppliers: ProfessionalWaterSupplier[] = [];
@@ -52,6 +58,12 @@ export class BackflowTestSubmitComponent implements OnInit {
     public bpatOptions: InputOption[] = [];
     public waterSupplierOptions: InputOption[] = [];
     public gaugeOptions: InputOption[] = [];
+    public stateOptions: InputOption[] = [];
+
+    public readonly propertyTypeOptions: InputOption[] = [
+        { id: PropertyType.Residential, text: 'Residential' },
+        { id: PropertyType.Commercial, text: 'Commercial' }
+    ];
 
     public selectedBpatId?: number;
     public selectedWaterSupplierId?: number;
@@ -64,6 +76,7 @@ export class BackflowTestSubmitComponent implements OnInit {
     public readonly BackflowDeviceType = BackflowDeviceType;
     public readonly ExpirationType = ExpirationType;
     public readonly GaugeExpirationType = GaugeExpirationType;
+    public readonly PropertyType = PropertyType;
 
     public readonly deviceTypeOptions: InputOption[];
     public readonly hazardTypeOptions: InputOption[];
@@ -178,6 +191,7 @@ export class BackflowTestSubmitComponent implements OnInit {
             && this.professional?.insuranceExpirationType === ExpirationType.AboutToExpire;
     }
     public get isAirGap(): boolean { return this.model.deviceType === BackflowDeviceType.AG; }
+    public get isFailedResult(): boolean { return this.model.testResult === BackflowTestResult.Fail; }
     public get today(): Date { return new Date(); }
     public get deviceTypeLabel(): string {
         return this.deviceTypeOptions.find(o => o.id === this.model.deviceType)?.text ?? '';
@@ -395,7 +409,24 @@ export class BackflowTestSubmitComponent implements OnInit {
         return false;
     }
 
+    public get showInitialTestMessages(): boolean {
+        if (this.isFailedResult) {
+            return this.initialTestDateError !== null;
+        }
+
+        return this.initialTestFailed;
+    }
+
+    public get showFinalTestMessages(): boolean {
+        if (this.isFailedResult) {
+            return false;
+        }
+
+        return this.finalTestFailed;
+    }
+
     public get isOtherHazardType(): boolean { return this.model.hazardType === 'Other'; }
+    public get isResidential(): boolean { return this.model.propertyType === PropertyType.Residential; }
     public get remarksLength(): number { return this.model.comments?.length ?? 0; }
 
     public get initialTestDateError(): string | null {
@@ -470,7 +501,8 @@ export class BackflowTestSubmitComponent implements OnInit {
         private readonly _options: BackflowTestOptionsService,
         private readonly _settingsService: BackflowSettingsService,
         private readonly _siteService: SiteService,
-        private readonly _checkoutService: CheckoutService
+        private readonly _checkoutService: CheckoutService,
+        private readonly _lookupService: LookupService
     ) {
         this.deviceTypeOptions = this._options.deviceTypeOptions;
         this.hazardTypeOptions = this._options.hazardTypeOptions;
@@ -549,6 +581,7 @@ export class BackflowTestSubmitComponent implements OnInit {
     public async onWaterSupplierChange(value: number): Promise<void> {
         this.selectedWaterSupplierId = value;
         this.selectedWaterSupplier = this._waterSuppliers.find(s => s.waterSupplier?.id === value);
+        this.applyWaterSupplierState();
 
         this.isLoading = true;
 
@@ -590,6 +623,39 @@ export class BackflowTestSubmitComponent implements OnInit {
     public onGaugeChange(value: number): void {
         this.selectedGaugeId = value;
         this.selectedGauge = this._gauges.find(g => g.id === value);
+    }
+
+    public onPropertyTypeChange(value: number): void {
+        this.model.propertyType = value;
+
+        if (value === PropertyType.Residential) {
+            this.model.propertyBusinessName = undefined;
+        }
+    }
+
+    public requestLocationModification(): void {
+        this.isLocationEditing = true;
+    }
+
+    public cancelLocationModification(): void {
+        if (this._editingTest) {
+            this.applyPreviousTestLocation(this._editingTest);
+        } else if (this.site) {
+            this.applySiteLocation(this.site);
+        } else if (this.previousTest) {
+            this.applyPreviousTestLocation(this.previousTest);
+        }
+
+        this.isLocationEditing = false;
+    }
+
+    public copyPropertyAddress(): void {
+        this.model.mailingStreetNumber = this.model.propertyStreetNumber;
+        this.model.mailingStreetName = this.model.propertyStreetName;
+        this.model.mailingNumber = this.model.propertyNumber;
+        this.model.mailingCity = this.model.propertyCity;
+        this.model.mailingState = this.model.propertyState ? { ...this.model.propertyState } : undefined;
+        this.model.mailingZip = this.model.propertyZip;
     }
 
     public async submit(form: NgForm): Promise<void> {
@@ -639,15 +705,17 @@ export class BackflowTestSubmitComponent implements OnInit {
     private async loadData(fromTestId: number | null): Promise<void> {
         this.isLoading = true;
         try {
-            const [professional, usersPage, gaugesPage] = await Promise.all([
+            const [professional, usersPage, gaugesPage, stateOptions] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isBackflowTester', comparisonOperator: 'Eq', value: 'true' }] }),
-                this._gaugeService.getAll({ pageSize: MAX_PAGE_SIZE }, {})
+                this._gaugeService.getAll({ pageSize: MAX_PAGE_SIZE }, {}),
+                this._lookupService.getAllStatesAsOptions(false)
             ]);
 
             this.professional = professional;
             this._bpats = usersPage.data ?? [];
             this._gauges = gaugesPage.data ?? [];
+            this.stateOptions = stateOptions;
 
             const suppliersPage = await this._supplierService.getAllMy({ hasBackflowTesting: true });
             this._waterSuppliers = suppliersPage.data ?? [];
@@ -667,7 +735,11 @@ export class BackflowTestSubmitComponent implements OnInit {
 
             if (siteId) {
                 this.site = await this._siteService.getForProfessional(siteId);
+                this.applySiteLocation(this.site);
             }
+
+            this.isNewProperty = !this.site && !this.previousTest;
+            this.isLocationEditing = this.isNewProperty;
 
             await this.setDefaults();
 
@@ -699,6 +771,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         if (this._waterSuppliers.length === 1) {
             this.selectedWaterSupplierId = this._waterSuppliers[0].waterSupplier?.id;
             this.selectedWaterSupplier = this._waterSuppliers[0];
+            this.applyWaterSupplierState();
             await this.loadSupplierData();
         }
         const validGauges = this._gauges.filter(g => g.expirationType !== GaugeExpirationType.Expired);
@@ -709,25 +782,8 @@ export class BackflowTestSubmitComponent implements OnInit {
     }
 
     private populateFromPreviousTest(test: BackflowTest): void {
-        this.model.accountNumber = test.accountNumber;
-        this.model.propertyBusinessName = test.propertyBusinessName;
-        this.model.propertyType = test.propertyType;
-        this.model.propertyStreetNumber = test.propertyStreetNumber;
-        this.model.propertyStreetName = test.propertyStreetName;
-        this.model.propertyNumber = test.propertyNumber;
-        this.model.propertyCity = test.propertyCity;
-        this.model.propertyState = test.propertyState;
-        this.model.propertyZip = test.propertyZip;
-        this.model.mailingCompanyName = test.mailingCompanyName;
-        this.model.mailingContactName = test.mailingContactName;
-        this.model.mailingStreetNumber = test.mailingStreetNumber;
-        this.model.mailingStreetName = test.mailingStreetName;
-        this.model.mailingNumber = test.mailingNumber;
-        this.model.mailingCity = test.mailingCity;
-        this.model.mailingState = test.mailingState;
-        this.model.mailingZip = test.mailingZip;
-        this.model.mailingPhoneNumber = test.mailingPhoneNumber;
-        this.model.mailingEmailAddress = test.mailingEmailAddress;
+        this.applyPreviousTestLocation(test);
+
         this.model.deviceType = test.deviceType;
         this.model.manufacturer = test.manufacturer;
         this.model.model = test.model;
@@ -754,15 +810,17 @@ export class BackflowTestSubmitComponent implements OnInit {
     private async loadForEdit(testId: number): Promise<void> {
         this.isLoading = true;
         try {
-            const [professional, usersPage, gaugesPage] = await Promise.all([
+            const [professional, usersPage, gaugesPage, stateOptions] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isBackflowTester', comparisonOperator: 'Eq', value: 'true' }] }),
-                this._gaugeService.getAll({ pageSize: MAX_PAGE_SIZE }, {})
+                this._gaugeService.getAll({ pageSize: MAX_PAGE_SIZE }, {}),
+                this._lookupService.getAllStatesAsOptions(false)
             ]);
 
             this.professional = professional;
             this._bpats = usersPage.data ?? [];
             this._gauges = gaugesPage.data ?? [];
+            this.stateOptions = stateOptions;
 
             const suppliersPage = await this._supplierService.getAllMy({ hasBackflowTesting: true });
             this._waterSuppliers = suppliersPage.data ?? [];
@@ -771,6 +829,7 @@ export class BackflowTestSubmitComponent implements OnInit {
 
             const test = await this._backflowTestService.getForProfessional(testId);
             this.editingTestId = testId;
+            this._editingTest = test;
             await this.populateForEdit(test);
 
             if (test.site?.id) {
@@ -856,6 +915,65 @@ export class BackflowTestSubmitComponent implements OnInit {
         };
     }
 
+    private applyPreviousTestLocation(test: BackflowTest): void {
+        this.model.accountNumber = test.accountNumber;
+        this.model.propertyBusinessName = test.propertyBusinessName;
+        this.model.propertyType = test.propertyType;
+        this.model.propertyStreetNumber = test.propertyStreetNumber;
+        this.model.propertyStreetName = test.propertyStreetName;
+        this.model.propertyNumber = test.propertyNumber;
+        this.model.propertyCity = test.propertyCity;
+        this.model.propertyState = test.propertyState ? { ...test.propertyState } : undefined;
+        this.model.propertyZip = test.propertyZip;
+
+        this.model.mailingCompanyName = test.mailingCompanyName;
+        this.model.mailingContactName = test.mailingContactName;
+        this.model.mailingStreetNumber = test.mailingStreetNumber;
+        this.model.mailingStreetName = test.mailingStreetName;
+        this.model.mailingNumber = test.mailingNumber;
+        this.model.mailingCity = test.mailingCity;
+        this.model.mailingState = test.mailingState ? { ...test.mailingState } : undefined;
+        this.model.mailingZip = test.mailingZip;
+        this.model.mailingPhoneNumber = test.mailingPhoneNumber;
+        this.model.mailingEmailAddress = test.mailingEmailAddress;
+    }
+
+    private applySiteLocation(site: Site): void {
+        this.model.accountNumber = site.accountNumber;
+        this.model.propertyBusinessName = site.businessName;
+        this.model.propertyType = site.propertyType;
+        this.model.propertyStreetNumber = site.streetNumber;
+        this.model.propertyStreetName = site.streetName;
+        this.model.propertyNumber = site.propertyNumber;
+        this.model.propertyCity = site.city;
+        this.model.propertyState = site.state ? { ...site.state } : undefined;
+        this.model.propertyZip = site.zipCode;
+
+        this.model.mailingCompanyName = site.mailingCompanyName;
+        this.model.mailingContactName = site.mailingContactName;
+        this.model.mailingStreetNumber = site.mailingStreetNumber;
+        this.model.mailingStreetName = site.mailingStreetName;
+        this.model.mailingNumber = site.mailingNumber;
+        this.model.mailingCity = site.mailingCity;
+        this.model.mailingState = site.mailingState ? { ...site.mailingState } : undefined;
+        this.model.mailingZip = site.mailingZipCode;
+        this.model.mailingPhoneNumber = site.mailingPhoneNumber;
+        this.model.mailingEmailAddress = site.mailingEmailAddress;
+    }
+
+    private applyWaterSupplierState(): void {
+        if (!this.isNewProperty) {
+            return;
+        }
+
+        const stateId = this.selectedWaterSupplier?.waterSupplier?.state?.id;
+
+        if (stateId) {
+            this.model.propertyState = { id: stateId };
+            this.model.mailingState = { id: stateId };
+        }
+    }
+
     private async applySiteWaterSupplier(site: Site): Promise<void> {
         const siteWsId = site.waterSupplier?.id;
 
@@ -915,6 +1033,17 @@ export class BackflowTestSubmitComponent implements OnInit {
         return parts.join(', ');
     }
 
+    private hasMissingLocationFields(): boolean {
+        return this.model.propertyType == null
+            || !this.model.propertyStreetNumber
+            || !this.model.propertyStreetName
+            || !this.model.propertyCity
+            || !this.model.propertyZip
+            || !this.model.mailingStreetName
+            || !this.model.mailingCity
+            || !this.model.mailingZip;
+    }
+
     private collectValidationErrors(): void {
         if (!this.selectedBpatId) {
             this.validationErrors.push('Please select a BPAT account.');
@@ -930,6 +1059,21 @@ export class BackflowTestSubmitComponent implements OnInit {
         }
         if (!this.model.deviceType) {
             this.validationErrors.push('Please select a device type.');
+        }
+
+        if (!this.isLocationEditing && this.hasMissingLocationFields()) {
+            this.isLocationEditing = true;
+            this.validationErrors.push('Please complete the property and mailing information.');
+        }
+
+        if (this.model.propertyStreetNumber && !/^\d/.test(this.model.propertyStreetNumber)) {
+            this.isLocationEditing = true;
+            this.validationErrors.push('Property street number must start with a digit.');
+        }
+
+        if (this.model.mailingStreetNumber && !/^\d/.test(this.model.mailingStreetNumber)) {
+            this.isLocationEditing = true;
+            this.validationErrors.push('Mailing street number must start with a digit. If you are entering a PO Box, enter the "PO Box" and the box number in the street name field.');
         }
 
         if (this.isAirGap) {

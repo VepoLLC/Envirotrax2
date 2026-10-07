@@ -6,7 +6,7 @@ Moves data from the old (V1) system into the new Envirotrax2 (V2) database.
 
 ## How it works
 
-The app migrates one entity at a time — users, water suppliers, supplier users, sites, then site logs — in that order, because later entities depend on earlier ones. Each entity's migration has two steps:
+The app migrates one entity at a time — users, water suppliers, supplier users, professionals, GIS areas, sites, site logs, backflow gauges, then notification settings — in that order, because later entities depend on earlier ones. Each entity's migration has two steps:
 
 1. **Run SQL scripts.** Files under `Scripts/<Entity>/`, named with a numeric prefix (`01_`, `02_`, ...), run in that order. They copy rows from the legacy database into the V2 tables.
 2. **Run C# cleanup code.** After the raw data is in place, C# fixes up anything SQL can't do well — legacy passwords come in as plain text and get hashed with ASP.NET Identity's password hasher, and site log file attachments get downloaded from the legacy file server and uploaded to Azure Storage.
@@ -20,7 +20,7 @@ One caveat, on the audit tables rather than the data: `Scripts/Users/02_`–`06_
 ## Project layout
 
 - `Scripts/` — SQL scripts, one subfolder per entity, run in filename order.
-- `Services/` — one service per entity (`UserService`, `WaterSupplierService`, `WaterSupplierUserService`, `SiteService`, `SiteLogService`). Each has a `MigrateAsync()` that runs its scripts, then does any C#-side cleanup. `LegacyFileServerService` and `BlobStorageService` are helpers rather than entity migrations: they read files off the legacy file server and write them to Azure Storage.
+- `Services/` — one service per entity (`UserService`, `WaterSupplierService`, `WaterSupplierUserService`, `ProfessionalService`, `GisAreaService`, `SiteService`, `SiteLogService`, `BackflowGaugeService`, `NotificationSettingService`, and the other professional services). Each has a `MigrateAsync()` that runs its scripts, then does any C#-side cleanup. `LegacyFileServerService` and `BlobStorageService` are helpers rather than entity migrations: they read files off the legacy file server and write them to Azure Storage.
 - `Data/` — EF Core `DbContext`s and entity models for the V2 database.
 - `Logs/` — one log file per service, written while the migration runs.
 
@@ -49,6 +49,27 @@ Two queries tell you where things stand:
 
 - **Still pending:** `SELECT COUNT(*) FROM SiteLogs WHERE LegacyFilePath IS NOT NULL AND FileAttachmentPath IS NULL`
 - **Permanently unmigratable:** `SELECT * FROM MigrationSkippedSiteLogs WHERE SourceTable = 'CsiBackflowSiteLog.FileAttachment'` — V1 rows whose file type is missing or unusable, so there is no legacy file name to fetch. Everything else is logged to `Logs/SiteLogService.log` with per-run counts.
+
+## How notification settings are migrated
+
+V1 keeps a backflow notification rule per recipient in `WaterSupplierNotificationSettings`, naming that
+recipient by login rather than by id. V2 requires the recipient (`NotificationSettings.UserId` is NOT
+NULL), so the script resolves the login through `AspNetUsers.Email` to the supplier user of that same
+supplier, and records any rule it cannot place instead of dropping it silently.
+
+Three V1 shapes change on the way across:
+
+- **Colour** is an index in V1 (0-11) that only became a hex string when a page rendered it. V2 stores
+  the hex string itself, so the script applies the same table `ColorString` used, and the same
+  clamp-to-white fallback the editor applied before saving.
+- **Backflow test type** is its own V1 enum sitting one below `BackflowReasonForTest`. Its `Any` member
+  has no V2 counterpart: V2 leaves `ReasonForTest` NULL to mean the same thing.
+- **Two filter columns** are misspelled `...Exeeded` in V1 and corrected in V2.
+
+Rules that could not be migrated are queryable:
+
+`SELECT * FROM MigrationSkippedNotificationSettings` — either the water supplier never migrated, or no
+migrated supplier user matches the recipient login the rule was addressed to.
 
 ## Running it
 

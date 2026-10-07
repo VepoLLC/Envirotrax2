@@ -136,28 +136,22 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         query.Sort = query.ConvertSortProperties<Site, SiteDto>(Mapper);
         query.Filter = query.ConvertFilterProperties<Site, SiteDto>(Mapper);
 
-        var professionalType = await _siteScheduleService.GetMyProfessionalTypeAsync(cancellationToken);
-
         var sites = (await _siteRepository.SearchForProfessionalAsync(
             criteria,
             pageInfo,
             query,
             _authService.ProfessionalId,
             _authService.UserId,
-            professionalType,
             cancellationToken)).ToList();
 
-        var schedules = professionalType == null
-            ? []
-            : await _siteScheduleService.GetMyBySiteIdsAsync(sites.Select(s => s.Id), professionalType.Value, cancellationToken);
-
-        var schedulesBySiteId = schedules.ToDictionary(s => s.SiteId);
+        var schedules = await _siteScheduleService.GetMyBySiteIdsAsync(sites.Select(s => s.Id), cancellationToken);
+        var schedulesBySiteId = schedules.ToLookup(s => s.SiteId);
 
         return sites
             .Select(site =>
             {
                 var dto = Mapper.Map<ProfessionalSiteDto>(site);
-                dto.Schedule = schedulesBySiteId.GetValueOrDefault(site.Id);
+                dto.Schedules = schedulesBySiteId[site.Id].ToList();
 
                 return dto;
             })

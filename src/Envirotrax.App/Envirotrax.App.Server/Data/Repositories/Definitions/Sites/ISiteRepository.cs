@@ -1,5 +1,4 @@
 using DeveloperPartners.SortingFiltering;
-using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 
@@ -10,7 +9,7 @@ public interface ISiteRepository : IRepository<Site>
     Task<Site?> UpdateForAdminAsync(int id, SiteDto dto);
 
     Task<IEnumerable<Site>> SearchAsync(PageInfo pageInfo, Query query, bool? fogCompliant, CancellationToken cancellationToken);
-    Task<IEnumerable<Site>> SearchForProfessionalAsync(ProfessionalSiteSearchDto criteria, PageInfo pageInfo, Query query, int professionalId, int userId, ProfessionalType? professionalType, CancellationToken cancellationToken);
+    Task<IEnumerable<Site>> SearchForProfessionalAsync(ProfessionalSiteSearchDto criteria, PageInfo pageInfo, Query query, int professionalId, int userId, CancellationToken cancellationToken);
     Task<IEnumerable<Site>> GetAllPendingGeocodingAsync(int batchSize);
     Task UpdateGisCoordinatesAsync(Site site);
     Task UpdateManualGisDataAsync(int siteId, double? latitude, double? longitude, GisStatusType status);

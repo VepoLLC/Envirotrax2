@@ -69,12 +69,12 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
 
         var deleted = await _repository.DeleteAsync(id);
 
-        if (deleted == null || deleted.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(deleted.TransactionId))
+        if (deleted == null || !string.IsNullOrEmpty(deleted.TransactionId))
         {
             return null;
         }
 
-        await _assemblyService.DeleteByInspectionAsync(id, default);
+        await _assemblyService.DeleteByInspectionAsync(id, deleted.ProfessionalId, default);
 
         scope.Complete();
         return MapToDto(deleted);
@@ -85,7 +85,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         return _insuranceService.CheckForWaterSupplierAsync(_authService.ProfessionalId, waterSupplierId, ProfessionalType.CsiInspector, cancellationToken);
     }
 
-    public async Task<CsiInspectionDto> SubmitAsync(CsiInspectionDto request, CancellationToken cancellationToken)
+    public async Task<CsiInspectionDto> SubmitAsync(CreateCsiInspectionDto request, CancellationToken cancellationToken)
     {
         var siteId = request.Site!.Id.Value;
         var waterSupplierId = request.WaterSupplier!.Id.Value;
@@ -123,8 +123,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
             MaterialSolderOther = request.MaterialSolderOther,
             MaterialSolderOtherDescription = request.MaterialSolderOtherDescription,
             Comments = request.Comments,
-            NeedsValidation = true,
-            SubmissionId = request.SubmissionId
+            NeedsValidation = true
         };
 
         ApplySiteSnapshot(inspection, site);
@@ -134,7 +133,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
         var added = await _repository.AddAsync(inspection);
-        await _assemblyService.LinkToInspectionAsync(added, cancellationToken);
+        await _assemblyService.SaveForInspectionAsync(added, request, cancellationToken);
 
         scope.Complete();
         return Mapper.Map<CsiInspectionDto>(added);
@@ -164,11 +163,10 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
     }
 
     // Checkout "Edit" on an own, still-unpaid inspection: mirrors SubmitAsync's field list and snapshot
-    // logic, but against an existing row. Ownership + payment-status guard lives in the repository
-    // (UpdateForProfessionalAsync returns Model == null for not-found/not-owned/already-paid).
-    public async Task<CsiInspectionDto?> UpdateForProfessionalAsync(int id, CsiInspectionDto request, CancellationToken cancellationToken)
+    // logic, but against an existing row. Ownership is enforced by ProfessionalDbContext (CsiInspection
+    // is an ISharedProfessionalModel); the repository's own guard only covers not-found/already-paid.
+    public async Task<CsiInspectionDto?> UpdateForProfessionalAsync(int id, CreateCsiInspectionDto request, CancellationToken cancellationToken)
     {
-        var professionalId = _authService.ProfessionalId;
         var siteId = request.Site!.Id!.Value;
         var inspectorUserId = request.InspectorUser!.Id!.Value;
 
@@ -200,8 +198,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
             MaterialSolderSolventWeld = request.MaterialSolderSolventWeld,
             MaterialSolderOther = request.MaterialSolderOther,
             MaterialSolderOtherDescription = request.MaterialSolderOtherDescription,
-            Comments = request.Comments,
-            SubmissionId = request.SubmissionId
+            Comments = request.Comments
         };
 
         ApplySiteSnapshot(inspection, site);
@@ -209,14 +206,14 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
 
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        var saved = await _repository.UpdateForProfessionalAsync(inspection, professionalId);
+        var saved = await _repository.UpdateForProfessionalAsync(inspection);
 
         if (saved == null)
         {
             return null;
         }
 
-        await _assemblyService.LinkToInspectionAsync(saved, cancellationToken);
+        await _assemblyService.SaveForInspectionAsync(saved, request, cancellationToken);
 
         scope.Complete();
         return Mapper.Map<CsiInspectionDto>(saved);

@@ -63,16 +63,22 @@
             View
         </button>
 
-        <button type="button"
+        <button *ngIf="scheduleTypes.length"
+                type="button"
                 class="btn btn-sm text-nowrap"
-                [class.btn-primary]="!site.schedule"
-                [class.btn-success]="site.schedule"
+                [class.btn-primary]="!site.schedules?.length"
+                [class.btn-success]="site.schedules?.length"
                 (click)="editSchedule(site)">
-            <i class="fa-solid fa-clock me-1"></i>
-            <ng-container *ngIf="!site.schedule">Schedule</ng-container>
-            <ng-container *ngIf="site.schedule">
-                {{ site.schedule.scheduleDate | date: 'M/d/yyyy' }}<br />
-                {{ site.schedule.scheduleDate | date: 'h:mm a' }}
+            <ng-container *ngIf="!site.schedules?.length">
+                <i class="fa-solid fa-clock me-1"></i>Schedule
+            </ng-container>
+            <ng-container *ngIf="site.schedules?.length">
+                <div>
+                    <i class="fa-solid fa-clock me-1"></i>Scheduled
+                </div>
+                <div *ngFor="let schedule of site.schedules">
+                    {{ scheduleTypeNames[schedule.professionalType] }} - {{ schedule.scheduleDate | date: 'M/d/yyyy h:mm a' }}
+                </div>
             </ng-container>
         </button>
     </div>

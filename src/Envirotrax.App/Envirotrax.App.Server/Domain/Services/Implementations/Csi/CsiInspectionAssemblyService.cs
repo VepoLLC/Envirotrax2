@@ -1,6 +1,7 @@
 using AutoMapper;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Csi;
+using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
@@ -8,13 +9,12 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.Common.Data;
-using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Csi;
 
-// Works the way V1's csi_inspection_submit.aspx did: while the form is open, rows are saved under its
-// SubmissionId, and submitting the inspection links them (and the tests added on the form) to it.
-// An added assembly is a BackflowTest row, because Envirotrax stores assemblies and their tests together.
+// The "Assemblies at this Location" rows are saved together with their inspection. An assembly the
+// inspector adds is a new BackflowTest at the site, because Envirotrax stores assemblies and their tests
+// in the same table.
 public class CsiInspectionAssemblyService : ICsiInspectionAssemblyService
 {
     private readonly IMapper _mapper;
@@ -22,22 +22,19 @@ public class CsiInspectionAssemblyService : ICsiInspectionAssemblyService
     private readonly IBackflowTestRepository _testRepository;
     private readonly ISiteRepository _siteRepository;
     private readonly IBackflowTestService _testService;
-    private readonly IAuthService _authService;
 
     public CsiInspectionAssemblyService(
         IMapper mapper,
         ICsiInspectionAssemblyRepository repository,
         IBackflowTestRepository testRepository,
         ISiteRepository siteRepository,
-        IBackflowTestService testService,
-        IAuthService authService)
+        IBackflowTestService testService)
     {
         _mapper = mapper;
         _repository = repository;
         _testRepository = testRepository;
         _siteRepository = siteRepository;
         _testService = testService;
-        _authService = authService;
     }
 
     public async Task<List<CsiInspectionAssemblyDto>> GetByInspectionAsync(int inspectionId, CancellationToken cancellationToken)
@@ -52,155 +49,269 @@ public class CsiInspectionAssemblyService : ICsiInspectionAssemblyService
         return _repository.GetCountByInspectionAsync(inspectionId, cancellationToken);
     }
 
-    // V1 initializeAssemblies: when the form opens, every current test at the site that this submission
-    // does not list yet gets a row.
-    public async Task<List<CsiInspectionAssemblyDto>> InitializeAsync(int siteId, string submissionId, CancellationToken cancellationToken)
+    // What the form's Assemblies tab starts with (V1 initializeAssemblies): the inspection's saved rows
+    // when editing, plus an unsaved row (Id 0) for every current test at the site not listed yet.
+    public async Task<List<CsiInspectionAssemblyDto>> GetForFormAsync(int siteId, int? inspectionId, CancellationToken cancellationToken)
     {
-        var assemblies = await _repository.GetBySubmissionAsync(submissionId, cancellationToken);
-        var listedTestIds = assemblies.Select(assembly => assembly.TestId).ToHashSet();
+        var assemblies = inspectionId.HasValue
+            ? await _repository.GetByInspectionAsync(inspectionId.Value, cancellationToken)
+            : [];
 
+        var listedTestIds = assemblies.Select(assembly => assembly.TestId).ToHashSet();
         var tests = await _testRepository.GetCurrentBySiteAsync(siteId, cancellationToken);
 
-        foreach (var test in tests.Where(test => !listedTestIds.Contains(test.Id)))
+        var unlisted = tests
+            .Where(test => !listedTestIds.Contains(test.Id))
+            .Select(BuildAssembly);
+
+        return _mapper.Map<List<CsiInspectionAssemblyDto>>(assemblies.Concat(unlisted));
+    }
+
+    // Runs inside the inspection's submit/update transaction. Rows the inspector deleted go (only unpaid
+    // ones can be deleted), the checkboxes are saved, and new rows are added for site tests and for the
+    // assemblies added on the form.
+    public async Task SaveForInspectionAsync(CsiInspection inspection, CreateCsiInspectionDto request, CancellationToken cancellationToken)
+    {
+        var saved = await _repository.GetByInspectionAsync(inspection.Id, cancellationToken);
+
+        var keptIds = request.Assemblies
+            .Where(assembly => assembly.Id.HasValue)
+            .Select(assembly => assembly.Id!.Value)
+            .ToHashSet();
+
+        var deletedIds = saved
+            .Where(assembly => !keptIds.Contains(assembly.Id) && string.IsNullOrEmpty(assembly.TransactionId))
+            .Select(assembly => assembly.Id)
+            .ToList();
+
+        if (deletedIds.Count > 0)
         {
-            await _repository.AddAsync(BuildAssembly(test, submissionId));
+            await _repository.DeleteFromInspectionAsync(inspection.Id, deletedIds, cancellationToken);
         }
 
-        var initialized = await _repository.GetBySubmissionAsync(submissionId, cancellationToken);
-
-        return _mapper.Map<List<CsiInspectionAssemblyDto>>(initialized);
-    }
-
-    // V1 btnAddAssemblyOK_Click: the new test has no site until the inspection is submitted.
-    public async Task<CsiInspectionAssemblyDto> AddAsync(CsiInspectionAssemblyRequest request, CancellationToken cancellationToken)
-    {
-        ValidateRequest(request);
-
-        var site = await _siteRepository.GetNoIncludesAsync(request.SiteId, cancellationToken)
-            ?? throw new AppValidationException("The location of this inspection was not found.");
-
-        var test = new BackflowTest
+        if (saved.Count > 0)
         {
-            WaterSupplierId = site.WaterSupplierId,
-            ProfessionalId = _authService.ProfessionalId,
-            InspectorId = _authService.UserId,
-            SubmissionId = request.SubmissionId,
-            DeviceType = request.DeviceType,
-            Manufacturer = request.Manufacturer,
-            Model = request.Model,
-            Size = request.Size,
-            SerialNumber = request.SerialNumber?.Trim(),
-            Manufacturer2 = request.Manufacturer2,
-            Model2 = request.Model2,
-            Size2 = request.Size2,
-            SerialNumber2 = request.SerialNumber2?.Trim(),
-            HazardType = request.HazardType,
-            HazardTypeOtherDescription = request.HazardTypeOtherDescription?.Trim(),
-            LocationDescription = request.LocationDescription?.Trim(),
-            Comments = request.Comments?.Trim(),
-            ReasonForTest = BackflowReasonForTest.AnnualTest,
-            IsCurrent = true,
-            NeedsValidation = true
-        };
+            var visuallyIdentifiedIds = request.Assemblies
+                .Where(assembly => assembly.Id.HasValue && assembly.VisuallyIdentified)
+                .Select(assembly => assembly.Id!.Value)
+                .ToList();
 
-        // The renewal rules read the property type and aux water supply from the site, which the new
-        // test is not linked to yet.
-        test.RenewalRequired = await _testService.IsRenewalRequiredAsync(new BackflowTest
-        {
-            WaterSupplierId = site.WaterSupplierId,
-            DeviceType = test.DeviceType,
-            HazardType = test.HazardType,
-            PropertyType = (int)site.PropertyType,
-            Site = site
-        }, cancellationToken);
-
-        var assembly = BuildAssembly(test, request.SubmissionId);
-        assembly.Test = test;
-
-        await _repository.AddAsync(assembly);
-
-        return _mapper.Map<CsiInspectionAssemblyDto>(assembly);
-    }
-
-    public Task<bool> DeleteAsync(int id, string submissionId, CancellationToken cancellationToken)
-    {
-        return _repository.DeleteForSubmissionAsync(id, submissionId, cancellationToken);
-    }
-
-    public Task UpdateVisuallyIdentifiedAsync(CsiInspectionVisuallyIdentifiedRequest request, CancellationToken cancellationToken)
-    {
-        return _repository.UpdateVisuallyIdentifiedAsync(request.SubmissionId, request.VisuallyIdentifiedIds, cancellationToken);
-    }
-
-    // V1 setBackflowRecords, run when the inspection is submitted or edited.
-    public async Task LinkToInspectionAsync(CsiInspection inspection, CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrEmpty(inspection.SubmissionId))
-        {
-            return;
+            await _repository.UpdateVisuallyIdentifiedAsync(inspection.Id, inspection.ProfessionalId, visuallyIdentifiedIds, cancellationToken);
         }
 
-        await _repository.LinkToInspectionAsync(inspection.Id, inspection.SubmissionId, cancellationToken);
-        await _testRepository.ApplyCsiInspectionAsync(inspection, cancellationToken);
+        var added = await BuildSiteTestAssembliesAsync(inspection, saved, request.Assemblies, cancellationToken);
+        added.AddRange(await BuildNewAssembliesAsync(inspection, request.NewAssemblies, cancellationToken));
+
+        if (added.Count > 0)
+        {
+            await _repository.AddRangeAsync(added, cancellationToken);
+        }
     }
 
-    // V1 checkout: the tests added on the form and the inspection's rows are paid with the inspection.
+    // V1 checkout: the inspection's rows and the tests it added are paid with the inspection.
     public async Task MarkPaidAsync(IEnumerable<CsiInspection> inspections, string transactionId, DateTime transactionDate, CancellationToken cancellationToken)
     {
-        foreach (var inspection in inspections.Where(inspection => !string.IsNullOrEmpty(inspection.SubmissionId)))
+        foreach (var inspection in inspections)
         {
-            await _testRepository.MarkCsiInspectionTestsPaidAsync(inspection.SiteId, inspection.SubmissionId!, transactionId, transactionDate, cancellationToken);
-            await _repository.MarkPaidAsync(inspection.Id, inspection.SubmissionId!, transactionId, cancellationToken);
+            await _testRepository.MarkCsiInspectionTestsPaidAsync(inspection, transactionId, transactionDate, cancellationToken);
+            await _repository.MarkPaidAsync(inspection.Id, inspection.ProfessionalId, transactionId, cancellationToken);
         }
     }
 
-    public Task DeleteByInspectionAsync(int inspectionId, CancellationToken cancellationToken)
+    public Task DeleteByInspectionAsync(int inspectionId, int professionalId, CancellationToken cancellationToken)
     {
-        return _repository.DeleteByInspectionAsync(inspectionId, cancellationToken);
+        return _repository.DeleteByInspectionAsync(inspectionId, professionalId, cancellationToken);
     }
 
-    private static void ValidateRequest(CsiInspectionAssemblyRequest request)
+    // Site tests the inspector kept that the inspection does not list yet. The form listed them as current
+    // when it opened (V1 saved the row at that moment), so a test that stopped being current since then is
+    // still snapshotted; ids that are not tests at the inspection's site are ignored.
+    private async Task<List<CsiInspectionVisuallyIdentifiedAssembly>> BuildSiteTestAssembliesAsync(
+        CsiInspection inspection,
+        List<CsiInspectionVisuallyIdentifiedAssembly> saved,
+        List<CsiInspectionAssemblySelectionDto> selections,
+        CancellationToken cancellationToken)
     {
-        if (!Enum.GetNames<BackflowDeviceType>().Contains(request.DeviceType))
+        var listedTestIds = saved.Select(assembly => assembly.TestId).ToHashSet();
+
+        var newSelections = selections
+            .Where(selection => !selection.Id.HasValue && selection.TestId.HasValue && !listedTestIds.Contains(selection.TestId))
+            .DistinctBy(selection => selection.TestId)
+            .ToList();
+
+        if (newSelections.Count == 0)
+        {
+            return [];
+        }
+
+        var tests = await _testRepository.GetByIdsAsync(newSelections.Select(selection => selection.TestId!.Value), cancellationToken);
+
+        var siteTests = tests
+            .Where(test => test.SiteId == inspection.SiteId && test.WaterSupplierId == inspection.WaterSupplierId && test.DeletedTime == null)
+            .ToDictionary(test => test.Id);
+
+        return newSelections
+            .Where(selection => siteTests.ContainsKey(selection.TestId!.Value))
+            .Select(selection => LinkToInspection(BuildAssembly(siteTests[selection.TestId!.Value]), inspection, selection.VisuallyIdentified))
+            .ToList();
+    }
+
+    // V1 btnAddAssemblyOK_Click + setBackflowRecords: a current test at the inspection's site, dated the
+    // inspection date because the assembly was seen, not tested.
+    private async Task<List<CsiInspectionVisuallyIdentifiedAssembly>> BuildNewAssembliesAsync(
+        CsiInspection inspection,
+        List<CsiInspectionNewAssemblyDto> newAssemblies,
+        CancellationToken cancellationToken)
+    {
+        if (newAssemblies.Count == 0)
+        {
+            return [];
+        }
+
+        var site = await _siteRepository.GetNoIncludesAsync(inspection.SiteId, cancellationToken)
+            ?? throw new AppValidationException("The location of this inspection was not found.");
+
+        var assemblies = new List<CsiInspectionVisuallyIdentifiedAssembly>();
+
+        foreach (var newAssembly in newAssemblies)
+        {
+            ValidateNewAssembly(newAssembly);
+
+            var test = BuildTest(inspection, site, newAssembly);
+
+            // The renewal rules read the site's flags through test.Site; a separate copy carries them so
+            // the new test's own Site navigation stays unset.
+            test.RenewalRequired = await _testService.IsRenewalRequiredAsync(new BackflowTest
+            {
+                WaterSupplierId = test.WaterSupplierId,
+                DeviceType = test.DeviceType,
+                HazardType = test.HazardType,
+                PropertyType = test.PropertyType,
+                Site = site
+            }, cancellationToken);
+
+            var assembly = LinkToInspection(BuildAssembly(test), inspection, newAssembly.VisuallyIdentified);
+            assembly.AddedOnInspection = true;
+            assembly.Test = test;
+
+            assemblies.Add(assembly);
+        }
+
+        return assemblies;
+    }
+
+    private static BackflowTest BuildTest(CsiInspection inspection, Site site, CsiInspectionNewAssemblyDto newAssembly)
+    {
+        var inspectionDate = inspection.InspectionDate;
+
+        return new BackflowTest
+        {
+            WaterSupplierId = inspection.WaterSupplierId,
+            SiteId = inspection.SiteId,
+            ProfessionalId = inspection.ProfessionalId,
+            InspectorId = inspection.InspectorId,
+
+            DeviceType = newAssembly.DeviceType,
+            Manufacturer = newAssembly.Manufacturer,
+            Model = newAssembly.Model,
+            Size = newAssembly.Size,
+            SerialNumber = newAssembly.SerialNumber?.Trim(),
+            Manufacturer2 = newAssembly.Manufacturer2,
+            Model2 = newAssembly.Model2,
+            Size2 = newAssembly.Size2,
+            SerialNumber2 = newAssembly.SerialNumber2?.Trim(),
+            HazardType = newAssembly.HazardType,
+            HazardTypeOtherDescription = newAssembly.HazardTypeOtherDescription?.Trim(),
+            LocationDescription = newAssembly.LocationDescription?.Trim(),
+            Comments = newAssembly.Comments?.Trim(),
+
+            ReasonForTest = BackflowReasonForTest.AnnualTest,
+            IsCurrent = true,
+            NeedsValidation = true,
+
+            InitialTestDate = inspectionDate,
+            RepairTestDate = inspectionDate,
+            FinalTestDate = inspectionDate,
+            AirGapTestDate = inspectionDate,
+            TestDate = inspectionDate,
+            ExpirationDate = inspectionDate,
+
+            AccountNumber = site.AccountNumber,
+            PropertyType = (int)inspection.PropertyType,
+            PropertyBusinessName = inspection.PropertyBusinessName,
+            PropertyStreetNumber = inspection.PropertyStreetNumber,
+            PropertyStreetName = inspection.PropertyStreetName,
+            PropertyNumber = inspection.PropertyNumber,
+            PropertyCity = inspection.PropertyCity,
+            PropertyStateId = inspection.PropertyStateId,
+            PropertyZip = inspection.PropertyZip,
+            MailingCompanyName = inspection.MailingCompanyName,
+            MailingContactName = inspection.MailingContactName,
+            MailingStreetNumber = inspection.MailingStreetNumber,
+            MailingStreetName = inspection.MailingStreetName,
+            MailingNumber = inspection.MailingNumber,
+            MailingCity = inspection.MailingCity,
+            MailingStateId = inspection.MailingStateId,
+            MailingZip = inspection.MailingZip,
+            MailingPhoneNumber = inspection.MailingPhoneNumber,
+            MailingEmailAddress = inspection.MailingEmailAddress
+        };
+    }
+
+    private static void ValidateNewAssembly(CsiInspectionNewAssemblyDto newAssembly)
+    {
+        if (!Enum.GetNames<BackflowDeviceType>().Contains(newAssembly.DeviceType))
         {
             throw new AppValidationException("Please select a valid Backflow Method.");
         }
 
-        var mainIsIncomplete = string.IsNullOrWhiteSpace(request.Manufacturer)
-            || string.IsNullOrWhiteSpace(request.Model)
-            || string.IsNullOrWhiteSpace(request.Size)
-            || string.IsNullOrWhiteSpace(request.SerialNumber);
+        var mainIsIncomplete = string.IsNullOrWhiteSpace(newAssembly.Manufacturer)
+            || string.IsNullOrWhiteSpace(newAssembly.Model)
+            || string.IsNullOrWhiteSpace(newAssembly.Size)
+            || string.IsNullOrWhiteSpace(newAssembly.SerialNumber);
 
-        if (request.DeviceType != nameof(BackflowDeviceType.AG) && mainIsIncomplete)
+        if (newAssembly.DeviceType != nameof(BackflowDeviceType.AG) && mainIsIncomplete)
         {
             throw new AppValidationException("Main Assembly Manufacturer, Model, Size and Serial Number are required for this backflow method.");
         }
 
-        var bypassIsIncomplete = string.IsNullOrWhiteSpace(request.Manufacturer2)
-            || string.IsNullOrWhiteSpace(request.Model2)
-            || string.IsNullOrWhiteSpace(request.Size2)
-            || string.IsNullOrWhiteSpace(request.SerialNumber2);
+        var bypassIsIncomplete = string.IsNullOrWhiteSpace(newAssembly.Manufacturer2)
+            || string.IsNullOrWhiteSpace(newAssembly.Model2)
+            || string.IsNullOrWhiteSpace(newAssembly.Size2)
+            || string.IsNullOrWhiteSpace(newAssembly.SerialNumber2);
 
-        if (BackflowDeviceTypes.HasBypassAssembly(request.DeviceType) && bypassIsIncomplete)
+        if (BackflowDeviceTypes.HasBypassAssembly(newAssembly.DeviceType) && bypassIsIncomplete)
         {
             throw new AppValidationException("Bypass Assembly Manufacturer, Model, Size and Serial Number are required for this backflow method.");
         }
 
-        if (request.HazardType == "Other" && string.IsNullOrWhiteSpace(request.HazardTypeOtherDescription))
+        if (newAssembly.HazardType == "Other" && string.IsNullOrWhiteSpace(newAssembly.HazardTypeOtherDescription))
         {
             throw new AppValidationException("Other Description is required when the Hazard Type is Other.");
         }
     }
 
+    private static CsiInspectionVisuallyIdentifiedAssembly LinkToInspection(
+        CsiInspectionVisuallyIdentifiedAssembly assembly,
+        CsiInspection inspection,
+        bool visuallyIdentified)
+    {
+        assembly.WaterSupplierId = inspection.WaterSupplierId;
+        assembly.InspectionId = inspection.Id;
+        assembly.VisuallyIdentified = visuallyIdentified;
+        assembly.CreatedTime = DateTime.UtcNow;
+
+        return assembly;
+    }
+
     // V1 addVisuallyIdentifiedAssemblyFromTest: the row is a snapshot of the test.
-    private static CsiInspectionVisuallyIdentifiedAssembly BuildAssembly(BackflowTest test, string submissionId)
+    private static CsiInspectionVisuallyIdentifiedAssembly BuildAssembly(BackflowTest test)
     {
         var hasBypass = BackflowDeviceTypes.HasBypassAssembly(test.DeviceType);
 
         return new CsiInspectionVisuallyIdentifiedAssembly
         {
             WaterSupplierId = test.WaterSupplierId,
-            SubmissionId = submissionId,
             TestId = test.Id > 0 ? test.Id : null,
             DeviceType = test.DeviceType,
             AssemblyDescription = BuildDescription(test.Manufacturer, test.Model, test.Size, test.DeviceType),
@@ -215,8 +326,7 @@ public class CsiInspectionAssemblyService : ICsiInspectionAssemblyService
             OutOfService = test.OutOfService,
             TestDate = test.TestDate,
             ExpirationDate = test.ExpirationDate,
-            TransactionId = test.TransactionId,
-            CreatedTime = DateTime.UtcNow
+            TransactionId = test.TransactionId
         };
     }
 

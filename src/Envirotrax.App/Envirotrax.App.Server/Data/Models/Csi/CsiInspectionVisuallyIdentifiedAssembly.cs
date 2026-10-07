@@ -1,24 +1,36 @@
 using System.ComponentModel.DataAnnotations;
 using Envirotrax.App.Server.Data.Models.Backflow;
+using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
 
 namespace Envirotrax.App.Server.Data.Models.Csi;
 
-public class CsiInspectionVisuallyIdentifiedAssembly : TenantModel<WaterSupplier>
+// ISharedProfessionalModel: assemblies at a site are visible to every professional (a site's test
+// history is shared), but only the professional whose inspection added the row can change or delete
+// it (V1 let only the inspection's inspector or master account change them). ExecuteUpdateAsync/
+// ExecuteDeleteAsync calls bypass that check, so CsiInspectionAssemblyRepository filters those by
+// ProfessionalId itself.
+public class CsiInspectionVisuallyIdentifiedAssembly : TenantModel<WaterSupplier>, ISharedProfessionalModel
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }
 
-    // Null while the inspection is still being filled in (V1 stored 0). Rows are found by SubmissionId
-    // until the inspection is submitted and links them.
-    public int? InspectionId { get; set; }
+    public int ProfessionalId { get; set; }
+    public Professional? Professional { get; set; }
+
+    public int InspectionId { get; set; }
     public CsiInspection? Inspection { get; set; }
 
     public int? TestId { get; set; }
     public BackflowTest? Test { get; set; }
 
+    // True when this inspection's "+ Add Assembly" created the Test, so it is paid and deleted with
+    // the inspection. A row can also point at a test another inspection added at the same site.
+    public bool AddedOnInspection { get; set; }
+
+    // Legacy V1 value, kept for imported data only.
     [StringLength(50)]
     public string? SubmissionId { get; set; }
 

@@ -7,7 +7,6 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { Site } from "../../models/sites/site";
-import { SiteSchedule } from "../../models/sites/site-schedule";
 import { DownloadEndpoint } from "../../models/download-config";
 import { RecordLog } from "@envirotrax/common-ui";
 
@@ -219,30 +218,6 @@ export class SiteService {
 
         return lastValueFrom(
             this._http.get<Site>(url)
-        );
-    }
-
-    public getScheduleForProfessional(siteId: number): Promise<SiteSchedule | null> {
-        const url = this._urlResolver.resolveUrl(`/api/professionals/sites/${siteId}/schedule`);
-
-        return lastValueFrom(
-            this._http.get<SiteSchedule | null>(url)
-        );
-    }
-
-    public setScheduleForProfessional(siteId: number, schedule: SiteSchedule): Promise<SiteSchedule> {
-        const url = this._urlResolver.resolveUrl(`/api/professionals/sites/${siteId}/schedule`);
-
-        return lastValueFrom(
-            this._http.put<SiteSchedule>(url, schedule)
-        );
-    }
-
-    public clearScheduleForProfessional(siteId: number): Promise<void> {
-        const url = this._urlResolver.resolveUrl(`/api/professionals/sites/${siteId}/schedule`);
-
-        return lastValueFrom(
-            this._http.delete<void>(url)
         );
     }
 

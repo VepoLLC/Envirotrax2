@@ -55,7 +55,7 @@ public class SiteProfile : Profile
 
         CreateMap<Site, ProfessionalSiteDto>()
             .IncludeBase<Site, SiteDto>()
-            .ForMember(dto => dto.Schedule, opt => opt.Ignore());
+            .ForMember(dto => dto.Schedules, opt => opt.Ignore());
 
         CreateMap<Site, ReferencedSiteDto>()
             .AfterMap((model, dto) =>

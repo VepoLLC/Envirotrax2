@@ -71,7 +71,7 @@ export interface Site {
     backflowScheduleMonth?: number;
     gisLatitude?: number;
     gisLongitude?: number;
-    schedule?: SiteSchedule | null;
+    schedules?: SiteSchedule[];
     gisStatus?: number;
     gisDate?: string;
     gisAreaId?: number;

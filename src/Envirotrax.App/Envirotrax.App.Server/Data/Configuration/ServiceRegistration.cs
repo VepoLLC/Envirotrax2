@@ -68,6 +68,7 @@ public static class ServiceRegistration
         services.AddTransient<IGeneralSettingsRepository, GeneralSettingsRepository>();
         services.AddTransient<ISiteRepository, SiteRepository>();
         services.AddTransient<ISiteLogRepository, SiteLogRepository>();
+        services.AddTransient<ISiteScheduleRepository, SiteScheduleRepository>();
         services.AddTransient<ICsiInspectionRepository, CsiInspectionRepository>();
         services.AddTransient<ICsiInspectionImageRepository, CsiInspectionImageRepository>();
         services.AddTransient<ICsiInspectionAssemblyRepository, CsiInspectionAssemblyRepository>();

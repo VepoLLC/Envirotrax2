@@ -7,6 +7,7 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { Site } from "../../models/sites/site";
+import { SiteSchedule } from "../../models/sites/site-schedule";
 import { DownloadEndpoint } from "../../models/download-config";
 import { RecordLog } from "@envirotrax/common-ui";
 
@@ -17,6 +18,13 @@ export interface SiteTabCounts {
     outOfServiceCount: number;
     tripTicketCount: number;
     fogCount: number;
+}
+
+export interface ProfessionalSiteSearchCriteria {
+    workedOnly?: string | null;
+    scheduledOnly?: string | null;
+    scheduledFrom?: string | null;
+    scheduledTo?: string | null;
 }
 
 @Injectable({
@@ -168,12 +176,18 @@ export class SiteService {
         return await lastValueFrom(observable);
     }
 
-    public async getAllForProfessional(pageInfo: PageInfo, query: Query): Promise<PagedData<Site>> {
+    public async getAllForProfessional(pageInfo: PageInfo, query: Query, criteria: ProfessionalSiteSearchCriteria = {}): Promise<PagedData<Site>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/sites');
-        const observable = this._http.get<PagedData<Site>>(url, {
-            params: this._queryHelper.buildQuery(pageInfo, query)
-        });
-        return await lastValueFrom(observable);
+
+        let params = this._queryHelper.buildQuery(pageInfo, query);
+
+        for (const [name, value] of Object.entries(criteria)) {
+            if (value) {
+                params = params.append(name, value);
+            }
+        }
+
+        return await lastValueFrom(this._http.get<PagedData<Site>>(url, { params }));
     }
 
     public get(id: number): Promise<Site> {
@@ -205,6 +219,30 @@ export class SiteService {
 
         return lastValueFrom(
             this._http.get<Site>(url)
+        );
+    }
+
+    public getScheduleForProfessional(siteId: number): Promise<SiteSchedule | null> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/sites/${siteId}/schedule`);
+
+        return lastValueFrom(
+            this._http.get<SiteSchedule | null>(url)
+        );
+    }
+
+    public setScheduleForProfessional(siteId: number, schedule: SiteSchedule): Promise<SiteSchedule> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/sites/${siteId}/schedule`);
+
+        return lastValueFrom(
+            this._http.put<SiteSchedule>(url, schedule)
+        );
+    }
+
+    public clearScheduleForProfessional(siteId: number): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/sites/${siteId}/schedule`);
+
+        return lastValueFrom(
+            this._http.delete<void>(url)
         );
     }
 

@@ -531,8 +531,8 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     }
 
     // Checkout "Edit" on an own, still-unpaid test: mirrors SubmitWithImagesAsync's snapshot/renewal/image
-    // logic, but against an existing row instead of AddAsync. Ownership + payment-status guard lives in
-    // the repository (UpdateForProfessionalAsync returns Model == null for not-found/not-owned/already-paid).
+    // logic, but against an existing row instead of AddAsync. Ownership is enforced by ProfessionalDbContext
+    // (BackflowTest is an ISharedProfessionalModel); the repository's own guard only covers not-found/already-paid.
     public async Task<BackflowTestDto?> UpdateForProfessionalAsync(
         int id,
         BackflowTestDto dto,
@@ -593,7 +593,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
         var saved = await _testRepository.UpdateForProfessionalAsync(
-            model, professionalId,
+            model,
             newAssemblyPath, newSerialPath, newBypassAssemblyPath, newBypassSerialPath, newAirGapPath);
 
         if (saved == null)
@@ -728,12 +728,14 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         }
     }
 
+    // Ownership is enforced by ProfessionalDbContext (BackflowTest is an ISharedProfessionalModel); a
+    // non-owner's delete throws rather than returning null here. The payment-status guard still runs
+    // before the delete, since unlike ownership it must stop the row from being deleted at all.
     public override async Task<BackflowTestDto?> DeleteAsync(int id)
     {
-        var professionalId = _authService.ProfessionalId;
         var test = await _testRepository.GetNoIncludesAsync(id, CancellationToken.None);
 
-        if (test == null || test.ProfessionalId != professionalId || !string.IsNullOrEmpty(test.TransactionId))
+        if (test == null || !string.IsNullOrEmpty(test.TransactionId))
         {
             return null;
         }

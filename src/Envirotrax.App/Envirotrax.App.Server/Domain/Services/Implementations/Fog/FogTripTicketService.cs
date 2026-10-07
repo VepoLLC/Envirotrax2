@@ -73,7 +73,7 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
 
         var deleted = await _repository.DeleteAsync(id);
 
-        if (deleted == null || deleted.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(deleted.TransactionId))
+        if (deleted == null || !string.IsNullOrEmpty(deleted.TransactionId))
         {
             return null;
         }

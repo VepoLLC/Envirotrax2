@@ -9,6 +9,10 @@ import { PublicSearchCriteria } from "../../models/public-search/public-search-c
 import { PublicSearchWaterSuppliers } from "../../models/public-search/public-search-water-suppliers";
 import { PublicBackflowTestResult } from "../../models/public-search/public-backflow-test-result";
 import { PublicCsiInspectionResult } from "../../models/public-search/public-csi-inspection-result";
+import { PublicBackflowTestDetails } from "../../models/public-search/public-backflow-test-details";
+import { CsiInspection } from "../../models/csi/csi-inspection";
+import { CsiInspectionAssembly } from "../../models/csi/csi-inspection-assembly";
+import { CsiInspectionImage } from "../../models/csi/csi-inspection-image";
 
 @Injectable({
     providedIn: 'root'
@@ -47,6 +51,42 @@ export class PublicSearchService {
         return lastValueFrom(this._http.get<PagedData<PublicCsiInspectionResult>>(url, {
             params: this.buildSearchParams(criteria, pageInfo)
         }));
+    }
+
+    public getBackflowTest(id: number): Promise<PublicBackflowTestDetails | null> {
+        const url = this._urlResolver.resolveUrl(`/api/public-search/backflow-tests/${id}`);
+
+        return lastValueFrom(this._http.get<PublicBackflowTestDetails | null>(url));
+    }
+
+    public getBackflowTestPdf(id: number): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl(`/api/public-search/backflow-tests/${id}/pdf`);
+
+        return lastValueFrom(this._http.get(url, { responseType: 'blob' }));
+    }
+
+    public getCsiInspection(id: number): Promise<CsiInspection | null> {
+        const url = this._urlResolver.resolveUrl(`/api/public-search/csi-inspections/${id}`);
+
+        return lastValueFrom(this._http.get<CsiInspection | null>(url));
+    }
+
+    public getCsiInspectionAssemblies(id: number): Promise<CsiInspectionAssembly[]> {
+        const url = this._urlResolver.resolveUrl(`/api/public-search/csi-inspections/${id}/assemblies`);
+
+        return lastValueFrom(this._http.get<CsiInspectionAssembly[]>(url));
+    }
+
+    public getCsiInspectionImages(id: number): Promise<CsiInspectionImage[]> {
+        const url = this._urlResolver.resolveUrl(`/api/public-search/csi-inspections/${id}/images`);
+
+        return lastValueFrom(this._http.get<CsiInspectionImage[]>(url));
+    }
+
+    public getCsiInspectionPdf(id: number): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl(`/api/public-search/csi-inspections/${id}/pdf`);
+
+        return lastValueFrom(this._http.get(url, { responseType: 'blob' }));
     }
 
     private buildSearchParams(criteria: PublicSearchCriteria, pageInfo: PageInfo): HttpParams {

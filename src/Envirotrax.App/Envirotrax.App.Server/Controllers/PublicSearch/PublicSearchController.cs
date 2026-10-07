@@ -49,4 +49,62 @@ public class PublicSearchController : EnvirotraxBaseController
 
         return Ok(results);
     }
+
+    [HttpGet("backflow-tests/{id}")]
+    public async Task<IActionResult> GetBackflowTestAsync(int id, CancellationToken cancellationToken)
+    {
+        var test = await _publicSearchService.GetBackflowTestAsync(id, cancellationToken);
+
+        return Ok(test);
+    }
+
+    [HttpGet("backflow-tests/{id}/pdf")]
+    public async Task<IActionResult> GetBackflowTestPdfAsync(int id, CancellationToken cancellationToken)
+    {
+        var pdf = await _publicSearchService.GetBackflowTestPdfAsync(id, cancellationToken);
+
+        if (pdf == null)
+        {
+            return NoContent();
+        }
+
+        return File(pdf, "application/pdf");
+    }
+
+    [HttpGet("csi-inspections/{id}")]
+    public async Task<IActionResult> GetCsiInspectionAsync(int id, CancellationToken cancellationToken)
+    {
+        var inspection = await _publicSearchService.GetCsiInspectionAsync(id, cancellationToken);
+
+        return Ok(inspection);
+    }
+
+    [HttpGet("csi-inspections/{id}/assemblies")]
+    public async Task<IActionResult> GetCsiInspectionAssembliesAsync(int id, CancellationToken cancellationToken)
+    {
+        var assemblies = await _publicSearchService.GetCsiInspectionAssembliesAsync(id, cancellationToken);
+
+        return Ok(assemblies);
+    }
+
+    [HttpGet("csi-inspections/{id}/images")]
+    public async Task<IActionResult> GetCsiInspectionImagesAsync(int id, CancellationToken cancellationToken)
+    {
+        var images = await _publicSearchService.GetCsiInspectionImagesAsync(id, cancellationToken);
+
+        return Ok(images);
+    }
+
+    [HttpGet("csi-inspections/{id}/pdf")]
+    public async Task<IActionResult> GetCsiInspectionPdfAsync(int id, CancellationToken cancellationToken)
+    {
+        var pdf = await _publicSearchService.GetCsiInspectionPdfAsync(id, cancellationToken);
+
+        if (pdf == null)
+        {
+            return NoContent();
+        }
+
+        return File(pdf, "application/pdf");
+    }
 }

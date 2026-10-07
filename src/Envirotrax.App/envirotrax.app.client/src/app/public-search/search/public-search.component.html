@@ -160,7 +160,9 @@
                       [data]="backflowTable.items!.data"
                       [(pageInfo)]="backflowTable.items!.pageInfo"
                       (pageInfoChange)="getBackflowTests()"
-                      [(query)]="backflowTable.query" />
+                      [(query)]="backflowTable.query"
+                      [canViewDetails]="true"
+                      (viewDetails)="viewBackflowTest($event)" />
         </vp-section>
     </div>
 
@@ -174,7 +176,9 @@
                       [data]="csiTable.items!.data"
                       [(pageInfo)]="csiTable.items!.pageInfo"
                       (pageInfoChange)="getCsiInspections()"
-                      [(query)]="csiTable.query" />
+                      [(query)]="csiTable.query"
+                      [canViewDetails]="true"
+                      (viewDetails)="viewCsiInspection($event)" />
         </vp-section>
     </div>
 </div>

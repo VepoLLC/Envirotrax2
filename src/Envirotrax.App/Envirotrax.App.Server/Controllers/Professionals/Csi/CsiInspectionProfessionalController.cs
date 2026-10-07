@@ -33,7 +33,7 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
     {
-        var result = await _inspectionService.GetAsync(id, cancellationToken);
+        var result = await _inspectionService.GetForProfessionalAsync(id, cancellationToken);
         if (result == null)
         {
             return NotFound();
@@ -45,7 +45,7 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
     [HttpGet("{id}/pdf")]
     public async Task<IActionResult> GetPdfAsync(int id, CancellationToken cancellationToken)
     {
-        var inspection = await _inspectionService.GetAsync(id, cancellationToken);
+        var inspection = await _inspectionService.GetForProfessionalAsync(id, cancellationToken);
         if (inspection == null)
         {
             return NotFound();

@@ -25,6 +25,8 @@ export class GeneralSettings {
     lockFogInspectorRegistrations?: boolean;
     lockFogTransporterRegistrations?: boolean;
 
+    redactMailingInfo?: boolean;
+
     // Insurance Amount Fields
     bpatsRequireInsuranceAmount?: number;
     csiInspectorsRequireInsuranceAmount?: number;

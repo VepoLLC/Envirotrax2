@@ -28,6 +28,8 @@ public class GeneralSettings : TenantModel<WaterSupplier>
     public bool LockFogInspectorRegistrations { get; set; }
     public bool LockFogTransporterRegistrations { get; set; }
 
+    public bool RedactMailingInfo { get; set; }
+
     // Insurance Amount Fields
     [Precision(19, 4)]
     public decimal BpatsRequireInsuranceAmount { get; set; }

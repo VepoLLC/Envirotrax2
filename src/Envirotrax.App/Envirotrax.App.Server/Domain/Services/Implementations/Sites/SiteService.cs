@@ -31,6 +31,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     private readonly IBackflowOutOfServiceRequestRepository _outOfServiceRequestRepository;
     private readonly IFogInspectionRepository _fogInspectionRepository;
     private readonly IFogTripTicketRepository _fogTripTicketRepository;
+    private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
     private readonly ILogger<SiteService> _logger;
 
     public SiteService(
@@ -46,6 +47,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         IBackflowOutOfServiceRequestRepository outOfServiceRequestRepository,
         IFogInspectionRepository fogInspectionRepository,
         IFogTripTicketRepository fogTripTicketRepository,
+        IMailingInfoRedactionService mailingInfoRedactionService,
         ILogger<SiteService> logger)
         : base(mapper, repository)
     {
@@ -60,6 +62,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         _outOfServiceRequestRepository = outOfServiceRequestRepository;
         _fogInspectionRepository = fogInspectionRepository;
         _fogTripTicketRepository = fogTripTicketRepository;
+        _mailingInfoRedactionService = mailingInfoRedactionService;
         _logger = logger;
     }
 
@@ -122,6 +125,26 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         return sites
             .Select(s => MapToDto(s)!)
             .ToPagedData(pageInfo);
+    }
+
+    // GetAsync stays unredacted: professional submissions snapshot the site's real mailing information from it.
+    public async Task<IPagedData<SiteDto>> GetAllForProfessionalAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var sites = await GetAllAsync(pageInfo, query, cancellationToken);
+
+        return await _mailingInfoRedactionService.RedactAsync(sites, cancellationToken);
+    }
+
+    public async Task<SiteDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken)
+    {
+        var site = await GetAsync(id, cancellationToken);
+
+        if (site != null)
+        {
+            await _mailingInfoRedactionService.RedactAsync(site, cancellationToken);
+        }
+
+        return site;
     }
 
     public async Task<IEnumerable<SiteDto>> GetAllPendingGeocodingAsync(int batchSize)

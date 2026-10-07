@@ -8,6 +8,7 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
+using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Backflow;
@@ -16,15 +17,18 @@ public class BackflowOutOfServiceRequestService : Service<BackflowOutOfServiceRe
 {
     private readonly IBackflowOutOfServiceRequestRepository _repository;
     private readonly IAuthService _authService;
+    private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
 
     public BackflowOutOfServiceRequestService(
         IMapper mapper,
         IBackflowOutOfServiceRequestRepository repository,
-        IAuthService authService)
+        IAuthService authService,
+        IMailingInfoRedactionService mailingInfoRedactionService)
         : base(mapper, repository)
     {
         _repository = repository;
         _authService = authService;
+        _mailingInfoRedactionService = mailingInfoRedactionService;
     }
 
     public async Task<BackflowOutOfServiceRequestDto> SubmitAsync(BackflowOutOfServiceRequestDto dto, CancellationToken cancellationToken)
@@ -80,7 +84,9 @@ public class BackflowOutOfServiceRequestService : Service<BackflowOutOfServiceRe
     public async Task<IEnumerable<BackflowTestDto>> GetReplacementCandidatesAsync(int testId, CancellationToken cancellationToken)
     {
         var candidates = await _repository.GetReplacementCandidatesAsync(testId, cancellationToken);
-        return candidates.Select(c => Mapper.Map<BackflowTestDto>(c)!);
+        var dtos = candidates.Select(c => Mapper.Map<BackflowTestDto>(c)!);
+
+        return await _mailingInfoRedactionService.RedactAsync(dtos, cancellationToken);
     }
 
     public async Task<IPagedData<BackflowOutOfServiceRequestDto>> GetForWaterSupplierAsync(

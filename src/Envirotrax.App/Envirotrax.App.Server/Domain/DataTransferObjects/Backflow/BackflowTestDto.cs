@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 
-public class BackflowTestDto : IDto
+public class BackflowTestDto : IDto, IMailingInfoDto, IRedactableMailingInfoDto
 {
     public int Id { get; set; }
 
@@ -110,6 +110,8 @@ public class BackflowTestDto : IDto
 
     [StringLength(100)]
     public string? MailingEmailAddress { get; set; }
+
+    IEnumerable<IMailingInfoDto?> IRedactableMailingInfoDto.MailingInfo => [this, Site];
 
     // Device
     [StringLength(50)]

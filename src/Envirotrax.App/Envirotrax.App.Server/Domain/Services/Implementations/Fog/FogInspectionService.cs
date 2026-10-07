@@ -37,6 +37,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
     private readonly IPdfTemplateService _pdfTemplateService;
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IProfessionalSupplierService _professionalSupplierService;
+    private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
 
     public FogInspectionService(
         IMapper mapper,
@@ -48,7 +49,8 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         IAuthService authService,
         IPdfTemplateService pdfTemplateService,
         IGeneralSettingsService generalSettingsService,
-        IProfessionalSupplierService professionalSupplierService)
+        IProfessionalSupplierService professionalSupplierService,
+        IMailingInfoRedactionService mailingInfoRedactionService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -60,6 +62,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         _pdfTemplateService = pdfTemplateService;
         _generalSettingsService = generalSettingsService;
         _professionalSupplierService = professionalSupplierService;
+        _mailingInfoRedactionService = mailingInfoRedactionService;
     }
 
     public Task<byte[]> GeneratePdfAsync(FogInspectionDto inspection)
@@ -93,8 +96,13 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
             return null;
         }
 
+        var dto = MapToDto(deleted)!;
+
+        // Redact before Complete(): the settings lookup can't query the database once the scope is complete.
+        await _mailingInfoRedactionService.RedactAsync(dto, CancellationToken.None);
+
         scope.Complete();
-        return MapToDto(deleted);
+        return dto;
     }
 
     public async Task<FogInspectionDto> SubmitAsync(
@@ -200,8 +208,13 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
             await _fileStorageService.UploadAsync(inspection.SignatureImagePath, signatureStream);
         }
 
+        var dto = Mapper.Map<FogInspectionDto>(added);
+
+        // Redact before Complete(): the settings lookup can't query the database once the scope is complete.
+        await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
+
         scope.Complete();
-        return Mapper.Map<FogInspectionDto>(added);
+        return dto;
     }
 
     private async Task ApplyAmountAsync(FogInspection inspection, bool siteIsFeeExempt, CancellationToken cancellationToken)
@@ -332,9 +345,13 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
             await _fileStorageService.UploadAsync(newSignaturePath, signatureStream!);
         }
 
+        var dto = Mapper.Map<FogInspectionDto>(saved);
+
+        // Redact before Complete(): the settings lookup can't query the database once the scope is complete.
+        await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
+
         scope.Complete();
 
-        var dto = Mapper.Map<FogInspectionDto>(saved);
         await PopulateImageUrlsAsync(dto);
         return dto;
     }
@@ -351,6 +368,18 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         return dto;
     }
 
+    public async Task<FogInspectionDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken)
+    {
+        var dto = await GetAsync(id, cancellationToken);
+
+        if (dto != null)
+        {
+            await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
+        }
+
+        return dto;
+    }
+
     public async Task<IPagedData<FogInspectionDto>> SearchForProfessionalAsync(
         PageInfo pageInfo, Query query, bool latestOnly, CancellationToken cancellationToken)
     {
@@ -358,8 +387,9 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         query.Sort = query.ConvertSortProperties<FogInspection, FogInspectionDto>(Mapper);
 
         var inspections = await _repository.SearchForProfessionalAsync(pageInfo, query, latestOnly, cancellationToken);
+        var dtos = inspections.Select(m => Mapper.Map<FogInspectionDto>(m)!).ToPagedData(pageInfo);
 
-        return inspections.Select(m => Mapper.Map<FogInspectionDto>(m)!).ToPagedData(pageInfo);
+        return await _mailingInfoRedactionService.RedactAsync(dtos, cancellationToken);
     }
 
     private async Task PopulateImageUrlsAsync(FogInspectionDto dto)

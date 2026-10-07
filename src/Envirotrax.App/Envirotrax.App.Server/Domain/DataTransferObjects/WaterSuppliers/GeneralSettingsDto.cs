@@ -28,6 +28,8 @@ namespace Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers
         public bool LockFogInspectorRegistrations { get; set; }
         public bool LockFogTransporterRegistrations { get; set; }
 
+        public bool RedactMailingInfo { get; set; }
+
         // Insurance Amount Fields
         public decimal BpatsRequireInsuranceAmount { get; set; }
         public decimal CsiInspectorsRequireInsuranceAmount { get; set; }

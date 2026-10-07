@@ -462,6 +462,14 @@ body.vp-dark-theme .btn-primary:active {
     border-color: #008fd4 !important;
 }
 
+body.vp-dark-theme .flatpickr-confirm {
+    background-color: #008fd485;
+}
+
+body.vp-dark-theme .flatpickr-confirm:hover {
+    background-color: #008fd4;
+}
+
 /* bg-info section headers */
 
 body.vp-dark-theme .bg-info {

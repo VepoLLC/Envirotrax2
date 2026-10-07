@@ -44,17 +44,17 @@
                                       [options]="hazardTypeOptions" [required]="true" [placeholder]="'Select Hazard Type'" />
                         </div>
                     </div>
-                    <div class="d-flex align-items-center mb-2" *ngIf="isOtherHazardType">
+                    <div class="d-flex align-items-center mb-2" *ngIf="model.hazardType === 'Other'">
                         <span class="fw-semibold text-nowrap me-2" style="min-width:130px;">Description:</span>
                         <div class="flex-grow-1">
                             <vp-input type="text" name="hazardTypeOtherDescription" [(ngModel)]="model.hazardTypeOtherDescription" [required]="true" [form]="submitForm" />
                         </div>
                     </div>
-                    <div class="d-flex align-items-center mb-2" *ngIf="!isAirGap">
+                    <div class="d-flex align-items-center mb-2" *ngIf="model.deviceType !== BackflowDeviceType.AG">
                         <span class="fw-semibold text-nowrap me-2" style="min-width:130px;">Test Gauge:</span>
                         <div class="flex-grow-1">
                             <vp-input type="select" name="gaugeId" [ngModel]="selectedGaugeId" (ngModelChange)="onGaugeChange($event)"
-                                      [options]="gaugeOptions" [required]="!isAirGap" [placeholder]="'Select Gauge'" />
+                                      [options]="gaugeOptions" [required]="model.deviceType !== BackflowDeviceType.AG" [placeholder]="'Select Gauge'" />
                         </div>
                     </div>
                 </div>
@@ -179,7 +179,7 @@
 
                     <dl class="row mb-0">
                         <dt class="col-5">Property Type:</dt>
-                        <dd class="col-7 mb-1">{{ isResidential ? 'Residential' : 'Commercial' }}</dd>
+                        <dd class="col-7 mb-1">{{ model.propertyType === PropertyType.Residential ? 'Residential' : 'Commercial' }}</dd>
                         <dt class="col-5">Business Name:</dt>
                         <dd class="col-7 mb-1">{{ model.propertyBusinessName }}</dd>
                         <dt class="col-5">Property Address:</dt>
@@ -240,7 +240,7 @@
                         <div class="col-xl-8">
                             <vp-input name="propertyBusinessName"
                                       [(ngModel)]="model.propertyBusinessName"
-                                      [disabled]="isResidential"
+                                      [disabled]="model.propertyType === PropertyType.Residential"
                                       [maxLength]="100" />
                         </div>
                     </div>
@@ -316,7 +316,7 @@
                         <button *ngIf="!isNewProperty" type="button" (click)="cancelLocationModification()">Cancel</button>
                     </vp-section-actions>
 
-                    <p *ngIf="isResidential" class="mb-2">Leave Company Name blank if this is a residence not owned or managed by a business.</p>
+                    <p *ngIf="model.propertyType === PropertyType.Residential" class="mb-2">Leave Company Name blank if this is a residence not owned or managed by a business.</p>
                     <p class="text-danger mb-2">Do not enter your company's information for the mailing contact name or address.</p>
 
                     <div class="row mb-2">
@@ -456,7 +456,7 @@
                 </div>
 
                 <!-- Bypass assembly (DCD/DCD2/RPPD/RPPD2) -->
-                <div class="row mb-3" *ngIf="hasBypassCV || hasBypassBC">
+                <div class="row mb-3" *ngIf="model.deviceType === BackflowDeviceType.DCD || model.deviceType === BackflowDeviceType.DCD2 || model.deviceType === BackflowDeviceType.RPPD || model.deviceType === BackflowDeviceType.RPPD2">
                     <div class="col-12 fw-semibold mb-1">Bypass Assembly</div>
                     <div class="col-md-3">
                         <vp-input type="select" label="Manufacturer" name="manufacturer2" [(ngModel)]="model.manufacturer2"
@@ -552,7 +552,7 @@
                 </div>
 
                 <!-- Air Gap Test -->
-                <ng-container *ngIf="isAirGap">
+                <ng-container *ngIf="model.deviceType === BackflowDeviceType.AG">
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <vp-input type="datetime" label="Test Date and Time" name="airGapDate" [(ngModel)]="model.initialTestDate" [required]="true" [form]="submitForm" />
@@ -2021,7 +2021,7 @@
         </div>
 
         <!-- Bypass Meter Test — shown for DCD/DCD2/RPPD/RPPD2 (matches V1 trMeterTest) -->
-        <div class="mt-3" *ngIf="hasBypassCV || hasBypassBC">
+        <div class="mt-3" *ngIf="model.deviceType === BackflowDeviceType.DCD || model.deviceType === BackflowDeviceType.DCD2 || model.deviceType === BackflowDeviceType.RPPD || model.deviceType === BackflowDeviceType.RPPD2">
             <vp-section header="Bypass Meter Test">
                 <div class="row">
                     <div class="col-md-3">
@@ -2080,7 +2080,7 @@
         <!-- Remarks -->
         <div class="mt-3">
             <vp-section [header]="'Remarks (' + remarksLength + '/1000 Characters)'">
-                <vp-input type="textarea" name="comments" [(ngModel)]="model.comments" [maxLength]="1000" />
+                <vp-input type="textarea" name="comments" [ngModel]="model.comments" (ngModelChange)="onCommentsChange($event)" [maxLength]="1000" />
             </vp-section>
         </div>
 

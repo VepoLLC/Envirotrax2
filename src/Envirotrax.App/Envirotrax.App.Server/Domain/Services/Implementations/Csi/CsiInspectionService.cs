@@ -16,6 +16,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
+using Envirotrax.App.Server.Domain.Services.Implementations.Sites;
 using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
@@ -122,13 +123,13 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
             MaterialSolderSolventWeld = request.MaterialSolderSolventWeld,
             MaterialSolderOther = request.MaterialSolderOther,
             MaterialSolderOtherDescription = request.MaterialSolderOtherDescription,
-            Comments = request.Comments,
-            NeedsValidation = true
+            Comments = request.Comments
         };
 
-        ApplySiteSnapshot(inspection, site);
+        ApplyEnteredLocation(inspection, request);
+        ApplySiteValidation(inspection, site);
         ApplyInspectorSnapshot(inspection, professional, inspectorUser, csiLicense, inspectorUserId);
-        await ApplyAmountAsync(inspection, site.IsFeeExempt, cancellationToken);
+        await ApplyAmountAsync(inspection, site.IsFeeExempt, site.PropertyType, cancellationToken);
 
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
@@ -139,7 +140,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         return Mapper.Map<CsiInspectionDto>(added);
     }
 
-    private async Task ApplyAmountAsync(CsiInspection inspection, bool siteIsFeeExempt, CancellationToken cancellationToken)
+    private async Task ApplyAmountAsync(CsiInspection inspection, bool siteIsFeeExempt, PropertyType propertyType, CancellationToken cancellationToken)
     {
         inspection.Amount = 0;
         inspection.AmountShare = 0;
@@ -149,7 +150,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
             return;
         }
 
-        var isResidential = inspection.PropertyType == PropertyType.Residential;
+        var isResidential = propertyType == PropertyType.Residential;
 
         var settings = await _generalSettingsService.GetAsync(inspection.WaterSupplierId, cancellationToken);
         var fee = isResidential ? settings?.CsiResidentialInspectionFee ?? 0 : settings?.CsiCommercialInspectionFee ?? 0;
@@ -201,7 +202,8 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
             Comments = request.Comments
         };
 
-        ApplySiteSnapshot(inspection, site);
+        ApplyEnteredLocation(inspection, request);
+        ApplySiteValidation(inspection, site);
         ApplyInspectorSnapshot(inspection, professional, inspectorUser, csiLicense, inspectorUserId);
 
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
@@ -268,26 +270,72 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         return inspections.Select(m => Mapper.Map<CsiInspectionDto>(m)!).ToPagedData(pageInfo);
     }
 
-    private static void ApplySiteSnapshot(CsiInspection inspection, DataTransferObjects.Sites.SiteDto site)
+    private static void ApplyEnteredLocation(CsiInspection inspection, CsiInspectionDto request)
     {
-        inspection.PropertyBusinessName = site.BusinessName;
-        inspection.PropertyType = site.PropertyType;
-        inspection.PropertyStreetNumber = site.StreetNumber;
-        inspection.PropertyStreetName = site.StreetName;
-        inspection.PropertyNumber = site.PropertyNumber;
-        inspection.PropertyCity = site.City;
-        inspection.PropertyStateId = site.State?.Id;
-        inspection.PropertyZip = site.ZipCode;
-        inspection.MailingCompanyName = site.MailingCompanyName;
-        inspection.MailingContactName = site.MailingContactName;
-        inspection.MailingStreetNumber = site.MailingStreetNumber;
-        inspection.MailingStreetName = site.MailingStreetName;
-        inspection.MailingNumber = site.MailingNumber;
-        inspection.MailingCity = site.MailingCity;
-        inspection.MailingStateId = site.MailingState?.Id;
-        inspection.MailingZip = site.MailingZipCode;
-        inspection.MailingPhoneNumber = site.MailingPhoneNumber;
-        inspection.MailingEmailAddress = site.MailingEmailAddress;
+        inspection.PropertyBusinessName = request.PropertyBusinessName;
+        inspection.PropertyType = request.PropertyType;
+        inspection.PropertyStreetNumber = request.PropertyStreetNumber;
+        inspection.PropertyStreetName = request.PropertyStreetName;
+        inspection.PropertyNumber = request.PropertyNumber;
+        inspection.PropertyCity = request.PropertyCity;
+        inspection.PropertyStateId = SiteInformationComparer.GetStateId(request.PropertyState);
+        inspection.PropertyZip = request.PropertyZip;
+
+        inspection.MailingCompanyName = request.MailingCompanyName;
+        inspection.MailingContactName = request.MailingContactName;
+        inspection.MailingStreetNumber = request.MailingStreetNumber;
+        inspection.MailingStreetName = request.MailingStreetName;
+        inspection.MailingNumber = request.MailingNumber;
+        inspection.MailingCity = request.MailingCity;
+        inspection.MailingStateId = SiteInformationComparer.GetStateId(request.MailingState);
+        inspection.MailingZip = request.MailingZip;
+        inspection.MailingPhoneNumber = request.MailingPhoneNumber;
+        inspection.MailingEmailAddress = request.MailingEmailAddress;
+    }
+
+    private static void ApplySiteValidation(CsiInspection inspection, DataTransferObjects.Sites.SiteDto site)
+    {
+        inspection.ValidationSiteInformationChanged = HasSiteInformationChanged(inspection, site);
+        inspection.NeedsValidation = inspection.ValidationSiteInformationChanged;
+    }
+
+    private static bool HasSiteInformationChanged(CsiInspection inspection, DataTransferObjects.Sites.SiteDto site)
+    {
+        if (inspection.PropertyType != site.PropertyType)
+        {
+            return true;
+        }
+
+        if (inspection.PropertyStateId != SiteInformationComparer.GetStateId(site.State))
+        {
+            return true;
+        }
+
+        if (inspection.MailingStateId != SiteInformationComparer.GetStateId(site.MailingState))
+        {
+            return true;
+        }
+
+        var textFields = new List<(string? EnteredValue, string? SiteValue)>
+        {
+            (inspection.PropertyBusinessName, site.BusinessName),
+            (inspection.PropertyStreetNumber, site.StreetNumber),
+            (inspection.PropertyStreetName, site.StreetName),
+            (inspection.PropertyNumber, site.PropertyNumber),
+            (inspection.PropertyCity, site.City),
+            (inspection.PropertyZip, site.ZipCode),
+            (inspection.MailingCompanyName, site.MailingCompanyName),
+            (inspection.MailingContactName, site.MailingContactName),
+            (inspection.MailingStreetNumber, site.MailingStreetNumber),
+            (inspection.MailingStreetName, site.MailingStreetName),
+            (inspection.MailingNumber, site.MailingNumber),
+            (inspection.MailingCity, site.MailingCity),
+            (inspection.MailingZip, site.MailingZipCode),
+            (inspection.MailingPhoneNumber, site.MailingPhoneNumber),
+            (inspection.MailingEmailAddress, site.MailingEmailAddress)
+        };
+
+        return SiteInformationComparer.HasTextChanged(textFields);
     }
 
     public Task<byte[]> GeneratePdfAsync(CsiInspectionDto inspection)

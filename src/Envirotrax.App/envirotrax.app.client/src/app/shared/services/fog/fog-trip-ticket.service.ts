@@ -112,6 +112,14 @@ function buildFogTripTicketFormData(ticket: FogTripTicket): FormData {
     append('receiverDisposalSiteId', ticket.receiverDisposalSiteId);
 
     // Generator
+    append('propertyType', ticket.propertyType);
+    append('propertyBusinessName', ticket.propertyBusinessName);
+    append('propertyStreetNumber', ticket.propertyStreetNumber);
+    append('propertyStreetName', ticket.propertyStreetName);
+    append('propertyNumber', ticket.propertyNumber);
+    append('propertyCity', ticket.propertyCity);
+    if (ticket.propertyState?.id != null) { fd.append('propertyState.id', String(ticket.propertyState.id)); }
+    append('propertyZip', ticket.propertyZip);
     append('fogGeneratorContactName', ticket.fogGeneratorContactName);
     append('fogGeneratorPhoneNumber', ticket.fogGeneratorPhoneNumber);
     append('fogGeneratorEmailAddress', ticket.fogGeneratorEmailAddress);

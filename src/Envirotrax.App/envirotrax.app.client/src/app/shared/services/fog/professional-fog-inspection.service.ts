@@ -101,6 +101,26 @@ function buildFogInspectionFormData(inspection: FogInspection): FormData {
     if (inspection.waterSupplier?.id != null) { fd.append('waterSupplier.id', String(inspection.waterSupplier.id)); }
     if (inspection.inspector?.id != null) { fd.append('inspector.id', String(inspection.inspector.id)); }
 
+    append('propertyType', inspection.propertyType);
+    append('propertyBusinessName', inspection.propertyBusinessName);
+    append('propertyStreetNumber', inspection.propertyStreetNumber);
+    append('propertyStreetName', inspection.propertyStreetName);
+    append('propertyNumber', inspection.propertyNumber);
+    append('propertyCity', inspection.propertyCity);
+    if (inspection.propertyState?.id != null) { fd.append('propertyState.id', String(inspection.propertyState.id)); }
+    append('propertyZip', inspection.propertyZip);
+
+    append('mailingCompanyName', inspection.mailingCompanyName);
+    append('mailingContactName', inspection.mailingContactName);
+    append('mailingStreetNumber', inspection.mailingStreetNumber);
+    append('mailingStreetName', inspection.mailingStreetName);
+    append('mailingNumber', inspection.mailingNumber);
+    append('mailingCity', inspection.mailingCity);
+    if (inspection.mailingState?.id != null) { fd.append('mailingState.id', String(inspection.mailingState.id)); }
+    append('mailingZip', inspection.mailingZip);
+    append('mailingPhoneNumber', inspection.mailingPhoneNumber);
+    append('mailingEmailAddress', inspection.mailingEmailAddress);
+
     append('inspectionDate', inspection.inspectionDate);
     append('facilityType', inspection.facilityType);
     append('reasonForInspection', inspection.reasonForInspection);

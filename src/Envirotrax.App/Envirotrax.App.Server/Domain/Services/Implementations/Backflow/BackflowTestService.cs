@@ -12,6 +12,7 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
+using Envirotrax.App.Server.Domain.Services.Implementations.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
@@ -356,17 +357,17 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             return true;
         }
 
-        if (GetStateId(dto.PropertyState) != GetStateId(site.State))
+        if (SiteInformationComparer.GetStateId(dto.PropertyState) != SiteInformationComparer.GetStateId(site.State))
         {
             return true;
         }
 
-        if (GetStateId(dto.MailingState) != GetStateId(site.MailingState))
+        if (SiteInformationComparer.GetStateId(dto.MailingState) != SiteInformationComparer.GetStateId(site.MailingState))
         {
             return true;
         }
 
-        var textFields = new List<(string? TestValue, string? SiteValue)>
+        var textFields = new List<(string? EnteredValue, string? SiteValue)>
         {
             (dto.PropertyBusinessName, site.BusinessName),
             (dto.PropertyStreetNumber, site.StreetNumber),
@@ -385,38 +386,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             (dto.MailingEmailAddress, site.MailingEmailAddress)
         };
 
-        foreach (var field in textFields)
-        {
-            var testValue = NormalizeText(field.TestValue);
-            var siteValue = NormalizeText(field.SiteValue);
-
-            if (!string.Equals(testValue, siteValue, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private static int? GetStateId(ReferencedStateDto? state)
-    {
-        if (state == null)
-        {
-            return null;
-        }
-
-        return state.Id;
-    }
-
-    private static string NormalizeText(string? value)
-    {
-        if (value == null)
-        {
-            return string.Empty;
-        }
-
-        return value.Trim();
+        return SiteInformationComparer.HasTextChanged(textFields);
     }
 
     private async Task<SiteDto?> ApplySiteValidationAsync(BackflowTestDto dto, CancellationToken cancellationToken)

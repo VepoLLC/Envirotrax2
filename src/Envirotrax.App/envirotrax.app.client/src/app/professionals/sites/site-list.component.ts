@@ -19,6 +19,7 @@ import { PrintableTableService } from "../../shared/services/printable-table.ser
 import { ProfesisonalService } from "../../shared/services/professionals/professional.service";
 import { SiteSchedule } from "../../shared/models/sites/site-schedule";
 import { EditSiteScheduleComponent, EditSiteScheduleModel } from "./schedule/edit-site-schedule.component";
+import { SITE_SCHEDULE_TYPE_NAMES, SiteScheduleService, SiteScheduleType } from "../../shared/services/sites/site-schedule.service";
 
 const CRITERIA_FIELDS: (keyof ProfessionalSiteSearchCriteria)[] = [
     "workedOnly",
@@ -47,6 +48,9 @@ export class SiteListComponent implements OnInit {
 
     public isScheduledOnly: boolean = false;
     public isScheduledDateRange: boolean = false;
+
+    public scheduleTypes: SiteScheduleType[] = [];
+    public readonly scheduleTypeNames = SITE_SCHEDULE_TYPE_NAMES;
 
     private _criteria: ProfessionalSiteSearchCriteria = {};
 
@@ -123,7 +127,8 @@ export class SiteListComponent implements OnInit {
         private readonly _downloadService: DownloadService,
         private readonly _printService: PrintableTableService,
         private readonly _professionalService: ProfesisonalService,
-        private readonly _modalHelper: ModalHelperService
+        private readonly _modalHelper: ModalHelperService,
+        private readonly _siteScheduleService: SiteScheduleService
     ) {
     }
 
@@ -133,13 +138,15 @@ export class SiteListComponent implements OnInit {
         try {
             this.table.isLoading = true;
 
-            const [waterSupplierOptions, professional] = await Promise.all([
+            const [waterSupplierOptions, professional, scheduleTypes] = await Promise.all([
                 this._proSupplierService.getMyAsOptions(),
-                this._professionalService.getLoggedInProfessional()
+                this._professionalService.getLoggedInProfessional(),
+                this._siteScheduleService.getMyScheduleTypes()
             ]);
 
             this.waterSupplierOptions = waterSupplierOptions;
             this.canFilterByCsiInspection = professional.hasCsiInspection === true;
+            this.scheduleTypes = scheduleTypes;
         } finally {
             this.table.isLoading = false;
         }
@@ -332,13 +339,15 @@ export class SiteListComponent implements OnInit {
     }
 
     public editSchedule(site: Site): void {
-        this._modalHelper.show<EditSiteScheduleModel, SiteSchedule | null>(EditSiteScheduleComponent, {
+        this._modalHelper.show<EditSiteScheduleModel, SiteSchedule[]>(EditSiteScheduleComponent, {
             title: 'Set Schedule',
+            mode: 'disableFullScreen',
             model: {
                 siteId: site.id!,
-                schedule: site.schedule ?? null
+                schedules: site.schedules ?? [],
+                scheduleTypes: this.scheduleTypes
             }
-        }).result().subscribe(schedule => site.schedule = schedule);
+        }).result().subscribe(schedules => site.schedules = schedules);
     }
 
     public viewSite(site: Site): void {

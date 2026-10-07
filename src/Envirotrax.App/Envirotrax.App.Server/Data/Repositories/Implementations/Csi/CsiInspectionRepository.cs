@@ -210,7 +210,8 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         inspection.MaterialSolderOtherDescription = model.MaterialSolderOtherDescription;
 
         inspection.Comments = model.Comments;
-        inspection.NeedsValidation = true;
+        inspection.NeedsValidation = model.NeedsValidation;
+        inspection.ValidationSiteInformationChanged = model.ValidationSiteInformationChanged;
 
         // Site/Inspector snapshot fields — refreshed the same way SubmitAsync populates them for a new row.
         inspection.PropertyBusinessName = model.PropertyBusinessName;

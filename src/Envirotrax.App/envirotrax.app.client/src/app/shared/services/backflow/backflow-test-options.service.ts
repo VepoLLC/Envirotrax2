@@ -23,15 +23,42 @@ export class BackflowTestOptionsService {
         ...this.deviceTypeOptions
     ];
 
-    // V1's assembly manufacturer and size lists (csi_inspection_submit.aspx "Add Backflow Device").
     public readonly manufacturerOptions: InputOption[] = [
-        'Ames', 'Apollo', 'ARI', 'Buckner', 'Cash Acme', 'Cla-Val', 'Conbraco', 'Backflow Direct',
-        'Febco', 'Flomatic', 'Hersey', 'Neptune', 'Watts', 'Wilkins', 'Other'
-    ].map(manufacturer => ({ id: manufacturer, text: manufacturer }));
+        { id: 'Ames', text: 'Ames' },
+        { id: 'Apollo', text: 'Apollo' },
+        { id: 'ARI', text: 'ARI' },
+        { id: 'Buckner', text: 'Buckner' },
+        { id: 'Cash Acme', text: 'Cash Acme' },
+        { id: 'Cla-Val', text: 'Cla-Val' },
+        { id: 'Conbraco', text: 'Conbraco' },
+        { id: 'Backflow Direct', text: 'Backflow Direct' },
+        { id: 'Febco', text: 'Febco' },
+        { id: 'Flomatic', text: 'Flomatic' },
+        { id: 'Hersey', text: 'Hersey' },
+        { id: 'Neptune', text: 'Neptune' },
+        { id: 'Watts', text: 'Watts' },
+        { id: 'Wilkins', text: 'Wilkins' },
+        { id: 'Other', text: 'Other' }
+    ];
 
     public readonly sizeOptions: InputOption[] = [
-        '3/8', '1/2', '3/4', '1', '1 1/4', '1 1/2', '2', '2 1/2', '3', '4', '6', '8', '10', '12', '14', '16'
-    ].map(size => ({ id: size, text: `${size}"` }));
+        { id: '3/8', text: '3/8"' },
+        { id: '1/2', text: '1/2"' },
+        { id: '3/4', text: '3/4"' },
+        { id: '1', text: '1"' },
+        { id: '1 1/4', text: '1 1/4"' },
+        { id: '1 1/2', text: '1 1/2"' },
+        { id: '2', text: '2"' },
+        { id: '2 1/2', text: '2 1/2"' },
+        { id: '3', text: '3"' },
+        { id: '4', text: '4"' },
+        { id: '6', text: '6"' },
+        { id: '8', text: '8"' },
+        { id: '10', text: '10"' },
+        { id: '12', text: '12"' },
+        { id: '14', text: '14"' },
+        { id: '16', text: '16"' }
+    ];
 
     public readonly hazardTypeOptions: InputOption[] = [
         { id: 'Agricultural/Feed Lot', text: 'Agricultural/Feed Lot' },

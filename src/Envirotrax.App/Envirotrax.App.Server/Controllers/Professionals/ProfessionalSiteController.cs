@@ -1,4 +1,5 @@
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Microsoft.AspNetCore.Mvc;
@@ -33,9 +34,9 @@ public class ProfessionalSiteController : ProfessionalProtectedController
     }
 
     [HttpGet("{siteId}/schedule")]
-    public async Task<IActionResult> GetScheduleAsync(int siteId, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetSchedulesAsync(int siteId, CancellationToken cancellationToken)
     {
-        var result = await _siteScheduleService.GetMyAsync(siteId, cancellationToken);
+        var result = await _siteScheduleService.GetMyBySiteIdsAsync([siteId], cancellationToken);
         return Ok(result);
     }
 
@@ -53,9 +54,9 @@ public class ProfessionalSiteController : ProfessionalProtectedController
     }
 
     [HttpDelete("{siteId}/schedule")]
-    public async Task<IActionResult> ClearScheduleAsync(int siteId, CancellationToken cancellationToken)
+    public async Task<IActionResult> ClearScheduleAsync(int siteId, [FromQuery] ProfessionalType professionalType)
     {
-        await _siteScheduleService.ClearMyAsync(siteId, cancellationToken);
+        await _siteScheduleService.ClearMyAsync(siteId, professionalType);
         return Ok();
     }
 }

@@ -65,6 +65,7 @@ services.AddTransient<GisAreaService>();
 services.AddTransient<SiteService>();
 services.AddTransient<SiteLogService>();
 services.AddTransient<BackflowGaugeService>();
+services.AddTransient<NotificationSettingService>();
 
 var provider = services.BuildServiceProvider();
 
@@ -105,3 +106,8 @@ await siteLogService.MigrateAsync();
 // that the professional migration builds.
 var backflowGaugeService = provider.GetRequiredService<BackflowGaugeService>();
 await backflowGaugeService.MigrateAsync();
+
+// After the supplier users: a notification setting is delivered to one of them, and V2 requires
+// that recipient, so a setting whose user is missing cannot be migrated at all.
+var notificationSettingService = provider.GetRequiredService<NotificationSettingService>();
+await notificationSettingService.MigrateAsync();

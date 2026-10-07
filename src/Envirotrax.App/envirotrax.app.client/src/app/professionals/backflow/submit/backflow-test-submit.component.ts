@@ -79,6 +79,8 @@ export class BackflowTestSubmitComponent implements OnInit {
     public readonly PropertyType = PropertyType;
 
     public readonly deviceTypeOptions: InputOption[];
+    public readonly manufacturerOptions: InputOption[];
+    public readonly sizeOptions: InputOption[];
     public readonly hazardTypeOptions: InputOption[];
     public readonly reasonOptions: InputOption[];
 
@@ -152,6 +154,15 @@ export class BackflowTestSubmitComponent implements OnInit {
         ossf: false
     };
 
+    public isFailedResult = false;
+    public hasAssembly = false;
+    public locationDescriptionLength = 0;
+    public remarksLength = 0;
+    public deviceTypeLabel = '';
+    public showInsuranceRow = false;
+    public insuranceAboutToExpire = false;
+    public readonly today = new Date();
+
     // Repair checkboxes (serialized to text strings in the model)
     public repairCV1 = { cleaned: false, disc: false, spring: false, guide: false, pinRetainer: false, hingePin: false, seat: false, diaphragm: false };
     public repairCV2 = { cleaned: false, disc: false, spring: false, guide: false, pinRetainer: false, hingePin: false, seat: false, diaphragm: false };
@@ -165,7 +176,7 @@ export class BackflowTestSubmitComponent implements OnInit {
 
 
     public get verificationComplete(): boolean {
-        if (!this.selectedBpatId || !this.selectedWaterSupplierId || (!this.isAirGap && !this.selectedGaugeId)) {
+        if (!this.selectedBpatId || !this.selectedWaterSupplierId || (this.model.deviceType !== BackflowDeviceType.AG && !this.selectedGaugeId)) {
             return false;
         }
 
@@ -181,26 +192,6 @@ export class BackflowTestSubmitComponent implements OnInit {
 
         return true;
     }
-
-    public get showInsuranceRow(): boolean {
-        return !!this.insuranceCheck && this.insuranceCheck.result !== InsuranceCheckResult.NotRequired;
-    }
-
-    public get insuranceAboutToExpire(): boolean {
-        return this.insuranceCheck?.result === InsuranceCheckResult.Valid
-            && this.professional?.insuranceExpirationType === ExpirationType.AboutToExpire;
-    }
-    public get isAirGap(): boolean { return this.model.deviceType === BackflowDeviceType.AG; }
-    public get isFailedResult(): boolean { return this.model.testResult === BackflowTestResult.Fail; }
-    public get today(): Date { return new Date(); }
-    public get deviceTypeLabel(): string {
-        return this.deviceTypeOptions.find(o => o.id === this.model.deviceType)?.text ?? '';
-    }
-    public get isDC(): boolean { return [BackflowDeviceType.DC, BackflowDeviceType.DCD, BackflowDeviceType.DCD2].includes(this.model.deviceType as BackflowDeviceType); }
-    public get isRP(): boolean { return [BackflowDeviceType.RP, BackflowDeviceType.RPPD, BackflowDeviceType.RPPD2].includes(this.model.deviceType as BackflowDeviceType); }
-    public get isPVB(): boolean { return [BackflowDeviceType.PVB, BackflowDeviceType.SVB].includes(this.model.deviceType as BackflowDeviceType); }
-    public get hasBypassCV(): boolean { return [BackflowDeviceType.DCD, BackflowDeviceType.RPPD].includes(this.model.deviceType as BackflowDeviceType); }
-    public get hasBypassBC(): boolean { return [BackflowDeviceType.DCD2, BackflowDeviceType.RPPD2].includes(this.model.deviceType as BackflowDeviceType); }
 
     //Initial Test Validation
     public get initialTestFailedDc(): boolean {
@@ -290,7 +281,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         if (this.model.deviceType === BackflowDeviceType.RP) return this.initialTestFailedRp;
         if (this.model.deviceType === BackflowDeviceType.RPPD) return this.initialTestFailedRppd;
         if (this.model.deviceType === BackflowDeviceType.RPPD2) return this.initialTestFailedRppd2;
-        if (this.isPVB) return this.initialTestFailedPvb;
+        if (this.model.deviceType === BackflowDeviceType.PVB || this.model.deviceType === BackflowDeviceType.SVB) return this.initialTestFailedPvb;
         return false;
     }
 
@@ -405,7 +396,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         if (this.model.deviceType === BackflowDeviceType.RP) return this.finalTestFailedRp;
         if (this.model.deviceType === BackflowDeviceType.RPPD) return this.finalTestFailedRppd;
         if (this.model.deviceType === BackflowDeviceType.RPPD2) return this.finalTestFailedRppd2;
-        if (this.isPVB) return this.finalTestFailedPvb;
+        if (this.model.deviceType === BackflowDeviceType.PVB || this.model.deviceType === BackflowDeviceType.SVB) return this.finalTestFailedPvb;
         return false;
     }
 
@@ -425,14 +416,10 @@ export class BackflowTestSubmitComponent implements OnInit {
         return this.finalTestFailed;
     }
 
-    public get isOtherHazardType(): boolean { return this.model.hazardType === 'Other'; }
-    public get isResidential(): boolean { return this.model.propertyType === PropertyType.Residential; }
-    public get remarksLength(): number { return this.model.comments?.length ?? 0; }
-
     public get initialTestDateError(): string | null {
         if (!this.model.initialTestDate) { return 'Please enter a test date and time.'; }
         if (new Date(this.model.initialTestDate) > new Date()) {
-            return this.isAirGap
+            return this.model.deviceType === BackflowDeviceType.AG
                 ? 'AirGap Test date cannot be set to a future date and time.'
                 : 'Initial Test date cannot be set to a future date and time.';
         }
@@ -505,6 +492,8 @@ export class BackflowTestSubmitComponent implements OnInit {
         private readonly _lookupService: LookupService
     ) {
         this.deviceTypeOptions = this._options.deviceTypeOptions;
+        this.manufacturerOptions = this._options.manufacturerOptions;
+        this.sizeOptions = this._options.sizeOptions;
         this.hazardTypeOptions = this._options.hazardTypeOptions;
         this.reasonOptions = this._options.reasonOptions;
     }
@@ -526,8 +515,26 @@ export class BackflowTestSubmitComponent implements OnInit {
         });
     }
 
+    public onTestResultChange(value: BackflowTestResult): void {
+        this.model.testResult = value;
+        this.isFailedResult = value === BackflowTestResult.Fail;
+    }
+
+    public onLocationDescriptionChange(value: string): void {
+        this.model.locationDescription = value;
+        this.updateLocationDescriptionLength();
+    }
+
+    public onCommentsChange(value: string): void {
+        this.model.comments = value;
+        this.updateRemarksLength();
+    }
+
     public onDeviceTypeChange(value: string): void {
         this.model.deviceType = value;
+        this.updateHasAssembly();
+        this.updateDeviceTypeLabel();
+
         // Reset all test readings so stale values from a previous device type aren't submitted
         this.model.initialTestDate = undefined;
         this.model.repairTestDate = undefined;
@@ -608,6 +615,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         const waterSupplierId = this.selectedWaterSupplierId;
 
         this.insuranceCheck = undefined;
+        this.updateInsuranceFlags();
 
         if (!waterSupplierId) {
             return;
@@ -617,6 +625,7 @@ export class BackflowTestSubmitComponent implements OnInit {
 
         if (this.selectedWaterSupplierId === waterSupplierId) {
             this.insuranceCheck = check;
+            this.updateInsuranceFlags();
         }
     }
 
@@ -803,6 +812,59 @@ export class BackflowTestSubmitComponent implements OnInit {
         // V1 carries the water meter number onto the next test for the assembly; the submit form
         // posts it whether or not the setting is currently showing the field.
         this.model.waterMeterNumber = test.waterMeterNumber;
+
+        this.updateHasAssembly();
+        this.updateDeviceTypeLabel();
+        this.updateLocationDescriptionLength();
+    }
+
+    private updateHasAssembly(): void {
+        this.hasAssembly = !!this.model.deviceType && this.model.deviceType !== BackflowDeviceType.AG;
+    }
+
+    private updateDeviceTypeLabel(): void {
+        const option = this.deviceTypeOptions.find(o => o.id === this.model.deviceType);
+
+        if (!option || !option.text) {
+            this.deviceTypeLabel = '';
+            return;
+        }
+
+        this.deviceTypeLabel = option.text;
+    }
+
+    private updateLocationDescriptionLength(): void {
+        if (!this.model.locationDescription) {
+            this.locationDescriptionLength = 0;
+            return;
+        }
+
+        this.locationDescriptionLength = this.model.locationDescription.length;
+    }
+
+    private updateRemarksLength(): void {
+        if (!this.model.comments) {
+            this.remarksLength = 0;
+            return;
+        }
+
+        this.remarksLength = this.model.comments.length;
+    }
+
+    private updateInsuranceFlags(): void {
+        this.showInsuranceRow = false;
+        this.insuranceAboutToExpire = false;
+
+        if (!this.insuranceCheck) {
+            return;
+        }
+
+        this.showInsuranceRow = this.insuranceCheck.result !== InsuranceCheckResult.NotRequired;
+
+        if (this.professional) {
+            this.insuranceAboutToExpire = this.insuranceCheck.result === InsuranceCheckResult.Valid
+                && this.professional.insuranceExpirationType === ExpirationType.AboutToExpire;
+        }
     }
 
     // Checkout "Edit": full field load of an own, still-unpaid test — unlike loadData/populateFromPreviousTest,
@@ -842,6 +904,11 @@ export class BackflowTestSubmitComponent implements OnInit {
 
     private async populateForEdit(test: BackflowTest): Promise<void> {
         this.model = { ...test };
+        this.isFailedResult = test.testResult === BackflowTestResult.Fail;
+        this.updateHasAssembly();
+        this.updateDeviceTypeLabel();
+        this.updateLocationDescriptionLength();
+        this.updateRemarksLength();
 
         this.selectedBpatId = test.bpat?.id;
         this.selectedBpat = this._bpats.find(u => u.id === test.bpat?.id);
@@ -1054,11 +1121,11 @@ export class BackflowTestSubmitComponent implements OnInit {
         if (!this.model.hazardType) {
             this.validationErrors.push('Please select a hazard type.');
         }
-        if (!this.isAirGap && !this.selectedGaugeId) {
+        if (this.model.deviceType !== BackflowDeviceType.AG && !this.selectedGaugeId) {
             this.validationErrors.push('Please select a test gauge.');
         }
         if (!this.model.deviceType) {
-            this.validationErrors.push('Please select a device type.');
+            this.validationErrors.push('Please select a backflow method.');
         }
 
         if (!this.isLocationEditing && this.hasMissingLocationFields()) {
@@ -1076,7 +1143,7 @@ export class BackflowTestSubmitComponent implements OnInit {
             this.validationErrors.push('Mailing street number must start with a digit. If you are entering a PO Box, enter the "PO Box" and the box number in the street name field.');
         }
 
-        if (this.isAirGap) {
+        if (this.model.deviceType === BackflowDeviceType.AG) {
             if (!this.model.initialTestDate) {
                 this.validationErrors.push('Please enter a test date and time.');
             } else if (new Date(this.model.initialTestDate) > new Date()) {

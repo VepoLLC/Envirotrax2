@@ -477,7 +477,7 @@
                 <!-- Location description -->
                 <div class="row mb-3">
                     <div class="col-md-12">
-                        <vp-input type="text" label="Location" name="locationDescription" [(ngModel)]="model.locationDescription"
+                        <vp-input type="text" label="Location" name="locationDescription" [ngModel]="model.locationDescription" (ngModelChange)="onLocationDescriptionChange($event)"
                                   [maxLength]="100" [required]="true" [form]="submitForm" />
                         <div class="form-text text-end">{{ locationDescriptionLength }}/100 Characters</div>
                     </div>

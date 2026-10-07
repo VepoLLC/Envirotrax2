@@ -155,6 +155,8 @@ export class BackflowTestSubmitComponent implements OnInit {
     };
 
     public isFailedResult = false;
+    public hasAssembly = false;
+    public locationDescriptionLength = 0;
 
     // Repair checkboxes (serialized to text strings in the model)
     public repairCV1 = { cleaned: false, disc: false, spring: false, guide: false, pinRetainer: false, hingePin: false, seat: false, diaphragm: false };
@@ -202,7 +204,6 @@ export class BackflowTestSubmitComponent implements OnInit {
     public get isDC(): boolean { return [BackflowDeviceType.DC, BackflowDeviceType.DCD, BackflowDeviceType.DCD2].includes(this.model.deviceType as BackflowDeviceType); }
     public get isRP(): boolean { return [BackflowDeviceType.RP, BackflowDeviceType.RPPD, BackflowDeviceType.RPPD2].includes(this.model.deviceType as BackflowDeviceType); }
     public get isPVB(): boolean { return [BackflowDeviceType.PVB, BackflowDeviceType.SVB].includes(this.model.deviceType as BackflowDeviceType); }
-    public get hasAssembly(): boolean { return !!this.model.deviceType && !this.isAirGap; }
     public get hasBypassCV(): boolean { return [BackflowDeviceType.DCD, BackflowDeviceType.RPPD].includes(this.model.deviceType as BackflowDeviceType); }
     public get hasBypassBC(): boolean { return [BackflowDeviceType.DCD2, BackflowDeviceType.RPPD2].includes(this.model.deviceType as BackflowDeviceType); }
 
@@ -417,14 +418,6 @@ export class BackflowTestSubmitComponent implements OnInit {
     public get isResidential(): boolean { return this.model.propertyType === PropertyType.Residential; }
     public get remarksLength(): number { return this.model.comments?.length ?? 0; }
 
-    public get locationDescriptionLength(): number {
-        if (!this.model.locationDescription) {
-            return 0;
-        }
-
-        return this.model.locationDescription.length;
-    }
-
     public get initialTestDateError(): string | null {
         if (!this.model.initialTestDate) { return 'Please enter a test date and time.'; }
         if (new Date(this.model.initialTestDate) > new Date()) {
@@ -529,8 +522,15 @@ export class BackflowTestSubmitComponent implements OnInit {
         this.isFailedResult = value === BackflowTestResult.Fail;
     }
 
+    public onLocationDescriptionChange(value: string): void {
+        this.model.locationDescription = value;
+        this.updateLocationDescriptionLength();
+    }
+
     public onDeviceTypeChange(value: string): void {
         this.model.deviceType = value;
+        this.updateHasAssembly();
+
         // Reset all test readings so stale values from a previous device type aren't submitted
         this.model.initialTestDate = undefined;
         this.model.repairTestDate = undefined;
@@ -806,6 +806,22 @@ export class BackflowTestSubmitComponent implements OnInit {
         // V1 carries the water meter number onto the next test for the assembly; the submit form
         // posts it whether or not the setting is currently showing the field.
         this.model.waterMeterNumber = test.waterMeterNumber;
+
+        this.updateHasAssembly();
+        this.updateLocationDescriptionLength();
+    }
+
+    private updateHasAssembly(): void {
+        this.hasAssembly = !!this.model.deviceType && this.model.deviceType !== BackflowDeviceType.AG;
+    }
+
+    private updateLocationDescriptionLength(): void {
+        if (!this.model.locationDescription) {
+            this.locationDescriptionLength = 0;
+            return;
+        }
+
+        this.locationDescriptionLength = this.model.locationDescription.length;
     }
 
     // Checkout "Edit": full field load of an own, still-unpaid test — unlike loadData/populateFromPreviousTest,
@@ -846,6 +862,8 @@ export class BackflowTestSubmitComponent implements OnInit {
     private async populateForEdit(test: BackflowTest): Promise<void> {
         this.model = { ...test };
         this.isFailedResult = test.testResult === BackflowTestResult.Fail;
+        this.updateHasAssembly();
+        this.updateLocationDescriptionLength();
 
         this.selectedBpatId = test.bpat?.id;
         this.selectedBpat = this._bpats.find(u => u.id === test.bpat?.id);

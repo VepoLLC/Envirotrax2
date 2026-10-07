@@ -495,12 +495,12 @@
                             <span class="fw-semibold">Test Result:</span>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="testResult"
-                                       [value]="BackflowTestResult.Pass" [(ngModel)]="model.testResult" id="resultPass" required />
+                                       [value]="BackflowTestResult.Pass" [ngModel]="model.testResult" (ngModelChange)="onTestResultChange($event)" id="resultPass" required />
                                 <label class="form-check-label" for="resultPass">Passed</label>
                             </div>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="testResult"
-                                       [value]="BackflowTestResult.Fail" [(ngModel)]="model.testResult" id="resultFail" />
+                                       [value]="BackflowTestResult.Fail" [ngModel]="model.testResult" (ngModelChange)="onTestResultChange($event)" id="resultFail" />
                                 <label class="form-check-label" for="resultFail">Failed</label>
                             </div>
                         </div>
@@ -591,7 +591,7 @@
                             </thead>
 
                             <tbody>
-                                <tr *ngIf="showInitialTestMessages">
+                                <tr *ngIf="initialTestFailed">
                                     <td class="py-1 border-start-0 border-end-0">
                                         <span *ngIf="initialTestDateError" class="badge bg-warning text-dark">{{ initialTestDateError }}</span>
                                     </td>
@@ -679,7 +679,7 @@
                                     </td>
                                 </tr>
 
-                                <tr *ngIf="showFinalTestMessages">
+                                <tr *ngIf="!isFailedResult && finalTestFailed">
                                         <td class="py-1 border-start-0 border-end-0">
                                             <span *ngIf="finalTestDateError" class="badge bg-warning text-dark">{{ finalTestDateError }}</span>
                                         </td>
@@ -745,7 +745,7 @@
                             </thead>
 
                             <tbody>
-                                <tr *ngIf="showInitialTestMessages">
+                                <tr *ngIf="initialTestFailed">
                                     <td class="py-1 border-start-0 border-end-0">
                                         <span *ngIf="initialTestDateError" class="badge bg-warning text-dark">{{ initialTestDateError }}</span>
                                     </td>
@@ -900,7 +900,7 @@
                                     </td>
                                 </tr>
 
-                                    <tr *ngIf="showFinalTestMessages">
+                                    <tr *ngIf="!isFailedResult && finalTestFailed">
                                         <td class="py-1 border-start-0 border-end-0">
                                             <span class="badge bg-warning text-dark">{{ finalTestDateError }}</span>
                                         </td>
@@ -992,7 +992,7 @@
                             </thead>
 
                             <tbody>
-                                <tr *ngIf="showInitialTestMessages">
+                                <tr *ngIf="initialTestFailed">
                                     <td class="py-1 border-start-0 border-end-0">
                                         <span class="badge bg-warning text-dark">{{ initialTestDateError }}</span>
                                     </td>
@@ -1119,7 +1119,7 @@
 
                                 </tr>
 
-                                <tr *ngIf="showFinalTestMessages">
+                                <tr *ngIf="!isFailedResult && finalTestFailed">
                                         <td class="py-1 border-start-0 border-end-0">
                                             <span class="badge bg-warning text-dark">{{ finalTestDateError }}</span>
                                         </td>
@@ -1195,7 +1195,7 @@
                             </thead>
 
                             <tbody>
-                                <tr *ngIf="showInitialTestMessages">
+                                <tr *ngIf="initialTestFailed">
                                     <td class="py-1 border-start-0 border-end-0">
                                         <span *ngIf="initialTestDateError" class="badge bg-warning text-dark">{{ initialTestDateError }}</span>
                                     </td>
@@ -1306,7 +1306,7 @@
                                     </td>
                                 </tr>
 
-                                    <tr *ngIf="showFinalTestMessages">
+                                    <tr *ngIf="!isFailedResult && finalTestFailed">
                                         <td class="py-1 border-start-0 border-end-0">
                                             <span class="badge bg-warning text-dark">{{ finalTestDateError }}</span>
                                         </td>
@@ -1379,7 +1379,7 @@
                             </thead>
 
                             <tbody>
-                                <tr *ngIf="showInitialTestMessages">
+                                <tr *ngIf="initialTestFailed">
                                     <td class="py-1 border-start-0 border-end-0">
                                         <span class="badge bg-warning text-dark">{{ initialTestDateError }}</span>
                                     </td>
@@ -1584,7 +1584,7 @@
                                     </td>
                                 </tr>
 
-                                <tr *ngIf="showFinalTestMessages">
+                                <tr *ngIf="!isFailedResult && finalTestFailed">
                                         <td class="py-1 border-start-0 border-end-0">
                                             <span class="badge bg-warning text-dark">{{ finalTestDateError }}</span>
                                         </td>
@@ -1684,7 +1684,7 @@
                             </thead>
 
                             <tbody>
-                                <tr *ngIf="showInitialTestMessages">
+                                <tr *ngIf="initialTestFailed">
                                     <td class="py-1 border-start-0 border-end-0">
                                         <span class="badge bg-warning text-dark">{{ initialTestDateError }}</span>
                                     </td>
@@ -1832,7 +1832,7 @@
                                     </td>                                   
                                 </tr>
 
-                                <tr *ngIf="showFinalTestMessages">
+                                <tr *ngIf="!isFailedResult && finalTestFailed">
                                         <td class="py-1 border-start-0 border-end-0">
                                             <span class="badge bg-warning text-dark">{{ finalTestDateError }}</span>
                                         </td>
@@ -1909,7 +1909,7 @@
                             </thead>
 
                             <tbody>
-                                <tr *ngIf="showInitialTestMessages">
+                                <tr *ngIf="initialTestFailed">
                                     <td class="py-1 border-start-0 border-end-0">
                                         <span class="badge bg-warning text-dark">{{ initialTestDateError }}</span>
                                     </td>
@@ -1980,7 +1980,7 @@
                                     </td>
                                 </tr>
 
-                                <tr *ngIf="showFinalTestMessages">
+                                <tr *ngIf="!isFailedResult && finalTestFailed">
                                         <td class="py-1 border-start-0 border-end-0">
                                             <span class="badge bg-warning text-dark">{{ finalTestDateError }}</span>
                                         </td>

@@ -154,6 +154,8 @@ export class BackflowTestSubmitComponent implements OnInit {
         ossf: false
     };
 
+    public isFailedResult = false;
+
     // Repair checkboxes (serialized to text strings in the model)
     public repairCV1 = { cleaned: false, disc: false, spring: false, guide: false, pinRetainer: false, hingePin: false, seat: false, diaphragm: false };
     public repairCV2 = { cleaned: false, disc: false, spring: false, guide: false, pinRetainer: false, hingePin: false, seat: false, diaphragm: false };
@@ -193,7 +195,6 @@ export class BackflowTestSubmitComponent implements OnInit {
             && this.professional?.insuranceExpirationType === ExpirationType.AboutToExpire;
     }
     public get isAirGap(): boolean { return this.model.deviceType === BackflowDeviceType.AG; }
-    public get isFailedResult(): boolean { return this.model.testResult === BackflowTestResult.Fail; }
     public get today(): Date { return new Date(); }
     public get deviceTypeLabel(): string {
         return this.deviceTypeOptions.find(o => o.id === this.model.deviceType)?.text ?? '';
@@ -412,22 +413,6 @@ export class BackflowTestSubmitComponent implements OnInit {
         return false;
     }
 
-    public get showInitialTestMessages(): boolean {
-        if (this.isFailedResult) {
-            return this.initialTestDateError !== null;
-        }
-
-        return this.initialTestFailed;
-    }
-
-    public get showFinalTestMessages(): boolean {
-        if (this.isFailedResult) {
-            return false;
-        }
-
-        return this.finalTestFailed;
-    }
-
     public get isOtherHazardType(): boolean { return this.model.hazardType === 'Other'; }
     public get isResidential(): boolean { return this.model.propertyType === PropertyType.Residential; }
     public get remarksLength(): number { return this.model.comments?.length ?? 0; }
@@ -537,6 +522,11 @@ export class BackflowTestSubmitComponent implements OnInit {
                 await this.loadData(testId && testId !== 'new' ? Number(testId) : null);
             }
         });
+    }
+
+    public onTestResultChange(value: BackflowTestResult): void {
+        this.model.testResult = value;
+        this.isFailedResult = value === BackflowTestResult.Fail;
     }
 
     public onDeviceTypeChange(value: string): void {
@@ -855,6 +845,7 @@ export class BackflowTestSubmitComponent implements OnInit {
 
     private async populateForEdit(test: BackflowTest): Promise<void> {
         this.model = { ...test };
+        this.isFailedResult = test.testResult === BackflowTestResult.Fail;
 
         this.selectedBpatId = test.bpat?.id;
         this.selectedBpat = this._bpats.find(u => u.id === test.bpat?.id);

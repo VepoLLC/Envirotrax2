@@ -10,6 +10,11 @@ namespace Envirotrax.App.Server.Data.DbContexts
 {
     public class ProfessionalDbContext : TenantDbContext
     {
+        // Name of the IProfessionalModel query filter, so a query can lift just this filter with
+        // IgnoreQueryFilters([OwnProfessionalFilter]). The other contexts never define it, so the same
+        // repository query keeps their tenant filters.
+        public const string OwnProfessionalFilter = "OwnProfessional";
+
         private readonly ITenantProvidersService _tenantProvider;
 
         public ProfessionalDbContext(
@@ -24,6 +29,17 @@ namespace Envirotrax.App.Server.Data.DbContexts
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // The ownership check in SetSharedProfessionalSecurityProperties trusts the entry's original
+            // ProfessionalId, which for a detached entity that was Attach()ed is whatever the caller put on it.
+            // As a concurrency token it is also in the UPDATE/DELETE's WHERE clause, so a forged owner matches
+            // no row and the save fails instead of overwriting (and reassigning) another professional's row.
+            foreach (var entity in modelBuilder.Model.GetEntityTypes().Where(e => typeof(ISharedProfessionalModel).IsAssignableFrom(e.ClrType)))
+            {
+                modelBuilder.Entity(entity.ClrType)
+                    .Property(nameof(IProfessionalModel.ProfessionalId))
+                    .IsConcurrencyToken();
+            }
         }
 
         protected override void SetupGlobalFiltering(ModelBuilder builder, IMutableEntityType entity)
@@ -40,7 +56,7 @@ namespace Envirotrax.App.Server.Data.DbContexts
                 Expression<Func<IProfessionalModel, bool>> expression = model => model.ProfessionalId == _tenantProvider.ProfessionalId;
                 var lambdaExpression = ConvertFilterExpression(expression, entity.ClrType);
 
-                builder.Entity(entity.ClrType).HasQueryFilter(lambdaExpression);
+                builder.Entity(entity.ClrType).HasQueryFilter(OwnProfessionalFilter, lambdaExpression);
             }
         }
 

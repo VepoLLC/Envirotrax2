@@ -75,7 +75,7 @@
                         Delete
                     </button>
                     <a *ngIf="!editable && row.isPaid && row.assembly.testId" class="btn btn-primary btn-sm"
-                       [routerLink]="['/backflow/tests', row.assembly.testId, 'view']">
+                       [routerLink]="[testViewRoute, row.assembly.testId, 'view']">
                         View
                     </a>
                 </td>

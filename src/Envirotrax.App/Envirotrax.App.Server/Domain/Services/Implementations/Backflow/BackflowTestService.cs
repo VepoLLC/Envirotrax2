@@ -15,6 +15,8 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
 using Envirotrax.App.Server.Domain.Services.Implementations.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Licenses;
+using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
@@ -52,6 +54,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IProfessionalSupplierService _professionalSupplierService;
     private readonly IProfessionalInsuranceService _insuranceService;
+    private readonly IProfessionalUserLicenseService _licenseService;
     private readonly ILogger<BackflowTestService> _logger;
 
     public BackflowTestService(
@@ -71,6 +74,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         IGeneralSettingsService generalSettingsService,
         IProfessionalSupplierService professionalSupplierService,
         IProfessionalInsuranceService insuranceService,
+        IProfessionalUserLicenseService licenseService,
         ILogger<BackflowTestService> logger)
         : base(mapper, repository)
     {
@@ -89,6 +93,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         _generalSettingsService = generalSettingsService;
         _professionalSupplierService = professionalSupplierService;
         _insuranceService = insuranceService;
+        _licenseService = licenseService;
         _logger = logger;
     }
 
@@ -615,6 +620,11 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     public Task<InsuranceCheckDto> GetInsuranceCheckAsync(int waterSupplierId, CancellationToken cancellationToken = default)
     {
         return _insuranceService.CheckForWaterSupplierAsync(_authService.ProfessionalId, waterSupplierId, ProfessionalType.Bpat, cancellationToken);
+    }
+
+    public Task<BpatLicenseCheckDto> GetLicenseCheckAsync(int waterSupplierId, int bpatUserId, CancellationToken cancellationToken = default)
+    {
+        return _licenseService.CheckBpatForWaterSupplierAsync(_authService.ProfessionalId, bpatUserId, waterSupplierId, cancellationToken);
     }
 
     private async Task EnsureInsuranceAllowsSubmitAsync(BackflowTestDto dto, CancellationToken cancellationToken)

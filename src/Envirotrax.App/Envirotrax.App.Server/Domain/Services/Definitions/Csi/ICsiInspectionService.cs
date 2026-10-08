@@ -7,9 +7,9 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 
 public interface ICsiInspectionService : IService<CsiInspection, CsiInspectionDto>
 {
-    Task<CsiInspectionDto> SubmitAsync(CsiInspectionDto request, CancellationToken cancellationToken);
+    Task<CsiInspectionDto> SubmitAsync(CreateCsiInspectionDto request, CancellationToken cancellationToken);
     Task<InsuranceCheckDto> GetInsuranceCheckAsync(int waterSupplierId, CancellationToken cancellationToken);
-    Task<CsiInspectionDto?> UpdateForProfessionalAsync(int id, CsiInspectionDto request, CancellationToken cancellationToken);
+    Task<CsiInspectionDto?> UpdateForProfessionalAsync(int id, CreateCsiInspectionDto request, CancellationToken cancellationToken);
     Task<IPagedData<CsiInspectionDto>> SearchForProfessionalAsync(PageInfo pageInfo, Query query, bool latestOnly, CancellationToken cancellationToken);
     Task<CsiInspectionDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken);
     Task<IPagedData<CsiInspectionDto>> SearchForAdminAsync(PageInfo pageInfo, Query query, CsiPaymentStatus? paymentStatus, CancellationToken cancellationToken);

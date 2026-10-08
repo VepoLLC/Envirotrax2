@@ -1,8 +1,23 @@
 <h1 class="text-center h2">Property Record</h1>
 
-<div class="mb-3">
+<div class="mb-3 d-flex gap-2">
     <button type="button" class="btn btn-secondary" (click)="goBack()">
         &larr; Back to Search
+    </button>
+
+    <button *ngIf="site && scheduleTypes.length"
+            type="button"
+            class="btn d-flex align-items-center gap-2 text-start"
+            [class.btn-primary]="!schedules.length"
+            [class.btn-success]="schedules.length"
+            (click)="editSchedule()">
+        <i class="fa-solid fa-clock"></i>
+        <span *ngIf="!schedules.length">Set Schedule</span>
+        <span *ngIf="schedules.length">
+            <span *ngFor="let schedule of schedules" class="d-block">
+                {{ scheduleTypeNames[schedule.professionalType!] }}: Scheduled for {{ schedule.scheduleDate | date: 'M/d/yyyy h:mm a' }}
+            </span>
+        </span>
     </button>
 </div>
 

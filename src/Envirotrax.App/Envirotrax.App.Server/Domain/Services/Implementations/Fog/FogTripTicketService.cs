@@ -17,6 +17,7 @@ using Envirotrax.Common.Domain.Services.Defintions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
+using Envirotrax.App.Server.Domain.Services.Implementations.Sites;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Fog;
 
@@ -76,7 +77,7 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
 
         var deleted = await _repository.DeleteAsync(id);
 
-        if (deleted == null || deleted.ProfessionalId != _authService.ProfessionalId || !string.IsNullOrEmpty(deleted.TransactionId))
+        if (deleted == null || !string.IsNullOrEmpty(deleted.TransactionId))
         {
             return null;
         }
@@ -227,11 +228,11 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
             Comments = request.Comments,
 
             PickupCompleted = true,
-            Completed = true,
-            NeedsValidation = true
+            Completed = true
         };
 
-        ApplySiteSnapshot(ticket, site);
+        ApplyEnteredLocation(ticket, request);
+        ApplySiteValidation(ticket, site);
         ApplyTransporterSnapshot(ticket, professional!, transporterUser, transporterUserId);
         ApplyVehicleSnapshot(ticket, vehicle);
         ApplyReceiverSnapshot(ticket, disposalSite);
@@ -324,21 +325,61 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         return ext;
     }
 
-    private static void ApplySiteSnapshot(FogTripTicket ticket, SiteDto? site)
+    private static void ApplyEnteredLocation(FogTripTicket ticket, FogTripTicketDto request)
     {
+        ticket.PropertyBusinessName = request.PropertyBusinessName;
+        ticket.PropertyType = request.PropertyType;
+        ticket.PropertyStreetNumber = request.PropertyStreetNumber;
+        ticket.PropertyStreetName = request.PropertyStreetName;
+        ticket.PropertyNumber = request.PropertyNumber;
+        ticket.PropertyCity = request.PropertyCity;
+        ticket.PropertyStateId = SiteInformationComparer.GetStateId(request.PropertyState);
+        ticket.PropertyZip = request.PropertyZip;
+    }
+
+    private static void ApplySiteValidation(FogTripTicket ticket, SiteDto? site)
+    {
+        ticket.ValidationNewSite = false;
+        ticket.ValidationSiteInformationChanged = false;
+        ticket.NeedsValidation = false;
+
         if (site == null)
         {
+            ticket.ValidationNewSite = true;
+            ticket.NeedsValidation = true;
+
             return;
         }
 
-        ticket.PropertyBusinessName = site.BusinessName;
-        ticket.PropertyType = site.PropertyType;
-        ticket.PropertyStreetNumber = site.StreetNumber;
-        ticket.PropertyStreetName = site.StreetName;
-        ticket.PropertyNumber = site.PropertyNumber;
-        ticket.PropertyCity = site.City;
-        ticket.PropertyStateId = site.State?.Id;
-        ticket.PropertyZip = site.ZipCode;
+        ticket.ValidationSiteInformationChanged = HasSiteInformationChanged(ticket, site);
+        ticket.NeedsValidation = ticket.ValidationSiteInformationChanged;
+    }
+
+    private static bool HasSiteInformationChanged(FogTripTicket ticket, SiteDto site)
+    {
+        if (ticket.PropertyType != site.PropertyType)
+        {
+            return true;
+        }
+
+        if (ticket.PropertyStateId != SiteInformationComparer.GetStateId(site.State))
+        {
+            return true;
+        }
+
+        var textFields = new List<(string? EnteredValue, string? SiteValue)>
+        {
+            (ticket.PropertyBusinessName, site.BusinessName),
+            (ticket.PropertyStreetNumber, site.StreetNumber),
+            (ticket.PropertyStreetName, site.StreetName),
+            (ticket.PropertyNumber, site.PropertyNumber),
+            (ticket.PropertyCity, site.City),
+            (ticket.PropertyZip, site.ZipCode),
+            (ticket.FogGeneratorPhoneNumber, site.FogGeneratorPhoneNumber),
+            (ticket.FogGeneratorEmailAddress, site.FogGeneratorEmailAddress)
+        };
+
+        return SiteInformationComparer.HasTextChanged(textFields);
     }
 
     private static void ApplyTransporterSnapshot(

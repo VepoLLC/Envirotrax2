@@ -176,11 +176,13 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         return inspection;
     }
 
-    public async Task<CsiInspection?> UpdateForProfessionalAsync(CsiInspection model, int professionalId)
+    // Ownership is enforced by ProfessionalDbContext (CsiInspection is an ISharedProfessionalModel); a
+    // non-owner's save throws rather than returning null here. Only the not-found/already-paid guard is ours.
+    public async Task<CsiInspection?> UpdateForProfessionalAsync(CsiInspection model)
     {
         var inspection = await GetTrackedForUpdateAsync(model.Id, default);
 
-        if (inspection == null || inspection.ProfessionalId != professionalId || !string.IsNullOrEmpty(inspection.TransactionId))
+        if (inspection == null || !string.IsNullOrEmpty(inspection.TransactionId))
         {
             return null;
         }
@@ -208,8 +210,8 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         inspection.MaterialSolderOtherDescription = model.MaterialSolderOtherDescription;
 
         inspection.Comments = model.Comments;
-        inspection.NeedsValidation = true;
-        inspection.SubmissionId ??= model.SubmissionId;
+        inspection.NeedsValidation = model.NeedsValidation;
+        inspection.ValidationSiteInformationChanged = model.ValidationSiteInformationChanged;
 
         // Site/Inspector snapshot fields — refreshed the same way SubmitAsync populates them for a new row.
         inspection.PropertyBusinessName = model.PropertyBusinessName;

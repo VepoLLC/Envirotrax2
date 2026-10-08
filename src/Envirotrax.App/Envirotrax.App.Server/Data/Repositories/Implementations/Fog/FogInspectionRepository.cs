@@ -80,16 +80,17 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    // Ownership is enforced by ProfessionalDbContext (FogInspection is an ISharedProfessionalModel); a
+    // non-owner's save throws rather than returning null here. Only the not-found/already-paid guard is ours.
     public async Task<FogInspection?> UpdateForProfessionalAsync(
         FogInspection model,
-        int professionalId,
         string? newExteriorImagePath,
         string? newInteriorImagePath,
         string? newSignatureImagePath)
     {
         var inspection = await GetTrackedForUpdateAsync(model.Id, default);
 
-        if (inspection == null || inspection.ProfessionalId != professionalId || !string.IsNullOrEmpty(inspection.TransactionId))
+        if (inspection == null || !string.IsNullOrEmpty(inspection.TransactionId))
         {
             return null;
         }
@@ -139,7 +140,8 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
         inspection.FogGeneratorPhoneNumber = model.FogGeneratorPhoneNumber;
         inspection.FogGeneratorEmailAddress = model.FogGeneratorEmailAddress;
 
-        inspection.NeedsValidation = true;
+        inspection.NeedsValidation = model.NeedsValidation;
+        inspection.ValidationSiteInformationChanged = model.ValidationSiteInformationChanged;
 
         // Site/Inspector snapshot fields — refreshed the same way SubmitAsync populates them for a new row.
         inspection.PropertyBusinessName = model.PropertyBusinessName;

@@ -19,8 +19,11 @@ import { ProfessionalSupplierService } from '../../../../shared/services/profess
 import { CheckoutService } from '../../../../shared/services/professionals/checkout.service';
 import { ToastService, InputOption, ModalHelperService } from '@envirotrax/common-ui';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
-import { CsiInspectionAssembly, CsiInspectionAssemblyRequest } from '../../../../shared/models/csi/csi-inspection-assembly';
+import { CreateCsiInspection, CsiInspectionAssembly, CsiInspectionNewAssembly } from '../../../../shared/models/csi/csi-inspection-assembly';
+import { BackflowTestResult, BYPASS_DEVICE_TYPES } from '../../../../shared/models/backflow/backflow-test-enums';
 import { AddCsiInspectionAssemblyComponent } from './add-csi-inspection-assembly.component';
+import { LookupService } from '../../../../shared/services/lookup/lookup.service';
+import { PropertyType } from '../../../../shared/enums/property-type.enum';
 
 @Component({
     standalone: false,
@@ -37,6 +40,17 @@ export class CsiSubmissionCreateComponent implements OnInit {
     public site?: Site;
     public professional?: Professional;
     public editingId: number | null = null;
+    private _editingInspection: CsiInspection | null = null;
+
+    public isLocationEditing = false;
+    public stateOptions: InputOption[] = [];
+
+    public readonly propertyTypeOptions: InputOption[] = [
+        { id: PropertyType.Residential, text: 'Residential' },
+        { id: PropertyType.Commercial, text: 'Commercial' }
+    ];
+
+    public readonly PropertyType = PropertyType;
 
     private csiUsers: ProfessionalUser[] = [];
     private waterSuppliers: ProfessionalWaterSupplier[] = [];
@@ -53,6 +67,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
     public legalAcknowledgment = false;
     public pendingImages: { file: File; description: string; previewUrl: string }[] = [];
     public assemblies: CsiInspectionAssembly[] = [];
+    private readonly _newAssemblies = new Map<CsiInspectionAssembly, CsiInspectionNewAssembly>();
 
     public model: CsiInspection = {
         site: {},
@@ -105,7 +120,8 @@ export class CsiSubmissionCreateComponent implements OnInit {
         private readonly _professionalSupplierService: ProfessionalSupplierService,
         private readonly _toastService: ToastService,
         private readonly _checkoutService: CheckoutService,
-        private readonly _modalHelper: ModalHelperService
+        private readonly _modalHelper: ModalHelperService,
+        private readonly _lookupService: LookupService
     ) { }
 
     public ngOnInit(): void {
@@ -160,6 +176,37 @@ export class CsiSubmissionCreateComponent implements OnInit {
         this.remarksLength = value?.length ?? 0;
     }
 
+    public onPropertyTypeChange(value: PropertyType): void {
+        this.model.propertyType = value;
+
+        if (value === PropertyType.Residential) {
+            this.model.propertyBusinessName = undefined;
+        }
+    }
+
+    public requestLocationModification(): void {
+        this.isLocationEditing = true;
+    }
+
+    public cancelLocationModification(): void {
+        if (this._editingInspection) {
+            this.applyInspectionLocation(this._editingInspection);
+        } else if (this.site) {
+            this.applySiteLocation(this.site);
+        }
+
+        this.isLocationEditing = false;
+    }
+
+    public copyPropertyAddress(): void {
+        this.model.mailingStreetNumber = this.model.propertyStreetNumber;
+        this.model.mailingStreetName = this.model.propertyStreetName;
+        this.model.mailingNumber = this.model.propertyNumber;
+        this.model.mailingCity = this.model.propertyCity;
+        this.model.mailingState = this.model.propertyState ? { ...this.model.propertyState } : undefined;
+        this.model.mailingZip = this.model.propertyZip;
+    }
+
     public onComplianceChange(): void {
         if (this.submitted) {
             this.complianceIsInvalid = this.model.compliance1 == null || this.model.compliance2 == null || this.model.compliance3 == null ||
@@ -194,23 +241,26 @@ export class CsiSubmissionCreateComponent implements OnInit {
         this.pendingImages.splice(index, 1);
     }
 
+    // Added assemblies stay on the form until the inspection is submitted; the row shows it in the table.
     public addAssembly(): void {
-        this._modalHelper.show<CsiInspectionAssemblyRequest, CsiInspectionAssembly>(AddCsiInspectionAssemblyComponent, {
+        this._modalHelper.show<CsiInspectionNewAssembly>(AddCsiInspectionAssemblyComponent, {
             title: 'Add Backflow Device',
-            size: ModalSize.large,
-            model: { submissionId: this.model.submissionId!, siteId: this._siteId }
-        }).result().subscribe(assembly => {
-            this.assemblies = [...this.assemblies, assembly];
+            size: ModalSize.large
+        }).result().subscribe(newAssembly => {
+            const row = this.buildNewAssemblyRow(newAssembly);
+
+            this._newAssemblies.set(row, newAssembly);
+            this.assemblies = [...this.assemblies, row];
         });
     }
 
+    // Removed from the form only; the inspection's submit/update deletes a saved row.
     public deleteAssembly(assembly: CsiInspectionAssembly): void {
         this._modalHelper.confirm({
             title: 'Confirm Assembly Deletion',
             messages: ['Are you sure you want to delete the record for the following assembly?', assembly.assemblyDescription ?? '']
-        }).result().subscribe(async () => {
-            await this._inspectionService.deleteAssembly(assembly.id!, this.model.submissionId!);
-
+        }).result().subscribe(() => {
+            this._newAssemblies.delete(assembly);
             this.assemblies = this.assemblies.filter(listed => listed !== assembly);
         });
     }
@@ -219,7 +269,11 @@ export class CsiSubmissionCreateComponent implements OnInit {
     public markAllAssembliesVisuallyIdentified(): void {
         const visuallyIdentified = !this.assemblies.every(assembly => assembly.visuallyIdentified);
 
-        this.assemblies = this.assemblies.map(assembly => ({ ...assembly, visuallyIdentified }));
+        for (const assembly of this.assemblies) {
+            assembly.visuallyIdentified = visuallyIdentified;
+        }
+
+        this.assemblies = [...this.assemblies];
     }
 
     public async submit(submitForm: NgForm): Promise<void> {
@@ -232,10 +286,17 @@ export class CsiSubmissionCreateComponent implements OnInit {
 
         this.isLoading = true;
         try {
-            const visuallyIdentifiedIds = this.assemblies.filter(assembly => assembly.visuallyIdentified).map(assembly => assembly.id!);
-            await this._inspectionService.updateVisuallyIdentified(this.model.submissionId!, visuallyIdentifiedIds);
+            const payload: CreateCsiInspection = {
+                ...this.model,
+                site: { id: this._siteId },
+                assemblies: this.assemblies
+                    .filter(assembly => !this._newAssemblies.has(assembly))
+                    .map(assembly => ({ id: assembly.id || undefined, testId: assembly.testId, visuallyIdentified: !!assembly.visuallyIdentified })),
+                newAssemblies: this.assemblies
+                    .filter(assembly => this._newAssemblies.has(assembly))
+                    .map(assembly => ({ ...this._newAssemblies.get(assembly), visuallyIdentified: !!assembly.visuallyIdentified }))
+            };
 
-            const payload = { ...this.model, site: { id: this._siteId } };
             const result = this.editingId
                 ? await this._inspectionService.updateForProfessional(this.editingId, payload)
                 : await this._inspectionService.submit(payload);
@@ -285,20 +346,20 @@ export class CsiSubmissionCreateComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            const submissionId = this.newSubmissionId();
-            this.model.submissionId = submissionId;
-
-            const [professional, usersPage, site, assemblies] = await Promise.all([
+            const [professional, usersPage, site, assemblies, stateOptions] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isCsiInspector', comparisonOperator: 'Eq', value: 'true' }] }),
                 this._siteService.getForProfessional(this._siteId),
-                this._inspectionService.initializeAssemblies(this._siteId, submissionId)
+                this._inspectionService.getAssembliesForForm(this._siteId),
+                this._lookupService.getAllStatesAsOptions(false)
             ]);
 
             this.professional = professional;
             this.csiUsers = usersPage.data ?? [];
             this.site = site;
             this.assemblies = assemblies;
+            this.stateOptions = stateOptions;
+            this.applySiteLocation(site);
 
             const waterSuppliersPage = await this._professionalSupplierService.getAllMy({ hasCsiInspection: true });
             this.waterSuppliers = waterSuppliersPage.data ?? [];
@@ -320,27 +381,26 @@ export class CsiSubmissionCreateComponent implements OnInit {
             const inspection = await this._inspectionService.getProfessionalInspection(id);
             this._siteId = inspection.site?.id ?? 0;
 
-            // Inspections submitted before assemblies existed have no submission id yet.
-            const submissionId = inspection.submissionId || this.newSubmissionId();
-            inspection.submissionId = submissionId;
-
-            const [professional, usersPage, site, assemblies] = await Promise.all([
+            const [professional, usersPage, site, assemblies, stateOptions] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isCsiInspector', comparisonOperator: 'Eq', value: 'true' }] }),
                 this._siteService.getForProfessional(this._siteId),
-                this._inspectionService.initializeAssemblies(this._siteId, submissionId)
+                this._inspectionService.getAssembliesForForm(this._siteId, id),
+                this._lookupService.getAllStatesAsOptions(false)
             ]);
 
             this.professional = professional;
             this.csiUsers = usersPage.data ?? [];
             this.site = site;
             this.assemblies = assemblies;
+            this.stateOptions = stateOptions;
 
             const waterSuppliersPage = await this._professionalSupplierService.getAllMy({ hasCsiInspection: true });
             this.waterSuppliers = waterSuppliersPage.data ?? [];
 
             this.buildDropdownOptions();
 
+            this._editingInspection = inspection;
             this.model = { ...inspection };
             this.remarksLength = this.model.comments?.length ?? 0;
 
@@ -356,6 +416,61 @@ export class CsiSubmissionCreateComponent implements OnInit {
         } finally {
             this.isLoading = false;
         }
+    }
+
+    private applySiteLocation(site: Site): void {
+        this.model.propertyBusinessName = site.businessName;
+        this.model.propertyType = site.propertyType;
+        this.model.propertyStreetNumber = site.streetNumber;
+        this.model.propertyStreetName = site.streetName;
+        this.model.propertyNumber = site.propertyNumber;
+        this.model.propertyCity = site.city;
+        this.model.propertyState = site.state ? { ...site.state } : undefined;
+        this.model.propertyZip = site.zipCode;
+
+        this.model.mailingCompanyName = site.mailingCompanyName;
+        this.model.mailingContactName = site.mailingContactName;
+        this.model.mailingStreetNumber = site.mailingStreetNumber;
+        this.model.mailingStreetName = site.mailingStreetName;
+        this.model.mailingNumber = site.mailingNumber;
+        this.model.mailingCity = site.mailingCity;
+        this.model.mailingState = site.mailingState ? { ...site.mailingState } : undefined;
+        this.model.mailingZip = site.mailingZipCode;
+        this.model.mailingPhoneNumber = site.mailingPhoneNumber;
+        this.model.mailingEmailAddress = site.mailingEmailAddress;
+    }
+
+    private applyInspectionLocation(inspection: CsiInspection): void {
+        this.model.propertyBusinessName = inspection.propertyBusinessName;
+        this.model.propertyType = inspection.propertyType;
+        this.model.propertyStreetNumber = inspection.propertyStreetNumber;
+        this.model.propertyStreetName = inspection.propertyStreetName;
+        this.model.propertyNumber = inspection.propertyNumber;
+        this.model.propertyCity = inspection.propertyCity;
+        this.model.propertyState = inspection.propertyState ? { ...inspection.propertyState } : undefined;
+        this.model.propertyZip = inspection.propertyZip;
+
+        this.model.mailingCompanyName = inspection.mailingCompanyName;
+        this.model.mailingContactName = inspection.mailingContactName;
+        this.model.mailingStreetNumber = inspection.mailingStreetNumber;
+        this.model.mailingStreetName = inspection.mailingStreetName;
+        this.model.mailingNumber = inspection.mailingNumber;
+        this.model.mailingCity = inspection.mailingCity;
+        this.model.mailingState = inspection.mailingState ? { ...inspection.mailingState } : undefined;
+        this.model.mailingZip = inspection.mailingZip;
+        this.model.mailingPhoneNumber = inspection.mailingPhoneNumber;
+        this.model.mailingEmailAddress = inspection.mailingEmailAddress;
+    }
+
+    private hasMissingLocationFields(): boolean {
+        return this.model.propertyType == null
+            || !this.model.propertyStreetNumber
+            || !this.model.propertyStreetName
+            || !this.model.propertyCity
+            || !this.model.propertyZip
+            || !this.model.mailingStreetName
+            || !this.model.mailingCity
+            || !this.model.mailingZip;
     }
 
     private buildDropdownOptions(): void {
@@ -434,9 +549,25 @@ export class CsiSubmissionCreateComponent implements OnInit {
         }
     }
 
-    // Keys everything saved from this form until the inspection is submitted (V1 SubmissionID).
-    private newSubmissionId(): string {
-        return crypto.randomUUID().replace(/-/g, '');
+    // How an added assembly shows until the inspection is saved: a current, in-service test. The server
+    // stores the same "{manufacturer} {model} {size} - {device type}" description.
+    private buildNewAssemblyRow(newAssembly: CsiInspectionNewAssembly): CsiInspectionAssembly {
+        const hasBypass = BYPASS_DEVICE_TYPES.includes(newAssembly.deviceType ?? '');
+
+        return {
+            deviceType: newAssembly.deviceType,
+            assemblyDescription: `${newAssembly.manufacturer ?? ''} ${newAssembly.model ?? ''} ${newAssembly.size ?? ''} - ${newAssembly.deviceType}`,
+            serialNumber: newAssembly.serialNumber,
+            assemblyDescription2: hasBypass ? `${newAssembly.manufacturer2} ${newAssembly.model2} ${newAssembly.size2} - ${newAssembly.deviceType}` : undefined,
+            serialNumber2: hasBypass ? newAssembly.serialNumber2 : undefined,
+            hazardType: newAssembly.hazardType,
+            hazardTypeOtherDescription: newAssembly.hazardTypeOtherDescription,
+            locationDescription: newAssembly.locationDescription,
+            isCurrent: true,
+            testResult: BackflowTestResult.Pass,
+            outOfService: false,
+            visuallyIdentified: false
+        };
     }
 
     private resetValidation(): void {
@@ -458,6 +589,21 @@ export class CsiSubmissionCreateComponent implements OnInit {
     }
 
     private collectValidationErrors(): void {
+        if (!this.isLocationEditing && this.hasMissingLocationFields()) {
+            this.isLocationEditing = true;
+            this.validationErrors.push('Please complete the property and mailing information.');
+        }
+
+        if (this.model.propertyStreetNumber && !/^\d/.test(this.model.propertyStreetNumber)) {
+            this.isLocationEditing = true;
+            this.validationErrors.push('Property street number must start with a digit.');
+        }
+
+        if (this.model.mailingStreetNumber && !/^\d/.test(this.model.mailingStreetNumber)) {
+            this.isLocationEditing = true;
+            this.validationErrors.push('Mailing street number must start with a digit. If you are entering a PO Box, enter the "PO Box" and the box number in the street name field.');
+        }
+
         if (this.model.inspectionDate && new Date(this.model.inspectionDate) > new Date()) {
             this.validationErrors.push('Inspection Date cannot be in the future.');
         }

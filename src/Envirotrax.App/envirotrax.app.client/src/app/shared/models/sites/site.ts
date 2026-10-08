@@ -5,6 +5,7 @@ import { PropertyType } from "../../enums/property-type.enum";
 import { State } from "../lookup/state";
 import { WaterSupplier } from "../water-suppliers/water-supplier";
 import { SiteLog } from "./site-log";
+import { SiteSchedule } from "./site-schedule";
 
 export interface Site {
     id?: number;
@@ -70,6 +71,7 @@ export interface Site {
     backflowScheduleMonth?: number;
     gisLatitude?: number;
     gisLongitude?: number;
+    schedules?: SiteSchedule[];
     gisStatus?: number;
     gisDate?: string;
     gisAreaId?: number;

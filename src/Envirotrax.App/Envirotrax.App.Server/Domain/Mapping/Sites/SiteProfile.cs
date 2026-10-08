@@ -53,6 +53,10 @@ public class SiteProfile : Profile
             .ForMember(dto => dto.DaysOverdue, opt => opt.Ignore())
             .ForMember(dto => dto.OverdueSeverity, opt => opt.Ignore());
 
+        CreateMap<Site, ProfessionalSiteDto>()
+            .IncludeBase<Site, SiteDto>()
+            .ForMember(dto => dto.Schedules, opt => opt.Ignore());
+
         CreateMap<Site, ReferencedSiteDto>()
             .AfterMap((model, dto) =>
             {

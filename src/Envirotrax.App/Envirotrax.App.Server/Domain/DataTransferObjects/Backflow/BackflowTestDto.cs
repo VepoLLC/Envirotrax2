@@ -368,6 +368,8 @@ public class BackflowTestDto : IDto, IMailingInfoDto, IRedactableMailingInfoDto
     public string? RejectedReason { get; set; }
 
     public bool NeedsValidation { get; set; }
+    public bool ValidationNewSite { get; set; }
+    public bool ValidationSiteInformationChanged { get; set; }
 
     // Images
     public string? AssemblyImagePath { get; set; }

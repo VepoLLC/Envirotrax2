@@ -54,6 +54,36 @@
     </div>
 </ng-template>
 
+<ng-template #actionsCell let-site="rowData">
+    <div class="d-flex flex-column gap-1" (click)="$event.stopPropagation()">
+        <button type="button"
+                class="btn btn-primary btn-sm text-nowrap"
+                (click)="viewSite(site)">
+            <i class="fa-solid fa-magnifying-glass me-1"></i>
+            View
+        </button>
+
+        <button *ngIf="scheduleTypes.length"
+                type="button"
+                class="btn btn-sm text-nowrap"
+                [class.btn-primary]="!site.schedules?.length"
+                [class.btn-success]="site.schedules?.length"
+                (click)="editSchedule(site)">
+            <ng-container *ngIf="!site.schedules?.length">
+                <i class="fa-solid fa-clock me-1"></i>Schedule
+            </ng-container>
+            <ng-container *ngIf="site.schedules?.length">
+                <div>
+                    <i class="fa-solid fa-clock me-1"></i>Scheduled
+                </div>
+                <div *ngFor="let schedule of site.schedules">
+                    {{ scheduleTypeNames[schedule.professionalType] }} - {{ schedule.scheduleDate | date: 'M/d/yyyy h:mm a' }}
+                </div>
+            </ng-container>
+        </button>
+    </div>
+</ng-template>
+
 <div [hidden]="showResults || showMapResults">
 
     <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
@@ -76,12 +106,49 @@
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
-                            <vp-filter-panel-field fieldName="needsCsiInspection"
+                            <vp-filter-panel-field *ngIf="canFilterByCsiInspection"
+                                                   fieldName="needsCsiInspection"
                                                    label="Needs CSI Inspection"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [form]="searchForm"
                                                    [options]="yesNoOptions" />
+
+                            <vp-filter-panel-field fieldName="workedOnly"
+                                                   label="Property Filter"
+                                                   labelStyle="horizontal"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="propertyFilterOptions" />
+
+                            <vp-filter-panel-field fieldName="scheduledOnly"
+                                                   label="Scheduled Properties"
+                                                   labelStyle="horizontal"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="scheduledPropertiesOptions" />
+
+                            <vp-filter-panel-field *ngIf="isScheduledOnly"
+                                                   fieldName="scheduledDateType"
+                                                   label="Scheduled Date"
+                                                   labelStyle="horizontal"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="scheduledDateTypeOptions" />
+
+                            <vp-filter-panel-field *ngIf="isScheduledDateRange"
+                                                   fieldName="scheduledFrom"
+                                                   label="From"
+                                                   labelStyle="horizontal"
+                                                   type="date"
+                                                   [form]="searchForm" />
+
+                            <vp-filter-panel-field *ngIf="isScheduledDateRange"
+                                                   fieldName="scheduledTo"
+                                                   label="To"
+                                                   labelStyle="horizontal"
+                                                   type="date"
+                                                   [form]="searchForm" />
                         </vp-field-grid>
 
                         <div class="d-xl-flex justify-content-end">
@@ -244,9 +311,7 @@
                       [(query)]="table.query"
                       (queryChange)="getSites()"
                       (queryReset)="getSites()"
-                      [freeTextSearch]="table.freeTextSearch"
-                      [canViewDetails]="true"
-                      (viewDetails)="viewSite($event)" />
+                      [freeTextSearch]="table.freeTextSearch" />
         </div>
     </vp-section>
 </div>

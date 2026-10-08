@@ -21,6 +21,8 @@ import { BackflowTestResult, BackflowReasonForTest, BackflowDeviceType } from '.
 import { MAX_PAGE_SIZE } from '../../../shared/models/page-info';
 import { Site } from '../../../shared/models/sites/site';
 import { SiteService } from '../../../shared/services/sites/site.service';
+import { LookupService } from '../../../shared/services/lookup/lookup.service';
+import { PropertyType } from '../../../shared/enums/property-type.enum';
 import { InputOption } from '@envirotrax/common-ui';
 
 @Component({
@@ -42,8 +44,12 @@ export class BackflowTestSubmitComponent implements OnInit {
 
     public site: Site | null = null;
     public editingTestId: number | null = null;
+    private _editingTest: BackflowTest | null = null;
     private _siteId = 0;
     private editMode = false;
+
+    public isNewProperty = false;
+    public isLocationEditing = false;
 
     private _bpats: ProfessionalUser[] = [];
     private _waterSuppliers: ProfessionalWaterSupplier[] = [];
@@ -52,6 +58,12 @@ export class BackflowTestSubmitComponent implements OnInit {
     public bpatOptions: InputOption[] = [];
     public waterSupplierOptions: InputOption[] = [];
     public gaugeOptions: InputOption[] = [];
+    public stateOptions: InputOption[] = [];
+
+    public readonly propertyTypeOptions: InputOption[] = [
+        { id: PropertyType.Residential, text: 'Residential' },
+        { id: PropertyType.Commercial, text: 'Commercial' }
+    ];
 
     public selectedBpatId?: number;
     public selectedWaterSupplierId?: number;
@@ -64,8 +76,11 @@ export class BackflowTestSubmitComponent implements OnInit {
     public readonly BackflowDeviceType = BackflowDeviceType;
     public readonly ExpirationType = ExpirationType;
     public readonly GaugeExpirationType = GaugeExpirationType;
+    public readonly PropertyType = PropertyType;
 
     public readonly deviceTypeOptions: InputOption[];
+    public readonly manufacturerOptions: InputOption[];
+    public readonly sizeOptions: InputOption[];
     public readonly hazardTypeOptions: InputOption[];
     public readonly reasonOptions: InputOption[];
 
@@ -139,6 +154,15 @@ export class BackflowTestSubmitComponent implements OnInit {
         ossf: false
     };
 
+    public isFailedResult = false;
+    public hasAssembly = false;
+    public locationDescriptionLength = 0;
+    public remarksLength = 0;
+    public deviceTypeLabel = '';
+    public showInsuranceRow = false;
+    public insuranceAboutToExpire = false;
+    public readonly today = new Date();
+
     // Repair checkboxes (serialized to text strings in the model)
     public repairCV1 = { cleaned: false, disc: false, spring: false, guide: false, pinRetainer: false, hingePin: false, seat: false, diaphragm: false };
     public repairCV2 = { cleaned: false, disc: false, spring: false, guide: false, pinRetainer: false, hingePin: false, seat: false, diaphragm: false };
@@ -152,7 +176,7 @@ export class BackflowTestSubmitComponent implements OnInit {
 
 
     public get verificationComplete(): boolean {
-        if (!this.selectedBpatId || !this.selectedWaterSupplierId || (!this.isAirGap && !this.selectedGaugeId)) {
+        if (!this.selectedBpatId || !this.selectedWaterSupplierId || (this.model.deviceType !== BackflowDeviceType.AG && !this.selectedGaugeId)) {
             return false;
         }
 
@@ -168,25 +192,6 @@ export class BackflowTestSubmitComponent implements OnInit {
 
         return true;
     }
-
-    public get showInsuranceRow(): boolean {
-        return !!this.insuranceCheck && this.insuranceCheck.result !== InsuranceCheckResult.NotRequired;
-    }
-
-    public get insuranceAboutToExpire(): boolean {
-        return this.insuranceCheck?.result === InsuranceCheckResult.Valid
-            && this.professional?.insuranceExpirationType === ExpirationType.AboutToExpire;
-    }
-    public get isAirGap(): boolean { return this.model.deviceType === BackflowDeviceType.AG; }
-    public get today(): Date { return new Date(); }
-    public get deviceTypeLabel(): string {
-        return this.deviceTypeOptions.find(o => o.id === this.model.deviceType)?.text ?? '';
-    }
-    public get isDC(): boolean { return [BackflowDeviceType.DC, BackflowDeviceType.DCD, BackflowDeviceType.DCD2].includes(this.model.deviceType as BackflowDeviceType); }
-    public get isRP(): boolean { return [BackflowDeviceType.RP, BackflowDeviceType.RPPD, BackflowDeviceType.RPPD2].includes(this.model.deviceType as BackflowDeviceType); }
-    public get isPVB(): boolean { return [BackflowDeviceType.PVB, BackflowDeviceType.SVB].includes(this.model.deviceType as BackflowDeviceType); }
-    public get hasBypassCV(): boolean { return [BackflowDeviceType.DCD, BackflowDeviceType.RPPD].includes(this.model.deviceType as BackflowDeviceType); }
-    public get hasBypassBC(): boolean { return [BackflowDeviceType.DCD2, BackflowDeviceType.RPPD2].includes(this.model.deviceType as BackflowDeviceType); }
 
     //Initial Test Validation
     public get initialTestFailedDc(): boolean {
@@ -276,7 +281,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         if (this.model.deviceType === BackflowDeviceType.RP) return this.initialTestFailedRp;
         if (this.model.deviceType === BackflowDeviceType.RPPD) return this.initialTestFailedRppd;
         if (this.model.deviceType === BackflowDeviceType.RPPD2) return this.initialTestFailedRppd2;
-        if (this.isPVB) return this.initialTestFailedPvb;
+        if (this.model.deviceType === BackflowDeviceType.PVB || this.model.deviceType === BackflowDeviceType.SVB) return this.initialTestFailedPvb;
         return false;
     }
 
@@ -391,17 +396,30 @@ export class BackflowTestSubmitComponent implements OnInit {
         if (this.model.deviceType === BackflowDeviceType.RP) return this.finalTestFailedRp;
         if (this.model.deviceType === BackflowDeviceType.RPPD) return this.finalTestFailedRppd;
         if (this.model.deviceType === BackflowDeviceType.RPPD2) return this.finalTestFailedRppd2;
-        if (this.isPVB) return this.finalTestFailedPvb;
+        if (this.model.deviceType === BackflowDeviceType.PVB || this.model.deviceType === BackflowDeviceType.SVB) return this.finalTestFailedPvb;
         return false;
     }
 
-    public get isOtherHazardType(): boolean { return this.model.hazardType === 'Other'; }
-    public get remarksLength(): number { return this.model.comments?.length ?? 0; }
+    public get showInitialTestMessages(): boolean {
+        if (this.isFailedResult) {
+            return this.initialTestDateError !== null;
+        }
+
+        return this.initialTestFailed;
+    }
+
+    public get showFinalTestMessages(): boolean {
+        if (this.isFailedResult) {
+            return false;
+        }
+
+        return this.finalTestFailed;
+    }
 
     public get initialTestDateError(): string | null {
         if (!this.model.initialTestDate) { return 'Please enter a test date and time.'; }
         if (new Date(this.model.initialTestDate) > new Date()) {
-            return this.isAirGap
+            return this.model.deviceType === BackflowDeviceType.AG
                 ? 'AirGap Test date cannot be set to a future date and time.'
                 : 'Initial Test date cannot be set to a future date and time.';
         }
@@ -470,9 +488,12 @@ export class BackflowTestSubmitComponent implements OnInit {
         private readonly _options: BackflowTestOptionsService,
         private readonly _settingsService: BackflowSettingsService,
         private readonly _siteService: SiteService,
-        private readonly _checkoutService: CheckoutService
+        private readonly _checkoutService: CheckoutService,
+        private readonly _lookupService: LookupService
     ) {
         this.deviceTypeOptions = this._options.deviceTypeOptions;
+        this.manufacturerOptions = this._options.manufacturerOptions;
+        this.sizeOptions = this._options.sizeOptions;
         this.hazardTypeOptions = this._options.hazardTypeOptions;
         this.reasonOptions = this._options.reasonOptions;
     }
@@ -494,8 +515,26 @@ export class BackflowTestSubmitComponent implements OnInit {
         });
     }
 
+    public onTestResultChange(value: BackflowTestResult): void {
+        this.model.testResult = value;
+        this.isFailedResult = value === BackflowTestResult.Fail;
+    }
+
+    public onLocationDescriptionChange(value: string): void {
+        this.model.locationDescription = value;
+        this.updateLocationDescriptionLength();
+    }
+
+    public onCommentsChange(value: string): void {
+        this.model.comments = value;
+        this.updateRemarksLength();
+    }
+
     public onDeviceTypeChange(value: string): void {
         this.model.deviceType = value;
+        this.updateHasAssembly();
+        this.updateDeviceTypeLabel();
+
         // Reset all test readings so stale values from a previous device type aren't submitted
         this.model.initialTestDate = undefined;
         this.model.repairTestDate = undefined;
@@ -549,6 +588,7 @@ export class BackflowTestSubmitComponent implements OnInit {
     public async onWaterSupplierChange(value: number): Promise<void> {
         this.selectedWaterSupplierId = value;
         this.selectedWaterSupplier = this._waterSuppliers.find(s => s.waterSupplier?.id === value);
+        this.applyWaterSupplierState();
 
         this.isLoading = true;
 
@@ -575,6 +615,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         const waterSupplierId = this.selectedWaterSupplierId;
 
         this.insuranceCheck = undefined;
+        this.updateInsuranceFlags();
 
         if (!waterSupplierId) {
             return;
@@ -584,12 +625,46 @@ export class BackflowTestSubmitComponent implements OnInit {
 
         if (this.selectedWaterSupplierId === waterSupplierId) {
             this.insuranceCheck = check;
+            this.updateInsuranceFlags();
         }
     }
 
     public onGaugeChange(value: number): void {
         this.selectedGaugeId = value;
         this.selectedGauge = this._gauges.find(g => g.id === value);
+    }
+
+    public onPropertyTypeChange(value: number): void {
+        this.model.propertyType = value;
+
+        if (value === PropertyType.Residential) {
+            this.model.propertyBusinessName = undefined;
+        }
+    }
+
+    public requestLocationModification(): void {
+        this.isLocationEditing = true;
+    }
+
+    public cancelLocationModification(): void {
+        if (this._editingTest) {
+            this.applyPreviousTestLocation(this._editingTest);
+        } else if (this.site) {
+            this.applySiteLocation(this.site);
+        } else if (this.previousTest) {
+            this.applyPreviousTestLocation(this.previousTest);
+        }
+
+        this.isLocationEditing = false;
+    }
+
+    public copyPropertyAddress(): void {
+        this.model.mailingStreetNumber = this.model.propertyStreetNumber;
+        this.model.mailingStreetName = this.model.propertyStreetName;
+        this.model.mailingNumber = this.model.propertyNumber;
+        this.model.mailingCity = this.model.propertyCity;
+        this.model.mailingState = this.model.propertyState ? { ...this.model.propertyState } : undefined;
+        this.model.mailingZip = this.model.propertyZip;
     }
 
     public async submit(form: NgForm): Promise<void> {
@@ -639,15 +714,17 @@ export class BackflowTestSubmitComponent implements OnInit {
     private async loadData(fromTestId: number | null): Promise<void> {
         this.isLoading = true;
         try {
-            const [professional, usersPage, gaugesPage] = await Promise.all([
+            const [professional, usersPage, gaugesPage, stateOptions] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isBackflowTester', comparisonOperator: 'Eq', value: 'true' }] }),
-                this._gaugeService.getAll({ pageSize: MAX_PAGE_SIZE }, {})
+                this._gaugeService.getAll({ pageSize: MAX_PAGE_SIZE }, {}),
+                this._lookupService.getAllStatesAsOptions(false)
             ]);
 
             this.professional = professional;
             this._bpats = usersPage.data ?? [];
             this._gauges = gaugesPage.data ?? [];
+            this.stateOptions = stateOptions;
 
             const suppliersPage = await this._supplierService.getAllMy({ hasBackflowTesting: true });
             this._waterSuppliers = suppliersPage.data ?? [];
@@ -667,7 +744,11 @@ export class BackflowTestSubmitComponent implements OnInit {
 
             if (siteId) {
                 this.site = await this._siteService.getForProfessional(siteId);
+                this.applySiteLocation(this.site);
             }
+
+            this.isNewProperty = !this.site && !this.previousTest;
+            this.isLocationEditing = this.isNewProperty;
 
             await this.setDefaults();
 
@@ -699,6 +780,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         if (this._waterSuppliers.length === 1) {
             this.selectedWaterSupplierId = this._waterSuppliers[0].waterSupplier?.id;
             this.selectedWaterSupplier = this._waterSuppliers[0];
+            this.applyWaterSupplierState();
             await this.loadSupplierData();
         }
         const validGauges = this._gauges.filter(g => g.expirationType !== GaugeExpirationType.Expired);
@@ -709,25 +791,8 @@ export class BackflowTestSubmitComponent implements OnInit {
     }
 
     private populateFromPreviousTest(test: BackflowTest): void {
-        this.model.accountNumber = test.accountNumber;
-        this.model.propertyBusinessName = test.propertyBusinessName;
-        this.model.propertyType = test.propertyType;
-        this.model.propertyStreetNumber = test.propertyStreetNumber;
-        this.model.propertyStreetName = test.propertyStreetName;
-        this.model.propertyNumber = test.propertyNumber;
-        this.model.propertyCity = test.propertyCity;
-        this.model.propertyState = test.propertyState;
-        this.model.propertyZip = test.propertyZip;
-        this.model.mailingCompanyName = test.mailingCompanyName;
-        this.model.mailingContactName = test.mailingContactName;
-        this.model.mailingStreetNumber = test.mailingStreetNumber;
-        this.model.mailingStreetName = test.mailingStreetName;
-        this.model.mailingNumber = test.mailingNumber;
-        this.model.mailingCity = test.mailingCity;
-        this.model.mailingState = test.mailingState;
-        this.model.mailingZip = test.mailingZip;
-        this.model.mailingPhoneNumber = test.mailingPhoneNumber;
-        this.model.mailingEmailAddress = test.mailingEmailAddress;
+        this.applyPreviousTestLocation(test);
+
         this.model.deviceType = test.deviceType;
         this.model.manufacturer = test.manufacturer;
         this.model.model = test.model;
@@ -747,6 +812,59 @@ export class BackflowTestSubmitComponent implements OnInit {
         // V1 carries the water meter number onto the next test for the assembly; the submit form
         // posts it whether or not the setting is currently showing the field.
         this.model.waterMeterNumber = test.waterMeterNumber;
+
+        this.updateHasAssembly();
+        this.updateDeviceTypeLabel();
+        this.updateLocationDescriptionLength();
+    }
+
+    private updateHasAssembly(): void {
+        this.hasAssembly = !!this.model.deviceType && this.model.deviceType !== BackflowDeviceType.AG;
+    }
+
+    private updateDeviceTypeLabel(): void {
+        const option = this.deviceTypeOptions.find(o => o.id === this.model.deviceType);
+
+        if (!option || !option.text) {
+            this.deviceTypeLabel = '';
+            return;
+        }
+
+        this.deviceTypeLabel = option.text;
+    }
+
+    private updateLocationDescriptionLength(): void {
+        if (!this.model.locationDescription) {
+            this.locationDescriptionLength = 0;
+            return;
+        }
+
+        this.locationDescriptionLength = this.model.locationDescription.length;
+    }
+
+    private updateRemarksLength(): void {
+        if (!this.model.comments) {
+            this.remarksLength = 0;
+            return;
+        }
+
+        this.remarksLength = this.model.comments.length;
+    }
+
+    private updateInsuranceFlags(): void {
+        this.showInsuranceRow = false;
+        this.insuranceAboutToExpire = false;
+
+        if (!this.insuranceCheck) {
+            return;
+        }
+
+        this.showInsuranceRow = this.insuranceCheck.result !== InsuranceCheckResult.NotRequired;
+
+        if (this.professional) {
+            this.insuranceAboutToExpire = this.insuranceCheck.result === InsuranceCheckResult.Valid
+                && this.professional.insuranceExpirationType === ExpirationType.AboutToExpire;
+        }
     }
 
     // Checkout "Edit": full field load of an own, still-unpaid test — unlike loadData/populateFromPreviousTest,
@@ -754,15 +872,17 @@ export class BackflowTestSubmitComponent implements OnInit {
     private async loadForEdit(testId: number): Promise<void> {
         this.isLoading = true;
         try {
-            const [professional, usersPage, gaugesPage] = await Promise.all([
+            const [professional, usersPage, gaugesPage, stateOptions] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isBackflowTester', comparisonOperator: 'Eq', value: 'true' }] }),
-                this._gaugeService.getAll({ pageSize: MAX_PAGE_SIZE }, {})
+                this._gaugeService.getAll({ pageSize: MAX_PAGE_SIZE }, {}),
+                this._lookupService.getAllStatesAsOptions(false)
             ]);
 
             this.professional = professional;
             this._bpats = usersPage.data ?? [];
             this._gauges = gaugesPage.data ?? [];
+            this.stateOptions = stateOptions;
 
             const suppliersPage = await this._supplierService.getAllMy({ hasBackflowTesting: true });
             this._waterSuppliers = suppliersPage.data ?? [];
@@ -771,6 +891,7 @@ export class BackflowTestSubmitComponent implements OnInit {
 
             const test = await this._backflowTestService.getForProfessional(testId);
             this.editingTestId = testId;
+            this._editingTest = test;
             await this.populateForEdit(test);
 
             if (test.site?.id) {
@@ -783,6 +904,11 @@ export class BackflowTestSubmitComponent implements OnInit {
 
     private async populateForEdit(test: BackflowTest): Promise<void> {
         this.model = { ...test };
+        this.isFailedResult = test.testResult === BackflowTestResult.Fail;
+        this.updateHasAssembly();
+        this.updateDeviceTypeLabel();
+        this.updateLocationDescriptionLength();
+        this.updateRemarksLength();
 
         this.selectedBpatId = test.bpat?.id;
         this.selectedBpat = this._bpats.find(u => u.id === test.bpat?.id);
@@ -856,6 +982,65 @@ export class BackflowTestSubmitComponent implements OnInit {
         };
     }
 
+    private applyPreviousTestLocation(test: BackflowTest): void {
+        this.model.accountNumber = test.accountNumber;
+        this.model.propertyBusinessName = test.propertyBusinessName;
+        this.model.propertyType = test.propertyType;
+        this.model.propertyStreetNumber = test.propertyStreetNumber;
+        this.model.propertyStreetName = test.propertyStreetName;
+        this.model.propertyNumber = test.propertyNumber;
+        this.model.propertyCity = test.propertyCity;
+        this.model.propertyState = test.propertyState ? { ...test.propertyState } : undefined;
+        this.model.propertyZip = test.propertyZip;
+
+        this.model.mailingCompanyName = test.mailingCompanyName;
+        this.model.mailingContactName = test.mailingContactName;
+        this.model.mailingStreetNumber = test.mailingStreetNumber;
+        this.model.mailingStreetName = test.mailingStreetName;
+        this.model.mailingNumber = test.mailingNumber;
+        this.model.mailingCity = test.mailingCity;
+        this.model.mailingState = test.mailingState ? { ...test.mailingState } : undefined;
+        this.model.mailingZip = test.mailingZip;
+        this.model.mailingPhoneNumber = test.mailingPhoneNumber;
+        this.model.mailingEmailAddress = test.mailingEmailAddress;
+    }
+
+    private applySiteLocation(site: Site): void {
+        this.model.accountNumber = site.accountNumber;
+        this.model.propertyBusinessName = site.businessName;
+        this.model.propertyType = site.propertyType;
+        this.model.propertyStreetNumber = site.streetNumber;
+        this.model.propertyStreetName = site.streetName;
+        this.model.propertyNumber = site.propertyNumber;
+        this.model.propertyCity = site.city;
+        this.model.propertyState = site.state ? { ...site.state } : undefined;
+        this.model.propertyZip = site.zipCode;
+
+        this.model.mailingCompanyName = site.mailingCompanyName;
+        this.model.mailingContactName = site.mailingContactName;
+        this.model.mailingStreetNumber = site.mailingStreetNumber;
+        this.model.mailingStreetName = site.mailingStreetName;
+        this.model.mailingNumber = site.mailingNumber;
+        this.model.mailingCity = site.mailingCity;
+        this.model.mailingState = site.mailingState ? { ...site.mailingState } : undefined;
+        this.model.mailingZip = site.mailingZipCode;
+        this.model.mailingPhoneNumber = site.mailingPhoneNumber;
+        this.model.mailingEmailAddress = site.mailingEmailAddress;
+    }
+
+    private applyWaterSupplierState(): void {
+        if (!this.isNewProperty) {
+            return;
+        }
+
+        const stateId = this.selectedWaterSupplier?.waterSupplier?.state?.id;
+
+        if (stateId) {
+            this.model.propertyState = { id: stateId };
+            this.model.mailingState = { id: stateId };
+        }
+    }
+
     private async applySiteWaterSupplier(site: Site): Promise<void> {
         const siteWsId = site.waterSupplier?.id;
 
@@ -915,6 +1100,17 @@ export class BackflowTestSubmitComponent implements OnInit {
         return parts.join(', ');
     }
 
+    private hasMissingLocationFields(): boolean {
+        return this.model.propertyType == null
+            || !this.model.propertyStreetNumber
+            || !this.model.propertyStreetName
+            || !this.model.propertyCity
+            || !this.model.propertyZip
+            || !this.model.mailingStreetName
+            || !this.model.mailingCity
+            || !this.model.mailingZip;
+    }
+
     private collectValidationErrors(): void {
         if (!this.selectedBpatId) {
             this.validationErrors.push('Please select a BPAT account.');
@@ -925,14 +1121,29 @@ export class BackflowTestSubmitComponent implements OnInit {
         if (!this.model.hazardType) {
             this.validationErrors.push('Please select a hazard type.');
         }
-        if (!this.isAirGap && !this.selectedGaugeId) {
+        if (this.model.deviceType !== BackflowDeviceType.AG && !this.selectedGaugeId) {
             this.validationErrors.push('Please select a test gauge.');
         }
         if (!this.model.deviceType) {
-            this.validationErrors.push('Please select a device type.');
+            this.validationErrors.push('Please select a backflow method.');
         }
 
-        if (this.isAirGap) {
+        if (!this.isLocationEditing && this.hasMissingLocationFields()) {
+            this.isLocationEditing = true;
+            this.validationErrors.push('Please complete the property and mailing information.');
+        }
+
+        if (this.model.propertyStreetNumber && !/^\d/.test(this.model.propertyStreetNumber)) {
+            this.isLocationEditing = true;
+            this.validationErrors.push('Property street number must start with a digit.');
+        }
+
+        if (this.model.mailingStreetNumber && !/^\d/.test(this.model.mailingStreetNumber)) {
+            this.isLocationEditing = true;
+            this.validationErrors.push('Mailing street number must start with a digit. If you are entering a PO Box, enter the "PO Box" and the box number in the street name field.');
+        }
+
+        if (this.model.deviceType === BackflowDeviceType.AG) {
             if (!this.model.initialTestDate) {
                 this.validationErrors.push('Please enter a test date and time.');
             } else if (new Date(this.model.initialTestDate) > new Date()) {

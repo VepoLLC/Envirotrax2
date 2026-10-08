@@ -7,7 +7,7 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 public interface ISiteService : IService<Site, SiteDto>
 {
     Task<IPagedData<SiteDto>> SearchAsync(PageInfo pageInfo, Query query, FogCompliancyStatus? fogCompliancyStatus, CancellationToken cancellationToken);
-    Task<IPagedData<SiteDto>> GetAllForProfessionalAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<IPagedData<ProfessionalSiteDto>> SearchForProfessionalAsync(ProfessionalSiteSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<SiteDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken);
     Task<IEnumerable<SiteDto>> GetAllPendingGeocodingAsync(int batchSize);
     Task<SiteDto?> GeocodeAsync(int siteId, bool assignGisArea, CancellationToken cancellationToken);

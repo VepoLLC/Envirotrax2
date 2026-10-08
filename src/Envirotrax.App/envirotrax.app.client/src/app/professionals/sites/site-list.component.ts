@@ -2,12 +2,12 @@ import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/
 import { ActivatedRoute, Router } from "@angular/router";
 import { TableViewModel } from "../../shared/models/table-view-model";
 import { Site } from "../../shared/models/sites/site";
-import { SiteService } from "../../shared/services/sites/site.service";
+import { ProfessionalSiteSearchCriteria, SiteService } from "../../shared/services/sites/site.service";
 import { QueryProperty } from "../../shared/models/query";
 import { NgForm } from "@angular/forms";
 import { ProfessionalSupplierService } from "../../shared/services/professionals/professional-supplier.service";
 import { PropertyType } from "../../shared/enums/property-type.enum";
-import { CellTemplateData, ColumnType, InputOption, MapMarker, MapPolygon, TableColumn } from "@envirotrax/common-ui";
+import { CellTemplateData, ColumnType, InputOption, MapMarker, MapPolygon, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
 import { GisAreaService } from "../../shared/services/gis-areas/gis-area.service";
 import { GisAreaCoordinateService } from "../../shared/services/gis-areas/gis-area-coordinate.service";
@@ -16,6 +16,17 @@ import { GisArea } from "../../shared/models/gis-areas/gis-area";
 import { DownloadConfig } from "../../shared/models/download-config";
 import { DownloadService } from "../../shared/services/download.service";
 import { PrintableTableService } from "../../shared/services/printable-table.service";
+import { ProfesisonalService } from "../../shared/services/professionals/professional.service";
+import { SiteSchedule } from "../../shared/models/sites/site-schedule";
+import { EditSiteScheduleComponent, EditSiteScheduleModel } from "./schedule/edit-site-schedule.component";
+import { SITE_SCHEDULE_TYPE_NAMES, SiteScheduleService, SiteScheduleType } from "../../shared/services/sites/site-schedule.service";
+
+const CRITERIA_FIELDS: (keyof ProfessionalSiteSearchCriteria)[] = [
+    "workedOnly",
+    "scheduledOnly",
+    "scheduledFrom",
+    "scheduledTo"
+];
 
 @Component({
     standalone: false,
@@ -33,6 +44,15 @@ export class SiteListComponent implements OnInit {
     public mapZoom: number = 10;
 
     public waterSupplierOptions: InputOption[] = [];
+    public canFilterByCsiInspection: boolean = false;
+
+    public isScheduledOnly: boolean = false;
+    public isScheduledDateRange: boolean = false;
+
+    public scheduleTypes: SiteScheduleType[] = [];
+    public readonly scheduleTypeNames = SITE_SCHEDULE_TYPE_NAMES;
+
+    private _criteria: ProfessionalSiteSearchCriteria = {};
 
     public downloadConfig?: DownloadConfig<'Property Information' | 'Mailing Information'>;
 
@@ -47,6 +67,9 @@ export class SiteListComponent implements OnInit {
 
     @ViewChild('mailingInformation', { static: true })
     public mailingInformation?: TemplateRef<CellTemplateData<Site>>;
+
+    @ViewChild('actionsCell', { static: true })
+    public actionsCell?: TemplateRef<CellTemplateData<Site>>;
 
     public propertyType = PropertyType;
 
@@ -77,6 +100,21 @@ export class SiteListComponent implements OnInit {
         { id: PropertyType.Commercial.toString(), text: "Commercial" }
     ];
 
+    public propertyFilterOptions: InputOption[] = [
+        { id: "", text: "Any property" },
+        { id: "true", text: "Properties where I have worked" }
+    ];
+
+    public scheduledPropertiesOptions: InputOption[] = [
+        { id: "", text: "Any property" },
+        { id: "true", text: "Scheduled Date" }
+    ];
+
+    public scheduledDateTypeOptions: InputOption[] = [
+        { id: "", text: "Any Date" },
+        { id: "range", text: "Date Range" }
+    ];
+
     constructor(
         private readonly _siteService: SiteService,
         private readonly _proSupplierService: ProfessionalSupplierService,
@@ -87,13 +125,32 @@ export class SiteListComponent implements OnInit {
         private readonly _coordinateService: GisAreaCoordinateService,
         private readonly _gisMapService: GisMapService,
         private readonly _downloadService: DownloadService,
-        private readonly _printService: PrintableTableService
+        private readonly _printService: PrintableTableService,
+        private readonly _professionalService: ProfesisonalService,
+        private readonly _modalHelper: ModalHelperService,
+        private readonly _siteScheduleService: SiteScheduleService
     ) {
     }
 
     public async ngOnInit(): Promise<void> {
         this.table.columns = this.getColumns();
-        this.waterSupplierOptions = await this._proSupplierService.getMyAsOptions();
+
+        try {
+            this.table.isLoading = true;
+
+            const [waterSupplierOptions, professional, scheduleTypes] = await Promise.all([
+                this._proSupplierService.getMyAsOptions(),
+                this._professionalService.getLoggedInProfessional(),
+                this._siteScheduleService.getMyScheduleTypes()
+            ]);
+
+            this.waterSupplierOptions = waterSupplierOptions;
+            this.canFilterByCsiInspection = professional.hasCsiInspection === true;
+            this.scheduleTypes = scheduleTypes;
+        } finally {
+            this.table.isLoading = false;
+        }
+
         this.setDownloadConfig();
     }
 
@@ -161,6 +218,14 @@ export class SiteListComponent implements OnInit {
                 type: ColumnType.other,
                 cellTemplate: this.mailingInformation,
                 queryColumnExcluded: true
+            },
+            {
+                field: 'Actions',
+                caption: '',
+                type: ColumnType.other,
+                cellTemplate: this.actionsCell,
+                queryColumnExcluded: true,
+                isDownloadExcluded: true
             }
         ];
     }
@@ -171,7 +236,8 @@ export class SiteListComponent implements OnInit {
 
             const result = await this._siteService.getAllForProfessional(
                 this.table.items?.pageInfo || {},
-                this.table.query
+                this.table.query,
+                this._criteria
             );
 
             const startIndex = ((result.pageInfo.pageNumber ?? 1) - 1) * (result.pageInfo.pageSize ?? 10);
@@ -189,7 +255,23 @@ export class SiteListComponent implements OnInit {
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
-        this.table.query.filter = queryProperties;
+        this._criteria = {};
+
+        for (const field of CRITERIA_FIELDS) {
+            const property = queryProperties.find(p => p.columnName === field);
+
+            this._criteria[field] = property?.value ? property.value : null;
+        }
+
+        this.isScheduledOnly = !!this._criteria.scheduledOnly;
+        this.isScheduledDateRange = this.isScheduledOnly && queryProperties.find(p => p.columnName === 'scheduledDateType')?.value === 'range';
+
+        if (!this.isScheduledDateRange) {
+            this._criteria.scheduledFrom = null;
+            this._criteria.scheduledTo = null;
+        }
+
+        this.table.query.filter = queryProperties.filter(p => !CRITERIA_FIELDS.includes(p.columnName as keyof ProfessionalSiteSearchCriteria) && p.columnName !== 'scheduledDateType');
     }
 
     public async search(searchForm: NgForm): Promise<void> {
@@ -221,7 +303,7 @@ export class SiteListComponent implements OnInit {
             this.showMapResults = false;
 
             const [sitesPage, areas, coordinates, defaultView] = await Promise.all([
-                this._siteService.getAllForProfessional({ pageSize: 10000, pageNumber: 1 }, this.table.query),
+                this._siteService.getAllForProfessional({ pageSize: 10000, pageNumber: 1 }, this.table.query, this._criteria),
                 this._gisAreaService.getAllAreasForProfessional(waterSupplierId),
                 this._coordinateService.getAllForProfessional(waterSupplierId),
                 this._gisAreaService.getDefaultViewForProfessional(waterSupplierId)
@@ -254,6 +336,18 @@ export class SiteListComponent implements OnInit {
 
     public viewPrintableTable(): void {
         this._printService.open(this._printableSection.nativeElement);
+    }
+
+    public editSchedule(site: Site): void {
+        this._modalHelper.show<EditSiteScheduleModel, SiteSchedule[]>(EditSiteScheduleComponent, {
+            title: 'Set Schedule',
+            mode: 'disableFullScreen',
+            model: {
+                siteId: site.id!,
+                schedules: site.schedules ?? [],
+                scheduleTypes: this.scheduleTypes
+            }
+        }).result().subscribe(schedules => site.schedules = schedules);
     }
 
     public viewSite(site: Site): void {

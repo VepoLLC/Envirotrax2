@@ -19,6 +19,8 @@ import { MAX_PAGE_SIZE } from "../../../../shared/models/page-info";
 import { FogInspectionOptionsService } from "../../../../shared/services/fog/fog-inspection-options.service";
 import { InterceptorType } from "../../../../shared/enums/interceptor-type.enum";
 import { FogInspectionResult } from "../../../../shared/models/fog/fog-inspection-enums";
+import { LookupService } from "../../../../shared/services/lookup/lookup.service";
+import { PropertyType } from "../../../../shared/enums/property-type.enum";
 import { InputOption, ModalHelperService } from "@envirotrax/common-ui";
 
 @Component({
@@ -36,6 +38,15 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
     public site?: Site;
     public professional?: Professional;
     public editingId: number | null = null;
+    private _editingInspection: FogInspection | null = null;
+
+    public isLocationEditing = false;
+    public stateOptions: InputOption[] = [];
+
+    public readonly propertyTypeOptions: InputOption[] = [
+        { id: PropertyType.Residential, text: 'Residential' },
+        { id: PropertyType.Commercial, text: 'Commercial' }
+    ];
 
     private fogUsers: ProfessionalUser[] = [];
     private waterSuppliers: ProfessionalWaterSupplier[] = [];
@@ -50,6 +61,7 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
 
     public readonly InterceptorType = InterceptorType;
     public readonly FogInspectionResult = FogInspectionResult;
+    public readonly PropertyType = PropertyType;
 
     public readonly interceptorTypeOptions: InputOption[];
     public readonly capacityTypeOptions: InputOption[];
@@ -96,7 +108,8 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
         private readonly _inspectionService: ProfessionalFogInspectionService,
         private readonly _fogOptions: FogInspectionOptionsService,
         private readonly _modalHelper: ModalHelperService,
-        private readonly _checkoutService: CheckoutService
+        private readonly _checkoutService: CheckoutService,
+        private readonly _lookupService: LookupService
     ) {
         this.interceptorTypeOptions = this._fogOptions.interceptorTypeOptions;
         this.capacityTypeOptions = this._fogOptions.capacityTypeOptions;
@@ -142,6 +155,37 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
     public onCommentsChange(value: string | undefined): void {
         this.model.comments = value;
         this.remarksLength = value?.length ?? 0;
+    }
+
+    public onPropertyTypeChange(value: PropertyType): void {
+        this.model.propertyType = value;
+
+        if (value === PropertyType.Residential) {
+            this.model.propertyBusinessName = undefined;
+        }
+    }
+
+    public requestLocationModification(): void {
+        this.isLocationEditing = true;
+    }
+
+    public cancelLocationModification(): void {
+        if (this._editingInspection) {
+            this.applyInspectionLocation(this._editingInspection);
+        } else if (this.site) {
+            this.applySiteLocation(this.site);
+        }
+
+        this.isLocationEditing = false;
+    }
+
+    public copyPropertyAddress(): void {
+        this.model.mailingStreetNumber = this.model.propertyStreetNumber;
+        this.model.mailingStreetName = this.model.propertyStreetName;
+        this.model.mailingNumber = this.model.propertyNumber;
+        this.model.mailingCity = this.model.propertyCity;
+        this.model.mailingState = this.model.propertyState ? { ...this.model.propertyState } : undefined;
+        this.model.mailingZip = this.model.propertyZip;
     }
 
     public onExteriorImageChange(file: File | null): void {
@@ -243,6 +287,21 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
     }
 
     private collectValidationErrors(): void {
+        if (!this.isLocationEditing && this.hasMissingLocationFields()) {
+            this.isLocationEditing = true;
+            this.validationErrors.push('Please complete the property and mailing information.');
+        }
+
+        if (this.model.propertyStreetNumber && !/^\d/.test(this.model.propertyStreetNumber)) {
+            this.isLocationEditing = true;
+            this.validationErrors.push('Property street number must start with a digit.');
+        }
+
+        if (this.model.mailingStreetNumber && !/^\d/.test(this.model.mailingStreetNumber)) {
+            this.isLocationEditing = true;
+            this.validationErrors.push('Mailing street number must start with a digit. If you are entering a PO Box, enter the "PO Box" and the box number in the street name field.');
+        }
+
         if (this.model.inspectionDate && new Date(this.model.inspectionDate) > new Date()) {
             this.validationErrors.push('Inspection Date cannot be in the future.');
         }
@@ -322,15 +381,18 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            const [professional, usersPage, site] = await Promise.all([
+            const [professional, usersPage, site, stateOptions] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isFogInspector', comparisonOperator: 'Eq', value: 'true' }] }),
-                this._siteService.getForProfessional(this._siteId)
+                this._siteService.getForProfessional(this._siteId),
+                this._lookupService.getAllStatesAsOptions(false)
             ]);
 
             this.professional = professional;
             this.fogUsers = usersPage.data ?? [];
             this.site = site;
+            this.stateOptions = stateOptions;
+            this.applySiteLocation(site);
 
             const waterSuppliersPage = await this._professionalSupplierService.getAllMy({ hasFogInspection: true });
             this.waterSuppliers = waterSuppliersPage.data ?? [];
@@ -352,21 +414,24 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
             const inspection = await this._inspectionService.getById(id);
             this._siteId = inspection.site?.id ?? 0;
 
-            const [professional, usersPage, site] = await Promise.all([
+            const [professional, usersPage, site, stateOptions] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isFogInspector', comparisonOperator: 'Eq', value: 'true' }] }),
-                this._siteService.getForProfessional(this._siteId)
+                this._siteService.getForProfessional(this._siteId),
+                this._lookupService.getAllStatesAsOptions(false)
             ]);
 
             this.professional = professional;
             this.fogUsers = usersPage.data ?? [];
             this.site = site;
+            this.stateOptions = stateOptions;
 
             const waterSuppliersPage = await this._professionalSupplierService.getAllMy({ hasFogInspection: true });
             this.waterSuppliers = waterSuppliersPage.data ?? [];
 
             this.buildDropdownOptions();
 
+            this._editingInspection = inspection;
             this.model = { ...inspection };
             this.remarksLength = this.model.comments?.length ?? 0;
             this.recalcCapacity();
@@ -383,6 +448,61 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
         } finally {
             this.isLoading = false;
         }
+    }
+
+    private applySiteLocation(site: Site): void {
+        this.model.propertyBusinessName = site.businessName;
+        this.model.propertyType = site.propertyType;
+        this.model.propertyStreetNumber = site.streetNumber;
+        this.model.propertyStreetName = site.streetName;
+        this.model.propertyNumber = site.propertyNumber;
+        this.model.propertyCity = site.city;
+        this.model.propertyState = site.state ? { ...site.state } : undefined;
+        this.model.propertyZip = site.zipCode;
+
+        this.model.mailingCompanyName = site.mailingCompanyName;
+        this.model.mailingContactName = site.mailingContactName;
+        this.model.mailingStreetNumber = site.mailingStreetNumber;
+        this.model.mailingStreetName = site.mailingStreetName;
+        this.model.mailingNumber = site.mailingNumber;
+        this.model.mailingCity = site.mailingCity;
+        this.model.mailingState = site.mailingState ? { ...site.mailingState } : undefined;
+        this.model.mailingZip = site.mailingZipCode;
+        this.model.mailingPhoneNumber = site.mailingPhoneNumber;
+        this.model.mailingEmailAddress = site.mailingEmailAddress;
+    }
+
+    private applyInspectionLocation(inspection: FogInspection): void {
+        this.model.propertyBusinessName = inspection.propertyBusinessName;
+        this.model.propertyType = inspection.propertyType;
+        this.model.propertyStreetNumber = inspection.propertyStreetNumber;
+        this.model.propertyStreetName = inspection.propertyStreetName;
+        this.model.propertyNumber = inspection.propertyNumber;
+        this.model.propertyCity = inspection.propertyCity;
+        this.model.propertyState = inspection.propertyState ? { ...inspection.propertyState } : undefined;
+        this.model.propertyZip = inspection.propertyZip;
+
+        this.model.mailingCompanyName = inspection.mailingCompanyName;
+        this.model.mailingContactName = inspection.mailingContactName;
+        this.model.mailingStreetNumber = inspection.mailingStreetNumber;
+        this.model.mailingStreetName = inspection.mailingStreetName;
+        this.model.mailingNumber = inspection.mailingNumber;
+        this.model.mailingCity = inspection.mailingCity;
+        this.model.mailingState = inspection.mailingState ? { ...inspection.mailingState } : undefined;
+        this.model.mailingZip = inspection.mailingZip;
+        this.model.mailingPhoneNumber = inspection.mailingPhoneNumber;
+        this.model.mailingEmailAddress = inspection.mailingEmailAddress;
+    }
+
+    private hasMissingLocationFields(): boolean {
+        return this.model.propertyType == null
+            || !this.model.propertyStreetNumber
+            || !this.model.propertyStreetName
+            || !this.model.propertyCity
+            || !this.model.propertyZip
+            || !this.model.mailingStreetName
+            || !this.model.mailingCity
+            || !this.model.mailingZip;
     }
 
     private buildDropdownOptions(): void {

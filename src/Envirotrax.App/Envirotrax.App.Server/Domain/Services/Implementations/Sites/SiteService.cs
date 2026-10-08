@@ -15,6 +15,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
+using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Sites;
 
@@ -32,6 +33,8 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     private readonly IFogInspectionRepository _fogInspectionRepository;
     private readonly IFogTripTicketRepository _fogTripTicketRepository;
     private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
+    private readonly ISiteScheduleService _siteScheduleService;
+    private readonly IAuthService _authService;
     private readonly ILogger<SiteService> _logger;
 
     public SiteService(
@@ -48,6 +51,8 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         IFogInspectionRepository fogInspectionRepository,
         IFogTripTicketRepository fogTripTicketRepository,
         IMailingInfoRedactionService mailingInfoRedactionService,
+        ISiteScheduleService siteScheduleService,
+        IAuthService authService,
         ILogger<SiteService> logger)
         : base(mapper, repository)
     {
@@ -63,6 +68,8 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         _fogInspectionRepository = fogInspectionRepository;
         _fogTripTicketRepository = fogTripTicketRepository;
         _mailingInfoRedactionService = mailingInfoRedactionService;
+        _siteScheduleService = siteScheduleService;
+        _authService = authService;
         _logger = logger;
     }
 
@@ -128,11 +135,33 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     }
 
     // GetAsync stays unredacted: professional submissions snapshot the site's real mailing information from it.
-    public async Task<IPagedData<SiteDto>> GetAllForProfessionalAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public async Task<IPagedData<ProfessionalSiteDto>> SearchForProfessionalAsync(ProfessionalSiteSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        var sites = await GetAllAsync(pageInfo, query, cancellationToken);
+        query.Sort = query.ConvertSortProperties<Site, SiteDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<Site, SiteDto>(Mapper);
 
-        return await _mailingInfoRedactionService.RedactAsync(sites, cancellationToken);
+        var sites = (await _siteRepository.SearchForProfessionalAsync(
+            criteria,
+            pageInfo,
+            query,
+            _authService.ProfessionalId,
+            _authService.UserId,
+            cancellationToken)).ToList();
+
+        var schedules = await _siteScheduleService.GetMyBySiteIdsAsync(sites.Select(s => s.Id), cancellationToken);
+        var schedulesBySiteId = schedules.ToLookup(s => s.SiteId);
+
+        var result = sites
+            .Select(site =>
+            {
+                var dto = Mapper.Map<ProfessionalSiteDto>(site);
+                dto.Schedules = schedulesBySiteId[site.Id].ToList();
+
+                return dto;
+            })
+            .ToPagedData(pageInfo);
+
+        return await _mailingInfoRedactionService.RedactAsync(result, cancellationToken);
     }
 
     public async Task<SiteDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken)

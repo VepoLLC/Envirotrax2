@@ -63,14 +63,14 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
     }
 
     [HttpPost("submit")]
-    public async Task<IActionResult> SubmitAsync([FromBody] CsiInspectionDto request, CancellationToken cancellationToken)
+    public async Task<IActionResult> SubmitAsync([FromBody] CreateCsiInspectionDto request, CancellationToken cancellationToken)
     {
         var result = await _inspectionService.SubmitAsync(request, cancellationToken);
         return Ok(result);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync(int id, [FromBody] CsiInspectionDto request, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateAsync(int id, [FromBody] CreateCsiInspectionDto request, CancellationToken cancellationToken)
     {
         var result = await _inspectionService.UpdateForProfessionalAsync(id, request, cancellationToken);
         return result == null ? NotFound() : Ok(result);

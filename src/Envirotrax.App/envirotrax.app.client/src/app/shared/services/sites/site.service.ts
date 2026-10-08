@@ -19,6 +19,13 @@ export interface SiteTabCounts {
     fogCount: number;
 }
 
+export interface ProfessionalSiteSearchCriteria {
+    workedOnly?: string | null;
+    scheduledOnly?: string | null;
+    scheduledFrom?: string | null;
+    scheduledTo?: string | null;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -168,12 +175,18 @@ export class SiteService {
         return await lastValueFrom(observable);
     }
 
-    public async getAllForProfessional(pageInfo: PageInfo, query: Query): Promise<PagedData<Site>> {
+    public async getAllForProfessional(pageInfo: PageInfo, query: Query, criteria: ProfessionalSiteSearchCriteria = {}): Promise<PagedData<Site>> {
         const url = this._urlResolver.resolveUrl('/api/professionals/sites');
-        const observable = this._http.get<PagedData<Site>>(url, {
-            params: this._queryHelper.buildQuery(pageInfo, query)
-        });
-        return await lastValueFrom(observable);
+
+        let params = this._queryHelper.buildQuery(pageInfo, query);
+
+        for (const [name, value] of Object.entries(criteria)) {
+            if (value) {
+                params = params.append(name, value);
+            }
+        }
+
+        return await lastValueFrom(this._http.get<PagedData<Site>>(url, { params }));
     }
 
     public get(id: number): Promise<Site> {

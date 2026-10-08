@@ -64,6 +64,7 @@ public static class ServiceRegistration
         services.AddTransient<ISiteService, SiteService>();
         services.AddTransient<ISiteLogService, SiteLogService>();
         services.AddTransient<IMailingInfoRedactionService, MailingInfoRedactionService>();
+        services.AddTransient<ISiteScheduleService, SiteScheduleService>();
         services.AddTransient<ICsiInspectionService, CsiInspectionService>();
         services.AddTransient<ICsiInspectionImageService, CsiInspectionImageService>();
         services.AddTransient<ICsiInspectionAssemblyService, CsiInspectionAssemblyService>();

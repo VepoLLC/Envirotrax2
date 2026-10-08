@@ -24,6 +24,7 @@ import { FogTripTicket } from "../../../../shared/models/fog/fog-trip-ticket";
 import { FogTripTicketImages } from "../../../../shared/models/fog/fog-trip-ticket-images";
 import { WaterSupplier } from "../../../../shared/models/water-suppliers/water-supplier";
 import { LookupService } from "../../../../shared/services/lookup/lookup.service";
+import { PropertyType } from "../../../../shared/enums/property-type.enum";
 import { MAX_PAGE_SIZE } from "../../../../shared/models/page-info";
 import { InputOption, ModalHelperService } from "@envirotrax/common-ui";
 
@@ -65,7 +66,16 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
     public checks: VerificationCheck[] = [];
     public verificationPassed = false;
 
+    public isLocationEditing = false;
+    public stateOptions: InputOption[] = [];
+
+    public readonly propertyTypeOptions: InputOption[] = [
+        { id: PropertyType.Residential, text: 'Residential' },
+        { id: PropertyType.Commercial, text: 'Commercial' }
+    ];
+
     public readonly FogVehicleCapacityType = FogVehicleCapacityType;
+    public readonly PropertyType = PropertyType;
 
     public readonly interceptorTypeOptions: InputOption[] = [
         { id: '', text: 'Select Tank/Trap Type' },
@@ -183,6 +193,26 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         this.remarksLength = value?.length ?? 0;
     }
 
+    public onPropertyTypeChange(value: PropertyType): void {
+        this.model.propertyType = value;
+
+        if (value === PropertyType.Residential) {
+            this.model.propertyBusinessName = undefined;
+        }
+    }
+
+    public requestLocationModification(): void {
+        this.isLocationEditing = true;
+    }
+
+    public cancelLocationModification(): void {
+        if (this.site) {
+            this.applySiteLocation(this.site);
+        }
+
+        this.isLocationEditing = false;
+    }
+
     public onRemovedAmountChange(value: string | number | undefined): void {
         this.model.interceptorWasteRemovedAmount = this.toNonNegative(value);
     }
@@ -295,6 +325,16 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
     }
 
     private collectValidationErrors(): void {
+        if (!this.isLocationEditing && this.hasMissingLocationFields()) {
+            this.isLocationEditing = true;
+            this.validationErrors.push('Please complete the generator property information.');
+        }
+
+        if (this.model.propertyStreetNumber && !/^\d/.test(this.model.propertyStreetNumber)) {
+            this.isLocationEditing = true;
+            this.validationErrors.push('Property street number must start with a digit.');
+        }
+
         if (!this.model.interceptorType) {
             this.validationErrors.push('Please select what the waste was removed from.');
         }
@@ -357,16 +397,18 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
             }
 
             this._stateNamesById.clear();
+            const stateOptions: InputOption[] = [];
             for (const state of states) {
                 if (state.id != null && state.name) {
                     this._stateNamesById.set(state.id, state.name);
+                    stateOptions.push({ id: state.id, text: state.name });
                 }
             }
+            this.stateOptions = stateOptions;
 
             if (this._siteId > 0) {
                 this.site = await this._siteService.getForProfessional(this._siteId);
-                this.model.fogGeneratorPhoneNumber = this.site.fogGeneratorPhoneNumber;
-                this.model.fogGeneratorEmailAddress = this.site.fogGeneratorEmailAddress;
+                this.applySiteLocation(this.site);
             }
 
             await this.setDefaults();
@@ -374,6 +416,27 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         } finally {
             this.isLoading = false;
         }
+    }
+
+    private applySiteLocation(site: Site): void {
+        this.model.propertyBusinessName = site.businessName;
+        this.model.propertyType = site.propertyType;
+        this.model.propertyStreetNumber = site.streetNumber;
+        this.model.propertyStreetName = site.streetName;
+        this.model.propertyNumber = site.propertyNumber;
+        this.model.propertyCity = site.city;
+        this.model.propertyState = site.state ? { ...site.state } : undefined;
+        this.model.propertyZip = site.zipCode;
+        this.model.fogGeneratorPhoneNumber = site.fogGeneratorPhoneNumber;
+        this.model.fogGeneratorEmailAddress = site.fogGeneratorEmailAddress;
+    }
+
+    private hasMissingLocationFields(): boolean {
+        return this.model.propertyType == null
+            || !this.model.propertyStreetNumber
+            || !this.model.propertyStreetName
+            || !this.model.propertyCity
+            || !this.model.propertyZip;
     }
 
     private async setDefaults(): Promise<void> {

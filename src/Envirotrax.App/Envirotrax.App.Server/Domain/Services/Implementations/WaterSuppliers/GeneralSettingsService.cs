@@ -25,4 +25,13 @@ public class GeneralSettingsService : Service<GeneralSettings, GeneralSettingsDt
 
         return MapToDto(saved)!;
     }
+
+    public async Task<ReferencedGeneralSettingsDto> GetForProfessionalAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        var settings = await _repository.GetForProfessionalAsync(waterSupplierId, cancellationToken);
+
+        return settings == null
+            ? new ReferencedGeneralSettingsDto()
+            : Mapper.Map<ReferencedGeneralSettingsDto>(settings);
+    }
 }

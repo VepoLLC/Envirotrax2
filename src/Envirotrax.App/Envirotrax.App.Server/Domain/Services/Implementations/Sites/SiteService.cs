@@ -15,6 +15,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
+using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Sites;
@@ -104,6 +105,8 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     // (no field-level diff — V1 doesn't diff on create either, since there's no prior row to compare against).
     public override async Task<SiteDto> AddAsync(SiteDto dto)
     {
+        await PrepareWaterSupplierAccountNumberAsync(dto);
+
         var added = await base.AddAsync(dto);
 
         if (added.WaterSupplier?.Id is int waterSupplierId)
@@ -113,6 +116,28 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         }
 
         return added;
+    }
+
+    public override async Task<SiteDto> UpdateAsync(SiteDto dto)
+    {
+        await PrepareWaterSupplierAccountNumberAsync(dto);
+
+        return await base.UpdateAsync(dto);
+    }
+
+    // Stores a blank WS Account Number as NULL, so only real numbers have to be unique. V1 saved blanks as '',
+    // which meant a second site left blank failed with this same message.
+    private async Task PrepareWaterSupplierAccountNumberAsync(SiteDto dto)
+    {
+        dto.WaterSupplierAccountNumber = string.IsNullOrWhiteSpace(dto.WaterSupplierAccountNumber)
+            ? null
+            : dto.WaterSupplierAccountNumber.Trim();
+
+        if (dto.WaterSupplierAccountNumber != null
+            && await _siteRepository.IsWaterSupplierAccountNumberTakenAsync(dto.Id, dto.WaterSupplierAccountNumber, CancellationToken.None))
+        {
+            throw new AppValidationException("WS Account Number must be unique.");
+        }
     }
 
     public async Task<IPagedData<SiteDto>> SearchAsync(PageInfo pageInfo, Query query, FogCompliancyStatus? fogCompliancyStatus, CancellationToken cancellationToken)
@@ -301,6 +326,10 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         site.BackflowAccountAssignmentDate = null;
         site.FogAccountAssignmentId = null;
         site.FogAccountAssignmentDate = null;
+
+        // The previous supplier's own account number means nothing to the new one, and could collide with one of
+        // its sites under the unique index.
+        site.WaterSupplierAccountNumber = null;
 
         site.GisAreaId = 0;
         site.NeedsRenewalCheck = true;

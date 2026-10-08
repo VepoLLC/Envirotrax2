@@ -8,6 +8,7 @@ using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
@@ -70,6 +71,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         }
 
         ProfessionalRecordScope.ApplyToProfessionalSearch(query, _tenantProvider.ProfessionalId, nameof(BackflowTest.ProfessionalId));
+        WaterSupplierAccountNumberSearch.Apply(query, nameof(BackflowTest.AccountNumber), nameof(BackflowTest.Site));
 
         return base.GetAllAsync(pageInfo, query, cancellationToken);
     }
@@ -221,6 +223,8 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
 
     public async Task<IEnumerable<BackflowTest>> SearchAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken)
     {
+        WaterSupplierAccountNumberSearch.Apply(query, nameof(BackflowTest.AccountNumber), nameof(BackflowTest.Site));
+
         var dbQuery = GetListQuery().Where(query.Filter);
 
         if (paymentStatus == BackflowPaymentStatus.Paid)

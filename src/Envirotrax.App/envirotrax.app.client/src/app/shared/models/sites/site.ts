@@ -19,6 +19,7 @@ export interface Site {
     waterSupplier?: WaterSupplier;
     subArea?: string;
     accountNumber?: string;
+    waterSupplierAccountNumber?: string;
     businessName?: string;
     propertyType?: PropertyType;
     streetNumber?: string;

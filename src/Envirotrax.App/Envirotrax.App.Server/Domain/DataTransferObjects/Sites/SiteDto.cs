@@ -19,6 +19,9 @@ public class SiteDto : IDto, IMailingInfoDto, IRedactableMailingInfoDto
     [StringLength(20)]
     public string AccountNumber { get; set; } = null!;
 
+    [StringLength(20)]
+    public string? WaterSupplierAccountNumber { get; set; }
+
     [StringLength(100)]
     public string? BusinessName { get; set; }
 

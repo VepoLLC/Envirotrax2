@@ -20,6 +20,7 @@ import { ProfesisonalService } from "../../shared/services/professionals/profess
 import { SiteSchedule } from "../../shared/models/sites/site-schedule";
 import { EditSiteScheduleComponent, EditSiteScheduleModel } from "./schedule/edit-site-schedule.component";
 import { SITE_SCHEDULE_TYPE_NAMES, SiteScheduleService, SiteScheduleType } from "../../shared/services/sites/site-schedule.service";
+import { GeneralSettingsService } from "../../shared/services/settings/general-settings.service";
 
 const CRITERIA_FIELDS: (keyof ProfessionalSiteSearchCriteria)[] = [
     "workedOnly",
@@ -128,12 +129,13 @@ export class SiteListComponent implements OnInit {
         private readonly _printService: PrintableTableService,
         private readonly _professionalService: ProfesisonalService,
         private readonly _modalHelper: ModalHelperService,
-        private readonly _siteScheduleService: SiteScheduleService
+        private readonly _siteScheduleService: SiteScheduleService,
+        private readonly _generalSettingsService: GeneralSettingsService
     ) {
     }
 
     public async ngOnInit(): Promise<void> {
-        this.table.columns = this.getColumns();
+        this.table.columns = this.getColumns(false);
 
         try {
             this.table.isLoading = true;
@@ -151,10 +153,10 @@ export class SiteListComponent implements OnInit {
             this.table.isLoading = false;
         }
 
-        this.setDownloadConfig();
+        this.setDownloadConfig(false);
     }
 
-    private setDownloadConfig(): void {
+    private setDownloadConfig(includeWsAccountNumbers: boolean): void {
         this.downloadConfig = {
             fileName: 'Sites',
             endpoint: this._siteService.getAllForProfessionalEndpoint(),
@@ -165,6 +167,7 @@ export class SiteListComponent implements OnInit {
             ],
             columns: [
                 { field: 'accountNumber', caption: 'AccountNumber' },
+                ...(includeWsAccountNumbers ? [{ field: 'waterSupplierAccountNumber', caption: 'WaterSupplierAccountNumber' }] : []),
                 { field: 'propertyType', caption: 'PropertyType', category: 'Property Information' },
                 { field: 'businessName', caption: 'PropertyBusinessName', category: 'Property Information' },
                 { field: 'streetNumber', caption: 'PropertyStreetNumber', category: 'Property Information' },
@@ -185,7 +188,7 @@ export class SiteListComponent implements OnInit {
         };
     }
 
-    private getColumns(): TableColumn<Site>[] {
+    private getColumns(includeWsAccountNumbers: boolean): TableColumn<Site>[] {
         return [
             {
                 field: '_rowNumber',
@@ -204,6 +207,12 @@ export class SiteListComponent implements OnInit {
                 field: 'accountNumber',
                 caption: 'Account Number',
                 type: ColumnType.text
+            },
+            {
+                field: 'waterSupplierAccountNumber',
+                caption: 'WS Account Number',
+                type: ColumnType.text,
+                isTableColumnExcluded: !includeWsAccountNumbers
             },
             {
                 field: 'Property Information',
@@ -276,9 +285,13 @@ export class SiteListComponent implements OnInit {
 
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
+            // Like V1, the WS Account Number shows only when the selected water supplier includes it.
+            const includeWsAccountNumbers = await this.isWsAccountNumberIncluded();
+
             // Rebuild columns fresh: vp-table appends an Actions column bound to its own instance,
             // so reusing the array after "Search Again" leaves a stale View handler (dead until refresh).
-            this.table.columns = this.getColumns();
+            this.table.columns = this.getColumns(includeWsAccountNumbers);
+            this.setDownloadConfig(includeWsAccountNumbers);
             this.showMapResults = false;
             await this.getSites();
             this.setShowResults(true);
@@ -359,6 +372,18 @@ export class SiteListComponent implements OnInit {
         const value = property?.value;
 
         return value != null && value !== '' ? Number(value) : null;
+    }
+
+    private async isWsAccountNumberIncluded(): Promise<boolean> {
+        const waterSupplierId = this.getSelectedWaterSupplierId();
+
+        if (waterSupplierId == null) {
+            return false;
+        }
+
+        const settings = await this._generalSettingsService.getForProfessional(waterSupplierId);
+
+        return !!settings.includeWsAccountNumbers;
     }
 
     private buildMapMarkers(sites: Site[]): MapMarker<Site>[] {

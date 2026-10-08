@@ -8,6 +8,7 @@ import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { HelperService } from "../../shared/services/helpers/helper.service";
 import { Router } from "@angular/router";
 import { InputOption } from '@envirotrax/common-ui';
+import { GeneralSettingsService } from '../../shared/services/settings/general-settings.service';
 
 @Component({
     selector: 'app-create-site-component',
@@ -23,6 +24,7 @@ export class CreateSiteComponent {
     };
 
     public stateOptions: InputOption[] = [];
+    public includeWsAccountNumbers: boolean = false;
 
     public selectedPropertyType = {
         propertyType: PropertyType.Residential
@@ -38,12 +40,16 @@ export class CreateSiteComponent {
         private readonly _stateService: LookupService,
         private readonly _modalReference: ModalReference<Site>,
         private readonly _helper: HelperService,
-        private readonly _router: Router
+        private readonly _router: Router,
+        private readonly _generalSettingsService: GeneralSettingsService
     ) {
     }
 
     public async ngOnInit(): Promise<void> {
-        await this.loadStates();
+        await Promise.all([
+            this.loadStates(),
+            this.loadSettings()
+        ]);
     }
 
 
@@ -77,5 +83,10 @@ export class CreateSiteComponent {
 
     private async loadStates(): Promise<void> {
         this.stateOptions = await this._stateService.getAllStatesAsOptions(true);
+    }
+
+    private async loadSettings(): Promise<void> {
+        const settings = await this._generalSettingsService.get();
+        this.includeWsAccountNumbers = !!settings.includeWsAccountNumbers;
     }
 }

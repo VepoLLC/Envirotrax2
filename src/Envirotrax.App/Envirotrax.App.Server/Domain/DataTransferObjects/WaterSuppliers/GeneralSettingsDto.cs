@@ -13,6 +13,8 @@ namespace Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers
         public bool BackflowTesting { get; set; }
         public bool CsiInspections { get; set; }
         public bool FogProgram { get; set; }
+        public bool IncludeWsAccountNumbers { get; set; }
+        public bool UseWsAccountNumbersOnLetters { get; set; }
 
         // Insurance and License Requirements
         public bool BpatsRequireInsurance { get; set; }
@@ -60,5 +62,6 @@ namespace Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers
         public bool BackflowTesting { get; set; }
         public bool CsiInspections { get; set; }
         public bool FogProgram { get; set; }
+        public bool IncludeWsAccountNumbers { get; set; }
     }
 }

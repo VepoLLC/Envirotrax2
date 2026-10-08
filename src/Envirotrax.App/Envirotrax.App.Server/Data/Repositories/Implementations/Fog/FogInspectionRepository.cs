@@ -3,6 +3,7 @@ using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Fog;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Sites;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.Common.Data.Services.Definitions;
@@ -48,6 +49,9 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
         {
             query.Sort[nameof(FogInspection.Id)] = SortOperator.Asc;
         }
+
+        WaterSupplierAccountNumberSearch.ApplyThroughSite(query, nameof(FogInspection.Site));
+
         return base.GetAllAsync(pageInfo, query, cancellationToken);
     }
 
@@ -59,6 +63,7 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
             query.Sort[nameof(FogInspection.Id)] = SortOperator.Asc;
 
         ProfessionalRecordScope.ApplyToProfessionalSearch(query, _tenantProvider.ProfessionalId, nameof(FogInspection.ProfessionalId));
+        WaterSupplierAccountNumberSearch.ApplyThroughSite(query, nameof(FogInspection.Site));
 
         var filteredQ = GetListQuery()
             .Where(query.Filter);

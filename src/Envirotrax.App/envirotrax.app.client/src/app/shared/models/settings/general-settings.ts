@@ -9,6 +9,8 @@ export interface GeneralSettings {
     backflowTesting?: boolean;
     csiInspections?: boolean;
     fogProgram?: boolean;
+    includeWsAccountNumbers?: boolean;
+    useWsAccountNumbersOnLetters?: boolean;
 
     // Insurance and License Requirements
     bpatsRequireInsurance?: boolean;

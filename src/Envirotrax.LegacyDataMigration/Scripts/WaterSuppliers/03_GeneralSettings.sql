@@ -13,7 +13,7 @@ BEGIN TRY
          CsiCommercialInspectionFee, CsiCommercialInspectionFeeWsShare, CsiResidentialInspectionFee, CsiResidentialInspectionFeeWsShare,
          FogTransportFee, FogTransportFeeWsShare,
          RequireBackflowTestImages, RequireCsiInspectionImages,
-         RedactMailingInfo)
+         RedactMailingInfo, IncludeWsAccountNumbers, UseWsAccountNumbersOnLetters)
     SELECT
         newWaterSuppliers.Id, WaterSuppliers.PrivacyRequired, WaterSuppliers.UseSiteForWaterSupplierAssignment, WaterSuppliers.ProgramTypeWISE, WaterSuppliers.ProgramTypeBackflow,
         WaterSuppliers.ProgramTypeCSI, WaterSuppliers.ProgramTypeFOG, WaterSuppliers.ProgramTypeAdministrativeOnly,
@@ -38,7 +38,8 @@ BEGIN TRY
                 OR secondMasterWaterSuppliers.RedactMailingInfo = 1
             THEN 1
             ELSE 0
-        END
+        END,
+        WaterSuppliers.IncludeWsAccountNumbers, WaterSuppliers.UseWsAccountNumbersOnLetters
     FROM Vepo.dbo.WaterSuppliers
     INNER JOIN WaterSuppliers AS newWaterSuppliers
         ON newWaterSuppliers.LegacyRecordId = WaterSuppliers.ID

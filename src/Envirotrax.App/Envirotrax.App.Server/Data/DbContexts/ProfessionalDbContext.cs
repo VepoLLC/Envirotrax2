@@ -10,10 +10,16 @@ namespace Envirotrax.App.Server.Data.DbContexts
 {
     public class ProfessionalDbContext : TenantDbContext
     {
-        // Name of the IProfessionalModel query filter, so a query can lift just this filter with
-        // IgnoreQueryFilters([OwnProfessionalFilter]). The other contexts never define it, so the same
-        // repository query keeps their tenant filters.
+        // Base name of the IProfessionalModel query filter. Each entity type gets its own filter named
+        // OwnProfessionalFilterFor<TEntity>(), so IgnoreQueryFilters([...]) can lift exactly one entity
+        // type's ownership check instead of every IProfessionalModel filter that happens to share a name.
+        // The other contexts never define these filters, so the same repository query keeps their tenant
+        // filters.
         public const string OwnProfessionalFilter = "OwnProfessional";
+
+        public static string OwnProfessionalFilterFor<TEntity>() => OwnProfessionalFilterFor(typeof(TEntity));
+
+        public static string OwnProfessionalFilterFor(Type entityType) => $"{OwnProfessionalFilter}_{entityType.Name}";
 
         private readonly ITenantProvidersService _tenantProvider;
 
@@ -56,7 +62,7 @@ namespace Envirotrax.App.Server.Data.DbContexts
                 Expression<Func<IProfessionalModel, bool>> expression = model => model.ProfessionalId == _tenantProvider.ProfessionalId;
                 var lambdaExpression = ConvertFilterExpression(expression, entity.ClrType);
 
-                builder.Entity(entity.ClrType).HasQueryFilter(OwnProfessionalFilter, lambdaExpression);
+                builder.Entity(entity.ClrType).HasQueryFilter(OwnProfessionalFilterFor(entity.ClrType), lambdaExpression);
             }
         }
 

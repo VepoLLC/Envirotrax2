@@ -2,6 +2,7 @@ using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Models.Csi;
+using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 using Envirotrax.App.Server.Data.Services.Definitions;
@@ -34,7 +35,7 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
     protected override IQueryable<CsiInspection> GetDetailsQuery()
     {
         return base.GetDetailsQuery()
-            .IgnoreQueryFilters([ProfessionalDbContext.OwnProfessionalFilter])
+            .IgnoreQueryFilters([ProfessionalDbContext.OwnProfessionalFilterFor<ProfessionalUser>()])
             .Include(c => c.Site)
             .Include(c => c.WaterSupplier)
                 .ThenInclude(w => w!.State)

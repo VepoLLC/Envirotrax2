@@ -1,6 +1,8 @@
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
+using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Models.Csi;
+using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 using Envirotrax.App.Server.Data.Services.Definitions;
@@ -27,9 +29,13 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
             .Include(c => c.WaterSupplier);
     }
 
+    // Inspector is a required navigation to a ProfessionalUser, which the professional context filters to the
+    // logged-in professional's own users, so that filter would turn the inner join into "not found" for anyone
+    // viewing another professional's inspection. Lifting only that named filter keeps the other contexts' filters.
     protected override IQueryable<CsiInspection> GetDetailsQuery()
     {
         return base.GetDetailsQuery()
+            .IgnoreQueryFilters([ProfessionalDbContext.OwnProfessionalFilterFor<ProfessionalUser>()])
             .Include(c => c.Site)
             .Include(c => c.WaterSupplier)
                 .ThenInclude(w => w!.State)

@@ -1,6 +1,8 @@
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
+using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Models.Fog;
+using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 using Envirotrax.App.Server.Data.Services.Definitions;
@@ -27,9 +29,15 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
             .Include(t => t.Professional);
     }
 
+    // Transporter is an optional navigation to a ProfessionalUser, which the professional context filters to
+    // the logged-in professional's own users; left unfiltered that would silently null out another
+    // professional's Transporter on a shared ticket instead of hiding the row (TransporterId is nullable, so
+    // EF left-joins it). Lifting only that named filter keeps the other contexts' filters, same as
+    // CsiInspectionRepository.GetDetailsQuery.
     protected override IQueryable<FogTripTicket> GetDetailsQuery()
     {
         return base.GetDetailsQuery()
+            .IgnoreQueryFilters([ProfessionalDbContext.OwnProfessionalFilterFor<ProfessionalUser>()])
             .Include(t => t.WaterSupplier)
             .ThenInclude(ws => ws!.State)
             .Include(t => t.Site)

@@ -1,7 +1,9 @@
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
+using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Csi;
+using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
@@ -46,9 +48,14 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return query;
     }
 
+    // Bpat is an optional navigation to a ProfessionalUser, which the professional context filters to the
+    // logged-in professional's own users; left unfiltered that would silently null out another professional's
+    // Bpat on a shared test instead of hiding the row (BpatId is nullable, so EF left-joins it). Lifting only
+    // that named filter keeps the other contexts' filters, same as CsiInspectionRepository.GetDetailsQuery.
     protected override IQueryable<BackflowTest> GetDetailsQuery()
     {
         return base.GetDetailsQuery()
+            .IgnoreQueryFilters([ProfessionalDbContext.OwnProfessionalFilterFor<ProfessionalUser>()])
             .Include(bt => bt.WaterSupplier)
                 .ThenInclude(ws => ws!.State)
             .Include(bt => bt.Site)

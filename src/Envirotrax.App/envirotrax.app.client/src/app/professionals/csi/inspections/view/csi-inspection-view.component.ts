@@ -3,10 +3,12 @@ import { ActivatedRoute } from '@angular/router';
 import { CsiInspectionService } from '../../../../shared/services/csi/csi-inspection.service';
 import { CsiInspection } from '../../../../shared/models/csi/csi-inspection';
 import { CsiInspectionImage } from '../../../../shared/models/csi/csi-inspection-image';
+import { CsiInspectionAssembly } from '../../../../shared/models/csi/csi-inspection-assembly';
 import { CsiInspectionReason, csiInspectionReasonLabels } from '../../../../shared/enums/csi-inspection-reason.enum';
 import { ToastService, ToastType, ModalHelperService } from '@envirotrax/common-ui';
 import { DownloadService } from '../../../../shared/services/download.service';
 import { HelperService } from '../../../../shared/services/helpers/helper.service';
+import { AuthService } from '../../../../shared/services/auth/auth.service';
 
 @Component({
     standalone: false,
@@ -19,12 +21,17 @@ export class CsiInspectionViewComponent implements OnInit {
     public activeTab: 'main' | 'assemblies' | 'additional' | 'images' = 'main';
     public images: CsiInspectionImage[] = [];
     public isLoadingImages = false;
+    public assemblies: CsiInspectionAssembly[] = [];
+    public isLoadingAssemblies = false;
+    // Another professional's inspection can be viewed but not changed (the server rejects it anyway).
+    public isOwnInspection = false;
     public newImageDescription = '';
     public showAddImageModal = false;
     public modalPreviewUrl: string | null = null;
     public modalSelectedFile: File | null = null;
 
     private imagesLoaded = false;
+    private assembliesLoaded = false;
 
     constructor(
         private readonly _route: ActivatedRoute,
@@ -32,7 +39,8 @@ export class CsiInspectionViewComponent implements OnInit {
         private readonly _toastService: ToastService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _downloadService: DownloadService,
-        private readonly _helper: HelperService
+        private readonly _helper: HelperService,
+        private readonly _authService: AuthService
     ) { }
 
     public async ngOnInit(): Promise<void> {
@@ -71,6 +79,20 @@ export class CsiInspectionViewComponent implements OnInit {
         this.activeTab = tab;
         if (tab === 'images' && !this.imagesLoaded) {
             this.loadImages();
+        }
+        if (tab === 'assemblies' && !this.assembliesLoaded) {
+            this.loadAssemblies();
+        }
+    }
+
+    private async loadAssemblies(): Promise<void> {
+        if (!this.inspection?.id) return;
+        try {
+            this.isLoadingAssemblies = true;
+            this.assemblies = await this._inspectionService.getProfessionalAssemblies(this.inspection.id);
+        } finally {
+            this.assembliesLoaded = true;
+            this.isLoadingAssemblies = false;
         }
     }
 
@@ -158,7 +180,12 @@ export class CsiInspectionViewComponent implements OnInit {
 
         try {
             this.isLoading = true;
-            this.inspection = await this._inspectionService.getProfessionalInspection(Number(idParam));
+            const [inspection, professionalId] = await Promise.all([
+                this._inspectionService.getProfessionalInspection(Number(idParam)),
+                this._authService.getProfessionalId()
+            ]);
+            this.inspection = inspection;
+            this.isOwnInspection = professionalId != null && inspection.professional?.id === professionalId;
         } finally {
             this.isLoading = false;
         }

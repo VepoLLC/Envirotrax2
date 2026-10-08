@@ -1,6 +1,8 @@
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
+using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Models.Fog;
+using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 using Envirotrax.App.Server.Data.Services.Definitions;
@@ -27,9 +29,12 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
             .Include(fi => fi.WaterSupplier);
     }
 
+    // See CsiInspectionRepository.GetDetailsQuery: the required Inspector would otherwise hide another
+    // professional's inspection in the professional context.
     protected override IQueryable<FogInspection> GetDetailsQuery()
     {
         return base.GetDetailsQuery()
+            .IgnoreQueryFilters([ProfessionalDbContext.OwnProfessionalFilterFor<ProfessionalUser>()])
             .Include(fi => fi.Site)
             .Include(fi => fi.WaterSupplier)
             .ThenInclude(ws => ws!.State)

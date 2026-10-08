@@ -10,6 +10,17 @@ namespace Envirotrax.App.Server.Data.DbContexts
 {
     public class ProfessionalDbContext : TenantDbContext
     {
+        // Base name of the IProfessionalModel query filter. Each entity type gets its own filter named
+        // OwnProfessionalFilterFor<TEntity>(), so IgnoreQueryFilters([...]) can lift exactly one entity
+        // type's ownership check instead of every IProfessionalModel filter that happens to share a name.
+        // The other contexts never define these filters, so the same repository query keeps their tenant
+        // filters.
+        public const string OwnProfessionalFilter = "OwnProfessional";
+
+        public static string OwnProfessionalFilterFor<TEntity>() => OwnProfessionalFilterFor(typeof(TEntity));
+
+        public static string OwnProfessionalFilterFor(Type entityType) => $"{OwnProfessionalFilter}_{entityType.Name}";
+
         private readonly ITenantProvidersService _tenantProvider;
 
         public ProfessionalDbContext(
@@ -24,6 +35,17 @@ namespace Envirotrax.App.Server.Data.DbContexts
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // The ownership check in SetSharedProfessionalSecurityProperties trusts the entry's original
+            // ProfessionalId, which for a detached entity that was Attach()ed is whatever the caller put on it.
+            // As a concurrency token it is also in the UPDATE/DELETE's WHERE clause, so a forged owner matches
+            // no row and the save fails instead of overwriting (and reassigning) another professional's row.
+            foreach (var entity in modelBuilder.Model.GetEntityTypes().Where(e => typeof(ISharedProfessionalModel).IsAssignableFrom(e.ClrType)))
+            {
+                modelBuilder.Entity(entity.ClrType)
+                    .Property(nameof(IProfessionalModel.ProfessionalId))
+                    .IsConcurrencyToken();
+            }
         }
 
         protected override void SetupGlobalFiltering(ModelBuilder builder, IMutableEntityType entity)
@@ -40,7 +62,7 @@ namespace Envirotrax.App.Server.Data.DbContexts
                 Expression<Func<IProfessionalModel, bool>> expression = model => model.ProfessionalId == _tenantProvider.ProfessionalId;
                 var lambdaExpression = ConvertFilterExpression(expression, entity.ClrType);
 
-                builder.Entity(entity.ClrType).HasQueryFilter(lambdaExpression);
+                builder.Entity(entity.ClrType).HasQueryFilter(OwnProfessionalFilterFor(entity.ClrType), lambdaExpression);
             }
         }
 

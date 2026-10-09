@@ -13,6 +13,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
+using Envirotrax.App.Server.Domain.Services.Implementations.Sites;
 using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
@@ -160,12 +161,11 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
             Comments = request.Comments,
 
             FogGeneratorPhoneNumber = request.FogGeneratorPhoneNumber,
-            FogGeneratorEmailAddress = request.FogGeneratorEmailAddress,
-
-            NeedsValidation = true
+            FogGeneratorEmailAddress = request.FogGeneratorEmailAddress
         };
 
-        ApplySiteSnapshot(inspection, site);
+        ApplyEnteredLocation(inspection, request);
+        ApplySiteValidation(inspection, site);
         ApplyInspectorSnapshot(inspection, professional, inspectorUser, inspectorUserId);
         await ApplyAmountAsync(inspection, site.IsFeeExempt, cancellationToken);
 
@@ -289,7 +289,8 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
             FogGeneratorEmailAddress = request.FogGeneratorEmailAddress
         };
 
-        ApplySiteSnapshot(inspection, site);
+        ApplyEnteredLocation(inspection, request);
+        ApplySiteValidation(inspection, site);
         ApplyInspectorSnapshot(inspection, professional, inspectorUser, inspectorUserId);
 
         string? newExteriorPath = null;
@@ -399,26 +400,72 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         return ext;
     }
 
-    private static void ApplySiteSnapshot(FogInspection inspection, SiteDto site)
+    private static void ApplyEnteredLocation(FogInspection inspection, FogInspectionDto request)
     {
-        inspection.PropertyBusinessName = site.BusinessName;
-        inspection.PropertyType = site.PropertyType;
-        inspection.PropertyStreetNumber = site.StreetNumber;
-        inspection.PropertyStreetName = site.StreetName;
-        inspection.PropertyNumber = site.PropertyNumber;
-        inspection.PropertyCity = site.City;
-        inspection.PropertyStateId = site.State?.Id;
-        inspection.PropertyZip = site.ZipCode;
-        inspection.MailingCompanyName = site.MailingCompanyName;
-        inspection.MailingContactName = site.MailingContactName;
-        inspection.MailingStreetNumber = site.MailingStreetNumber;
-        inspection.MailingStreetName = site.MailingStreetName;
-        inspection.MailingNumber = site.MailingNumber;
-        inspection.MailingCity = site.MailingCity;
-        inspection.MailingStateId = site.MailingState?.Id;
-        inspection.MailingZip = site.MailingZipCode;
-        inspection.MailingPhoneNumber = site.MailingPhoneNumber;
-        inspection.MailingEmailAddress = site.MailingEmailAddress;
+        inspection.PropertyBusinessName = request.PropertyBusinessName;
+        inspection.PropertyType = request.PropertyType;
+        inspection.PropertyStreetNumber = request.PropertyStreetNumber;
+        inspection.PropertyStreetName = request.PropertyStreetName;
+        inspection.PropertyNumber = request.PropertyNumber;
+        inspection.PropertyCity = request.PropertyCity;
+        inspection.PropertyStateId = SiteInformationComparer.GetStateId(request.PropertyState);
+        inspection.PropertyZip = request.PropertyZip;
+
+        inspection.MailingCompanyName = request.MailingCompanyName;
+        inspection.MailingContactName = request.MailingContactName;
+        inspection.MailingStreetNumber = request.MailingStreetNumber;
+        inspection.MailingStreetName = request.MailingStreetName;
+        inspection.MailingNumber = request.MailingNumber;
+        inspection.MailingCity = request.MailingCity;
+        inspection.MailingStateId = SiteInformationComparer.GetStateId(request.MailingState);
+        inspection.MailingZip = request.MailingZip;
+        inspection.MailingPhoneNumber = request.MailingPhoneNumber;
+        inspection.MailingEmailAddress = request.MailingEmailAddress;
+    }
+
+    private static void ApplySiteValidation(FogInspection inspection, SiteDto site)
+    {
+        inspection.ValidationSiteInformationChanged = HasSiteInformationChanged(inspection, site);
+        inspection.NeedsValidation = inspection.ValidationSiteInformationChanged;
+    }
+
+    private static bool HasSiteInformationChanged(FogInspection inspection, SiteDto site)
+    {
+        if (inspection.PropertyType != site.PropertyType)
+        {
+            return true;
+        }
+
+        if (inspection.PropertyStateId != SiteInformationComparer.GetStateId(site.State))
+        {
+            return true;
+        }
+
+        if (inspection.MailingStateId != SiteInformationComparer.GetStateId(site.MailingState))
+        {
+            return true;
+        }
+
+        var textFields = new List<(string? EnteredValue, string? SiteValue)>
+        {
+            (inspection.PropertyBusinessName, site.BusinessName),
+            (inspection.PropertyStreetNumber, site.StreetNumber),
+            (inspection.PropertyStreetName, site.StreetName),
+            (inspection.PropertyNumber, site.PropertyNumber),
+            (inspection.PropertyCity, site.City),
+            (inspection.PropertyZip, site.ZipCode),
+            (inspection.MailingCompanyName, site.MailingCompanyName),
+            (inspection.MailingContactName, site.MailingContactName),
+            (inspection.MailingStreetNumber, site.MailingStreetNumber),
+            (inspection.MailingStreetName, site.MailingStreetName),
+            (inspection.MailingNumber, site.MailingNumber),
+            (inspection.MailingCity, site.MailingCity),
+            (inspection.MailingZip, site.MailingZipCode),
+            (inspection.MailingPhoneNumber, site.MailingPhoneNumber),
+            (inspection.MailingEmailAddress, site.MailingEmailAddress)
+        };
+
+        return SiteInformationComparer.HasTextChanged(textFields);
     }
 
 

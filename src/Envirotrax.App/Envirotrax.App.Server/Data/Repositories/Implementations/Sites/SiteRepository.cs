@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
-using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Data.Services.Definitions;
@@ -152,19 +151,19 @@ public class SiteRepository : Repository<Site>, ISiteRepository
         return await paginated.ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Site>> SearchForProfessionalAsync(ProfessionalSiteSearchDto criteria, PageInfo pageInfo, Query query, int professionalId, int userId, ProfessionalType? professionalType, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Site>> SearchForProfessionalAsync(ProfessionalSiteSearchDto criteria, PageInfo pageInfo, Query query, int professionalId, int userId, CancellationToken cancellationToken)
     {
         var scheduledFrom = criteria.ScheduledFrom?.Date;
         var scheduledBefore = criteria.ScheduledTo?.Date.AddDays(1);
 
         var mySchedules = DbContext.SiteSchedules
-            .Where(schedule => schedule.ProfessionalId == professionalId && schedule.UserId == userId && schedule.ProfessionalType == professionalType)
+            .Where(schedule => schedule.ProfessionalId == professionalId && schedule.UserId == userId)
             .WhereIf(scheduledFrom != null, schedule => schedule.ScheduleDate >= scheduledFrom)
             .WhereIf(scheduledBefore != null, schedule => schedule.ScheduleDate < scheduledBefore);
 
         var paginated = await GetListQuery()
             .Where(query.Filter)
-            .WhereIf(criteria.WorkedOnly, GetWorkedOnFilter(professionalId, professionalType))
+            .WhereIf(criteria.WorkedOnly, GetWorkedOnFilter(professionalId))
             .WhereIf(criteria.ScheduledOnly, site => mySchedules.Any(schedule => schedule.SiteId == site.Id))
             .OrderBy(query.Sort)
             .PaginateAsync(pageInfo, cancellationToken);
@@ -172,16 +171,13 @@ public class SiteRepository : Repository<Site>, ISiteRepository
         return await paginated.ToListAsync(cancellationToken);
     }
 
-    private Expression<Func<Site, bool>> GetWorkedOnFilter(int professionalId, ProfessionalType? professionalType)
+    private Expression<Func<Site, bool>> GetWorkedOnFilter(int professionalId)
     {
-        return professionalType switch
-        {
-            ProfessionalType.Bpat => site => DbContext.BackflowTests.Any(t => t.SiteId == site.Id && t.ProfessionalId == professionalId && t.BpatId != null && t.DeletedTime == null),
-            ProfessionalType.CsiInspector => site => DbContext.CsiInspections.Any(i => i.SiteId == site.Id && i.ProfessionalId == professionalId && i.DeletedTime == null),
-            ProfessionalType.FogInspector => site => DbContext.FogInspections.Any(i => i.SiteId == site.Id && i.ProfessionalId == professionalId && i.DeletedTime == null),
-            ProfessionalType.FogTransporter => site => DbContext.FogTripTickets.Any(t => t.SiteId == site.Id && t.ProfessionalId == professionalId && t.DeletedTime == null),
-            _ => site => false
-        };
+        return site =>
+            DbContext.BackflowTests.Any(t => t.SiteId == site.Id && t.ProfessionalId == professionalId && t.BpatId != null && t.DeletedTime == null)
+            || DbContext.CsiInspections.Any(i => i.SiteId == site.Id && i.ProfessionalId == professionalId && i.DeletedTime == null)
+            || DbContext.FogInspections.Any(i => i.SiteId == site.Id && i.ProfessionalId == professionalId && i.DeletedTime == null)
+            || DbContext.FogTripTickets.Any(t => t.SiteId == site.Id && t.ProfessionalId == professionalId && t.DeletedTime == null);
     }
 
     protected override IQueryable<Site> GetDetailsQuery()

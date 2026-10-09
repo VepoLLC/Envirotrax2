@@ -1,7 +1,5 @@
 
 using System.Dynamic;
-using Azure.Communication.Email;
-using Azure.Identity;
 using Envirotrax.Common.Configuration;
 using Envirotrax.Common.Domain.DataTransferObjects;
 using Envirotrax.Common.Domain.Services.Defintions;
@@ -9,6 +7,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 
 namespace Envirotrax.Common.Domain.Services.Implementations;
 
@@ -20,7 +20,7 @@ public class EmailService : IEmailService
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IHostEnvironment _environment;
 
-    private readonly EmailClient _emailClient;
+    private readonly ISendGridClient _emailClient;
 
     public EmailService(
         IOptions<EmailOptions> emailOptions,
@@ -35,7 +35,7 @@ public class EmailService : IEmailService
         _contextAccessor = contextAccessor;
         _environment = environment;
 
-        _emailClient = new(new Uri(_emailOptions.Endpoint), new DefaultAzureCredential());
+        _emailClient = new SendGridClient(_emailOptions.ApiKey);
     }
 
     private string GetFromAddress(FromAddressType addressType)
@@ -81,21 +81,27 @@ public class EmailService : IEmailService
 
             var fromAddress = GetFromAddress(email.FromAddress);
 
-            var message = new EmailMessage(
-                senderAddress: GetFromAddress(email.FromAddress),
-                content: new EmailContent(email.Subject ?? string.Empty) { Html = body },
-                recipients: new EmailRecipients(GetToAddresses(email.Recipients).Select(address => new EmailAddress(address))));
+            var message = new SendGridMessage
+            {
+                From = new EmailAddress(fromAddress),
+                Subject = email.Subject ?? string.Empty,
+                HtmlContent = body,
+            };
+
+            message.AddTos(GetToAddresses(email.Recipients).Select(address => new EmailAddress(address)).ToList());
 
             foreach (var attachment in email.Attachments)
             {
-                message.Attachments.Add(new EmailAttachment(attachment.Name, attachment.ContentType, BinaryData.FromBytes(attachment.Content)));
+                message.AddAttachment(attachment.Name, Convert.ToBase64String(attachment.Content), attachment.ContentType);
             }
 
-            // Started, not Completed: Completed keeps polling Azure until the message reaches a terminal
-            // delivery status, which takes tens of seconds per email and blocks the caller for all of it.
-            // Accept-time failures (bad address, authentication, throttling) still surface here — the only
-            // thing given up is the final delivery status, which nothing acts on anyway.
-            await _emailClient.SendAsync(Azure.WaitUntil.Started, message);
+            var response = await _emailClient.SendEmailAsync(message);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var responseBody = await response.Body.ReadAsStringAsync();
+                throw new Exception($"SendGrid returned {(int)response.StatusCode}: {responseBody}");
+            }
         }
         catch (Exception ex)
         {

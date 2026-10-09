@@ -145,7 +145,8 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
         inspection.FogGeneratorPhoneNumber = model.FogGeneratorPhoneNumber;
         inspection.FogGeneratorEmailAddress = model.FogGeneratorEmailAddress;
 
-        inspection.NeedsValidation = true;
+        inspection.NeedsValidation = model.NeedsValidation;
+        inspection.ValidationSiteInformationChanged = model.ValidationSiteInformationChanged;
 
         // Site/Inspector snapshot fields — refreshed the same way SubmitAsync populates them for a new row.
         inspection.PropertyBusinessName = model.PropertyBusinessName;

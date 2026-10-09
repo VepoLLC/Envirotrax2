@@ -82,6 +82,15 @@ a:hover {
     border-color: #dde3eb !important;
 }
 
+.flatpickr-confirm {
+    background-color: #008fd4;
+    color: #fff;
+}
+
+.flatpickr-confirm:hover {
+    background-color: #3282b8;
+}
+
 .btn-outline-primary {
     --bs-btn-color: #008fd4;
     --bs-btn-border-color: #008fd4;

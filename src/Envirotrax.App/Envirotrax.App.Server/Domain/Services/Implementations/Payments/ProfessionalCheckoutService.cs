@@ -1,7 +1,9 @@
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Payments;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.Payments;
+using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
@@ -9,12 +11,14 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Payments;
 
 public abstract class ProfessionalCheckoutService<TItem, TItemDto>
     where TItem : IPayableModel
+    where TItemDto : IRedactableMailingInfoDto
 {
     private const string AmountsChangedMessage = "The amounts have changed. Please refresh the page and try again.";
 
     private readonly IProfessionalRepository _professionalRepository;
     private readonly IProfessionalTransactionRepository _transactionRepository;
     private readonly IProfessionalPaymentService _paymentService;
+    private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
 
     protected IAuthService AuthService { get; private set; }
 
@@ -24,12 +28,14 @@ public abstract class ProfessionalCheckoutService<TItem, TItemDto>
         IAuthService authService,
         IProfessionalRepository professionalRepository,
         IProfessionalTransactionRepository transactionRepository,
-        IProfessionalPaymentService paymentService)
+        IProfessionalPaymentService paymentService,
+        IMailingInfoRedactionService mailingInfoRedactionService)
     {
         AuthService = authService;
         _professionalRepository = professionalRepository;
         _transactionRepository = transactionRepository;
         _paymentService = paymentService;
+        _mailingInfoRedactionService = mailingInfoRedactionService;
     }
 
     public async Task<ProfessionalCheckoutReceiptDto<TItemDto>> CheckoutAsync(ProfessionalCheckoutRequestDto request, CancellationToken cancellationToken)
@@ -43,6 +49,10 @@ public abstract class ProfessionalCheckoutService<TItem, TItemDto>
 
         var (transaction, isNewPayment) = await PayAsync(request, itemIds, cancellationToken);
         var receipt = await BuildReceiptAsync(transaction, CancellationToken.None);
+
+        // Redact before OnPaymentCompletedAsync: the report PDFs it emails are built from these items and
+        // go to the paying professional, just like the receipt itself.
+        receipt.Items = await _mailingInfoRedactionService.RedactAsync(receipt.Items, CancellationToken.None);
 
         if (isNewPayment)
         {

@@ -15,6 +15,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
+using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Sites;
@@ -32,6 +33,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     private readonly IBackflowOutOfServiceRequestRepository _outOfServiceRequestRepository;
     private readonly IFogInspectionRepository _fogInspectionRepository;
     private readonly IFogTripTicketRepository _fogTripTicketRepository;
+    private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
     private readonly ISiteScheduleService _siteScheduleService;
     private readonly IAuthService _authService;
     private readonly ILogger<SiteService> _logger;
@@ -49,6 +51,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         IBackflowOutOfServiceRequestRepository outOfServiceRequestRepository,
         IFogInspectionRepository fogInspectionRepository,
         IFogTripTicketRepository fogTripTicketRepository,
+        IMailingInfoRedactionService mailingInfoRedactionService,
         ISiteScheduleService siteScheduleService,
         IAuthService authService,
         ILogger<SiteService> logger)
@@ -65,6 +68,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         _outOfServiceRequestRepository = outOfServiceRequestRepository;
         _fogInspectionRepository = fogInspectionRepository;
         _fogTripTicketRepository = fogTripTicketRepository;
+        _mailingInfoRedactionService = mailingInfoRedactionService;
         _siteScheduleService = siteScheduleService;
         _authService = authService;
         _logger = logger;
@@ -101,6 +105,8 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     // (no field-level diff — V1 doesn't diff on create either, since there's no prior row to compare against).
     public override async Task<SiteDto> AddAsync(SiteDto dto)
     {
+        await PrepareWaterSupplierAccountNumberAsync(dto);
+
         var added = await base.AddAsync(dto);
 
         if (added.WaterSupplier?.Id is int waterSupplierId)
@@ -110,6 +116,28 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         }
 
         return added;
+    }
+
+    public override async Task<SiteDto> UpdateAsync(SiteDto dto)
+    {
+        await PrepareWaterSupplierAccountNumberAsync(dto);
+
+        return await base.UpdateAsync(dto);
+    }
+
+    // Stores a blank WS Account Number as NULL, so only real numbers have to be unique. V1 saved blanks as '',
+    // which meant a second site left blank failed with this same message.
+    private async Task PrepareWaterSupplierAccountNumberAsync(SiteDto dto)
+    {
+        dto.WaterSupplierAccountNumber = string.IsNullOrWhiteSpace(dto.WaterSupplierAccountNumber)
+            ? null
+            : dto.WaterSupplierAccountNumber.Trim();
+
+        if (dto.WaterSupplierAccountNumber != null
+            && await _siteRepository.IsWaterSupplierAccountNumberTakenAsync(dto.Id, dto.WaterSupplierAccountNumber, CancellationToken.None))
+        {
+            throw new AppValidationException("WS Account Number must be unique.");
+        }
     }
 
     public async Task<IPagedData<SiteDto>> SearchAsync(PageInfo pageInfo, Query query, FogCompliancyStatus? fogCompliancyStatus, CancellationToken cancellationToken)
@@ -131,6 +159,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
             .ToPagedData(pageInfo);
     }
 
+    // GetAsync stays unredacted: professional submissions snapshot the site's real mailing information from it.
     public async Task<IPagedData<ProfessionalSiteDto>> SearchForProfessionalAsync(ProfessionalSiteSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         query.Sort = query.ConvertSortProperties<Site, SiteDto>(Mapper);
@@ -147,7 +176,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         var schedules = await _siteScheduleService.GetMyBySiteIdsAsync(sites.Select(s => s.Id), cancellationToken);
         var schedulesBySiteId = schedules.ToLookup(s => s.SiteId);
 
-        return sites
+        var result = sites
             .Select(site =>
             {
                 var dto = Mapper.Map<ProfessionalSiteDto>(site);
@@ -156,6 +185,20 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
                 return dto;
             })
             .ToPagedData(pageInfo);
+
+        return await _mailingInfoRedactionService.RedactAsync(result, cancellationToken);
+    }
+
+    public async Task<SiteDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken)
+    {
+        var site = await GetAsync(id, cancellationToken);
+
+        if (site != null)
+        {
+            await _mailingInfoRedactionService.RedactAsync(site, cancellationToken);
+        }
+
+        return site;
     }
 
     public async Task<IEnumerable<SiteDto>> GetAllPendingGeocodingAsync(int batchSize)
@@ -283,6 +326,10 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         site.BackflowAccountAssignmentDate = null;
         site.FogAccountAssignmentId = null;
         site.FogAccountAssignmentDate = null;
+
+        // The previous supplier's own account number means nothing to the new one, and could collide with one of
+        // its sites under the unique index.
+        site.WaterSupplierAccountNumber = null;
 
         site.GisAreaId = 0;
         site.NeedsRenewalCheck = true;

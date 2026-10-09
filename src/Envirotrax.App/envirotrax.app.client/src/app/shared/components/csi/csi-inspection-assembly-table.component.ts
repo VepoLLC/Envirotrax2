@@ -22,6 +22,8 @@ interface AssemblyRowVm {
 export class CsiInspectionAssemblyTableComponent implements OnChanges {
     @Input() public assemblies: CsiInspectionAssembly[] = [];
     @Input() public editable = false;
+    // Where a paid row's View button goes: `${testViewRoute}/{testId}/view`.
+    @Input() public testViewRoute = '/backflow/tests';
 
     @Output() public delete = new EventEmitter<CsiInspectionAssembly>();
 

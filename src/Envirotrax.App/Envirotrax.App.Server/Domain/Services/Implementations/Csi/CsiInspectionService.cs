@@ -35,6 +35,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
     private readonly IProfessionalSupplierService _professionalSupplierService;
     private readonly IProfessionalInsuranceService _insuranceService;
     private readonly ICsiInspectionAssemblyService _assemblyService;
+    private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
 
     public CsiInspectionService(
         IMapper mapper,
@@ -48,7 +49,8 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         IGeneralSettingsService generalSettingsService,
         IProfessionalSupplierService professionalSupplierService,
         IProfessionalInsuranceService insuranceService,
-        ICsiInspectionAssemblyService assemblyService)
+        ICsiInspectionAssemblyService assemblyService,
+        IMailingInfoRedactionService mailingInfoRedactionService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -62,6 +64,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         _professionalSupplierService = professionalSupplierService;
         _insuranceService = insuranceService;
         _assemblyService = assemblyService;
+        _mailingInfoRedactionService = mailingInfoRedactionService;
     }
 
     public override async Task<CsiInspectionDto?> DeleteAsync(int id)
@@ -77,8 +80,13 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
 
         await _assemblyService.DeleteByInspectionAsync(id, deleted.ProfessionalId, default);
 
+        var dto = MapToDto(deleted)!;
+
+        // Redact before Complete(): the settings lookup can't query the database once the scope is complete.
+        await _mailingInfoRedactionService.RedactAsync(dto, default);
+
         scope.Complete();
-        return MapToDto(deleted);
+        return dto;
     }
 
     public Task<InsuranceCheckDto> GetInsuranceCheckAsync(int waterSupplierId, CancellationToken cancellationToken)
@@ -136,8 +144,13 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         var added = await _repository.AddAsync(inspection);
         await _assemblyService.SaveForInspectionAsync(added, request, cancellationToken);
 
+        var dto = Mapper.Map<CsiInspectionDto>(added);
+
+        // Redact before Complete(): the settings lookup can't query the database once the scope is complete.
+        await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
+
         scope.Complete();
-        return Mapper.Map<CsiInspectionDto>(added);
+        return dto;
     }
 
     private async Task ApplyAmountAsync(CsiInspection inspection, bool siteIsFeeExempt, PropertyType propertyType, CancellationToken cancellationToken)
@@ -217,8 +230,13 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
 
         await _assemblyService.SaveForInspectionAsync(saved, request, cancellationToken);
 
+        var dto = Mapper.Map<CsiInspectionDto>(saved);
+
+        // Redact before Complete(): the settings lookup can't query the database once the scope is complete.
+        await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
+
         scope.Complete();
-        return Mapper.Map<CsiInspectionDto>(saved);
+        return dto;
     }
 
     public async Task<CsiInspectionDto?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken)
@@ -257,7 +275,21 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         query.Filter = query.ConvertFilterProperties<CsiInspection, CsiInspectionDto>(Mapper);
         query.Sort = query.ConvertSortProperties<CsiInspection, CsiInspectionDto>(Mapper);
         var inspections = await _repository.SearchForProfessionalAsync(pageInfo, query, latestOnly, cancellationToken);
-        return inspections.Select(m => Mapper.Map<CsiInspectionDto>(m)!).ToPagedData(pageInfo);
+        var dtos = inspections.Select(m => Mapper.Map<CsiInspectionDto>(m)!).ToPagedData(pageInfo);
+
+        return await _mailingInfoRedactionService.RedactAsync(dtos, cancellationToken);
+    }
+
+    public async Task<CsiInspectionDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken)
+    {
+        var dto = await GetAsync(id, cancellationToken);
+
+        if (dto != null)
+        {
+            await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
+        }
+
+        return dto;
     }
 
     public async Task<IPagedData<CsiInspectionDto>> SearchForAdminAsync(PageInfo pageInfo, Query query, CsiPaymentStatus? paymentStatus, CancellationToken cancellationToken)

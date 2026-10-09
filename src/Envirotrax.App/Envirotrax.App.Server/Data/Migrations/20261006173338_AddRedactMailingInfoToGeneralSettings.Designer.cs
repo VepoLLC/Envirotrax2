@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Envirotrax.App.Server.Data.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261006173338_AddRedactMailingInfoToGeneralSettings")]
+    partial class AddRedactMailingInfoToGeneralSettings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1218,9 +1221,6 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("AddedOnInspection")
-                        .HasColumnType("bit");
-
                     b.Property<string>("AssemblyDescription")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -1247,7 +1247,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("InspectionId")
+                    b.Property<int?>("InspectionId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsCurrent")
@@ -1259,9 +1259,6 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.Property<bool>("OutOfService")
                         .HasColumnType("bit");
-
-                    b.Property<int>("ProfessionalId")
-                        .HasColumnType("int");
 
                     b.Property<string>("SerialNumber")
                         .HasMaxLength(50)
@@ -1292,8 +1289,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("bit");
 
                     b.HasKey("WaterSupplierId", "Id");
-
-                    b.HasIndex("ProfessionalId");
 
                     b.HasIndex("WaterSupplierId", "InspectionId");
 
@@ -3400,10 +3395,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("ValidationOnHold")
                         .HasColumnType("bit");
 
-                    b.Property<string>("WaterSupplierAccountNumber")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<int>("WaterSupplierId")
                         .HasColumnType("int");
 
@@ -3432,10 +3423,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("WaterSupplierId", "FogAccountAssignmentId");
 
                     b.HasIndex("WaterSupplierId", "UserAccountAssignmentId");
-
-                    b.HasIndex("WaterSupplierId", "WaterSupplierAccountNumber")
-                        .IsUnique()
-                        .HasFilter("[WaterSupplierAccountNumber] IS NOT NULL");
 
                     b.ToTable("Sites");
                 });
@@ -3492,47 +3479,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("WaterSupplierId", "AssemblyId");
 
                     b.ToTable("SiteLogs");
-                });
-
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Sites.SiteSchedule", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ProfessionalId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProfessionalType")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ScheduleDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("SiteId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("ProfessionalId", "UserId");
-
-                    b.HasIndex("SiteId", "ProfessionalId", "UserId", "ProfessionalType")
-                        .IsUnique();
-
-                    b.ToTable("SiteSchedules");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.States.State", b =>
@@ -4141,9 +4087,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("FogVehiclesRequirePermit")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IncludeWsAccountNumbers")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("LockBpatRegistrations")
                         .HasColumnType("bit");
 
@@ -4169,9 +4112,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("RequireCsiInspectionImages")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("UseWsAccountNumbersOnLetters")
                         .HasColumnType("bit");
 
                     b.Property<bool>("WiseGuys")
@@ -4623,12 +4563,6 @@ namespace Envirotrax.App.Server.Data.Migrations
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Csi.CsiInspectionVisuallyIdentifiedAssembly", b =>
                 {
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
-                        .WithMany()
-                        .HasForeignKey("ProfessionalId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
                         .WithMany()
                         .HasForeignKey("WaterSupplierId")
@@ -4638,8 +4572,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasOne("Envirotrax.App.Server.Data.Models.Csi.CsiInspection", "Inspection")
                         .WithMany()
                         .HasForeignKey("WaterSupplierId", "InspectionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Envirotrax.App.Server.Data.Models.Backflow.BackflowTest", "Test")
                         .WithMany()
@@ -4647,8 +4580,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Inspection");
-
-                    b.Navigation("Professional");
 
                     b.Navigation("Test");
 
@@ -5306,40 +5237,6 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("Site");
 
                     b.Navigation("WaterSupplier");
-                });
-
-            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Sites.SiteSchedule", b =>
-                {
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
-                        .WithMany()
-                        .HasForeignKey("ProfessionalId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Sites.Site", "Site")
-                        .WithMany()
-                        .HasForeignKey("SiteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalUser", "User")
-                        .WithMany()
-                        .HasForeignKey("ProfessionalId", "UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("Professional");
-
-                    b.Navigation("Site");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Users.Role", b =>

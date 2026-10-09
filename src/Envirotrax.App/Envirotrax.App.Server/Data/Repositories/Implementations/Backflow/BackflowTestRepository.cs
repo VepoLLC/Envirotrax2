@@ -1,13 +1,16 @@
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
+using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Csi;
+using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
@@ -46,9 +49,14 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return query;
     }
 
+    // Bpat is an optional navigation to a ProfessionalUser, which the professional context filters to the
+    // logged-in professional's own users; left unfiltered that would silently null out another professional's
+    // Bpat on a shared test instead of hiding the row (BpatId is nullable, so EF left-joins it). Lifting only
+    // that named filter keeps the other contexts' filters, same as CsiInspectionRepository.GetDetailsQuery.
     protected override IQueryable<BackflowTest> GetDetailsQuery()
     {
         return base.GetDetailsQuery()
+            .IgnoreQueryFilters([ProfessionalDbContext.OwnProfessionalFilterFor<ProfessionalUser>()])
             .Include(bt => bt.WaterSupplier)
                 .ThenInclude(ws => ws!.State)
             .Include(bt => bt.Site)
@@ -70,6 +78,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         }
 
         ProfessionalRecordScope.ApplyToProfessionalSearch(query, _tenantProvider.ProfessionalId, nameof(BackflowTest.ProfessionalId));
+        WaterSupplierAccountNumberSearch.Apply(query, nameof(BackflowTest.AccountNumber), nameof(BackflowTest.Site));
 
         return base.GetAllAsync(pageInfo, query, cancellationToken);
     }
@@ -221,6 +230,8 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
 
     public async Task<IEnumerable<BackflowTest>> SearchAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken)
     {
+        WaterSupplierAccountNumberSearch.Apply(query, nameof(BackflowTest.AccountNumber), nameof(BackflowTest.Site));
+
         var dbQuery = GetListQuery().Where(query.Filter);
 
         if (paymentStatus == BackflowPaymentStatus.Paid)

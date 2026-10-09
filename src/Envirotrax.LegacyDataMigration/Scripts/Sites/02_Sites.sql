@@ -32,7 +32,7 @@ BEGIN TRY
     SET IDENTITY_INSERT Sites ON;
 
     INSERT INTO Sites
-        (Id, LegacyRecordId, WaterSupplierId, SubArea, AccountNumber, BusinessName, PropertyType,
+        (Id, LegacyRecordId, WaterSupplierId, SubArea, AccountNumber, WaterSupplierAccountNumber, BusinessName, PropertyType,
          StreetNumber, StreetName, PropertyNumber, City, StateId, ZipCode,
          MailingCompanyName, MailingContactName, MailingStreetNumber, MailingStreetName, MailingNumber, MailingCity, MailingStateId, MailingZipCode,
          MailingPhoneNumber, MailingEmailAddress, FogGeneratorPhoneNumber, FogGeneratorEmailAddress, Comments,
@@ -52,7 +52,8 @@ BEGIN TRY
          NeedsRenewalCheck, CsiAccountAssignmentDate, BackflowAccountAssignmentDate, FogAccountAssignmentDate,
          Active, CreatedById, CreatedTime, UpdatedById, UpdatedTime)
     SELECT
-        legacySites.ID, legacySites.ID, waterSuppliers.Id, legacySites.SubArea, legacySites.AccountNumber, legacySites.PropertyBusinessName, legacySites.PropertyType,
+        -- V1 saved a cleared WS Account Number as '', which V2 stores as NULL so the unique index skips it.
+        legacySites.ID, legacySites.ID, waterSuppliers.Id, legacySites.SubArea, legacySites.AccountNumber, NULLIF(RTRIM(legacySites.WaterSupplierAccountNumber), ''), legacySites.PropertyBusinessName, legacySites.PropertyType,
         legacySites.PropertyStreetNumber, legacySites.PropertyStreetName, legacySites.PropertyNumber, legacySites.PropertyCity, propertyStates.Id, legacySites.PropertyZIP,
         legacySites.MailingCompanyName, legacySites.MailingContactName, legacySites.MailingStreetNumber, legacySites.MailingStreetName, legacySites.MailingNumber, legacySites.MailingCity, mailingStates.Id, legacySites.MailingZIP,
         legacySites.MailingPhoneNumber, legacySites.MailingEmailAddress, legacySites.FogGeneratorPhoneNumber, legacySites.FogGeneratorEmailAddress, legacySites.Comments,

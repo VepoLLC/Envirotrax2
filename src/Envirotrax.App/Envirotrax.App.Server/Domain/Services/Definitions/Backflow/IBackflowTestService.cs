@@ -2,6 +2,7 @@ using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Licenses;
 
 namespace Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 
@@ -22,9 +23,15 @@ public interface IBackflowTestService : IService<BackflowTest, BackflowTestDto>
 
     Task<InsuranceCheckDto> GetInsuranceCheckAsync(int waterSupplierId, CancellationToken cancellationToken = default);
 
+    Task<BpatLicenseCheckDto> GetLicenseCheckAsync(int waterSupplierId, int bpatUserId, CancellationToken cancellationToken = default);
+
     Task<IPagedData<BackflowComplianceDto>> GetComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
 
     Task<IPagedData<BackflowTestDto>> SearchAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken);
+
+    Task<IPagedData<BackflowTestDto>> GetAllForProfessionalAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+
+    Task<BackflowTestDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken);
 
     Task<BackflowTestAdminDetailsDto?> GetForAdminAsync(int id, CancellationToken cancellationToken);
 

@@ -79,6 +79,11 @@
                     <dt class="col-sm-4">Account Number</dt>
                     <dd class="col-sm-8">{{ site.accountNumber || '&mdash;' }}</dd>
 
+                    <ng-container *ngIf="includeWsAccountNumbers">
+                        <dt class="col-sm-4">WS Account Number</dt>
+                        <dd class="col-sm-8">{{ site.waterSupplierAccountNumber || '&mdash;' }}</dd>
+                    </ng-container>
+
                     <dt class="col-sm-4">Property Type</dt>
                     <dd class="col-sm-8">
                         <ng-container *ngIf="site.propertyType === PropertyType.Residential">Residential</ng-container>

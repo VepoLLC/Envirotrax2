@@ -11,6 +11,7 @@ import { BackflowPaymentStatus } from "../../models/backflow/backflow-test-enums
 import { BackflowCompliance } from "../../models/backflow/backflow-compliance";
 import { BackflowTestImages } from "../../models/backflow/backflow-test-images";
 import { InsuranceCheck } from "../../models/professionals/insurance-check";
+import { BpatLicenseCheck } from "../../models/professionals/license-check";
 import { ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../../models/payments/professional-checkout";
 import { DownloadEndpoint } from "../../models/download-config";
 import { RecordLog } from "@envirotrax/common-ui";
@@ -120,6 +121,12 @@ export class BackflowTestService {
         const url = this._urlResolver.resolveUrl('/api/professionals/backflow/tests/insurance-check');
 
         return await lastValueFrom(this._http.get<InsuranceCheck>(url, { params: { waterSupplierId } }));
+    }
+
+    public async getLicenseCheck(waterSupplierId: number, bpatUserId: number): Promise<BpatLicenseCheck> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/backflow/tests/license-check');
+
+        return await lastValueFrom(this._http.get<BpatLicenseCheck>(url, { params: { waterSupplierId, bpatUserId } }));
     }
 
     public async submit(test: BackflowTest, images: BackflowTestImages = {}): Promise<BackflowTest> {

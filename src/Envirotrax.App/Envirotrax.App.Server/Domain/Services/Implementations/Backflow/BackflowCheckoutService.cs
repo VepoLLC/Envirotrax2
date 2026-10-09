@@ -8,6 +8,7 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Payments;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Notifications;
 using Envirotrax.App.Server.Domain.Services.Definitions.Payments;
+using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Implementations.Payments;
 using Envirotrax.Common;
 using Envirotrax.Common.Domain.Services.Defintions;
@@ -32,8 +33,9 @@ public class BackflowCheckoutService
         IProfessionalTransactionRepository transactionRepository,
         IProfessionalPaymentService paymentService,
         IBackflowTestNotificationService notificationService,
-        IBackflowCheckoutEmailService checkoutEmailService)
-        : base(authService, professionalRepository, transactionRepository, paymentService)
+        IBackflowCheckoutEmailService checkoutEmailService,
+        IMailingInfoRedactionService mailingInfoRedactionService)
+        : base(authService, professionalRepository, transactionRepository, paymentService, mailingInfoRedactionService)
     {
         _mapper = mapper;
         _testRepository = testRepository;

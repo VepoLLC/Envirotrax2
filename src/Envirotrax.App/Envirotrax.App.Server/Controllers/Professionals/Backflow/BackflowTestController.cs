@@ -29,7 +29,7 @@ public class BackflowTestController : ProfessionalProtectedController
     [HttpGet]
     public async Task<IActionResult> GetAllAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
     {
-        var result = await _backflowTestService.GetAllAsync(pageInfo, query, cancellationToken);
+        var result = await _backflowTestService.GetAllForProfessionalAsync(pageInfo, query, cancellationToken);
         return Ok(result);
     }
 
@@ -47,10 +47,17 @@ public class BackflowTestController : ProfessionalProtectedController
         return Ok(result);
     }
 
+    [HttpGet("license-check")]
+    public async Task<IActionResult> GetLicenseCheckAsync([FromQuery] int waterSupplierId, [FromQuery] int bpatUserId, CancellationToken cancellationToken)
+    {
+        var result = await _backflowTestService.GetLicenseCheckAsync(waterSupplierId, bpatUserId, cancellationToken);
+        return Ok(result);
+    }
+
     [HttpGet("pdf")]
     public async Task<IActionResult> GetAllPdfAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
     {
-        var tests = await _backflowTestService.GetAllAsync(pageInfo, query, cancellationToken);
+        var tests = await _backflowTestService.GetAllForProfessionalAsync(pageInfo, query, cancellationToken);
         var pdf = await _backflowTestService.GeneratePdfAsync(tests.Data);
         return File(pdf, "application/pdf");
     }
@@ -58,14 +65,14 @@ public class BackflowTestController : ProfessionalProtectedController
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
     {
-        var result = await _backflowTestService.GetAsync(id, cancellationToken);
+        var result = await _backflowTestService.GetForProfessionalAsync(id, cancellationToken);
         return Ok(result);
     }
 
     [HttpGet("{id}/pdf")]
     public async Task<IActionResult> GetPdfAsync(int id, CancellationToken cancellationToken)
     {
-        var test = await _backflowTestService.GetAsync(id, cancellationToken);
+        var test = await _backflowTestService.GetForProfessionalAsync(id, cancellationToken);
         if (test == null)
         {
             return NotFound();

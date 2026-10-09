@@ -37,6 +37,7 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IProfessionalSupplierService _professionalSupplierService;
     private readonly IProfessionalInsuranceService _insuranceService;
+    private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
 
     public FogTripTicketService(
         IMapper mapper,
@@ -51,7 +52,8 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         IPdfTemplateService pdfTemplateService,
         IGeneralSettingsService generalSettingsService,
         IProfessionalSupplierService professionalSupplierService,
-        IProfessionalInsuranceService insuranceService)
+        IProfessionalInsuranceService insuranceService,
+        IMailingInfoRedactionService mailingInfoRedactionService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -66,6 +68,7 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         _generalSettingsService = generalSettingsService;
         _professionalSupplierService = professionalSupplierService;
         _insuranceService = insuranceService;
+        _mailingInfoRedactionService = mailingInfoRedactionService;
     }
 
     public override async Task<FogTripTicketDto?> DeleteAsync(int id)
@@ -79,8 +82,13 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
             return null;
         }
 
+        var dto = MapToDto(deleted)!;
+
+        // Redact before Complete(): the settings lookup can't query the database once the scope is complete.
+        await _mailingInfoRedactionService.RedactAsync(dto, CancellationToken.None);
+
         scope.Complete();
-        return MapToDto(deleted);
+        return dto;
     }
 
     public Task<byte[]> GeneratePdfAsync(FogTripTicketDto ticket)
@@ -110,6 +118,18 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         if (dto != null)
         {
             await PopulateSignatureUrlsAsync(dto);
+        }
+
+        return dto;
+    }
+
+    public async Task<FogTripTicketDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken)
+    {
+        var dto = await GetAsync(id, cancellationToken);
+
+        if (dto != null)
+        {
+            await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
         }
 
         return dto;
@@ -147,8 +167,9 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         query.Sort = query.ConvertSortProperties<FogTripTicket, FogTripTicketDto>(Mapper);
 
         var tickets = await _repository.SearchForProfessionalAsync(pageInfo, query, waterSupplierId, cancelationToken);
+        var dtos = tickets.Select(Mapper.Map<FogTripTicketDto>).ToPagedData(pageInfo);
 
-        return tickets.Select(Mapper.Map<FogTripTicketDto>).ToPagedData(pageInfo);
+        return await _mailingInfoRedactionService.RedactAsync(dtos, cancelationToken);
     }
 
     public Task<InsuranceCheckDto> GetInsuranceCheckAsync(int waterSupplierId, CancellationToken cancellationToken)
@@ -240,8 +261,13 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
             await _fileStorageService.UploadAsync(ticket.ReceiverSignaturePath, receiverSignatureStream);
         }
 
+        var dto = Mapper.Map<FogTripTicketDto>(added);
+
+        // Redact before Complete(): the settings lookup can't query the database once the scope is complete.
+        await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
+
         scope.Complete();
-        return Mapper.Map<FogTripTicketDto>(added);
+        return dto;
     }
 
     private async Task ApplyAmountAsync(FogTripTicket ticket, bool siteIsFeeExempt, CancellationToken cancellationToken)

@@ -32,6 +32,12 @@ public class Site : IAuditableModel<AppUser>
     [StringLength(20)]
     public string AccountNumber { get; set; } = null!;
 
+    // The water supplier's own account number for the site, shown and searched alongside AccountNumber when
+    // GeneralSettings.IncludeWsAccountNumbers is on. Unique per water supplier, archived sites included, as in
+    // V1; blank is stored as NULL.
+    [MaxLength(20)]
+    public string? WaterSupplierAccountNumber { get; set; }
+
     [StringLength(100)]
     public string? BusinessName { get; set; }
 
@@ -236,5 +242,9 @@ public class SiteConfiguration : IEntityTypeConfiguration<Site>
     public void Configure(EntityTypeBuilder<Site> builder)
     {
         builder.HasIndex(site => site.LegacyRecordId);
+
+        builder.HasIndex(site => new { site.WaterSupplierId, site.WaterSupplierAccountNumber })
+            .IsUnique()
+            .HasFilter("[WaterSupplierAccountNumber] IS NOT NULL");
     }
 }

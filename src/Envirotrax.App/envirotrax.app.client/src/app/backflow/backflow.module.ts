@@ -16,6 +16,7 @@ import { BackflowTesterUsersComponent } from "./testers/details/users/list/backf
 import { AddEditBackflowTesterUserComponent } from "./testers/details/users/edit/add-edit-backflow-tester-user.component";
 import { BackflowTesterLicenseInsuranceComponent } from "./testers/details/license-insurance/list/backflow-tester-license-insurance.component";
 import { AddEditBackflowTesterLicenseComponent } from "./testers/details/license-insurance/edit/add-edit-backflow-tester-license.component";
+import { AddEditBackflowTesterCompanyLicenseComponent } from "./testers/details/license-insurance/edit/add-edit-backflow-tester-company-license.component";
 import { AddEditBackflowTesterInsuranceComponent } from "./testers/details/license-insurance/edit/add-edit-backflow-tester-insurance.component";
 import { ProfessionalModule } from "../professionals/professional.module";
 import { BackflowTesterGaugeComponent } from "./testers/details/gauge/list/backflow-tester-gauge.component";
@@ -48,6 +49,7 @@ import { BackflowTestDetailsSectionsModule } from "./tests/details/backflow-test
         AddEditBackflowTesterUserComponent,
         BackflowTesterLicenseInsuranceComponent,
         AddEditBackflowTesterLicenseComponent,
+        AddEditBackflowTesterCompanyLicenseComponent,
         AddEditBackflowTesterInsuranceComponent,
         BackflowTesterGaugeComponent,
         AddEditBackflowTesterGaugeComponent,

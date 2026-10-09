@@ -39,88 +39,274 @@
                       [canDelete]="true"
                       (delete)="delete($event)"
                       [(pageInfo)]="table.items.pageInfo"
-                      (pageInfoChange)="getInsurances()"
+                      (pageInfoChange)="getRows()"
                       [(query)]="table.query"
-                      (queryChange)="getInsurances()"
-                      (queryReset)="getInsurances()"
+                      (queryChange)="getRows()"
+                      (queryReset)="getRows()"
                       [freeTextSearch]="table.freeTextSearch" />
         </div>
     </vp-section>
 </div>
 
 <vp-section header="Register New Insurance Policy">
-    <p class="text-center text-danger fw-bold">
-        Please read the following important information on how to register and manage your insurance policies
-    </p>
-
-    <h3 class="text-bg-light p-2 border h6">Adding Insurance Policies</h3>
-    <div class="mx-1">
-        <p>
-            When registering an insurance policy, you must upload an electronic copy of your Certificate of Insurance
-            (COI)
-            by clicking the <strong>Choose File</strong> button and selecting the file to upload. Once received, our
-            staff
-            will validate the policy by entering the expiration date.
-        </p>
-        <p>
-            Verify that all information is correct, then click the <strong>Register New Insurance Policy</strong> button
-            to submit your policy for review.
-        </p>
+    <div *ngIf="showBackflowHelp || showCsiHelp || showFogInspectionHelp" class="text-center mb-3">
+        <ul class="vp-tabs nav nav-pills d-inline-flex flex-wrap justify-content-center">
+            <li *ngIf="showBackflowHelp" class="nav-item">
+                <a class="nav-link" [class.active]="activeHelpTab === 'backflow'" (click)="setHelpTab('backflow')">
+                    Backflow Testing
+                </a>
+            </li>
+            <li *ngIf="showCsiHelp" class="nav-item">
+                <a class="nav-link" [class.active]="activeHelpTab === 'csi'" (click)="setHelpTab('csi')">
+                    CSI Inspection
+                </a>
+            </li>
+            <li *ngIf="showFogInspectionHelp" class="nav-item">
+                <a class="nav-link" [class.active]="activeHelpTab === 'fogInspection'" (click)="setHelpTab('fogInspection')">
+                    FOG Inspection
+                </a>
+            </li>
+        </ul>
     </div>
 
-    <h3 class="text-bg-light p-2 border h6">Renewing Your Insurance Policies</h3>
-    <div class="mx-1">
-        <p>
-            To renew an insurance policy, enter the new policy number and upload an updated Certificate of Insurance
-            (COI).
-            Policies are typically validated within an hour, but may take up to one business day in rare cases.
+    <div *ngIf="showBackflowHelp && activeHelpTab === 'backflow'">
+        <p class="text-center text-danger fw-bold">
+            Please read the following important information on how to register and manage your licenses &amp; company insurance policy.
         </p>
+
+        <h3 class="text-bg-light p-2 border h6">Adding Licenses &amp; Insurance Policies</h3>
+        <div class="mx-1">
+            <p>
+                Use the form below to add a new license or insurance policy to your account.
+            </p>
+        </div>
+
+        <h3 class="text-bg-light p-2 border h6">The following applies to all “Master” and sub accounts:</h3>
+        <ol>
+            <li>
+                A BPAT license must be added for each account or sub account in order for the account to be authorized
+                for use in backflow test submissions. The Company Name and/or Contact Name on the account must match the
+                name of the license holder. If a "master" account is only used for sub account administration and not
+                backflow test submissions, a BPAT license does not need to be registered for the account.
+            </li>
+            <li>
+                Insurance policies registered with a "master" account will be applied to all of its sub accounts.
+                Insurance policy registration is not necessary for each individual sub account. The Company Name on the
+                account must match the company name on the Certificate of Insurance (COI).
+            </li>
+        </ol>
+
+        <h3 class="text-bg-light p-2 border h6">
+            Verify that the information is correct and click the Register New License or Insurance Policy button to
+            begin the process of registering your license or insurance policy.
+        </h3>
+        <ol>
+            <li>
+                All BPAT and fire company licenses will be verified by Vepo personnel. Once the license is verified, our
+                staff will validate the license by entering in the expiration date on file with the authority issuing the
+                license.<br />
+                Note: If your company intends to test fireline assemblies in the State of Texas, you certify that BPATs
+                registered in your account are permanent employees per §290.44(h)(4)(A)(ii).
+            </li>
+            <li>
+                If you are registering an insurance policy you must upload an electronic copy of your Certificate of
+                Insurance (COI) to your account by clicking on the Choose File button and selecting the COI file to
+                upload. Once we receive the file, our staff will validate the policy by entering the expiration date.
+            </li>
+        </ol>
+
+        <h3 class="text-bg-light p-2 border h6">Renewing Your Licenses &amp; Insurance Policies</h3>
+        <ol>
+            <li>
+                All BPAT and fire company licenses are monitored by Vepo personnel and updated near the time of their
+                expiration. If a license is not renewed, we will not be able to update the license and your account will
+                become unauthorized for use.
+            </li>
+            <li>
+                For insurance policy renewals, you must enter the new policy number and upload an electronic copy of your
+                Certificate of Insurance (COI) to your account by clicking on the Choose File button and selecting the
+                COI file to upload. Policies are normally validated within an hour, but could take as long as one
+                business day on rare occasions.
+            </li>
+        </ol>
+
+        <h3 class="text-bg-light p-2 border h6">Reinstating Expired Licenses &amp; Insurance Policies</h3>
+        <ol>
+            <li>
+                Vepo personnel will continue to check for renewals of expired BPAT and fire company licenses for a set
+                period of time. If the license is not renewed within that set time period, the license will no longer be
+                checked for renewal and you must reinstate the license manually. To reinstate an expired license you must
+                first renew your license with the authority issuing the license. Then, contact us so that we can verify
+                the license and update it within the system.
+            </li>
+        </ol>
     </div>
 
-    <h3 class="text-bg-light p-2 border h6">Reinstating Expired Insurance Policies</h3>
-    <div class="mx-3">
-        <p>
-            If your insurance policy has expired, you must obtain a renewed policy from your insurance provider before
-            reinstating it in the system. Once you have the updated policy, contact us so our staff can verify and
-            update
-            it.
+    <div *ngIf="showCsiHelp && activeHelpTab === 'csi'">
+        <p class="text-center text-danger fw-bold">
+            Please read the following important information on how to register and manage your licenses &amp; company insurance policy.
         </p>
+
+        <h3 class="text-bg-light p-2 border h6">Adding Licenses &amp; Insurance Policies</h3>
+        <div class="mx-1">
+            <p>
+                Use the form below to add a new license or insurance policy to your account.
+            </p>
+        </div>
+
+        <h3 class="text-bg-light p-2 border h6">The following applies to all “Master” and sub accounts:</h3>
+        <ol>
+            <li>
+                A CSI license must be added for each account or sub account in order for that account to be authorized
+                for use in CSI submissions. If a "master" account is only used for sub account administration and not CSI
+                submissions, a CSI license does not need to be registered for the account. The name on the master account
+                or sub account must match the name on the license associated with the account.
+            </li>
+            <li>
+                Insurance policies registered with a "master" account will be applied to all of its sub accounts.
+                Insurance policy registration is not necessary for each sub account.
+            </li>
+        </ol>
+
+        <h3 class="text-bg-light p-2 border h6">
+            Verify that the information is correct and click the Register New License or Insurance Policy button to
+            begin the process of registering your license or insurance policy.
+        </h3>
+        <ol>
+            <li>
+                All CSI licenses will be verified by Vepo personnel. Once the license is verified, our staff will validate
+                the license by entering in the expiration date on file with the authority issuing the license.
+            </li>
+            <li>
+                If you are registering an insurance policy you must upload an electronic copy of your Certificate of
+                Insurance (COI) to your account by clicking on the Choose File button and selecting the COI file to
+                upload. Once we receive the file, our staff will validate the policy by entering the expiration date.
+            </li>
+        </ol>
+
+        <h3 class="text-bg-light p-2 border h6">Renewing Your Licenses &amp; Insurance Policies</h3>
+        <ol>
+            <li>
+                All CSI licenses will be monitored by Vepo personnel and updated near the time of their expiration. If you
+                do not renew your license, we will not be able to update your license and your account will become
+                unauthorized for use.
+            </li>
+            <li>
+                For insurance policy renewals, you must enter the new policy number and upload an electronic copy of your
+                Certificate of Insurance (COI) to your account by clicking on the Choose File button and selecting the
+                COI file to upload. Policies are normally validated within an hour, but could take as long as one
+                business day on rare occasions.
+            </li>
+        </ol>
+
+        <h3 class="text-bg-light p-2 border h6">Reinstating Expired Licenses &amp; Insurance Policies</h3>
+        <ol>
+            <li>
+                Vepo personnel will continue to check for renewals of expired licenses for a set period of time. If the
+                license is not renewed within that set time period the license will no longer be checked for renewal and
+                you must reinstate the license manually. To reinstate an expired license you must first renew your
+                license with the authority issuing the license. Then, contact us so that we can verify the license and
+                update it within the system.
+            </li>
+        </ol>
+    </div>
+
+    <div *ngIf="showFogInspectionHelp && activeHelpTab === 'fogInspection'">
+        <p class="text-center text-danger fw-bold">
+            Please read the following important information on how to register and manage your insurance policies
+        </p>
+
+        <h3 class="text-bg-light p-2 border h6">Adding Insurance Policies</h3>
+        <div class="mx-1">
+            <p>
+                When registering an insurance policy, you must upload an electronic copy of your Certificate of Insurance
+                (COI)
+                by clicking the <strong>Choose File</strong> button and selecting the file to upload. Once received, our
+                staff
+                will validate the policy by entering the expiration date.
+            </p>
+            <p>
+                Verify that all information is correct, then click the <strong>Register New Insurance Policy</strong> button
+                to submit your policy for review.
+            </p>
+        </div>
+
+        <h3 class="text-bg-light p-2 border h6">Renewing Your Insurance Policies</h3>
+        <div class="mx-1">
+            <p>
+                To renew an insurance policy, enter the new policy number and upload an updated Certificate of Insurance
+                (COI).
+                Policies are typically validated within an hour, but may take up to one business day in rare cases.
+            </p>
+        </div>
+
+        <h3 class="text-bg-light p-2 border h6">Reinstating Expired Insurance Policies</h3>
+        <div class="mx-3">
+            <p>
+                If your insurance policy has expired, you must obtain a renewed policy from your insurance provider before
+                reinstating it in the system. Once you have the updated policy, contact us so our staff can verify and
+                update
+                it.
+            </p>
+        </div>
     </div>
 
     <div *ngIf="newInsurance" class="d-flex justify-content-center" dp-spinner-parent>
         <dp-loading-spinner *ngIf="isNewInsuranceLoading" />
-        <form #form="ngForm" (ngSubmit)="saveInsurance(form)">
-            <div class="mb-3">
-                <vp-input name="insuranceNumber"
-                          label="Policy Number"
-                          [(ngModel)]="newInsurance.insuranceNumber"
+        <form #form="ngForm" (ngSubmit)="save(form)">
+            <div *ngIf="hasCompanyLicenseTypes" class="mb-3">
+                <vp-input type="select"
+                          name="documentType"
+                          label="Type"
+                          [ngModel]="documentTypeId"
+                          (ngModelChange)="documentTypeChange($event)"
+                          [required]="true"
+                          [options]="documentTypes"
+                          [form]="form" />
+            </div>
+
+            <ng-container *ngIf="!isCompanyLicense">
+                <div class="mb-3">
+                    <vp-input name="insuranceNumber"
+                              label="Policy Number"
+                              [(ngModel)]="newInsurance.insuranceNumber"
+                              [required]="true"
+                              [maxLength]="50"
+                              [form]="form" />
+                </div>
+
+                <div class="mb-3">
+                    <vp-input name="coverageAmount"
+                              label="Coverage $"
+                              type="number"
+                              [decimals]="2"
+                              [min]="0"
+                              [(ngModel)]="newInsurance.coverageAmount"
+                              [required]="true"
+                              [form]="form" />
+                </div>
+
+                <div class="mb-3">
+                    <p>
+                        Please click on the Choose File button below and select the Certificate of Insurance (COI) you wish to upload.
+                    </p>
+
+                    <vp-file-upload name="coiFile"
+                                    validationLabel="Certificate of Insurance (COI)"
+                                    [(ngModel)]="certificateFile"
+                                    [required]="true"
+                                    accept=".jpg, .jpeg, .gif, .png, .bmp, .pdf"
+                                    [form]="form" />
+                </div>
+            </ng-container>
+
+            <div *ngIf="isCompanyLicense" class="mb-3">
+                <vp-input name="licenseNumber"
+                          label="License Number"
+                          [(ngModel)]="newLicense.licenseNumber"
                           [required]="true"
                           [maxLength]="50"
                           [form]="form" />
-            </div>
-
-            <div class="mb-3">
-                <vp-input name="coverageAmount"
-                          label="Coverage $"
-                          type="number"
-                          [decimals]="2"
-                          [min]="0"
-                          [(ngModel)]="newInsurance.coverageAmount"
-                          [required]="true"
-                          [form]="form" />
-            </div>
-
-            <div class="mb-3">
-                <p>
-                    Please click on the Choose File button below and select the Certificate of Insurance (COI) you
-                </p>
-
-                <vp-file-upload name="coiFile"
-                                validationLabel="Certificate of Insurance (COI)"
-                                [(ngModel)]="certificateFile"
-                                [required]="true"
-                                accept=".jpg, .jpeg, .gif, .png, .bmp, .pdf"
-                                [form]="form" />
             </div>
 
             <div class="form-check mb-3">
@@ -143,7 +329,8 @@
 
                 <div class="d-flex justify-content-center">
                     <button type="submit" class="btn btn-primary w-100">
-                        Submit New Insurance Policy
+                        <ng-container *ngIf="!isCompanyLicense">Submit New Insurance Policy</ng-container>
+                        <ng-container *ngIf="isCompanyLicense">Submit New License</ng-container>
                     </button>
                 </div>
             </div>

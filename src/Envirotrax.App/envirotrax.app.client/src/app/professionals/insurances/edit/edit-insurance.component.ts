@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { ProfessionalInsurance } from "../../../shared/models/professionals/professional-insurance";
 import { ProfessionalInsuranceService } from "../../../shared/services/professionals/professional-insurance.service";
 import { ModalReference } from "@developer-partners/ngx-modal-dialog";
@@ -10,8 +10,8 @@ import { ToastService } from '@envirotrax/common-ui';
     standalone: false,
     templateUrl: './edit-insurance.component.html'
 })
-export class EditInsuranceComponent {
-    public insurance: ProfessionalInsurance;
+export class EditInsuranceComponent implements OnInit {
+    public insurance: ProfessionalInsurance = {};
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
 
@@ -21,7 +21,15 @@ export class EditInsuranceComponent {
         private readonly _helper: HelperService,
         private readonly _toastService: ToastService
     ) {
-        this.insurance = { ...this._modalReference.config.model! };
+    }
+
+    public async ngOnInit(): Promise<void> {
+        try {
+            this.isLoading = true;
+            this.insurance = await this._insuranceService.get(this._modalReference.config.model!.id!);
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public async save(form: NgForm): Promise<void> {

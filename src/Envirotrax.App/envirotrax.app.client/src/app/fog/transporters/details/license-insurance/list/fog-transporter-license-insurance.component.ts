@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { ExpirationType, ProfessionalUserLicense, professionalTypeLabels, ProfessionalType } from "../../../../../shared/models/professionals/licenses/professional-user-license";
+import { ExpirationType } from "../../../../../shared/models/professionals/licenses/professional-user-license";
+import { ProfessionalLicense } from "../../../../../shared/models/professionals/licenses/professional-license";
 import { ProfessionalInsurance, ExpirationType as InsuranceExpirationType } from "../../../../../shared/models/professionals/professional-insurance";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
 import { FogTransporterLicensesService } from "../../../../../shared/services/fog/fog-transporter-licenses.service";
@@ -31,7 +32,7 @@ export class FogTransporterLicenseInsuranceComponent implements OnInit {
     public canManageLicenses: boolean = false;
     public canManageInsurances: boolean = false;
 
-    public licensesTable: TableViewModel<ProfessionalUserLicense> = {
+    public licensesTable: TableViewModel<ProfessionalLicense> = {
         columns: [],
         query: { sort: {}, filter: [] }
     };
@@ -44,16 +45,10 @@ export class FogTransporterLicenseInsuranceComponent implements OnInit {
     public insuranceCustomActions: TableCustomAction<ProfessionalInsurance>[] = [];
 
     @ViewChild('licenseTypeCell', { static: true })
-    private licenseTypeCellTemplate!: TemplateRef<CellTemplateData<ProfessionalUserLicense>>;
-
-    @ViewChild('professionalTypeCell', { static: true })
-    private professionalTypeCellTemplate!: TemplateRef<CellTemplateData<ProfessionalUserLicense>>;
-
-    @ViewChild('userEmailCell', { static: true })
-    private userEmailCellTemplate!: TemplateRef<CellTemplateData<ProfessionalUserLicense>>;
+    private licenseTypeCellTemplate!: TemplateRef<CellTemplateData<ProfessionalLicense>>;
 
     @ViewChild('licenseExpirationCell', { static: true })
-    private licenseExpirationCellTemplate!: TemplateRef<CellTemplateData<ProfessionalUserLicense>>;
+    private licenseExpirationCellTemplate!: TemplateRef<CellTemplateData<ProfessionalLicense>>;
 
     @ViewChild('insuranceExpirationCell', { static: true })
     private insuranceExpirationCellTemplate!: TemplateRef<CellTemplateData<ProfessionalInsurance>>;
@@ -109,7 +104,7 @@ export class FogTransporterLicenseInsuranceComponent implements OnInit {
         this.insurancesTable.columns = this.getInsuranceColumns();
     }
 
-    private getLicenseColumns(): TableColumn<ProfessionalUserLicense>[] {
+    private getLicenseColumns(): TableColumn<ProfessionalLicense>[] {
         return [
             {
                 field: 'licenseNumber',
@@ -120,18 +115,6 @@ export class FogTransporterLicenseInsuranceComponent implements OnInit {
                 field: 'licenseType.name',
                 caption: 'Type',
                 cellTemplate: this.licenseTypeCellTemplate,
-                type: ColumnType.text
-            },
-            {
-                field: 'professionalType',
-                caption: 'Professional Type',
-                cellTemplate: this.professionalTypeCellTemplate,
-                type: ColumnType.text
-            },
-            {
-                field: 'user.emailAddress',
-                caption: 'Email Address',
-                cellTemplate: this.userEmailCellTemplate,
                 type: ColumnType.text
             },
             {
@@ -160,7 +143,7 @@ export class FogTransporterLicenseInsuranceComponent implements OnInit {
     }
 
     public addLicense(): void {
-        this._modalHelper.show<FogLicenseModalData, ProfessionalUserLicense>(EditFogTransporterLicenseComponent, {
+        this._modalHelper.show<FogLicenseModalData, ProfessionalLicense>(EditFogTransporterLicenseComponent, {
             title: 'Add License',
             model: { transporterId: this.transporterId, license: {} },
             size: ModalSize.large,
@@ -168,8 +151,8 @@ export class FogTransporterLicenseInsuranceComponent implements OnInit {
         }).result().subscribe(() => this.loadLicenses());
     }
 
-    public editLicense(license: ProfessionalUserLicense): void {
-        this._modalHelper.show<FogLicenseModalData, ProfessionalUserLicense>(EditFogTransporterLicenseComponent, {
+    public editLicense(license: ProfessionalLicense): void {
+        this._modalHelper.show<FogLicenseModalData, ProfessionalLicense>(EditFogTransporterLicenseComponent, {
             title: 'Edit License',
             model: { transporterId: this.transporterId, license },
             size: ModalSize.large,
@@ -259,12 +242,5 @@ export class FogTransporterLicenseInsuranceComponent implements OnInit {
         } finally {
             this.insurancesTable.isLoading = false;
         }
-    }
-
-    public getProfessionalTypeLabel(type?: number): string {
-        if (type === undefined || type === null) {
-            return '';
-        }
-        return professionalTypeLabels[type as ProfessionalType] ?? '';
     }
 }

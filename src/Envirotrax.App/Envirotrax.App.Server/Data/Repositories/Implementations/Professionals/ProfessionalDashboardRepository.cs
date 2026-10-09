@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 
 /// <summary>
-/// Spans two unrelated entities, so it owns none of them and does not derive from <see cref="Repository{TModel}"/>.
-/// Both sets carry the <c>IProfessionalModel</c> global query filter, so the union is already scoped to the current professional.
+/// Spans several unrelated entities, so it owns none of them and does not derive from <see cref="Repository{TModel}"/>.
+/// All sets carry the <c>IProfessionalModel</c> global query filter, so the union is already scoped to the current professional.
 /// </summary>
 public class ProfessionalDashboardRepository(IDbContextSelector dbContextSelector) : IProfessionalDashboardRepository
 {
@@ -19,7 +19,24 @@ public class ProfessionalDashboardRepository(IDbContextSelector dbContextSelecto
 
     public async Task<IEnumerable<ProfessionalDashboardLicenseInsuranceDto>> GetLicensesAndInsurancesAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        var licenseQuery = _dbContext.ProfessionalUserLicenses
+        var rows = GetUserLicenseRows()
+            .Union(GetCompanyLicenseRows())
+            .Union(GetInsuranceRows());
+
+        return await PaginateAsync(rows, pageInfo, query, cancellationToken);
+    }
+
+    public async Task<IEnumerable<ProfessionalDashboardLicenseInsuranceDto>> GetCompanyLicensesAndInsurancesAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var rows = GetCompanyLicenseRows()
+            .Union(GetInsuranceRows());
+
+        return await PaginateAsync(rows, pageInfo, query, cancellationToken);
+    }
+
+    private IQueryable<ProfessionalDashboardLicenseInsuranceDto> GetUserLicenseRows()
+    {
+        return _dbContext.ProfessionalUserLicenses
             .AsNoTracking()
             .Select(license => new ProfessionalDashboardLicenseInsuranceDto
             {
@@ -32,8 +49,26 @@ public class ProfessionalDashboardRepository(IDbContextSelector dbContextSelecto
                     : license.ProfessionalUser!.ContactName,
                 ExpirationDate = license.ExpirationDate
             });
+    }
 
-        var insuranceQuery = _dbContext.ProfessionalInsurances
+    private IQueryable<ProfessionalDashboardLicenseInsuranceDto> GetCompanyLicenseRows()
+    {
+        return _dbContext.ProfessionalLicenses
+            .AsNoTracking()
+            .Select(license => new ProfessionalDashboardLicenseInsuranceDto
+            {
+                Id = license.Id,
+                RowType = ProfessionalDashboardRowType.CompanyLicense,
+                TypeName = license.LicenseType!.Name,
+                Number = license.LicenseNumber,
+                AssignedTo = license.Professional!.Name,
+                ExpirationDate = license.ExpirationDate
+            });
+    }
+
+    private IQueryable<ProfessionalDashboardLicenseInsuranceDto> GetInsuranceRows()
+    {
+        return _dbContext.ProfessionalInsurances
             .AsNoTracking()
             .Select(insurance => new ProfessionalDashboardLicenseInsuranceDto
             {
@@ -44,7 +79,10 @@ public class ProfessionalDashboardRepository(IDbContextSelector dbContextSelecto
                 AssignedTo = insurance.Professional!.Name,
                 ExpirationDate = insurance.ExpirationDate
             });
+    }
 
+    private static async Task<IEnumerable<ProfessionalDashboardLicenseInsuranceDto>> PaginateAsync(IQueryable<ProfessionalDashboardLicenseInsuranceDto> rows, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
         if (query.Sort.IsNullOrEmpty())
         {
             query.Sort[nameof(ProfessionalDashboardLicenseInsuranceDto.ExpirationDate)] = SortOperator.Asc;
@@ -55,8 +93,7 @@ public class ProfessionalDashboardRepository(IDbContextSelector dbContextSelecto
         query.Sort[nameof(ProfessionalDashboardLicenseInsuranceDto.RowType)] = SortOperator.Asc;
         query.Sort[nameof(ProfessionalDashboardLicenseInsuranceDto.Id)] = SortOperator.Asc;
 
-        var paginated = await licenseQuery
-            .Union(insuranceQuery)
+        var paginated = await rows
             .Where(query.Filter)
             .OrderBy(query.Sort)
             .PaginateAsync(pageInfo, cancellationToken);

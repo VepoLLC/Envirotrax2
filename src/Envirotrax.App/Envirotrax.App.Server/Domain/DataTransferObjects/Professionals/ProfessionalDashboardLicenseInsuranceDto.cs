@@ -27,5 +27,6 @@ public class ProfessionalDashboardLicenseInsuranceDto
 public enum ProfessionalDashboardRowType
 {
     License,
-    Insurance
+    Insurance,
+    CompanyLicense
 }

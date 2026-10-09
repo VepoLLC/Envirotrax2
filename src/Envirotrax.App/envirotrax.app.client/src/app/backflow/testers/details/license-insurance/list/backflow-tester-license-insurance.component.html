@@ -46,6 +46,11 @@
                     Licenses
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'companyLicenses'" (click)="setActiveTab('companyLicenses')">
+                    Company Licenses
+                </a>
+            </li>
         </ul>
     </div>
 
@@ -91,6 +96,28 @@
                       (edit)="editLicense($event)"
                       [canDelete]="canManageLicenses"
                       (delete)="deleteLicense($event)" />
+        </div>
+    </div>
+
+    <div *ngIf="activeTab === 'companyLicenses'">
+        <div dp-spinner-parent>
+            <dp-loading-spinner *ngIf="companyLicensesTable.isLoading"></dp-loading-spinner>
+
+            <vp-table *ngIf="companyLicensesTable.items"
+                      [columns]="companyLicensesTable.columns!"
+                      [data]="companyLicensesTable.items.data"
+                      [(pageInfo)]="companyLicensesTable.items.pageInfo"
+                      (pageInfoChange)="loadCompanyLicenses()"
+                      [(query)]="companyLicensesTable.query"
+                      (queryChange)="loadCompanyLicenses()"
+                      (queryReset)="loadCompanyLicenses()"
+                      [showActionLabels]="false"
+                      [canAdd]="canManageLicenses"
+                      (add)="addCompanyLicense()"
+                      [canEdit]="canManageLicenses"
+                      (edit)="editCompanyLicense($event)"
+                      [canDelete]="canManageLicenses"
+                      (delete)="deleteCompanyLicense($event)" />
         </div>
     </div>
 </vp-section>

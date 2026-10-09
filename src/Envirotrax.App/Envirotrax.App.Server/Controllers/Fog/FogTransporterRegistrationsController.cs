@@ -9,10 +9,10 @@ namespace Envirotrax.App.Server.Controllers.Fog;
 [Route("api/fog/transporters")]
 public class FogTransporterRegistrationsController : WaterSupplierProtectedController
 {
-    private readonly IProfessionalUserLicenseService _licenseService;
+    private readonly IWaterSupplierLicenseService _licenseService;
     private readonly IAuthService _authService;
 
-    public FogTransporterRegistrationsController(IProfessionalUserLicenseService licenseService, IAuthService authService)
+    public FogTransporterRegistrationsController(IWaterSupplierLicenseService licenseService, IAuthService authService)
     {
         _licenseService = licenseService;
         _authService = authService;
@@ -29,7 +29,7 @@ public class FogTransporterRegistrationsController : WaterSupplierProtectedContr
             return Forbid();
         }
 
-        var result = await _licenseService.GetUnverifiedRegistrationsByWaterSupplierAsync(pageInfo, query, cancellationToken);
+        var result = await _licenseService.GetUnverifiedRegistrationsAsync(pageInfo, query, cancellationToken);
 
         return Ok(result);
     }

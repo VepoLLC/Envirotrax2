@@ -1,4 +1,3 @@
-
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
@@ -24,6 +23,22 @@ public class ProfessionalDashboardService : IProfessionalDashboardService
     {
         var rows = await _dashboardRepository.GetLicensesAndInsurancesAsync(pageInfo, query, cancellationToken);
 
+        SetExpirationTypes(rows);
+
+        return rows.ToPagedData(pageInfo);
+    }
+
+    public async Task<IPagedData<ProfessionalDashboardLicenseInsuranceDto>> GetCompanyLicensesAndInsurancesAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var rows = await _dashboardRepository.GetCompanyLicensesAndInsurancesAsync(pageInfo, query, cancellationToken);
+
+        SetExpirationTypes(rows);
+
+        return rows.ToPagedData(pageInfo);
+    }
+
+    private void SetExpirationTypes(IEnumerable<ProfessionalDashboardLicenseInsuranceDto> rows)
+    {
         // Expiration is relative to the viewer's clock, so it is computed here rather than stored or queried.
         var now = _timeZoneHelper.GetUserLocalTime();
 
@@ -35,7 +50,5 @@ public class ProfessionalDashboardService : IProfessionalDashboardService
                     : ExpirationType.Valid)
                 : ExpirationType.Valid;
         }
-
-        return rows.ToPagedData(pageInfo);
     }
 }

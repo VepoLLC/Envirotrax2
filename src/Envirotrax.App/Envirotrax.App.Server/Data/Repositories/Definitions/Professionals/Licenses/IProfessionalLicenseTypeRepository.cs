@@ -7,4 +7,5 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Professionals.Lice
 public interface IProfessionalLicenseTypeRepository
 {
     Task<IEnumerable<ProfessionalLicenseType>> GetAllAsync(Query query, CancellationToken cancellationToken);
+    Task<ProfessionalLicenseType?> GetAsync(int id, CancellationToken cancellationToken);
 }

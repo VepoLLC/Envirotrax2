@@ -11,13 +11,13 @@ public class WaterSupplierDashboardService : IWaterSupplierDashboardService
 {
     private readonly IWaterSupplierDashboardRepository _repository;
     private readonly IBackflowComplianceReportService _complianceReportService;
-    private readonly IProfessionalUserLicenseService _licenseService;
+    private readonly IWaterSupplierLicenseService _licenseService;
     private readonly IBackflowGaugeService _gaugeService;
 
     public WaterSupplierDashboardService(
         IWaterSupplierDashboardRepository repository,
         IBackflowComplianceReportService complianceReportService,
-        IProfessionalUserLicenseService licenseService,
+        IWaterSupplierLicenseService licenseService,
         IBackflowGaugeService gaugeService)
     {
         _repository = repository;
@@ -29,14 +29,14 @@ public class WaterSupplierDashboardService : IWaterSupplierDashboardService
     public async Task<WaterSupplierDashboardStatsDto> GetStatsAsync(CancellationToken cancellationToken)
     {
         var stats = await _repository.GetStatsAsync(cancellationToken);
-        var licenseCounts = await _licenseService.GetCountsByWaterSupplierAsync(cancellationToken);
+        var licenseCounts = await _licenseService.GetCountsAsync(cancellationToken);
 
         stats.UnverifiedLicenseCount = licenseCounts.UnverifiedCount;
         stats.ExpiredLicenseCount = licenseCounts.ExpiredCount;
         stats.ExpiringLicenseCount = licenseCounts.ExpiringCount;
 
         stats.TestGaugeCount = await _gaugeService.GetUnverifiedCountByWaterSupplierAsync(cancellationToken);
-        stats.TransporterRegistrationCount = await _licenseService.GetUnverifiedRegistrationCountByWaterSupplierAsync(cancellationToken);
+        stats.TransporterRegistrationCount = await _licenseService.CountUnverifiedRegistrationsAsync(cancellationToken);
 
         return stats;
     }

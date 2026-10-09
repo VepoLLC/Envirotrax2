@@ -12,6 +12,8 @@ import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { ToastService, CellTemplateData, ColumnType, ModalHelperService, TableColumn, TableCustomAction } from '@envirotrax/common-ui';
 import { AddEditBackflowTesterInsuranceComponent } from "../edit/add-edit-backflow-tester-insurance.component";
 import { AddEditBackflowTesterLicenseComponent } from "../edit/add-edit-backflow-tester-license.component";
+import { AddEditBackflowTesterCompanyLicenseComponent, BackflowCompanyLicenseModalData } from "../edit/add-edit-backflow-tester-company-license.component";
+import { ProfessionalLicense } from "../../../../../shared/models/professionals/licenses/professional-license";
 import { DownloadService } from "../../../../../shared/services/download.service";
 
 @Component({
@@ -23,7 +25,7 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
     @Input() public testerId!: number;
     @Input() public tester: Professional | null = null;
 
-    public activeTab: 'insurances' | 'licenses' = 'insurances';
+    public activeTab: 'insurances' | 'licenses' | 'companyLicenses' = 'insurances';
 
     public expirationType = ExpirationType;
     public insuranceExpirationType = InsuranceExpirationType;
@@ -32,6 +34,11 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
     public canManageInsurances: boolean = false;
 
     public licensesTable: TableViewModel<ProfessionalUserLicense> = {
+        columns: [],
+        query: { sort: {}, filter: [] }
+    };
+
+    public companyLicensesTable: TableViewModel<ProfessionalLicense> = {
         columns: [],
         query: { sort: {}, filter: [] }
     };
@@ -70,15 +77,18 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         await this.setPermissions();
         this.licensesTable.columns = this.getLicenseColumns();
+        this.companyLicensesTable.columns = this.getCompanyLicenseColumns();
         this.insurancesTable.columns = this.getInsuranceColumns();
         await this.loadInsurances();
     }
 
-    public async setActiveTab(tab: 'insurances' | 'licenses'): Promise<void> {
+    public async setActiveTab(tab: 'insurances' | 'licenses' | 'companyLicenses'): Promise<void> {
         this.activeTab = tab;
 
         if (tab === 'licenses' && !this.licensesTable.items) {
             await this.loadLicenses();
+        } else if (tab === 'companyLicenses' && !this.companyLicensesTable.items) {
+            await this.loadCompanyLicenses();
         } else if (tab === 'insurances' && !this.insurancesTable.items) {
             await this.loadInsurances();
         }
@@ -129,6 +139,28 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
                 field: 'user.emailAddress',
                 caption: 'Email Address',
                 cellTemplate: this.userEmailCellTemplate,
+                type: ColumnType.text
+            },
+            {
+                field: 'expirationDate',
+                caption: 'Expiration Date',
+                cellTemplate: this.licenseExpirationCellTemplate,
+                type: ColumnType.date
+            }
+        ];
+    }
+
+    private getCompanyLicenseColumns(): TableColumn<ProfessionalLicense>[] {
+        return [
+            {
+                field: 'licenseNumber',
+                caption: 'License Number',
+                type: ColumnType.text
+            },
+            {
+                field: 'licenseType.name',
+                caption: 'Type',
+                cellTemplate: this.licenseTypeCellTemplate,
                 type: ColumnType.text
             },
             {
@@ -196,6 +228,38 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
         });
     }
 
+    public addCompanyLicense(): void {
+        this._modalHelper.show<BackflowCompanyLicenseModalData, ProfessionalLicense>(AddEditBackflowTesterCompanyLicenseComponent, {
+            title: 'Add Company License',
+            model: { testerId: this.testerId, license: {} },
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
+        }).result().subscribe(() => this.loadCompanyLicenses(false));
+    }
+
+    public editCompanyLicense(license: ProfessionalLicense): void {
+        this._modalHelper.show<BackflowCompanyLicenseModalData, ProfessionalLicense>(AddEditBackflowTesterCompanyLicenseComponent, {
+            title: 'Edit Company License',
+            model: { testerId: this.testerId, license },
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
+        }).result().subscribe(() => this.loadCompanyLicenses(false));
+    }
+
+    public deleteCompanyLicense(license: ProfessionalLicense): void {
+        this._modalHelper.showDeleteConfirmation().result().subscribe(async () => {
+            try {
+                this.companyLicensesTable.isLoading = true;
+                await this._licensesService.deleteCompanyLicense(this.testerId, license.id!);
+                this._toastService.successFullyDeleted('License');
+            } finally {
+                this.companyLicensesTable.isLoading = false;
+            }
+
+            await this.loadCompanyLicenses(false);
+        });
+    }
+
     public editInsurance(insurance: ProfessionalInsurance): void {
         this._modalHelper.show<any, ProfessionalInsurance>(AddEditBackflowTesterInsuranceComponent, {
             title: 'Edit Insurance Policy',
@@ -257,6 +321,22 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
             );
         } finally {
             this.licensesTable.isLoading = false;
+        }
+    }
+
+    public async loadCompanyLicenses(showLoading: boolean = true): Promise<void> {
+        try {
+            if (showLoading) {
+                this.companyLicensesTable.isLoading = true;
+            }
+
+            this.companyLicensesTable.items = await this._licensesService.getCompanyLicenses(
+                this.testerId,
+                this.companyLicensesTable.items?.pageInfo || {},
+                this.companyLicensesTable.query
+            );
+        } finally {
+            this.companyLicensesTable.isLoading = false;
         }
     }
 

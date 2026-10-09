@@ -4,7 +4,7 @@ import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { ProfessionalUserLicense, ProfessionalType } from "../../../../../shared/models/professionals/licenses/professional-user-license";
 import { BackflowTesterLicensesService } from "../../../../../shared/services/backflow/backflow-tester-licenses.service";
 import { BackflowTesterUserService } from "../../../../../shared/services/backflow/backflow-tester-user.service";
-import { ProfessionalLicenseType } from "../../../../../shared/models/professionals/licenses/professional-license-type";
+import { LicenseScope, ProfessionalLicenseType } from "../../../../../shared/models/professionals/licenses/professional-license-type";
 import { ProfessionalUser } from "../../../../../shared/models/professionals/professional-user";
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
 import { ToastService, InputOption } from '@envirotrax/common-ui';
@@ -54,7 +54,7 @@ export class AddEditBackflowTesterLicenseComponent implements OnInit {
             ]);
             this._allLicenseTypes = types;
             this.userOptions = users.data.map((u: ProfessionalUser) => ({ id: u.id, text: u.emailAddress ?? u.contactName, data: u }));
-            this.licenseTypes = this._allLicenseTypes.filter(t => t.data?.professionalType == this.license.professionalType);
+            this.licenseTypes = this._allLicenseTypes.filter(t => t.data?.professionalType == this.license.professionalType && t.data?.licenseScope == LicenseScope.User);
         } finally {
             this.isLoading = false;
         }

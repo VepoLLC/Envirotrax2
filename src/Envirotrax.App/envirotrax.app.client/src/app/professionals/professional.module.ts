@@ -17,6 +17,7 @@ import { SiteBackflowTestsComponent } from "./sites/details/site-backflow-tests.
 import { SiteCsiInspectionsComponent } from "./sites/details/site-csi-inspections.component";
 import { InsuranceListComponent } from "./insurances/list/insurance-list.component";
 import { EditInsuranceComponent } from "./insurances/edit/edit-insurance.component";
+import { EditCompanyLicenseComponent } from "./insurances/edit/edit-company-license.component";
 import { LicenseHelpTextComponent } from "./users/edit/licenses/help-text/license-help-text.component";
 import { LicenseListComponent } from "./licenses/license-list.component";
 import { DashboardComponent } from "./dashboard/dashboard.component";
@@ -41,6 +42,7 @@ import { AccountBalanceManagementComponent } from "./account/account-balance-man
         SiteCsiInspectionsComponent,
         InsuranceListComponent,
         EditInsuranceComponent,
+        EditCompanyLicenseComponent,
         LicenseListComponent
     ],
     imports: [

@@ -42,4 +42,14 @@ export class WaterSupplierLicenseService {
         const url = this._urlResolver.resolveUrl(`/api/licenses/${id}`);
         return lastValueFrom(this._http.delete<void>(url));
     }
+
+    public updateCompanyLicense(id: number, dto: UpdateWaterSupplierLicense): Promise<WaterSupplierLicense> {
+        const url = this._urlResolver.resolveUrl(`/api/company-licenses/${id}`);
+        return lastValueFrom(this._http.put<WaterSupplierLicense>(url, dto));
+    }
+
+    public deleteCompanyLicense(id: number): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/company-licenses/${id}`);
+        return lastValueFrom(this._http.delete<void>(url));
+    }
 }

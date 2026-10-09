@@ -4,7 +4,7 @@ import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { ProfessionalUserLicense, ProfessionalType, professionalTypeLabels } from "../../../../../shared/models/professionals/licenses/professional-user-license";
 import { FogInspectorLicensesService } from "../../../../../shared/services/fog/fog-inspector-licenses.service";
 import { FogInspectorSubAccountsService } from "../../../../../shared/services/fog/fog-inspector-user.service";
-import { ProfessionalLicenseType } from "../../../../../shared/models/professionals/licenses/professional-license-type";
+import { LicenseScope, ProfessionalLicenseType } from "../../../../../shared/models/professionals/licenses/professional-license-type";
 import { ProfessionalUser } from "../../../../../shared/models/professionals/professional-user";
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
 import { ToastService, InputOption } from '@envirotrax/common-ui';
@@ -56,7 +56,7 @@ export class EditFogInspectorLicenseComponent implements OnInit {
                 this._licensesService.getLicenseTypes(),
                 this._subAccountsService.getSubAccounts(inspectorId, { pageNumber: 1, pageSize: 1000 }, {})
             ]);
-            this._allLicenseTypes = types;
+            this._allLicenseTypes = types.filter(t => t.data?.licenseScope == LicenseScope.User);
             this.userOptions = users.data.map((u: ProfessionalUser) => ({ id: u.id, text: u.emailAddress ?? u.contactName, data: u }));
 
             if (this.license.professionalType !== undefined) {

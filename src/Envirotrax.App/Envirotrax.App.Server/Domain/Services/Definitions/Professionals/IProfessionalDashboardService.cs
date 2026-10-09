@@ -7,4 +7,5 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 public interface IProfessionalDashboardService
 {
     Task<IPagedData<ProfessionalDashboardLicenseInsuranceDto>> GetLicensesAndInsurancesAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<IPagedData<ProfessionalDashboardLicenseInsuranceDto>> GetCompanyLicensesAndInsurancesAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
 }

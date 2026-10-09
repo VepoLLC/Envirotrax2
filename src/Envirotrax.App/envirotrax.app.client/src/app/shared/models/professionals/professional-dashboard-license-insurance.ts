@@ -12,7 +12,8 @@ export interface ProfessionalDashboardLicenseInsurance {
 
 export enum ProfessionalDashboardRowType {
     License,
-    Insurance
+    Insurance,
+    CompanyLicense
 }
 
 export { ExpirationType };

@@ -26,6 +26,7 @@ public static class ProfessionalLicenseTypeSeedData
             Description = "ASSE License",
             ProfessionalType = ProfessionalType.Bpat,
             IsFireLicense = true,
+            LicenseScope = LicenseScope.Company,
             StateId = kansas.Id
         });
 
@@ -45,6 +46,7 @@ public static class ProfessionalLicenseTypeSeedData
             Description = "TCEQ - BPAT License",
             ProfessionalType = ProfessionalType.Bpat,
             IsFireLicense = true,
+            LicenseScope = LicenseScope.Company,
             StateId = texas.Id
         });
         types.Add(new()
@@ -108,6 +110,7 @@ public static class ProfessionalLicenseTypeSeedData
             Name = "TCEQ - Registration Number",
             Description = "TCEQ - Registration Number",
             ProfessionalType = ProfessionalType.FogTransporter,
+            LicenseScope = LicenseScope.Company,
             StateId = texas.Id
         });
 
@@ -139,6 +142,7 @@ public static class ProfessionalLicenseTypeSeedData
             Name = "WCS - Registration Number",
             Description = "WCS - Registration Number",
             ProfessionalType = ProfessionalType.FogTransporter,
+            LicenseScope = LicenseScope.Company,
             StateId = washington.Id
         });
 

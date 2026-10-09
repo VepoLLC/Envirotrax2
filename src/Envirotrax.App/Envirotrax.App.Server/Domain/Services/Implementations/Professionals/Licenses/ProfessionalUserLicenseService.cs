@@ -18,6 +18,7 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Professionals.Li
 public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, ProfessionalUserLicenseDto>, IProfessionalUserLicenseService
 {
     private readonly IProfessionalUserLicenseRepository _licenseRepository;
+    private readonly IProfessionalLicenseTypeService _licenseTypeService;
     private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly IAuthService _authService;
     private readonly IRecordLogService _recordLogService;
@@ -25,12 +26,14 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
     public ProfessionalUserLicenseService(
         IMapper mapper,
         IProfessionalUserLicenseRepository repository,
+        IProfessionalLicenseTypeService licenseTypeService,
         ITimeZoneHelperService timeZoneHelper,
         IAuthService authService,
         IRecordLogService recordLogService)
         : base(mapper, repository)
     {
         _licenseRepository = repository;
+        _licenseTypeService = licenseTypeService;
         _timeZoneHelper = timeZoneHelper;
         _authService = authService;
         _recordLogService = recordLogService;
@@ -73,8 +76,24 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
         return items.ToLookup(l => l.ProfessionalId, l => MapToDto(l)!);
     }
 
+    public override async Task<ProfessionalUserLicenseDto> AddAsync(ProfessionalUserLicenseDto dto)
+    {
+        await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.User);
+
+        return await base.AddAsync(dto);
+    }
+
+    public override async Task<ProfessionalUserLicenseDto> UpdateAsync(ProfessionalUserLicenseDto dto)
+    {
+        await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.User);
+
+        return await base.UpdateAsync(dto);
+    }
+
     public async Task<ProfessionalUserLicenseDto> AddForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto)
     {
+        await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.User);
+
         var model = MapToModel(dto)!;
         model.ProfessionalId = professionalId;
         var added = await Repository.AddAsync(model);
@@ -83,6 +102,8 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
 
     public async Task<ProfessionalUserLicenseDto> UpdateForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto)
     {
+        await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.User);
+
         var model = MapToModel(dto)!;
         model.ProfessionalId = professionalId;
         var updated = await Repository.UpdateAsync(model);
@@ -98,33 +119,6 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
         var dtoList = licenses.Select(l => MapToDto(l)!);
 
         return dtoList.ToPagedData(pageInfo);
-    }
-
-    public async Task<IPagedData<WaterSupplierLicenseDto>> GetAllByWaterSupplierAsync(PageInfo pageInfo, Query query, string? licenseFilter, CancellationToken cancellationToken)
-    {
-        query.Sort = query.ConvertSortProperties<ProfessionalUserLicense, WaterSupplierLicenseDto>(Mapper);
-        query.Filter = query.ConvertFilterProperties<ProfessionalUserLicense, WaterSupplierLicenseDto>(Mapper);
-
-        var items = await _licenseRepository.GetAllByWaterSupplierAsync(pageInfo, query, licenseFilter, cancellationToken);
-        var now = _timeZoneHelper.GetUserLocalTime();
-
-        var dtos = items.Select(l => MapToWaterSupplierDto(l, now));
-
-        return dtos.ToPagedData(pageInfo);
-    }
-
-    public async Task<LicenseCountsDto> GetCountsByWaterSupplierAsync(CancellationToken cancellationToken)
-    {
-        var unverified = await _licenseRepository.GetCountByWaterSupplierAsync("unverified", cancellationToken);
-        var expired = await _licenseRepository.GetCountByWaterSupplierAsync("expired", cancellationToken);
-        var expiring = await _licenseRepository.GetCountByWaterSupplierAsync("expiring", cancellationToken);
-
-        return new LicenseCountsDto
-        {
-            UnverifiedCount = unverified,
-            ExpiredCount = expired,
-            ExpiringCount = expiring
-        };
     }
 
     public async Task<WaterSupplierLicenseDto> UpdateForWaterSupplierAsync(int id, UpdateWaterSupplierLicenseDto dto, CancellationToken cancellationToken)
@@ -145,29 +139,12 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
             $"Deleted license — LicenseNumber: '{license.LicenseNumber}', ExpirationDate: '{license.ExpirationDate:d}'", professionalId: license.ProfessionalId);
     }
 
-    public async Task<IPagedData<WaterSupplierLicenseDto>> GetUnverifiedRegistrationsByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
-    {
-        query.Sort = query.ConvertSortProperties<ProfessionalUserLicense, WaterSupplierLicenseDto>(Mapper);
-        query.Filter = query.ConvertFilterProperties<ProfessionalUserLicense, WaterSupplierLicenseDto>(Mapper);
-
-        var items = await _licenseRepository.GetUnverifiedRegistrationsByWaterSupplierAsync(pageInfo, query, cancellationToken);
-        var now = _timeZoneHelper.GetUserLocalTime();
-
-        var dtos = items.Select(l => MapToWaterSupplierDto(l, now));
-
-        return dtos.ToPagedData(pageInfo);
-    }
-
-    public Task<int> GetUnverifiedRegistrationCountByWaterSupplierAsync(CancellationToken cancellationToken)
-    {
-        return _licenseRepository.GetUnverifiedRegistrationCountByWaterSupplierAsync(cancellationToken);
-    }
-
     private static WaterSupplierLicenseDto MapToWaterSupplierDto(ProfessionalUserLicense license, DateTime now)
     {
         return new WaterSupplierLicenseDto
         {
             Id = license.Id,
+            LicenseScope = LicenseScope.User,
             ProfessionalId = license.ProfessionalId,
             UserId = license.UserId,
             SubmittedOn = license.CreatedTime,

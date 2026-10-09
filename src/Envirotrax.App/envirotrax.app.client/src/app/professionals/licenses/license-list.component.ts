@@ -6,7 +6,7 @@ import { TableViewModel } from "../../shared/models/table-view-model";
 import { CreateEditLicenseComponent } from "../users/edit/licenses/create-edit/create-edit-license.component";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { NgForm } from "@angular/forms";
-import { ProfessionalLicenseType } from "../../shared/models/professionals/licenses/professional-license-type";
+import { LicenseScope, ProfessionalLicenseType } from "../../shared/models/professionals/licenses/professional-license-type";
 import { ProfesisonalService } from "../../shared/services/professionals/professional.service";
 import { ProfessionalUser } from "../../shared/models/professionals/professional-user";
 import { ProfessionalUserLookupComponent } from "../../shared/components/lookups/professional-user-lookup/professional-user-lookup.component";
@@ -32,13 +32,7 @@ export class LicenseListComponent implements OnInit {
     public licenseTypes: InputOption<ProfessionalLicenseType>[] = [];
     public isNewLicenseLoading: boolean = false;
 
-    public readonly professionalTypeOptions: InputOption<ProfessionalType>[] = Object.values(ProfessionalType)
-        .filter(v => typeof v === 'number')
-        .map(v => ({
-            id: v as ProfessionalType,
-            text: professionalTypeLabels[v as ProfessionalType],
-            data: v as ProfessionalType
-        }));
+    public professionalTypeOptions: InputOption<ProfessionalType>[] = [];
 
     public table: TableViewModel<ProfessionalUserLicense> = {
         columns: [],
@@ -61,7 +55,7 @@ export class LicenseListComponent implements OnInit {
         private readonly _toastService: ToastService,
         private readonly _professionalService: ProfesisonalService
     ) {
-        this.professionalTypeOptions.splice(0, 0, { id: '', text: '' });
+
     }
 
     public async ngOnInit(): Promise<void> {
@@ -70,11 +64,12 @@ export class LicenseListComponent implements OnInit {
         const [_, professional, licenseTypes] = await Promise.all([
             this.getLicenses(),
             this._professionalService.getLoggedInProfessional(),
-            this._licenseService.getAllTypesAsOptions({}, true)
+            this._licenseService.getAllTypesAsOptions({ sort: {}, filter: [{ columnName: 'licenseScope', comparisonOperator: 'Eq', value: LicenseScope.User.toString() }] }, false)
         ]);
 
-        this._allLicenseTypes = licenseTypes;
-        this.licenseTypes = this._allLicenseTypes.filter(l => l.data?.state?.id == professional.state?.id || !l.id);
+        this._allLicenseTypes = licenseTypes.filter(l => l.data?.state?.id == professional.state?.id);
+        this.licenseTypes = this._allLicenseTypes;
+        this.professionalTypeOptions = this._licenseService.getProfessionalTypeOptions(this._allLicenseTypes);
     }
 
     private getColumns(): TableColumn<ProfessionalUserLicense>[] {
@@ -150,7 +145,7 @@ export class LicenseListComponent implements OnInit {
     }
 
     public professionChange(): void {
-        this.licenseTypes = this._allLicenseTypes.filter(t => t.data?.professionalType == this.newLicense.professionalType || !t.id);
+        this.licenseTypes = this._allLicenseTypes.filter(t => t.data?.professionalType == this.newLicense.professionalType);
         this.newLicense.licenseType = undefined;
     }
 

@@ -66,6 +66,7 @@ services.AddTransient<SiteService>();
 services.AddTransient<SiteLogService>();
 services.AddTransient<BackflowGaugeService>();
 services.AddTransient<NotificationSettingService>();
+services.AddTransient<NotificationService>();
 
 var provider = services.BuildServiceProvider();
 
@@ -111,3 +112,9 @@ await backflowGaugeService.MigrateAsync();
 // that recipient, so a setting whose user is missing cannot be migrated at all.
 var notificationSettingService = provider.GetRequiredService<NotificationSettingService>();
 await notificationSettingService.MigrateAsync();
+
+// Last, because a notification points at the record that raised it through RecordId. That pointer
+// is carried over unresolved: V2 row ids equal the V1 ids, so it lines up by itself once the
+// backflow test and CSI inspection migrations land.
+var notificationService = provider.GetRequiredService<NotificationService>();
+await notificationService.MigrateAsync();

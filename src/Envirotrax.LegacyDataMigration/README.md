@@ -6,7 +6,7 @@ Moves data from the old (V1) system into the new Envirotrax2 (V2) database.
 
 ## How it works
 
-The app migrates one entity at a time — users, water suppliers, supplier users, professionals, GIS areas, sites, site logs, backflow gauges, then notification settings — in that order, because later entities depend on earlier ones. Each entity's migration has two steps:
+The app migrates one entity at a time — users, water suppliers, supplier users, professionals, GIS areas, sites, site logs, backflow gauges, notification settings, then notifications — in that order, because later entities depend on earlier ones. Each entity's migration has two steps:
 
 1. **Run SQL scripts.** Files under `Scripts/<Entity>/`, named with a numeric prefix (`01_`, `02_`, ...), run in that order. They copy rows from the legacy database into the V2 tables.
 2. **Run C# cleanup code.** After the raw data is in place, C# fixes up anything SQL can't do well — legacy passwords come in as plain text and get hashed with ASP.NET Identity's password hasher, and site log file attachments get downloaded from the legacy file server and uploaded to Azure Storage.
@@ -20,7 +20,7 @@ One caveat, on the audit tables rather than the data: `Scripts/Users/02_`–`06_
 ## Project layout
 
 - `Scripts/` — SQL scripts, one subfolder per entity, run in filename order.
-- `Services/` — one service per entity (`UserService`, `WaterSupplierService`, `WaterSupplierUserService`, `ProfessionalService`, `GisAreaService`, `SiteService`, `SiteLogService`, `BackflowGaugeService`, `NotificationSettingService`, and the other professional services). Each has a `MigrateAsync()` that runs its scripts, then does any C#-side cleanup. `LegacyFileServerService` and `BlobStorageService` are helpers rather than entity migrations: they read files off the legacy file server and write them to Azure Storage.
+- `Services/` — one service per entity (`UserService`, `WaterSupplierService`, `WaterSupplierUserService`, `ProfessionalService`, `GisAreaService`, `SiteService`, `SiteLogService`, `BackflowGaugeService`, `NotificationSettingService`, `NotificationService`, and the other professional services). Each has a `MigrateAsync()` that runs its scripts, then does any C#-side cleanup. `LegacyFileServerService` and `BlobStorageService` are helpers rather than entity migrations: they read files off the legacy file server and write them to Azure Storage.
 - `Data/` — EF Core `DbContext`s and entity models for the V2 database.
 - `Logs/` — one log file per service, written while the migration runs.
 
@@ -70,6 +70,29 @@ Rules that could not be migrated are queryable:
 
 `SELECT * FROM MigrationSkippedNotificationSettings` — either the water supplier never migrated, or no
 migrated supplier user matches the recipient login the rule was addressed to.
+
+## How notifications are migrated
+
+A notification is a raised alert rather than a rule, so it carries the matched rule flattened onto it
+plus a pointer to the record that triggered it. The same three shape changes as the settings apply —
+colour index to hex, `Any` test type to a NULL `ReasonForTest`, and the `...Exeeded` spelling fix —
+and the recipient login is resolved the same way, with unplaceable rows recorded in
+`MigrationSkippedNotifications`.
+
+Four things are specific to notifications:
+
+- **`RecordId` is carried over unresolved.** It points at a backflow test or a CSI inspection
+  depending on `ModuleType`, and V2 puts no foreign key on it. Neither of those records is migrated
+  yet, but EN-241 made a migrated row keep its V1 id, so these pointers line up by themselves once
+  those migrations land. Nothing needs to be rewritten afterwards.
+- **`MasterWaterSupplierID` is dropped.** V1 shows a notification under either that or
+  `WaterSupplierID`; V2 removed the master column (EN-184), so the owning `WaterSupplierID` is the
+  one carried over.
+- **`HazardTypeFountainsGardenPondsWaterFeatures` is always false.** The V1 notifications table has
+  no such column — neither `WaterSupplierNotification.Save` nor its `FromReader` touches one — even
+  though the settings table does, so V1 could never record that hazard against a notification.
+- **`SentTime` stays NULL.** V1 records no send time; its scheduled jobs select by `CreationDate`
+  and interval instead of stamping a row once it has gone out.
 
 ## Running it
 

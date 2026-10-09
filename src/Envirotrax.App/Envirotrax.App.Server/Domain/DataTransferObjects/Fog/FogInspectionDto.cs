@@ -9,7 +9,7 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 
-public class FogInspectionDto : IDto
+public class FogInspectionDto : IDto, IMailingInfoDto, IRedactableMailingInfoDto
 {
     public int Id { get; set; }
 
@@ -74,6 +74,8 @@ public class FogInspectionDto : IDto
 
     [StringLength(100)]
     public string? MailingEmailAddress { get; set; }
+
+    IEnumerable<IMailingInfoDto?> IRedactableMailingInfoDto.MailingInfo => [this, Site];
 
     // Inspector fields
     // Professional is derived server-side from the logged-in user, so it is not required on the request.

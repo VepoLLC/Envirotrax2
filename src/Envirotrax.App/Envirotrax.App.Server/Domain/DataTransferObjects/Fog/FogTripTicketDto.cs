@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 
-public class FogTripTicketDto : IDto
+public class FogTripTicketDto : IDto, IRedactableMailingInfoDto
 {
     public int Id { get; set; }
 
@@ -21,6 +21,10 @@ public class FogTripTicketDto : IDto
 
     // Site (generator)
     public ReferencedSiteDto? Site { get; set; }
+
+    // Only the generator site's owner info is redacted; the ticket's FogGenerator* contact fields are
+    // left visible, as in V1.
+    IEnumerable<IMailingInfoDto?> IRedactableMailingInfoDto.MailingInfo => [Site];
 
     // Property / Generator
     [StringLength(100)]

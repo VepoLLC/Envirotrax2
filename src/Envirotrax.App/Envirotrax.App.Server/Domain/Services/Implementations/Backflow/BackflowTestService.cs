@@ -55,6 +55,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     private readonly IProfessionalSupplierService _professionalSupplierService;
     private readonly IProfessionalInsuranceService _insuranceService;
     private readonly IProfessionalUserLicenseService _licenseService;
+    private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
     private readonly ILogger<BackflowTestService> _logger;
 
     public BackflowTestService(
@@ -75,6 +76,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         IProfessionalSupplierService professionalSupplierService,
         IProfessionalInsuranceService insuranceService,
         IProfessionalUserLicenseService licenseService,
+        IMailingInfoRedactionService mailingInfoRedactionService,
         ILogger<BackflowTestService> logger)
         : base(mapper, repository)
     {
@@ -94,6 +96,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         _professionalSupplierService = professionalSupplierService;
         _insuranceService = insuranceService;
         _licenseService = licenseService;
+        _mailingInfoRedactionService = mailingInfoRedactionService;
         _logger = logger;
     }
 
@@ -501,6 +504,9 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             await _fileStorageService.UploadAsync(dto.AirGapImagePath, airGapStream);
         }
 
+        // Redact before Complete(): the settings lookup can't query the database once the scope is complete.
+        await _mailingInfoRedactionService.RedactAsync(saved, cancellationToken);
+
         scope.Complete();
         return saved;
     }
@@ -597,9 +603,13 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             await _fileStorageService.UploadAsync(newAirGapPath, airGapStream!);
         }
 
+        var result = MapToDto(saved)!;
+
+        // Redact before Complete(): the settings lookup can't query the database once the scope is complete.
+        await _mailingInfoRedactionService.RedactAsync(result, cancellationToken);
+
         scope.Complete();
 
-        var result = MapToDto(saved)!;
         await PopulateImageUrlsAsync(result);
         return result;
     }
@@ -644,6 +654,25 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         if (dto != null)
         {
             await PopulateImageUrlsAsync(dto);
+        }
+
+        return dto;
+    }
+
+    public async Task<IPagedData<BackflowTestDto>> GetAllForProfessionalAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var tests = await GetAllAsync(pageInfo, query, cancellationToken);
+
+        return await _mailingInfoRedactionService.RedactAsync(tests, cancellationToken);
+    }
+
+    public async Task<BackflowTestDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken)
+    {
+        var dto = await GetAsync(id, cancellationToken);
+
+        if (dto != null)
+        {
+            await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
         }
 
         return dto;
@@ -721,8 +750,14 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         }
 
         var deleted = await _testRepository.DeleteAsync(id);
+        var dto = MapToDto(deleted);
 
-        return MapToDto(deleted);
+        if (dto != null)
+        {
+            await _mailingInfoRedactionService.RedactAsync(dto, CancellationToken.None);
+        }
+
+        return dto;
     }
 
     public async Task<BackflowTestDto?> UpdateImageAsync(int id, string imageType, Stream fileStream, string fileName, CancellationToken cancellationToken = default)

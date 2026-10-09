@@ -29,6 +29,10 @@ public interface IBackflowTestService : IService<BackflowTest, BackflowTestDto>
 
     Task<IPagedData<BackflowTestDto>> SearchAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken);
 
+    Task<IPagedData<BackflowTestDto>> GetAllForProfessionalAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+
+    Task<BackflowTestDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken);
+
     Task<BackflowTestAdminDetailsDto?> GetForAdminAsync(int id, CancellationToken cancellationToken);
 
     Task<BackflowTestAdminDetailsDto?> UpdateForAdminAsync(int id, BackflowTestAdminUpdateRequest request);

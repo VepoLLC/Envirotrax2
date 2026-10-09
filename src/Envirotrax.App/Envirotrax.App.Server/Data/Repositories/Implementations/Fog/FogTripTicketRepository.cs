@@ -5,6 +5,7 @@ using Envirotrax.App.Server.Data.Models.Fog;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Sites;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
@@ -57,6 +58,8 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
             query.Sort[nameof(FogTripTicket.Id)] = SortOperator.Asc;
         }
 
+        WaterSupplierAccountNumberSearch.ApplyThroughSite(query, nameof(FogTripTicket.Site));
+
         return base.GetAllAsync(pageInfo, query, cancellationToken);
     }
 
@@ -78,6 +81,8 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
         {
             ProfessionalRecordScope.ApplyToProfessionalSearch(query, _tenantProvider.ProfessionalId, nameof(FogTripTicket.ProfessionalId));
         }
+
+        WaterSupplierAccountNumberSearch.ApplyThroughSite(query, nameof(FogTripTicket.Site));
 
         var paginated = await dbQuery
             .Where(query.Filter)

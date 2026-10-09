@@ -23,6 +23,14 @@ export class GeneralSettingsService {
         return response.data?.[0] ?? {};
     }
 
+    // The program flags only (ReferencedGeneralSettingsDto), for a water supplier the professional is registered with.
+    public getForProfessional(waterSupplierId: number): Promise<GeneralSettings> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/general-settings/${waterSupplierId}`);
+        const observable = this._http.get<GeneralSettings>(url);
+
+        return lastValueFrom(observable);
+    }
+
     public add(settings: GeneralSettings): Promise<GeneralSettings> {
         const url = this._urlResolver.resolveUrl('/api/general-settings');
         const observable = this._http.post<GeneralSettings>(url, settings);

@@ -13,6 +13,8 @@ public class GeneralSettings : TenantModel<WaterSupplier>
     public bool BackflowTesting { get; set; }
     public bool CsiInspections { get; set; }
     public bool FogProgram { get; set; }
+    public bool IncludeWsAccountNumbers { get; set; }
+    public bool UseWsAccountNumbersOnLetters { get; set; }
 
     // Insurance and License Requirements
     public bool BpatsRequireInsurance { get; set; }
@@ -27,6 +29,8 @@ public class GeneralSettings : TenantModel<WaterSupplier>
     public bool LockCsiRegistrations { get; set; }
     public bool LockFogInspectorRegistrations { get; set; }
     public bool LockFogTransporterRegistrations { get; set; }
+
+    public bool RedactMailingInfo { get; set; }
 
     // Insurance Amount Fields
     [Precision(19, 4)]

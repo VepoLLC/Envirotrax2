@@ -23,7 +23,7 @@ public class RenewalOptInController : EnvirotraxBaseController
     {
         var site = await _renewalOptInService.GetSiteAsync(siteId, cancellationToken);
 
-        return Ok(site);
+        return site == null ? NotFound() : Ok(site);
     }
 
     [HttpPost("sites/{siteId}")]

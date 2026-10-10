@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Templates.Emails.Sites;
+using Envirotrax.Common.Data;
 using Envirotrax.Common.Data.Services.Definitions;
 using Envirotrax.Common.Domain.DataTransferObjects;
 using Envirotrax.Common.Domain.Services.Defintions;
@@ -35,18 +36,17 @@ public class RenewalOptInService : IRenewalOptInService
         _tenantProvider = tenantProvider;
     }
 
-    public async Task<RenewalOptInSiteDto> GetSiteAsync(int siteId, CancellationToken cancellationToken)
+    public async Task<RenewalOptInSiteDto?> GetSiteAsync(int siteId, CancellationToken cancellationToken)
     {
         var site = await _renewalOptInRepository.GetSiteAsync(siteId, cancellationToken);
 
         if (site == null)
         {
-            return new RenewalOptInSiteDto { Found = false };
+            return null;
         }
 
         return new RenewalOptInSiteDto
         {
-            Found = true,
             OptInType = site.RenewalOptInType
         };
     }
@@ -57,18 +57,18 @@ public class RenewalOptInService : IRenewalOptInService
 
         if (site == null)
         {
-            return Failed("Site not found.");
+            throw new AppValidationException("Site not found.");
         }
 
         if (site.OptInCodeHash == null || site.OptInCodeExpirationDate == null || DateTime.UtcNow > site.OptInCodeExpirationDate)
         {
-            return Failed("This opt-in code is invalid or expired.");
+            throw new AppValidationException("This opt-in code is invalid or expired.");
         }
 
         if (!BCrypt.Net.BCrypt.Verify(request.Passcode.Trim(), site.OptInCodeHash)
             || request.ZipCodePrefix.Trim() != GetZipCodePrefix(site.ZipCode))
         {
-            return Failed("The Opt-In Code or Property Zip Code does not match our records.");
+            throw new AppValidationException("The Opt-In Code or Property Zip Code does not match our records.");
         }
 
         var emailAddresses = request.OptInType == RenewalOptInType.OptedIn
@@ -77,12 +77,12 @@ public class RenewalOptInService : IRenewalOptInService
 
         if (request.OptInType == RenewalOptInType.OptedIn && emailAddresses.Count == 0)
         {
-            return Failed("Please enter at least one mailing email address.");
+            throw new AppValidationException("Please enter at least one mailing email address.");
         }
 
         if (emailAddresses.Any(email => !IsValidEmailAddress(email)))
         {
-            return Failed("One or more mailing email addresses are invalid.");
+            throw new AppValidationException("One or more mailing email addresses are invalid.");
         }
 
         ApplyOptIn(site, request.OptInType);
@@ -106,10 +106,10 @@ public class RenewalOptInService : IRenewalOptInService
 
         if (pendingVerifications.Count == 0)
         {
-            return Succeeded("Your renewal opt-in preference has been saved.");
+            return Result("Your renewal opt-in preference has been saved.");
         }
 
-        return Succeeded("Your renewal opt-in preference has been saved. Verification emails have been sent to each address — "
+        return Result("Your renewal opt-in preference has been saved. Verification emails have been sent to each address — "
             + "they will be added to your renewal notifications once each recipient confirms their address.");
     }
 
@@ -119,22 +119,22 @@ public class RenewalOptInService : IRenewalOptInService
 
         if (verification == null || !_keyHashingService.VerifyHashedText(request.Token, verification.TokenHash))
         {
-            return Failed("This verification link is invalid.");
+            throw new AppValidationException("This verification link is invalid.");
         }
 
         if (verification.IsVerified)
         {
-            return Succeeded("Your email address has already been verified. Thank you!");
+            return Result("Your email address has already been verified. Thank you!");
         }
 
         if (verification.UnsubscribedDate != null)
         {
-            return Failed("This email address has been unsubscribed from renewal notifications.");
+            throw new AppValidationException("This email address has been unsubscribed from renewal notifications.");
         }
 
         if (DateTime.UtcNow > verification.CreatedDate.AddDays(VerificationLinkValidDays))
         {
-            return Failed("This verification link has expired. Please contact us if you need a new one.");
+            throw new AppValidationException("This verification link has expired. Please contact us if you need a new one.");
         }
 
         var site = verification.Site!;
@@ -142,7 +142,7 @@ public class RenewalOptInService : IRenewalOptInService
 
         if (mailingEmailAddress.Length > MailingEmailAddressMaxLength)
         {
-            return Failed("No more email addresses can be added to this site's renewal notifications.");
+            throw new AppValidationException("No more email addresses can be added to this site's renewal notifications.");
         }
 
         var unsubscribeToken = _keyHashingService.GenerateApiKey();
@@ -160,7 +160,7 @@ public class RenewalOptInService : IRenewalOptInService
             "Envirotrax - You Are Subscribed to Renewal Notifications",
             "Sites.RenewalEmailSubscribed");
 
-        return Succeeded($"Your email address {verification.EmailAddress} has been verified and will receive renewal notifications. Thank you!");
+        return Result($"Your email address {verification.EmailAddress} has been verified and will receive renewal notifications. Thank you!");
     }
 
     public async Task<RenewalOptInResultDto> UnsubscribeAsync(RenewalOptInTokenDto request, CancellationToken cancellationToken)
@@ -171,12 +171,12 @@ public class RenewalOptInService : IRenewalOptInService
             || verification.UnsubscribeTokenHash == null
             || !_keyHashingService.VerifyHashedText(request.Token, verification.UnsubscribeTokenHash))
         {
-            return Failed("This unsubscribe link is invalid.");
+            throw new AppValidationException("This unsubscribe link is invalid.");
         }
 
         if (!verification.IsVerified)
         {
-            return Succeeded("This email address is not currently subscribed to renewal notifications.");
+            return Result("This email address is not currently subscribed to renewal notifications.");
         }
 
         var site = verification.Site!;
@@ -188,7 +188,7 @@ public class RenewalOptInService : IRenewalOptInService
 
         await _renewalOptInRepository.SaveAsync(cancellationToken);
 
-        return Succeeded($"You have been unsubscribed. {verification.EmailAddress} will no longer receive renewal notifications.");
+        return Result($"You have been unsubscribed. {verification.EmailAddress} will no longer receive renewal notifications.");
     }
 
     private void ApplyOptIn(Site site, RenewalOptInType optInType)
@@ -287,14 +287,9 @@ public class RenewalOptInService : IRenewalOptInService
         return string.Join(MailingEmailAddressSeparator, emailAddresses);
     }
 
-    private static RenewalOptInResultDto Succeeded(string message)
+    private static RenewalOptInResultDto Result(string message)
     {
-        return new RenewalOptInResultDto { Succeeded = true, Message = message };
-    }
-
-    private static RenewalOptInResultDto Failed(string message)
-    {
-        return new RenewalOptInResultDto { Succeeded = false, Message = message };
+        return new RenewalOptInResultDto { Message = message };
     }
 
     private record PendingVerification(RenewalEmailVerification Verification, string Token);

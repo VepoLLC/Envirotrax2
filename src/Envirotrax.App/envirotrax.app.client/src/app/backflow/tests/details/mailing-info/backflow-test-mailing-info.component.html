@@ -56,7 +56,7 @@
                       [(ngModel)]="test.mailingPhoneNumber" />
         </div>
         <div class="mb-3">
-            <vp-input name="mailingEmailAddress" label="Email Address" type="email"
+            <vp-input name="mailingEmailAddress" label="Email Address" type="multi-email" [maxLength]="500"
                       [form]="mailingForm" [disabled]="!canModify"
                       [(ngModel)]="test.mailingEmailAddress" />
         </div>

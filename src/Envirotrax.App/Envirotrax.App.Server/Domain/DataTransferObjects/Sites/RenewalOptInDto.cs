@@ -5,8 +5,6 @@ namespace Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 
 public class RenewalOptInSiteDto
 {
-    public bool Found { get; set; }
-
     public RenewalOptInType OptInType { get; set; }
 }
 
@@ -37,7 +35,5 @@ public class RenewalOptInTokenDto
 
 public class RenewalOptInResultDto
 {
-    public bool Succeeded { get; set; }
-
     public string Message { get; set; } = null!;
 }

@@ -453,8 +453,9 @@
                             <div class="col-xl-4 col-form-label fw-bold">Email Address:</div>
                             <div class="col-xl-8">
                                 <vp-input name="mailingEmailAddress"
+                                          type="multi-email"
                                           [(ngModel)]="model.mailingEmailAddress"
-                                          [maxLength]="100" />
+                                          [maxLength]="500" />
                             </div>
                         </div>
                     </vp-section>

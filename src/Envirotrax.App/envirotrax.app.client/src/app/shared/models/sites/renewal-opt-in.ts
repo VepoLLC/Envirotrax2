@@ -4,7 +4,6 @@ export enum RenewalOptInType {
 }
 
 export interface RenewalOptInSite {
-    found: boolean;
     optInType: RenewalOptInType;
 }
 
@@ -21,6 +20,5 @@ export interface RenewalOptInTokenRequest {
 }
 
 export interface RenewalOptInResult {
-    succeeded: boolean;
     message: string;
 }

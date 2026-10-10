@@ -2,9 +2,11 @@
 
 <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
 
-<div *ngIf="result" class="alert text-center"
-     [class.alert-success]="result.succeeded"
-     [class.alert-danger]="!result.succeeded">
-    <i *ngIf="result.succeeded" class="fa-regular fa-thumbs-up me-1"></i>
+<div *ngIf="result" class="alert alert-success text-center">
+    <i class="fa-regular fa-thumbs-up me-1"></i>
     {{result.message}}
+</div>
+
+<div *ngIf="isLoaded && !result" class="alert alert-danger text-center">
+    This link could not be processed.
 </div>

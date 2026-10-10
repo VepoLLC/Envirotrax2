@@ -4,7 +4,7 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 
 public interface IRenewalOptInService
 {
-    Task<RenewalOptInSiteDto> GetSiteAsync(int siteId, CancellationToken cancellationToken);
+    Task<RenewalOptInSiteDto?> GetSiteAsync(int siteId, CancellationToken cancellationToken);
 
     Task<RenewalOptInResultDto> SaveAsync(int siteId, RenewalOptInRequestDto request, CancellationToken cancellationToken);
 

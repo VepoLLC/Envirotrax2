@@ -48,7 +48,7 @@ export class RenewalOptInComponent implements OnInit {
 
             const site = await this._renewalOptInService.getSite(this.siteId);
 
-            this.isSiteFound = site.found;
+            this.isSiteFound = true;
             this.optInType = String(site.optInType);
             this.onOptInTypeChanged();
         } finally {

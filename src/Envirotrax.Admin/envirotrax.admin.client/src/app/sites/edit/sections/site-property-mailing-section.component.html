@@ -119,7 +119,7 @@
             </div>
 
             <div class="mb-2">
-                <vp-input name="mailingEmailAddress" label="Email Address" [(ngModel)]="site.mailingEmailAddress" [maxLength]="100" [form]="form"></vp-input>
+                <vp-input name="mailingEmailAddress" label="Email Address" type="multi-email" [(ngModel)]="site.mailingEmailAddress" [maxLength]="500" [form]="form"></vp-input>
             </div>
         </vp-section>
     </div>

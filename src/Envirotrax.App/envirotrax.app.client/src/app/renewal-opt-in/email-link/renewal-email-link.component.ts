@@ -11,6 +11,7 @@ export abstract class RenewalEmailLinkComponent implements OnInit {
     public abstract readonly title: string;
 
     public isLoading: boolean = false;
+    public isLoaded: boolean = false;
     public result?: RenewalOptInResult;
 
     constructor(private readonly _activatedRoute: ActivatedRoute) {
@@ -23,7 +24,7 @@ export abstract class RenewalEmailLinkComponent implements OnInit {
         const token = queryParams.get('token');
 
         if (!id || !token) {
-            this.result = { succeeded: false, message: 'This link is invalid.' };
+            this.isLoaded = true;
             return;
         }
 
@@ -32,6 +33,7 @@ export abstract class RenewalEmailLinkComponent implements OnInit {
             this.result = await this.process({ id, token });
         } finally {
             this.isLoading = false;
+            this.isLoaded = true;
         }
     }
 

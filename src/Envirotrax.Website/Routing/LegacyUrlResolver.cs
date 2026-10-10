@@ -8,6 +8,12 @@ public static class LegacyUrlResolver
     private const string PublicSearchLegacyIndexPath = "/public_search/index.aspx";
     private const string PublicSearchAppPath = "/public-search";
 
+    // Printed on renewal letters and sent in renewal emails, so these keep working after V1 is retired.
+    private const string RenewalOptInLegacyPath = "/renewal_opt_in.aspx";
+    private const string RenewalEmailVerifyLegacyPath = "/renewal_email_verify.aspx";
+    private const string RenewalUnsubscribeLegacyPath = "/renewal_unsubscribe.aspx";
+    private const string RenewalOptInAppPath = "/renewal-opt-in";
+
     public static bool IsLegacyRequest(string path)
     {
         return path.EndsWith(LegacyExtension, StringComparison.OrdinalIgnoreCase);
@@ -51,6 +57,32 @@ public static class LegacyUrlResolver
         return subdomain == null
             ? url
             : $"{url}?domain={Uri.EscapeDataString(subdomain)}";
+    }
+
+    /// <summary>
+    /// Builds the app URL for a legacy renewal opt-in page, or returns null when the path is not one.
+    /// The opt-in page takes the site id in its path; the email links keep their query string as is.
+    /// </summary>
+    public static string? BuildRenewalOptInUrl(string appUrl, string normalizedPath, string? siteId, string queryString)
+    {
+        var url = appUrl.TrimEnd('/') + RenewalOptInAppPath;
+
+        if (normalizedPath == RenewalOptInLegacyPath && !string.IsNullOrWhiteSpace(siteId))
+        {
+            return $"{url}/{Uri.EscapeDataString(siteId)}";
+        }
+
+        if (normalizedPath == RenewalEmailVerifyLegacyPath)
+        {
+            return $"{url}/verify-email{queryString}";
+        }
+
+        if (normalizedPath == RenewalUnsubscribeLegacyPath)
+        {
+            return $"{url}/unsubscribe{queryString}";
+        }
+
+        return null;
     }
 
     public static string Normalize(string path)

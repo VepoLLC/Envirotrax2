@@ -1,0 +1,81 @@
+<h1 class="text-center h2">Renewal Opt-In / Opt-Out</h1>
+
+<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+<div *ngIf="isLoaded && !isSiteFound" class="alert alert-danger text-center">
+    Invalid site.
+</div>
+
+<div *ngIf="result?.succeeded" class="alert alert-success text-center">
+    <i class="fa-regular fa-thumbs-up me-1"></i>
+    {{result?.message}}
+</div>
+
+<form *ngIf="isSiteFound && !result?.succeeded" #optInForm="ngForm" (ngSubmit)="submit(optInForm)">
+    <vp-section header="Renewal Opt-In Information">
+        <p class="text-center p-3 mb-0">
+            By opting in, you agree to receive your renewal letters and related notifications directly to your email address.
+        </p>
+
+        <div class="row justify-content-center m-3">
+            <div class="col-xl-8 col-xxl-6">
+                <vp-field-grid>
+                    <vp-input name="passcode"
+                              label="Passcode:"
+                              labelStyle="horizontal"
+                              [maxLength]="20"
+                              [required]="true"
+                              [(ngModel)]="passcode"
+                              [form]="optInForm" />
+
+                    <vp-input name="zipCodePrefix"
+                              label="Property Zip Code:"
+                              labelStyle="horizontal"
+                              placeholder="Please enter only the first 3 digits of the zip code."
+                              [maxLength]="3"
+                              [required]="true"
+                              [(ngModel)]="zipCodePrefix"
+                              [form]="optInForm" />
+
+                    <vp-input name="optInType"
+                              label="Delivery Type:"
+                              labelStyle="horizontal"
+                              type="select"
+                              [options]="deliveryOptions"
+                              [required]="true"
+                              [(ngModel)]="optInType"
+                              (ngModelChange)="onOptInTypeChanged()"
+                              [form]="optInForm" />
+
+                    <vp-field-grid-row *ngIf="isEmailDelivery">
+                        <vp-field-grid-label>Mailing Email Addresses:</vp-field-grid-label>
+                        <vp-field-grid-control>
+                            <vp-input name="emailAddresses"
+                                      validationLabel="Mailing Email Addresses"
+                                      [maxLength]="500"
+                                      [required]="true"
+                                      [(ngModel)]="emailAddresses"
+                                      [form]="optInForm" />
+
+                            <small class="text-muted d-block">
+                                Separate multiple email addresses with a semicolon.
+                            </small>
+                        </vp-field-grid-control>
+                    </vp-field-grid-row>
+                </vp-field-grid>
+            </div>
+        </div>
+    </vp-section>
+
+    <div class="mt-3">
+        <div *ngIf="result && !result.succeeded" class="alert alert-danger mb-2 text-center">{{result.message}}</div>
+
+        <vp-validation-summary [form]="optInForm" />
+
+        <div class="d-flex justify-content-center">
+            <button type="submit" class="btn btn-primary vp-section-button">
+                Submit
+            </button>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,10 @@
+<h1 class="text-center h2">{{title}}</h1>
+
+<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+<div *ngIf="result" class="alert text-center"
+     [class.alert-success]="result.succeeded"
+     [class.alert-danger]="!result.succeeded">
+    <i *ngIf="result.succeeded" class="fa-regular fa-thumbs-up me-1"></i>
+    {{result.message}}
+</div>

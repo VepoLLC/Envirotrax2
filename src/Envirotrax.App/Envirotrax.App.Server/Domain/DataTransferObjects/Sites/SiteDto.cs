@@ -67,7 +67,7 @@ public class SiteDto : IDto
     [StringLength(50)]
     public string? MailingPhoneNumber { get; set; }
 
-    [StringLength(100)]
+    [StringLength(500)]
     public string? MailingEmailAddress { get; set; }
 
     [StringLength(50)]
@@ -148,6 +148,11 @@ public class SiteDto : IDto
     public DateTime? CsiAccountAssignmentDate { get; set; }
     public DateTime? BackflowAccountAssignmentDate { get; set; }
     public DateTime? FogAccountAssignmentDate { get; set; }
+
+    public RenewalOptInType RenewalOptInType { get; set; }
+    public DateTime? RenewalOptInOutDate { get; set; }
+    public RenewalOptInOrigin? RenewalOptInOrigin { get; set; }
+
     public DateTime CreatedTime { get; set; }
     public DateTime? UpdatedTime { get; set; }
     public AppUserDto? UpdatedBy { get; set; }

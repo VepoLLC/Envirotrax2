@@ -70,6 +70,7 @@ public partial class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUse
     public DbSet<BackflowComplianceSnapshot> BackflowComplianceSnapshots { get; set; }
     public DbSet<SiteLog> SiteLogs { get; set; }
     public DbSet<SiteSchedule> SiteSchedules { get; set; }
+    public DbSet<RenewalEmailVerification> RenewalEmailVerifications { get; set; }
 
     // Site is not an ITenantModel, so the base class does not filter or stamp it. The tenant
     // provider is held here so this context can apply that behavior to Site itself.

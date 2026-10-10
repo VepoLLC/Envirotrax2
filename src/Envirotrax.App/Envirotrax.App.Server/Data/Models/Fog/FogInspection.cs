@@ -82,7 +82,7 @@ public class FogInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser
     [StringLength(50)]
     public string? MailingPhoneNumber { get; set; }
 
-    [StringLength(100)]
+    [StringLength(500)]
     public string? MailingEmailAddress { get; set; }
 
     // Inspector fields

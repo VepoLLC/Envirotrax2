@@ -50,6 +50,7 @@ BEGIN TRY
          CustomData1, CustomBooleanData1,
          UserAccountAssignmentId, CsiAccountAssignmentId, BackflowAccountAssignmentId, FogAccountAssignmentId,
          NeedsRenewalCheck, CsiAccountAssignmentDate, BackflowAccountAssignmentDate, FogAccountAssignmentDate,
+         RenewalOptInType, RenewalOptInOutDate, RenewalOptInOrigin, RenewalOptInIpAddress, OptInCodeHash, OptInCodeExpirationDate,
          Active, CreatedById, CreatedTime, UpdatedById, UpdatedTime)
     SELECT
         legacySites.ID, legacySites.ID, waterSuppliers.Id, legacySites.SubArea, legacySites.AccountNumber, legacySites.PropertyBusinessName, legacySites.PropertyType,
@@ -86,6 +87,7 @@ BEGIN TRY
         legacySites.CustomData1, legacySites.CustomBooleanData1,
         userAccountAssignmentUsers.UserId, csiAccountAssignmentUsers.UserId, backflowAccountAssignmentUsers.UserId, fogAccountAssignmentUsers.UserId,
         legacySites.NeedsRenewalCheck, legacySites.CsiAccountAssignmentDate, legacySites.BackflowAccountAssignmentDate, legacySites.FogAccountAssignmentDate,
+        legacySites.OptInType, legacySites.RenewalOptInOutDate, legacySites.OptInOutOrigin, legacySites.IpAddress, legacySites.OptInCodeHash, legacySites.OptInCodeExpirationDate,
         legacySites.Active,
         NULL, legacySites.CreationDate,
         lastModifiedByUsers.Id, legacySites.LastModifiedDate

@@ -127,7 +127,7 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     [StringLength(50)]
     public string? MailingPhoneNumber { get; set; }
 
-    [StringLength(100)]
+    [StringLength(500)]
     public string? MailingEmailAddress { get; set; }
 
     // The single mailing address string V1 stored alongside the components above. Preserved

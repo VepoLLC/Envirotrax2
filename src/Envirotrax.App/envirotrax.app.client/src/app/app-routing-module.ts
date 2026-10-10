@@ -115,6 +115,12 @@ const routes: Routes = [
     loadChildren: () => import('./public-search/public-search.module').then(m => m.PublicSearchModule)
   },
   {
+    // Linked from printed renewal letters and renewal emails, so it must stay outside the AuthGuard branch.
+    path: 'renewal-opt-in',
+    title: '',
+    loadChildren: () => import('./renewal-opt-in/renewal-opt-in.module').then(m => m.RenewalOptInModule)
+  },
+  {
     path: 'auth',
     title: '',
     loadChildren: () => import('./auth/auth.module').then(m => m.AppAuthModule)

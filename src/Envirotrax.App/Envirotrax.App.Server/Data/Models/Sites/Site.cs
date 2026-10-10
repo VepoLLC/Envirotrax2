@@ -82,7 +82,7 @@ public class Site : IAuditableModel<AppUser>
     [StringLength(50)]
     public string? MailingPhoneNumber { get; set; }
 
-    [StringLength(100)]
+    [StringLength(500)]
     public string? MailingEmailAddress { get; set; }
 
     [StringLength(50)]
@@ -216,6 +216,20 @@ public class Site : IAuditableModel<AppUser>
     public DateTime? BackflowAccountAssignmentDate { get; set; }
 
     public DateTime? FogAccountAssignmentDate { get; set; }
+
+    public RenewalOptInType RenewalOptInType { get; set; }
+
+    public DateTime? RenewalOptInOutDate { get; set; }
+
+    public RenewalOptInOrigin? RenewalOptInOrigin { get; set; }
+
+    [StringLength(45)]
+    public string? RenewalOptInIpAddress { get; set; }
+
+    // BCrypt hash of the one-time code printed on renewal letters by the V1 Letter Generator.
+    public string? OptInCodeHash { get; set; }
+
+    public DateTime? OptInCodeExpirationDate { get; set; }
 
     public bool Active { get; set; }
 

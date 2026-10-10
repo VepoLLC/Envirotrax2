@@ -114,6 +114,14 @@ public class SiteRepository : Repository<Site>, ISiteRepository
         // WaterSupplierId is a normal writable column now that it is no longer part of the primary
         // key. Normal Site editing must never reassign a Site; that is a separate, dedicated flow.
         entry.Property(site => site.WaterSupplierId).IsModified = false;
+
+        // Renewal opt-in is changed only by the site owner through the public opt-in pages.
+        entry.Property(site => site.RenewalOptInType).IsModified = false;
+        entry.Property(site => site.RenewalOptInOutDate).IsModified = false;
+        entry.Property(site => site.RenewalOptInOrigin).IsModified = false;
+        entry.Property(site => site.RenewalOptInIpAddress).IsModified = false;
+        entry.Property(site => site.OptInCodeHash).IsModified = false;
+        entry.Property(site => site.OptInCodeExpirationDate).IsModified = false;
     }
 
     protected override IQueryable<Site> GetListQuery()

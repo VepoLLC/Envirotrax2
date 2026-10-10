@@ -24,6 +24,7 @@ import { FogTripTicket } from "../../../../shared/models/fog/fog-trip-ticket";
 import { FogTripTicketImages } from "../../../../shared/models/fog/fog-trip-ticket-images";
 import { WaterSupplier } from "../../../../shared/models/water-suppliers/water-supplier";
 import { LookupService } from "../../../../shared/services/lookup/lookup.service";
+import { GeneralSettingsService } from "../../../../shared/services/settings/general-settings.service";
 import { PropertyType } from "../../../../shared/enums/property-type.enum";
 import { MAX_PAGE_SIZE } from "../../../../shared/models/page-info";
 import { InputOption, ModalHelperService } from "@envirotrax/common-ui";
@@ -67,6 +68,8 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
     public verificationPassed = false;
 
     public isLocationEditing = false;
+    public isMailingInfoRedacted = false;
+    public showModificationBlockedMessage = false;
     public stateOptions: InputOption[] = [];
 
     public readonly propertyTypeOptions: InputOption[] = [
@@ -123,7 +126,8 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         private readonly _tripTicketService: FogTripTicketService,
         private readonly _lookupService: LookupService,
         private readonly _modalHelper: ModalHelperService,
-        private readonly _checkoutService: CheckoutService
+        private readonly _checkoutService: CheckoutService,
+        private readonly _generalSettingsService: GeneralSettingsService
     ) { }
 
     public ngOnInit(): void {
@@ -202,6 +206,11 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
     }
 
     public requestLocationModification(): void {
+        if (this.isMailingInfoRedacted) {
+            this.showModificationBlockedMessage = true;
+            return;
+        }
+
         this.isLocationEditing = true;
     }
 
@@ -325,14 +334,18 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
     }
 
     private collectValidationErrors(): void {
-        if (!this.isLocationEditing && this.hasMissingLocationFields()) {
-            this.isLocationEditing = true;
-            this.validationErrors.push('Please complete the generator property information.');
-        }
+        // While the mailing information is redacted, the server keeps the site's own location, which the
+        // professional can't change.
+        if (!this.isMailingInfoRedacted) {
+            if (!this.isLocationEditing && this.hasMissingLocationFields()) {
+                this.isLocationEditing = true;
+                this.validationErrors.push('Please complete the generator property information.');
+            }
 
-        if (this.model.propertyStreetNumber && !/^\d/.test(this.model.propertyStreetNumber)) {
-            this.isLocationEditing = true;
-            this.validationErrors.push('Property street number must start with a digit.');
+            if (this.model.propertyStreetNumber && !/^\d/.test(this.model.propertyStreetNumber)) {
+                this.isLocationEditing = true;
+                this.validationErrors.push('Property street number must start with a digit.');
+            }
         }
 
         if (!this.model.interceptorType) {
@@ -469,9 +482,35 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
             ? this._stateNamesById.get(stateId)
             : undefined;
 
-        this._insuranceCheck = waterSupplierId
-            ? await this._tripTicketService.getInsuranceCheck(waterSupplierId)
-            : undefined;
+        const [insuranceCheck] = await Promise.all([
+            waterSupplierId ? this._tripTicketService.getInsuranceCheck(waterSupplierId) : undefined,
+            this.loadMailingInfoRedaction()
+        ]);
+
+        this._insuranceCheck = insuranceCheck;
+    }
+
+    // Like V1 does for tests and inspections, an existing site's location can't be modified while its water
+    // supplier redacts the mailing information.
+    private async loadMailingInfoRedaction(): Promise<void> {
+        const waterSupplierId = this.selectedWaterSupplierId;
+
+        this.isMailingInfoRedacted = false;
+        this.showModificationBlockedMessage = false;
+
+        if (!waterSupplierId || !this.site) {
+            return;
+        }
+
+        const settings = await this._generalSettingsService.getForProfessional(waterSupplierId);
+
+        if (this.selectedWaterSupplierId === waterSupplierId) {
+            this.isMailingInfoRedacted = settings.redactMailingInfo === true;
+        }
+
+        if (this.isMailingInfoRedacted && this.isLocationEditing) {
+            this.cancelLocationModification();
+        }
     }
 
     private async computeVerification(): Promise<void> {

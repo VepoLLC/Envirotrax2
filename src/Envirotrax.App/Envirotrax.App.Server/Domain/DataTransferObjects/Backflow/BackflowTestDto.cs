@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Envirotrax.App.Server.Data.Models.Backflow;
+using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
@@ -9,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 
-public class BackflowTestDto : IDto, IMailingInfoDto, IRedactableMailingInfoDto
+public class BackflowTestDto : IDto, IPropertyLocationDto, IMailingInfoDto, IRedactableMailingInfoDto
 {
     public int Id { get; set; }
 
@@ -80,6 +81,12 @@ public class BackflowTestDto : IDto, IMailingInfoDto, IRedactableMailingInfoDto
 
     [StringLength(20)]
     public string? PropertyZip { get; set; }
+
+    PropertyType IPropertyLocationDto.PropertyType
+    {
+        get => (PropertyType)PropertyType;
+        set => PropertyType = (int)value;
+    }
 
     // Mailing
     [StringLength(100)]

@@ -34,4 +34,9 @@ public class GeneralSettingsService : Service<GeneralSettings, GeneralSettingsDt
             ? new ReferencedGeneralSettingsDto()
             : Mapper.Map<ReferencedGeneralSettingsDto>(settings);
     }
+
+    public Task<HashSet<int>> GetRedactingWaterSupplierIdsAsync(IReadOnlyCollection<int> waterSupplierIds, CancellationToken cancellationToken)
+    {
+        return _repository.GetRedactingWaterSupplierIdsAsync(waterSupplierIds, cancellationToken);
+    }
 }

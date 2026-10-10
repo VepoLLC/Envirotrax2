@@ -9,7 +9,7 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 
-public class FogInspectionDto : IDto, IMailingInfoDto, IRedactableMailingInfoDto
+public class FogInspectionDto : IDto, IPropertyLocationDto, IMailingInfoDto, IRedactableMailingInfoDto
 {
     public int Id { get; set; }
 

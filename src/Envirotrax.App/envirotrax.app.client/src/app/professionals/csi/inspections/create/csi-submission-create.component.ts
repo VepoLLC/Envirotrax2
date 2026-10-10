@@ -23,6 +23,7 @@ import { CreateCsiInspection, CsiInspectionAssembly, CsiInspectionNewAssembly } 
 import { BackflowTestResult, BYPASS_DEVICE_TYPES } from '../../../../shared/models/backflow/backflow-test-enums';
 import { AddCsiInspectionAssemblyComponent } from './add-csi-inspection-assembly.component';
 import { LookupService } from '../../../../shared/services/lookup/lookup.service';
+import { GeneralSettingsService } from '../../../../shared/services/settings/general-settings.service';
 import { PropertyType } from '../../../../shared/enums/property-type.enum';
 
 @Component({
@@ -43,6 +44,8 @@ export class CsiSubmissionCreateComponent implements OnInit {
     private _editingInspection: CsiInspection | null = null;
 
     public isLocationEditing = false;
+    public isMailingInfoRedacted = false;
+    public showModificationBlockedMessage = false;
     public stateOptions: InputOption[] = [];
 
     public readonly propertyTypeOptions: InputOption[] = [
@@ -121,7 +124,8 @@ export class CsiSubmissionCreateComponent implements OnInit {
         private readonly _toastService: ToastService,
         private readonly _checkoutService: CheckoutService,
         private readonly _modalHelper: ModalHelperService,
-        private readonly _lookupService: LookupService
+        private readonly _lookupService: LookupService,
+        private readonly _generalSettingsService: GeneralSettingsService
     ) { }
 
     public ngOnInit(): void {
@@ -165,7 +169,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
         this.isLoading = true;
 
         try {
-            await this.loadInsuranceCheck();
+            await Promise.all([this.loadInsuranceCheck(), this.loadMailingInfoRedaction()]);
         } finally {
             this.isLoading = false;
         }
@@ -185,6 +189,11 @@ export class CsiSubmissionCreateComponent implements OnInit {
     }
 
     public requestLocationModification(): void {
+        if (this.isMailingInfoRedacted) {
+            this.showModificationBlockedMessage = true;
+            return;
+        }
+
         this.isLocationEditing = true;
     }
 
@@ -406,7 +415,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
 
             this.selectedWaterSupplierId = inspection.waterSupplier?.id;
             this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === inspection.waterSupplier?.id);
-            await this.loadInsuranceCheck();
+            await Promise.all([this.loadInsuranceCheck(), this.loadMailingInfoRedaction()]);
 
             this.selectedCsiUserId = inspection.inspectorUser?.id ?? 0;
             this.selectedCsiUser = this.csiUsers.find(u => u.id === this.selectedCsiUserId);
@@ -509,7 +518,30 @@ export class CsiSubmissionCreateComponent implements OnInit {
         this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === this.selectedWaterSupplierId);
         this.model.waterSupplier = { id: this.selectedWaterSupplierId };
 
-        await this.loadInsuranceCheck();
+        await Promise.all([this.loadInsuranceCheck(), this.loadMailingInfoRedaction()]);
+    }
+
+    // Like V1, an existing site's location and owner contact information can't be modified while its water
+    // supplier redacts the mailing information.
+    private async loadMailingInfoRedaction(): Promise<void> {
+        const waterSupplierId = this.selectedWaterSupplierId;
+
+        this.isMailingInfoRedacted = false;
+        this.showModificationBlockedMessage = false;
+
+        if (!waterSupplierId || !this.site) {
+            return;
+        }
+
+        const settings = await this._generalSettingsService.getForProfessional(waterSupplierId);
+
+        if (this.selectedWaterSupplierId === waterSupplierId) {
+            this.isMailingInfoRedacted = settings.redactMailingInfo === true;
+        }
+
+        if (this.isMailingInfoRedacted && this.isLocationEditing) {
+            this.cancelLocationModification();
+        }
     }
 
     private async loadInsuranceCheck(): Promise<void> {
@@ -589,19 +621,23 @@ export class CsiSubmissionCreateComponent implements OnInit {
     }
 
     private collectValidationErrors(): void {
-        if (!this.isLocationEditing && this.hasMissingLocationFields()) {
-            this.isLocationEditing = true;
-            this.validationErrors.push('Please complete the property and mailing information.');
-        }
+        // While the mailing information is redacted, the server keeps the site's own location, and the redacted
+        // placeholders ("****") would fail these checks.
+        if (!this.isMailingInfoRedacted) {
+            if (!this.isLocationEditing && this.hasMissingLocationFields()) {
+                this.isLocationEditing = true;
+                this.validationErrors.push('Please complete the property and mailing information.');
+            }
 
-        if (this.model.propertyStreetNumber && !/^\d/.test(this.model.propertyStreetNumber)) {
-            this.isLocationEditing = true;
-            this.validationErrors.push('Property street number must start with a digit.');
-        }
+            if (this.model.propertyStreetNumber && !/^\d/.test(this.model.propertyStreetNumber)) {
+                this.isLocationEditing = true;
+                this.validationErrors.push('Property street number must start with a digit.');
+            }
 
-        if (this.model.mailingStreetNumber && !/^\d/.test(this.model.mailingStreetNumber)) {
-            this.isLocationEditing = true;
-            this.validationErrors.push('Mailing street number must start with a digit. If you are entering a PO Box, enter the "PO Box" and the box number in the street name field.');
+            if (this.model.mailingStreetNumber && !/^\d/.test(this.model.mailingStreetNumber)) {
+                this.isLocationEditing = true;
+                this.validationErrors.push('Mailing street number must start with a digit. If you are entering a PO Box, enter the "PO Box" and the box number in the street name field.');
+            }
         }
 
         if (this.model.inspectionDate && new Date(this.model.inspectionDate) > new Date()) {

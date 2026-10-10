@@ -35,6 +35,17 @@ public class GeneralSettingsRepository : TenantSettingsRepository<GeneralSetting
             .SingleOrDefaultAsync(cancellationToken);
     }
 
+    // One query for any number of water suppliers, returning those with RedactMailingInfo turned on.
+    public async Task<HashSet<int>> GetRedactingWaterSupplierIdsAsync(IReadOnlyCollection<int> waterSupplierIds, CancellationToken cancellationToken)
+    {
+        var redactingSupplierIds = await Entity
+            .Where(settings => waterSupplierIds.Contains(settings.WaterSupplierId) && settings.RedactMailingInfo)
+            .Select(settings => settings.WaterSupplierId)
+            .ToListAsync(cancellationToken);
+
+        return redactingSupplierIds.ToHashSet();
+    }
+
     protected override void CopyValues(GeneralSettings source, GeneralSettings target, SettingsSection section)
     {
         if (section != SettingsSection.General)

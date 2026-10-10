@@ -159,6 +159,11 @@
                                         (click)="requestLocationModification()">Request Modification</button>
                             </vp-section-actions>
 
+                            <p *ngIf="showModificationBlockedMessage" class="text-danger">
+                                When mailing information is redacted, you cannot request modifications. Please contact
+                                the water supplier for support.
+                            </p>
+
                             <dl class="row mb-0">
                                 <dt class="col-5">Property Type:</dt>
                                 <dd class="col-7 mb-1">
@@ -183,6 +188,11 @@
                                 <button type="button" class="btn-primary"
                                         (click)="requestLocationModification()">Request Modification</button>
                             </vp-section-actions>
+
+                            <p *ngIf="showModificationBlockedMessage" class="text-danger">
+                                When mailing information is redacted, you cannot request modifications. Please contact
+                                the water supplier for support.
+                            </p>
 
                             <dl class="row mb-0">
                                 <dt class="col-5">Company Name:</dt>

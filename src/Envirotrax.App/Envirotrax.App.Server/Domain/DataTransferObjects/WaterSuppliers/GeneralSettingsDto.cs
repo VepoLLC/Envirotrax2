@@ -63,5 +63,6 @@ namespace Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers
         public bool CsiInspections { get; set; }
         public bool FogProgram { get; set; }
         public bool IncludeWsAccountNumbers { get; set; }
+        public bool RedactMailingInfo { get; set; }
     }
 }

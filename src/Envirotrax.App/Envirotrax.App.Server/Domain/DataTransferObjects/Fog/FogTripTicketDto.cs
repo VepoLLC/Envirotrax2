@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 
-public class FogTripTicketDto : IDto, IRedactableMailingInfoDto
+public class FogTripTicketDto : IDto, IPropertyLocationDto, IRedactableMailingInfoDto
 {
     public int Id { get; set; }
 

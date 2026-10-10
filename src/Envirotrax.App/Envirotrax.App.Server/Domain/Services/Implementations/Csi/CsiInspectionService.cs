@@ -69,24 +69,25 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
 
     public override async Task<CsiInspectionDto?> DeleteAsync(int id)
     {
-        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        CsiInspection? deleted;
 
-        var deleted = await _repository.DeleteAsync(id);
-
-        if (deleted == null || !string.IsNullOrEmpty(deleted.TransactionId))
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            return null;
-        }
+            deleted = await _repository.DeleteAsync(id);
 
-        await _assemblyService.DeleteByInspectionAsync(id, deleted.ProfessionalId, default);
+            if (deleted == null || !string.IsNullOrEmpty(deleted.TransactionId))
+            {
+                return null;
+            }
+
+            await _assemblyService.DeleteByInspectionAsync(id, deleted.ProfessionalId, default);
+
+            scope.Complete();
+        }
 
         var dto = MapToDto(deleted)!;
 
-        // Redact before Complete(): the settings lookup can't query the database once the scope is complete.
-        await _mailingInfoRedactionService.RedactAsync(dto, default);
-
-        scope.Complete();
-        return dto;
+        return await _mailingInfoRedactionService.RedactAsync(dto, default);
     }
 
     public Task<InsuranceCheckDto> GetInsuranceCheckAsync(int waterSupplierId, CancellationToken cancellationToken)
@@ -134,23 +135,26 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
             Comments = request.Comments
         };
 
+        await _mailingInfoRedactionService.KeepSiteLocationWhenRedactedAsync(request, site, waterSupplierId, cancellationToken);
+
         ApplyEnteredLocation(inspection, request);
         ApplySiteValidation(inspection, site);
         ApplyInspectorSnapshot(inspection, professional, inspectorUser, csiLicense, inspectorUserId);
         await ApplyAmountAsync(inspection, site.IsFeeExempt, site.PropertyType, cancellationToken);
 
-        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        CsiInspection added;
 
-        var added = await _repository.AddAsync(inspection);
-        await _assemblyService.SaveForInspectionAsync(added, request, cancellationToken);
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            added = await _repository.AddAsync(inspection);
+            await _assemblyService.SaveForInspectionAsync(added, request, cancellationToken);
+
+            scope.Complete();
+        }
 
         var dto = Mapper.Map<CsiInspectionDto>(added);
 
-        // Redact before Complete(): the settings lookup can't query the database once the scope is complete.
-        await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
-
-        scope.Complete();
-        return dto;
+        return await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
     }
 
     private async Task ApplyAmountAsync(CsiInspection inspection, bool siteIsFeeExempt, PropertyType propertyType, CancellationToken cancellationToken)
@@ -181,10 +185,18 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
     // is an ISharedProfessionalModel); the repository's own guard only covers not-found/already-paid.
     public async Task<CsiInspectionDto?> UpdateForProfessionalAsync(int id, CreateCsiInspectionDto request, CancellationToken cancellationToken)
     {
-        var siteId = request.Site!.Id!.Value;
+        var existing = await _repository.GetNoIncludesAsync(id, cancellationToken);
+
+        if (existing == null)
+        {
+            return null;
+        }
+
         var inspectorUserId = request.InspectorUser!.Id!.Value;
 
-        var site = await _siteService.GetAsync(siteId, cancellationToken);
+        // An edit can't move the inspection to another site or water supplier (the repository keeps both), so the
+        // location is checked, and redaction decided, against the inspection's own ones rather than the request's.
+        var site = await _siteService.GetAsync(existing.SiteId, cancellationToken);
         var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
         var inspectorUser = await _professionalUserService.GetAsync(inspectorUserId, cancellationToken);
         var licenses = await _licenseService.GetAllAsync(inspectorUserId, new PageInfo(), new Query());
@@ -215,28 +227,31 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
             Comments = request.Comments
         };
 
+        await _mailingInfoRedactionService.KeepSiteLocationWhenRedactedAsync(request, site, existing.WaterSupplierId, cancellationToken);
+
         ApplyEnteredLocation(inspection, request);
         ApplySiteValidation(inspection, site);
         ApplyInspectorSnapshot(inspection, professional, inspectorUser, csiLicense, inspectorUserId);
 
-        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        CsiInspection? saved;
 
-        var saved = await _repository.UpdateForProfessionalAsync(inspection);
-
-        if (saved == null)
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            return null;
-        }
+            saved = await _repository.UpdateForProfessionalAsync(inspection);
 
-        await _assemblyService.SaveForInspectionAsync(saved, request, cancellationToken);
+            if (saved == null)
+            {
+                return null;
+            }
+
+            await _assemblyService.SaveForInspectionAsync(saved, request, cancellationToken);
+
+            scope.Complete();
+        }
 
         var dto = Mapper.Map<CsiInspectionDto>(saved);
 
-        // Redact before Complete(): the settings lookup can't query the database once the scope is complete.
-        await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
-
-        scope.Complete();
-        return dto;
+        return await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
     }
 
     public async Task<CsiInspectionDto?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken)

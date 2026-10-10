@@ -9,4 +9,5 @@ public interface IGeneralSettingsService : IService<GeneralSettings, GeneralSett
 {
     Task<GeneralSettingsDto> AddOrUpdateAsync(int waterSupplierId, GeneralSettingsDto settings);
     Task<ReferencedGeneralSettingsDto> GetForProfessionalAsync(int waterSupplierId, CancellationToken cancellationToken);
+    Task<HashSet<int>> GetRedactingWaterSupplierIdsAsync(IReadOnlyCollection<int> waterSupplierIds, CancellationToken cancellationToken);
 }

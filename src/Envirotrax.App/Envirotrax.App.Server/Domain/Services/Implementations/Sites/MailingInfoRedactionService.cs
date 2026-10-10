@@ -11,9 +11,9 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Sites;
 /// supplier has GeneralSettings.RedactMailingInfo turned on. Unlike V1, only the record's own supplier is
 /// checked, never its parents: a child account that wants the parent's choice uses "Copy from Parent".
 /// Called by the …ForProfessionalAsync service methods and the professional checkout, only on what is returned
-/// or sent to a professional. Inside a TransactionScope, call it before Complete(), because it reads
-/// GeneralSettings. SiteService.GetAsync must stay unredacted, because test and inspection submissions
-/// snapshot the site's real mailing information from it.
+/// or sent to a professional. It reads GeneralSettings, so call it after a TransactionScope's using block has
+/// ended (the scope commits there, not at Complete()), to keep the transaction short. SiteService.GetAsync must
+/// stay unredacted, because KeepSiteLocationWhenRedactedAsync snapshots the site's real values from it.
 /// </summary>
 public class MailingInfoRedactionService : IMailingInfoRedactionService
 {
@@ -74,27 +74,71 @@ public class MailingInfoRedactionService : IMailingInfoRedactionService
         return materialized;
     }
 
+    // Like V1, a professional can't request a site modification while the record's water supplier redacts the
+    // owner's mailing information. A submission then carries the redacted placeholders the professional was shown,
+    // so the site's own values are kept instead, which also leaves the record nothing to flag as changed.
+    public async Task<bool> KeepSiteLocationWhenRedactedAsync(
+        IPropertyLocationDto submission,
+        SiteDto? site,
+        int? waterSupplierId,
+        CancellationToken cancellationToken)
+    {
+        if (site == null || waterSupplierId == null)
+        {
+            return false;
+        }
+
+        var redactingSupplierIds = await _generalSettingsService.GetRedactingWaterSupplierIdsAsync([waterSupplierId.Value], cancellationToken);
+
+        if (!redactingSupplierIds.Contains(waterSupplierId.Value))
+        {
+            return false;
+        }
+
+        submission.PropertyType = site.PropertyType;
+        submission.PropertyBusinessName = site.BusinessName;
+        submission.PropertyStreetNumber = site.StreetNumber;
+        submission.PropertyStreetName = site.StreetName;
+        submission.PropertyNumber = site.PropertyNumber;
+        submission.PropertyCity = site.City;
+        submission.PropertyState = site.State;
+        submission.PropertyZip = site.ZipCode;
+
+        if (submission is IMailingInfoDto mailingInfo)
+        {
+            IMailingInfoDto siteMailingInfo = site;
+
+            mailingInfo.MailingCompanyName = siteMailingInfo.MailingCompanyName;
+            mailingInfo.MailingContactName = siteMailingInfo.MailingContactName;
+            mailingInfo.MailingStreetNumber = siteMailingInfo.MailingStreetNumber;
+            mailingInfo.MailingStreetName = siteMailingInfo.MailingStreetName;
+            mailingInfo.MailingNumber = siteMailingInfo.MailingNumber;
+            mailingInfo.MailingCity = siteMailingInfo.MailingCity;
+            mailingInfo.MailingState = siteMailingInfo.MailingState;
+            mailingInfo.MailingZip = siteMailingInfo.MailingZip;
+            mailingInfo.MailingPhoneNumber = siteMailingInfo.MailingPhoneNumber;
+            mailingInfo.MailingEmailAddress = siteMailingInfo.MailingEmailAddress;
+        }
+
+        return true;
+    }
+
+    // One query for all the records' suppliers, never a settings lookup per supplier.
     private async Task<HashSet<int>> GetRedactingWaterSupplierIdsAsync<TDto>(List<TDto> dtos, CancellationToken cancellationToken)
         where TDto : IRedactableMailingInfoDto
     {
         var waterSupplierIds = dtos
             .Select(dto => dto.WaterSupplier?.Id)
             .OfType<int>()
-            .Distinct();
+            .Distinct()
+            .ToList();
 
-        var redactingSupplierIds = new HashSet<int>();
-
-        foreach (var waterSupplierId in waterSupplierIds)
+        if (waterSupplierIds.Count == 0)
         {
-            var settings = await _generalSettingsService.GetAsync(waterSupplierId, cancellationToken);
-
-            if (settings?.RedactMailingInfo == true)
-            {
-                redactingSupplierIds.Add(waterSupplierId);
-            }
+            return [];
         }
 
-        return redactingSupplierIds;
+        return await _generalSettingsService.GetRedactingWaterSupplierIdsAsync(waterSupplierIds, cancellationToken);
     }
 
     private static void Redact(IMailingInfoDto? mailingInfo)

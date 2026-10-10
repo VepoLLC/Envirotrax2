@@ -115,6 +115,75 @@ public class PublicSearchRepository : Repository<WaterSupplier, int, PublicDbCon
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    public async Task<BackflowTest?> GetBackflowTestAsync(int id, CancellationToken cancellationToken)
+    {
+        return await RestrictToEligibleSupplier(DbContext.BackflowTests.AsNoTracking())
+            .Include(test => test.WaterSupplier)
+                .ThenInclude(supplier => supplier!.State)
+            .Include(test => test.Site)
+            .Include(test => test.Professional)
+            .Include(test => test.Bpat)
+                .ThenInclude(bpat => bpat!.User)
+            .Include(test => test.BpatState)
+            .Include(test => test.PropertyState)
+            .Include(test => test.MailingState)
+            .Where(test => test.Id == id
+                && test.DeletedTime == null
+                && test.TransactionId != null
+                && test.TransactionId != string.Empty)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<BackflowSettings?> GetBackflowSettingsAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        return await DbContext.BackflowSettings
+            .AsNoTracking()
+            .FirstOrDefaultAsync(settings => settings.WaterSupplierId == waterSupplierId, cancellationToken);
+    }
+
+    public async Task<CsiInspection?> GetCsiInspectionAsync(int id, CancellationToken cancellationToken)
+    {
+        return await RestrictToEligibleSupplier(DbContext.CsiInspections.AsNoTracking())
+            .Include(inspection => inspection.Site)
+            .Include(inspection => inspection.WaterSupplier)
+                .ThenInclude(supplier => supplier!.State)
+            .Include(inspection => inspection.Professional)
+            .Include(inspection => inspection.Inspector)
+                .ThenInclude(inspector => inspector!.User)
+            .Include(inspection => inspection.PropertyState)
+            .Include(inspection => inspection.MailingState)
+            .Where(inspection => inspection.Id == id
+                && inspection.DeletedTime == null
+                && inspection.TransactionId != null
+                && inspection.TransactionId != string.Empty)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<List<CsiInspectionVisuallyIdentifiedAssembly>> GetCsiInspectionAssembliesAsync(
+        int waterSupplierId,
+        int inspectionId,
+        CancellationToken cancellationToken)
+    {
+        return await DbContext.CsiInspectionVisuallyIdentifiedAssemblies
+            .AsNoTracking()
+            .Include(assembly => assembly.Test)
+            .Where(assembly => assembly.WaterSupplierId == waterSupplierId && assembly.InspectionId == inspectionId)
+            .OrderBy(assembly => assembly.Id)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<CsiInspectionImage>> GetCsiInspectionImagesAsync(
+        int waterSupplierId,
+        int inspectionId,
+        CancellationToken cancellationToken)
+    {
+        return await DbContext.CsiInspectionImages
+            .AsNoTracking()
+            .Where(image => image.WaterSupplierId == waterSupplierId && image.InspectionId == inspectionId)
+            .OrderBy(image => image.Id)
+            .ToListAsync(cancellationToken);
+    }
+
     private IQueryable<WaterSupplier> GetEligibleSuppliersQuery()
     {
         return GetListQuery()
@@ -131,10 +200,17 @@ public class PublicSearchRepository : Repository<WaterSupplier, int, PublicDbCon
     {
         var eligibleSuppliers = GetEligibleSuppliersQuery();
 
-        return records.Where(record =>
+        return RestrictToEligibleSupplier(records).Where(record =>
             (record.WaterSupplierId == waterSupplierId || record.WaterSupplier!.ParentId == waterSupplierId)
-            && eligibleSuppliers.Any(supplier => supplier.Id == waterSupplierId)
-            && eligibleSuppliers.Any(supplier => supplier.Id == record.WaterSupplierId));
+            && eligibleSuppliers.Any(supplier => supplier.Id == waterSupplierId));
+    }
+
+    private IQueryable<TRecord> RestrictToEligibleSupplier<TRecord>(IQueryable<TRecord> records)
+        where TRecord : TenantModel<WaterSupplier>
+    {
+        var eligibleSuppliers = GetEligibleSuppliersQuery();
+
+        return records.Where(record => eligibleSuppliers.Any(supplier => supplier.Id == record.WaterSupplierId));
     }
 
     private static IQueryable<BackflowTest> ApplyCriteria(IQueryable<BackflowTest> tests, PublicSearchCriteria criteria)

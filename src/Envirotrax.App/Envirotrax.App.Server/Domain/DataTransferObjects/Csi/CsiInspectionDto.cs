@@ -9,7 +9,7 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 
-public class CsiInspectionDto : IDto, IMailingInfoDto, IRedactableMailingInfoDto
+public class CsiInspectionDto : IDto, IPropertyLocationDto, IMailingInfoDto, IRedactableMailingInfoDto
 {
     public int Id { get; set; }
 

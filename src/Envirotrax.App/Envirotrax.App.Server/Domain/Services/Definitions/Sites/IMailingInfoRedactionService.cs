@@ -13,4 +13,10 @@ public interface IMailingInfoRedactionService
 
     Task<IPagedData<TDto>> RedactAsync<TDto>(IPagedData<TDto> page, CancellationToken cancellationToken)
         where TDto : IRedactableMailingInfoDto;
+
+    Task<bool> KeepSiteLocationWhenRedactedAsync(
+        IPropertyLocationDto submission,
+        SiteDto? site,
+        int? waterSupplierId,
+        CancellationToken cancellationToken);
 }

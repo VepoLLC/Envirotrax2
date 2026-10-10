@@ -73,22 +73,23 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
 
     public override async Task<FogTripTicketDto?> DeleteAsync(int id)
     {
-        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        FogTripTicket? deleted;
 
-        var deleted = await _repository.DeleteAsync(id);
-
-        if (deleted == null || !string.IsNullOrEmpty(deleted.TransactionId))
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            return null;
+            deleted = await _repository.DeleteAsync(id);
+
+            if (deleted == null || !string.IsNullOrEmpty(deleted.TransactionId))
+            {
+                return null;
+            }
+
+            scope.Complete();
         }
 
         var dto = MapToDto(deleted)!;
 
-        // Redact before Complete(): the settings lookup can't query the database once the scope is complete.
-        await _mailingInfoRedactionService.RedactAsync(dto, CancellationToken.None);
-
-        scope.Complete();
-        return dto;
+        return await _mailingInfoRedactionService.RedactAsync(dto, CancellationToken.None);
     }
 
     public Task<byte[]> GeneratePdfAsync(FogTripTicketDto ticket)
@@ -201,6 +202,13 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
             ? await _disposalSiteService.GetAsync(request.ReceiverDisposalSiteId.Value, cancellationToken)
             : null;
 
+        if (await _mailingInfoRedactionService.KeepSiteLocationWhenRedactedAsync(request, site, waterSupplierId, cancellationToken))
+        {
+            // A trip ticket also checks the generator's contact details against the site's.
+            request.FogGeneratorPhoneNumber = site!.FogGeneratorPhoneNumber;
+            request.FogGeneratorEmailAddress = site.FogGeneratorEmailAddress;
+        }
+
         var ticket = new FogTripTicket
         {
             WaterSupplierId = waterSupplierId,
@@ -249,25 +257,27 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
             ticket.ReceiverSignatureDate = DateTime.UtcNow;
         }
 
-        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        var added = await _repository.AddAsync(ticket);
+        FogTripTicket added;
 
-        if (generatorSignatureStream != null && ticket.GeneratorSignaturePath != null)
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            await _fileStorageService.UploadAsync(ticket.GeneratorSignaturePath, generatorSignatureStream);
-        }
-        if (receiverSignatureStream != null && ticket.ReceiverSignaturePath != null)
-        {
-            await _fileStorageService.UploadAsync(ticket.ReceiverSignaturePath, receiverSignatureStream);
+            added = await _repository.AddAsync(ticket);
+
+            if (generatorSignatureStream != null && ticket.GeneratorSignaturePath != null)
+            {
+                await _fileStorageService.UploadAsync(ticket.GeneratorSignaturePath, generatorSignatureStream);
+            }
+            if (receiverSignatureStream != null && ticket.ReceiverSignaturePath != null)
+            {
+                await _fileStorageService.UploadAsync(ticket.ReceiverSignaturePath, receiverSignatureStream);
+            }
+
+            scope.Complete();
         }
 
         var dto = Mapper.Map<FogTripTicketDto>(added);
 
-        // Redact before Complete(): the settings lookup can't query the database once the scope is complete.
-        await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
-
-        scope.Complete();
-        return dto;
+        return await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
     }
 
     private async Task ApplyAmountAsync(FogTripTicket ticket, bool siteIsFeeExempt, CancellationToken cancellationToken)

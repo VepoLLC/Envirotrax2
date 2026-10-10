@@ -1,6 +1,6 @@
 import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { formatDate } from "@angular/common";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { NgForm } from "@angular/forms";
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from "@envirotrax/common-ui";
 import { TableViewModel } from "../../shared/models/table-view-model";
@@ -92,7 +92,8 @@ export class PublicSearchComponent implements OnInit {
     constructor(
         private readonly _publicSearchService: PublicSearchService,
         private readonly _containerHelper: AppContainerHelperService,
-        private readonly _activatedRoute: ActivatedRoute
+        private readonly _activatedRoute: ActivatedRoute,
+        private readonly _router: Router
     ) {
 
     }
@@ -128,6 +129,14 @@ export class PublicSearchComponent implements OnInit {
 
     public searchAgain(): void {
         this.setShowResults(false);
+    }
+
+    public viewBackflowTest(row: PublicBackflowTestRowVm): void {
+        this.openInNewTab(['/public-search/backflow-tests', row.id, 'view']);
+    }
+
+    public viewCsiInspection(row: PublicCsiInspectionRowVm): void {
+        this.openInNewTab(['/public-search/csi-inspections', row.id, 'view']);
     }
 
     public setActiveTab(tab: PublicSearchTab): void {
@@ -234,6 +243,12 @@ export class PublicSearchComponent implements OnInit {
         if (items) {
             items.pageInfo = { ...items.pageInfo, pageNumber: 1 };
         }
+    }
+
+    private openInNewTab(commands: (string | number)[]): void {
+        const url = this._router.serializeUrl(this._router.createUrlTree(commands));
+
+        window.open(url, '_blank');
     }
 
     private setShowResults(visible: boolean): void {

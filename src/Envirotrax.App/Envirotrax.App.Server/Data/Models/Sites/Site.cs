@@ -13,6 +13,7 @@ namespace Envirotrax.App.Server.Data.Models.Sites;
 
 [Table("Sites")]
 [RecordLogged(RecordLogTableNames.Sites, ProfessionalSource = RecordLogIdSource.None)]
+[AppIndex(nameof(WaterSupplierId), nameof(WaterSupplierAccountNumber), IsUnique = true)]
 public class Site : IAuditableModel<AppUser>
 {
     [AppPrimaryKey(true)]
@@ -242,9 +243,5 @@ public class SiteConfiguration : IEntityTypeConfiguration<Site>
     public void Configure(EntityTypeBuilder<Site> builder)
     {
         builder.HasIndex(site => site.LegacyRecordId);
-
-        builder.HasIndex(site => new { site.WaterSupplierId, site.WaterSupplierAccountNumber })
-            .IsUnique()
-            .HasFilter("[WaterSupplierAccountNumber] IS NOT NULL");
     }
 }

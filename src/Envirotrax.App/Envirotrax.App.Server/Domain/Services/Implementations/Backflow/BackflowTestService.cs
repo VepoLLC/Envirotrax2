@@ -418,6 +418,8 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             return null;
         }
 
+        await _mailingInfoRedactionService.KeepSiteLocationWhenRedactedAsync(dto, site, dto.WaterSupplier?.Id, cancellationToken);
+
         dto.AccountNumber = site.AccountNumber;
         dto.ValidationSiteInformationChanged = HasSiteInformationChanged(dto, site);
         dto.NeedsValidation = dto.ValidationSiteInformationChanged;
@@ -480,35 +482,37 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             dto.AirGapImagePath = $"professionals/{professionalId}/backflow-tests/air-gap/{Guid.NewGuid()}{ValidateAndGetExtension(airGapFileName)}";
         }
 
-        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        var saved = await base.AddAsync(dto);
+        BackflowTestDto saved;
 
-        if (assemblyStream != null && dto.AssemblyImagePath != null)
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            await _fileStorageService.UploadAsync(dto.AssemblyImagePath, assemblyStream);
-        }
-        if (serialStream != null && dto.SerialNumberImagePath != null)
-        {
-            await _fileStorageService.UploadAsync(dto.SerialNumberImagePath, serialStream);
-        }
-        if (bypassAssemblyStream != null && dto.BypassAssemblyImagePath != null)
-        {
-            await _fileStorageService.UploadAsync(dto.BypassAssemblyImagePath, bypassAssemblyStream);
-        }
-        if (bypassSerialStream != null && dto.BypassSerialNumberImagePath != null)
-        {
-            await _fileStorageService.UploadAsync(dto.BypassSerialNumberImagePath, bypassSerialStream);
-        }
-        if (airGapStream != null && dto.AirGapImagePath != null)
-        {
-            await _fileStorageService.UploadAsync(dto.AirGapImagePath, airGapStream);
+            saved = await base.AddAsync(dto);
+
+            if (assemblyStream != null && dto.AssemblyImagePath != null)
+            {
+                await _fileStorageService.UploadAsync(dto.AssemblyImagePath, assemblyStream);
+            }
+            if (serialStream != null && dto.SerialNumberImagePath != null)
+            {
+                await _fileStorageService.UploadAsync(dto.SerialNumberImagePath, serialStream);
+            }
+            if (bypassAssemblyStream != null && dto.BypassAssemblyImagePath != null)
+            {
+                await _fileStorageService.UploadAsync(dto.BypassAssemblyImagePath, bypassAssemblyStream);
+            }
+            if (bypassSerialStream != null && dto.BypassSerialNumberImagePath != null)
+            {
+                await _fileStorageService.UploadAsync(dto.BypassSerialNumberImagePath, bypassSerialStream);
+            }
+            if (airGapStream != null && dto.AirGapImagePath != null)
+            {
+                await _fileStorageService.UploadAsync(dto.AirGapImagePath, airGapStream);
+            }
+
+            scope.Complete();
         }
 
-        // Redact before Complete(): the settings lookup can't query the database once the scope is complete.
-        await _mailingInfoRedactionService.RedactAsync(saved, cancellationToken);
-
-        scope.Complete();
-        return saved;
+        return await _mailingInfoRedactionService.RedactAsync(saved, cancellationToken);
     }
 
     // Checkout "Edit" on an own, still-unpaid test: mirrors SubmitWithImagesAsync's snapshot/renewal/image
@@ -524,9 +528,21 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         Stream? airGapStream, string? airGapFileName,
         CancellationToken cancellationToken = default)
     {
+        var existing = await _testRepository.GetNoIncludesAsync(id, cancellationToken);
+
+        if (existing == null)
+        {
+            return null;
+        }
+
         var professionalId = _authService.ProfessionalId;
         dto.Id = id;
         dto.Professional = new ReferencedProfessionalDto { Id = professionalId };
+
+        // An edit can't move the test to another site or water supplier (the repository keeps both), so the location
+        // is checked, and redaction decided, against the test's own ones rather than the request's.
+        dto.Site = existing.SiteId == null ? null : new ReferencedSiteDto { Id = existing.SiteId };
+        dto.WaterSupplier = new ReferencedWaterSupplierDto { Id = existing.WaterSupplierId };
 
         await PopulateBpatSnapshotAsync(dto);
         DeriveTestDate(dto);
@@ -571,46 +587,48 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
         var model = MapToModel(dto)!;
 
-        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        BackflowTest? saved;
 
-        var saved = await _testRepository.UpdateForProfessionalAsync(
-            model,
-            newAssemblyPath, newSerialPath, newBypassAssemblyPath, newBypassSerialPath, newAirGapPath);
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            saved = await _testRepository.UpdateForProfessionalAsync(
+                model,
+                newAssemblyPath, newSerialPath, newBypassAssemblyPath, newBypassSerialPath, newAirGapPath);
 
-        if (saved == null)
-        {
-            return null;
-        }
+            if (saved == null)
+            {
+                return null;
+            }
 
-        if (newAssemblyPath != null)
-        {
-            await _fileStorageService.UploadAsync(newAssemblyPath, assemblyStream!);
-        }
-        if (newSerialPath != null)
-        {
-            await _fileStorageService.UploadAsync(newSerialPath, serialStream!);
-        }
-        if (newBypassAssemblyPath != null)
-        {
-            await _fileStorageService.UploadAsync(newBypassAssemblyPath, bypassAssemblyStream!);
-        }
-        if (newBypassSerialPath != null)
-        {
-            await _fileStorageService.UploadAsync(newBypassSerialPath, bypassSerialStream!);
-        }
-        if (newAirGapPath != null)
-        {
-            await _fileStorageService.UploadAsync(newAirGapPath, airGapStream!);
+            if (newAssemblyPath != null)
+            {
+                await _fileStorageService.UploadAsync(newAssemblyPath, assemblyStream!);
+            }
+            if (newSerialPath != null)
+            {
+                await _fileStorageService.UploadAsync(newSerialPath, serialStream!);
+            }
+            if (newBypassAssemblyPath != null)
+            {
+                await _fileStorageService.UploadAsync(newBypassAssemblyPath, bypassAssemblyStream!);
+            }
+            if (newBypassSerialPath != null)
+            {
+                await _fileStorageService.UploadAsync(newBypassSerialPath, bypassSerialStream!);
+            }
+            if (newAirGapPath != null)
+            {
+                await _fileStorageService.UploadAsync(newAirGapPath, airGapStream!);
+            }
+
+            scope.Complete();
         }
 
         var result = MapToDto(saved)!;
 
-        // Redact before Complete(): the settings lookup can't query the database once the scope is complete.
         await _mailingInfoRedactionService.RedactAsync(result, cancellationToken);
-
-        scope.Complete();
-
         await PopulateImageUrlsAsync(result);
+
         return result;
     }
 

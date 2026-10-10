@@ -7,6 +7,7 @@ import { BackflowTestService } from '../../../shared/services/backflow/backflow-
 import { BackflowTestOptionsService } from '../../../shared/services/backflow/backflow-test-options.service';
 import { BackflowGaugeService } from '../../../shared/services/backflow/backflow-gauge.service';
 import { BackflowSettingsService } from '../../../shared/services/backflow/backflow-settings.service';
+import { GeneralSettingsService } from '../../../shared/services/settings/general-settings.service';
 import { BackflowTestingSettings } from '../../../shared/models/backflow/backflow-testing-settings';
 import { ProfesisonalService } from '../../../shared/services/professionals/professional.service';
 import { ProfesionalUserService } from '../../../shared/services/professionals/professional-user.service';
@@ -60,6 +61,8 @@ export class BackflowTestSubmitComponent implements OnInit {
 
     public isNewProperty = false;
     public isLocationEditing = false;
+    public isMailingInfoRedacted = false;
+    public showModificationBlockedMessage = false;
     public isVerificationPassed = false;
     public verificationChecks: VerificationCheck[] = [];
     public selectedGaugeText = '';
@@ -480,7 +483,8 @@ export class BackflowTestSubmitComponent implements OnInit {
         private readonly _settingsService: BackflowSettingsService,
         private readonly _siteService: SiteService,
         private readonly _checkoutService: CheckoutService,
-        private readonly _lookupService: LookupService
+        private readonly _lookupService: LookupService,
+        private readonly _generalSettingsService: GeneralSettingsService
     ) {
         this.deviceTypeOptions = this._options.deviceTypeOptions;
         this.manufacturerOptions = this._options.manufacturerOptions;
@@ -604,9 +608,37 @@ export class BackflowTestSubmitComponent implements OnInit {
     }
 
     private async loadSupplierData(): Promise<void> {
-        await Promise.all([this.loadAdditionalInfoSettings(), this.loadInsuranceCheck(), this.loadLicenseCheck()]);
+        await Promise.all([
+            this.loadAdditionalInfoSettings(),
+            this.loadInsuranceCheck(),
+            this.loadLicenseCheck(),
+            this.loadMailingInfoRedaction()
+        ]);
 
         this.updateVerification();
+    }
+
+    // Like V1, an existing site's location and owner contact information can't be modified while its water
+    // supplier redacts the mailing information.
+    private async loadMailingInfoRedaction(): Promise<void> {
+        const waterSupplierId = this.selectedWaterSupplierId;
+
+        this.isMailingInfoRedacted = false;
+        this.showModificationBlockedMessage = false;
+
+        if (!waterSupplierId || !this.site) {
+            return;
+        }
+
+        const settings = await this._generalSettingsService.getForProfessional(waterSupplierId);
+
+        if (this.selectedWaterSupplierId === waterSupplierId) {
+            this.isMailingInfoRedacted = settings.redactMailingInfo === true;
+        }
+
+        if (this.isMailingInfoRedacted && this.isLocationEditing) {
+            this.cancelLocationModification();
+        }
     }
 
     private async loadAdditionalInfoSettings(): Promise<void> {
@@ -668,6 +700,11 @@ export class BackflowTestSubmitComponent implements OnInit {
     }
 
     public requestLocationModification(): void {
+        if (this.isMailingInfoRedacted) {
+            this.showModificationBlockedMessage = true;
+            return;
+        }
+
         this.isLocationEditing = true;
     }
 
@@ -955,11 +992,13 @@ export class BackflowTestSubmitComponent implements OnInit {
             const test = await this._backflowTestService.getForProfessional(testId);
             this.editingTestId = testId;
             this._editingTest = test;
-            await this.populateForEdit(test);
 
+            // Loaded before populateForEdit, whose supplier data checks whether the site's location is locked.
             if (test.site?.id) {
                 this.site = await this._siteService.getForProfessional(test.site.id);
             }
+
+            await this.populateForEdit(test);
         } finally {
             this.isLoading = false;
         }
@@ -1191,19 +1230,23 @@ export class BackflowTestSubmitComponent implements OnInit {
             this.validationErrors.push('Please select a backflow method.');
         }
 
-        if (!this.isLocationEditing && this.hasMissingLocationFields()) {
-            this.isLocationEditing = true;
-            this.validationErrors.push('Please complete the property and mailing information.');
-        }
+        // While the mailing information is redacted, the server keeps the site's own location, and the redacted
+        // placeholders ("****") would fail these checks.
+        if (!this.isMailingInfoRedacted) {
+            if (!this.isLocationEditing && this.hasMissingLocationFields()) {
+                this.isLocationEditing = true;
+                this.validationErrors.push('Please complete the property and mailing information.');
+            }
 
-        if (this.model.propertyStreetNumber && !/^\d/.test(this.model.propertyStreetNumber)) {
-            this.isLocationEditing = true;
-            this.validationErrors.push('Property street number must start with a digit.');
-        }
+            if (this.model.propertyStreetNumber && !/^\d/.test(this.model.propertyStreetNumber)) {
+                this.isLocationEditing = true;
+                this.validationErrors.push('Property street number must start with a digit.');
+            }
 
-        if (this.model.mailingStreetNumber && !/^\d/.test(this.model.mailingStreetNumber)) {
-            this.isLocationEditing = true;
-            this.validationErrors.push('Mailing street number must start with a digit. If you are entering a PO Box, enter the "PO Box" and the box number in the street name field.');
+            if (this.model.mailingStreetNumber && !/^\d/.test(this.model.mailingStreetNumber)) {
+                this.isLocationEditing = true;
+                this.validationErrors.push('Mailing street number must start with a digit. If you are entering a PO Box, enter the "PO Box" and the box number in the street name field.');
+            }
         }
 
         if (this.model.deviceType === BackflowDeviceType.AG) {

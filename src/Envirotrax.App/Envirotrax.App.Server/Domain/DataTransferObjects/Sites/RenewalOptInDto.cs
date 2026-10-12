@@ -20,7 +20,7 @@ public class RenewalOptInRequestDto
 
     public RenewalOptInType OptInType { get; set; }
 
-    [StringLength(500)]
+    [StringLength(100)]
     public string? EmailAddresses { get; set; }
 }
 

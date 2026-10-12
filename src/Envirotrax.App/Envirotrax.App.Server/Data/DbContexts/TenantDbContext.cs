@@ -102,7 +102,8 @@ public partial class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUse
 
     /// <summary>
     /// Applies the WaterSupplier tenant filter to Site, which the base class skips
-    /// because Site does not implement ITenantModel.
+    /// because Site does not implement ITenantModel, and to the renewal email verifications that
+    /// belong to a Site, so they follow the Site when it is moved to another water supplier.
     ///
     /// This MUST stay inside SetupGlobalFiltering: AdminDbContext and ProfessionalDbContext
     /// suppress tenant filtering by overriding this method without calling base. Moving it to
@@ -116,6 +117,12 @@ public partial class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUse
         {
             builder.Entity<Site>()
                 .HasQueryFilter(site => site.WaterSupplierId == _tenantProvider.WaterSupplierId);
+        }
+
+        if (entity.ClrType == typeof(RenewalEmailVerification))
+        {
+            builder.Entity<RenewalEmailVerification>()
+                .HasQueryFilter(verification => verification.Site!.WaterSupplierId == _tenantProvider.WaterSupplierId);
         }
     }
 

@@ -67,7 +67,7 @@ public class SiteDto : IDto
     [StringLength(50)]
     public string? MailingPhoneNumber { get; set; }
 
-    [StringLength(500)]
+    [StringLength(100)]
     public string? MailingEmailAddress { get; set; }
 
     [StringLength(50)]

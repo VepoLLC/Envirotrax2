@@ -544,8 +544,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("MailingEmailAddress")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("MailingNumber")
                         .HasMaxLength(50)
@@ -1030,8 +1030,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("MailingEmailAddress")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("MailingNumber")
                         .HasMaxLength(50)
@@ -1566,8 +1566,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("MailingEmailAddress")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("MailingNumber")
                         .HasMaxLength(50)
@@ -3108,9 +3108,6 @@ namespace Envirotrax.App.Server.Data.Migrations
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Sites.RenewalEmailVerification", b =>
                 {
-                    b.Property<int>("WaterSupplierId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
@@ -3144,9 +3141,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<DateTime?>("VerifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("WaterSupplierId", "Id");
+                    b.HasKey("Id");
 
-                    b.HasIndex("SiteId", "IsVerified", "CreatedDate");
+                    b.HasIndex("SiteId");
 
                     b.ToTable("RenewalEmailVerifications");
                 });
@@ -3346,8 +3343,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("MailingEmailAddress")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("MailingNumber")
                         .HasMaxLength(50)
@@ -5256,15 +5253,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
-                        .WithMany()
-                        .HasForeignKey("WaterSupplierId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Site");
-
-                    b.Navigation("WaterSupplier");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Sites.Site", b =>

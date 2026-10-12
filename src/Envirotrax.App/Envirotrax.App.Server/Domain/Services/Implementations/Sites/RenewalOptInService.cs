@@ -16,7 +16,7 @@ public class RenewalOptInService : IRenewalOptInService
     private const int VerificationLinkValidDays = 7;
     private const int ZipCodePrefixLength = 3;
     private const int EmailAddressMaxLength = 320;
-    private const int MailingEmailAddressMaxLength = 500;
+    private const int MailingEmailAddressMaxLength = 100;
     private const string MailingEmailAddressSeparator = "; ";
 
     private readonly IRenewalOptInRepository _renewalOptInRepository;
@@ -209,7 +209,6 @@ public class RenewalOptInService : IRenewalOptInService
 
         var verification = new RenewalEmailVerification
         {
-            WaterSupplierId = site.WaterSupplierId,
             SiteId = site.Id,
             EmailAddress = emailAddress,
             TokenHash = _keyHashingService.HashText(token),

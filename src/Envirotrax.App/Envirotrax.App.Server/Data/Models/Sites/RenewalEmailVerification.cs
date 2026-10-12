@@ -1,15 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.Common.Data.Attributes;
-using Envirotrax.Common.Data.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Envirotrax.App.Server.Data.Models.Sites;
 
 [Table("RenewalEmailVerifications")]
-public class RenewalEmailVerification : TenantModel<WaterSupplier>
+public class RenewalEmailVerification
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }
@@ -33,12 +29,4 @@ public class RenewalEmailVerification : TenantModel<WaterSupplier>
     public string? UnsubscribeTokenHash { get; set; }
 
     public DateTime? UnsubscribedDate { get; set; }
-}
-
-public class RenewalEmailVerificationConfiguration : IEntityTypeConfiguration<RenewalEmailVerification>
-{
-    public void Configure(EntityTypeBuilder<RenewalEmailVerification> builder)
-    {
-        builder.HasIndex(verification => new { verification.SiteId, verification.IsVerified, verification.CreatedDate });
-    }
 }

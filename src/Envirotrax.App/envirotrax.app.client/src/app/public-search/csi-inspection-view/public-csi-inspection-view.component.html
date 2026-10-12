@@ -191,26 +191,26 @@
                         <td class="fw-bold pe-3 text-end text-nowrap align-middle col-material-label">Service Lines:</td>
                         <td class="pe-4 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="slLead" disabled [checked]="inspection.materialServiceLineLead" />
-                                <label class="form-check-label" for="slLead">Lead</label>
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="slLead" disabled [checked]="inspection.materialServiceLineLead" />
+                                <label class="form-check-label text-muted" for="slLead">Lead</label>
                             </div>
                         </td>
                         <td class="pe-4 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="slCopper" disabled [checked]="inspection.materialServiceLineCopper" />
-                                <label class="form-check-label" for="slCopper">Copper</label>
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="slCopper" disabled [checked]="inspection.materialServiceLineCopper" />
+                                <label class="form-check-label text-muted" for="slCopper">Copper</label>
                             </div>
                         </td>
                         <td class="pe-4 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="slPVC" disabled [checked]="inspection.materialServiceLinePVC" />
-                                <label class="form-check-label" for="slPVC">PVC</label>
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="slPVC" disabled [checked]="inspection.materialServiceLinePVC" />
+                                <label class="form-check-label text-muted" for="slPVC">PVC</label>
                             </div>
                         </td>
                         <td class="pe-3 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="slOther" disabled [checked]="inspection.materialServiceLineOther" />
-                                <label class="form-check-label" for="slOther">Other</label>
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="slOther" disabled [checked]="inspection.materialServiceLineOther" />
+                                <label class="form-check-label text-muted" for="slOther">Other</label>
                             </div>
                         </td>
                         <td class="align-middle">
@@ -221,26 +221,26 @@
                         <td class="fw-bold pe-3 text-end text-nowrap align-middle">Solder:</td>
                         <td class="pe-4 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="soldLead" disabled [checked]="inspection.materialSolderLead" />
-                                <label class="form-check-label" for="soldLead">Lead</label>
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="soldLead" disabled [checked]="inspection.materialSolderLead" />
+                                <label class="form-check-label text-muted" for="soldLead">Lead</label>
                             </div>
                         </td>
                         <td class="pe-4 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="soldLeadFree" disabled [checked]="inspection.materialSolderLeadFree" />
-                                <label class="form-check-label" for="soldLeadFree">Lead Free</label>
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="soldLeadFree" disabled [checked]="inspection.materialSolderLeadFree" />
+                                <label class="form-check-label text-muted" for="soldLeadFree">Lead Free</label>
                             </div>
                         </td>
                         <td class="pe-4 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="soldSolvent" disabled [checked]="inspection.materialSolderSolventWeld" />
-                                <label class="form-check-label" for="soldSolvent">Solvent Weld</label>
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="soldSolvent" disabled [checked]="inspection.materialSolderSolventWeld" />
+                                <label class="form-check-label text-muted" for="soldSolvent">Solvent Weld</label>
                             </div>
                         </td>
                         <td class="pe-3 align-middle">
                             <div class="form-check form-check-inline mb-0">
-                                <input class="form-check-input" type="checkbox" id="soldOther" disabled [checked]="inspection.materialSolderOther" />
-                                <label class="form-check-label" for="soldOther">Other</label>
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="soldOther" disabled [checked]="inspection.materialSolderOther" />
+                                <label class="form-check-label text-muted" for="soldOther">Other</label>
                             </div>
                         </td>
                         <td class="align-middle">
@@ -251,8 +251,8 @@
             </table>
 
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="legalAck" disabled [checked]="true" />
-                <label class="form-check-label" for="legalAck">
+                <input class="form-check-input readonly-checkbox" type="checkbox" id="legalAck" disabled [checked]="true" />
+                <label class="form-check-label text-muted" for="legalAck">
                     "I recognize that this document shall be retained by the aforementioned Public Water System for a minimum of ten years and that I am legally responsible for the validity of the information I have provided."
                 </label>
             </div>
@@ -288,48 +288,48 @@
     <div *ngIf="activeTab === 'additional'">
         <vp-section header="Additional Information" class="d-block">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="aiOssf" disabled [checked]="inspection.aiOssf" />
-                <label class="form-check-label" for="aiOssf">Has On Site Sewage Facility</label>
+                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiOssf" disabled [checked]="inspection.aiOssf" />
+                <label class="form-check-label text-muted" for="aiOssf">Has On Site Sewage Facility</label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="aiWaterWell" disabled [checked]="inspection.aiWaterWell" />
-                <label class="form-check-label" for="aiWaterWell">Has Auxiliary Water Supply</label>
+                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiWaterWell" disabled [checked]="inspection.aiWaterWell" />
+                <label class="form-check-label text-muted" for="aiWaterWell">Has Auxiliary Water Supply</label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="aiReclaimedWater" disabled [checked]="inspection.aiReclaimedWater" />
-                <label class="form-check-label" for="aiReclaimedWater">Has Reclaimed Water</label>
+                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiReclaimedWater" disabled [checked]="inspection.aiReclaimedWater" />
+                <label class="form-check-label text-muted" for="aiReclaimedWater">Has Reclaimed Water</label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="aiFireSystem" disabled [checked]="inspection.aiFireSystem" />
-                <label class="form-check-label" for="aiFireSystem">Has Fire System</label>
+                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiFireSystem" disabled [checked]="inspection.aiFireSystem" />
+                <label class="form-check-label text-muted" for="aiFireSystem">Has Fire System</label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="aiFireSystem2" disabled [checked]="inspection.aiFireSystem2" />
-                <label class="form-check-label" for="aiFireSystem2">Fire System on Separate Water Supply</label>
+                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiFireSystem2" disabled [checked]="inspection.aiFireSystem2" />
+                <label class="form-check-label text-muted" for="aiFireSystem2">Fire System on Separate Water Supply</label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="aiGreaseTrap" disabled [checked]="inspection.aiGreaseTrap" />
-                <label class="form-check-label" for="aiGreaseTrap">Has Grease Trap</label>
+                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiGreaseTrap" disabled [checked]="inspection.aiGreaseTrap" />
+                <label class="form-check-label text-muted" for="aiGreaseTrap">Has Grease Trap</label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="aiSandGrit" disabled [checked]="inspection.aiSandGrit" />
-                <label class="form-check-label" for="aiSandGrit">Has Sand &amp; Grit Trap</label>
+                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiSandGrit" disabled [checked]="inspection.aiSandGrit" />
+                <label class="form-check-label text-muted" for="aiSandGrit">Has Sand &amp; Grit Trap</label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="aiIrrigationSystem" disabled [checked]="inspection.aiIrrigationSystem" />
-                <label class="form-check-label" for="aiIrrigationSystem">Has Irrigation System</label>
+                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiIrrigationSystem" disabled [checked]="inspection.aiIrrigationSystem" />
+                <label class="form-check-label text-muted" for="aiIrrigationSystem">Has Irrigation System</label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="aiIrrigationSystem2" disabled [checked]="inspection.aiIrrigationSystem2" />
-                <label class="form-check-label" for="aiIrrigationSystem2">Irrigation on Separate Water Supply</label>
+                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiIrrigationSystem2" disabled [checked]="inspection.aiIrrigationSystem2" />
+                <label class="form-check-label text-muted" for="aiIrrigationSystem2">Irrigation on Separate Water Supply</label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="aiHasIsolation" disabled [checked]="inspection.aiHasDomesticPremisesIsolation" />
-                <label class="form-check-label" for="aiHasIsolation">Has Domestic/Premises Isolation</label>
+                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiHasIsolation" disabled [checked]="inspection.aiHasDomesticPremisesIsolation" />
+                <label class="form-check-label text-muted" for="aiHasIsolation">Has Domestic/Premises Isolation</label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="aiRequiresIsolation" disabled [checked]="inspection.aiRequiresDomesticPremisesIsolation" />
-                <label class="form-check-label" for="aiRequiresIsolation">Requires Domestic/Premises Isolation</label>
+                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiRequiresIsolation" disabled [checked]="inspection.aiRequiresDomesticPremisesIsolation" />
+                <label class="form-check-label text-muted" for="aiRequiresIsolation">Requires Domestic/Premises Isolation</label>
             </div>
         </vp-section>
     </div>

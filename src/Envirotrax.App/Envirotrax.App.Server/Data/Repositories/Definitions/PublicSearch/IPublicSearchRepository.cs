@@ -29,6 +29,8 @@ public interface IPublicSearchRepository
 
     Task<BackflowSettings?> GetBackflowSettingsAsync(int waterSupplierId, CancellationToken cancellationToken);
 
+    Task<bool> IsMailingInfoRedactedAsync(int waterSupplierId, CancellationToken cancellationToken);
+
     Task<CsiInspection?> GetCsiInspectionAsync(int id, CancellationToken cancellationToken);
 
     Task<List<CsiInspectionVisuallyIdentifiedAssembly>> GetCsiInspectionAssembliesAsync(

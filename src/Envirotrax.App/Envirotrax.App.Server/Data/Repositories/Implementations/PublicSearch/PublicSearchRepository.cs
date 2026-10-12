@@ -141,6 +141,12 @@ public class PublicSearchRepository : Repository<WaterSupplier, int, PublicDbCon
             .FirstOrDefaultAsync(settings => settings.WaterSupplierId == waterSupplierId, cancellationToken);
     }
 
+    public async Task<bool> IsMailingInfoRedactedAsync(int waterSupplierId, CancellationToken cancellationToken)
+    {
+        return await DbContext.GeneralSettings
+            .AnyAsync(settings => settings.WaterSupplierId == waterSupplierId && settings.RedactMailingInfo, cancellationToken);
+    }
+
     public async Task<CsiInspection?> GetCsiInspectionAsync(int id, CancellationToken cancellationToken)
     {
         return await RestrictToEligibleSupplier(DbContext.CsiInspections.AsNoTracking())

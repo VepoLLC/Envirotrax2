@@ -10,8 +10,8 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Sites;
 /// Hides the property owner's mailing/contact information from professionals when the record's water
 /// supplier has GeneralSettings.RedactMailingInfo turned on. Unlike V1, only the record's own supplier is
 /// checked, never its parents: a child account that wants the parent's choice uses "Copy from Parent".
-/// Called by the …ForProfessionalAsync service methods and the professional checkout, only on what is returned
-/// or sent to a professional. It reads GeneralSettings, so call it after a TransactionScope's using block has
+/// Called by the …ForProfessionalAsync service methods, the professional checkout and Public Search, only on what
+/// is returned or sent to a professional or an anonymous visitor. It reads GeneralSettings, so call it after a TransactionScope's using block has
 /// ended (the scope commits there, not at Complete()), to keep the transaction short. SiteService.GetAsync must
 /// stay unredacted, because KeepSiteLocationWhenRedactedAsync snapshots the site's real values from it.
 /// </summary>
@@ -64,14 +64,21 @@ public class MailingInfoRedactionService : IMailingInfoRedactionService
         {
             if (dto.WaterSupplier?.Id is int waterSupplierId && redactingSupplierIds.Contains(waterSupplierId))
             {
-                foreach (var mailingInfo in dto.MailingInfo)
-                {
-                    Redact(mailingInfo);
-                }
+                Redact(dto);
             }
         }
 
         return materialized;
+    }
+
+    // Redacts without checking the setting, for callers that read it themselves, such as Public Search,
+    // whose anonymous requests can't read GeneralSettings through the tenant-filtered context.
+    public void Redact(IRedactableMailingInfoDto dto)
+    {
+        foreach (var mailingInfo in dto.MailingInfo)
+        {
+            RedactFields(mailingInfo);
+        }
     }
 
     // Like V1, a professional can't request a site modification while the record's water supplier redacts the
@@ -141,7 +148,7 @@ public class MailingInfoRedactionService : IMailingInfoRedactionService
         return await _generalSettingsService.GetRedactingWaterSupplierIdsAsync(waterSupplierIds, cancellationToken);
     }
 
-    private static void Redact(IMailingInfoDto? mailingInfo)
+    private static void RedactFields(IMailingInfoDto? mailingInfo)
     {
         if (mailingInfo == null)
         {

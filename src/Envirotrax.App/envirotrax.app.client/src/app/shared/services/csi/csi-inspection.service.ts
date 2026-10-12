@@ -162,6 +162,11 @@ export class CsiInspectionService {
         return lastValueFrom(this._http.get<CsiInspectionImage[]>(url));
     }
 
+    public getProfessionalAssemblies(inspectionId: number): Promise<CsiInspectionAssembly[]> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${inspectionId}/assemblies`);
+        return lastValueFrom(this._http.get<CsiInspectionAssembly[]>(url));
+    }
+
     public addImage(inspectionId: number, description: string | null, file: File): Promise<CsiInspectionImage> {
         const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${inspectionId}/images`);
         const formData = new FormData();

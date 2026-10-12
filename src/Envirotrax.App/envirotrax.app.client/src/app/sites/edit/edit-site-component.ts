@@ -23,6 +23,7 @@ import { ToastService, ToastType, InputOption, RecordLog } from '@envirotrax/com
 import { AuthService } from '../../shared/services/auth/auth.service';
 import { PermissionAction, PermissionType } from '../../shared/models/permission-type';
 import { FeatureType } from '../../shared/models/feature-type';
+import { GeneralSettingsService } from '../../shared/services/settings/general-settings.service';
 
 type SiteTab = 'logHistory' | 'csi' | 'backflow' | 'outOfService' | 'tripTickets' | 'fog' | 'recordLog';
 
@@ -55,6 +56,7 @@ export class EditSiteComponent implements OnInit {
     public outOfServiceCount: number = 0;
     public tripTicketCount: number = 0;
     public fogCount: number = 0;
+    public includeWsAccountNumbers: boolean = false;
 
     public site: Site = {
         backflowScheduleMonth: 0,
@@ -101,14 +103,18 @@ export class EditSiteComponent implements OnInit {
         private readonly _userService: UserService,
         private readonly _toastService: ToastService,
         private readonly _authService: AuthService,
-        private readonly _containerHelper: AppContainerHelperService
+        private readonly _containerHelper: AppContainerHelperService,
+        private readonly _generalSettingsService: GeneralSettingsService
     ) {
     }
 
     public async ngOnInit(): Promise<void> {
 
         await this.loadPermissions();
-        await this.loadStates();
+        await Promise.all([
+            this.loadStates(),
+            this.loadGeneralSettings()
+        ]);
         await this.getUsers();
         this._acitvatedRoute.paramMap.subscribe(async params => {
             const siteId = params.get('id');
@@ -382,7 +388,15 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.zipCode = this.site.zipCode;
                     this.currentSite.fogGeneratorPhoneNumber = this.site.fogGeneratorPhoneNumber;
                     this.currentSite.fogGeneratorEmailAddress = this.site.fogGeneratorEmailAddress;
-                    const result = await this._siteService.update(this.currentSite);
+
+                    // Kept out of currentSite until the save succeeds: every section saves currentSite, so a
+                    // rejected duplicate left in it would fail the other sections with the same error.
+                    const result = await this._siteService.update({
+                        ...this.currentSite,
+                        waterSupplierAccountNumber: this.site.waterSupplierAccountNumber
+                    });
+
+                    this.currentSite.waterSupplierAccountNumber = result.waterSupplierAccountNumber;
 
                     this._toastService.successfullySaved('Location');
                 }
@@ -518,5 +532,10 @@ export class EditSiteComponent implements OnInit {
 
     private async loadStates(): Promise<void> {
         this.stateOptions = await this._stateService.getAllStatesAsOptions(true);
+    }
+
+    private async loadGeneralSettings(): Promise<void> {
+        const settings = await this._generalSettingsService.get();
+        this.includeWsAccountNumbers = !!settings.includeWsAccountNumbers;
     }
 }

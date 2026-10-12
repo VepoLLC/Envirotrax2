@@ -15,4 +15,5 @@ public interface IProfessionalUserLicenseService : IService<ProfessionalUserLice
     Task<ProfessionalUserLicenseDto> UpdateForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto);
     Task<WaterSupplierLicenseDto> UpdateForWaterSupplierAsync(int id, UpdateWaterSupplierLicenseDto dto, CancellationToken cancellationToken);
     Task DeleteForWaterSupplierAsync(int id, CancellationToken cancellationToken);
+    Task<BpatLicenseCheckDto> CheckBpatForWaterSupplierAsync(int professionalId, int userId, int waterSupplierId, CancellationToken cancellationToken);
 }

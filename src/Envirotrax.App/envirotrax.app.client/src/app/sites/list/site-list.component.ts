@@ -17,6 +17,7 @@ import { FeatureType } from "../../shared/models/feature-type";
 import { DownloadService } from "../../shared/services/download.service";
 import { CellTemplateData, ColumnType, InputOption, MapMarker, MapPolygon, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
+import { GeneralSettingsService } from "../../shared/services/settings/general-settings.service";
 
 @Component({
     standalone: false,
@@ -107,12 +108,13 @@ export class SiteListComponent implements OnInit {
         private readonly _gisMapService: GisMapService,
         private readonly _authService: AuthService,
         private readonly _downloadService: DownloadService,
-        private readonly _containerHelper: AppContainerHelperService
+        private readonly _containerHelper: AppContainerHelperService,
+        private readonly _generalSettingsService: GeneralSettingsService
     ) {
 
     }
 
-    private async setDownloadConfig(): Promise<void> {
+    private async setDownloadConfig(includeWsAccountNumbers: boolean): Promise<void> {
         this.downloadConfig = {
             fileName: 'Sites',
             endpoint: this._siteService.getAllEndpoint(),
@@ -126,6 +128,7 @@ export class SiteListComponent implements OnInit {
             columns: [
                 { field: 'id', caption: 'SiteID' },
                 { field: 'accountNumber', caption: 'AccountNumber' },
+                ...(includeWsAccountNumbers ? [{ field: 'waterSupplierAccountNumber', caption: 'WaterSupplierAccountNumber' }] : []),
                 { field: 'active', caption: 'Active' },
                 { field: 'outOfArea', caption: 'OutOfArea' },
                 { field: 'invalidMailingAddress', caption: 'InvalidMailingAddress' },
@@ -198,11 +201,14 @@ export class SiteListComponent implements OnInit {
     }
 
     public async ngOnInit(): Promise<void> {
-        this.table.columns = this.getColumns();
-        this.setDownloadConfig();
+        const settings = await this._generalSettingsService.get();
+        const includeWsAccountNumbers = !!settings.includeWsAccountNumbers;
+
+        this.table.columns = this.getColumns(includeWsAccountNumbers);
+        this.setDownloadConfig(includeWsAccountNumbers);
     }
 
-    private getColumns(): TableColumn<Site>[] {
+    private getColumns(includeWsAccountNumbers: boolean): TableColumn<Site>[] {
         return [
             {
                 field: 'Key Indicators',
@@ -214,6 +220,12 @@ export class SiteListComponent implements OnInit {
                 field: 'accountNumber',
                 caption: 'Account Number',
                 type: ColumnType.text
+            },
+            {
+                field: 'waterSupplierAccountNumber',
+                caption: 'WS Account Number',
+                type: ColumnType.text,
+                isTableColumnExcluded: !includeWsAccountNumbers
             },
             {
                 field: 'Property Information',

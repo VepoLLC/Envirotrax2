@@ -37,6 +37,7 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IProfessionalSupplierService _professionalSupplierService;
     private readonly IProfessionalInsuranceService _insuranceService;
+    private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
 
     public FogTripTicketService(
         IMapper mapper,
@@ -51,7 +52,8 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         IPdfTemplateService pdfTemplateService,
         IGeneralSettingsService generalSettingsService,
         IProfessionalSupplierService professionalSupplierService,
-        IProfessionalInsuranceService insuranceService)
+        IProfessionalInsuranceService insuranceService,
+        IMailingInfoRedactionService mailingInfoRedactionService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -66,21 +68,28 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         _generalSettingsService = generalSettingsService;
         _professionalSupplierService = professionalSupplierService;
         _insuranceService = insuranceService;
+        _mailingInfoRedactionService = mailingInfoRedactionService;
     }
 
     public override async Task<FogTripTicketDto?> DeleteAsync(int id)
     {
-        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        FogTripTicket? deleted;
 
-        var deleted = await _repository.DeleteAsync(id);
-
-        if (deleted == null || !string.IsNullOrEmpty(deleted.TransactionId))
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            return null;
+            deleted = await _repository.DeleteAsync(id);
+
+            if (deleted == null || !string.IsNullOrEmpty(deleted.TransactionId))
+            {
+                return null;
+            }
+
+            scope.Complete();
         }
 
-        scope.Complete();
-        return MapToDto(deleted);
+        var dto = MapToDto(deleted)!;
+
+        return await _mailingInfoRedactionService.RedactAsync(dto, CancellationToken.None);
     }
 
     public Task<byte[]> GeneratePdfAsync(FogTripTicketDto ticket)
@@ -110,6 +119,18 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         if (dto != null)
         {
             await PopulateSignatureUrlsAsync(dto);
+        }
+
+        return dto;
+    }
+
+    public async Task<FogTripTicketDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken)
+    {
+        var dto = await GetAsync(id, cancellationToken);
+
+        if (dto != null)
+        {
+            await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
         }
 
         return dto;
@@ -147,8 +168,9 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         query.Sort = query.ConvertSortProperties<FogTripTicket, FogTripTicketDto>(Mapper);
 
         var tickets = await _repository.SearchForProfessionalAsync(pageInfo, query, waterSupplierId, cancelationToken);
+        var dtos = tickets.Select(Mapper.Map<FogTripTicketDto>).ToPagedData(pageInfo);
 
-        return tickets.Select(Mapper.Map<FogTripTicketDto>).ToPagedData(pageInfo);
+        return await _mailingInfoRedactionService.RedactAsync(dtos, cancelationToken);
     }
 
     public Task<InsuranceCheckDto> GetInsuranceCheckAsync(int waterSupplierId, CancellationToken cancellationToken)
@@ -179,6 +201,13 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         var disposalSite = request.ReceiverDisposalSiteId.HasValue
             ? await _disposalSiteService.GetAsync(request.ReceiverDisposalSiteId.Value, cancellationToken)
             : null;
+
+        if (await _mailingInfoRedactionService.KeepSiteLocationWhenRedactedAsync(request, site, waterSupplierId, cancellationToken))
+        {
+            // A trip ticket also checks the generator's contact details against the site's.
+            request.FogGeneratorPhoneNumber = site!.FogGeneratorPhoneNumber;
+            request.FogGeneratorEmailAddress = site.FogGeneratorEmailAddress;
+        }
 
         var ticket = new FogTripTicket
         {
@@ -228,20 +257,27 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
             ticket.ReceiverSignatureDate = DateTime.UtcNow;
         }
 
-        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        var added = await _repository.AddAsync(ticket);
+        FogTripTicket added;
 
-        if (generatorSignatureStream != null && ticket.GeneratorSignaturePath != null)
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            await _fileStorageService.UploadAsync(ticket.GeneratorSignaturePath, generatorSignatureStream);
-        }
-        if (receiverSignatureStream != null && ticket.ReceiverSignaturePath != null)
-        {
-            await _fileStorageService.UploadAsync(ticket.ReceiverSignaturePath, receiverSignatureStream);
+            added = await _repository.AddAsync(ticket);
+
+            if (generatorSignatureStream != null && ticket.GeneratorSignaturePath != null)
+            {
+                await _fileStorageService.UploadAsync(ticket.GeneratorSignaturePath, generatorSignatureStream);
+            }
+            if (receiverSignatureStream != null && ticket.ReceiverSignaturePath != null)
+            {
+                await _fileStorageService.UploadAsync(ticket.ReceiverSignaturePath, receiverSignatureStream);
+            }
+
+            scope.Complete();
         }
 
-        scope.Complete();
-        return Mapper.Map<FogTripTicketDto>(added);
+        var dto = Mapper.Map<FogTripTicketDto>(added);
+
+        return await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
     }
 
     private async Task ApplyAmountAsync(FogTripTicket ticket, bool siteIsFeeExempt, CancellationToken cancellationToken)

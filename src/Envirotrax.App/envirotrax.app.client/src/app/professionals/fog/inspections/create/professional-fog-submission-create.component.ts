@@ -20,6 +20,7 @@ import { FogInspectionOptionsService } from "../../../../shared/services/fog/fog
 import { InterceptorType } from "../../../../shared/enums/interceptor-type.enum";
 import { FogInspectionResult } from "../../../../shared/models/fog/fog-inspection-enums";
 import { LookupService } from "../../../../shared/services/lookup/lookup.service";
+import { GeneralSettingsService } from "../../../../shared/services/settings/general-settings.service";
 import { PropertyType } from "../../../../shared/enums/property-type.enum";
 import { InputOption, ModalHelperService } from "@envirotrax/common-ui";
 
@@ -41,6 +42,8 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
     private _editingInspection: FogInspection | null = null;
 
     public isLocationEditing = false;
+    public isMailingInfoRedacted = false;
+    public showModificationBlockedMessage = false;
     public stateOptions: InputOption[] = [];
 
     public readonly propertyTypeOptions: InputOption[] = [
@@ -109,7 +112,8 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
         private readonly _fogOptions: FogInspectionOptionsService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _checkoutService: CheckoutService,
-        private readonly _lookupService: LookupService
+        private readonly _lookupService: LookupService,
+        private readonly _generalSettingsService: GeneralSettingsService
     ) {
         this.interceptorTypeOptions = this._fogOptions.interceptorTypeOptions;
         this.capacityTypeOptions = this._fogOptions.capacityTypeOptions;
@@ -147,9 +151,11 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
         // Reference: professionals/csi/inspections/create/csi-submission-create.component.ts
     }
 
-    public onWaterSupplierChange(value: number): void {
+    public async onWaterSupplierChange(value: number): Promise<void> {
         this.selectedWaterSupplierId = value;
         this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === value);
+
+        await this.loadMailingInfoRedaction();
     }
 
     public onCommentsChange(value: string | undefined): void {
@@ -166,6 +172,11 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
     }
 
     public requestLocationModification(): void {
+        if (this.isMailingInfoRedacted) {
+            this.showModificationBlockedMessage = true;
+            return;
+        }
+
         this.isLocationEditing = true;
     }
 
@@ -287,19 +298,23 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
     }
 
     private collectValidationErrors(): void {
-        if (!this.isLocationEditing && this.hasMissingLocationFields()) {
-            this.isLocationEditing = true;
-            this.validationErrors.push('Please complete the property and mailing information.');
-        }
+        // While the mailing information is redacted, the server keeps the site's own location, and the redacted
+        // placeholders ("****") would fail these checks.
+        if (!this.isMailingInfoRedacted) {
+            if (!this.isLocationEditing && this.hasMissingLocationFields()) {
+                this.isLocationEditing = true;
+                this.validationErrors.push('Please complete the property and mailing information.');
+            }
 
-        if (this.model.propertyStreetNumber && !/^\d/.test(this.model.propertyStreetNumber)) {
-            this.isLocationEditing = true;
-            this.validationErrors.push('Property street number must start with a digit.');
-        }
+            if (this.model.propertyStreetNumber && !/^\d/.test(this.model.propertyStreetNumber)) {
+                this.isLocationEditing = true;
+                this.validationErrors.push('Property street number must start with a digit.');
+            }
 
-        if (this.model.mailingStreetNumber && !/^\d/.test(this.model.mailingStreetNumber)) {
-            this.isLocationEditing = true;
-            this.validationErrors.push('Mailing street number must start with a digit. If you are entering a PO Box, enter the "PO Box" and the box number in the street name field.');
+            if (this.model.mailingStreetNumber && !/^\d/.test(this.model.mailingStreetNumber)) {
+                this.isLocationEditing = true;
+                this.validationErrors.push('Mailing street number must start with a digit. If you are entering a PO Box, enter the "PO Box" and the box number in the street name field.');
+            }
         }
 
         if (this.model.inspectionDate && new Date(this.model.inspectionDate) > new Date()) {
@@ -400,6 +415,7 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
             this.buildDropdownOptions();
             await this.setDefaultFogUser();
             this.setDefaultWaterSupplier(site);
+            await this.loadMailingInfoRedaction();
         } finally {
             this.isLoading = false;
         }
@@ -438,6 +454,7 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
 
             this.selectedWaterSupplierId = inspection.waterSupplier?.id;
             this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === inspection.waterSupplier?.id);
+            await this.loadMailingInfoRedaction();
 
             this.selectedFogUserId = inspection.inspector?.id ?? 0;
             this.selectedFogUser = this.fogUsers.find(u => u.id === this.selectedFogUserId);
@@ -537,5 +554,28 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
         }
 
         this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === this.selectedWaterSupplierId);
+    }
+
+    // Like V1, an existing site's location and owner contact information can't be modified while its water
+    // supplier redacts the mailing information.
+    private async loadMailingInfoRedaction(): Promise<void> {
+        const waterSupplierId = this.selectedWaterSupplierId;
+
+        this.isMailingInfoRedacted = false;
+        this.showModificationBlockedMessage = false;
+
+        if (!waterSupplierId || !this.site) {
+            return;
+        }
+
+        const settings = await this._generalSettingsService.getForProfessional(waterSupplierId);
+
+        if (this.selectedWaterSupplierId === waterSupplierId) {
+            this.isMailingInfoRedacted = settings.redactMailingInfo === true;
+        }
+
+        if (this.isMailingInfoRedacted && this.isLocationEditing) {
+            this.cancelLocationModification();
+        }
     }
 }

@@ -1,8 +1,11 @@
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
+using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Models.Csi;
+using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Sites;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.Common.Data.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
@@ -27,9 +30,13 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
             .Include(c => c.WaterSupplier);
     }
 
+    // Inspector is a required navigation to a ProfessionalUser, which the professional context filters to the
+    // logged-in professional's own users, so that filter would turn the inner join into "not found" for anyone
+    // viewing another professional's inspection. Lifting only that named filter keeps the other contexts' filters.
     protected override IQueryable<CsiInspection> GetDetailsQuery()
     {
         return base.GetDetailsQuery()
+            .IgnoreQueryFilters([ProfessionalDbContext.OwnProfessionalFilterFor<ProfessionalUser>()])
             .Include(c => c.Site)
             .Include(c => c.WaterSupplier)
                 .ThenInclude(w => w!.State)
@@ -40,6 +47,13 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
             .Include(c => c.MailingState);
     }
 
+    public override Task<IEnumerable<CsiInspection>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        WaterSupplierAccountNumberSearch.ApplyThroughSite(query, nameof(CsiInspection.Site));
+
+        return base.GetAllAsync(pageInfo, query, cancellationToken);
+    }
+
     public async Task<IEnumerable<CsiInspection>> SearchForProfessionalAsync(
         PageInfo pageInfo,
         Query query,
@@ -47,6 +61,7 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         CancellationToken cancellationToken)
     {
         ProfessionalRecordScope.ApplyToProfessionalSearch(query, _tenantProvider.ProfessionalId, nameof(CsiInspection.ProfessionalId));
+        WaterSupplierAccountNumberSearch.ApplyThroughSite(query, nameof(CsiInspection.Site));
 
         var dbQuery = GetListQuery()
             .Where(c => c.Site != null && !c.Site.OutOfArea)
@@ -67,6 +82,8 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         CsiPaymentStatus? paymentStatus,
         CancellationToken cancellationToken)
     {
+        WaterSupplierAccountNumberSearch.ApplyThroughSite(query, nameof(CsiInspection.Site));
+
         var dbQuery = GetListQuery()
             .Include(c => c.PropertyState)
             .Where(query.Filter);

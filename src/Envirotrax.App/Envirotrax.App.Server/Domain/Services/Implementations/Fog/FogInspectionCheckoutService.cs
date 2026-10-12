@@ -7,6 +7,7 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Payments;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Payments;
+using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Implementations.Payments;
 using Envirotrax.Common;
 using Envirotrax.Common.Domain.Services.Defintions;
@@ -27,8 +28,9 @@ public class FogInspectionCheckoutService
         IFogInspectionRepository inspectionRepository,
         IProfessionalRepository professionalRepository,
         IProfessionalTransactionRepository transactionRepository,
-        IProfessionalPaymentService paymentService)
-        : base(authService, professionalRepository, transactionRepository, paymentService)
+        IProfessionalPaymentService paymentService,
+        IMailingInfoRedactionService mailingInfoRedactionService)
+        : base(authService, professionalRepository, transactionRepository, paymentService, mailingInfoRedactionService)
     {
         _mapper = mapper;
         _inspectionRepository = inspectionRepository;

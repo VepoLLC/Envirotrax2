@@ -15,6 +15,8 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
 using Envirotrax.App.Server.Domain.Services.Implementations.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Licenses;
+using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
@@ -52,6 +54,8 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IProfessionalSupplierService _professionalSupplierService;
     private readonly IProfessionalInsuranceService _insuranceService;
+    private readonly IProfessionalUserLicenseService _licenseService;
+    private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
     private readonly ILogger<BackflowTestService> _logger;
 
     public BackflowTestService(
@@ -71,6 +75,8 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         IGeneralSettingsService generalSettingsService,
         IProfessionalSupplierService professionalSupplierService,
         IProfessionalInsuranceService insuranceService,
+        IProfessionalUserLicenseService licenseService,
+        IMailingInfoRedactionService mailingInfoRedactionService,
         ILogger<BackflowTestService> logger)
         : base(mapper, repository)
     {
@@ -89,6 +95,8 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         _generalSettingsService = generalSettingsService;
         _professionalSupplierService = professionalSupplierService;
         _insuranceService = insuranceService;
+        _licenseService = licenseService;
+        _mailingInfoRedactionService = mailingInfoRedactionService;
         _logger = logger;
     }
 
@@ -410,6 +418,8 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             return null;
         }
 
+        await _mailingInfoRedactionService.KeepSiteLocationWhenRedactedAsync(dto, site, dto.WaterSupplier?.Id, cancellationToken);
+
         dto.AccountNumber = site.AccountNumber;
         dto.ValidationSiteInformationChanged = HasSiteInformationChanged(dto, site);
         dto.NeedsValidation = dto.ValidationSiteInformationChanged;
@@ -472,32 +482,37 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             dto.AirGapImagePath = $"professionals/{professionalId}/backflow-tests/air-gap/{Guid.NewGuid()}{ValidateAndGetExtension(airGapFileName)}";
         }
 
-        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        var saved = await base.AddAsync(dto);
+        BackflowTestDto saved;
 
-        if (assemblyStream != null && dto.AssemblyImagePath != null)
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            await _fileStorageService.UploadAsync(dto.AssemblyImagePath, assemblyStream);
-        }
-        if (serialStream != null && dto.SerialNumberImagePath != null)
-        {
-            await _fileStorageService.UploadAsync(dto.SerialNumberImagePath, serialStream);
-        }
-        if (bypassAssemblyStream != null && dto.BypassAssemblyImagePath != null)
-        {
-            await _fileStorageService.UploadAsync(dto.BypassAssemblyImagePath, bypassAssemblyStream);
-        }
-        if (bypassSerialStream != null && dto.BypassSerialNumberImagePath != null)
-        {
-            await _fileStorageService.UploadAsync(dto.BypassSerialNumberImagePath, bypassSerialStream);
-        }
-        if (airGapStream != null && dto.AirGapImagePath != null)
-        {
-            await _fileStorageService.UploadAsync(dto.AirGapImagePath, airGapStream);
+            saved = await base.AddAsync(dto);
+
+            if (assemblyStream != null && dto.AssemblyImagePath != null)
+            {
+                await _fileStorageService.UploadAsync(dto.AssemblyImagePath, assemblyStream);
+            }
+            if (serialStream != null && dto.SerialNumberImagePath != null)
+            {
+                await _fileStorageService.UploadAsync(dto.SerialNumberImagePath, serialStream);
+            }
+            if (bypassAssemblyStream != null && dto.BypassAssemblyImagePath != null)
+            {
+                await _fileStorageService.UploadAsync(dto.BypassAssemblyImagePath, bypassAssemblyStream);
+            }
+            if (bypassSerialStream != null && dto.BypassSerialNumberImagePath != null)
+            {
+                await _fileStorageService.UploadAsync(dto.BypassSerialNumberImagePath, bypassSerialStream);
+            }
+            if (airGapStream != null && dto.AirGapImagePath != null)
+            {
+                await _fileStorageService.UploadAsync(dto.AirGapImagePath, airGapStream);
+            }
+
+            scope.Complete();
         }
 
-        scope.Complete();
-        return saved;
+        return await _mailingInfoRedactionService.RedactAsync(saved, cancellationToken);
     }
 
     // Checkout "Edit" on an own, still-unpaid test: mirrors SubmitWithImagesAsync's snapshot/renewal/image
@@ -513,9 +528,21 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         Stream? airGapStream, string? airGapFileName,
         CancellationToken cancellationToken = default)
     {
+        var existing = await _testRepository.GetNoIncludesAsync(id, cancellationToken);
+
+        if (existing == null)
+        {
+            return null;
+        }
+
         var professionalId = _authService.ProfessionalId;
         dto.Id = id;
         dto.Professional = new ReferencedProfessionalDto { Id = professionalId };
+
+        // An edit can't move the test to another site or water supplier (the repository keeps both), so the location
+        // is checked, and redaction decided, against the test's own ones rather than the request's.
+        dto.Site = existing.SiteId == null ? null : new ReferencedSiteDto { Id = existing.SiteId };
+        dto.WaterSupplier = new ReferencedWaterSupplierDto { Id = existing.WaterSupplierId };
 
         await PopulateBpatSnapshotAsync(dto);
         DeriveTestDate(dto);
@@ -560,42 +587,48 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
         var model = MapToModel(dto)!;
 
-        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        BackflowTest? saved;
 
-        var saved = await _testRepository.UpdateForProfessionalAsync(
-            model,
-            newAssemblyPath, newSerialPath, newBypassAssemblyPath, newBypassSerialPath, newAirGapPath);
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            saved = await _testRepository.UpdateForProfessionalAsync(
+                model,
+                newAssemblyPath, newSerialPath, newBypassAssemblyPath, newBypassSerialPath, newAirGapPath);
 
-        if (saved == null)
-        {
-            return null;
-        }
+            if (saved == null)
+            {
+                return null;
+            }
 
-        if (newAssemblyPath != null)
-        {
-            await _fileStorageService.UploadAsync(newAssemblyPath, assemblyStream!);
-        }
-        if (newSerialPath != null)
-        {
-            await _fileStorageService.UploadAsync(newSerialPath, serialStream!);
-        }
-        if (newBypassAssemblyPath != null)
-        {
-            await _fileStorageService.UploadAsync(newBypassAssemblyPath, bypassAssemblyStream!);
-        }
-        if (newBypassSerialPath != null)
-        {
-            await _fileStorageService.UploadAsync(newBypassSerialPath, bypassSerialStream!);
-        }
-        if (newAirGapPath != null)
-        {
-            await _fileStorageService.UploadAsync(newAirGapPath, airGapStream!);
-        }
+            if (newAssemblyPath != null)
+            {
+                await _fileStorageService.UploadAsync(newAssemblyPath, assemblyStream!);
+            }
+            if (newSerialPath != null)
+            {
+                await _fileStorageService.UploadAsync(newSerialPath, serialStream!);
+            }
+            if (newBypassAssemblyPath != null)
+            {
+                await _fileStorageService.UploadAsync(newBypassAssemblyPath, bypassAssemblyStream!);
+            }
+            if (newBypassSerialPath != null)
+            {
+                await _fileStorageService.UploadAsync(newBypassSerialPath, bypassSerialStream!);
+            }
+            if (newAirGapPath != null)
+            {
+                await _fileStorageService.UploadAsync(newAirGapPath, airGapStream!);
+            }
 
-        scope.Complete();
+            scope.Complete();
+        }
 
         var result = MapToDto(saved)!;
+
+        await _mailingInfoRedactionService.RedactAsync(result, cancellationToken);
         await PopulateImageUrlsAsync(result);
+
         return result;
     }
 
@@ -617,6 +650,11 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         return _insuranceService.CheckForWaterSupplierAsync(_authService.ProfessionalId, waterSupplierId, ProfessionalType.Bpat, cancellationToken);
     }
 
+    public Task<BpatLicenseCheckDto> GetLicenseCheckAsync(int waterSupplierId, int bpatUserId, CancellationToken cancellationToken = default)
+    {
+        return _licenseService.CheckBpatForWaterSupplierAsync(_authService.ProfessionalId, bpatUserId, waterSupplierId, cancellationToken);
+    }
+
     private async Task EnsureInsuranceAllowsSubmitAsync(BackflowTestDto dto, CancellationToken cancellationToken)
     {
         if (dto.WaterSupplier?.Id is not int waterSupplierId)
@@ -634,6 +672,25 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         if (dto != null)
         {
             await PopulateImageUrlsAsync(dto);
+        }
+
+        return dto;
+    }
+
+    public async Task<IPagedData<BackflowTestDto>> GetAllForProfessionalAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var tests = await GetAllAsync(pageInfo, query, cancellationToken);
+
+        return await _mailingInfoRedactionService.RedactAsync(tests, cancellationToken);
+    }
+
+    public async Task<BackflowTestDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken)
+    {
+        var dto = await GetAsync(id, cancellationToken);
+
+        if (dto != null)
+        {
+            await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
         }
 
         return dto;
@@ -711,8 +768,14 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         }
 
         var deleted = await _testRepository.DeleteAsync(id);
+        var dto = MapToDto(deleted);
 
-        return MapToDto(deleted);
+        if (dto != null)
+        {
+            await _mailingInfoRedactionService.RedactAsync(dto, CancellationToken.None);
+        }
+
+        return dto;
     }
 
     public async Task<BackflowTestDto?> UpdateImageAsync(int id, string imageType, Stream fileStream, string fileName, CancellationToken cancellationToken = default)

@@ -55,6 +55,19 @@
                                            name="administrativeOnly" id="administrativeOnly">
                                     <label class="form-check-label" for="administrativeOnly">Administrative Only</label>
                                 </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           [(ngModel)]="settings.includeWsAccountNumbers"
+                                           name="includeWsAccountNumbers" id="includeWsAccountNumbers">
+                                    <label class="form-check-label" for="includeWsAccountNumbers">Include WS Account Number</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           [(ngModel)]="settings.useWsAccountNumbersOnLetters"
+                                           name="useWsAccountNumbersOnLetters" id="useWsAccountNumbersOnLetters">
+                                    <label class="form-check-label" for="useWsAccountNumbersOnLetters">Use WS Account Number on
+                                        Renewal Letters</label>
+                                </div>
                             </div>
                         </div>
 
@@ -203,12 +216,20 @@
                             <label class="form-check-label" for="lockFogInspectorRegistrations">Lock FOG Inspector
                                 Registrations</label>
                         </div>
-                        <div class="form-check">
+                        <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox"
                                    [(ngModel)]="settings.lockFogTransporterRegistrations"
                                    name="lockFogTransporterRegistrations" id="lockFogTransporterRegistrations">
                             <label class="form-check-label" for="lockFogTransporterRegistrations">Lock FOG Transporter
                                 Registrations</label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   [(ngModel)]="settings.redactMailingInfo"
+                                   name="redactMailingInfo" id="redactMailingInfo">
+                            <label class="form-check-label" for="redactMailingInfo">Redact Property Mailing
+                                Information</label>
                         </div>
                     </vp-section>
                 </div>

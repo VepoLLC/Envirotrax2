@@ -45,7 +45,7 @@ public class ProfessionalFogInspectionController : ProfessionalProtectedControll
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
     {
-        var result = await _fogInspectionService.GetAsync(id, cancellationToken);
+        var result = await _fogInspectionService.GetForProfessionalAsync(id, cancellationToken);
         if (result == null)
         {
             return NotFound();
@@ -57,7 +57,7 @@ public class ProfessionalFogInspectionController : ProfessionalProtectedControll
     [HttpGet("{id}/pdf")]
     public async Task<IActionResult> GetPdfAsync(int id, CancellationToken cancellationToken)
     {
-        var inspection = await _fogInspectionService.GetAsync(id, cancellationToken);
+        var inspection = await _fogInspectionService.GetForProfessionalAsync(id, cancellationToken);
         if (inspection == null)
         {
             return NotFound();

@@ -125,6 +125,11 @@
                             (click)="cancelLocationModification()">Cancel</button>
                 </vp-section-actions>
 
+                <p *ngIf="showModificationBlockedMessage" class="text-danger">
+                    When mailing information is redacted, you cannot request modifications. Please contact the water
+                    supplier for support.
+                </p>
+
                 <div class="row">
                     <div class="col-md-6">
                         <dl class="row mb-0" *ngIf="site && !isLocationEditing">

@@ -11,6 +11,10 @@ public static class LegacyUrlResolver
     // Printed on renewal letters and sent in renewal emails, so these keep working after V1 is retired.
     private const string RenewalOptInLegacyPath = "/renewal_opt_in.aspx";
     private const string RenewalEmailVerifyLegacyPath = "/renewal_email_verify.aspx";
+
+    // V1 production built its verification links on top of the opt-in page's URL, so the emails
+    // already sent point here rather than at renewal_email_verify.aspx.
+    private const string RenewalEmailVerifyMisbuiltLegacyPath = "/renewal_opt_in.aspx/renewal_email_verify.aspx";
     private const string RenewalUnsubscribeLegacyPath = "/renewal_unsubscribe.aspx";
     private const string RenewalOptInAppPath = "/renewal-opt-in";
 
@@ -72,7 +76,7 @@ public static class LegacyUrlResolver
             return $"{url}/{Uri.EscapeDataString(siteId)}";
         }
 
-        if (normalizedPath == RenewalEmailVerifyLegacyPath)
+        if (normalizedPath == RenewalEmailVerifyLegacyPath || normalizedPath == RenewalEmailVerifyMisbuiltLegacyPath)
         {
             return $"{url}/verify-email{queryString}";
         }

@@ -18,6 +18,7 @@ public class RenewalOptInService : IRenewalOptInService
     private const int EmailAddressMaxLength = 320;
     private const int MailingEmailAddressMaxLength = 100;
     private const string MailingEmailAddressSeparator = "; ";
+    private const string BCryptHashPrefix = "$2";
 
     private readonly IRenewalOptInRepository _renewalOptInRepository;
     private readonly IKeyHashingService _keyHashingService;
@@ -117,7 +118,7 @@ public class RenewalOptInService : IRenewalOptInService
     {
         var verification = await _renewalOptInRepository.GetTrackedVerificationAsync(request.Id, cancellationToken);
 
-        if (verification == null || !_keyHashingService.VerifyHashedText(request.Token, verification.TokenHash))
+        if (verification == null || !IsVerificationTokenValid(request.Token, verification.TokenHash))
         {
             throw new AppValidationException("This verification link is invalid.");
         }
@@ -232,6 +233,17 @@ public class RenewalOptInService : IRenewalOptInService
                 EmailAddress = verification.EmailAddress
             }
         });
+    }
+
+    // Verifications migrated from V1 keep the BCrypt hash V1 wrote; V2 hashes its own tokens with SHA-256.
+    private bool IsVerificationTokenValid(string token, string tokenHash)
+    {
+        if (tokenHash.StartsWith(BCryptHashPrefix))
+        {
+            return BCrypt.Net.BCrypt.Verify(token, tokenHash);
+        }
+
+        return _keyHashingService.VerifyHashedText(token, tokenHash);
     }
 
     private static string? GetZipCodePrefix(string? zipCode)

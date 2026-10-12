@@ -29,6 +29,30 @@ BEGIN TRY
         AND (GisAreas.Id IS NULL OR GisAreas.WaterSupplierId <> WaterSuppliers.Id)
         AND alreadySkipped.SiteId IS NULL
 
+    -- The insert below skips sites an earlier run already migrated, but V1 keeps changing their
+    -- renewal opt-in: every letter run prints a new opt-in code, and owners keep opting in and out.
+    -- Whichever side changed last wins, so a re-run never overwrites a choice made in V2.
+    UPDATE Sites
+    SET OptInCodeHash = legacySites.OptInCodeHash,
+        OptInCodeExpirationDate = legacySites.OptInCodeExpirationDate
+    FROM Sites
+    INNER JOIN Vepo.dbo.CsiBackflowSites AS legacySites
+        ON legacySites.ID = Sites.LegacyRecordId
+    WHERE legacySites.OptInCodeExpirationDate > ISNULL(Sites.OptInCodeExpirationDate, '0001-01-01')
+        -- A code used in V2 is cleared there and the opt-in date moves on; bringing the V1 copy
+        -- back would make a used code work again.
+        AND ISNULL(Sites.RenewalOptInOutDate, '0001-01-01') <= ISNULL(legacySites.RenewalOptInOutDate, '0001-01-01')
+
+    UPDATE Sites
+    SET RenewalOptInType = legacySites.OptInType,
+        RenewalOptInOutDate = legacySites.RenewalOptInOutDate,
+        RenewalOptInOrigin = legacySites.OptInOutOrigin,
+        RenewalOptInIpAddress = legacySites.IpAddress
+    FROM Sites
+    INNER JOIN Vepo.dbo.CsiBackflowSites AS legacySites
+        ON legacySites.ID = Sites.LegacyRecordId
+    WHERE legacySites.RenewalOptInOutDate > ISNULL(Sites.RenewalOptInOutDate, '0001-01-01')
+
     SET IDENTITY_INSERT Sites ON;
 
     INSERT INTO Sites

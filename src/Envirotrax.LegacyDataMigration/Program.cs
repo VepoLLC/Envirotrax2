@@ -64,6 +64,7 @@ services.AddTransient<ProfessionalInsuranceService>();
 services.AddTransient<GisAreaService>();
 services.AddTransient<SiteService>();
 services.AddTransient<SiteLogService>();
+services.AddTransient<RenewalEmailVerificationService>();
 services.AddTransient<BackflowGaugeService>();
 services.AddTransient<NotificationSettingService>();
 
@@ -98,6 +99,11 @@ await gisAreaService.MigrateAsync();
 
 var siteService = provider.GetRequiredService<SiteService>();
 await siteService.MigrateAsync();
+
+// After the sites: a pending verification belongs to a site, and its address is added to that site
+// once it is confirmed.
+var renewalEmailVerificationService = provider.GetRequiredService<RenewalEmailVerificationService>();
+await renewalEmailVerificationService.MigrateAsync();
 
 var siteLogService = provider.GetRequiredService<SiteLogService>();
 await siteLogService.MigrateAsync();

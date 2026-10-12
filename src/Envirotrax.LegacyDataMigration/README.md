@@ -6,7 +6,7 @@ Moves data from the old (V1) system into the new Envirotrax2 (V2) database.
 
 ## How it works
 
-The app migrates one entity at a time — users, water suppliers, supplier users, professionals, GIS areas, sites, site logs, backflow gauges, then notification settings — in that order, because later entities depend on earlier ones. Each entity's migration has two steps:
+The app migrates one entity at a time — users, water suppliers, supplier users, professionals, GIS areas, sites, renewal email verifications, site logs, backflow gauges, then notification settings — in that order, because later entities depend on earlier ones. Each entity's migration has two steps:
 
 1. **Run SQL scripts.** Files under `Scripts/<Entity>/`, named with a numeric prefix (`01_`, `02_`, ...), run in that order. They copy rows from the legacy database into the V2 tables.
 2. **Run C# cleanup code.** After the raw data is in place, C# fixes up anything SQL can't do well — legacy passwords come in as plain text and get hashed with ASP.NET Identity's password hasher, and site log file attachments get downloaded from the legacy file server and uploaded to Azure Storage.
@@ -49,6 +49,24 @@ Two queries tell you where things stand:
 
 - **Still pending:** `SELECT COUNT(*) FROM SiteLogs WHERE LegacyFilePath IS NOT NULL AND FileAttachmentPath IS NULL`
 - **Permanently unmigratable:** `SELECT * FROM MigrationSkippedSiteLogs WHERE SourceTable = 'CsiBackflowSiteLog.FileAttachment'` — V1 rows whose file type is missing or unusable, so there is no legacy file name to fetch. Everything else is logged to `Logs/SiteLogService.log` with per-run counts.
+
+## How renewal opt-in is migrated
+
+Site owners switch their renewal letters to email with the one-time code printed on a letter, then
+confirm each address through a link sent to it. Both have to survive the move to V2.
+
+- **Opt-in codes and choices** travel with the site in `Scripts/Sites/02_Sites.sql`. V1 prints a new
+  code on every letter run, so a re-run refreshes the code and the opt-in choice of sites migrated by an
+  earlier run, whichever side changed last. A code already used in V2 is never brought back.
+- **Pending email verifications** are copied by `Scripts/RenewalEmailVerifications`. Only rows that are
+  neither verified nor unsubscribed move; expired ones move too, so their link reports "expired" rather
+  than "invalid". Each row keeps its V1 id, because the link in the email carries it, and its V1 BCrypt
+  token hash, which V2 still accepts.
+
+Verifications that could not be migrated are queryable:
+
+`SELECT * FROM MigrationSkippedRenewalEmailVerifications` — either the site never migrated, or its V1 id
+was already taken by a verification created in V2.
 
 ## How notification settings are migrated
 

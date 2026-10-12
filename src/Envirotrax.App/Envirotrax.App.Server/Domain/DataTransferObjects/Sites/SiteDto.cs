@@ -159,6 +159,11 @@ public class SiteDto : IDto, IMailingInfoDto, IRedactableMailingInfoDto
     public DateTime? CsiAccountAssignmentDate { get; set; }
     public DateTime? BackflowAccountAssignmentDate { get; set; }
     public DateTime? FogAccountAssignmentDate { get; set; }
+
+    public RenewalOptInType RenewalOptInType { get; set; }
+    public DateTime? RenewalOptInOutDate { get; set; }
+    public RenewalOptInOrigin? RenewalOptInOrigin { get; set; }
+
     public DateTime CreatedTime { get; set; }
     public DateTime? UpdatedTime { get; set; }
     public AppUserDto? UpdatedBy { get; set; }

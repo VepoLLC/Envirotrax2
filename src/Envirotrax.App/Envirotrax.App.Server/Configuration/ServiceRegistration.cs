@@ -37,6 +37,7 @@ public static class ServiceRegistration
             });
 
         return services
+            .AddRateLimitPolicies()
             .AddDataServices(configuration, environment)
             .AddDomainServices(configuration, environment);
     }

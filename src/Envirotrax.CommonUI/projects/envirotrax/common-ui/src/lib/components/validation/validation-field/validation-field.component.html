@@ -15,4 +15,7 @@
     <div *ngIf="form?.controls![fieldName]?.errors!['max']">
         The {{fieldLabel}} field must be {{form?.controls![fieldName]?.errors!['max'].max}} or less.
     </div>
+    <div *ngIf="form?.controls![fieldName]?.errors!['maxlength']">
+        The {{fieldLabel}} field must be {{form?.controls![fieldName]?.errors!['maxlength'].requiredLength}} characters or fewer.
+    </div>
 </div>

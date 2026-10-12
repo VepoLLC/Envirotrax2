@@ -15,7 +15,7 @@
 
         <div [class.vp-input-control-col]="labelStyle == 'horizontal'"
              [class.input-group]="isInputGroup">
-            <input *ngIf="type != 'textarea' && type != 'select' && type != 'multi-select' && type != 'date' && type != 'datetime' && type != 'daterange'"
+            <input *ngIf="type != 'textarea' && type != 'select' && type != 'multi-select' && type != 'multi-email' && type != 'date' && type != 'datetime' && type != 'daterange'"
                    [attr.id]="id"
                    [attr.name]="name"
                    [attr.type]="decimals != null ? 'text' : type"
@@ -98,6 +98,23 @@
                        [clearable]="false"
                        [searchable]="false"
                        appendTo="body">
+            </ng-select>
+
+            <ng-select *ngIf="type == 'multi-email'"
+                       [attr.id]="id"
+                       [attr.name]="name"
+                       class="form-control vp-multi-email"
+                       [required]="required"
+                       [disabled]="disabled || readonly"
+                       [(ngModel)]="emailAddresses"
+                       [multiple]="true"
+                       [addTag]="addEmailAddressTag"
+                       [isOpen]="false"
+                       [selectOnTab]="true"
+                       [clearable]="false"
+                       [placeholder]="placeholder"
+                       (change)="onEmailAddressesChanged()"
+                       (blur)="onEmailAddressesBlur($event)">
             </ng-select>
 
             <ng-content select="vp-input-add-on">

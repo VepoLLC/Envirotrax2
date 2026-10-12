@@ -224,6 +224,20 @@ public class Site : IAuditableModel<AppUser>
 
     public DateTime? FogAccountAssignmentDate { get; set; }
 
+    public RenewalOptInType RenewalOptInType { get; set; }
+
+    public DateTime? RenewalOptInOutDate { get; set; }
+
+    public RenewalOptInOrigin? RenewalOptInOrigin { get; set; }
+
+    [StringLength(45)]
+    public string? RenewalOptInIpAddress { get; set; }
+
+    // BCrypt hash of the one-time code printed on renewal letters by the V1 Letter Generator.
+    public string? OptInCodeHash { get; set; }
+
+    public DateTime? OptInCodeExpirationDate { get; set; }
+
     public bool Active { get; set; }
 
     // Audit properties

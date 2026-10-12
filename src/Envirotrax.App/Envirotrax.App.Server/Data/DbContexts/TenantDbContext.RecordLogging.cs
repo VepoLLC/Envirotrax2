@@ -1,4 +1,5 @@
 using Envirotrax.App.Server.Data.Models.Logs;
+using Envirotrax.App.Server.Data.Models.Sites;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.DbContexts;
@@ -100,6 +101,7 @@ public partial class TenantDbContext
     protected override bool IsChangeDescriptionSkipped(string propertyName)
     {
         return base.IsChangeDescriptionSkipped(propertyName)
-            || propertyName == SubmissionIdPropertyName;
+            || propertyName == SubmissionIdPropertyName
+            || propertyName == nameof(Site.OptInCodeHash);
     }
 }

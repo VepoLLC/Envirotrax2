@@ -3106,6 +3106,48 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.ToTable("ProfessionalWaterSuppliers");
                 });
 
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Sites.RenewalEmailVerification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EmailAddress")
+                        .IsRequired()
+                        .HasMaxLength(320)
+                        .HasColumnType("nvarchar(320)");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SiteId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UnsubscribeTokenHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UnsubscribedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("VerifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SiteId");
+
+                    b.ToTable("RenewalEmailVerifications");
+                });
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Sites.Site", b =>
                 {
                     b.Property<int>("Id")
@@ -3345,6 +3387,12 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("NeedsValidation")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime?>("OptInCodeExpirationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("OptInCodeHash")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("OutOfArea")
                         .HasColumnType("bit");
 
@@ -3356,6 +3404,19 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("RainFreezeSensorType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RenewalOptInIpAddress")
+                        .HasMaxLength(45)
+                        .HasColumnType("nvarchar(45)");
+
+                    b.Property<int?>("RenewalOptInOrigin")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("RenewalOptInOutDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RenewalOptInType")
                         .HasColumnType("int");
 
                     b.Property<bool>("RequiresDomesticPremisesIsolation")
@@ -5199,6 +5260,17 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("Professional");
 
                     b.Navigation("WaterSupplier");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Sites.RenewalEmailVerification", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Sites.Site", "Site")
+                        .WithMany()
+                        .HasForeignKey("SiteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Site");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Sites.Site", b =>

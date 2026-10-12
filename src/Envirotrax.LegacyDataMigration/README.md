@@ -81,10 +81,14 @@ and the recipient login is resolved the same way, with unplaceable rows recorded
 
 Four things are specific to notifications:
 
-- **`RecordId` is carried over unresolved.** It points at a backflow test or a CSI inspection
-  depending on `ModuleType`, and V2 puts no foreign key on it. Neither of those records is migrated
-  yet, but EN-241 made a migrated row keep its V1 id, so these pointers line up by themselves once
-  those migrations land. Nothing needs to be rewritten afterwards.
+- **`RecordId` is carried over unresolved, and only backflow tests need to catch up.** It is a
+  pointer read through `ModuleType`, and V2 puts no foreign key on it. In V1 it is always a backflow
+  test id: `ValidateBackflowTest` is the only factory that produces a notification and it hardcodes
+  the module type, while the CSI, FOG and transporter checkouts that appear to raise one each iterate
+  a collection whose only `Add` is commented out, so no CSI notification can exist. EN-241 made a
+  migrated row keep its V1 id, so these pointers line up by themselves once the **backflow test**
+  migration lands — provided it inserts with `IDENTITY_INSERT` the way sites and water suppliers do.
+  Nothing needs rewriting afterwards, and no CSI inspection migration is needed for this to resolve.
 - **`MasterWaterSupplierID` is dropped.** V1 shows a notification under either that or
   `WaterSupplierID`; V2 removed the master column (EN-184), so the owning `WaterSupplierID` is the
   one carried over.

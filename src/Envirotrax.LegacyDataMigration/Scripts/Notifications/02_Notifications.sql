@@ -59,12 +59,19 @@ BEGIN TRY
         legacyNotifications.ID,
         waterSuppliers.Id,
         recipients.UserId,
-        -- Both enums carry over value for value: Backflow 0, CSI 1 (WaterSupplierNotification).
+        -- Both enums carry over value for value: Backflow 0, CSI 1 (WaterSupplierNotification), but
+        -- every row V1 can produce is a Backflow one. The only factory that returns a notification is
+        -- WaterSupplierNotificationSetting.ValidateBackflowTest, which hardcodes the module type
+        -- (line 476), and the CSI, FOG and transporter checkouts that look like they raise one each
+        -- iterate a collection whose only Add is commented out. The column is still copied rather than
+        -- forced to 0, so a row from some path not found here keeps its own module type instead of
+        -- being silently relabelled.
         legacyNotifications.ModuleType,
-        -- A polymorphic pointer, read through ModuleType, and V2 puts no foreign key on it. It is
-        -- carried over unchanged because EN-241 made the V2 row id equal the V1 record id, so these
-        -- line up by themselves once the backflow test and CSI inspection migrations land. Until then
-        -- the value is deliberately unresolved rather than remapped: see the README.
+        -- A polymorphic pointer, read through ModuleType, and V2 puts no foreign key on it. Because
+        -- every V1 row is a Backflow one, this is always a SaveBackflowDeviceTests.ID. It is carried
+        -- over unchanged because EN-241 made a migrated row keep its V1 id, so these line up by
+        -- themselves once the backflow test migration lands, and that is the only migration they wait
+        -- on. Until then the value is deliberately unresolved rather than remapped: see the README.
         legacyNotifications.RecordID,
         -- The V1 field is MaxLength="50", the same width as the V2 column, so LEFT only guards against
         -- a longer value having been posted past the browser. ISNULL keeps a NULL from failing the

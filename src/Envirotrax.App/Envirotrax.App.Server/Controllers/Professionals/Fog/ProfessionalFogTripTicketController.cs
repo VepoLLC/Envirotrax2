@@ -44,7 +44,7 @@ public class ProfessionalFogTripTicketController : ProfessionalProtectedControll
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAsync(int id, CancellationToken ct)
     {
-        var result = await _fogService.GetAsync(id, ct);
+        var result = await _fogService.GetForProfessionalAsync(id, ct);
 
         if (result == null)
         {
@@ -64,7 +64,7 @@ public class ProfessionalFogTripTicketController : ProfessionalProtectedControll
     [HttpGet("{id}/pdf")]
     public async Task<IActionResult> GetPdfAsync(int id, CancellationToken cancellationToken)
     {
-        var ticket = await _fogService.GetAsync(id, cancellationToken);
+        var ticket = await _fogService.GetForProfessionalAsync(id, cancellationToken);
 
         if (ticket == null)
         {

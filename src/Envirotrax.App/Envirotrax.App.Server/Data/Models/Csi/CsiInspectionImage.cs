@@ -8,7 +8,7 @@ using Envirotrax.Common.Data.Models;
 namespace Envirotrax.App.Server.Data.Models.Csi;
 
 [Table("CsiInspectionImages")]
-public class CsiInspectionImage : TenantModel<WaterSupplier>, IProfessionalModel
+public class CsiInspectionImage : TenantModel<WaterSupplier>, ISharedProfessionalModel
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }

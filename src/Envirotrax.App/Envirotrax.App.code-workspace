@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "Envirotrax.Common",
+			"path": "../Envirotrax.Common"
+		}
+	],
+	"settings": {}
+}

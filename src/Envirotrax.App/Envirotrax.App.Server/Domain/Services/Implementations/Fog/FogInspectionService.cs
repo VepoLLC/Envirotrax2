@@ -38,6 +38,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
     private readonly IPdfTemplateService _pdfTemplateService;
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IProfessionalSupplierService _professionalSupplierService;
+    private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
 
     public FogInspectionService(
         IMapper mapper,
@@ -49,7 +50,8 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         IAuthService authService,
         IPdfTemplateService pdfTemplateService,
         IGeneralSettingsService generalSettingsService,
-        IProfessionalSupplierService professionalSupplierService)
+        IProfessionalSupplierService professionalSupplierService,
+        IMailingInfoRedactionService mailingInfoRedactionService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -61,6 +63,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         _pdfTemplateService = pdfTemplateService;
         _generalSettingsService = generalSettingsService;
         _professionalSupplierService = professionalSupplierService;
+        _mailingInfoRedactionService = mailingInfoRedactionService;
     }
 
     public Task<byte[]> GeneratePdfAsync(FogInspectionDto inspection)
@@ -85,17 +88,23 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
 
     public override async Task<FogInspectionDto?> DeleteAsync(int id)
     {
-        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        FogInspection? deleted;
 
-        var deleted = await _repository.DeleteAsync(id);
-
-        if (deleted == null || !string.IsNullOrEmpty(deleted.TransactionId))
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            return null;
+            deleted = await _repository.DeleteAsync(id);
+
+            if (deleted == null || !string.IsNullOrEmpty(deleted.TransactionId))
+            {
+                return null;
+            }
+
+            scope.Complete();
         }
 
-        scope.Complete();
-        return MapToDto(deleted);
+        var dto = MapToDto(deleted)!;
+
+        return await _mailingInfoRedactionService.RedactAsync(dto, CancellationToken.None);
     }
 
     public async Task<FogInspectionDto> SubmitAsync(
@@ -164,6 +173,8 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
             FogGeneratorEmailAddress = request.FogGeneratorEmailAddress
         };
 
+        await _mailingInfoRedactionService.KeepSiteLocationWhenRedactedAsync(request, site, waterSupplierId, cancellationToken);
+
         ApplyEnteredLocation(inspection, request);
         ApplySiteValidation(inspection, site);
         ApplyInspectorSnapshot(inspection, professional, inspectorUser, inspectorUserId);
@@ -184,24 +195,31 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
             inspection.SignatureDate = DateTime.UtcNow;
         }
 
-        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        var added = await _repository.AddAsync(inspection);
+        FogInspection added;
 
-        if (exteriorStream != null && inspection.ExteriorImagePath != null)
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            await _fileStorageService.UploadAsync(inspection.ExteriorImagePath, exteriorStream);
-        }
-        if (interiorStream != null && inspection.InteriorImagePath != null)
-        {
-            await _fileStorageService.UploadAsync(inspection.InteriorImagePath, interiorStream);
-        }
-        if (signatureStream != null && inspection.SignatureImagePath != null)
-        {
-            await _fileStorageService.UploadAsync(inspection.SignatureImagePath, signatureStream);
+            added = await _repository.AddAsync(inspection);
+
+            if (exteriorStream != null && inspection.ExteriorImagePath != null)
+            {
+                await _fileStorageService.UploadAsync(inspection.ExteriorImagePath, exteriorStream);
+            }
+            if (interiorStream != null && inspection.InteriorImagePath != null)
+            {
+                await _fileStorageService.UploadAsync(inspection.InteriorImagePath, interiorStream);
+            }
+            if (signatureStream != null && inspection.SignatureImagePath != null)
+            {
+                await _fileStorageService.UploadAsync(inspection.SignatureImagePath, signatureStream);
+            }
+
+            scope.Complete();
         }
 
-        scope.Complete();
-        return Mapper.Map<FogInspectionDto>(added);
+        var dto = Mapper.Map<FogInspectionDto>(added);
+
+        return await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
     }
 
     private async Task ApplyAmountAsync(FogInspection inspection, bool siteIsFeeExempt, CancellationToken cancellationToken)
@@ -232,10 +250,18 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         Stream? signatureStream, string? signatureFileName,
         CancellationToken cancellationToken)
     {
-        var siteId = request.Site!.Id!.Value;
+        var existing = await _repository.GetNoIncludesAsync(id, cancellationToken);
+
+        if (existing == null)
+        {
+            return null;
+        }
+
         var inspectorUserId = request.Inspector!.Id!.Value;
 
-        var site = await _siteService.GetAsync(siteId, cancellationToken);
+        // An edit can't move the inspection to another site or water supplier (the repository keeps both), so the
+        // location is checked, and redaction decided, against the inspection's own ones rather than the request's.
+        var site = await _siteService.GetAsync(existing.SiteId, cancellationToken);
         var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
         var inspectorUser = await _professionalUserService.GetAsync(inspectorUserId, cancellationToken);
 
@@ -289,6 +315,8 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
             FogGeneratorEmailAddress = request.FogGeneratorEmailAddress
         };
 
+        await _mailingInfoRedactionService.KeepSiteLocationWhenRedactedAsync(request, site, existing.WaterSupplierId, cancellationToken);
+
         ApplyEnteredLocation(inspection, request);
         ApplySiteValidation(inspection, site);
         ApplyInspectorSnapshot(inspection, professional, inspectorUser, inspectorUserId);
@@ -310,32 +338,38 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
             newSignaturePath = $"professionals/{professional.Id}/fog-inspections/signature/{Guid.NewGuid()}{ValidateAndGetExtension(signatureFileName)}";
         }
 
-        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        FogInspection? saved;
 
-        var saved = await _repository.UpdateForProfessionalAsync(inspection, newExteriorPath, newInteriorPath, newSignaturePath);
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            saved = await _repository.UpdateForProfessionalAsync(inspection, newExteriorPath, newInteriorPath, newSignaturePath);
 
-        if (saved == null)
-        {
-            return null;
-        }
+            if (saved == null)
+            {
+                return null;
+            }
 
-        if (newExteriorPath != null)
-        {
-            await _fileStorageService.UploadAsync(newExteriorPath, exteriorStream!);
-        }
-        if (newInteriorPath != null)
-        {
-            await _fileStorageService.UploadAsync(newInteriorPath, interiorStream!);
-        }
-        if (newSignaturePath != null)
-        {
-            await _fileStorageService.UploadAsync(newSignaturePath, signatureStream!);
-        }
+            if (newExteriorPath != null)
+            {
+                await _fileStorageService.UploadAsync(newExteriorPath, exteriorStream!);
+            }
+            if (newInteriorPath != null)
+            {
+                await _fileStorageService.UploadAsync(newInteriorPath, interiorStream!);
+            }
+            if (newSignaturePath != null)
+            {
+                await _fileStorageService.UploadAsync(newSignaturePath, signatureStream!);
+            }
 
-        scope.Complete();
+            scope.Complete();
+        }
 
         var dto = Mapper.Map<FogInspectionDto>(saved);
+
+        await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
         await PopulateImageUrlsAsync(dto);
+
         return dto;
     }
 
@@ -351,6 +385,18 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         return dto;
     }
 
+    public async Task<FogInspectionDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken)
+    {
+        var dto = await GetAsync(id, cancellationToken);
+
+        if (dto != null)
+        {
+            await _mailingInfoRedactionService.RedactAsync(dto, cancellationToken);
+        }
+
+        return dto;
+    }
+
     public async Task<IPagedData<FogInspectionDto>> SearchForProfessionalAsync(
         PageInfo pageInfo, Query query, bool latestOnly, CancellationToken cancellationToken)
     {
@@ -358,8 +404,9 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         query.Sort = query.ConvertSortProperties<FogInspection, FogInspectionDto>(Mapper);
 
         var inspections = await _repository.SearchForProfessionalAsync(pageInfo, query, latestOnly, cancellationToken);
+        var dtos = inspections.Select(m => Mapper.Map<FogInspectionDto>(m)!).ToPagedData(pageInfo);
 
-        return inspections.Select(m => Mapper.Map<FogInspectionDto>(m)!).ToPagedData(pageInfo);
+        return await _mailingInfoRedactionService.RedactAsync(dtos, cancellationToken);
     }
 
     private async Task PopulateImageUrlsAsync(FogInspectionDto dto)

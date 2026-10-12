@@ -360,6 +360,15 @@
                                               [form]="form">
                                     </vp-input>
 
+                                    <vp-input *ngIf="includeWsAccountNumbers"
+                                              [(ngModel)]="site.waterSupplierAccountNumber"
+                                              name="waterSupplierAccountNumber"
+                                              label="WS Account Number:"
+                                              labelStyle="horizontal"
+                                              [maxLength]="20"
+                                              [form]="form">
+                                    </vp-input>
+
                                     <vp-input name="propertyType"
                                               label="Property Type:"
                                               labelStyle="horizontal"

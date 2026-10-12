@@ -16,11 +16,16 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
 {
     private readonly ICsiInspectionService _inspectionService;
     private readonly ICsiCheckoutService _checkoutService;
+    private readonly ICsiInspectionAssemblyService _assemblyService;
 
-    public CsiInspectionProfessionalController(ICsiInspectionService inspectionService, ICsiCheckoutService checkoutService)
+    public CsiInspectionProfessionalController(
+        ICsiInspectionService inspectionService,
+        ICsiCheckoutService checkoutService,
+        ICsiInspectionAssemblyService assemblyService)
     {
         _inspectionService = inspectionService;
         _checkoutService = checkoutService;
+        _assemblyService = assemblyService;
     }
 
     [HttpGet("insurance-check")]
@@ -33,7 +38,7 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
     {
-        var result = await _inspectionService.GetAsync(id, cancellationToken);
+        var result = await _inspectionService.GetForProfessionalAsync(id, cancellationToken);
         if (result == null)
         {
             return NotFound();
@@ -45,7 +50,7 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
     [HttpGet("{id}/pdf")]
     public async Task<IActionResult> GetPdfAsync(int id, CancellationToken cancellationToken)
     {
-        var inspection = await _inspectionService.GetAsync(id, cancellationToken);
+        var inspection = await _inspectionService.GetForProfessionalAsync(id, cancellationToken);
         if (inspection == null)
         {
             return NotFound();
@@ -53,6 +58,15 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
 
         var pdf = await _inspectionService.GeneratePdfForProfessionalAsync(inspection);
         return File(pdf, "application/pdf");
+    }
+
+    // The inspection's saved "Assemblies at This Location" rows, for the read-only view. The form uses
+    // CsiInspectionAssemblyProfessionalController instead, which also lists the site's unlisted tests.
+    [HttpGet("{id}/assemblies")]
+    public async Task<IActionResult> GetAssembliesAsync(int id, CancellationToken cancellationToken)
+    {
+        var assemblies = await _assemblyService.GetByInspectionAsync(id, cancellationToken);
+        return Ok(assemblies);
     }
 
     [HttpGet]

@@ -11,6 +11,8 @@ public interface IProfessionalUserLicenseRepository : IRepository<ProfessionalUs
     Task<IEnumerable<ProfessionalUserLicense>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUserLicense, bool>>? filter = null);
     Task<IEnumerable<ProfessionalUserLicense>> GetAllByProfessionalIdsAsync(IEnumerable<int> professionalIds, ProfessionalType professionalType, CancellationToken cancellationToken);
     Task<IEnumerable<ProfessionalUserLicense>> GetBpatLicensesForProfessionalAsync(int professionalId, CancellationToken cancellationToken);
+    Task<IEnumerable<ProfessionalUserLicense>> GetUserLicensesForWaterSupplierAsync(int professionalId, int userId, int waterSupplierId, ProfessionalType professionalType, CancellationToken cancellationToken);
+    Task<IEnumerable<ProfessionalLicenseType>> GetLicenseTypesForWaterSupplierAsync(int waterSupplierId, ProfessionalType professionalType, CancellationToken cancellationToken);
     Task<IEnumerable<ProfessionalUserLicense>> GetAllByWaterSupplierAsync(PageInfo pageInfo, Query query, string? licenseFilter, CancellationToken cancellationToken);
     Task<int> GetCountByWaterSupplierAsync(string? licenseFilter, CancellationToken cancellationToken);
     Task<IEnumerable<ProfessionalUserLicense>> GetUnverifiedRegistrationsByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);

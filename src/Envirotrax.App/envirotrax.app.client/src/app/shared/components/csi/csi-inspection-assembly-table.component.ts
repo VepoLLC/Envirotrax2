@@ -22,6 +22,8 @@ interface AssemblyRowVm {
 export class CsiInspectionAssemblyTableComponent implements OnChanges {
     @Input() public assemblies: CsiInspectionAssembly[] = [];
     @Input() public editable = false;
+    @Input() public viewTestBasePath = '/backflow/tests';
+    @Input() public viewTestInNewTab = false;
 
     @Output() public delete = new EventEmitter<CsiInspectionAssembly>();
 

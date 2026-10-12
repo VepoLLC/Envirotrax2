@@ -13,6 +13,7 @@ namespace Envirotrax.App.Server.Data.Models.Sites;
 
 [Table("Sites")]
 [RecordLogged(RecordLogTableNames.Sites, ProfessionalSource = RecordLogIdSource.None)]
+[AppIndex(nameof(WaterSupplierId), nameof(WaterSupplierAccountNumber), IsUnique = true)]
 public class Site : IAuditableModel<AppUser>
 {
     [AppPrimaryKey(true)]
@@ -31,6 +32,12 @@ public class Site : IAuditableModel<AppUser>
     [Required]
     [StringLength(20)]
     public string AccountNumber { get; set; } = null!;
+
+    // The water supplier's own account number for the site, shown and searched alongside AccountNumber when
+    // GeneralSettings.IncludeWsAccountNumbers is on. Unique per water supplier, archived sites included, as in
+    // V1; blank is stored as NULL.
+    [MaxLength(20)]
+    public string? WaterSupplierAccountNumber { get; set; }
 
     [StringLength(100)]
     public string? BusinessName { get; set; }

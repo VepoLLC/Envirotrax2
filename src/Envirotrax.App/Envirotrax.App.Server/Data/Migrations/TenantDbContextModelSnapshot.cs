@@ -3400,6 +3400,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("ValidationOnHold")
                         .HasColumnType("bit");
 
+                    b.Property<string>("WaterSupplierAccountNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<int>("WaterSupplierId")
                         .HasColumnType("int");
 
@@ -3428,6 +3432,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("WaterSupplierId", "FogAccountAssignmentId");
 
                     b.HasIndex("WaterSupplierId", "UserAccountAssignmentId");
+
+                    b.HasIndex("WaterSupplierId", "WaterSupplierAccountNumber")
+                        .IsUnique()
+                        .HasFilter("[WaterSupplierAccountNumber] IS NOT NULL");
 
                     b.ToTable("Sites");
                 });
@@ -4133,6 +4141,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("FogVehiclesRequirePermit")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IncludeWsAccountNumbers")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("LockBpatRegistrations")
                         .HasColumnType("bit");
 
@@ -4151,10 +4162,16 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("PrivacyRequired")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("RedactMailingInfo")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("RequireBackflowTestImages")
                         .HasColumnType("bit");
 
                     b.Property<bool>("RequireCsiInspectionImages")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("UseWsAccountNumbersOnLetters")
                         .HasColumnType("bit");
 
                     b.Property<bool>("WiseGuys")

@@ -53,11 +53,14 @@
                 </td>
                 <td>
                     <ng-container *ngIf="row.hasBypass; else singleAssembly">
-                        <div><span class="fw-semibold">Main Assembly:</span> {{ row.assembly.assemblyDescription }}</div>
-                        <div><span class="fw-semibold">Bypass Assembly:</span> {{ row.assembly.assemblyDescription2 }}</div>
+                        <div><span class="fw-semibold">Main Assembly:</span> {{ row.assembly.assemblyDescription }}
+                        </div>
+                        <div><span class="fw-semibold">Bypass Assembly:</span> {{ row.assembly.assemblyDescription2 }}
+                        </div>
                     </ng-container>
                     <ng-template #singleAssembly>
-                        <div><span class="fw-semibold">Assembly Desc:</span> {{ row.assembly.assemblyDescription }}</div>
+                        <div><span class="fw-semibold">Assembly Desc:</span> {{ row.assembly.assemblyDescription }}
+                        </div>
                     </ng-template>
                     <div><span class="fw-semibold">Hazard Type:</span> {{ row.hazardDescription }}</div>
                     <div><span class="fw-semibold">Location Desc:</span> {{ row.assembly.locationDescription }}</div>
@@ -75,7 +78,8 @@
                         Delete
                     </button>
                     <a *ngIf="!editable && row.isPaid && row.assembly.testId" class="btn btn-primary btn-sm"
-                       [routerLink]="['/backflow/tests', row.assembly.testId, 'view']">
+                       [routerLink]="[viewTestBasePath, row.assembly.testId, 'view']"
+                       [attr.target]="viewTestInNewTab ? '_blank' : null">
                         View
                     </a>
                 </td>

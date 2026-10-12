@@ -10,6 +10,8 @@ export class GeneralSettings {
     backflowTesting?: boolean;
     csiInspections?: boolean;
     fogProgram?: boolean;
+    includeWsAccountNumbers?: boolean;
+    useWsAccountNumbersOnLetters?: boolean;
 
     // Insurance and License Requirements
     bpatsRequireInsurance?: boolean;
@@ -24,6 +26,8 @@ export class GeneralSettings {
     lockCsiRegistrations?: boolean;
     lockFogInspectorRegistrations?: boolean;
     lockFogTransporterRegistrations?: boolean;
+
+    redactMailingInfo?: boolean;
 
     // Insurance Amount Fields
     bpatsRequireInsuranceAmount?: number;

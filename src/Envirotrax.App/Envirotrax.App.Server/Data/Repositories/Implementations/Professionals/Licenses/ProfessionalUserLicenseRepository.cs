@@ -80,6 +80,42 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<ProfessionalUserLicense>> GetUserLicensesForWaterSupplierAsync(int professionalId, int userId, int waterSupplierId, ProfessionalType professionalType, CancellationToken cancellationToken)
+    {
+        var supplierStateIds = GetSupplierStateIdsQuery(waterSupplierId);
+
+        return await DbContext.ProfessionalUserLicenses
+            .AsNoTracking()
+            .Include(l => l.LicenseType)
+            .Where(l => l.ProfessionalId == professionalId
+                && l.UserId == userId
+                && l.ProfessionalType == professionalType
+                && l.LicenseType!.ProfessionalType == professionalType
+                && l.LicenseType.StateId != null
+                && supplierStateIds.Contains(l.LicenseType.StateId))
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<ProfessionalLicenseType>> GetLicenseTypesForWaterSupplierAsync(int waterSupplierId, ProfessionalType professionalType, CancellationToken cancellationToken)
+    {
+        var supplierStateIds = GetSupplierStateIdsQuery(waterSupplierId);
+
+        return await DbContext.ProfessionalLicenseTypes
+            .AsNoTracking()
+            .Where(licenseType => licenseType.ProfessionalType == professionalType
+                && licenseType.StateId != null
+                && supplierStateIds.Contains(licenseType.StateId))
+            .OrderBy(licenseType => licenseType.Id)
+            .ToListAsync(cancellationToken);
+    }
+
+    private IQueryable<int?> GetSupplierStateIdsQuery(int waterSupplierId)
+    {
+        return DbContext.WaterSuppliers
+            .Where(supplier => supplier.Id == waterSupplierId)
+            .Select(supplier => supplier.StateId);
+    }
+
     public async Task<IEnumerable<ProfessionalUserLicense>> GetAllByWaterSupplierAsync(PageInfo pageInfo, Query query, string? licenseFilter, CancellationToken cancellationToken)
     {
         var baseQuery = ScopedToLicenses()

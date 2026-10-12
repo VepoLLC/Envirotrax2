@@ -50,6 +50,8 @@ public class SiteLogRepository : Repository<SiteLog>, ISiteLogRepository
             query.Sort[nameof(SiteLog.Id)] = SortOperator.Desc;
         }
 
+        WaterSupplierAccountNumberSearch.ApplyThroughSite(query, nameof(SiteLog.Site));
+
         var paginated = await ApplyLogTypeFilter(GetListQuery(), logTypeFilter)
             .Where(query.Filter)
             .OrderBy(query.Sort)

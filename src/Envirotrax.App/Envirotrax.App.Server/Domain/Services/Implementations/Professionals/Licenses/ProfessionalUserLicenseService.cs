@@ -17,6 +17,16 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Professionals.Li
 
 public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, ProfessionalUserLicenseDto>, IProfessionalUserLicenseService
 {
+    private const string FireLicenseLabel = "Fire License";
+    private const string DefaultLicenseLabel = "BPAT License";
+
+    private static readonly LicenseCheckResult[] LicenseResultPriority =
+    [
+        LicenseCheckResult.Valid,
+        LicenseCheckResult.Unverified,
+        LicenseCheckResult.Expired
+    ];
+
     private readonly IProfessionalUserLicenseRepository _licenseRepository;
     private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly IAuthService _authService;
@@ -161,6 +171,86 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
     public Task<int> GetUnverifiedRegistrationCountByWaterSupplierAsync(CancellationToken cancellationToken)
     {
         return _licenseRepository.GetUnverifiedRegistrationCountByWaterSupplierAsync(cancellationToken);
+    }
+
+    public async Task<BpatLicenseCheckDto> CheckBpatForWaterSupplierAsync(int professionalId, int userId, int waterSupplierId, CancellationToken cancellationToken)
+    {
+        var licenseTypes = await _licenseRepository.GetLicenseTypesForWaterSupplierAsync(waterSupplierId, ProfessionalType.Bpat, cancellationToken);
+        var licenses = await _licenseRepository.GetUserLicensesForWaterSupplierAsync(professionalId, userId, waterSupplierId, ProfessionalType.Bpat, cancellationToken);
+
+        var licenseTypesByFire = licenseTypes.ToLookup(licenseType => licenseType.IsFireLicense);
+        var licensesByFire = licenses.ToLookup(license => license.LicenseType!.IsFireLicense);
+
+        var mainLicenseLabel = licenseTypesByFire[false].FirstOrDefault()?.Description ?? DefaultLicenseLabel;
+
+        return new BpatLicenseCheckDto
+        {
+            License = CheckLicense(licenseTypesByFire[false].Any(), licensesByFire[false], mainLicenseLabel),
+            FireLicense = CheckLicense(licenseTypesByFire[true].Any(), licensesByFire[true], FireLicenseLabel)
+        };
+    }
+
+    private LicenseCheckDto CheckLicense(bool isRequired, IEnumerable<ProfessionalUserLicense> licenses, string label)
+    {
+        if (!isRequired)
+        {
+            return CreateLicenseCheck(LicenseCheckResult.NotRequired, label, null);
+        }
+
+        var now = _timeZoneHelper.GetUserLocalTime();
+
+        var candidates = licenses
+            .Select(license => (License: license, Result: GetLicenseResult(license, now)))
+            .ToList();
+
+        foreach (var result in LicenseResultPriority)
+        {
+            var match = candidates.FirstOrDefault(candidate => candidate.Result == result);
+
+            if (match.License != null)
+            {
+                return CreateLicenseCheck(result, label, match.License);
+            }
+        }
+
+        return CreateLicenseCheck(LicenseCheckResult.NotFound, label, null);
+    }
+
+    private static LicenseCheckResult GetLicenseResult(ProfessionalUserLicense license, DateTime now)
+    {
+        if (license.ExpirationDate == null)
+        {
+            return LicenseCheckResult.Unverified;
+        }
+
+        return now > license.ExpirationDate
+            ? LicenseCheckResult.Expired
+            : LicenseCheckResult.Valid;
+    }
+
+    private static LicenseCheckDto CreateLicenseCheck(LicenseCheckResult result, string label, ProfessionalUserLicense? license)
+    {
+        return new LicenseCheckDto
+        {
+            Result = result,
+            Label = label,
+            Message = GetLicenseCheckMessage(result),
+            LicenseNumber = license?.LicenseNumber,
+            LicenseTypeName = license?.LicenseType?.Name,
+            ExpirationDate = license?.ExpirationDate
+        };
+    }
+
+    private static string GetLicenseCheckMessage(LicenseCheckResult result)
+    {
+        return result switch
+        {
+            LicenseCheckResult.NotRequired => "Not Required",
+            LicenseCheckResult.Unverified => "License awaiting validation...",
+            LicenseCheckResult.Expired => "License expired",
+            LicenseCheckResult.Valid => "License valid",
+            _ => "No license found"
+        };
     }
 
     private static WaterSupplierLicenseDto MapToWaterSupplierDto(ProfessionalUserLicense license, DateTime now)

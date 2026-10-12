@@ -24,4 +24,5 @@ public interface ISiteRepository : IRepository<Site>
     Task ClearNeedsCsiInspectionAsync(IReadOnlyCollection<int> siteIds);
     Task UpdateLastTripTicketDatesAsync(IReadOnlyDictionary<int, DateTime> lastTripTicketDates);
     Task<IEnumerable<Site>> GetAllPendingRenewalAsync(int batchSize);
+    Task<bool> IsWaterSupplierAccountNumberTakenAsync(int siteId, string waterSupplierAccountNumber, CancellationToken cancellationToken);
 }

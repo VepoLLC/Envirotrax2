@@ -6,10 +6,12 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.PublicSearch;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.PublicSearch;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.PublicSearch;
+using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using UserDelegationKey = Azure.Storage.Blobs.Models.UserDelegationKey;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.PublicSearch;
@@ -24,19 +26,22 @@ public class PublicSearchService : IPublicSearchService
     private readonly IBackflowTestService _backflowTestService;
     private readonly ICsiInspectionService _csiInspectionService;
     private readonly IFileStorageService _fileStorageService;
+    private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
 
     public PublicSearchService(
         IMapper mapper,
         IPublicSearchRepository publicSearchRepository,
         IBackflowTestService backflowTestService,
         ICsiInspectionService csiInspectionService,
-        IFileStorageService fileStorageService)
+        IFileStorageService fileStorageService,
+        IMailingInfoRedactionService mailingInfoRedactionService)
     {
         _mapper = mapper;
         _publicSearchRepository = publicSearchRepository;
         _backflowTestService = backflowTestService;
         _csiInspectionService = csiInspectionService;
         _fileStorageService = fileStorageService;
+        _mailingInfoRedactionService = mailingInfoRedactionService;
     }
 
     public async Task<PublicSearchWaterSuppliersDto> GetWaterSuppliersAsync(string? domain, CancellationToken cancellationToken)
@@ -114,6 +119,9 @@ public class PublicSearchService : IPublicSearchService
         }
 
         var testDto = _mapper.Map<BackflowTestDto>(test);
+
+        await RedactMailingInfoAsync(testDto, test.WaterSupplierId, cancellationToken);
+
         var details = _mapper.Map<PublicBackflowTestDetailsDto>(testDto);
         var settings = await _publicSearchRepository.GetBackflowSettingsAsync(test.WaterSupplierId, cancellationToken);
 
@@ -136,7 +144,11 @@ public class PublicSearchService : IPublicSearchService
             return null;
         }
 
-        return await _backflowTestService.GeneratePdfAsync(_mapper.Map<BackflowTestDto>(test));
+        var testDto = _mapper.Map<BackflowTestDto>(test);
+
+        await RedactMailingInfoAsync(testDto, test.WaterSupplierId, cancellationToken);
+
+        return await _backflowTestService.GeneratePdfAsync(testDto);
     }
 
     public async Task<PublicCsiInspectionDetailsDto?> GetCsiInspectionAsync(int id, CancellationToken cancellationToken)
@@ -149,6 +161,8 @@ public class PublicSearchService : IPublicSearchService
         }
 
         var inspectionDto = _mapper.Map<CsiInspectionDto>(inspection);
+
+        await RedactMailingInfoAsync(inspectionDto, inspection.WaterSupplierId, cancellationToken);
 
         return _mapper.Map<PublicCsiInspectionDetailsDto>(inspectionDto);
     }
@@ -211,7 +225,19 @@ public class PublicSearchService : IPublicSearchService
             return null;
         }
 
-        return await _csiInspectionService.GeneratePdfAsync(_mapper.Map<CsiInspectionDto>(inspection));
+        var inspectionDto = _mapper.Map<CsiInspectionDto>(inspection);
+
+        await RedactMailingInfoAsync(inspectionDto, inspection.WaterSupplierId, cancellationToken);
+
+        return await _csiInspectionService.GeneratePdfAsync(inspectionDto);
+    }
+
+    private async Task RedactMailingInfoAsync(IRedactableMailingInfoDto dto, int waterSupplierId, CancellationToken cancellationToken)
+    {
+        if (await _publicSearchRepository.IsMailingInfoRedactedAsync(waterSupplierId, cancellationToken))
+        {
+            _mailingInfoRedactionService.Redact(dto);
+        }
     }
 
     private async Task PopulateImageUrlsAsync(PublicBackflowTestDetailsDto details, BackflowTestDto test)

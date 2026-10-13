@@ -27,6 +27,7 @@ export class ModalHelperService {
         return this._modalService.show<string[], void>(ConfirmModalComponent, {
             title: config.title || 'Question',
             type: config.type,
+            mode: 'disableFullScreen',
             model: config.messages
         });
     }

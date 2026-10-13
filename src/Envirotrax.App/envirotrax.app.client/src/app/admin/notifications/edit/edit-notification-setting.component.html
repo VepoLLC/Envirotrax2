@@ -6,7 +6,7 @@
             <div class="col-md-6 col-xl-3">
                 <div class="mb-3">
                     <vp-input name="description"
-                              label="Description"
+                              label="Description:"
                               [maxLength]="50"
                               [required]="true"
                               [form]="form"
@@ -15,7 +15,7 @@
 
                 <div class="mb-3">
                     <vp-lookup-field name="userId"
-                                     label="Account"
+                                     label="Account:"
                                      [canSearch]="true"
                                      [required]="true"
                                      [form]="form"
@@ -24,7 +24,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Color Identifier</label>
+                    <label class="form-label">Color Identifier:</label>
                     <div class="d-flex flex-wrap gap-1">
                         <button *ngFor="let color of colorOptions"
                                 type="button"
@@ -42,14 +42,14 @@
                 <div class="mb-3">
                     <vp-input type="select"
                               name="reasonForTest"
-                              label="Backflow Test Type"
+                              label="Backflow Test Type:"
                               [options]="reasonForTestOptions"
                               [form]="form"
                               [(ngModel)]="setting.reasonForTest" />
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Property Type</label>
+                    <label class="form-label">Property Type:</label>
 
                     <div class="form-check">
                         <input id="notification-property-type-residential"
@@ -85,7 +85,7 @@
                 <div class="mb-3">
                     <vp-input type="select"
                               name="interval"
-                              label="Interval"
+                              label="Interval:"
                               [options]="intervalOptions"
                               [required]="true"
                               [form]="form"
@@ -95,7 +95,7 @@
                 <div class="mb-3">
                     <vp-input type="select"
                               name="deliveryType"
-                              label="Type"
+                              label="Type:"
                               [options]="deliveryTypeOptions"
                               [required]="true"
                               [form]="form"
@@ -104,7 +104,7 @@
             </div>
 
             <div class="col-md-6 col-xl-3">
-                <label class="form-label">Notification Filters</label>
+                <label class="form-label">Notification Filters:</label>
 
                 <div class="form-check">
                     <input id="notification-filter-failed-test"
@@ -249,7 +249,7 @@
                 <div class="mb-3 ms-4">
                     <vp-input type="number"
                               name="filterSubmissionDaysExceededDays"
-                              label="Allowed Submission Days"
+                              label="Allowed Submission Days:"
                               [min]="0"
                               [form]="form"
                               [(ngModel)]="setting.filterSubmissionDaysExceededDays" />
@@ -267,7 +267,7 @@
             </div>
 
             <div class="col-md-6 col-xl-3">
-                <label class="form-label">Hazard Types</label>
+                <label class="form-label">Hazard Types:</label>
 
                 <div class="form-check">
                     <input id="notification-hazard-type-agricultural-feed-lot"

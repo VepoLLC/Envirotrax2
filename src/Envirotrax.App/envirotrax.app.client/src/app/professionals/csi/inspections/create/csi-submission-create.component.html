@@ -69,7 +69,7 @@
                 <vp-section header="Account Selection &amp; License Verification">
                     <div class="row align-items-center mb-2">
                         <div class="col-md-6 d-flex align-items-center">
-                            <span class="fw-semibold text-nowrap" style="width: 120px;">CSI Account:</span>
+                            <span class="fw-semibold text-nowrap text-end me-2" style="width: 120px;">CSI Account:</span>
                             <div class="flex-grow-1">
                                 <vp-input type="select"
                                           name="csiAccountUserId"
@@ -79,14 +79,16 @@
                                           [required]="true" />
                             </div>
                         </div>
-                        <div class="col-md-6 ps-4">
-                            <span class="fw-semibold">Texas CSI/Plumbing Inspector/WSPS:</span>
-                            <span class="ms-1" [ngClass]="licenseStatusClass">{{ licenseStatusText }}</span>
+                        <div class="col-md-6">
+                            <dl class="row mb-0">
+                                <dt class="col-5 text-end">Texas CSI/Plumbing Inspector/WSPS:</dt>
+                                <dd class="col-7 mb-1" [ngClass]="licenseStatusClass">{{ licenseStatusText }}</dd>
+                            </dl>
                         </div>
                     </div>
                     <div class="row align-items-center">
                         <div class="col-md-6 d-flex align-items-center">
-                            <span class="fw-semibold text-nowrap" style="width: 120px;">Water Supplier:</span>
+                            <span class="fw-semibold text-nowrap text-end me-2" style="width: 120px;">Water Supplier:</span>
                             <div class="flex-grow-1">
                                 <vp-input type="select"
                                           name="waterSupplierId"
@@ -96,10 +98,12 @@
                                           [required]="true" />
                             </div>
                         </div>
-                        <div class="col-md-6 ps-4" *ngIf="showInsuranceRow">
-                            <span class="fw-semibold">Insurance Policy:</span>
-                            <span class="ms-1"
-                                  [ngClass]="insuranceCheck?.isSatisfied ? 'text-success' : 'text-danger'">{{ insuranceCheck?.message }}</span>
+                        <div class="col-md-6" *ngIf="showInsuranceRow">
+                            <dl class="row mb-0">
+                                <dt class="col-5 text-end">Insurance Policy:</dt>
+                                <dd class="col-7 mb-1"
+                                    [ngClass]="insuranceCheck?.isSatisfied ? 'text-success' : 'text-danger'">{{ insuranceCheck?.message }}</dd>
+                            </dl>
                         </div>
                     </div>
                 </vp-section>
@@ -110,9 +114,9 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <dl class="row mb-0">
-                                    <dt class="col-5">Water Supplier:</dt>
+                                    <dt class="col-5 text-end">Water Supplier:</dt>
                                     <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.name }}</dd>
-                                    <dt class="col-5">Address:</dt>
+                                    <dt class="col-5 text-end">Address:</dt>
                                     <dd class="col-7 mb-1">
                                         {{ selectedWaterSupplier.waterSupplier?.address }}<br
                                             *ngIf="selectedWaterSupplier.waterSupplier?.address">
@@ -125,13 +129,13 @@
                             </div>
                             <div class="col-md-6">
                                 <dl class="row mb-0">
-                                    <dt class="col-5">PWS ID:</dt>
+                                    <dt class="col-5 text-end">PWS ID:</dt>
                                     <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.pwsId }}</dd>
-                                    <dt class="col-5">Contact Name:</dt>
+                                    <dt class="col-5 text-end">Contact Name:</dt>
                                     <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.contactName }}</dd>
-                                    <dt class="col-5">Phone Number:</dt>
+                                    <dt class="col-5 text-end">Phone Number:</dt>
                                     <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.phoneNumber }}</dd>
-                                    <dt class="col-5">Email Address:</dt>
+                                    <dt class="col-5 text-end">Email Address:</dt>
                                     <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.emailAddress }}</dd>
                                 </dl>
                             </div>
@@ -144,13 +148,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <dl class="row mb-0">
-                                <dt class="col-5">Company Name:</dt>
+                                <dt class="col-5 text-end">Company Name:</dt>
                                 <dd class="col-7 mb-1">{{ professional?.name }}</dd>
-                                <dt class="col-5">Title of Inspector:</dt>
+                                <dt class="col-5 text-end">Title of Inspector:</dt>
                                 <dd class="col-7 mb-1">{{ selectedCsiUser?.jobTitle }}</dd>
-                                <dt class="col-5">Inspector Name:</dt>
+                                <dt class="col-5 text-end">Inspector Name:</dt>
                                 <dd class="col-7 mb-1">{{ selectedCsiUser?.contactName }}</dd>
-                                <dt class="col-5">Address:</dt>
+                                <dt class="col-5 text-end">Address:</dt>
                                 <dd class="col-7 mb-1">
                                     {{ professional?.address }}<br *ngIf="professional?.address">
                                     {{ professional?.city }}<span
@@ -161,13 +165,13 @@
                         </div>
                         <div class="col-md-6">
                             <dl class="row mb-0">
-                                <dt class="col-5">Phone Number:</dt>
+                                <dt class="col-5 text-end">Phone Number:</dt>
                                 <dd class="col-7 mb-1">{{ professional?.phoneNumber }}</dd>
-                                <dt class="col-5">Email Address:</dt>
+                                <dt class="col-5 text-end">Email Address:</dt>
                                 <dd class="col-7 mb-1">{{ selectedCsiUser?.emailAddress }}</dd>
-                                <dt class="col-5">License Number:</dt>
+                                <dt class="col-5 text-end">License Number:</dt>
                                 <dd class="col-7 mb-1">{{ currentLicense?.licenseNumber }}</dd>
-                                <dt class="col-5">License Type:</dt>
+                                <dt class="col-5 text-end">License Type:</dt>
                                 <dd class="col-7 mb-1">{{ currentLicense?.licenseType?.name }}</dd>
                             </dl>
                         </div>
@@ -189,13 +193,13 @@
                             </p>
 
                             <dl class="row mb-0">
-                                <dt class="col-5">Property Type:</dt>
+                                <dt class="col-5 text-end">Property Type:</dt>
                                 <dd class="col-7 mb-1">
                                     {{ model.propertyType === PropertyType.Residential ? 'Residential' : 'Commercial' }}
                                 </dd>
-                                <dt class="col-5">Business Name:</dt>
+                                <dt class="col-5 text-end">Business Name:</dt>
                                 <dd class="col-7 mb-1">{{ model.propertyBusinessName }}</dd>
-                                <dt class="col-5">Property Address:</dt>
+                                <dt class="col-5 text-end">Property Address:</dt>
                                 <dd class="col-7 mb-1">
                                     {{ model.propertyStreetNumber }} {{ model.propertyStreetName }}<span
                                           *ngIf="model.propertyNumber"> #{{ model.propertyNumber }}</span><br>
@@ -219,20 +223,20 @@
                             </p>
 
                             <dl class="row mb-0">
-                                <dt class="col-5">Company Name:</dt>
+                                <dt class="col-5 text-end">Company Name:</dt>
                                 <dd class="col-7 mb-1">{{ model.mailingCompanyName }}</dd>
-                                <dt class="col-5">Contact Name:</dt>
+                                <dt class="col-5 text-end">Contact Name:</dt>
                                 <dd class="col-7 mb-1">{{ model.mailingContactName }}</dd>
-                                <dt class="col-5">Mailing Address:</dt>
+                                <dt class="col-5 text-end">Mailing Address:</dt>
                                 <dd class="col-7 mb-1">
                                     {{ model.mailingStreetNumber }} {{ model.mailingStreetName }}<span
                                           *ngIf="model.mailingNumber"> #{{ model.mailingNumber }}</span><br>
                                     {{ model.mailingCity }}<span *ngIf="model.mailingCity && model.mailingState?.name">,
                                     </span>{{ model.mailingState?.name }} {{ model.mailingZip }}
                                 </dd>
-                                <dt class="col-5">Phone Number:</dt>
+                                <dt class="col-5 text-end">Phone Number:</dt>
                                 <dd class="col-7 mb-1">{{ model.mailingPhoneNumber }}</dd>
-                                <dt class="col-5">Email Address:</dt>
+                                <dt class="col-5 text-end">Email Address:</dt>
                                 <dd class="col-7 mb-1">{{ model.mailingEmailAddress }}</dd>
                             </dl>
                         </vp-section>
@@ -248,7 +252,7 @@
                             </vp-section-actions>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">Property Type: <span
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">Property Type: <span
                                           class="text-danger">*</span></div>
                                 <div class="col-xl-8">
                                     <vp-input type="select"
@@ -263,7 +267,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">Business Name:</div>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">Business Name:</div>
                                 <div class="col-xl-8">
                                     <vp-input name="propertyBusinessName"
                                               [(ngModel)]="model.propertyBusinessName"
@@ -273,7 +277,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 fw-bold d-xl-flex align-items-xl-center">Address:</div>
+                                <div class="col-xl-4 fw-bold d-xl-flex align-items-xl-center justify-content-xl-end">Address:</div>
                                 <div class="col-xl-8">
                                     <div class="row g-2">
                                         <div class="col-3">
@@ -304,7 +308,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">City: <span class="text-danger">*</span>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">City: <span class="text-danger">*</span>
                                 </div>
                                 <div class="col-xl-8">
                                     <vp-input name="propertyCity"
@@ -317,7 +321,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">State:</div>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">State:</div>
                                 <div class="col-xl-8">
                                     <vp-input type="select"
                                               name="propertyStateId"
@@ -328,7 +332,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">ZIP: <span class="text-danger">*</span>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">ZIP: <span class="text-danger">*</span>
                                 </div>
                                 <div class="col-xl-8">
                                     <vp-input name="propertyZip"
@@ -353,7 +357,7 @@
                                 name or address.</p>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">Company Name:</div>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">Company Name:</div>
                                 <div class="col-xl-8">
                                     <vp-input name="mailingCompanyName"
                                               [(ngModel)]="model.mailingCompanyName"
@@ -362,7 +366,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">Contact Name:</div>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">Contact Name:</div>
                                 <div class="col-xl-8">
                                     <vp-input name="mailingContactName"
                                               [(ngModel)]="model.mailingContactName"
@@ -371,7 +375,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 fw-bold d-xl-flex align-items-xl-center">Address:</div>
+                                <div class="col-xl-4 fw-bold d-xl-flex align-items-xl-center justify-content-xl-end">Address:</div>
                                 <div class="col-xl-8">
                                     <button type="button" class="btn btn-primary vp-section-button mt-2"
                                             (click)="copyPropertyAddress()">
@@ -406,7 +410,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">City: <span class="text-danger">*</span>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">City: <span class="text-danger">*</span>
                                 </div>
                                 <div class="col-xl-8">
                                     <vp-input name="mailingCity"
@@ -419,7 +423,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">State:</div>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">State:</div>
                                 <div class="col-xl-8">
                                     <vp-input type="select"
                                               name="mailingStateId"
@@ -430,7 +434,7 @@
                             </div>
 
                             <div class="row mb-4">
-                                <div class="col-xl-4 col-form-label fw-bold">ZIP: <span class="text-danger">*</span>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">ZIP: <span class="text-danger">*</span>
                                 </div>
                                 <div class="col-xl-8">
                                     <vp-input name="mailingZip"
@@ -442,7 +446,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">Phone Number:</div>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">Phone Number:</div>
                                 <div class="col-xl-8">
                                     <vp-input name="mailingPhoneNumber"
                                               [(ngModel)]="model.mailingPhoneNumber"
@@ -451,7 +455,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">Email Address:</div>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">Email Address:</div>
                                 <div class="col-xl-8">
                                     <vp-input name="mailingEmailAddress"
                                               type="multi-email"
@@ -470,7 +474,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <vp-input type="select"
-                                      label="Reason for Inspection"
+                                      label="Reason for Inspection:"
                                       name="reasonForInspection"
                                       [(ngModel)]="model.reasonForInspection"
                                       [options]="reasonOptions"
@@ -480,7 +484,7 @@
                         </div>
                         <div class="col-md-6">
                             <vp-input type="datetime"
-                                      label="Inspection Date"
+                                      label="Inspection Date:"
                                       name="inspectionDate"
                                       [(ngModel)]="model.inspectionDate"
                                       [required]="true"

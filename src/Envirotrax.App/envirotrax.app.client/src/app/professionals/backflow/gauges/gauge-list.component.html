@@ -71,7 +71,7 @@
             <form #form="ngForm" (ngSubmit)="saveGauge(form)" style="width: 100%; max-width: 480px;">
                 <div class="mb-3">
                     <vp-input name="manufacturer"
-                              label="Manufacturer"
+                              label="Manufacturer:"
                               [(ngModel)]="newGauge.manufacturer"
                               [required]="true"
                               [maxLength]="100"
@@ -80,7 +80,7 @@
 
                 <div class="mb-3">
                     <vp-input name="model"
-                              label="Model"
+                              label="Model:"
                               [(ngModel)]="newGauge.model"
                               [required]="true"
                               [maxLength]="100"
@@ -89,7 +89,7 @@
 
                 <div class="mb-3">
                     <vp-input name="serialNumber"
-                              label="Serial Number"
+                              label="Serial Number:"
                               [(ngModel)]="newGauge.serialNumber"
                               [required]="true"
                               [maxLength]="50"
@@ -99,7 +99,7 @@
                 <div class="mb-3">
                     <label class="col-form-label"
                            [class.text-danger]="form.submitted && newGauge.isPortable == null">
-                        For use on what type of water system
+                        For use on what type of water system:
                         <span class="text-danger">*</span>
                     </label>
 

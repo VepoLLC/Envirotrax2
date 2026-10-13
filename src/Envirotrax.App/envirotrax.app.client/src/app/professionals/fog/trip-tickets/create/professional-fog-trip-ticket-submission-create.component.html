@@ -88,9 +88,9 @@
             <div class="row">
                 <div class="col-md-6">
                     <dl class="row mb-0">
-                        <dt class="col-5">Water Supplier:</dt>
+                        <dt class="col-5 text-end">Water Supplier:</dt>
                         <dd class="col-7 mb-1">{{ selectedWaterSupplier.name }}</dd>
-                        <dt class="col-5">Address:</dt>
+                        <dt class="col-5 text-end">Address:</dt>
                         <dd class="col-7 mb-1">
                             {{ selectedWaterSupplier.address }}<br *ngIf="selectedWaterSupplier.address">
                             {{ selectedWaterSupplier.city }}<span
@@ -101,13 +101,13 @@
                 </div>
                 <div class="col-md-6">
                     <dl class="row mb-0">
-                        <dt class="col-5">PWS ID:</dt>
+                        <dt class="col-5 text-end">PWS ID:</dt>
                         <dd class="col-7 mb-1">{{ selectedWaterSupplier.pwsId }}</dd>
-                        <dt class="col-5">Contact Name:</dt>
+                        <dt class="col-5 text-end">Contact Name:</dt>
                         <dd class="col-7 mb-1">{{ selectedWaterSupplier.contactName }}</dd>
-                        <dt class="col-5">Phone Number:</dt>
+                        <dt class="col-5 text-end">Phone Number:</dt>
                         <dd class="col-7 mb-1">{{ selectedWaterSupplier.phoneNumber }}</dd>
-                        <dt class="col-5">Email Address:</dt>
+                        <dt class="col-5 text-end">Email Address:</dt>
                         <dd class="col-7 mb-1">{{ selectedWaterSupplier.emailAddress }}</dd>
                     </dl>
                 </div>
@@ -133,28 +133,28 @@
                 <div class="row">
                     <div class="col-md-6">
                         <dl class="row mb-0" *ngIf="site && !isLocationEditing">
-                            <dt class="col-5">Property Type:</dt>
+                            <dt class="col-5 text-end">Property Type:</dt>
                             <dd class="col-7 mb-1">
                                 {{ model.propertyType === PropertyType.Residential ? 'Residential' : 'Commercial' }}
                             </dd>
-                            <dt class="col-5">Business Name:</dt>
+                            <dt class="col-5 text-end">Business Name:</dt>
                             <dd class="col-7 mb-1">{{ model.propertyBusinessName }}</dd>
-                            <dt class="col-5">Address:</dt>
+                            <dt class="col-5 text-end">Address:</dt>
                             <dd class="col-7 mb-1">
                                 {{ model.propertyStreetNumber }} {{ model.propertyStreetName }}<span
                                       *ngIf="model.propertyNumber"> #{{ model.propertyNumber }}</span><br>
                                 {{ model.propertyCity }}<span *ngIf="model.propertyCity && model.propertyState?.name">,
                                 </span>{{ model.propertyState?.name }} {{ model.propertyZip }}
                             </dd>
-                            <dt class="col-5">Phone Number:</dt>
+                            <dt class="col-5 text-end">Phone Number:</dt>
                             <dd class="col-7 mb-1">{{ model.fogGeneratorPhoneNumber }}</dd>
-                            <dt class="col-5">Email Address:</dt>
+                            <dt class="col-5 text-end">Email Address:</dt>
                             <dd class="col-7 mb-1">{{ model.fogGeneratorEmailAddress }}</dd>
                         </dl>
 
                         <ng-container *ngIf="isLocationEditing">
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">Property Type: <span
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">Property Type: <span
                                           class="text-danger">*</span></div>
                                 <div class="col-xl-8">
                                     <vp-input type="select"
@@ -169,7 +169,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">Business Name:</div>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">Business Name:</div>
                                 <div class="col-xl-8">
                                     <vp-input name="propertyBusinessName"
                                               [(ngModel)]="model.propertyBusinessName"
@@ -179,7 +179,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 fw-bold d-xl-flex align-items-xl-center">Address:</div>
+                                <div class="col-xl-4 fw-bold d-xl-flex align-items-xl-center justify-content-xl-end">Address:</div>
                                 <div class="col-xl-8">
                                     <div class="row g-2">
                                         <div class="col-3">
@@ -210,7 +210,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">City: <span class="text-danger">*</span>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">City: <span class="text-danger">*</span>
                                 </div>
                                 <div class="col-xl-8">
                                     <vp-input name="propertyCity"
@@ -223,7 +223,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">State:</div>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">State:</div>
                                 <div class="col-xl-8">
                                     <vp-input type="select"
                                               name="propertyStateId"
@@ -234,7 +234,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">ZIP: <span class="text-danger">*</span>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">ZIP: <span class="text-danger">*</span>
                                 </div>
                                 <div class="col-xl-8">
                                     <vp-input name="propertyZip"
@@ -246,7 +246,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">Phone Number:</div>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">Phone Number:</div>
                                 <div class="col-xl-8">
                                     <vp-input name="fogGeneratorPhoneNumber"
                                               [(ngModel)]="model.fogGeneratorPhoneNumber"
@@ -255,7 +255,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">Email Address:</div>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">Email Address:</div>
                                 <div class="col-xl-8">
                                     <vp-input name="fogGeneratorEmailAddress"
                                               [(ngModel)]="model.fogGeneratorEmailAddress"
@@ -269,7 +269,7 @@
                     <div class="col-md-6">
                         <div class="mb-2">
                             <vp-input type="datetime"
-                                      label="Waste Removal Date"
+                                      label="Waste Removal Date:"
                                       name="interceptorWasteRemovedDate"
                                       [(ngModel)]="model.interceptorWasteRemovedDate"
                                       [required]="true"
@@ -279,7 +279,7 @@
                         <div class="row">
                             <div class="col-7 mb-2">
                                 <vp-input type="number"
-                                          label="Removed Amount"
+                                          label="Removed Amount:"
                                           name="interceptorWasteRemovedAmount"
                                           [ngModel]="model.interceptorWasteRemovedAmount"
                                           (ngModelChange)="onRemovedAmountChange($event)"
@@ -289,7 +289,7 @@
                             </div>
                             <div class="col-5 mb-2">
                                 <vp-input type="select"
-                                          label="Capacity Type"
+                                          label="Capacity Type:"
                                           name="interceptorWasteRemovedType"
                                           [(ngModel)]="model.interceptorWasteRemovedType"
                                           [options]="capacityTypeOptions"
@@ -299,7 +299,7 @@
 
                         <div class="mb-2">
                             <vp-input type="select"
-                                      label="Removed From"
+                                      label="Removed From:"
                                       name="interceptorType"
                                       [(ngModel)]="model.interceptorType"
                                       [options]="interceptorTypeOptions"
@@ -309,7 +309,7 @@
 
                         <div class="mb-2" *ngIf="model.interceptorType === 'Other'">
                             <vp-input type="text"
-                                      label="Other Description"
+                                      label="Other Description:"
                                       name="interceptorOtherDescription"
                                       [(ngModel)]="model.interceptorOtherDescription"
                                       [form]="submitForm" />
@@ -318,7 +318,7 @@
                         <div class="row">
                             <div class="col-7 mb-2">
                                 <vp-input type="number"
-                                          label="Trap/Tank Capacity"
+                                          label="Trap/Tank Capacity:"
                                           name="interceptorCapacity"
                                           [ngModel]="model.interceptorCapacity"
                                           (ngModelChange)="onCapacityChange($event)"
@@ -327,7 +327,7 @@
                             </div>
                             <div class="col-5 mb-2">
                                 <vp-input type="select"
-                                          label="Capacity Type"
+                                          label="Capacity Type:"
                                           name="interceptorCapacityType"
                                           [(ngModel)]="model.interceptorCapacityType"
                                           [options]="capacityTypeOptions"
@@ -352,7 +352,7 @@
                 <div class="row mt-3">
                     <div class="col-md-6 mb-3">
                         <vp-input type="text"
-                                  label="Generator Name"
+                                  label="Generator Name:"
                                   name="generatorContactName"
                                   [(ngModel)]="model.generatorContactName"
                                   [form]="submitForm" />
@@ -385,13 +385,13 @@
                 <div class="row">
                     <div class="col-md-6">
                         <dl class="row mb-0">
-                            <dt class="col-5">Company Name:</dt>
+                            <dt class="col-5 text-end">Company Name:</dt>
                             <dd class="col-7 mb-1">{{ professional?.name }}</dd>
-                            <dt class="col-5">Contact Name:</dt>
+                            <dt class="col-5 text-end">Contact Name:</dt>
                             <dd class="col-7 mb-1">{{ selectedTransporter?.contactName }}</dd>
-                            <dt class="col-5">Email Address:</dt>
+                            <dt class="col-5 text-end">Email Address:</dt>
                             <dd class="col-7 mb-1">{{ selectedTransporter?.emailAddress }}</dd>
-                            <dt class="col-5">Address:</dt>
+                            <dt class="col-5 text-end">Address:</dt>
                             <dd class="col-7 mb-1">
                                 {{ professional?.address }}<br *ngIf="professional?.address">
                                 {{ professional?.city }}<span *ngIf="professional?.city && professional?.state?.name">,
@@ -401,14 +401,14 @@
                     </div>
                     <div class="col-md-6">
                         <dl class="row mb-0" *ngIf="selectedVehicle">
-                            <dt class="col-5">Vehicle:</dt>
+                            <dt class="col-5 text-end">Vehicle:</dt>
                             <dd class="col-7 mb-1">{{ selectedVehicle.manufacturedYear }}
                                 {{ selectedVehicle.manufacturer }}</dd>
-                            <dt class="col-5">License Plate:</dt>
+                            <dt class="col-5 text-end">License Plate:</dt>
                             <dd class="col-7 mb-1">{{ selectedVehicle.licensePlateNumber }}</dd>
-                            <dt class="col-5">Sticker Number:</dt>
+                            <dt class="col-5 text-end">Sticker Number:</dt>
                             <dd class="col-7 mb-1">{{ selectedVehicle.stickerNumber }}</dd>
-                            <dt class="col-5">Capacity:</dt>
+                            <dt class="col-5 text-end">Capacity:</dt>
                             <dd class="col-7 mb-1">
                                 {{ selectedVehicle.capacity }}
                                 {{ selectedVehicle.capacityType === FogVehicleCapacityType.Gallons ? 'Gallons' : 'Cubic Yards' }}
@@ -440,32 +440,32 @@
                 <div class="row">
                     <div class="col-md-6">
                         <dl class="row mb-0" *ngIf="selectedDisposalSite">
-                            <dt class="col-5">Company Name:</dt>
+                            <dt class="col-5 text-end">Company Name:</dt>
                             <dd class="col-7 mb-1">{{ selectedDisposalSite.name }}</dd>
-                            <dt class="col-5">Address:</dt>
+                            <dt class="col-5 text-end">Address:</dt>
                             <dd class="col-7 mb-1">
                                 {{ selectedDisposalSite.address }}<br *ngIf="selectedDisposalSite.address">
                                 {{ selectedDisposalSite.city }}<span
                                       *ngIf="selectedDisposalSite.city && selectedDisposalSite.state?.name">, </span>{{
                                 selectedDisposalSite.state?.name }} {{ selectedDisposalSite.zipCode }}
                             </dd>
-                            <dt class="col-5">Registration Number:</dt>
+                            <dt class="col-5 text-end">Registration Number:</dt>
                             <dd class="col-7 mb-1">{{ selectedDisposalSite.registrationNumber }}</dd>
-                            <dt class="col-5">Permit Number:</dt>
+                            <dt class="col-5 text-end">Permit Number:</dt>
                             <dd class="col-7 mb-1">{{ selectedDisposalSite.permitNumber }}</dd>
                         </dl>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-2">
                             <vp-input type="text"
-                                      label="Receiver Contact Name"
+                                      label="Receiver Contact Name:"
                                       name="receiverContactName"
                                       [(ngModel)]="model.receiverContactName"
                                       [form]="submitForm" />
                         </div>
                         <div class="mb-2">
                             <vp-input type="date"
-                                      label="Date Waste Delivered"
+                                      label="Date Waste Delivered:"
                                       name="receiverWasteDeliveredDate"
                                       [(ngModel)]="model.receiverWasteDeliveredDate"
                                       [required]="true"

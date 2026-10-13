@@ -256,7 +256,7 @@
         <form #form="ngForm" (ngSubmit)="save(form)">
             <div class="mb-3">
                 <vp-input name="insuranceNumber"
-                          label="Policy Number"
+                          label="Policy Number:"
                           [(ngModel)]="newInsurance.insuranceNumber"
                           [required]="true"
                           [maxLength]="50"
@@ -265,7 +265,7 @@
 
             <div class="mb-3">
                 <vp-input name="coverageAmount"
-                          label="Coverage $"
+                          label="Coverage: $"
                           type="number"
                           [decimals]="2"
                           [min]="0"

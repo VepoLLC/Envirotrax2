@@ -56,7 +56,7 @@
                 <vp-section header="Account Selection &amp; License Verification">
                     <div class="row align-items-center mb-2">
                         <div class="col-md-6 d-flex align-items-center">
-                            <span class="fw-semibold text-nowrap account-label">FOG Account:</span>
+                            <span class="fw-semibold text-nowrap text-end me-2 account-label">FOG Account:</span>
                             <div class="flex-grow-1">
                                 <vp-input type="select"
                                           name="fogAccountUserId"
@@ -69,7 +69,7 @@
                     </div>
                     <div class="row align-items-center">
                         <div class="col-md-6 d-flex align-items-center">
-                            <span class="fw-semibold text-nowrap account-label">Water Supplier:</span>
+                            <span class="fw-semibold text-nowrap text-end me-2 account-label">Water Supplier:</span>
                             <div class="flex-grow-1">
                                 <vp-input type="select"
                                           name="waterSupplierId"
@@ -87,9 +87,9 @@
                     <div class="row">
                         <div class="col-md-6">
                             <dl class="row mb-0">
-                                <dt class="col-5">Water Supplier:</dt>
+                                <dt class="col-5 text-end">Water Supplier:</dt>
                                 <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.name }}</dd>
-                                <dt class="col-5">Address:</dt>
+                                <dt class="col-5 text-end">Address:</dt>
                                 <dd class="col-7 mb-1">
                                     {{ selectedWaterSupplier.waterSupplier?.address }}<br
                                         *ngIf="selectedWaterSupplier.waterSupplier?.address">
@@ -102,13 +102,13 @@
                         </div>
                         <div class="col-md-6">
                             <dl class="row mb-0">
-                                <dt class="col-5">PWS ID:</dt>
+                                <dt class="col-5 text-end">PWS ID:</dt>
                                 <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.pwsId }}</dd>
-                                <dt class="col-5">Contact Name:</dt>
+                                <dt class="col-5 text-end">Contact Name:</dt>
                                 <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.contactName }}</dd>
-                                <dt class="col-5">Phone Number:</dt>
+                                <dt class="col-5 text-end">Phone Number:</dt>
                                 <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.phoneNumber }}</dd>
-                                <dt class="col-5">Email Address:</dt>
+                                <dt class="col-5 text-end">Email Address:</dt>
                                 <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.emailAddress }}</dd>
                             </dl>
                         </div>
@@ -120,13 +120,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <dl class="row mb-0">
-                                <dt class="col-5">Company Name:</dt>
+                                <dt class="col-5 text-end">Company Name:</dt>
                                 <dd class="col-7 mb-1">{{ professional?.name }}</dd>
-                                <dt class="col-5">Title of Inspector:</dt>
+                                <dt class="col-5 text-end">Title of Inspector:</dt>
                                 <dd class="col-7 mb-1">{{ selectedFogUser.jobTitle }}</dd>
-                                <dt class="col-5">Inspector Name:</dt>
+                                <dt class="col-5 text-end">Inspector Name:</dt>
                                 <dd class="col-7 mb-1">{{ selectedFogUser.contactName }}</dd>
-                                <dt class="col-5">Address:</dt>
+                                <dt class="col-5 text-end">Address:</dt>
                                 <dd class="col-7 mb-1">
                                     {{ professional?.address }}<br *ngIf="professional?.address">
                                     {{ professional?.city }}<span
@@ -137,13 +137,13 @@
                         </div>
                         <div class="col-md-6">
                             <dl class="row mb-0">
-                                <dt class="col-5">Phone Number:</dt>
+                                <dt class="col-5 text-end">Phone Number:</dt>
                                 <dd class="col-7 mb-1">{{ professional?.phoneNumber }}</dd>
-                                <dt class="col-5">Email Address:</dt>
+                                <dt class="col-5 text-end">Email Address:</dt>
                                 <dd class="col-7 mb-1">{{ selectedFogUser.emailAddress }}</dd>
-                                <dt class="col-5">License Number:</dt>
+                                <dt class="col-5 text-end">License Number:</dt>
                                 <dd class="col-7 mb-1"></dd>
-                                <dt class="col-5">License Type:</dt>
+                                <dt class="col-5 text-end">License Type:</dt>
                                 <dd class="col-7 mb-1"></dd>
                             </dl>
                         </div>
@@ -165,13 +165,13 @@
                             </p>
 
                             <dl class="row mb-0">
-                                <dt class="col-5">Property Type:</dt>
+                                <dt class="col-5 text-end">Property Type:</dt>
                                 <dd class="col-7 mb-1">
                                     {{ model.propertyType === PropertyType.Residential ? 'Residential' : 'Commercial' }}
                                 </dd>
-                                <dt class="col-5">Business Name:</dt>
+                                <dt class="col-5 text-end">Business Name:</dt>
                                 <dd class="col-7 mb-1">{{ model.propertyBusinessName }}</dd>
-                                <dt class="col-5">Property Address:</dt>
+                                <dt class="col-5 text-end">Property Address:</dt>
                                 <dd class="col-7 mb-1">
                                     {{ model.propertyStreetNumber }} {{ model.propertyStreetName }}<span
                                           *ngIf="model.propertyNumber"> #{{ model.propertyNumber }}</span><br>
@@ -195,20 +195,20 @@
                             </p>
 
                             <dl class="row mb-0">
-                                <dt class="col-5">Company Name:</dt>
+                                <dt class="col-5 text-end">Company Name:</dt>
                                 <dd class="col-7 mb-1">{{ model.mailingCompanyName }}</dd>
-                                <dt class="col-5">Contact Name:</dt>
+                                <dt class="col-5 text-end">Contact Name:</dt>
                                 <dd class="col-7 mb-1">{{ model.mailingContactName }}</dd>
-                                <dt class="col-5">Mailing Address:</dt>
+                                <dt class="col-5 text-end">Mailing Address:</dt>
                                 <dd class="col-7 mb-1">
                                     {{ model.mailingStreetNumber }} {{ model.mailingStreetName }}<span
                                           *ngIf="model.mailingNumber"> #{{ model.mailingNumber }}</span><br>
                                     {{ model.mailingCity }}<span *ngIf="model.mailingCity && model.mailingState?.name">,
                                     </span>{{ model.mailingState?.name }} {{ model.mailingZip }}
                                 </dd>
-                                <dt class="col-5">Phone Number:</dt>
+                                <dt class="col-5 text-end">Phone Number:</dt>
                                 <dd class="col-7 mb-1">{{ model.mailingPhoneNumber }}</dd>
-                                <dt class="col-5">Email Address:</dt>
+                                <dt class="col-5 text-end">Email Address:</dt>
                                 <dd class="col-7 mb-1">{{ model.mailingEmailAddress }}</dd>
                             </dl>
                         </vp-section>
@@ -224,7 +224,7 @@
                             </vp-section-actions>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">Property Type: <span
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">Property Type: <span
                                           class="text-danger">*</span></div>
                                 <div class="col-xl-8">
                                     <vp-input type="select"
@@ -239,7 +239,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">Business Name:</div>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">Business Name:</div>
                                 <div class="col-xl-8">
                                     <vp-input name="propertyBusinessName"
                                               [(ngModel)]="model.propertyBusinessName"
@@ -249,7 +249,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 fw-bold d-xl-flex align-items-xl-center">Address:</div>
+                                <div class="col-xl-4 fw-bold d-xl-flex align-items-xl-center justify-content-xl-end">Address:</div>
                                 <div class="col-xl-8">
                                     <div class="row g-2">
                                         <div class="col-3">
@@ -280,7 +280,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">City: <span class="text-danger">*</span>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">City: <span class="text-danger">*</span>
                                 </div>
                                 <div class="col-xl-8">
                                     <vp-input name="propertyCity"
@@ -293,7 +293,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">State:</div>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">State:</div>
                                 <div class="col-xl-8">
                                     <vp-input type="select"
                                               name="propertyStateId"
@@ -304,7 +304,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">ZIP: <span class="text-danger">*</span>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">ZIP: <span class="text-danger">*</span>
                                 </div>
                                 <div class="col-xl-8">
                                     <vp-input name="propertyZip"
@@ -329,7 +329,7 @@
                                 name or address.</p>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">Company Name:</div>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">Company Name:</div>
                                 <div class="col-xl-8">
                                     <vp-input name="mailingCompanyName"
                                               [(ngModel)]="model.mailingCompanyName"
@@ -338,7 +338,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">Contact Name:</div>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">Contact Name:</div>
                                 <div class="col-xl-8">
                                     <vp-input name="mailingContactName"
                                               [(ngModel)]="model.mailingContactName"
@@ -347,7 +347,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 fw-bold d-xl-flex align-items-xl-center">Address:</div>
+                                <div class="col-xl-4 fw-bold d-xl-flex align-items-xl-center justify-content-xl-end">Address:</div>
                                 <div class="col-xl-8">
                                     <button type="button" class="btn btn-primary vp-section-button mt-2"
                                             (click)="copyPropertyAddress()">
@@ -382,7 +382,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">City: <span class="text-danger">*</span>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">City: <span class="text-danger">*</span>
                                 </div>
                                 <div class="col-xl-8">
                                     <vp-input name="mailingCity"
@@ -395,7 +395,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">State:</div>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">State:</div>
                                 <div class="col-xl-8">
                                     <vp-input type="select"
                                               name="mailingStateId"
@@ -406,7 +406,7 @@
                             </div>
 
                             <div class="row mb-4">
-                                <div class="col-xl-4 col-form-label fw-bold">ZIP: <span class="text-danger">*</span>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">ZIP: <span class="text-danger">*</span>
                                 </div>
                                 <div class="col-xl-8">
                                     <vp-input name="mailingZip"
@@ -418,7 +418,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">Phone Number:</div>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">Phone Number:</div>
                                 <div class="col-xl-8">
                                     <vp-input name="mailingPhoneNumber"
                                               [(ngModel)]="model.mailingPhoneNumber"
@@ -427,7 +427,7 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-xl-4 col-form-label fw-bold">Email Address:</div>
+                                <div class="col-xl-4 col-form-label fw-bold text-xl-end">Email Address:</div>
                                 <div class="col-xl-8">
                                     <vp-input name="mailingEmailAddress"
                                               type="multi-email"
@@ -444,7 +444,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-2">
                             <vp-input type="select"
-                                      label="Waste Trap or Tank Type"
+                                      label="Waste Trap or Tank Type:"
                                       name="interceptorType"
                                       [(ngModel)]="model.interceptorType"
                                       [options]="interceptorTypeOptions"
@@ -454,7 +454,7 @@
                         </div>
                         <div class="col-md-6 mb-2" *ngIf="model.interceptorType === InterceptorType.Other">
                             <vp-input type="text"
-                                      label="Other Description"
+                                      label="Other Description:"
                                       name="interceptorOtherDescription"
                                       [(ngModel)]="model.interceptorOtherDescription"
                                       [form]="submitForm" />
@@ -464,7 +464,7 @@
                     <div class="row">
                         <div class="col-md-3 mb-2">
                             <vp-input type="number"
-                                      label="Waste Trap or Tank Capacity"
+                                      label="Waste Trap or Tank Capacity:"
                                       name="interceptorCapacity"
                                       [(ngModel)]="model.interceptorCapacity"
                                       [required]="true"
@@ -472,7 +472,7 @@
                         </div>
                         <div class="col-md-3 mb-2">
                             <vp-input type="select"
-                                      label="Capacity Type"
+                                      label="Capacity Type:"
                                       name="interceptorCapacityType"
                                       [(ngModel)]="model.interceptorCapacityType"
                                       [options]="capacityTypeOptions"
@@ -485,7 +485,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-2">
                             <vp-input type="text"
-                                      label="Location Description"
+                                      label="Location Description:"
                                       name="interceptorLocationDescription"
                                       [(ngModel)]="model.interceptorLocationDescription"
                                       [required]="true"
@@ -502,7 +502,7 @@
                         <div class="col-md-6">
                             <div class="mb-2">
                                 <vp-input type="datetime"
-                                          label="Inspection Date"
+                                          label="Inspection Date:"
                                           name="inspectionDate"
                                           [(ngModel)]="model.inspectionDate"
                                           [required]="true"
@@ -510,7 +510,7 @@
                             </div>
                             <div class="mb-2">
                                 <vp-input type="select"
-                                          label="Reason for Inspection"
+                                          label="Reason for Inspection:"
                                           name="reasonForInspection"
                                           [(ngModel)]="model.reasonForInspection"
                                           [options]="reasonOptions"
@@ -520,7 +520,7 @@
                             </div>
                             <div class="mb-2">
                                 <vp-input type="select"
-                                          label="Facility Type"
+                                          label="Facility Type:"
                                           name="facilityType"
                                           [(ngModel)]="model.facilityType"
                                           [options]="facilityTypeOptions"
@@ -537,7 +537,7 @@
                         <!-- LEFT COLUMN -->
                         <div class="col-md-6">
                             <div class="row align-items-center mb-2">
-                                <div class="col-8">Is it properly maintained?</div>
+                                <div class="col-8 text-end">Is it properly maintained?</div>
                                 <div class="col-4 text-nowrap"
                                      [class.radio-group-invalid]="submitted && model.maintained == null">
                                     <label class="me-2"><input type="radio" name="maintained" [value]="true"
@@ -548,7 +548,7 @@
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
-                                <div class="col-8">Is it accessible?</div>
+                                <div class="col-8 text-end">Is it accessible?</div>
                                 <div class="col-4 text-nowrap"
                                      [class.radio-group-invalid]="submitted && model.accessible == null">
                                     <label class="me-2"><input type="radio" name="accessible" [value]="true"
@@ -559,7 +559,7 @@
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
-                                <div class="col-8">Is there evidence of past overflow?</div>
+                                <div class="col-8 text-end">Is there evidence of past overflow?</div>
                                 <div class="col-4 text-nowrap"
                                      [class.radio-group-invalid]="submitted && model.pastOverflow == null">
                                     <label class="me-2"><input type="radio" name="pastOverflow" [value]="true"
@@ -573,7 +573,7 @@
 
                             <h6 class="mt-4">Inlet Chamber:</h6>
                             <div class="row align-items-center mb-2">
-                                <div class="col-8">Is the inlet tee visible?</div>
+                                <div class="col-8 text-end">Is the inlet tee visible?</div>
                                 <div class="col-4 text-nowrap">
                                     <label class="me-2"><input type="radio" name="inletTeeVisible" [value]="true"
                                                [(ngModel)]="model.inletTeeVisible"
@@ -584,7 +584,7 @@
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
-                                <div class="col-8">Is the inlet tee intact?</div>
+                                <div class="col-8 text-end">Is the inlet tee intact?</div>
                                 <div class="col-4 text-nowrap">
                                     <label class="me-2"><input type="radio" name="inletTeeIntact" [value]="true"
                                                [(ngModel)]="model.inletTeeIntact"
@@ -595,7 +595,7 @@
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
-                                <div class="col-8">Wetted Height in Inches:</div>
+                                <div class="col-8 text-end">Wetted Height in Inches:</div>
                                 <div class="col-4">
                                     <vp-input type="text" name="inletChamberWettingHeight"
                                               [numeric]="true"
@@ -608,7 +608,7 @@
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
-                                <div class="col-8">Grease Blanket in Inches:</div>
+                                <div class="col-8 text-end">Grease Blanket in Inches:</div>
                                 <div class="col-4">
                                     <vp-input type="text" name="inletChamberGreaseBlanket"
                                               [numeric]="true"
@@ -621,7 +621,7 @@
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
-                                <div class="col-8">Sediments in Inches:</div>
+                                <div class="col-8 text-end">Sediments in Inches:</div>
                                 <div class="col-4">
                                     <vp-input type="text" name="inletChamberSediments"
                                               [numeric]="true"
@@ -634,15 +634,15 @@
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2 mt-3">
-                                <div class="col-8">Grease Layer %:</div>
+                                <div class="col-8 text-end">Grease Layer %:</div>
                                 <div class="col-4">{{ inletGreaseLayerPercent }}%</div>
                             </div>
                             <div class="row align-items-center mb-2">
-                                <div class="col-8">Sediment Layer %:</div>
+                                <div class="col-8 text-end">Sediment Layer %:</div>
                                 <div class="col-4">{{ inletSedimentLayerPercent }}%</div>
                             </div>
                             <div class="row align-items-center mb-2">
-                                <div class="col-8">Total Inlet Chamber %:</div>
+                                <div class="col-8 text-end">Total Inlet Chamber %:</div>
                                 <div class="col-4">{{ model.inletTotalCapacityPercent }}%</div>
                             </div>
                         </div>
@@ -651,7 +651,7 @@
                         <div class="col-md-6">
                             <h6>Sampling Point:</h6>
                             <div class="row align-items-center mb-2">
-                                <div class="col-8">Is it accessible?</div>
+                                <div class="col-8 text-end">Is it accessible?</div>
                                 <div class="col-4 text-nowrap"
                                      [class.radio-group-invalid]="submitted && model.samplingPointAccessible == null">
                                     <label class="me-2"><input type="radio" name="samplingPointAccessible"
@@ -664,7 +664,7 @@
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
-                                <div class="col-8">Does it need to be cleaned?</div>
+                                <div class="col-8 text-end">Does it need to be cleaned?</div>
                                 <div class="col-4 text-nowrap"
                                      [class.radio-group-invalid]="submitted && model.samplingPointClean == null">
                                     <label class="me-2"><input type="radio" name="samplingPointClean" [value]="true"
@@ -676,7 +676,7 @@
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
-                                <div class="col-4">Sampled From:</div>
+                                <div class="col-4 text-end">Sampled From:</div>
                                 <div class="col-8">
                                     <vp-input type="select"
                                               name="sampledFrom"
@@ -688,7 +688,7 @@
 
                             <h6 class="mt-4">Outlet Chamber:</h6>
                             <div class="row align-items-center mb-2">
-                                <div class="col-8">Is the outfall tee visible?</div>
+                                <div class="col-8 text-end">Is the outfall tee visible?</div>
                                 <div class="col-4 text-nowrap">
                                     <label class="me-2"><input type="radio" name="outletTeeVisible" [value]="true"
                                                [(ngModel)]="model.outletTeeVisible"
@@ -699,7 +699,7 @@
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
-                                <div class="col-8">Is the outfall tee intact?</div>
+                                <div class="col-8 text-end">Is the outfall tee intact?</div>
                                 <div class="col-4 text-nowrap">
                                     <label class="me-2"><input type="radio" name="outletTeeIntact" [value]="true"
                                                [(ngModel)]="model.outletTeeIntact"
@@ -710,7 +710,7 @@
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
-                                <div class="col-8">Wetted Height in Inches:</div>
+                                <div class="col-8 text-end">Wetted Height in Inches:</div>
                                 <div class="col-4">
                                     <vp-input type="text" name="outletChamberWettingHeight"
                                               [numeric]="true"
@@ -723,7 +723,7 @@
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
-                                <div class="col-8">Grease Blanket in Inches:</div>
+                                <div class="col-8 text-end">Grease Blanket in Inches:</div>
                                 <div class="col-4">
                                     <vp-input type="text" name="outletChamberGreaseBlanket"
                                               [numeric]="true"
@@ -736,7 +736,7 @@
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2">
-                                <div class="col-8">Sediments in Inches:</div>
+                                <div class="col-8 text-end">Sediments in Inches:</div>
                                 <div class="col-4">
                                     <vp-input type="text" name="outletChamberSediments"
                                               [numeric]="true"
@@ -749,15 +749,15 @@
                                 </div>
                             </div>
                             <div class="row align-items-center mb-2 mt-3">
-                                <div class="col-8">Grease Layer %:</div>
+                                <div class="col-8 text-end">Grease Layer %:</div>
                                 <div class="col-4">{{ outletGreaseLayerPercent }}%</div>
                             </div>
                             <div class="row align-items-center mb-2">
-                                <div class="col-8">Sediment Layer %:</div>
+                                <div class="col-8 text-end">Sediment Layer %:</div>
                                 <div class="col-4">{{ outletSedimentLayerPercent }}%</div>
                             </div>
                             <div class="row align-items-center mb-2">
-                                <div class="col-8">Total Outlet Chamber %:</div>
+                                <div class="col-8 text-end">Total Outlet Chamber %:</div>
                                 <div class="col-4">{{ model.outletTotalCapacityPercent }}%</div>
                             </div>
                         </div>
@@ -767,11 +767,11 @@
                     <div class="row justify-content-center mt-3">
                         <div class="col-md-6">
                             <div class="row align-items-center mb-2">
-                                <div class="col-5 fw-semibold">Total Capacity %:</div>
+                                <div class="col-5 fw-semibold text-end">Total Capacity %:</div>
                                 <div class="col-7">{{ model.totalCapacityPercent }}%</div>
                             </div>
                             <div class="row align-items-center">
-                                <div class="col-5 fw-semibold">Inspection Result:</div>
+                                <div class="col-5 fw-semibold text-end">Inspection Result:</div>
                                 <div class="col-7 text-nowrap"
                                      [class.radio-group-invalid]="submitted && model.inspectionResult == null">
                                     <label class="me-2"><input type="radio" name="inspectionResult"
@@ -793,7 +793,7 @@
                 <vp-section header="Signature" class="mt-3 d-block">
                     <div class="row mb-3">
                         <div class="col-md-6 d-flex align-items-center">
-                            <span class="fw-semibold text-nowrap account-label">Contact Name:</span>
+                            <span class="fw-semibold text-nowrap text-end me-2 account-label">Contact Name:</span>
                             <div class="flex-grow-1">
                                 <vp-input type="text"
                                           name="signatureContactName"

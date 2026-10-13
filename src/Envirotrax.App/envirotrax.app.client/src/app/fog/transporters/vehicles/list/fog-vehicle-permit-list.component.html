@@ -8,17 +8,17 @@
                     <vp-section header="Search By Vehicle">
                         <vp-field-grid>
                             <vp-filter-panel-field fieldName="professional.name"
-                                                   label="Transporter Company Name"
+                                                   label="Transporter Company Name:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="licensePlateNumber"
-                                                   label="Vehicle License Plate #"
+                                                   label="Vehicle License Plate #:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="stickerNumber"
-                                                   label="Vehicle Sticker #"
+                                                   label="Vehicle Sticker #:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </vp-field-grid>
@@ -29,18 +29,18 @@
                     <vp-section header="Search By Permit">
                         <vp-field-grid>
                             <vp-filter-panel-field fieldName="permit.permitNumber"
-                                                   label="Permit #"
+                                                   label="Permit #:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="permit.inspectionDueDate"
-                                                   label="Inspection Due Date"
+                                                   label="Inspection Due Date:"
                                                    labelStyle="horizontal"
                                                    type="daterange"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="permit.isActive"
-                                                   label="Active"
+                                                   label="Active:"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [options]="activeOptions"

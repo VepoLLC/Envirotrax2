@@ -4,9 +4,9 @@
         <div class="row">
             <div class="col-md-6">
                 <dl class="row mb-0">
-                    <dt class="col-sm-4">Test Result:</dt>
+                    <dt class="col-sm-4 text-sm-end">Test Result:</dt>
                     <dd class="col-sm-8">{{ getTestResultLabel() }}</dd>
-                    <dt class="col-sm-4">Reason for Test:</dt>
+                    <dt class="col-sm-4 text-sm-end">Reason for Test:</dt>
                     <dd class="col-sm-8">
                         {{ getReasonForTestLabel() }}
                         <span *ngIf="test.reasonForTest === BackflowReasonForTest.Replacement && test.replacementAssembly">
@@ -17,7 +17,7 @@
             </div>
             <div class="col-md-6" *ngIf="test.jobNumber">
                 <dl class="row mb-0">
-                    <dt class="col-sm-4">Job Number:</dt>
+                    <dt class="col-sm-4 text-sm-end">Job Number:</dt>
                     <dd class="col-sm-8">{{ test.jobNumber }}</dd>
                 </dl>
             </div>

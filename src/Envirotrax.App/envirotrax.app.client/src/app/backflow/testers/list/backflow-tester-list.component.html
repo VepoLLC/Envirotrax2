@@ -1,4 +1,4 @@
-﻿<h1 class="text-center h2">BPAT Management</h1>
+<h1 class="text-center h2">BPAT Management</h1>
 
 <div [hidden]="showResults">
     <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
@@ -49,17 +49,17 @@
                     <div class="col-md-5">
                         <vp-field-grid>
                             <vp-filter-panel-field fieldName="bpatLicenseNumber"
-                                                   label="BPAT License Number"
+                                                   label="BPAT License Number:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="fireLicenseNumber"
-                                                   label="Fire License Number"
+                                                   label="Fire License Number:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="insurancePolicyNumber"
-                                                   label="Insurance Policy Number"
+                                                   label="Insurance Policy Number:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </vp-field-grid>

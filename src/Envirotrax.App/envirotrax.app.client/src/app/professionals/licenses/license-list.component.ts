@@ -33,7 +33,7 @@ export class LicenseListComponent implements OnInit {
 
     public expirationType = ExpirationType;
     public professionalType = ProfessionalType;
-    public professionalTypeLabels = professionalTypeLabels;
+    public professionalTypeLabels: { [professionalType: number]: string } = professionalTypeLabels;
     public hasReadHelp: boolean = false;
     public newLicense: ProfessionalUserLicense = {};
     public newLicenseValidationErrors: string[] = [];

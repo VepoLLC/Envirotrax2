@@ -1,0 +1,95 @@
+<form #filterForm="ngForm" (ngSubmit)="search()">
+    <vp-filter-panel (filterChange)="onFilterChange($event)">
+        <vp-section header="FOG Disposal Site Filters" [isExpanded]="false">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-2">
+                        <vp-filter-panel-field fieldName="name"
+                                               label="Name"
+                                               [form]="filterForm" />
+                    </div>
+
+                    <div class="mb-2">
+                        <vp-filter-panel-field fieldName="city"
+                                               label="City"
+                                               [form]="filterForm" />
+                    </div>
+
+                    <div class="mb-2">
+                        <vp-filter-panel-field fieldName="county"
+                                               label="County"
+                                               [form]="filterForm" />
+                    </div>
+
+                    <div class="mb-2">
+                        <vp-filter-panel-field fieldName="tceqRegion"
+                                               label="TCEQ Region"
+                                               [form]="filterForm" />
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-2">
+                        <vp-filter-panel-field fieldName="registrationNumber"
+                                               label="Registration Number"
+                                               [form]="filterForm" />
+                    </div>
+
+                    <div class="mb-2">
+                        <vp-filter-panel-field fieldName="permitNumber"
+                                               label="Permit Number"
+                                               [form]="filterForm" />
+                    </div>
+
+                    <div class="mb-2">
+                        <vp-filter-panel-field fieldName="physicalType"
+                                               label="Waste Type"
+                                               type="select"
+                                               [options]="physicalTypeOptions"
+                                               [form]="filterForm" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center mt-2">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>
+                    Search
+                </button>
+            </div>
+        </vp-section>
+    </vp-filter-panel>
+</form>
+
+<div class="mt-3">
+    <vp-section [header]="'FOG Disposal Sites (' + (table.items?.pageInfo?.totalItems ?? 0) + ')'">
+        <vp-section-actions>
+            <button type="button" title="Add Site" (click)="addSite()">
+                <i class="fa-solid fa-plus me-1"></i>
+                Add Site
+            </button>
+        </vp-section-actions>
+
+        <div dp-spinner-parent>
+            <dp-loading-spinner *ngIf="table.isLoading" />
+
+            <vp-table *ngIf="table.items"
+                      [columns]="table.columns!"
+                      [data]="table.items.data"
+                      [showActionLabels]="false"
+                      [canEdit]="true"
+                      (edit)="editSite($event)"
+                      [canDelete]="true"
+                      (delete)="deleteSite($event)"
+                      [(pageInfo)]="table.items.pageInfo"
+                      (pageInfoChange)="getSites()"
+                      [(query)]="table.query"
+                      (queryChange)="getSites()"
+                      (queryReset)="getSites()" />
+        </div>
+    </vp-section>
+</div>
+
+<ng-template #cityStateCell let-rowData="rowData">
+    {{ rowData?.cityState }}
+</ng-template>

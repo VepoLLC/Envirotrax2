@@ -7,15 +7,15 @@ import { InputOption } from "@envirotrax/common-ui";
 })
 export class BackflowTestOptionsService {
     public readonly deviceTypeOptions: InputOption[] = [
-        { id: BackflowDeviceType.DC, text: 'DC - Double Check Valve' },
-        { id: BackflowDeviceType.DCD, text: 'DCD - Double Check Detector' },
-        { id: BackflowDeviceType.DCD2, text: 'DCD2 - Double Check Detector Type II' },
-        { id: BackflowDeviceType.RP, text: 'RP - Reduced Pressure Principle' },
-        { id: BackflowDeviceType.RPPD, text: 'RPPD - Reduced Pressure Principle Detector' },
-        { id: BackflowDeviceType.RPPD2, text: 'RPPD2 - Reduced Pressure Principle Detector Type II' },
-        { id: BackflowDeviceType.PVB, text: 'PVB - Pressure Vacuum Breaker' },
-        { id: BackflowDeviceType.SVB, text: 'SVB - Spill-Resistant Pressure Vacuum Breaker' },
-        { id: BackflowDeviceType.AG, text: 'AG - Air Gap' }
+        { id: BackflowDeviceType.DC, text: 'Double Check Valve' },
+        { id: BackflowDeviceType.DCD, text: 'Double Check Detector' },
+        { id: BackflowDeviceType.DCD2, text: 'Double Check Detector Type II' },
+        { id: BackflowDeviceType.RP, text: 'Reduced Pressure Principle' },
+        { id: BackflowDeviceType.RPPD, text: 'Reduced Pressure Principle Detector' },
+        { id: BackflowDeviceType.RPPD2, text: 'Reduced Pressure Principle Detector Type II' },
+        { id: BackflowDeviceType.PVB, text: 'Pressure Vacuum Breaker' },
+        { id: BackflowDeviceType.SVB, text: 'Spill-Resistant Pressure Vacuum Breaker' },
+        { id: BackflowDeviceType.AG, text: 'Air Gap' }
     ];
 
     public readonly deviceTypeFilterOptions: InputOption[] = [

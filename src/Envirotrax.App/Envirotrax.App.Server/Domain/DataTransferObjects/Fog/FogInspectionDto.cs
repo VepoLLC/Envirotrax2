@@ -72,7 +72,7 @@ public class FogInspectionDto : IDto
     [StringLength(50)]
     public string? MailingPhoneNumber { get; set; }
 
-    [StringLength(100)]
+    [StringLength(1000)]
     public string? MailingEmailAddress { get; set; }
 
     // Inspector fields

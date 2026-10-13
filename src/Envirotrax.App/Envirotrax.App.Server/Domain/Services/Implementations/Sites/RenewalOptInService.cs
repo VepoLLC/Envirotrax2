@@ -16,7 +16,7 @@ public class RenewalOptInService : IRenewalOptInService
     private const int VerificationLinkValidDays = 7;
     private const int ZipCodePrefixLength = 3;
     private const int EmailAddressMaxLength = 320;
-    private const int MailingEmailAddressMaxLength = 100;
+    private const int MailingEmailAddressMaxLength = 1000;
     private const string MailingEmailAddressSeparator = "; ";
     private const string BCryptHashPrefix = "$2";
 

@@ -60,7 +60,7 @@
 
         <form #form="ngForm" (ngSubmit)="add(form)">
             <div class="mb-3">
-                <vp-lookup-field label="Account"
+                <vp-lookup-field label="Account:"
                                  [canSearch]="true"
                                  [form]="form"
                                  [required]="true"
@@ -74,7 +74,7 @@
                           (ngModelChange)="professionChange()"
                           [required]="true"
                           name="professionalType"
-                          label="Profession"
+                          label="Profession:"
                           [options]="professionalTypeOptions"
                           [form]="form" />
             </div>
@@ -82,7 +82,7 @@
             <div class="mb-3">
                 <vp-input type="select"
                           name="licenseType"
-                          label="Type"
+                          label="Type:"
                           [ngModel]="newLicense.licenseType?.id"
                           (ngModelChange)="licenseTypeChange($event)"
                           [required]="true"
@@ -92,7 +92,7 @@
 
             <div class="mb-3">
                 <vp-input name="licenseNumber"
-                          label="License Number"
+                          label="License Number:"
                           [(ngModel)]="newLicense.licenseNumber"
                           [required]="true"
                           [maxLength]="50"

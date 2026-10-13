@@ -7,7 +7,7 @@
             <div class="mb-3">
                 <vp-input [(ngModel)]="site.accountNumber"
                           name="accountNumber"
-                          label="Account Number"
+                          label="Account Number:"
                           [required]="true"
                           [maxLength]="50"
                           [form]="form">
@@ -15,7 +15,7 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Property Type</label>
+                <label class="form-label">Property Type:</label>
 
                 <select class="form-select"
                         [(ngModel)]="site.propertyType"
@@ -34,20 +34,20 @@
             <div class="mb-3">
                 <vp-input [(ngModel)]="site.businessName"
                           name="businessName"
-                          label="Business Name"
+                          label="Business Name:"
                           [maxLength]="255"
                           [form]="form">
                 </vp-input>
             </div>
 
-            <p class="fw-bold">Property Address</p>
+            <p class="fw-bold">Property Address:</p>
 
             <!--Street #-->
             <div class="col-md-4">
                 <div class="mb-3">
                     <vp-input [(ngModel)]="site.streetNumber"
                               name="streetNumber"
-                              label="Street #"
+                              label="Street #:"
                               [form]="form">
                     </vp-input>
                 </div>
@@ -58,7 +58,7 @@
                 <div class="mb-3">
                     <vp-input [(ngModel)]="site.streetName"
                               name="streetName"
-                              label="Street Name"
+                              label="Street Name:"
                               [form]="form">
                     </vp-input>
                 </div>
@@ -69,7 +69,7 @@
                 <div class="mb-3">
                     <vp-input [(ngModel)]="site.propertyNumber"
                               name="propertyNumber"
-                              label="Suite / Apt #"
+                              label="Suite / Apt #:"
                               [form]="form">
                     </vp-input>
                 </div>
@@ -79,7 +79,7 @@
             <div class="mb-3">
                 <vp-input [(ngModel)]="site.city"
                             name="city"
-                            label="City"
+                            label="City:"
                             [form]="form">
                 </vp-input>
             </div>
@@ -88,7 +88,7 @@
             <div class="mb-3">
 
                 <vp-input name="stateId"
-                          label="State"
+                          label="State:"
                           type="select"
                           [form]="form"
                           [ngModel]="site.state?.id"
@@ -102,7 +102,7 @@
                 <div class="mb-3">
                     <vp-input [(ngModel)]="site.zipCode"
                               name="zip"
-                              label="ZIP"
+                              label="ZIP:"
                               [maxLength]="10"
                               [form]="form">
                     </vp-input>
@@ -112,7 +112,7 @@
             <div class="mb-3">
                 <vp-input [(ngModel)]="site.fogGeneratorPhoneNumber"
                           name="phone"
-                          label="Phone Number"
+                          label="Phone Number:"
                           [form]="form">
                 </vp-input>
             </div>
@@ -121,7 +121,7 @@
             <div class="mb-3">
                 <vp-input [(ngModel)]="site.fogGeneratorEmailAddress"
                           name="email"
-                          label="Email Address"
+                          label="Email Address:"
                           [form]="form">
                 </vp-input>
             </div>

@@ -33,7 +33,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="d-flex align-items-center mb-2">
-                        <span class="fw-semibold text-nowrap text-end me-2" style="min-width:130px;">BPAT Account</span>
+                        <span class="fw-semibold text-nowrap text-end me-2" style="min-width:130px;">BPAT Account:</span>
                         <div class="flex-grow-1">
                             <vp-input type="select" name="bpatId" [ngModel]="selectedBpatId"
                                       (ngModelChange)="onBpatChange($event)"
@@ -41,7 +41,7 @@
                         </div>
                     </div>
                     <div class="d-flex align-items-center mb-2">
-                        <span class="fw-semibold text-nowrap text-end me-2" style="min-width:130px;">Water Supplier</span>
+                        <span class="fw-semibold text-nowrap text-end me-2" style="min-width:130px;">Water Supplier:</span>
                         <div class="flex-grow-1">
                             <vp-input type="select" name="waterSupplierId" [ngModel]="selectedWaterSupplierId"
                                       (ngModelChange)="onWaterSupplierChange($event)"
@@ -50,7 +50,7 @@
                         </div>
                     </div>
                     <div class="d-flex align-items-center mb-2">
-                        <span class="fw-semibold text-nowrap text-end me-2" style="min-width:130px;">Hazard Type</span>
+                        <span class="fw-semibold text-nowrap text-end me-2" style="min-width:130px;">Hazard Type:</span>
                         <div class="flex-grow-1">
                             <vp-input type="select" name="hazardType" [ngModel]="model.hazardType"
                                       (ngModelChange)="onHazardTypeChange($event)"
@@ -59,7 +59,7 @@
                         </div>
                     </div>
                     <div class="d-flex align-items-center mb-2" *ngIf="model.hazardType === 'Other'">
-                        <span class="fw-semibold text-nowrap text-end me-2" style="min-width:130px;">Description</span>
+                        <span class="fw-semibold text-nowrap text-end me-2" style="min-width:130px;">Description:</span>
                         <div class="flex-grow-1">
                             <vp-input type="text" name="hazardTypeOtherDescription"
                                       [(ngModel)]="model.hazardTypeOtherDescription" [required]="true"
@@ -67,7 +67,7 @@
                         </div>
                     </div>
                     <div class="d-flex align-items-center mb-2" *ngIf="model.deviceType !== BackflowDeviceType.AG">
-                        <span class="fw-semibold text-nowrap text-end me-2" style="min-width:130px;">Test Gauge</span>
+                        <span class="fw-semibold text-nowrap text-end me-2" style="min-width:130px;">Test Gauge:</span>
                         <div class="flex-grow-1">
                             <vp-input type="select" name="gaugeId" [ngModel]="selectedGaugeId"
                                       (ngModelChange)="onGaugeChange($event)"
@@ -80,7 +80,7 @@
                 <div class="col-md-6 border-start ps-3" *ngIf="verificationChecks.length > 0">
                     <dl class="row mb-0 small">
                         <ng-container *ngFor="let check of verificationChecks">
-                            <dt class="col-5 text-nowrap text-end fw-semibold">{{ check.label }}</dt>
+                            <dt class="col-5 text-nowrap text-end fw-semibold">{{ check.label }}:</dt>
                             <dd class="col-7 mb-1" [class.text-success]="check.valid" [class.text-danger]="!check.valid">
                                 {{ check.message }}
                             </dd>
@@ -96,9 +96,9 @@
                 <div class="row">
                     <div class="col-md-6">
                         <dl class="row mb-0">
-                            <dt class="col-5 text-end">Water Supplier</dt>
+                            <dt class="col-5 text-end">Water Supplier:</dt>
                             <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.name }}</dd>
-                            <dt class="col-5 text-end">Address</dt>
+                            <dt class="col-5 text-end">Address:</dt>
                             <dd class="col-7 mb-1">
                                 {{ selectedWaterSupplier.waterSupplier?.address }}<br
                                     *ngIf="selectedWaterSupplier.waterSupplier?.address">
@@ -111,13 +111,13 @@
                     </div>
                     <div class="col-md-6">
                         <dl class="row mb-0">
-                            <dt class="col-5 text-end">PWS ID</dt>
+                            <dt class="col-5 text-end">PWS ID:</dt>
                             <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.pwsId }}</dd>
-                            <dt class="col-5 text-end">Contact Name</dt>
+                            <dt class="col-5 text-end">Contact Name:</dt>
                             <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.contactName }}</dd>
-                            <dt class="col-5 text-end">Phone Number</dt>
+                            <dt class="col-5 text-end">Phone Number:</dt>
                             <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.phoneNumber }}</dd>
-                            <dt class="col-5 text-end">Email Address</dt>
+                            <dt class="col-5 text-end">Email Address:</dt>
                             <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.emailAddress }}</dd>
                         </dl>
                     </div>
@@ -131,13 +131,13 @@
                 <div class="row">
                     <div class="col-md-6">
                         <dl class="row mb-0">
-                            <dt class="col-5 text-end">Company Name</dt>
+                            <dt class="col-5 text-end">Company Name:</dt>
                             <dd class="col-7 mb-1">{{ professional?.name }}</dd>
-                            <dt class="col-5 text-end">Title of BPAT</dt>
+                            <dt class="col-5 text-end">Title of BPAT:</dt>
                             <dd class="col-7 mb-1">{{ selectedBpat.jobTitle }}</dd>
-                            <dt class="col-5 text-end">BPAT Name</dt>
+                            <dt class="col-5 text-end">BPAT Name:</dt>
                             <dd class="col-7 mb-1">{{ selectedBpat.contactName }}</dd>
-                            <dt class="col-5 text-end">Address</dt>
+                            <dt class="col-5 text-end">Address:</dt>
                             <dd class="col-7 mb-1">
                                 {{ professional?.address }}<br *ngIf="professional?.address">
                                 {{ professional?.city }}<span *ngIf="professional?.city && professional?.state?.name">,
@@ -147,15 +147,15 @@
                     </div>
                     <div class="col-md-6">
                         <dl class="row mb-0">
-                            <dt class="col-5 text-end">Phone Number</dt>
+                            <dt class="col-5 text-end">Phone Number:</dt>
                             <dd class="col-7 mb-1">{{ professional?.phoneNumber }}</dd>
-                            <dt class="col-5 text-end">Email Address</dt>
+                            <dt class="col-5 text-end">Email Address:</dt>
                             <dd class="col-7 mb-1">{{ selectedBpat.emailAddress }}</dd>
-                            <dt class="col-5 text-end">License Number</dt>
+                            <dt class="col-5 text-end">License Number:</dt>
                             <dd class="col-7 mb-1">{{ licenseCheck?.license?.licenseNumber }}</dd>
-                            <dt class="col-5 text-end">License Type</dt>
+                            <dt class="col-5 text-end">License Type:</dt>
                             <dd class="col-7 mb-1">{{ licenseCheck?.license?.licenseTypeName }}</dd>
-                            <dt class="col-5 text-end">License Exp Date</dt>
+                            <dt class="col-5 text-end">License Exp Date:</dt>
                             <dd class="col-7 mb-1">{{ licenseCheck?.license?.expirationDate | date:'MM/dd/yyyy' }}</dd>
                         </dl>
                     </div>
@@ -175,13 +175,13 @@
                         </vp-section-actions>
 
                         <dl class="row mb-0">
-                            <dt class="col-5 text-end">Property Type</dt>
+                            <dt class="col-5 text-end">Property Type:</dt>
                             <dd class="col-7 mb-1">
                                 {{ model.propertyType === PropertyType.Residential ? 'Residential' : 'Commercial' }}
                             </dd>
-                            <dt class="col-5 text-end">Business Name</dt>
+                            <dt class="col-5 text-end">Business Name:</dt>
                             <dd class="col-7 mb-1">{{ model.propertyBusinessName }}</dd>
-                            <dt class="col-5 text-end">Property Address</dt>
+                            <dt class="col-5 text-end">Property Address:</dt>
                             <dd class="col-7 mb-1">
                                 {{ model.propertyStreetNumber }} {{ model.propertyStreetName }}<span
                                       *ngIf="model.propertyNumber"> #{{ model.propertyNumber }}</span><br>
@@ -199,20 +199,20 @@
                         </vp-section-actions>
 
                         <dl class="row mb-0">
-                            <dt class="col-5 text-end">Company Name</dt>
+                            <dt class="col-5 text-end">Company Name:</dt>
                             <dd class="col-7 mb-1">{{ model.mailingCompanyName }}</dd>
-                            <dt class="col-5 text-end">Contact Name</dt>
+                            <dt class="col-5 text-end">Contact Name:</dt>
                             <dd class="col-7 mb-1">{{ model.mailingContactName }}</dd>
-                            <dt class="col-5 text-end">Mailing Address</dt>
+                            <dt class="col-5 text-end">Mailing Address:</dt>
                             <dd class="col-7 mb-1">
                                 {{ model.mailingStreetNumber }} {{ model.mailingStreetName }}<span
                                       *ngIf="model.mailingNumber"> #{{ model.mailingNumber }}</span><br>
                                 {{ model.mailingCity }}<span *ngIf="model.mailingCity && model.mailingState?.name">,
                                 </span>{{ model.mailingState?.name }} {{ model.mailingZip }}
                             </dd>
-                            <dt class="col-5 text-end">Phone Number</dt>
+                            <dt class="col-5 text-end">Phone Number:</dt>
                             <dd class="col-7 mb-1">{{ model.mailingPhoneNumber }}</dd>
-                            <dt class="col-5 text-end">Email Address</dt>
+                            <dt class="col-5 text-end">Email Address:</dt>
                             <dd class="col-7 mb-1">{{ model.mailingEmailAddress }}</dd>
                         </dl>
                     </vp-section>
@@ -228,7 +228,7 @@
                         </vp-section-actions>
 
                         <div class="row mb-2">
-                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Property Type <span
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Property Type: <span
                                       class="text-danger">*</span></div>
                             <div class="col-xl-9">
                                 <vp-input type="select"
@@ -243,7 +243,7 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Business Name</div>
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Business Name:</div>
                             <div class="col-xl-9">
                                 <vp-input name="propertyBusinessName"
                                           [(ngModel)]="model.propertyBusinessName"
@@ -253,12 +253,12 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-3 fw-bold d-xl-flex align-items-xl-center justify-content-xl-end">Address</div>
+                            <div class="col-xl-3 fw-bold d-xl-flex align-items-xl-center justify-content-xl-end">Address:</div>
                             <div class="col-xl-9">
                                 <div class="row g-2">
                                     <div class="col-3">
                                         <vp-input name="propertyStreetNumber"
-                                                  label="Street #"
+                                                  label="Street #:"
                                                   [(ngModel)]="model.propertyStreetNumber"
                                                   [required]="true"
                                                   [maxLength]="50"
@@ -266,7 +266,7 @@
                                     </div>
                                     <div class="col-6">
                                         <vp-input name="propertyStreetName"
-                                                  label="Street Name"
+                                                  label="Street Name:"
                                                   [(ngModel)]="model.propertyStreetName"
                                                   [required]="true"
                                                   [maxLength]="100"
@@ -274,7 +274,7 @@
                                     </div>
                                     <div class="col-3">
                                         <vp-input name="propertyNumber"
-                                                  label="Suite/Apt #"
+                                                  label="Suite/Apt #:"
                                                   [(ngModel)]="model.propertyNumber"
                                                   [maxLength]="50"
                                                   [form]="submitForm" />
@@ -284,7 +284,7 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">City <span class="text-danger">*</span></div>
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">City: <span class="text-danger">*</span></div>
                             <div class="col-xl-9">
                                 <vp-input name="propertyCity"
                                           [(ngModel)]="model.propertyCity"
@@ -295,7 +295,7 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">State</div>
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">State:</div>
                             <div class="col-xl-9">
                                 <vp-input type="select"
                                           name="propertyStateId"
@@ -306,7 +306,7 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">ZIP <span class="text-danger">*</span></div>
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">ZIP: <span class="text-danger">*</span></div>
                             <div class="col-xl-9">
                                 <vp-input name="propertyZip"
                                           [(ngModel)]="model.propertyZip"
@@ -330,7 +330,7 @@
                             or address.</p>
 
                         <div class="row mb-2">
-                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Company Name</div>
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Company Name:</div>
                             <div class="col-xl-9">
                                 <vp-input name="mailingCompanyName"
                                           [(ngModel)]="model.mailingCompanyName"
@@ -339,7 +339,7 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Contact Name</div>
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Contact Name:</div>
                             <div class="col-xl-9">
                                 <vp-input name="mailingContactName"
                                           [(ngModel)]="model.mailingContactName"
@@ -348,7 +348,7 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Address</div>
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Address:</div>
                             <div class="col-xl-9">
                                 <button type="button" class="btn btn-primary vp-section-button mt-2"
                                         (click)="copyPropertyAddress()">
@@ -358,14 +358,14 @@
                                 <div class="row g-2">
                                     <div class="col-3">
                                         <vp-input name="mailingStreetNumber"
-                                                  label="Street #"
+                                                  label="Street #:"
                                                   [(ngModel)]="model.mailingStreetNumber"
                                                   [maxLength]="50"
                                                   [form]="submitForm" />
                                     </div>
                                     <div class="col-6">
                                         <vp-input name="mailingStreetName"
-                                                  label="Street Name"
+                                                  label="Street Name:"
                                                   [(ngModel)]="model.mailingStreetName"
                                                   [required]="true"
                                                   [maxLength]="100"
@@ -373,7 +373,7 @@
                                     </div>
                                     <div class="col-3">
                                         <vp-input name="mailingNumber"
-                                                  label="Suite/Apt #"
+                                                  label="Suite/Apt #:"
                                                   [(ngModel)]="model.mailingNumber"
                                                   [maxLength]="50"
                                                   [form]="submitForm" />
@@ -383,7 +383,7 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">City <span class="text-danger">*</span></div>
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">City: <span class="text-danger">*</span></div>
                             <div class="col-xl-9">
                                 <vp-input name="mailingCity"
                                           [(ngModel)]="model.mailingCity"
@@ -394,7 +394,7 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">State</div>
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">State:</div>
                             <div class="col-xl-9">
                                 <vp-input type="select"
                                           name="mailingStateId"
@@ -405,7 +405,7 @@
                         </div>
 
                         <div class="row mb-4">
-                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">ZIP <span class="text-danger">*</span></div>
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">ZIP: <span class="text-danger">*</span></div>
                             <div class="col-xl-9">
                                 <vp-input name="mailingZip"
                                           [(ngModel)]="model.mailingZip"
@@ -416,7 +416,7 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Phone Number</div>
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Phone Number:</div>
                             <div class="col-xl-9">
                                 <vp-input name="mailingPhoneNumber"
                                           [(ngModel)]="model.mailingPhoneNumber"
@@ -425,7 +425,7 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Email Address</div>
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Email Address:</div>
                             <div class="col-xl-9">
                                 <vp-input name="mailingEmailAddress"
                                           [(ngModel)]="model.mailingEmailAddress"
@@ -442,7 +442,7 @@
                     <!-- Device Type -->
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <vp-input type="select" label="Backflow Method" name="deviceType"
+                            <vp-input type="select" label="Backflow Method:" name="deviceType"
                                       [ngModel]="model.deviceType" (ngModelChange)="onDeviceTypeChange($event)"
                                       [options]="deviceTypeOptions" [required]="true" [form]="submitForm"
                                       [placeholder]="'Select a backflow method'" />
@@ -452,20 +452,20 @@
                     <!-- Main assembly -->
                     <div class="row mb-3" *ngIf="hasAssembly">
                         <div class="col-md-3">
-                            <vp-input type="select" label="Manufacturer" name="manufacturer"
+                            <vp-input type="select" label="Manufacturer:" name="manufacturer"
                                       [(ngModel)]="model.manufacturer"
                                       [options]="manufacturerOptions" [required]="true" [form]="submitForm" />
                         </div>
                         <div class="col-md-3">
-                            <vp-input type="text" label="Model" name="model" [(ngModel)]="model.model" [required]="true"
+                            <vp-input type="text" label="Model:" name="model" [(ngModel)]="model.model" [required]="true"
                                       [form]="submitForm" />
                         </div>
                         <div class="col-md-2">
-                            <vp-input type="select" label="Size" name="size" [(ngModel)]="model.size"
+                            <vp-input type="select" label="Size:" name="size" [(ngModel)]="model.size"
                                       [options]="sizeOptions" [required]="true" [form]="submitForm" />
                         </div>
                         <div class="col-md-4">
-                            <vp-input type="text" label="Serial Number" name="serialNumber"
+                            <vp-input type="text" label="Serial Number:" name="serialNumber"
                                       [(ngModel)]="model.serialNumber" />
                         </div>
                     </div>
@@ -475,20 +475,20 @@
                          *ngIf="model.deviceType === BackflowDeviceType.DCD || model.deviceType === BackflowDeviceType.DCD2 || model.deviceType === BackflowDeviceType.RPPD || model.deviceType === BackflowDeviceType.RPPD2">
                         <div class="col-12 fw-semibold mb-1">Bypass Assembly</div>
                         <div class="col-md-3">
-                            <vp-input type="select" label="Manufacturer" name="manufacturer2"
+                            <vp-input type="select" label="Manufacturer:" name="manufacturer2"
                                       [(ngModel)]="model.manufacturer2"
                                       [options]="manufacturerOptions" [required]="true" [form]="submitForm" />
                         </div>
                         <div class="col-md-3">
-                            <vp-input type="text" label="Model" name="model2" [(ngModel)]="model.model2"
+                            <vp-input type="text" label="Model:" name="model2" [(ngModel)]="model.model2"
                                       [required]="true" [form]="submitForm" />
                         </div>
                         <div class="col-md-2">
-                            <vp-input type="select" label="Size" name="size2" [(ngModel)]="model.size2"
+                            <vp-input type="select" label="Size:" name="size2" [(ngModel)]="model.size2"
                                       [options]="sizeOptions" [required]="true" [form]="submitForm" />
                         </div>
                         <div class="col-md-4">
-                            <vp-input type="text" label="Serial Number" name="serialNumber2"
+                            <vp-input type="text" label="Serial Number:" name="serialNumber2"
                                       [(ngModel)]="model.serialNumber2" />
                         </div>
                     </div>
@@ -496,7 +496,7 @@
                     <!-- Location description -->
                     <div class="row mb-3">
                         <div class="col-md-12">
-                            <vp-input type="text" label="Location" name="locationDescription"
+                            <vp-input type="text" label="Location:" name="locationDescription"
                                       [ngModel]="model.locationDescription"
                                       (ngModelChange)="onLocationDescriptionChange($event)"
                                       [maxLength]="100" [required]="true" [form]="submitForm" />
@@ -513,7 +513,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="d-flex align-items-center gap-3 mb-3">
-                                <span class="fw-semibold">Test Result</span>
+                                <span class="fw-semibold">Test Result:</span>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="testResult"
                                            [value]="BackflowTestResult.Pass" [ngModel]="model.testResult"
@@ -527,13 +527,13 @@
                                     <label class="form-check-label" for="resultFail">Failed</label>
                                 </div>
                             </div>
-                            <vp-input type="select" label="Reason for Test" name="reasonForTest"
+                            <vp-input type="select" label="Reason for Test:" name="reasonForTest"
                                       [(ngModel)]="model.reasonForTest"
                                       [options]="reasonOptions" [required]="true" [form]="submitForm"
                                       [placeholder]="'Select reason'" />
                         </div>
                         <div class="col-md-6">
-                            <vp-input type="text" label="Job Number" name="jobNumber" [(ngModel)]="model.jobNumber" />
+                            <vp-input type="text" label="Job Number:" name="jobNumber" [(ngModel)]="model.jobNumber" />
                             <span class="form-text text-muted">(Optional)</span>
                         </div>
                     </div>
@@ -541,7 +541,7 @@
                     <!-- Replacement assembly -->
                     <div class="row mb-3" *ngIf="model.reasonForTest === BackflowReasonForTest.Replacement">
                         <div class="col-md-6">
-                            <vp-input type="text" label="Old Model / Serial #" name="replacementAssembly"
+                            <vp-input type="text" label="Old Model / Serial #:" name="replacementAssembly"
                                       [(ngModel)]="model.replacementAssembly" />
                         </div>
                     </div>
@@ -576,7 +576,7 @@
 
                     <!-- Test Gauge display -->
                     <div class="mb-3" *ngIf="selectedGauge">
-                        <span class="fw-semibold">Test Gauge</span>
+                        <span class="fw-semibold">Test Gauge:</span>
                         <span class="ms-2">{{ selectedGauge.manufacturer }} {{ selectedGauge.model }}
                             {{ selectedGauge.serialNumber }}</span>
                     </div>
@@ -585,12 +585,12 @@
                     <ng-container *ngIf="model.deviceType === BackflowDeviceType.AG">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <vp-input type="datetime" label="Test Date and Time" name="airGapDate"
+                                <vp-input type="datetime" label="Test Date and Time:" name="airGapDate"
                                           [(ngModel)]="model.initialTestDate" [required]="true" [form]="submitForm" />
                             </div>
                             <div class="col-md-6">
                                 <div class="d-flex align-items-center gap-3 mt-3">
-                                    <span class="fw-semibold">Air Gap</span>
+                                    <span class="fw-semibold">Air Gap:</span>
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input" type="radio" name="airGapValid" [value]="true"
                                                [(ngModel)]="model.airGapValid" id="agValid" required />
@@ -643,7 +643,7 @@
                                         <td [class.table-success]="!initialTestDateError"
                                             [class.table-danger]="!!initialTestDateError">
                                             <div class="fw-bold mb-3 text-center">Initial Test</div>
-                                            <strong>Date and Time</strong><br>
+                                            <strong>Date and Time:</strong><br>
                                             <vp-input type="datetime" name="initialTestDate"
                                                       [(ngModel)]="model.initialTestDate" [required]="true"
                                                       [max]="today" [form]="submitForm" />
@@ -701,7 +701,7 @@
                                                            [(ngModel)]="repairCV1.cleaned" name="rCV1Cleaned"
                                                            id="rCV1Cleaned"><label class="form-check-label"
                                                            for="rCV1Cleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairCV1.disc" name="rCV1Disc"
                                                            id="rCV1Disc"><label class="form-check-label"
@@ -736,7 +736,7 @@
                                                            [(ngModel)]="repairCV2.cleaned" name="rCV2Cleaned"
                                                            id="rCV2Cleaned"><label class="form-check-label"
                                                            for="rCV2Cleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairCV2.disc" name="rCV2Disc"
                                                            id="rCV2Disc"><label class="form-check-label"
@@ -768,7 +768,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Repair Details</strong></td>
+                                            <td><strong>Repair Details:</strong></td>
                                             <td>
                                                 <vp-input type="textarea" name="repairCV1Details"
                                                           [(ngModel)]="model.repairCV1Details" [maxLength]="100" />
@@ -798,7 +798,7 @@
                                             <td [class.table-success]="!isFailedResult && !finalTestDateError"
                                                 [class.table-danger]="!isFailedResult && !!finalTestDateError">
                                                 <div class="fw-bold mb-3 text-center">Test After Repair</div>
-                                                <strong>Date and Time</strong><br>
+                                                <strong>Date and Time:</strong><br>
                                                 <vp-input type="datetime" name="finalTestDate"
                                                           [(ngModel)]="model.finalTestDate" [required]="true"
                                                           [max]="today" [form]="submitForm" />
@@ -889,7 +889,7 @@
                                         <td [class.table-success]="!initialTestDateError"
                                             [class.table-danger]="!!initialTestDateError">
                                             <div class="fw-bold mb-3 text-center">Initial Test</div>
-                                            <strong>Date and Time</strong><br>
+                                            <strong>Date and Time:</strong><br>
                                             <vp-input type="datetime" name="initialTestDate"
                                                       [(ngModel)]="model.initialTestDate" [required]="true"
                                                       [max]="today" [form]="submitForm" />
@@ -994,7 +994,7 @@
                                                            [(ngModel)]="repairCV1.cleaned" name="rCV1Cleaned"
                                                            id="rCV1Cleaned"><label class="form-check-label"
                                                            for="rCV1Cleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairCV1.disc" name="rCV1Disc"
                                                            id="rCV1Disc"><label class="form-check-label"
@@ -1029,7 +1029,7 @@
                                                            [(ngModel)]="repairCV2.cleaned" name="rCV2Cleaned"
                                                            id="rCV2Cleaned"><label class="form-check-label"
                                                            for="rCV2Cleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairCV2.disc" name="rCV2Disc"
                                                            id="rCV2Disc"><label class="form-check-label"
@@ -1065,7 +1065,7 @@
                                                            [(ngModel)]="repairCV12.cleaned" name="rCV12Cleaned"
                                                            id="rCV12Cleaned"><label class="form-check-label"
                                                            for="rCV12Cleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairCV12.disc" name="rCV12Disc"
                                                            id="rCV12Disc"><label class="form-check-label"
@@ -1100,7 +1100,7 @@
                                                            [(ngModel)]="repairCV22.cleaned" name="rCV22Cleaned"
                                                            id="rCV22Cleaned"><label class="form-check-label"
                                                            for="rCV22Cleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairCV22.disc" name="rCV22Disc"
                                                            id="rCV22Disc"><label class="form-check-label"
@@ -1132,7 +1132,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Repair Details</strong></td>
+                                            <td><strong>Repair Details:</strong></td>
                                             <td>
                                                 <vp-input type="textarea" name="repairCV1Details"
                                                           [(ngModel)]="model.repairCV1Details" [maxLength]="100" />
@@ -1178,7 +1178,7 @@
                                             <td [class.table-success]="!isFailedResult && !finalTestDateError"
                                                 [class.table-danger]="!isFailedResult && !!finalTestDateError">
                                                 <div class="fw-bold mb-3 text-center">Test After Repair</div>
-                                                <strong>Date and Time</strong><br>
+                                                <strong>Date and Time:</strong><br>
                                                 <vp-input type="datetime" name="finalTestDate"
                                                           [(ngModel)]="model.finalTestDate" [required]="true"
                                                           [max]="today" [form]="submitForm" />
@@ -1298,7 +1298,7 @@
                                         <td [class.table-success]="!initialTestDateError"
                                             [class.table-danger]="!!initialTestDateError">
                                             <div class="fw-bold mb-3 text-center">Initial Test</div>
-                                            <strong>Date and Time</strong><br>
+                                            <strong>Date and Time:</strong><br>
                                             <vp-input type="datetime" name="initialTestDate"
                                                       [(ngModel)]="model.initialTestDate" [required]="true"
                                                       [max]="today" [form]="submitForm" />
@@ -1380,7 +1380,7 @@
                                                            [(ngModel)]="repairCV1.cleaned" name="rCV1Cleaned"
                                                            id="rCV1Cleaned"><label class="form-check-label"
                                                            for="rCV1Cleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairCV1.disc" name="rCV1Disc"
                                                            id="rCV1Disc"><label class="form-check-label"
@@ -1415,7 +1415,7 @@
                                                            [(ngModel)]="repairCV2.cleaned" name="rCV2Cleaned"
                                                            id="rCV2Cleaned"><label class="form-check-label"
                                                            for="rCV2Cleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairCV2.disc" name="rCV2Disc"
                                                            id="rCV2Disc"><label class="form-check-label"
@@ -1451,7 +1451,7 @@
                                                            [(ngModel)]="repairBC.cleaned" name="rBCCleaned"
                                                            id="rBCCleaned"><label class="form-check-label"
                                                            for="rBCCleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairBC.disc" name="rBCDisc"
                                                            id="rBCDisc"><label class="form-check-label"
@@ -1484,7 +1484,7 @@
 
                                         </tr>
                                         <tr>
-                                            <td><strong>Repair Details</strong></td>
+                                            <td><strong>Repair Details:</strong></td>
                                             <td>
                                                 <vp-input type="textarea" name="repairCV1Details"
                                                           [(ngModel)]="model.repairCV1Details" [maxLength]="100" />
@@ -1523,7 +1523,7 @@
                                             <td [class.table-success]="!isFailedResult && !finalTestDateError"
                                                 [class.table-danger]="!isFailedResult && !!finalTestDateError">
                                                 <div class="fw-bold mb-3 text-center">Test After Repair</div>
-                                                <strong>Date and Time</strong><br>
+                                                <strong>Date and Time:</strong><br>
                                                 <vp-input type="datetime" name="finalTestDate"
                                                           [(ngModel)]="model.finalTestDate" [required]="true"
                                                           [max]="today" [form]="submitForm" />
@@ -1619,7 +1619,7 @@
                                         <td [class.table-success]="!initialTestDateError"
                                             [class.table-danger]="!!initialTestDateError">
                                             <div class="fw-bold mb-3 text-center">Initial Test</div>
-                                            <strong>Date and Time</strong><br>
+                                            <strong>Date and Time:</strong><br>
                                             <vp-input type="datetime" name="initialTestDate"
                                                       [(ngModel)]="model.initialTestDate" [required]="true"
                                                       [max]="today" [form]="submitForm" />
@@ -1685,7 +1685,7 @@
                                                            [(ngModel)]="repairCV1.cleaned" name="rCV1Cleaned"
                                                            id="rCV1Cleaned"><label class="form-check-label"
                                                            for="rCV1Cleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairCV1.disc" name="rCV1Disc"
                                                            id="rCV1Disc"><label class="form-check-label"
@@ -1720,7 +1720,7 @@
                                                            [(ngModel)]="repairCV2.cleaned" name="rCV2Cleaned"
                                                            id="rCV2Cleaned"><label class="form-check-label"
                                                            for="rCV2Cleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairCV2.disc" name="rCV2Disc"
                                                            id="rCV2Disc"><label class="form-check-label"
@@ -1755,7 +1755,7 @@
                                                            [(ngModel)]="repairRV.cleaned" name="rRVCleaned"
                                                            id="rRVCleaned"><label class="form-check-label"
                                                            for="rRVCleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairRV.discUpper" name="rRVDU"
                                                            id="rRVDU"><label class="form-check-label" for="rRVDU">Disc
@@ -1795,7 +1795,7 @@
 
                                         </tr>
                                         <tr>
-                                            <td><strong>Repair Details</strong></td>
+                                            <td><strong>Repair Details:</strong></td>
                                             <td>
                                                 <vp-input type="textarea" name="repairCV1Details"
                                                           [(ngModel)]="model.repairCV1Details" [maxLength]="100" />
@@ -1829,7 +1829,7 @@
                                             <td [class.table-success]="!isFailedResult && !finalTestDateError"
                                                 [class.table-danger]="!isFailedResult && !!finalTestDateError">
                                                 <div class="fw-bold mb-3 text-center">Test After Repair</div>
-                                                <strong>Date and Time</strong><br>
+                                                <strong>Date and Time:</strong><br>
                                                 <vp-input type="datetime" name="finalTestDate"
                                                           [(ngModel)]="model.finalTestDate" [required]="true"
                                                           [max]="today" [form]="submitForm" />
@@ -1927,7 +1927,7 @@
                                         <td [class.table-success]="!initialTestDateError"
                                             [class.table-danger]="!!initialTestDateError">
                                             <div class="fw-bold mb-3 text-center">Initial Test</div>
-                                            <strong>Date and Time</strong><br>
+                                            <strong>Date and Time:</strong><br>
                                             <vp-input type="datetime" name="initialTestDate"
                                                       [(ngModel)]="model.initialTestDate" [required]="true"
                                                       [max]="today" [form]="submitForm" />
@@ -2052,7 +2052,7 @@
                                                            [(ngModel)]="repairCV1.cleaned" name="rCV1Cleaned"
                                                            id="rCV1Cleaned"><label class="form-check-label"
                                                            for="rCV1Cleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairCV1.disc" name="rCV1Disc"
                                                            id="rCV1Disc"><label class="form-check-label"
@@ -2087,7 +2087,7 @@
                                                            [(ngModel)]="repairCV2.cleaned" name="rCV2Cleaned"
                                                            id="rCV2Cleaned"><label class="form-check-label"
                                                            for="rCV2Cleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairCV2.disc" name="rCV2Disc"
                                                            id="rCV2Disc"><label class="form-check-label"
@@ -2123,7 +2123,7 @@
                                                            [(ngModel)]="repairRV.cleaned" name="rRVCleaned"
                                                            id="rRVCleaned"><label class="form-check-label"
                                                            for="rRVCleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairRV.discUpper" name="rRVDU"
                                                            id="rRVDU"><label class="form-check-label" for="rRVDU">Disc
@@ -2166,7 +2166,7 @@
                                                            [(ngModel)]="repairCV12.cleaned" name="rCV12Cleaned"
                                                            id="rCV12Cleaned"><label class="form-check-label"
                                                            for="rCV12Cleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairCV12.disc" name="rCV12Disc"
                                                            id="rCV12Disc"><label class="form-check-label"
@@ -2201,7 +2201,7 @@
                                                            [(ngModel)]="repairCV22.cleaned" name="rCV22Cleaned"
                                                            id="rCV22Cleaned"><label class="form-check-label"
                                                            for="rCV22Cleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairCV22.disc" name="rCV22Disc"
                                                            id="rCV22Disc"><label class="form-check-label"
@@ -2237,7 +2237,7 @@
                                                            [(ngModel)]="repairRV2.cleaned" name="rRV2Cleaned"
                                                            id="rRV2Cleaned"><label class="form-check-label"
                                                            for="rRV2Cleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairRV2.discUpper" name="rRV2DU"
                                                            id="rRV2DU"><label class="form-check-label" for="rRV2DU">Disc
@@ -2276,7 +2276,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Repair Details</strong></td>
+                                            <td><strong>Repair Details:</strong></td>
                                             <td>
                                                 <vp-input type="textarea" name="repairCV1Details"
                                                           [(ngModel)]="model.repairCV1Details" [maxLength]="100" />
@@ -2332,7 +2332,7 @@
                                             <td [class.table-success]="!isFailedResult && !finalTestDateError"
                                                 [class.table-danger]="!isFailedResult && !!finalTestDateError">
                                                 <div class="fw-bold mb-3 text-center">Test After Repair</div>
-                                                <strong>Date and Time</strong><br>
+                                                <strong>Date and Time:</strong><br>
                                                 <vp-input type="datetime" name="finalTestDate"
                                                           [(ngModel)]="model.finalTestDate" [required]="true"
                                                           [max]="today" [form]="submitForm" />
@@ -2459,7 +2459,7 @@
                                         <td [class.table-success]="!initialTestDateError"
                                             [class.table-danger]="!!initialTestDateError">
                                             <div class="fw-bold mb-3 text-center">Initial Test</div>
-                                            <strong>Date and Time</strong><br>
+                                            <strong>Date and Time:</strong><br>
                                             <vp-input type="datetime" name="initialTestDate"
                                                       [(ngModel)]="model.initialTestDate" [required]="true"
                                                       [max]="today" [form]="submitForm" />
@@ -2548,7 +2548,7 @@
                                                            [(ngModel)]="repairCV1.cleaned" name="rCV1Cleaned"
                                                            id="rCV1Cleaned"><label class="form-check-label"
                                                            for="rCV1Cleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairCV1.disc" name="rCV1Disc"
                                                            id="rCV1Disc"><label class="form-check-label"
@@ -2583,7 +2583,7 @@
                                                            [(ngModel)]="repairCV2.cleaned" name="rCV2Cleaned"
                                                            id="rCV2Cleaned"><label class="form-check-label"
                                                            for="rCV2Cleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairCV2.disc" name="rCV2Disc"
                                                            id="rCV2Disc"><label class="form-check-label"
@@ -2619,7 +2619,7 @@
                                                            [(ngModel)]="repairRV.cleaned" name="rRVCleaned"
                                                            id="rRVCleaned"><label class="form-check-label"
                                                            for="rRVCleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairRV.discUpper" name="rRVDU"
                                                            id="rRVDU"><label class="form-check-label" for="rRVDU">Disc
@@ -2662,7 +2662,7 @@
                                                            [(ngModel)]="repairBC.cleaned" name="rBCCleaned"
                                                            id="rBCCleaned"><label class="form-check-label"
                                                            for="rBCCleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairBC.disc" name="rBCDisc"
                                                            id="rBCDisc"><label class="form-check-label"
@@ -2694,7 +2694,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Repair Details</strong></td>
+                                            <td><strong>Repair Details:</strong></td>
                                             <td>
                                                 <vp-input type="textarea" name="repairCV1Details"
                                                           [(ngModel)]="model.repairCV1Details" [maxLength]="100" />
@@ -2737,7 +2737,7 @@
                                             <td [class.table-success]="!isFailedResult && !finalTestDateError"
                                                 [class.table-danger]="!isFailedResult && !!finalTestDateError">
                                                 <div class="fw-bold mb-3 text-center">Test After Repair</div>
-                                                <strong>Date and Time</strong><br>
+                                                <strong>Date and Time:</strong><br>
                                                 <vp-input type="datetime" name="finalTestDate"
                                                           [(ngModel)]="model.finalTestDate" [required]="true"
                                                           [max]="today" [form]="submitForm" />
@@ -2832,7 +2832,7 @@
                                         <td [class.table-success]="!initialTestDateError"
                                             [class.table-danger]="!!initialTestDateError">
                                             <div class="fw-bold mb-3 text-center">Initial Test</div>
-                                            <strong>Date and Time</strong><br>
+                                            <strong>Date and Time:</strong><br>
                                             <vp-input type="datetime" name="initialTestDate"
                                                       [(ngModel)]="model.initialTestDate" [required]="true"
                                                       [max]="today" [form]="submitForm" />
@@ -2887,7 +2887,7 @@
                                                            name="rPvbAirInletCleaned" id="rPvbAirInletCleaned"><label
                                                            class="form-check-label"
                                                            for="rPvbAirInletCleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairPvbAirInlet.disc" name="rPvbAirInletDisc"
                                                            id="rPvbAirInletDisc"><label class="form-check-label"
@@ -2903,7 +2903,7 @@
                                                            [(ngModel)]="repairPvbCV.cleaned" name="rPvbCVCleaned"
                                                            id="rPvbCVCleaned"><label class="form-check-label"
                                                            for="rPvbCVCleaned">Cleaned</label></div>
-                                                <div class="text-muted small mb-1">Replaced</div>
+                                                <div class="text-muted small mb-1">Replaced:</div>
                                                 <div class="form-check"><input class="form-check-input" type="checkbox"
                                                            [(ngModel)]="repairPvbCV.disc" name="rPvbCVDisc"
                                                            id="rPvbCVDisc"><label class="form-check-label"
@@ -2915,7 +2915,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Repair Details</strong></td>
+                                            <td><strong>Repair Details:</strong></td>
                                             <td>
                                                 <vp-input type="textarea" name="repairPvbAirInletDetails"
                                                           [(ngModel)]="model.repairPvbAirInletDetails"
@@ -2945,7 +2945,7 @@
                                             <td [class.table-success]="!isFailedResult && !finalTestDateError"
                                                 [class.table-danger]="!isFailedResult && !!finalTestDateError">
                                                 <div class="fw-bold mb-3 text-center">Test After Repair</div>
-                                                <strong>Date and Time</strong><br>
+                                                <strong>Date and Time:</strong><br>
                                                 <vp-input type="datetime" name="finalTestDate"
                                                           [(ngModel)]="model.finalTestDate" [required]="true"
                                                           [max]="today" [form]="submitForm" />
@@ -2989,15 +2989,15 @@
                 <vp-section header="Bypass Meter Test">
                     <div class="row">
                         <div class="col-md-3">
-                            <vp-input type="text" label="Bypass Meter Number" name="meterNumber"
+                            <vp-input type="text" label="Bypass Meter Number:" name="meterNumber"
                                       [(ngModel)]="model.meterNumber" />
                         </div>
                         <div class="col-md-3">
-                            <vp-input type="number" label="Meter Reading Prior to Test" name="meterReadingBefore"
+                            <vp-input type="number" label="Meter Reading Prior to Test:" name="meterReadingBefore"
                                       [(ngModel)]="model.meterReadingBefore" />
                         </div>
                         <div class="col-md-3">
-                            <vp-input type="number" label="Meter Reading Upon Completion" name="meterReadingAfter"
+                            <vp-input type="number" label="Meter Reading Upon Completion:" name="meterReadingAfter"
                                       [(ngModel)]="model.meterReadingAfter" />
                         </div>
                         <div class="col-md-3">
@@ -3018,11 +3018,11 @@
                 <vp-section header="Additional Information">
                     <div class="row">
                         <div class="col-md-4" *ngIf="additionalInfoSettings?.showPermitNumber">
-                            <vp-input type="text" label="Permit Number" name="permitNumber"
+                            <vp-input type="text" label="Permit Number:" name="permitNumber"
                                       [(ngModel)]="model.permitNumber" />
                         </div>
                         <div class="col-md-4" *ngIf="additionalInfoSettings?.showWaterMeterNumber">
-                            <vp-input type="text" label="Water Meter Number" name="waterMeterNumber" [maxLength]="50"
+                            <vp-input type="text" label="Water Meter Number:" name="waterMeterNumber" [maxLength]="50"
                                       [(ngModel)]="model.waterMeterNumber" />
                         </div>
                         <div class="col-md-4" *ngIf="additionalInfoSettings?.showOSSF">

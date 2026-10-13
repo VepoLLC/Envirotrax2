@@ -1,4 +1,4 @@
-﻿<h1 class="text-center h2">
+<h1 class="text-center h2">
     Property Record Search
 </h1>
 
@@ -88,7 +88,7 @@
                     <div class="col-md-6">
                         <vp-field-grid>
                             <vp-filter-panel-field fieldName="waterSupplier.id"
-                                                   label="Water Supplier"
+                                                   label="Water Supplier:"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [form]="searchForm"
@@ -96,27 +96,27 @@
                                                    [required]="true" />
 
                             <vp-filter-panel-field fieldName="accountNumber"
-                                                   label="Account Number"
+                                                   label="Account Number:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field *ngIf="canFilterByCsiInspection"
                                                    fieldName="needsCsiInspection"
-                                                   label="Needs CSI Inspection"
+                                                   label="Needs CSI Inspection:"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [form]="searchForm"
                                                    [options]="yesNoOptions" />
 
                             <vp-filter-panel-field fieldName="workedOnly"
-                                                   label="Property Filter"
+                                                   label="Property Filter:"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [form]="searchForm"
                                                    [options]="propertyFilterOptions" />
 
                             <vp-filter-panel-field fieldName="scheduledOnly"
-                                                   label="Scheduled Properties"
+                                                   label="Scheduled Properties:"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [form]="searchForm"
@@ -124,7 +124,7 @@
 
                             <vp-filter-panel-field *ngIf="isScheduledOnly"
                                                    fieldName="scheduledDateType"
-                                                   label="Scheduled Date"
+                                                   label="Scheduled Date:"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [form]="searchForm"
@@ -132,14 +132,14 @@
 
                             <vp-filter-panel-field *ngIf="isScheduledDateRange"
                                                    fieldName="scheduledFrom"
-                                                   label="From"
+                                                   label="From:"
                                                    labelStyle="horizontal"
                                                    type="date"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field *ngIf="isScheduledDateRange"
                                                    fieldName="scheduledTo"
-                                                   label="To"
+                                                   label="To:"
                                                    labelStyle="horizontal"
                                                    type="date"
                                                    [form]="searchForm" />
@@ -158,38 +158,38 @@
                     <vp-section header="Location / Property Criteria">
                         <vp-field-grid>
                             <vp-filter-panel-field fieldName="propertyType"
-                                                   label="Property Type"
+                                                   label="Property Type:"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [form]="searchForm"
                                                    [options]="propertyTypes" />
 
                             <vp-filter-panel-field fieldName="businessName"
-                                                   label="Business Name"
+                                                   label="Business Name:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
                             <vp-field-grid-row>
-                                <vp-field-grid-label>Address</vp-field-grid-label>
+                                <vp-field-grid-label>Address:</vp-field-grid-label>
                                 <vp-field-grid-control>
                                     <div class="d-flex gap-1">
                                         <vp-filter-panel-field fieldName="streetNumber"
-                                                               label="Street #"
+                                                               label="Street #:"
                                                                [form]="searchForm" />
 
                                         <vp-filter-panel-field fieldName="streetName"
-                                                               label="Street Name"
+                                                               label="Street Name:"
                                                                [form]="searchForm" />
 
                                         <vp-filter-panel-field fieldName="propertyNumber"
-                                                               label="Suite/Apt #"
+                                                               label="Suite/Apt #:"
                                                                [form]="searchForm" />
                                     </div>
                                 </vp-field-grid-control>
                             </vp-field-grid-row>
 
                             <vp-filter-panel-field fieldName="zipCode"
-                                                   label="ZIP"
+                                                   label="ZIP:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </vp-field-grid>
@@ -200,36 +200,36 @@
                     <vp-section header="Contact / Mailing Criteria">
                         <vp-field-grid>
                             <vp-filter-panel-field fieldName="mailingCompanyName"
-                                                   label="Company Name"
+                                                   label="Company Name:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="mailingContactName"
-                                                   label="Contact Name"
+                                                   label="Contact Name:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
                             <vp-field-grid-row>
-                                <vp-field-grid-label>Address</vp-field-grid-label>
+                                <vp-field-grid-label>Address:</vp-field-grid-label>
                                 <vp-field-grid-control>
                                     <div class="d-flex gap-1">
                                         <vp-filter-panel-field fieldName="mailingStreetNumber"
-                                                               label="Street #"
+                                                               label="Street #:"
                                                                [form]="searchForm" />
 
                                         <vp-filter-panel-field fieldName="mailingStreetName"
-                                                               label="Street Name"
+                                                               label="Street Name:"
                                                                [form]="searchForm" />
 
                                         <vp-filter-panel-field fieldName="mailingNumber"
-                                                               label="Suite/Apt #"
+                                                               label="Suite/Apt #:"
                                                                [form]="searchForm" />
                                     </div>
                                 </vp-field-grid-control>
                             </vp-field-grid-row>
 
                             <vp-filter-panel-field fieldName="mailingZipCode"
-                                                   label="ZIP"
+                                                   label="ZIP:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </vp-field-grid>

@@ -23,7 +23,7 @@
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <vp-input name="backflowScheduleMonth"
-                                                  label="Test Renewal Month"
+                                                  label="Test Renewal Month:"
                                                   type="select"
                                                   [(ngModel)]="site.backflowScheduleMonth"
                                                   [options]="backflowScheduleMonths"
@@ -80,7 +80,7 @@
                                     <div class="col-md-6 mb-3" style="margin-top: 40px;">
                                         <div class="mb-2">
                                             <vp-input name="lastTripTicketDate"
-                                                      label="Last Trip Ticket Date"
+                                                      label="Last Trip Ticket Date:"
                                                       type="date"
                                                       [(ngModel)]="site.lastTripTicketDate"
                                                       [form]="form">
@@ -89,7 +89,7 @@
                                         <div class="mb-2">
                                             <vp-input [(ngModel)]="site.tripTicketInterval"
                                                       name="tripTicketInterval"
-                                                      label="Trip Ticket Interval"
+                                                      label="Trip Ticket Interval:"
                                                       type="number"
                                                       [form]="form">
                                             </vp-input>
@@ -104,7 +104,7 @@
                                         <p>Program User Account Assignments:</p>
                                         <div class="mb-2">
                                             <vp-input name="CsiAccountAssignment"
-                                                      label="CSI"
+                                                      label="CSI:"
                                                       type="select"
                                                       [(ngModel)]="site.csiAccountAssignmentId"
                                                       [options]="csiUsers"
@@ -113,7 +113,7 @@
                                         </div>
                                         <div class="mb-2">
                                             <vp-input name="backflowAccountAssignment"
-                                                      label="Backflow"
+                                                      label="Backflow:"
                                                       type="select"
                                                       [(ngModel)]="site.backflowAccountAssignmentId"
                                                       [options]="backflowUsers"
@@ -122,7 +122,7 @@
                                         </div>
                                         <div class="mb-2">
                                             <vp-input name="fogAccountAssignment"
-                                                      label="FOG"
+                                                      label="FOG:"
                                                       type="select"
                                                       [(ngModel)]="site.fogAccountAssignmentId"
                                                       [options]="fogUsers"
@@ -163,7 +163,7 @@
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <vp-input name="facilityType"
-                                                  label="Facility Type"
+                                                  label="Facility Type:"
                                                   type="select"
                                                   [(ngModel)]="site.facilityType"
                                                   [options]="facilityTypes"
@@ -172,7 +172,7 @@
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <vp-input name="greaseTrapType"
-                                                  label="Grease Trap Type"
+                                                  label="Grease Trap Type:"
                                                   type="select"
                                                   [(ngModel)]="site.greaseTrapType"
                                                   [options]="greaseTrapTypes"
@@ -278,7 +278,7 @@
                                 <div class="col-md-6 mb-3">
                                     <vp-input [(ngModel)]="site.gisLatitude"
                                               name="gisLatitude"
-                                              label="Latitude"
+                                              label="Latitude:"
                                               type="number"
                                               [form]="form">
                                     </vp-input>
@@ -287,7 +287,7 @@
                                 <div class="col-md-6 mb-3">
                                     <vp-input [(ngModel)]="site.gisLongitude"
                                               name="gisLongitude"
-                                              label="Longitude"
+                                              label="Longitude:"
                                               type="number"
                                               [form]="form">
                                     </vp-input>
@@ -295,7 +295,7 @@
 
                                 <div class="col-md-6 mb-3">
                                     <vp-input name="gisStatus"
-                                              label="GIS Status"
+                                              label="GIS Status:"
                                               type="select"
                                               [(ngModel)]="site.gisStatus"
                                               [options]="gisStatusOptions"
@@ -304,7 +304,7 @@
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">GIS Date</label>
+                                    <label class="form-label">GIS Date:</label>
                                     <div class="form-control-plaintext">{{ site.gisDate | date:'M/d/yyyy' }}</div>
                                 </div>
                             </div>

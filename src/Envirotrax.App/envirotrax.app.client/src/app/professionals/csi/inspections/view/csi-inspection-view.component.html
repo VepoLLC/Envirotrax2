@@ -31,20 +31,20 @@
 
         <!-- Account Selection & License Verification -->
         <vp-section header="Account Selection &amp; License Verification">
-            <div class="row align-items-center mb-2">
-                <div class="col-md-6 d-flex align-items-center">
-                    <span class="fw-semibold text-nowrap me-2">CSI Account:</span>
-                    <span>{{ inspection.inspectorContactName }}</span>
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row mb-0">
+                        <dt class="col-5 text-end">CSI Account:</dt>
+                        <dd class="col-7 mb-1">{{ inspection.inspectorContactName }}</dd>
+                        <dt class="col-5 text-end">Water Supplier:</dt>
+                        <dd class="col-7 mb-1">{{ inspection.waterSupplier?.name }}</dd>
+                    </dl>
                 </div>
-                <div class="col-md-6 ps-4">
-                    <span class="fw-semibold">Texas CSI/Plumbing Inspector/WSPS:</span>
-                    <span class="ms-1 text-success">License valid</span>
-                </div>
-            </div>
-            <div class="row align-items-center">
-                <div class="col-md-6 d-flex align-items-center">
-                    <span class="fw-semibold text-nowrap me-2">Water Supplier:</span>
-                    <span>{{ inspection.waterSupplier?.name }}</span>
+                <div class="col-md-6">
+                    <dl class="row mb-0">
+                        <dt class="col-5 text-end">Texas CSI/Plumbing Inspector/WSPS:</dt>
+                        <dd class="col-7 mb-1 text-success">License valid</dd>
+                    </dl>
                 </div>
             </div>
         </vp-section>
@@ -53,9 +53,9 @@
             <div class="row">
                 <div class="col-md-6">
                     <dl class="row mb-0">
-                        <dt class="col-5">Water Supplier:</dt>
+                        <dt class="col-5 text-end">Water Supplier:</dt>
                         <dd class="col-7 mb-1">{{ inspection.waterSupplier.name }}</dd>
-                        <dt class="col-5">Address:</dt>
+                        <dt class="col-5 text-end">Address:</dt>
                         <dd class="col-7 mb-1">
                             {{ inspection.waterSupplier.address }}<br *ngIf="inspection.waterSupplier.address">
                             {{ inspection.waterSupplier.city }}<span *ngIf="inspection.waterSupplier.city && inspection.waterSupplier.state?.name">, </span>{{ inspection.waterSupplier.state?.name }} {{ inspection.waterSupplier.zipCode }}
@@ -64,13 +64,13 @@
                 </div>
                 <div class="col-md-6">
                     <dl class="row mb-0">
-                        <dt class="col-5">PWS ID:</dt>
+                        <dt class="col-5 text-end">PWS ID:</dt>
                         <dd class="col-7 mb-1">{{ inspection.waterSupplier.pwsId }}</dd>
-                        <dt class="col-5">Contact Name:</dt>
+                        <dt class="col-5 text-end">Contact Name:</dt>
                         <dd class="col-7 mb-1">{{ inspection.waterSupplier.contactName }}</dd>
-                        <dt class="col-5">Phone Number:</dt>
+                        <dt class="col-5 text-end">Phone Number:</dt>
                         <dd class="col-7 mb-1">{{ inspection.waterSupplier.phoneNumber }}</dd>
-                        <dt class="col-5">Email Address:</dt>
+                        <dt class="col-5 text-end">Email Address:</dt>
                         <dd class="col-7 mb-1">{{ inspection.waterSupplier.emailAddress }}</dd>
                     </dl>
                 </div>
@@ -81,13 +81,13 @@
             <div class="row">
                 <div class="col-md-6">
                     <dl class="row mb-0">
-                        <dt class="col-5">Company Name:</dt>
+                        <dt class="col-5 text-end">Company Name:</dt>
                         <dd class="col-7 mb-1">{{ inspection.inspectorCompanyName }}</dd>
-                        <dt class="col-5">Title of Inspector:</dt>
+                        <dt class="col-5 text-end">Title of Inspector:</dt>
                         <dd class="col-7 mb-1">{{ inspection.inspectorJobTitle }}</dd>
-                        <dt class="col-5">Inspector Name:</dt>
+                        <dt class="col-5 text-end">Inspector Name:</dt>
                         <dd class="col-7 mb-1">{{ inspection.inspectorContactName }}</dd>
-                        <dt class="col-5">Address:</dt>
+                        <dt class="col-5 text-end">Address:</dt>
                         <dd class="col-7 mb-1">
                             {{ inspection.inspectorAddress }}<br *ngIf="inspection.inspectorAddress">
                             {{ inspection.inspectorCity }}<span *ngIf="inspection.inspectorCity && inspection.inspectorState">, </span>{{ inspection.inspectorState }} {{ inspection.inspectorZip }}
@@ -96,11 +96,11 @@
                 </div>
                 <div class="col-md-6">
                     <dl class="row mb-0">
-                        <dt class="col-5">Phone Number:</dt>
+                        <dt class="col-5 text-end">Phone Number:</dt>
                         <dd class="col-7 mb-1">{{ inspection.inspectorWorkNumber }}</dd>
-                        <dt class="col-5">License Number:</dt>
+                        <dt class="col-5 text-end">License Number:</dt>
                         <dd class="col-7 mb-1">{{ inspection.inspectorLicenseNumber }}</dd>
-                        <dt class="col-5">License Type:</dt>
+                        <dt class="col-5 text-end">License Type:</dt>
                         <dd class="col-7 mb-1">{{ inspection.inspectorLicenseType }}</dd>
                     </dl>
                 </div>
@@ -111,11 +111,11 @@
             <div class="col-md-6">
                 <vp-section header="Location / Property Information">
                     <dl class="row mb-0">
-                        <dt class="col-5">Property Type:</dt>
+                        <dt class="col-5 text-end">Property Type:</dt>
                         <dd class="col-7 mb-1">{{ inspection.propertyType === 0 ? 'Residential' : 'Commercial' }}</dd>
-                        <dt class="col-5">Business Name:</dt>
+                        <dt class="col-5 text-end">Business Name:</dt>
                         <dd class="col-7 mb-1">{{ inspection.propertyBusinessName }}</dd>
-                        <dt class="col-5">Property Address:</dt>
+                        <dt class="col-5 text-end">Property Address:</dt>
                         <dd class="col-7 mb-1">
                             {{ inspection.propertyStreetNumber }} {{ inspection.propertyStreetName }}<span *ngIf="inspection.propertyNumber"> #{{ inspection.propertyNumber }}</span><br>
                             {{ inspection.propertyCity }} {{ inspection.propertyZip }}
@@ -126,18 +126,18 @@
             <div class="col-md-6">
                 <vp-section header="Assembly Owner's Contact Information">
                     <dl class="row mb-0">
-                        <dt class="col-5">Company Name:</dt>
+                        <dt class="col-5 text-end">Company Name:</dt>
                         <dd class="col-7 mb-1">{{ inspection.mailingCompanyName }}</dd>
-                        <dt class="col-5">Contact Name:</dt>
+                        <dt class="col-5 text-end">Contact Name:</dt>
                         <dd class="col-7 mb-1">{{ inspection.mailingContactName }}</dd>
-                        <dt class="col-5">Mailing Address:</dt>
+                        <dt class="col-5 text-end">Mailing Address:</dt>
                         <dd class="col-7 mb-1">
                             {{ inspection.mailingStreetNumber }} {{ inspection.mailingStreetName }}<span *ngIf="inspection.mailingNumber"> #{{ inspection.mailingNumber }}</span><br>
                             {{ inspection.mailingCity }} {{ inspection.mailingZip }}
                         </dd>
-                        <dt class="col-5">Phone Number:</dt>
+                        <dt class="col-5 text-end">Phone Number:</dt>
                         <dd class="col-7 mb-1">{{ inspection.mailingPhoneNumber }}</dd>
-                        <dt class="col-5">Email Address:</dt>
+                        <dt class="col-5 text-end">Email Address:</dt>
                         <dd class="col-7 mb-1">{{ inspection.mailingEmailAddress }}</dd>
                     </dl>
                 </vp-section>
@@ -149,12 +149,16 @@
             <!-- Reason + Date -->
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <span class="fw-semibold me-2">Reason for Inspection:</span>
-                    <span>{{ getReasonLabel(inspection.reasonForInspection) }}</span>
+                    <dl class="row mb-0">
+                        <dt class="col-5 text-end">Reason for Inspection:</dt>
+                        <dd class="col-7 mb-1">{{ getReasonLabel(inspection.reasonForInspection) }}</dd>
+                    </dl>
                 </div>
                 <div class="col-md-6">
-                    <span class="fw-semibold me-2">Inspection Date:</span>
-                    <span>{{ inspection.inspectionDate | date:'MM/dd/yyyy' }}</span>
+                    <dl class="row mb-0">
+                        <dt class="col-5 text-end">Inspection Date:</dt>
+                        <dd class="col-7 mb-1">{{ inspection.inspectionDate | date:'MM/dd/yyyy' }}</dd>
+                    </dl>
                 </div>
             </div>
 

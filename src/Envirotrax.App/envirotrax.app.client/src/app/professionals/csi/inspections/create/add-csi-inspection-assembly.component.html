@@ -1,7 +1,7 @@
 <form #form="ngForm" (ngSubmit)="add(form)">
     <div class="mb-3">
         <vp-input type="select"
-                  label="Backflow Method"
+                  label="Backflow Method:"
                   name="deviceType"
                   [ngModel]="model.deviceType"
                   (ngModelChange)="onDeviceTypeChange($event)"
@@ -13,38 +13,38 @@
 
     <div *ngIf="showMainAssembly" class="row mb-3">
         <div class="col-md-4">
-            <vp-input type="select" label="Main Assembly Manufacturer" name="manufacturer" [(ngModel)]="model.manufacturer" [options]="manufacturerOptions" [placeholder]="'Select a manufacturer'" [required]="true" [form]="form" />
+            <vp-input type="select" label="Main Assembly Manufacturer:" name="manufacturer" [(ngModel)]="model.manufacturer" [options]="manufacturerOptions" [placeholder]="'Select a manufacturer'" [required]="true" [form]="form" />
         </div>
         <div class="col-md-3">
-            <vp-input label="Model" name="model" [(ngModel)]="model.model" [maxLength]="50" [required]="true" [form]="form" />
+            <vp-input label="Model:" name="model" [(ngModel)]="model.model" [maxLength]="50" [required]="true" [form]="form" />
         </div>
         <div class="col-md-2">
-            <vp-input type="select" label="Size" name="size" [(ngModel)]="model.size" [options]="sizeOptions" [placeholder]="'Select'" [required]="true" [form]="form" />
+            <vp-input type="select" label="Size:" name="size" [(ngModel)]="model.size" [options]="sizeOptions" [placeholder]="'Select'" [required]="true" [form]="form" />
         </div>
         <div class="col-md-3">
-            <vp-input label="Serial Number" name="serialNumber" [(ngModel)]="model.serialNumber" [maxLength]="50" [required]="true" [form]="form" />
+            <vp-input label="Serial Number:" name="serialNumber" [(ngModel)]="model.serialNumber" [maxLength]="50" [required]="true" [form]="form" />
         </div>
     </div>
 
     <div *ngIf="showBypassAssembly" class="row mb-3">
         <div class="col-md-4">
-            <vp-input type="select" label="Bypass Assembly Manufacturer" name="manufacturer2" [(ngModel)]="model.manufacturer2" [options]="manufacturerOptions" [placeholder]="'Select a manufacturer'" [required]="true" [form]="form" />
+            <vp-input type="select" label="Bypass Assembly Manufacturer:" name="manufacturer2" [(ngModel)]="model.manufacturer2" [options]="manufacturerOptions" [placeholder]="'Select a manufacturer'" [required]="true" [form]="form" />
         </div>
         <div class="col-md-3">
-            <vp-input label="Model" name="model2" [(ngModel)]="model.model2" [maxLength]="50" [required]="true" [form]="form" />
+            <vp-input label="Model:" name="model2" [(ngModel)]="model.model2" [maxLength]="50" [required]="true" [form]="form" />
         </div>
         <div class="col-md-2">
-            <vp-input type="select" label="Size" name="size2" [(ngModel)]="model.size2" [options]="sizeOptions" [placeholder]="'Select'" [required]="true" [form]="form" />
+            <vp-input type="select" label="Size:" name="size2" [(ngModel)]="model.size2" [options]="sizeOptions" [placeholder]="'Select'" [required]="true" [form]="form" />
         </div>
         <div class="col-md-3">
-            <vp-input label="Serial Number" name="serialNumber2" [(ngModel)]="model.serialNumber2" [maxLength]="50" [required]="true" [form]="form" />
+            <vp-input label="Serial Number:" name="serialNumber2" [(ngModel)]="model.serialNumber2" [maxLength]="50" [required]="true" [form]="form" />
         </div>
     </div>
 
     <div class="row mb-3">
         <div class="col-md-6">
             <vp-input type="select"
-                      label="Hazard Type"
+                      label="Hazard Type:"
                       name="hazardType"
                       [ngModel]="model.hazardType"
                       (ngModelChange)="onHazardTypeChange($event)"
@@ -54,16 +54,16 @@
                       [form]="form" />
         </div>
         <div *ngIf="showHazardTypeOtherDescription" class="col-md-6">
-            <vp-input label="Other Description" name="hazardTypeOtherDescription" [(ngModel)]="model.hazardTypeOtherDescription" [maxLength]="200" [required]="true" [form]="form" />
+            <vp-input label="Other Description:" name="hazardTypeOtherDescription" [(ngModel)]="model.hazardTypeOtherDescription" [maxLength]="200" [required]="true" [form]="form" />
         </div>
     </div>
 
     <div class="mb-3">
-        <vp-input label="Location Description" name="locationDescription" [(ngModel)]="model.locationDescription" [maxLength]="200" [form]="form" />
+        <vp-input label="Location Description:" name="locationDescription" [(ngModel)]="model.locationDescription" [maxLength]="200" [form]="form" />
     </div>
 
     <div class="mb-3">
-        <vp-input type="textarea" label="Comments" name="comments" [(ngModel)]="model.comments" [form]="form" />
+        <vp-input type="textarea" label="Comments:" name="comments" [(ngModel)]="model.comments" [form]="form" />
     </div>
 
     <vp-validation-summary [form]="form" [validationErrors]="validationErrors" />

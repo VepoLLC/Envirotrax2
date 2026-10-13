@@ -25,10 +25,10 @@
         <div class="col-md-6">
             <vp-section header="Water Supplier">
                 <dl class="row mb-0">
-                    <dt class="col-sm-4">Water Supplier</dt>
+                    <dt class="col-sm-4 text-sm-end">Water Supplier:</dt>
                     <dd class="col-sm-8">{{ site.waterSupplier?.name || '&mdash;' }}</dd>
 
-                    <dt class="col-sm-4">Address</dt>
+                    <dt class="col-sm-4 text-sm-end">Address:</dt>
                     <dd class="col-sm-8">
                         <ng-container *ngIf="site.waterSupplier?.address || site.waterSupplier?.city || site.waterSupplier?.zipCode; else emptyWsAddress">
                             <span *ngIf="site.waterSupplier?.address">{{ site.waterSupplier!.address }}<br /></span>
@@ -39,13 +39,13 @@
                         <ng-template #emptyWsAddress>&mdash;</ng-template>
                     </dd>
 
-                    <dt class="col-sm-4">PWS ID</dt>
+                    <dt class="col-sm-4 text-sm-end">PWS ID:</dt>
                     <dd class="col-sm-8">{{ site.waterSupplier?.pwsId || '&mdash;' }}</dd>
 
-                    <dt class="col-sm-4">Phone Number</dt>
+                    <dt class="col-sm-4 text-sm-end">Phone Number:</dt>
                     <dd class="col-sm-8">{{ site.waterSupplier?.phoneNumber || '&mdash;' }}</dd>
 
-                    <dt class="col-sm-4">Email Address</dt>
+                    <dt class="col-sm-4 text-sm-end">Email Address:</dt>
                     <dd class="col-sm-8">{{ site.waterSupplier?.emailAddress || '&mdash;' }}</dd>
                 </dl>
             </vp-section>
@@ -72,20 +72,20 @@
         <div class="col-md-6">
             <vp-section header="Location / Property Information">
                 <dl class="row mb-0">
-                    <dt class="col-sm-4">Account Number</dt>
+                    <dt class="col-sm-4 text-sm-end">Account Number:</dt>
                     <dd class="col-sm-8">{{ site.accountNumber || '&mdash;' }}</dd>
 
-                    <dt class="col-sm-4">Property Type</dt>
+                    <dt class="col-sm-4 text-sm-end">Property Type:</dt>
                     <dd class="col-sm-8">
                         <ng-container *ngIf="site.propertyType === PropertyType.Residential">Residential</ng-container>
                         <ng-container *ngIf="site.propertyType === PropertyType.Commercial">Commercial</ng-container>
                         <ng-container *ngIf="site.propertyType == null">&mdash;</ng-container>
                     </dd>
 
-                    <dt class="col-sm-4">Business Name</dt>
+                    <dt class="col-sm-4 text-sm-end">Business Name:</dt>
                     <dd class="col-sm-8">{{ site.businessName || '&mdash;' }}</dd>
 
-                    <dt class="col-sm-4">Property Address</dt>
+                    <dt class="col-sm-4 text-sm-end">Property Address:</dt>
                     <dd class="col-sm-8">
                         <ng-container *ngIf="site.streetNumber || site.streetName || site.propertyNumber || site.city || site.zipCode; else emptyAddress">
                             <span *ngIf="site.streetNumber">{{ site.streetNumber }} </span>
@@ -107,13 +107,13 @@
         <div class="col-md-6 mt-3 mt-md-0">
             <vp-section header="Contact / Mailing Information">
                 <dl class="row mb-0">
-                    <dt class="col-sm-4">Company Name</dt>
+                    <dt class="col-sm-4 text-sm-end">Company Name:</dt>
                     <dd class="col-sm-8">{{ site.mailingCompanyName || '&mdash;' }}</dd>
 
-                    <dt class="col-sm-4">Contact Name</dt>
+                    <dt class="col-sm-4 text-sm-end">Contact Name:</dt>
                     <dd class="col-sm-8">{{ site.mailingContactName || '&mdash;' }}</dd>
 
-                    <dt class="col-sm-4">Mailing Address</dt>
+                    <dt class="col-sm-4 text-sm-end">Mailing Address:</dt>
                     <dd class="col-sm-8">
                         <ng-container *ngIf="site.mailingStreetNumber || site.mailingStreetName || site.mailingNumber || site.mailingCity || site.mailingZipCode; else emptyMailingAddress">
                             <span *ngIf="site.mailingStreetNumber">{{ site.mailingStreetNumber }} </span>
@@ -129,10 +129,10 @@
                         <ng-template #emptyMailingAddress>&mdash;</ng-template>
                     </dd>
 
-                    <dt class="col-sm-4">Phone Number</dt>
+                    <dt class="col-sm-4 text-sm-end">Phone Number:</dt>
                     <dd class="col-sm-8">{{ site.mailingPhoneNumber || '&mdash;' }}</dd>
 
-                    <dt class="col-sm-4">Email Address</dt>
+                    <dt class="col-sm-4 text-sm-end">Email Address:</dt>
                     <dd class="col-sm-8">{{ site.mailingEmailAddress || '&mdash;' }}</dd>
                 </dl>
             </vp-section>

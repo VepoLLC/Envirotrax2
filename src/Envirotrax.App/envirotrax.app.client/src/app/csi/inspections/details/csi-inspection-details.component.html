@@ -43,21 +43,21 @@
                 <div class="row">
                     <div class="col-md-6">
                         <dl class="row mb-0">
-                            <dt class="col-sm-5">Water Supplier:</dt>
+                            <dt class="col-sm-5 text-sm-end">Water Supplier:</dt>
                             <dd class="col-sm-7">{{ inspection.waterSupplier?.name }}</dd>
-                            <dt class="col-sm-5">Address:</dt>
+                            <dt class="col-sm-5 text-sm-end">Address:</dt>
                             <dd class="col-sm-7">{{ inspection.waterSupplier?.address }}</dd>
-                            <dt class="col-sm-5">PWS ID:</dt>
+                            <dt class="col-sm-5 text-sm-end">PWS ID:</dt>
                             <dd class="col-sm-7">{{ inspection.waterSupplier?.pwsId }}</dd>
                         </dl>
                     </div>
                     <div class="col-md-6">
                         <dl class="row mb-0">
-                            <dt class="col-sm-5">Contact Name:</dt>
+                            <dt class="col-sm-5 text-sm-end">Contact Name:</dt>
                             <dd class="col-sm-7">{{ inspection.waterSupplier?.contactName }}</dd>
-                            <dt class="col-sm-5">Phone Number:</dt>
+                            <dt class="col-sm-5 text-sm-end">Phone Number:</dt>
                             <dd class="col-sm-7">{{ inspection.waterSupplier?.phoneNumber }}</dd>
-                            <dt class="col-sm-5">Email Address:</dt>
+                            <dt class="col-sm-5 text-sm-end">Email Address:</dt>
                             <dd class="col-sm-7">{{ inspection.waterSupplier?.emailAddress }}</dd>
                         </dl>
                     </div>
@@ -70,25 +70,25 @@
                 <div class="row">
                     <div class="col-md-6">
                         <dl class="row mb-0">
-                            <dt class="col-sm-5">Company Name:</dt>
+                            <dt class="col-sm-5 text-sm-end">Company Name:</dt>
                             <dd class="col-sm-7">{{ inspection.inspectorCompanyName }}</dd>
-                            <dt class="col-sm-5">Title of Inspector:</dt>
+                            <dt class="col-sm-5 text-sm-end">Title of Inspector:</dt>
                             <dd class="col-sm-7">{{ inspection.inspectorJobTitle }}</dd>
-                            <dt class="col-sm-5">Inspector Name:</dt>
+                            <dt class="col-sm-5 text-sm-end">Inspector Name:</dt>
                             <dd class="col-sm-7">{{ inspection.inspectorContactName }}</dd>
-                            <dt class="col-sm-5">Address:</dt>
+                            <dt class="col-sm-5 text-sm-end">Address:</dt>
                             <dd class="col-sm-7">{{ inspection.inspectorAddress }}</dd>
                         </dl>
                     </div>
                     <div class="col-md-6">
                         <dl class="row mb-0">
-                            <dt class="col-sm-5">Phone Number:</dt>
+                            <dt class="col-sm-5 text-sm-end">Phone Number:</dt>
                             <dd class="col-sm-7">{{ inspection.inspectorCellNumber }}</dd>
-                            <dt class="col-sm-5">Email Address:</dt>
+                            <dt class="col-sm-5 text-sm-end">Email Address:</dt>
                             <dd class="col-sm-7">{{ inspection.id }}</dd>
-                            <dt class="col-sm-5">License Number:</dt>
+                            <dt class="col-sm-5 text-sm-end">License Number:</dt>
                             <dd class="col-sm-7">{{ inspection.inspectorLicenseNumber }}</dd>
-                            <dt class="col-sm-5">License Type:</dt>
+                            <dt class="col-sm-5 text-sm-end">License Type:</dt>
                             <dd class="col-sm-7">{{ inspection.inspectorLicenseType }}</dd>
                         </dl>
                     </div>
@@ -100,11 +100,11 @@
             <div class="col-md-6">
                 <vp-section header="Location / Property Information">
                     <dl class="row mb-0">
-                        <dt class="col-sm-5">Property Type:</dt>
+                        <dt class="col-sm-5 text-sm-end">Property Type:</dt>
                         <dd class="col-sm-7">{{ getPropertyTypeLabel() }}</dd>
-                        <dt class="col-sm-5">Business Name:</dt>
+                        <dt class="col-sm-5 text-sm-end">Business Name:</dt>
                         <dd class="col-sm-7">{{ inspection.propertyBusinessName }}</dd>
-                        <dt class="col-sm-5">Property Address:</dt>
+                        <dt class="col-sm-5 text-sm-end">Property Address:</dt>
                         <dd class="col-sm-7">{{ inspection.propertyStreetNumber }} {{ inspection.propertyStreetName }}
                             {{ inspection.propertyCity }} {{ inspection.propertyZip }}</dd>
                     </dl>
@@ -114,16 +114,16 @@
             <div class="col-md-6">
                 <vp-section header="Contact / Mailing Information">
                     <dl class="row mb-0">
-                        <dt class="col-sm-5">Company Name:</dt>
+                        <dt class="col-sm-5 text-sm-end">Company Name:</dt>
                         <dd class="col-sm-7">{{ inspection.mailingCompanyName }}</dd>
-                        <dt class="col-sm-5">Contact Name:</dt>
+                        <dt class="col-sm-5 text-sm-end">Contact Name:</dt>
                         <dd class="col-sm-7">{{ inspection.mailingContactName }}</dd>
-                        <dt class="col-sm-5">Mailing Address:</dt>
+                        <dt class="col-sm-5 text-sm-end">Mailing Address:</dt>
                         <dd class="col-sm-7">{{ inspection.mailingStreetNumber }} {{ inspection.mailingStreetName }} {{
                             inspection.mailingCity }} {{ inspection.mailingZip }}</dd>
-                        <dt class="col-sm-5">Phone Number:</dt>
+                        <dt class="col-sm-5 text-sm-end">Phone Number:</dt>
                         <dd class="col-sm-7">{{ inspection.mailingPhoneNumber }}</dd>
-                        <dt class="col-sm-5">Email Address:</dt>
+                        <dt class="col-sm-5 text-sm-end">Email Address:</dt>
                         <dd class="col-sm-7">{{ inspection.mailingEmailAddress }}</dd>
                     </dl>
                 </vp-section>
@@ -134,9 +134,9 @@
             <vp-section header="Inspection Results">
                 <div class="content">
                     <dl class="row mb-3">
-                        <dt class="col-sm-3">Reason for Inspection:</dt>
+                        <dt class="col-sm-3 text-sm-end">Reason for Inspection:</dt>
                         <dd class="col-sm-9">{{ getReasonForInspectionLabel() }}</dd>
-                        <dt class="col-sm-3">Inspection Date:</dt>
+                        <dt class="col-sm-3 text-sm-end">Inspection Date:</dt>
                         <dd class="col-sm-9">{{ inspection.inspectionDate | date:'dd.MM.yyyy' }}</dd>
                     </dl>
                     <div class="p-2 mb-3 border border-5 border-secondary-subtle">

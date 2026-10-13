@@ -544,8 +544,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("MailingEmailAddress")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("MailingNumber")
                         .HasMaxLength(50)
@@ -1030,8 +1030,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("MailingEmailAddress")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("MailingNumber")
                         .HasMaxLength(50)
@@ -1566,8 +1566,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("MailingEmailAddress")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("MailingNumber")
                         .HasMaxLength(50)
@@ -3343,8 +3343,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("MailingEmailAddress")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("MailingNumber")
                         .HasMaxLength(50)

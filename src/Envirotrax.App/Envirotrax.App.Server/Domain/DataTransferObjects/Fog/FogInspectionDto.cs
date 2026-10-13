@@ -72,7 +72,7 @@ public class FogInspectionDto : IDto, IPropertyLocationDto, IMailingInfoDto, IRe
     [StringLength(50)]
     public string? MailingPhoneNumber { get; set; }
 
-    [StringLength(100)]
+    [StringLength(1000)]
     public string? MailingEmailAddress { get; set; }
 
     IEnumerable<IMailingInfoDto?> IRedactableMailingInfoDto.MailingInfo => [this, Site];

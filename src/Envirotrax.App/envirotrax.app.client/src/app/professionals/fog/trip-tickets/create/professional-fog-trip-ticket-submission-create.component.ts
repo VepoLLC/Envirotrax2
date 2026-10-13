@@ -11,12 +11,13 @@ import { ProfesionalUserService } from "../../../../shared/services/professional
 import { ProfessionalSupplierService } from "../../../../shared/services/professionals/professional-supplier.service";
 import { ProfessionalFogVehicleService } from "../../../../shared/services/fog/professional-fog-vehicle.service";
 import { ProfessionalFogDisposalSiteService } from "../../../../shared/services/fog/professional-fog-disposal-site.service";
-import { ProfessionalUserLicenseService } from "../../../../shared/services/professionals/professional-user-license.service";
+import { ProfessionalLicenseService } from "../../../../shared/services/professionals/professional-license.service";
 import { FogTripTicketService } from "../../../../shared/services/fog/fog-trip-ticket.service";
 import { Professional } from "../../../../shared/models/professionals/professional";
 import { ProfessionalUser } from "../../../../shared/models/professionals/professional-user";
 import { InsuranceCheck, InsuranceCheckResult } from "../../../../shared/models/professionals/insurance-check";
-import { ProfessionalType, ExpirationType as LicenseExpirationType, ProfessionalUserLicense } from "../../../../shared/models/professionals/licenses/professional-user-license";
+import { ProfessionalType, ExpirationType as LicenseExpirationType } from "../../../../shared/models/professionals/licenses/professional-user-license";
+import { ProfessionalLicense } from "../../../../shared/models/professionals/licenses/professional-license";
 import { FogVehicle } from "../../../../shared/models/fog/fog-vehicle";
 import { FogDisposalSite } from "../../../../shared/models/fog/fog-disposal-site";
 import { FogVehicleCapacityType } from "../../../../shared/models/fog/fog-vehicle-enums";
@@ -108,7 +109,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
     public transporterSignatureUrl: string | null = null;
 
     private _siteId = 0;
-    private _transporterLicense?: ProfessionalUserLicense;
+    private _transporterLicense?: ProfessionalLicense;
     private _insuranceCheck?: InsuranceCheck;
     private readonly _myWaterSuppliers = new Map<number, WaterSupplier>();
     private readonly _stateNamesById = new Map<number, string>();
@@ -122,7 +123,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         private readonly _supplierService: ProfessionalSupplierService,
         private readonly _vehicleService: ProfessionalFogVehicleService,
         private readonly _disposalSiteService: ProfessionalFogDisposalSiteService,
-        private readonly _licenseService: ProfessionalUserLicenseService,
+        private readonly _licenseService: ProfessionalLicenseService,
         private readonly _tripTicketService: FogTripTicketService,
         private readonly _lookupService: LookupService,
         private readonly _modalHelper: ModalHelperService,
@@ -535,7 +536,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
             return { label, message: 'Select a transporter account', valid: false };
         }
 
-        const licensePage = await this._licenseService.getForUser(this.selectedTransporterUserId, { pageSize: MAX_PAGE_SIZE }, {});
+        const licensePage = await this._licenseService.getAll({ pageSize: MAX_PAGE_SIZE }, {});
         const license = licensePage.data?.find(l => l.professionalType === ProfessionalType.FogTransporter);
 
         if (!license) {

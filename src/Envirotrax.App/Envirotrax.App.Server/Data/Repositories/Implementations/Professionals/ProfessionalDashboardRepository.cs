@@ -26,10 +26,10 @@ public class ProfessionalDashboardRepository(IDbContextSelector dbContextSelecto
         return await PaginateAsync(rows, pageInfo, query, cancellationToken);
     }
 
-    public async Task<IEnumerable<ProfessionalDashboardLicenseInsuranceDto>> GetCompanyLicensesAndInsurancesAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public async Task<IEnumerable<ProfessionalDashboardLicenseInsuranceDto>> GetLicensesAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        var rows = GetCompanyLicenseRows()
-            .Union(GetInsuranceRows());
+        var rows = GetUserLicenseRows()
+            .Union(GetCompanyLicenseRows());
 
         return await PaginateAsync(rows, pageInfo, query, cancellationToken);
     }
@@ -42,6 +42,7 @@ public class ProfessionalDashboardRepository(IDbContextSelector dbContextSelecto
             {
                 Id = license.Id,
                 RowType = ProfessionalDashboardRowType.License,
+                ProfessionalType = license.ProfessionalType,
                 TypeName = license.LicenseType!.Name,
                 Number = license.LicenseNumber,
                 AssignedTo = string.IsNullOrEmpty(license.ProfessionalUser!.ContactName)
@@ -59,6 +60,7 @@ public class ProfessionalDashboardRepository(IDbContextSelector dbContextSelecto
             {
                 Id = license.Id,
                 RowType = ProfessionalDashboardRowType.CompanyLicense,
+                ProfessionalType = license.ProfessionalType,
                 TypeName = license.LicenseType!.Name,
                 Number = license.LicenseNumber,
                 AssignedTo = license.Professional!.Name,
@@ -74,6 +76,7 @@ public class ProfessionalDashboardRepository(IDbContextSelector dbContextSelecto
             {
                 Id = insurance.Id,
                 RowType = ProfessionalDashboardRowType.Insurance,
+                ProfessionalType = null,
                 TypeName = "Insurance Policy",
                 Number = insurance.InsuranceNumber,
                 AssignedTo = insurance.Professional!.Name,

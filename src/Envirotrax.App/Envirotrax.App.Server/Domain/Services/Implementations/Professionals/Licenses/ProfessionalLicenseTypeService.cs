@@ -21,7 +21,7 @@ public class ProfessionalLicenseTypeService(IMapper mapper, IProfessionalLicense
         return types.Select(mapper.Map<ProfessionalLicenseTypeDto>);
     }
 
-    public async Task EnsureLicenseScopeAsync(int? licenseTypeId, LicenseScope licenseScope)
+    public async Task<ProfessionalLicenseTypeDto> EnsureLicenseScopeAsync(int? licenseTypeId, LicenseScope licenseScope)
     {
         var licenseType = await repository.GetAsync(licenseTypeId.GetValueOrDefault(), default);
 
@@ -29,5 +29,7 @@ public class ProfessionalLicenseTypeService(IMapper mapper, IProfessionalLicense
         {
             throw new AppValidationException("The selected license type can't be registered here.");
         }
+
+        return mapper.Map<ProfessionalLicenseTypeDto>(licenseType);
     }
 }

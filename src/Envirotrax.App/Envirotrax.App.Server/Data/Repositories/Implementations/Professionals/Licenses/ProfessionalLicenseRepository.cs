@@ -44,6 +44,23 @@ public class ProfessionalLicenseRepository : Repository<ProfessionalLicense>, IP
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<ProfessionalLicense>> GetForWaterSupplierAsync(int professionalId, int waterSupplierId, ProfessionalType professionalType, CancellationToken cancellationToken)
+    {
+        var supplierStateIds = DbContext.WaterSuppliers
+            .Where(supplier => supplier.Id == waterSupplierId)
+            .Select(supplier => supplier.StateId);
+
+        return await DbContext.ProfessionalLicenses
+            .AsNoTracking()
+            .Include(license => license.LicenseType)
+            .Where(license => license.ProfessionalId == professionalId
+                && license.ProfessionalType == professionalType
+                && license.LicenseType!.ProfessionalType == professionalType
+                && license.LicenseType.StateId != null
+                && supplierStateIds.Contains(license.LicenseType.StateId))
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<ProfessionalLicense> UpdateForWaterSupplierAsync(int id, string licenseNumber, DateTime? expirationDate)
     {
         var license = await DbContext.ProfessionalLicenses

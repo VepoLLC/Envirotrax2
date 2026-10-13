@@ -77,21 +77,40 @@ public class ProfessionalLicenseService : Service<ProfessionalLicense, Professio
 
     public override async Task<ProfessionalLicenseDto> AddAsync(ProfessionalLicenseDto dto)
     {
-        await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.Company);
+        var licenseType = await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.Company);
+
+        dto.ProfessionalType = licenseType.ProfessionalType;
+        dto.ExpirationDate = null;
 
         return await base.AddAsync(dto);
     }
 
     public override async Task<ProfessionalLicenseDto> UpdateAsync(ProfessionalLicenseDto dto)
     {
-        await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.Company);
+        var licenseType = await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.Company);
+        var existing = await Repository.GetNoIncludesAsync(dto.Id, default);
+
+        if (existing == null)
+        {
+            throw new InvalidOperationException($"License {dto.Id} not found.");
+        }
+
+        dto.ProfessionalType = licenseType.ProfessionalType;
+        dto.ExpirationDate = existing.ExpirationDate;
+
+        if (existing.LicenseNumber != dto.LicenseNumber || existing.LicenseTypeId != licenseType.Id)
+        {
+            dto.ExpirationDate = null;
+        }
 
         return await base.UpdateAsync(dto);
     }
 
     public async Task<ProfessionalLicenseDto> AddForProfessionalAsync(int professionalId, ProfessionalLicenseDto dto)
     {
-        await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.Company);
+        var licenseType = await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.Company);
+
+        dto.ProfessionalType = licenseType.ProfessionalType;
 
         var model = MapToModel(dto)!;
         model.ProfessionalId = professionalId;
@@ -103,7 +122,9 @@ public class ProfessionalLicenseService : Service<ProfessionalLicense, Professio
 
     public async Task<ProfessionalLicenseDto> UpdateForProfessionalAsync(int professionalId, ProfessionalLicenseDto dto)
     {
-        await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.Company);
+        var licenseType = await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.Company);
+
+        dto.ProfessionalType = licenseType.ProfessionalType;
 
         var model = MapToModel(dto)!;
         model.ProfessionalId = professionalId;

@@ -254,59 +254,37 @@
     <div *ngIf="newInsurance" class="d-flex justify-content-center" dp-spinner-parent>
         <dp-loading-spinner *ngIf="isNewInsuranceLoading" />
         <form #form="ngForm" (ngSubmit)="save(form)">
-            <div *ngIf="hasCompanyLicenseTypes" class="mb-3">
-                <vp-input type="select"
-                          name="documentType"
-                          label="Type"
-                          [ngModel]="documentTypeId"
-                          (ngModelChange)="documentTypeChange($event)"
-                          [required]="true"
-                          [options]="documentTypes"
-                          [form]="form" />
-            </div>
-
-            <ng-container *ngIf="!isCompanyLicense">
-                <div class="mb-3">
-                    <vp-input name="insuranceNumber"
-                              label="Policy Number"
-                              [(ngModel)]="newInsurance.insuranceNumber"
-                              [required]="true"
-                              [maxLength]="50"
-                              [form]="form" />
-                </div>
-
-                <div class="mb-3">
-                    <vp-input name="coverageAmount"
-                              label="Coverage $"
-                              type="number"
-                              [decimals]="2"
-                              [min]="0"
-                              [(ngModel)]="newInsurance.coverageAmount"
-                              [required]="true"
-                              [form]="form" />
-                </div>
-
-                <div class="mb-3">
-                    <p>
-                        Please click on the Choose File button below and select the Certificate of Insurance (COI) you wish to upload.
-                    </p>
-
-                    <vp-file-upload name="coiFile"
-                                    validationLabel="Certificate of Insurance (COI)"
-                                    [(ngModel)]="certificateFile"
-                                    [required]="true"
-                                    accept=".jpg, .jpeg, .gif, .png, .bmp, .pdf"
-                                    [form]="form" />
-                </div>
-            </ng-container>
-
-            <div *ngIf="isCompanyLicense" class="mb-3">
-                <vp-input name="licenseNumber"
-                          label="License Number"
-                          [(ngModel)]="newLicense.licenseNumber"
+            <div class="mb-3">
+                <vp-input name="insuranceNumber"
+                          label="Policy Number"
+                          [(ngModel)]="newInsurance.insuranceNumber"
                           [required]="true"
                           [maxLength]="50"
                           [form]="form" />
+            </div>
+
+            <div class="mb-3">
+                <vp-input name="coverageAmount"
+                          label="Coverage $"
+                          type="number"
+                          [decimals]="2"
+                          [min]="0"
+                          [(ngModel)]="newInsurance.coverageAmount"
+                          [required]="true"
+                          [form]="form" />
+            </div>
+
+            <div class="mb-3">
+                <p>
+                    Please click on the Choose File button below and select the Certificate of Insurance (COI) you wish to upload.
+                </p>
+
+                <vp-file-upload name="coiFile"
+                                validationLabel="Certificate of Insurance (COI)"
+                                [(ngModel)]="certificateFile"
+                                [required]="true"
+                                accept=".jpg, .jpeg, .gif, .png, .bmp, .pdf"
+                                [form]="form" />
             </div>
 
             <div class="form-check mb-3">
@@ -329,8 +307,7 @@
 
                 <div class="d-flex justify-content-center">
                     <button type="submit" class="btn btn-primary w-100">
-                        <ng-container *ngIf="!isCompanyLicense">Submit New Insurance Policy</ng-container>
-                        <ng-container *ngIf="isCompanyLicense">Submit New License</ng-container>
+                        Submit New Insurance Policy
                     </button>
                 </div>
             </div>

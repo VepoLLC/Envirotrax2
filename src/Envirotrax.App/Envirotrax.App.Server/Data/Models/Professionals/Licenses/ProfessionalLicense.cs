@@ -7,7 +7,7 @@ using Envirotrax.Common.Data.Models;
 namespace Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 
 [RecordLogged(RecordLogTableNames.ProfessionalLicenses, WaterSupplierSource = RecordLogIdSource.Ambient, ProfessionalSource = RecordLogIdSource.Entity)]
-public class ProfessionalLicense : IProfessionalModel, ICreateAuditableModel<AppUser>
+public class ProfessionalLicense : IProfessionalModel, ICreateAuditableModel<AppUser>, ILicenseModel
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }

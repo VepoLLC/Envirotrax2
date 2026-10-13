@@ -8,5 +8,5 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licens
 public interface IProfessionalLicenseTypeService
 {
     Task<IEnumerable<ProfessionalLicenseTypeDto>> GetAllAsync(Query query, CancellationToken cancellationToken);
-    Task EnsureLicenseScopeAsync(int? licenseTypeId, LicenseScope licenseScope);
+    Task<ProfessionalLicenseTypeDto> EnsureLicenseScopeAsync(int? licenseTypeId, LicenseScope licenseScope);
 }

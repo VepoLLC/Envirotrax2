@@ -28,9 +28,9 @@ public class ProfessionalDashboardService : IProfessionalDashboardService
         return rows.ToPagedData(pageInfo);
     }
 
-    public async Task<IPagedData<ProfessionalDashboardLicenseInsuranceDto>> GetCompanyLicensesAndInsurancesAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public async Task<IPagedData<ProfessionalDashboardLicenseInsuranceDto>> GetLicensesAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        var rows = await _dashboardRepository.GetCompanyLicensesAndInsurancesAsync(pageInfo, query, cancellationToken);
+        var rows = await _dashboardRepository.GetLicensesAsync(pageInfo, query, cancellationToken);
 
         SetExpirationTypes(rows);
 

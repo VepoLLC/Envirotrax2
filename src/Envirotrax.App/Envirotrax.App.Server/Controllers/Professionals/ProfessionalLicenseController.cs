@@ -20,10 +20,10 @@ public class ProfessionalLicenseController : ProfessionalCrudController<Professi
         _dashboardService = dashboardService;
     }
 
-    [HttpGet("/api/professionals/company-licenses-and-insurances")]
-    public async Task<IActionResult> GetAllWithInsurancesAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
+    [HttpGet("/api/professionals/user-and-company-licenses")]
+    public async Task<IActionResult> GetAllWithUserLicensesAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
     {
-        var rows = await _dashboardService.GetCompanyLicensesAndInsurancesAsync(pageInfo, query, cancellationToken);
+        var rows = await _dashboardService.GetLicensesAsync(pageInfo, query, cancellationToken);
 
         return Ok(rows);
     }

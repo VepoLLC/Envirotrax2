@@ -21,10 +21,20 @@ export class ProfessionalLicenseService {
 
     }
 
-    public getAllWithInsurances(pageInfo: PageInfo, query: Query): Promise<PagedData<ProfessionalDashboardLicenseInsurance>> {
-        const url = this._urlResolver.resolveUrl('/api/professionals/company-licenses-and-insurances');
+    public getAllWithUserLicenses(pageInfo: PageInfo, query: Query): Promise<PagedData<ProfessionalDashboardLicenseInsurance>> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/user-and-company-licenses');
 
         const observable = this._http.get<PagedData<ProfessionalDashboardLicenseInsurance>>(url, {
+            params: this._queryHelper.buildQuery(pageInfo, query)
+        });
+
+        return lastValueFrom(observable);
+    }
+
+    public getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<ProfessionalLicense>> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/company-licenses');
+
+        const observable = this._http.get<PagedData<ProfessionalLicense>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)
         });
 

@@ -28,6 +28,7 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
     ];
 
     private readonly IProfessionalUserLicenseRepository _licenseRepository;
+    private readonly IProfessionalLicenseRepository _companyLicenseRepository;
     private readonly IProfessionalLicenseTypeService _licenseTypeService;
     private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly IAuthService _authService;
@@ -36,6 +37,7 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
     public ProfessionalUserLicenseService(
         IMapper mapper,
         IProfessionalUserLicenseRepository repository,
+        IProfessionalLicenseRepository companyLicenseRepository,
         IProfessionalLicenseTypeService licenseTypeService,
         ITimeZoneHelperService timeZoneHelper,
         IAuthService authService,
@@ -43,6 +45,7 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
         : base(mapper, repository)
     {
         _licenseRepository = repository;
+        _companyLicenseRepository = companyLicenseRepository;
         _licenseTypeService = licenseTypeService;
         _timeZoneHelper = timeZoneHelper;
         _authService = authService;
@@ -88,21 +91,40 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
 
     public override async Task<ProfessionalUserLicenseDto> AddAsync(ProfessionalUserLicenseDto dto)
     {
-        await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.User);
+        var licenseType = await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.User);
+
+        dto.ProfessionalType = licenseType.ProfessionalType;
+        dto.ExpirationDate = null;
 
         return await base.AddAsync(dto);
     }
 
     public override async Task<ProfessionalUserLicenseDto> UpdateAsync(ProfessionalUserLicenseDto dto)
     {
-        await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.User);
+        var licenseType = await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.User);
+        var existing = await Repository.GetNoIncludesAsync(dto.Id, default);
+
+        if (existing == null)
+        {
+            throw new InvalidOperationException($"License {dto.Id} not found.");
+        }
+
+        dto.ProfessionalType = licenseType.ProfessionalType;
+        dto.ExpirationDate = existing.ExpirationDate;
+
+        if (existing.LicenseNumber != dto.LicenseNumber || existing.LicenseTypeId != licenseType.Id)
+        {
+            dto.ExpirationDate = null;
+        }
 
         return await base.UpdateAsync(dto);
     }
 
     public async Task<ProfessionalUserLicenseDto> AddForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto)
     {
-        await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.User);
+        var licenseType = await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.User);
+
+        dto.ProfessionalType = licenseType.ProfessionalType;
 
         var model = MapToModel(dto)!;
         model.ProfessionalId = professionalId;
@@ -112,7 +134,9 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
 
     public async Task<ProfessionalUserLicenseDto> UpdateForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto)
     {
-        await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.User);
+        var licenseType = await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.User);
+
+        dto.ProfessionalType = licenseType.ProfessionalType;
 
         var model = MapToModel(dto)!;
         model.ProfessionalId = professionalId;
@@ -152,21 +176,23 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
     public async Task<BpatLicenseCheckDto> CheckBpatForWaterSupplierAsync(int professionalId, int userId, int waterSupplierId, CancellationToken cancellationToken)
     {
         var licenseTypes = await _licenseRepository.GetLicenseTypesForWaterSupplierAsync(waterSupplierId, ProfessionalType.Bpat, cancellationToken);
-        var licenses = await _licenseRepository.GetUserLicensesForWaterSupplierAsync(professionalId, userId, waterSupplierId, ProfessionalType.Bpat, cancellationToken);
+        var userLicenses = await _licenseRepository.GetUserLicensesForWaterSupplierAsync(professionalId, userId, waterSupplierId, ProfessionalType.Bpat, cancellationToken);
+        var companyLicenses = await _companyLicenseRepository.GetForWaterSupplierAsync(professionalId, waterSupplierId, ProfessionalType.Bpat, cancellationToken);
 
         var licenseTypesByFire = licenseTypes.ToLookup(licenseType => licenseType.IsFireLicense);
-        var licensesByFire = licenses.ToLookup(license => license.LicenseType!.IsFireLicense);
+        var bpatLicenses = userLicenses.Where(license => !license.LicenseType!.IsFireLicense);
+        var fireLicenses = companyLicenses.Where(license => license.LicenseType!.IsFireLicense);
 
         var mainLicenseLabel = licenseTypesByFire[false].FirstOrDefault()?.Description ?? DefaultLicenseLabel;
 
         return new BpatLicenseCheckDto
         {
-            License = CheckLicense(licenseTypesByFire[false].Any(), licensesByFire[false], mainLicenseLabel),
-            FireLicense = CheckLicense(licenseTypesByFire[true].Any(), licensesByFire[true], FireLicenseLabel)
+            License = CheckLicense(licenseTypesByFire[false].Any(), bpatLicenses, mainLicenseLabel),
+            FireLicense = CheckLicense(licenseTypesByFire[true].Any(), fireLicenses, FireLicenseLabel)
         };
     }
 
-    private LicenseCheckDto CheckLicense(bool isRequired, IEnumerable<ProfessionalUserLicense> licenses, string label)
+    private LicenseCheckDto CheckLicense(bool isRequired, IEnumerable<ILicenseModel> licenses, string label)
     {
         if (!isRequired)
         {
@@ -192,7 +218,7 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
         return CreateLicenseCheck(LicenseCheckResult.NotFound, label, null);
     }
 
-    private static LicenseCheckResult GetLicenseResult(ProfessionalUserLicense license, DateTime now)
+    private static LicenseCheckResult GetLicenseResult(ILicenseModel license, DateTime now)
     {
         if (license.ExpirationDate == null)
         {
@@ -204,7 +230,7 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
             : LicenseCheckResult.Valid;
     }
 
-    private static LicenseCheckDto CreateLicenseCheck(LicenseCheckResult result, string label, ProfessionalUserLicense? license)
+    private static LicenseCheckDto CreateLicenseCheck(LicenseCheckResult result, string label, ILicenseModel? license)
     {
         return new LicenseCheckDto
         {

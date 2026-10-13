@@ -13,13 +13,13 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Fog
     public class FogTransporterService : Service<Professional, ProfessionalDto>, IFogTransporterService
     {
         private readonly IFogTransporterRepository _transporterRepository;
-        private readonly IProfessionalUserLicenseService _licenseService;
+        private readonly IProfessionalLicenseService _licenseService;
         private readonly IProfessionalInsuranceService _insuranceService;
 
         public FogTransporterService(
             IMapper mapper,
             IFogTransporterRepository repository,
-            IProfessionalUserLicenseService licenseService,
+            IProfessionalLicenseService licenseService,
             IProfessionalInsuranceService insuranceService)
             : base(mapper, repository)
         {

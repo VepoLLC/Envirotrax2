@@ -6,7 +6,7 @@ import { QueryHelperService } from "../helpers/query-helper.service";
 import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
-import { ProfessionalUserLicense } from "../../models/professionals/licenses/professional-user-license";
+import { ProfessionalLicense } from "../../models/professionals/licenses/professional-license";
 import { ProfessionalLicenseType } from "../../models/professionals/licenses/professional-license-type";
 import { InputOption } from "@envirotrax/common-ui";
 
@@ -29,20 +29,20 @@ export class FogTransporterLicensesService {
         return types.map(t => ({ id: t.id, text: t.name, data: t }));
     }
 
-    public async getLicenses(id: number, pageInfo: PageInfo, query: Query): Promise<PagedData<ProfessionalUserLicense>> {
+    public async getLicenses(id: number, pageInfo: PageInfo, query: Query): Promise<PagedData<ProfessionalLicense>> {
         const url = this._urlResolver.resolveUrl(`/api/fog/transporters/${id}/licenses`);
-        return await lastValueFrom(this._http.get<PagedData<ProfessionalUserLicense>>(url, {
+        return await lastValueFrom(this._http.get<PagedData<ProfessionalLicense>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));
     }
 
-    public add(transporterId: number, license: ProfessionalUserLicense): Promise<ProfessionalUserLicense> {
+    public add(transporterId: number, license: ProfessionalLicense): Promise<ProfessionalLicense> {
         const url = this._urlResolver.resolveUrl(`/api/fog/transporters/${transporterId}/licenses`);
-        return lastValueFrom(this._http.post<ProfessionalUserLicense>(url, license));
+        return lastValueFrom(this._http.post<ProfessionalLicense>(url, license));
     }
 
-    public update(transporterId: number, license: ProfessionalUserLicense): Promise<ProfessionalUserLicense> {
+    public update(transporterId: number, license: ProfessionalLicense): Promise<ProfessionalLicense> {
         const url = this._urlResolver.resolveUrl(`/api/fog/transporters/${transporterId}/licenses/${license.id}`);
-        return lastValueFrom(this._http.put<ProfessionalUserLicense>(url, license));
+        return lastValueFrom(this._http.put<ProfessionalLicense>(url, license));
     }
 }

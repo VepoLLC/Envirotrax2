@@ -154,85 +154,6 @@ export class App implements OnInit {
         ]
       },
       {
-        title: 'CSI Management',
-        iconCss: 'fa-solid fa-building-magnifying-glass',
-        hasPermission: true,
-        hasFeature: await this._authService.hasAnyFeatures(FeatureType.CsiInspection),
-        children: [
-          {
-            title: 'Property Record Search',
-            iconCss: 'fa-regular fa-building-magnifying-glass',
-            routerLink: ['sites'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Sites),
-            hasFeature: true
-          },
-          {
-            title: 'Inspection Search',
-            iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['csi'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiInspections),
-            hasFeature: true
-          },
-          {
-            type: 'separator',
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Sites, PermissionType.CsiInspections),
-            hasFeature: true
-          },
-          {
-            title: 'Inspector Management',
-            iconCss: 'fa-regular fa-user',
-            routerLink: ['csi/inspectors'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiInspectors),
-            hasFeature: true
-          },
-          {
-            title: 'License Management',
-            iconCss: 'fa-regular fa-id-card',
-            routerLink: ['licenses'],
-            hasPermission: hasLicenseAccess,
-            hasFeature: true
-          },
-          {
-            title: 'Letter History',
-            iconCss: 'fa-regular fa-envelope',
-            routerLink: ['/'],
-            hasPermission: true,
-            hasFeature: true
-          },
-          {
-            type: 'separator',
-            hasPermission: true,
-            hasFeature: true
-          },
-          {
-            title: 'System Reports',
-            iconCss: 'fa-regular fa-chart-simple-horizontal',
-            routerLink: ['csi/reports/system'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports),
-            hasFeature: true
-          },
-          {
-            type: 'separator',
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports),
-            hasFeature: false
-          },
-          {
-            title: 'Compliance Management',
-            iconCss: 'fa-solid fa-list-check',
-            routerLink: ['csi/compliance'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports),
-            hasFeature: true
-          },
-          {
-            title: 'Property Log Management',
-            iconCss: 'fa-light fa-building-memo',
-            routerLink: ['sites/reports/property-log-management'],
-            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports, PermissionType.BackflowReports, PermissionType.FogReports),
-            hasFeature: true
-          }
-        ]
-      },
-      {
         title: 'Backflow Management',
         iconCss: 'fa-regular fa-gauge',
         hasPermission: true,
@@ -328,6 +249,85 @@ export class App implements OnInit {
             iconCss: 'fa-solid fa-list-check',
             routerLink: ['backflow/compliance'],
             hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowReports),
+            hasFeature: true
+          },
+          {
+            title: 'Property Log Management',
+            iconCss: 'fa-light fa-building-memo',
+            routerLink: ['sites/reports/property-log-management'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports, PermissionType.BackflowReports, PermissionType.FogReports),
+            hasFeature: true
+          }
+        ]
+      },
+      {
+        title: 'CSI Management',
+        iconCss: 'fa-solid fa-building-magnifying-glass',
+        hasPermission: true,
+        hasFeature: await this._authService.hasAnyFeatures(FeatureType.CsiInspection),
+        children: [
+          {
+            title: 'Property Record Search',
+            iconCss: 'fa-regular fa-building-magnifying-glass',
+            routerLink: ['sites'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Sites),
+            hasFeature: true
+          },
+          {
+            title: 'Inspection Search',
+            iconCss: 'fa-regular fa-file-magnifying-glass',
+            routerLink: ['csi'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiInspections),
+            hasFeature: true
+          },
+          {
+            type: 'separator',
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Sites, PermissionType.CsiInspections),
+            hasFeature: true
+          },
+          {
+            title: 'Inspector Management',
+            iconCss: 'fa-regular fa-user',
+            routerLink: ['csi/inspectors'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiInspectors),
+            hasFeature: true
+          },
+          {
+            title: 'License Management',
+            iconCss: 'fa-regular fa-id-card',
+            routerLink: ['licenses'],
+            hasPermission: hasLicenseAccess,
+            hasFeature: true
+          },
+          {
+            title: 'Letter History',
+            iconCss: 'fa-regular fa-envelope',
+            routerLink: ['/'],
+            hasPermission: true,
+            hasFeature: true
+          },
+          {
+            type: 'separator',
+            hasPermission: true,
+            hasFeature: true
+          },
+          {
+            title: 'System Reports',
+            iconCss: 'fa-regular fa-chart-simple-horizontal',
+            routerLink: ['csi/reports/system'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports),
+            hasFeature: true
+          },
+          {
+            type: 'separator',
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports),
+            hasFeature: false
+          },
+          {
+            title: 'Compliance Management',
+            iconCss: 'fa-solid fa-list-check',
+            routerLink: ['csi/compliance'],
+            hasPermission: await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.CsiReports),
             hasFeature: true
           },
           {
@@ -529,35 +529,6 @@ export class App implements OnInit {
         ]
       },
       {
-        title: 'CSI Management',
-        iconCss: 'fa-solid fa-building-magnifying-glass',
-        hasPermission: isCsiInspector,
-        hasFeature: await this._authService.hasAnyFeatures(FeatureType.CsiInspection),
-        children: [
-          {
-            title: 'Property Record Search',
-            iconCss: 'fa-regular fa-building-magnifying-glass',
-            routerLink: ['professionals/sites'],
-            hasPermission: isCsiInspector,
-            hasFeature: true
-          },
-          {
-            title: 'Inspection Search',
-            iconCss: 'fa-regular fa-file-magnifying-glass',
-            routerLink: ['professionals/csi/inspections'],
-            hasPermission: isCsiInspector,
-            hasFeature: true
-          },
-          {
-            title: 'Submit CSI',
-            iconCss: 'fa-regular fa-file-plus',
-            routerLink: ['professionals/csi/inspections/create'],
-            hasPermission: isCsiInspector,
-            hasFeature: true
-          }
-        ]
-      },
-      {
         title: 'Backflow Management',
         iconCss: 'fa-regular fa-gauge',
         hasPermission: isBackflowTester,
@@ -582,6 +553,35 @@ export class App implements OnInit {
             iconCss: 'fa-regular fa-file-plus',
             routerLink: ['professionals/backflow/tests/submit'],
             hasPermission: isBackflowTester,
+            hasFeature: true
+          }
+        ]
+      },
+      {
+        title: 'CSI Management',
+        iconCss: 'fa-solid fa-building-magnifying-glass',
+        hasPermission: isCsiInspector,
+        hasFeature: await this._authService.hasAnyFeatures(FeatureType.CsiInspection),
+        children: [
+          {
+            title: 'Property Record Search',
+            iconCss: 'fa-regular fa-building-magnifying-glass',
+            routerLink: ['professionals/sites'],
+            hasPermission: isCsiInspector,
+            hasFeature: true
+          },
+          {
+            title: 'Inspection Search',
+            iconCss: 'fa-regular fa-file-magnifying-glass',
+            routerLink: ['professionals/csi/inspections'],
+            hasPermission: isCsiInspector,
+            hasFeature: true
+          },
+          {
+            title: 'Submit CSI',
+            iconCss: 'fa-regular fa-file-plus',
+            routerLink: ['professionals/csi/inspections/create'],
+            hasPermission: isCsiInspector,
             hasFeature: true
           }
         ]

@@ -6,7 +6,7 @@
                 <vp-input [(ngModel)]="user.contactName"
                               [required]="true"
                               name="contactName"
-                              label="Contact Name"
+                              label="Contact Name:"
                               [maxLength]="255"
                               [form]="form" />
             </div>
@@ -17,7 +17,7 @@
                                   [required]="true"
                                   [type]="'email'"
                                   name="emailAddress"
-                                  label="Email"
+                                  label="Email:"
                                   [maxLength]="100"
                                   [form]="form" />
                 </div>
@@ -26,7 +26,7 @@
             <div class="mb-3 w-100">
                 <vp-input [(ngModel)]="user.jobTitle"
                               name="jobTitle"
-                              label="Job Title"
+                              label="Job Title:"
                               [maxLength]="150"
                               [form]="form" />
             </div>

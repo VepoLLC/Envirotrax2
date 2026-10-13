@@ -2,11 +2,11 @@
     <div class="row">
         <div class="col-md-6">
             <dl class="row mb-0">
-                <dt class="col-sm-5">Company Name:</dt>
+                <dt class="col-sm-5 text-sm-end">Company Name:</dt>
                 <dd class="col-sm-7">{{ test.bpatCompanyName }}</dd>
-                <dt class="col-sm-5">Tester Name:</dt>
+                <dt class="col-sm-5 text-sm-end">Tester Name:</dt>
                 <dd class="col-sm-7">{{ test.bpatContactName }}</dd>
-                <dt class="col-sm-5">Address:</dt>
+                <dt class="col-sm-5 text-sm-end">Address:</dt>
                 <dd class="col-sm-7">
                     <div>{{ test.bpatAddress }}</div>
                     <div *ngIf="test.bpatCity || test.bpatState?.name || test.bpatZip">
@@ -17,12 +17,12 @@
         </div>
         <div class="col-md-6">
             <dl class="row mb-0">
-                <dt class="col-sm-5">Phone Number:</dt>
+                <dt class="col-sm-5 text-sm-end">Phone Number:</dt>
                 <dd class="col-sm-7">{{ test.bpatCellNumber }}</dd>
-                <dt class="col-sm-5">License Number:</dt>
+                <dt class="col-sm-5 text-sm-end">License Number:</dt>
                 <dd class="col-sm-7">{{ test.bpatLicenseNumber }}</dd>
-                <dt class="col-sm-5">License Exp Date:</dt>
-                <dd class="col-sm-7">{{ test.bpatLicenseExpiration | date:'dd.MM.yyyy' }}</dd>
+                <dt class="col-sm-5 text-sm-end">License Exp Date:</dt>
+                <dd class="col-sm-7">{{ test.bpatLicenseExpiration | date:'MM/dd/yyyy' }}</dd>
             </dl>
         </div>
     </div>

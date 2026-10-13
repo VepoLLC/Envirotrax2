@@ -1,7 +1,9 @@
-import { ExpirationType, ProfessionalType } from './professional-user-license';
+import { ExpirationType, ProfessionalType } from "./professional-user-license";
+import { LicenseScope } from "./professional-license-type";
 
 export interface WaterSupplierLicense {
     id?: number;
+    licenseScope?: LicenseScope;
     professionalId?: number;
     userId?: number;
     submittedOn?: string;

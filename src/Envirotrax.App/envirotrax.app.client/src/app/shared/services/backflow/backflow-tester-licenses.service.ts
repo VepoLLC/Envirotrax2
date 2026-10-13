@@ -7,6 +7,7 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { ProfessionalUserLicense } from "../../models/professionals/licenses/professional-user-license";
+import { ProfessionalLicense } from "../../models/professionals/licenses/professional-license";
 import { ProfessionalLicenseType } from "../../models/professionals/licenses/professional-license-type";
 import { InputOption } from "@envirotrax/common-ui";
 
@@ -51,4 +52,25 @@ export class BackflowTesterLicensesService {
         return lastValueFrom(this._http.delete<void>(url));
     }
 
+    public getCompanyLicenses(testerId: number, pageInfo: PageInfo, query: Query): Promise<PagedData<ProfessionalLicense>> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/company-licenses`);
+        return lastValueFrom(this._http.get<PagedData<ProfessionalLicense>>(url, {
+            params: this._queryHelper.buildQuery(pageInfo, query)
+        }));
+    }
+
+    public addCompanyLicense(testerId: number, license: ProfessionalLicense): Promise<ProfessionalLicense> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/company-licenses`);
+        return lastValueFrom(this._http.post<ProfessionalLicense>(url, license));
+    }
+
+    public updateCompanyLicense(testerId: number, license: ProfessionalLicense): Promise<ProfessionalLicense> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/company-licenses/${license.id}`);
+        return lastValueFrom(this._http.put<ProfessionalLicense>(url, license));
+    }
+
+    public deleteCompanyLicense(testerId: number, licenseId: number): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/company-licenses/${licenseId}`);
+        return lastValueFrom(this._http.delete<void>(url));
+    }
 }

@@ -8,6 +8,7 @@ public static class RecordLogTableNames
     public const string WaterSuppliers = "WaterSuppliers";
     public const string ProfessionalUsers = "ProfessionalUsers";
     public const string ProfessionalUserLicenses = "ProfessionalUserLicenses";
+    public const string ProfessionalLicenses = "ProfessionalLicenses";
     public const string FogVehiclePermits = "FogVehiclePermits";
     public const string BackflowGauges = "BackflowGauges";
     public const string FogVehicles = "FogVehicles";

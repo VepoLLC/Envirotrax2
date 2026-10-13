@@ -97,8 +97,8 @@ export class PropertyLogManagementComponent implements OnInit {
 
     public userAccountTypeOptions: InputOption[] = [
         { id: String(PropertyLogUserAccountType.LogCreator), text: 'Log creator' },
-        { id: String(PropertyLogUserAccountType.CsiComplianceAssignment), text: 'CSI compliance assignment' },
         { id: String(PropertyLogUserAccountType.BackflowComplianceAssignment), text: 'Backflow compliance assignment' },
+        { id: String(PropertyLogUserAccountType.CsiComplianceAssignment), text: 'CSI compliance assignment' },
         { id: String(PropertyLogUserAccountType.FogComplianceAssignment), text: 'FOG compliance assignment' }
     ];
 

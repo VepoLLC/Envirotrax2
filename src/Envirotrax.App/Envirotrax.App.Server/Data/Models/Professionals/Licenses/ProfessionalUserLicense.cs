@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 
 [RecordLogged(RecordLogTableNames.ProfessionalUserLicenses, WaterSupplierSource = RecordLogIdSource.Ambient, ProfessionalSource = RecordLogIdSource.Entity)]
-public class ProfessionalUserLicense : IProfessionalModel, ICreateAuditableModel<AppUser>
+public class ProfessionalUserLicense : IProfessionalModel, ICreateAuditableModel<AppUser>, ILicenseModel
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }

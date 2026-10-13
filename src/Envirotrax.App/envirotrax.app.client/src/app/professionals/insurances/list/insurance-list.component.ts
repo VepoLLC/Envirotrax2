@@ -1,5 +1,5 @@
 import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { ExpirationType, ProfessionalInsurance } from "../../../shared/models/professionals/professional-insurance";
+import { ProfessionalInsurance } from "../../../shared/models/professionals/professional-insurance";
 import { ProfessionalInsuranceService } from "../../../shared/services/professionals/professional-insurance.service";
 import { ToastService, ToastType, CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 import { TableViewModel } from "../../../shared/models/table-view-model";
@@ -7,6 +7,9 @@ import { ProfesisonalService } from "../../../shared/services/professionals/prof
 import { NgForm } from "@angular/forms";
 import { EditInsuranceComponent } from "../edit/edit-insurance.component";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
+import { ExpirationType } from "../../../shared/models/professionals/licenses/professional-user-license";
+import { Professional } from "../../../shared/models/professionals/professional";
+import { HelperService } from "../../../shared/services/helpers/helper.service";
 
 @Component({
     selector: 'vp-insurance-list',
@@ -34,6 +37,11 @@ export class InsuranceListComponent implements OnInit {
     public isNewInsuranceLoading: boolean = false;
     public expirationType = ExpirationType;
 
+    public showBackflowHelp: boolean = false;
+    public showCsiHelp: boolean = false;
+    public showFogInspectionHelp: boolean = false;
+    public activeHelpTab: 'backflow' | 'csi' | 'fogInspection' = 'backflow';
+
     @ViewChild('dateCell', { static: true })
     private dateCellTemplate!: TemplateRef<CellTemplateData<ProfessionalInsurance>>;
 
@@ -42,13 +50,32 @@ export class InsuranceListComponent implements OnInit {
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService,
         private readonly _professionalService: ProfesisonalService,
+        private readonly _helper: HelperService
     ) { }
 
     public async ngOnInit(): Promise<void> {
         this.table.columns = this.getColumns();
 
-        this.getInsurances();
+        this.getRows();
         this.resetNewInsurance();
+
+        const professional = await this._professionalService.getLoggedInProfessional();
+
+        this.setHelpTabs(professional);
+    }
+
+    private setHelpTabs(professional: Professional): void {
+        this.showBackflowHelp = professional.hasBackflowTesting == true;
+        this.showCsiHelp = professional.hasCsiInspection == true;
+        this.showFogInspectionHelp = professional.hasFogInspection == true;
+
+        if (this.showBackflowHelp) {
+            this.activeHelpTab = 'backflow';
+        } else if (this.showCsiHelp) {
+            this.activeHelpTab = 'csi';
+        } else if (this.showFogInspectionHelp) {
+            this.activeHelpTab = 'fogInspection';
+        }
     }
 
     private async newInsuranceObject(): Promise<ProfessionalInsurance> {
@@ -71,8 +98,13 @@ export class InsuranceListComponent implements OnInit {
         return [
             {
                 field: 'insuranceNumber',
-                caption: 'Insurance Number',
+                caption: 'Policy Number',
                 type: ColumnType.text
+            },
+            {
+                field: 'coverageAmount',
+                caption: 'Coverage $',
+                type: ColumnType.number
             },
             {
                 field: 'expirationDate',
@@ -83,7 +115,7 @@ export class InsuranceListComponent implements OnInit {
         ];
     }
 
-    public async getInsurances(): Promise<void> {
+    public async getRows(): Promise<void> {
         try {
             this.table.isLoading = true;
             this.table.items = await this._insuranceService.getAll(
@@ -95,13 +127,17 @@ export class InsuranceListComponent implements OnInit {
         }
     }
 
+    public setHelpTab(tab: 'backflow' | 'csi' | 'fogInspection'): void {
+        this.activeHelpTab = tab;
+    }
+
     public edit(insurance: ProfessionalInsurance): void {
         this._modalHelper.show<ProfessionalInsurance>(EditInsuranceComponent, {
             title: 'Edit Insurance Policy',
-            model: insurance,
+            model: { id: insurance.id },
             size: ModalSize.large,
             mode: 'disableFullScreen'
-        }).result().subscribe(() => this.getInsurances());
+        }).result().subscribe(() => this.getRows());
     }
 
     public delete(insurance: ProfessionalInsurance): void {
@@ -110,21 +146,18 @@ export class InsuranceListComponent implements OnInit {
             .subscribe(async () => {
                 try {
                     this.table.isLoading = true;
+
                     await this._insuranceService.delete(insurance.id!);
                     this._toastService.successFullyDeleted('Insurance');
                 } finally {
                     this.table.isLoading = false;
                 }
 
-                await this.getInsurances();
+                await this.getRows();
             });
     }
 
-    public certificateFileSelected(file: File | null): void {
-        this.certificateFile = file;
-    }
-
-    public async saveInsurance(form: NgForm): Promise<void> {
+    public async save(form: NgForm): Promise<void> {
         if (form.valid) {
             try {
                 this.isNewInsuranceLoading = true;
@@ -137,11 +170,14 @@ export class InsuranceListComponent implements OnInit {
                     text: 'Your insurance has been submitted for validation. The validation process may take anywhere from an hour up to 1 business day to process.'
                 });
 
-                this.resetNewInsurance();
-                this.getInsurances();
                 form.resetForm();
-            } catch (e) {
 
+                this.resetNewInsurance();
+                this.getRows();
+            } catch (error) {
+                if (!this._helper.parseValidationErrors(error, this.newInsuranceValidationErrors)) {
+                    throw error;
+                }
             } finally {
                 this.isNewInsuranceLoading = false;
             }

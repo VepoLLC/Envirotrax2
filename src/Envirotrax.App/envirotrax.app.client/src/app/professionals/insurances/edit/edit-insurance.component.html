@@ -1,10 +1,10 @@
 <div dp-spinner-parent>
     <dp-loading-spinner *ngIf="isLoading" />
 
-    <form #form="ngForm" (ngSubmit)="save(form)">
+    <form *ngIf="insurance.id" #form="ngForm" (ngSubmit)="save(form)">
         <div class="mb-3">
             <vp-input name="insuranceNumber"
-                      label="Policy Number"
+                      label="Policy Number:"
                       [(ngModel)]="insurance.insuranceNumber"
                       [required]="true"
                       [maxLength]="50"
@@ -13,7 +13,7 @@
 
         <div class="mb-3">
             <vp-input name="coverageAmount"
-                      label="Coverage $"
+                      label="Coverage: $"
                       type="number"
                       [decimals]="2"
                       [min]="0"

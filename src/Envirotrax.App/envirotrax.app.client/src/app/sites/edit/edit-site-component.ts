@@ -167,16 +167,16 @@ export class EditSiteComponent implements OnInit {
 
         if (this.canViewLogHistory) {
             this.setActiveTab('logHistory');
-        } else if (this.canViewCsi) {
-            this.setActiveTab('csi');
         } else if (this.canViewBackflow) {
             this.setActiveTab('backflow');
-        } else if (this.canViewOutOfService) {
-            this.setActiveTab('outOfService');
-        } else if (this.canViewTripTickets) {
-            this.setActiveTab('tripTickets');
+        } else if (this.canViewCsi) {
+            this.setActiveTab('csi');
         } else if (this.canViewFog) {
             this.setActiveTab('fog');
+        } else if (this.canViewTripTickets) {
+            this.setActiveTab('tripTickets');
+        } else if (this.canViewOutOfService) {
+            this.setActiveTab('outOfService');
         }
     }
 

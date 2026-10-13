@@ -21,6 +21,8 @@ public class ProfessionalLicenseType
 
     public bool IsFireLicense { get; set; }
 
+    public LicenseScope LicenseScope { get; set; }
+
     public int? StateId { get; set; }
     public State? State { get; set; }
 }

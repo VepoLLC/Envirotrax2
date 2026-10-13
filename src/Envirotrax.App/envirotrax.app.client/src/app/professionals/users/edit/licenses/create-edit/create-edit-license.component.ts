@@ -1,10 +1,10 @@
 import { Component, OnInit } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { ModalReference } from "@developer-partners/ngx-modal-dialog";
-import { ProfessionalUserLicense, ProfessionalType, professionalTypeLabels } from "../../../../../shared/models/professionals/licenses/professional-user-license";
+import { ProfessionalUserLicense, ProfessionalType } from "../../../../../shared/models/professionals/licenses/professional-user-license";
 import { ProfessionalUserLicenseService } from "../../../../../shared/services/professionals/professional-user-license.service";
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
-import { ProfessionalLicenseType } from "../../../../../shared/models/professionals/licenses/professional-license-type";
+import { LicenseScope, ProfessionalLicenseType } from "../../../../../shared/models/professionals/licenses/professional-license-type";
 import { ProfesisonalService } from "../../../../../shared/services/professionals/professional.service";
 import { ToastService, ToastType, InputOption } from '@envirotrax/common-ui';
 
@@ -24,13 +24,7 @@ export class CreateEditLicenseComponent implements OnInit {
 
     public licenseTypes: InputOption<ProfessionalLicenseType>[] = [];
 
-    public readonly professionalTypeOptions: InputOption<ProfessionalType>[] = Object.values(ProfessionalType)
-        .filter(v => typeof v === 'number')
-        .map(v => ({
-            id: v as ProfessionalType,
-            text: professionalTypeLabels[v as ProfessionalType],
-            data: v as ProfessionalType
-        }));
+    public professionalTypeOptions: InputOption<ProfessionalType>[] = [];
 
     public get isEditMode(): boolean {
         return !!this._modalReference.config.model?.id;
@@ -53,12 +47,13 @@ export class CreateEditLicenseComponent implements OnInit {
             const [license, professional, licenseTypes] = await Promise.all([
                 this.getLicense(),
                 this._professionalService.getLoggedInProfessional(),
-                this._licenseService.getAllTypesAsOptions({}, true)
+                this._licenseService.getAllTypesAsOptions({ sort: {}, filter: [{ columnName: 'licenseScope', comparisonOperator: 'Eq', value: LicenseScope.User.toString() }] }, true)
             ]);
 
             this.license = license;
-            this._allLicenseTypes = licenseTypes;
-            this.licenseTypes = this._allLicenseTypes.filter(l => l.data?.state?.id == professional.state?.id);
+            this._allLicenseTypes = licenseTypes.filter(l => l.data?.state?.id == professional.state?.id);
+            this.licenseTypes = this._allLicenseTypes;
+            this.professionalTypeOptions = this._licenseService.getProfessionalTypeOptions(this._allLicenseTypes);
         } finally {
             this.isLoading = false;
         }

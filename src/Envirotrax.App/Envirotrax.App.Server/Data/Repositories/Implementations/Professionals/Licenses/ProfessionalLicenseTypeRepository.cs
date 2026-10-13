@@ -24,4 +24,12 @@ public class ProfessionalLicenseTypeRepository : IProfessionalLicenseTypeReposit
             .Where(query.Filter)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<ProfessionalLicenseType?> GetAsync(int id, CancellationToken cancellationToken)
+    {
+        return await _dbContext
+            .ProfessionalLicenseTypes
+            .AsNoTracking()
+            .SingleOrDefaultAsync(licenseType => licenseType.Id == id, cancellationToken);
+    }
 }

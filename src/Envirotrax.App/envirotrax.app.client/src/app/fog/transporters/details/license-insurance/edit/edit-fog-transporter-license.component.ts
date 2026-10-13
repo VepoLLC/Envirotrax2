@@ -1,17 +1,16 @@
 import { Component, OnInit } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { ModalReference } from "@developer-partners/ngx-modal-dialog";
-import { ProfessionalUserLicense, ProfessionalType, professionalTypeLabels } from "../../../../../shared/models/professionals/licenses/professional-user-license";
+import { ProfessionalType } from "../../../../../shared/models/professionals/licenses/professional-user-license";
+import { ProfessionalLicense } from "../../../../../shared/models/professionals/licenses/professional-license";
 import { FogTransporterLicensesService } from "../../../../../shared/services/fog/fog-transporter-licenses.service";
-import { FogTransporterSubAccountsService } from "../../../../../shared/services/fog/fog-transporter-user.service";
-import { ProfessionalLicenseType } from "../../../../../shared/models/professionals/licenses/professional-license-type";
-import { ProfessionalUser } from "../../../../../shared/models/professionals/professional-user";
+import { LicenseScope, ProfessionalLicenseType } from "../../../../../shared/models/professionals/licenses/professional-license-type";
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
 import { InputOption, ToastService } from "@envirotrax/common-ui";
 
 export interface FogLicenseModalData {
     transporterId: number;
-    license: ProfessionalUserLicense;
+    license: ProfessionalLicense;
 }
 
 @Component({
@@ -19,61 +18,34 @@ export interface FogLicenseModalData {
     templateUrl: './edit-fog-transporter-license.component.html'
 })
 export class EditFogTransporterLicenseComponent implements OnInit {
-    private _allLicenseTypes: InputOption<ProfessionalLicenseType>[] = [];
-
-    public license: ProfessionalUserLicense;
+    public license: ProfessionalLicense;
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
     public licenseTypes: InputOption<ProfessionalLicenseType>[] = [];
-    public userOptions: InputOption<ProfessionalUser>[] = [];
-
-    public readonly professionalTypeOptions: InputOption<ProfessionalType>[] = Object.values(ProfessionalType)
-        .filter(v => typeof v === 'number')
-        .map(v => ({
-            id: v as ProfessionalType,
-            text: professionalTypeLabels[v as ProfessionalType],
-            data: v as ProfessionalType
-        }));
 
     public isEditMode: boolean = false;
 
     constructor(
-        private readonly _modalReference: ModalReference<FogLicenseModalData, ProfessionalUserLicense>,
+        private readonly _modalReference: ModalReference<FogLicenseModalData, ProfessionalLicense>,
         private readonly _licensesService: FogTransporterLicensesService,
-        private readonly _subAccountsService: FogTransporterSubAccountsService,
         private readonly _helper: HelperService,
         private readonly _toastService: ToastService
     ) {
         this.license = { ...this._modalReference.config.model!.license };
+        this.license.professionalType = ProfessionalType.FogTransporter;
         this.isEditMode = !!this.license.id;
     }
 
     public async ngOnInit(): Promise<void> {
-        const { transporterId } = this._modalReference.config.model!;
         try {
             this.isLoading = true;
-            const [types, users] = await Promise.all([
-                this._licensesService.getLicenseTypes(),
-                this._subAccountsService.getSubAccounts(transporterId, { pageNumber: 1, pageSize: 1000 }, {})
-            ]);
-            this._allLicenseTypes = types;
-            this.userOptions = users.data.map((u: ProfessionalUser) => ({ id: u.id, text: u.emailAddress ?? u.contactName, data: u }));
 
-            if (this.license.professionalType !== undefined) {
-                this.licenseTypes = this._allLicenseTypes.filter(t => t.data?.professionalType == this.license.professionalType);
-            }
+            const types = await this._licensesService.getLicenseTypes();
+
+            this.licenseTypes = types.filter(t => t.data?.professionalType == ProfessionalType.FogTransporter && t.data?.licenseScope == LicenseScope.Company);
         } finally {
             this.isLoading = false;
         }
-    }
-
-    public userChange(userId: number): void {
-        this.license.user = userId ? { id: userId } : undefined;
-    }
-
-    public professionalTypeChange(): void {
-        this.licenseTypes = this._allLicenseTypes.filter(t => t.data?.professionalType == this.license.professionalType);
-        this.license.licenseType = undefined;
     }
 
     public licenseTypeChange(typeId: number): void {

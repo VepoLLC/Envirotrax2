@@ -165,9 +165,18 @@ public class RegisteredProfessionalRepository : Repository<Professional, int, Pu
         };
     }
 
-    private IQueryable<ProfessionalUserLicense> GetUnexpiredLicensesQuery(ProfessionalType professionalType, DateTime now)
+    private IQueryable<ProfessionalUserLicense> GetUnexpiredUserLicensesQuery(ProfessionalType professionalType, DateTime now)
     {
         return DbContext.ProfessionalUserLicenses
+            .AsNoTracking()
+            .Where(license => license.ProfessionalType == professionalType
+                && license.ExpirationDate != null
+                && license.ExpirationDate > now);
+    }
+
+    private IQueryable<ProfessionalLicense> GetUnexpiredCompanyLicensesQuery(ProfessionalType professionalType, DateTime now)
+    {
+        return DbContext.ProfessionalLicenses
             .AsNoTracking()
             .Where(license => license.ProfessionalType == professionalType
                 && license.ExpirationDate != null
@@ -192,16 +201,24 @@ public class RegisteredProfessionalRepository : Repository<Professional, int, Pu
             return professionals;
         }
 
-        var licenses = GetUnexpiredLicensesQuery(professionalType, now)
+        var userLicenseHolders = GetUnexpiredUserLicensesQuery(professionalType, now)
             .Where(license => license.LicenseType!.StateId == requirements.StateId
-                && !license.LicenseType.IsFireLicense);
+                && !license.LicenseType.IsFireLicense)
+            .Select(license => license.ProfessionalId);
+
+        var companyLicenseHolders = GetUnexpiredCompanyLicensesQuery(professionalType, now)
+            .Where(license => license.LicenseType!.StateId == requirements.StateId
+                && !license.LicenseType.IsFireLicense)
+            .Select(license => license.ProfessionalId);
+
+        var licensedProfessionalIds = userLicenseHolders.Concat(companyLicenseHolders);
 
         var subAccounts = GetListQuery().Where(subAccount => subAccount.DeletedTime == null);
 
         return professionals.Where(professional =>
-            licenses.Any(license => license.ProfessionalId == professional.Id)
+            licensedProfessionalIds.Contains(professional.Id)
             || subAccounts.Any(subAccount => subAccount.ParentId == professional.Id
-                && licenses.Any(license => license.ProfessionalId == subAccount.Id)));
+                && licensedProfessionalIds.Contains(subAccount.Id)));
     }
 
     /// <summary>
@@ -234,7 +251,7 @@ public class RegisteredProfessionalRepository : Repository<Professional, int, Pu
 
         // V1 flagged fireline testers from any unexpired fire license on the account, regardless of
         // which state issued it, so this deliberately does not filter by the supplier's state.
-        var fireLicenses = GetUnexpiredLicensesQuery(ProfessionalType.Bpat, now)
+        var fireLicenses = GetUnexpiredCompanyLicensesQuery(ProfessionalType.Bpat, now)
             .Where(license => license.LicenseType!.IsFireLicense);
 
         return professionals

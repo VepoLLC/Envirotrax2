@@ -7,7 +7,7 @@
             <input class="form-control" [value]="license.companyName" readonly />
         </div>
 
-        <div class="mb-3">
+        <div *ngIf="!isCompanyLicense" class="mb-3">
             <vp-input name="contactName"
                       label="Contact Name"
                       [(ngModel)]="model.contactName"

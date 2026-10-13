@@ -49,6 +49,7 @@ public partial class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUse
     public DbSet<ProfessionalWaterSupplier> ProfessionalWaterSuppliers { get; set; }
     public DbSet<ProfessionalLicenseType> ProfessionalLicenseTypes { get; set; }
     public DbSet<ProfessionalUserLicense> ProfessionalUserLicenses { get; set; }
+    public DbSet<ProfessionalLicense> ProfessionalLicenses { get; set; }
     public DbSet<ProfessionalInsurance> ProfessionalInsurances { get; set; }
     public DbSet<ProfessionalTransaction> ProfessionalTransactions { get; set; }
     public DbSet<BackflowGauge> BackflowGauges { get; set; }

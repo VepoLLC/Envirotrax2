@@ -10,11 +10,13 @@ namespace Envirotrax.App.Server.Controllers.WaterSuppliers;
 [Route("api/licenses")]
 public class LicenseManagementController : WaterSupplierProtectedController
 {
+    private readonly IWaterSupplierLicenseService _waterSupplierLicenseService;
     private readonly IProfessionalUserLicenseService _licenseService;
     private readonly IAuthService _authService;
 
-    public LicenseManagementController(IProfessionalUserLicenseService licenseService, IAuthService authService)
+    public LicenseManagementController(IWaterSupplierLicenseService waterSupplierLicenseService, IProfessionalUserLicenseService licenseService, IAuthService authService)
     {
+        _waterSupplierLicenseService = waterSupplierLicenseService;
         _licenseService = licenseService;
         _authService = authService;
     }
@@ -29,7 +31,7 @@ public class LicenseManagementController : WaterSupplierProtectedController
         if (!HasLicenseAccess())
             return Forbid();
 
-        var result = await _licenseService.GetAllByWaterSupplierAsync(pageInfo, query, licenseFilter, cancellationToken);
+        var result = await _waterSupplierLicenseService.GetAllAsync(licenseFilter, pageInfo, query, cancellationToken);
         return Ok(result);
     }
 
@@ -39,7 +41,7 @@ public class LicenseManagementController : WaterSupplierProtectedController
         if (!HasLicenseAccess())
             return Forbid();
 
-        var counts = await _licenseService.GetCountsByWaterSupplierAsync(cancellationToken);
+        var counts = await _waterSupplierLicenseService.GetCountsAsync(cancellationToken);
         return Ok(counts);
     }
 

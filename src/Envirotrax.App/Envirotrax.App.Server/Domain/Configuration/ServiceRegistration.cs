@@ -126,6 +126,7 @@ public static class ServiceRegistration
         services.AddTransient<INotificationService, NotificationService>();
         services.AddTransient<IBackflowTestNotificationService, BackflowTestNotificationService>();
         services.AddTransient<IBackflowTestNotificationMatcher, BackflowTestNotificationMatcher>();
+        services.AddTransient<INotificationDigestService, NotificationDigestService>();
 
         services.AddTransient<IWaterSupplierDashboardService, WaterSupplierDashboardService>();
 

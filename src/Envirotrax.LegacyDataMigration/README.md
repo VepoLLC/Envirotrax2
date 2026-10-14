@@ -6,7 +6,7 @@ Moves data from the old (V1) system into the new Envirotrax2 (V2) database.
 
 ## How it works
 
-The app migrates one entity at a time — users, water suppliers, supplier users, professionals, GIS areas, sites, renewal email verifications, site logs, backflow gauges, notification settings, then notifications — in that order, because later entities depend on earlier ones. Each entity's migration has two steps:
+The app migrates one entity at a time — users, water suppliers, supplier users, professionals, GIS areas, sites, renewal email verifications, site logs, backflow gauges, backflow tests, notification settings, then notifications — in that order, because later entities depend on earlier ones. Each entity's migration has two steps:
 
 1. **Run SQL scripts.** Files under `Scripts/<Entity>/`, named with a numeric prefix (`01_`, `02_`, ...), run in that order. They copy rows from the legacy database into the V2 tables.
 2. **Run C# cleanup code.** After the raw data is in place, C# fixes up anything SQL can't do well — legacy passwords come in as plain text and get hashed with ASP.NET Identity's password hasher, and site log file attachments get downloaded from the legacy file server and uploaded to Azure Storage.
@@ -20,7 +20,7 @@ One caveat, on the audit tables rather than the data: `Scripts/Users/02_`–`06_
 ## Project layout
 
 - `Scripts/` — SQL scripts, one subfolder per entity, run in filename order.
-- `Services/` — one service per entity (`UserService`, `WaterSupplierService`, `WaterSupplierUserService`, `ProfessionalService`, `GisAreaService`, `SiteService`, `SiteLogService`, `BackflowGaugeService`, `NotificationSettingService`, `NotificationService`, and the other professional services). Each has a `MigrateAsync()` that runs its scripts, then does any C#-side cleanup. `LegacyFileServerService` and `BlobStorageService` are helpers rather than entity migrations: they read files off the legacy file server and write them to Azure Storage.
+- `Services/` — one service per entity (`UserService`, `WaterSupplierService`, `WaterSupplierUserService`, `ProfessionalService`, `GisAreaService`, `SiteService`, `SiteLogService`, `BackflowGaugeService`, `BackflowTestService`, `NotificationSettingService`, `NotificationService`, and the other professional services). Each has a `MigrateAsync()` that runs its scripts, then does any C#-side cleanup. `LegacyFileServerService` and `BlobStorageService` are helpers rather than entity migrations: they read files off the legacy file server and write them to Azure Storage.
 - `Data/` — EF Core `DbContext`s and entity models for the V2 database.
 - `Logs/` — one log file per service, written while the migration runs.
 
@@ -115,6 +115,43 @@ Four things are specific to notifications:
   though the settings table does, so V1 could never record that hazard against a notification.
 - **`SentTime` stays NULL.** V1 records no send time; its scheduled jobs select by `CreationDate`
   and interval instead of stamping a row once it has gone out.
+
+## How backflow tests are migrated
+
+This is the largest entity in the system: 176 columns, 135 of which carry the same name in both
+databases. Everything it points at — water suppliers, sites, professionals, professional users,
+supplier users and the seeded states — is migrated before it, so nothing here has to be backfilled.
+
+Like sites and water suppliers, a test keeps its V1 id: the insert runs under `IDENTITY_INSERT`, so
+`BackflowTests.Id` equals `SaveBackflowDeviceTests.ID`. That is what makes two earlier migrations
+resolve without any rewriting — `Notifications.RecordId` and `SiteLogs.LegacyAssemblyRecordId` both
+reference a test by its V1 id. `LegacyRecordId` is written as well, because `Id` alone cannot say
+whether a row came from V1 or was created in V2, and every guard in this script reads it.
+
+Four things are worth knowing:
+
+- **A test carries a BPAT or a CSI inspector, never both.** V2 gives them one shared
+  `ProfessionalId`, so the BPAT login is preferred and the inspector is left NULL when one resolves.
+  Mixing them would point the composite foreign key at a person from another company.
+  A test whose tester login matches no migrated professional user is recorded as skipped, because
+  `ProfessionalId` is NOT NULL.
+- **V2 made 55 value columns NOT NULL that V1 leaves nullable.** Each falls back to `0`, so a single
+  legacy NULL cannot roll back the whole run. `CreatedTime` is deliberately not defaulted: there is
+  no honest stand-in for when a test was recorded, so a NULL there should stop the run.
+- **The five test images are not migrated yet.** V1 stores no image columns at all: it rebuilds each
+  path from the record id (`backflow/<id rounded down to 10000>/<id>-ext|sn|bext|bsn|ag.jpg`) and
+  decides whether to show it with `File.Exists`, so which images exist is not knowable from the
+  database. Moving them needs a probe-and-upload pass of its own and is tracked separately; the five
+  `*ImagePath` columns stay NULL until then.
+- **Some V1 columns have no V2 counterpart** and are deliberately dropped: the master water supplier
+  and master BPAT ids, the per-component `Repair*Cleaned` / `Repair*Replaced` flags (V2 keeps only
+  the `Repair*` booleans and their details), the rain/freeze sensor make and model, `TestType`,
+  `PriorInstall` and `ManualUserID`.
+
+Tests that could not be migrated are queryable:
+
+`SELECT * FROM MigrationSkippedBackflowTests` — either the water supplier never migrated, or no
+migrated professional user matches the tester login the test was recorded under.
 
 ## Running it
 

@@ -66,6 +66,7 @@ services.AddTransient<SiteService>();
 services.AddTransient<SiteLogService>();
 services.AddTransient<RenewalEmailVerificationService>();
 services.AddTransient<BackflowGaugeService>();
+services.AddTransient<BackflowTestService>();
 services.AddTransient<NotificationSettingService>();
 services.AddTransient<NotificationService>();
 
@@ -113,6 +114,11 @@ await siteLogService.MigrateAsync();
 // that the professional migration builds.
 var backflowGaugeService = provider.GetRequiredService<BackflowGaugeService>();
 await backflowGaugeService.MigrateAsync();
+
+// After the sites and the professionals, because a test is recorded against a site by a tester who
+// belongs to one of them, and before the notifications, whose RecordId points at a test by its V1 id.
+var backflowTestService = provider.GetRequiredService<BackflowTestService>();
+await backflowTestService.MigrateAsync();
 
 // After the supplier users: a notification setting is delivered to one of them, and V2 requires
 // that recipient, so a setting whose user is missing cannot be migrated at all.

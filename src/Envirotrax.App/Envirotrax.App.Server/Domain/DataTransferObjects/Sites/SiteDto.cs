@@ -6,7 +6,7 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 
-public class SiteDto : IDto
+public class SiteDto : IDto, IMailingInfoDto, IRedactableMailingInfoDto
 {
     public int Id { get; set; }
 
@@ -18,6 +18,9 @@ public class SiteDto : IDto
     [Required]
     [StringLength(20)]
     public string AccountNumber { get; set; } = null!;
+
+    [StringLength(20)]
+    public string? WaterSupplierAccountNumber { get; set; }
 
     [StringLength(100)]
     public string? BusinessName { get; set; }
@@ -67,8 +70,16 @@ public class SiteDto : IDto
     [StringLength(50)]
     public string? MailingPhoneNumber { get; set; }
 
-    [StringLength(100)]
+    [StringLength(1000)]
     public string? MailingEmailAddress { get; set; }
+
+    string? IMailingInfoDto.MailingZip
+    {
+        get => MailingZipCode;
+        set => MailingZipCode = value;
+    }
+
+    IEnumerable<IMailingInfoDto?> IRedactableMailingInfoDto.MailingInfo => [this];
 
     [StringLength(50)]
     public string? FogGeneratorPhoneNumber { get; set; }
@@ -148,6 +159,11 @@ public class SiteDto : IDto
     public DateTime? CsiAccountAssignmentDate { get; set; }
     public DateTime? BackflowAccountAssignmentDate { get; set; }
     public DateTime? FogAccountAssignmentDate { get; set; }
+
+    public RenewalOptInType RenewalOptInType { get; set; }
+    public DateTime? RenewalOptInOutDate { get; set; }
+    public RenewalOptInOrigin? RenewalOptInOrigin { get; set; }
+
     public DateTime CreatedTime { get; set; }
     public DateTime? UpdatedTime { get; set; }
     public AppUserDto? UpdatedBy { get; set; }
@@ -206,7 +222,7 @@ public class FogPermitComplianceSiteDto : ComplianceSiteDtoBase
 {
 }
 
-public class ReferencedSiteDto
+public class ReferencedSiteDto : IMailingInfoDto
 {
     [Required]
     public int? Id { get; set; }
@@ -248,6 +264,12 @@ public class ReferencedSiteDto
     public string? MailingPhoneNumber { get; set; }
 
     public string? MailingEmailAddress { get; set; }
+
+    string? IMailingInfoDto.MailingZip
+    {
+        get => MailingZipCode;
+        set => MailingZipCode = value;
+    }
 
     public FacilityType FacilityType { get; set; }
 

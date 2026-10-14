@@ -46,6 +46,14 @@ export class GlobalErrorHandler implements ErrorHandler {
 
                 break;
 
+            case HttpStatusCode.TooManyRequests:
+                this._toastService.show({
+                    text: 'Too many attempts. Please wait a few minutes and try again.',
+                    type: ToastType.Error
+                });
+
+                break;
+
             case HttpStatusCode.InternalServerError: {
                 const messages = ['An unexpected error occurred. Please try again.'];
                 const traceId = httpError.error?.traceId;

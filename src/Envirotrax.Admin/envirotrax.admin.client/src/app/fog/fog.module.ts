@@ -5,6 +5,8 @@ import { SharedComponentsModule } from '../shared/components/shared.components.m
 import { FogRoutingModule } from './fog-routing.module';
 import { FogInspectionDetailsComponent } from './inspections/details/fog-inspection-details.component';
 import { FogInspectionListComponent } from './inspections/list/fog-inspection-list.component';
+import { FogInspectorListComponent } from './inspectors/list/fog-inspector-list.component';
+import { FogDisposalSiteListComponent } from './disposal-sites/list/fog-disposal-site-list.component';
 
 @NgModule({
     declarations: [
@@ -16,6 +18,8 @@ import { FogInspectionListComponent } from './inspections/list/fog-inspection-li
         SharedComponentsModule,
         FogRoutingModule,
         FogInspectionDetailsComponent,
+        FogInspectorListComponent,
+        FogDisposalSiteListComponent,
     ],
 })
 export class FogModule { }

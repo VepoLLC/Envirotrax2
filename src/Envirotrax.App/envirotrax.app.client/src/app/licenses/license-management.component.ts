@@ -4,6 +4,7 @@ import { WaterSupplierLicense, LicenseCounts } from '../shared/models/profession
 import { WaterSupplierLicenseService } from '../shared/services/licenses/water-supplier-license.service';
 import { TableViewModel } from '../shared/models/table-view-model';
 import { ExpirationType } from '../shared/models/professionals/licenses/professional-user-license';
+import { LicenseScope } from '../shared/models/professionals/licenses/professional-license-type';
 import { AuthService } from '../shared/services/auth/auth.service';
 import { FeatureType } from '../shared/models/feature-type';
 import { PermissionAction, PermissionType } from '../shared/models/permission-type';
@@ -126,18 +127,26 @@ export class LicenseManagementComponent implements OnInit {
 
     public editLicense(license: WaterSupplierLicense): void {
         this._modalHelper.show<WaterSupplierLicenseModalData, WaterSupplierLicense>(EditWaterSupplierLicenseComponent, {
-            title: `Edit License - ${license.contactName ?? license.userEmail}`,
+            title: `Edit License - ${license.contactName ?? license.userEmail ?? license.companyName}`,
             model: { license },
             size: ModalSize.large,
             mode: 'disableFullScreen'
-        }).result().subscribe(() => this.loadLicenses());
+        }).result().subscribe(async () => {
+            await Promise.all([this.loadLicenses(), this.loadCounts()]);
+        });
     }
 
     public deleteLicense(license: WaterSupplierLicense): void {
         this._modalHelper.showDeleteConfirmation().result().subscribe(async () => {
             try {
                 this.table.isLoading = true;
-                await this._licenseService.delete(license.id!);
+
+                if (license.licenseScope == LicenseScope.Company) {
+                    await this._licenseService.deleteCompanyLicense(license.id!);
+                } else {
+                    await this._licenseService.delete(license.id!);
+                }
+
                 this._toastService.successFullyDeleted('License');
             } finally {
                 this.table.isLoading = false;

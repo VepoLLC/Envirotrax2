@@ -6,5 +6,11 @@ export interface ProfessionalLicenseType {
     name?: string;
     description?: string;
     professionalType?: ProfessionalType;
+    licenseScope?: LicenseScope;
     state?: State;
+}
+
+export enum LicenseScope {
+    User,
+    Company
 }

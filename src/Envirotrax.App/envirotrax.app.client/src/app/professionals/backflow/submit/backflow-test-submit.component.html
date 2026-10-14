@@ -22,15 +22,18 @@
     </div>
 
     <form *ngIf="!submitSuccess" #submitForm="ngForm" (ngSubmit)="submit(submitForm)">
-        <p class="text-center">The following form must be completed for each assembly tested for recordkeeping purposes:
+        <p class="text-center">The following form must be completed for each assembly tested for recordkeeping *purposes:
         </p>
 
         <!-- Verification -->
         <vp-section header="Verification">
+            <p class="text-center mb-2" *ngIf="!isVerificationPassed">Please complete the following fields to continue
+                with your backflow test submission.</p>
+
             <div class="row">
                 <div class="col-md-6">
                     <div class="d-flex align-items-center mb-2">
-                        <span class="fw-semibold text-nowrap me-2" style="min-width:130px;">BPAT Account:</span>
+                        <span class="fw-semibold text-nowrap text-end me-2" style="min-width:130px;">BPAT Account:</span>
                         <div class="flex-grow-1">
                             <vp-input type="select" name="bpatId" [ngModel]="selectedBpatId"
                                       (ngModelChange)="onBpatChange($event)"
@@ -38,23 +41,25 @@
                         </div>
                     </div>
                     <div class="d-flex align-items-center mb-2">
-                        <span class="fw-semibold text-nowrap me-2" style="min-width:130px;">Water Supplier:</span>
+                        <span class="fw-semibold text-nowrap text-end me-2" style="min-width:130px;">Water Supplier:</span>
                         <div class="flex-grow-1">
                             <vp-input type="select" name="waterSupplierId" [ngModel]="selectedWaterSupplierId"
                                       (ngModelChange)="onWaterSupplierChange($event)"
-                                      [options]="waterSupplierOptions" [required]="true" />
+                                      [options]="waterSupplierOptions" [required]="true"
+                                      [placeholder]="'Select a Water Supplier'" />
                         </div>
                     </div>
                     <div class="d-flex align-items-center mb-2">
-                        <span class="fw-semibold text-nowrap me-2" style="min-width:130px;">Hazard Type:</span>
+                        <span class="fw-semibold text-nowrap text-end me-2" style="min-width:130px;">Hazard Type:</span>
                         <div class="flex-grow-1">
-                            <vp-input type="select" name="hazardType" [(ngModel)]="model.hazardType"
+                            <vp-input type="select" name="hazardType" [ngModel]="model.hazardType"
+                                      (ngModelChange)="onHazardTypeChange($event)"
                                       [options]="hazardTypeOptions" [required]="true"
-                                      [placeholder]="'Select Hazard Type'" />
+                                      [placeholder]="'Select a Hazard Type'" />
                         </div>
                     </div>
                     <div class="d-flex align-items-center mb-2" *ngIf="model.hazardType === 'Other'">
-                        <span class="fw-semibold text-nowrap me-2" style="min-width:130px;">Description:</span>
+                        <span class="fw-semibold text-nowrap text-end me-2" style="min-width:130px;">Description:</span>
                         <div class="flex-grow-1">
                             <vp-input type="text" name="hazardTypeOtherDescription"
                                       [(ngModel)]="model.hazardTypeOtherDescription" [required]="true"
@@ -62,52 +67,22 @@
                         </div>
                     </div>
                     <div class="d-flex align-items-center mb-2" *ngIf="model.deviceType !== BackflowDeviceType.AG">
-                        <span class="fw-semibold text-nowrap me-2" style="min-width:130px;">Test Gauge:</span>
+                        <span class="fw-semibold text-nowrap text-end me-2" style="min-width:130px;">Test Gauge:</span>
                         <div class="flex-grow-1">
                             <vp-input type="select" name="gaugeId" [ngModel]="selectedGaugeId"
                                       (ngModelChange)="onGaugeChange($event)"
                                       [options]="gaugeOptions" [required]="model.deviceType !== BackflowDeviceType.AG"
-                                      [placeholder]="'Select Gauge'" />
+                                      [placeholder]="'Select a Test Gauge'" />
                         </div>
                     </div>
                 </div>
                 <!-- Right: status panel -->
-                <div class="col-md-6 border-start ps-3"
-                     *ngIf="selectedBpat?.bpatLicenseExpirationType != null || showInsuranceRow || selectedGauge">
+                <div class="col-md-6 border-start ps-3" *ngIf="verificationChecks.length > 0">
                     <dl class="row mb-0 small">
-                        <ng-container *ngIf="selectedBpat?.bpatLicenseExpirationType != null">
-                            <dt class="col-5 text-nowrap fw-semibold">TCEQ - BPAT License:</dt>
-                            <dd class="col-7 mb-1"
-                                [class.text-success]="selectedBpat?.bpatLicenseExpirationType === ExpirationType.Valid"
-                                [class.text-warning]="selectedBpat?.bpatLicenseExpirationType === ExpirationType.AboutToExpire"
-                                [class.text-danger]="selectedBpat?.bpatLicenseExpirationType === ExpirationType.Expired">
-                                {{ selectedBpat?.bpatLicenseExpirationType === ExpirationType.Valid ? 'License valid' :
-                                   selectedBpat?.bpatLicenseExpirationType === ExpirationType.AboutToExpire ? 'License about to expire' :
-                                   'License expired' }}
-                            </dd>
-                        </ng-container>
-                        <ng-container *ngIf="showInsuranceRow">
-                            <dt class="col-5 text-nowrap fw-semibold">Insurance Policy:</dt>
-                            <dd class="col-7 mb-1"
-                                [class.text-success]="insuranceCheck?.isSatisfied && !insuranceAboutToExpire"
-                                [class.text-warning]="insuranceAboutToExpire"
-                                [class.text-danger]="!insuranceCheck?.isSatisfied">
-                                {{ insuranceAboutToExpire ? 'Insurance policy about to expire' : insuranceCheck?.message }}
-                            </dd>
-                        </ng-container>
-                        <ng-container *ngIf="selectedGauge">
-                            <dt class="col-5 text-nowrap fw-semibold">Test Gauge:</dt>
-                            <dd class="col-7 mb-1">{{ selectedGauge.manufacturer }} {{ selectedGauge.model }}
-                                {{ selectedGauge.serialNumber }}
-                            </dd>
-                            <dt class="col-5 text-nowrap fw-semibold">Gauge Calibration:</dt>
-                            <dd class="col-7 mb-1"
-                                [class.text-success]="selectedGauge.expirationType === GaugeExpirationType.Valid"
-                                [class.text-warning]="selectedGauge.expirationType === GaugeExpirationType.AboutToExpire"
-                                [class.text-danger]="selectedGauge.expirationType === GaugeExpirationType.Expired">
-                                {{ selectedGauge.expirationType === GaugeExpirationType.Valid ? 'Calibration valid' :
-                                   selectedGauge.expirationType === GaugeExpirationType.AboutToExpire ? 'Calibration about to expire' :
-                                   'Calibration expired' }}
+                        <ng-container *ngFor="let check of verificationChecks">
+                            <dt class="col-5 text-nowrap text-end fw-semibold">{{ check.label }}:</dt>
+                            <dd class="col-7 mb-1" [class.text-success]="check.valid" [class.text-danger]="!check.valid">
+                                {{ check.message }}
                             </dd>
                         </ng-container>
                     </dl>
@@ -116,14 +91,14 @@
         </vp-section>
 
         <!-- Water Supplier Information -->
-        <div class="mt-3" *ngIf="selectedWaterSupplier">
+        <div class="mt-3" *ngIf="isVerificationPassed && selectedWaterSupplier">
             <vp-section header="Water Supplier Information">
                 <div class="row">
                     <div class="col-md-6">
                         <dl class="row mb-0">
-                            <dt class="col-5">Water Supplier:</dt>
+                            <dt class="col-5 text-end">Water Supplier:</dt>
                             <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.name }}</dd>
-                            <dt class="col-5">Address:</dt>
+                            <dt class="col-5 text-end">Address:</dt>
                             <dd class="col-7 mb-1">
                                 {{ selectedWaterSupplier.waterSupplier?.address }}<br
                                     *ngIf="selectedWaterSupplier.waterSupplier?.address">
@@ -136,13 +111,13 @@
                     </div>
                     <div class="col-md-6">
                         <dl class="row mb-0">
-                            <dt class="col-5">PWS ID:</dt>
+                            <dt class="col-5 text-end">PWS ID:</dt>
                             <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.pwsId }}</dd>
-                            <dt class="col-5">Contact Name:</dt>
+                            <dt class="col-5 text-end">Contact Name:</dt>
                             <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.contactName }}</dd>
-                            <dt class="col-5">Phone Number:</dt>
+                            <dt class="col-5 text-end">Phone Number:</dt>
                             <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.phoneNumber }}</dd>
-                            <dt class="col-5">Email Address:</dt>
+                            <dt class="col-5 text-end">Email Address:</dt>
                             <dd class="col-7 mb-1">{{ selectedWaterSupplier.waterSupplier?.emailAddress }}</dd>
                         </dl>
                     </div>
@@ -151,18 +126,18 @@
         </div>
 
         <!-- BPAT Information -->
-        <div class="mt-3" *ngIf="selectedBpat">
+        <div class="mt-3" *ngIf="isVerificationPassed && selectedBpat">
             <vp-section header="BPAT Information">
                 <div class="row">
                     <div class="col-md-6">
                         <dl class="row mb-0">
-                            <dt class="col-5">Company Name:</dt>
+                            <dt class="col-5 text-end">Company Name:</dt>
                             <dd class="col-7 mb-1">{{ professional?.name }}</dd>
-                            <dt class="col-5">Title of BPAT:</dt>
+                            <dt class="col-5 text-end">Title of BPAT:</dt>
                             <dd class="col-7 mb-1">{{ selectedBpat.jobTitle }}</dd>
-                            <dt class="col-5">BPAT Name:</dt>
+                            <dt class="col-5 text-end">BPAT Name:</dt>
                             <dd class="col-7 mb-1">{{ selectedBpat.contactName }}</dd>
-                            <dt class="col-5">Address:</dt>
+                            <dt class="col-5 text-end">Address:</dt>
                             <dd class="col-7 mb-1">
                                 {{ professional?.address }}<br *ngIf="professional?.address">
                                 {{ professional?.city }}<span *ngIf="professional?.city && professional?.state?.name">,
@@ -172,16 +147,16 @@
                     </div>
                     <div class="col-md-6">
                         <dl class="row mb-0">
-                            <dt class="col-5">Phone Number:</dt>
+                            <dt class="col-5 text-end">Phone Number:</dt>
                             <dd class="col-7 mb-1">{{ professional?.phoneNumber }}</dd>
-                            <dt class="col-5">Email Address:</dt>
+                            <dt class="col-5 text-end">Email Address:</dt>
                             <dd class="col-7 mb-1">{{ selectedBpat.emailAddress }}</dd>
-                            <dt class="col-5">License Number:</dt>
-                            <dd class="col-7 mb-1">{{ selectedBpat.bpatLicenseNumber }}</dd>
-                            <dt class="col-5">License Type:</dt>
-                            <dd class="col-7 mb-1">{{ selectedBpat.bpatLicenseTypeName }}</dd>
-                            <dt class="col-5">License Exp Date:</dt>
-                            <dd class="col-7 mb-1">{{ selectedBpat.bpatLicenseExpirationDate | date:'MM/dd/yyyy' }}</dd>
+                            <dt class="col-5 text-end">License Number:</dt>
+                            <dd class="col-7 mb-1">{{ licenseCheck?.license?.licenseNumber }}</dd>
+                            <dt class="col-5 text-end">License Type:</dt>
+                            <dd class="col-7 mb-1">{{ licenseCheck?.license?.licenseTypeName }}</dd>
+                            <dt class="col-5 text-end">License Exp Date:</dt>
+                            <dd class="col-7 mb-1">{{ licenseCheck?.license?.expirationDate | date:'MM/dd/yyyy' }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -189,7 +164,7 @@
         </div>
 
         <!-- Main test form — only visible after BPAT + water supplier are selected (matches V1 divTest reveal) -->
-        <ng-container *ngIf="verificationComplete">
+        <ng-container *ngIf="isVerificationPassed">
 
             <div class="row mt-3" *ngIf="!isLocationEditing">
                 <div class="col-md-6">
@@ -199,14 +174,19 @@
                                     (click)="requestLocationModification()">Request Modification</button>
                         </vp-section-actions>
 
+                        <p *ngIf="showModificationBlockedMessage" class="text-danger">
+                            When mailing information is redacted, you cannot request modifications. Please contact the
+                            water supplier for support.
+                        </p>
+
                         <dl class="row mb-0">
-                            <dt class="col-5">Property Type:</dt>
+                            <dt class="col-5 text-end">Property Type:</dt>
                             <dd class="col-7 mb-1">
                                 {{ model.propertyType === PropertyType.Residential ? 'Residential' : 'Commercial' }}
                             </dd>
-                            <dt class="col-5">Business Name:</dt>
+                            <dt class="col-5 text-end">Business Name:</dt>
                             <dd class="col-7 mb-1">{{ model.propertyBusinessName }}</dd>
-                            <dt class="col-5">Property Address:</dt>
+                            <dt class="col-5 text-end">Property Address:</dt>
                             <dd class="col-7 mb-1">
                                 {{ model.propertyStreetNumber }} {{ model.propertyStreetName }}<span
                                       *ngIf="model.propertyNumber"> #{{ model.propertyNumber }}</span><br>
@@ -223,21 +203,26 @@
                                     (click)="requestLocationModification()">Request Modification</button>
                         </vp-section-actions>
 
+                        <p *ngIf="showModificationBlockedMessage" class="text-danger">
+                            When mailing information is redacted, you cannot request modifications. Please contact the
+                            water supplier for support.
+                        </p>
+
                         <dl class="row mb-0">
-                            <dt class="col-5">Company Name:</dt>
+                            <dt class="col-5 text-end">Company Name:</dt>
                             <dd class="col-7 mb-1">{{ model.mailingCompanyName }}</dd>
-                            <dt class="col-5">Contact Name:</dt>
+                            <dt class="col-5 text-end">Contact Name:</dt>
                             <dd class="col-7 mb-1">{{ model.mailingContactName }}</dd>
-                            <dt class="col-5">Mailing Address:</dt>
+                            <dt class="col-5 text-end">Mailing Address:</dt>
                             <dd class="col-7 mb-1">
                                 {{ model.mailingStreetNumber }} {{ model.mailingStreetName }}<span
                                       *ngIf="model.mailingNumber"> #{{ model.mailingNumber }}</span><br>
                                 {{ model.mailingCity }}<span *ngIf="model.mailingCity && model.mailingState?.name">,
                                 </span>{{ model.mailingState?.name }} {{ model.mailingZip }}
                             </dd>
-                            <dt class="col-5">Phone Number:</dt>
+                            <dt class="col-5 text-end">Phone Number:</dt>
                             <dd class="col-7 mb-1">{{ model.mailingPhoneNumber }}</dd>
-                            <dt class="col-5">Email Address:</dt>
+                            <dt class="col-5 text-end">Email Address:</dt>
                             <dd class="col-7 mb-1">{{ model.mailingEmailAddress }}</dd>
                         </dl>
                     </vp-section>
@@ -253,9 +238,9 @@
                         </vp-section-actions>
 
                         <div class="row mb-2">
-                            <div class="col-xl-4 col-form-label fw-bold">Property Type: <span
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Property Type: <span
                                       class="text-danger">*</span></div>
-                            <div class="col-xl-8">
+                            <div class="col-xl-9">
                                 <vp-input type="select"
                                           name="propertyType"
                                           [ngModel]="model.propertyType"
@@ -268,8 +253,8 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-4 col-form-label fw-bold">Business Name:</div>
-                            <div class="col-xl-8">
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Business Name:</div>
+                            <div class="col-xl-9">
                                 <vp-input name="propertyBusinessName"
                                           [(ngModel)]="model.propertyBusinessName"
                                           [disabled]="model.propertyType === PropertyType.Residential"
@@ -278,8 +263,8 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-4 fw-bold d-xl-flex align-items-xl-center">Address:</div>
-                            <div class="col-xl-8">
+                            <div class="col-xl-3 fw-bold d-xl-flex align-items-xl-center justify-content-xl-end">Address:</div>
+                            <div class="col-xl-9">
                                 <div class="row g-2">
                                     <div class="col-3">
                                         <vp-input name="propertyStreetNumber"
@@ -309,8 +294,8 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-4 col-form-label fw-bold">City: <span class="text-danger">*</span></div>
-                            <div class="col-xl-8">
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">City: <span class="text-danger">*</span></div>
+                            <div class="col-xl-9">
                                 <vp-input name="propertyCity"
                                           [(ngModel)]="model.propertyCity"
                                           [required]="true"
@@ -320,8 +305,8 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-4 col-form-label fw-bold">State:</div>
-                            <div class="col-xl-8">
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">State:</div>
+                            <div class="col-xl-9">
                                 <vp-input type="select"
                                           name="propertyStateId"
                                           [ngModel]="model.propertyState?.id"
@@ -331,8 +316,8 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-4 col-form-label fw-bold">ZIP: <span class="text-danger">*</span></div>
-                            <div class="col-xl-8">
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">ZIP: <span class="text-danger">*</span></div>
+                            <div class="col-xl-9">
                                 <vp-input name="propertyZip"
                                           [(ngModel)]="model.propertyZip"
                                           [required]="true"
@@ -355,8 +340,8 @@
                             or address.</p>
 
                         <div class="row mb-2">
-                            <div class="col-xl-4 col-form-label fw-bold">Company Name:</div>
-                            <div class="col-xl-8">
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Company Name:</div>
+                            <div class="col-xl-9">
                                 <vp-input name="mailingCompanyName"
                                           [(ngModel)]="model.mailingCompanyName"
                                           [maxLength]="100" />
@@ -364,8 +349,8 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-4 col-form-label fw-bold">Contact Name:</div>
-                            <div class="col-xl-8">
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Contact Name:</div>
+                            <div class="col-xl-9">
                                 <vp-input name="mailingContactName"
                                           [(ngModel)]="model.mailingContactName"
                                           [maxLength]="100" />
@@ -373,8 +358,8 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-4 fw-bold d-xl-flex align-items-xl-center">Address:</div>
-                            <div class="col-xl-8">
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Address:</div>
+                            <div class="col-xl-9">
                                 <button type="button" class="btn btn-primary vp-section-button mt-2"
                                         (click)="copyPropertyAddress()">
                                     Copy from Property Address
@@ -408,8 +393,8 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-4 col-form-label fw-bold">City: <span class="text-danger">*</span></div>
-                            <div class="col-xl-8">
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">City: <span class="text-danger">*</span></div>
+                            <div class="col-xl-9">
                                 <vp-input name="mailingCity"
                                           [(ngModel)]="model.mailingCity"
                                           [required]="true"
@@ -419,8 +404,8 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-4 col-form-label fw-bold">State:</div>
-                            <div class="col-xl-8">
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">State:</div>
+                            <div class="col-xl-9">
                                 <vp-input type="select"
                                           name="mailingStateId"
                                           [ngModel]="model.mailingState?.id"
@@ -430,8 +415,8 @@
                         </div>
 
                         <div class="row mb-4">
-                            <div class="col-xl-4 col-form-label fw-bold">ZIP: <span class="text-danger">*</span></div>
-                            <div class="col-xl-8">
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">ZIP: <span class="text-danger">*</span></div>
+                            <div class="col-xl-9">
                                 <vp-input name="mailingZip"
                                           [(ngModel)]="model.mailingZip"
                                           [required]="true"
@@ -441,8 +426,8 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-4 col-form-label fw-bold">Phone Number:</div>
-                            <div class="col-xl-8">
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Phone Number:</div>
+                            <div class="col-xl-9">
                                 <vp-input name="mailingPhoneNumber"
                                           [(ngModel)]="model.mailingPhoneNumber"
                                           [maxLength]="50" />
@@ -450,11 +435,12 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-xl-4 col-form-label fw-bold">Email Address:</div>
-                            <div class="col-xl-8">
+                            <div class="col-xl-3 col-form-label fw-bold text-xl-end">Email Address:</div>
+                            <div class="col-xl-9">
                                 <vp-input name="mailingEmailAddress"
+                                          type="multi-email"
                                           [(ngModel)]="model.mailingEmailAddress"
-                                          [maxLength]="100" />
+                                          [maxLength]="1000" />
                             </div>
                         </div>
                     </vp-section>
@@ -467,7 +453,7 @@
                     <!-- Device Type -->
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <vp-input type="select" label="Backflow Method" name="deviceType"
+                            <vp-input type="select" label="Backflow Method:" name="deviceType"
                                       [ngModel]="model.deviceType" (ngModelChange)="onDeviceTypeChange($event)"
                                       [options]="deviceTypeOptions" [required]="true" [form]="submitForm"
                                       [placeholder]="'Select a backflow method'" />
@@ -477,20 +463,20 @@
                     <!-- Main assembly -->
                     <div class="row mb-3" *ngIf="hasAssembly">
                         <div class="col-md-3">
-                            <vp-input type="select" label="Manufacturer" name="manufacturer"
+                            <vp-input type="select" label="Manufacturer:" name="manufacturer"
                                       [(ngModel)]="model.manufacturer"
                                       [options]="manufacturerOptions" [required]="true" [form]="submitForm" />
                         </div>
                         <div class="col-md-3">
-                            <vp-input type="text" label="Model" name="model" [(ngModel)]="model.model" [required]="true"
+                            <vp-input type="text" label="Model:" name="model" [(ngModel)]="model.model" [required]="true"
                                       [form]="submitForm" />
                         </div>
                         <div class="col-md-2">
-                            <vp-input type="select" label="Size" name="size" [(ngModel)]="model.size"
+                            <vp-input type="select" label="Size:" name="size" [(ngModel)]="model.size"
                                       [options]="sizeOptions" [required]="true" [form]="submitForm" />
                         </div>
                         <div class="col-md-4">
-                            <vp-input type="text" label="Serial Number" name="serialNumber"
+                            <vp-input type="text" label="Serial Number:" name="serialNumber"
                                       [(ngModel)]="model.serialNumber" />
                         </div>
                     </div>
@@ -500,20 +486,20 @@
                          *ngIf="model.deviceType === BackflowDeviceType.DCD || model.deviceType === BackflowDeviceType.DCD2 || model.deviceType === BackflowDeviceType.RPPD || model.deviceType === BackflowDeviceType.RPPD2">
                         <div class="col-12 fw-semibold mb-1">Bypass Assembly</div>
                         <div class="col-md-3">
-                            <vp-input type="select" label="Manufacturer" name="manufacturer2"
+                            <vp-input type="select" label="Manufacturer:" name="manufacturer2"
                                       [(ngModel)]="model.manufacturer2"
                                       [options]="manufacturerOptions" [required]="true" [form]="submitForm" />
                         </div>
                         <div class="col-md-3">
-                            <vp-input type="text" label="Model" name="model2" [(ngModel)]="model.model2"
+                            <vp-input type="text" label="Model:" name="model2" [(ngModel)]="model.model2"
                                       [required]="true" [form]="submitForm" />
                         </div>
                         <div class="col-md-2">
-                            <vp-input type="select" label="Size" name="size2" [(ngModel)]="model.size2"
+                            <vp-input type="select" label="Size:" name="size2" [(ngModel)]="model.size2"
                                       [options]="sizeOptions" [required]="true" [form]="submitForm" />
                         </div>
                         <div class="col-md-4">
-                            <vp-input type="text" label="Serial Number" name="serialNumber2"
+                            <vp-input type="text" label="Serial Number:" name="serialNumber2"
                                       [(ngModel)]="model.serialNumber2" />
                         </div>
                     </div>
@@ -521,7 +507,7 @@
                     <!-- Location description -->
                     <div class="row mb-3">
                         <div class="col-md-12">
-                            <vp-input type="text" label="Location" name="locationDescription"
+                            <vp-input type="text" label="Location:" name="locationDescription"
                                       [ngModel]="model.locationDescription"
                                       (ngModelChange)="onLocationDescriptionChange($event)"
                                       [maxLength]="100" [required]="true" [form]="submitForm" />
@@ -552,13 +538,13 @@
                                     <label class="form-check-label" for="resultFail">Failed</label>
                                 </div>
                             </div>
-                            <vp-input type="select" label="Reason for Test" name="reasonForTest"
+                            <vp-input type="select" label="Reason for Test:" name="reasonForTest"
                                       [(ngModel)]="model.reasonForTest"
                                       [options]="reasonOptions" [required]="true" [form]="submitForm"
                                       [placeholder]="'Select reason'" />
                         </div>
                         <div class="col-md-6">
-                            <vp-input type="text" label="Job Number" name="jobNumber" [(ngModel)]="model.jobNumber" />
+                            <vp-input type="text" label="Job Number:" name="jobNumber" [(ngModel)]="model.jobNumber" />
                             <span class="form-text text-muted">(Optional)</span>
                         </div>
                     </div>
@@ -566,7 +552,7 @@
                     <!-- Replacement assembly -->
                     <div class="row mb-3" *ngIf="model.reasonForTest === BackflowReasonForTest.Replacement">
                         <div class="col-md-6">
-                            <vp-input type="text" label="Old Model / Serial #" name="replacementAssembly"
+                            <vp-input type="text" label="Old Model / Serial #:" name="replacementAssembly"
                                       [(ngModel)]="model.replacementAssembly" />
                         </div>
                     </div>
@@ -610,7 +596,7 @@
                     <ng-container *ngIf="model.deviceType === BackflowDeviceType.AG">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <vp-input type="datetime" label="Test Date and Time" name="airGapDate"
+                                <vp-input type="datetime" label="Test Date and Time:" name="airGapDate"
                                           [(ngModel)]="model.initialTestDate" [required]="true" [form]="submitForm" />
                             </div>
                             <div class="col-md-6">
@@ -3014,15 +3000,15 @@
                 <vp-section header="Bypass Meter Test">
                     <div class="row">
                         <div class="col-md-3">
-                            <vp-input type="text" label="Bypass Meter Number" name="meterNumber"
+                            <vp-input type="text" label="Bypass Meter Number:" name="meterNumber"
                                       [(ngModel)]="model.meterNumber" />
                         </div>
                         <div class="col-md-3">
-                            <vp-input type="number" label="Meter Reading Prior to Test" name="meterReadingBefore"
+                            <vp-input type="number" label="Meter Reading Prior to Test:" name="meterReadingBefore"
                                       [(ngModel)]="model.meterReadingBefore" />
                         </div>
                         <div class="col-md-3">
-                            <vp-input type="number" label="Meter Reading Upon Completion" name="meterReadingAfter"
+                            <vp-input type="number" label="Meter Reading Upon Completion:" name="meterReadingAfter"
                                       [(ngModel)]="model.meterReadingAfter" />
                         </div>
                         <div class="col-md-3">
@@ -3043,11 +3029,11 @@
                 <vp-section header="Additional Information">
                     <div class="row">
                         <div class="col-md-4" *ngIf="additionalInfoSettings?.showPermitNumber">
-                            <vp-input type="text" label="Permit Number" name="permitNumber"
+                            <vp-input type="text" label="Permit Number:" name="permitNumber"
                                       [(ngModel)]="model.permitNumber" />
                         </div>
                         <div class="col-md-4" *ngIf="additionalInfoSettings?.showWaterMeterNumber">
-                            <vp-input type="text" label="Water Meter Number" name="waterMeterNumber" [maxLength]="50"
+                            <vp-input type="text" label="Water Meter Number:" name="waterMeterNumber" [maxLength]="50"
                                       [(ngModel)]="model.waterMeterNumber" />
                         </div>
                         <div class="col-md-4" *ngIf="additionalInfoSettings?.showOSSF">

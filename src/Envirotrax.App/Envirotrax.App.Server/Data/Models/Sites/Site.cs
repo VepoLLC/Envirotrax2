@@ -13,6 +13,7 @@ namespace Envirotrax.App.Server.Data.Models.Sites;
 
 [Table("Sites")]
 [RecordLogged(RecordLogTableNames.Sites, ProfessionalSource = RecordLogIdSource.None)]
+[AppIndex(nameof(WaterSupplierId), nameof(WaterSupplierAccountNumber), IsUnique = true)]
 public class Site : IAuditableModel<AppUser>
 {
     [AppPrimaryKey(true)]
@@ -31,6 +32,12 @@ public class Site : IAuditableModel<AppUser>
     [Required]
     [StringLength(20)]
     public string AccountNumber { get; set; } = null!;
+
+    // The water supplier's own account number for the site, shown and searched alongside AccountNumber when
+    // GeneralSettings.IncludeWsAccountNumbers is on. Unique per water supplier, archived sites included, as in
+    // V1; blank is stored as NULL.
+    [MaxLength(20)]
+    public string? WaterSupplierAccountNumber { get; set; }
 
     [StringLength(100)]
     public string? BusinessName { get; set; }
@@ -82,7 +89,7 @@ public class Site : IAuditableModel<AppUser>
     [StringLength(50)]
     public string? MailingPhoneNumber { get; set; }
 
-    [StringLength(100)]
+    [StringLength(1000)]
     public string? MailingEmailAddress { get; set; }
 
     [StringLength(50)]
@@ -216,6 +223,20 @@ public class Site : IAuditableModel<AppUser>
     public DateTime? BackflowAccountAssignmentDate { get; set; }
 
     public DateTime? FogAccountAssignmentDate { get; set; }
+
+    public RenewalOptInType RenewalOptInType { get; set; }
+
+    public DateTime? RenewalOptInOutDate { get; set; }
+
+    public RenewalOptInOrigin? RenewalOptInOrigin { get; set; }
+
+    [StringLength(45)]
+    public string? RenewalOptInIpAddress { get; set; }
+
+    // BCrypt hash of the one-time code printed on renewal letters by the V1 Letter Generator.
+    public string? OptInCodeHash { get; set; }
+
+    public DateTime? OptInCodeExpirationDate { get; set; }
 
     public bool Active { get; set; }
 

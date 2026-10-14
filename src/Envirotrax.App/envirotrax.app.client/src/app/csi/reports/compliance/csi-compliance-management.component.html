@@ -92,14 +92,14 @@
                     <div class="col-md-4">
                         <vp-field-grid>
                             <vp-input type="select"
-                                      label="Days Overdue"
+                                      label="Days Overdue:"
                                       name="daysOverdue"
                                       labelStyle="horizontal"
                                       [(ngModel)]="daysOverdue"
                                       [options]="daysOverdueOptions" />
 
                             <vp-input type="select"
-                                      label="Sort By"
+                                      label="Sort By:"
                                       name="sortBy"
                                       labelStyle="horizontal"
                                       [(ngModel)]="sortBy"
@@ -133,7 +133,7 @@
                     <div class="col-md-4">
                         <vp-field-grid>
                             <vp-filter-panel-field fieldName="csiAccountAssignmentId"
-                                                   label="User Account Assignment"
+                                                   label="User Account Assignment:"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
@@ -142,14 +142,14 @@
                             <app-gis-area-lookup [form]="searchForm" labelStyle="horizontal" />
 
                             <vp-filter-panel-field fieldName="propertyType"
-                                                   label="Property Type"
+                                                   label="Property Type:"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="propertyTypes" />
 
                             <vp-filter-panel-field fieldName="facilityType"
-                                                   label="Facility Type"
+                                                   label="Facility Type:"
                                                    type="select" labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="facilityTypes" />
@@ -158,20 +158,20 @@
 
                     <div class="col-md-4">
                         <vp-field-grid>
-                            <vp-input label="Property Street Name"
+                            <vp-input label="Property Street Name:"
                                       name="propertyStreetName"
                                       labelStyle="horizontal"
                                       [(ngModel)]="propertyStreet" />
 
                             <vp-filter-panel-field fieldName="hasOnSiteSewageFacility"
-                                                   label="Has On-Site Sewage Facility"
+                                                   label="Has On-Site Sewage Facility:"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="yesNoOptions" />
 
                             <vp-filter-panel-field fieldName="hasAuxWaterSupply"
-                                                   label="Has Auxiliary Water Supply"
+                                                   label="Has Auxiliary Water Supply:"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"

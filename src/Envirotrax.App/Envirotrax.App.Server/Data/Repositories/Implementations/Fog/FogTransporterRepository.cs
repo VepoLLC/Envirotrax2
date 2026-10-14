@@ -28,7 +28,7 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Fog
 
             if (!string.IsNullOrWhiteSpace(registrationNumber))
             {
-                query = query.Where(p => DbContext.ProfessionalUserLicenses.Any(l =>
+                query = query.Where(p => DbContext.ProfessionalLicenses.Any(l =>
                     l.ProfessionalId == p.Id &&
                     l.ProfessionalType == ProfessionalType.FogTransporter &&
                     l.LicenseNumber.Contains(registrationNumber)));

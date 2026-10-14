@@ -64,8 +64,10 @@ services.AddTransient<ProfessionalInsuranceService>();
 services.AddTransient<GisAreaService>();
 services.AddTransient<SiteService>();
 services.AddTransient<SiteLogService>();
+services.AddTransient<RenewalEmailVerificationService>();
 services.AddTransient<BackflowGaugeService>();
 services.AddTransient<NotificationSettingService>();
+services.AddTransient<NotificationService>();
 
 var provider = services.BuildServiceProvider();
 
@@ -99,6 +101,11 @@ await gisAreaService.MigrateAsync();
 var siteService = provider.GetRequiredService<SiteService>();
 await siteService.MigrateAsync();
 
+// After the sites: a pending verification belongs to a site, and its address is added to that site
+// once it is confirmed.
+var renewalEmailVerificationService = provider.GetRequiredService<RenewalEmailVerificationService>();
+await renewalEmailVerificationService.MigrateAsync();
+
 var siteLogService = provider.GetRequiredService<SiteLogService>();
 await siteLogService.MigrateAsync();
 
@@ -111,3 +118,9 @@ await backflowGaugeService.MigrateAsync();
 // that recipient, so a setting whose user is missing cannot be migrated at all.
 var notificationSettingService = provider.GetRequiredService<NotificationSettingService>();
 await notificationSettingService.MigrateAsync();
+
+// Last, because a notification points at the record that raised it through RecordId. Every row V1
+// can produce is a backflow one, so that pointer is always a backflow test id. It is carried over
+// unresolved: V2 row ids equal the V1 ids, so it lines up once the backflow test migration lands.
+var notificationService = provider.GetRequiredService<NotificationService>();
+await notificationService.MigrateAsync();

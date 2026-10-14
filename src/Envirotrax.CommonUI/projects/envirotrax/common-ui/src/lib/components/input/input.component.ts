@@ -35,6 +35,12 @@ export class InputComponent implements ControlValueAccessor, Validator, OnInit, 
 
     private static _counter: number = 0;
 
+    private static readonly EmailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+
+    private static readonly EmailSeparator = '; ';
+
+    private static readonly MultiEmailPlaceholder = 'Type an email address and press Enter';
+
     @Input()
     public id: string = null!;
 
@@ -42,7 +48,7 @@ export class InputComponent implements ControlValueAccessor, Validator, OnInit, 
     public name: string = null!;
 
     @Input()
-    public type: 'text' | 'number' | 'date' | 'datetime' | 'daterange' | 'textarea' | 'select' | 'email' | 'multi-select' = 'text';
+    public type: 'text' | 'number' | 'date' | 'datetime' | 'daterange' | 'textarea' | 'select' | 'email' | 'multi-select' | 'multi-email' = 'text';
 
     @Input()
     public required: boolean = false;
@@ -102,6 +108,10 @@ export class InputComponent implements ControlValueAccessor, Validator, OnInit, 
     public isInputGroup: boolean = false;
 
     public value: any | DateRange;
+
+    public emailAddresses: string[] = [];
+
+    public readonly addEmailAddressTag = (term: string): string => term;
 
     @ViewChild('flatpickr')
     public flatpickr?: ElementRef<HTMLElement>;
@@ -168,6 +178,10 @@ export class InputComponent implements ControlValueAccessor, Validator, OnInit, 
     public writeValue(obj: any): void {
         this.value = obj;
 
+        if (this.type === 'multi-email') {
+            this.emailAddresses = this.splitEmailAddresses([obj ?? '']);
+        }
+
         if (this._flatpickerInstance) {
             this._flatpickerInstance.setDate(this.value, false);
         }
@@ -195,9 +209,18 @@ export class InputComponent implements ControlValueAccessor, Validator, OnInit, 
 
     public validate(control: AbstractControl): ValidationErrors | null {
         if (this.type === 'email' && control.value) {
-            const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-            if (!emailRegex.test(control.value)) {
+            if (!InputComponent.EmailRegex.test(control.value)) {
                 return { email: true };
+            }
+        }
+
+        if (this.type === 'multi-email' && control.value) {
+            if (this.emailAddresses.some(email => !InputComponent.EmailRegex.test(email))) {
+                return { email: true };
+            }
+
+            if (this.maxLength && control.value.length > this.maxLength) {
+                return { maxlength: { requiredLength: this.maxLength, actualLength: control.value.length } };
             }
         }
 
@@ -236,6 +259,10 @@ export class InputComponent implements ControlValueAccessor, Validator, OnInit, 
         if (!this.name) {
             this.name = `input${InputComponent._counter}`;
         }
+
+        if (this.type === 'multi-email' && !this.placeholder) {
+            this.placeholder = InputComponent.MultiEmailPlaceholder;
+        }
     }
 
     public onChanged(): void {
@@ -261,6 +288,35 @@ export class InputComponent implements ControlValueAccessor, Validator, OnInit, 
         const v = (e.target as HTMLInputElement).value;
         this.value = v;
         this._onChanged(v);
+    }
+
+    public onEmailAddressesChanged(): void {
+        this.emailAddresses = this.splitEmailAddresses(this.emailAddresses);
+        this.value = this.emailAddresses.join(InputComponent.EmailSeparator);
+
+        this._onChanged(this.value);
+    }
+
+    public onEmailAddressesBlur(event: FocusEvent): void {
+        const pendingAddress = this.select?.searchTerm?.trim();
+
+        if (pendingAddress) {
+            this.select!.searchTerm = '';
+            this.emailAddresses = [...this.emailAddresses, pendingAddress];
+            this.onEmailAddressesChanged();
+        }
+
+        this.onTouched(event);
+    }
+
+    private splitEmailAddresses(values: string[]): string[] {
+        const addresses = values
+            .flatMap(value => value.split(/[;,\s]+/))
+            .map(address => address.trim())
+            .filter(address => address);
+
+        return addresses.filter((address, index) =>
+            addresses.findIndex(other => other.toLowerCase() === address.toLowerCase()) === index);
     }
 }
 

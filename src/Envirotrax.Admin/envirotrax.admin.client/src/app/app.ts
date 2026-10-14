@@ -10,6 +10,8 @@ import { BackflowTestListComponent } from './backflow/tests/list/backflow-test-l
 import { BackflowTesterListComponent } from './backflow/testers/list/backflow-tester-list.component';
 import { BackflowReplacementListComponent } from './backflow/replacements/list/backflow-replacement-list.component';
 import { FogInspectionListComponent } from './fog/inspections/list/fog-inspection-list.component';
+import { FogInspectorListComponent } from './fog/inspectors/list/fog-inspector-list.component';
+import { FogDisposalSiteListComponent } from './fog/disposal-sites/list/fog-disposal-site-list.component';
 import { NavigationEnd, Router } from '@angular/router';
 import { ROLE_DEFINITIONS } from './shared/models/role-definitions';
 import { filter } from 'rxjs';
@@ -112,6 +114,19 @@ export class App implements OnInit {
             title: 'Inspection Search',
             iconCss: 'fa-solid fa-magnifying-glass',
             onClick: this.showFogInspectionSearch.bind(this)
+          },
+          {
+            title: 'Inspector Search',
+            iconCss: 'fa-solid fa-user',
+            onClick: this.showFogInspectorSearch.bind(this)
+          },
+          {
+            type: 'separator'
+          },
+          {
+            title: 'Disposal Sites',
+            iconCss: 'fa-solid fa-dumpster',
+            onClick: this.showFogDisposalSites.bind(this)
           }
         ]
       }
@@ -196,6 +211,18 @@ export class App implements OnInit {
   public showFogInspectionSearch(): void {
     this._windowService.addWindow(FogInspectionListComponent, {
       title: 'FOG Inspection Search'
+    });
+  }
+
+  public showFogInspectorSearch(): void {
+    this._windowService.addWindow(FogInspectorListComponent, {
+      title: 'FOG Inspector Search'
+    });
+  }
+
+  public showFogDisposalSites(): void {
+    this._windowService.addWindow(FogDisposalSiteListComponent, {
+      title: 'FOG Disposal Sites'
     });
   }
 }

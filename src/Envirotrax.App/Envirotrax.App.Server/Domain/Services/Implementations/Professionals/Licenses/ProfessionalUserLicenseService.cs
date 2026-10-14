@@ -17,7 +17,19 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Professionals.Li
 
 public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, ProfessionalUserLicenseDto>, IProfessionalUserLicenseService
 {
+    private const string FireLicenseLabel = "Fire License";
+    private const string DefaultLicenseLabel = "BPAT License";
+
+    private static readonly LicenseCheckResult[] LicenseResultPriority =
+    [
+        LicenseCheckResult.Valid,
+        LicenseCheckResult.Unverified,
+        LicenseCheckResult.Expired
+    ];
+
     private readonly IProfessionalUserLicenseRepository _licenseRepository;
+    private readonly IProfessionalLicenseRepository _companyLicenseRepository;
+    private readonly IProfessionalLicenseTypeService _licenseTypeService;
     private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly IAuthService _authService;
     private readonly IRecordLogService _recordLogService;
@@ -25,12 +37,16 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
     public ProfessionalUserLicenseService(
         IMapper mapper,
         IProfessionalUserLicenseRepository repository,
+        IProfessionalLicenseRepository companyLicenseRepository,
+        IProfessionalLicenseTypeService licenseTypeService,
         ITimeZoneHelperService timeZoneHelper,
         IAuthService authService,
         IRecordLogService recordLogService)
         : base(mapper, repository)
     {
         _licenseRepository = repository;
+        _companyLicenseRepository = companyLicenseRepository;
+        _licenseTypeService = licenseTypeService;
         _timeZoneHelper = timeZoneHelper;
         _authService = authService;
         _recordLogService = recordLogService;
@@ -73,8 +89,43 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
         return items.ToLookup(l => l.ProfessionalId, l => MapToDto(l)!);
     }
 
+    public override async Task<ProfessionalUserLicenseDto> AddAsync(ProfessionalUserLicenseDto dto)
+    {
+        var licenseType = await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.User);
+
+        dto.ProfessionalType = licenseType.ProfessionalType;
+        dto.ExpirationDate = null;
+
+        return await base.AddAsync(dto);
+    }
+
+    public override async Task<ProfessionalUserLicenseDto> UpdateAsync(ProfessionalUserLicenseDto dto)
+    {
+        var licenseType = await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.User);
+        var existing = await Repository.GetNoIncludesAsync(dto.Id, default);
+
+        if (existing == null)
+        {
+            throw new InvalidOperationException($"License {dto.Id} not found.");
+        }
+
+        dto.ProfessionalType = licenseType.ProfessionalType;
+        dto.ExpirationDate = existing.ExpirationDate;
+
+        if (existing.LicenseNumber != dto.LicenseNumber || existing.LicenseTypeId != licenseType.Id)
+        {
+            dto.ExpirationDate = null;
+        }
+
+        return await base.UpdateAsync(dto);
+    }
+
     public async Task<ProfessionalUserLicenseDto> AddForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto)
     {
+        var licenseType = await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.User);
+
+        dto.ProfessionalType = licenseType.ProfessionalType;
+
         var model = MapToModel(dto)!;
         model.ProfessionalId = professionalId;
         var added = await Repository.AddAsync(model);
@@ -83,6 +134,10 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
 
     public async Task<ProfessionalUserLicenseDto> UpdateForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto)
     {
+        var licenseType = await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.User);
+
+        dto.ProfessionalType = licenseType.ProfessionalType;
+
         var model = MapToModel(dto)!;
         model.ProfessionalId = professionalId;
         var updated = await Repository.UpdateAsync(model);
@@ -98,33 +153,6 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
         var dtoList = licenses.Select(l => MapToDto(l)!);
 
         return dtoList.ToPagedData(pageInfo);
-    }
-
-    public async Task<IPagedData<WaterSupplierLicenseDto>> GetAllByWaterSupplierAsync(PageInfo pageInfo, Query query, string? licenseFilter, CancellationToken cancellationToken)
-    {
-        query.Sort = query.ConvertSortProperties<ProfessionalUserLicense, WaterSupplierLicenseDto>(Mapper);
-        query.Filter = query.ConvertFilterProperties<ProfessionalUserLicense, WaterSupplierLicenseDto>(Mapper);
-
-        var items = await _licenseRepository.GetAllByWaterSupplierAsync(pageInfo, query, licenseFilter, cancellationToken);
-        var now = _timeZoneHelper.GetUserLocalTime();
-
-        var dtos = items.Select(l => MapToWaterSupplierDto(l, now));
-
-        return dtos.ToPagedData(pageInfo);
-    }
-
-    public async Task<LicenseCountsDto> GetCountsByWaterSupplierAsync(CancellationToken cancellationToken)
-    {
-        var unverified = await _licenseRepository.GetCountByWaterSupplierAsync("unverified", cancellationToken);
-        var expired = await _licenseRepository.GetCountByWaterSupplierAsync("expired", cancellationToken);
-        var expiring = await _licenseRepository.GetCountByWaterSupplierAsync("expiring", cancellationToken);
-
-        return new LicenseCountsDto
-        {
-            UnverifiedCount = unverified,
-            ExpiredCount = expired,
-            ExpiringCount = expiring
-        };
     }
 
     public async Task<WaterSupplierLicenseDto> UpdateForWaterSupplierAsync(int id, UpdateWaterSupplierLicenseDto dto, CancellationToken cancellationToken)
@@ -145,22 +173,86 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
             $"Deleted license — LicenseNumber: '{license.LicenseNumber}', ExpirationDate: '{license.ExpirationDate:d}'", professionalId: license.ProfessionalId);
     }
 
-    public async Task<IPagedData<WaterSupplierLicenseDto>> GetUnverifiedRegistrationsByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public async Task<BpatLicenseCheckDto> CheckBpatForWaterSupplierAsync(int professionalId, int userId, int waterSupplierId, CancellationToken cancellationToken)
     {
-        query.Sort = query.ConvertSortProperties<ProfessionalUserLicense, WaterSupplierLicenseDto>(Mapper);
-        query.Filter = query.ConvertFilterProperties<ProfessionalUserLicense, WaterSupplierLicenseDto>(Mapper);
+        var licenseTypes = await _licenseRepository.GetLicenseTypesForWaterSupplierAsync(waterSupplierId, ProfessionalType.Bpat, cancellationToken);
+        var userLicenses = await _licenseRepository.GetUserLicensesForWaterSupplierAsync(professionalId, userId, waterSupplierId, ProfessionalType.Bpat, cancellationToken);
+        var companyLicenses = await _companyLicenseRepository.GetForWaterSupplierAsync(professionalId, waterSupplierId, ProfessionalType.Bpat, cancellationToken);
 
-        var items = await _licenseRepository.GetUnverifiedRegistrationsByWaterSupplierAsync(pageInfo, query, cancellationToken);
-        var now = _timeZoneHelper.GetUserLocalTime();
+        var licenseTypesByFire = licenseTypes.ToLookup(licenseType => licenseType.IsFireLicense);
+        var bpatLicenses = userLicenses.Where(license => !license.LicenseType!.IsFireLicense);
+        var fireLicenses = companyLicenses.Where(license => license.LicenseType!.IsFireLicense);
 
-        var dtos = items.Select(l => MapToWaterSupplierDto(l, now));
+        var mainLicenseLabel = licenseTypesByFire[false].FirstOrDefault()?.Description ?? DefaultLicenseLabel;
 
-        return dtos.ToPagedData(pageInfo);
+        return new BpatLicenseCheckDto
+        {
+            License = CheckLicense(licenseTypesByFire[false].Any(), bpatLicenses, mainLicenseLabel),
+            FireLicense = CheckLicense(licenseTypesByFire[true].Any(), fireLicenses, FireLicenseLabel)
+        };
     }
 
-    public Task<int> GetUnverifiedRegistrationCountByWaterSupplierAsync(CancellationToken cancellationToken)
+    private LicenseCheckDto CheckLicense(bool isRequired, IEnumerable<ILicenseModel> licenses, string label)
     {
-        return _licenseRepository.GetUnverifiedRegistrationCountByWaterSupplierAsync(cancellationToken);
+        if (!isRequired)
+        {
+            return CreateLicenseCheck(LicenseCheckResult.NotRequired, label, null);
+        }
+
+        var now = _timeZoneHelper.GetUserLocalTime();
+
+        var candidates = licenses
+            .Select(license => (License: license, Result: GetLicenseResult(license, now)))
+            .ToList();
+
+        foreach (var result in LicenseResultPriority)
+        {
+            var match = candidates.FirstOrDefault(candidate => candidate.Result == result);
+
+            if (match.License != null)
+            {
+                return CreateLicenseCheck(result, label, match.License);
+            }
+        }
+
+        return CreateLicenseCheck(LicenseCheckResult.NotFound, label, null);
+    }
+
+    private static LicenseCheckResult GetLicenseResult(ILicenseModel license, DateTime now)
+    {
+        if (license.ExpirationDate == null)
+        {
+            return LicenseCheckResult.Unverified;
+        }
+
+        return now > license.ExpirationDate
+            ? LicenseCheckResult.Expired
+            : LicenseCheckResult.Valid;
+    }
+
+    private static LicenseCheckDto CreateLicenseCheck(LicenseCheckResult result, string label, ILicenseModel? license)
+    {
+        return new LicenseCheckDto
+        {
+            Result = result,
+            Label = label,
+            Message = GetLicenseCheckMessage(result),
+            LicenseNumber = license?.LicenseNumber,
+            LicenseTypeName = license?.LicenseType?.Name,
+            ExpirationDate = license?.ExpirationDate
+        };
+    }
+
+    private static string GetLicenseCheckMessage(LicenseCheckResult result)
+    {
+        return result switch
+        {
+            LicenseCheckResult.NotRequired => "Not Required",
+            LicenseCheckResult.Unverified => "License awaiting validation...",
+            LicenseCheckResult.Expired => "License expired",
+            LicenseCheckResult.Valid => "License valid",
+            _ => "No license found"
+        };
     }
 
     private static WaterSupplierLicenseDto MapToWaterSupplierDto(ProfessionalUserLicense license, DateTime now)
@@ -168,6 +260,7 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
         return new WaterSupplierLicenseDto
         {
             Id = license.Id,
+            LicenseScope = LicenseScope.User,
             ProfessionalId = license.ProfessionalId,
             UserId = license.UserId,
             SubmittedOn = license.CreatedTime,

@@ -5,19 +5,15 @@ using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Services.Definitions;
-using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Professionals.Licenses;
 
 public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLicense>, IProfessionalUserLicenseRepository
 {
-    private readonly ITimeZoneHelperService _timeZoneHelper;
-
-    public ProfessionalUserLicenseRepository(IDbContextSelector dbContextSelector, ITimeZoneHelperService timeZoneHelper)
+    public ProfessionalUserLicenseRepository(IDbContextSelector dbContextSelector)
         : base(dbContextSelector)
     {
-        _timeZoneHelper = timeZoneHelper;
     }
 
     protected override IQueryable<ProfessionalUserLicense> GetListQuery()
@@ -80,93 +76,40 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<ProfessionalUserLicense>> GetAllByWaterSupplierAsync(PageInfo pageInfo, Query query, string? licenseFilter, CancellationToken cancellationToken)
+    public async Task<IEnumerable<ProfessionalUserLicense>> GetUserLicensesForWaterSupplierAsync(int professionalId, int userId, int waterSupplierId, ProfessionalType professionalType, CancellationToken cancellationToken)
     {
-        var baseQuery = ScopedToLicenses()
-            .Include(l => l.LicenseType)
-            .Include(l => l.User)
-            .Include(l => l.Professional)
-            .Include(l => l.ProfessionalUser);
+        var supplierStateIds = GetSupplierStateIdsQuery(waterSupplierId);
 
-        var filtered = ApplyLicenseFilter(baseQuery, licenseFilter);
-
-        if (query.Sort.IsNullOrEmpty())
-            query.Sort[nameof(ProfessionalUserLicense.Id)] = SortOperator.Asc;
-
-        var paginated = await filtered
-            .Where(query.Filter)
-            .OrderBy(query.Sort)
-            .PaginateAsync(pageInfo, cancellationToken);
-
-        return await paginated.ToListAsync(cancellationToken);
-    }
-
-    public async Task<int> GetCountByWaterSupplierAsync(string? licenseFilter, CancellationToken cancellationToken)
-    {
-        var baseQuery = ApplyLicenseFilter(ScopedToLicenses(), licenseFilter);
-
-        return await baseQuery.CountAsync(cancellationToken);
-    }
-
-    private IQueryable<ProfessionalUserLicense> ScopedToWaterSupplier()
-    {
-        return DbContext.ProfessionalUserLicenses
+        return await DbContext.ProfessionalUserLicenses
             .AsNoTracking()
-            .Where(l => DbContext.ProfessionalWaterSuppliers.Any(pws => pws.ProfessionalId == l.ProfessionalId));
-    }
-
-    private IQueryable<ProfessionalUserLicense> ScopedToLicenses()
-    {
-        return ScopedToWaterSupplier().Where(l => l.ProfessionalType != ProfessionalType.FogTransporter);
-    }
-
-    private IQueryable<ProfessionalUserLicense> ScopedToRegistrations()
-    {
-        return ScopedToWaterSupplier().Where(l => l.ProfessionalType == ProfessionalType.FogTransporter);
-    }
-
-    public async Task<IEnumerable<ProfessionalUserLicense>> GetUnverifiedRegistrationsByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
-    {
-        var baseQuery = ScopedToRegistrations()
-            .Where(l => l.ExpirationDate == null)
             .Include(l => l.LicenseType)
-            .Include(l => l.User)
-            .Include(l => l.Professional)
-            .Include(l => l.ProfessionalUser);
-
-        if (query.Sort.IsNullOrEmpty())
-        {
-            query.Sort[nameof(ProfessionalUserLicense.Id)] = SortOperator.Asc;
-        }
-
-        var paginated = await baseQuery
-            .Where(query.Filter)
-            .OrderBy(query.Sort)
-            .PaginateAsync(pageInfo, cancellationToken);
-
-        return await paginated.ToListAsync(cancellationToken);
+            .Where(l => l.ProfessionalId == professionalId
+                && l.UserId == userId
+                && l.ProfessionalType == professionalType
+                && l.LicenseType!.ProfessionalType == professionalType
+                && l.LicenseType.StateId != null
+                && supplierStateIds.Contains(l.LicenseType.StateId))
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task<int> GetUnverifiedRegistrationCountByWaterSupplierAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<ProfessionalLicenseType>> GetLicenseTypesForWaterSupplierAsync(int waterSupplierId, ProfessionalType professionalType, CancellationToken cancellationToken)
     {
-        return await ScopedToRegistrations().CountAsync(l => l.ExpirationDate == null, cancellationToken);
+        var supplierStateIds = GetSupplierStateIdsQuery(waterSupplierId);
+
+        return await DbContext.ProfessionalLicenseTypes
+            .AsNoTracking()
+            .Where(licenseType => licenseType.ProfessionalType == professionalType
+                && licenseType.StateId != null
+                && supplierStateIds.Contains(licenseType.StateId))
+            .OrderBy(licenseType => licenseType.Id)
+            .ToListAsync(cancellationToken);
     }
 
-    private IQueryable<ProfessionalUserLicense> ApplyLicenseFilter(IQueryable<ProfessionalUserLicense> query, string? licenseFilter)
+    private IQueryable<int?> GetSupplierStateIdsQuery(int waterSupplierId)
     {
-        var now = _timeZoneHelper.GetUserLocalTime();
-        var firstDayThisMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0);
-        var firstDayLastMonth = firstDayThisMonth.AddMonths(-1);
-
-        return licenseFilter switch
-        {
-            "unverified" => query.Where(l => l.ExpirationDate == null),
-            "expired" => query.Where(l => l.ExpirationDate != null
-                && l.ExpirationDate >= firstDayLastMonth
-                && l.ExpirationDate < firstDayThisMonth),
-            "expiring" => query.Where(l => l.ExpirationDate != null && l.ExpirationDate >= firstDayThisMonth && l.ExpirationDate < firstDayThisMonth.AddMonths(1)),
-            _ => query
-        };
+        return DbContext.WaterSuppliers
+            .Where(supplier => supplier.Id == waterSupplierId)
+            .Select(supplier => supplier.StateId);
     }
 
     public async Task<ProfessionalUserLicense?> UpdateForWaterSupplierAsync(int id, string licenseNumber, string? contactName, DateTime? expirationDate, CancellationToken cancellationToken)

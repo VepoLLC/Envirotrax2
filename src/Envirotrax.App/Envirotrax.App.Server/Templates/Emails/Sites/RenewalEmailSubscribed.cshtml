@@ -1,0 +1,22 @@
+@using RazorLight
+@using Envirotrax.App.Server.Templates.Emails.Sites
+@inherits TemplatePage<RenewalEmailVm>
+
+@{
+    Layout = "Templates.Emails._EmailLayout";
+
+    var unsubscribeUrl = $"{ViewBag.BaseUrl}/renewal-opt-in/unsubscribe?id={Model.VerificationId}&token={System.Uri.EscapeDataString(Model.Token)}";
+}
+
+<div>
+    <h2 style="margin-top: 0;">You Are Subscribed</h2>
+
+    <p>
+        <strong>@Model.EmailAddress</strong> has been verified and will now receive renewal notifications by email.
+    </p>
+
+    <p style="color: #6c757d; font-size: 13px; margin-bottom: 0;">
+        If you no longer want to receive renewal notifications at this address, you can
+        <a href="@unsubscribeUrl" target="_blank">unsubscribe</a> at any time.
+    </p>
+</div>

@@ -1,4 +1,4 @@
-﻿<ng-template #propertyTypeTemplate let-site="rowData">
+<ng-template #propertyTypeTemplate let-site="rowData">
     {{ site?.propertyType === PropertyType.Residential ? 'Residential' : 'Commercial' }}
 </ng-template>
 
@@ -98,7 +98,7 @@
                             <h4 class="text-center">Customer Account Number</h4>
                             <div class="row">
                                 <vp-input type="text"
-                                    label="Account Number"
+                                    label="Account Number:"
                                     [(ngModel)]="accountNumber"
                                     name="accountNumber"
                                     />
@@ -112,7 +112,7 @@
                             <h4 class="text-center">Property Location</h4>
                             <div class="row">
                                 <vp-input type="text"
-                                    label="Street Number"
+                                    label="Street Number:"
                                     [(ngModel)]="streetNumber"
                                     name="streetNumber"
                                     />

@@ -17,6 +17,7 @@ public class ProfessionalDashboardController : ProfessionalProtectedController
     private readonly IProfessionalSupplierService _supplierService;
     private readonly IProfessionalUserService _userService;
     private readonly IProfessionalUserLicenseService _licenseService;
+    private readonly IProfessionalLicenseService _companyLicenseService;
     private readonly IProfessionalInsuranceService _insuranceService;
     private readonly IBackflowGaugeService _gaugeService;
     private readonly IFogVehicleService _vehicleService;
@@ -27,6 +28,7 @@ public class ProfessionalDashboardController : ProfessionalProtectedController
         IProfessionalSupplierService supplierService,
         IProfessionalUserService userService,
         IProfessionalUserLicenseService licenseService,
+        IProfessionalLicenseService companyLicenseService,
         IProfessionalInsuranceService insuranceService,
         IBackflowGaugeService gaugeService,
         IFogVehicleService vehicleService,
@@ -36,6 +38,7 @@ public class ProfessionalDashboardController : ProfessionalProtectedController
         _supplierService = supplierService;
         _userService = userService;
         _licenseService = licenseService;
+        _companyLicenseService = companyLicenseService;
         _insuranceService = insuranceService;
         _gaugeService = gaugeService;
         _vehicleService = vehicleService;
@@ -56,7 +59,7 @@ public class ProfessionalDashboardController : ProfessionalProtectedController
         {
             dto.SupplierCount   = await _supplierService.CountAsync(cancellationToken);
             dto.SubAccountCount = await _userService.CountAsync(cancellationToken);
-            dto.LicenseCount    = await _licenseService.CountAsync(cancellationToken);
+            dto.LicenseCount    = await _licenseService.CountAsync(cancellationToken) + await _companyLicenseService.CountAsync(cancellationToken);
             dto.InsuranceCount  = await _insuranceService.CountAsync(cancellationToken);
         }
 

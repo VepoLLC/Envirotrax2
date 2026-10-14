@@ -158,14 +158,14 @@
                     <div class="col-md-4">
                         <!-- Expired from [ ... ] To [ ... ] — inline on one row (V1 layout) -->
                         <div class="row g-2 align-items-center mb-3">
-                            <label class="col-4 col-form-label text-end">Expired From</label>
+                            <label class="col-4 col-form-label text-end">Expired From:</label>
                             <div class="col">
                                 <vp-input type="select"
                                           name="expiredFrom"
                                           [(ngModel)]="expiredFrom"
                                           [options]="expiredFromOptions" />
                             </div>
-                            <label class="col-auto col-form-label px-1">To</label>
+                            <label class="col-auto col-form-label px-1">To:</label>
                             <div class="col">
                                 <vp-input type="select"
                                           name="expiredTo"
@@ -192,7 +192,7 @@
                         </div>
 
                         <div class="row g-2 align-items-center mb-3">
-                            <label class="col-4 col-form-label text-end">Sort By</label>
+                            <label class="col-4 col-form-label text-end">Sort By:</label>
                             <div class="col">
                                 <vp-input type="select"
                                           name="sortBy"
@@ -231,29 +231,29 @@
                     <div class="col-md-4">
                         <vp-field-grid>
                             <vp-filter-panel-field fieldName="site.backflowAccountAssignmentId"
-                                                   label="User Account Assignment"
+                                                   label="User Account Assignment:"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="userOptions" />
 
-                            <app-gis-area-lookup fieldName="site.gisAreaId" label="GIS Area" labelStyle="horizontal"
+                            <app-gis-area-lookup fieldName="site.gisAreaId" label="GIS Area:" labelStyle="horizontal"
                                                  [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="propertyType"
-                                                   label="Property Type"
+                                                   label="Property Type:"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="propertyTypes" />
 
-                            <vp-input label="Property Street Name"
+                            <vp-input label="Property Street Name:"
                                       name="propertyStreet"
                                       labelStyle="horizontal"
                                       [(ngModel)]="propertyStreet" />
 
                             <vp-filter-panel-field fieldName="site.facilityType"
-                                                   label="Facility Type"
+                                                   label="Facility Type:"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
@@ -265,28 +265,28 @@
                     <div class="col-md-4">
                         <vp-field-grid>
                             <vp-filter-panel-field fieldName="deviceType"
-                                                   label="Assembly Type"
+                                                   label="Assembly Type:"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="deviceTypeOptions" />
 
                             <vp-filter-panel-field fieldName="hazardType"
-                                                   label="Hazard Type"
+                                                   label="Hazard Type:"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="hazardTypeOptions" />
 
                             <vp-filter-panel-field fieldName="site.hasOnSiteSewageFacility"
-                                                   label="Has On-Site Sewage Facility"
+                                                   label="Has On-Site Sewage Facility:"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"
                                                    [options]="yesNoOptions" />
 
                             <vp-filter-panel-field fieldName="site.hasAuxWaterSupply"
-                                                   label="Has Auxiliary Water Supply"
+                                                   label="Has Auxiliary Water Supply:"
                                                    type="select"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm"

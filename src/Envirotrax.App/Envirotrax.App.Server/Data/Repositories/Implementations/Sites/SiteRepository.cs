@@ -114,6 +114,14 @@ public class SiteRepository : Repository<Site>, ISiteRepository
         // WaterSupplierId is a normal writable column now that it is no longer part of the primary
         // key. Normal Site editing must never reassign a Site; that is a separate, dedicated flow.
         entry.Property(site => site.WaterSupplierId).IsModified = false;
+
+        // Renewal opt-in is changed only by the site owner through the public opt-in pages.
+        entry.Property(site => site.RenewalOptInType).IsModified = false;
+        entry.Property(site => site.RenewalOptInOutDate).IsModified = false;
+        entry.Property(site => site.RenewalOptInOrigin).IsModified = false;
+        entry.Property(site => site.RenewalOptInIpAddress).IsModified = false;
+        entry.Property(site => site.OptInCodeHash).IsModified = false;
+        entry.Property(site => site.OptInCodeExpirationDate).IsModified = false;
     }
 
     protected override IQueryable<Site> GetListQuery()
@@ -126,8 +134,17 @@ public class SiteRepository : Repository<Site>, ISiteRepository
             .AsNoTracking();
     }
 
+    public override Task<IEnumerable<Site>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        WaterSupplierAccountNumberSearch.Apply(query, nameof(Site.AccountNumber));
+
+        return base.GetAllAsync(pageInfo, query, cancellationToken);
+    }
+
     public async Task<IEnumerable<Site>> SearchAsync(PageInfo pageInfo, Query query, bool? fogCompliant, CancellationToken cancellationToken)
     {
+        WaterSupplierAccountNumberSearch.Apply(query, nameof(Site.AccountNumber));
+
         var sites = GetListQuery().Where(query.Filter);
 
         if (fogCompliant.HasValue)
@@ -153,6 +170,8 @@ public class SiteRepository : Repository<Site>, ISiteRepository
 
     public async Task<IEnumerable<Site>> SearchForProfessionalAsync(ProfessionalSiteSearchDto criteria, PageInfo pageInfo, Query query, int professionalId, int userId, CancellationToken cancellationToken)
     {
+        WaterSupplierAccountNumberSearch.Apply(query, nameof(Site.AccountNumber));
+
         var scheduledFrom = criteria.ScheduledFrom?.Date;
         var scheduledBefore = criteria.ScheduledTo?.Date.AddDays(1);
 
@@ -398,5 +417,13 @@ public class SiteRepository : Repository<Site>, ISiteRepository
             .Select(s => new Site { Id = s.Id, WaterSupplierId = s.WaterSupplierId })
             .AsNoTracking()
             .ToListAsync();
+    }
+
+    // Archived sites count too, matching the unique index, so reactivating one can never collide.
+    public Task<bool> IsWaterSupplierAccountNumberTakenAsync(int siteId, string waterSupplierAccountNumber, CancellationToken cancellationToken)
+    {
+        return Entity.AnyAsync(
+            site => site.Id != siteId && site.WaterSupplierAccountNumber == waterSupplierAccountNumber,
+            cancellationToken);
     }
 }

@@ -63,6 +63,7 @@ public static class ServiceRegistration
         services.AddTransient<IGeneralSettingsService, GeneralSettingsService>();
         services.AddTransient<ISiteService, SiteService>();
         services.AddTransient<ISiteLogService, SiteLogService>();
+        services.AddTransient<IMailingInfoRedactionService, MailingInfoRedactionService>();
         services.AddTransient<ISiteScheduleService, SiteScheduleService>();
         services.AddTransient<ICsiInspectionService, CsiInspectionService>();
         services.AddTransient<ICsiInspectionImageService, CsiInspectionImageService>();
@@ -110,9 +111,12 @@ public static class ServiceRegistration
         services.AddTransient<IProfessionalService, ProfessionalService>();
         services.AddTransient<IRegisteredProfessionalService, RegisteredProfessionalService>();
         services.AddTransient<IPublicSearchService, PublicSearchService>();
+        services.AddTransient<IRenewalOptInService, RenewalOptInService>();
         services.AddTransient<IProfessionalUserService, ProfessionalUserService>();
         services.AddTransient<IProfessionalSupplierService, ProfessionalSupplierService>();
         services.AddTransient<IProfessionalUserLicenseService, ProfessionalUserLicenseService>();
+        services.AddTransient<IProfessionalLicenseService, ProfessionalLicenseService>();
+        services.AddTransient<IWaterSupplierLicenseService, WaterSupplierLicenseService>();
         services.AddTransient<IProfessionalLicenseTypeService, ProfessionalLicenseTypeService>();
         services.AddTransient<IProfessionalInsuranceService, ProfessionalInsuranceService>();
         services.AddTransient<IProfessionalDashboardService, ProfessionalDashboardService>();

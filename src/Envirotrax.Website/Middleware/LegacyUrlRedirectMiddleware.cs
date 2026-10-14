@@ -35,6 +35,11 @@ public class LegacyUrlRedirectMiddleware
             return;
         }
 
+        if (TryRedirectToRenewalOptIn(context, requestPath, configuration))
+        {
+            return;
+        }
+
         if (!LegacyUrlResolver.IsLegacyRequest(rawPath))
         {
             await _next(context);
@@ -118,5 +123,30 @@ public class LegacyUrlRedirectMiddleware
         }
 
         return false;
+    }
+
+    private static bool TryRedirectToRenewalOptIn(HttpContext context, string requestPath, IConfiguration configuration)
+    {
+        var appUrl = configuration["Envirotrax:AppUrl"];
+
+        if (string.IsNullOrWhiteSpace(appUrl))
+        {
+            return false;
+        }
+
+        var redirectUrl = LegacyUrlResolver.BuildRenewalOptInUrl(
+            appUrl,
+            requestPath,
+            context.Request.Query["id"].ToString(),
+            context.Request.QueryString.Value ?? string.Empty);
+
+        if (redirectUrl == null)
+        {
+            return false;
+        }
+
+        context.Response.Redirect(redirectUrl, permanent: true);
+
+        return true;
     }
 }

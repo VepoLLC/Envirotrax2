@@ -1,3 +1,4 @@
+using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 
@@ -10,6 +11,8 @@ public class ProfessionalDashboardLicenseInsuranceDto
     public int Id { get; set; }
 
     public ProfessionalDashboardRowType RowType { get; set; }
+
+    public ProfessionalType? ProfessionalType { get; set; }
 
     /// <summary>License type name, or "Insurance Policy" for insurance rows.</summary>
     public string TypeName { get; set; } = null!;
@@ -27,5 +30,6 @@ public class ProfessionalDashboardLicenseInsuranceDto
 public enum ProfessionalDashboardRowType
 {
     License,
-    Insurance
+    Insurance,
+    CompanyLicense
 }

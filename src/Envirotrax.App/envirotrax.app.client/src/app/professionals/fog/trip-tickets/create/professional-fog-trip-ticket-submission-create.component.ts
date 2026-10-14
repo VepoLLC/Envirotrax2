@@ -11,12 +11,13 @@ import { ProfesionalUserService } from "../../../../shared/services/professional
 import { ProfessionalSupplierService } from "../../../../shared/services/professionals/professional-supplier.service";
 import { ProfessionalFogVehicleService } from "../../../../shared/services/fog/professional-fog-vehicle.service";
 import { ProfessionalFogDisposalSiteService } from "../../../../shared/services/fog/professional-fog-disposal-site.service";
-import { ProfessionalUserLicenseService } from "../../../../shared/services/professionals/professional-user-license.service";
+import { ProfessionalLicenseService } from "../../../../shared/services/professionals/professional-license.service";
 import { FogTripTicketService } from "../../../../shared/services/fog/fog-trip-ticket.service";
 import { Professional } from "../../../../shared/models/professionals/professional";
 import { ProfessionalUser } from "../../../../shared/models/professionals/professional-user";
 import { InsuranceCheck, InsuranceCheckResult } from "../../../../shared/models/professionals/insurance-check";
-import { ProfessionalType, ExpirationType as LicenseExpirationType, ProfessionalUserLicense } from "../../../../shared/models/professionals/licenses/professional-user-license";
+import { ProfessionalType, ExpirationType as LicenseExpirationType } from "../../../../shared/models/professionals/licenses/professional-user-license";
+import { ProfessionalLicense } from "../../../../shared/models/professionals/licenses/professional-license";
 import { FogVehicle } from "../../../../shared/models/fog/fog-vehicle";
 import { FogDisposalSite } from "../../../../shared/models/fog/fog-disposal-site";
 import { FogVehicleCapacityType } from "../../../../shared/models/fog/fog-vehicle-enums";
@@ -24,6 +25,7 @@ import { FogTripTicket } from "../../../../shared/models/fog/fog-trip-ticket";
 import { FogTripTicketImages } from "../../../../shared/models/fog/fog-trip-ticket-images";
 import { WaterSupplier } from "../../../../shared/models/water-suppliers/water-supplier";
 import { LookupService } from "../../../../shared/services/lookup/lookup.service";
+import { GeneralSettingsService } from "../../../../shared/services/settings/general-settings.service";
 import { PropertyType } from "../../../../shared/enums/property-type.enum";
 import { MAX_PAGE_SIZE } from "../../../../shared/models/page-info";
 import { InputOption, ModalHelperService } from "@envirotrax/common-ui";
@@ -67,6 +69,8 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
     public verificationPassed = false;
 
     public isLocationEditing = false;
+    public isMailingInfoRedacted = false;
+    public showModificationBlockedMessage = false;
     public stateOptions: InputOption[] = [];
 
     public readonly propertyTypeOptions: InputOption[] = [
@@ -105,7 +109,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
     public transporterSignatureUrl: string | null = null;
 
     private _siteId = 0;
-    private _transporterLicense?: ProfessionalUserLicense;
+    private _transporterLicense?: ProfessionalLicense;
     private _insuranceCheck?: InsuranceCheck;
     private readonly _myWaterSuppliers = new Map<number, WaterSupplier>();
     private readonly _stateNamesById = new Map<number, string>();
@@ -119,11 +123,12 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         private readonly _supplierService: ProfessionalSupplierService,
         private readonly _vehicleService: ProfessionalFogVehicleService,
         private readonly _disposalSiteService: ProfessionalFogDisposalSiteService,
-        private readonly _licenseService: ProfessionalUserLicenseService,
+        private readonly _licenseService: ProfessionalLicenseService,
         private readonly _tripTicketService: FogTripTicketService,
         private readonly _lookupService: LookupService,
         private readonly _modalHelper: ModalHelperService,
-        private readonly _checkoutService: CheckoutService
+        private readonly _checkoutService: CheckoutService,
+        private readonly _generalSettingsService: GeneralSettingsService
     ) { }
 
     public ngOnInit(): void {
@@ -202,6 +207,11 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
     }
 
     public requestLocationModification(): void {
+        if (this.isMailingInfoRedacted) {
+            this.showModificationBlockedMessage = true;
+            return;
+        }
+
         this.isLocationEditing = true;
     }
 
@@ -325,14 +335,18 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
     }
 
     private collectValidationErrors(): void {
-        if (!this.isLocationEditing && this.hasMissingLocationFields()) {
-            this.isLocationEditing = true;
-            this.validationErrors.push('Please complete the generator property information.');
-        }
+        // While the mailing information is redacted, the server keeps the site's own location, which the
+        // professional can't change.
+        if (!this.isMailingInfoRedacted) {
+            if (!this.isLocationEditing && this.hasMissingLocationFields()) {
+                this.isLocationEditing = true;
+                this.validationErrors.push('Please complete the generator property information.');
+            }
 
-        if (this.model.propertyStreetNumber && !/^\d/.test(this.model.propertyStreetNumber)) {
-            this.isLocationEditing = true;
-            this.validationErrors.push('Property street number must start with a digit.');
+            if (this.model.propertyStreetNumber && !/^\d/.test(this.model.propertyStreetNumber)) {
+                this.isLocationEditing = true;
+                this.validationErrors.push('Property street number must start with a digit.');
+            }
         }
 
         if (!this.model.interceptorType) {
@@ -469,9 +483,35 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
             ? this._stateNamesById.get(stateId)
             : undefined;
 
-        this._insuranceCheck = waterSupplierId
-            ? await this._tripTicketService.getInsuranceCheck(waterSupplierId)
-            : undefined;
+        const [insuranceCheck] = await Promise.all([
+            waterSupplierId ? this._tripTicketService.getInsuranceCheck(waterSupplierId) : undefined,
+            this.loadMailingInfoRedaction()
+        ]);
+
+        this._insuranceCheck = insuranceCheck;
+    }
+
+    // Like V1 does for tests and inspections, an existing site's location can't be modified while its water
+    // supplier redacts the mailing information.
+    private async loadMailingInfoRedaction(): Promise<void> {
+        const waterSupplierId = this.selectedWaterSupplierId;
+
+        this.isMailingInfoRedacted = false;
+        this.showModificationBlockedMessage = false;
+
+        if (!waterSupplierId || !this.site) {
+            return;
+        }
+
+        const settings = await this._generalSettingsService.getForProfessional(waterSupplierId);
+
+        if (this.selectedWaterSupplierId === waterSupplierId) {
+            this.isMailingInfoRedacted = settings.redactMailingInfo === true;
+        }
+
+        if (this.isMailingInfoRedacted && this.isLocationEditing) {
+            this.cancelLocationModification();
+        }
     }
 
     private async computeVerification(): Promise<void> {
@@ -496,7 +536,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
             return { label, message: 'Select a transporter account', valid: false };
         }
 
-        const licensePage = await this._licenseService.getForUser(this.selectedTransporterUserId, { pageSize: MAX_PAGE_SIZE }, {});
+        const licensePage = await this._licenseService.getAll({ pageSize: MAX_PAGE_SIZE }, {});
         const license = licensePage.data?.find(l => l.professionalType === ProfessionalType.FogTransporter);
 
         if (!license) {

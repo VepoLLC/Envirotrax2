@@ -7,6 +7,10 @@
     border-width: 2px !important;
 }
 
+::ng-deep ng-select.vp-multi-email .ng-arrow-wrapper {
+    display: none;
+}
+
 /* No Bootstrap utility exists for an auto-sized (max-content) grid column, or for spanning both. */
 .vp-input-row.d-xl-grid {
     grid-template-columns: max-content 1fr;

@@ -16,7 +16,7 @@
 </div>
 
 <ng-template #typeCell let-license="rowData">
-    {{ getProfessionalTypeLabel(license.professionalType) }}
+    {{ professionalTypeLabels[license.professionalType] }}
 </ng-template>
 
 <ng-template #dateCell let-license="rowData">
@@ -53,14 +53,233 @@
 </div>
 
 <vp-section header="Register New License">
-    <vp-license-help-text />
+    <div *ngIf="professions.length > 0" class="text-center mb-3">
+        <ul class="vp-tabs nav nav-pills d-inline-flex flex-wrap justify-content-center">
+            <li *ngFor="let profession of professions" class="nav-item">
+                <a class="nav-link" [class.active]="activeProfession === profession.data"
+                   (click)="selectProfession(profession.data!)">
+                    {{ profession.text }}
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div *ngIf="activeProfession === professionalType.Bpat">
+        <p class="text-center text-danger fw-bold">
+            Please read the following important information on how to register and manage your licenses.
+        </p>
+
+        <h3 class="text-bg-light p-2 border h6">Adding Licenses</h3>
+        <div class="mx-1">
+            <p>
+                Use the form below to add a new license to your account.
+            </p>
+        </div>
+
+        <h3 class="text-bg-light p-2 border h6">The following applies to all “Master” and sub accounts:</h3>
+        <ol>
+            <li>
+                A BPAT license must be added for each account or sub account in order for the account to be authorized
+                for use in backflow test submissions. The Company Name and/or Contact Name on the account must match the
+                name of the license holder. If a "master" account is only used for sub account administration and not
+                backflow test submissions, a BPAT license does not need to be registered for the account.
+            </li>
+            <li>
+                Fire company licenses are registered for the company and are not tied to a specific account.
+            </li>
+        </ol>
+
+        <h3 class="text-bg-light p-2 border h6">
+            Verify that the information is correct and click the Add New License button to begin the process of
+            registering your license.
+        </h3>
+        <ol>
+            <li>
+                All BPAT and fire company licenses will be verified by Vepo personnel. Once the license is verified, our
+                staff will validate the license by entering in the expiration date on file with the authority issuing
+                the
+                license.<br />
+                Note: If your company intends to test fireline assemblies in the State of Texas, you certify that BPATs
+                registered in your account are permanent employees per §290.44(h)(4)(A)(ii).
+            </li>
+        </ol>
+
+        <h3 class="text-bg-light p-2 border h6">Renewing Your Licenses</h3>
+        <ol>
+            <li>
+                All BPAT and fire company licenses are monitored by Vepo personnel and updated near the time of their
+                expiration. If a license is not renewed, we will not be able to update the license and your account will
+                become unauthorized for use.
+            </li>
+        </ol>
+
+        <h3 class="text-bg-light p-2 border h6">Reinstating Expired Licenses</h3>
+        <ol>
+            <li>
+                Vepo personnel will continue to check for renewals of expired BPAT and fire company licenses for a set
+                period of time. If the license is not renewed within that set time period, the license will no longer be
+                checked for renewal and you must reinstate the license manually. To reinstate an expired license you
+                must
+                first renew your license with the authority issuing the license. Then, contact us so that we can verify
+                the license and update it within the system.
+            </li>
+        </ol>
+    </div>
+
+    <div *ngIf="activeProfession === professionalType.CsiInspector">
+        <p class="text-center text-danger fw-bold">
+            Please read the following important information on how to register and manage your licenses.
+        </p>
+
+        <h3 class="text-bg-light p-2 border h6">Adding Licenses</h3>
+        <div class="mx-1">
+            <p>
+                Use the form below to add a new license to your account.
+            </p>
+        </div>
+
+        <h3 class="text-bg-light p-2 border h6">The following applies to all “Master” and sub accounts:</h3>
+        <ol>
+            <li>
+                A CSI license must be added for each account or sub account in order for that account to be authorized
+                for use in CSI submissions. If a "master" account is only used for sub account administration and not
+                CSI
+                submissions, a CSI license does not need to be registered for the account. The name on the master
+                account
+                or sub account must match the name on the license associated with the account.
+            </li>
+        </ol>
+
+        <h3 class="text-bg-light p-2 border h6">
+            Verify that the information is correct and click the Add New License button to begin the process of
+            registering your license.
+        </h3>
+        <ol>
+            <li>
+                All CSI licenses will be verified by Vepo personnel. Once the license is verified, our staff will
+                validate
+                the license by entering in the expiration date on file with the authority issuing the license.
+            </li>
+        </ol>
+
+        <h3 class="text-bg-light p-2 border h6">Renewing Your Licenses</h3>
+        <ol>
+            <li>
+                All CSI licenses will be monitored by Vepo personnel and updated near the time of their expiration. If
+                you
+                do not renew your license, we will not be able to update your license and your account will become
+                unauthorized for use.
+            </li>
+        </ol>
+
+        <h3 class="text-bg-light p-2 border h6">Reinstating Expired Licenses</h3>
+        <ol>
+            <li>
+                Vepo personnel will continue to check for renewals of expired licenses for a set period of time. If the
+                license is not renewed within that set time period the license will no longer be checked for renewal and
+                you must reinstate the license manually. To reinstate an expired license you must first renew your
+                license with the authority issuing the license. Then, contact us so that we can verify the license and
+                update it within the system.
+            </li>
+        </ol>
+    </div>
+
+    <div *ngIf="activeProfession === professionalType.FogInspector">
+        <p class="text-center text-danger fw-bold">
+            Please read the following important information on how to register and manage your licenses.
+        </p>
+
+        <h3 class="text-bg-light p-2 border h6">Adding Licenses</h3>
+        <div class="mx-1">
+            <p>
+                Use the form below to add a new license to your account.
+            </p>
+        </div>
+
+        <h3 class="text-bg-light p-2 border h6">The following applies to all “Master” and sub accounts:</h3>
+        <ol>
+            <li>
+                A license must be added for each account or sub account in order for that account to be authorized for
+                use in FOG inspection submissions. If a "master" account is only used for sub account administration and
+                not FOG inspection submissions, a license does not need to be registered for the account. The name on
+                the
+                master account or sub account must match the name on the license associated with the account.
+            </li>
+        </ol>
+
+        <h3 class="text-bg-light p-2 border h6">
+            Verify that the information is correct and click the Add New License button to begin the process of
+            registering your license.
+        </h3>
+        <ol>
+            <li>
+                All FOG inspector licenses will be verified by Vepo personnel. Once the license is verified, our staff
+                will validate the license by entering in the expiration date on file with the authority issuing the
+                license.
+            </li>
+        </ol>
+
+        <h3 class="text-bg-light p-2 border h6">Renewing Your Licenses</h3>
+        <ol>
+            <li>
+                All FOG inspector licenses will be monitored by Vepo personnel and updated near the time of their
+                expiration. If you do not renew your license, we will not be able to update your license and your
+                account
+                will become unauthorized for use.
+            </li>
+        </ol>
+
+        <h3 class="text-bg-light p-2 border h6">Reinstating Expired Licenses</h3>
+        <ol>
+            <li>
+                Vepo personnel will continue to check for renewals of expired licenses for a set period of time. If the
+                license is not renewed within that set time period the license will no longer be checked for renewal and
+                you must reinstate the license manually. To reinstate an expired license you must first renew your
+                license with the authority issuing the license. Then, contact us so that we can verify the license and
+                update it within the system.
+            </li>
+        </ol>
+    </div>
+
+    <div *ngIf="activeProfession === professionalType.FogTransporter">
+        <p class="text-center text-danger fw-bold">
+            Please read the following important information on how to add and manage your registration number.
+        </p>
+
+        <h3 class="text-bg-light p-2 border h6">Adding a Registration</h3>
+        <div class="mx-1">
+            <p>
+                Use the form below to add a new registration to your account.
+            </p>
+        </div>
+
+        <h3 class="text-bg-light p-2 border h6">The following applies to all “Master” and sub accounts:</h3>
+        <ol>
+            <li>
+                A Sludge Transporter Registration number must be added for each master account in order for the account
+                to be authorized to submit trip tickets. The Sludge Transporter Registration number of a "master"
+                account
+                will be applied to all of its sub accounts. The Company Name on the account must match the company name
+                on
+                the Sludge Transporter Registration. Our staff will validate the number by entering the expiration date.
+            </li>
+        </ol>
+
+        <h3 class="text-bg-light p-2 border h6">Renewing Your Registration</h3>
+        <ol>
+            <li>
+                For a Sludge Transporter Registration renewal, you must enter the registration number. Registrations are
+                normally validated within an hour but could take up to one business day on rare occasions.
+            </li>
+        </ol>
+    </div>
 
     <div class="d-flex justify-content-center mt-3" dp-spinner-parent>
         <dp-loading-spinner *ngIf="isNewLicenseLoading" />
 
         <form #form="ngForm" (ngSubmit)="add(form)">
-            <div class="mb-3">
-                <vp-lookup-field label="Account"
+            <div *ngIf="!isCompanyLicense" class="mb-3">
+                <vp-lookup-field label="Account:"
                                  [canSearch]="true"
                                  [form]="form"
                                  [required]="true"
@@ -74,15 +293,15 @@
                           (ngModelChange)="professionChange()"
                           [required]="true"
                           name="professionalType"
-                          label="Profession"
-                          [options]="professionalTypeOptions"
+                          label="Profession:"
+                          [options]="professions"
                           [form]="form" />
             </div>
 
             <div class="mb-3">
                 <vp-input type="select"
                           name="licenseType"
-                          label="Type"
+                          label="Type:"
                           [ngModel]="newLicense.licenseType?.id"
                           (ngModelChange)="licenseTypeChange($event)"
                           [required]="true"
@@ -92,7 +311,7 @@
 
             <div class="mb-3">
                 <vp-input name="licenseNumber"
-                          label="License Number"
+                          label="License Number:"
                           [(ngModel)]="newLicense.licenseNumber"
                           [required]="true"
                           [maxLength]="50"

@@ -1,0 +1,12 @@
+<h1 class="text-center h2">{{title}}</h1>
+
+<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+<div *ngIf="result" class="alert alert-success text-center">
+    <i class="fa-regular fa-thumbs-up me-1"></i>
+    {{result.message}}
+</div>
+
+<div *ngIf="isLoaded && !result" class="alert alert-danger text-center">
+    This link could not be processed.
+</div>

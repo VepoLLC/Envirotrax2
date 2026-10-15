@@ -9,4 +9,6 @@ public interface INotificationRepository : IRepository<Notification>
     Task<List<Notification>> AddRangeAsync(List<Notification> notifications);
 
     Task MarkSentAsync(IEnumerable<int> ids, CancellationToken cancellationToken);
+
+    Task<List<Notification>> GetUnscheduledForDigestAsync(int notificationSettingId, DateTime startUtc, DateTime endUtc, CancellationToken cancellationToken);
 }

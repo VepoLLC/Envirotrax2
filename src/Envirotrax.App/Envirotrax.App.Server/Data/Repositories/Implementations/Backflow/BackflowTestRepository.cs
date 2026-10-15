@@ -97,6 +97,15 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<Dictionary<int, BackflowTest>> GetNotifiedTestsAsync(IEnumerable<int> ids, CancellationToken cancellationToken)
+    {
+        return await DbContext.BackflowTests
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Where(t => ids.Contains(t.Id))
+            .ToDictionaryAsync(t => t.Id, cancellationToken);
+    }
+
     public async Task<Dictionary<int, BackflowTest>> FindPreviousTestsAsync(
         IReadOnlyCollection<BackflowTest> tests, CancellationToken cancellationToken)
     {

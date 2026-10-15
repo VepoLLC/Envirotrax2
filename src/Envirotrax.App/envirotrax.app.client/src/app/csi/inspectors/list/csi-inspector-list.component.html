@@ -1,4 +1,4 @@
-﻿<h1 class="text-center h2">CSI Management</h1>
+<h1 class="text-center h2">CSI Management</h1>
 
 <div [hidden]="showResults">
     <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
@@ -34,12 +34,12 @@
                     <div class="col-md-5">
                         <vp-field-grid>
                             <vp-filter-panel-field fieldName="inspectorLicenseNumber"
-                                                   label="Inspector License Number"
+                                                   label="Inspector License Number:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="insurancePolicyNumber"
-                                                   label="Insurance Policy Number"
+                                                   label="Insurance Policy Number:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </vp-field-grid>

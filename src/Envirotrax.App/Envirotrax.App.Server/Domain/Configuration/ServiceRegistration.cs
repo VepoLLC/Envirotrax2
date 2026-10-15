@@ -115,6 +115,8 @@ public static class ServiceRegistration
         services.AddTransient<IProfessionalUserService, ProfessionalUserService>();
         services.AddTransient<IProfessionalSupplierService, ProfessionalSupplierService>();
         services.AddTransient<IProfessionalUserLicenseService, ProfessionalUserLicenseService>();
+        services.AddTransient<IProfessionalLicenseService, ProfessionalLicenseService>();
+        services.AddTransient<IWaterSupplierLicenseService, WaterSupplierLicenseService>();
         services.AddTransient<IProfessionalLicenseTypeService, ProfessionalLicenseTypeService>();
         services.AddTransient<IProfessionalInsuranceService, ProfessionalInsuranceService>();
         services.AddTransient<IProfessionalDashboardService, ProfessionalDashboardService>();
@@ -126,6 +128,7 @@ public static class ServiceRegistration
         services.AddTransient<INotificationService, NotificationService>();
         services.AddTransient<IBackflowTestNotificationService, BackflowTestNotificationService>();
         services.AddTransient<IBackflowTestNotificationMatcher, BackflowTestNotificationMatcher>();
+        services.AddTransient<INotificationDigestService, NotificationDigestService>();
 
         services.AddTransient<IWaterSupplierDashboardService, WaterSupplierDashboardService>();
 

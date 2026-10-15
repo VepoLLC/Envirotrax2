@@ -18,4 +18,9 @@ public class QueueNames
     {
         public const string Process = "backflow-compliance-snapshots-process";
     }
+
+    public class NotificationSettings
+    {
+        public const string ScheduleDigest = "notification-settings-schedule-digest";
+    }
 }

@@ -9,9 +9,9 @@
         <div class="row">
             <div class="col-lg-6">
                 <dl class="row mb-0">
-                    <dt class="col-5">Water Supplier:</dt>
+                    <dt class="col-5 text-end">Water Supplier:</dt>
                     <dd class="col-7 mb-1">{{ ticket.waterSupplier?.name }}</dd>
-                    <dt class="col-5">Address:</dt>
+                    <dt class="col-5 text-end">Address:</dt>
                     <dd class="col-7 mb-1">
                         {{ ticket.waterSupplier?.address }}<br *ngIf="ticket.waterSupplier?.address">
                         {{ ticket.waterSupplier?.city }}<span
@@ -22,13 +22,13 @@
             </div>
             <div class="col-lg-6">
                 <dl class="row mb-0">
-                    <dt class="col-5">PWS ID:</dt>
+                    <dt class="col-5 text-end">PWS ID:</dt>
                     <dd class="col-7 mb-1">{{ ticket.waterSupplier?.pwsId }}</dd>
-                    <dt class="col-5">Contact Name:</dt>
+                    <dt class="col-5 text-end">Contact Name:</dt>
                     <dd class="col-7 mb-1">{{ ticket.waterSupplier?.contactName }}</dd>
-                    <dt class="col-5">Phone Number:</dt>
+                    <dt class="col-5 text-end">Phone Number:</dt>
                     <dd class="col-7 mb-1">{{ ticket.waterSupplier?.phoneNumber }}</dd>
-                    <dt class="col-5">Email Address:</dt>
+                    <dt class="col-5 text-end">Email Address:</dt>
                     <dd class="col-7 mb-1">{{ ticket.waterSupplier?.emailAddress }}</dd>
                 </dl>
             </div>
@@ -40,13 +40,13 @@
         <div class="row">
             <div class="col-lg-6">
                 <dl class="row mb-0">
-                    <dt class="col-5">Property Type:</dt>
+                    <dt class="col-5 text-end">Property Type:</dt>
                     <dd class="col-7 mb-1">
                         {{ ticket.propertyType === PropertyType.Residential ? 'Residential' : 'Commercial' }}
                     </dd>
-                    <dt class="col-5">Business Name:</dt>
+                    <dt class="col-5 text-end">Business Name:</dt>
                     <dd class="col-7 mb-1">{{ ticket.propertyBusinessName }}</dd>
-                    <dt class="col-5">Property Address:</dt>
+                    <dt class="col-5 text-end">Property Address:</dt>
                     <dd class="col-7 mb-1">
                         {{ ticket.propertyStreetNumber }} {{ ticket.propertyStreetName }}<span
                               *ngIf="ticket.propertyNumber"> #{{ ticket.propertyNumber }}</span><br>
@@ -58,11 +58,11 @@
             </div>
             <div class="col-lg-6">
                 <dl class="row mb-0">
-                    <dt class="col-5">This Waste Was Removed From:</dt>
+                    <dt class="col-5 text-end">This Waste Was Removed From:</dt>
                     <dd class="col-7 mb-1">{{ ticket.interceptorType }} {{ ticket.interceptorOtherDescription }}</dd>
-                    <dt class="col-5">Waste Trap or Tank Capacity:</dt>
+                    <dt class="col-5 text-end">Waste Trap or Tank Capacity:</dt>
                     <dd class="col-7 mb-1">{{ ticket.interceptorCapacity }} {{ interceptorCapacityLabel }}</dd>
-                    <dt class="col-5">Amount of Waste Removed:</dt>
+                    <dt class="col-5 text-end">Amount of Waste Removed:</dt>
                     <dd class="col-7 mb-1">{{ ticket.interceptorWasteRemovedAmount }} {{ wasteRemovedLabel }}</dd>
                 </dl>
             </div>
@@ -99,9 +99,9 @@
         <div class="row mb-2">
             <div class="col-lg-6">
                 <dl class="row mb-0">
-                    <dt class="col-5">Company Name:</dt>
+                    <dt class="col-5 text-end">Company Name:</dt>
                     <dd class="col-7 mb-1">{{ ticket.transporterCompanyName }}</dd>
-                    <dt class="col-5">Address:</dt>
+                    <dt class="col-5 text-end">Address:</dt>
                     <dd class="col-7 mb-1">
                         {{ ticket.transporterAddress }}<br *ngIf="ticket.transporterAddress">
                         {{ ticket.transporterCity }}<span
@@ -112,32 +112,32 @@
             </div>
             <div class="col-lg-6">
                 <dl class="row mb-0">
-                    <dt class="col-5">Registration Number:</dt>
+                    <dt class="col-5 text-end">Registration Number:</dt>
                     <dd class="col-7 mb-1">{{ ticket.transporterLicenseNumber }}</dd>
-                    <dt class="col-5">Email Address:</dt>
+                    <dt class="col-5 text-end">Email Address:</dt>
                     <dd class="col-7 mb-1">{{ ticket.transporterEmailAddress }}</dd>
-                    <dt class="col-5">Phone Number:</dt>
+                    <dt class="col-5 text-end">Phone Number:</dt>
                     <dd class="col-7 mb-1">{{ ticket.transporterWorkNumber }}</dd>
                 </dl>
             </div>
         </div>
 
         <div class="row mt-3">
-            <div class="col-md-3 d-flex">
-                <div class="fw-bold">Vehicle: </div>
-                <span class="ms-2"> {{ ticket.vehicleYear }} {{ ticket.vehicleManufacturer }}</span>
+            <div class="col-lg-6">
+                <dl class="row mb-0">
+                    <dt class="col-5 text-end">Vehicle:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.vehicleYear }} {{ ticket.vehicleManufacturer }}</dd>
+                    <dt class="col-5 text-end">License Plate #:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.vehicleYear }} {{ ticket.vehicleManufacturer }}</dd>
+                </dl>
             </div>
-            <div class="col-md-3 d-flex">
-                <div class="fw-bold">License Plate #: </div>
-                <span class="ms-2"> {{ ticket.vehicleYear }} {{ ticket.vehicleManufacturer }}</span>
-            </div>
-            <div class="col-md-3 d-flex">
-                <div class="fw-bold">Sticker #: </div>
-                <span class="ms-2">{{ ticket.vehicleStickerNumber }} </span>
-            </div>
-            <div class="col-md-3 d-flex">
-                <div class="fw-bold">Capacity: </div>
-                <span class="ms-2">{{ ticket.vehicleCapacity }} {{ vehicleCapacityLabel }} </span>
+            <div class="col-lg-6">
+                <dl class="row mb-0">
+                    <dt class="col-5 text-end">Sticker #:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.vehicleStickerNumber }}</dd>
+                    <dt class="col-5 text-end">Capacity:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.vehicleCapacity }} {{ vehicleCapacityLabel }}</dd>
+                </dl>
             </div>
         </div>
 
@@ -150,13 +150,17 @@
         </p>
 
         <div class="row mt-3">
-            <div class="col-md-6 d-flex">
-                <div class="fw-bold">Waste Receiver: </div>
-                <span class="ms-2"> {{ ticket.receiverCompanyName }}</span>
+            <div class="col-lg-6">
+                <dl class="row mb-0">
+                    <dt class="col-5 text-end">Waste Receiver:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.receiverCompanyName }}</dd>
+                </dl>
             </div>
-            <div class="col-md-6 d-flex">
-                <div class="fw-bold">Registration Number: </div>
-                <span class="ms-2"> {{ ticket.receiverRegistrationNumber }}</span>
+            <div class="col-lg-6">
+                <dl class="row mb-0">
+                    <dt class="col-5 text-end">Registration Number:</dt>
+                    <dd class="col-7 mb-1">{{ ticket.receiverRegistrationNumber }}</dd>
+                </dl>
             </div>
         </div>
 
@@ -185,9 +189,9 @@
         <div class="row">
             <div class="col-lg-6">
                 <dl class="row mb-0">
-                    <dt class="col-5">Waste Receiver:</dt>
+                    <dt class="col-5 text-end">Waste Receiver:</dt>
                     <dd class="col-7 mb-1">{{ ticket.receiverCompanyName }}</dd>
-                    <dt class="col-5">Address:</dt>
+                    <dt class="col-5 text-end">Address:</dt>
                     <dd class="col-7 mb-1">
                         {{ ticket.receiverAddress }}<br *ngIf="ticket.receiverAddress">
                         {{ ticket.receiverCity }}<span
@@ -198,11 +202,11 @@
             </div>
             <div class="col-lg-6">
                 <dl class="row mb-0">
-                    <dt class="col-5">Registration Number:</dt>
+                    <dt class="col-5 text-end">Registration Number:</dt>
                     <dd class="col-7 mb-1">{{ ticket.receiverRegistrationNumber }}</dd>
-                    <dt class="col-5">Email Address:</dt>
+                    <dt class="col-5 text-end">Email Address:</dt>
                     <dd class="col-7 mb-1">{{ ticket.receiverEmailAddress }}</dd>
-                    <dt class="col-5">Phone Number:</dt>
+                    <dt class="col-5 text-end">Phone Number:</dt>
                     <dd class="col-7 mb-1">{{ ticket.receiverPhoneNumber }}</dd>
                 </dl>
             </div>

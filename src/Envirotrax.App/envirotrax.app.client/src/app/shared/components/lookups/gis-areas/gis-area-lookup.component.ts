@@ -32,7 +32,7 @@ export class GisAreaLookupComponent implements OnInit {
     public fieldName: string = 'gisAreaId';
 
     @Input()
-    public label: string = 'GIS Area';
+    public label: string = 'GIS Area:';
 
     @Input()
     public form?: NgForm;

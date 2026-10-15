@@ -13,7 +13,7 @@
                     <vp-field-grid>
                         <vp-input [(ngModel)]="supplier.name"
                                   name="name"
-                                  label="Water Supplier Name"
+                                  label="Water Supplier Name:"
                                   labelStyle="horizontal"
                                   [required]="true"
                                   [maxLength]="255"
@@ -22,7 +22,7 @@
 
                         <vp-input [(ngModel)]="supplier.contactName"
                                   name="contactName"
-                                  label="Contact Name"
+                                  label="Contact Name:"
                                   labelStyle="horizontal"
                                   [required]="true"
                                   [maxLength]="100"
@@ -31,7 +31,7 @@
 
                         <vp-input [(ngModel)]="supplier.address"
                                   name="address"
-                                  label="Address"
+                                  label="Address:"
                                   labelStyle="horizontal"
                                   [maxLength]="100"
                                   [disabled]="!canModify"
@@ -39,7 +39,7 @@
 
                         <vp-input [(ngModel)]="supplier.city"
                                   name="city"
-                                  label="City"
+                                  label="City:"
                                   labelStyle="horizontal"
                                   [maxLength]="50"
                                   [disabled]="!canModify"
@@ -49,7 +49,7 @@
                                   (ngModelChange)="supplier.state = $event ? { id: $event } : undefined"
                                   type="select"
                                   name="stateId"
-                                  label="State"
+                                  label="State:"
                                   labelStyle="horizontal"
                                   [options]="states"
                                   [disabled]="!canModify"
@@ -57,7 +57,7 @@
 
                         <vp-input [(ngModel)]="supplier.zipCode"
                                   name="zipCode"
-                                  label="Zip Code"
+                                  label="Zip Code:"
                                   labelStyle="horizontal"
                                   [maxLength]="50"
                                   [disabled]="!canModify"
@@ -69,7 +69,7 @@
                     <vp-field-grid>
                         <vp-input [(ngModel)]="supplier.pwsId"
                                   name="pwsId"
-                                  label="PWS ID"
+                                  label="PWS ID:"
                                   labelStyle="horizontal"
                                   [maxLength]="25"
                                   [disabled]="!canModify"
@@ -77,7 +77,7 @@
 
                         <vp-input [(ngModel)]="supplier.phoneNumber"
                                   name="phoneNumber"
-                                  label="Phone Number"
+                                  label="Phone Number:"
                                   labelStyle="horizontal"
                                   [maxLength]="25"
                                   [disabled]="!canModify"
@@ -85,7 +85,7 @@
 
                         <vp-input [(ngModel)]="supplier.faxNumber"
                                   name="faxNumber"
-                                  label="Fax Number"
+                                  label="Fax Number:"
                                   labelStyle="horizontal"
                                   [maxLength]="25"
                                   [disabled]="!canModify"
@@ -93,7 +93,7 @@
 
                         <vp-input [(ngModel)]="supplier.emailAddress"
                                   name="emailAddress"
-                                  label="Email Address"
+                                  label="Email Address:"
                                   labelStyle="horizontal"
                                   type="email"
                                   [maxLength]="100"
@@ -110,7 +110,7 @@
                     <vp-field-grid>
                         <vp-input [(ngModel)]="supplier.letterCompanyName"
                                   name="lrCompanyName"
-                                  label="Company Name"
+                                  label="Company Name:"
                                   labelStyle="horizontal"
                                   [maxLength]="255"
                                   [disabled]="!canModify"
@@ -118,7 +118,7 @@
 
                         <vp-input [(ngModel)]="supplier.letterContactName"
                                   name="lrContactName"
-                                  label="Contact Name"
+                                  label="Contact Name:"
                                   labelStyle="horizontal"
                                   [maxLength]="100"
                                   [disabled]="!canModify"
@@ -126,7 +126,7 @@
 
                         <vp-input [(ngModel)]="supplier.letterAddress"
                                   name="lrAddress"
-                                  label="Address"
+                                  label="Address:"
                                   labelStyle="horizontal"
                                   [maxLength]="100"
                                   [disabled]="!canModify"
@@ -134,7 +134,7 @@
 
                         <vp-input [(ngModel)]="supplier.letterCity"
                                   name="lrCity"
-                                  label="City"
+                                  label="City:"
                                   labelStyle="horizontal"
                                   [maxLength]="50"
                                   [disabled]="!canModify"
@@ -144,7 +144,7 @@
                                   (ngModelChange)="supplier.letterState = $event ? { id: $event } : undefined"
                                   type="select"
                                   name="letterStateId"
-                                  label="State"
+                                  label="State:"
                                   labelStyle="horizontal"
                                   [options]="states"
                                   [disabled]="!canModify"
@@ -152,7 +152,7 @@
 
                         <vp-input [(ngModel)]="supplier.letterZipCode"
                                   name="lrZipCode"
-                                  label="Zip Code"
+                                  label="Zip Code:"
                                   labelStyle="horizontal"
                                   [maxLength]="50"
                                   [disabled]="!canModify"
@@ -166,7 +166,7 @@
                     <vp-field-grid>
                         <vp-input [(ngModel)]="supplier.letterContactCompanyName"
                                   name="lcCompanyName"
-                                  label="Company Name"
+                                  label="Company Name:"
                                   labelStyle="horizontal"
                                   [maxLength]="100"
                                   [disabled]="!canModify"
@@ -174,7 +174,7 @@
 
                         <vp-input [(ngModel)]="supplier.letterContactContactName"
                                   name="lcContactName"
-                                  label="Contact Name"
+                                  label="Contact Name:"
                                   labelStyle="horizontal"
                                   [maxLength]="100"
                                   [disabled]="!canModify"
@@ -182,7 +182,7 @@
 
                         <vp-input [(ngModel)]="supplier.letterContactAddress"
                                   name="lcAddress"
-                                  label="Address"
+                                  label="Address:"
                                   labelStyle="horizontal"
                                   [maxLength]="100"
                                   [disabled]="!canModify"
@@ -190,7 +190,7 @@
 
                         <vp-input [(ngModel)]="supplier.letterContactCity"
                                   name="lcCity"
-                                  label="City"
+                                  label="City:"
                                   labelStyle="horizontal"
                                   [maxLength]="50"
                                   [disabled]="!canModify"
@@ -200,7 +200,7 @@
                                   (ngModelChange)="supplier.letterContactState = $event ? { id: $event } : undefined"
                                   type="select"
                                   name="letterContactStateId"
-                                  label="State"
+                                  label="State:"
                                   labelStyle="horizontal"
                                   [options]="states"
                                   [disabled]="!canModify"
@@ -208,7 +208,7 @@
 
                         <vp-input [(ngModel)]="supplier.letterContactZipCode"
                                   name="lcZipCode"
-                                  label="Zip Code"
+                                  label="Zip Code:"
                                   labelStyle="horizontal"
                                   [maxLength]="50"
                                   [disabled]="!canModify"
@@ -216,7 +216,7 @@
 
                         <vp-input [(ngModel)]="supplier.letterContactPhoneNumber"
                                   name="lcPhone"
-                                  label="Phone Number"
+                                  label="Phone Number:"
                                   labelStyle="horizontal"
                                   [maxLength]="25"
                                   [disabled]="!canModify"
@@ -224,7 +224,7 @@
 
                         <vp-input [(ngModel)]="supplier.letterContactFaxNumber"
                                   name="lcFax"
-                                  label="Fax Number"
+                                  label="Fax Number:"
                                   labelStyle="horizontal"
                                   [maxLength]="25"
                                   [disabled]="!canModify"
@@ -232,7 +232,7 @@
 
                         <vp-input [(ngModel)]="supplier.letterContactEmailAddress"
                                   name="lcEmail"
-                                  label="Email Address"
+                                  label="Email Address:"
                                   labelStyle="horizontal"
                                   type="email"
                                   [maxLength]="100"

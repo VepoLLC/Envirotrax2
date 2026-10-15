@@ -10,27 +10,27 @@
                 <table class="table table-borderless mb-0">
                     <tbody>
                         <tr>
-                            <th class="w-40">Creation Date:</th>
+                            <th class="w-40 text-end">Creation Date:</th>
                             <td>{{ accountInfo.createdTime | date:'M/d/yy h:mm a' }}</td>
                         </tr>
                         <tr>
-                            <th>Company Email:</th>
+                            <th class="text-end">Company Email:</th>
                             <td>{{ accountInfo.companyEmail }}</td>
                         </tr>
                         <tr>
-                            <th>Company Name:</th>
+                            <th class="text-end">Company Name:</th>
                             <td>{{ accountInfo.name }}</td>
                         </tr>
                         <tr>
-                            <th>Address:</th>
+                            <th class="text-end">Address:</th>
                             <td>{{ formattedAddress }}</td>
                         </tr>
                         <tr>
-                            <th>Phone Number:</th>
+                            <th class="text-end">Phone Number:</th>
                             <td>{{ accountInfo.phoneNumber }}</td>
                         </tr>
                         <tr>
-                            <th>Fax Number:</th>
+                            <th class="text-end">Fax Number:</th>
                             <td>{{ accountInfo.faxNumber }}</td>
                         </tr>
                     </tbody>

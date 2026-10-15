@@ -12,6 +12,7 @@ public class BackflowTestNotificationMatcher : IBackflowTestNotificationMatcher
         var notification = new Notification
         {
             UserId = setting.UserId,
+            NotificationSettingId = setting.Id,
             Description = setting.Description ?? string.Empty,
             Color = setting.Color ?? string.Empty,
             ReasonForTest = setting.ReasonForTest,

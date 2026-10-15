@@ -4,10 +4,14 @@
         commission regulations and is certified to be operating within acceptable parameters.
     </div>
 
-    <div class="mb-2"><strong>Backflow Method:</strong>&nbsp;&nbsp;{{ getDeviceTypeLabel() }}</div>
+    <div class="row mb-2">
+        <div class="col-lg-3 fw-bold text-lg-end">Backflow Method:</div>
+        <div class="col-lg-9">{{ getDeviceTypeLabel() }}</div>
+    </div>
 
     <div class="row mb-2">
-        <div class="col-lg-6"><strong>Main Assembly Manufacturer:</strong>&nbsp;&nbsp;{{ test.manufacturer }}</div>
+        <div class="col-lg-3 fw-bold text-lg-end">Main Assembly Manufacturer:</div>
+        <div class="col-lg-3">{{ test.manufacturer }}</div>
         <div class="col-lg-6">
             <span class="me-3"><strong>Model:</strong>&nbsp;{{ test.model }}</span>
             <span class="me-3"><strong>Size:</strong>&nbsp;{{ test.size }}</span>
@@ -15,8 +19,9 @@
         </div>
     </div>
 
-    <div class="row mb-3" *ngIf="test.manufacturer2 || test.model2 || test.serialNumber2 || test.size2">
-        <div class="col-lg-6"><strong>Bypass Assembly Manufacturer:</strong>&nbsp;&nbsp;{{ test.manufacturer2 }}</div>
+    <div class="row mb-2" *ngIf="test.manufacturer2 || test.model2 || test.serialNumber2 || test.size2">
+        <div class="col-lg-3 fw-bold text-lg-end">Bypass Assembly Manufacturer:</div>
+        <div class="col-lg-3">{{ test.manufacturer2 }}</div>
         <div class="col-lg-6">
             <span class="me-3"><strong>Model:</strong>&nbsp;{{ test.model2 }}</span>
             <span class="me-3"><strong>Size:</strong>&nbsp;{{ test.size2 }}</span>
@@ -24,8 +29,15 @@
         </div>
     </div>
 
-    <div class="mb-2"><strong>Location:</strong>&nbsp;&nbsp;{{ test.locationDescription }}</div>
-    <div class="mb-2">
-        <strong>Hazard Type ****:</strong>&nbsp;&nbsp;{{ test.hazardType }}<span *ngIf="test.hazardType === 'Other' && test.hazardTypeOtherDescription"> - {{ test.hazardTypeOtherDescription }}</span>
+    <div class="row mb-2">
+        <div class="col-lg-3 fw-bold text-lg-end">Location:</div>
+        <div class="col-lg-9">{{ test.locationDescription }}</div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-lg-3 fw-bold text-lg-end">Hazard Type ****:</div>
+        <div class="col-lg-9">
+            {{ test.hazardType }}<span *ngIf="test.hazardType === 'Other' && test.hazardTypeOtherDescription"> - {{ test.hazardTypeOtherDescription }}</span>
+        </div>
     </div>
 </vp-section>

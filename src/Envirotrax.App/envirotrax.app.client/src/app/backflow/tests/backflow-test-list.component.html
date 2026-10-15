@@ -1,4 +1,4 @@
-﻿<h1 class="text-center h2">Backflow Test Search</h1>
+<h1 class="text-center h2">Backflow Test Search</h1>
 
 <ng-template #statusTemplate let-test="rowData">
     <div class="d-flex flex-wrap gap-1">
@@ -156,31 +156,31 @@
                             <div class="col-md-6">
                                 <vp-field-grid>
                                     <vp-filter-panel-field fieldName="accountNumber"
-                                                           label="Account Number"
+                                                           label="Account Number:"
                                                            labelStyle="horizontal"
                                                            [form]="searchForm" />
 
                                     <vp-filter-panel-field fieldName="serialNumber"
-                                                           label="Serial Number"
+                                                           label="Serial Number:"
                                                            labelStyle="horizontal"
                                                            [form]="searchForm" />
 
                                     <vp-filter-panel-field fieldName="reasonForTest"
-                                                           label="Reason for Test"
+                                                           label="Reason for Test:"
                                                            labelStyle="horizontal"
                                                            type="select"
                                                            [options]="reasonForTestOptions"
                                                            [form]="searchForm" />
 
                                     <vp-filter-panel-field fieldName="hazardType"
-                                                           label="Hazard Type"
+                                                           label="Hazard Type:"
                                                            labelStyle="horizontal"
                                                            type="select"
                                                            [options]="hazardTypeOptions"
                                                            [form]="searchForm" />
 
                                     <vp-filter-panel-field fieldName="deviceType"
-                                                           label="Device Type"
+                                                           label="Device Type:"
                                                            labelStyle="horizontal"
                                                            type="select"
                                                            [options]="deviceTypeOptions"
@@ -190,7 +190,7 @@
                             <div class="col-md-6">
                                 <vp-field-grid>
                                     <vp-filter-panel-field fieldName="isCurrent"
-                                                           label="Test History"
+                                                           label="Test History:"
                                                            labelStyle="horizontal"
                                                            type="select"
                                                            [options]="testHistoryOptions"
@@ -198,7 +198,7 @@
                                                            borderColor="#00a000" />
 
                                     <vp-filter-panel-field fieldName="testResult"
-                                                           label="Test Result"
+                                                           label="Test Result:"
                                                            labelStyle="horizontal"
                                                            type="select"
                                                            [options]="testResultOptions"
@@ -206,7 +206,7 @@
                                                            borderColor="#00a000" />
 
                                     <vp-filter-panel-field fieldName="outOfService"
-                                                           label="Service Status"
+                                                           label="Service Status:"
                                                            labelStyle="horizontal"
                                                            type="select"
                                                            [options]="serviceStatusOptions"
@@ -214,7 +214,7 @@
                                                            borderColor="orange" />
 
                                     <vp-input name="paymentStatus"
-                                              label="Payment Status"
+                                              label="Payment Status:"
                                               labelStyle="horizontal"
                                               type="select"
                                               [options]="paymentStatusOptions"
@@ -223,7 +223,7 @@
                                               [(ngModel)]="paymentStatus" />
 
                                     <vp-filter-panel-field fieldName="disapproved"
-                                                           label="Approval Status"
+                                                           label="Approval Status:"
                                                            labelStyle="horizontal"
                                                            type="select"
                                                            [options]="approvalStatusOptions"
@@ -231,7 +231,7 @@
                                                            borderColor="cyan" />
 
                                     <vp-filter-panel-field fieldName="rejected"
-                                                           label="Rejected Status"
+                                                           label="Rejected Status:"
                                                            labelStyle="horizontal"
                                                            type="select"
                                                            [options]="rejectedStatusOptions"
@@ -245,7 +245,7 @@
                             <div class="row">
                                 <div class="col-md-8 offset-md-4">
                                     <app-gis-area-lookup fieldName="site.gisAreaId"
-                                                         label="GIS Area"
+                                                         label="GIS Area:"
                                                          labelStyle="horizontal"
                                                          [form]="searchForm" />
                                 </div>
@@ -255,46 +255,46 @@
                     <div class="col-md-4">
                         <vp-field-grid>
                             <vp-filter-panel-field fieldName="ossf"
-                                                   label="OSSF"
+                                                   label="OSSF:"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [options]="yesNoOptions"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="meterNumber"
-                                                   label="Water Meter Number"
+                                                   label="Water Meter Number:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="testDate"
-                                                   label="Test Date Range"
+                                                   label="Test Date Range:"
                                                    labelStyle="horizontal"
                                                    type="daterange"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="properlyInstalled"
-                                                   label="Installed per Recommendations and/or Local Codes"
+                                                   label="Installed per Recommendations and/or Local Codes:"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [options]="yesNoOptions"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="nonPotable"
-                                                   label="Installed on a Non-Potable Water Supply (Auxiliary)"
+                                                   label="Installed on a Non-Potable Water Supply (Auxiliary):"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [options]="yesNoOptions"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="gaugeNonPotable"
-                                                   label="Test Gauge"
+                                                   label="Test Gauge:"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [options]="gaugeOptions"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="site.facilityType"
-                                                   label="Facility Type"
+                                                   label="Facility Type:"
                                                    labelStyle="horizontal"
                                                    type="multi-select"
                                                    [options]="facilityTypeOptions"
@@ -310,19 +310,19 @@
                     <div class="row">
                         <div class="col-md-4 mb-2">
                             <vp-filter-panel-field fieldName="bpatLicenseNumber"
-                                                   label="BPAT License Number"
+                                                   label="BPAT License Number:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                         <div class="col-md-4 mb-2">
                             <vp-filter-panel-field fieldName="bpatCompanyName"
-                                                   label="BPAT Company Name"
+                                                   label="BPAT Company Name:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
                         <div class="col-md-4 mb-2">
                             <vp-filter-panel-field fieldName="bpatContactName"
-                                                   label="BPAT Contact Name"
+                                                   label="BPAT Contact Name:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </div>
@@ -336,38 +336,38 @@
                     <vp-section header="Location / Property Criteria">
                         <vp-field-grid>
                             <vp-filter-panel-field fieldName="propertyType"
-                                                   label="Property Type"
+                                                   label="Property Type:"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [options]="propertyTypeOptions"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="propertyBusinessName"
-                                                   label="Business Name"
+                                                   label="Business Name:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
                             <vp-field-grid-row>
-                                <vp-field-grid-label>Address</vp-field-grid-label>
+                                <vp-field-grid-label>Address:</vp-field-grid-label>
                                 <vp-field-grid-control>
                                     <div class="d-flex gap-1">
                                         <vp-filter-panel-field fieldName="propertyStreetNumber"
-                                                               label="Street #"
+                                                               label="Street #:"
                                                                [form]="searchForm" />
 
                                         <vp-filter-panel-field fieldName="propertyStreetName"
-                                                               label="Street Name"
+                                                               label="Street Name:"
                                                                [form]="searchForm" />
 
                                         <vp-filter-panel-field fieldName="propertyNumber"
-                                                               label="Suite/Apt #"
+                                                               label="Suite/Apt #:"
                                                                [form]="searchForm" />
                                     </div>
                                 </vp-field-grid-control>
                             </vp-field-grid-row>
 
                             <vp-filter-panel-field fieldName="propertyZip"
-                                                   label="ZIP"
+                                                   label="ZIP:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </vp-field-grid>
@@ -378,36 +378,36 @@
                     <vp-section header="Contact / Mailing Criteria">
                         <vp-field-grid>
                             <vp-filter-panel-field fieldName="mailingCompanyName"
-                                                   label="Company Name"
+                                                   label="Company Name:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="mailingContactName"
-                                                   label="Contact Name"
+                                                   label="Contact Name:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
                             <vp-field-grid-row>
-                                <vp-field-grid-label>Address</vp-field-grid-label>
+                                <vp-field-grid-label>Address:</vp-field-grid-label>
                                 <vp-field-grid-control>
                                     <div class="d-flex gap-1">
                                         <vp-filter-panel-field fieldName="mailingStreetNumber"
-                                                               label="Street #"
+                                                               label="Street #:"
                                                                [form]="searchForm" />
 
                                         <vp-filter-panel-field fieldName="mailingStreetName"
-                                                               label="Street Name"
+                                                               label="Street Name:"
                                                                [form]="searchForm" />
 
                                         <vp-filter-panel-field fieldName="mailingNumber"
-                                                               label="Suite/Apt #"
+                                                               label="Suite/Apt #:"
                                                                [form]="searchForm" />
                                     </div>
                                 </vp-field-grid-control>
                             </vp-field-grid-row>
 
                             <vp-filter-panel-field fieldName="mailingZip"
-                                                   label="ZIP"
+                                                   label="ZIP:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </vp-field-grid>

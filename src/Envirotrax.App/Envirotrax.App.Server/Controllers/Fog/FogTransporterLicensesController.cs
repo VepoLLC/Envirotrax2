@@ -13,10 +13,10 @@ namespace Envirotrax.App.Server.Controllers.Fog
     [PermissionResource(PermissionType.FogTransporters)]
     public class FogTransporterLicensesController : WaterSupplierProtectedController
     {
-        private readonly IProfessionalUserLicenseService _licenseService;
+        private readonly IProfessionalLicenseService _licenseService;
         private readonly IProfessionalLicenseTypeService _licenseTypeService;
 
-        public FogTransporterLicensesController(IProfessionalUserLicenseService licenseService, IProfessionalLicenseTypeService licenseTypeService)
+        public FogTransporterLicensesController(IProfessionalLicenseService licenseService, IProfessionalLicenseTypeService licenseTypeService)
         {
             _licenseService = licenseService;
             _licenseTypeService = licenseTypeService;
@@ -34,14 +34,14 @@ namespace Envirotrax.App.Server.Controllers.Fog
         [HasPermission(PermissionAction.CanView)]
         public async Task<IActionResult> GetLicensesAsync(int id, [FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
         {
-            var result = await _licenseService.GetAllByProfessionalAsync(id, pageInfo, query, cancellationToken, l => l.ProfessionalType == ProfessionalType.FogTransporter);
+            var result = await _licenseService.GetAllByProfessionalAsync(id, ProfessionalType.FogTransporter, pageInfo, query, cancellationToken);
             return Ok(result);
         }
 
         [HttpPost("{id}/licenses")]
         [HasFeature(FeatureType.ManageProfessionalLicenses)]
         [HasPermission(PermissionAction.CanModify)]
-        public async Task<IActionResult> AddLicenseAsync(int id, [FromBody] ProfessionalUserLicenseDto dto)
+        public async Task<IActionResult> AddLicenseAsync(int id, [FromBody] ProfessionalLicenseDto dto)
         {
             var result = await _licenseService.AddForProfessionalAsync(id, dto);
             return Ok(result);
@@ -50,7 +50,7 @@ namespace Envirotrax.App.Server.Controllers.Fog
         [HttpPut("{id}/licenses/{licenseId}")]
         [HasFeature(FeatureType.ManageProfessionalLicenses)]
         [HasPermission(PermissionAction.CanModify)]
-        public async Task<IActionResult> UpdateLicenseAsync(int id, int licenseId, [FromBody] ProfessionalUserLicenseDto dto)
+        public async Task<IActionResult> UpdateLicenseAsync(int id, int licenseId, [FromBody] ProfessionalLicenseDto dto)
         {
             dto.Id = licenseId;
             var result = await _licenseService.UpdateForProfessionalAsync(id, dto);

@@ -3,6 +3,7 @@ import { NgForm } from '@angular/forms';
 import { ModalReference } from '@developer-partners/ngx-modal-dialog';
 import { WaterSupplierLicense, UpdateWaterSupplierLicense } from '../../shared/models/professionals/licenses/water-supplier-license';
 import { WaterSupplierLicenseService } from '../../shared/services/licenses/water-supplier-license.service';
+import { LicenseScope } from '../../shared/models/professionals/licenses/professional-license-type';
 import { HelperService } from '../../shared/services/helpers/helper.service';
 import { ToastService } from '@envirotrax/common-ui';
 
@@ -17,6 +18,7 @@ export interface WaterSupplierLicenseModalData {
 export class EditWaterSupplierLicenseComponent {
     public license: WaterSupplierLicense;
     public model: UpdateWaterSupplierLicense;
+    public isCompanyLicense: boolean;
     public isLoading = false;
     public validationErrors: string[] = [];
 
@@ -28,6 +30,7 @@ export class EditWaterSupplierLicenseComponent {
     ) {
         const { license } = this._modalReference.config.model!;
         this.license = license;
+        this.isCompanyLicense = license.licenseScope == LicenseScope.Company;
         this.model = {
             licenseNumber: license.licenseNumber ?? '',
             contactName: license.contactName,
@@ -41,7 +44,15 @@ export class EditWaterSupplierLicenseComponent {
         try {
             this.isLoading = true;
             const { license } = this._modalReference.config.model!;
-            const result = await this._licenseService.update(license.id!, this.model);
+
+            let result: WaterSupplierLicense;
+
+            if (this.isCompanyLicense) {
+                result = await this._licenseService.updateCompanyLicense(license.id!, this.model);
+            } else {
+                result = await this._licenseService.update(license.id!, this.model);
+            }
+
             this._toastService.successfullySaved('License');
             this._modalReference.closeSuccess(result);
         } catch (error) {

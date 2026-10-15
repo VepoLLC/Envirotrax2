@@ -41,7 +41,6 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow
                 dbQuery = dbQuery.Where(p => DbContext.ProfessionalUserLicenses.Any(l =>
                     l.ProfessionalId == p.Id &&
                     l.ProfessionalType == ProfessionalType.Bpat &&
-                    !l.LicenseType!.IsFireLicense &&
                     l.LicenseNumber.Contains(bpatLicenseNumber)));
             }
 
@@ -49,7 +48,7 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow
             {
                 var fireLicenseNumber = criteria.FireLicenseNumber;
 
-                dbQuery = dbQuery.Where(p => DbContext.ProfessionalUserLicenses.Any(l =>
+                dbQuery = dbQuery.Where(p => DbContext.ProfessionalLicenses.Any(l =>
                     l.ProfessionalId == p.Id &&
                     l.ProfessionalType == ProfessionalType.Bpat &&
                     l.LicenseType!.IsFireLicense &&

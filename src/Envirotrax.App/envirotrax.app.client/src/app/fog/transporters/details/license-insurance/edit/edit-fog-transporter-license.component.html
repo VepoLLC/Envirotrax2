@@ -5,28 +5,6 @@
         <div>
             <div class="mb-3">
                 <vp-input type="select"
-                        name="professionalType"
-                        label="Professional Type"
-                        [(ngModel)]="license.professionalType"
-                        (ngModelChange)="professionalTypeChange()"
-                        [required]="true"
-                        [options]="professionalTypeOptions"
-                        [form]="form" />
-            </div>
-
-            <div class="mb-3">
-                <vp-input type="select"
-                        name="user"
-                        label="User"
-                        [ngModel]="license.user?.id"
-                        (ngModelChange)="userChange($event)"
-                        [required]="true"
-                        [options]="userOptions"
-                        [form]="form" />
-            </div>
-
-            <div class="mb-3" *ngIf="license.professionalType !== undefined">
-                <vp-input type="select"
                         name="licenseType"
                         label="License Type"
                         [ngModel]="license.licenseType?.id"

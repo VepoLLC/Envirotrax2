@@ -10,33 +10,33 @@
                     <div class="col-md-6">
                         <vp-field-grid>
                             <vp-filter-panel-field fieldName="waterSupplier.id"
-                                                   label="Water Supplier"
+                                                   label="Water Supplier:"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [form]="searchForm"
                                                    [options]="waterSupplierOptions" />
 
                             <vp-filter-panel-field fieldName="site.accountNumber"
-                                                   label="Account Number"
+                                                   label="Account Number:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="professionalId"
-                                                   label="Transporter"
+                                                   label="Transporter:"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [options]="transporterOptions"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="vehicleId"
-                                                   label="Vehicle"
+                                                   label="Vehicle:"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [options]="vehicleOptions"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="receiverDisposalSiteId"
-                                                   label="Disposal Site"
+                                                   label="Disposal Site:"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [options]="disposalSiteOptions"
@@ -47,7 +47,7 @@
                         <vp-field-grid>
                             <!-- Date Type -->
                             <vp-filter-panel-field fieldName="dateType"
-                                                   label="Date Type"
+                                                   label="Date Type:"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [options]="dateTypeOptions"
@@ -55,7 +55,7 @@
 
                             @if (selectedDateType) {
                                 <vp-filter-panel-field fieldName="dateRange"
-                                                       label="Date Range"
+                                                       label="Date Range:"
                                                        labelStyle="horizontal"
                                                        type="daterange"
                                                        [form]="searchForm" />
@@ -63,7 +63,7 @@
 
                             <!-- Interceptor -->
                             <vp-filter-panel-field fieldName="interceptorType"
-                                                   label="Interceptor Type"
+                                                   label="Interceptor Type:"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [options]="interceptorTypeOptions"
@@ -71,7 +71,7 @@
 
                             <!-- Ticket Status -->
                             <vp-filter-panel-field fieldName="ticketStatus"
-                                                   label="Ticket Status"
+                                                   label="Ticket Status:"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [options]="ticketStatusOptions"
@@ -93,38 +93,38 @@
                         <div class="col-md-6">
                             <vp-field-grid>
                                 <vp-filter-panel-field fieldName="propertyType"
-                                                       label="Property Type"
+                                                       label="Property Type:"
                                                        labelStyle="horizontal"
                                                        type="select"
                                                        [options]="propertyTypeOptions"
                                                        [form]="searchForm" />
 
                                 <vp-filter-panel-field fieldName="propertyBusinessName"
-                                                       label="Business Name"
+                                                       label="Business Name:"
                                                        labelStyle="horizontal"
                                                        [form]="searchForm" />
 
                                 <vp-field-grid-row>
-                                    <vp-field-grid-label>Address</vp-field-grid-label>
+                                    <vp-field-grid-label>Address:</vp-field-grid-label>
                                     <vp-field-grid-control>
                                         <div class="d-flex gap-1">
                                             <vp-filter-panel-field fieldName="propertyStreetNumber"
-                                                                   label="Street #"
+                                                                   label="Street #:"
                                                                    [form]="searchForm" />
 
                                             <vp-filter-panel-field fieldName="propertyStreetName"
-                                                                   label="Street Name"
+                                                                   label="Street Name:"
                                                                    [form]="searchForm" />
 
                                             <vp-filter-panel-field fieldName="propertyNumber"
-                                                                   label="Suite/Apt #"
+                                                                   label="Suite/Apt #:"
                                                                    [form]="searchForm" />
                                         </div>
                                     </vp-field-grid-control>
                                 </vp-field-grid-row>
 
                                 <vp-filter-panel-field fieldName="propertyZip"
-                                                       label="ZIP"
+                                                       label="ZIP:"
                                                        labelStyle="horizontal"
                                                        [form]="searchForm" />
                             </vp-field-grid>

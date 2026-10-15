@@ -1,0 +1,101 @@
+<div [hidden]="showResults">
+    <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+        <vp-filter-panel (filterChange)="onFilterChange($event)">
+            <vp-section header="FOG Disposal Site Filters">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="name"
+                                                   label="Name"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="city"
+                                                   label="City"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="county"
+                                                   label="County"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="tceqRegion"
+                                                   label="TCEQ Region"
+                                                   [form]="searchForm" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="registrationNumber"
+                                                   label="Registration Number"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="permitNumber"
+                                                   label="Permit Number"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="physicalType"
+                                                   label="Waste Type"
+                                                   type="select"
+                                                   [options]="physicalTypeOptions"
+                                                   [form]="searchForm" />
+                        </div>
+                    </div>
+                </div>
+            </vp-section>
+        </vp-filter-panel>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="searchForm" />
+
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>
+                    Search
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+<div *ngIf="showResults">
+    <div class="d-flex justify-content-end mb-3">
+        <button type="button" class="btn btn-primary vp-section-button" (click)="showResults = false">
+            <i class="fa-solid fa-magnifying-glass me-1"></i>
+            Search Again
+        </button>
+    </div>
+
+    <vp-section [header]="'FOG Disposal Sites (' + (table.items?.pageInfo?.totalItems ?? 0) + ')'">
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [showActionLabels]="false"
+                  [canAdd]="true"
+                  (add)="addSite()"
+                  [canEdit]="true"
+                  (edit)="editSite($event)"
+                  [canDelete]="true"
+                  (delete)="deleteSite($event)"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getSites()"
+                  [(query)]="table.query"
+                  (queryChange)="getSites()"
+                  (queryReset)="getSites()" />
+    </vp-section>
+</div>
+
+<ng-template #cityStateCell let-rowData="rowData">
+    {{ rowData?.cityState }}
+</ng-template>

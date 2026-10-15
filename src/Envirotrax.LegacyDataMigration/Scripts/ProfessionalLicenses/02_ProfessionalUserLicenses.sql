@@ -36,6 +36,14 @@ BEGIN TRY
             ON licenseTypes.Name = licenses.Type
             AND licenseTypes.ProfessionalType = licenses.UserType
         WHERE licenses.Type <> 'Insurance Policy'
+            AND NOT EXISTS
+            (
+                SELECT 1
+                FROM ProfessionalLicenseTypes AS companyLicenseTypes
+                WHERE companyLicenseTypes.Name = licenses.Type
+                    AND companyLicenseTypes.ProfessionalType = licenses.UserType
+                    AND companyLicenseTypes.LicenseScope = 1
+            )
     )
     INSERT INTO MigrationSkippedProfessionals (LegacyRecordId, LegacyUserId, SourceTable, Reason)
     SELECT licenses.ID, licenses.UserID, 'SaveLicenses',
@@ -91,6 +99,7 @@ BEGIN TRY
     INNER JOIN ProfessionalLicenseTypes AS licenseTypes
         ON licenseTypes.Name = licenses.Type
         AND licenseTypes.ProfessionalType = licenses.UserType
+        AND licenseTypes.LicenseScope = 0
     WHERE licenses.Type <> 'Insurance Policy'
         AND NOT EXISTS
         (

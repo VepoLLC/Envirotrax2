@@ -2,14 +2,6 @@
     {{ license.licenseType?.name }}
 </ng-template>
 
-<ng-template #professionalTypeCell let-license="rowData">
-    {{ getProfessionalTypeLabel(license.professionalType) }}
-</ng-template>
-
-<ng-template #userEmailCell let-license="rowData">
-    {{ license.user?.emailAddress }}
-</ng-template>
-
 <ng-template #licenseExpirationCell let-license="rowData">
     <div class="border border-secondary d-inline-block px-2 py-1 rounded-3"
          [class.text-bg-primary]="!license.expirationDate"

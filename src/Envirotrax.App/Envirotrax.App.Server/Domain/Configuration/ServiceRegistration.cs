@@ -114,6 +114,7 @@ public static class ServiceRegistration
         services.AddTransient<IRenewalOptInService, RenewalOptInService>();
         services.AddTransient<IProfessionalUserService, ProfessionalUserService>();
         services.AddTransient<IProfessionalSupplierService, ProfessionalSupplierService>();
+        services.AddTransient<ISubmissionWaterSupplierService, SubmissionWaterSupplierService>();
         services.AddTransient<IProfessionalUserLicenseService, ProfessionalUserLicenseService>();
         services.AddTransient<IProfessionalLicenseService, ProfessionalLicenseService>();
         services.AddTransient<IWaterSupplierLicenseService, WaterSupplierLicenseService>();

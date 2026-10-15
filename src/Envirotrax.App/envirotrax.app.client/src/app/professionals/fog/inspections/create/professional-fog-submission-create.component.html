@@ -70,15 +70,19 @@
                     <div class="row align-items-center">
                         <div class="col-md-6 d-flex align-items-center">
                             <span class="fw-semibold text-nowrap text-end me-2 account-label">Water Supplier:</span>
-                            <div class="flex-grow-1">
+                            <div class="flex-grow-1" *ngIf="selectedWaterSupplier">
                                 <vp-input type="select"
                                           name="waterSupplierId"
                                           [ngModel]="selectedWaterSupplierId"
-                                          (ngModelChange)="onWaterSupplierChange($event)"
                                           [options]="waterSupplierOptions"
                                           [required]="true" />
                             </div>
                         </div>
+                    </div>
+                    <div *ngIf="!selectedWaterSupplier" class="text-danger mt-3">
+                        This site is located within {{ site.waterSupplier?.name }}, which is not currently on your list of
+                        selected water suppliers. You must add {{ site.waterSupplier?.name }} to your water suppliers to
+                        continue.
                     </div>
                 </vp-section>
 

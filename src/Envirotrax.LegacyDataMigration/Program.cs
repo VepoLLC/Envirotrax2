@@ -68,6 +68,7 @@ services.AddTransient<RenewalEmailVerificationService>();
 services.AddTransient<BackflowGaugeService>();
 services.AddTransient<BackflowTestService>();
 services.AddTransient<FogInspectionService>();
+services.AddTransient<FogDisposalSiteService>();
 services.AddTransient<NotificationSettingService>();
 services.AddTransient<NotificationService>();
 
@@ -125,6 +126,11 @@ await backflowTestService.MigrateAsync();
 // inspector who belongs to one of them. Its photos and signature are moved into Azure Storage here too.
 var fogInspectionService = provider.GetRequiredService<FogInspectionService>();
 await fogInspectionService.MigrateAsync();
+
+// A global master list that depends on nothing else, but it has to land before the transporter
+// registrations and trip tickets that point at a disposal site by its V1 id.
+var fogDisposalSiteService = provider.GetRequiredService<FogDisposalSiteService>();
+await fogDisposalSiteService.MigrateAsync();
 
 // After the supplier users: a notification setting is delivered to one of them, and V2 requires
 // that recipient, so a setting whose user is missing cannot be migrated at all.

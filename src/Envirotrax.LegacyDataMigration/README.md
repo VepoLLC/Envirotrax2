@@ -6,7 +6,7 @@ Moves data from the old (V1) system into the new Envirotrax2 (V2) database.
 
 ## How it works
 
-The app migrates one entity at a time — users, water suppliers, supplier users, professionals, GIS areas, sites, renewal email verifications, site logs, backflow gauges, backflow tests, FOG inspections, notification settings, then notifications — in that order, because later entities depend on earlier ones. Each entity's migration has two steps:
+The app migrates one entity at a time — users, water suppliers, supplier users, professionals, GIS areas, sites, renewal email verifications, site logs, backflow gauges, backflow tests, FOG inspections, FOG disposal sites, notification settings, then notifications — in that order, because later entities depend on earlier ones. Each entity's migration has two steps:
 
 1. **Run SQL scripts.** Files under `Scripts/<Entity>/`, named with a numeric prefix (`01_`, `02_`, ...), run in that order. They copy rows from the legacy database into the V2 tables.
 2. **Run C# cleanup code.** After the raw data is in place, C# fixes up anything SQL can't do well — legacy passwords come in as plain text and get hashed with ASP.NET Identity's password hasher, and site log file attachments get downloaded from the legacy file server and uploaded to Azure Storage.
@@ -20,7 +20,7 @@ One caveat, on the audit tables rather than the data: `Scripts/Users/02_`–`06_
 ## Project layout
 
 - `Scripts/` — SQL scripts, one subfolder per entity, run in filename order.
-- `Services/` — one service per entity (`UserService`, `WaterSupplierService`, `WaterSupplierUserService`, `ProfessionalService`, `GisAreaService`, `SiteService`, `SiteLogService`, `BackflowGaugeService`, `BackflowTestService`, `FogInspectionService`, `NotificationSettingService`, `NotificationService`, and the other professional services). Each has a `MigrateAsync()` that runs its scripts, then does any C#-side cleanup. `LegacyFileServerService` and `BlobStorageService` are helpers rather than entity migrations: they read files off the legacy file server and write them to Azure Storage.
+- `Services/` — one service per entity (`UserService`, `WaterSupplierService`, `WaterSupplierUserService`, `ProfessionalService`, `GisAreaService`, `SiteService`, `SiteLogService`, `BackflowGaugeService`, `BackflowTestService`, `FogInspectionService`, `FogDisposalSiteService`, `NotificationSettingService`, `NotificationService`, and the other professional services). Each has a `MigrateAsync()` that runs its scripts, then does any C#-side cleanup. `LegacyFileServerService` and `BlobStorageService` are helpers rather than entity migrations: they read files off the legacy file server and write them to Azure Storage.
 - `Data/` — EF Core `DbContext`s and entity models for the V2 database.
 - `Logs/` — one log file per service, written while the migration runs.
 
@@ -208,6 +208,33 @@ caveat applies too: the folder is the V2 `ProfessionalId`, which a rebuild of th
 - **Still pending:** `SELECT COUNT(*) FROM FogInspections WHERE (LegacyExteriorImagePath IS NOT NULL AND ExteriorImagePath IS NULL) OR (LegacyInteriorImagePath IS NOT NULL AND InteriorImagePath IS NULL) OR (HasLegacySignature = 1 AND SignatureImagePath IS NULL)`
 - **Not found in V1:** logged to `Logs/FogInspectionService.log` with per-run counts, for example a
   photo the legacy file server no longer has.
+
+## How FOG disposal sites are migrated
+
+Disposal sites are one global master list, not owned by a water supplier, and a site points at nothing
+V2 requires, so every V1 row migrates and there is no skipped table. A site keeps its V1 id
+(`IDENTITY_INSERT`), and `LegacyRecordId` is written as well. That matters later: transporter
+registrations and trip tickets both point at a disposal site by its V1 id, so they line up without any
+rewriting once they are migrated.
+
+Three V1 shapes change on the way across:
+
+- **`Active` becomes a soft delete.** V2 has no active flag; retiring a site there is a delete that
+  only sets `DeletedTime`. V1 only offers active sites for registration, so an inactive (or NULL) one
+  arrives deleted, with the migration time as `DeletedTime` because V1 records no date for switching a
+  site off. The row stays, so registrations and trip tickets that point at it still resolve. Unlike
+  V1, a deleted site is also left out of a transporter's own list, so it can no longer be picked on a
+  new trip ticket.
+- **`PhysicalType`** is free text in V1 and an enum in V2. "Landfill", "Transfer Station" and
+  "Processing Facility" (with or without the space) map to their V2 values, and anything else becomes
+  Other. V1 web only ever displays this text; the list itself is maintained in the Management Studio,
+  whose source is not available.
+- **Coordinates and state.** Latitude and longitude are text in V1 and numbers in V2, and a blank one
+  becomes NULL rather than 0. The state is matched by code or by full name, since it is typed in by hand.
+
+The five columns V2 requires (name, county, TCEQ region, registration number, permit number) fall back
+to an empty string when V1 leaves them NULL, so one blank field cannot drop a site that other records
+point at.
 
 ## Running it
 

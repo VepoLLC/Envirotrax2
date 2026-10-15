@@ -28,9 +28,11 @@ public class NotificationSettingController : ControllerBase
     [HttpPost("schedule-digests")]
     public async Task<IActionResult> ScheduleDigestsAsync(CancellationToken cancellationToken)
     {
+        var asOfTime = DateTimeOffset.UtcNow;
+
         var settings = await _internalApi.GetAsync<ICollection<NotificationSettingDto>>(
             null,
-            $"api/task-runner/notification-settings/digests/pending?batchSize={_options.BatchSize}",
+            $"api/task-runner/notification-settings/digests/pending?batchSize={_options.BatchSize}&asOfTime={Uri.EscapeDataString(asOfTime.ToString("O"))}",
             cancellationToken);
 
         await _queueService.EnsureQueueExistsAsync(QueueNames.NotificationSettings.ScheduleDigest, cancellationToken);
@@ -41,6 +43,8 @@ public class NotificationSettingController : ControllerBase
         {
             if (!ct.IsCancellationRequested)
             {
+                setting.AsOfTime = asOfTime;
+
                 await _queueService.SendMessageAsync(QueueNames.NotificationSettings.ScheduleDigest, setting, ct);
             }
         });

@@ -42,9 +42,8 @@ public class NotificationDigestService : INotificationDigestService
         _emailService = emailService;
     }
 
-    public async Task<List<NotificationDigestSettingDto>> GetPendingAsync(int batchSize, CancellationToken cancellationToken)
+    public async Task<List<NotificationDigestSettingDto>> GetPendingAsync(int batchSize, DateTimeOffset asOfTime, CancellationToken cancellationToken)
     {
-        var utcNow = DateTime.UtcNow;
         var settings = new List<NotificationSetting>();
 
         foreach (var interval in DigestIntervals)
@@ -56,7 +55,7 @@ public class NotificationDigestService : INotificationDigestService
                 break;
             }
 
-            var period = NotificationDigestPeriod.GetLastClosed(interval, utcNow);
+            var period = NotificationDigestPeriod.GetLastClosed(interval, asOfTime.UtcDateTime);
 
             settings.AddRange(await _settingRepository.GetPendingDigestsAsync(interval, period.StartUtc, period.EndUtc, remaining, cancellationToken));
         }
@@ -64,7 +63,7 @@ public class NotificationDigestService : INotificationDigestService
         return _mapper.Map<List<NotificationDigestSettingDto>>(settings);
     }
 
-    public async Task ScheduleAsync(int notificationSettingId, CancellationToken cancellationToken)
+    public async Task ScheduleAsync(int notificationSettingId, DateTimeOffset asOfTime, CancellationToken cancellationToken)
     {
         var setting = await _settingRepository.GetForDigestAsync(notificationSettingId, cancellationToken);
 
@@ -73,24 +72,28 @@ public class NotificationDigestService : INotificationDigestService
             return;
         }
 
-        var utcNow = DateTime.UtcNow;
-        var period = NotificationDigestPeriod.GetLastClosed(setting.Interval, utcNow);
-        var notifications = await _notificationRepository.GetUnscheduledForDigestAsync(setting.Id, period.StartUtc, period.EndUtc, cancellationToken);
+        var period = NotificationDigestPeriod.GetLastClosed(setting.Interval, asOfTime.UtcDateTime);
+        var notifications = await _notificationRepository.GetForDigestAsync(setting.UserId, setting.Interval, period.StartUtc, period.EndUtc, cancellationToken);
 
-        if (notifications.Count == 0)
+        var unscheduledSettingNotifications = notifications
+            .Where(notification => notification.NotificationSettingId == setting.Id && notification.EmailBatchId == null)
+            .ToList();
+
+        if (unscheduledSettingNotifications.Count == 0)
         {
             return;
         }
 
         var tests = await _testRepository.GetNotifiedTestsAsync(notifications.Select(notification => notification.RecordId).Distinct(), cancellationToken);
 
+        var utcNow = DateTime.UtcNow;
         var email = BuildEmail(setting, period, notifications, tests, utcNow);
         var sendTimeUtc = period.GetSendTimeUtc(utcNow);
         var batchId = await _emailService.CreateBatchIdAsync();
 
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        foreach (var notification in notifications)
+        foreach (var notification in unscheduledSettingNotifications)
         {
             notification.EmailBatchId = batchId;
             notification.SentTime = sendTimeUtc;

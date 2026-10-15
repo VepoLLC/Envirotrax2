@@ -1,0 +1,63 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="isLoading" />
+
+    <form #form="ngForm" (ngSubmit)="save(form)">
+        <div class="mb-3">
+            <vp-input [ngModel]="registration.waterSupplier?.name"
+                      name="waterSupplier"
+                      label="Water Supplier"
+                      [readonly]="true" />
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <vp-input [(ngModel)]="registration.backflowCommercialTestFee"
+                          name="backflowCommercialTestFee"
+                          type="number"
+                          [decimals]="2"
+                          label="Commercial Fee"
+                          [form]="form" />
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <vp-input [(ngModel)]="registration.backflowResidentialTestFee"
+                          name="backflowResidentialTestFee"
+                          type="number"
+                          [decimals]="2"
+                          label="Residential Fee"
+                          [form]="form" />
+            </div>
+        </div>
+
+        <p class="small text-muted">
+            -1 uses the Water Supplier fee, 0 is a free submission, and a value above 0 overrides the Water Supplier fee.
+        </p>
+
+        <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox"
+                   [(ngModel)]="registration.hasBackflowTesting"
+                   name="hasBackflowTesting" [id]="idPrefix + '-active'">
+            <label class="form-check-label" [attr.for]="idPrefix + '-active'">
+                Active
+            </label>
+        </div>
+
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox"
+                   [(ngModel)]="registration.isBackflowTestingSuspended"
+                   name="isBackflowTestingSuspended" [id]="idPrefix + '-suspended'">
+            <label class="form-check-label" [attr.for]="idPrefix + '-suspended'">
+                Suspended
+            </label>
+        </div>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="form" [validationErrors]="validationErrors" />
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-primary w-100" (click)="cancel()">Cancel</button>
+                <button type="submit" class="btn btn-primary w-100">Save</button>
+            </div>
+        </div>
+    </form>
+</div>

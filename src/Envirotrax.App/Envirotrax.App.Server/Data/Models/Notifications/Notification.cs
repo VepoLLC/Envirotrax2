@@ -9,6 +9,7 @@ using Envirotrax.Common.Data.Models;
 namespace Envirotrax.App.Server.Data.Models.Notifications;
 
 [Table("Notifications")]
+[AppIndex(nameof(NotificationSettingId), nameof(CreatedTime))]
 public class Notification : TenantModel<WaterSupplier>, ICreateAuditableModel<AppUser>
 {
     [AppPrimaryKey(true)]
@@ -16,6 +17,8 @@ public class Notification : TenantModel<WaterSupplier>, ICreateAuditableModel<Ap
 
     public int UserId { get; set; }
     public WaterSupplierUser? User { get; set; }
+
+    public int? NotificationSettingId { get; set; }
 
     public NotificationModuleType ModuleType { get; set; }
     public int RecordId { get; set; }
@@ -79,6 +82,9 @@ public class Notification : TenantModel<WaterSupplier>, ICreateAuditableModel<Ap
     public bool Hidden { get; set; }
 
     public DateTime? SentTime { get; set; }
+
+    [StringLength(100)]
+    public string? EmailBatchId { get; set; }
 
     public int? CreatedById { get; set; }
     public AppUser? CreatedBy { get; set; }

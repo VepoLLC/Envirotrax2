@@ -4,6 +4,7 @@ using Envirotrax.TaskRunner.Authentication;
 using Envirotrax.TaskRunner.Domain.DataTransferObjects;
 using Envirotrax.TaskRunner.Domain.Services.Definitions;
 using Envirotrax.TaskRunner.Workers.Backflow;
+using Envirotrax.TaskRunner.Workers.Notifications;
 using Envirotrax.TaskRunner.Workers.Sites;
 
 namespace Envirotrax.TaskRunner.Configuration;
@@ -44,6 +45,12 @@ public static class ServiceRegistration
         });
 
         services.AddQueueWorker(new QueueWorkerOptions<ComplianceSnapshotWorker, ComplianceSnapshotMessageDto>(QueueNames.BackflowComplianceSnapshots.Process)
+        {
+            MaxDequeuCount = 2
+        });
+
+        services.Configure<NotificationDigestOptions>(configuration.GetSection("Tasks:NotificationDigests"));
+        services.AddQueueWorker(new QueueWorkerOptions<NotificationDigestWorker, NotificationSettingDto>(QueueNames.NotificationSettings.ScheduleDigest)
         {
             MaxDequeuCount = 2
         });

@@ -36,6 +36,7 @@ const CRITERIA_FIELDS: (keyof ProfessionalSiteSearchCriteria)[] = [
 export class SiteListComponent implements OnInit {
     public showResults: boolean = false;
     public showMapResults: boolean = false;
+    public hasNoResults: boolean = false;
     public isMapLoading: boolean = false;
     public mapResultCount: number = 0;
     public mapMarkers: MapMarker<Site>[] = [];
@@ -285,6 +286,8 @@ export class SiteListComponent implements OnInit {
 
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
+            this.hasNoResults = false;
+
             // Like V1, the WS Account Number shows only when the selected water supplier includes it.
             const includeWsAccountNumbers = await this.isWsAccountNumberIncluded();
 
@@ -293,7 +296,18 @@ export class SiteListComponent implements OnInit {
             this.table.columns = this.getColumns(includeWsAccountNumbers);
             this.setDownloadConfig(includeWsAccountNumbers);
             this.showMapResults = false;
+
+            if (this.table.items) {
+                this.table.items.pageInfo.pageNumber = 1;
+            }
+
             await this.getSites();
+
+            if (this.table.items!.data.length === 0) {
+                this.showNoResults();
+                return;
+            }
+
             this.setShowResults(true);
         }
     }
@@ -312,6 +326,7 @@ export class SiteListComponent implements OnInit {
 
         try {
             this.isMapLoading = true;
+            this.hasNoResults = false;
             this.setShowResults(false);
             this.showMapResults = false;
 
@@ -321,6 +336,11 @@ export class SiteListComponent implements OnInit {
                 this._coordinateService.getAllForProfessional(waterSupplierId),
                 this._gisAreaService.getDefaultViewForProfessional(waterSupplierId)
             ]);
+
+            if (sitesPage.data.length === 0) {
+                this.showNoResults();
+                return;
+            }
 
             this.mapResultCount = sitesPage.pageInfo?.totalItems ?? sitesPage.data.length;
             this.mapMarkers = this.buildMapMarkers(sitesPage.data);
@@ -341,6 +361,11 @@ export class SiteListComponent implements OnInit {
         } finally {
             this.isMapLoading = false;
         }
+    }
+
+    private showNoResults(): void {
+        this.hasNoResults = true;
+        window.scrollTo({ top: 0 });
     }
 
     public showDownloadManager(): void {

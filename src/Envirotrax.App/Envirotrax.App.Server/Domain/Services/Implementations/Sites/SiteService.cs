@@ -118,6 +118,23 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         return added;
     }
 
+    public async Task<SiteDto> AddFromProfessionalAsync(SiteDto dto)
+    {
+        var site = MapToModel(dto)!;
+        site.AccountNumber = string.Empty;
+
+        await _siteRepository.AddAsync(site);
+
+        var accountNumber = $"{site.WaterSupplierId}-{Random.Shared.Next(1000, 9999)}-{site.Id}";
+
+        await _siteRepository.UpdateAccountNumberAsync(site.Id, accountNumber);
+
+        var added = MapToDto(site)!;
+        added.AccountNumber = accountNumber;
+
+        return added;
+    }
+
     public override async Task<SiteDto> UpdateAsync(SiteDto dto)
     {
         await PrepareWaterSupplierAccountNumberAsync(dto);

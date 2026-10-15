@@ -1018,6 +1018,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         var airGapImagePath = test.AirGapImagePath;
         var inspectorId = test.InspectorId;
         var mailingAddress = test.MailingAddress;
+        var validationNewSite = test.ValidationNewSite;
 
         DbContext.Entry(test).CurrentValues.SetValues(model);
 
@@ -1051,6 +1052,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         test.AirGapImagePath = newAirGapImagePath ?? airGapImagePath;
         test.InspectorId = inspectorId;
         test.MailingAddress = mailingAddress;
+        test.ValidationNewSite = validationNewSite;
 
         await SaveChangesAsync(logData: true);
 

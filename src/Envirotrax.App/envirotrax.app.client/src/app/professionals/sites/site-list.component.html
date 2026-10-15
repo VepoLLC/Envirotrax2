@@ -2,6 +2,10 @@
     Property Record Search
 </h1>
 
+<div *ngIf="hasNoResults" class="alert alert-danger text-center">
+    No records have been found that match your search criteria.
+</div>
+
 <ng-template #keyIndicators let-site="rowData">
     <div class="d-flex gap-1">
         <vp-status-icon *ngIf="site.active"

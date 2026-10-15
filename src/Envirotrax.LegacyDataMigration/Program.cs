@@ -69,6 +69,7 @@ services.AddTransient<BackflowGaugeService>();
 services.AddTransient<BackflowTestService>();
 services.AddTransient<FogInspectionService>();
 services.AddTransient<FogDisposalSiteService>();
+services.AddTransient<FogVehicleService>();
 services.AddTransient<NotificationSettingService>();
 services.AddTransient<NotificationService>();
 
@@ -131,6 +132,12 @@ await fogInspectionService.MigrateAsync();
 // registrations and trip tickets that point at a disposal site by its V1 id.
 var fogDisposalSiteService = provider.GetRequiredService<FogDisposalSiteService>();
 await fogDisposalSiteService.MigrateAsync();
+
+// After the professionals and the water suppliers: a vehicle belongs to a transporter's company, found
+// through the staging table the professional migration builds, and each permit is issued by a supplier.
+// Before the trip tickets that point at a vehicle by its V1 id.
+var fogVehicleService = provider.GetRequiredService<FogVehicleService>();
+await fogVehicleService.MigrateAsync();
 
 // After the supplier users: a notification setting is delivered to one of them, and V2 requires
 // that recipient, so a setting whose user is missing cannot be migrated at all.

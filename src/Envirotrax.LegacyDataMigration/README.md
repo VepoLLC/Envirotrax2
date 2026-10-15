@@ -6,7 +6,7 @@ Moves data from the old (V1) system into the new Envirotrax2 (V2) database.
 
 ## How it works
 
-The app migrates one entity at a time — users, water suppliers, supplier users, professionals, GIS areas, sites, renewal email verifications, site logs, backflow gauges, backflow tests, FOG inspections, FOG disposal sites, notification settings, then notifications — in that order, because later entities depend on earlier ones. Each entity's migration has two steps:
+The app migrates one entity at a time — users, water suppliers, supplier users, professionals, GIS areas, sites, renewal email verifications, site logs, backflow gauges, backflow tests, FOG inspections, FOG disposal sites, FOG vehicles and their permits, notification settings, then notifications — in that order, because later entities depend on earlier ones. Each entity's migration has two steps:
 
 1. **Run SQL scripts.** Files under `Scripts/<Entity>/`, named with a numeric prefix (`01_`, `02_`, ...), run in that order. They copy rows from the legacy database into the V2 tables.
 2. **Run C# cleanup code.** After the raw data is in place, C# fixes up anything SQL can't do well — legacy passwords come in as plain text and get hashed with ASP.NET Identity's password hasher, and site log file attachments get downloaded from the legacy file server and uploaded to Azure Storage.
@@ -20,7 +20,7 @@ One caveat, on the audit tables rather than the data: `Scripts/Users/02_`–`06_
 ## Project layout
 
 - `Scripts/` — SQL scripts, one subfolder per entity, run in filename order.
-- `Services/` — one service per entity (`UserService`, `WaterSupplierService`, `WaterSupplierUserService`, `ProfessionalService`, `GisAreaService`, `SiteService`, `SiteLogService`, `BackflowGaugeService`, `BackflowTestService`, `FogInspectionService`, `FogDisposalSiteService`, `NotificationSettingService`, `NotificationService`, and the other professional services). Each has a `MigrateAsync()` that runs its scripts, then does any C#-side cleanup. `LegacyFileServerService` and `BlobStorageService` are helpers rather than entity migrations: they read files off the legacy file server and write them to Azure Storage.
+- `Services/` — one service per entity (`UserService`, `WaterSupplierService`, `WaterSupplierUserService`, `ProfessionalService`, `GisAreaService`, `SiteService`, `SiteLogService`, `BackflowGaugeService`, `BackflowTestService`, `FogInspectionService`, `FogDisposalSiteService`, `FogVehicleService`, `NotificationSettingService`, `NotificationService`, and the other professional services). Each has a `MigrateAsync()` that runs its scripts, then does any C#-side cleanup. `LegacyFileServerService` and `BlobStorageService` are helpers rather than entity migrations: they read files off the legacy file server and write them to Azure Storage.
 - `Data/` — EF Core `DbContext`s and entity models for the V2 database.
 - `Logs/` — one log file per service, written while the migration runs.
 
@@ -235,6 +235,35 @@ Three V1 shapes change on the way across:
 The five columns V2 requires (name, county, TCEQ region, registration number, permit number) fall back
 to an empty string when V1 leaves them NULL, so one blank field cannot drop a site that other records
 point at.
+
+## How FOG vehicles and permits are migrated
+
+`Scripts/FogVehicles` moves both: `02_FogVehicles.sql` the vehicles, then `03_FogVehiclePermits.sql` the
+permits water suppliers issue for them. A vehicle keeps its V1 id (`IDENTITY_INSERT`), so trip tickets,
+which point at a vehicle by its V1 id, line up once they are migrated. A V2 permit has no id of its own
+(it is keyed by water supplier and vehicle), so `LegacyRecordId` on it is the only way back to V1.
+
+Four things are worth knowing:
+
+- **A vehicle belongs to its transporter's company.** V1 names the owner by login (`TransporterID`),
+  resolved through `MigrationLegacyProfessionalAccounts` exactly as gauges are, which already applies
+  the master/sub-account rule. The vehicle's own `MasterTransporterID` is not used: a vehicle a water
+  supplier adds never sets it, and a login rename only rewrites `TransporterID`.
+- **One permit per vehicle.** V2 enforces it with a unique index, and V1 does the same in practice:
+  issuing a permit first deletes every permit the vehicle already has, whichever supplier issued it.
+  Older V1 rows can still hold several, so the newest one is kept (ID breaks a tie) and the rest are
+  recorded as superseded. If V1 issues a newer permit after a vehicle's first permit was migrated, a
+  re-run records it instead of replacing the one already in V2.
+- **Deleted vehicles leave permits behind.** V1 deletes a vehicle outright and leaves its permits in
+  place, so a permit whose vehicle is gone is recorded as skipped. Every vehicle that does migrate is a
+  live one, so `DeletedTime` stays NULL.
+- **Dropped:** the permit's `MasterWaterSupplierID`, since V2 removed master suppliers (EN-184).
+
+Vehicles and permits that could not be migrated are queryable, told apart by `SourceTable`:
+
+`SELECT * FROM MigrationSkippedFogVehicles` — a vehicle whose transporter login has no migrated company,
+or a permit whose water supplier or vehicle did not migrate, or that lost to a newer permit for the same
+vehicle.
 
 ## Running it
 

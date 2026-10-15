@@ -67,6 +67,7 @@ services.AddTransient<SiteLogService>();
 services.AddTransient<RenewalEmailVerificationService>();
 services.AddTransient<BackflowGaugeService>();
 services.AddTransient<BackflowTestService>();
+services.AddTransient<FogInspectionService>();
 services.AddTransient<NotificationSettingService>();
 services.AddTransient<NotificationService>();
 
@@ -119,6 +120,11 @@ await backflowGaugeService.MigrateAsync();
 // belongs to one of them, and before the notifications, whose RecordId points at a test by its V1 id.
 var backflowTestService = provider.GetRequiredService<BackflowTestService>();
 await backflowTestService.MigrateAsync();
+
+// After the sites and the professionals, because an inspection is recorded against a site by an
+// inspector who belongs to one of them. Its photos and signature are moved into Azure Storage here too.
+var fogInspectionService = provider.GetRequiredService<FogInspectionService>();
+await fogInspectionService.MigrateAsync();
 
 // After the supplier users: a notification setting is delivered to one of them, and V2 requires
 // that recipient, so a setting whose user is missing cannot be migrated at all.

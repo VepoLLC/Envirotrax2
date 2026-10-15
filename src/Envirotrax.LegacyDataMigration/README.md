@@ -6,7 +6,7 @@ Moves data from the old (V1) system into the new Envirotrax2 (V2) database.
 
 ## How it works
 
-The app migrates one entity at a time — users, water suppliers, supplier users, professionals, GIS areas, sites, renewal email verifications, site logs, backflow gauges, backflow tests, notification settings, then notifications — in that order, because later entities depend on earlier ones. Each entity's migration has two steps:
+The app migrates one entity at a time — users, water suppliers, supplier users, professionals, GIS areas, sites, renewal email verifications, site logs, backflow gauges, backflow tests, FOG inspections, notification settings, then notifications — in that order, because later entities depend on earlier ones. Each entity's migration has two steps:
 
 1. **Run SQL scripts.** Files under `Scripts/<Entity>/`, named with a numeric prefix (`01_`, `02_`, ...), run in that order. They copy rows from the legacy database into the V2 tables.
 2. **Run C# cleanup code.** After the raw data is in place, C# fixes up anything SQL can't do well — legacy passwords come in as plain text and get hashed with ASP.NET Identity's password hasher, and site log file attachments get downloaded from the legacy file server and uploaded to Azure Storage.
@@ -20,7 +20,7 @@ One caveat, on the audit tables rather than the data: `Scripts/Users/02_`–`06_
 ## Project layout
 
 - `Scripts/` — SQL scripts, one subfolder per entity, run in filename order.
-- `Services/` — one service per entity (`UserService`, `WaterSupplierService`, `WaterSupplierUserService`, `ProfessionalService`, `GisAreaService`, `SiteService`, `SiteLogService`, `BackflowGaugeService`, `BackflowTestService`, `NotificationSettingService`, `NotificationService`, and the other professional services). Each has a `MigrateAsync()` that runs its scripts, then does any C#-side cleanup. `LegacyFileServerService` and `BlobStorageService` are helpers rather than entity migrations: they read files off the legacy file server and write them to Azure Storage.
+- `Services/` — one service per entity (`UserService`, `WaterSupplierService`, `WaterSupplierUserService`, `ProfessionalService`, `GisAreaService`, `SiteService`, `SiteLogService`, `BackflowGaugeService`, `BackflowTestService`, `FogInspectionService`, `NotificationSettingService`, `NotificationService`, and the other professional services). Each has a `MigrateAsync()` that runs its scripts, then does any C#-side cleanup. `LegacyFileServerService` and `BlobStorageService` are helpers rather than entity migrations: they read files off the legacy file server and write them to Azure Storage.
 - `Data/` — EF Core `DbContext`s and entity models for the V2 database.
 - `Logs/` — one log file per service, written while the migration runs.
 
@@ -152,6 +152,62 @@ Tests that could not be migrated are queryable:
 
 `SELECT * FROM MigrationSkippedBackflowTests` — either the water supplier never migrated, or no
 migrated professional user matches the tester login the test was recorded under.
+
+## How FOG inspections are migrated
+
+Like backflow tests, an inspection keeps its V1 id: the insert runs under `IDENTITY_INSERT`, so
+`FogInspections.Id` equals the V1 `FogInspections.ID`, and `LegacyRecordId` is written as well because
+every guard in the script reads it. Water suppliers, sites, professionals and professional users are
+all migrated before it, so nothing here has to be backfilled.
+
+Five things are worth knowing:
+
+- **The inspector is matched within the company the inspection was filed under.** V1 names the
+  inspector by login (`InspectorID`) and their company by `MasterInspectorID`, which is empty when the
+  inspector is the company. One login can belong to more than one company in V2, so the script prefers
+  the pairing in that company, then any pairing flagged as a FOG inspector. `ProfessionalId` and
+  `InspectorId` are NOT NULL, so an inspection whose login matches no migrated professional user is
+  recorded as skipped.
+- **The site is required.** `SiteId` is NOT NULL in V2, so an inspection whose site did not migrate is
+  recorded as skipped too. If a later run migrates it, its entry in the skipped table is cleared.
+- **An unpaid inspection has a NULL `TransactionId`.** V1 marks one with an empty string, and some V2
+  checks, such as the one that blocks downloading the report before payment, only test for NULL.
+- **Facility type and coordinates change shape.** `FacilityType` is the text of a dropdown in V1 and an
+  enum in V2; it goes through the same table as sites. The interceptor's latitude and longitude are
+  text in V1 and numbers in V2, and a blank one becomes NULL rather than 0.
+- **Some columns have no counterpart on the other side.** The master water supplier ids,
+  `MasterInspectorID` (used only for the match above) and `InterceptorPhotograph` (read by V1 but never
+  written) are dropped. `InspectorJobTitle`, `LastTripTicketDate`, `TripTicketInterval` and `EmailPdf`
+  stay empty: V1 stores no job title or "email PDF" flag on a FOG inspection, and keeps the trip
+  ticket schedule on the site, which the sites migration already carries over.
+
+Inspections that could not be migrated are queryable:
+
+`SELECT * FROM MigrationSkippedFogInspections` — the water supplier or the site never migrated, or no
+migrated professional user matches the inspector login.
+
+### How FOG inspection images are migrated
+
+An inspection has up to three images, and V1 keeps them in two different places:
+
+- **The exterior and interior photos** are files on the legacy file server. V1 stores no path for
+  them: every page rebuilds it from the record id (`fog_inspections/<id rounded down to 10000>/<id>-ext.jpg`,
+  or `-int.jpg`) and shows the photo whenever `OutsideImageType` (or `InsideImageType`) is not NULL.
+  The script applies the same rule and writes that path into `LegacyExteriorImagePath` /
+  `LegacyInteriorImagePath`.
+- **The signature** is a PNG stored in the V1 `FogInspections.Signature` column. The script sets
+  `HasLegacySignature`, and the service reads the bytes back out of the legacy database.
+
+`FogInspectionService` then uploads each image to
+`professionals/<ProfessionalId>/fog-inspections/<exterior|interior|signature>/legacy-<V1 id>.<jpg|png>`,
+the same folders V2 uses, and only after that writes `ExteriorImagePath`, `InteriorImagePath` or
+`SignatureImagePath`. As with site log attachments, an image V2 has no path for yet shows as missing
+rather than as a broken link, and a re-run picks up only what is still pending. The same storage
+caveat applies too: the folder is the V2 `ProfessionalId`, which a rebuild of the V2 database reassigns.
+
+- **Still pending:** `SELECT COUNT(*) FROM FogInspections WHERE (LegacyExteriorImagePath IS NOT NULL AND ExteriorImagePath IS NULL) OR (LegacyInteriorImagePath IS NOT NULL AND InteriorImagePath IS NULL) OR (HasLegacySignature = 1 AND SignatureImagePath IS NULL)`
+- **Not found in V1:** logged to `Logs/FogInspectionService.log` with per-run counts, for example a
+  photo the legacy file server no longer has.
 
 ## Running it
 

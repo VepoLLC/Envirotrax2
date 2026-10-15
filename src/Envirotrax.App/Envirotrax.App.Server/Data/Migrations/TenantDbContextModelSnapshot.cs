@@ -2378,6 +2378,10 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("EmailBatchId")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<bool>("FilterAny")
                         .HasColumnType("bit");
 
@@ -2483,6 +2487,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<int>("ModuleType")
                         .HasColumnType("int");
 
+                    b.Property<int?>("NotificationSettingId")
+                        .HasColumnType("int");
+
                     b.Property<string>("PropertyDescription")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -2516,6 +2523,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("WaterSupplierId", "UserId");
+
+                    b.HasIndex("WaterSupplierId", "NotificationSettingId", "CreatedTime");
 
                     b.ToTable("Notifications");
                 });

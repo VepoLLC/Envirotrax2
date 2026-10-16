@@ -10,5 +10,5 @@ public interface INotificationRepository : IRepository<Notification>
 
     Task MarkSentAsync(IEnumerable<int> ids, CancellationToken cancellationToken);
 
-    Task<List<Notification>> GetUnscheduledForDigestAsync(int notificationSettingId, DateTime startUtc, DateTime endUtc, CancellationToken cancellationToken);
+    Task<List<Notification>> GetForDigestAsync(int userId, NotificationInterval interval, DateTime startUtc, DateTime endUtc, CancellationToken cancellationToken);
 }

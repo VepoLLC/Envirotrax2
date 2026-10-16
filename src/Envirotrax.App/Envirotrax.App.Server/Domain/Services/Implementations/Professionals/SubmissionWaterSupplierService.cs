@@ -18,11 +18,13 @@ public class SubmissionWaterSupplierService : ISubmissionWaterSupplierService
         _supplierRepository = supplierRepository;
     }
 
-    public async Task<int> ResolveForSiteAsync(SiteDto site, ProfessionalType professionalType, CancellationToken cancellationToken)
+    public async Task<int> ResolveAsync(SiteDto? site, int? requestedWaterSupplierId, ProfessionalType professionalType, CancellationToken cancellationToken)
     {
-        if (site.WaterSupplier?.Id is not int waterSupplierId)
+        var resolvedWaterSupplierId = site != null ? site.WaterSupplier?.Id : requestedWaterSupplierId;
+
+        if (resolvedWaterSupplierId is not int waterSupplierId)
         {
-            throw new AppValidationException("The site does not belong to a water supplier.");
+            throw new AppValidationException("Please select a water supplier.");
         }
 
         await EnsureCanSubmitAsync(waterSupplierId, professionalType, cancellationToken);

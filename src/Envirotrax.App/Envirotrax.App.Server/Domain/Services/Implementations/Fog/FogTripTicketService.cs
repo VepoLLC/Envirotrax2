@@ -191,7 +191,7 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         var transporterUserId = request.Transporter!.Id!.Value;
 
         var site = await _siteService.GetAsync(siteId, cancellationToken);
-        var waterSupplierId = await _submissionSupplierService.ResolveForSiteAsync(site, ProfessionalType.FogTransporter, cancellationToken);
+        var waterSupplierId = await _submissionSupplierService.ResolveAsync(site, request.WaterSupplier?.Id, ProfessionalType.FogTransporter, cancellationToken);
 
         await _insuranceService.EnsureSatisfiedForWaterSupplierAsync(_authService.ProfessionalId, waterSupplierId, ProfessionalType.FogTransporter, cancellationToken);
 

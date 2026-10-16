@@ -73,6 +73,7 @@ export class BackflowTestSubmitComponent implements OnInit {
 
     public bpatOptions: InputOption[] = [];
     public waterSupplierOptions: InputOption[] = [];
+    public isSiteWaterSupplierMissing = false;
     public gaugeOptions: InputOption[] = [];
     public stateOptions: InputOption[] = [];
 
@@ -1018,6 +1019,12 @@ export class BackflowTestSubmitComponent implements OnInit {
         this.selectedWaterSupplierId = test.waterSupplier?.id;
         this.selectedWaterSupplier = this._waterSuppliers.find(ws => ws.waterSupplier?.id === test.waterSupplier?.id);
 
+        this.isSiteWaterSupplierMissing = !!this.site && !this.selectedWaterSupplier;
+
+        if (this.site && this.selectedWaterSupplier) {
+            this.buildSiteWaterSupplierOptions();
+        }
+
         this.selectedGauge = this._gauges.find(g =>
             g.manufacturer === test.gaugeManufacturer &&
             g.model === test.gaugeModel &&
@@ -1143,15 +1150,26 @@ export class BackflowTestSubmitComponent implements OnInit {
         }
     }
 
+    private buildSiteWaterSupplierOptions(): void {
+        this.waterSupplierOptions = [{ id: this.selectedWaterSupplierId, text: this.selectedWaterSupplier?.waterSupplier?.name ?? '' }];
+    }
+
     private async applySiteWaterSupplier(site: Site): Promise<void> {
         const siteWsId = site.waterSupplier?.id;
+        const siteSupplier = this._waterSuppliers.find(ws => ws.waterSupplier?.id === siteWsId);
 
-        if (siteWsId && this._waterSuppliers.some(ws => ws.waterSupplier?.id === siteWsId)) {
-            this.selectedWaterSupplierId = siteWsId;
-            this.selectedWaterSupplier = this._waterSuppliers.find(s => s.waterSupplier?.id === siteWsId);
+        this.isSiteWaterSupplierMissing = !siteSupplier;
 
-            await this.loadSupplierData();
+        if (!siteSupplier) {
+            return;
         }
+
+        this.waterSupplierOptions = [{ id: siteWsId, text: siteSupplier.waterSupplier?.name ?? '' }];
+
+        this.selectedWaterSupplierId = siteWsId;
+        this.selectedWaterSupplier = siteSupplier;
+
+        await this.loadSupplierData();
     }
 
     private serializeRepairs(): void {

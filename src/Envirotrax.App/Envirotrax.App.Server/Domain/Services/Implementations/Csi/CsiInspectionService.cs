@@ -36,6 +36,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
     private readonly IProfessionalInsuranceService _insuranceService;
     private readonly ICsiInspectionAssemblyService _assemblyService;
     private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
+    private readonly ISubmissionWaterSupplierService _submissionSupplierService;
 
     public CsiInspectionService(
         IMapper mapper,
@@ -50,7 +51,8 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         IProfessionalSupplierService professionalSupplierService,
         IProfessionalInsuranceService insuranceService,
         ICsiInspectionAssemblyService assemblyService,
-        IMailingInfoRedactionService mailingInfoRedactionService)
+        IMailingInfoRedactionService mailingInfoRedactionService,
+        ISubmissionWaterSupplierService submissionSupplierService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -65,6 +67,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         _insuranceService = insuranceService;
         _assemblyService = assemblyService;
         _mailingInfoRedactionService = mailingInfoRedactionService;
+        _submissionSupplierService = submissionSupplierService;
     }
 
     public override async Task<CsiInspectionDto?> DeleteAsync(int id)
@@ -98,12 +101,13 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
     public async Task<CsiInspectionDto> SubmitAsync(CreateCsiInspectionDto request, CancellationToken cancellationToken)
     {
         var siteId = request.Site!.Id.Value;
-        var waterSupplierId = request.WaterSupplier!.Id.Value;
         var inspectorUserId = request.InspectorUser!.Id.Value;
+
+        var site = await _siteService.GetAsync(siteId, cancellationToken);
+        var waterSupplierId = await _submissionSupplierService.ResolveForSiteAsync(site, ProfessionalType.CsiInspector, cancellationToken);
 
         await _insuranceService.EnsureSatisfiedForWaterSupplierAsync(_authService.ProfessionalId, waterSupplierId, ProfessionalType.CsiInspector, cancellationToken);
 
-        var site = await _siteService.GetAsync(siteId, cancellationToken);
         var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
         var inspectorUser = await _professionalUserService.GetAsync(inspectorUserId, cancellationToken);
         var licenses = await _licenseService.GetAllAsync(inspectorUserId, new PageInfo(), new Query());

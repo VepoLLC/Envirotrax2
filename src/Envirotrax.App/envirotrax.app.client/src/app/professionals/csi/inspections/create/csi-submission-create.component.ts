@@ -161,20 +161,6 @@ export class CsiSubmissionCreateComponent implements OnInit {
         }
     }
 
-    public async onWaterSupplierChange(value: number): Promise<void> {
-        this.selectedWaterSupplierId = value;
-        this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === value);
-        this.model.waterSupplier = { id: value };
-
-        this.isLoading = true;
-
-        try {
-            await Promise.all([this.loadInsuranceCheck(), this.loadMailingInfoRedaction()]);
-        } finally {
-            this.isLoading = false;
-        }
-    }
-
     public onCommentsChange(value: string | undefined): void {
         this.model.comments = value;
         this.remarksLength = value?.length ?? 0;
@@ -375,7 +361,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
 
             this.buildDropdownOptions();
             await this.setDefaultCsiUser();
-            await this.setDefaultWaterSupplier(site);
+            await this.setSiteWaterSupplier(site);
         } finally {
             this.isLoading = false;
         }
@@ -415,6 +401,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
 
             this.selectedWaterSupplierId = inspection.waterSupplier?.id;
             this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === inspection.waterSupplier?.id);
+            this.buildWaterSupplierOptions();
             await Promise.all([this.loadInsuranceCheck(), this.loadMailingInfoRedaction()]);
 
             this.selectedCsiUserId = inspection.inspectorUser?.id ?? 0;
@@ -487,11 +474,6 @@ export class CsiSubmissionCreateComponent implements OnInit {
             id: u.id,
             text: u.contactName ?? `User ${u.id}`
         }));
-
-        this.waterSupplierOptions = this.waterSuppliers.map(ws => ({
-            id: ws.waterSupplier?.id,
-            text: ws.waterSupplier?.name ?? ''
-        }));
     }
 
     private async setDefaultCsiUser(): Promise<void> {
@@ -505,18 +487,22 @@ export class CsiSubmissionCreateComponent implements OnInit {
         }
     }
 
-    private async setDefaultWaterSupplier(site: Site): Promise<void> {
-        if (this.waterSuppliers.length === 1) {
-            this.selectedWaterSupplierId = this.waterSuppliers[0].waterSupplier?.id;
-        }
+    private buildWaterSupplierOptions(): void {
+        this.waterSupplierOptions = this.selectedWaterSupplier
+            ? [{ id: this.selectedWaterSupplierId, text: this.selectedWaterSupplier.waterSupplier?.name ?? '' }]
+            : [];
+    }
 
-        const siteWsId = site.waterSupplier?.id;
-        if (siteWsId && this.waterSuppliers.some(ws => ws.waterSupplier?.id === siteWsId)) {
-            this.selectedWaterSupplierId = siteWsId;
-        }
-
+    private async setSiteWaterSupplier(site: Site): Promise<void> {
+        this.selectedWaterSupplierId = site.waterSupplier?.id;
         this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === this.selectedWaterSupplierId);
         this.model.waterSupplier = { id: this.selectedWaterSupplierId };
+
+        if (!this.selectedWaterSupplier) {
+            return;
+        }
+
+        this.buildWaterSupplierOptions();
 
         await Promise.all([this.loadInsuranceCheck(), this.loadMailingInfoRedaction()]);
     }

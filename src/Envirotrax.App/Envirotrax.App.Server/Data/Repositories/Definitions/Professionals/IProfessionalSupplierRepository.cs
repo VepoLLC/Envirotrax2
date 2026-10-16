@@ -9,4 +9,5 @@ public interface IProfessionalSupplierRepository : IRepository<ProfessionalWater
 {
     Task<IEnumerable<AvailableWaterSupplier>> GetAllAvailableSuppliersAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<IEnumerable<ProfessionalWaterSupplier>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalWaterSupplier, bool>>? filter = null);
+    Task<ProfessionalWaterSupplier?> GetRegistrationAsync(int waterSupplierId, CancellationToken cancellationToken);
 }

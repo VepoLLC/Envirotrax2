@@ -38,6 +38,7 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
     private readonly IProfessionalSupplierService _professionalSupplierService;
     private readonly IProfessionalInsuranceService _insuranceService;
     private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
+    private readonly ISubmissionWaterSupplierService _submissionSupplierService;
 
     public FogTripTicketService(
         IMapper mapper,
@@ -53,7 +54,8 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         IGeneralSettingsService generalSettingsService,
         IProfessionalSupplierService professionalSupplierService,
         IProfessionalInsuranceService insuranceService,
-        IMailingInfoRedactionService mailingInfoRedactionService)
+        IMailingInfoRedactionService mailingInfoRedactionService,
+        ISubmissionWaterSupplierService submissionSupplierService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -69,6 +71,7 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         _professionalSupplierService = professionalSupplierService;
         _insuranceService = insuranceService;
         _mailingInfoRedactionService = mailingInfoRedactionService;
+        _submissionSupplierService = submissionSupplierService;
     }
 
     public override async Task<FogTripTicketDto?> DeleteAsync(int id)
@@ -185,12 +188,13 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         CancellationToken cancellationToken)
     {
         var siteId = request.Site!.Id!.Value;
-        var waterSupplierId = request.WaterSupplier!.Id!.Value;
         var transporterUserId = request.Transporter!.Id!.Value;
+
+        var site = await _siteService.GetAsync(siteId, cancellationToken);
+        var waterSupplierId = await _submissionSupplierService.ResolveForSiteAsync(site, ProfessionalType.FogTransporter, cancellationToken);
 
         await _insuranceService.EnsureSatisfiedForWaterSupplierAsync(_authService.ProfessionalId, waterSupplierId, ProfessionalType.FogTransporter, cancellationToken);
 
-        var site = await _siteService.GetAsync(siteId, cancellationToken);
         var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
         var transporterUser = await _professionalUserService.GetAsync(transporterUserId, cancellationToken);
 

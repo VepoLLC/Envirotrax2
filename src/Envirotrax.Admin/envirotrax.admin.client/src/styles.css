@@ -241,6 +241,12 @@ a:hover {
     padding: 0.25rem 0.75rem;
 }
 
+.form-control,
+.ng-select,
+.ng-dropdown-panel {
+    font-size: 0.875rem;
+}
+
 .ng-select .ng-arrow-wrapper .ng-arrow {
     border-color: none !important;
     border-style: none !important;
@@ -303,6 +309,10 @@ dp-loading-spinner.vp-spinner-overlay .dp-spinner-container {
 
 .ng-select .ng-select-container:hover {
     border-color: #86b7fe;
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items {
+    max-height: 400px !important;
 }
 
 .form-check-input {

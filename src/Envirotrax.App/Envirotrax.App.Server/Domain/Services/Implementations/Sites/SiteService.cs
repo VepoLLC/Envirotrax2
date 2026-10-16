@@ -140,6 +140,20 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         }
     }
 
+    public async Task<SiteDto> AddWithGeneratedAccountNumberAsync(SiteDto dto)
+    {
+        var prefix = $"{dto.WaterSupplier!.Id}-{Random.Shared.Next(1000, 10000)}";
+        dto.AccountNumber = prefix;
+
+        var added = await AddAsync(dto);
+
+        added.AccountNumber = $"{prefix}-{added.Id}";
+
+        await _siteRepository.UpdateAccountNumberAsync(added.Id, added.AccountNumber);
+
+        return added;
+    }
+
     public async Task<IPagedData<SiteDto>> SearchAsync(PageInfo pageInfo, Query query, FogCompliancyStatus? fogCompliancyStatus, CancellationToken cancellationToken)
     {
         query.Sort = query.ConvertSortProperties<Site, SiteDto>(Mapper);

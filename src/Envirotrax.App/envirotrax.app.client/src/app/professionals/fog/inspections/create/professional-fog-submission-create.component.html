@@ -4,7 +4,7 @@
 
 <div *ngIf="!isLoading">
 
-    <div *ngIf="site">
+    <div *ngIf="site || isUnlistedProperty">
 
         <!-- Tabs -->
         <ul class="nav vp-tabs justify-content-center mb-1">
@@ -219,7 +219,7 @@
                     <div class="col-md-6">
                         <vp-section header="Location / Property Information">
                             <vp-section-actions>
-                                <button type="button" class="btn-primary"
+                                <button *ngIf="!isUnlistedProperty" type="button" class="btn-primary"
                                         (click)="cancelLocationModification()">Cancel</button>
                             </vp-section-actions>
 
@@ -243,7 +243,7 @@
                                 <div class="col-xl-8">
                                     <vp-input name="propertyBusinessName"
                                               [(ngModel)]="model.propertyBusinessName"
-                                              [disabled]="model.propertyType === PropertyType.Residential"
+                                              [disabled]="!isUnlistedProperty && model.propertyType === PropertyType.Residential"
                                               [maxLength]="100" />
                                 </div>
                             </div>
@@ -319,7 +319,7 @@
                     <div class="col-md-6">
                         <vp-section header="Contact / Mailing Information">
                             <vp-section-actions>
-                                <button type="button" class="btn-primary"
+                                <button *ngIf="!isUnlistedProperty" type="button" class="btn-primary"
                                         (click)="cancelLocationModification()">Cancel</button>
                             </vp-section-actions>
 

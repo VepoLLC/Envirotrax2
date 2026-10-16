@@ -354,6 +354,15 @@ public class SiteRepository : Repository<Site>, ISiteRepository
         return Entity.SingleOrDefaultAsync(s => s.Id == siteId && s.DeletedTime == null, cancellationToken);
     }
 
+    public async Task UpdateAccountNumberAsync(int siteId, string accountNumber)
+    {
+        await DbContext
+            .Sites
+            .Where(s => s.Id == siteId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(s => s.AccountNumber, accountNumber));
+    }
+
     public async Task ClearNeedsRenewalCheckAsync(int siteId)
     {
         await DbContext

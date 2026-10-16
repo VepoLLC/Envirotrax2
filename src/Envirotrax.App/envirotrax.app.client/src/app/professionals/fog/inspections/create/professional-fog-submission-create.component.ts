@@ -24,6 +24,8 @@ import { GeneralSettingsService } from "../../../../shared/services/settings/gen
 import { PropertyType } from "../../../../shared/enums/property-type.enum";
 import { InputOption, ModalHelperService } from "@envirotrax/common-ui";
 
+const UNLISTED_PROPERTY_ROUTE = 'unlisted';
+
 @Component({
     standalone: false,
     templateUrl: './professional-fog-submission-create.component.html',
@@ -38,6 +40,7 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
 
     public site?: Site;
     public professional?: Professional;
+    public isUnlistedProperty = false;
     public editingId: number | null = null;
     private _editingInspection: FogInspection | null = null;
 
@@ -133,9 +136,10 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
             }
 
             const idParam = params.get('siteId');
-            this._siteId = idParam ? Number(idParam) : 0;
+            this.isUnlistedProperty = idParam === UNLISTED_PROPERTY_ROUTE;
+            this._siteId = this.isUnlistedProperty || !idParam ? 0 : Number(idParam);
 
-            if (this._siteId > 0) {
+            if (this._siteId > 0 || this.isUnlistedProperty) {
                 await this.loadData();
             }
         });
@@ -166,7 +170,7 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
     public onPropertyTypeChange(value: PropertyType): void {
         this.model.propertyType = value;
 
-        if (value === PropertyType.Residential) {
+        if (!this.isUnlistedProperty && value === PropertyType.Residential) {
             this.model.propertyBusinessName = undefined;
         }
     }
@@ -268,7 +272,7 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
         try {
             const submission = {
                 ...this.model,
-                site: { id: this._siteId },
+                site: this.isUnlistedProperty ? undefined : { id: this._siteId },
                 waterSupplier: { id: this.selectedWaterSupplierId },
                 inspector: { id: this.selectedFogUserId }
             };
@@ -399,7 +403,7 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
             const [professional, usersPage, site, stateOptions] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isFogInspector', comparisonOperator: 'Eq', value: 'true' }] }),
-                this._siteService.getForProfessional(this._siteId),
+                this.isUnlistedProperty ? undefined : this._siteService.getForProfessional(this._siteId),
                 this._lookupService.getAllStatesAsOptions(false)
             ]);
 
@@ -407,7 +411,12 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
             this.fogUsers = usersPage.data ?? [];
             this.site = site;
             this.stateOptions = stateOptions;
-            this.applySiteLocation(site);
+
+            this.isLocationEditing = this.isUnlistedProperty;
+
+            if (site) {
+                this.applySiteLocation(site);
+            }
 
             const waterSuppliersPage = await this._professionalSupplierService.getAllMy({ hasFogInspection: true });
             this.waterSuppliers = waterSuppliersPage.data ?? [];
@@ -543,12 +552,12 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
         }
     }
 
-    private setDefaultWaterSupplier(site: Site): void {
+    private setDefaultWaterSupplier(site?: Site): void {
         if (this.waterSuppliers.length === 1) {
             this.selectedWaterSupplierId = this.waterSuppliers[0].waterSupplier?.id;
         }
 
-        const siteWsId = site.waterSupplier?.id;
+        const siteWsId = site?.waterSupplier?.id;
         if (siteWsId && this.waterSuppliers.some(ws => ws.waterSupplier?.id === siteWsId)) {
             this.selectedWaterSupplierId = siteWsId;
         }

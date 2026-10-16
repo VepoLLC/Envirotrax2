@@ -4,10 +4,10 @@
 
 <div *ngIf="!isLoading">
 
-    <div *ngIf="site">
+    <div *ngIf="site || isUnlistedProperty">
 
         <!-- Tabs -->
-        <ul class="nav vp-tabs justify-content-center mb-1">
+        <ul *ngIf="verificationPassed && !submitSuccess" class="nav vp-tabs justify-content-center mb-1">
             <li class="nav-item">
                 <a class="nav-link" [class.active]="activeTab === 'main'" (click)="activeTab = 'main'" role="button">
                     CSI Main Form
@@ -247,7 +247,7 @@
                     <div class="col-md-6">
                         <vp-section header="Location / Property Information">
                             <vp-section-actions>
-                                <button type="button" class="btn-primary"
+                                <button *ngIf="!isUnlistedProperty" type="button" class="btn-primary"
                                         (click)="cancelLocationModification()">Cancel</button>
                             </vp-section-actions>
 
@@ -347,7 +347,7 @@
                     <div class="col-md-6">
                         <vp-section header="Assembly Owner's Contact / Mailing Information">
                             <vp-section-actions>
-                                <button type="button" class="btn-primary"
+                                <button *ngIf="!isUnlistedProperty" type="button" class="btn-primary"
                                         (click)="cancelLocationModification()">Cancel</button>
                             </vp-section-actions>
 
@@ -749,13 +749,16 @@
                 <vp-csi-inspection-assembly-table [assemblies]="assemblies" [editable]="true"
                                                   (delete)="deleteAssembly($event)">
                     <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
-                        <button type="button" class="btn btn-primary btn-sm" (click)="addAssembly()">+ Add
-                            Assembly</button>
+                        <button type="button" class="btn btn-primary btn-sm" [disabled]="!model.inspectionDate"
+                                (click)="addAssembly()">+ Add Assembly</button>
                         <button type="button" class="btn btn-primary btn-sm" [disabled]="assemblies.length === 0"
                                 (click)="markAllAssembliesVisuallyIdentified()">
                             Mark All Assemblies as Visually Identified
                         </button>
                     </div>
+                    <p *ngIf="!model.inspectionDate" class="text-danger small text-center mb-3">
+                        The Inspection Date must be set before an assembly can be added.
+                    </p>
                 </vp-csi-inspection-assembly-table>
             </vp-section>
 

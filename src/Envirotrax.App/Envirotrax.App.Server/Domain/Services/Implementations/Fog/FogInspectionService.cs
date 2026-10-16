@@ -8,6 +8,7 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
+using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
@@ -114,18 +115,27 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         Stream? signatureStream, string? signatureFileName,
         CancellationToken cancellationToken)
     {
-        var siteId = request.Site!.Id!.Value;
         var waterSupplierId = request.WaterSupplier!.Id!.Value;
         var inspectorUserId = request.Inspector!.Id!.Value;
 
-        var site = await _siteService.GetAsync(siteId, cancellationToken);
+        var isUnlistedProperty = request.Site?.Id == null;
+
+        var site = isUnlistedProperty
+            ? null
+            : await _siteService.GetAsync(request.Site!.Id!.Value, cancellationToken);
+
+        if (!isUnlistedProperty && site == null)
+        {
+            throw new AppValidationException("The property for this inspection was not found.");
+        }
+
         var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
         var inspectorUser = await _professionalUserService.GetAsync(inspectorUserId, cancellationToken);
 
         var inspection = new FogInspection
         {
             WaterSupplierId = waterSupplierId,
-            SiteId = siteId,
+            SiteId = site?.Id ?? 0,
             InspectionDate = request.InspectionDate,
             FacilityType = request.FacilityType,
             ReasonForInspection = request.ReasonForInspection,
@@ -178,7 +188,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         ApplyEnteredLocation(inspection, request);
         ApplySiteValidation(inspection, site);
         ApplyInspectorSnapshot(inspection, professional, inspectorUser, inspectorUserId);
-        await ApplyAmountAsync(inspection, site.IsFeeExempt, cancellationToken);
+        await ApplyAmountAsync(inspection, site?.IsFeeExempt ?? false, cancellationToken);
 
         // Set image paths before AddAsync so they persist with the initial insert (both optional).
         if (exteriorStream != null && exteriorFileName != null)
@@ -199,6 +209,13 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
 
         using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
+            if (isUnlistedProperty)
+            {
+                var createdSite = await _siteService.AddWithGeneratedAccountNumberAsync(BuildSiteForUnlistedProperty(request, waterSupplierId));
+
+                inspection.SiteId = createdSite.Id;
+            }
+
             added = await _repository.AddAsync(inspection);
 
             if (exteriorStream != null && inspection.ExteriorImagePath != null)
@@ -470,8 +487,17 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         inspection.MailingEmailAddress = request.MailingEmailAddress;
     }
 
-    private static void ApplySiteValidation(FogInspection inspection, SiteDto site)
+    private static void ApplySiteValidation(FogInspection inspection, SiteDto? site)
     {
+        if (site == null)
+        {
+            inspection.ValidationNewSite = true;
+            inspection.ValidationSiteInformationChanged = false;
+            inspection.NeedsValidation = true;
+
+            return;
+        }
+
         inspection.ValidationSiteInformationChanged = HasSiteInformationChanged(inspection, site);
         inspection.NeedsValidation = inspection.ValidationSiteInformationChanged;
     }
@@ -589,6 +615,35 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         "interior" => inspection.InteriorImagePath,
         _ => null
     };
+
+    private static SiteDto BuildSiteForUnlistedProperty(FogInspectionDto request, int waterSupplierId)
+    {
+        return new SiteDto
+        {
+            WaterSupplier = new ReferencedWaterSupplierDto { Id = waterSupplierId },
+            Active = true,
+
+            BusinessName = request.PropertyBusinessName,
+            PropertyType = request.PropertyType,
+            StreetNumber = request.PropertyStreetNumber,
+            StreetName = request.PropertyStreetName,
+            PropertyNumber = request.PropertyNumber,
+            City = request.PropertyCity,
+            State = request.PropertyState,
+            ZipCode = request.PropertyZip,
+
+            MailingCompanyName = request.MailingCompanyName,
+            MailingContactName = request.MailingContactName,
+            MailingStreetNumber = request.MailingStreetNumber,
+            MailingStreetName = request.MailingStreetName,
+            MailingNumber = request.MailingNumber,
+            MailingCity = request.MailingCity,
+            MailingState = request.MailingState,
+            MailingZipCode = request.MailingZip,
+            MailingPhoneNumber = request.MailingPhoneNumber,
+            MailingEmailAddress = request.MailingEmailAddress
+        };
+    }
 
     private static string GetImagePathPropertyName(string imageType) => imageType.ToLowerInvariant() switch
     {

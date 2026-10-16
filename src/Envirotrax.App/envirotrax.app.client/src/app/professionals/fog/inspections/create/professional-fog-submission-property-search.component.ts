@@ -102,6 +102,10 @@ export class ProfessionalFogSubmissionPropertySearchComponent implements OnInit 
         this._router.navigate([site.id], { relativeTo: this._activatedRoute });
     }
 
+    public submitUnlisted(): void {
+        this._router.navigate(['unlisted'], { relativeTo: this._activatedRoute });
+    }
+
     private getColumns(): TableColumn<Site>[] {
         return [
             {

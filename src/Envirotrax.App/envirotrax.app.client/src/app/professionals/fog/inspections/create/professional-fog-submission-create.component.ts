@@ -61,6 +61,7 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
 
     public fogAccountOptions: InputOption[] = [];
     public waterSupplierOptions: InputOption[] = [];
+    public isSiteWaterSupplierMissing = false;
 
     public readonly InterceptorType = InterceptorType;
     public readonly FogInspectionResult = FogInspectionResult;
@@ -149,6 +150,13 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
         // flow (loadLicense / hasValidLicense / license status display, gating the form on a valid license)
         // using ProfessionalType.FogInspector — ProfessionalUserLicenseService.getForUser already supports it.
         // Reference: professionals/csi/inspections/create/csi-submission-create.component.ts
+    }
+
+    public async onWaterSupplierChange(value: number): Promise<void> {
+        this.selectedWaterSupplierId = value;
+        this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === value);
+
+        await this.loadMailingInfoRedaction();
     }
 
     public onCommentsChange(value: string | undefined): void {
@@ -332,7 +340,9 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
             this.validationErrors.push('Please select an Inspection Result (Passed or Failed).');
         }
         if (!this.selectedWaterSupplier) {
-            this.validationErrors.push(`${this.site?.waterSupplier?.name} is not on your list of selected water suppliers.`);
+            this.validationErrors.push(this.isSiteWaterSupplierMissing
+                ? `${this.site?.waterSupplier?.name} is not on your list of selected water suppliers.`
+                : 'Please select a water supplier.');
         }
         if (this.model.interceptorCapacity != null && String(this.model.interceptorCapacity).trim() !== '') {
             const capacity = Number(this.model.interceptorCapacity);
@@ -449,6 +459,7 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
 
             this.selectedWaterSupplierId = inspection.waterSupplier?.id;
             this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === inspection.waterSupplier?.id);
+            this.isSiteWaterSupplierMissing = !this.selectedWaterSupplier;
             this.buildWaterSupplierOptions();
             await this.loadMailingInfoRedaction();
 
@@ -543,6 +554,7 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
     private async setSiteWaterSupplier(site: Site): Promise<void> {
         this.selectedWaterSupplierId = site.waterSupplier?.id;
         this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === this.selectedWaterSupplierId);
+        this.isSiteWaterSupplierMissing = !this.selectedWaterSupplier;
 
         if (!this.selectedWaterSupplier) {
             return;

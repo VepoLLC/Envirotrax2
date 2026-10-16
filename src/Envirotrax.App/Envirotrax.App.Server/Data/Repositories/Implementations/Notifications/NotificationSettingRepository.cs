@@ -59,6 +59,8 @@ public class NotificationSettingRepository : Repository<NotificationSetting>, IN
             .Where(setting => setting.Interval == interval
                 && DbContext.Notifications.Any(notification => notification.WaterSupplierId == setting.WaterSupplierId
                     && notification.NotificationSettingId == setting.Id
+                    && notification.UserId == setting.UserId
+                    && notification.Interval == setting.Interval
                     && notification.EmailBatchId == null
                     && notification.CreatedTime >= startUtc
                     && notification.CreatedTime < endUtc))

@@ -29,12 +29,12 @@ public class NotificationRepository : Repository<Notification>, INotificationRep
             .ExecuteUpdateAsync(s => s.SetProperty(notification => notification.SentTime, DateTime.UtcNow), cancellationToken);
     }
 
-    public async Task<List<Notification>> GetUnscheduledForDigestAsync(
-        int notificationSettingId, DateTime startUtc, DateTime endUtc, CancellationToken cancellationToken)
+    public async Task<List<Notification>> GetForDigestAsync(
+        int userId, NotificationInterval interval, DateTime startUtc, DateTime endUtc, CancellationToken cancellationToken)
     {
         return await Entity
-            .Where(notification => notification.NotificationSettingId == notificationSettingId
-                && notification.EmailBatchId == null
+            .Where(notification => notification.UserId == userId
+                && notification.Interval == interval
                 && notification.CreatedTime >= startUtc
                 && notification.CreatedTime < endUtc)
             .OrderBy(notification => notification.CreatedTime)

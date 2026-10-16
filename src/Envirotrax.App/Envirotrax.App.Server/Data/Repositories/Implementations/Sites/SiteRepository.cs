@@ -363,15 +363,6 @@ public class SiteRepository : Repository<Site>, ISiteRepository
                 .SetProperty(s => s.NeedsRenewalCheck, false));
     }
 
-    public async Task UpdateAccountNumberAsync(int siteId, string accountNumber)
-    {
-        await DbContext
-            .Sites
-            .Where(s => s.Id == siteId)
-            .ExecuteUpdateAsync(setter => setter
-                .SetProperty(s => s.AccountNumber, accountNumber));
-    }
-
     public async Task ClearNeedsCsiInspectionAsync(IReadOnlyCollection<int> siteIds)
     {
         var sites = await Entity

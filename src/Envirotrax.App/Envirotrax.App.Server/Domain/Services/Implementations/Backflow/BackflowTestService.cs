@@ -427,36 +427,6 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         return site;
     }
 
-    private async Task AddNewSiteAsync(BackflowTestDto dto)
-    {
-        var site = await _siteService.AddFromProfessionalAsync(new SiteDto
-        {
-            WaterSupplier = dto.WaterSupplier,
-            BusinessName = dto.PropertyBusinessName,
-            PropertyType = (PropertyType)dto.PropertyType,
-            StreetNumber = dto.PropertyStreetNumber,
-            StreetName = dto.PropertyStreetName,
-            PropertyNumber = dto.PropertyNumber,
-            City = dto.PropertyCity,
-            State = dto.PropertyState,
-            ZipCode = dto.PropertyZip,
-            MailingCompanyName = dto.MailingCompanyName,
-            MailingContactName = dto.MailingContactName,
-            MailingStreetNumber = dto.MailingStreetNumber,
-            MailingStreetName = dto.MailingStreetName,
-            MailingNumber = dto.MailingNumber,
-            MailingCity = dto.MailingCity,
-            MailingState = dto.MailingState,
-            MailingZipCode = dto.MailingZip,
-            MailingPhoneNumber = dto.MailingPhoneNumber,
-            MailingEmailAddress = dto.MailingEmailAddress,
-            Active = true
-        });
-
-        dto.Site = new ReferencedSiteDto { Id = site.Id };
-        dto.AccountNumber = site.AccountNumber;
-    }
-
     public async Task<BackflowTestDto> SubmitWithImagesAsync(
         BackflowTestDto dto,
         Stream? assemblyStream, string? assemblyFileName,
@@ -516,11 +486,6 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
         using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            if (dto.ValidationNewSite)
-            {
-                await AddNewSiteAsync(dto);
-            }
-
             saved = await base.AddAsync(dto);
 
             if (assemblyStream != null && dto.AssemblyImagePath != null)

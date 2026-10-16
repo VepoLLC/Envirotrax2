@@ -63,6 +63,7 @@
                                           [ngModel]="selectedFogUserId"
                                           (ngModelChange)="onFogAccountChange($event)"
                                           [options]="fogAccountOptions"
+                                          [placeholder]="'Select a FOG Account'"
                                           [required]="true" />
                             </div>
                         </div>
@@ -70,16 +71,18 @@
                     <div class="row align-items-center">
                         <div class="col-md-6 d-flex align-items-center">
                             <span class="fw-semibold text-nowrap text-end me-2 account-label">Water Supplier:</span>
-                            <div class="flex-grow-1" *ngIf="selectedWaterSupplier">
+                            <div class="flex-grow-1" *ngIf="!isSiteWaterSupplierMissing">
                                 <vp-input type="select"
                                           name="waterSupplierId"
                                           [ngModel]="selectedWaterSupplierId"
+                                          (ngModelChange)="onWaterSupplierChange($event)"
                                           [options]="waterSupplierOptions"
+                                          [placeholder]="'Select a Water Supplier'"
                                           [required]="true" />
                             </div>
                         </div>
                     </div>
-                    <div *ngIf="!selectedWaterSupplier" class="text-danger mt-3">
+                    <div *ngIf="isSiteWaterSupplierMissing" class="text-danger mt-3">
                         This site is located within {{ site.waterSupplier?.name }}, which is not currently on your list of
                         selected water suppliers. You must add {{ site.waterSupplier?.name }} to your water suppliers to
                         continue.

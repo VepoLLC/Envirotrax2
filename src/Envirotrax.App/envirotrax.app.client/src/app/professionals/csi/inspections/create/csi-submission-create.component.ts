@@ -66,6 +66,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
 
     public csiAccountOptions: InputOption[] = [];
     public waterSupplierOptions: InputOption[] = [];
+    public isSiteWaterSupplierMissing = false;
 
     public legalAcknowledgment = false;
     public pendingImages: { file: File; description: string; previewUrl: string }[] = [];
@@ -156,6 +157,20 @@ export class CsiSubmissionCreateComponent implements OnInit {
 
         try {
             await this.loadLicense(value);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    public async onWaterSupplierChange(value: number): Promise<void> {
+        this.selectedWaterSupplierId = value;
+        this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === value);
+        this.model.waterSupplier = { id: value };
+
+        this.isLoading = true;
+
+        try {
+            await Promise.all([this.loadInsuranceCheck(), this.loadMailingInfoRedaction()]);
         } finally {
             this.isLoading = false;
         }
@@ -401,6 +416,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
 
             this.selectedWaterSupplierId = inspection.waterSupplier?.id;
             this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === inspection.waterSupplier?.id);
+            this.isSiteWaterSupplierMissing = !this.selectedWaterSupplier;
             this.buildWaterSupplierOptions();
             await Promise.all([this.loadInsuranceCheck(), this.loadMailingInfoRedaction()]);
 
@@ -497,6 +513,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
         this.selectedWaterSupplierId = site.waterSupplier?.id;
         this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === this.selectedWaterSupplierId);
         this.model.waterSupplier = { id: this.selectedWaterSupplierId };
+        this.isSiteWaterSupplierMissing = !this.selectedWaterSupplier;
 
         if (!this.selectedWaterSupplier) {
             return;

@@ -1,0 +1,73 @@
+// V1's test cell colors (assets/css/main_back.css: .test-cell.green / .test-cell.red), in both themes.
+:host {
+    --test-cell-valid-color: #0b0;
+    --test-cell-valid-bg: #00bb0044;
+    --test-cell-invalid-color: #f00;
+    --test-cell-invalid-bg: #ff000044;
+}
+
+:host-context(body.vp-dark-theme) {
+    --test-cell-valid-color: #0a0;
+    --test-cell-valid-bg: #00880066;
+    --test-cell-invalid-color: #c00;
+    --test-cell-invalid-bg: #ff000044;
+}
+
+// Bootstrap paints a cell's background through this variable, so the tint sits over the table's own background.
+td.test-cell-valid {
+    --bs-table-bg-state: var(--test-cell-valid-bg);
+    border: 2px solid var(--test-cell-valid-color);
+}
+
+td.test-cell-invalid {
+    --bs-table-bg-state: var(--test-cell-invalid-bg);
+    border: 2px solid var(--test-cell-invalid-color);
+}
+
+// V1's validation tool-tip (assets/css/tooltip.css): yellow note, red outline, pointing at the cell below.
+.test-tooltip {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 5px;
+    padding: 5px 20px;
+    background-color: yellow;
+    color: black;
+    border: 1px solid red;
+    border-radius: 6px;
+    text-align: center;
+
+    // Some message cells render the span with no message, which Bootstrap's badge used to hide (.badge:empty).
+    &:empty {
+        display: none;
+    }
+
+    &::after {
+        content: " ";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: red transparent transparent transparent;
+    }
+}
+
+// V1's trNonPotableWarning row.
+.gauge-warning {
+    padding: 4px 10px;
+    color: #ff0000;
+    background-color: #fff2a7;
+    border: 1px solid #ff0000;
+}
+
+// The PSID readings sit inline ("Held at [ ] PSID") at the small input size the raw inputs used.
+.psid-input {
+    display: inline-block;
+    width: 70px;
+
+    ::ng-deep .form-control {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+}

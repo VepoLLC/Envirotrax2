@@ -122,7 +122,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         var inspectorUserId = request.Inspector!.Id!.Value;
 
         var site = await _siteService.GetAsync(siteId, cancellationToken);
-        var waterSupplierId = await _submissionSupplierService.ResolveForSiteAsync(site, ProfessionalType.FogInspector, cancellationToken);
+        var waterSupplierId = await _submissionSupplierService.ResolveAsync(site, request.WaterSupplier?.Id, ProfessionalType.FogInspector, cancellationToken);
 
         var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
         var inspectorUser = await _professionalUserService.GetAsync(inspectorUserId, cancellationToken);

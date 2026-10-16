@@ -35,9 +35,13 @@ interface VerificationCheck {
     valid: boolean;
 }
 
+// A PSID reading as the numeric text box holds it: a number once loaded from a saved test, the typed text otherwise.
+type PsidValue = number | string | null | undefined;
+
 @Component({
     standalone: false,
-    templateUrl: './backflow-test-submit.component.html'
+    templateUrl: './backflow-test-submit.component.html',
+    styleUrl: './backflow-test-submit.component.scss'
 })
 export class BackflowTestSubmitComponent implements OnInit {
     public isLoading = false;
@@ -161,13 +165,14 @@ export class BackflowTestSubmitComponent implements OnInit {
         this.airGapImagePreview = file ? URL.createObjectURL(file) : null;
     }
 
+    // The two installation questions start unanswered, as in V1: the tester has to pick Yes or No.
     public model: BackflowTest = {
         id: 0,
         testResult: BackflowTestResult.Pass,
-        properlyInstalled: true,
-        nonPotable: false,
         ossf: false
     };
+
+    public nonPotableWarning = '';
 
     public isFailedResult = false;
     public hasAssembly = false;
@@ -431,28 +436,40 @@ export class BackflowTestSubmitComponent implements OnInit {
         return null;
     }
 
-    public cvPsidMessage(psid: number | undefined): string | null {
+    public cvPsidMessage(value: PsidValue): string | null {
+        const psid = this.toPsid(value);
+
         if (psid != null && (psid < 1 || psid > 15)) { return 'PSID must be >= 1 and <= 15.'; }
         return null;
     }
 
-    public rpCV1PsidMessage(psid: number | undefined, rvPsid: number | undefined): string | null {
+    public rpCV1PsidMessage(value: PsidValue, rvValue: PsidValue): string | null {
+        const psid = this.toPsid(value);
+        const rvPsid = this.toPsid(rvValue);
+
         if (psid != null && (psid < 5 || psid > 15 || (rvPsid != null && psid <= rvPsid))) {
             return 'PSID >= 5 and <= 15 and > RV PSID.';
         }
         return null;
     }
 
-    public rvPsidMessage(psid: number | undefined): string | null {
+    public rvPsidMessage(value: PsidValue): string | null {
+        const psid = this.toPsid(value);
+
         if (psid != null && (psid < 2 || psid > 15)) { return 'PSID must be >= 2 and <= 15.'; }
         return null;
     }
 
-    public isCVCellValid(psid: number | undefined, closedTight: boolean | undefined, leaked: boolean | undefined): boolean {
+    public isCVCellValid(value: PsidValue, closedTight: boolean | undefined, leaked: boolean | undefined): boolean {
+        const psid = this.toPsid(value);
+
         return psid != null && psid >= 1 && psid <= 15 && !!closedTight && !leaked;
     }
 
-    public isRPCV1CellValid(psid: number | undefined, closedTight: boolean | undefined, leaked: boolean | undefined, rvPsid: number | undefined): boolean {
+    public isRPCV1CellValid(value: PsidValue, closedTight: boolean | undefined, leaked: boolean | undefined, rvValue: PsidValue): boolean {
+        const psid = this.toPsid(value);
+        const rvPsid = this.toPsid(rvValue);
+
         return psid != null && psid >= 5 && psid <= 15 && (rvPsid == null || psid > rvPsid) && !!closedTight && !leaked;
     }
 
@@ -460,16 +477,34 @@ export class BackflowTestSubmitComponent implements OnInit {
         return !!closedTight && !leaked;
     }
 
-    public isRVCellValid(psid: number | undefined, didNotOpen: boolean | undefined): boolean {
+    public isRVCellValid(value: PsidValue, didNotOpen: boolean | undefined): boolean {
+        const psid = this.toPsid(value);
+
         return psid != null && psid >= 2 && psid <= 15 && !didNotOpen;
     }
 
-    public isPvbCVCellValid(psid: number | undefined, leaked: boolean | undefined): boolean {
+    public isPvbCVCellValid(value: PsidValue, leaked: boolean | undefined): boolean {
+        const psid = this.toPsid(value);
+
         return psid != null && psid >= 1 && psid <= 15 && !leaked;
     }
 
-    public isAirInletCellValid(openedPSID: number | undefined, didNotOpen: boolean | undefined, fullyOpened: boolean | undefined): boolean {
+    public isAirInletCellValid(value: PsidValue, didNotOpen: boolean | undefined, fullyOpened: boolean | undefined): boolean {
+        const openedPSID = this.toPsid(value);
+
         return openedPSID != null && openedPSID >= 1 && openedPSID <= 15 && !!fullyOpened;
+    }
+
+    // The readings are typed into numeric text boxes (no spinner arrows), which hand back the text the tester
+    // typed rather than a number. A cleared box is no reading, and comparing the text would order "10" before "9".
+    private toPsid(value: PsidValue): number | null {
+        if (value == null || String(value).trim() === '') {
+            return null;
+        }
+
+        const psid = Number(value);
+
+        return isNaN(psid) ? null : psid;
     }
 
     constructor(
@@ -491,7 +526,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         this.manufacturerOptions = this._options.manufacturerOptions;
         this.sizeOptions = this._options.sizeOptions;
         this.hazardTypeOptions = this._options.hazardTypeOptions;
-        this.reasonOptions = this._options.reasonOptions;
+        this.reasonOptions = this._options.submitReasonOptions;
     }
 
     public ngOnInit(): void {
@@ -690,6 +725,31 @@ export class BackflowTestSubmitComponent implements OnInit {
         this.selectedGauge = this._gauges.find(g => g.id === value);
 
         this.updateVerification();
+    }
+
+    public onNonPotableChange(value: boolean): void {
+        this.model.nonPotable = value;
+        this.updateNonPotableWarning();
+    }
+
+    // V1's checkNonPotableMismatch: warns when the answer to the non-potable question doesn't match the gauge's
+    // potable/non-potable use. It's only a warning; the test can still be submitted.
+    private updateNonPotableWarning(): void {
+        this.nonPotableWarning = '';
+
+        if (this.model.nonPotable == null || this.selectedGauge?.isPortable == null) {
+            return;
+        }
+
+        const isGaugeNonPotable = !this.selectedGauge.isPortable;
+
+        if (this.model.nonPotable && !isGaugeNonPotable) {
+            this.nonPotableWarning = 'Please be aware that you have specified that an assembly on a non-potable water system was tested with a gauge specified for potable usage. '
+                + 'Future use of this gauge on a potable water system will be brought to the attention of the administrators.';
+        } else if (!this.model.nonPotable && isGaugeNonPotable) {
+            this.nonPotableWarning = 'Please be aware that you have specified that an assembly on a potable water system was tested with a gauge specified for non-potable usage. '
+                + 'Continued use of this gauge on potable water systems will be brought to the attention of the administrators.';
+        }
     }
 
     public onPropertyTypeChange(value: number): void {
@@ -916,6 +976,7 @@ export class BackflowTestSubmitComponent implements OnInit {
 
     private updateVerification(): void {
         this.selectedGaugeText = this.selectedGauge ? this.buildGaugeText(this.selectedGauge) : '';
+        this.updateNonPotableWarning();
         this.verificationChecks = this.buildVerificationChecks();
 
         this.isVerificationPassed = !!this.selectedBpatId
@@ -1246,6 +1307,16 @@ export class BackflowTestSubmitComponent implements OnInit {
         }
         if (!this.model.deviceType) {
             this.validationErrors.push('Please select a backflow method.');
+        }
+
+        // V1 asks both installation questions for every device except an air gap, and doesn't answer them for the tester.
+        if (this.model.deviceType !== BackflowDeviceType.AG) {
+            if (this.model.properlyInstalled == null) {
+                this.validationErrors.push('Please answer whether the assembly is installed in accordance with manufacturer recommendations and/or local codes.');
+            }
+            if (this.model.nonPotable == null) {
+                this.validationErrors.push('Please answer whether the assembly is installed on a non-potable water supply (auxiliary).');
+            }
         }
 
         // While the mailing information is redacted, the server keeps the site's own location, and the redacted

@@ -3,7 +3,6 @@ using System.Transactions;
 using AutoMapper;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Notifications;
-using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Notifications;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Notifications;
 using Envirotrax.App.Server.Domain.Services.Definitions.Notifications;
@@ -25,20 +24,17 @@ public class NotificationDigestService : INotificationDigestService
     private readonly IMapper _mapper;
     private readonly INotificationSettingRepository _settingRepository;
     private readonly INotificationRepository _notificationRepository;
-    private readonly IBackflowTestRepository _testRepository;
     private readonly IEmailService _emailService;
 
     public NotificationDigestService(
         IMapper mapper,
         INotificationSettingRepository settingRepository,
         INotificationRepository notificationRepository,
-        IBackflowTestRepository testRepository,
         IEmailService emailService)
     {
         _mapper = mapper;
         _settingRepository = settingRepository;
         _notificationRepository = notificationRepository;
-        _testRepository = testRepository;
         _emailService = emailService;
     }
 
@@ -84,10 +80,8 @@ public class NotificationDigestService : INotificationDigestService
             return;
         }
 
-        var tests = await _testRepository.GetNotifiedTestsAsync(notifications.Select(notification => notification.RecordId).Distinct(), cancellationToken);
-
         var utcNow = DateTime.UtcNow;
-        var email = BuildEmail(setting, period, notifications, tests, utcNow);
+        var email = BuildEmail(setting, period, notifications, utcNow);
         var sendTimeUtc = period.GetSendTimeUtc(utcNow);
         var batchId = await _emailService.CreateBatchIdAsync();
 
@@ -106,11 +100,7 @@ public class NotificationDigestService : INotificationDigestService
     }
 
     private static EmailDto<NotificationDigestVm> BuildEmail(
-        NotificationSetting setting,
-        NotificationDigestPeriod period,
-        List<Notification> notifications,
-        Dictionary<int, BackflowTest> tests,
-        DateTime utcNow)
+        NotificationSetting setting, NotificationDigestPeriod period, List<Notification> notifications, DateTime utcNow)
     {
         var vm = new NotificationDigestVm
         {
@@ -125,7 +115,7 @@ public class NotificationDigestService : INotificationDigestService
             Description = setting.Description,
             Color = setting.Color,
             Items = [.. notifications
-                .Select(notification => BuildItem(notification, tests.GetValueOrDefault(notification.RecordId)))
+                .Select(BuildItem)
                 .OrderBy(item => item.Title)
                 .ThenBy(item => item.TestId)]
         };
@@ -139,23 +129,15 @@ public class NotificationDigestService : INotificationDigestService
         };
     }
 
-    private static BackflowTestNotificationItemVm BuildItem(Notification notification, BackflowTest? test)
+    private static BackflowTestNotificationItemVm BuildItem(Notification notification)
     {
-        var serialNumber = string.IsNullOrWhiteSpace(test?.SerialNumber) ? null : $"#{test.SerialNumber}";
-
-        var parts = new[] { notification.RecordDescription, serialNumber, test?.HazardType }
-            .Where(part => !string.IsNullOrWhiteSpace(part));
-
-        var details = string.Join(" · ", parts);
-
         return new BackflowTestNotificationItemVm
         {
             TestId = notification.RecordId,
             Title = string.IsNullOrWhiteSpace(notification.PropertyDescription)
                 ? $"Backflow test #{notification.RecordId}"
                 : notification.PropertyDescription,
-            Details = string.IsNullOrEmpty(details) ? null : details,
-            LocationDescription = test?.LocationDescription
+            Details = notification.RecordDescription
         };
     }
 

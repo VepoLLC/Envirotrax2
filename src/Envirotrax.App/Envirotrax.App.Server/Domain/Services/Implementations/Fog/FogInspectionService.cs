@@ -4,6 +4,7 @@ using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Fog;
+using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
@@ -39,6 +40,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IProfessionalSupplierService _professionalSupplierService;
     private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
+    private readonly ISubmissionWaterSupplierService _submissionSupplierService;
 
     public FogInspectionService(
         IMapper mapper,
@@ -51,7 +53,8 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         IPdfTemplateService pdfTemplateService,
         IGeneralSettingsService generalSettingsService,
         IProfessionalSupplierService professionalSupplierService,
-        IMailingInfoRedactionService mailingInfoRedactionService)
+        IMailingInfoRedactionService mailingInfoRedactionService,
+        ISubmissionWaterSupplierService submissionSupplierService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -64,6 +67,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         _generalSettingsService = generalSettingsService;
         _professionalSupplierService = professionalSupplierService;
         _mailingInfoRedactionService = mailingInfoRedactionService;
+        _submissionSupplierService = submissionSupplierService;
     }
 
     public Task<byte[]> GeneratePdfAsync(FogInspectionDto inspection)
@@ -115,10 +119,11 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         CancellationToken cancellationToken)
     {
         var siteId = request.Site!.Id!.Value;
-        var waterSupplierId = request.WaterSupplier!.Id!.Value;
         var inspectorUserId = request.Inspector!.Id!.Value;
 
         var site = await _siteService.GetAsync(siteId, cancellationToken);
+        var waterSupplierId = await _submissionSupplierService.ResolveForSiteAsync(site, ProfessionalType.FogInspector, cancellationToken);
+
         var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
         var inspectorUser = await _professionalUserService.GetAsync(inspectorUserId, cancellationToken);
 

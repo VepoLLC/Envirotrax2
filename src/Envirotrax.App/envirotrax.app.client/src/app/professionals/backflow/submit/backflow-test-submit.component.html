@@ -42,12 +42,17 @@
                     </div>
                     <div class="d-flex align-items-center mb-2">
                         <span class="fw-semibold text-nowrap text-end me-2" style="min-width:130px;">Water Supplier:</span>
-                        <div class="flex-grow-1">
+                        <div class="flex-grow-1" *ngIf="!isSiteWaterSupplierMissing">
                             <vp-input type="select" name="waterSupplierId" [ngModel]="selectedWaterSupplierId"
                                       (ngModelChange)="onWaterSupplierChange($event)"
                                       [options]="waterSupplierOptions" [required]="true"
                                       [placeholder]="'Select a Water Supplier'" />
                         </div>
+                    </div>
+                    <div *ngIf="isSiteWaterSupplierMissing" class="text-danger mb-2">
+                        This site is located within {{ site?.waterSupplier?.name }}, which is not currently on your list of
+                        selected water suppliers. You must add {{ site?.waterSupplier?.name }} to your water suppliers to
+                        continue.
                     </div>
                     <div class="d-flex align-items-center mb-2">
                         <span class="fw-semibold text-nowrap text-end me-2" style="min-width:130px;">Hazard Type:</span>
@@ -452,7 +457,7 @@
                 <vp-section header="Backflow Information">
                     <!-- Device Type -->
                     <div class="row mb-3">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <vp-input type="select" label="Backflow Method:" name="deviceType"
                                       [ngModel]="model.deviceType" (ngModelChange)="onDeviceTypeChange($event)"
                                       [options]="deviceTypeOptions" [required]="true" [form]="submitForm"

@@ -60,6 +60,9 @@ export class ProfessionalSupplierService {
         if (options?.hasFogInspection) {
             filter.push({ columnName: 'hasFogInspection', comparisonOperator: 'Eq', value: 'true' });
         }
+        if (options?.hasFogTransportation) {
+            filter.push({ columnName: 'hasFogTransportation', comparisonOperator: 'Eq', value: 'true' });
+        }
 
         const query: Query = filter.length > 0 ? { filter } : {};
         return lastValueFrom(

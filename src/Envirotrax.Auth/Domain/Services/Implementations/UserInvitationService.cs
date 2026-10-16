@@ -1,7 +1,6 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Transactions;
-using Envirotrax.Auth.Data;
 using Envirotrax.Auth.Data.Models;
 using Envirotrax.Auth.Data.Repositories.Defintions;
 using Envirotrax.Auth.Domain.DataTransferObjects;
@@ -9,7 +8,6 @@ using Envirotrax.Auth.Domain.Services.Definitions;
 using Envirotrax.Auth.Templates.Emails;
 using Envirotrax.Common.Domain.Services.Defintions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.Auth.Domain.Services.Implementations;
 
@@ -22,7 +20,6 @@ public class UserInvitationService : IUserInvitationService
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IEmailService _emailService;
     private readonly Definitions.IAuthService _authService;
-    private readonly ApplicationDbContext _dbContext;
 
     public UserInvitationService(
         UserManager<AppUser> userManager,
@@ -31,8 +28,7 @@ public class UserInvitationService : IUserInvitationService
         LinkGenerator linkGenerator,
         IHttpContextAccessor contextAccessor,
         IEmailService emailService,
-        Definitions.IAuthService authService,
-        ApplicationDbContext dbContext)
+        Definitions.IAuthService authService)
     {
         _userManager = userManager;
         _passwordHasher = passwordHasher;
@@ -41,7 +37,6 @@ public class UserInvitationService : IUserInvitationService
         _contextAccessor = contextAccessor;
         _emailService = emailService;
         _authService = authService;
-        _dbContext = dbContext;
     }
 
     private async Task<AppUser> GetOrCreateUserIdAsync(AppUser? user, UserInvitationDto invitation)
@@ -68,16 +63,11 @@ public class UserInvitationService : IUserInvitationService
 
     public async Task<UserInvitationDto> AddAsync(UserInvitationDto invitation)
     {
-        var strategy = _dbContext.Database.CreateExecutionStrategy();
+        var user = await _userManager.FindByEmailAsync(invitation.EmailAddress);
 
-        return await strategy.ExecuteAsync(async () =>
+        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            _dbContext.ChangeTracker.Clear();
-
-            using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-
-            var existingUser = await _userManager.FindByEmailAsync(invitation.EmailAddress);
-            var user = await GetOrCreateUserIdAsync(existingUser, invitation);
+            user = await GetOrCreateUserIdAsync(user, invitation);
 
             var token = Guid.NewGuid().ToString();
 
@@ -113,9 +103,8 @@ public class UserInvitationService : IUserInvitationService
             });
 
             transaction.Complete();
-
             return invitation;
-        });
+        }
     }
 
     public async Task<InvitationValidationResultDto> ValidateAsync(int invitationId, string token)

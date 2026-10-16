@@ -92,8 +92,6 @@ export class BackflowTestOptionsService {
         { id: BackflowReasonForTest.AnnualTestAfterRepairs, text: 'Annual Test After Repairs' }
     ];
 
-    // A tester can only pick the reasons on the TCEQ test report, as in V1 (save_bpats/backflow_test_submit.aspx).
-    // The others in reasonOptions stay for showing and filtering records that already have them.
     public readonly submitReasonOptions: InputOption[] = [
         { id: BackflowReasonForTest.NewInstallation, text: 'New Installation' },
         { id: BackflowReasonForTest.ExistingInstallation, text: 'Existing Installation' },

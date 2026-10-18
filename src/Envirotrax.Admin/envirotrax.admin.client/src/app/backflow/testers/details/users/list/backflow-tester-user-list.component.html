@@ -1,0 +1,21 @@
+<vp-section [header]="'User Accounts (' + (table.items?.pageInfo?.totalItems ?? 0) + ')'">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [showActionLabels]="false"
+                  [canAdd]="true"
+                  (add)="addUser()"
+                  [canEdit]="true"
+                  (edit)="editUser($event)"
+                  [canDelete]="true"
+                  (delete)="deleteUser($event)"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getUsers()"
+                  [(query)]="table.query"
+                  (queryChange)="getUsers()"
+                  (queryReset)="getUsers()" />
+    </div>
+</vp-section>

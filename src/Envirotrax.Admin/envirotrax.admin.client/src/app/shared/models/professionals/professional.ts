@@ -21,6 +21,7 @@ export interface Professional {
     hasFogInspection?: boolean;
     hasFogTransportation?: boolean;
     createdTime?: string;
+    accountBalance?: number;
 }
 
 export interface ReferencedProfessional {

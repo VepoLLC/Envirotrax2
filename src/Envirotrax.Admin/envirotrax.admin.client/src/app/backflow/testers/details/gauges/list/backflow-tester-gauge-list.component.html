@@ -1,0 +1,33 @@
+<vp-section [header]="'Gauges (' + (table.items?.pageInfo?.totalItems ?? 0) + ')'">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [showActionLabels]="false"
+                  [customActions]="customActions"
+                  [canAdd]="true"
+                  (add)="addGauge()"
+                  [canEdit]="true"
+                  (edit)="editGauge($event)"
+                  [canDelete]="true"
+                  (delete)="deleteGauge($event)"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getGauges()"
+                  [(query)]="table.query"
+                  (queryChange)="getGauges()"
+                  (queryReset)="getGauges()" />
+    </div>
+</vp-section>
+
+<ng-template #waterSystemCell let-rowData="rowData">
+    {{ rowData.waterSystemType }}
+</ng-template>
+
+<ng-template #calibrationCell let-rowData="rowData">
+    <span class="border border-secondary d-inline-block px-2 py-1 rounded-3"
+          [class]="rowData.expirationCssClass">
+        {{ rowData.lastCalibrationDate ? (rowData.lastCalibrationDate | date) : 'Validating...' }}
+    </span>
+</ng-template>

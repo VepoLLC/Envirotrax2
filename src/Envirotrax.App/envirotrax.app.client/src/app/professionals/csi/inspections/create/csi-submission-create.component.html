@@ -776,6 +776,105 @@
             </div>
         </div>
 
+        <!-- Additional Information Tab -->
+        <div *ngIf="activeTab === 'additional' && !submitSuccess">
+            <vp-section header="Additional Information" class="mt-3 d-block">
+                <p class="mb-3">
+                    <span class="text-danger">Please Note:</span> Modifications made to the following information will
+                    be reflected on the property record. Be sure any changes made are as accurate as possible.
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="aiOssf" name="aiOssf"
+                                       [(ngModel)]="model.aiOssf" [ngModelOptions]="{standalone: true}" />
+                                <label class="form-check-label" for="aiOssf">Has On Site Sewage Facility</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="aiWaterWell" name="aiWaterWell"
+                                       [(ngModel)]="model.aiWaterWell" [ngModelOptions]="{standalone: true}" />
+                                <label class="form-check-label" for="aiWaterWell">Has Auxiliary Water Supply</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="aiReclaimedWater"
+                                       name="aiReclaimedWater" [(ngModel)]="model.aiReclaimedWater"
+                                       [ngModelOptions]="{standalone: true}" />
+                                <label class="form-check-label" for="aiReclaimedWater">Has Reclaimed Water</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="aiFireSystem" name="aiFireSystem"
+                                       [(ngModel)]="model.aiFireSystem" [ngModelOptions]="{standalone: true}" />
+                                <label class="form-check-label" for="aiFireSystem">Has Fire System</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="aiFireSystem2" name="aiFireSystem2"
+                                       [(ngModel)]="model.aiFireSystem2" [ngModelOptions]="{standalone: true}" />
+                                <label class="form-check-label" for="aiFireSystem2">Fire System on Separate Water
+                                    Supply</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="aiGreaseTrap" name="aiGreaseTrap"
+                                       [(ngModel)]="model.aiGreaseTrap" [ngModelOptions]="{standalone: true}" />
+                                <label class="form-check-label" for="aiGreaseTrap">Has Grease Trap</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="aiSandGrit" name="aiSandGrit"
+                                       [(ngModel)]="model.aiSandGrit" [ngModelOptions]="{standalone: true}" />
+                                <label class="form-check-label" for="aiSandGrit">Has Sand &amp; Grit Trap</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="aiIrrigationSystem"
+                                       name="aiIrrigationSystem" [(ngModel)]="model.aiIrrigationSystem"
+                                       [ngModelOptions]="{standalone: true}" />
+                                <label class="form-check-label" for="aiIrrigationSystem">Has Irrigation System</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="aiIrrigationSystem2"
+                                       name="aiIrrigationSystem2" [(ngModel)]="model.aiIrrigationSystem2"
+                                       [ngModelOptions]="{standalone: true}" />
+                                <label class="form-check-label" for="aiIrrigationSystem2">Irrigation on Separate Water
+                                    Supply</label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="aiHasIsolation" name="aiHasIsolation"
+                                       [(ngModel)]="model.aiHasDomesticPremisesIsolation"
+                                       [ngModelOptions]="{standalone: true}" />
+                                <label class="form-check-label" for="aiHasIsolation">Has Domestic/Premises
+                                    Isolation</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="aiRequiresIsolation"
+                                       name="aiRequiresIsolation" [(ngModel)]="model.aiRequiresDomesticPremisesIsolation"
+                                       [ngModelOptions]="{standalone: true}" />
+                                <label class="form-check-label" for="aiRequiresIsolation">Requires Domestic/Premises
+                                    Isolation</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </vp-section>
+
+            <div class="mt-3 d-flex justify-content-center">
+                <button type="button" class="btn btn-primary vp-section-button" (click)="activeTab = 'main'">
+                    Back to Main Form
+                </button>
+            </div>
+        </div>
+
         <!-- Images Tab -->
         <div *ngIf="activeTab === 'images' && !submitSuccess">
             <vp-section header="Inspection Images" class="mt-3 d-block">

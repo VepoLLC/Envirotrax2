@@ -32,6 +32,53 @@ public class SiteRepository : Repository<Site>, ISiteRepository
         return site;
     }
 
+    public async Task<Site?> UpdateAdditionalInformationAsync(int id, SiteAdditionalInformationDto dto)
+    {
+        var site = await GetTrackedForUpdateAsync(id, CancellationToken.None);
+
+        if (site == null)
+        {
+            return null;
+        }
+
+        var renewalTriggerChanged =
+            site.HasOnSiteSewageFacility != dto.HasOnSiteSewageFacility
+            || site.HasAuxWaterSupply != dto.HasAuxWaterSupply;
+
+        if (renewalTriggerChanged)
+        {
+            site.NeedsRenewalCheck = true;
+        }
+
+        site.HasOnSiteSewageFacility = dto.HasOnSiteSewageFacility;
+        site.HasAuxWaterSupply = dto.HasAuxWaterSupply;
+        site.HasReclaimed = dto.HasReclaimed;
+        site.HasFireSystem = dto.HasFireSystem;
+        site.FireSeparateWater = dto.FireSeparateWater;
+        site.GreaseTrapType = ResolveGreaseTrapType(site.GreaseTrapType, dto.HasGreaseTrap);
+        site.HasGritTrap = dto.HasGritTrap;
+        site.HasIrrigation = dto.HasIrrigation;
+        site.IrrigationSeparateWater = dto.IrrigationSeparateWater;
+        site.HasDomesticPremisesIsolation = dto.HasDomesticPremisesIsolation;
+        site.RequiresDomesticPremisesIsolation = dto.RequiresDomesticPremisesIsolation;
+
+        await SaveChangesAsync(logData: true);
+
+        return site;
+    }
+
+    private static GreaseTrapType ResolveGreaseTrapType(GreaseTrapType current, bool hasGreaseTrap)
+    {
+        if (!hasGreaseTrap)
+        {
+            return GreaseTrapType.TrapNotRequired;
+        }
+
+        return current == GreaseTrapType.TrapNotRequired
+            ? GreaseTrapType.HasGreaseTrap
+            : current;
+    }
+
     /// <summary>
     /// Copies the approved editable fields from a SiteDto onto the loaded (tracked) Site — a deliberate
     /// ALLOWLIST, so protected DTO columns (WaterSupplier, GIS, audit, NeedsRenewalCheck, …) are ignored.

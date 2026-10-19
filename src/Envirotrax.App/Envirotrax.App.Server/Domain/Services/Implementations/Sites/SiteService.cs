@@ -320,6 +320,16 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         return true;
     }
 
+    public async Task UpdateAdditionalInformationAsync(int siteId, SiteAdditionalInformationDto dto)
+    {
+        var saved = await _siteRepository.UpdateAdditionalInformationAsync(siteId, dto);
+
+        if (saved == null)
+        {
+            throw new AppValidationException("The property for this inspection was not found.");
+        }
+    }
+
     public async Task<bool> UpdateWaterSupplierAsync(int siteId, UpdateSiteWaterSupplierDto dto)
     {
         var site = await _siteRepository.GetTrackedForUpdateAsync(siteId, CancellationToken.None);

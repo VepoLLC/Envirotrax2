@@ -25,6 +25,7 @@ import { AddCsiInspectionAssemblyComponent } from './add-csi-inspection-assembly
 import { LookupService } from '../../../../shared/services/lookup/lookup.service';
 import { GeneralSettingsService } from '../../../../shared/services/settings/general-settings.service';
 import { PropertyType } from '../../../../shared/enums/property-type.enum';
+import { GreaseTrapType } from '../../../../shared/enums/grease-trap-type.enum';
 
 const UNLISTED_PROPERTY_ROUTE = 'unlisted';
 
@@ -378,6 +379,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
 
             if (site) {
                 this.applySiteLocation(site);
+                this.applySiteAdditionalInformation(site);
             }
 
             const waterSuppliersPage = await this._professionalSupplierService.getAllMy({ hasCsiInspection: true });
@@ -463,6 +465,20 @@ export class CsiSubmissionCreateComponent implements OnInit {
         this.model.mailingZip = site.mailingZipCode;
         this.model.mailingPhoneNumber = site.mailingPhoneNumber;
         this.model.mailingEmailAddress = site.mailingEmailAddress;
+    }
+
+    private applySiteAdditionalInformation(site: Site): void {
+        this.model.aiOssf = !!site.hasOnSiteSewageFacility;
+        this.model.aiWaterWell = !!site.hasAuxWaterSupply;
+        this.model.aiReclaimedWater = !!site.hasReclaimed;
+        this.model.aiFireSystem = !!site.hasFireSystem;
+        this.model.aiFireSystem2 = !!site.fireSeparateWater;
+        this.model.aiGreaseTrap = site.greaseTrapType != null && site.greaseTrapType !== GreaseTrapType.TrapNotRequired;
+        this.model.aiSandGrit = !!site.hasGritTrap;
+        this.model.aiIrrigationSystem = !!site.hasIrrigation;
+        this.model.aiIrrigationSystem2 = !!site.irrigationSeparateWater;
+        this.model.aiHasDomesticPremisesIsolation = !!site.hasDomesticPremisesIsolation;
+        this.model.aiRequiresDomesticPremisesIsolation = !!site.requiresDomesticPremisesIsolation;
     }
 
     private applyInspectionLocation(inspection: CsiInspection): void {

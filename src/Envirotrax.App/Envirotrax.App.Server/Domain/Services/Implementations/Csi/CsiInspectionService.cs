@@ -153,6 +153,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         await _mailingInfoRedactionService.KeepSiteLocationWhenRedactedAsync(request, site, waterSupplierId, cancellationToken);
 
         ApplyEnteredLocation(inspection, request);
+        ApplyAdditionalInformation(inspection, request);
         ApplySiteValidation(inspection, site);
         ApplyInspectorSnapshot(inspection, professional, inspectorUser, csiLicense, inspectorUserId);
 
@@ -171,6 +172,11 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
 
             added = await _repository.AddAsync(inspection);
             await _assemblyService.SaveForInspectionAsync(added, request, cancellationToken);
+
+            if (!isUnlistedProperty)
+            {
+                await _siteService.UpdateAdditionalInformationAsync(inspection.SiteId, BuildAdditionalInformation(request));
+            }
 
             scope.Complete();
         }
@@ -253,6 +259,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         await _mailingInfoRedactionService.KeepSiteLocationWhenRedactedAsync(request, site, existing.WaterSupplierId, cancellationToken);
 
         ApplyEnteredLocation(inspection, request);
+        ApplyAdditionalInformation(inspection, request);
         ApplySiteValidation(inspection, site);
         ApplyInspectorSnapshot(inspection, professional, inspectorUser, csiLicense, inspectorUserId);
 
@@ -268,6 +275,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
             }
 
             await _assemblyService.SaveForInspectionAsync(saved, request, cancellationToken);
+            await _siteService.UpdateAdditionalInformationAsync(saved.SiteId, BuildAdditionalInformation(request));
 
             scope.Complete();
         }
@@ -363,6 +371,39 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         inspection.MailingEmailAddress = request.MailingEmailAddress;
     }
 
+    private static void ApplyAdditionalInformation(CsiInspection inspection, CsiInspectionDto request)
+    {
+        inspection.AiOssf = request.AiOssf;
+        inspection.AiWaterWell = request.AiWaterWell;
+        inspection.AiReclaimedWater = request.AiReclaimedWater;
+        inspection.AiFireSystem = request.AiFireSystem;
+        inspection.AiFireSystem2 = request.AiFireSystem2;
+        inspection.AiGreaseTrap = request.AiGreaseTrap;
+        inspection.AiSandGrit = request.AiSandGrit;
+        inspection.AiIrrigationSystem = request.AiIrrigationSystem;
+        inspection.AiIrrigationSystem2 = request.AiIrrigationSystem2;
+        inspection.AiHasDomesticPremisesIsolation = request.AiHasDomesticPremisesIsolation;
+        inspection.AiRequiresDomesticPremisesIsolation = request.AiRequiresDomesticPremisesIsolation;
+    }
+
+    private static SiteAdditionalInformationDto BuildAdditionalInformation(CsiInspectionDto request)
+    {
+        return new SiteAdditionalInformationDto
+        {
+            HasOnSiteSewageFacility = request.AiOssf,
+            HasAuxWaterSupply = request.AiWaterWell,
+            HasReclaimed = request.AiReclaimedWater,
+            HasFireSystem = request.AiFireSystem,
+            FireSeparateWater = request.AiFireSystem2,
+            HasGreaseTrap = request.AiGreaseTrap,
+            HasGritTrap = request.AiSandGrit,
+            HasIrrigation = request.AiIrrigationSystem,
+            IrrigationSeparateWater = request.AiIrrigationSystem2,
+            HasDomesticPremisesIsolation = request.AiHasDomesticPremisesIsolation,
+            RequiresDomesticPremisesIsolation = request.AiRequiresDomesticPremisesIsolation
+        };
+    }
+
     private static void ApplySiteValidation(CsiInspection inspection, SiteDto? site)
     {
         if (site == null)
@@ -442,7 +483,19 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
             MailingState = request.MailingState,
             MailingZipCode = request.MailingZip,
             MailingPhoneNumber = request.MailingPhoneNumber,
-            MailingEmailAddress = request.MailingEmailAddress
+            MailingEmailAddress = request.MailingEmailAddress,
+
+            HasOnSiteSewageFacility = request.AiOssf,
+            HasAuxWaterSupply = request.AiWaterWell,
+            HasReclaimed = request.AiReclaimedWater,
+            HasFireSystem = request.AiFireSystem,
+            FireSeparateWater = request.AiFireSystem2,
+            GreaseTrapType = request.AiGreaseTrap ? GreaseTrapType.HasGreaseTrap : GreaseTrapType.TrapNotRequired,
+            HasGritTrap = request.AiSandGrit,
+            HasIrrigation = request.AiIrrigationSystem,
+            IrrigationSeparateWater = request.AiIrrigationSystem2,
+            HasDomesticPremisesIsolation = request.AiHasDomesticPremisesIsolation,
+            RequiresDomesticPremisesIsolation = request.AiRequiresDomesticPremisesIsolation
         };
     }
 

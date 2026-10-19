@@ -7,6 +7,7 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 public interface ISiteRepository : IRepository<Site>
 {
     Task<Site?> UpdateForAdminAsync(int id, SiteDto dto);
+    Task<Site?> UpdateAdditionalInformationAsync(int id, SiteAdditionalInformationDto dto);
 
     Task<IEnumerable<Site>> SearchAsync(PageInfo pageInfo, Query query, bool? fogCompliant, CancellationToken cancellationToken);
     Task<IEnumerable<Site>> SearchForProfessionalAsync(ProfessionalSiteSearchDto criteria, PageInfo pageInfo, Query query, int professionalId, int userId, CancellationToken cancellationToken);

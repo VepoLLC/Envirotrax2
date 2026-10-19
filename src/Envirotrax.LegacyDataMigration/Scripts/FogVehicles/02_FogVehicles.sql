@@ -32,11 +32,9 @@ BEGIN TRY
     WHERE professionals.Id IS NULL
         AND alreadySkipped.LegacyRecordId IS NULL
 
-    -- The V1 record id becomes the V2 row id, the way sites, water suppliers and backflow tests are
-    -- migrated (EN-241). Trip tickets point at a vehicle by its V1 id (FogTripTickets.VehicleID), so
-    -- they line up by themselves once they are migrated.
-    SET IDENTITY_INSERT FogVehicles ON;
-
+    -- V2 assigns the vehicle a new Id. LegacyRecordId keeps the V1 record id and is what links the row
+    -- back to V1: 03_FogVehiclePermits.sql finds a permit's vehicle through it, and so will the trip
+    -- ticket migration (FogTripTickets.VehicleID points at a vehicle by its V1 id).
     ;WITH AccountsWithoutDuplicates AS
     (
         SELECT accounts.*,
@@ -45,10 +43,9 @@ BEGIN TRY
         WHERE accounts.SourceTable = 'FogTransporters'
     )
     INSERT INTO FogVehicles
-        (Id, LegacyRecordId, ProfessionalId, LicensePlateNumber, Manufacturer, ManufacturedYear, Capacity, CapacityType,
+        (LegacyRecordId, ProfessionalId, LicensePlateNumber, Manufacturer, ManufacturedYear, Capacity, CapacityType,
          StickerNumber, CreatedById, CreatedTime, DeletedById, DeletedTime)
     SELECT
-        legacyVehicles.ID,
         legacyVehicles.ID,
         professionals.Id,
         -- V2 requires these three, V1 does not. Empty keeps the vehicle, which trip tickets and permits
@@ -79,8 +76,6 @@ BEGIN TRY
         FROM FogVehicles AS alreadyInserted
         WHERE alreadyInserted.LegacyRecordId = legacyVehicles.ID
     )
-
-    SET IDENTITY_INSERT FogVehicles OFF;
 
     -- A vehicle skipped by an earlier run goes in once its company has been migrated. Its entry no longer
     -- describes anything, so it is cleared to keep this table a list of what is really missing.

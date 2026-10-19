@@ -1,6 +1,5 @@
--- The V1 record id is also written into FogVehicles.Id with IDENTITY_INSERT, the way sites, water
--- suppliers and backflow tests are migrated (EN-241). This column is still what the guards in the
--- migration read, because Id alone cannot say whether a row came from V1 or was created in V2.
+-- Links each migrated vehicle back to its V1 FogVehicles.ID. V2 assigns the row its own Id, so this
+-- column is what the guards in the migration, the permit script and the trip ticket migration read.
 IF COL_LENGTH('FogVehicles', 'LegacyRecordId') IS NULL
 BEGIN
     ALTER TABLE FogVehicles

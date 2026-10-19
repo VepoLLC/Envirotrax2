@@ -129,13 +129,13 @@ var fogInspectionService = provider.GetRequiredService<FogInspectionService>();
 await fogInspectionService.MigrateAsync();
 
 // A global master list that depends on nothing else, but it has to land before the transporter
-// registrations and trip tickets that point at a disposal site by its V1 id.
+// registrations and trip tickets, which find a disposal site by its V1 id through LegacyRecordId.
 var fogDisposalSiteService = provider.GetRequiredService<FogDisposalSiteService>();
 await fogDisposalSiteService.MigrateAsync();
 
 // After the professionals and the water suppliers: a vehicle belongs to a transporter's company, found
 // through the staging table the professional migration builds, and each permit is issued by a supplier.
-// Before the trip tickets that point at a vehicle by its V1 id.
+// Before the trip tickets, which find a vehicle by its V1 id through LegacyRecordId.
 var fogVehicleService = provider.GetRequiredService<FogVehicleService>();
 await fogVehicleService.MigrateAsync();
 

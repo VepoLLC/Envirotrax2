@@ -2,18 +2,15 @@ BEGIN TRAN
 
 BEGIN TRY
 
-    -- The V1 record id becomes the V2 row id, the way sites, water suppliers and backflow tests are
-    -- migrated (EN-241). Transporter registrations (FogDisposalSiteRegistrations.DisposalSiteID) and
-    -- trip tickets (FogTripTickets.ReceiverSiteID) point at a disposal site by its V1 id, so they line
-    -- up by themselves once they are migrated.
-    SET IDENTITY_INSERT FogDisposalSites ON;
-
+    -- V2 assigns the site a new Id. LegacyRecordId keeps the V1 record id and is what links the row back
+    -- to V1: transporter registrations (FogDisposalSiteRegistrations.DisposalSiteID) and trip tickets
+    -- (FogTripTickets.ReceiverSiteID) point at a disposal site by its V1 id, so their migrations look the
+    -- site up through it.
     INSERT INTO FogDisposalSites
-        (Id, LegacyRecordId, Name, Address, City, StateId, ZipCode, PhoneNumber, EmailAddress,
+        (LegacyRecordId, Name, Address, City, StateId, ZipCode, PhoneNumber, EmailAddress,
          County, TceqRegion, RegistrationNumber, PermitNumber, PhysicalType, LocationDescription,
          Latitude, Longitude, CreatedById, CreatedTime, DeletedById, DeletedTime)
     SELECT
-        legacyDisposalSites.ID,
         legacyDisposalSites.ID,
         -- V2 requires the name, county, TCEQ region, registration number and permit number; V1 does
         -- not. Empty keeps the site, which trip tickets and registrations point at, rather than dropping
@@ -67,8 +64,6 @@ BEGIN TRY
         FROM FogDisposalSites AS alreadyInserted
         WHERE alreadyInserted.LegacyRecordId = legacyDisposalSites.ID
     )
-
-    SET IDENTITY_INSERT FogDisposalSites OFF;
 
     COMMIT TRAN
 

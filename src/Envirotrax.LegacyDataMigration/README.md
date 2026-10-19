@@ -213,10 +213,9 @@ caveat applies too: the folder is the V2 `ProfessionalId`, which a rebuild of th
 ## How FOG disposal sites are migrated
 
 Disposal sites are one global master list, not owned by a water supplier, and a site points at nothing
-V2 requires, so every V1 row migrates and there is no skipped table. A site keeps its V1 id
-(`IDENTITY_INSERT`), and `LegacyRecordId` is written as well. That matters later: transporter
-registrations and trip tickets both point at a disposal site by its V1 id, so they line up without any
-rewriting once they are migrated.
+V2 requires, so every V1 row migrates and there is no skipped table. V2 gives each site a new `Id`; the
+V1 id goes into `LegacyRecordId`. That matters later: transporter registrations and trip tickets both
+point at a disposal site by its V1 id, so their migrations look the site up through `LegacyRecordId`.
 
 Three V1 shapes change on the way across:
 
@@ -240,9 +239,10 @@ point at.
 ## How FOG vehicles and permits are migrated
 
 `Scripts/FogVehicles` moves both: `02_FogVehicles.sql` the vehicles, then `03_FogVehiclePermits.sql` the
-permits water suppliers issue for them. A vehicle keeps its V1 id (`IDENTITY_INSERT`), so trip tickets,
-which point at a vehicle by its V1 id, line up once they are migrated. A V2 permit has no id of its own
-(it is keyed by water supplier and vehicle), so `LegacyRecordId` on it is the only way back to V1.
+permits water suppliers issue for them. V2 gives each vehicle a new `Id`; the V1 id goes into
+`LegacyRecordId`, which is how the permit script, and later the trip ticket migration, find a vehicle.
+A V2 permit has no id of its own (it is keyed by water supplier and vehicle), so `LegacyRecordId` on it
+is the only way back to V1.
 
 Four things are worth knowing:
 

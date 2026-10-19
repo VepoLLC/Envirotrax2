@@ -1,6 +1,6 @@
-
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.Backflow;
+using Envirotrax.Admin.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.Admin.Server.Domain.Services.Definitions.Backflow;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,5 +22,21 @@ public class BackflowTesterController : AdminBaseController
         var testers = await _testerService.SearchAsync(criteria, pageInfo, query, cancellationToken);
 
         return Ok(testers);
+    }
+
+    [HttpGet("{professionalId}")]
+    public async Task<IActionResult> GetAsync(int professionalId, CancellationToken cancellationToken)
+    {
+        var tester = await _testerService.GetAsync(professionalId, cancellationToken);
+
+        return tester == null ? NotFound() : Ok(tester);
+    }
+
+    [HttpPut("{professionalId}")]
+    public async Task<IActionResult> UpdateAsync(int professionalId, [FromBody] ProfessionalDto professional, CancellationToken cancellationToken)
+    {
+        var updated = await _testerService.UpdateAsync(professionalId, professional, cancellationToken);
+
+        return updated == null ? NotFound() : Ok(updated);
     }
 }

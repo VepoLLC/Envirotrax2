@@ -92,6 +92,12 @@ export class BackflowTestOptionsService {
         { id: BackflowReasonForTest.AnnualTestAfterRepairs, text: 'Annual Test After Repairs' }
     ];
 
+    public readonly submitReasonOptions: InputOption[] = [
+        { id: BackflowReasonForTest.NewInstallation, text: 'New Installation' },
+        { id: BackflowReasonForTest.ExistingInstallation, text: 'Existing Installation' },
+        { id: BackflowReasonForTest.Replacement, text: 'Replacement' }
+    ];
+
     public readonly reasonFilterOptions: InputOption[] = [
         { id: '', text: 'All Values' },
         ...this.reasonOptions.map(o => ({ id: o.id?.toString(), text: o.text }))

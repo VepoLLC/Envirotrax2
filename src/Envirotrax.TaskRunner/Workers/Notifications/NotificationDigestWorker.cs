@@ -17,11 +17,11 @@ public class NotificationDigestWorker : IQueueWorker<NotificationSettingDto>
 
     public async Task DoWorkAsync(NotificationSettingDto? setting, CancellationToken cancellationToken)
     {
-        var apiRequest = new ServiceMessageDto<NotificationSettingDto>(waterSupplierId: setting!.WaterSupplier.Id, loggedInUserId: null)
+        var apiRequest = new ServiceMessageDto<ScheduleNotificationDigestRequest>(waterSupplierId: setting!.WaterSupplier.Id, loggedInUserId: null)
         {
-            Data = setting
+            Data = new ScheduleNotificationDigestRequest { AsOfTime = setting.AsOfTime }
         };
 
-        await _internalApi.PostAsync<NotificationSettingDto, object>($"/api/task-runner/notification-settings/{setting.Id}/schedule-digest", apiRequest, cancellationToken);
+        await _internalApi.PostAsync<ScheduleNotificationDigestRequest, object>($"/api/task-runner/notification-settings/{setting.Id}/schedule-digest", apiRequest, cancellationToken);
     }
 }

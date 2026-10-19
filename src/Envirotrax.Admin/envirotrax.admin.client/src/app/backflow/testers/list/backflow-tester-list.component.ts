@@ -5,6 +5,8 @@ import { CellTemplateData, ColumnType, QueryProperty, TableColumn, TableViewMode
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import { Professional } from '../../../shared/models/professionals/professional';
 import { BackflowTesterSearchCriteria, BackflowTesterService } from '../../../shared/services/backflow/backflow-tester.service';
+import { WindowService } from '../../../shared/services/window.service';
+import { BackflowTesterDetailsComponent } from '../details/backflow-tester-details.component';
 
 /**
  * Criteria that match a child collection (licences, insurances) or a person inside the company rather than a
@@ -47,13 +49,27 @@ export class BackflowTesterListComponent implements OnInit {
     };
 
     constructor(
-        private readonly _backflowTesterService: BackflowTesterService
+        private readonly _backflowTesterService: BackflowTesterService,
+        private readonly _windowService: WindowService
     ) {
 
     }
 
     public ngOnInit(): void {
         this.table.columns = this.getColumns();
+    }
+
+    public openDetails(tester: Professional): void {
+        this._windowService.addWindow(BackflowTesterDetailsComponent, {
+            title: this.buildTitle(tester),
+            model: tester
+        });
+    }
+
+    private buildTitle(tester: Professional): string {
+        return [tester.name, tester.companyEmail]
+            .filter(part => part)
+            .join(' - ');
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {

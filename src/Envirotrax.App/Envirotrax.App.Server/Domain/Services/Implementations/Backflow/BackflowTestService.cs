@@ -56,6 +56,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     private readonly IProfessionalInsuranceService _insuranceService;
     private readonly IProfessionalUserLicenseService _licenseService;
     private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
+    private readonly ISubmissionWaterSupplierService _submissionSupplierService;
     private readonly ILogger<BackflowTestService> _logger;
 
     public BackflowTestService(
@@ -77,6 +78,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         IProfessionalInsuranceService insuranceService,
         IProfessionalUserLicenseService licenseService,
         IMailingInfoRedactionService mailingInfoRedactionService,
+        ISubmissionWaterSupplierService submissionSupplierService,
         ILogger<BackflowTestService> logger)
         : base(mapper, repository)
     {
@@ -97,6 +99,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         _insuranceService = insuranceService;
         _licenseService = licenseService;
         _mailingInfoRedactionService = mailingInfoRedactionService;
+        _submissionSupplierService = submissionSupplierService;
         _logger = logger;
     }
 
@@ -439,7 +442,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         var professionalId = _authService.ProfessionalId;
         dto.Professional = new ReferencedProfessionalDto { Id = professionalId };
 
-        await EnsureInsuranceAllowsSubmitAsync(dto, cancellationToken);
+        await ApplyWaterSupplierAsync(dto, cancellationToken);
 
         await PopulateBpatSnapshotAsync(dto);
         DeriveTestDate(dto);
@@ -655,13 +658,23 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         return _licenseService.CheckBpatForWaterSupplierAsync(_authService.ProfessionalId, bpatUserId, waterSupplierId, cancellationToken);
     }
 
-    private async Task EnsureInsuranceAllowsSubmitAsync(BackflowTestDto dto, CancellationToken cancellationToken)
+    private async Task ApplyWaterSupplierAsync(BackflowTestDto dto, CancellationToken cancellationToken)
     {
-        if (dto.WaterSupplier?.Id is not int waterSupplierId)
+        var site = dto.Site?.Id is int siteId
+            ? await _siteRepository.GetNoIncludesAsync(siteId, cancellationToken)
+            : null;
+
+        if (site != null)
         {
-            return;
+            dto.WaterSupplier = new ReferencedWaterSupplierDto { Id = site.WaterSupplierId };
         }
 
+        if (dto.WaterSupplier?.Id is not int waterSupplierId)
+        {
+            throw new AppValidationException("Please select a water supplier.");
+        }
+
+        await _submissionSupplierService.EnsureCanSubmitAsync(waterSupplierId, ProfessionalType.Bpat, cancellationToken);
         await _insuranceService.EnsureSatisfiedForWaterSupplierAsync(_authService.ProfessionalId, waterSupplierId, ProfessionalType.Bpat, cancellationToken);
     }
 

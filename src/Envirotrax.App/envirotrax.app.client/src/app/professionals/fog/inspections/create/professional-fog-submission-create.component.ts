@@ -61,6 +61,7 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
 
     public fogAccountOptions: InputOption[] = [];
     public waterSupplierOptions: InputOption[] = [];
+    public isSiteWaterSupplierMissing = false;
 
     public readonly InterceptorType = InterceptorType;
     public readonly FogInspectionResult = FogInspectionResult;
@@ -338,6 +339,11 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
         if (this.model.inspectionResult == null) {
             this.validationErrors.push('Please select an Inspection Result (Passed or Failed).');
         }
+        if (!this.selectedWaterSupplier) {
+            this.validationErrors.push(this.isSiteWaterSupplierMissing
+                ? `${this.site?.waterSupplier?.name} is not on your list of selected water suppliers.`
+                : 'Please select a water supplier.');
+        }
         if (this.model.interceptorCapacity != null && String(this.model.interceptorCapacity).trim() !== '') {
             const capacity = Number(this.model.interceptorCapacity);
             if (isNaN(capacity) || capacity < 0 || !Number.isInteger(capacity)) {
@@ -414,8 +420,7 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
 
             this.buildDropdownOptions();
             await this.setDefaultFogUser();
-            this.setDefaultWaterSupplier(site);
-            await this.loadMailingInfoRedaction();
+            await this.setSiteWaterSupplier(site);
         } finally {
             this.isLoading = false;
         }
@@ -454,6 +459,8 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
 
             this.selectedWaterSupplierId = inspection.waterSupplier?.id;
             this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === inspection.waterSupplier?.id);
+            this.isSiteWaterSupplierMissing = !this.selectedWaterSupplier;
+            this.buildWaterSupplierOptions();
             await this.loadMailingInfoRedaction();
 
             this.selectedFogUserId = inspection.inspector?.id ?? 0;
@@ -527,11 +534,6 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
             id: u.id,
             text: u.contactName ?? `User ${u.id}`
         }));
-
-        this.waterSupplierOptions = this.waterSuppliers.map(ws => ({
-            id: ws.waterSupplier?.id,
-            text: ws.waterSupplier?.name ?? ''
-        }));
     }
 
     private async setDefaultFogUser(): Promise<void> {
@@ -543,17 +545,24 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
         }
     }
 
-    private setDefaultWaterSupplier(site: Site): void {
-        if (this.waterSuppliers.length === 1) {
-            this.selectedWaterSupplierId = this.waterSuppliers[0].waterSupplier?.id;
-        }
+    private buildWaterSupplierOptions(): void {
+        this.waterSupplierOptions = this.selectedWaterSupplier
+            ? [{ id: this.selectedWaterSupplierId, text: this.selectedWaterSupplier.waterSupplier?.name ?? '' }]
+            : [];
+    }
 
-        const siteWsId = site.waterSupplier?.id;
-        if (siteWsId && this.waterSuppliers.some(ws => ws.waterSupplier?.id === siteWsId)) {
-            this.selectedWaterSupplierId = siteWsId;
-        }
-
+    private async setSiteWaterSupplier(site: Site): Promise<void> {
+        this.selectedWaterSupplierId = site.waterSupplier?.id;
         this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === this.selectedWaterSupplierId);
+        this.isSiteWaterSupplierMissing = !this.selectedWaterSupplier;
+
+        if (!this.selectedWaterSupplier) {
+            return;
+        }
+
+        this.buildWaterSupplierOptions();
+
+        await this.loadMailingInfoRedaction();
     }
 
     // Like V1, an existing site's location and owner contact information can't be modified while its water

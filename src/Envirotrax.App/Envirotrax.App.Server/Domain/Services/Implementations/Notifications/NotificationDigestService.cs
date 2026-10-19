@@ -3,7 +3,6 @@ using System.Transactions;
 using AutoMapper;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Notifications;
-using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Notifications;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Notifications;
 using Envirotrax.App.Server.Domain.Services.Definitions.Notifications;
@@ -25,26 +24,22 @@ public class NotificationDigestService : INotificationDigestService
     private readonly IMapper _mapper;
     private readonly INotificationSettingRepository _settingRepository;
     private readonly INotificationRepository _notificationRepository;
-    private readonly IBackflowTestRepository _testRepository;
     private readonly IEmailService _emailService;
 
     public NotificationDigestService(
         IMapper mapper,
         INotificationSettingRepository settingRepository,
         INotificationRepository notificationRepository,
-        IBackflowTestRepository testRepository,
         IEmailService emailService)
     {
         _mapper = mapper;
         _settingRepository = settingRepository;
         _notificationRepository = notificationRepository;
-        _testRepository = testRepository;
         _emailService = emailService;
     }
 
-    public async Task<List<NotificationDigestSettingDto>> GetPendingAsync(int batchSize, CancellationToken cancellationToken)
+    public async Task<List<NotificationDigestSettingDto>> GetPendingAsync(int batchSize, DateTimeOffset asOfTime, CancellationToken cancellationToken)
     {
-        var utcNow = DateTime.UtcNow;
         var settings = new List<NotificationSetting>();
 
         foreach (var interval in DigestIntervals)
@@ -56,7 +51,7 @@ public class NotificationDigestService : INotificationDigestService
                 break;
             }
 
-            var period = NotificationDigestPeriod.GetLastClosed(interval, utcNow);
+            var period = NotificationDigestPeriod.GetLastClosed(interval, asOfTime.UtcDateTime);
 
             settings.AddRange(await _settingRepository.GetPendingDigestsAsync(interval, period.StartUtc, period.EndUtc, remaining, cancellationToken));
         }
@@ -64,7 +59,7 @@ public class NotificationDigestService : INotificationDigestService
         return _mapper.Map<List<NotificationDigestSettingDto>>(settings);
     }
 
-    public async Task ScheduleAsync(int notificationSettingId, CancellationToken cancellationToken)
+    public async Task ScheduleAsync(int notificationSettingId, DateTimeOffset asOfTime, CancellationToken cancellationToken)
     {
         var setting = await _settingRepository.GetForDigestAsync(notificationSettingId, cancellationToken);
 
@@ -73,24 +68,26 @@ public class NotificationDigestService : INotificationDigestService
             return;
         }
 
-        var utcNow = DateTime.UtcNow;
-        var period = NotificationDigestPeriod.GetLastClosed(setting.Interval, utcNow);
-        var notifications = await _notificationRepository.GetUnscheduledForDigestAsync(setting.Id, period.StartUtc, period.EndUtc, cancellationToken);
+        var period = NotificationDigestPeriod.GetLastClosed(setting.Interval, asOfTime.UtcDateTime);
+        var notifications = await _notificationRepository.GetForDigestAsync(setting.UserId, setting.Interval, period.StartUtc, period.EndUtc, cancellationToken);
 
-        if (notifications.Count == 0)
+        var unscheduledSettingNotifications = notifications
+            .Where(notification => notification.NotificationSettingId == setting.Id && notification.EmailBatchId == null)
+            .ToList();
+
+        if (unscheduledSettingNotifications.Count == 0)
         {
             return;
         }
 
-        var tests = await _testRepository.GetNotifiedTestsAsync(notifications.Select(notification => notification.RecordId).Distinct(), cancellationToken);
-
-        var email = BuildEmail(setting, period, notifications, tests, utcNow);
+        var utcNow = DateTime.UtcNow;
+        var email = BuildEmail(setting, period, notifications, utcNow);
         var sendTimeUtc = period.GetSendTimeUtc(utcNow);
         var batchId = await _emailService.CreateBatchIdAsync();
 
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        foreach (var notification in notifications)
+        foreach (var notification in unscheduledSettingNotifications)
         {
             notification.EmailBatchId = batchId;
             notification.SentTime = sendTimeUtc;
@@ -103,11 +100,7 @@ public class NotificationDigestService : INotificationDigestService
     }
 
     private static EmailDto<NotificationDigestVm> BuildEmail(
-        NotificationSetting setting,
-        NotificationDigestPeriod period,
-        List<Notification> notifications,
-        Dictionary<int, BackflowTest> tests,
-        DateTime utcNow)
+        NotificationSetting setting, NotificationDigestPeriod period, List<Notification> notifications, DateTime utcNow)
     {
         var vm = new NotificationDigestVm
         {
@@ -122,7 +115,7 @@ public class NotificationDigestService : INotificationDigestService
             Description = setting.Description,
             Color = setting.Color,
             Items = [.. notifications
-                .Select(notification => BuildItem(notification, tests.GetValueOrDefault(notification.RecordId)))
+                .Select(BuildItem)
                 .OrderBy(item => item.Title)
                 .ThenBy(item => item.TestId)]
         };
@@ -136,23 +129,15 @@ public class NotificationDigestService : INotificationDigestService
         };
     }
 
-    private static BackflowTestNotificationItemVm BuildItem(Notification notification, BackflowTest? test)
+    private static BackflowTestNotificationItemVm BuildItem(Notification notification)
     {
-        var serialNumber = string.IsNullOrWhiteSpace(test?.SerialNumber) ? null : $"#{test.SerialNumber}";
-
-        var parts = new[] { notification.RecordDescription, serialNumber, test?.HazardType }
-            .Where(part => !string.IsNullOrWhiteSpace(part));
-
-        var details = string.Join(" · ", parts);
-
         return new BackflowTestNotificationItemVm
         {
             TestId = notification.RecordId,
             Title = string.IsNullOrWhiteSpace(notification.PropertyDescription)
                 ? $"Backflow test #{notification.RecordId}"
                 : notification.PropertyDescription,
-            Details = string.IsNullOrEmpty(details) ? null : details,
-            LocationDescription = test?.LocationDescription
+            Details = notification.RecordDescription
         };
     }
 

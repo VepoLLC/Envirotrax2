@@ -34,7 +34,8 @@
                                       name="transporterAccount"
                                       [ngModel]="selectedTransporterUserId"
                                       (ngModelChange)="onTransporterChange($event)"
-                                      [options]="transporterOptions" />
+                                      [options]="transporterOptions"
+                                      [placeholder]="'Select a Transporter Account'" />
                         </div>
                     </div>
                     <div class="row align-items-center mb-3">
@@ -44,7 +45,8 @@
                                       name="waterSupplier"
                                       [ngModel]="selectedWaterSupplierId"
                                       (ngModelChange)="onWaterSupplierChange($event)"
-                                      [options]="waterSupplierOptions" />
+                                      [options]="waterSupplierOptions"
+                                      [placeholder]="'Select a Water Supplier'" />
                         </div>
                     </div>
                     <div class="row align-items-center mb-3">
@@ -54,7 +56,8 @@
                                       name="disposalLocation"
                                       [ngModel]="selectedDisposalSiteId"
                                       (ngModelChange)="onDisposalSiteChange($event)"
-                                      [options]="disposalSiteOptions" />
+                                      [options]="disposalSiteOptions"
+                                      [placeholder]="'Select a Disposal Site'" />
                         </div>
                     </div>
                     <div class="row align-items-center mb-3">
@@ -64,7 +67,8 @@
                                       name="transporterVehicle"
                                       [ngModel]="selectedVehicleId"
                                       (ngModelChange)="onVehicleChange($event)"
-                                      [options]="vehicleOptions" />
+                                      [options]="vehicleOptions"
+                                      [placeholder]="'Select a Transporter Vehicle'" />
                         </div>
                     </div>
                 </div>

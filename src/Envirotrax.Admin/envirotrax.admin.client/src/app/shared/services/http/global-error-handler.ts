@@ -81,13 +81,22 @@ export class GlobalErrorHandler implements ErrorHandler {
                     this._modalHelper.showMessage({
                         title: 'Validation Error',
                         type: 'error',
-                        messages
+                        messages: this.toUserFriendlyMessages(messages)
                     });
                 }
 
                 break;
             }
         }
+    }
+
+    private toUserFriendlyMessages(messages: string[]): string[] {
+        const bindingErrorPattern = /^The value '.*' is not valid( for .+)?\.?$/i;
+        const friendlyMessages = messages.map(message => bindingErrorPattern.test(message.trim())
+            ? 'The link or the value you entered is not valid. Please check it and try again.'
+            : message);
+
+        return [...new Set(friendlyMessages)];
     }
 
     private asHttpErrorResponse(error: unknown): HttpErrorResponse | undefined {

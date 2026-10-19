@@ -8,7 +8,6 @@ import { NgForm } from "@angular/forms";
 import { EditInsuranceComponent } from "../edit/edit-insurance.component";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { ExpirationType } from "../../../shared/models/professionals/licenses/professional-user-license";
-import { Professional } from "../../../shared/models/professionals/professional";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 
 @Component({
@@ -37,11 +36,6 @@ export class InsuranceListComponent implements OnInit {
     public isNewInsuranceLoading: boolean = false;
     public expirationType = ExpirationType;
 
-    public showBackflowHelp: boolean = false;
-    public showCsiHelp: boolean = false;
-    public showFogInspectionHelp: boolean = false;
-    public activeHelpTab: 'backflow' | 'csi' | 'fogInspection' = 'backflow';
-
     @ViewChild('dateCell', { static: true })
     private dateCellTemplate!: TemplateRef<CellTemplateData<ProfessionalInsurance>>;
 
@@ -53,29 +47,11 @@ export class InsuranceListComponent implements OnInit {
         private readonly _helper: HelperService
     ) { }
 
-    public async ngOnInit(): Promise<void> {
+    public ngOnInit(): void {
         this.table.columns = this.getColumns();
 
         this.getRows();
         this.resetNewInsurance();
-
-        const professional = await this._professionalService.getLoggedInProfessional();
-
-        this.setHelpTabs(professional);
-    }
-
-    private setHelpTabs(professional: Professional): void {
-        this.showBackflowHelp = professional.hasBackflowTesting == true;
-        this.showCsiHelp = professional.hasCsiInspection == true;
-        this.showFogInspectionHelp = professional.hasFogInspection == true;
-
-        if (this.showBackflowHelp) {
-            this.activeHelpTab = 'backflow';
-        } else if (this.showCsiHelp) {
-            this.activeHelpTab = 'csi';
-        } else if (this.showFogInspectionHelp) {
-            this.activeHelpTab = 'fogInspection';
-        }
     }
 
     private async newInsuranceObject(): Promise<ProfessionalInsurance> {
@@ -125,10 +101,6 @@ export class InsuranceListComponent implements OnInit {
         } finally {
             this.table.isLoading = false;
         }
-    }
-
-    public setHelpTab(tab: 'backflow' | 'csi' | 'fogInspection'): void {
-        this.activeHelpTab = tab;
     }
 
     public edit(insurance: ProfessionalInsurance): void {

@@ -25,7 +25,7 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
     @Input() public testerId!: number;
     @Input() public tester: Professional | null = null;
 
-    public activeTab: 'insurances' | 'licenses' | 'companyLicenses' = 'insurances';
+    public activeTab: 'insurances' | 'licenses' | 'companyLicenses' = 'licenses';
 
     public expirationType = ExpirationType;
     public insuranceExpirationType = InsuranceExpirationType;
@@ -79,7 +79,7 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
         this.licensesTable.columns = this.getLicenseColumns();
         this.companyLicensesTable.columns = this.getCompanyLicenseColumns();
         this.insurancesTable.columns = this.getInsuranceColumns();
-        await this.loadInsurances();
+        await this.loadLicenses();
     }
 
     public async setActiveTab(tab: 'insurances' | 'licenses' | 'companyLicenses'): Promise<void> {

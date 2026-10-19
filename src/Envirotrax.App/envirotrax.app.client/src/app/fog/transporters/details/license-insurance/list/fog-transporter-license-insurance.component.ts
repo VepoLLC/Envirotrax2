@@ -24,7 +24,7 @@ export class FogTransporterLicenseInsuranceComponent implements OnInit {
     @Input() public transporterId!: number;
     @Input() public transporter: Professional | null = null;
 
-    public activeTab: 'insurances' | 'licenses' = 'insurances';
+    public activeTab: 'insurances' | 'licenses' = 'licenses';
 
     public expirationType = ExpirationType;
     public insuranceExpirationType = InsuranceExpirationType;
@@ -65,7 +65,7 @@ export class FogTransporterLicenseInsuranceComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         await this.setPermissions();
         this.setupColumns();
-        await this.loadInsurances();
+        await this.loadLicenses();
     }
 
     private async setPermissions(): Promise<void> {

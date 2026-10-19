@@ -89,7 +89,8 @@ BEGIN TRY
         rankedPermits.MigratedWaterSupplierId,
         rankedPermits.MigratedVehicleId,
         rankedPermits.ID,
-        -- V2 requires it and V1 asks for it on save, but does not enforce it in the table.
+        -- V2 requires it and V1 asks for it on save, but does not enforce it in the table. V1 declares it
+        -- nvarchar(20), narrower than the V2 column, so LEFT never cuts a V1 value short.
         LEFT(ISNULL(rankedPermits.PermitNumber, ''), 50),
         rankedPermits.InspectionDueDate,
         ISNULL(rankedPermits.Active, 0),

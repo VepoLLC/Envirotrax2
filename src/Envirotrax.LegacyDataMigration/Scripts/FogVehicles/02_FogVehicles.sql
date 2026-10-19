@@ -49,7 +49,8 @@ BEGIN TRY
         legacyVehicles.ID,
         professionals.Id,
         -- V2 requires these three, V1 does not. Empty keeps the vehicle, which trip tickets and permits
-        -- point at, rather than dropping it over a blank field.
+        -- point at, rather than dropping it over a blank field. V1 declares them varchar(20), varchar(255)
+        -- and varchar(50), the same widths as the V2 columns, so LEFT never cuts a V1 value short.
         LEFT(ISNULL(legacyVehicles.VehicleLicensePlateNumber, ''), 20),
         LEFT(ISNULL(legacyVehicles.VehicleManufacturer, ''), 255),
         ISNULL(legacyVehicles.VehicleYear, 0),

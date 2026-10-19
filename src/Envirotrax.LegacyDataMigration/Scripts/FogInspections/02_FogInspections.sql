@@ -48,13 +48,11 @@ BEGIN TRY
             WHERE professionalUsers.LegacyUserId = NULLIF(legacyInspections.InspectorID, '')
         )
 
-    -- The V1 record id becomes the V2 row id, the way sites, water suppliers and backflow tests are
-    -- migrated (EN-241), so an inspection keeps the number its inspector and supplier already know it by.
-    SET IDENTITY_INSERT FogInspections ON;
-
+    -- V2 assigns the inspection a new Id. LegacyRecordId keeps the V1 record id, and it is what links
+    -- the row back to V1: every guard below, the image upload and any later migration read it.
     INSERT INTO FogInspections
         -- Identity
-        (Id, LegacyRecordId, WaterSupplierId, SiteId, InspectionDate, SubmissionId,
+        (LegacyRecordId, WaterSupplierId, SiteId, InspectionDate, SubmissionId,
 
         -- Property / Location fields
          PropertyBusinessName, PropertyType, PropertyStreetNumber, PropertyStreetName, PropertyNumber, PropertyCity,
@@ -109,7 +107,7 @@ BEGIN TRY
          CreatedById, CreatedTime, UpdatedById, UpdatedTime, DeletedById, DeletedTime)
     SELECT
         -- Identity
-        legacyInspections.ID, legacyInspections.ID, waterSuppliers.Id, sites.Id, legacyInspections.InspectionDate,
+        legacyInspections.ID, waterSuppliers.Id, sites.Id, legacyInspections.InspectionDate,
         LEFT(legacyInspections.SubmissionID, 50),
 
         -- Property / Location fields
@@ -262,8 +260,6 @@ BEGIN TRY
         FROM FogInspections AS alreadyInserted
         WHERE alreadyInserted.LegacyRecordId = legacyInspections.ID
     )
-
-    SET IDENTITY_INSERT FogInspections OFF;
 
     -- An inspection skipped by an earlier run, say because its site had not been migrated yet, goes in
     -- once that is fixed. Its entry no longer describes anything, so it is cleared to keep this table

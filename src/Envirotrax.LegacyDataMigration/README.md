@@ -155,10 +155,11 @@ migrated professional user matches the tester login the test was recorded under.
 
 ## How FOG inspections are migrated
 
-Like backflow tests, an inspection keeps its V1 id: the insert runs under `IDENTITY_INSERT`, so
-`FogInspections.Id` equals the V1 `FogInspections.ID`, and `LegacyRecordId` is written as well because
-every guard in the script reads it. Water suppliers, sites, professionals and professional users are
-all migrated before it, so nothing here has to be backfilled.
+V2 gives each inspection a new `Id`; the V1 `FogInspections.ID` goes into `LegacyRecordId`, which is
+what links the row back to V1 and what every guard in the script reads. (Only backflow tests, water
+suppliers and sites keep their V1 ids, because the customer-facing legacy API exposes them.) Water
+suppliers, sites, professionals and professional users are all migrated before it, so nothing here has
+to be backfilled.
 
 Five things are worth knowing:
 

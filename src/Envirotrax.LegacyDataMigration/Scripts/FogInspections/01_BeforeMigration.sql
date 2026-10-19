@@ -1,6 +1,5 @@
--- The V1 record id is also written into FogInspections.Id with IDENTITY_INSERT, the way sites, water
--- suppliers and backflow tests are migrated (EN-241). This column is still what every guard and every
--- join in the migration reads, because Id alone cannot say whether a row came from V1 or was created in V2.
+-- Links each migrated inspection back to its V1 FogInspections.ID. V2 assigns the row its own Id, so
+-- this column is what every guard and every join in the migration reads.
 IF COL_LENGTH('FogInspections', 'LegacyRecordId') IS NULL
 BEGIN
     ALTER TABLE FogInspections

@@ -385,9 +385,9 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
             const [professional, transporterOptions, suppliersPage, disposalSiteOptions, vehicleOptions, states] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAllAsOptions(false, '', { filter: [{ columnName: 'isFogTransporter', comparisonOperator: 'Eq', value: 'true' }] }),
-                this._supplierService.getAllMy(),
-                this._disposalSiteService.getAllRegisteredAsOptions(true, 'Select a disposal site'),
-                this._vehicleService.getAllAsOptions(true, 'Select a transporter vehicle'),
+                this._supplierService.getAllMy({ hasFogTransportation: true }),
+                this._disposalSiteService.getAllRegisteredAsOptions(false, ''),
+                this._vehicleService.getAllAsOptions(false, ''),
                 this._lookupService.getAllStates()
             ]);
 
@@ -395,13 +395,6 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
             this.transporterOptions = transporterOptions;
             this.disposalSiteOptions = disposalSiteOptions;
             this.vehicleOptions = vehicleOptions;
-
-            this.waterSupplierOptions = [
-                { id: '', text: 'Select a water supplier' },
-                ...suppliersPage.data
-                    .filter(s => s.waterSupplier?.id)
-                    .map(s => ({ id: s.waterSupplier!.id, text: s.waterSupplier!.name ?? '' }))
-            ];
 
             this._myWaterSuppliers.clear();
             for (const supplier of suppliersPage.data) {
@@ -461,13 +454,16 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
 
         await this.loadTransporterSignatureUrl();
 
-        const registeredIds = this.waterSupplierOptions.filter(o => o.id).map(o => Number(o.id));
-        const siteWsId = this.site?.waterSupplier?.id;
+        const suppliers = [...this._myWaterSuppliers.values()];
 
-        if (siteWsId && registeredIds.includes(siteWsId)) {
-            this.selectedWaterSupplierId = siteWsId;
-        } else if (registeredIds.length === 1) {
-            this.selectedWaterSupplierId = registeredIds[0];
+        if (this.site) {
+            this.selectedWaterSupplierId = this.site.waterSupplier?.id;
+            this.waterSupplierOptions = suppliers
+                .filter(s => s.id === this.selectedWaterSupplierId)
+                .map(s => ({ id: s.id, text: s.name ?? '' }));
+        } else {
+            this.waterSupplierOptions = suppliers.map(s => ({ id: s.id, text: s.name ?? '' }));
+            this.selectedWaterSupplierId = undefined;
         }
 
         await this.applySelectedWaterSupplier(this.selectedWaterSupplierId);
@@ -482,6 +478,12 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         this.selectedWaterSupplierStateName = stateId != null
             ? this._stateNamesById.get(stateId)
             : undefined;
+
+        if (!this.selectedWaterSupplier) {
+            this._insuranceCheck = undefined;
+
+            return;
+        }
 
         const [insuranceCheck] = await Promise.all([
             waterSupplierId ? this._tripTicketService.getInsuranceCheck(waterSupplierId) : undefined,
@@ -515,8 +517,16 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
     }
 
     private async computeVerification(): Promise<void> {
+        if (!this.selectedWaterSupplier) {
+            this.checks = this.site ? [this.buildWaterSupplierCheck()] : [];
+            this.verificationPassed = false;
+
+            return;
+        }
+
         const checks: VerificationCheck[] = [];
 
+        checks.push(this.buildWaterSupplierCheck());
         checks.push(await this.buildRegistrationCheck());
         checks.push(this.buildInsuranceCheck());
         checks.push(this.buildDisposalSiteCheck());
@@ -525,6 +535,20 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
 
         this.checks = checks;
         this.verificationPassed = checks.every(c => c.valid);
+    }
+
+    private buildWaterSupplierCheck(): VerificationCheck {
+        const label = 'Water Supplier';
+
+        if (!this.selectedWaterSupplier) {
+            const message = this.site && this.waterSupplierOptions.length === 0
+                ? `${this.site.waterSupplier?.name} is not on your list of selected water suppliers`
+                : 'Select a Water Supplier';
+
+            return { label, message, valid: false };
+        }
+
+        return { label, message: this.selectedWaterSupplier.name ?? 'Registered', valid: true };
     }
 
     private async buildRegistrationCheck(): Promise<VerificationCheck> {

@@ -41,6 +41,11 @@ export class InputComponent implements ControlValueAccessor, Validator, OnInit, 
 
     private static readonly MultiEmailPlaceholder = 'Type an email address and press Enter';
 
+    // Shown like a US browser's datetime-local box (V1's date and time inputs): month/day/year and a 12-hour clock.
+    private static readonly DateTimePlaceholder = 'mm/dd/yyyy --:-- --';
+
+    private static readonly DateTimeDisplayFormat = 'm/d/Y G:i K';
+
     @Input()
     public id: string = null!;
 
@@ -142,7 +147,14 @@ export class InputComponent implements ControlValueAccessor, Validator, OnInit, 
 
     public ngAfterViewInit(): void {
         if (this.flatpickr?.nativeElement) {
+            // The display format only changes what the box shows. The bound value keeps its ISO format (set in
+            // onChange below), so incoming values are parsed as ISO strings rather than with the display format.
+            const dateTimeFormatOptions = this.type == 'datetime'
+                ? { dateFormat: InputComponent.DateTimeDisplayFormat, parseDate: (date: string) => new Date(date) }
+                : {};
+
             this._flatpickerInstance = flatpickr(this.flatpickr.nativeElement, {
+                ...dateTimeFormatOptions,
                 enableTime: this.type == 'datetime',
                 mode: this.type == 'daterange'
                     ? 'range'
@@ -262,6 +274,10 @@ export class InputComponent implements ControlValueAccessor, Validator, OnInit, 
 
         if (this.type === 'multi-email' && !this.placeholder) {
             this.placeholder = InputComponent.MultiEmailPlaceholder;
+        }
+
+        if (this.type === 'datetime' && !this.placeholder) {
+            this.placeholder = InputComponent.DateTimePlaceholder;
         }
     }
 

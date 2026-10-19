@@ -55,6 +55,9 @@ public class ProfessionalDto
     public bool HasFogTransportation { get; set; }
 
     public DateTime CreatedTime { get; set; }
+
+    // Display only. The App ignores it on update - the balance only moves through ledger transactions.
+    public decimal AccountBalance { get; set; }
 }
 
 public class ReferencedProfessionalDto

@@ -44,4 +44,16 @@ export class BackflowTesterService {
 
         return await lastValueFrom(observable);
     }
+
+    public get(professionalId: number): Promise<Professional> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${professionalId}`);
+
+        return lastValueFrom(this._http.get<Professional>(url));
+    }
+
+    public update(professional: Professional): Promise<Professional> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${professional.id}`);
+
+        return lastValueFrom(this._http.put<Professional>(url, professional));
+    }
 }

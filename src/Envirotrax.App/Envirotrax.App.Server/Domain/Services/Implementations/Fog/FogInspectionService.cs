@@ -4,6 +4,7 @@ using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Fog;
+using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
@@ -40,6 +41,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IProfessionalSupplierService _professionalSupplierService;
     private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
+    private readonly ISubmissionWaterSupplierService _submissionSupplierService;
 
     public FogInspectionService(
         IMapper mapper,
@@ -52,7 +54,8 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         IPdfTemplateService pdfTemplateService,
         IGeneralSettingsService generalSettingsService,
         IProfessionalSupplierService professionalSupplierService,
-        IMailingInfoRedactionService mailingInfoRedactionService)
+        IMailingInfoRedactionService mailingInfoRedactionService,
+        ISubmissionWaterSupplierService submissionSupplierService)
         : base(mapper, repository)
     {
         _repository = repository;
@@ -65,6 +68,7 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         _generalSettingsService = generalSettingsService;
         _professionalSupplierService = professionalSupplierService;
         _mailingInfoRedactionService = mailingInfoRedactionService;
+        _submissionSupplierService = submissionSupplierService;
     }
 
     public Task<byte[]> GeneratePdfAsync(FogInspectionDto inspection)
@@ -115,7 +119,6 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         Stream? signatureStream, string? signatureFileName,
         CancellationToken cancellationToken)
     {
-        var waterSupplierId = request.WaterSupplier!.Id!.Value;
         var inspectorUserId = request.Inspector!.Id!.Value;
 
         var isUnlistedProperty = request.Site?.Id == null;
@@ -128,6 +131,8 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         {
             throw new AppValidationException("The property for this inspection was not found.");
         }
+
+        var waterSupplierId = await _submissionSupplierService.ResolveAsync(site, request.WaterSupplier?.Id, ProfessionalType.FogInspector, cancellationToken);
 
         var professional = await _professionalService.GetLoggedInProfessionalAsync(cancellationToken);
         var inspectorUser = await _professionalUserService.GetAsync(inspectorUserId, cancellationToken);

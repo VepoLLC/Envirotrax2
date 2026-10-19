@@ -50,4 +50,31 @@ public class NotificationSettingRepository : Repository<NotificationSetting>, IN
             .Where(setting => setting.WaterSupplierId == waterSupplierId)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<List<NotificationSetting>> GetPendingDigestsAsync(
+        NotificationInterval interval, DateTime startUtc, DateTime endUtc, int batchSize, CancellationToken cancellationToken)
+    {
+        return await DbContext.NotificationSettings
+            .IgnoreQueryFilters()
+            .Where(setting => setting.Interval == interval
+                && DbContext.Notifications.Any(notification => notification.WaterSupplierId == setting.WaterSupplierId
+                    && notification.NotificationSettingId == setting.Id
+                    && notification.UserId == setting.UserId
+                    && notification.Interval == setting.Interval
+                    && notification.EmailBatchId == null
+                    && notification.CreatedTime >= startUtc
+                    && notification.CreatedTime < endUtc))
+            .OrderBy(setting => setting.Id)
+            .Take(batchSize)
+            .Select(setting => new NotificationSetting { Id = setting.Id, WaterSupplierId = setting.WaterSupplierId })
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
+
+    public Task<NotificationSetting?> GetForDigestAsync(int id, CancellationToken cancellationToken)
+    {
+        return GetDetailsQuery()
+            .Include(setting => setting.WaterSupplier)
+            .SingleOrDefaultAsync(setting => setting.Id == id, cancellationToken);
+    }
 }

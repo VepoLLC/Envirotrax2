@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
 import {
     CellTemplateData,
@@ -31,6 +31,8 @@ export class FogDisposalSiteListComponent implements OnInit {
     @ViewChild('cityStateCell', { static: true })
     public cityStateCell?: TemplateRef<CellTemplateData<FogDisposalSiteRow>>;
 
+    public showResults: boolean = false;
+
     public table: TableViewModel<FogDisposalSiteRow> = {
         query: {
             sort: { name: 'Asc' },
@@ -56,20 +58,25 @@ export class FogDisposalSiteListComponent implements OnInit {
         this.table.columns = this.getColumns();
 
         await this.loadStates();
-        await this.getSites();
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
         this.table.query.filter = queryProperties;
     }
 
-    public async search(): Promise<void> {
-        // A new filter starts again from the first page.
+    public async search(searchForm: NgForm): Promise<void> {
+        if (!searchForm.valid) {
+            return;
+        }
+
+        // A new search starts again from the first page.
         if (this.table.items) {
             this.table.items.pageInfo = { ...this.table.items.pageInfo, pageNumber: 1 };
         }
 
         await this.getSites();
+
+        this.showResults = true;
     }
 
     public async getSites(): Promise<void> {

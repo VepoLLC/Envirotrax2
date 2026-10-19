@@ -22,4 +22,15 @@ public class BackflowTesterService : IBackflowTesterService
     {
         return _apiClient.GetAsync<ProfessionalDto>(BaseUrl, pageInfo, query, criteria.ToParameters(), cancellationToken);
     }
+
+    public Task<ProfessionalDto?> GetAsync(int professionalId, CancellationToken cancellationToken)
+    {
+        return _apiClient.GetAsync<ProfessionalDto>($"{BaseUrl}/{professionalId}", cancellationToken);
+    }
+
+    // Professionals are not owned by a water supplier, so this uses the tenant-less write overload.
+    public Task<ProfessionalDto?> UpdateAsync(int professionalId, ProfessionalDto professional, CancellationToken cancellationToken)
+    {
+        return _apiClient.PutAsync<ProfessionalDto, ProfessionalDto>($"{BaseUrl}/{professionalId}", professional, cancellationToken);
+    }
 }

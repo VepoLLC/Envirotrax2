@@ -1,0 +1,53 @@
+@using RazorLight
+@using Envirotrax.App.Server.Templates.Emails.Notifications
+@inherits TemplatePage<NotificationDigestVm>
+
+@{
+    Layout = "Templates.Emails._EmailLayout";
+
+    var summaryRows = new[]
+    {
+        ("Period", $"{Model.Period} (Central Time)"),
+        ("Date Generated", $"{Model.DateGenerated} (Central Time)"),
+        ("# Notifications", Model.Items.Count.ToString()),
+        ("Water Supplier", Model.WaterSupplierName),
+        ("Account", Model.Account),
+        ("Backflow Test Type", Model.BackflowTestType),
+        ("Property Type", Model.PropertyType),
+        ("Notification Filter", Model.NotificationFilter),
+        ("Hazard Types", Model.HazardTypes)
+    };
+}
+
+<div>
+    <table style="width: 100%; margin-bottom: 28px; border-collapse: collapse;">
+        @foreach (var (label, value) in summaryRows)
+        {
+            <tr>
+                <td style="padding: 2px 15px 2px 0; white-space: nowrap; vertical-align: top;" nowrap>@(label.Replace(' ', ' ')):</td>
+                <td style="padding: 2px 0; width: 100%;">@value</td>
+            </tr>
+        }
+    </table>
+
+    <div style="border-left: 4px solid @Model.Color; padding-left: 14px; margin-bottom: 28px;">
+        <p style="margin: 0 0 14px 0;">
+            <strong>@Model.Description</strong>
+            <span style="color: #6c757d;">(@Model.Items.Count)</span>
+        </p>
+
+        @foreach (var entry in Model.Items)
+        {
+            var testUrl = $"{ViewBag.BaseUrl}/backflow/tests/{entry.TestId}/view";
+
+            <div style="margin-bottom: 14px;">
+                <a href="@testUrl" target="_blank" style="font-weight: bold;">@entry.Title</a>
+
+                @if (!string.IsNullOrEmpty(entry.Details))
+                {
+                    <div style="color: #6c757d; font-size: 13px;">@entry.Details</div>
+                }
+            </div>
+        }
+    </div>
+</div>

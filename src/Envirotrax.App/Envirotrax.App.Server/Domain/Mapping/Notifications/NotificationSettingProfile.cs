@@ -1,6 +1,7 @@
 using AutoMapper;
 using Envirotrax.App.Server.Data.Models.Notifications;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Notifications;
+using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.App.Server.Domain.Mapping.Notifications;
 
@@ -12,5 +13,8 @@ public class NotificationSettingProfile : Profile
             .ReverseMap()
             .ForMember(setting => setting.User, opt => opt.Ignore())
             .ForMember(setting => setting.CreatedBy, opt => opt.Ignore());
+
+        CreateMap<NotificationSetting, NotificationDigestSettingDto>()
+            .ForMember(dto => dto.WaterSupplier, opt => opt.MapFrom(setting => new ReferencedWaterSupplierDto { Id = setting.WaterSupplierId }));
     }
 }

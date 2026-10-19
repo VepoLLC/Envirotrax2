@@ -76,6 +76,7 @@
                                           [ngModel]="selectedCsiUserId"
                                           (ngModelChange)="onCsiAccountChange($event)"
                                           [options]="csiAccountOptions"
+                                          [placeholder]="'Select a CSI Account'"
                                           [required]="true" />
                             </div>
                         </div>
@@ -89,12 +90,13 @@
                     <div class="row align-items-center">
                         <div class="col-md-6 d-flex align-items-center">
                             <span class="fw-semibold text-nowrap text-end me-2" style="width: 120px;">Water Supplier:</span>
-                            <div class="flex-grow-1">
+                            <div class="flex-grow-1" *ngIf="!isSiteWaterSupplierMissing">
                                 <vp-input type="select"
                                           name="waterSupplierId"
                                           [ngModel]="selectedWaterSupplierId"
                                           (ngModelChange)="onWaterSupplierChange($event)"
                                           [options]="waterSupplierOptions"
+                                          [placeholder]="'Select a Water Supplier'"
                                           [required]="true" />
                             </div>
                         </div>
@@ -105,6 +107,11 @@
                                     [ngClass]="insuranceCheck?.isSatisfied ? 'text-success' : 'text-danger'">{{ insuranceCheck?.message }}</dd>
                             </dl>
                         </div>
+                    </div>
+                    <div *ngIf="isSiteWaterSupplierMissing" class="text-danger mt-3">
+                        This site is located within {{ site?.waterSupplier?.name }}, which is not currently on your list of
+                        selected water suppliers. You must add {{ site?.waterSupplier?.name }} to your water suppliers to
+                        continue.
                     </div>
                 </vp-section>
 

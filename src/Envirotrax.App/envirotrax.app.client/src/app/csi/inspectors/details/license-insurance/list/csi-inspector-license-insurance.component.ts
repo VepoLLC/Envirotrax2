@@ -24,7 +24,7 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
     @Input() public inspectorId!: number;
     @Input() public inspector: Professional | null = null;
 
-    public activeTab: 'insurances' | 'licenses' = 'insurances';
+    public activeTab: 'insurances' | 'licenses' = 'licenses';
 
     public expirationType = ExpirationType;
     public insuranceExpirationType = InsuranceExpirationType;
@@ -72,7 +72,7 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
         await this.setPermissions();
 
         this.setupColumns();
-        await this.loadInsurances();
+        await this.loadLicenses();
     }
 
     public async setActiveTab(tab: 'insurances' | 'licenses'): Promise<void> {

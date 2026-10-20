@@ -501,7 +501,7 @@ export class App implements OnInit {
           {
             title: 'Licenses & Insurance Policies',
             iconCss: 'fa-solid fa-shield-halved',
-            routerLink: ['professionals/insurances'],
+            routerLink: ['professionals/licenses'],
             hasPermission: isAdmin,
             hasFeature: true
           },

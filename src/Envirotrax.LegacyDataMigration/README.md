@@ -6,7 +6,7 @@ Moves data from the old (V1) system into the new Envirotrax2 (V2) database.
 
 ## How it works
 
-The app migrates one entity at a time — users, water suppliers, supplier users, professionals, GIS areas, sites, renewal email verifications, site logs, backflow gauges, backflow tests, FOG inspections, FOG disposal sites, FOG vehicles and their permits, notification settings, then notifications — in that order, because later entities depend on earlier ones. Each entity's migration has two steps:
+The app migrates one entity at a time — users, water suppliers, supplier users, professionals, GIS areas, sites, renewal email verifications, site logs, backflow gauges, backflow tests, FOG inspections, FOG disposal sites, FOG vehicles and their permits, FOG trip tickets, notification settings, then notifications — in that order, because later entities depend on earlier ones. Each entity's migration has two steps:
 
 1. **Run SQL scripts.** Files under `Scripts/<Entity>/`, named with a numeric prefix (`01_`, `02_`, ...), run in that order. They copy rows from the legacy database into the V2 tables.
 2. **Run C# cleanup code.** After the raw data is in place, C# fixes up anything SQL can't do well — legacy passwords come in as plain text and get hashed with ASP.NET Identity's password hasher, and site log file attachments get downloaded from the legacy file server and uploaded to Azure Storage.
@@ -20,7 +20,7 @@ One caveat, on the audit tables rather than the data: `Scripts/Users/02_`–`06_
 ## Project layout
 
 - `Scripts/` — SQL scripts, one subfolder per entity, run in filename order.
-- `Services/` — one service per entity (`UserService`, `WaterSupplierService`, `WaterSupplierUserService`, `ProfessionalService`, `GisAreaService`, `SiteService`, `SiteLogService`, `BackflowGaugeService`, `BackflowTestService`, `FogInspectionService`, `FogDisposalSiteService`, `FogVehicleService`, `NotificationSettingService`, `NotificationService`, and the other professional services). Each has a `MigrateAsync()` that runs its scripts, then does any C#-side cleanup. `LegacyFileServerService` and `BlobStorageService` are helpers rather than entity migrations: they read files off the legacy file server and write them to Azure Storage.
+- `Services/` — one service per entity (`UserService`, `WaterSupplierService`, `WaterSupplierUserService`, `ProfessionalService`, `GisAreaService`, `SiteService`, `SiteLogService`, `BackflowGaugeService`, `BackflowTestService`, `FogInspectionService`, `FogDisposalSiteService`, `FogVehicleService`, `FogTripTicketService`, `NotificationSettingService`, `NotificationService`, and the other professional services). Each has a `MigrateAsync()` that runs its scripts, then does any C#-side cleanup. `LegacyFileServerService` and `BlobStorageService` are helpers rather than entity migrations: they read files off the legacy file server and write them to Azure Storage.
 - `Data/` — EF Core `DbContext`s and entity models for the V2 database.
 - `Logs/` — one log file per service, written while the migration runs.
 
@@ -265,6 +265,54 @@ Vehicles and permits that could not be migrated are queryable, told apart by `So
 `SELECT * FROM MigrationSkippedFogVehicles` — a vehicle whose transporter login has no migrated company,
 or a permit whose water supplier or vehicle did not migrate, or that lost to a newer permit for the same
 vehicle.
+
+## How FOG trip tickets are migrated
+
+V2 gives each ticket a new `Id`; the V1 `FogTripTickets.ID` goes into `LegacyRecordId`. A ticket points at
+a site, a transporter, a vehicle, a disposal site and sometimes the supplier user who approved it. All of
+them are migrated before it, and each is found through its own `LegacyRecordId`, or by login for people.
+
+Five things are worth knowing:
+
+- **The transporter is matched within the company the ticket was filed under**, as FOG inspections are.
+  V2 requires the company (`ProfessionalId`) but not the user (`TransporterId`), so a ticket whose
+  transporter login did not migrate still goes in under the company it was filed under
+  (`MasterTransporterID`, or the transporter's own login when they are the company). Only a ticket with
+  neither is skipped. A ticket whose site did not migrate is skipped too, because `SiteId` is required.
+- **Vehicles and disposal sites are optional links.** V1 deletes a vehicle outright, so a ticket can name
+  a vehicle that no longer exists; `VehicleId` is then NULL, and the vehicle columns on the ticket still
+  say which vehicle it was. `ReceiverDisposalSiteId` is set the same way. `ReceiverSiteId` stays NULL, as
+  it does on the tickets V2 creates, because V2 never reads it.
+- **Text is copied without `LEFT()`.** V1 declares every text column no wider than its V2 column, so
+  nothing can be cut, and a value that did not fit would stop the run instead of being shortened.
+- **Values that change shape:** an unpaid ticket's empty `TransactionID` becomes NULL, as for FOG
+  inspections. A capacity type of `-1` (V1's "not selected", shown with no unit) is kept as it is rather
+  than turned into a unit. `UpdatedBy` and `UpdatedTime` come from `LastModifiedBy` and `LastModifiedDate`,
+  which V1 writes only when a supplier user approves or disapproves a ticket; `ApprovedBy` is resolved the
+  same way, to that supplier's user.
+- **Dropped:** the master water supplier ids, since V2 removed master suppliers (EN-184).
+
+Tickets that could not be migrated are queryable:
+
+`SELECT * FROM MigrationSkippedFogTripTickets` — the water supplier or the site never migrated, or
+neither the transporter nor their company did.
+
+### How FOG trip ticket signatures are migrated
+
+V1 stores three signatures on each ticket as PNG bytes: the generator's and the receiver's, captured on
+the ticket, and a copy of the transporter's own signature taken when the ticket is submitted. The script
+sets `HasLegacyTransporterSignature`, `HasLegacyGeneratorSignature` and `HasLegacyReceiverSignature`.
+`FogTripTicketService` then reads the bytes out of the legacy database a batch of tickets at a time,
+uploads each to `professionals/<ProfessionalId>/fog-trip-tickets/<transporter|generator|receiver>/legacy-<V1 id>.png`,
+and only after that writes the matching `…SignaturePath`.
+
+V2 already uses the generator and receiver folders. It keeps no per-ticket transporter signature (a
+ticket it creates points at the transporter's own signature), so the copy V1 kept on each ticket gets a
+`transporter` folder of its own. V1 has no transporter signature date; `TransporterSignatureDate` is the
+ticket's creation date, the moment V1 copied the signature and V2 would stamp it.
+
+- **Still pending:** `SELECT COUNT(*) FROM FogTripTickets WHERE (HasLegacyTransporterSignature = 1 AND TransporterSignaturePath IS NULL) OR (HasLegacyGeneratorSignature = 1 AND GeneratorSignaturePath IS NULL) OR (HasLegacyReceiverSignature = 1 AND ReceiverSignaturePath IS NULL)`
+- **Not found in V1:** logged to `Logs/FogTripTicketService.log` with per-run counts.
 
 ## Running it
 

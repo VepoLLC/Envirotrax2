@@ -70,6 +70,7 @@ services.AddTransient<BackflowTestService>();
 services.AddTransient<FogInspectionService>();
 services.AddTransient<FogDisposalSiteService>();
 services.AddTransient<FogVehicleService>();
+services.AddTransient<FogTripTicketService>();
 services.AddTransient<NotificationSettingService>();
 services.AddTransient<NotificationService>();
 
@@ -138,6 +139,12 @@ await fogDisposalSiteService.MigrateAsync();
 // Before the trip tickets, which find a vehicle by its V1 id through LegacyRecordId.
 var fogVehicleService = provider.GetRequiredService<FogVehicleService>();
 await fogVehicleService.MigrateAsync();
+
+// After the sites, the professionals, the disposal sites and the vehicles: a ticket records a pickup at a
+// site by a transporter, in one of their vehicles, delivered to a disposal site, and it finds each of them
+// by its V1 id through LegacyRecordId. Its signatures are moved into Azure Storage here too.
+var fogTripTicketService = provider.GetRequiredService<FogTripTicketService>();
+await fogTripTicketService.MigrateAsync();
 
 // After the supplier users: a notification setting is delivered to one of them, and V2 requires
 // that recipient, so a setting whose user is missing cannot be migrated at all.

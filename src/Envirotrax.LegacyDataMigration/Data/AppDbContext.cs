@@ -22,6 +22,7 @@ public class AppDbContext : TenantDbContextBase<WaterSupplier>
     public DbSet<ProfessionalInsurance> ProfessionalInsurances { get; set; }
     public DbSet<BackflowGauge> BackflowGauges { get; set; }
     public DbSet<FogInspection> FogInspections { get; set; }
+    public DbSet<FogTripTicket> FogTripTickets { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options, ILogger<AppDbContext> logger, ITenantProvidersService tenantProvider)
         : base(options, logger, tenantProvider)

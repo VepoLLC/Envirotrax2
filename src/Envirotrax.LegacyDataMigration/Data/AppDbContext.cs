@@ -2,6 +2,7 @@
 using Envirotrax.Common.Data.DbContexts;
 using Envirotrax.Common.Data.Services.Definitions;
 using Envirotrax.LegacyDataMigration.Data.Backflow;
+using Envirotrax.LegacyDataMigration.Data.Csi;
 using Envirotrax.LegacyDataMigration.Data.Fog;
 using Envirotrax.LegacyDataMigration.Data.Professionals;
 using Envirotrax.LegacyDataMigration.Data.Sites;
@@ -23,6 +24,8 @@ public class AppDbContext : TenantDbContextBase<WaterSupplier>
     public DbSet<BackflowGauge> BackflowGauges { get; set; }
     public DbSet<FogInspection> FogInspections { get; set; }
     public DbSet<FogTripTicket> FogTripTickets { get; set; }
+    public DbSet<CsiInspectionImage> CsiInspectionImages { get; set; }
+    public DbSet<PendingCsiInspectionImage> MigrationPendingCsiInspectionImages { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options, ILogger<AppDbContext> logger, ITenantProvidersService tenantProvider)
         : base(options, logger, tenantProvider)

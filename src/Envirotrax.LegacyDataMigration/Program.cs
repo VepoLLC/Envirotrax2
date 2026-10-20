@@ -67,6 +67,7 @@ services.AddTransient<SiteLogService>();
 services.AddTransient<RenewalEmailVerificationService>();
 services.AddTransient<BackflowGaugeService>();
 services.AddTransient<BackflowTestService>();
+services.AddTransient<CsiInspectionService>();
 services.AddTransient<FogInspectionService>();
 services.AddTransient<FogDisposalSiteService>();
 services.AddTransient<FogVehicleService>();
@@ -123,6 +124,9 @@ await backflowGaugeService.MigrateAsync();
 // belongs to one of them, and before the notifications, whose RecordId points at a test by its V1 id.
 var backflowTestService = provider.GetRequiredService<BackflowTestService>();
 await backflowTestService.MigrateAsync();
+
+var csiInspectionService = provider.GetRequiredService<CsiInspectionService>();
+await csiInspectionService.MigrateAsync();
 
 // After the sites and the professionals, because an inspection is recorded against a site by an
 // inspector who belongs to one of them. Its photos and signature are moved into Azure Storage here too.

@@ -209,10 +209,10 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     [StringLength(50)]
     public string? MeterNumber { get; set; }
 
-    [Precision(10, 2)]
+    [Precision(12, 2)]
     public decimal? MeterReadingBefore { get; set; }
     public bool MeterRegisters { get; set; }
-    [Precision(10, 2)]
+    [Precision(12, 2)]
     public decimal? MeterReadingAfter { get; set; }
 
     [StringLength(50)]
@@ -279,31 +279,31 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public bool ValidationReplacementCleared { get; set; }
 
     // Initial test readings - main assembly
-    [Precision(5, 2)]
+    [Precision(12, 2)]
     public decimal? InitCV1HeldPSID { get; set; }
     public bool InitCV1ClosedTight { get; set; }
     public bool InitCV1Leaked { get; set; }
 
-    [Precision(5, 2)]
+    [Precision(12, 2)]
     public decimal? InitCV2HeldPSID { get; set; }
     public bool InitCV2ClosedTight { get; set; }
     public bool InitCV2Leaked { get; set; }
 
-    [Precision(5, 2)]
+    [Precision(12, 2)]
     public decimal? InitRVOpenedPSID { get; set; }
     public bool InitRVDidNotOpen { get; set; }
 
-    [Precision(5, 2)]
+    [Precision(12, 2)]
     public decimal? InitBCHeldPSID { get; set; }
     public bool InitBCClosedTight { get; set; }
     public bool InitBCLeaked { get; set; }
 
-    [Precision(5, 2)]
+    [Precision(12, 2)]
     public decimal? InitPvbAirInletOpenedPSID { get; set; }
     public bool InitPvbAirInletDidNotOpen { get; set; }
     public bool InitPvbAirInletFullyOpened { get; set; }
 
-    [Precision(5, 2)]
+    [Precision(12, 2)]
     public decimal? InitPvbCVHeldPSID { get; set; }
     public bool InitPvbCVLeaked { get; set; }
 
@@ -337,40 +337,40 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public string? RepairBCDetails { get; set; }
 
     // Final test readings - main assembly
-    [Precision(5, 2)]
+    [Precision(12, 2)]
     public decimal? FinalCV1HeldPSID { get; set; }
     public bool FinalCV1ClosedTight { get; set; }
 
-    [Precision(5, 2)]
+    [Precision(12, 2)]
     public decimal? FinalCV2HeldPSID { get; set; }
     public bool FinalCV2ClosedTight { get; set; }
 
-    [Precision(5, 2)]
+    [Precision(12, 2)]
     public decimal? FinalRVOpenedPSID { get; set; }
 
-    [Precision(5, 2)]
+    [Precision(12, 2)]
     public decimal? FinalBCHeldPSID { get; set; }
     public bool FinalBCClosedTight { get; set; }
 
-    [Precision(5, 2)]
+    [Precision(12, 2)]
     public decimal? FinalPvbAirInletOpenedPSID { get; set; }
     public bool FinalPvbAirInletFullyOpened { get; set; }
 
-    [Precision(5, 2)]
+    [Precision(12, 2)]
     public decimal? FinalPvbCVHeldPSID { get; set; }
 
     // Bypass assembly readings (DCD/RPPD device types only)
-    [Precision(5, 2)]
+    [Precision(12, 2)]
     public decimal? InitCV1HeldPSID2 { get; set; }
     public bool InitCV1ClosedTight2 { get; set; }
     public bool InitCV1Leaked2 { get; set; }
 
-    [Precision(5, 2)]
+    [Precision(12, 2)]
     public decimal? InitCV2HeldPSID2 { get; set; }
     public bool InitCV2ClosedTight2 { get; set; }
     public bool InitCV2Leaked2 { get; set; }
 
-    [Precision(5, 2)]
+    [Precision(12, 2)]
     public decimal? InitRVOpenedPSID2 { get; set; }
     public bool InitRVDidNotOpen2 { get; set; }
 
@@ -404,15 +404,15 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     [StringLength(100)]
     public string? RepairPvbCVDetails { get; set; }
 
-    [Precision(5, 2)]
+    [Precision(12, 2)]
     public decimal? FinalCV1HeldPSID2 { get; set; }
     public bool FinalCV1ClosedTight2 { get; set; }
 
-    [Precision(5, 2)]
+    [Precision(12, 2)]
     public decimal? FinalCV2HeldPSID2 { get; set; }
     public bool FinalCV2ClosedTight2 { get; set; }
 
-    [Precision(5, 2)]
+    [Precision(12, 2)]
     public decimal? FinalRVOpenedPSID2 { get; set; }
 
     // Images

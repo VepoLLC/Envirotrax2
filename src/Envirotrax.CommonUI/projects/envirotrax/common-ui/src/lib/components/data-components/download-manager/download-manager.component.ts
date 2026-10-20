@@ -2,9 +2,9 @@ import { Component } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { ModalReference, ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { DownloadConfig } from "../../../models/download-config";
-import { DownloadService } from "../../../services/download.service";
+import { DownloadService } from "../../../services/download/download.service";
 import { MAX_PAGE_SIZE } from "../../../models/page-info";
-import { InputOption } from "@envirotrax/common-ui";
+import { InputOption } from "../../input/input.component";
 
 @Component({
     templateUrl: './download-manager.component.html',

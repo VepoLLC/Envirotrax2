@@ -42,10 +42,13 @@ export class BackflowTesterDetailsComponent implements OnInit {
 
     public states: InputOption<State>[] = [];
 
+    // The state options carry string ids, so the selects bind these and map back to the professional on change.
+    public stateId: string = '';
+    public defaultStateId: string = '';
+
     public isLoading: boolean = false;
     public isSaving: boolean = false;
     public isSaved: boolean = false;
-    public saveFailed: boolean = false;
     public validationErrors: string[] = [];
 
     constructor(
@@ -68,9 +71,16 @@ export class BackflowTesterDetailsComponent implements OnInit {
         ]);
     }
 
+    public onStateChange(value: string): void {
+        this.professional.state = this.states.find(option => option.id === value)?.data;
+    }
+
+    public onDefaultStateChange(value: string): void {
+        this.professional.defaultState = this.states.find(option => option.id === value)?.data;
+    }
+
     public async save(detailsForm: NgForm): Promise<void> {
         this.isSaved = false;
-        this.saveFailed = false;
         this.validationErrors = [];
 
         if (!detailsForm.valid) {
@@ -81,14 +91,14 @@ export class BackflowTesterDetailsComponent implements OnInit {
             this.isSaving = true;
 
             this.professional = await this._testerService.update(this.professional);
+            this.setStateIds();
 
             this.isSaved = true;
             this._toastService.successfullySaved('Backflow Tester Account');
         } catch (error) {
-            const validationErrors: string[] = [];
-
-            this.saveFailed = !this._helper.parseValidationErrors(error, validationErrors);
-            this.validationErrors = validationErrors;
+            if (!this._helper.parseValidationErrors(error, this.validationErrors)) {
+                throw error;
+            }
 
             this._toastService.failedToSave('Backflow Tester Account');
         } finally {
@@ -97,12 +107,7 @@ export class BackflowTesterDetailsComponent implements OnInit {
     }
 
     private async loadStates(): Promise<void> {
-        const states = await this._lookupService.getAllStates();
-
-        this.states = [
-            { id: '', text: '' },
-            ...states.map(state => ({ id: state.id, text: state.name ?? '', data: state }))
-        ];
+        this.states = await this._lookupService.getStatesAsOptions(true);
     }
 
     private async loadProfessional(): Promise<void> {
@@ -113,8 +118,14 @@ export class BackflowTesterDetailsComponent implements OnInit {
         try {
             this.isLoading = true;
             this.professional = await this._testerService.get(this.professionalId);
+            this.setStateIds();
         } finally {
             this.isLoading = false;
         }
+    }
+
+    private setStateIds(): void {
+        this.stateId = this.professional.state?.id == null ? '' : String(this.professional.state.id);
+        this.defaultStateId = this.professional.defaultState?.id == null ? '' : String(this.professional.defaultState.id);
     }
 }

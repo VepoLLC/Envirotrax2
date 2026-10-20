@@ -25,6 +25,9 @@ import { AddCsiInspectionAssemblyComponent } from './add-csi-inspection-assembly
 import { LookupService } from '../../../../shared/services/lookup/lookup.service';
 import { GeneralSettingsService } from '../../../../shared/services/settings/general-settings.service';
 import { PropertyType } from '../../../../shared/enums/property-type.enum';
+import { GreaseTrapType } from '../../../../shared/enums/grease-trap-type.enum';
+
+const UNLISTED_PROPERTY_ROUTE = 'unlisted';
 
 @Component({
     standalone: false,
@@ -44,6 +47,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
     private _editingInspection: CsiInspection | null = null;
 
     public isLocationEditing = false;
+    public isUnlistedProperty = false;
     public isMailingInfoRedacted = false;
     public showModificationBlockedMessage = false;
     public stateOptions: InputOption[] = [];
@@ -140,9 +144,10 @@ export class CsiSubmissionCreateComponent implements OnInit {
             }
 
             const idParam = params.get('siteId');
-            this._siteId = this._siteId = idParam ? Number(idParam) : 0;
+            this.isUnlistedProperty = idParam === UNLISTED_PROPERTY_ROUTE;
+            this._siteId = this.isUnlistedProperty || !idParam ? 0 : Number(idParam);
 
-            if (this._siteId > 0) {
+            if (this._siteId > 0 || this.isUnlistedProperty) {
                 await this.loadData();
             }
         });
@@ -298,7 +303,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
         try {
             const payload: CreateCsiInspection = {
                 ...this.model,
-                site: { id: this._siteId },
+                site: this.isUnlistedProperty ? undefined : { id: this._siteId },
                 assemblies: this.assemblies
                     .filter(assembly => !this._newAssemblies.has(assembly))
                     .map(assembly => ({ id: assembly.id || undefined, testId: assembly.testId, visuallyIdentified: !!assembly.visuallyIdentified })),
@@ -359,8 +364,8 @@ export class CsiSubmissionCreateComponent implements OnInit {
             const [professional, usersPage, site, assemblies, stateOptions] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isCsiInspector', comparisonOperator: 'Eq', value: 'true' }] }),
-                this._siteService.getForProfessional(this._siteId),
-                this._inspectionService.getAssembliesForForm(this._siteId),
+                this.isUnlistedProperty ? undefined : this._siteService.getForProfessional(this._siteId),
+                this.isUnlistedProperty ? [] : this._inspectionService.getAssembliesForForm(this._siteId),
                 this._lookupService.getAllStatesAsOptions(false)
             ]);
 
@@ -369,14 +374,24 @@ export class CsiSubmissionCreateComponent implements OnInit {
             this.site = site;
             this.assemblies = assemblies;
             this.stateOptions = stateOptions;
-            this.applySiteLocation(site);
+
+            this.isLocationEditing = this.isUnlistedProperty;
+
+            if (site) {
+                this.applySiteLocation(site);
+                this.applySiteAdditionalInformation(site);
+            }
 
             const waterSuppliersPage = await this._professionalSupplierService.getAllMy({ hasCsiInspection: true });
             this.waterSuppliers = waterSuppliersPage.data ?? [];
 
             this.buildDropdownOptions();
             await this.setDefaultCsiUser();
-            await this.setSiteWaterSupplier(site);
+            if (site) {
+                await this.setSiteWaterSupplier(site);
+            } else {
+                await this.setUnlistedWaterSupplier();
+            }
         } finally {
             this.isLoading = false;
         }
@@ -452,6 +467,20 @@ export class CsiSubmissionCreateComponent implements OnInit {
         this.model.mailingEmailAddress = site.mailingEmailAddress;
     }
 
+    private applySiteAdditionalInformation(site: Site): void {
+        this.model.aiOssf = !!site.hasOnSiteSewageFacility;
+        this.model.aiWaterWell = !!site.hasAuxWaterSupply;
+        this.model.aiReclaimedWater = !!site.hasReclaimed;
+        this.model.aiFireSystem = !!site.hasFireSystem;
+        this.model.aiFireSystem2 = !!site.fireSeparateWater;
+        this.model.aiGreaseTrap = site.greaseTrapType != null && site.greaseTrapType !== GreaseTrapType.TrapNotRequired;
+        this.model.aiSandGrit = !!site.hasGritTrap;
+        this.model.aiIrrigationSystem = !!site.hasIrrigation;
+        this.model.aiIrrigationSystem2 = !!site.irrigationSeparateWater;
+        this.model.aiHasDomesticPremisesIsolation = !!site.hasDomesticPremisesIsolation;
+        this.model.aiRequiresDomesticPremisesIsolation = !!site.requiresDomesticPremisesIsolation;
+    }
+
     private applyInspectionLocation(inspection: CsiInspection): void {
         this.model.propertyBusinessName = inspection.propertyBusinessName;
         this.model.propertyType = inspection.propertyType;
@@ -520,6 +549,21 @@ export class CsiSubmissionCreateComponent implements OnInit {
         }
 
         this.buildWaterSupplierOptions();
+
+        await Promise.all([this.loadInsuranceCheck(), this.loadMailingInfoRedaction()]);
+    }
+
+    private async setUnlistedWaterSupplier(): Promise<void> {
+        this.waterSupplierOptions = this.waterSuppliers.map(ws => ({
+            id: ws.waterSupplier?.id,
+            text: ws.waterSupplier?.name ?? ''
+        }));
+
+        if (this.waterSuppliers.length === 1) {
+            this.selectedWaterSupplier = this.waterSuppliers[0];
+            this.selectedWaterSupplierId = this.selectedWaterSupplier.waterSupplier?.id;
+            this.model.waterSupplier = { id: this.selectedWaterSupplierId };
+        }
 
         await Promise.all([this.loadInsuranceCheck(), this.loadMailingInfoRedaction()]);
     }

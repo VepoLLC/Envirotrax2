@@ -4,6 +4,7 @@
     --test-cell-valid-bg: #00bb0044;
     --test-cell-invalid-color: #f00;
     --test-cell-invalid-bg: #ff000044;
+    --test-cell-disabled-bg: #ddd;
 }
 
 :host-context(body.vp-dark-theme) {
@@ -11,6 +12,7 @@
     --test-cell-valid-bg: #00880066;
     --test-cell-invalid-color: #c00;
     --test-cell-invalid-bg: #ff000044;
+    --test-cell-disabled-bg: #222;
 }
 
 // Bootstrap paints a cell's background through this variable, so the tint sits over the table's own background.
@@ -22,6 +24,12 @@ td.test-cell-valid {
 td.test-cell-invalid {
     --bs-table-bg-state: var(--test-cell-invalid-bg);
     border: 2px solid var(--test-cell-invalid-color);
+}
+
+// V1's .test-cell.disabled: the repairs and final test greyed out while the initial test passes.
+td.test-cell-disabled {
+    --bs-table-bg-state: var(--test-cell-disabled-bg);
+    border: 1px solid #808080a0;
 }
 
 // V1's validation tool-tip (assets/css/tooltip.css): yellow note, red outline, pointing at the cell below.

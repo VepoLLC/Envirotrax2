@@ -10,6 +10,8 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Licenses;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
+using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
@@ -100,10 +102,19 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
 
     public async Task<CsiInspectionDto> SubmitAsync(CreateCsiInspectionDto request, CancellationToken cancellationToken)
     {
-        var siteId = request.Site!.Id.Value;
         var inspectorUserId = request.InspectorUser!.Id.Value;
 
-        var site = await _siteService.GetAsync(siteId, cancellationToken);
+        var isUnlistedProperty = request.Site?.Id == null;
+
+        var site = isUnlistedProperty
+            ? null
+            : await _siteService.GetAsync(request.Site!.Id!.Value, cancellationToken);
+
+        if (!isUnlistedProperty && site == null)
+        {
+            throw new AppValidationException("The property for this inspection was not found.");
+        }
+
         var waterSupplierId = await _submissionSupplierService.ResolveAsync(site, request.WaterSupplier?.Id, ProfessionalType.CsiInspector, cancellationToken);
 
         await _insuranceService.EnsureSatisfiedForWaterSupplierAsync(_authService.ProfessionalId, waterSupplierId, ProfessionalType.CsiInspector, cancellationToken);
@@ -117,7 +128,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         var inspection = new CsiInspection
         {
             WaterSupplierId = waterSupplierId,
-            SiteId = siteId,
+            SiteId = site?.Id ?? 0,
             InspectionDate = request.InspectionDate,
             ReasonForInspection = request.ReasonForInspection,
             Compliance1 = request.Compliance1,
@@ -142,16 +153,30 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         await _mailingInfoRedactionService.KeepSiteLocationWhenRedactedAsync(request, site, waterSupplierId, cancellationToken);
 
         ApplyEnteredLocation(inspection, request);
+        ApplyAdditionalInformation(inspection, request);
         ApplySiteValidation(inspection, site);
         ApplyInspectorSnapshot(inspection, professional, inspectorUser, csiLicense, inspectorUserId);
-        await ApplyAmountAsync(inspection, site.IsFeeExempt, site.PropertyType, cancellationToken);
+
+        await ApplyAmountAsync(inspection, site?.IsFeeExempt ?? false, site?.PropertyType ?? request.PropertyType, cancellationToken);
 
         CsiInspection added;
 
         using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
+            if (isUnlistedProperty)
+            {
+                var createdSite = await _siteService.AddWithGeneratedAccountNumberAsync(BuildSiteForUnlistedProperty(request, waterSupplierId));
+
+                inspection.SiteId = createdSite.Id;
+            }
+
             added = await _repository.AddAsync(inspection);
             await _assemblyService.SaveForInspectionAsync(added, request, cancellationToken);
+
+            if (!isUnlistedProperty)
+            {
+                await _siteService.UpdateAdditionalInformationAsync(inspection.SiteId, BuildAdditionalInformation(request));
+            }
 
             scope.Complete();
         }
@@ -234,6 +259,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         await _mailingInfoRedactionService.KeepSiteLocationWhenRedactedAsync(request, site, existing.WaterSupplierId, cancellationToken);
 
         ApplyEnteredLocation(inspection, request);
+        ApplyAdditionalInformation(inspection, request);
         ApplySiteValidation(inspection, site);
         ApplyInspectorSnapshot(inspection, professional, inspectorUser, csiLicense, inspectorUserId);
 
@@ -249,6 +275,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
             }
 
             await _assemblyService.SaveForInspectionAsync(saved, request, cancellationToken);
+            await _siteService.UpdateAdditionalInformationAsync(saved.SiteId, BuildAdditionalInformation(request));
 
             scope.Complete();
         }
@@ -344,13 +371,55 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         inspection.MailingEmailAddress = request.MailingEmailAddress;
     }
 
-    private static void ApplySiteValidation(CsiInspection inspection, DataTransferObjects.Sites.SiteDto site)
+    private static void ApplyAdditionalInformation(CsiInspection inspection, CsiInspectionDto request)
     {
+        inspection.AiOssf = request.AiOssf;
+        inspection.AiWaterWell = request.AiWaterWell;
+        inspection.AiReclaimedWater = request.AiReclaimedWater;
+        inspection.AiFireSystem = request.AiFireSystem;
+        inspection.AiFireSystem2 = request.AiFireSystem2;
+        inspection.AiGreaseTrap = request.AiGreaseTrap;
+        inspection.AiSandGrit = request.AiSandGrit;
+        inspection.AiIrrigationSystem = request.AiIrrigationSystem;
+        inspection.AiIrrigationSystem2 = request.AiIrrigationSystem2;
+        inspection.AiHasDomesticPremisesIsolation = request.AiHasDomesticPremisesIsolation;
+        inspection.AiRequiresDomesticPremisesIsolation = request.AiRequiresDomesticPremisesIsolation;
+    }
+
+    private static SiteAdditionalInformationDto BuildAdditionalInformation(CsiInspectionDto request)
+    {
+        return new SiteAdditionalInformationDto
+        {
+            HasOnSiteSewageFacility = request.AiOssf,
+            HasAuxWaterSupply = request.AiWaterWell,
+            HasReclaimed = request.AiReclaimedWater,
+            HasFireSystem = request.AiFireSystem,
+            FireSeparateWater = request.AiFireSystem2,
+            HasGreaseTrap = request.AiGreaseTrap,
+            HasGritTrap = request.AiSandGrit,
+            HasIrrigation = request.AiIrrigationSystem,
+            IrrigationSeparateWater = request.AiIrrigationSystem2,
+            HasDomesticPremisesIsolation = request.AiHasDomesticPremisesIsolation,
+            RequiresDomesticPremisesIsolation = request.AiRequiresDomesticPremisesIsolation
+        };
+    }
+
+    private static void ApplySiteValidation(CsiInspection inspection, SiteDto? site)
+    {
+        if (site == null)
+        {
+            inspection.ValidationNewSite = true;
+            inspection.ValidationSiteInformationChanged = false;
+            inspection.NeedsValidation = true;
+
+            return;
+        }
+
         inspection.ValidationSiteInformationChanged = HasSiteInformationChanged(inspection, site);
         inspection.NeedsValidation = inspection.ValidationSiteInformationChanged;
     }
 
-    private static bool HasSiteInformationChanged(CsiInspection inspection, DataTransferObjects.Sites.SiteDto site)
+    private static bool HasSiteInformationChanged(CsiInspection inspection, SiteDto site)
     {
         if (inspection.PropertyType != site.PropertyType)
         {
@@ -387,6 +456,47 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         };
 
         return SiteInformationComparer.HasTextChanged(textFields);
+    }
+
+    private static SiteDto BuildSiteForUnlistedProperty(CreateCsiInspectionDto request, int waterSupplierId)
+    {
+        return new SiteDto
+        {
+            WaterSupplier = new ReferencedWaterSupplierDto { Id = waterSupplierId },
+            Active = true,
+
+            BusinessName = request.PropertyBusinessName,
+            PropertyType = request.PropertyType,
+            StreetNumber = request.PropertyStreetNumber,
+            StreetName = request.PropertyStreetName,
+            PropertyNumber = request.PropertyNumber,
+            City = request.PropertyCity,
+            State = request.PropertyState,
+            ZipCode = request.PropertyZip,
+
+            MailingCompanyName = request.MailingCompanyName,
+            MailingContactName = request.MailingContactName,
+            MailingStreetNumber = request.MailingStreetNumber,
+            MailingStreetName = request.MailingStreetName,
+            MailingNumber = request.MailingNumber,
+            MailingCity = request.MailingCity,
+            MailingState = request.MailingState,
+            MailingZipCode = request.MailingZip,
+            MailingPhoneNumber = request.MailingPhoneNumber,
+            MailingEmailAddress = request.MailingEmailAddress,
+
+            HasOnSiteSewageFacility = request.AiOssf,
+            HasAuxWaterSupply = request.AiWaterWell,
+            HasReclaimed = request.AiReclaimedWater,
+            HasFireSystem = request.AiFireSystem,
+            FireSeparateWater = request.AiFireSystem2,
+            GreaseTrapType = request.AiGreaseTrap ? GreaseTrapType.HasGreaseTrap : GreaseTrapType.TrapNotRequired,
+            HasGritTrap = request.AiSandGrit,
+            HasIrrigation = request.AiIrrigationSystem,
+            IrrigationSeparateWater = request.AiIrrigationSystem2,
+            HasDomesticPremisesIsolation = request.AiHasDomesticPremisesIsolation,
+            RequiresDomesticPremisesIsolation = request.AiRequiresDomesticPremisesIsolation
+        };
     }
 
     public Task<byte[]> GeneratePdfAsync(CsiInspectionDto inspection)

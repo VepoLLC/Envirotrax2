@@ -226,6 +226,18 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         inspection.MaterialSolderOther = model.MaterialSolderOther;
         inspection.MaterialSolderOtherDescription = model.MaterialSolderOtherDescription;
 
+        inspection.AiOssf = model.AiOssf;
+        inspection.AiWaterWell = model.AiWaterWell;
+        inspection.AiReclaimedWater = model.AiReclaimedWater;
+        inspection.AiFireSystem = model.AiFireSystem;
+        inspection.AiFireSystem2 = model.AiFireSystem2;
+        inspection.AiGreaseTrap = model.AiGreaseTrap;
+        inspection.AiSandGrit = model.AiSandGrit;
+        inspection.AiIrrigationSystem = model.AiIrrigationSystem;
+        inspection.AiIrrigationSystem2 = model.AiIrrigationSystem2;
+        inspection.AiHasDomesticPremisesIsolation = model.AiHasDomesticPremisesIsolation;
+        inspection.AiRequiresDomesticPremisesIsolation = model.AiRequiresDomesticPremisesIsolation;
+
         inspection.Comments = model.Comments;
         inspection.NeedsValidation = model.NeedsValidation;
         inspection.ValidationSiteInformationChanged = model.ValidationSiteInformationChanged;

@@ -1,3 +1,4 @@
+import { formatDate } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Site } from '../../shared/models/sites/site';
 import { NgForm } from "@angular/forms";
@@ -327,6 +328,12 @@ export class EditSiteComponent implements OnInit {
         }
     }
 
+    public setDefaultDateWhenEnabled(enabled: boolean, field: 'csiRenewalDate' | 'fogInspectionExpirationDate' | 'fogPermitExpirationDate'): void {
+        if (enabled && !this.site[field]) {
+            this.site[field] = formatDate(new Date(), 'yyyy-MM-dd', 'en-US');
+        }
+    }
+
     public async updateSiteSettings(form: NgForm): Promise<void> {
         this.applyTripTicketIntervalValidation(form);
 
@@ -345,9 +352,14 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.invalidMailingAddress = this.site.invalidMailingAddress;
                     this.currentSite.outOfArea = this.site.outOfArea;
                     this.currentSite.isFeeExempt = this.site.isFeeExempt;
+                    this.currentSite.excludeFromBackflowMailing = this.site.excludeFromBackflowMailing;
+                    this.currentSite.excludeFromCsiMailing = this.site.excludeFromCsiMailing;
                     this.currentSite.needsCsiInspection = this.site.needsCsiInspection;
+                    this.currentSite.csiRenewalDate = this.site.csiRenewalDate;
                     this.currentSite.needsFogInspection = this.site.needsFogInspection;
+                    this.currentSite.fogInspectionExpirationDate = this.site.fogInspectionExpirationDate;
                     this.currentSite.needsFogPermit = this.site.needsFogPermit;
+                    this.currentSite.fogPermitExpirationDate = this.site.fogPermitExpirationDate;
                     this.currentSite.csiAccountAssignmentId = this.site.csiAccountAssignmentId;
                     this.currentSite.backflowAccountAssignmentId = this.site.backflowAccountAssignmentId;
                     this.currentSite.fogAccountAssignmentId = this.site.fogAccountAssignmentId;

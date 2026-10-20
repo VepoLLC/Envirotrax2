@@ -176,7 +176,7 @@ public class BackflowTestNotificationService : IBackflowTestNotificationService
         notification.ModuleType = NotificationModuleType.Backflow;
         notification.RecordId = test.Id;
         notification.PropertyDescription = BuildPropertyDescription(test);
-        notification.RecordDescription = BuildDeviceDescription(test);
+        notification.RecordDescription = BuildRecordDescription(test);
     }
 
     private static string? BuildPropertyDescription(BackflowTest test)
@@ -189,12 +189,17 @@ public class BackflowTestNotificationService : IBackflowTestNotificationService
         return string.IsNullOrEmpty(address) ? null : address;
     }
 
-    private static string? BuildDeviceDescription(BackflowTest test)
+    private static string? BuildRecordDescription(BackflowTest test)
     {
-        var parts = new[] { test.Manufacturer, test.Model, test.Size, test.DeviceType }
+        var device = string.Join(" ", new[] { test.Manufacturer, test.Model, test.Size, test.DeviceType }
+            .Where(part => !string.IsNullOrWhiteSpace(part)));
+
+        var serialNumber = string.IsNullOrWhiteSpace(test.SerialNumber) ? null : $"#{test.SerialNumber}";
+
+        var parts = new[] { device, serialNumber, test.HazardType }
             .Where(part => !string.IsNullOrWhiteSpace(part));
 
-        var description = string.Join(" ", parts);
+        var description = string.Join(" · ", parts);
 
         return string.IsNullOrEmpty(description) ? null : description;
     }
@@ -270,20 +275,13 @@ public class BackflowTestNotificationService : IBackflowTestNotificationService
 
     private static BackflowTestNotificationItemVm BuildEmailItem(NotificationMatch match)
     {
-        var serialNumber = string.IsNullOrWhiteSpace(match.Test.SerialNumber) ? null : $"#{match.Test.SerialNumber}";
-
-        var parts = new[] { match.Notification.RecordDescription, serialNumber, match.Test.HazardType }
-            .Where(part => !string.IsNullOrWhiteSpace(part));
-
-        var details = string.Join(" · ", parts);
-
         return new BackflowTestNotificationItemVm
         {
             TestId = match.Test.Id,
             Title = string.IsNullOrWhiteSpace(match.Notification.PropertyDescription)
                 ? $"Backflow test #{match.Test.Id}"
                 : match.Notification.PropertyDescription,
-            Details = string.IsNullOrEmpty(details) ? null : details,
+            Details = match.Notification.RecordDescription,
             LocationDescription = match.Test.LocationDescription
         };
     }

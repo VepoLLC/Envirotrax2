@@ -1,0 +1,23 @@
+<vp-section [header]="'Water Supplier Registrations (' + (table.items?.pageInfo?.totalItems ?? 0) + ')'">
+    <p class="small text-muted">
+        <strong>Fee value of -1:</strong> Use Water Supplier fee.
+        <strong class="ms-2">Fee value of 0:</strong> Free submission.
+        <strong class="ms-2">Fee value of &gt;0:</strong> Overrides the Water Supplier fee and uses this fee.
+    </p>
+
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [showActionLabels]="false"
+                  [canEdit]="true"
+                  (edit)="editRegistration($event)"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getRegistrations()"
+                  [(query)]="table.query"
+                  (queryChange)="getRegistrations()"
+                  (queryReset)="getRegistrations()" />
+    </div>
+</vp-section>

@@ -43,6 +43,11 @@ public static class ServiceRegistration
                 services.AddTransient<ICsiInspectorInsuranceService, CsiInspectorInsuranceService>();
                 services.AddTransient<IBackflowTestService, BackflowTestService>();
                 services.AddTransient<IBackflowTesterService, BackflowTesterService>();
+                services.AddTransient<IBackflowTesterWaterSupplierService, BackflowTesterWaterSupplierService>();
+                services.AddTransient<IBackflowTesterUserService, BackflowTesterUserService>();
+                services.AddTransient<IBackflowTesterLicenseService, BackflowTesterLicenseService>();
+                services.AddTransient<IBackflowTesterInsuranceService, BackflowTesterInsuranceService>();
+                services.AddTransient<IBackflowTesterGaugeService, BackflowTesterGaugeService>();
                 services.AddTransient<IBackflowReplacementService, BackflowReplacementService>();
                 services.AddTransient<IFogInspectionService, FogInspectionService>();
                 services.AddTransient<IFogInspectorService, FogInspectorService>();

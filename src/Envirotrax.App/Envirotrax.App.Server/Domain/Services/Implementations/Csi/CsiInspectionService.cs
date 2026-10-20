@@ -104,7 +104,7 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         var inspectorUserId = request.InspectorUser!.Id.Value;
 
         var site = await _siteService.GetAsync(siteId, cancellationToken);
-        var waterSupplierId = await _submissionSupplierService.ResolveForSiteAsync(site, ProfessionalType.CsiInspector, cancellationToken);
+        var waterSupplierId = await _submissionSupplierService.ResolveAsync(site, request.WaterSupplier?.Id, ProfessionalType.CsiInspector, cancellationToken);
 
         await _insuranceService.EnsureSatisfiedForWaterSupplierAsync(_authService.ProfessionalId, waterSupplierId, ProfessionalType.CsiInspector, cancellationToken);
 

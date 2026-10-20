@@ -38,7 +38,7 @@
     <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
 
     <div *ngIf="!isLoading && inspection">
-        <div class="row mt-3">
+        <div *ngIf="selectedTab === 'main'" class="row mt-3">
             <vp-section header="Water Supplier">
                 <div class="row">
                     <div class="col-md-6">
@@ -65,7 +65,7 @@
             </vp-section>
         </div>
 
-        <div class="row mt-3">
+        <div *ngIf="selectedTab === 'main'" class="row mt-3">
             <vp-section header="CSI Inspector">
                 <div class="row">
                     <div class="col-md-6">
@@ -96,7 +96,7 @@
             </vp-section>
         </div>
 
-        <div class="row mt-3">
+        <div *ngIf="selectedTab === 'main'" class="row mt-3">
             <div class="col-md-6">
                 <vp-section header="Location / Property Information">
                     <dl class="row mb-0">
@@ -130,7 +130,7 @@
             </div>
         </div>
 
-        <div class="row mt-3">
+        <div *ngIf="selectedTab === 'main'" class="row mt-3">
             <vp-section header="Inspection Results">
                 <div class="content">
                     <dl class="row mb-3">
@@ -276,13 +276,13 @@
             </vp-section>
         </div>
 
-        <div class="row mt-3">
+        <div *ngIf="selectedTab === 'main'" class="row mt-3">
             <vp-section header="Remarks">
                 <p>{{ inspection.comments }}</p>
             </vp-section>
         </div>
 
-        <div class="row mt-3">
+        <div *ngIf="selectedTab === 'main'" class="row mt-3">
             <vp-section header="Record Log">
                 <vp-record-log-list [logs]="recordLogs" [isLoading]="isLoadingRecordLogs" [recordLabel]="'inspection'" />
             </vp-section>
@@ -290,7 +290,7 @@
 
         
 
-        <div class="row mt-3">
+        <div *ngIf="selectedTab === 'main'" class="row mt-3">
             <div class="col-12 text-center text-muted">
                 A Customer Service Inspection Certificate should be on file for each connection in a public water system
                 to document compliance with 30 TAC §290.44(h)/290.46(j).
@@ -300,6 +300,73 @@
         <div *ngIf="selectedTab === 'assemblies'" class="row mt-3">
             <vp-section header="Assemblies at This Location">
                 <vp-csi-inspection-assembly-table [assemblies]="assemblies" />
+            </vp-section>
+        </div>
+
+        <div *ngIf="selectedTab === 'additional'" class="row mt-3">
+            <vp-section header="Additional Information">
+                <div class="d-flex justify-content-center">
+                    <div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiOssf" disabled [checked]="inspection.aiOssf" />
+                                <label class="form-check-label" for="aiOssf">Has On Site Sewage Facility</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiWaterWell" disabled [checked]="inspection.aiWaterWell" />
+                                <label class="form-check-label" for="aiWaterWell">Has Auxiliary Water Supply</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiReclaimedWater" disabled [checked]="inspection.aiReclaimedWater" />
+                                <label class="form-check-label" for="aiReclaimedWater">Has Reclaimed Water</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiFireSystem" disabled [checked]="inspection.aiFireSystem" />
+                                <label class="form-check-label" for="aiFireSystem">Has Fire System</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiFireSystem2" disabled [checked]="inspection.aiFireSystem2" />
+                                <label class="form-check-label" for="aiFireSystem2">Fire System on Separate Water Supply</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiGreaseTrap" disabled [checked]="inspection.aiGreaseTrap" />
+                                <label class="form-check-label" for="aiGreaseTrap">Has Grease Trap</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiSandGrit" disabled [checked]="inspection.aiSandGrit" />
+                                <label class="form-check-label" for="aiSandGrit">Has Sand &amp; Grit Trap</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiIrrigationSystem" disabled [checked]="inspection.aiIrrigationSystem" />
+                                <label class="form-check-label" for="aiIrrigationSystem">Has Irrigation System</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiIrrigationSystem2" disabled [checked]="inspection.aiIrrigationSystem2" />
+                                <label class="form-check-label" for="aiIrrigationSystem2">Irrigation on Separate Water Supply</label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="form-check">
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiHasIsolation" disabled [checked]="inspection.aiHasDomesticPremisesIsolation" />
+                                <label class="form-check-label" for="aiHasIsolation">Has Domestic/Premises Isolation</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input readonly-checkbox" type="checkbox" id="aiRequiresIsolation" disabled [checked]="inspection.aiRequiresDomesticPremisesIsolation" />
+                                <label class="form-check-label" for="aiRequiresIsolation">Requires Domestic/Premises Isolation</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </vp-section>
         </div>
 

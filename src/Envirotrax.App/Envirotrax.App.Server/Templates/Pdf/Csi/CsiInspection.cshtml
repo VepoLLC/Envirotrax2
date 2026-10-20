@@ -1,4 +1,4 @@
-@model System.Collections.Generic.IEnumerable<Envirotrax.App.Server.Domain.DataTransferObjects.Csi.CsiInspectionDto>
+@model System.Collections.Generic.IEnumerable<Envirotrax.App.Server.Domain.DataTransferObjects.Csi.CsiInspectionPdfModel>
 @{
     Layout = null;
     var reasonLabels = new[] {
@@ -84,18 +84,77 @@
             color: #555;
         }
 
-        .inspection-wrapper:not(:last-child) {
+        .pdf-page {
             break-after: page;
+        }
+
+        .pdf-page:last-child {
+            break-after: auto;
+        }
+
+        .assembly-table {
+            margin-top: 5px;
+        }
+
+        .assembly-table th {
+            background-color: #f0f0f0;
+            color: #000000;
+            border: 1px solid #505050;
+        }
+
+        .assembly-table td {
+            border: 1px solid #c8c8c8;
+            padding: 3.5px 8px;
+        }
+
+        .assembly-table tr {
+            break-inside: avoid;
+        }
+
+        .assembly-table tbody tr:nth-child(even) td {
+            background-color: #e6e6f0;
+        }
+
+        .date-label {
+            display: inline-block;
+            width: 52px;
+        }
+
+        .additional-info {
+            margin: 14px 0 0 35%;
+        }
+
+        .additional-info-group {
+            margin-bottom: 10px;
+        }
+
+        .additional-info-row {
+            padding: 1.5px 0;
+        }
+
+        .checkbox {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            line-height: 9px;
+            margin-right: 7px;
+            border: 1px solid #323232;
+            text-align: center;
+            font-size: 9px;
+            vertical-align: -1px;
         }
     </style>
 </head>
 <body>
-@foreach (var inspection in Model)
+@foreach (var item in Model)
 {
+    var inspection = item.Inspection;
     var reasonLabel = (int)inspection.ReasonForInspection < reasonLabels.Length
         ? reasonLabels[(int)inspection.ReasonForInspection] : "";
+    var propertyAddress = $"{inspection.PropertyStreetNumber} {inspection.PropertyStreetName}"
+        + (string.IsNullOrWhiteSpace(inspection.PropertyNumber) ? "" : $" #{inspection.PropertyNumber}");
 
-    <div class="inspection-wrapper">
+    <div class="pdf-page">
         <div class="page-title">@inspection.WaterSupplier?.Name &ndash; Customer Service Inspection</div>
 
         <div class="section-header">Water Supplier</div>
@@ -284,6 +343,68 @@
         <div class="footer-note">
             A Customer Service Inspection Certificate should be on file for each connection in a public water system
             to document compliance with 30 TAC &sect;290.44(h)/290.46(j).
+        </div>
+    </div>
+
+    if (item.Assemblies.Count > 0)
+    {
+        <div class="pdf-page">
+            <div class="section-header">Assemblies at this Location - @propertyAddress</div>
+            <table class="assembly-table">
+                <thead>
+                    <tr>
+                        <th style="width:33%">Assembly Information</th>
+                        <th style="width:40%">Location Description</th>
+                        <th style="width:27%">Expiration Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var assembly in item.Assemblies)
+                    {
+                        <tr>
+                            <td>
+                                <div>@assembly.AssemblyDescription</div>
+                                <div>SN: @assembly.SerialNumber</div>
+                            </td>
+                            <td>
+                                <div>@assembly.LocationDescription</div>
+                                @if (assembly.HazardType == "Fire System")
+                                {
+                                    <div>*** Fire System ***</div>
+                                }
+                            </td>
+                            <td>
+                                <div><span class="date-label">Tested On:</span> @assembly.TestDate?.ToString("M/d/yyyy")</div>
+                                <div><span class="date-label">Expiration:</span> @assembly.ExpirationDate?.ToString("M/d/yyyy")</div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    var additionalInformationGroups = new[]
+    {
+        new[] { ("Has On Site Sewage Facility", inspection.AiOssf), ("Has Auxiliary Water Supply", inspection.AiWaterWell), ("Has Reclaimed Water", inspection.AiReclaimedWater) },
+        new[] { ("Has Fire System", inspection.AiFireSystem), ("Fire System on Separate Water Supply", inspection.AiFireSystem2) },
+        new[] { ("Has Grease Trap", inspection.AiGreaseTrap), ("Has Sand & Grit Trap", inspection.AiSandGrit) },
+        new[] { ("Has Irrigation System", inspection.AiIrrigationSystem), ("Irrigation on Separate Water Supply", inspection.AiIrrigationSystem2) },
+        new[] { ("Has Domestic/Premises Isolation", inspection.AiHasDomesticPremisesIsolation), ("Requires Domestic/Premises Isolation", inspection.AiRequiresDomesticPremisesIsolation) }
+    };
+
+    <div class="pdf-page">
+        <div class="section-header">Additional Information - @propertyAddress</div>
+        <div class="additional-info">
+            @foreach (var group in additionalInformationGroups)
+            {
+                <div class="additional-info-group">
+                    @foreach (var (label, isChecked) in group)
+                    {
+                        <div class="additional-info-row"><span class="checkbox">@(isChecked ? "✓" : "")</span>@label</div>
+                    }
+                </div>
+            }
         </div>
     </div>
 }

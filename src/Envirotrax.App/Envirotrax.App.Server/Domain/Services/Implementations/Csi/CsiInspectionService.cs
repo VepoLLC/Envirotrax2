@@ -504,9 +504,28 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         return GeneratePdfAsync([inspection]);
     }
 
-    public Task<byte[]> GeneratePdfAsync(IEnumerable<CsiInspectionDto> inspections)
+    public async Task<byte[]> GeneratePdfAsync(IEnumerable<CsiInspectionDto> inspections)
     {
-        return _pdfTemplateService.GenerateAsync("Csi.CsiInspection", inspections);
+        var models = new List<CsiInspectionPdfModel>();
+
+        foreach (var inspection in inspections)
+        {
+            var assemblies = await _assemblyService.GetByInspectionAsync(inspection.Id, CancellationToken.None);
+
+            models.Add(new CsiInspectionPdfModel { Inspection = inspection, Assemblies = assemblies });
+        }
+
+        return await _pdfTemplateService.GenerateAsync("Csi.CsiInspection", models);
+    }
+
+    public Task<byte[]> GeneratePdfAsync(CsiInspectionDto inspection, IReadOnlyList<CsiInspectionAssemblyDto> assemblies)
+    {
+        var models = new List<CsiInspectionPdfModel>
+        {
+            new() { Inspection = inspection, Assemblies = assemblies }
+        };
+
+        return _pdfTemplateService.GenerateAsync("Csi.CsiInspection", models);
     }
 
     public Task<byte[]> GeneratePdfForProfessionalAsync(CsiInspectionDto inspection)

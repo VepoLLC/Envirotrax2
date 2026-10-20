@@ -229,7 +229,12 @@ public class PublicSearchService : IPublicSearchService
 
         await RedactMailingInfoAsync(inspectionDto, inspection.WaterSupplierId, cancellationToken);
 
-        return await _csiInspectionService.GeneratePdfAsync(inspectionDto);
+        var assemblies = await _publicSearchRepository.GetCsiInspectionAssembliesAsync(
+            inspection.WaterSupplierId, inspection.Id, cancellationToken);
+
+        return await _csiInspectionService.GeneratePdfAsync(
+            inspectionDto,
+            _mapper.Map<List<CsiInspectionAssemblyDto>>(assemblies));
     }
 
     private async Task RedactMailingInfoAsync(IRedactableMailingInfoDto dto, int waterSupplierId, CancellationToken cancellationToken)

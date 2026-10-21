@@ -1,5 +1,6 @@
-import { Component } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { Router, ActivatedRoute } from "@angular/router";
+import { Subscription } from "rxjs";
 import { NgForm } from "@angular/forms";
 import { HelperService } from "@envirotrax/common-ui";
 import { BackflowTest } from "../../../shared/models/backflow/backflow-test";
@@ -27,7 +28,7 @@ interface SubmissionSiteBox {
     standalone: false,
     templateUrl: './backflow-test-assembly-search.component.html'
 })
-export class BackflowTestAssemblySearchComponent {
+export class BackflowTestAssemblySearchComponent implements OnInit, OnDestroy {
 
     public readonly PropertyType = PropertyType;
 
@@ -50,6 +51,7 @@ export class BackflowTestAssemblySearchComponent {
     };
 
     private _criteria: BackflowSubmissionSearchCriteria = {};
+    private _routeSub?: Subscription;
 
     constructor(
         private readonly _siteService: SiteService,
@@ -58,11 +60,32 @@ export class BackflowTestAssemblySearchComponent {
         private readonly _activatedRoute: ActivatedRoute
     ) { }
 
+    public ngOnInit(): void {
+        this._routeSub = this._activatedRoute.queryParamMap.subscribe(async params => {
+            this.accountNumber = params.get('accountNumber') ?? '';
+            this.manufacturer = params.get('manufacturer') ?? '';
+            this.serialNumber = params.get('serialNumber') ?? '';
+            this.streetNumber = params.get('streetNumber') ?? '';
+
+            if (this.accountNumber || this.manufacturer || this.serialNumber || this.streetNumber) {
+                await this.runSearch();
+            }
+        });
+    }
+
+    public ngOnDestroy(): void {
+        this._routeSub?.unsubscribe();
+    }
+
     public async search(searchForm: NgForm): Promise<void> {
         if (!searchForm.valid) {
             return;
         }
 
+        await this.runSearch();
+    }
+
+    private async runSearch(): Promise<void> {
         if (!this.accountNumber && !(this.manufacturer && this.serialNumber) && !this.streetNumber) {
             this.errorMessage = 'Please enter an Account Number, Manufacturer and Serial Number, or a Street Number to search.';
             return;

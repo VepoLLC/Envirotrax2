@@ -22,11 +22,13 @@ import { LicenseHelpTextComponent } from "./users/edit/licenses/help-text/licens
 import { LicenseListComponent } from "./licenses/license-list.component";
 import { DashboardComponent } from "./dashboard/dashboard.component";
 import { AccountBalanceManagementComponent } from "./account/account-balance-management.component";
+import { PaymentReceiptsComponent } from "./payments/payment-receipts.component";
 
 @NgModule({
     declarations: [
         DashboardComponent,
         AccountBalanceManagementComponent,
+        PaymentReceiptsComponent,
         WaterSuppliersComponent,
         WaterSupplierRegistrationComponent,
         ProfessionalUserListComponent,

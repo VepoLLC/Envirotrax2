@@ -9,7 +9,7 @@ using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Payments;
 
-public abstract class ProfessionalCheckoutService<TItem, TItemDto>
+public abstract class ProfessionalCheckoutService<TItem, TItemDto> : IProfessionalReceiptReferenceProvider
     where TItem : IPayableModel
     where TItemDto : IRedactableMailingInfoDto
 {
@@ -61,6 +61,18 @@ public abstract class ProfessionalCheckoutService<TItem, TItemDto>
 
         return receipt;
     }
+
+    ProfessionalTransactionType IProfessionalReceiptReferenceProvider.TransactionType => TransactionType;
+
+    public async Task<ReceiptReferenceDto> GetReceiptReferenceAsync(ProfessionalTransaction transaction, CancellationToken cancellationToken)
+    {
+        var receipt = await BuildReceiptAsync(transaction, cancellationToken);
+        var items = await _mailingInfoRedactionService.RedactAsync(receipt.Items, cancellationToken);
+
+        return BuildReceiptReference(items);
+    }
+
+    protected abstract ReceiptReferenceDto BuildReceiptReference(List<TItemDto> items);
 
     protected abstract Task<List<TItem>> GetUnpaidItemsAsync(List<int> ids, CancellationToken cancellationToken);
 

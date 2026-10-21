@@ -89,6 +89,37 @@ public class FogTripTicketCheckoutService
         receipt.EmailResults = await _checkoutEmailService.SendTripTicketReportsAsync(ticketsToEmail, request.TransactionId);
     }
 
+    protected override ReceiptReferenceDto BuildReceiptReference(List<FogTripTicketDto> tickets)
+    {
+        return new ReceiptReferenceDto
+        {
+            Headers = ["Generator Information", "Inspection Information", "Amount"],
+            Rows = tickets
+                .Select(ticket => new ReceiptRowDto
+                {
+                    Cells =
+                    [
+                        ReceiptFormatter.PropertyLines(ticket),
+                        [
+                            ReceiptFormatter.Labeled("Removal Date:", ReceiptFormatter.DateTimeText(ticket.InterceptorWasteRemovedDate)),
+                            ReceiptFormatter.Labeled("Trap/Interceptor:", ReceiptFormatter.Join(
+                                " ",
+                                ticket.InterceptorType,
+                                ticket.InterceptorOtherDescription,
+                                ticket.InterceptorCapacity.ToString(),
+                                ReceiptFormatter.CapacityLabel(ticket.InterceptorCapacityType))),
+                            ReceiptFormatter.Labeled("Waste Removed:", ReceiptFormatter.Join(
+                                " ",
+                                ticket.InterceptorWasteRemovedAmount.ToString(),
+                                ReceiptFormatter.CapacityLabel(ticket.InterceptorWasteRemovedType)))
+                        ],
+                        ReceiptFormatter.AmountCell(ticket.Amount)
+                    ]
+                })
+                .ToList()
+        };
+    }
+
     private int? GetTransporterId()
     {
         return AuthService.HasAnyRole(RoleDefinitions.Professionals.Admin) ? null : AuthService.UserId;

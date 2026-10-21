@@ -78,11 +78,6 @@ export class InsuranceListComponent implements OnInit {
                 type: ColumnType.text
             },
             {
-                field: 'coverageAmount',
-                caption: 'Coverage $',
-                type: ColumnType.number
-            },
-            {
                 field: 'expirationDate',
                 caption: 'Expiration Date',
                 cellTemplate: this.dateCellTemplate,

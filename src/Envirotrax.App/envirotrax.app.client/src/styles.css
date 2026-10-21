@@ -265,15 +265,37 @@ a:hover {
 
 .form-control,
 .form-control:focus,
-.ng-select.ng-select-opened>.ng-select-container,
-.ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+.ng-select.ng-select-opened>.ng-select-container {
     padding: 0.25rem 0.75rem;
 }
 
+.form-check {
+    min-height: 1.25rem;
+}
+
+.form-check:not(.form-check-inline) {
+    margin-bottom: 0.375rem;
+}
+
+.form-check.mb-2 {
+    margin-bottom: 0.375rem !important;
+}
+
+td .form-check:not(.form-check-inline) {
+    margin-bottom: 0.125rem;
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+    padding: 0.125rem 0.75rem;
+}
+
 .form-control,
-.ng-select,
-.ng-dropdown-panel {
+.ng-select {
     font-size: 0.875rem;
+}
+
+.ng-dropdown-panel {
+    font-size: 0.8rem;
 }
 
 .ng-select .ng-arrow-wrapper .ng-arrow {
@@ -327,7 +349,7 @@ a:hover {
 }
 
 .ng-dropdown-panel .ng-dropdown-panel-items {
-    max-height: 400px !important;
+    max-height: min(480px, 50vh) !important;
 }
 
 .form-check-input {

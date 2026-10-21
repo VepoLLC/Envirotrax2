@@ -5,6 +5,7 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 public interface ICsiInspectionAssemblyRepository : IRepository<CsiInspectionVisuallyIdentifiedAssembly>
 {
     Task<List<CsiInspectionVisuallyIdentifiedAssembly>> GetByInspectionAsync(int inspectionId, CancellationToken cancellationToken);
+    Task<List<CsiInspectionVisuallyIdentifiedAssembly>> GetByInspectionsAsync(IReadOnlyCollection<int> inspectionIds, CancellationToken cancellationToken);
     Task<int> GetCountByInspectionAsync(int inspectionId, CancellationToken cancellationToken);
     Task AddRangeAsync(IEnumerable<CsiInspectionVisuallyIdentifiedAssembly> assemblies, CancellationToken cancellationToken);
     Task UpdateVisuallyIdentifiedAsync(int inspectionId, int professionalId, IReadOnlyCollection<int> visuallyIdentifiedIds, CancellationToken cancellationToken);

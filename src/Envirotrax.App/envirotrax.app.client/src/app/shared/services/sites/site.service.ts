@@ -7,6 +7,7 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { Site } from "../../models/sites/site";
+import { BackflowSubmissionSite } from "../../models/backflow/backflow-submission-site";
 import { DownloadEndpoint } from "../../models/download-config";
 import { RecordLog } from "@envirotrax/common-ui";
 
@@ -24,6 +25,11 @@ export interface ProfessionalSiteSearchCriteria {
     scheduledOnly?: string | null;
     scheduledFrom?: string | null;
     scheduledTo?: string | null;
+}
+
+export interface BackflowSubmissionSearchCriteria {
+    manufacturer?: string | null;
+    serialNumber?: string | null;
 }
 
 @Injectable({
@@ -187,6 +193,20 @@ export class SiteService {
         }
 
         return await lastValueFrom(this._http.get<PagedData<Site>>(url, { params }));
+    }
+
+    public async getAllForBackflowSubmission(pageInfo: PageInfo, query: Query, criteria: BackflowSubmissionSearchCriteria = {}): Promise<PagedData<BackflowSubmissionSite>> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/backflow/sites');
+
+        let params = this._queryHelper.buildQuery(pageInfo, query);
+
+        for (const [name, value] of Object.entries(criteria)) {
+            if (value) {
+                params = params.append(name, value);
+            }
+        }
+
+        return await lastValueFrom(this._http.get<PagedData<BackflowSubmissionSite>>(url, { params }));
     }
 
     public get(id: number): Promise<Site> {

@@ -7,6 +7,7 @@ import { ProfessionalBackflowTestListComponent } from "./tests/professional-back
 import { ProfessionalBackflowTestDetailsComponent } from "./tests/details/professional-backflow-test-details.component";
 import { BackflowTestAssemblySearchComponent } from "./submit/backflow-test-assembly-search.component";
 import { BackflowTestSubmitComponent } from "./submit/backflow-test-submit.component";
+import { BackflowTestSubmitConfirmationComponent } from "./submit/backflow-test-submit-confirmation.component";
 import { BackflowOutOfServiceRequestComponent } from "./tests/out-of-service/backflow-out-of-service-request.component";
 
 const routes: Routes = [
@@ -42,6 +43,13 @@ const routes: Routes = [
         path: 'tests/submit',
         title: 'Submit Backflow Test',
         component: BackflowTestAssemblySearchComponent,
+        canActivate: [RoleGuard],
+        data: { roles: [ROLE_DEFINITIONS.PROFESSIONAL] }
+    },
+    {
+        path: 'tests/submit/confirmation',
+        title: 'Backflow Test Submission',
+        component: BackflowTestSubmitConfirmationComponent,
         canActivate: [RoleGuard],
         data: { roles: [ROLE_DEFINITIONS.PROFESSIONAL] }
     },

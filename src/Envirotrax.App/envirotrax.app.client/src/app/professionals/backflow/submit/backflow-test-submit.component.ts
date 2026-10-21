@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { BackflowTest } from '../../../shared/models/backflow/backflow-test';
 import { BackflowTestImages } from '../../../shared/models/backflow/backflow-test-images';
@@ -816,18 +816,24 @@ export class BackflowTestSubmitComponent implements OnInit {
         try {
             if (this.editingTestId) {
                 await this._backflowTestService.updateForProfessional(this.editingTestId, submission, this.images);
+
+                this.submitSuccess = true;
             } else {
                 await this._backflowTestService.submit(submission, this.images);
+
+                const queryParams: Params = {};
+
+                if (submission.site?.id) {
+                    queryParams['siteId'] = submission.site.id;
+                }
+
+                this._router.navigate(['..', 'confirmation'], { relativeTo: this._activatedRoute, queryParams: queryParams });
             }
-            this.submitSuccess = true;
+
             this._checkoutService.refresh();
         } finally {
             this.isLoading = false;
         }
-    }
-
-    public submitAnother(): void {
-        this._router.navigate(['..'], { relativeTo: this._activatedRoute });
     }
 
     public returnToAccountOverview(): void {

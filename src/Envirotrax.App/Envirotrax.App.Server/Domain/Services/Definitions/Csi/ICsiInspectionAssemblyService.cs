@@ -6,6 +6,7 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 public interface ICsiInspectionAssemblyService
 {
     Task<List<CsiInspectionAssemblyDto>> GetByInspectionAsync(int inspectionId, CancellationToken cancellationToken);
+    Task<Dictionary<int, List<CsiInspectionAssemblyDto>>> GetByInspectionsAsync(IReadOnlyCollection<int> inspectionIds, CancellationToken cancellationToken);
     Task<int> GetCountByInspectionAsync(int inspectionId, CancellationToken cancellationToken);
     Task<List<CsiInspectionAssemblyDto>> GetForFormAsync(int siteId, int? inspectionId, CancellationToken cancellationToken);
     Task SaveForInspectionAsync(CsiInspection inspection, CreateCsiInspectionDto request, CancellationToken cancellationToken);

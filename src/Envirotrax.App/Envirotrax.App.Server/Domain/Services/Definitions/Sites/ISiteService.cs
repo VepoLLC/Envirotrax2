@@ -10,6 +10,7 @@ public interface ISiteService : IService<Site, SiteDto>
     Task<IPagedData<ProfessionalSiteDto>> SearchForProfessionalAsync(ProfessionalSiteSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<SiteDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken);
     Task<SiteDto> AddWithGeneratedAccountNumberAsync(SiteDto dto);
+    Task<IPagedData<BackflowSubmissionSiteDto>> SearchForBackflowSubmissionAsync(BackflowSubmissionSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<IEnumerable<SiteDto>> GetAllPendingGeocodingAsync(int batchSize);
     Task<SiteDto?> GeocodeAsync(int siteId, bool assignGisArea, CancellationToken cancellationToken);
     Task UpdateGisDataAsync(int siteId, UpdateSiteGisDataDto dto, CancellationToken cancellationToken);

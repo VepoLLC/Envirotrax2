@@ -10,6 +10,7 @@ import { ProfessionalBackflowTestListComponent } from "./tests/professional-back
 import { ProfessionalBackflowTestDetailsComponent } from "./tests/details/professional-backflow-test-details.component";
 import { BackflowTestAssemblySearchComponent } from "./submit/backflow-test-assembly-search.component";
 import { BackflowTestSubmitComponent } from "./submit/backflow-test-submit.component";
+import { BackflowTestSubmitConfirmationComponent } from "./submit/backflow-test-submit-confirmation.component";
 import { BackflowOutOfServiceRequestComponent } from "./tests/out-of-service/backflow-out-of-service-request.component";
 
 @NgModule({
@@ -20,6 +21,7 @@ import { BackflowOutOfServiceRequestComponent } from "./tests/out-of-service/bac
         ProfessionalBackflowTestDetailsComponent,
         BackflowTestAssemblySearchComponent,
         BackflowTestSubmitComponent,
+        BackflowTestSubmitConfirmationComponent,
         BackflowOutOfServiceRequestComponent
     ],
     imports: [CommonModule, FormsModule, SharedComponentsModule, BackflowTestDetailsSectionsModule, ProfessionalsBackflowRoutingModule]

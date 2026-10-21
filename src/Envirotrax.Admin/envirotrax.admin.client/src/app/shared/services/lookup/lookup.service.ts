@@ -26,9 +26,15 @@ export class LookupService {
         return await lastValueFrom(this._states$);
     }
 
-    public async getStatesAsOptions(): Promise<InputOption<State>[]> {
+    public async getStatesAsOptions(includeEmpty: boolean = false): Promise<InputOption<State>[]> {
         const states = await this.getAllStates();
 
-        return states.map(state => ({ id: String(state.id), text: state.code ?? '', data: state }));
+        const options: InputOption<State>[] = states.map(state => ({ id: String(state.id), text: state.code ?? '', data: state }));
+
+        if (includeEmpty) {
+            options.splice(0, 0, { id: '', text: '' });
+        }
+
+        return options;
     }
 }

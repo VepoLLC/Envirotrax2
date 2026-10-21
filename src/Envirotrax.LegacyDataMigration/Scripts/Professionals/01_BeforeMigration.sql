@@ -66,6 +66,7 @@ CREATE TABLE MigrationLegacyProfessionalAccounts (
     FaxNumber NVARCHAR(50) NULL,
     WebsiteUrl NVARCHAR(255) NULL,
     HidePublicListing BIT NULL,
+    SendCheckoutEmail BIT NULL,
     AdminAccount BIT NULL,
     AccountBalance MONEY NULL,
     CreationDate DATETIME NULL,

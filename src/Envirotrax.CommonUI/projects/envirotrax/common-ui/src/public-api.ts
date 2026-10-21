@@ -48,6 +48,7 @@ export * from './lib/models/paged-data';
 export * from './lib/models/query';
 export * from './lib/models/table-view-model';
 export * from './lib/models/record-log';
+export * from './lib/models/download-config';
 
 // Services
 export * from './lib/services/helpers/url-resolver.service';
@@ -56,3 +57,4 @@ export * from './lib/services/helpers/query-helper.service';
 export * from './lib/services/helpers/modal-helper.service'
 export * from "./lib/services/helpers/timezone/timezone.interceptor";
 export * from "./lib/services/toast/toast.service";
+export * from "./lib/services/download/download.service";

@@ -2841,6 +2841,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("DefaultStateId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("DeletedById")
                         .HasColumnType("int");
 
@@ -2884,6 +2887,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("SendCheckoutEmail")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("StateId")
                         .HasColumnType("int");
 
@@ -2904,6 +2910,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("DefaultStateId");
 
                     b.HasIndex("DeletedById");
 
@@ -5229,6 +5237,11 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "DefaultState")
+                        .WithMany()
+                        .HasForeignKey("DefaultStateId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "DeletedBy")
                         .WithMany()
                         .HasForeignKey("DeletedById")
@@ -5250,6 +5263,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("DefaultState");
 
                     b.Navigation("DeletedBy");
 

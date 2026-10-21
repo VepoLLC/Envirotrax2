@@ -43,7 +43,7 @@ export class AddEditBackflowTesterLicenseComponent implements OnInit {
         private readonly _helper: HelperService,
         private readonly _toastService: ToastService
     ) {
-        // This grid only holds BPAT licenses (fire licence types included - they are BPAT types too). The server
+        // This grid only holds user-level BPAT licenses (fire licences are company-level). The server
         // pins the type as well, but the DTO marks it required, so it has to be on the payload or model binding
         // rejects the request first.
         this.license = {

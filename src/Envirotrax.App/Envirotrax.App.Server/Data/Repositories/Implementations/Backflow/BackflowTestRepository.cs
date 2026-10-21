@@ -12,6 +12,7 @@ using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
@@ -1077,6 +1078,16 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             .AsNoTracking()
             .Where(t => t.SiteId == siteId && t.DeletedTime == null && t.IsCurrent)
             .OrderBy(t => t.SerialNumber)
+            .ToListAsync(cancellationToken);
+    }
+
+    public Task<List<BackflowTest>> GetSubmissionAssembliesAsync(IReadOnlyCollection<int> siteIds, BackflowSubmissionSearchDto criteria, CancellationToken cancellationToken)
+    {
+        return Entity
+            .AsNoTracking()
+            .WhereSubmissionAssembly(criteria)
+            .Where(test => test.SiteId != null && siteIds.Contains(test.SiteId.Value))
+            .OrderBy(test => test.SerialNumber)
             .ToListAsync(cancellationToken);
     }
 

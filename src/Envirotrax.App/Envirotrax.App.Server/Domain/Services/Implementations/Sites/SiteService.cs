@@ -10,6 +10,7 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Data.Repositories.Definitions.GisAreas;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
@@ -199,6 +200,46 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         }
 
         return site;
+    }
+
+    public async Task<IPagedData<BackflowSubmissionSiteDto>> SearchForBackflowSubmissionAsync(BackflowSubmissionSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<Site, SiteDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<Site, SiteDto>(Mapper);
+
+        var sites = (await _siteRepository.SearchForBackflowSubmissionAsync(criteria, pageInfo, query, cancellationToken)).ToList();
+
+        var siteIds = new List<int>();
+
+        foreach (var site in sites)
+        {
+            siteIds.Add(site.Id);
+        }
+
+        var assemblies = await _backflowTestRepository.GetSubmissionAssembliesAsync(siteIds, criteria, cancellationToken);
+        var assembliesBySiteId = assemblies.ToLookup(assembly => assembly.SiteId);
+
+        var siteDtos = new List<BackflowSubmissionSiteDto>();
+        var assemblyDtos = new List<BackflowTestDto>();
+
+        foreach (var site in sites)
+        {
+            var siteDto = Mapper.Map<BackflowSubmissionSiteDto>(site);
+
+            foreach (var assembly in assembliesBySiteId[site.Id])
+            {
+                var assemblyDto = Mapper.Map<BackflowTestDto>(assembly);
+
+                siteDto.Assemblies.Add(assemblyDto);
+                assemblyDtos.Add(assemblyDto);
+            }
+
+            siteDtos.Add(siteDto);
+        }
+
+        await _mailingInfoRedactionService.RedactAsync(assemblyDtos, cancellationToken);
+
+        return await _mailingInfoRedactionService.RedactAsync(siteDtos.ToPagedData(pageInfo), cancellationToken);
     }
 
     public async Task<IEnumerable<SiteDto>> GetAllPendingGeocodingAsync(int batchSize)

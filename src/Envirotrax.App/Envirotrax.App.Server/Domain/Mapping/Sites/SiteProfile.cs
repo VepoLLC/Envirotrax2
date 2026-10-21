@@ -57,6 +57,11 @@ public class SiteProfile : Profile
             .IncludeBase<Site, SiteDto>()
             .ForMember(dto => dto.Schedules, opt => opt.Ignore());
 
+        CreateMap<Site, BackflowSubmissionSiteDto>()
+            .IncludeBase<Site, SiteDto>()
+            .ForMember(dto => dto.IncludeWsAccountNumbers, opt => opt.MapFrom(site => site.WaterSupplier!.GeneralSettings!.IncludeWsAccountNumbers))
+            .ForMember(dto => dto.Assemblies, opt => opt.Ignore());
+
         CreateMap<Site, ReferencedSiteDto>()
             .AfterMap((model, dto) =>
             {

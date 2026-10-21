@@ -3,6 +3,7 @@ using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Backflow;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Microsoft.EntityFrameworkCore;
@@ -184,6 +185,23 @@ public class SiteRepository : Repository<Site>, ISiteRepository
             .Where(query.Filter)
             .WhereIf(criteria.WorkedOnly, GetWorkedOnFilter(professionalId))
             .WhereIf(criteria.ScheduledOnly, site => mySchedules.Any(schedule => schedule.SiteId == site.Id))
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<Site>> SearchForBackflowSubmissionAsync(BackflowSubmissionSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        WaterSupplierAccountNumberSearch.Apply(query, nameof(Site.AccountNumber));
+
+        var hasAssemblyCriteria = BackflowSubmissionAssemblyQuery.HasAssemblyCriteria(criteria);
+        var matchingAssemblies = DbContext.BackflowTests.WhereSubmissionAssembly(criteria);
+
+        var paginated = await GetListQuery()
+            .Include(site => site.WaterSupplier!.GeneralSettings)
+            .Where(query.Filter)
+            .WhereIf(hasAssemblyCriteria, site => matchingAssemblies.Any(test => test.SiteId == site.Id))
             .OrderBy(query.Sort)
             .PaginateAsync(pageInfo, cancellationToken);
 

@@ -1,6 +1,10 @@
+<ng-template #jobFunctionsTemplate let-data="rowData">
+    {{ data.jobFunctions }}
+</ng-template>
+
 <div class="text-center mb-3">
     <h1 class="h2">
-        User Management
+        User Account Management
     </h1>
 </div>
 
@@ -8,29 +12,54 @@
     <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
 
     <div>
-        <h3 class="h4 text-center text-decoration-underline mb-4">
-            If this is a company account employing more than one inspector, you will need to create a sub-account for
-            each inspector.
-        </h3>
-
         <p>
-            This account will then be considered the "Master" (owner/manager) account. Each employed inspector can then
-            login to their sub-account with the User ID (email address) and Password that they create when they accept
-            the invitation to register. Below are the advantages of creating sub-accounts for all
-            inspectors employed by the Master account holder:
+            If your company employs more than one professional, you will need to create a separate User Account for
+            each individual.
         </p>
 
+        <p>
+            Your company account will serve as the Master Account (Owner/Manager), allowing you to manage the User
+            Accounts associated with your company.
+        </p>
+
+        <p>
+            Each professional will receive an invitation to register and create their own login credentials, including
+            a User ID (email address) and password.
+        </p>
+
+        <p class="fw-bold mb-1">Benefits of Creating User Accounts</p>
         <ul>
             <li>
-                Sub-accounts will automatically be registered with any water supplier in which the Master account is
-                registered.
+                Each User Account is automatically registered with all water suppliers associated with the Master
+                Account, eliminating the need for individual registrations.
             </li>
             <li>
-                If an inspector with a sub-account employment is terminated, you can remove the sub-account from the
-                Master account at any time. All inspections submitted under the removed sub-account will be moved to the
-                Master account and will no longer be available to the sub-account. The removed sub-account will be
-                considered independent of the Master account and will no longer share the Master account's water
-                supplier registrations, licenses, or insurance.
+                Each professional has their own User ID and password, allowing them to access Envirotrax® and submit
+                reports under their individual account.
+            </li>
+            <li>
+                The Master Account holder or an administrator can manage associated User Accounts and remove
+                individuals who are no longer employed by the company.
+            </li>
+        </ul>
+
+        <p class="fw-bold mb-1">Removing a User Account</p>
+        <p class="mb-1">
+            If a professional leaves your company or is terminated, the Master Account holder or an administrator can
+            remove their User Account at any time. When a User Account is removed:
+        </p>
+        <ul>
+            <li>
+                All reports previously submitted by that individual are automatically transferred to the Master
+                Account, preserving the company's reporting history.
+            </li>
+            <li>
+                The individual will no longer have access to those reports.
+            </li>
+            <li>
+                The individual's User Account will be removed from the system and will no longer be associated with the
+                Master Account, its water supplier registrations, licenses, insurance, test gauges, or vehicle
+                information.
             </li>
         </ul>
     </div>
@@ -53,7 +82,7 @@
 
     <div class="mt-3 d-flex justify-content-center">
         <button class="btn btn-primary" (click)="add()">
-            Add New Sub Account
+            Add New User Account
         </button>
     </div>
 </vp-section>

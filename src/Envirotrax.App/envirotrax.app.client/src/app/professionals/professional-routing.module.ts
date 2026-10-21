@@ -49,7 +49,7 @@ const routes: Routes = [
     },
     {
         path: 'users',
-        title: 'Users',
+        title: 'User Account Management',
         component: ProfessionalUserListComponent,
         canActivate: [RoleGuard],
         data: {

@@ -8,6 +8,7 @@ export interface Professional {
     address?: string;
     city?: string;
     state?: State;
+    defaultState?: State;
     zipCode?: string;
     phoneNumber?: string;
     faxNumber?: string;
@@ -15,6 +16,7 @@ export interface Professional {
     webSiteUrl?: string;
     hidePublicListing?: boolean;
     hideCellPhoneNumber?: boolean;
+    sendCheckoutEmail?: boolean;
     hasWiseGuys?: boolean;
     hasBackflowTesting?: boolean;
     hasCsiInspection?: boolean;

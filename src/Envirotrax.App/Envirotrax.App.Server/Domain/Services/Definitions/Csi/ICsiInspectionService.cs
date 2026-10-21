@@ -17,5 +17,6 @@ public interface ICsiInspectionService : IService<CsiInspection, CsiInspectionDt
     Task<CsiInspectionDto?> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request);
     Task<byte[]> GeneratePdfAsync(CsiInspectionDto inspection);
     Task<byte[]> GeneratePdfAsync(IEnumerable<CsiInspectionDto> inspections);
+    Task<byte[]> GeneratePdfAsync(CsiInspectionDto inspection, IReadOnlyList<CsiInspectionAssemblyDto> assemblies);
     Task<byte[]> GeneratePdfForProfessionalAsync(CsiInspectionDto inspection);
 }

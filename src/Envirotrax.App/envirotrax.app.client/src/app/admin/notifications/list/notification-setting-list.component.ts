@@ -164,7 +164,8 @@ export class NotificationSettingListComponent implements OnInit {
         this._modalHelper.show<NotificationSetting>(EditNotificationSettingComponent, {
             title: title,
             model: setting,
-            size: ModalSize.extraLarge
+            size: ModalSize.extraLarge,
+            mode: 'disableFullScreen'
         }).result().subscribe(() => this.getSettings());
     }
 

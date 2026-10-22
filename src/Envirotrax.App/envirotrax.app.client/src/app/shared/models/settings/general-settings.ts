@@ -11,6 +11,7 @@ export interface GeneralSettings {
     fogProgram?: boolean;
     includeWsAccountNumbers?: boolean;
     useWsAccountNumbersOnLetters?: boolean;
+    allowAccountNumberChanges?: boolean;
 
     // Insurance and License Requirements
     bpatsRequireInsurance?: boolean;

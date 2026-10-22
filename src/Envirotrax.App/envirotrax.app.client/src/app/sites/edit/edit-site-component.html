@@ -201,7 +201,7 @@
 
                             <div>
                                 <vp-validation-summary [form]="form"
-                                                       [validationErrors]="validationErrors">
+                                                       [validationErrors]="sectionValidationErrors.siteSettings">
                                 </vp-validation-summary>
 
                                 <div class="d-flex justify-content-end">
@@ -318,7 +318,7 @@
 
                             <div>
                                 <vp-validation-summary [form]="form"
-                                                       [validationErrors]="validationErrors">
+                                                       [validationErrors]="sectionValidationErrors.facilityType">
                                 </vp-validation-summary>
 
                                 <div class="d-flex justify-content-end">
@@ -391,7 +391,7 @@
 
                             <div>
                                 <vp-validation-summary [form]="form"
-                                                       [validationErrors]="validationErrors">
+                                                       [validationErrors]="sectionValidationErrors.gisData">
                                 </vp-validation-summary>
 
                                 <div class="d-flex justify-content-end mt-1">
@@ -421,6 +421,7 @@
                                               name="accountNumber"
                                               label="Account Number:"
                                               labelStyle="horizontal"
+                                              [readonly]="!allowAccountNumberChanges"
                                               [required]="true"
                                               [maxLength]="50"
                                               [form]="form">
@@ -530,7 +531,7 @@
 
                             <div>
                                 <vp-validation-summary [form]="form"
-                                                       [validationErrors]="validationErrors">
+                                                       [validationErrors]="sectionValidationErrors.location">
                                 </vp-validation-summary>
 
                                 <div class="d-flex justify-content-end">
@@ -652,7 +653,7 @@
 
                             <div>
                                 <vp-validation-summary [form]="form"
-                                                       [validationErrors]="validationErrors">
+                                                       [validationErrors]="sectionValidationErrors.mailing">
                                 </vp-validation-summary>
 
                                 <div class="d-flex justify-content-end">

@@ -1,4 +1,6 @@
 <vp-section header="Payment Receipt">
+    <dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
     <div class="mb-3">
         <div><span class="fw-bold">Date:</span> {{ receipt.transactionDate | date: 'short' }}</div>
         <div><span class="fw-bold">Transaction ID:</span> {{ receipt.transactionId }}</div>

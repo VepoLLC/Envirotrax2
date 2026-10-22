@@ -485,6 +485,13 @@ export class App implements OnInit {
             hasFeature: true
           },
           {
+            title: 'Payment Receipts',
+            iconCss: 'fa-solid fa-receipt',
+            routerLink: ['professionals/payment-receipts'],
+            hasPermission: true,
+            hasFeature: true
+          },
+          {
             title: 'User Accounts',
             iconCss: 'fa-solid fa-users',
             routerLink: ['professionals/users'],

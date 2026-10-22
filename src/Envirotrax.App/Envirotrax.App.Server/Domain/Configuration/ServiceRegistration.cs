@@ -139,6 +139,13 @@ public static class ServiceRegistration
         services.Configure<AuthorizeNetOptions>(configuration.GetSection("AuthorizeNet"));
         services.AddHttpClient<IAuthorizeNetPaymentService, AuthorizeNetPaymentService>(client => client.Timeout = TimeSpan.FromSeconds(60));
         services.AddTransient<IProfessionalPaymentService, ProfessionalPaymentService>();
+        services.AddTransient<IProfessionalTransactionService, ProfessionalTransactionService>();
+        services.AddTransient<IProfessionalReceiptService, ProfessionalReceiptService>();
+
+        services.AddTransient<IProfessionalReceiptReferenceProvider>(provider => provider.GetRequiredService<IBackflowCheckoutService>());
+        services.AddTransient<IProfessionalReceiptReferenceProvider>(provider => provider.GetRequiredService<ICsiCheckoutService>());
+        services.AddTransient<IProfessionalReceiptReferenceProvider>(provider => provider.GetRequiredService<IFogInspectionCheckoutService>());
+        services.AddTransient<IProfessionalReceiptReferenceProvider>(provider => provider.GetRequiredService<IFogTripTicketCheckoutService>());
 
         services.AddEmailService(configuration.GetSection("Email"), opts =>
         {

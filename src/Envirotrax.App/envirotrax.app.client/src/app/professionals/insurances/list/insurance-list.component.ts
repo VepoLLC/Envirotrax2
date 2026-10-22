@@ -5,8 +5,7 @@ import { ToastService, ToastType, CellTemplateData, ColumnType, ModalHelperServi
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { ProfesisonalService } from "../../../shared/services/professionals/professional.service";
 import { NgForm } from "@angular/forms";
-import { EditInsuranceComponent } from "../edit/edit-insurance.component";
-import { ModalSize } from "@developer-partners/ngx-modal-dialog";
+import { DownloadService } from "../../../shared/services/download.service";
 import { ExpirationType } from "../../../shared/models/professionals/licenses/professional-user-license";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 
@@ -44,7 +43,8 @@ export class InsuranceListComponent implements OnInit {
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService,
         private readonly _professionalService: ProfesisonalService,
-        private readonly _helper: HelperService
+        private readonly _helper: HelperService,
+        private readonly _downloadService: DownloadService
     ) { }
 
     public ngOnInit(): void {
@@ -78,11 +78,6 @@ export class InsuranceListComponent implements OnInit {
                 type: ColumnType.text
             },
             {
-                field: 'coverageAmount',
-                caption: 'Coverage $',
-                type: ColumnType.number
-            },
-            {
                 field: 'expirationDate',
                 caption: 'Expiration Date',
                 cellTemplate: this.dateCellTemplate,
@@ -103,13 +98,15 @@ export class InsuranceListComponent implements OnInit {
         }
     }
 
-    public edit(insurance: ProfessionalInsurance): void {
-        this._modalHelper.show<ProfessionalInsurance>(EditInsuranceComponent, {
-            title: 'Edit Insurance Policy',
-            model: { id: insurance.id },
-            size: ModalSize.large,
-            mode: 'disableFullScreen'
-        }).result().subscribe(() => this.getRows());
+    public async view(insurance: ProfessionalInsurance): Promise<void> {
+        try {
+            this.table.isLoading = true;
+
+            const url = await this._insuranceService.getFileUrl(insurance.id!);
+            this._downloadService.downloadFileFromUrl(url);
+        } finally {
+            this.table.isLoading = false;
+        }
     }
 
     public delete(insurance: ProfessionalInsurance): void {

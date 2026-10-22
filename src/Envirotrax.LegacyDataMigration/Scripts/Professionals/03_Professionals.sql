@@ -54,8 +54,8 @@ BEGIN TRY
         WHERE accounts.IsCompanyOwner = 1
     )
     INSERT INTO Professionals
-        (LegacyRecordId, LegacyUserId, Name, CompanyEmail, Address, City, StateId, ZipCode,
-         PhoneNumber, FaxNumber, WebSiteUrl, HidePublicListing,
+        (LegacyRecordId, LegacyUserId, Name, CompanyEmail, Address, City, StateId, DefaultStateId, ZipCode,
+         PhoneNumber, FaxNumber, WebSiteUrl, HidePublicListing, SendCheckoutEmail,
          HasWiseGuys, HasBackflowTesting, HasCsiInspection, HasFogInspection, HasFogTransportation,
          AccountBalance, CreatedById, CreatedTime)
     SELECT
@@ -69,11 +69,13 @@ BEGIN TRY
         NULLIF(owners.Address, ''),
         NULLIF(owners.City, ''),
         states.Id,
+        defaultStates.Id,
         LEFT(NULLIF(owners.ZipCode, ''), 25),
         NULLIF(owners.WorkNumber, ''),
         NULLIF(owners.FaxNumber, ''),
         NULLIF(owners.WebsiteUrl, ''),
         ISNULL(owners.HidePublicListing, 0),
+        ISNULL(owners.SendCheckoutEmail, 0),
         0,
         companies.HasBackflowTesting,
         companies.HasCsiInspection,
@@ -87,6 +89,9 @@ BEGIN TRY
         ON companies.LegacyCompanyUserId = owners.LegacyCompanyUserId
     LEFT JOIN States AS states
         ON states.Name = CASE WHEN owners.State = 'International' THEN 'International (Outside the USA)' ELSE owners.State END
+    -- V1 DefaultState holds a state name, the same way State does.
+    LEFT JOIN States AS defaultStates
+        ON defaultStates.Name = CASE WHEN owners.DefaultState = 'International' THEN 'International (Outside the USA)' ELSE owners.DefaultState END
     WHERE owners.OwnerRank = 1
         AND NOT EXISTS
         (

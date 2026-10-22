@@ -44,6 +44,15 @@ public class CsiInspectionAssemblyService : ICsiInspectionAssemblyService
         return _mapper.Map<List<CsiInspectionAssemblyDto>>(assemblies);
     }
 
+    public async Task<Dictionary<int, List<CsiInspectionAssemblyDto>>> GetByInspectionsAsync(IReadOnlyCollection<int> inspectionIds, CancellationToken cancellationToken)
+    {
+        var assemblies = await _repository.GetByInspectionsAsync(inspectionIds, cancellationToken);
+
+        return _mapper.Map<List<CsiInspectionAssemblyDto>>(assemblies)
+            .GroupBy(assembly => assembly.InspectionId)
+            .ToDictionary(group => group.Key, group => group.ToList());
+    }
+
     public Task<int> GetCountByInspectionAsync(int inspectionId, CancellationToken cancellationToken)
     {
         return _repository.GetCountByInspectionAsync(inspectionId, cancellationToken);

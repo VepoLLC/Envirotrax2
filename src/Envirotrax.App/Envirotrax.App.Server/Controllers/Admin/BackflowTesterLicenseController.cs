@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Envirotrax.App.Server.Controllers.Admin;
 
 /// <summary>
-/// BPAT licenses for the admin backflow tester window. Every fire licence type is itself ProfessionalType.Bpat, so
-/// this grid holds both the BPAT and the fire marshal licences, as V1's BPAT window did (SaveLicenses.UserType = BPAT).
+/// User-level BPAT licenses for the admin backflow tester window. Fire licences are company-level
+/// (ProfessionalLicenses), so their types are left out here; the user license service would reject them anyway.
 /// </summary>
 [Route("api/admin/backflow/testers")]
 public class BackflowTesterLicenseController : AdminBaseController
@@ -29,7 +29,7 @@ public class BackflowTesterLicenseController : AdminBaseController
     {
         var types = await _licenseTypeService.GetAllAsync(query, cancellationToken);
 
-        return Ok(types.Where(type => type.ProfessionalType == ProfessionalType.Bpat));
+        return Ok(types.Where(type => type.ProfessionalType == ProfessionalType.Bpat && type.LicenseScope == LicenseScope.User));
     }
 
     [HttpGet("{professionalId}/licenses")]

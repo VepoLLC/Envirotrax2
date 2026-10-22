@@ -38,6 +38,7 @@ import { AppLoadingSpinnerModule } from "./components/loading-spinner/app-loadin
 import { InputAddOnComponent } from "./components/input/input-add-on.component";
 import { ToastContainerComponent } from "./components/toast-container/toast-container.component";
 import { RecordLogListComponent } from "./components/record-log/record-log-list.component";
+import { DownloadManagerComponent } from "./components/data-components/download-manager/download-manager.component";
 
 @NgModule({
     declarations: [
@@ -74,6 +75,7 @@ import { RecordLogListComponent } from "./components/record-log/record-log-list.
         MapResultsComponent,
         ToastContainerComponent,
         RecordLogListComponent,
+        DownloadManagerComponent,
     ],
     imports: [
         CommonModule,

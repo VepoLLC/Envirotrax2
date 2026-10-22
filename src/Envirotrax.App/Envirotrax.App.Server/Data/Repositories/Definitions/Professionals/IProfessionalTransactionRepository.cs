@@ -5,4 +5,6 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 public interface IProfessionalTransactionRepository : IRepository<ProfessionalTransaction>
 {
     Task<ProfessionalTransaction?> GetByTransactionIdAsync(string transactionId, CancellationToken cancellationToken);
+
+    Task<ProfessionalTransaction?> GetMyByTransactionIdAsync(string transactionId, CancellationToken cancellationToken);
 }

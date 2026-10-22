@@ -16,17 +16,18 @@ import { EditSiteScheduleComponent } from "./sites/schedule/edit-site-schedule.c
 import { SiteBackflowTestsComponent } from "./sites/details/site-backflow-tests.component";
 import { SiteCsiInspectionsComponent } from "./sites/details/site-csi-inspections.component";
 import { InsuranceListComponent } from "./insurances/list/insurance-list.component";
-import { EditInsuranceComponent } from "./insurances/edit/edit-insurance.component";
 import { EditCompanyLicenseComponent } from "./licenses/edit/edit-company-license.component";
 import { LicenseHelpTextComponent } from "./users/edit/licenses/help-text/license-help-text.component";
 import { LicenseListComponent } from "./licenses/license-list.component";
 import { DashboardComponent } from "./dashboard/dashboard.component";
 import { AccountBalanceManagementComponent } from "./account/account-balance-management.component";
+import { PaymentReceiptsComponent } from "./payments/payment-receipts.component";
 
 @NgModule({
     declarations: [
         DashboardComponent,
         AccountBalanceManagementComponent,
+        PaymentReceiptsComponent,
         WaterSuppliersComponent,
         WaterSupplierRegistrationComponent,
         ProfessionalUserListComponent,
@@ -41,7 +42,6 @@ import { AccountBalanceManagementComponent } from "./account/account-balance-man
         SiteBackflowTestsComponent,
         SiteCsiInspectionsComponent,
         InsuranceListComponent,
-        EditInsuranceComponent,
         EditCompanyLicenseComponent,
         LicenseListComponent
     ],

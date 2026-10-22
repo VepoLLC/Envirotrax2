@@ -14,22 +14,33 @@
     <div dp-spinner-parent>
         <dp-loading-spinner *ngIf="isLoading" message="Loading Payments" />
 
-        <div class="d-flex align-items-center gap-3 flex-wrap mb-3">
-            <select class="form-select w-auto" name="transactionType" [(ngModel)]="transactionType">
-                @for (option of transactionTypeOptions; track option.id) {
-                    <option [value]="option.id">{{ option.text }}</option>
-                }
-            </select>
+        <div class="mx-auto w-50 mb-3">
+            <vp-field-grid>
+                <vp-input name="transactionType"
+                          label="Payment Type:"
+                          labelStyle="horizontal"
+                          type="select"
+                          [options]="transactionTypeOptions"
+                          [(ngModel)]="transactionType" />
 
-            <span class="fw-bold">From:</span>
-            <input type="date" class="form-control w-auto" name="fromDate" [(ngModel)]="fromDate" />
+                <vp-input name="fromDate"
+                          label="From:"
+                          labelStyle="horizontal"
+                          type="date"
+                          [(ngModel)]="fromDate" />
 
-            <span class="fw-bold">To:</span>
-            <input type="date" class="form-control w-auto" name="toDate" [(ngModel)]="toDate" />
+                <vp-input name="toDate"
+                          label="To:"
+                          labelStyle="horizontal"
+                          type="date"
+                          [(ngModel)]="toDate" />
+            </vp-field-grid>
 
-            <button type="button" class="btn btn-primary" [disabled]="!fromDate || !toDate" (click)="search()">
-                Search
-            </button>
+            <div class="text-center mt-2">
+                <button type="button" class="btn btn-primary" [disabled]="!fromDate || !toDate" (click)="search()">
+                    Search
+                </button>
+            </div>
         </div>
 
         <vp-table *ngIf="table.items"

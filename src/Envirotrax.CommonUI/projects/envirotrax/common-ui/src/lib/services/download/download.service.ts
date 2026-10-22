@@ -8,6 +8,39 @@ import { Query } from "../../models/query";
 import { DownloadManagerComponent } from "../../components/data-components/download-manager/download-manager.component";
 import { ModalHelperService } from "../helpers/modal-helper.service";
 
+const LOADING_WINDOW_TITLE = 'Loading...';
+
+const LOADING_WINDOW_STYLES = `
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #555;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #ddd;
+            border-top-color: #0084c3;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>`;
+
+const LOADING_WINDOW_BODY = '<div class="spinner"></div><p>Loading...</p>';
+
 @Injectable({
     providedIn: 'root'
 })
@@ -46,6 +79,37 @@ export class DownloadService {
         window.setTimeout(function () {
             URL.revokeObjectURL(objectUrl);
         }, 5000);
+    }
+
+    public async openBlobInNewWindow(loadBlob: () => Promise<Blob>): Promise<void> {
+        const newWindow = window.open('', '_blank');
+
+        if (!newWindow) {
+            this.downloadFileFromBlob(await loadBlob());
+            return;
+        }
+
+        newWindow.document.title = LOADING_WINDOW_TITLE;
+        newWindow.document.head.innerHTML = LOADING_WINDOW_STYLES;
+        newWindow.document.body.innerHTML = LOADING_WINDOW_BODY;
+
+        let isOpened = false;
+
+        try {
+            const blob = await loadBlob();
+            const objectUrl = URL.createObjectURL(blob);
+
+            newWindow.location.href = objectUrl;
+            isOpened = true;
+
+            window.setTimeout(function () {
+                URL.revokeObjectURL(objectUrl);
+            }, 5000);
+        } finally {
+            if (!isOpened) {
+                newWindow.close();
+            }
+        }
     }
 
     private getAcceptHeader(format: FileFormat): string {

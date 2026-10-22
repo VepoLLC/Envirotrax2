@@ -6,6 +6,7 @@ import { PagedData } from "../../shared/models/paged-data";
 import { ProfessionalTransaction, ProfessionalTransactionType, professionalTransactionTypeLabels } from "../../shared/models/payments/professional-transaction";
 import { ProfessionalTransactionService } from "../../shared/services/professionals/professional-transaction.service";
 import { AuthService } from "../../shared/services/auth/auth.service";
+import { DownloadService } from "../../shared/services/download.service";
 import { FeatureType } from "../../shared/models/feature-type";
 import { ROLE_DEFINITIONS } from "../../shared/models/role-definitions";
 
@@ -44,7 +45,8 @@ export class PaymentReceiptsComponent implements OnInit {
 
     constructor(
         private readonly _transactionService: ProfessionalTransactionService,
-        private readonly _authService: AuthService
+        private readonly _authService: AuthService,
+        private readonly _downloadService: DownloadService
     ) {
 
     }
@@ -133,12 +135,7 @@ export class PaymentReceiptsComponent implements OnInit {
     }
 
     public async viewReceipt(transaction: PaymentReceiptRowVm): Promise<void> {
-        try {
-            this.isLoading = true;
-            await this._transactionService.openReceiptPdf(transaction.transactionId);
-        } finally {
-            this.isLoading = false;
-        }
+        await this._downloadService.openBlobInNewWindow(() => this._transactionService.getReceiptPdf(transaction.transactionId));
     }
 
     private buildFilter(): QueryProperty[] {

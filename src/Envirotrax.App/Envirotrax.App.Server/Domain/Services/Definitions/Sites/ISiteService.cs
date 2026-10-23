@@ -26,4 +26,5 @@ public interface ISiteService : IService<Site, SiteDto>
     Task UpdateFogAssignmentAsync(int siteId, int? userId);
     Task<IEnumerable<SiteDto>> GetAllPendingRenewalAsync(int batchSize, CancellationToken cancellationToken);
     Task<SiteTabCountsDto?> GetTabCountsAsync(int siteId, CancellationToken cancellationToken);
+    Task<SiteAccountNumberDto> GenerateAccountNumberAsync();
 }

@@ -28,4 +28,7 @@ public interface ISiteRepository : IRepository<Site>
     Task UpdateLastTripTicketDatesAsync(IReadOnlyDictionary<int, DateTime> lastTripTicketDates);
     Task<IEnumerable<Site>> GetAllPendingRenewalAsync(int batchSize);
     Task<bool> IsWaterSupplierAccountNumberTakenAsync(int siteId, string waterSupplierAccountNumber, CancellationToken cancellationToken);
+    Task<bool> IsAccountNumberTakenAsync(int siteId, string accountNumber, CancellationToken cancellationToken);
+    Task<string?> GetAccountNumberAsync(int siteId, CancellationToken cancellationToken);
+    Task<long> GetNextAccountNumberAsync();
 }

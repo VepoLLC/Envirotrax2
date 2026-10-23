@@ -46,10 +46,17 @@ export class CreateSiteComponent {
     }
 
     public async ngOnInit(): Promise<void> {
-        await Promise.all([
-            this.loadStates(),
-            this.loadSettings()
-        ]);
+        try {
+            this.isLoading = true;
+
+            await Promise.all([
+                this.loadStates(),
+                this.loadSettings(),
+                this.generateAccountNumber()
+            ]);
+        } finally {
+            this.isLoading = false;
+        }
     }
 
 
@@ -83,6 +90,11 @@ export class CreateSiteComponent {
 
     private async loadStates(): Promise<void> {
         this.stateOptions = await this._stateService.getAllStatesAsOptions(true);
+    }
+
+    private async generateAccountNumber(): Promise<void> {
+        const result = await this._siteService.generateAccountNumber();
+        this.site.accountNumber = result.accountNumber;
     }
 
     private async loadSettings(): Promise<void> {

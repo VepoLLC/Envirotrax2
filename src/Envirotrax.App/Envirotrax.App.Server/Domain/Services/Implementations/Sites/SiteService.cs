@@ -16,6 +16,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
+using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
@@ -37,6 +38,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
     private readonly ISiteScheduleService _siteScheduleService;
     private readonly IAuthService _authService;
+    private readonly IGeneralSettingsService _generalSettingsService;
     private readonly ILogger<SiteService> _logger;
 
     public SiteService(
@@ -55,6 +57,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         IMailingInfoRedactionService mailingInfoRedactionService,
         ISiteScheduleService siteScheduleService,
         IAuthService authService,
+        IGeneralSettingsService generalSettingsService,
         ILogger<SiteService> logger)
         : base(mapper, repository)
     {
@@ -72,6 +75,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         _mailingInfoRedactionService = mailingInfoRedactionService;
         _siteScheduleService = siteScheduleService;
         _authService = authService;
+        _generalSettingsService = generalSettingsService;
         _logger = logger;
     }
 
@@ -106,6 +110,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     // (no field-level diff — V1 doesn't diff on create either, since there's no prior row to compare against).
     public override async Task<SiteDto> AddAsync(SiteDto dto)
     {
+        await ValidateAccountNumberAsync(dto);
         await PrepareWaterSupplierAccountNumberAsync(dto);
 
         var added = await base.AddAsync(dto);
@@ -121,9 +126,50 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
     public override async Task<SiteDto> UpdateAsync(SiteDto dto)
     {
+        await KeepAccountNumberUnlessChangesAllowedAsync(dto);
+        await ValidateAccountNumberAsync(dto);
         await PrepareWaterSupplierAccountNumberAsync(dto);
 
         return await base.UpdateAsync(dto);
+    }
+
+    public async Task<SiteAccountNumberDto> GenerateAccountNumberAsync()
+    {
+        var nextNumber = await _siteRepository.GetNextAccountNumberAsync();
+
+        return new SiteAccountNumberDto
+        {
+            AccountNumber = nextNumber.ToString()
+        };
+    }
+
+    private async Task KeepAccountNumberUnlessChangesAllowedAsync(SiteDto dto)
+    {
+        var settings = await _generalSettingsService.GetAsync(_authService.WaterSupplierId, CancellationToken.None);
+
+        if (settings != null && settings.AllowAccountNumberChanges)
+        {
+            return;
+        }
+
+        var storedAccountNumber = await _siteRepository.GetAccountNumberAsync(dto.Id, CancellationToken.None);
+
+        if (storedAccountNumber == null)
+        {
+            return;
+        }
+
+        dto.AccountNumber = storedAccountNumber;
+    }
+
+    private async Task ValidateAccountNumberAsync(SiteDto dto)
+    {
+        var isTaken = await _siteRepository.IsAccountNumberTakenAsync(dto.Id, dto.AccountNumber, CancellationToken.None);
+
+        if (isTaken)
+        {
+            throw new AppValidationException("Account Number must be unique.");
+        }
     }
 
     // Stores a blank WS Account Number as NULL, so only real numbers have to be unique. V1 saved blanks as '',

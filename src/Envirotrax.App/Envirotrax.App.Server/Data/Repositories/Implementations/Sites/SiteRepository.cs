@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
+using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Backflow;
@@ -162,6 +163,9 @@ public class SiteRepository : Repository<Site>, ISiteRepository
         // WaterSupplierId is a normal writable column now that it is no longer part of the primary
         // key. Normal Site editing must never reassign a Site; that is a separate, dedicated flow.
         entry.Property(site => site.WaterSupplierId).IsModified = false;
+
+        entry.Property(site => site.AccountNumberDuplicateIndex).IsModified = false;
+        entry.Property(site => site.WaterSupplierAccountNumberDuplicateIndex).IsModified = false;
 
         // Renewal opt-in is changed only by the site owner through the public opt-in pages.
         entry.Property(site => site.RenewalOptInType).IsModified = false;
@@ -494,10 +498,48 @@ public class SiteRepository : Repository<Site>, ISiteRepository
     }
 
     // Archived sites count too, matching the unique index, so reactivating one can never collide.
-    public Task<bool> IsWaterSupplierAccountNumberTakenAsync(int siteId, string waterSupplierAccountNumber, CancellationToken cancellationToken)
+    public async Task<bool> IsWaterSupplierAccountNumberTakenAsync(int siteId, string waterSupplierAccountNumber, CancellationToken cancellationToken)
     {
-        return Entity.AnyAsync(
-            site => site.Id != siteId && site.WaterSupplierAccountNumber == waterSupplierAccountNumber,
+        var duplicateIndex = await Entity
+            .Where(site => site.Id == siteId)
+            .Select(site => site.WaterSupplierAccountNumberDuplicateIndex)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return await Entity.AnyAsync(
+            site => site.Id != siteId
+                && site.WaterSupplierAccountNumber == waterSupplierAccountNumber
+                && site.WaterSupplierAccountNumberDuplicateIndex == duplicateIndex,
             cancellationToken);
+    }
+
+    public async Task<bool> IsAccountNumberTakenAsync(int siteId, string accountNumber, CancellationToken cancellationToken)
+    {
+        var duplicateIndex = await Entity
+            .Where(site => site.Id == siteId)
+            .Select(site => site.AccountNumberDuplicateIndex)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return await Entity.AnyAsync(
+            site => site.Id != siteId
+                && site.AccountNumber == accountNumber
+                && site.AccountNumberDuplicateIndex == duplicateIndex,
+            cancellationToken);
+    }
+
+    public Task<string?> GetAccountNumberAsync(int siteId, CancellationToken cancellationToken)
+    {
+        return Entity
+            .Where(site => site.Id == siteId)
+            .Select(site => site.AccountNumber)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<long> GetNextAccountNumberAsync()
+    {
+        var values = await DbContext.Database
+            .SqlQueryRaw<long>($"SELECT NEXT VALUE FOR dbo.{TenantDbContext.SiteAccountNumberSequence} AS Value")
+            .ToListAsync();
+
+        return values.Single();
     }
 }

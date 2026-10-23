@@ -153,31 +153,32 @@ export class TableComponent implements OnChanges {
     }
 
     public sortColumn(column: TableColumn<any>): void {
-        if (this.query && column.field) {
-            if (!column.queryColumnExcluded) {
-                if (this.query?.sort) {
-                    for (const key in this.query.sort) {
-                        if (key !== column.field && this.query.sort.hasOwnProperty(key)) {
-                            delete this.query.sort[key];
-                        }
+        // A column that doesn't set sortColumnExcluded keeps the old rule, where queryColumnExcluded also stops sorting.
+        const isSortExcluded = column.sortColumnExcluded ?? column.queryColumnExcluded;
+
+        if (this.query && column.field && !isSortExcluded) {
+            if (this.query?.sort) {
+                for (const key in this.query.sort) {
+                    if (key !== column.field && this.query.sort.hasOwnProperty(key)) {
+                        delete this.query.sort[key];
                     }
                 }
-
-                this.query.sort = this.query.sort || {};
-
-                switch (this.query.sort[column.field]) {
-                    case 'Asc':
-                        this.query.sort[column.field] = 'Desc';
-                        break
-                    case 'Desc':
-                        delete this.query.sort[column.field];
-                        break
-                    default:
-                        this.query.sort[column.field] = 'Asc';
-                }
-
-                this.query = { ...this.query };
             }
+
+            this.query.sort = this.query.sort || {};
+
+            switch (this.query.sort[column.field]) {
+                case 'Asc':
+                    this.query.sort[column.field] = 'Desc';
+                    break
+                case 'Desc':
+                    delete this.query.sort[column.field];
+                    break
+                default:
+                    this.query.sort[column.field] = 'Asc';
+            }
+
+            this.query = { ...this.query };
 
             this.onQueryChange(this.query);
         }

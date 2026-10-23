@@ -11,6 +11,8 @@ public interface IFogTripTicketService : IService<FogTripTicket, FogTripTicketDt
 
     Task<IPagedData<FogTripTicketDto>> SearchForProfessionalAsync(PageInfo pageInfo, Query query, int? waterSupplierId, CancellationToken cancelationToken);
 
+    Task<IPagedData<FogTripTicketDto>> SearchForAdminAsync(FogTripTicketSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+
     Task<FogTripTicketDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken);
 
     Task<FogTripTicketDto> SubmitAsync(

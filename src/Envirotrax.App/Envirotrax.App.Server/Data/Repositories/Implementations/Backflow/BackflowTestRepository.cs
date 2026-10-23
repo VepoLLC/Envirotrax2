@@ -1240,7 +1240,8 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             return null;
         }
 
-        var candidates = GetPreviousCurrentTestCandidates(test);
+        var parentWaterSupplierId = await GetParentWaterSupplierIdAsync(test, cancellationToken);
+        var candidates = GetPreviousCurrentTestCandidates(test, parentWaterSupplierId);
 
         var matches = await candidates
             .Where(t => t.SerialNumber == serialNumber)
@@ -1287,10 +1288,26 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
                 && t.DeletedTime == null);
     }
 
-    private IQueryable<BackflowTest> GetPreviousCurrentTestCandidates(BackflowTest test)
+    public async Task<bool> HasSubmissionAsync(string submissionId, CancellationToken cancellationToken)
     {
-        var parentWaterSupplierId = test.WaterSupplier?.ParentId;
+        return await Entity.AnyAsync(t => t.SubmissionId == submissionId, cancellationToken);
+    }
 
+    private async Task<int?> GetParentWaterSupplierIdAsync(BackflowTest test, CancellationToken cancellationToken)
+    {
+        if (test.WaterSupplier != null)
+        {
+            return test.WaterSupplier.ParentId;
+        }
+
+        return await DbContext.WaterSuppliers
+            .Where(supplier => supplier.Id == test.WaterSupplierId)
+            .Select(supplier => supplier.ParentId)
+            .SingleOrDefaultAsync(cancellationToken);
+    }
+
+    private IQueryable<BackflowTest> GetPreviousCurrentTestCandidates(BackflowTest test, int? parentWaterSupplierId)
+    {
         return DbContext.BackflowTests
             .AsNoTracking()
             .Where(t => (t.WaterSupplierId == test.WaterSupplierId

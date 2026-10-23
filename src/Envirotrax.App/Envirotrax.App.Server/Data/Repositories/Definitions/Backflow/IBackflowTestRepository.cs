@@ -72,6 +72,7 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
 
     Task<List<BackflowTest>> GetSubmissionAssembliesAsync(IReadOnlyCollection<int> siteIds, CancellationToken cancellationToken);
     Task<List<BackflowTest>> GetSerialNumberMatchesAsync(BackflowSubmissionSearchDto criteria, CancellationToken cancellationToken);
+    Task<bool> HasSubmissionAsync(string submissionId, CancellationToken cancellationToken);
 
     // CSI inspection visually identified assemblies
     Task MarkCsiInspectionTestsPaidAsync(CsiInspection inspection, string transactionId, DateTime transactionDate, CancellationToken cancellationToken);

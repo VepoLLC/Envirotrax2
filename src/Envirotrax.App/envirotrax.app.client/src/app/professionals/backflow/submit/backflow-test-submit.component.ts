@@ -878,6 +878,7 @@ export class BackflowTestSubmitComponent implements OnInit {
 
             this.isNewProperty = !this.site && !this.previousTest;
             this.isLocationEditing = this.isNewProperty;
+            this.model.submissionId = crypto.randomUUID();
 
             await this.setDefaults();
 

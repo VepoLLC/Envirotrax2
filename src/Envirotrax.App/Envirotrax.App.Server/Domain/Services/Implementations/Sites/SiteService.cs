@@ -4,6 +4,7 @@ using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Sites;
+using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
@@ -23,6 +24,9 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Sites;
 
 public class SiteService : Service<Site, SiteDto>, ISiteService
 {
+    private const string AccountNumberIndexName = "IX_Sites_WaterSupplierId_AccountNumber_AccountNumberDuplicateIndex";
+    private const string WaterSupplierAccountNumberIndexName = "IX_Sites_WaterSupplierId_WaterSupplierAccountNumber_WaterSupplierAccountNumberDuplicateIndex";
+
     private readonly ISiteRepository _siteRepository;
     private readonly ISiteLogService _siteLogService;
     private readonly IRecordLogService _recordLogService;
@@ -109,10 +113,20 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     // (no field-level diff — V1 doesn't diff on create either, since there's no prior row to compare against).
     public override async Task<SiteDto> AddAsync(SiteDto dto)
     {
-        await ValidateAccountNumberAsync(dto);
         await PrepareWaterSupplierAccountNumberAsync(dto);
 
-        var added = await base.AddAsync(dto);
+        SiteDto added;
+
+        try
+        {
+            added = await base.AddAsync(dto);
+        }
+        catch (DuplicateRecordException exception)
+        {
+            ThrowIfAccountNumberDuplicated(exception);
+
+            throw;
+        }
 
         if (added.WaterSupplier?.Id is int waterSupplierId)
         {
@@ -126,27 +140,39 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     public override async Task<SiteDto> UpdateAsync(SiteDto dto)
     {
         await KeepAccountNumberUnlessChangesAllowedAsync(dto);
-        await ValidateAccountNumberAsync(dto);
         await PrepareWaterSupplierAccountNumberAsync(dto);
 
-        return await base.UpdateAsync(dto);
+        try
+        {
+            return await base.UpdateAsync(dto);
+        }
+        catch (DuplicateRecordException exception)
+        {
+            ThrowIfAccountNumberDuplicated(exception);
+
+            throw;
+        }
     }
 
     public async Task<SiteAccountNumberDto> GenerateAccountNumberAsync()
     {
-        var nextNumber = await _siteRepository.GetNextAccountNumberAsync();
+        var uniqueNumber = await _siteRepository.GetNextAccountNumberAsync();
+        var randomNumber = Random.Shared.Next(1000, 9999);
 
         return new SiteAccountNumberDto
         {
-            AccountNumber = nextNumber.ToString()
+            AccountNumber = $"{_authService.WaterSupplierId}-{randomNumber}-{uniqueNumber}"
         };
     }
 
     private async Task KeepAccountNumberUnlessChangesAllowedAsync(SiteDto dto)
     {
-        var settings = await _generalSettingsService.GetAsync(_authService.WaterSupplierId, CancellationToken.None);
+        var settings = await _generalSettingsService.GetAsync(
+            _authService.WaterSupplierId,
+            generalSettings => new GeneralSettings { AllowAccountNumberChanges = generalSettings.AllowAccountNumberChanges },
+            CancellationToken.None);
 
-        if (settings != null && settings.AllowAccountNumberChanges)
+        if (settings.AllowAccountNumberChanges)
         {
             return;
         }
@@ -161,28 +187,29 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         dto.AccountNumber = storedAccountNumber;
     }
 
-    private async Task ValidateAccountNumberAsync(SiteDto dto)
-    {
-        var isTaken = await _siteRepository.IsAccountNumberTakenAsync(dto.Id, dto.AccountNumber, CancellationToken.None);
-
-        if (isTaken)
-        {
-            throw new AppValidationException("Account Number must be unique.");
-        }
-    }
-
     // Stores a blank WS Account Number as NULL, so only real numbers have to be unique. V1 saved blanks as '',
-    // which meant a second site left blank failed with this same message.
-    private async Task PrepareWaterSupplierAccountNumberAsync(SiteDto dto)
+    // which meant a second site left blank failed with the "must be unique" message.
+    private Task PrepareWaterSupplierAccountNumberAsync(SiteDto dto)
     {
         dto.WaterSupplierAccountNumber = string.IsNullOrWhiteSpace(dto.WaterSupplierAccountNumber)
             ? null
             : dto.WaterSupplierAccountNumber.Trim();
 
-        if (dto.WaterSupplierAccountNumber != null
-            && await _siteRepository.IsWaterSupplierAccountNumberTakenAsync(dto.Id, dto.WaterSupplierAccountNumber, CancellationToken.None))
+        return Task.CompletedTask;
+    }
+
+    private static void ThrowIfAccountNumberDuplicated(DuplicateRecordException exception)
+    {
+        var message = exception.GetBaseException().Message;
+
+        if (message.Contains(WaterSupplierAccountNumberIndexName))
         {
-            throw new AppValidationException("WS Account Number must be unique.");
+            throw new AppValidationException("WS Account Number must be unique.", exception);
+        }
+
+        if (message.Contains(AccountNumberIndexName))
+        {
+            throw new AppValidationException("Account Number must be unique.", exception);
         }
     }
 

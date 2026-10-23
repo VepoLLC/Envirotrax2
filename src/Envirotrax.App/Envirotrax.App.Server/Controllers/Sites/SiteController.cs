@@ -22,6 +22,15 @@ public class SiteController : WaterSupplierCrudController<SiteDto>
         _recordLogService = recordLogService;
     }
 
+    [HttpPost("account-numbers")]
+    [HasPermission(PermissionAction.CanModify)]
+    public async Task<IActionResult> GenerateAccountNumberAsync()
+    {
+        var accountNumber = await _siteService.GenerateAccountNumberAsync();
+
+        return Ok(accountNumber);
+    }
+
     [HttpPut("{id}/csi-assignment")]
     [HasPermission(PermissionAction.CanModify)]
     public async Task<IActionResult> UpdateCsiAssignmentAsync(int id, [FromBody] UpdateCsiAssignmentDto dto)

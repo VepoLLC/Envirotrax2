@@ -15,6 +15,7 @@ public class GeneralSettings : TenantModel<WaterSupplier>
     public bool FogProgram { get; set; }
     public bool IncludeWsAccountNumbers { get; set; }
     public bool UseWsAccountNumbersOnLetters { get; set; }
+    public bool AllowAccountNumberChanges { get; set; }
 
     // Insurance and License Requirements
     public bool BpatsRequireInsurance { get; set; }

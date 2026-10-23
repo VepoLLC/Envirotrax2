@@ -1,18 +1,28 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { ProfessionalUser } from "../../../shared/models/professionals/professional-user";
 import { ProfesionalUserService } from "../../../shared/services/professionals/professional-user.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import { CreateProfessionalUserComponent } from "../create/create-professional-user.component";
-import { ToastService, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
+import { ToastService, CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
+
+// A grid row: a user decorated with the abbreviated job functions shown in the Job Functions column.
+type ProfessionalUserRow = ProfessionalUser & {
+    jobFunctions?: string;
+};
 
 @Component({
     standalone: false,
     templateUrl: './professional-user-list.component.html'
 })
 export class ProfessionalUserListComponent implements OnInit {
-    public table: TableViewModel<ProfessionalUser> = {
-        columns: this.getColumns(),
+    // Kept as a template so the column's `field` stays empty: vp-table refetches when the header of a column
+    // with a field is clicked, and jobFunctions is not a DTO field the API can sort on.
+    @ViewChild('jobFunctionsTemplate', { static: true })
+    public jobFunctionsTemplate!: TemplateRef<CellTemplateData<ProfessionalUserRow>>;
+
+    public table: TableViewModel<ProfessionalUserRow> = {
+        columns: [],
         query: {
             sort: {},
             filter: []
@@ -35,7 +45,7 @@ export class ProfessionalUserListComponent implements OnInit {
 
     }
 
-    private getColumns(): TableColumn<ProfessionalUser>[] {
+    private getColumns(): TableColumn<ProfessionalUserRow>[] {
         return [
             {
                 field: 'contactName',
@@ -51,21 +61,58 @@ export class ProfessionalUserListComponent implements OnInit {
                 field: 'jobTitle',
                 caption: 'Job Title',
                 type: ColumnType.text
+            },
+            {
+                field: '',
+                caption: 'Job Functions',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.jobFunctionsTemplate
             }
         ];
     }
 
     public async ngOnInit(): Promise<void> {
+        this.table.columns = this.getColumns();
+
         await this.getUsers();
     }
 
     public async getUsers(): Promise<void> {
         try {
             this.table.isLoading = true;
-            this.table.items = await this._userService.getAll(this.table.items?.pageInfo || {}, this.table.query);
+
+            const users = await this._userService.getAll(this.table.items?.pageInfo || {}, this.table.query);
+
+            this.table.items = {
+                ...users,
+                data: users.data.map(user => ({ ...user, jobFunctions: this.buildJobFunctions(user) }))
+            };
         } finally {
             this.table.isLoading = false;
         }
+    }
+
+    private buildJobFunctions(user: ProfessionalUser): string {
+        const jobFunctions: string[] = [];
+
+        if (user.isBackflowTester) {
+            jobFunctions.push('BPAT');
+        }
+
+        if (user.isCsiInspector) {
+            jobFunctions.push('CSI');
+        }
+
+        if (user.isFogInspector) {
+            jobFunctions.push('FOGI');
+        }
+
+        if (user.isFogTransporter) {
+            jobFunctions.push('FOGT');
+        }
+
+        return jobFunctions.join(', ');
     }
 
     public add(): void {

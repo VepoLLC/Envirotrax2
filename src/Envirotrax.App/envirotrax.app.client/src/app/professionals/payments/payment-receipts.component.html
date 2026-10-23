@@ -14,22 +14,43 @@
     <div dp-spinner-parent>
         <dp-loading-spinner *ngIf="isLoading" message="Loading Payments" />
 
-        <div class="d-flex align-items-center gap-3 flex-wrap mb-3">
-            <select class="form-select w-auto" name="transactionType" [(ngModel)]="transactionType">
-                @for (option of transactionTypeOptions; track option.id) {
-                    <option [value]="option.id">{{ option.text }}</option>
-                }
-            </select>
+        <div class="mb-3">
+            <div class="row">
+                <div class="col-xl col-md-6">
+                    <vp-input name="transactionType"
+                              label="Payment Type:"
+                              labelStyle="horizontal"
+                              type="select"
+                              [options]="transactionTypeOptions"
+                              [(ngModel)]="transactionType" />
+                </div>
 
-            <span class="fw-bold">From:</span>
-            <input type="date" class="form-control w-auto" name="fromDate" [(ngModel)]="fromDate" />
+                <div class="col-xl col-md-6">
+                    <vp-input name="fromDate"
+                              label="From:"
+                              labelStyle="horizontal"
+                              type="date"
+                              [(ngModel)]="fromDate" />
+                </div>
 
-            <span class="fw-bold">To:</span>
-            <input type="date" class="form-control w-auto" name="toDate" [(ngModel)]="toDate" />
+                <div class="col-xl col-md-6">
+                    <vp-input name="toDate"
+                              label="To:"
+                              labelStyle="horizontal"
+                              type="date"
+                              [(ngModel)]="toDate" />
+                </div>
 
-            <button type="button" class="btn btn-primary" [disabled]="!fromDate || !toDate" (click)="search()">
-                Search
-            </button>
+                <div class="col-xl-2 mt-3 mt-xl-0">
+                    <div class="d-flex justify-content-center">
+                        <button type="button" class="btn btn-primary vp-section-button"
+                                [disabled]="!fromDate || !toDate"
+                                (click)="search()">
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <vp-table *ngIf="table.items"

@@ -277,7 +277,7 @@
             <div *ngIf="isAdmin" class="col-sm-12 col-md-6 col-xl-3">
                 <a routerLink="/professionals/users" class="overview-box bordered">
                     <i class="fa-solid fa-users overview-icon"></i>
-                    <span class="overview-label">Licensed Personnel Sub Accounts</span>
+                    <span class="overview-label">Licensed Personnel User Accounts</span>
                     <div class="number-box">{{ dashboardStats.subAccountCount ?? 0 }}</div>
                 </a>
             </div>
@@ -324,7 +324,7 @@
     <!-- Full view: side-by-side sections -->
     <div *ngIf="viewMode === 'full'">
 
-        <!-- Row 1: Water Suppliers + Sub Accounts (admin only) -->
+        <!-- Row 1: Water Suppliers + User Accounts (admin only) -->
         <div *ngIf="isAdmin" class="row mb-4">
             <div class="col-md-6 mb-4 mb-md-0">
                 <vp-section header="Water Suppliers">
@@ -349,7 +349,7 @@
             </div>
 
             <div class="col-md-6">
-                <vp-section header="Licensed Personnel Sub Accounts">
+                <vp-section header="Licensed Personnel User Accounts">
                     <div dp-spinner-parent>
                         <dp-loading-spinner *ngIf="subAccountsTable.isLoading"></dp-loading-spinner>
 
@@ -366,7 +366,7 @@
                     <div class="text-end mt-3">
                         <a routerLink="/professionals/users" class="btn btn-primary vp-section-button">
                             <i class="fa-solid fa-users me-1"></i>
-                            Sub Account Management
+                            User Account Management
                         </a>
                     </div>
                 </vp-section>
@@ -447,7 +447,7 @@
                         <p *ngIf="vehiclesTable.items && !vehiclesTable.items.data.length"
                            class="text-danger fw-semibold text-center">
                             You must register your transporter vehicle(s) prior to entering a trip ticket. Any
-                            vehicle(s) registered in the master account will be available for use by any sub account.
+                            vehicle(s) registered in the Master Account will be available for use by any User Account.
                             Click on the Vehicle Management button below to view more information on how to submit and
                             manage your transporter vehicle(s).
                         </p>

@@ -33,20 +33,4 @@ export class ProfessionalTransactionService {
         const url = this._urlResolver.resolveUrl(`/api/professionals/transactions/${encodeURIComponent(transactionId)}/receipt`);
         return await lastValueFrom(this._http.get(url, { responseType: 'blob' }));
     }
-
-    public async openReceiptPdf(transactionId: string): Promise<void> {
-        const receiptWindow = window.open('', '_blank');
-        let isOpened = false;
-
-        try {
-            const pdf = await this.getReceiptPdf(transactionId);
-
-            receiptWindow!.location.href = URL.createObjectURL(pdf);
-            isOpened = true;
-        } finally {
-            if (!isOpened) {
-                receiptWindow?.close();
-            }
-        }
-    }
 }

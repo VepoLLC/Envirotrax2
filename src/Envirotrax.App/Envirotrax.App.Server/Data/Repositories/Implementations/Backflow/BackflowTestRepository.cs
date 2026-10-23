@@ -34,8 +34,10 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
     {
         var query = base.GetListQuery()
             .Include(bt => bt.WaterSupplier)
+                .ThenInclude(ws => ws!.State)
             .Include(bt => bt.Site)
             .Include(bt => bt.Bpat)
+                .ThenInclude(bpat => bpat!.User)
             .Include(bt => bt.BpatState)
             .Include(bt => bt.PropertyState)
             .Include(bt => bt.MailingState);

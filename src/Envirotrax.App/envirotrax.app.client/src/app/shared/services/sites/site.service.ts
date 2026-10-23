@@ -20,6 +20,10 @@ export interface SiteTabCounts {
     fogCount: number;
 }
 
+export interface SiteAccountNumber {
+    accountNumber: string;
+}
+
 export interface ProfessionalSiteSearchCriteria {
     workedOnly?: string | null;
     scheduledOnly?: string | null;
@@ -246,6 +250,14 @@ export class SiteService {
 
         return lastValueFrom(
             this._http.post<Site>(url, site)
+        );
+    }
+
+    public generateAccountNumber(): Promise<SiteAccountNumber> {
+        const url = this._urlResolver.resolveUrl('/api/sites/account-numbers');
+
+        return lastValueFrom(
+            this._http.post<SiteAccountNumber>(url, {})
         );
     }
 

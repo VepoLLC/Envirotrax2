@@ -13,6 +13,7 @@ using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
+using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,11 +24,13 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
     private const string HazardTypeOther = "Other";
 
     private readonly ITenantProvidersService _tenantProvider;
+    private readonly ITimeZoneHelperService _timeZoneHelper;
 
-    public BackflowTestRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider)
+    public BackflowTestRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider, ITimeZoneHelperService timeZoneHelper)
         : base(dbContextSelector)
     {
         _tenantProvider = tenantProvider;
+        _timeZoneHelper = timeZoneHelper;
     }
 
     protected override IQueryable<BackflowTest> GetListQuery()
@@ -232,6 +235,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
     public async Task<IEnumerable<BackflowTest>> SearchAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken)
     {
         WaterSupplierAccountNumberSearch.Apply(query, nameof(BackflowTest.AccountNumber), nameof(BackflowTest.Site));
+        CreatedTimeDaySearch.Apply(query, _timeZoneHelper.GetUserTimeZone());
 
         var dbQuery = GetListQuery().Where(query.Filter);
 

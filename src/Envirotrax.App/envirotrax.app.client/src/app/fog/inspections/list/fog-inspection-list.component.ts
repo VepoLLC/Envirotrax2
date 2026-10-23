@@ -135,10 +135,10 @@ export class FogInspectionListComponent implements OnInit, OnDestroy {
 
     private applyDateFilter(startDate: string, endDate: string = startDate): void {
         this.table.query.filter = [{
-            columnName: 'inspectionDate',
+            columnName: 'createdTime',
             children: [
-                { columnName: 'inspectionDate', value: startDate, comparisonOperator: 'Gte', logicalOperator: 'And' },
-                { columnName: 'inspectionDate', value: endDate, comparisonOperator: 'Lte', logicalOperator: 'And' }
+                { columnName: 'createdTime', value: startDate, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                { columnName: 'createdTime', value: endDate, comparisonOperator: 'Lte', logicalOperator: 'And' }
             ]
         }];
     }

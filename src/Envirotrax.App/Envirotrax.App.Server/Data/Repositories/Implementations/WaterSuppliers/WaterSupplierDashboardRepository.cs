@@ -49,7 +49,7 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
         var utcEnd = TimeZoneInfo.ConvertTimeToUtc(localToday.AddDays(1), userTz);
 
         var allDates = Enumerable.Range(0, 10)
-            .Select(i => DateOnly.FromDateTime(localStart.AddDays(i)))
+            .Select(i => DateOnly.FromDateTime(localToday.AddDays(-i)))
             .ToList();
 
         var rawMain = await _context.CsiInspections
@@ -129,16 +129,16 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
         var utcEnd = TimeZoneInfo.ConvertTimeToUtc(localToday.AddDays(1), userTz);
 
         var allDates = Enumerable.Range(0, 10)
-            .Select(i => DateOnly.FromDateTime(localStart.AddDays(i)))
+            .Select(i => DateOnly.FromDateTime(localToday.AddDays(-i)))
             .ToList();
 
         var rawMain = await _context.BackflowTests
-            .Where(b => b.WaterSupplierId == wsId && b.TestDate >= utcStart && b.TestDate < utcEnd)
-            .Select(b => new { b.TestDate, b.TransactionId })
+            .Where(b => b.WaterSupplierId == wsId && b.CreatedTime >= utcStart && b.CreatedTime < utcEnd)
+            .Select(b => new { b.CreatedTime, b.TransactionId })
             .ToListAsync(cancellationToken);
 
         var groupedMain = rawMain
-            .GroupBy(b => DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(b.TestDate!.Value, userTz)))
+            .GroupBy(b => DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(b.CreatedTime, userTz)))
             .Select(g => new
             {
                 Date = g.Key,
@@ -166,12 +166,12 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
             var childIds = childWaterSuppliers.Select(ws => ws.Id).ToList();
             var rawSub = await _context.BackflowTests
                 .IgnoreQueryFilters()
-                .Where(b => childIds.Contains(b.WaterSupplierId) && b.TestDate >= utcStart && b.TestDate < utcEnd)
-                .Select(b => new { b.WaterSupplierId, b.TestDate, b.TransactionId })
+                .Where(b => childIds.Contains(b.WaterSupplierId) && b.CreatedTime >= utcStart && b.CreatedTime < utcEnd)
+                .Select(b => new { b.WaterSupplierId, b.CreatedTime, b.TransactionId })
                 .ToListAsync(cancellationToken);
 
             var groupedSub = rawSub
-                .GroupBy(b => new { b.WaterSupplierId, Date = DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(b.TestDate!.Value, userTz)) })
+                .GroupBy(b => new { b.WaterSupplierId, Date = DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(b.CreatedTime, userTz)) })
                 .Select(g => new
                 {
                     g.Key.WaterSupplierId,
@@ -209,7 +209,7 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
         var utcEnd = TimeZoneInfo.ConvertTimeToUtc(localToday.AddDays(1), userTz);
 
         var allDates = Enumerable.Range(0, 10)
-            .Select(i => DateOnly.FromDateTime(localStart.AddDays(i)))
+            .Select(i => DateOnly.FromDateTime(localToday.AddDays(-i)))
             .ToList();
 
         var rawMain = await _context.FogInspections
@@ -289,7 +289,7 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
         var utcEnd = TimeZoneInfo.ConvertTimeToUtc(localToday.AddDays(1), userTz);
 
         var allDates = Enumerable.Range(0, 10)
-            .Select(i => DateOnly.FromDateTime(localStart.AddDays(i)))
+            .Select(i => DateOnly.FromDateTime(localToday.AddDays(-i)))
             .ToList();
 
         var rawMain = await _context.FogTripTickets

@@ -236,7 +236,7 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
     }
 
     // Both drill-down entry points arrive as query params on this list: the dashboard "date" click
-    // (a single-day test-date range) and the Tab 2 (Current Compliance Status) "View" link (the
+    // (a single-day submission-date range) and the Tab 2 (Current Compliance Status) "View" link (the
     // non-compliant assemblies behind a requirement row). Apply the matching preset filter and run
     // the search automatically.
     private subscribeToQueryParams(): void {
@@ -271,10 +271,10 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
 
     private applyDateFilter(startDate: string, endDate: string = startDate): void {
         this.table.query.filter = [{
-            columnName: 'testDate',
+            columnName: 'createdTime',
             children: [
-                { columnName: 'testDate', value: startDate, comparisonOperator: 'Gte', logicalOperator: 'And' },
-                { columnName: 'testDate', value: endDate, comparisonOperator: 'Lte', logicalOperator: 'And' }
+                { columnName: 'createdTime', value: startDate, comparisonOperator: 'Gte', logicalOperator: 'And' },
+                { columnName: 'createdTime', value: endDate, comparisonOperator: 'Lte', logicalOperator: 'And' }
             ]
         }];
     }

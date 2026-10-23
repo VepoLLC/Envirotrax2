@@ -8,6 +8,7 @@ using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Sites;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
+using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,11 +17,13 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Fog;
 public class FogInspectionRepository : Repository<FogInspection>, IFogInspectionRepository
 {
     private readonly ITenantProvidersService _tenantProvider;
+    private readonly ITimeZoneHelperService _timeZoneHelper;
 
-    public FogInspectionRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider)
+    public FogInspectionRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider, ITimeZoneHelperService timeZoneHelper)
         : base(dbContextSelector)
     {
         _tenantProvider = tenantProvider;
+        _timeZoneHelper = timeZoneHelper;
     }
 
     protected override IQueryable<FogInspection> GetListQuery()
@@ -56,6 +59,7 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
         }
 
         WaterSupplierAccountNumberSearch.ApplyThroughSite(query, nameof(FogInspection.Site));
+        CreatedTimeDaySearch.Apply(query, _timeZoneHelper.GetUserTimeZone());
 
         return base.GetAllAsync(pageInfo, query, cancellationToken);
     }

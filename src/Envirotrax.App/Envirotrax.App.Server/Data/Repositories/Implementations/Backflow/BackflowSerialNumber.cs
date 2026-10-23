@@ -23,6 +23,16 @@ public static class BackflowSerialNumber
         return leadingZeroCount == digits.Length ? digits : digits[leadingZeroCount..];
     }
 
+    public static string Correct(string? serialNumber)
+    {
+        if (string.IsNullOrEmpty(serialNumber))
+        {
+            return string.Empty;
+        }
+
+        return string.Concat(serialNumber.ToUpper().Trim().Where(char.IsLetterOrDigit));
+    }
+
     public static bool IsBaseNumberMatch(string serialNumber, string candidateSerialNumber)
     {
         if (ToBaseNumber(serialNumber) != ToBaseNumber(candidateSerialNumber))

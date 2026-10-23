@@ -1083,14 +1083,79 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             .ToListAsync(cancellationToken);
     }
 
-    public Task<List<BackflowTest>> GetSubmissionAssembliesAsync(IReadOnlyCollection<int> siteIds, BackflowSubmissionSearchDto criteria, CancellationToken cancellationToken)
+    public Task<List<BackflowTest>> GetSubmissionAssembliesAsync(IReadOnlyCollection<int> siteIds, CancellationToken cancellationToken)
     {
-        return Entity
-            .AsNoTracking()
-            .WhereSubmissionAssembly(criteria)
+        return GetSubmissionAssemblyQuery()
             .Where(test => test.SiteId != null && siteIds.Contains(test.SiteId.Value))
             .OrderBy(test => test.SerialNumber)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<BackflowTest>> GetSerialNumberMatchesAsync(BackflowSubmissionSearchDto criteria, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(criteria.Manufacturer) || string.IsNullOrWhiteSpace(criteria.SerialNumber))
+        {
+            return [];
+        }
+
+        var manufacturer = criteria.Manufacturer.Trim();
+        var serialNumber = criteria.SerialNumber.Trim();
+
+        if (!BackflowSerialNumber.IsValid(serialNumber))
+        {
+            return [];
+        }
+
+        var candidates = GetSubmissionAssemblyQuery()
+            .Where(test => test.SiteId != null
+                && test.Manufacturer != null
+                && test.Manufacturer.StartsWith(manufacturer)
+                && test.SerialNumber != null
+                && test.SerialNumber != string.Empty)
+            .OrderByDescending(test => test.ExpirationDate);
+
+        var matches = await candidates
+            .Where(test => test.SerialNumber == serialNumber)
+            .ToListAsync(cancellationToken);
+
+        if (matches.Count == 0)
+        {
+            var letterWildcardPattern = BackflowSerialNumber.ToLetterWildcardPattern(serialNumber);
+
+            matches = await candidates
+                .Where(test => EF.Functions.Like(test.SerialNumber!, letterWildcardPattern))
+                .ToListAsync(cancellationToken);
+        }
+
+        if (matches.Count == 0)
+        {
+            var baseNumberPattern = $"%{BackflowSerialNumber.ToBaseNumber(serialNumber)}%";
+
+            var baseNumberCandidates = await candidates
+                .Where(test => EF.Functions.Like(test.SerialNumber!, baseNumberPattern))
+                .ToListAsync(cancellationToken);
+
+            foreach (var candidate in baseNumberCandidates)
+            {
+                if (BackflowSerialNumber.IsBaseNumberMatch(serialNumber, candidate.SerialNumber!))
+                {
+                    matches.Add(candidate);
+                }
+            }
+        }
+
+        return matches;
+    }
+
+    private IQueryable<BackflowTest> GetSubmissionAssemblyQuery()
+    {
+        return Entity
+            .AsNoTracking()
+            .Where(test => test.DeletedTime == null
+                && test.IsCurrent
+                && !test.OutOfService
+                && test.TransactionId != null
+                && test.TransactionId != string.Empty);
     }
 
     private async Task<int?> FindPreviousTestIdAsync(BackflowTest fromTest)
@@ -1175,7 +1240,8 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             return null;
         }
 
-        var candidates = GetPreviousCurrentTestCandidates(test);
+        var parentWaterSupplierId = await GetParentWaterSupplierIdAsync(test, cancellationToken);
+        var candidates = GetPreviousCurrentTestCandidates(test, parentWaterSupplierId);
 
         var matches = await candidates
             .Where(t => t.SerialNumber == serialNumber)
@@ -1222,10 +1288,26 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
                 && t.DeletedTime == null);
     }
 
-    private IQueryable<BackflowTest> GetPreviousCurrentTestCandidates(BackflowTest test)
+    public async Task<bool> HasSubmissionAsync(string submissionId, CancellationToken cancellationToken)
     {
-        var parentWaterSupplierId = test.WaterSupplier?.ParentId;
+        return await Entity.AnyAsync(t => t.SubmissionId == submissionId, cancellationToken);
+    }
 
+    private async Task<int?> GetParentWaterSupplierIdAsync(BackflowTest test, CancellationToken cancellationToken)
+    {
+        if (test.WaterSupplier != null)
+        {
+            return test.WaterSupplier.ParentId;
+        }
+
+        return await DbContext.WaterSuppliers
+            .Where(supplier => supplier.Id == test.WaterSupplierId)
+            .Select(supplier => supplier.ParentId)
+            .SingleOrDefaultAsync(cancellationToken);
+    }
+
+    private IQueryable<BackflowTest> GetPreviousCurrentTestCandidates(BackflowTest test, int? parentWaterSupplierId)
+    {
         return DbContext.BackflowTests
             .AsNoTracking()
             .Where(t => (t.WaterSupplierId == test.WaterSupplierId

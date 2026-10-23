@@ -27,7 +27,7 @@ export class BackflowTestSubmitConfirmationComponent implements OnInit, OnDestro
     public accountNumber = '';
     public manufacturer = '';
     public serialNumber = '';
-    public streetNumber = '';
+    public propertyAddress = '';
 
     private _routeSub?: Subscription;
 
@@ -86,8 +86,8 @@ export class BackflowTestSubmitConfirmationComponent implements OnInit, OnDestro
             queryParams['serialNumber'] = this.serialNumber;
         }
 
-        if (this.streetNumber) {
-            queryParams['streetNumber'] = this.streetNumber;
+        if (this.propertyAddress) {
+            queryParams['propertyAddress'] = this.propertyAddress;
         }
 
         this._router.navigate(['..'], { relativeTo: this._activatedRoute, queryParams: queryParams });

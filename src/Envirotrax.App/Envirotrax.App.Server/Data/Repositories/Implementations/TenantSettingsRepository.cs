@@ -1,4 +1,5 @@
 
+using System.Linq.Expressions;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.Repositories.Definitions;
 using Envirotrax.App.Server.Data.Services.Definitions;
@@ -14,6 +15,21 @@ public abstract class TenantSettingsRepository<TModel> : Repository<TModel>, ITe
     public TenantSettingsRepository(IDbContextSelector dbContextSelector)
         : base(dbContextSelector)
     {
+    }
+
+    public async Task<TModel> GetAsync(int waterSupplierId, Expression<Func<TModel, TModel>> selector, CancellationToken cancellationToken = default)
+    {
+        return await Entity
+            .Where(settings => settings.WaterSupplierId == waterSupplierId)
+            .Select(selector)
+            .SingleOrDefaultAsync(cancellationToken) ?? new();
+    }
+
+    public async Task<TModel> GetAsync(Expression<Func<TModel, TModel>> selector, CancellationToken cancellationToken = default)
+    {
+        return await Entity
+            .Select(selector)
+            .SingleOrDefaultAsync(cancellationToken) ?? new();
     }
 
     public async Task<TModel> AddOrUpdateAsync(int waterSupplierId, TModel settings)

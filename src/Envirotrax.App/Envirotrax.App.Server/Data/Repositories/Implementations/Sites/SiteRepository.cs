@@ -3,7 +3,6 @@ using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
-using Envirotrax.App.Server.Data.Repositories.Implementations.Backflow;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Microsoft.EntityFrameworkCore;
@@ -240,19 +239,66 @@ public class SiteRepository : Repository<Site>, ISiteRepository
 
     public async Task<IEnumerable<Site>> SearchForBackflowSubmissionAsync(BackflowSubmissionSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        WaterSupplierAccountNumberSearch.Apply(query, nameof(Site.AccountNumber));
+        var sites = GetBackflowSubmissionQuery();
 
-        var hasAssemblyCriteria = BackflowSubmissionAssemblyQuery.HasAssemblyCriteria(criteria);
-        var matchingAssemblies = DbContext.BackflowTests.WhereSubmissionAssembly(criteria);
+        if (!string.IsNullOrWhiteSpace(criteria.AccountNumber))
+        {
+            sites = WhereAccountNumber(sites, criteria.AccountNumber);
+        }
+        else if (!string.IsNullOrWhiteSpace(criteria.PropertyAddress))
+        {
+            sites = WherePropertyAddress(sites, criteria.PropertyAddress);
+        }
 
-        var paginated = await GetListQuery()
-            .Include(site => site.WaterSupplier!.GeneralSettings)
+        return await GetBackflowSubmissionPageAsync(sites, pageInfo, query, cancellationToken);
+    }
+
+    public async Task<IEnumerable<Site>> GetForBackflowSubmissionAsync(IReadOnlyCollection<int> siteIds, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var sites = GetBackflowSubmissionQuery()
+            .Where(site => siteIds.Contains(site.Id));
+
+        return await GetBackflowSubmissionPageAsync(sites, pageInfo, query, cancellationToken);
+    }
+
+    private IQueryable<Site> GetBackflowSubmissionQuery()
+    {
+        return GetListQuery()
+            .Include(site => site.WaterSupplier!.GeneralSettings);
+    }
+
+    private static async Task<IEnumerable<Site>> GetBackflowSubmissionPageAsync(IQueryable<Site> sites, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var paginated = await sites
             .Where(query.Filter)
-            .WhereIf(hasAssemblyCriteria, site => matchingAssemblies.Any(test => test.SiteId == site.Id))
             .OrderBy(query.Sort)
             .PaginateAsync(pageInfo, cancellationToken);
 
         return await paginated.ToListAsync(cancellationToken);
+    }
+
+    private static IQueryable<Site> WhereAccountNumber(IQueryable<Site> sites, string enteredAccountNumber)
+    {
+        var accountNumber = enteredAccountNumber.Trim();
+        var correctedAccountNumber = SiteAccountNumber.CorrectWithHyphens(accountNumber);
+
+        return sites.Where(site => site.AccountNumber == accountNumber
+            || site.AccountNumber == correctedAccountNumber
+            || (site.WaterSupplier!.GeneralSettings!.IncludeWsAccountNumbers
+                && (site.WaterSupplierAccountNumber == accountNumber || site.WaterSupplierAccountNumber == correctedAccountNumber)));
+    }
+
+    private static IQueryable<Site> WherePropertyAddress(IQueryable<Site> sites, string enteredAddress)
+    {
+        var address = SiteAddress.Clean(enteredAddress);
+        var streetNumber = SiteAddress.GetStreetNumber(address);
+        var streetName = SiteAddress.GetStreetName(address);
+        var suiteNumber = SiteAddress.GetSuiteNumber(address).Replace("#", string.Empty);
+
+        return sites
+            .Where(site => site.StreetNumber == streetNumber)
+            .WhereIf(streetName.Length > 0, site => site.StreetName != null && site.StreetName.Contains(streetName))
+            .WhereIf(suiteNumber.Length > 0, site => site.PropertyNumber != null && site.PropertyNumber.EndsWith(suiteNumber));
     }
 
     private Expression<Func<Site, bool>> GetWorkedOnFilter(int professionalId)

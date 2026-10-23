@@ -4,12 +4,10 @@
     <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
         <div class="mb-2">
             <vp-section header="Assembly Search Instructions">
-                <p>Search for an existing assembly by entering one of the following criteria. If the assembly you tested has a previous test record, select it to pre-fill the submission form. If no prior record exists, click <strong>Submit a Test for an Unlisted Property</strong>.</p>
-                <ul>
-                    <li>If you know the customer <strong>Account Number</strong>, enter it in Option 1.</li>
-                    <li>If you know the assembly <strong>Manufacturer and Serial Number</strong>, enter them in Option 2.</li>
-                    <li>If you only know the <strong>property address</strong>, enter the street number in Option 3.</li>
-                </ul>
+                <p>If you test an assembly with a known serial number, use the search form below to look for any previous test history for the assembly. If previous test history is found, you may submit a new test for the assembly and automatically populate information from the previous test such as the property location, the mailing address, and the assembly information.</p>
+                <p>Search for the existing assembly by either the property account number, manufacturer and serial number, or the property address.</p>
+                <p>If you are searching by the property address, be sure to enter only the numerical street number followed by the main street name in the <strong>Property Address</strong> textbox. DO NOT include descriptive prefixes such as <strong>North, South, East, West</strong>, or <strong>N/S/E/W</strong>, or suffixes such as <strong>BLVD, St, Lane, Dr</strong>, etcetera when entering the <strong>Property Address</strong>.</p>
+                <p class="mb-0"><em>For Example, "12345 North Richmond Blvd" should be entered in the <strong>Property Address</strong> text box as "12345 Richmond"</em></p>
             </vp-section>
         </div>
 
@@ -28,8 +26,8 @@
                     </div>
                     <div class="col-lg-4">
                         <h5 class="text-center">Option 3: Property Address</h5>
-                        <vp-input type="text" label="Street Number:" [(ngModel)]="streetNumber" name="streetNumber" />
-                        <p class="form-text text-muted">Example: 123</p>
+                        <vp-input type="text" label="Property Number and Name:" [(ngModel)]="propertyAddress" name="propertyAddress" />
+                        <p class="form-text text-muted">Example: 123 Main</p>
                     </div>
                 </div>
             </vp-section>
@@ -55,9 +53,7 @@
             <p class="mt-2">If no record exists for the assembly you tested, click <strong>Submit a Test for an Unlisted Property</strong> below.</p>
         </ng-container>
 
-        <div *ngFor="let box of siteBoxes; let odd = odd"
-             class="border border-4 rounded p-3 mt-3"
-             [ngClass]="odd ? 'border-secondary-subtle bg-body-secondary' : 'border-info bg-info-subtle'">
+        <div *ngFor="let box of siteBoxes; let odd = odd" class="test-search" [class.alt]="odd">
 
             <div class="row">
                 <div class="col-lg-6">

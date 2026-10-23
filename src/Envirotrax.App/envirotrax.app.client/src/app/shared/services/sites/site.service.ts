@@ -28,8 +28,10 @@ export interface ProfessionalSiteSearchCriteria {
 }
 
 export interface BackflowSubmissionSearchCriteria {
+    accountNumber?: string | null;
     manufacturer?: string | null;
     serialNumber?: string | null;
+    propertyAddress?: string | null;
 }
 
 @Injectable({

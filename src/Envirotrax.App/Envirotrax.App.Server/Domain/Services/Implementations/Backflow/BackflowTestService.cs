@@ -430,6 +430,35 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         return site;
     }
 
+    private static SiteDto BuildSiteForUnlistedProperty(BackflowTestDto dto)
+    {
+        return new SiteDto
+        {
+            WaterSupplier = dto.WaterSupplier,
+            Active = true,
+
+            BusinessName = dto.PropertyBusinessName,
+            PropertyType = (PropertyType)dto.PropertyType,
+            StreetNumber = dto.PropertyStreetNumber,
+            StreetName = dto.PropertyStreetName,
+            PropertyNumber = dto.PropertyNumber,
+            City = dto.PropertyCity,
+            State = dto.PropertyState,
+            ZipCode = dto.PropertyZip,
+
+            MailingCompanyName = dto.MailingCompanyName,
+            MailingContactName = dto.MailingContactName,
+            MailingStreetNumber = dto.MailingStreetNumber,
+            MailingStreetName = dto.MailingStreetName,
+            MailingNumber = dto.MailingNumber,
+            MailingCity = dto.MailingCity,
+            MailingState = dto.MailingState,
+            MailingZipCode = dto.MailingZip,
+            MailingPhoneNumber = dto.MailingPhoneNumber,
+            MailingEmailAddress = dto.MailingEmailAddress
+        };
+    }
+
     public async Task<BackflowTestDto> SubmitWithImagesAsync(
         BackflowTestDto dto,
         Stream? assemblyStream, string? assemblyFileName,
@@ -447,6 +476,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         await PopulateBpatSnapshotAsync(dto);
         DeriveTestDate(dto);
 
+        var isUnlistedProperty = dto.Site == null || dto.Site.Id == null;
         var site = await ApplySiteValidationAsync(dto, cancellationToken);
 
         var hasAuxWaterSupply = false;
@@ -489,6 +519,14 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
         using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
+            if (isUnlistedProperty)
+            {
+                var createdSite = await _siteService.AddWithGeneratedAccountNumberAsync(BuildSiteForUnlistedProperty(dto));
+
+                dto.Site = new ReferencedSiteDto { Id = createdSite.Id };
+                dto.AccountNumber = createdSite.AccountNumber;
+            }
+
             saved = await base.AddAsync(dto);
 
             if (assemblyStream != null && dto.AssemblyImagePath != null)

@@ -2,6 +2,7 @@ using System.Transactions;
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
+using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
@@ -221,20 +222,30 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         query.Sort = query.ConvertSortProperties<Site, SiteDto>(Mapper);
         query.Filter = query.ConvertFilterProperties<Site, SiteDto>(Mapper);
 
-        var sites = (await _siteRepository.SearchForBackflowSubmissionAsync(criteria, pageInfo, query, cancellationToken)).ToList();
+        List<Site> sites;
+        List<BackflowTest> assemblies;
 
-        var siteIds = new List<int>();
-
-        foreach (var site in sites)
+        if (IsSerialNumberSearch(criteria))
         {
-            siteIds.Add(site.Id);
+            assemblies = await _backflowTestRepository.GetSerialNumberMatchesAsync(criteria, cancellationToken);
+
+            var matchingSiteIds = GetSiteIds(assemblies);
+
+            sites = (await _siteRepository.GetForBackflowSubmissionAsync(matchingSiteIds, pageInfo, query, cancellationToken)).ToList();
+        }
+        else
+        {
+            sites = (await _siteRepository.SearchForBackflowSubmissionAsync(criteria, pageInfo, query, cancellationToken)).ToList();
+
+            var siteIds = GetSiteIds(sites);
+
+            assemblies = await _backflowTestRepository.GetSubmissionAssembliesAsync(siteIds, cancellationToken);
         }
 
-        var assemblies = await _backflowTestRepository.GetSubmissionAssembliesAsync(siteIds, criteria, cancellationToken);
         var assembliesBySiteId = assemblies.ToLookup(assembly => assembly.SiteId);
 
         var siteDtos = new List<BackflowSubmissionSiteDto>();
-        var assemblyDtos = new List<BackflowTestDto>();
+        var redactableDtos = new List<IRedactableMailingInfoDto>();
 
         foreach (var site in sites)
         {
@@ -245,15 +256,48 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
                 var assemblyDto = Mapper.Map<BackflowTestDto>(assembly);
 
                 siteDto.Assemblies.Add(assemblyDto);
-                assemblyDtos.Add(assemblyDto);
+                redactableDtos.Add(assemblyDto);
             }
 
             siteDtos.Add(siteDto);
+            redactableDtos.Add(siteDto);
         }
 
-        await _mailingInfoRedactionService.RedactAsync(assemblyDtos, cancellationToken);
+        await _mailingInfoRedactionService.RedactAsync(redactableDtos, cancellationToken);
 
-        return await _mailingInfoRedactionService.RedactAsync(siteDtos.ToPagedData(pageInfo), cancellationToken);
+        return siteDtos.ToPagedData(pageInfo);
+    }
+
+    private static bool IsSerialNumberSearch(BackflowSubmissionSearchDto criteria)
+    {
+        return string.IsNullOrWhiteSpace(criteria.AccountNumber) && !string.IsNullOrWhiteSpace(criteria.Manufacturer);
+    }
+
+    private static List<int> GetSiteIds(List<Site> sites)
+    {
+        var siteIds = new List<int>();
+
+        foreach (var site in sites)
+        {
+            siteIds.Add(site.Id);
+        }
+
+        return siteIds;
+    }
+
+    private static List<int> GetSiteIds(List<BackflowTest> assemblies)
+    {
+        var siteIds = new List<int>();
+
+        foreach (var assembly in assemblies)
+        {
+            if (assembly.SiteId != null && !siteIds.Contains(assembly.SiteId.Value))
+            {
+                siteIds.Add(assembly.SiteId.Value);
+            }
+        }
+
+        return siteIds;
     }
 
     public async Task<IEnumerable<SiteDto>> GetAllPendingGeocodingAsync(int batchSize)

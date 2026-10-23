@@ -70,7 +70,8 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
     // Full current test rows at a site, for seeding a CSI inspection's visually identified assemblies.
     Task<List<BackflowTest>> GetCurrentBySiteAsync(int siteId, CancellationToken cancellationToken);
 
-    Task<List<BackflowTest>> GetSubmissionAssembliesAsync(IReadOnlyCollection<int> siteIds, BackflowSubmissionSearchDto criteria, CancellationToken cancellationToken);
+    Task<List<BackflowTest>> GetSubmissionAssembliesAsync(IReadOnlyCollection<int> siteIds, CancellationToken cancellationToken);
+    Task<List<BackflowTest>> GetSerialNumberMatchesAsync(BackflowSubmissionSearchDto criteria, CancellationToken cancellationToken);
 
     // CSI inspection visually identified assemblies
     Task MarkCsiInspectionTestsPaidAsync(CsiInspection inspection, string transactionId, DateTime transactionDate, CancellationToken cancellationToken);

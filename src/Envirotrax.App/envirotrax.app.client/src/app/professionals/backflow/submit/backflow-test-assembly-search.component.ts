@@ -8,7 +8,7 @@ import { BackflowSubmissionSite } from "../../../shared/models/backflow/backflow
 import { Site } from "../../../shared/models/sites/site";
 import { BackflowSubmissionSearchCriteria, SiteService } from "../../../shared/services/sites/site.service";
 import { PageInfo } from "../../../shared/models/page-info";
-import { Query, QueryProperty } from "../../../shared/models/query";
+import { Query } from "../../../shared/models/query";
 import { PropertyType } from "../../../shared/enums/property-type.enum";
 
 interface SubmissionAssemblyRow {
@@ -38,7 +38,7 @@ export class BackflowTestAssemblySearchComponent implements OnInit, OnDestroy {
     public accountNumber = '';
     public manufacturer = '';
     public serialNumber = '';
-    public streetNumber = '';
+    public propertyAddress = '';
     public errorMessage = '';
     public resultsHeader = '';
 
@@ -65,9 +65,9 @@ export class BackflowTestAssemblySearchComponent implements OnInit, OnDestroy {
             this.accountNumber = params.get('accountNumber') ?? '';
             this.manufacturer = params.get('manufacturer') ?? '';
             this.serialNumber = params.get('serialNumber') ?? '';
-            this.streetNumber = params.get('streetNumber') ?? '';
+            this.propertyAddress = params.get('propertyAddress') ?? '';
 
-            if (this.accountNumber || this.manufacturer || this.serialNumber || this.streetNumber) {
+            if (this.accountNumber || this.manufacturer || this.serialNumber || this.propertyAddress) {
                 await this.runSearch();
             }
         });
@@ -86,8 +86,8 @@ export class BackflowTestAssemblySearchComponent implements OnInit, OnDestroy {
     }
 
     private async runSearch(): Promise<void> {
-        if (!this.accountNumber && !(this.manufacturer && this.serialNumber) && !this.streetNumber) {
-            this.errorMessage = 'Please enter an Account Number, Manufacturer and Serial Number, or a Street Number to search.';
+        if (!this.accountNumber && !(this.manufacturer && this.serialNumber) && !this.propertyAddress) {
+            this.errorMessage = 'Please enter an Account Number, Manufacturer and Serial Number, or a Property Address to search.';
             return;
         }
 
@@ -127,22 +127,16 @@ export class BackflowTestAssemblySearchComponent implements OnInit, OnDestroy {
     }
 
     private buildSearch(): void {
-        const filter: QueryProperty[] = [];
-
-        this._criteria = {};
-
         if (this.accountNumber) {
-            filter.push({ columnName: 'accountNumber', comparisonOperator: 'Eq', value: this.accountNumber });
+            this._criteria = { accountNumber: this.accountNumber };
             this.resultsHeader = `Property Matching Account Number '${this.accountNumber}'`;
         } else if (this.manufacturer && this.serialNumber) {
             this._criteria = { manufacturer: this.manufacturer, serialNumber: this.serialNumber };
             this.resultsHeader = `Properties With Assembly Serial Numbers Similar To '${this.serialNumber}'`;
         } else {
-            filter.push({ columnName: 'streetNumber', comparisonOperator: 'Eq', value: this.streetNumber });
-            this.resultsHeader = `Property Locations Similar To '${this.streetNumber}'`;
+            this._criteria = { propertyAddress: this.propertyAddress };
+            this.resultsHeader = `Property Locations Similar To '${this.propertyAddress}'`;
         }
-
-        this._query.filter = filter;
     }
 
     private buildSiteBoxes(sites: BackflowSubmissionSite[]): SubmissionSiteBox[] {

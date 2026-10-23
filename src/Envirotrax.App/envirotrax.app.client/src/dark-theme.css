@@ -475,3 +475,12 @@ body.vp-dark-theme .flatpickr-confirm:hover {
 body.vp-dark-theme .bg-info {
     background-color: #066d7f !important;
 }
+
+body.vp-dark-theme .test-search {
+    background-color: #008fd430;
+}
+
+body.vp-dark-theme .test-search.alt {
+    border-color: #808080;
+    background-color: #202020;
+}

@@ -20,42 +20,59 @@
     };
     var deviceTypeLabels = new System.Collections.Generic.Dictionary<string, string>
     {
-        ["DC"] = "DC - Double Check Valve",
-        ["DCD"] = "DCD - Double Check Detector",
-        ["DCD2"] = "DCD2 - Double Check Detector Type II",
-        ["RP"] = "RP - Reduced Pressure Principle",
-        ["RPPD"] = "RPPD - Reduced Pressure Principle Detector",
-        ["RPPD2"] = "RPPD2 - Reduced Pressure Principle Detector Type II",
-        ["PVB"] = "PVB - Pressure Vacuum Breaker",
-        ["SVB"] = "SVB - Spill-Resistant Pressure Vacuum Breaker",
-        ["AG"] = "AG - Air Gap"
+        ["DC"] = "Double Check Valve",
+        ["DCD"] = "Double Check Detector",
+        ["DCD2"] = "Double Check Detector Type II",
+        ["RP"] = "Reduced Pressure Principle",
+        ["RPPD"] = "Reduced Pressure Principle Detector",
+        ["RPPD2"] = "Reduced Pressure Principle Detector Type II",
+        ["PVB"] = "Pressure Vacuum Breaker",
+        ["SVB"] = "Spill-Resistant Pressure Vacuum Breaker",
+        ["AG"] = "Air Gap"
     };
 
-    // Reading column definitions — mirrors Angular _valveColumns
+    // Reading column definitions — the same columns V1 prints per device type
     var allReadingCols = new (int Index, string Group, string Header, string InitVerb, string? InitVal, (string Label,
-string Field)[] InitChecks, string? RepairField, string? RepairDetailsField, string? FinalVerb, string? FinalVal,
-(string Label, string Field)[] FinalChecks)[]
+        string Field)[] InitChecks, string? RepairField, string? RepairDetailsField, string? FinalVerb, string? FinalVal,
+        (string Label, string Field)[] FinalChecks)[]
     {
-        (1, "main", "Check Valve #1", "Held at", "InitCV1HeldPSID", new[] { ("Closed Tight", "InitCV1ClosedTight"),
-("Leaked","InitCV1Leaked") }, "RepairCV1", "RepairCV1Details", "Held at", "FinalCV1HeldPSID", new[] { ("Closed Tight","FinalCV1ClosedTight") }),
-        (2, "main", "Check Valve #2 ***", "Held at", "InitCV2HeldPSID", new[] { ("Closed Tight",
-"InitCV2ClosedTight"),("Leaked", "InitCV2Leaked") }, "RepairCV2", "RepairCV2Details", "Held at", "FinalCV2HeldPSID",
-new[] { ("Closed Tight","FinalCV2ClosedTight") }),
-        (3, "main", "Relief Valve", "Opened at", "InitRVOpenedPSID", new[] { ("Did not open", "InitRVDidNotOpen") },
-"RepairRV","RepairRVDetails", "Opened at", "FinalRVOpenedPSID", System.Array.Empty<(string, string)>()),
-        (4, "bypass", "Check Valve #1", "Held at", "InitCV1HeldPSID2", new[] { ("Closed Tight",
-"InitCV1ClosedTight2"),("Leaked", "InitCV1Leaked2") }, "RepairCV12", "RepairCV1Details2", "Held at",
-"FinalCV1HeldPSID2", new[] { ("Closed Tight", "FinalCV1ClosedTight2") }),
-        (5, "bypass", "Check Valve #2 ***", "Held at", "InitCV2HeldPSID2", new[] { ("Closed Tight",
-"InitCV2ClosedTight2"),("Leaked", "InitCV2Leaked2") }, "RepairCV22", "RepairCV2Details2", "Held at", null, new[] {
-("Closed Tight","FinalCV2ClosedTight2") }),
-        (6, "bypass", "Relief Valve", "Opened at", "InitRVOpenedPSID2", new[] { ("Did not open", "InitRVDidNotOpen2")
-},"RepairRV2", "RepairRVDetails2", "Opened at", "FinalRVOpenedPSID2", System.Array.Empty<(string, string)>()),
-        (7, "bypass", "Bypass Check", "Held at", "InitBCHeldPSID", new[] { ("Closed Tight", "InitBCClosedTight"),
-("Leaked","InitBCLeaked") }, "RepairBC", "RepairBCDetails", "Held at", "FinalBCHeldPSID", new[] { ("Closed Tight","FinalBCClosedTight") }),
-        (8, "main", "Air Inlet", "Opened at", "InitPvbAirInletOpenedPSID", new[] { ("Did not open","InitPvbAirInletDidNotOpen"),
-("Fully opened", "InitPvbAirInletFullyOpened") }, null, null, "Opened at","FinalPvbAirInletOpenedPSID", new[] { ("Fully opened", "FinalPvbAirInletFullyOpened") }),
-        (9, "main", "Check Valve", "Held at", "InitPvbCVHeldPSID", new[] { ("Leaked", "InitPvbCVLeaked") }, null, null, "Held at", "FinalPvbCVHeldPSID", System.Array.Empty<(string, string)>()),
+        (1, "main", "Check Valve #1",
+            "Held at", "InitCV1HeldPSID", new[] { ("Closed Tight", "InitCV1ClosedTight"), ("Leaked", "InitCV1Leaked") },
+            "RepairCV1", "RepairCV1Details",
+            "Held at", "FinalCV1HeldPSID", new[] { ("Closed Tight", "FinalCV1ClosedTight") }),
+        (2, "main", "Check Valve #2 ***",
+            "Held at", "InitCV2HeldPSID", new[] { ("Closed Tight", "InitCV2ClosedTight"), ("Leaked", "InitCV2Leaked") },
+            "RepairCV2", "RepairCV2Details",
+            "Held at", "FinalCV2HeldPSID", new[] { ("Closed Tight", "FinalCV2ClosedTight") }),
+        (3, "main", "Relief Valve",
+            "Opened at", "InitRVOpenedPSID", new[] { ("Did not open", "InitRVDidNotOpen") },
+            "RepairRV", "RepairRVDetails",
+            "Opened at", "FinalRVOpenedPSID", System.Array.Empty<(string, string)>()),
+        (4, "bypass", "Check Valve #1",
+            "Held at", "InitCV1HeldPSID2", new[] { ("Closed Tight", "InitCV1ClosedTight2"), ("Leaked", "InitCV1Leaked2") },
+            "RepairCV12", "RepairCV1Details2",
+            "Held at", "FinalCV1HeldPSID2", new[] { ("Closed Tight", "FinalCV1ClosedTight2") }),
+        (5, "bypass", "Check Valve #2 ***",
+            "Held at", "InitCV2HeldPSID2", new[] { ("Closed Tight", "InitCV2ClosedTight2"), ("Leaked", "InitCV2Leaked2") },
+            "RepairCV22", "RepairCV2Details2",
+            "Held at", "FinalCV2HeldPSID2", new[] { ("Closed Tight", "FinalCV2ClosedTight2") }),
+        (6, "bypass", "Relief Valve",
+            "Opened at", "InitRVOpenedPSID2", new[] { ("Did not open", "InitRVDidNotOpen2") },
+            "RepairRV2", "RepairRVDetails2",
+            "Opened at", "FinalRVOpenedPSID2", System.Array.Empty<(string, string)>()),
+        (7, "bypass", "Bypass Check",
+            "Held at", "InitBCHeldPSID", new[] { ("Closed Tight", "InitBCClosedTight"), ("Leaked", "InitBCLeaked") },
+            "RepairBC", "RepairBCDetails",
+            "Held at", "FinalBCHeldPSID", new[] { ("Closed Tight", "FinalBCClosedTight") }),
+        (8, "main", "Air Inlet",
+            "Opened at", "InitPvbAirInletOpenedPSID", new[] { ("Did not open", "InitPvbAirInletDidNotOpen"), ("Did it fully open",
+"InitPvbAirInletFullyOpened") },
+            "RepairPvbAirInlet", "RepairPvbAirInletDetails",
+            "Opened at", "FinalPvbAirInletOpenedPSID", new[] { ("Did it fully open", "FinalPvbAirInletFullyOpened") }),
+        (9, "main", "Check Valve",
+            "Held at", "InitPvbCVHeldPSID", new[] { ("Leaked", "InitPvbCVLeaked") },
+            "RepairPvbCV", "RepairPvbCVDetails",
+            "Held at", "FinalPvbCVHeldPSID", System.Array.Empty<(string, string)>()),
     };
     var deviceColMap = new System.Collections.Generic.Dictionary<string, int[]>
     {
@@ -68,9 +85,35 @@ new[] { ("Closed Tight","FinalCV2ClosedTight") }),
         ["PVB"] = new[] { 8, 9 },
         ["SVB"] = new[] { 8, 9 },
     };
+    var readingColWidthInches = new System.Collections.Generic.Dictionary<string, double>
+    {
+        ["RPPD"] = 1.05,
+        ["RPPD2"] = 1.25
+    };
+    var repairDetailsLabels = new System.Collections.Generic.Dictionary<int, string>
+    {
+        [1] = "Check Valve #1",
+        [2] = "Check Valve #2",
+        [3] = "Relief Valve",
+        [4] = "Bypass Check Valve #1",
+        [5] = "Bypass Check Valve #2",
+        [6] = "Bypass Relief Valve",
+        [7] = "Bypass Check",
+        [8] = "PVB & SVB Air Inlet",
+        [9] = "PVB & SVB Check Valve"
+    };
     var bypassDeviceSet = new System.Collections.Generic.HashSet<string> { "DCD", "DCD2", "RPPD", "RPPD2" };
     var meterDeviceSet = new System.Collections.Generic.HashSet<string> { "DCD", "DCD2", "RPPD", "RPPD2" };
+    var reducedPressureDeviceSet = new System.Collections.Generic.HashSet<string> { "RP", "RPPD", "RPPD2" };
+    var secondCheckColIndices = new[] { 2, 5 };
     var dtoType = typeof(Envirotrax.App.Server.Domain.DataTransferObjects.Backflow.BackflowTestDto);
+
+    string FormatCityStateZip(string? city, string? state, string? zip)
+    {
+        var stateZip = string.Join(" ", new[] { state, zip }.Where(s => !string.IsNullOrWhiteSpace(s)));
+
+        return string.Join(", ", new[] { city, stateZip }.Where(s => !string.IsNullOrWhiteSpace(s)));
+    }
 }
 <!DOCTYPE html>
 <html>
@@ -79,30 +122,69 @@ new[] { ("Closed Tight","FinalCV2ClosedTight") }),
     <meta charset="utf-8" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
     <style>
+            @@page {
+                margin: 0.5in 0.5in 0 0.5in;
+            }
+
+            /* Sizes reproduce V1*/
+            :root {
+                --line: 11.04px;
+                --gap: 3.31px;
+            }
+
             body {
-                width: 702px;
-                font-size: 9.1px;
+                width: 720px;
+                font-size: 9.6px;
                 font-family: Arial, sans-serif;
+                line-height: var(--line);
             }
 
             .page-title {
                 background-color: #323232;
                 color: #ffffff;
-                font-size: 10.6px;
+                font-size: 12px;
+                line-height: 13.8px;
                 font-weight: bold;
                 text-align: center;
-                padding: 5px 3px;
-                margin-bottom: 5px;
+                padding: 4.8px;
+                margin-bottom: calc(var(--gap) * 2);
+            }
+
+            .intro {
+                margin: 0 0 15.67px;
             }
 
             .section-header {
                 background-color: #a0a0a0;
                 color: #ffffff;
+                font-size: 10.56px;
+                line-height: 12.14px;
                 font-weight: bold;
-                padding: 2.5px 5px;
-                margin-top: 5px;
+                padding: 1.4px 5px;
+                margin: var(--gap) 0;
                 text-align: center;
                 border: 1px solid #323232;
+            }
+
+            .section-header-large {
+                font-size: 12px;
+                line-height: var(--line);
+                padding: calc(var(--gap) - 1px) 5px;
+            }
+
+            .section-pair {
+                display: flex;
+                gap: var(--gap);
+                margin: var(--gap) 0;
+            }
+
+            .section-pair .section-header {
+                flex: 1;
+                margin: 0;
+            }
+
+            .section-pair .section-header:last-child {
+                flex: 0 0 360px;
             }
 
             .label {
@@ -114,10 +196,47 @@ new[] { ("Closed Tight","FinalCV2ClosedTight") }),
                 border-collapse: collapse;
             }
 
+            .info-table {
+                table-layout: fixed;
+            }
+
+            .info-table td {
+                overflow-wrap: anywhere;
+            }
+
+            .col-label {
+                width: 115.2px;
+            }
+
+            .col-value {
+                width: 244.8px;
+            }
+
             td {
                 border: none;
-                padding: 2.5px 5px;
+                padding: 0 4px var(--gap) 0;
                 vertical-align: top;
+            }
+
+            .row-gap>td {
+                padding-bottom: calc(var(--gap) * 2);
+            }
+
+            .statement {
+                margin-bottom: calc(var(--line) - var(--gap));
+            }
+
+            .statement div {
+                padding-bottom: var(--gap);
+            }
+
+            .manufacturer-table {
+                margin-bottom: var(--gap);
+            }
+
+            .gauge-label {
+                line-height: calc(var(--line) + var(--gap));
+                padding-bottom: 0;
             }
 
             th {
@@ -125,20 +244,30 @@ new[] { ("Closed Tight","FinalCV2ClosedTight") }),
                 background-color: #a0a0a0;
                 color: #ffffff;
                 text-align: center;
-                padding: 3px 6px;
                 vertical-align: top;
+            }
+
+            .readings-table {
+                table-layout: fixed;
+                margin-bottom: var(--line);
             }
 
             .readings-table td,
             .readings-table th {
-                border: 1px solid #ccc;
-                text-align: center;
-                padding: 3px 5px;
+                border: 1px solid #000;
+                text-align: left;
+                padding: var(--gap);
             }
 
             .readings-table thead th {
                 background-color: #a0a0a0;
                 color: #ffffff;
+                text-align: center;
+            }
+
+            .readings-table .readings-corner {
+                background-color: transparent;
+                border: none;
             }
 
             thead {
@@ -148,8 +277,11 @@ new[] { ("Closed Tight","FinalCV2ClosedTight") }),
             .readings-table tbody th {
                 background-color: #a0a0a0;
                 color: #ffffff;
-                text-align: left;
-                white-space: nowrap;
+            }
+
+            .readings-table tbody th.readings-row-title {
+                text-align: center;
+                vertical-align: middle;
             }
 
             .readings-device-label {
@@ -158,8 +290,95 @@ new[] { ("Closed Tight","FinalCV2ClosedTight") }),
                 font-weight: bold;
             }
 
-            .readings-table td {
-                text-align: left;
+            .readings-heading {
+                text-align: center;
+                padding-bottom: var(--gap);
+            }
+
+            .readings-heading-line {
+                padding-bottom: var(--gap);
+            }
+
+            .readings-date-label {
+                display: inline-block;
+                width: 33.6px;
+            }
+
+            .reading-value {
+                margin-bottom: calc(var(--gap) * 2);
+            }
+
+            .reading-check {
+                margin-bottom: var(--gap);
+            }
+
+            .readings-initial>* {
+                height: 49.68px;
+            }
+
+            .readings-repairs>* {
+                height: 35.33px;
+            }
+
+            .readings-repairs>td {
+                padding: 0.55px var(--gap);
+                line-height: 11.59px;
+            }
+
+            .readings-details>* {
+                height: 20.06px;
+            }
+
+            .readings-details>td {
+                font-size: 9.12px;
+                line-height: 10.49px;
+                padding: 4.8px;
+            }
+
+            .repair-detail+.repair-detail {
+                margin-top: 10.49px;
+            }
+
+            .readings-final>* {
+                height: 53px;
+            }
+
+            .air-gap-question td {
+                padding-bottom: var(--line);
+            }
+
+            .air-gap-question td:first-child {
+                padding-right: 9.6px;
+            }
+
+            .air-gap-date {
+                padding-bottom: calc(var(--gap) * 2);
+            }
+
+            .air-gap-date-label {
+                display: inline-block;
+                width: 96px;
+            }
+
+            .air-gap-note {
+                padding-bottom: var(--line);
+            }
+
+            .additional-row {
+                padding-bottom: calc(var(--gap) * 2);
+            }
+
+            .additional-row-last {
+                padding-bottom: var(--gap);
+            }
+
+            .additional-value {
+                margin-left: 12px;
+            }
+
+            .remarks {
+                font-size: 9.12px;
+                line-height: 10.49px;
             }
 
             .disapproval-box {
@@ -176,7 +395,8 @@ new[] { ("Closed Tight","FinalCV2ClosedTight") }),
             }
 
             .footer-note {
-                font-size: 9px;
+                font-size: 9.12px;
+                line-height: calc(var(--line) + var(--gap));
                 font-style: italic;
                 text-align: center;
                 color: #555;
@@ -189,416 +409,505 @@ new[] { ("Closed Tight","FinalCV2ClosedTight") }),
     @foreach (var test in Model)
     {
         var reasonLabel = reasonLabels.TryGetValue((int)test.ReasonForTest, out var rl) ? rl :
-        test.ReasonForTest.ToString();
+    test.ReasonForTest.ToString();
         var resultLabel = resultLabels.TryGetValue((int)test.TestResult, out var rtl) ? rtl : test.TestResult.ToString();
 
         // Per-test readings setup
         var isAG = test.DeviceType == "AG";
         int[] colIndices = test.DeviceType != null && deviceColMap.TryGetValue(test.DeviceType, out var mapIdx) ? mapIdx :
-        System.Array.Empty<int>();
+            System.Array.Empty<int>();
         var cols = allReadingCols.Where(c => colIndices.Contains(c.Index)).ToArray();
+        var colWidth = (test.DeviceType != null && readingColWidthInches.TryGetValue(test.DeviceType, out var cwi) ? cwi :
+    1.5) * 96;
         bool showBypassHdr = test.DeviceType != null && bypassDeviceSet.Contains(test.DeviceType);
         bool showMeterRow = test.DeviceType != null && meterDeviceSet.Contains(test.DeviceType);
+        bool isReducedPressure = test.DeviceType != null && reducedPressureDeviceSet.Contains(test.DeviceType);
         int mainColCnt = cols.Count(c => c.Group == "main");
         int bypassColCnt = cols.Count(c => c.Group == "bypass");
         string deviceLabel = test.DeviceType != null && deviceTypeLabels.TryGetValue(test.DeviceType, out var dlbl) ? dlbl :
-        (test.DeviceType ?? "");
+            (test.DeviceType ?? "");
         var hasBackflowManufacturer = test.Manufacturer2 != null;
+        var hazardDescription = string.IsNullOrWhiteSpace(test.HazardTypeOtherDescription)
+            ? test.HazardType
+            : test.HazardType + " - " + test.HazardTypeOtherDescription;
         var gaugeBase = string.Join(" ", new[] { test.GaugeManufacturer, test.GaugeModel }.Where(s =>
-    !string.IsNullOrWhiteSpace(s)));
+            !string.IsNullOrWhiteSpace(s)));
         var gaugeDesc = string.IsNullOrWhiteSpace(gaugeBase) ? "" : gaugeBase + (test.GaugeNonPotable ? " (non-potable)" : " (potable)");
 
         Func<string?, decimal?> getPSID = f =>
         {
-            if (f == null) return null;
+            if (f == null)
+            {
+                return null;
+            }
+
             var v = dtoType.GetProperty(f)?.GetValue(test);
+
             return v == null ? (decimal?)null : (decimal)v;
+        };
+        Func<int, decimal?, string> formatPSID = (colIndex, psid) =>
+        {
+            if (psid.HasValue)
+            {
+                return psid.Value.ToString();
+            }
+
+            return isReducedPressure && secondCheckColIndices.Contains(colIndex) ? "__" : "0";
         };
         Func<string, bool> getBool = f =>
         {
             var v = dtoType.GetProperty(f)?.GetValue(test);
+
             return v != null && (bool)v;
         };
         Func<string?, string?> getStr = f =>
         {
-            if (f == null) return null;
+            if (f == null)
+            {
+                return null;
+            }
+
             return dtoType.GetProperty(f)?.GetValue(test) as string;
         };
+
+        var repairDetails = cols
+            .Select(c => (Label: repairDetailsLabels[c.Index], Text: getStr(c.RepairDetailsField)))
+            .Where(d => !string.IsNullOrWhiteSpace(d.Text))
+            .ToArray();
 
         <div class="test-wrapper">
             <div class="content">
                 <div class="page-title">@test.WaterSupplier?.Name &ndash; Backflow Prevention Assembly Test and Maintenance
                     Report</div>
-                    <p style="margin:3px 0; font-size:9.1px; text-align:center;">The following form must be completed for each
-                        assembly tested for recordkeeping *purposes:</p>
+                    <p class="intro">The following form must be completed for each assembly tested for recordkeeping *purposes:
+                    </p>
 
-                        <div class="section-header">Water Supplier</div>
-                        <table>
-                            <tr>
-                                <td class="label" style="width:120px">Water supplier:</td>
-                                <td>@test.WaterSupplier?.Name</td>
-                                <td class="label" style="width:110px">Contact name:</td>
-                                <td>@test.WaterSupplier?.ContactName</td>
-                            </tr>
-                            <tr>
-                                <td class="label">Address:</td>
-                                <td>@test.WaterSupplier?.Address</td>
-                                <td class="label">Phone number:</td>
+                    <table class="info-table">
+                        <colgroup>
+                            <col class="col-label" />
+                            <col class="col-value" />
+                            <col class="col-label" />
+                            <col />
+                        </colgroup>
+                        <tr>
+                            <td></td>
+                            <td>@test.WaterSupplier?.Name</td>
+                            <td class="label">PWS ID:</td>
+                            <td>@test.WaterSupplier?.PwsId</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>@test.WaterSupplier?.Address</td>
+                            <td class="label">Contact Name:</td>
+                            <td>@test.WaterSupplier?.ContactName</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>@FormatCityStateZip(test.WaterSupplier?.City, test.WaterSupplier?.State?.Name,
+                                                                                        test.WaterSupplier?.ZipCode)</td>
+                                <td class="label">Phone Number:</td>
                                 <td>@test.WaterSupplier?.PhoneNumber</td>
-                            </tr>
-                            <tr>
-                                <td class="label">PWS ID:</td>
-                                <td>@test.WaterSupplier?.PwsId</td>
-                                <td class="label">Email address:</td>
-                                <td colspan="3">@test.WaterSupplier?.EmailAddress</td>
                             </tr>
                         </table>
 
                         <div class="section-header">BPAT Information</div>
-                        <table>
+                        <table class="info-table">
+                            <colgroup>
+                                <col class="col-label" />
+                                <col class="col-value" />
+                                <col class="col-label" />
+                                <col />
+                            </colgroup>
                             <tr>
-                                <td class="label" style="width:120px">Company name:</td>
+                                <td class="label">Company Name:</td>
                                 <td>@test.BpatCompanyName</td>
-                                <td class="label" style="width:110px">Work number:</td>
+                                <td class="label">Phone Number:</td>
                                 <td>@test.BpatWorkNumber</td>
                             </tr>
                             <tr>
-                                <td class="label">Tester name:</td>
+                                <td class="label">Tester Name:</td>
                                 <td>@test.BpatContactName</td>
-                                <td class="label">Cell number:</td>
-                                <td>@test.BpatCellNumber</td>
+                                <td class="label">Email Address:</td>
+                                <td>@test.Bpat?.EmailAddress</td>
                             </tr>
                             <tr>
-                                <td class="label">License number:</td>
-                                <td>@test.BpatLicenseNumber</td>
                                 <td class="label">Address:</td>
-                                <td>@test.BpatAddress @test.BpatCity @test.BpatState?.Name @test.BpatZip</td>
+                                <td>@test.BpatAddress</td>
+                                <td class="label">License Number:</td>
+                                <td>@test.BpatLicenseNumber</td>
                             </tr>
                             <tr>
-                                <td class="label">License expiration:</td>
+                                <td></td>
+                                <td>@FormatCityStateZip(test.BpatCity, test.BpatState?.Name, test.BpatZip)</td>
+                                <td class="label">License Expiration:</td>
                                 <td>@test.BpatLicenseExpiration?.ToString("MM/dd/yyyy")</td>
-                                <td class="label"></td>
-                                <td colspan="3"></td>
                             </tr>
                         </table>
-                        <table>
+
+                        <div class="section-pair">
+                            <div class="section-header">Location / Property Information</div>
+                            <div class="section-header">Contact / Mailing Information</div>
+                        </div>
+                        <table class="info-table">
+                            <colgroup>
+                                <col class="col-label" />
+                                <col class="col-value" />
+                                <col class="col-label" />
+                                <col />
+                            </colgroup>
                             <tr>
-                                <td class="ps-0">
-                                    <div class="section-header">Location / Property Information</div>
-                                    <table>
+                                <td class="label">Property Type:</td>
+                                <td>@(test.PropertyType == 0 ? "Residential" : "Commercial")</td>
+                                <td class="label">Company Name:</td>
+                                <td>@test.MailingCompanyName</td>
+                            </tr>
+                            <tr>
+                                <td class="label">Business Name:</td>
+                                <td>@test.PropertyBusinessName</td>
+                                <td class="label">Contact Name:</td>
+                                <td>@test.MailingContactName</td>
+                            </tr>
+                            <tr>
+                                <td class="label">Property Address:</td>
+                                <td>@test.PropertyStreetNumber @test.PropertyStreetName</td>
+                                <td class="label">Mailing Address:</td>
+                                <td>@test.MailingStreetNumber @test.MailingStreetName</td>
+                            </tr>
+                            <tr class="row-gap">
+                                <td></td>
+                                <td>@FormatCityStateZip(test.PropertyCity, test.PropertyState?.Code, test.PropertyZip)</td>
+                                <td></td>
+                                <td>@FormatCityStateZip(test.MailingCity, test.MailingState?.Code, test.MailingZip)</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td class="label">Phone Number:</td>
+                                <td>@test.MailingPhoneNumber</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td class="label">Email Address:</td>
+                                <td>@test.MailingEmailAddress</td>
+                            </tr>
+                        </table>
+
+                        <div class="section-header">Backflow Information</div>
+                        <div class="statement">
+                            <div>
+                                The backflow prevention assembly detailed below has been tested and maintained as required by
+                                commission
+                                regulations and is certified to be operating within
+                            </div>
+                            <div>acceptable parameters.</div>
+                        </div>
+                        <table class="info-table manufacturer-table">
+                            <colgroup>
+                                <col style="width:160.3px" />
+                                <col style="width:103.7px" />
+                                <col style="width:45.1px" />
+                                <col style="width:89.3px" />
+                                <col style="width:33.6px" />
+                                <col style="width:48px" />
+                                <col style="width:81.6px" />
+                                <col />
+                            </colgroup>
+                            <tr>
+                                <td class="label">Backflow Method:</td>
+                                <td colspan="7">@deviceLabel</td>
+                            </tr>
+                            <tr>
+                                <td class="label">Main Assembly Manufacturer:</td>
+                                <td>@test.Manufacturer</td>
+                                <td class="label">Model:</td>
+                                <td>@test.Model</td>
+                                <td class="label">Size:</td>
+                                <td>@test.Size</td>
+                                <td class="label">Serial Number:</td>
+                                <td>@(test.UnknownSerialNumber ? "Unknown" : test.SerialNumber)</td>
+                            </tr>
+
+                            @if (hasBackflowManufacturer)
+                            {
+                                <tr>
+                                    <td class="label">Bypass Assembly Manufacturer:</td>
+                                    <td>@test.Manufacturer2</td>
+                                    <td class="label">Model:</td>
+                                    <td>@test.Model2</td>
+                                    <td class="label">Size:</td>
+                                    <td>@test.Size2</td>
+                                    <td class="label">Serial Number:</td>
+                                    <td>@(test.UnknownSerialNumber ? "Unknown" : test.SerialNumber2)</td>
+                                </tr>
+                            }
+                        </table>
+                        <table class="info-table">
+                            <colgroup>
+                                <col class="col-label" />
+                                <col />
+                            </colgroup>
+                            <tr>
+                                <td class="label">Location:</td>
+                                <td>@test.LocationDescription</td>
+                            </tr>
+                            <tr>
+                                <td class="label">Hazard Type ****:</td>
+                                <td>@hazardDescription</td>
+                            </tr>
+                        </table>
+
+                        <div class="section-header">Backflow Test Information</div>
+                        <table class="info-table">
+                            <colgroup>
+                                <col class="col-label" />
+                                <col style="width:187.2px" />
+                                <col style="width:81.6px" />
+                                <col style="width:96px" />
+                                <col style="width:136.8px" />
+                                <col />
+                            </colgroup>
+                            <tr>
+                                <td class="label">Test Result:</td>
+                                <td colspan="5">@resultLabel</td>
+                            </tr>
+                            <tr class="row-gap">
+                                <td class="label">Reason for Test:</td>
+                                <td colspan="5">@reasonLabel</td>
+                            </tr>
+                            <tr class="row-gap">
+                                <td class="label" colspan="6">
+                                    Is the assembly installed in accordance with manufacturer recommendations and/or local codes?
+                                    <span class="ms-2">@(test.ProperlyInstalled ? "Yes" : "No")</span>
+                                </td>
+                            </tr>
+                            <tr class="row-gap">
+                                <td class="label" colspan="6">
+                                    Is the assembly installed on a non-potable water supply (auxiliary)?
+                                    <span class="ms-2">@(test.NonPotable ? "Yes" : "No")</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label gauge-label">Differential pressure<br />gauge used:</td>
+                                <td>@gaugeDesc</td>
+                                <td class="label">Serial Number:</td>
+                                <td>@test.GaugeSerialNumber</td>
+                                <td class="label">Date Tested for Accuracy:</td>
+                                <td>@test.GaugeLastCalibrationDate?.ToString("MM/dd/yyyy")</td>
+                            </tr>
+                        </table>
+
+                        @if (isAG)
+                        {
+                            <div class="section-header section-header-large mt-0">Air Gap Test Information</div>
+                            <table class="info-table air-gap-question">
+                                <colgroup>
+                                    <col style="width:681.6px" />
+                                    <col />
+                                </colgroup>
+                                <tr>
+                                    <td>
+                                        Do you certify that the air gap between the potable water supply and the overflow rim
+                                        of the containment vessel complies with the requirements of an approved air gap and has
+                                        not been bypassed, or otherwise made ineffective?
+                                    </td>
+                                    <td>@(test.AirGapValid ? "✓ Yes" : "☐ No")</td>
+                                </tr>
+                            </table>
+                            <div class="air-gap-date">
+                                <span class="label air-gap-date-label">Test Date:</span>@test.TestDate?.ToString("MM/dd/yyyy")
+                            </div>
+                            <div class="air-gap-note">
+                                (An approved air gap shall be at least twice the diameter of the supply pipe
+                                measured vertically above the overflow rim of the receiving vessel, and in no case less than
+                                1 inch.)
+                            </div>
+                        }
+                        else if (cols.Length > 0)
+                        {
+                            <table class="readings-table" style="width:@(colWidth * (cols.Length + 1))px">
+                                <colgroup>
+                                    @for (var colNumber = 0; colNumber <= cols.Length; colNumber++)
+                                    {
+                                        <col style="width:@(colWidth)px" />
+                                    }
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th class="readings-corner"></th>
+                                        <th colspan="@cols.Length" class="readings-device-label">@deviceLabel</th>
+                                    </tr>
+                                    @if (showBypassHdr)
+                                    {
                                         <tr>
-                                            <td class="label" style="width:120px">Property type:</td>
-                                            <td>@(test.PropertyType == 0 ? "Commercial" : "Residential")</td>
+                                            <th class="readings-corner"></th>
+                                            <th colspan="@mainColCnt">Main Assembly</th>
+                                            <th colspan="@bypassColCnt">Bypass Assembly</th>
                                         </tr>
-                                        <tr>
-                                            <td class="label">Business name:</td>
-                                            <td>@test.PropertyBusinessName</td>
+                                    }
+                                    <tr>
+                                        <th class="readings-corner"></th>
+                                        @foreach (var col in cols)
+                                        {
+                                            <th>@col.Header</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="readings-initial">
+                                        <th>
+                                            <div class="readings-heading">Initial Test</div>
+                                            @if (test.InitialTestDate.HasValue)
+                                            {
+                                                <div class="readings-heading-line"><span
+                                                    class="readings-date-label">Date:</span>@test.InitialTestDate?.ToString("MM/dd/yyyy")
+                                                </div>
+                                                <div class="readings-heading-line"><span
+                                                    class="readings-date-label">Time:</span>@test.InitialTestDate?.ToString("h:mm tt")
+                                                </div>
+                                            }
+                                        </th>
+                                        @foreach (var col in cols)
+                                        {
+                                            <td>
+                                                <div class="reading-value">@col.InitVerb @(formatPSID(col.Index, getPSID(col.InitVal))) PSID
+                                                </div>
+                                                @foreach (var chk in col.InitChecks)
+                                                {
+                                                    <div class="reading-check">@(getBool(chk.Field) ? "✓" : "☐") @chk.Label</div>
+                                                }
+                                            </td>
+                                        }
+                                    </tr>
+                                    <tr class="readings-repairs">
+                                        <th class="readings-row-title">Repairs and<br />Materials Used</th>
+                                        @foreach (var col in cols)
+                                        {
+                                            <td>@getStr(col.RepairField)</td>
+                                        }
+                                    </tr>
+                                    <tr class="readings-details">
+                                        <th class="readings-row-title">Repair Details</th>
+                                        <td colspan="@cols.Length">
+                                            @foreach (var detail in repairDetails)
+                                            {
+                                                <div class="repair-detail">
+                                                    <div>Repair Details - @detail.Label:</div>
+                                                    <div>@detail.Text</div>
+                                                </div>
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr class="readings-final">
+                                        <th>
+                                            <div class="readings-heading">Test After Repairs</div>
+                                            @if (test.RepairTestDate.HasValue)
+                                            {
+                                                <div class="readings-heading-line"><span
+                                                    class="readings-date-label">Date:</span>@test.RepairTestDate?.ToString("MM/dd/yyyy")
+                                                </div>
+                                                <div class="readings-heading-line"><span
+                                                    class="readings-date-label">Time:</span>@test.RepairTestDate?.ToString("h:mm tt")
+                                                </div>
+                                            }
+                                        </th>
+                                        @foreach (var col in cols)
+                                        {
+                                            <td>
+                                                <div class="reading-value">@col.FinalVerb @(formatPSID(col.Index, getPSID(col.FinalVal)))
+                                                    PSID</div>
+                                                    @foreach (var chk in col.FinalChecks)
+                                                    {
+                                                        <div class="reading-check">@(getBool(chk.Field) ? "✓" : "☐") @chk.Label</div>
+                                                    }
+                                                </td>
+                                            }
                                         </tr>
+                                    </tbody>
+                                </table>
+
+                                @if (showMeterRow)
+                                {
+                                    <table class="readings-table">
+                                        <colgroup>
+                                            <col style="width:@(colWidth)px" />
+                                            <col />
+                                        </colgroup>
                                         <tr>
-                                            <td class="label">Property address:</td>
-                                            <td>@test.PropertyStreetNumber @test.PropertyStreetName @test.PropertyCity
-                                                @test.PropertyState?.Name @test.PropertyZip
+                                            <th class="readings-row-title">Bypass Meter Test</th>
+                                            <td>
+                                                <span class="me-3">Meter #: @test.MeterNumber</span>
+                                                <span class="me-3">Reading before: @test.MeterReadingBefore</span>
+                                                <span class="me-3">Registers flow: @(test.MeterRegisters ? "Yes" : "No")</span>
+                                                <span>Reading after: @test.MeterReadingAfter</span>
                                             </td>
                                         </tr>
                                     </table>
-                                </td>
-                                <td class="pe-0">
-                                    <div class="section-header">Contact / Mailing Information</div>
-                                    <table>
-                                        <tr>
-                                            <td class="label" style="width:120px">Company name:</td>
-                                            <td>@test.MailingCompanyName</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="label">Contact name:</td>
-                                            <td>@test.MailingContactName</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="label">Mailing address:</td>
-                                            <td>@test.MailingStreetNumber @test.MailingStreetName @test.MailingCity
-                                                @test.MailingState?.Name @test.MailingZip</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="label">Phone number:</td>
-                                                <td>@test.MailingPhoneNumber</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="label">Email address:</td>
-                                                <td>@test.MailingEmailAddress</td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <div class="section-header">Backflow Information</div>
-                            <div class="mb-2">`
-                                <p style="margin:2px 0; font-size:9.1px;">
-                                    The backflow prevention assembly detailed below has been tested and maintained as required by
-                                    commission
-                                    regulations and is certified to be operating within acceptable parameters.
-                                </p>
-                            </div>
-                            <table>
-                                <tr>
-                                    <td class="label" style="width:120px">Backflow method:</td>
-                                    <td colspan="8">@deviceLabel</td>
-                                </tr>
-                                <tr>
-                                    <td class="label" colspan="2">Main Assembly Manufacturer:</td>
-                                    <td>@test.Manufacturer</td>
-                                    <td class="label">Model:</td>
-                                    <td>@test.Model</td>
-                                    <td class="label">Size:</td>
-                                    <td>@test.Size</td>
-                                    <td class="label">Serial number:</td>
-                                    <td>@(test.UnknownSerialNumber ? "Unknown" : test.SerialNumber)</td>
-                                </tr>
-
-                                @if (hasBackflowManufacturer)
-                                {
-                                    <tr>
-                                        <td class="label" colspan="2">Bypass Assembly Manufacturer:</td>
-                                        <td>@test.Manufacturer2</td>
-                                        <td class="label">Model:</td>
-                                        <td>@test.Model2</td>
-                                        <td class="label">Size:</td>
-                                        <td>@test.Size2</td>
-                                        <td class="label">Serial number:</td>
-                                        <td>@(test.UnknownSerialNumber ? "Unknown" : test.SerialNumber2)</td>
-                                    </tr>
                                 }
+                            }
 
-                                <tr>
-                                    <td class="label">Location:</td>
-                                    <td colspan="8">@test.LocationDescription</td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Hazard type****:</td>
-                                    <td colspan="8">@test.HazardType</td>
-                                </tr>
-                            </table>
+                            <div class="section-header section-header-large">Additional Information Required by
+                                @test.WaterSupplier?.Name ****</div>
+                                <div class="additional-row"><span class="label">Water Meter Number:</span><span
+                                    class="additional-value">@test.WaterMeterNumber</span></div>
+                                    <div class="additional-row additional-row-last"><span class="label">Permit Number:</span><span
+                                        class="additional-value">@test.PermitNumber</span></div>
 
-                            <div class="section-header">Backflow Test Information</div>
-                            <table>
-                                <tr>
-                                    <td class="label" style="width:120px">Test result:</td>
-                                    <td colspan="5">@resultLabel</td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Reason for test:</td>
-                                    <td colspan="6">@reasonLabel</td>
-                                </tr>
-                                <tr>
-                                    <td class="label" colspan="5">Is the assembly installed in accordance with manufacturer
-                                        recommendations
-                                        and/or local codes?</td>
-                                        <td colspan="2">@(test.ProperlyInstalled ? "Yes" : "No")</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="label" colspan="5">Is the assembly installed on a non-potable water supply (auxiliary)?
-                                        </td>
-                                        <td colspan="2">@(test.NonPotable ? "Yes" : "No")</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="label" colspan="2">Differential Pressure Gauge Used:</td>
-                                        <td>@gaugeDesc</td>
-                                        <td class="label">Serial number:</td>
-                                        <td>@test.GaugeSerialNumber</td>
-                                        <td class="label">Date Tested for Accuracy:</td>
-                                        <td>@test.GaugeLastCalibrationDate?.ToString("MM/dd/yyyy")</td>
-                                    </tr>
-                                </table>
+                                        <div class="section-header section-header-large">Remarks</div>
+                                        <div class="remarks">@test.Comments</div>
 
-                                @if (isAG)
-                                {
-                                    <div class="section-header">Air Gap Test Information</div>
-                                    <table class="readings-table mt-1">
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    Do you certify that the air gap between the potable water supply and the overflow rim
-                                                    of the containment vessel complies with the requirements of an approved air gap and has
-                                                    not been bypassed, or otherwise made ineffective?
-                                                </td>
-                                                <td style="white-space:nowrap">@(test.AirGapValid ? "✓ Yes" : "☐ No")</td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="2"><span class="label">Test Date:</span> @test.TestDate?.ToString("MM/dd/yyyy")
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="2">(An approved air gap shall be at least twice the diameter of the supply pipe
-                                                    measured vertically above the overflow rim of the receiving vessel, and in no case less than
-                                                    1
-                                                    inch.)
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                }
-                                else if (cols.Length > 0)
-                                {
-                                    <table class="readings-table mt-2">
-                                        <thead>
-                                            <tr>
-                                                <th style="min-width:90px; background-color:transparent; border:none;"></th>
-                                                <th colspan="@cols.Length" class="readings-device-label">@deviceLabel</th>
-                                            </tr>
-                                            @if (showBypassHdr)
-                                            {
-                                                <tr>
-                                                    <th style="background-color:transparent; border:none;"></th>
-                                                    <th colspan="@mainColCnt">Main Assembly</th>
-                                                    <th colspan="@bypassColCnt">Bypass Assembly</th>
-                                                </tr>
+                                        @if (test.Disapproved)
+                                        {
+                                            <div class="disapproval-box">DISAPPROVED</div>
+                                        }
+                                    </div>
+
+                                    <div class="footer-note">
+                                        The above is certified to be true at the time of testing.<br>
+                                        * TEST RECORDS MUST BE KEPT FOR AT LEAST THREE YEARS [30 TAC 290.46(B)]<br>
+                                        ** USE ONLY MANUFACTURER'S REPLACEMENT PARTS<br>
+                                        *** 2nd Check: Numeric reading required for double check valve only.<br>
+                                        **** Indicates additional information not present on the standard TCEQ report<br>
+                                    </div>
+                                </div>
+                            }
+
+                            <script>
+                                    // Pins each report's certification note to the bottom of that report's last page, like V1, and shrinks a
+                                    // report too long for one page until it fits, because a report must never print on two pages.
+                                    // The page height and the 720px body width must match the Letter size and the page margins in the styles
+                                    // (V1's 0.5in, with no bottom margin so the note sits at the page edge like V1).
+                                    window.addEventListener('load', function () {
+                                        var cssPixelsPerInch = 96;
+                                        var pageTopMargin = 0.5 * cssPixelsPerInch;
+                                        var printablePageHeight = 11 * cssPixelsPerInch - pageTopMargin;
+                                        var roundingAllowance = 20;
+                                        var zoomRoundingAllowance = 5;
+
+                                        document.querySelectorAll('.test-wrapper').forEach(function (wrapper) {
+                                            var content = wrapper.querySelector('.content');
+                                            var note = wrapper.querySelector('.footer-note');
+                                            var noteHeight = note.getBoundingClientRect().height;
+                                            var neededSpace = noteHeight + roundingAllowance;
+                                            var maxContentHeight = printablePageHeight - neededSpace - zoomRoundingAllowance;
+                                            var contentHeight = note.getBoundingClientRect().top - wrapper.getBoundingClientRect().top;
+
+                                            if (contentHeight > maxContentHeight) {
+                                                content.style.zoom = maxContentHeight / contentHeight;
+                                                contentHeight = note.getBoundingClientRect().top - wrapper.getBoundingClientRect().top;
                                             }
-                                            <tr>
-                                                <th style="background-color:transparent; border:none;"></th>
-                                                @foreach (var col in cols)
-                                                {
-                                                    <th>@col.Header</th>
-                                                }
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <th>
-                                                    <div style="font-weight:bold;text-align:center;margin-bottom:3px">Initial Test</div>
-                                                    @if (test.InitialTestDate.HasValue)
-                                                    {
-                                                        <div><strong>Date:</strong> @test.InitialTestDate?.ToString("MM/dd/yyyy")</div>
-                                                    }
-                                                </th>
-                                                @foreach (var col in cols)
-                                                {
-                                                    var psid0 = getPSID(col.InitVal);
-                                                    <td>
-                                                        @if (psid0.HasValue)
-                                                        {
-                                                            <div>@col.InitVerb @psid0 PSID</div>
-                                                        }
-                                                        @foreach (var chk in col.InitChecks)
-                                                        {
-                                                            <div>@(getBool(chk.Field) ? "✓" : "☐") @chk.Label</div>
-                                                        }
-                                                    </td>
-                                                }
-                                            </tr>
-                                            <tr>
-                                                <th>Repairs and Materials Used</th>
-                                                @foreach (var col in cols)
-                                                {
-                                                    <td>@getStr(col.RepairField)</td>
-                                                }
-                                            </tr>
-                                            <tr>
-                                                <th>Repair Details</th>
-                                                @foreach (var col in cols)
-                                                {
-                                                    <td>@getStr(col.RepairDetailsField)</td>
-                                                }
-                                            </tr>
-                                            <tr>
-                                                <th>
-                                                    <div style="font-weight:bold;text-align:center;margin-bottom:3px">Test After Repairs</div>
-                                                    @if (test.RepairTestDate.HasValue)
-                                                    {
-                                                        <div><strong>Date:</strong> @test.RepairTestDate?.ToString("MM/dd/yyyy")</div>
-                                                    }
-                                                </th>
-                                                @foreach (var col in cols)
-                                                {
-                                                    var psid1 = getPSID(col.FinalVal);
-                                                    <td>
-                                                        @if (psid1.HasValue)
-                                                        {
-                                                            <div>@col.FinalVerb @psid1 PSID</div>
-                                                        }
-                                                        @foreach (var chk in col.FinalChecks)
-                                                        {
-                                                            <div>@(getBool(chk.Field) ? "✓" : "☐") @chk.Label</div>
-                                                        }
-                                                    </td>
-                                                }
-                                            </tr>
-                                            @if (showMeterRow)
-                                            {
-                                                <tr>
-                                                    <th>Bypass Meter Test</th>
-                                                    <td colspan="@cols.Length">
-                                                        <div>Meter #: @test.MeterNumber</div>
-                                                        <div>Reading before: @test.MeterReadingBefore</div>
-                                                        <div>Registers flow: @(test.MeterRegisters ? "Yes" : "No")</div>
-                                                        <div>Reading after: @test.MeterReadingAfter</div>
-                                                    </td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                }
 
-                                <div class="section-header">Additional Information Required by @test.WaterSupplier?.Name ****</div>
-                                <table>
-                                    <tr>
-                                        <td class="label" style="width:120px">Water Meter Number:</td>
-                                        <td>@test.WaterMeterNumber</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="label" style="width:120px">Permit Number:</td>
-                                        <td>@test.PermitNumber</td>
-                                    </tr>
-                                </table>
+                                            var freeSpaceOnLastPage = printablePageHeight - contentHeight % printablePageHeight;
+                                            var spaceBeforeNote = freeSpaceOnLastPage >= neededSpace
+                                                ? freeSpaceOnLastPage - neededSpace
+                                                : freeSpaceOnLastPage + printablePageHeight - neededSpace;
 
-                                <div class="section-header">Remarks</div>
-                                <table>
-                                    <tr>
-                                        <td style="min-height:60px">@test.Comments</td>
-                                    </tr>
-                                </table>
+                                            var spacer = document.createElement('div');
+                                            spacer.style.height = spaceBeforeNote + 'px';
+                                            note.parentNode.insertBefore(spacer, note);
+                                        });
+                                    });
+                            </script>
+                        </body>
 
-                                @if (test.Disapproved)
-                                {
-                                    <div class="disapproval-box">DISAPPROVED</div>
-                                }
-                            </div>
-
-                            <div class="footer-note">
-                                The above is certified to be true at the time of testing.<br>
-                                * TEST RECORDS MUST BE KEPT FOR AT LEAST THREE YEARS [30 TAC 290.46(B)]<br>
-                                ** USE ONLY MANUFACTURER'S REPLACEMENT PARTS<br>
-                                *** 2nd Check: Numeric reading required for double check valve only.<br>
-                                **** Indicates additional information not present on the standard TCEQ report<br>
-                            </div>
-                        </div>
-                    }
-
-                    <script>
-                            // Pins each report's certification note to the bottom of that report's last page, like V1.
-                            // The page height and the 702px body width must match the Letter size and 1.5cm margins in PdfTemplateService.
-                            window.addEventListener('load', function () {
-                                var cssPixelsPerInch = 96;
-                                var pageMargin = 1.5 / 2.54 * cssPixelsPerInch;
-                                var printablePageHeight = 11 * cssPixelsPerInch - 2 * pageMargin;
-                                var roundingAllowance = 20;
-
-                                document.querySelectorAll('.test-wrapper').forEach(function (wrapper) {
-                                    var note = wrapper.querySelector('.footer-note');
-                                    var noteHeight = note.getBoundingClientRect().height;
-                                    var contentHeight = note.getBoundingClientRect().top - wrapper.getBoundingClientRect().top;
-
-                                    var freeSpaceOnLastPage = printablePageHeight - contentHeight % printablePageHeight;
-                                    var neededSpace = noteHeight + roundingAllowance;
-                                    var spaceBeforeNote = freeSpaceOnLastPage >= neededSpace
-                                        ? freeSpaceOnLastPage - neededSpace
-                                        : freeSpaceOnLastPage + printablePageHeight - neededSpace;
-
-                                    var spacer = document.createElement('div');
-                                    spacer.style.height = spaceBeforeNote + 'px';
-                                    note.parentNode.insertBefore(spacer, note);
-                                });
-                            });
-                    </script>
-                </body>
-
-            </html>
+                    </html>

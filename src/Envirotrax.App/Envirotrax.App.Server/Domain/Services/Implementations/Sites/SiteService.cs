@@ -24,9 +24,6 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Sites;
 
 public class SiteService : Service<Site, SiteDto>, ISiteService
 {
-    private const string AccountNumberIndexName = "IX_Sites_WaterSupplierId_AccountNumber_AccountNumberDuplicateIndex";
-    private const string WaterSupplierAccountNumberIndexName = "IX_Sites_WaterSupplierId_WaterSupplierAccountNumber_WaterSupplierAccountNumberDuplicateIndex";
-
     private readonly ISiteRepository _siteRepository;
     private readonly ISiteLogService _siteLogService;
     private readonly IRecordLogService _recordLogService;
@@ -200,14 +197,12 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
     private static void ThrowIfAccountNumberDuplicated(DuplicateRecordException exception)
     {
-        var message = exception.GetBaseException().Message;
-
-        if (message.Contains(WaterSupplierAccountNumberIndexName))
+        if (exception.PropertyNames.Contains(nameof(Site.WaterSupplierAccountNumber)))
         {
             throw new AppValidationException("WS Account Number must be unique.", exception);
         }
 
-        if (message.Contains(AccountNumberIndexName))
+        if (exception.PropertyNames.Contains(nameof(Site.AccountNumber)))
         {
             throw new AppValidationException("Account Number must be unique.", exception);
         }

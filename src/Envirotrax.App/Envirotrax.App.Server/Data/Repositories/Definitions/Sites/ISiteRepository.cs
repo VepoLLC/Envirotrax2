@@ -7,9 +7,12 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 public interface ISiteRepository : IRepository<Site>
 {
     Task<Site?> UpdateForAdminAsync(int id, SiteDto dto);
+    Task<Site?> UpdateAdditionalInformationAsync(int id, SiteAdditionalInformationDto dto);
 
     Task<IEnumerable<Site>> SearchAsync(PageInfo pageInfo, Query query, bool? fogCompliant, CancellationToken cancellationToken);
     Task<IEnumerable<Site>> SearchForProfessionalAsync(ProfessionalSiteSearchDto criteria, PageInfo pageInfo, Query query, int professionalId, int userId, CancellationToken cancellationToken);
+    Task<IEnumerable<Site>> SearchForBackflowSubmissionAsync(BackflowSubmissionSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<IEnumerable<Site>> GetForBackflowSubmissionAsync(IReadOnlyCollection<int> siteIds, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<IEnumerable<Site>> GetAllPendingGeocodingAsync(int batchSize);
     Task UpdateGisCoordinatesAsync(Site site);
     Task UpdateManualGisDataAsync(int siteId, double? latitude, double? longitude, GisStatusType status);
@@ -20,9 +23,11 @@ public interface ISiteRepository : IRepository<Site>
     Task UpdateBackflowAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate);
     Task<IEnumerable<Site>> GetFogTripTicketComplianceAsync(PageInfo pageInfo, Query query, DateTime? dueDateFrom, DateTime? dueDateTo, bool sortDescending, CancellationToken cancellationToken);
     Task UpdateFogAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate);
+    Task UpdateAccountNumberAsync(int siteId, string accountNumber);
     Task ClearNeedsRenewalCheckAsync(int siteId);
     Task ClearNeedsCsiInspectionAsync(IReadOnlyCollection<int> siteIds);
     Task UpdateLastTripTicketDatesAsync(IReadOnlyDictionary<int, DateTime> lastTripTicketDates);
     Task<IEnumerable<Site>> GetAllPendingRenewalAsync(int batchSize);
-    Task<bool> IsWaterSupplierAccountNumberTakenAsync(int siteId, string waterSupplierAccountNumber, CancellationToken cancellationToken);
+    Task<string?> GetAccountNumberAsync(int siteId, CancellationToken cancellationToken);
+    Task<long> GetNextAccountNumberAsync();
 }

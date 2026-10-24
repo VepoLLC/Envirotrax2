@@ -22,6 +22,9 @@ namespace Envirotrax.App.Server.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.HasSequence("SiteAccountNumberSequence")
+                .StartsAt(100000L);
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Api.ApiAccount", b =>
                 {
                     b.Property<int>("Id")
@@ -2841,6 +2844,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("DefaultStateId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("DeletedById")
                         .HasColumnType("int");
 
@@ -2884,6 +2890,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("SendCheckoutEmail")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("StateId")
                         .HasColumnType("int");
 
@@ -2904,6 +2913,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("DefaultStateId");
 
                     b.HasIndex("DeletedById");
 
@@ -3215,6 +3226,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<int>("AccountNumberDuplicateIndex")
+                        .HasColumnType("int");
+
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
 
@@ -3519,6 +3533,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<int>("WaterSupplierAccountNumberDuplicateIndex")
+                        .HasColumnType("int");
+
                     b.Property<int>("WaterSupplierId")
                         .HasColumnType("int");
 
@@ -3548,7 +3565,10 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.HasIndex("WaterSupplierId", "UserAccountAssignmentId");
 
-                    b.HasIndex("WaterSupplierId", "WaterSupplierAccountNumber")
+                    b.HasIndex("WaterSupplierId", "AccountNumber", "AccountNumberDuplicateIndex")
+                        .IsUnique();
+
+                    b.HasIndex("WaterSupplierId", "WaterSupplierAccountNumber", "WaterSupplierAccountNumberDuplicateIndex")
                         .IsUnique()
                         .HasFilter("[WaterSupplierAccountNumber] IS NOT NULL");
 
@@ -4167,6 +4187,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("AdministrativeOnly")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("AllowAccountNumberChanges")
                         .HasColumnType("bit");
 
                     b.Property<decimal>("BackflowCommercialTestFee")
@@ -5229,6 +5252,11 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "DefaultState")
+                        .WithMany()
+                        .HasForeignKey("DefaultStateId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "DeletedBy")
                         .WithMany()
                         .HasForeignKey("DeletedById")
@@ -5250,6 +5278,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("DefaultState");
 
                     b.Navigation("DeletedBy");
 

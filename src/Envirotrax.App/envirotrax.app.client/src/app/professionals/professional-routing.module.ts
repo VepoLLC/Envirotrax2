@@ -13,6 +13,7 @@ import { FeatureGuard } from "../shared/guards/feature.guard";
 import { FeatureType } from "../shared/models/feature-type";
 import { DashboardComponent } from "./dashboard/dashboard.component";
 import { AccountBalanceManagementComponent } from "./account/account-balance-management.component";
+import { PaymentReceiptsComponent } from "./payments/payment-receipts.component";
 
 const routes: Routes = [
     {
@@ -39,6 +40,15 @@ const routes: Routes = [
         }
     },
     {
+        path: 'payment-receipts',
+        title: 'Payment Receipts',
+        component: PaymentReceiptsComponent,
+        canActivate: [RoleGuard],
+        data: {
+            roles: [ROLE_DEFINITIONS.PROFESSIONAL]
+        }
+    },
+    {
         path: 'water-suppliers',
         title: 'Water Supplier Registration',
         component: WaterSuppliersComponent,
@@ -49,7 +59,7 @@ const routes: Routes = [
     },
     {
         path: 'users',
-        title: 'Users',
+        title: 'User Account Management',
         component: ProfessionalUserListComponent,
         canActivate: [RoleGuard],
         data: {

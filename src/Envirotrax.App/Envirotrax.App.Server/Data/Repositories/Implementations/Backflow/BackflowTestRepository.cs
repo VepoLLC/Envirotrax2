@@ -12,6 +12,8 @@ using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
+using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,19 +24,23 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
     private const string HazardTypeOther = "Other";
 
     private readonly ITenantProvidersService _tenantProvider;
+    private readonly ITimeZoneHelperService _timeZoneHelper;
 
-    public BackflowTestRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider)
+    public BackflowTestRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider, ITimeZoneHelperService timeZoneHelper)
         : base(dbContextSelector)
     {
         _tenantProvider = tenantProvider;
+        _timeZoneHelper = timeZoneHelper;
     }
 
     protected override IQueryable<BackflowTest> GetListQuery()
     {
         var query = base.GetListQuery()
             .Include(bt => bt.WaterSupplier)
+                .ThenInclude(ws => ws!.State)
             .Include(bt => bt.Site)
             .Include(bt => bt.Bpat)
+                .ThenInclude(bpat => bpat!.User)
             .Include(bt => bt.BpatState)
             .Include(bt => bt.PropertyState)
             .Include(bt => bt.MailingState);
@@ -231,6 +237,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
     public async Task<IEnumerable<BackflowTest>> SearchAsync(PageInfo pageInfo, Query query, BackflowPaymentStatus? paymentStatus, CancellationToken cancellationToken)
     {
         WaterSupplierAccountNumberSearch.Apply(query, nameof(BackflowTest.AccountNumber), nameof(BackflowTest.Site));
+        CreatedTimeDaySearch.Apply(query, _timeZoneHelper.GetUserTimeZone());
 
         var dbQuery = GetListQuery().Where(query.Filter);
 
@@ -1080,6 +1087,81 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             .ToListAsync(cancellationToken);
     }
 
+    public Task<List<BackflowTest>> GetSubmissionAssembliesAsync(IReadOnlyCollection<int> siteIds, CancellationToken cancellationToken)
+    {
+        return GetSubmissionAssemblyQuery()
+            .Where(test => test.SiteId != null && siteIds.Contains(test.SiteId.Value))
+            .OrderBy(test => test.SerialNumber)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<BackflowTest>> GetSerialNumberMatchesAsync(BackflowSubmissionSearchDto criteria, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(criteria.Manufacturer) || string.IsNullOrWhiteSpace(criteria.SerialNumber))
+        {
+            return [];
+        }
+
+        var manufacturer = criteria.Manufacturer.Trim();
+        var serialNumber = criteria.SerialNumber.Trim();
+
+        if (!BackflowSerialNumber.IsValid(serialNumber))
+        {
+            return [];
+        }
+
+        var candidates = GetSubmissionAssemblyQuery()
+            .Where(test => test.SiteId != null
+                && test.Manufacturer != null
+                && test.Manufacturer.StartsWith(manufacturer)
+                && test.SerialNumber != null
+                && test.SerialNumber != string.Empty)
+            .OrderByDescending(test => test.ExpirationDate);
+
+        var matches = await candidates
+            .Where(test => test.SerialNumber == serialNumber)
+            .ToListAsync(cancellationToken);
+
+        if (matches.Count == 0)
+        {
+            var letterWildcardPattern = BackflowSerialNumber.ToLetterWildcardPattern(serialNumber);
+
+            matches = await candidates
+                .Where(test => EF.Functions.Like(test.SerialNumber!, letterWildcardPattern))
+                .ToListAsync(cancellationToken);
+        }
+
+        if (matches.Count == 0)
+        {
+            var baseNumberPattern = $"%{BackflowSerialNumber.ToBaseNumber(serialNumber)}%";
+
+            var baseNumberCandidates = await candidates
+                .Where(test => EF.Functions.Like(test.SerialNumber!, baseNumberPattern))
+                .ToListAsync(cancellationToken);
+
+            foreach (var candidate in baseNumberCandidates)
+            {
+                if (BackflowSerialNumber.IsBaseNumberMatch(serialNumber, candidate.SerialNumber!))
+                {
+                    matches.Add(candidate);
+                }
+            }
+        }
+
+        return matches;
+    }
+
+    private IQueryable<BackflowTest> GetSubmissionAssemblyQuery()
+    {
+        return Entity
+            .AsNoTracking()
+            .Where(test => test.DeletedTime == null
+                && test.IsCurrent
+                && !test.OutOfService
+                && test.TransactionId != null
+                && test.TransactionId != string.Empty);
+    }
+
     private async Task<int?> FindPreviousTestIdAsync(BackflowTest fromTest)
     {
         if (string.IsNullOrWhiteSpace(fromTest.SerialNumber))
@@ -1162,7 +1244,8 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             return null;
         }
 
-        var candidates = GetPreviousCurrentTestCandidates(test);
+        var parentWaterSupplierId = await GetParentWaterSupplierIdAsync(test, cancellationToken);
+        var candidates = GetPreviousCurrentTestCandidates(test, parentWaterSupplierId);
 
         var matches = await candidates
             .Where(t => t.SerialNumber == serialNumber)
@@ -1209,10 +1292,26 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
                 && t.DeletedTime == null);
     }
 
-    private IQueryable<BackflowTest> GetPreviousCurrentTestCandidates(BackflowTest test)
+    public async Task<bool> HasSubmissionAsync(string submissionId, CancellationToken cancellationToken)
     {
-        var parentWaterSupplierId = test.WaterSupplier?.ParentId;
+        return await Entity.AnyAsync(t => t.SubmissionId == submissionId, cancellationToken);
+    }
 
+    private async Task<int?> GetParentWaterSupplierIdAsync(BackflowTest test, CancellationToken cancellationToken)
+    {
+        if (test.WaterSupplier != null)
+        {
+            return test.WaterSupplier.ParentId;
+        }
+
+        return await DbContext.WaterSuppliers
+            .Where(supplier => supplier.Id == test.WaterSupplierId)
+            .Select(supplier => supplier.ParentId)
+            .SingleOrDefaultAsync(cancellationToken);
+    }
+
+    private IQueryable<BackflowTest> GetPreviousCurrentTestCandidates(BackflowTest test, int? parentWaterSupplierId)
+    {
         return DbContext.BackflowTests
             .AsNoTracking()
             .Where(t => (t.WaterSupplierId == test.WaterSupplierId

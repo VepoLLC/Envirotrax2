@@ -2,6 +2,7 @@ using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 
 namespace Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 
@@ -68,6 +69,10 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
 
     // Full current test rows at a site, for seeding a CSI inspection's visually identified assemblies.
     Task<List<BackflowTest>> GetCurrentBySiteAsync(int siteId, CancellationToken cancellationToken);
+
+    Task<List<BackflowTest>> GetSubmissionAssembliesAsync(IReadOnlyCollection<int> siteIds, CancellationToken cancellationToken);
+    Task<List<BackflowTest>> GetSerialNumberMatchesAsync(BackflowSubmissionSearchDto criteria, CancellationToken cancellationToken);
+    Task<bool> HasSubmissionAsync(string submissionId, CancellationToken cancellationToken);
 
     // CSI inspection visually identified assemblies
     Task MarkCsiInspectionTestsPaidAsync(CsiInspection inspection, string transactionId, DateTime transactionDate, CancellationToken cancellationToken);

@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
+using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Data.Services.Definitions;
@@ -30,6 +31,53 @@ public class SiteRepository : Repository<Site>, ISiteRepository
         await SaveChangesAsync(logData: true);
 
         return site;
+    }
+
+    public async Task<Site?> UpdateAdditionalInformationAsync(int id, SiteAdditionalInformationDto dto)
+    {
+        var site = await GetTrackedForUpdateAsync(id, CancellationToken.None);
+
+        if (site == null)
+        {
+            return null;
+        }
+
+        var renewalTriggerChanged =
+            site.HasOnSiteSewageFacility != dto.HasOnSiteSewageFacility
+            || site.HasAuxWaterSupply != dto.HasAuxWaterSupply;
+
+        if (renewalTriggerChanged)
+        {
+            site.NeedsRenewalCheck = true;
+        }
+
+        site.HasOnSiteSewageFacility = dto.HasOnSiteSewageFacility;
+        site.HasAuxWaterSupply = dto.HasAuxWaterSupply;
+        site.HasReclaimed = dto.HasReclaimed;
+        site.HasFireSystem = dto.HasFireSystem;
+        site.FireSeparateWater = dto.FireSeparateWater;
+        site.GreaseTrapType = ResolveGreaseTrapType(site.GreaseTrapType, dto.HasGreaseTrap);
+        site.HasGritTrap = dto.HasGritTrap;
+        site.HasIrrigation = dto.HasIrrigation;
+        site.IrrigationSeparateWater = dto.IrrigationSeparateWater;
+        site.HasDomesticPremisesIsolation = dto.HasDomesticPremisesIsolation;
+        site.RequiresDomesticPremisesIsolation = dto.RequiresDomesticPremisesIsolation;
+
+        await SaveChangesAsync(logData: true);
+
+        return site;
+    }
+
+    private static GreaseTrapType ResolveGreaseTrapType(GreaseTrapType current, bool hasGreaseTrap)
+    {
+        if (!hasGreaseTrap)
+        {
+            return GreaseTrapType.TrapNotRequired;
+        }
+
+        return current == GreaseTrapType.TrapNotRequired
+            ? GreaseTrapType.HasGreaseTrap
+            : current;
     }
 
     /// <summary>
@@ -115,6 +163,9 @@ public class SiteRepository : Repository<Site>, ISiteRepository
         // key. Normal Site editing must never reassign a Site; that is a separate, dedicated flow.
         entry.Property(site => site.WaterSupplierId).IsModified = false;
 
+        entry.Property(site => site.AccountNumberDuplicateIndex).IsModified = false;
+        entry.Property(site => site.WaterSupplierAccountNumberDuplicateIndex).IsModified = false;
+
         // Renewal opt-in is changed only by the site owner through the public opt-in pages.
         entry.Property(site => site.RenewalOptInType).IsModified = false;
         entry.Property(site => site.RenewalOptInOutDate).IsModified = false;
@@ -188,6 +239,70 @@ public class SiteRepository : Repository<Site>, ISiteRepository
             .PaginateAsync(pageInfo, cancellationToken);
 
         return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<Site>> SearchForBackflowSubmissionAsync(BackflowSubmissionSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var sites = GetBackflowSubmissionQuery();
+
+        if (!string.IsNullOrWhiteSpace(criteria.AccountNumber))
+        {
+            sites = WhereAccountNumber(sites, criteria.AccountNumber);
+        }
+        else if (!string.IsNullOrWhiteSpace(criteria.PropertyAddress))
+        {
+            sites = WherePropertyAddress(sites, criteria.PropertyAddress);
+        }
+
+        return await GetBackflowSubmissionPageAsync(sites, pageInfo, query, cancellationToken);
+    }
+
+    public async Task<IEnumerable<Site>> GetForBackflowSubmissionAsync(IReadOnlyCollection<int> siteIds, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var sites = GetBackflowSubmissionQuery()
+            .Where(site => siteIds.Contains(site.Id));
+
+        return await GetBackflowSubmissionPageAsync(sites, pageInfo, query, cancellationToken);
+    }
+
+    private IQueryable<Site> GetBackflowSubmissionQuery()
+    {
+        return GetListQuery()
+            .Include(site => site.WaterSupplier!.GeneralSettings);
+    }
+
+    private static async Task<IEnumerable<Site>> GetBackflowSubmissionPageAsync(IQueryable<Site> sites, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var paginated = await sites
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
+    private static IQueryable<Site> WhereAccountNumber(IQueryable<Site> sites, string enteredAccountNumber)
+    {
+        var accountNumber = enteredAccountNumber.Trim();
+        var correctedAccountNumber = SiteAccountNumber.CorrectWithHyphens(accountNumber);
+
+        return sites.Where(site => site.AccountNumber == accountNumber
+            || site.AccountNumber == correctedAccountNumber
+            || (site.WaterSupplier!.GeneralSettings!.IncludeWsAccountNumbers
+                && (site.WaterSupplierAccountNumber == accountNumber || site.WaterSupplierAccountNumber == correctedAccountNumber)));
+    }
+
+    private static IQueryable<Site> WherePropertyAddress(IQueryable<Site> sites, string enteredAddress)
+    {
+        var address = SiteAddress.Clean(enteredAddress);
+        var streetNumber = SiteAddress.GetStreetNumber(address);
+        var streetName = SiteAddress.GetStreetName(address);
+        var suiteNumber = SiteAddress.GetSuiteNumber(address).Replace("#", string.Empty);
+
+        return sites
+            .Where(site => site.StreetNumber == streetNumber)
+            .WhereIf(streetName.Length > 0, site => site.StreetName != null && site.StreetName.Contains(streetName))
+            .WhereIf(suiteNumber.Length > 0, site => site.PropertyNumber != null && site.PropertyNumber.EndsWith(suiteNumber));
     }
 
     private Expression<Func<Site, bool>> GetWorkedOnFilter(int professionalId)
@@ -354,6 +469,15 @@ public class SiteRepository : Repository<Site>, ISiteRepository
         return Entity.SingleOrDefaultAsync(s => s.Id == siteId && s.DeletedTime == null, cancellationToken);
     }
 
+    public async Task UpdateAccountNumberAsync(int siteId, string accountNumber)
+    {
+        await DbContext
+            .Sites
+            .Where(s => s.Id == siteId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(s => s.AccountNumber, accountNumber));
+    }
+
     public async Task ClearNeedsRenewalCheckAsync(int siteId)
     {
         await DbContext
@@ -419,11 +543,20 @@ public class SiteRepository : Repository<Site>, ISiteRepository
             .ToListAsync();
     }
 
-    // Archived sites count too, matching the unique index, so reactivating one can never collide.
-    public Task<bool> IsWaterSupplierAccountNumberTakenAsync(int siteId, string waterSupplierAccountNumber, CancellationToken cancellationToken)
+    public Task<string?> GetAccountNumberAsync(int siteId, CancellationToken cancellationToken)
     {
-        return Entity.AnyAsync(
-            site => site.Id != siteId && site.WaterSupplierAccountNumber == waterSupplierAccountNumber,
-            cancellationToken);
+        return Entity
+            .Where(site => site.Id == siteId)
+            .Select(site => site.AccountNumber)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<long> GetNextAccountNumberAsync()
+    {
+        var values = await DbContext.Database
+            .SqlQueryRaw<long>($"SELECT NEXT VALUE FOR dbo.{TenantDbContext.SiteAccountNumberSequence} AS Value")
+            .ToListAsync();
+
+        return values.Single();
     }
 }

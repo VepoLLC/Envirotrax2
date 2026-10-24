@@ -29,6 +29,8 @@ public class BackflowTestDto
 
     public string? TransactionId { get; set; }
 
+    public DateTime? TransactionDate { get; set; }
+
     public string? SerialNumber { get; set; }
 
     public string? SerialNumber2 { get; set; }

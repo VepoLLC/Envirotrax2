@@ -93,6 +93,25 @@ public class CsiCheckoutService
         receipt.EmailResults = await _checkoutEmailService.SendInspectionReportsAsync(inspectionsToEmail, request.TransactionId);
     }
 
+    protected override ReceiptReferenceDto BuildReceiptReference(List<CsiInspectionDto> inspections)
+    {
+        return new ReceiptReferenceDto
+        {
+            Headers = ["Account", "Property Address", "Mailing Address"],
+            Rows = inspections
+                .Select(inspection => new ReceiptRowDto
+                {
+                    Cells =
+                    [
+                        ReceiptFormatter.TextLines(inspection.InspectorUser?.EmailAddress),
+                        ReceiptFormatter.PropertyLines(inspection),
+                        ReceiptFormatter.MailingLines(inspection)
+                    ]
+                })
+                .ToList()
+        };
+    }
+
     private int? GetInspectorId()
     {
         return AuthService.HasAnyRole(RoleDefinitions.Professionals.Admin) ? null : AuthService.UserId;

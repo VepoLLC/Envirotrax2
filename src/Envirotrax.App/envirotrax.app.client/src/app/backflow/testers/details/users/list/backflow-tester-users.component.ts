@@ -64,7 +64,7 @@ export class BackflowTesterUsersComponent implements OnInit {
 
     public addUser(): void {
         this._modalHelper.show<BackflowUserModalData, ProfessionalUser>(AddEditBackflowTesterUserComponent, {
-            title: 'Add Sub Account',
+            title: 'Add User Account',
             model: { testerId: this.testerId, user: {} },
             size: ModalSize.large,
             mode: 'disableFullScreen'
@@ -73,7 +73,7 @@ export class BackflowTesterUsersComponent implements OnInit {
 
     public editUser(user: ProfessionalUser): void {
         this._modalHelper.show<BackflowUserModalData, ProfessionalUser>(AddEditBackflowTesterUserComponent, {
-            title: 'Edit Sub Account',
+            title: 'Edit User Account',
             model: { testerId: this.testerId, user },
             size: ModalSize.large,
             mode: 'disableFullScreen'
@@ -85,7 +85,7 @@ export class BackflowTesterUsersComponent implements OnInit {
             try {
                 this.table.isLoading = true;
                 await this._service.delete(this.testerId, user.id!);
-                this._toastService.successFullyDeleted('Sub Account');
+                this._toastService.successFullyDeleted('User Account');
             } finally {
                 this.table.isLoading = false;
             }

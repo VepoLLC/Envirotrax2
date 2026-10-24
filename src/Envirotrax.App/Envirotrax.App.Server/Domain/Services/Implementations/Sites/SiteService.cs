@@ -2,19 +2,23 @@ using System.Transactions;
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
+using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Sites;
+using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Data.Repositories.Definitions.GisAreas;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
+using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
@@ -36,6 +40,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
     private readonly ISiteScheduleService _siteScheduleService;
     private readonly IAuthService _authService;
+    private readonly IGeneralSettingsService _generalSettingsService;
     private readonly ILogger<SiteService> _logger;
 
     public SiteService(
@@ -54,6 +59,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         IMailingInfoRedactionService mailingInfoRedactionService,
         ISiteScheduleService siteScheduleService,
         IAuthService authService,
+        IGeneralSettingsService generalSettingsService,
         ILogger<SiteService> logger)
         : base(mapper, repository)
     {
@@ -71,6 +77,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         _mailingInfoRedactionService = mailingInfoRedactionService;
         _siteScheduleService = siteScheduleService;
         _authService = authService;
+        _generalSettingsService = generalSettingsService;
         _logger = logger;
     }
 
@@ -107,7 +114,18 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     {
         await PrepareWaterSupplierAccountNumberAsync(dto);
 
-        var added = await base.AddAsync(dto);
+        SiteDto added;
+
+        try
+        {
+            added = await base.AddAsync(dto);
+        }
+        catch (DuplicateRecordException exception)
+        {
+            ThrowIfAccountNumberDuplicated(exception);
+
+            throw;
+        }
 
         if (added.WaterSupplier?.Id is int waterSupplierId)
         {
@@ -120,24 +138,90 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
     public override async Task<SiteDto> UpdateAsync(SiteDto dto)
     {
+        await KeepAccountNumberUnlessChangesAllowedAsync(dto);
         await PrepareWaterSupplierAccountNumberAsync(dto);
 
-        return await base.UpdateAsync(dto);
+        try
+        {
+            return await base.UpdateAsync(dto);
+        }
+        catch (DuplicateRecordException exception)
+        {
+            ThrowIfAccountNumberDuplicated(exception);
+
+            throw;
+        }
+    }
+
+    public async Task<SiteAccountNumberDto> GenerateAccountNumberAsync()
+    {
+        var uniqueNumber = await _siteRepository.GetNextAccountNumberAsync();
+        var randomNumber = Random.Shared.Next(1000, 9999);
+
+        return new SiteAccountNumberDto
+        {
+            AccountNumber = $"{_authService.WaterSupplierId}-{randomNumber}-{uniqueNumber}"
+        };
+    }
+
+    private async Task KeepAccountNumberUnlessChangesAllowedAsync(SiteDto dto)
+    {
+        var settings = await _generalSettingsService.GetAsync(
+            _authService.WaterSupplierId,
+            generalSettings => new GeneralSettings { AllowAccountNumberChanges = generalSettings.AllowAccountNumberChanges },
+            CancellationToken.None);
+
+        if (settings.AllowAccountNumberChanges)
+        {
+            return;
+        }
+
+        var storedAccountNumber = await _siteRepository.GetAccountNumberAsync(dto.Id, CancellationToken.None);
+
+        if (storedAccountNumber == null)
+        {
+            return;
+        }
+
+        dto.AccountNumber = storedAccountNumber;
     }
 
     // Stores a blank WS Account Number as NULL, so only real numbers have to be unique. V1 saved blanks as '',
-    // which meant a second site left blank failed with this same message.
-    private async Task PrepareWaterSupplierAccountNumberAsync(SiteDto dto)
+    // which meant a second site left blank failed with the "must be unique" message.
+    private Task PrepareWaterSupplierAccountNumberAsync(SiteDto dto)
     {
         dto.WaterSupplierAccountNumber = string.IsNullOrWhiteSpace(dto.WaterSupplierAccountNumber)
             ? null
             : dto.WaterSupplierAccountNumber.Trim();
 
-        if (dto.WaterSupplierAccountNumber != null
-            && await _siteRepository.IsWaterSupplierAccountNumberTakenAsync(dto.Id, dto.WaterSupplierAccountNumber, CancellationToken.None))
+        return Task.CompletedTask;
+    }
+
+    private static void ThrowIfAccountNumberDuplicated(DuplicateRecordException exception)
+    {
+        if (exception.PropertyNames.Contains(nameof(Site.WaterSupplierAccountNumber)))
         {
-            throw new AppValidationException("WS Account Number must be unique.");
+            throw new AppValidationException("WS Account Number must be unique.", exception);
         }
+
+        if (exception.PropertyNames.Contains(nameof(Site.AccountNumber)))
+        {
+            throw new AppValidationException("Account Number must be unique.", exception);
+        }
+    }
+
+    public async Task<SiteDto> AddWithGeneratedAccountNumberAsync(SiteDto dto)
+    {
+        var prefix = $"{dto.WaterSupplier!.Id}-{Random.Shared.Next(1000, 10000)}";
+        dto.AccountNumber = prefix;
+
+        var added = await AddAsync(dto);
+
+        added.AccountNumber = $"{prefix}-{added.Id}";
+
+        await _siteRepository.UpdateAccountNumberAsync(added.Id, added.AccountNumber);
+
+        return added;
     }
 
     public async Task<IPagedData<SiteDto>> SearchAsync(PageInfo pageInfo, Query query, FogCompliancyStatus? fogCompliancyStatus, CancellationToken cancellationToken)
@@ -199,6 +283,89 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         }
 
         return site;
+    }
+
+    public async Task<IPagedData<BackflowSubmissionSiteDto>> SearchForBackflowSubmissionAsync(BackflowSubmissionSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<Site, SiteDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<Site, SiteDto>(Mapper);
+
+        List<Site> sites;
+        List<BackflowTest> assemblies;
+
+        if (IsSerialNumberSearch(criteria))
+        {
+            assemblies = await _backflowTestRepository.GetSerialNumberMatchesAsync(criteria, cancellationToken);
+
+            var matchingSiteIds = GetSiteIds(assemblies);
+
+            sites = (await _siteRepository.GetForBackflowSubmissionAsync(matchingSiteIds, pageInfo, query, cancellationToken)).ToList();
+        }
+        else
+        {
+            sites = (await _siteRepository.SearchForBackflowSubmissionAsync(criteria, pageInfo, query, cancellationToken)).ToList();
+
+            var siteIds = GetSiteIds(sites);
+
+            assemblies = await _backflowTestRepository.GetSubmissionAssembliesAsync(siteIds, cancellationToken);
+        }
+
+        var assembliesBySiteId = assemblies.ToLookup(assembly => assembly.SiteId);
+
+        var siteDtos = new List<BackflowSubmissionSiteDto>();
+        var redactableDtos = new List<IRedactableMailingInfoDto>();
+
+        foreach (var site in sites)
+        {
+            var siteDto = Mapper.Map<BackflowSubmissionSiteDto>(site);
+
+            foreach (var assembly in assembliesBySiteId[site.Id])
+            {
+                var assemblyDto = Mapper.Map<BackflowTestDto>(assembly);
+
+                siteDto.Assemblies.Add(assemblyDto);
+                redactableDtos.Add(assemblyDto);
+            }
+
+            siteDtos.Add(siteDto);
+            redactableDtos.Add(siteDto);
+        }
+
+        await _mailingInfoRedactionService.RedactAsync(redactableDtos, cancellationToken);
+
+        return siteDtos.ToPagedData(pageInfo);
+    }
+
+    private static bool IsSerialNumberSearch(BackflowSubmissionSearchDto criteria)
+    {
+        return string.IsNullOrWhiteSpace(criteria.AccountNumber) && !string.IsNullOrWhiteSpace(criteria.Manufacturer);
+    }
+
+    private static List<int> GetSiteIds(List<Site> sites)
+    {
+        var siteIds = new List<int>();
+
+        foreach (var site in sites)
+        {
+            siteIds.Add(site.Id);
+        }
+
+        return siteIds;
+    }
+
+    private static List<int> GetSiteIds(List<BackflowTest> assemblies)
+    {
+        var siteIds = new List<int>();
+
+        foreach (var assembly in assemblies)
+        {
+            if (assembly.SiteId != null && !siteIds.Contains(assembly.SiteId.Value))
+            {
+                siteIds.Add(assembly.SiteId.Value);
+            }
+        }
+
+        return siteIds;
     }
 
     public async Task<IEnumerable<SiteDto>> GetAllPendingGeocodingAsync(int batchSize)
@@ -304,6 +471,16 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         }
 
         return true;
+    }
+
+    public async Task UpdateAdditionalInformationAsync(int siteId, SiteAdditionalInformationDto dto)
+    {
+        var saved = await _siteRepository.UpdateAdditionalInformationAsync(siteId, dto);
+
+        if (saved == null)
+        {
+            throw new AppValidationException("The property for this inspection was not found.");
+        }
     }
 
     public async Task<bool> UpdateWaterSupplierAsync(int siteId, UpdateSiteWaterSupplierDto dto)

@@ -138,7 +138,7 @@ export class BackflowTestListComponent implements OnInit {
     public readonly dateSearchOptions: InputOption[] = [
         { id: '', text: 'None' },
         { id: 'testDate', text: 'Test Date' },
-        { id: 'createdTime', text: 'Submission Date' },
+        { id: 'transactionDate', text: 'Submission Date' },
         { id: 'expirationDate', text: 'Expiration Date' }
     ];
 
@@ -222,6 +222,10 @@ export class BackflowTestListComponent implements OnInit {
 
     private addTestHistoryFilter(filter: QueryProperty[]): void {
         if (!this.testHistory) {
+            return;
+        }
+
+        if (this.paymentStatus === String(BackflowPaymentStatus.Unpaid)) {
             return;
         }
 

@@ -68,7 +68,7 @@ export class CsiInspectorUsersComponent implements OnInit {
 
     public addUser(): void {
         this._modalHelper.show<CsiUserModalData, ProfessionalUser>(AddEditCsiInspectorUserComponent, {
-            title: 'Add Sub Account',
+            title: 'Add User Account',
             model: { inspectorId: this.inspectorId, user: {} },
             size: ModalSize.large,
             mode: 'disableFullScreen'
@@ -77,7 +77,7 @@ export class CsiInspectorUsersComponent implements OnInit {
 
     public editUser(user: ProfessionalUser): void {
         this._modalHelper.show<CsiUserModalData, ProfessionalUser>(AddEditCsiInspectorUserComponent, {
-            title: 'Edit Sub Account',
+            title: 'Edit User Account',
             model: { inspectorId: this.inspectorId, user },
             size: ModalSize.large,
             mode: 'disableFullScreen'
@@ -89,7 +89,7 @@ export class CsiInspectorUsersComponent implements OnInit {
             try {
                 this.table.isLoading = true;
                 await this._service.delete(this.inspectorId, user.id!);
-                this._toastService.successFullyDeleted('Sub Account');
+                this._toastService.successFullyDeleted('User Account');
             } finally {
                 this.table.isLoading = false;
             }

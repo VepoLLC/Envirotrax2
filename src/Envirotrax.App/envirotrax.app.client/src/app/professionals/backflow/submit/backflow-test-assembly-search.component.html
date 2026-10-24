@@ -1,53 +1,13 @@
-﻿<ng-template #assemblyInfoTemplate let-test="rowData">
-    <div *ngIf="test?.deviceType"><strong>{{ test.deviceType }}</strong></div>
-    <div *ngIf="test?.manufacturer">{{ test.manufacturer }} {{ test.model }}</div>
-    <div *ngIf="test?.serialNumber">S/N: {{ test.serialNumber }}</div>
-    <div *ngIf="test?.size">Size: {{ test.size }}</div>
-</ng-template>
-
-<ng-template #propertyInfoTemplate let-test="rowData">
-    <div *ngIf="test?.propertyBusinessName">{{ test.propertyBusinessName }}</div>
-    <div>{{ test?.propertyStreetNumber }} {{ test?.propertyStreetName }}<span *ngIf="test?.propertyNumber"> #{{ test.propertyNumber }}</span></div>
-    <div>{{ test?.propertyCity }}<span *ngIf="test?.propertyCity && test?.propertyState?.name">, </span>{{ test?.propertyState?.name }} {{ test?.propertyZip }}</div>
-</ng-template>
-
-<ng-template #testInfoTemplate let-test="rowData">
-    <div *ngIf="test?.testDate">{{ test.testDate | date:'MM/dd/yyyy' }}</div>
-    <div *ngIf="test?.testResult === 0" class="text-success fw-bold">Pass</div>
-    <div *ngIf="test?.testResult === 1" class="text-danger fw-bold">Fail</div>
-    <div *ngIf="test?.testResult === 2" class="text-warning fw-bold">Pass After Repairs</div>
-    <div *ngIf="test?.expirationDate">Exp: {{ test.expirationDate | date:'MM/dd/yyyy' }}</div>
-</ng-template>
-
-<ng-template #siteTypeTemplate let-site="rowData">
-    {{ site?.propertyType === PropertyType.Residential ? 'Residential' : 'Commercial' }}
-</ng-template>
-
-<ng-template #sitePropertyInfoTemplate let-site="rowData">
-    <div *ngIf="site?.businessName">{{ site.businessName }}</div>
-    <div>{{ site?.streetNumber }} {{ site?.streetName }}<span *ngIf="site?.propertyNumber"> #{{ site.propertyNumber }}</span></div>
-    <div>{{ site?.city }}<span *ngIf="site?.city && site?.state?.name">, </span>{{ site?.state?.name }} {{ site?.zipCode }}</div>
-</ng-template>
-
-<ng-template #siteContactInfoTemplate let-site="rowData">
-    <div *ngIf="site?.mailingCompanyName">{{ site.mailingCompanyName }}</div>
-    <div *ngIf="site?.mailingContactName">{{ site.mailingContactName }}</div>
-    <div>{{ site?.mailingStreetNumber }} {{ site?.mailingStreetName }}<span *ngIf="site?.mailingNumber"> #{{ site.mailingNumber }}</span></div>
-    <div>{{ site?.mailingCity }}<span *ngIf="site?.mailingCity && site?.mailingState?.name">, </span>{{ site?.mailingState?.name }} {{ site?.mailingZipCode }}</div>
-</ng-template>
-
-<h1 class="text-center h2">Submit Backflow Test</h1>
+﻿<h1 class="text-center h2">Submit Backflow Test</h1>
 
 <div [hidden]="showResults">
     <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
         <div class="mb-2">
             <vp-section header="Assembly Search Instructions">
-                <p>Search for an existing assembly by entering one of the following criteria. If the assembly you tested has a previous test record, select it to pre-fill the submission form. If no prior record exists, click <strong>Submit Test for Unlisted Assembly</strong>.</p>
-                <ul>
-                    <li>If you know the customer <strong>Account Number</strong>, enter it in Option 1.</li>
-                    <li>If you know the assembly <strong>Manufacturer and Serial Number</strong>, enter them in Option 2.</li>
-                    <li>If you only know the <strong>property address</strong>, enter the street number in Option 3.</li>
-                </ul>
+                <p>If you test an assembly with a known serial number, use the search form below to look for any previous test history for the assembly. If previous test history is found, you may submit a new test for the assembly and automatically populate information from the previous test such as the property location, the mailing address, and the assembly information.</p>
+                <p>Search for the existing assembly by either the property account number, manufacturer and serial number, or the property address.</p>
+                <p>If you are searching by the property address, be sure to enter only the numerical street number followed by the main street name in the <strong>Property Address</strong> textbox. DO NOT include descriptive prefixes such as <strong>North, South, East, West</strong>, or <strong>N/S/E/W</strong>, or suffixes such as <strong>BLVD, St, Lane, Dr</strong>, etcetera when entering the <strong>Property Address</strong>.</p>
+                <p class="mb-0"><em>For Example, "12345 North Richmond Blvd" should be entered in the <strong>Property Address</strong> text box as "12345 Richmond"</em></p>
             </vp-section>
         </div>
 
@@ -66,8 +26,8 @@
                     </div>
                     <div class="col-lg-4">
                         <h5 class="text-center">Option 3: Property Address</h5>
-                        <vp-input type="text" label="Street Number:" [(ngModel)]="streetNumber" name="streetNumber" />
-                        <p class="form-text text-muted">Example: 123</p>
+                        <vp-input type="text" label="Property Number and Name:" [(ngModel)]="propertyAddress" name="propertyAddress" />
+                        <p class="form-text text-muted">Example: 123 Main</p>
                     </div>
                 </div>
             </vp-section>
@@ -83,64 +43,120 @@
     </form>
 </div>
 
-<dp-loading-spinner *ngIf="siteTable.isLoading || testTable.isLoading"></dp-loading-spinner>
+<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
 
 <div *ngIf="showResults">
+    <vp-section [header]="hasResults ? resultsHeader : 'No Property Records Found'">
 
-    <ng-container *ngIf="searchType === 'sites'">
-        <vp-section [header]="siteTable.items?.data?.length === 0 ? 'No Property Records Found' : 'Property Search Results'">
-            <ng-container *ngIf="siteTable.items?.data?.length === 0">
-                <p class="text-center mt-2 mb-0 fw-bold fs-5">No property records were found matching the specified search criteria.</p>
-                <p class="mt-2">If no record exists for the assembly you tested, click <strong>Submit Test for Unlisted Assembly</strong> below.</p>
-            </ng-container>
-            <ng-container *ngIf="siteTable.items?.data?.length !== 0">
-                <p class="mt-2"><strong>Property found:</strong> If one of the results matches the property where the assembly is located, click <strong>Submit Test for Unlisted Assembly</strong> to proceed.</p>
-                <p><strong>No match found:</strong> If none of the records match, click <strong>Submit Test for Unlisted Assembly</strong> below.</p>
-            </ng-container>
-            <div class="d-flex justify-content-center mb-4 gap-2">
-                <button type="button" class="btn btn-primary vp-section-button" (click)="submitUnlisted()">Submit Test for Unlisted Assembly</button>
-                <button type="button" class="btn btn-primary vp-section-button" (click)="showResults = false">
-                    <i class="fa-solid fa-magnifying-glass me-1"></i>Search Again
-                </button>
+        <ng-container *ngIf="!hasResults">
+            <p class="text-center mt-2 mb-0 fw-bold fs-5">No property records were found matching the specified search criteria.</p>
+            <p class="mt-2">If no record exists for the assembly you tested, click <strong>Submit a Test for an Unlisted Property</strong> below.</p>
+        </ng-container>
+
+        <div *ngFor="let box of siteBoxes; let odd = odd" class="test-search" [class.alt]="odd">
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <dl class="row mb-0">
+                        <dt class="col-5 text-end">Account Number:</dt>
+                        <dd class="col-7 mb-1">{{ box.site.accountNumber }}</dd>
+
+                        <ng-container *ngIf="box.showWsAccountNumber">
+                            <dt class="col-5 text-end">WS Account Number:</dt>
+                            <dd class="col-7 mb-1">{{ box.site.waterSupplierAccountNumber }}</dd>
+                        </ng-container>
+
+                        <dt class="col-5 text-end">Property Type:</dt>
+                        <dd class="col-7 mb-1">{{ box.site.propertyType === PropertyType.Residential ? 'Residential' : 'Commercial' }}</dd>
+
+                        <ng-container *ngIf="box.site.businessName">
+                            <dt class="col-5 text-end">Property Business:</dt>
+                            <dd class="col-7 mb-1">{{ box.site.businessName }}</dd>
+                        </ng-container>
+
+                        <dt class="col-5 text-end">Property Address:</dt>
+                        <dd class="col-7 mb-1">
+                            <div>{{ box.site.streetNumber }} {{ box.site.streetName }}<span *ngIf="box.site.propertyNumber"> #{{ box.site.propertyNumber }}</span></div>
+                            <div>{{ box.site.city }}<span *ngIf="box.site.city && box.site.state?.name">, </span>{{ box.site.state?.name }} {{ box.site.zipCode }}</div>
+                        </dd>
+                    </dl>
+                </div>
+
+                <div class="col-lg-6">
+                    <dl class="row mb-0">
+                        <dt class="col-5 text-end">Mailing Company Name:</dt>
+                        <dd class="col-7 mb-1">{{ box.site.mailingCompanyName }}</dd>
+
+                        <dt class="col-5 text-end">Mailing Contact Name:</dt>
+                        <dd class="col-7 mb-1">{{ box.site.mailingContactName }}</dd>
+
+                        <dt class="col-5 text-end">Mailing Address:</dt>
+                        <dd class="col-7 mb-1">
+                            <div>{{ box.site.mailingStreetNumber }} {{ box.site.mailingStreetName }}<span *ngIf="box.site.mailingNumber"> #{{ box.site.mailingNumber }}</span></div>
+                            <div>{{ box.site.mailingCity }}<span *ngIf="box.site.mailingCity && box.site.mailingState?.name">, </span>{{ box.site.mailingState?.name }} {{ box.site.mailingZipCode }}</div>
+                        </dd>
+
+                        <ng-container *ngIf="box.renewalMonth">
+                            <dt class="col-5 text-end">Renewal Month:</dt>
+                            <dd class="col-7 mb-1">{{ box.renewalMonth }}</dd>
+                        </ng-container>
+                    </dl>
+                </div>
             </div>
-            <vp-table *ngIf="siteTable.items"
-                      [columns]="siteTable.columns!"
-                      [data]="siteTable.items.data"
-                      [(pageInfo)]="siteTable.items.pageInfo"
-                      (pageInfoChange)="getSites()"
-                      [(query)]="siteTable.query"
-                      (queryChange)="getSites()"
-                      (queryReset)="getSites()"
-                      [customActions]="siteCustomActions" />
-        </vp-section>
-    </ng-container>
 
-    <ng-container *ngIf="searchType === 'tests'">
-        <vp-section [header]="testTable.items?.data?.length === 0 ? 'No Assembly Records Found' : 'Assembly Search Results'">
-            <ng-container *ngIf="testTable.items?.data?.length === 0">
-                <p class="text-center mt-2 mb-0 fw-bold fs-5">No assembly records were found matching the specified search criteria.</p>
-                <p class="mt-2">If no record exists for the assembly you tested, click <strong>Submit Test for Unlisted Assembly</strong> below.</p>
+            <ng-container *ngIf="box.assemblies.length > 0">
+                <h5 class="text-center fw-bold mt-3">Assembly Records for this Property</h5>
+
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped table-bordered align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Dates</th>
+                                <th>Serial Number</th>
+                                <th>Assembly Description</th>
+                                <th>Location Description</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let assembly of box.assemblies">
+                                <td class="text-nowrap">
+                                    <div *ngIf="assembly.test.expirationDate"><strong>Expires:</strong> {{ assembly.test.expirationDate | date:'MM/dd/yyyy' }}</div>
+                                    <div *ngIf="assembly.renewalMonth"><strong>Renews:</strong> {{ assembly.renewalMonth }}</div>
+                                </td>
+                                <td>{{ assembly.test.serialNumber }}</td>
+                                <td>
+                                    <div>{{ assembly.description }}</div>
+                                    <div>{{ assembly.test.hazardType }}</div>
+                                </td>
+                                <td>{{ assembly.test.locationDescription }}</td>
+                                <td class="text-nowrap">
+                                    <button type="button" class="btn btn-primary btn-sm" (click)="selectAssembly(assembly.test)">Submit Test for This Assembly</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </ng-container>
-            <ng-container *ngIf="testTable.items?.data?.length !== 0">
-                <p class="mt-2"><strong>Assembly found:</strong> If one of the results matches the assembly you tested, click <strong>Submit Test</strong> to proceed.</p>
-                <p><strong>No match found:</strong> If none of the records match, click <strong>Submit Test for Unlisted Assembly</strong> below.</p>
-            </ng-container>
-            <div class="d-flex justify-content-center mb-4 gap-2">
-                <button type="button" class="btn btn-primary vp-section-button" (click)="submitUnlisted()">Submit Test for Unlisted Assembly</button>
-                <button type="button" class="btn btn-primary vp-section-button" (click)="showResults = false">
-                    <i class="fa-solid fa-magnifying-glass me-1"></i>Search Again
-                </button>
+
+            <h5 *ngIf="box.assemblies.length === 0" class="text-center fw-bold mt-3">There are no assembly records for this property.</h5>
+
+            <div class="d-flex justify-content-center mt-3">
+                <button type="button" class="btn btn-primary vp-section-button" (click)="submitForSite(box.site)">Submit Unlisted Assembly for this Property</button>
             </div>
-            <vp-table *ngIf="testTable.items"
-                      [columns]="testTable.columns!"
-                      [data]="testTable.items.data"
-                      [(pageInfo)]="testTable.items.pageInfo"
-                      (pageInfoChange)="getAssemblies()"
-                      [(query)]="testTable.query"
-                      (queryChange)="getAssemblies()"
-                      (queryReset)="getAssemblies()"
-                      [customActions]="testCustomActions" />
-        </vp-section>
-    </ng-container>
+        </div>
 
+        <div class="d-flex justify-content-center mt-3">
+            <vp-pagination [(pageInfo)]="pageInfo" (pageInfoChange)="getSites()" />
+        </div>
+
+        <p *ngIf="hasResults" class="mt-3">If none of the above property records or their assembly test history are a match, start a new test using a blank test form by clicking on the <strong>Submit a Test for an Unlisted Property</strong> button below.</p>
+
+        <div class="d-flex justify-content-center mt-3 gap-2">
+            <button type="button" class="btn btn-primary vp-section-button" (click)="submitUnlisted()">Submit a Test for an Unlisted Property</button>
+            <button type="button" class="btn btn-primary vp-section-button" (click)="showResults = false">
+                <i class="fa-solid fa-magnifying-glass me-1"></i>Search Again
+            </button>
+        </div>
+    </vp-section>
 </div>

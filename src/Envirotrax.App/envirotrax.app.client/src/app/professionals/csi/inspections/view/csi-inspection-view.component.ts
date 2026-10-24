@@ -22,7 +22,6 @@ export class CsiInspectionViewComponent implements OnInit {
     public images: CsiInspectionImage[] = [];
     public isLoadingImages = false;
     public assemblies: CsiInspectionAssembly[] = [];
-    public isLoadingAssemblies = false;
     // Another professional's inspection can be viewed but not changed (the server rejects it anyway).
     public isOwnInspection = false;
     public newImageDescription = '';
@@ -31,7 +30,6 @@ export class CsiInspectionViewComponent implements OnInit {
     public modalSelectedFile: File | null = null;
 
     private imagesLoaded = false;
-    private assembliesLoaded = false;
 
     constructor(
         private readonly _route: ActivatedRoute,
@@ -79,20 +77,6 @@ export class CsiInspectionViewComponent implements OnInit {
         this.activeTab = tab;
         if (tab === 'images' && !this.imagesLoaded) {
             this.loadImages();
-        }
-        if (tab === 'assemblies' && !this.assembliesLoaded) {
-            this.loadAssemblies();
-        }
-    }
-
-    private async loadAssemblies(): Promise<void> {
-        if (!this.inspection?.id) return;
-        try {
-            this.isLoadingAssemblies = true;
-            this.assemblies = await this._inspectionService.getProfessionalAssemblies(this.inspection.id);
-        } finally {
-            this.assembliesLoaded = true;
-            this.isLoadingAssemblies = false;
         }
     }
 
@@ -180,11 +164,13 @@ export class CsiInspectionViewComponent implements OnInit {
 
         try {
             this.isLoading = true;
-            const [inspection, professionalId] = await Promise.all([
+            const [inspection, professionalId, assemblies] = await Promise.all([
                 this._inspectionService.getProfessionalInspection(Number(idParam)),
-                this._authService.getProfessionalId()
+                this._authService.getProfessionalId(),
+                this._inspectionService.getProfessionalAssemblies(Number(idParam))
             ]);
             this.inspection = inspection;
+            this.assemblies = assemblies;
             this.isOwnInspection = professionalId != null && inspection.professional?.id === professionalId;
         } finally {
             this.isLoading = false;

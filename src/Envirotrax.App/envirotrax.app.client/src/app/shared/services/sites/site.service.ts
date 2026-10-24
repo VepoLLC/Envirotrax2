@@ -7,6 +7,7 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { Site } from "../../models/sites/site";
+import { BackflowSubmissionSite } from "../../models/backflow/backflow-submission-site";
 import { DownloadEndpoint } from "../../models/download-config";
 import { RecordLog } from "@envirotrax/common-ui";
 
@@ -19,11 +20,22 @@ export interface SiteTabCounts {
     fogCount: number;
 }
 
+export interface SiteAccountNumber {
+    accountNumber: string;
+}
+
 export interface ProfessionalSiteSearchCriteria {
     workedOnly?: string | null;
     scheduledOnly?: string | null;
     scheduledFrom?: string | null;
     scheduledTo?: string | null;
+}
+
+export interface BackflowSubmissionSearchCriteria {
+    accountNumber?: string | null;
+    manufacturer?: string | null;
+    serialNumber?: string | null;
+    propertyAddress?: string | null;
 }
 
 @Injectable({
@@ -189,6 +201,20 @@ export class SiteService {
         return await lastValueFrom(this._http.get<PagedData<Site>>(url, { params }));
     }
 
+    public async getAllForBackflowSubmission(pageInfo: PageInfo, query: Query, criteria: BackflowSubmissionSearchCriteria = {}): Promise<PagedData<BackflowSubmissionSite>> {
+        const url = this._urlResolver.resolveUrl('/api/professionals/backflow/sites');
+
+        let params = this._queryHelper.buildQuery(pageInfo, query);
+
+        for (const [name, value] of Object.entries(criteria)) {
+            if (value) {
+                params = params.append(name, value);
+            }
+        }
+
+        return await lastValueFrom(this._http.get<PagedData<BackflowSubmissionSite>>(url, { params }));
+    }
+
     public get(id: number): Promise<Site> {
         const url = this._urlResolver.resolveUrl(`/api/sites/${id}`);
 
@@ -226,6 +252,14 @@ export class SiteService {
 
         return lastValueFrom(
             this._http.post<Site>(url, site)
+        );
+    }
+
+    public generateAccountNumber(): Promise<SiteAccountNumber> {
+        const url = this._urlResolver.resolveUrl('/api/sites/account-numbers');
+
+        return lastValueFrom(
+            this._http.post<SiteAccountNumber>(url, {})
         );
     }
 

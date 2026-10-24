@@ -32,22 +32,22 @@ BEGIN TRY
             WHEN tests.SubmissionId = NULLIF(inspections.SubmissionId, '') THEN 1
             ELSE 0
         END,
-        LEFT(legacyAssemblies.SubmissionID, 50),
+        legacyAssemblies.SubmissionID,
         ISNULL(legacyAssemblies.VisuallyIdentified, 0),
-        LEFT(legacyAssemblies.DeviceType, 50),
-        LEFT(legacyAssemblies.AssemblyDescription, 200),
-        LEFT(legacyAssemblies.SerialNumber, 50),
-        LEFT(legacyAssemblies.AssemblyDescription2, 200),
-        LEFT(legacyAssemblies.SerialNumber2, 50),
-        LEFT(legacyAssemblies.HazardType, 50),
-        LEFT(legacyAssemblies.HazardTypeOtherDescription, 200),
-        LEFT(legacyAssemblies.LocationDescription, 500),
+        legacyAssemblies.DeviceType,
+        legacyAssemblies.AssemblyDescription,
+        legacyAssemblies.SerialNumber,
+        legacyAssemblies.AssemblyDescription2,
+        legacyAssemblies.SerialNumber2,
+        legacyAssemblies.HazardType,
+        legacyAssemblies.HazardTypeOtherDescription,
+        legacyAssemblies.LocationDescription,
         ISNULL(legacyAssemblies.IsCurrent, 0),
         ISNULL(legacyAssemblies.TestResult, 0),
         ISNULL(legacyAssemblies.OutOfService, 0),
         legacyAssemblies.TestDate,
         legacyAssemblies.ExpirationDate,
-        LEFT(NULLIF(legacyAssemblies.TransactionID, ''), 100),
+        NULLIF(legacyAssemblies.TransactionID, ''),
         ISNULL(legacyAssemblies.CreationDate, inspections.CreatedTime)
     FROM Vepo.dbo.CsiInspectionVisuallyIdentifiedAssemblies AS legacyAssemblies
     INNER JOIN CsiInspections AS inspections

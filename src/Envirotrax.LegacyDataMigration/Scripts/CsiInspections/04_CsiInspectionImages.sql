@@ -22,7 +22,7 @@ BEGIN TRY
         inspections.WaterSupplierId,
         inspections.Id,
         inspections.ProfessionalId,
-        LEFT(NULLIF(CAST(legacyImages.Description AS NVARCHAR(MAX)), ''), 1000),
+        NULLIF(CAST(legacyImages.Description AS NVARCHAR(MAX)), ''),
         -- V1 keeps no path: an image lives on the legacy file server at csi/<ID rounded down to 10000>/<ID>.jpg,
         -- unless its bytes are still in ImageData, in which case CsiInspectionService reads them from V1.
         CONCAT('csi/', CAST((legacyImages.ID / 10000) * 10000 AS VARCHAR(20)), '/', CAST(legacyImages.ID AS VARCHAR(20)), '.jpg'),

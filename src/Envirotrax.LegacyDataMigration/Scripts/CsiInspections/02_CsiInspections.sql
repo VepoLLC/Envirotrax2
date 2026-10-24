@@ -77,26 +77,26 @@ BEGIN TRY
          CreatedById, CreatedTime, UpdatedById, UpdatedTime)
     SELECT
         legacyInspections.ID, waterSuppliers.Id, sites.Id, legacyInspections.InspectionDate,
-        LEFT(legacyInspections.SubmissionID, 50),
+        legacyInspections.SubmissionID,
 
-        LEFT(legacyInspections.PropertyBusinessName, 100), ISNULL(legacyInspections.PropertyType, 0),
-        LEFT(legacyInspections.PropertyStreetNumber, 50), LEFT(legacyInspections.PropertyStreetName, 100),
-        LEFT(legacyInspections.PropertyNumber, 50), LEFT(legacyInspections.PropertyCity, 50), propertyStates.Id,
-        LEFT(legacyInspections.PropertyZIP, 20),
+        legacyInspections.PropertyBusinessName, ISNULL(legacyInspections.PropertyType, 0),
+        legacyInspections.PropertyStreetNumber, legacyInspections.PropertyStreetName,
+        legacyInspections.PropertyNumber, legacyInspections.PropertyCity, propertyStates.Id,
+        legacyInspections.PropertyZIP,
 
-        LEFT(legacyInspections.MailingCompanyName, 100), LEFT(legacyInspections.MailingContactName, 100),
-        LEFT(legacyInspections.MailingStreetNumber, 50), LEFT(legacyInspections.MailingStreetName, 100),
-        LEFT(legacyInspections.MailingNumber, 50), LEFT(legacyInspections.MailingCity, 50), mailingStates.Id,
-        LEFT(legacyInspections.MailingZIP, 20), LEFT(legacyInspections.MailingPhoneNumber, 50),
-        LEFT(legacyInspections.MailingEmailAddress, 100),
+        legacyInspections.MailingCompanyName, legacyInspections.MailingContactName,
+        legacyInspections.MailingStreetNumber, legacyInspections.MailingStreetName,
+        legacyInspections.MailingNumber, legacyInspections.MailingCity, mailingStates.Id,
+        legacyInspections.MailingZIP, legacyInspections.MailingPhoneNumber,
+        legacyInspections.MailingEmailAddress,
 
-        inspectors.ProfessionalId, inspectors.UserId, LEFT(legacyInspections.InspectorLicenseNumber, 50),
-        LEFT(legacyInspections.InspectorLicenseType, 50), LEFT(legacyInspections.InspectorCompanyName, 100),
-        LEFT(legacyInspections.InspectorJobTitle, 100), LEFT(legacyInspections.InspectorContactName, 100),
-        LEFT(legacyInspections.InspectorAddress, 200), LEFT(legacyInspections.InspectorCity, 50),
-        LEFT(legacyInspections.InspectorState, 50), LEFT(legacyInspections.InspectorZIP, 20),
-        LEFT(legacyInspections.InspectorWorkNumber, 50), LEFT(legacyInspections.InspectorCellNumber, 50),
-        LEFT(legacyInspections.InspectorFaxNumber, 50),
+        inspectors.ProfessionalId, inspectors.UserId, legacyInspections.InspectorLicenseNumber,
+        legacyInspections.InspectorLicenseType, legacyInspections.InspectorCompanyName,
+        legacyInspections.InspectorJobTitle, legacyInspections.InspectorContactName,
+        legacyInspections.InspectorAddress, legacyInspections.InspectorCity,
+        legacyInspections.InspectorState, legacyInspections.InspectorZIP,
+        legacyInspections.InspectorWorkNumber, legacyInspections.InspectorCellNumber,
+        legacyInspections.InspectorFaxNumber,
 
         ISNULL(legacyInspections.ReasonForInspection, 0), ISNULL(legacyInspections.Compliance1, 0),
         ISNULL(legacyInspections.Compliance2, 0), ISNULL(legacyInspections.Compliance3, 0),
@@ -111,9 +111,9 @@ BEGIN TRY
 
         ISNULL(legacyInspections.MaterialServiceLineLead, 0), ISNULL(legacyInspections.MaterialServiceLineCopper, 0),
         ISNULL(legacyInspections.MaterialServiceLinePVC, 0), ISNULL(legacyInspections.MaterialServiceLineOther, 0),
-        LEFT(legacyInspections.MaterialServiceLineOtherDescription, 200), ISNULL(legacyInspections.MaterialSolderLead, 0),
+        legacyInspections.MaterialServiceLineOtherDescription, ISNULL(legacyInspections.MaterialSolderLead, 0),
         ISNULL(legacyInspections.MaterialSolderLeadFree, 0), ISNULL(legacyInspections.MaterialSolderSolventWeld, 0),
-        ISNULL(legacyInspections.MaterialSolderOther, 0), LEFT(legacyInspections.MaterialSolderOtherDescription, 200),
+        ISNULL(legacyInspections.MaterialSolderOther, 0), legacyInspections.MaterialSolderOtherDescription,
 
         ISNULL(legacyInspections.Disapproved, 0), legacyInspections.DisapprovedReason,
 
@@ -128,7 +128,7 @@ BEGIN TRY
         ISNULL(legacyInspections.ValidationNewSite, 0), ISNULL(legacyInspections.ValidationSiteInformationChanged, 0),
 
         -- An empty TransactionID is an unpaid inspection still in the inspector's cart.
-        LEFT(NULLIF(legacyInspections.TransactionID, ''), 100), legacyInspections.TransactionDate,
+        NULLIF(legacyInspections.TransactionID, ''), legacyInspections.TransactionDate,
         ISNULL(legacyInspections.Amount, 0), ISNULL(legacyInspections.AmountShare, 0),
         ISNULL(legacyInspections.EmailPDF, 0),
 

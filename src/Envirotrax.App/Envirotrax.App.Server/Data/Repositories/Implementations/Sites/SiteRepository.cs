@@ -543,35 +543,6 @@ public class SiteRepository : Repository<Site>, ISiteRepository
             .ToListAsync();
     }
 
-    // Archived sites count too, matching the unique index, so reactivating one can never collide.
-    public async Task<bool> IsWaterSupplierAccountNumberTakenAsync(int siteId, string waterSupplierAccountNumber, CancellationToken cancellationToken)
-    {
-        var duplicateIndex = await Entity
-            .Where(site => site.Id == siteId)
-            .Select(site => site.WaterSupplierAccountNumberDuplicateIndex)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        return await Entity.AnyAsync(
-            site => site.Id != siteId
-                && site.WaterSupplierAccountNumber == waterSupplierAccountNumber
-                && site.WaterSupplierAccountNumberDuplicateIndex == duplicateIndex,
-            cancellationToken);
-    }
-
-    public async Task<bool> IsAccountNumberTakenAsync(int siteId, string accountNumber, CancellationToken cancellationToken)
-    {
-        var duplicateIndex = await Entity
-            .Where(site => site.Id == siteId)
-            .Select(site => site.AccountNumberDuplicateIndex)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        return await Entity.AnyAsync(
-            site => site.Id != siteId
-                && site.AccountNumber == accountNumber
-                && site.AccountNumberDuplicateIndex == duplicateIndex,
-            cancellationToken);
-    }
-
     public Task<string?> GetAccountNumberAsync(int siteId, CancellationToken cancellationToken)
     {
         return Entity

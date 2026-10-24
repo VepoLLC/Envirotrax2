@@ -1,4 +1,5 @@
 
+using System.Linq.Expressions;
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
@@ -7,6 +8,7 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 
 public interface IGeneralSettingsService : IService<GeneralSettings, GeneralSettingsDto>
 {
+    Task<GeneralSettingsDto> GetAsync(int waterSupplierId, Expression<Func<GeneralSettings, GeneralSettings>> selector, CancellationToken cancellationToken);
     Task<GeneralSettingsDto> AddOrUpdateAsync(int waterSupplierId, GeneralSettingsDto settings);
     Task<ReferencedGeneralSettingsDto> GetForProfessionalAsync(int waterSupplierId, CancellationToken cancellationToken);
     Task<HashSet<int>> GetRedactingWaterSupplierIdsAsync(IReadOnlyCollection<int> waterSupplierIds, CancellationToken cancellationToken);

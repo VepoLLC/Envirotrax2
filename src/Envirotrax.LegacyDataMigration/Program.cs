@@ -74,6 +74,7 @@ services.AddTransient<FogVehicleService>();
 services.AddTransient<FogTripTicketService>();
 services.AddTransient<NotificationSettingService>();
 services.AddTransient<NotificationService>();
+services.AddTransient<ApiAccountService>();
 
 var provider = services.BuildServiceProvider();
 
@@ -160,3 +161,6 @@ await notificationSettingService.MigrateAsync();
 // unresolved: V2 row ids equal the V1 ids, so it lines up once the backflow test migration lands.
 var notificationService = provider.GetRequiredService<NotificationService>();
 await notificationService.MigrateAsync();
+
+var apiAccountService = provider.GetRequiredService<ApiAccountService>();
+await apiAccountService.MigrateAsync();

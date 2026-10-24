@@ -1,3 +1,4 @@
+import { formatDate } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Site } from '../../shared/models/sites/site';
 import { NgForm } from "@angular/forms";
@@ -27,13 +28,27 @@ import { GeneralSettingsService } from '../../shared/services/settings/general-s
 
 type SiteTab = 'logHistory' | 'csi' | 'backflow' | 'outOfService' | 'tripTickets' | 'fog' | 'recordLog';
 
+interface SectionValidationErrors {
+    siteSettings: string[];
+    facilityType: string[];
+    location: string[];
+    mailing: string[];
+    gisData: string[];
+}
+
 @Component({
     selector: 'app-edit-site-component',
     standalone: false,
     templateUrl: './edit-site-component.html'
 })
 export class EditSiteComponent implements OnInit {
-    public validationErrors: string[] = [];
+    public sectionValidationErrors: SectionValidationErrors = {
+        siteSettings: [],
+        facilityType: [],
+        location: [],
+        mailing: [],
+        gisData: []
+    };
 
     public activeTab?: SiteTab;
     public canViewLogHistory: boolean = false;
@@ -57,6 +72,7 @@ export class EditSiteComponent implements OnInit {
     public tripTicketCount: number = 0;
     public fogCount: number = 0;
     public includeWsAccountNumbers: boolean = false;
+    public allowAccountNumberChanges: boolean = false;
 
     public site: Site = {
         backflowScheduleMonth: 0,
@@ -293,7 +309,7 @@ export class EditSiteComponent implements OnInit {
         if (form.valid) {
             try {
                 this.sectionLoading.facilityType = true;
-                this.validationErrors = [];
+                this.sectionValidationErrors.facilityType = [];
 
                 console.log(this.site.facilityType);
 
@@ -316,7 +332,7 @@ export class EditSiteComponent implements OnInit {
                     this._toastService.successfullySaved('Facility Type');
                 }
             } catch (e) {
-                if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
+                if (!this._helper.parseValidationErrors(e, this.sectionValidationErrors.facilityType)) {
                     throw e;
                 }
 
@@ -327,13 +343,19 @@ export class EditSiteComponent implements OnInit {
         }
     }
 
+    public setDefaultDateWhenEnabled(enabled: boolean, field: 'csiRenewalDate' | 'fogInspectionExpirationDate' | 'fogPermitExpirationDate'): void {
+        if (enabled && !this.site[field]) {
+            this.site[field] = formatDate(new Date(), 'yyyy-MM-dd', 'en-US');
+        }
+    }
+
     public async updateSiteSettings(form: NgForm): Promise<void> {
         this.applyTripTicketIntervalValidation(form);
 
         if (form.valid) {
             try {
                 this.sectionLoading.siteSettings = true;
-                this.validationErrors = [];
+                this.sectionValidationErrors.siteSettings = [];
 
                 if (this.currentSite) {
                     this.currentSite.id = this.site.id;
@@ -345,9 +367,14 @@ export class EditSiteComponent implements OnInit {
                     this.currentSite.invalidMailingAddress = this.site.invalidMailingAddress;
                     this.currentSite.outOfArea = this.site.outOfArea;
                     this.currentSite.isFeeExempt = this.site.isFeeExempt;
+                    this.currentSite.excludeFromBackflowMailing = this.site.excludeFromBackflowMailing;
+                    this.currentSite.excludeFromCsiMailing = this.site.excludeFromCsiMailing;
                     this.currentSite.needsCsiInspection = this.site.needsCsiInspection;
+                    this.currentSite.csiRenewalDate = this.site.csiRenewalDate;
                     this.currentSite.needsFogInspection = this.site.needsFogInspection;
+                    this.currentSite.fogInspectionExpirationDate = this.site.fogInspectionExpirationDate;
                     this.currentSite.needsFogPermit = this.site.needsFogPermit;
+                    this.currentSite.fogPermitExpirationDate = this.site.fogPermitExpirationDate;
                     this.currentSite.csiAccountAssignmentId = this.site.csiAccountAssignmentId;
                     this.currentSite.backflowAccountAssignmentId = this.site.backflowAccountAssignmentId;
                     this.currentSite.fogAccountAssignmentId = this.site.fogAccountAssignmentId;
@@ -357,7 +384,7 @@ export class EditSiteComponent implements OnInit {
                     this._toastService.successfullySaved('Site Settings');
                 }
             } catch (e) {
-                if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
+                if (!this._helper.parseValidationErrors(e, this.sectionValidationErrors.siteSettings)) {
                     throw e;
                 }
 
@@ -374,10 +401,9 @@ export class EditSiteComponent implements OnInit {
         if (form.valid) {
             try {
                 this.sectionLoading.location = true;
-                this.validationErrors = [];
+                this.sectionValidationErrors.location = [];
                 if (this.currentSite) {
                     this.currentSite.id = this.site.id;
-                    this.currentSite.accountNumber = this.site.accountNumber;
                     this.currentSite.propertyType = this.site.propertyType;
                     this.currentSite.businessName = this.site.businessName;
                     this.currentSite.streetNumber = this.site.streetNumber;
@@ -393,15 +419,17 @@ export class EditSiteComponent implements OnInit {
                     // rejected duplicate left in it would fail the other sections with the same error.
                     const result = await this._siteService.update({
                         ...this.currentSite,
+                        accountNumber: this.site.accountNumber,
                         waterSupplierAccountNumber: this.site.waterSupplierAccountNumber
                     });
 
+                    this.currentSite.accountNumber = result.accountNumber;
                     this.currentSite.waterSupplierAccountNumber = result.waterSupplierAccountNumber;
 
                     this._toastService.successfullySaved('Location');
                 }
             } catch (e) {
-                if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
+                if (!this._helper.parseValidationErrors(e, this.sectionValidationErrors.location)) {
                     throw e;
                 }
 
@@ -418,7 +446,7 @@ export class EditSiteComponent implements OnInit {
             try {
                 this.sectionLoading.mailing = true;
 
-                this.validationErrors = [];
+                this.sectionValidationErrors.mailing = [];
                 if (this.currentSite) {
                     this.currentSite.id = this.site.id;
                     this.currentSite.mailingCompanyName = this.site.mailingCompanyName;
@@ -436,7 +464,7 @@ export class EditSiteComponent implements OnInit {
                     this._toastService.successfullySaved('Mailing Information');
                 }
             } catch (e) {
-                if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
+                if (!this._helper.parseValidationErrors(e, this.sectionValidationErrors.mailing)) {
                     throw e;
                 }
 
@@ -451,7 +479,7 @@ export class EditSiteComponent implements OnInit {
         if (form.valid) {
             try {
                 this.sectionLoading.gisData = true;
-                this.validationErrors = [];
+                this.sectionValidationErrors.gisData = [];
 
                 if (this.site.id) {
                     await this._siteService.updateGisData(this.site.id, {
@@ -464,7 +492,7 @@ export class EditSiteComponent implements OnInit {
                     this._toastService.successfullySaved('GIS Data');
                 }
             } catch (e) {
-                if (!this._helper.parseValidationErrors(e, this.validationErrors)) {
+                if (!this._helper.parseValidationErrors(e, this.sectionValidationErrors.gisData)) {
                     throw e;
                 }
 
@@ -537,5 +565,6 @@ export class EditSiteComponent implements OnInit {
     private async loadGeneralSettings(): Promise<void> {
         const settings = await this._generalSettingsService.get();
         this.includeWsAccountNumbers = !!settings.includeWsAccountNumbers;
+        this.allowAccountNumberChanges = !!settings.allowAccountNumberChanges;
     }
 }

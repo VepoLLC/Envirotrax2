@@ -26,6 +26,8 @@ public class ProfessionalDto
 
     public StateDto? State { get; set; }
 
+    public StateDto? DefaultState { get; set; }
+
     [StringLength(25)]
     public string? ZipCode { get; set; }
 
@@ -47,6 +49,8 @@ public class ProfessionalDto
     public bool HidePublicListing { get; set; }
 
     public bool HideCellPhoneNumber { get; set; }
+
+    public bool SendCheckoutEmail { get; set; }
 
     public bool HasWiseGuys { get; set; }
     public bool HasBackflowTesting { get; set; }

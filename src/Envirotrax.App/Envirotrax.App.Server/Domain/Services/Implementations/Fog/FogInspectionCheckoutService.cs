@@ -64,6 +64,33 @@ public class FogInspectionCheckoutService
         return receipt;
     }
 
+    protected override ReceiptReferenceDto BuildReceiptReference(List<FogInspectionDto> inspections)
+    {
+        return new ReceiptReferenceDto
+        {
+            Headers = ["Generator Information", "Inspection Information", "Amount"],
+            Rows = inspections
+                .Select(inspection => new ReceiptRowDto
+                {
+                    Cells =
+                    [
+                        ReceiptFormatter.PropertyLines(inspection),
+                        [
+                            ReceiptFormatter.Labeled("Inspection Date:", ReceiptFormatter.DateTimeText(inspection.InspectionDate)),
+                            ReceiptFormatter.Labeled("Trap/Interceptor:", ReceiptFormatter.Join(
+                                " ",
+                                inspection.InterceptorType,
+                                inspection.InterceptorOtherDescription,
+                                inspection.InterceptorCapacity.ToString(),
+                                ReceiptFormatter.CapacityLabel(inspection.InterceptorCapacityType)))
+                        ],
+                        ReceiptFormatter.AmountCell(inspection.Amount)
+                    ]
+                })
+                .ToList()
+        };
+    }
+
     private int? GetInspectorId()
     {
         return AuthService.HasAnyRole(RoleDefinitions.Professionals.Admin) ? null : AuthService.UserId;

@@ -6,12 +6,17 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { CreateProfessionalUserComponent } from "../create/create-professional-user.component";
 import { ToastService, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 
+// A grid row: a user decorated with the abbreviated job functions shown in the Job Functions column.
+type ProfessionalUserRow = ProfessionalUser & {
+    jobFunctions?: string;
+};
+
 @Component({
     standalone: false,
     templateUrl: './professional-user-list.component.html'
 })
 export class ProfessionalUserListComponent implements OnInit {
-    public table: TableViewModel<ProfessionalUser> = {
+    public table: TableViewModel<ProfessionalUserRow> = {
         columns: this.getColumns(),
         query: {
             sort: {},
@@ -35,7 +40,7 @@ export class ProfessionalUserListComponent implements OnInit {
 
     }
 
-    private getColumns(): TableColumn<ProfessionalUser>[] {
+    private getColumns(): TableColumn<ProfessionalUserRow>[] {
         return [
             {
                 field: 'contactName',
@@ -51,6 +56,13 @@ export class ProfessionalUserListComponent implements OnInit {
                 field: 'jobTitle',
                 caption: 'Job Title',
                 type: ColumnType.text
+            },
+            {
+                field: 'jobFunctions',
+                caption: 'Job Functions',
+                type: ColumnType.text,
+                queryColumnExcluded: true,
+                sortColumnExcluded: true
             }
         ];
     }
@@ -62,10 +74,38 @@ export class ProfessionalUserListComponent implements OnInit {
     public async getUsers(): Promise<void> {
         try {
             this.table.isLoading = true;
-            this.table.items = await this._userService.getAll(this.table.items?.pageInfo || {}, this.table.query);
+
+            const users = await this._userService.getAll(this.table.items?.pageInfo || {}, this.table.query);
+
+            this.table.items = {
+                ...users,
+                data: users.data.map(user => ({ ...user, jobFunctions: this.buildJobFunctions(user) }))
+            };
         } finally {
             this.table.isLoading = false;
         }
+    }
+
+    private buildJobFunctions(user: ProfessionalUser): string {
+        const jobFunctions: string[] = [];
+
+        if (user.isBackflowTester) {
+            jobFunctions.push('BPAT');
+        }
+
+        if (user.isCsiInspector) {
+            jobFunctions.push('CSI');
+        }
+
+        if (user.isFogInspector) {
+            jobFunctions.push('FOGI');
+        }
+
+        if (user.isFogTransporter) {
+            jobFunctions.push('FOGT');
+        }
+
+        return jobFunctions.join(', ');
     }
 
     public add(): void {

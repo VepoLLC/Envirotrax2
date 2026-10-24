@@ -9,6 +9,7 @@ using Envirotrax.App.Server.Data.Repositories.Implementations.Sites;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.Common.Data.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
+using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Csi;
@@ -16,11 +17,13 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Csi;
 public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspectionRepository
 {
     private readonly ITenantProvidersService _tenantProvider;
+    private readonly ITimeZoneHelperService _timeZoneHelper;
 
-    public CsiInspectionRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider)
+    public CsiInspectionRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider, ITimeZoneHelperService timeZoneHelper)
         : base(dbContextSelector)
     {
         _tenantProvider = tenantProvider;
+        _timeZoneHelper = timeZoneHelper;
     }
 
     protected override IQueryable<CsiInspection> GetListQuery()
@@ -50,6 +53,7 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
     public override Task<IEnumerable<CsiInspection>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         WaterSupplierAccountNumberSearch.ApplyThroughSite(query, nameof(CsiInspection.Site));
+        CreatedTimeDaySearch.Apply(query, _timeZoneHelper.GetUserTimeZone());
 
         return base.GetAllAsync(pageInfo, query, cancellationToken);
     }
@@ -225,6 +229,18 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         inspection.MaterialSolderSolventWeld = model.MaterialSolderSolventWeld;
         inspection.MaterialSolderOther = model.MaterialSolderOther;
         inspection.MaterialSolderOtherDescription = model.MaterialSolderOtherDescription;
+
+        inspection.AiOssf = model.AiOssf;
+        inspection.AiWaterWell = model.AiWaterWell;
+        inspection.AiReclaimedWater = model.AiReclaimedWater;
+        inspection.AiFireSystem = model.AiFireSystem;
+        inspection.AiFireSystem2 = model.AiFireSystem2;
+        inspection.AiGreaseTrap = model.AiGreaseTrap;
+        inspection.AiSandGrit = model.AiSandGrit;
+        inspection.AiIrrigationSystem = model.AiIrrigationSystem;
+        inspection.AiIrrigationSystem2 = model.AiIrrigationSystem2;
+        inspection.AiHasDomesticPremisesIsolation = model.AiHasDomesticPremisesIsolation;
+        inspection.AiRequiresDomesticPremisesIsolation = model.AiRequiresDomesticPremisesIsolation;
 
         inspection.Comments = model.Comments;
         inspection.NeedsValidation = model.NeedsValidation;

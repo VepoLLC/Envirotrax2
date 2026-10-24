@@ -56,7 +56,7 @@ BEGIN TRY
     SET IDENTITY_INSERT Sites ON;
 
     INSERT INTO Sites
-        (Id, LegacyRecordId, WaterSupplierId, SubArea, AccountNumber, WaterSupplierAccountNumber, BusinessName, PropertyType,
+        (Id, LegacyRecordId, WaterSupplierId, SubArea, AccountNumber, AccountNumberDuplicateIndex, WaterSupplierAccountNumber, WaterSupplierAccountNumberDuplicateIndex, BusinessName, PropertyType,
          StreetNumber, StreetName, PropertyNumber, City, StateId, ZipCode,
          MailingCompanyName, MailingContactName, MailingStreetNumber, MailingStreetName, MailingNumber, MailingCity, MailingStateId, MailingZipCode,
          MailingPhoneNumber, MailingEmailAddress, FogGeneratorPhoneNumber, FogGeneratorEmailAddress, Comments,
@@ -77,8 +77,17 @@ BEGIN TRY
          RenewalOptInType, RenewalOptInOutDate, RenewalOptInOrigin, RenewalOptInIpAddress, OptInCodeHash, OptInCodeExpirationDate,
          Active, CreatedById, CreatedTime, UpdatedById, UpdatedTime)
     SELECT
-        -- V1 saved a cleared WS Account Number as '', which V2 stores as NULL so the unique index skips it.
-        legacySites.ID, legacySites.ID, waterSuppliers.Id, legacySites.SubArea, legacySites.AccountNumber, NULLIF(RTRIM(legacySites.WaterSupplierAccountNumber), ''), legacySites.PropertyBusinessName, legacySites.PropertyType,
+        legacySites.ID, legacySites.ID, waterSuppliers.Id, legacySites.SubArea,
+        legacySites.AccountNumber,
+        ISNULL(existingAccountNumbers.NextDuplicateIndex, 0)
+            + ROW_NUMBER() OVER (PARTITION BY waterSuppliers.Id, legacySites.AccountNumber ORDER BY legacySites.ID) - 1,
+        legacyWaterSupplierAccountNumbers.WaterSupplierAccountNumber,
+        CASE
+            WHEN legacyWaterSupplierAccountNumbers.WaterSupplierAccountNumber IS NULL THEN 0
+            ELSE ISNULL(existingWaterSupplierAccountNumbers.NextDuplicateIndex, 0)
+                + ROW_NUMBER() OVER (PARTITION BY waterSuppliers.Id, legacyWaterSupplierAccountNumbers.WaterSupplierAccountNumber ORDER BY legacySites.ID) - 1
+        END,
+        legacySites.PropertyBusinessName, legacySites.PropertyType,
         legacySites.PropertyStreetNumber, legacySites.PropertyStreetName, legacySites.PropertyNumber, legacySites.PropertyCity, propertyStates.Id, legacySites.PropertyZIP,
         legacySites.MailingCompanyName, legacySites.MailingContactName, legacySites.MailingStreetNumber, legacySites.MailingStreetName, legacySites.MailingNumber, legacySites.MailingCity, mailingStates.Id, legacySites.MailingZIP,
         legacySites.MailingPhoneNumber, legacySites.MailingEmailAddress, legacySites.FogGeneratorPhoneNumber, legacySites.FogGeneratorEmailAddress, legacySites.Comments,
@@ -119,6 +128,22 @@ BEGIN TRY
     FROM Vepo.dbo.CsiBackflowSites AS legacySites
     INNER JOIN WaterSuppliers AS waterSuppliers
         ON waterSuppliers.LegacyRecordId = legacySites.WaterSupplierID
+    -- V1 saved a cleared WS Account Number as '', which V2 stores as NULL so the unique index skips it.
+    CROSS APPLY (
+        SELECT NULLIF(RTRIM(legacySites.WaterSupplierAccountNumber), '') AS WaterSupplierAccountNumber
+    ) AS legacyWaterSupplierAccountNumbers
+    OUTER APPLY (
+        SELECT MAX(existingSites.AccountNumberDuplicateIndex) + 1 AS NextDuplicateIndex
+        FROM Sites AS existingSites
+        WHERE existingSites.WaterSupplierId = waterSuppliers.Id
+            AND existingSites.AccountNumber = legacySites.AccountNumber
+    ) AS existingAccountNumbers
+    OUTER APPLY (
+        SELECT MAX(existingSites.WaterSupplierAccountNumberDuplicateIndex) + 1 AS NextDuplicateIndex
+        FROM Sites AS existingSites
+        WHERE existingSites.WaterSupplierId = waterSuppliers.Id
+            AND existingSites.WaterSupplierAccountNumber = legacyWaterSupplierAccountNumbers.WaterSupplierAccountNumber
+    ) AS existingWaterSupplierAccountNumbers
     LEFT JOIN States AS propertyStates
         ON propertyStates.Code = legacySites.PropertyState
     LEFT JOIN States AS mailingStates

@@ -20,6 +20,19 @@ public class ProfessionalInsuranceController : ProfessionalCrudController<Profes
         _insuranceService = service;
     }
 
+    [HttpGet("{id}/file-url")]
+    public async Task<IActionResult> GetFileUrlAsync(int id, CancellationToken cancellationToken)
+    {
+        var url = await _insuranceService.GenerateFileUrlAsync(id, cancellationToken);
+
+        if (url == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(url);
+    }
+
     [NonAction]
     public override Task<IActionResult> AddAsync(ProfessionalInsuranceDto dto)
     {

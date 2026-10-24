@@ -101,6 +101,61 @@ public class BackflowCheckoutService
         receipt.EmailResults = await _checkoutEmailService.SendTestReportsAsync(testsToEmail, request.TransactionId);
     }
 
+    protected override ReceiptReferenceDto BuildReceiptReference(List<BackflowTestDto> tests)
+    {
+        return new ReceiptReferenceDto
+        {
+            Headers = ["Assembly Description", "Property Information", "Amount"],
+            Rows = tests
+                .Select(test => new ReceiptRowDto
+                {
+                    Cells = [BuildAssemblyLines(test), ReceiptFormatter.PropertyLines(test), ReceiptFormatter.AmountCell(test.Amount)]
+                })
+                .ToList()
+        };
+    }
+
+    private static List<ReceiptLineDto> BuildAssemblyLines(BackflowTestDto test)
+    {
+        var serialNumber = test.UnknownSerialNumber ? "Unknown" : test.SerialNumber;
+        var lines = new List<ReceiptLineDto>();
+
+        if (test.DeviceType is "DCD" or "DCD2" or "RPPD" or "RPPD2")
+        {
+            var bypassSerialNumber = test.UnknownSerialNumber ? "Unknown" : test.SerialNumber2;
+
+            lines.Add(ReceiptFormatter.Labeled("Main Assembly:", ReceiptFormatter.Join(" ", test.Manufacturer, test.Model, test.Size, test.DeviceType)));
+            lines.Add(ReceiptFormatter.Labeled("Main Serial #:", serialNumber));
+            lines.Add(ReceiptFormatter.Labeled("Bypass Assembly:", ReceiptFormatter.Join(" ", test.Manufacturer2, test.Model2, test.Size2, test.DeviceType)));
+            lines.Add(ReceiptFormatter.Labeled("Bypass Serial #:", bypassSerialNumber));
+        }
+        else
+        {
+            lines.Add(ReceiptFormatter.Labeled("Assembly Desc:", ReceiptFormatter.Join(" ", test.Manufacturer, test.Model, test.Size, test.DeviceType)));
+            lines.Add(ReceiptFormatter.Labeled("Serial Number:", serialNumber));
+        }
+
+        lines.Add(ReceiptFormatter.Labeled("Hazard Type:", BuildHazardType(test)));
+        lines.Add(ReceiptFormatter.Labeled("Location Desc:", test.LocationDescription));
+
+        if (!string.IsNullOrWhiteSpace(test.JobNumber))
+        {
+            lines.Add(ReceiptFormatter.Labeled("Job Number:", test.JobNumber));
+        }
+
+        return lines;
+    }
+
+    private static string BuildHazardType(BackflowTestDto test)
+    {
+        return test.HazardType switch
+        {
+            null or "" => "Unknown",
+            "Other" => $"Other - {test.HazardTypeOtherDescription}",
+            _ => test.HazardType
+        };
+    }
+
     private int? GetBpatId()
     {
         return AuthService.HasAnyRole(RoleDefinitions.Professionals.Admin) ? null : AuthService.UserId;

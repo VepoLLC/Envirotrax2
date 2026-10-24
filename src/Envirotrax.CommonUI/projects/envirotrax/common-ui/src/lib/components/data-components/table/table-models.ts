@@ -4,7 +4,11 @@ import { ComparisonOperator } from "../../../models/query";
 
 export interface TableColumn<T> extends QueryColumn {
     isTableColumnExcluded?: boolean;
+    // Leaves the column out of the sorting/filtering modal. Unless sortColumnExcluded is set, it also makes the header inert.
     queryColumnExcluded?: boolean;
+    // Makes the header inert: clicking it neither sorts the column nor reloads the table. Set it to false to keep
+    // a queryColumnExcluded column sortable.
+    sortColumnExcluded?: boolean;
     isInvisible?: boolean;
     cellTemplate?: TemplateRef<CellTemplateData<T>>;
     cellComponent?: Type<any>;

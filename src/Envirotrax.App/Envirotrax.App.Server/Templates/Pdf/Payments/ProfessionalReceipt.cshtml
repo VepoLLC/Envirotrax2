@@ -1,0 +1,245 @@
+@using Envirotrax.App.Server.Domain.Services.Implementations.Payments
+@model Envirotrax.App.Server.Domain.DataTransferObjects.Payments.ProfessionalReceiptDto
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-size: 12px;
+            color: #000;
+        }
+
+        .receipt {
+            border: 1px solid #008fd4;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .receipt-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #999;
+            padding: 8px 0 4px;
+        }
+
+        .company {
+            text-align: center;
+            padding: 8px 0 12px;
+            line-height: 1.5;
+        }
+
+        .details {
+            display: flex;
+            padding: 0 16px 12px;
+        }
+
+        .details-info {
+            flex: 1;
+        }
+
+        .details-info table {
+            border-collapse: collapse;
+        }
+
+        .details-info td {
+            padding: 4px 0;
+            vertical-align: top;
+            line-height: 1.5;
+        }
+
+        .details-info td.label {
+            font-weight: 700;
+            text-align: right;
+            white-space: nowrap;
+            padding-right: 12px;
+        }
+
+        .card {
+            width: 190px;
+            align-self: flex-start;
+            border: 3px solid #ccc;
+            border-radius: 15px;
+            padding: 15px;
+        }
+
+        .card-label {
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .card-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .card-value.card-number {
+            font-size: 11px;
+        }
+
+        .card-value:last-child {
+            margin-bottom: 0;
+        }
+
+        .reference-title {
+            text-align: center;
+            font-weight: 700;
+            padding: 4px 0;
+        }
+
+        .reference-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .reference-table th {
+            background-color: #ddd;
+            border: 1px solid #aaa;
+            padding: 4px 6px;
+            text-align: center;
+        }
+
+        .reference-table td {
+            border: 1px solid #ddd;
+            padding: 6px 8px;
+            vertical-align: top;
+            line-height: 1.6;
+        }
+
+        .reference-table tr {
+            break-inside: avoid;
+        }
+
+        .reference-table tbody tr:nth-child(even) td {
+            background-color: #eee;
+        }
+
+        .label-text {
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="receipt">
+        <div class="receipt-title">Payment Receipt</div>
+
+        <div class="company">
+            <b>Vepo, LLC</b><br />
+            25740 Century Oaks Blvd<br />
+            Hockley, Texas 77447
+        </div>
+
+        <div class="details">
+            <div class="details-info">
+                <table>
+                    <tr>
+                        <td class="label">Date:</td>
+                        <td>@Model.TransactionDate.ToString("M/d/yyyy h:mm tt", System.Globalization.CultureInfo.InvariantCulture)</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Transaction ID:</td>
+                        <td>@Model.TransactionId</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Transaction Type:</td>
+                        <td>@Model.TransactionType</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Account Holder:</td>
+                        <td>
+                            @foreach (var line in Model.AccountHolder)
+                            {
+                                <div>@line</div>
+                            }
+                        </td>
+                    </tr>
+                    @if (!string.IsNullOrWhiteSpace(Model.ReferenceDescription))
+                    {
+                        <tr>
+                            <td class="label">Reference:</td>
+                            <td>@Model.ReferenceDescription</td>
+                        </tr>
+                    }
+                </table>
+            </div>
+
+            @if (Model.ShowCreditCard || Model.ShowBalanceAdjustment || Model.ShowTotal)
+            {
+                <div class="card">
+                    @if (Model.ShowCreditCard)
+                    {
+                        <div class="card-label">Name on card:</div>
+                        <div class="card-value">@Model.NameOnCard</div>
+                        <div class="card-label">Card Ending In:</div>
+                        <div class="card-value card-number">@string.Join(" ", (Model.CardNumber ?? string.Empty).Replace('X', '*').ToCharArray())</div>
+                        <div class="card-label">Credit Card Charge:</div>
+                        <div class="card-value">@ReceiptFormatter.Money(Model.CardCharge)</div>
+                    }
+
+                    @if (Model.ShowBalanceAdjustment)
+                    {
+                        <div class="card-label">Account Balance Adjustment:</div>
+                        <div class="card-value">@ReceiptFormatter.Money(Model.BalanceAdjustment)</div>
+                    }
+
+                    @if (Model.ShowTotal)
+                    {
+                        <div class="card-label">Total Amount Paid:</div>
+                        <div class="card-value">@ReceiptFormatter.Money(Model.Total)</div>
+                    }
+                </div>
+            }
+        </div>
+
+        @if (Model.Reference != null)
+        {
+            <div class="reference-title">Reference</div>
+            <table class="reference-table">
+                <thead>
+                    <tr>
+                        @foreach (var header in Model.Reference.Headers)
+                        {
+                            <th>@header</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Model.Reference.Rows)
+                    {
+                        <tr>
+                            @foreach (var cell in row.Cells)
+                            {
+                                <td>
+                                    @foreach (var line in cell)
+                                    {
+                                        <div>
+                                            @if (!string.IsNullOrEmpty(line.Label))
+                                            {
+                                                <span class="label-text">@line.Label</span>
+                                            }
+                                            @line.Value
+                                        </div>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</body>
+
+</html>

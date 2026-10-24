@@ -7,16 +7,12 @@
     <!-- Confirmation Screen -->
     <div *ngIf="submitSuccess">
         <vp-section header="Backflow Test Submission Confirmation" class="text-center">
-            <p class="text-center fw-bold text-success">
-                {{ editingTestId ? 'Your backflow test has been updated successfully.' : 'Your backflow test has been submitted successfully.' }}
-            </p>
+            <p class="text-center fw-bold text-success">Your backflow test has been updated successfully.</p>
             <p>The test record has been recorded in the system. The water supplier may review the submission for
                 approval.</p>
             <div class="d-flex justify-content-center gap-2 mt-3">
                 <button type="button" class="btn btn-primary vp-section-button"
                         (click)="returnToAccountOverview()">Return to Account Overview</button>
-                <button type="button" class="btn btn-primary vp-section-button" *ngIf="!editingTestId"
-                        (click)="submitAnother()">Submit Another Test</button>
             </div>
         </vp-section>
     </div>
@@ -55,7 +51,7 @@
                         continue.
                     </div>
                     <div class="d-flex align-items-center mb-2">
-                        <span class="fw-semibold text-nowrap text-end me-2" style="min-width:130px;">Hazard Type ****:</span>
+                        <span class="fw-semibold text-nowrap text-end me-2" style="min-width:130px;">Hazard Type:</span>
                         <div class="flex-grow-1">
                             <vp-input type="select" name="hazardType" [ngModel]="model.hazardType"
                                       (ngModelChange)="onHazardTypeChange($event)"
@@ -339,7 +335,7 @@
                                     (click)="cancelLocationModification()">Cancel</button>
                         </vp-section-actions>
 
-                        <p *ngIf="model.propertyType === PropertyType.Residential" class="mb-2">Leave Company Name blank
+                        <p *ngIf="model.propertyType === PropertyType.Residential" class="text-danger mb-2">Leave Company Name blank
                             if this is a residence not owned or managed by a business.</p>
                         <p class="text-danger mb-2">Do not enter your company's information for the mailing contact name
                             or address.</p>
@@ -517,6 +513,14 @@
                                       (ngModelChange)="onLocationDescriptionChange($event)"
                                       [maxLength]="100" [required]="true" [form]="submitForm" />
                             <div class="form-text text-end">{{ locationDescriptionLength }}/100 Characters</div>
+                        </div>
+                    </div>
+
+                    <!-- Hazard Type (read-only, selected in Verification) -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-form-label">Hazard Type ****:</div>
+                            <div>{{ model.hazardType }}</div>
                         </div>
                     </div>
                 </vp-section>
@@ -710,90 +714,91 @@
                                     </tr>
 
 
-                                    <ng-container *ngIf="initialTestFailed">
+                                    <ng-container>
+                                        @let repairsDisabled = !isFailedResult && !initialTestFailed;
                                         <tr>
-                                            <td class="align-top">
+                                            <td class="align-top" [class.test-cell-disabled]="repairsDisabled">
                                                 <div class="fw-bold">Repairs and Materials Used **</div>
                                             </td>
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.cleaned" name="rCV1Cleaned"
                                                            id="rCV1Cleaned"><label class="form-check-label"
                                                            for="rCV1Cleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.disc" name="rCV1Disc"
                                                            id="rCV1Disc"><label class="form-check-label"
                                                            for="rCV1Disc">Disc</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.spring" name="rCV1Spring"
                                                            id="rCV1Spring"><label class="form-check-label"
                                                            for="rCV1Spring">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.guide" name="rCV1Guide"
                                                            id="rCV1Guide"><label class="form-check-label"
                                                            for="rCV1Guide">Guide</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.pinRetainer" name="rCV1PR"
                                                            id="rCV1PR"><label class="form-check-label" for="rCV1PR">Pin
                                                         Retainer</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.hingePin" name="rCV1HP"
                                                            id="rCV1HP"><label class="form-check-label"
                                                            for="rCV1HP">Hinge Pin</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.seat" name="rCV1Seat"
                                                            id="rCV1Seat"><label class="form-check-label"
                                                            for="rCV1Seat">Seat</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.diaphragm" name="rCV1Dia"
                                                            id="rCV1Dia"><label class="form-check-label"
                                                            for="rCV1Dia">Diaphragm</label></div>
                                             </td>
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.cleaned" name="rCV2Cleaned"
                                                            id="rCV2Cleaned"><label class="form-check-label"
                                                            for="rCV2Cleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.disc" name="rCV2Disc"
                                                            id="rCV2Disc"><label class="form-check-label"
                                                            for="rCV2Disc">Disc</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.spring" name="rCV2Spring"
                                                            id="rCV2Spring"><label class="form-check-label"
                                                            for="rCV2Spring">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.guide" name="rCV2Guide"
                                                            id="rCV2Guide"><label class="form-check-label"
                                                            for="rCV2Guide">Guide</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.pinRetainer" name="rCV2PR"
                                                            id="rCV2PR"><label class="form-check-label" for="rCV2PR">Pin
                                                         Retainer</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.hingePin" name="rCV2HP"
                                                            id="rCV2HP"><label class="form-check-label"
                                                            for="rCV2HP">Hinge Pin</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.seat" name="rCV2Seat"
                                                            id="rCV2Seat"><label class="form-check-label"
                                                            for="rCV2Seat">Seat</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.diaphragm" name="rCV2Dia"
                                                            id="rCV2Dia"><label class="form-check-label"
                                                            for="rCV2Dia">Diaphragm</label></div>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Repair Details:</strong></td>
-                                            <td>
-                                                <vp-input type="textarea" name="repairCV1Details"
+                                            <td [class.test-cell-disabled]="repairsDisabled"><strong>Repair Details:</strong></td>
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairCV1Details"
                                                           [(ngModel)]="model.repairCV1Details" [maxLength]="100" />
                                             </td>
-                                            <td>
-                                                <vp-input type="textarea" name="repairCV2Details"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairCV2Details"
                                                           [(ngModel)]="model.repairCV2Details" [maxLength]="100" />
                                             </td>
                                         </tr>
@@ -814,31 +819,31 @@
                                         </tr>
 
                                         <tr>
-                                            <td [class.test-cell-valid]="!isFailedResult && !finalTestDateError"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && !finalTestDateError"
                                                 [class.test-cell-invalid]="!isFailedResult && !!finalTestDateError">
                                                 <div class="fw-bold mb-3 text-center">Test After Repair</div>
                                                 <strong>Date and Time:</strong><br>
-                                                <vp-input type="datetime" name="finalTestDate"
+                                                <vp-input [disabled]="repairsDisabled" type="datetime" name="finalTestDate"
                                                           [(ngModel)]="model.finalTestDate" [required]="true"
                                                           [max]="today" [form]="submitForm" />
                                             </td>
-                                            <td [class.test-cell-valid]="!isFailedResult && isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)">
-                                                <div class="mb-3">Held at <vp-input type="text" class="psid-input" name="finalCV1PSID" [numeric]="true"
+                                                <div class="mb-3">Held at <vp-input [disabled]="repairsDisabled" type="text" class="psid-input" name="finalCV1PSID" [numeric]="true"
                                                            [(ngModel)]="model.finalCV1HeldPSID" [min]="0" [max]="15" /> PSID </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="finalCV1CT"
+                                                    <input class="form-check-input" type="checkbox" [disabled]="repairsDisabled" id="finalCV1CT"
                                                            name="finalCV1CT" [(ngModel)]="model.finalCV1ClosedTight" />
                                                     <label class="form-check-label" for="finalCV1CT">Closed
                                                         Tight</label>
                                                 </div>
                                             </td>
-                                            <td [class.test-cell-valid]="!isFailedResult && isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)">
-                                                <div class="mb-3">Held at <vp-input type="text" class="psid-input" name="finalCV2PSID" [numeric]="true"
+                                                <div class="mb-3">Held at <vp-input [disabled]="repairsDisabled" type="text" class="psid-input" name="finalCV2PSID" [numeric]="true"
                                                            [(ngModel)]="model.finalCV2HeldPSID" [min]="0" [max]="15" /> PSID </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="finalCV2CT"
+                                                    <input class="form-check-input" type="checkbox" [disabled]="repairsDisabled" id="finalCV2CT"
                                                            name="finalCV2CT" [(ngModel)]="model.finalCV2ClosedTight" />
                                                     <label class="form-check-label" for="finalCV2CT">Closed
                                                         Tight</label>
@@ -985,170 +990,171 @@
                                         </td>
                                     </tr>
 
-                                    <ng-container *ngIf="initialTestFailed">
+                                    <ng-container>
+                                        @let repairsDisabled = !isFailedResult && !initialTestFailed;
                                         <tr>
-                                            <td class="align-top">
+                                            <td class="align-top" [class.test-cell-disabled]="repairsDisabled">
                                                 <div class="fw-bold">Repairs and Materials Used **</div>
                                             </td>
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.cleaned" name="rCV1Cleaned"
                                                            id="rCV1Cleaned"><label class="form-check-label"
                                                            for="rCV1Cleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.disc" name="rCV1Disc"
                                                            id="rCV1Disc"><label class="form-check-label"
                                                            for="rCV1Disc">Disc</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.spring" name="rCV1Spring"
                                                            id="rCV1Spring"><label class="form-check-label"
                                                            for="rCV1Spring">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.guide" name="rCV1Guide"
                                                            id="rCV1Guide"><label class="form-check-label"
                                                            for="rCV1Guide">Guide</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.pinRetainer" name="rCV1PR"
                                                            id="rCV1PR"><label class="form-check-label" for="rCV1PR">Pin
                                                         Retainer</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.hingePin" name="rCV1HP"
                                                            id="rCV1HP"><label class="form-check-label"
                                                            for="rCV1HP">Hinge Pin</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.seat" name="rCV1Seat"
                                                            id="rCV1Seat"><label class="form-check-label"
                                                            for="rCV1Seat">Seat</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.diaphragm" name="rCV1Dia"
                                                            id="rCV1Dia"><label class="form-check-label"
                                                            for="rCV1Dia">Diaphragm</label></div>
                                             </td>
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.cleaned" name="rCV2Cleaned"
                                                            id="rCV2Cleaned"><label class="form-check-label"
                                                            for="rCV2Cleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.disc" name="rCV2Disc"
                                                            id="rCV2Disc"><label class="form-check-label"
                                                            for="rCV2Disc">Disc</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.spring" name="rCV2Spring"
                                                            id="rCV2Spring"><label class="form-check-label"
                                                            for="rCV2Spring">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.guide" name="rCV2Guide"
                                                            id="rCV2Guide"><label class="form-check-label"
                                                            for="rCV2Guide">Guide</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.pinRetainer" name="rCV2PR"
                                                            id="rCV2PR"><label class="form-check-label" for="rCV2PR">Pin
                                                         Retainer</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.hingePin" name="rCV2HP"
                                                            id="rCV2HP"><label class="form-check-label"
                                                            for="rCV2HP">Hinge Pin</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.seat" name="rCV2Seat"
                                                            id="rCV2Seat"><label class="form-check-label"
                                                            for="rCV2Seat">Seat</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.diaphragm" name="rCV2Dia"
                                                            id="rCV2Dia"><label class="form-check-label"
                                                            for="rCV2Dia">Diaphragm</label></div>
                                             </td>
 
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV12.cleaned" name="rCV12Cleaned"
                                                            id="rCV12Cleaned"><label class="form-check-label"
                                                            for="rCV12Cleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV12.disc" name="rCV12Disc"
                                                            id="rCV12Disc"><label class="form-check-label"
                                                            for="rCV12Disc">Disc</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV12.spring" name="rCV12Spring"
                                                            id="rCV12Spring"><label class="form-check-label"
                                                            for="rCV12Spring">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV12.guide" name="rCV12Guide"
                                                            id="rCV12Guide"><label class="form-check-label"
                                                            for="rCV12Guide">Guide</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV12.pinRetainer" name="rCV12PR"
                                                            id="rCV12PR"><label class="form-check-label"
                                                            for="rCV12PR">Pin Retainer</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV12.hingePin" name="rCV12HP"
                                                            id="rCV12HP"><label class="form-check-label"
                                                            for="rCV12HP">Hinge Pin</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV12.seat" name="rCV12Seat"
                                                            id="rCV12Seat"><label class="form-check-label"
                                                            for="rCV12Seat">Seat</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV12.diaphragm" name="rCV12Dia"
                                                            id="rCV12Dia"><label class="form-check-label"
                                                            for="rCV12Dia">Diaphragm</label></div>
                                             </td>
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV22.cleaned" name="rCV22Cleaned"
                                                            id="rCV22Cleaned"><label class="form-check-label"
                                                            for="rCV22Cleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV22.disc" name="rCV22Disc"
                                                            id="rCV22Disc"><label class="form-check-label"
                                                            for="rCV22Disc">Disc</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV22.spring" name="rCV22Spring"
                                                            id="rCV22Spring"><label class="form-check-label"
                                                            for="rCV22Spring">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV22.guide" name="rCV22Guide"
                                                            id="rCV22Guide"><label class="form-check-label"
                                                            for="rCV22Guide">Guide</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV22.pinRetainer" name="rCV22PR"
                                                            id="rCV22PR"><label class="form-check-label"
                                                            for="rCV22PR">Pin Retainer</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV22.hingePin" name="rCV22HP"
                                                            id="rCV22HP"><label class="form-check-label"
                                                            for="rCV22HP">Hinge Pin</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV22.seat" name="rCV22Seat"
                                                            id="rCV22Seat"><label class="form-check-label"
                                                            for="rCV22Seat">Seat</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV22.diaphragm" name="rCV22Dia"
                                                            id="rCV22Dia"><label class="form-check-label"
                                                            for="rCV22Dia">Diaphragm</label></div>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Repair Details:</strong></td>
-                                            <td>
-                                                <vp-input type="textarea" name="repairCV1Details"
+                                            <td [class.test-cell-disabled]="repairsDisabled"><strong>Repair Details:</strong></td>
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairCV1Details"
                                                           [(ngModel)]="model.repairCV1Details" [maxLength]="100" />
                                             </td>
-                                            <td>
-                                                <vp-input type="textarea" name="repairCV2Details"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairCV2Details"
                                                           [(ngModel)]="model.repairCV2Details" [maxLength]="100" />
                                             </td>
 
-                                            <td>
-                                                <vp-input type="textarea" name="repairCV1Details2"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairCV1Details2"
                                                           [(ngModel)]="model.repairCV1Details2" [maxLength]="100" />
                                             </td>
-                                            <td>
-                                                <vp-input type="textarea" name="repairCV2Details2"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairCV2Details2"
                                                           [(ngModel)]="model.repairCV2Details2" [maxLength]="100" />
                                             </td>
                                         </tr>
@@ -1176,56 +1182,56 @@
                                         </tr>
 
                                         <tr>
-                                            <td [class.test-cell-valid]="!isFailedResult && !finalTestDateError"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && !finalTestDateError"
                                                 [class.test-cell-invalid]="!isFailedResult && !!finalTestDateError">
                                                 <div class="fw-bold mb-3 text-center">Test After Repair</div>
                                                 <strong>Date and Time:</strong><br>
-                                                <vp-input type="datetime" name="finalTestDate"
+                                                <vp-input [disabled]="repairsDisabled" type="datetime" name="finalTestDate"
                                                           [(ngModel)]="model.finalTestDate" [required]="true"
                                                           [max]="today" [form]="submitForm" />
                                             </td>
 
-                                            <td [class.test-cell-valid]="!isFailedResult && isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)">
-                                                <div class="mb-3">Held at <vp-input type="text" class="psid-input" name="finalCV1PSID" [numeric]="true"
+                                                <div class="mb-3">Held at <vp-input [disabled]="repairsDisabled" type="text" class="psid-input" name="finalCV1PSID" [numeric]="true"
                                                            [(ngModel)]="model.finalCV1HeldPSID" [min]="0" [max]="15" /> PSID </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="finalCV1CT"
+                                                    <input class="form-check-input" type="checkbox" [disabled]="repairsDisabled" id="finalCV1CT"
                                                            name="finalCV1CT" [(ngModel)]="model.finalCV1ClosedTight" />
                                                     <label class="form-check-label" for="finalCV1CT">Closed
                                                         Tight</label>
                                                 </div>
                                             </td>
-                                            <td [class.test-cell-valid]="!isFailedResult && isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)">
-                                                <div class="mb-3">Held at <vp-input type="text" class="psid-input" name="finalCV2PSID" [numeric]="true"
+                                                <div class="mb-3">Held at <vp-input [disabled]="repairsDisabled" type="text" class="psid-input" name="finalCV2PSID" [numeric]="true"
                                                            [(ngModel)]="model.finalCV2HeldPSID" [min]="0" [max]="15" /> PSID </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="finalCV2CT"
+                                                    <input class="form-check-input" type="checkbox" [disabled]="repairsDisabled" id="finalCV2CT"
                                                            name="finalCV2CT" [(ngModel)]="model.finalCV2ClosedTight" />
                                                     <label class="form-check-label" for="finalCV2CT">Closed
                                                         Tight</label>
                                                 </div>
                                             </td>
 
-                                            <td [class.test-cell-valid]="!isFailedResult && isCVCellValid(model.finalCV1HeldPSID2, model.finalCV1ClosedTight2, undefined)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isCVCellValid(model.finalCV1HeldPSID2, model.finalCV1ClosedTight2, undefined)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isCVCellValid(model.finalCV1HeldPSID2, model.finalCV1ClosedTight2, undefined)">
-                                                <div class="mb-3">Held at <vp-input type="text" class="psid-input" name="finalCV1PSID2" [numeric]="true"
+                                                <div class="mb-3">Held at <vp-input [disabled]="repairsDisabled" type="text" class="psid-input" name="finalCV1PSID2" [numeric]="true"
                                                            [(ngModel)]="model.finalCV1HeldPSID2" [min]="0" [max]="15" /> PSID </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="finalCV1CT2"
+                                                    <input class="form-check-input" type="checkbox" [disabled]="repairsDisabled" id="finalCV1CT2"
                                                            name="finalCV1CT2"
                                                            [(ngModel)]="model.finalCV1ClosedTight2" />
                                                     <label class="form-check-label" for="finalCV1CT2">Closed
                                                         Tight</label>
                                                 </div>
                                             </td>
-                                            <td [class.test-cell-valid]="!isFailedResult && isCVCellValid(model.finalCV2HeldPSID2, model.finalCV2ClosedTight2, undefined)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isCVCellValid(model.finalCV2HeldPSID2, model.finalCV2ClosedTight2, undefined)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isCVCellValid(model.finalCV2HeldPSID2, model.finalCV2ClosedTight2, undefined)">
-                                                <div class="mb-3">Held at <vp-input type="text" class="psid-input" name="finalCV2PSID2" [numeric]="true"
+                                                <div class="mb-3">Held at <vp-input [disabled]="repairsDisabled" type="text" class="psid-input" name="finalCV2PSID2" [numeric]="true"
                                                            [(ngModel)]="model.finalCV2HeldPSID2" [min]="0" [max]="15" /> PSID </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="finalCV2CT2"
+                                                    <input class="form-check-input" type="checkbox" [disabled]="repairsDisabled" id="finalCV2CT2"
                                                            name="finalCV2CT2"
                                                            [(ngModel)]="model.finalCV2ClosedTight2" />
                                                     <label class="form-check-label" for="finalCV2CT2">Closed
@@ -1350,113 +1356,114 @@
 
                                     </tr>
 
-                                    <ng-container *ngIf="initialTestFailed">
+                                    <ng-container>
+                                        @let repairsDisabled = !isFailedResult && !initialTestFailed;
                                         <tr>
-                                            <td class="align-top">
+                                            <td class="align-top" [class.test-cell-disabled]="repairsDisabled">
                                                 <div class="fw-bold">Repairs and Materials Used **</div>
                                             </td>
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.cleaned" name="rCV1Cleaned"
                                                            id="rCV1Cleaned"><label class="form-check-label"
                                                            for="rCV1Cleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.disc" name="rCV1Disc"
                                                            id="rCV1Disc"><label class="form-check-label"
                                                            for="rCV1Disc">Disc</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.spring" name="rCV1Spring"
                                                            id="rCV1Spring"><label class="form-check-label"
                                                            for="rCV1Spring">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.guide" name="rCV1Guide"
                                                            id="rCV1Guide"><label class="form-check-label"
                                                            for="rCV1Guide">Guide</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.pinRetainer" name="rCV1PR"
                                                            id="rCV1PR"><label class="form-check-label" for="rCV1PR">Pin
                                                         Retainer</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.hingePin" name="rCV1HP"
                                                            id="rCV1HP"><label class="form-check-label"
                                                            for="rCV1HP">Hinge Pin</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.seat" name="rCV1Seat"
                                                            id="rCV1Seat"><label class="form-check-label"
                                                            for="rCV1Seat">Seat</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.diaphragm" name="rCV1Dia"
                                                            id="rCV1Dia"><label class="form-check-label"
                                                            for="rCV1Dia">Diaphragm</label></div>
                                             </td>
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.cleaned" name="rCV2Cleaned"
                                                            id="rCV2Cleaned"><label class="form-check-label"
                                                            for="rCV2Cleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.disc" name="rCV2Disc"
                                                            id="rCV2Disc"><label class="form-check-label"
                                                            for="rCV2Disc">Disc</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.spring" name="rCV2Spring"
                                                            id="rCV2Spring"><label class="form-check-label"
                                                            for="rCV2Spring">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.guide" name="rCV2Guide"
                                                            id="rCV2Guide"><label class="form-check-label"
                                                            for="rCV2Guide">Guide</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.pinRetainer" name="rCV2PR"
                                                            id="rCV2PR"><label class="form-check-label" for="rCV2PR">Pin
                                                         Retainer</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.hingePin" name="rCV2HP"
                                                            id="rCV2HP"><label class="form-check-label"
                                                            for="rCV2HP">Hinge Pin</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.seat" name="rCV2Seat"
                                                            id="rCV2Seat"><label class="form-check-label"
                                                            for="rCV2Seat">Seat</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.diaphragm" name="rCV2Dia"
                                                            id="rCV2Dia"><label class="form-check-label"
                                                            for="rCV2Dia">Diaphragm</label></div>
                                             </td>
 
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairBC.cleaned" name="rBCCleaned"
                                                            id="rBCCleaned"><label class="form-check-label"
                                                            for="rBCCleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairBC.disc" name="rBCDisc"
                                                            id="rBCDisc"><label class="form-check-label"
                                                            for="rBCDisc">Disc</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairBC.spring" name="rBCSpring"
                                                            id="rBCSpring"><label class="form-check-label"
                                                            for="rBCSpring">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairBC.guide" name="rBCGuide"
                                                            id="rBCGuide"><label class="form-check-label"
                                                            for="rBCGuide">Guide</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairBC.pinRetainer" name="rBCPR"
                                                            id="rBCPR"><label class="form-check-label" for="rBCPR">Pin
                                                         Retainer</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairBC.hingePin" name="rBCHP"
                                                            id="rBCHP"><label class="form-check-label" for="rBCHP">Hinge
                                                         Pin</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairBC.seat" name="rBCSeat"
                                                            id="rBCSeat"><label class="form-check-label"
                                                            for="rBCSeat">Seat</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairBC.diaphragm" name="rBCDia"
                                                            id="rBCDia"><label class="form-check-label"
                                                            for="rBCDia">Diaphragm</label></div>
@@ -1464,18 +1471,18 @@
 
                                         </tr>
                                         <tr>
-                                            <td><strong>Repair Details:</strong></td>
-                                            <td>
-                                                <vp-input type="textarea" name="repairCV1Details"
+                                            <td [class.test-cell-disabled]="repairsDisabled"><strong>Repair Details:</strong></td>
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairCV1Details"
                                                           [(ngModel)]="model.repairCV1Details" [maxLength]="100" />
                                             </td>
-                                            <td>
-                                                <vp-input type="textarea" name="repairCV2Details"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairCV2Details"
                                                           [(ngModel)]="model.repairCV2Details" [maxLength]="100" />
                                             </td>
 
-                                            <td>
-                                                <vp-input type="textarea" name="repairBCDetails"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairBCDetails"
                                                           [(ngModel)]="model.repairBCDetails" [maxLength]="100" />
                                             </td>
 
@@ -1500,44 +1507,44 @@
                                         </tr>
 
                                         <tr>
-                                            <td [class.test-cell-valid]="!isFailedResult && !finalTestDateError"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && !finalTestDateError"
                                                 [class.test-cell-invalid]="!isFailedResult && !!finalTestDateError">
                                                 <div class="fw-bold mb-3 text-center">Test After Repair</div>
                                                 <strong>Date and Time:</strong><br>
-                                                <vp-input type="datetime" name="finalTestDate"
+                                                <vp-input [disabled]="repairsDisabled" type="datetime" name="finalTestDate"
                                                           [(ngModel)]="model.finalTestDate" [required]="true"
                                                           [max]="today" [form]="submitForm" />
                                             </td>
 
-                                            <td [class.test-cell-valid]="!isFailedResult && isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isCVCellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined)">
-                                                <div class="mb-3">Held at <vp-input type="text" class="psid-input" name="finalCV1PSID" [numeric]="true"
+                                                <div class="mb-3">Held at <vp-input [disabled]="repairsDisabled" type="text" class="psid-input" name="finalCV1PSID" [numeric]="true"
                                                            [(ngModel)]="model.finalCV1HeldPSID" [min]="0" [max]="15" /> PSID </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="finalCV1CT"
+                                                    <input class="form-check-input" type="checkbox" [disabled]="repairsDisabled" id="finalCV1CT"
                                                            name="finalCV1CT" [(ngModel)]="model.finalCV1ClosedTight" />
                                                     <label class="form-check-label" for="finalCV1CT">Closed
                                                         Tight</label>
                                                 </div>
                                             </td>
-                                            <td [class.test-cell-valid]="!isFailedResult && isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isCVCellValid(model.finalCV2HeldPSID, model.finalCV2ClosedTight, undefined)">
-                                                <div class="mb-3">Held at <vp-input type="text" class="psid-input" name="finalCV2PSID" [numeric]="true"
+                                                <div class="mb-3">Held at <vp-input [disabled]="repairsDisabled" type="text" class="psid-input" name="finalCV2PSID" [numeric]="true"
                                                            [(ngModel)]="model.finalCV2HeldPSID" [min]="0" [max]="15" /> PSID </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="finalCV2CT"
+                                                    <input class="form-check-input" type="checkbox" [disabled]="repairsDisabled" id="finalCV2CT"
                                                            name="finalCV2CT" [(ngModel)]="model.finalCV2ClosedTight" />
                                                     <label class="form-check-label" for="finalCV2CT">Closed
                                                         Tight</label>
                                                 </div>
                                             </td>
 
-                                            <td [class.test-cell-valid]="!isFailedResult && isCVCellValid(model.finalBCHeldPSID, model.finalBCClosedTight, undefined)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isCVCellValid(model.finalBCHeldPSID, model.finalBCClosedTight, undefined)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isCVCellValid(model.finalBCHeldPSID, model.finalBCClosedTight, undefined)">
-                                                <div class="mb-3">Held at <vp-input type="text" class="psid-input" name="finalBCHeldPSID" [numeric]="true"
+                                                <div class="mb-3">Held at <vp-input [disabled]="repairsDisabled" type="text" class="psid-input" name="finalBCHeldPSID" [numeric]="true"
                                                            [(ngModel)]="model.finalBCHeldPSID" [min]="0" [max]="15" /> PSID </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="finalBCT"
+                                                    <input class="form-check-input" type="checkbox" [disabled]="repairsDisabled" id="finalBCT"
                                                            name="finalBCT" [(ngModel)]="model.finalBCClosedTight" />
                                                     <label class="form-check-label" for="finalBCT">Closed Tight</label>
                                                 </div>
@@ -1640,119 +1647,120 @@
                                         </td>
                                     </tr>
 
-                                    <ng-container *ngIf="initialTestFailed">
+                                    <ng-container>
+                                        @let repairsDisabled = !isFailedResult && !initialTestFailed;
                                         <tr>
-                                            <td class="align-top">
+                                            <td class="align-top" [class.test-cell-disabled]="repairsDisabled">
                                                 <div class="fw-bold">Repairs and Materials Used **</div>
                                             </td>
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.cleaned" name="rCV1Cleaned"
                                                            id="rCV1Cleaned"><label class="form-check-label"
                                                            for="rCV1Cleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.disc" name="rCV1Disc"
                                                            id="rCV1Disc"><label class="form-check-label"
                                                            for="rCV1Disc">Disc</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.spring" name="rCV1Spring"
                                                            id="rCV1Spring"><label class="form-check-label"
                                                            for="rCV1Spring">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.guide" name="rCV1Guide"
                                                            id="rCV1Guide"><label class="form-check-label"
                                                            for="rCV1Guide">Guide</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.pinRetainer" name="rCV1PR"
                                                            id="rCV1PR"><label class="form-check-label" for="rCV1PR">Pin
                                                         Retainer</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.hingePin" name="rCV1HP"
                                                            id="rCV1HP"><label class="form-check-label"
                                                            for="rCV1HP">Hinge Pin</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.seat" name="rCV1Seat"
                                                            id="rCV1Seat"><label class="form-check-label"
                                                            for="rCV1Seat">Seat</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.diaphragm" name="rCV1Dia"
                                                            id="rCV1Dia"><label class="form-check-label"
                                                            for="rCV1Dia">Diaphragm</label></div>
                                             </td>
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.cleaned" name="rCV2Cleaned"
                                                            id="rCV2Cleaned"><label class="form-check-label"
                                                            for="rCV2Cleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.disc" name="rCV2Disc"
                                                            id="rCV2Disc"><label class="form-check-label"
                                                            for="rCV2Disc">Disc</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.spring" name="rCV2Spring"
                                                            id="rCV2Spring"><label class="form-check-label"
                                                            for="rCV2Spring">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.guide" name="rCV2Guide"
                                                            id="rCV2Guide"><label class="form-check-label"
                                                            for="rCV2Guide">Guide</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.pinRetainer" name="rCV2PR"
                                                            id="rCV2PR"><label class="form-check-label" for="rCV2PR">Pin
                                                         Retainer</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.hingePin" name="rCV2HP"
                                                            id="rCV2HP"><label class="form-check-label"
                                                            for="rCV2HP">Hinge Pin</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.seat" name="rCV2Seat"
                                                            id="rCV2Seat"><label class="form-check-label"
                                                            for="rCV2Seat">Seat</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.diaphragm" name="rCV2Dia"
                                                            id="rCV2Dia"><label class="form-check-label"
                                                            for="rCV2Dia">Diaphragm</label></div>
                                             </td>
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.cleaned" name="rRVCleaned"
                                                            id="rRVCleaned"><label class="form-check-label"
                                                            for="rRVCleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.discUpper" name="rRVDU"
                                                            id="rRVDU"><label class="form-check-label" for="rRVDU">Disc
                                                         Upper</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.discLower" name="rRVDL"
                                                            id="rRVDL"><label class="form-check-label" for="rRVDL">Disc
                                                         Lower</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.spring" name="rRVS" id="rRVS"><label
                                                            class="form-check-label" for="rRVS">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.diaphragmUpper" name="rRVDiaU"
                                                            id="rRVDiaU"><label class="form-check-label"
                                                            for="rRVDiaU">Diaphragm Upper</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.diaphragmLower" name="rRVDiaL"
                                                            id="rRVDiaL"><label class="form-check-label"
                                                            for="rRVDiaL">Diaphragm Lower</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.diaphragmSmall" name="rRVDiaS"
                                                            id="rRVDiaS"><label class="form-check-label"
                                                            for="rRVDiaS">Diaphragm Small</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.seatUpper" name="rRVSU"
                                                            id="rRVSU"><label class="form-check-label" for="rRVSU">Seat
                                                         Upper</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.seatLower" name="rRVSL"
                                                            id="rRVSL"><label class="form-check-label" for="rRVSL">Seat
                                                         Lower</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.spacerLower" name="rRVSpL"
                                                            id="rRVSpL"><label class="form-check-label"
                                                            for="rRVSpL">Spacer Lower</label></div>
@@ -1760,17 +1768,17 @@
 
                                         </tr>
                                         <tr>
-                                            <td><strong>Repair Details:</strong></td>
-                                            <td>
-                                                <vp-input type="textarea" name="repairCV1Details"
+                                            <td [class.test-cell-disabled]="repairsDisabled"><strong>Repair Details:</strong></td>
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairCV1Details"
                                                           [(ngModel)]="model.repairCV1Details" [maxLength]="100" />
                                             </td>
-                                            <td>
-                                                <vp-input type="textarea" name="repairCV2Details"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairCV2Details"
                                                           [(ngModel)]="model.repairCV2Details" [maxLength]="100" />
                                             </td>
-                                            <td>
-                                                <vp-input type="textarea" name="repairRVDetails"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairRVDetails"
                                                           [(ngModel)]="model.repairRVDetails" [maxLength]="100" />
                                             </td>
                                         </tr>
@@ -1791,38 +1799,38 @@
                                         </tr>
 
                                         <tr>
-                                            <td [class.test-cell-valid]="!isFailedResult && !finalTestDateError"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && !finalTestDateError"
                                                 [class.test-cell-invalid]="!isFailedResult && !!finalTestDateError">
                                                 <div class="fw-bold mb-3 text-center">Test After Repair</div>
                                                 <strong>Date and Time:</strong><br>
-                                                <vp-input type="datetime" name="finalTestDate"
+                                                <vp-input [disabled]="repairsDisabled" type="datetime" name="finalTestDate"
                                                           [(ngModel)]="model.finalTestDate" [required]="true"
                                                           [max]="today" [form]="submitForm" />
                                             </td>
-                                            <td [class.test-cell-valid]="!isFailedResult && isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)">
-                                                <div class="mb-3">Held at <vp-input type="text" class="psid-input" name="finalCV1PSID" [numeric]="true"
+                                                <div class="mb-3">Held at <vp-input [disabled]="repairsDisabled" type="text" class="psid-input" name="finalCV1PSID" [numeric]="true"
                                                            [(ngModel)]="model.finalCV1HeldPSID" [min]="0" [max]="15" /> PSID </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="finalCV1CT"
+                                                    <input class="form-check-input" type="checkbox" [disabled]="repairsDisabled" id="finalCV1CT"
                                                            name="finalCV1CT" [(ngModel)]="model.finalCV1ClosedTight" />
                                                     <label class="form-check-label" for="finalCV1CT">Closed
                                                         Tight</label>
                                                 </div>
                                             </td>
-                                            <td [class.test-cell-valid]="!isFailedResult && isRPCV2CellValid(model.finalCV2ClosedTight, undefined)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isRPCV2CellValid(model.finalCV2ClosedTight, undefined)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isRPCV2CellValid(model.finalCV2ClosedTight, undefined)">
 
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="finalCV2CT"
+                                                    <input class="form-check-input" type="checkbox" [disabled]="repairsDisabled" id="finalCV2CT"
                                                            name="finalCV2CT" [(ngModel)]="model.finalCV2ClosedTight" />
                                                     <label class="form-check-label" for="finalCV2CT">Closed
                                                         Tight</label>
                                                 </div>
                                             </td>
-                                            <td [class.test-cell-valid]="!isFailedResult && isRVCellValid(model.finalRVOpenedPSID, undefined)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isRVCellValid(model.finalRVOpenedPSID, undefined)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isRVCellValid(model.finalRVOpenedPSID, undefined)">
-                                                <div class="mb-3">Opened at <vp-input type="text" class="psid-input" name="finalRVOpenedPSID" [numeric]="true"
+                                                <div class="mb-3">Opened at <vp-input [disabled]="repairsDisabled" type="text" class="psid-input" name="finalRVOpenedPSID" [numeric]="true"
                                                            [(ngModel)]="model.finalRVOpenedPSID" [min]="0" [max]="15" /> PSID </div>
                                             </td>
                                         </tr>
@@ -1989,264 +1997,265 @@
                                         </td>
                                     </tr>
 
-                                    <ng-container *ngIf="initialTestFailed">
+                                    <ng-container>
+                                        @let repairsDisabled = !isFailedResult && !initialTestFailed;
                                         <tr>
-                                            <td class="align-top">
+                                            <td class="align-top" [class.test-cell-disabled]="repairsDisabled">
                                                 <div class="fw-bold">Repairs and Materials Used **</div>
                                             </td>
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.cleaned" name="rCV1Cleaned"
                                                            id="rCV1Cleaned"><label class="form-check-label"
                                                            for="rCV1Cleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.disc" name="rCV1Disc"
                                                            id="rCV1Disc"><label class="form-check-label"
                                                            for="rCV1Disc">Disc</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.spring" name="rCV1Spring"
                                                            id="rCV1Spring"><label class="form-check-label"
                                                            for="rCV1Spring">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.guide" name="rCV1Guide"
                                                            id="rCV1Guide"><label class="form-check-label"
                                                            for="rCV1Guide">Guide</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.pinRetainer" name="rCV1PR"
                                                            id="rCV1PR"><label class="form-check-label" for="rCV1PR">Pin
                                                         Retainer</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.hingePin" name="rCV1HP"
                                                            id="rCV1HP"><label class="form-check-label"
                                                            for="rCV1HP">Hinge Pin</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.seat" name="rCV1Seat"
                                                            id="rCV1Seat"><label class="form-check-label"
                                                            for="rCV1Seat">Seat</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.diaphragm" name="rCV1Dia"
                                                            id="rCV1Dia"><label class="form-check-label"
                                                            for="rCV1Dia">Diaphragm</label></div>
                                             </td>
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.cleaned" name="rCV2Cleaned"
                                                            id="rCV2Cleaned"><label class="form-check-label"
                                                            for="rCV2Cleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.disc" name="rCV2Disc"
                                                            id="rCV2Disc"><label class="form-check-label"
                                                            for="rCV2Disc">Disc</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.spring" name="rCV2Spring"
                                                            id="rCV2Spring"><label class="form-check-label"
                                                            for="rCV2Spring">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.guide" name="rCV2Guide"
                                                            id="rCV2Guide"><label class="form-check-label"
                                                            for="rCV2Guide">Guide</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.pinRetainer" name="rCV2PR"
                                                            id="rCV2PR"><label class="form-check-label" for="rCV2PR">Pin
                                                         Retainer</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.hingePin" name="rCV2HP"
                                                            id="rCV2HP"><label class="form-check-label"
                                                            for="rCV2HP">Hinge Pin</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.seat" name="rCV2Seat"
                                                            id="rCV2Seat"><label class="form-check-label"
                                                            for="rCV2Seat">Seat</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.diaphragm" name="rCV2Dia"
                                                            id="rCV2Dia"><label class="form-check-label"
                                                            for="rCV2Dia">Diaphragm</label></div>
                                             </td>
 
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.cleaned" name="rRVCleaned"
                                                            id="rRVCleaned"><label class="form-check-label"
                                                            for="rRVCleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.discUpper" name="rRVDU"
                                                            id="rRVDU"><label class="form-check-label" for="rRVDU">Disc
                                                         Upper</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.discLower" name="rRVDL"
                                                            id="rRVDL"><label class="form-check-label" for="rRVDL">Disc
                                                         Lower</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.spring" name="rRVS" id="rRVS"><label
                                                            class="form-check-label" for="rRVS">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.diaphragmUpper" name="rRVDiaU"
                                                            id="rRVDiaU"><label class="form-check-label"
                                                            for="rRVDiaU">Diaphragm Upper</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.diaphragmLower" name="rRVDiaL"
                                                            id="rRVDiaL"><label class="form-check-label"
                                                            for="rRVDiaL">Diaphragm Lower</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.diaphragmSmall" name="rRVDiaS"
                                                            id="rRVDiaS"><label class="form-check-label"
                                                            for="rRVDiaS">Diaphragm Small</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.seatUpper" name="rRVSU"
                                                            id="rRVSU"><label class="form-check-label" for="rRVSU">Seat
                                                         Upper</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.seatLower" name="rRVSL"
                                                            id="rRVSL"><label class="form-check-label" for="rRVSL">Seat
                                                         Lower</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.spacerLower" name="rRVSpL"
                                                            id="rRVSpL"><label class="form-check-label"
                                                            for="rRVSpL">Spacer Lower</label></div>
                                             </td>
 
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV12.cleaned" name="rCV12Cleaned"
                                                            id="rCV12Cleaned"><label class="form-check-label"
                                                            for="rCV12Cleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV12.disc" name="rCV12Disc"
                                                            id="rCV12Disc"><label class="form-check-label"
                                                            for="rCV12Disc">Disc</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV12.spring" name="rCV12Spring"
                                                            id="rCV12Spring"><label class="form-check-label"
                                                            for="rCV12Spring">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV12.guide" name="rCV12Guide"
                                                            id="rCV12Guide"><label class="form-check-label"
                                                            for="rCV12Guide">Guide</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV12.pinRetainer" name="rCV12PR"
                                                            id="rCV12PR"><label class="form-check-label"
                                                            for="rCV12PR">Pin Retainer</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV12.hingePin" name="rCV12HP"
                                                            id="rCV12HP"><label class="form-check-label"
                                                            for="rCV12HP">Hinge Pin</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV12.seat" name="rCV12Seat"
                                                            id="rCV12Seat"><label class="form-check-label"
                                                            for="rCV12Seat">Seat</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV12.diaphragm" name="rCV12Dia"
                                                            id="rCV12Dia"><label class="form-check-label"
                                                            for="rCV12Dia">Diaphragm</label></div>
                                             </td>
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV22.cleaned" name="rCV22Cleaned"
                                                            id="rCV22Cleaned"><label class="form-check-label"
                                                            for="rCV22Cleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV22.disc" name="rCV22Disc"
                                                            id="rCV22Disc"><label class="form-check-label"
                                                            for="rCV22Disc">Disc</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV22.spring" name="rCV22Spring"
                                                            id="rCV22Spring"><label class="form-check-label"
                                                            for="rCV22Spring">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV22.guide" name="rCV22Guide"
                                                            id="rCV22Guide"><label class="form-check-label"
                                                            for="rCV22Guide">Guide</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV22.pinRetainer" name="rCV22PR"
                                                            id="rCV22PR"><label class="form-check-label"
                                                            for="rCV22PR">Pin Retainer</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV22.hingePin" name="rCV22HP"
                                                            id="rCV22HP"><label class="form-check-label"
                                                            for="rCV22HP">Hinge Pin</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV22.seat" name="rCV22Seat"
                                                            id="rCV22Seat"><label class="form-check-label"
                                                            for="rCV22Seat">Seat</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV22.diaphragm" name="rCV22Dia"
                                                            id="rCV22Dia"><label class="form-check-label"
                                                            for="rCV22Dia">Diaphragm</label></div>
                                             </td>
 
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV2.cleaned" name="rRV2Cleaned"
                                                            id="rRV2Cleaned"><label class="form-check-label"
                                                            for="rRV2Cleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV2.discUpper" name="rRV2DU"
                                                            id="rRV2DU"><label class="form-check-label" for="rRV2DU">Disc
                                                         Upper</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV2.discLower" name="rRV2DL"
                                                            id="rRV2DL"><label class="form-check-label" for="rRV2DL">Disc
                                                         Lower</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV2.spring" name="rRV2S" id="rRV2S"><label
                                                            class="form-check-label" for="rRV2S">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV2.diaphragmUpper" name="rRV2DiaU"
                                                            id="rRV2DiaU"><label class="form-check-label"
                                                            for="rRV2DiaU">Diaphragm Upper</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV2.diaphragmLower" name="rRV2DiaL"
                                                            id="rRV2DiaL"><label class="form-check-label"
                                                            for="rRV2DiaL">Diaphragm Lower</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV2.diaphragmSmall" name="rRV2DiaS"
                                                            id="rRV2DiaS"><label class="form-check-label"
                                                            for="rRV2DiaS">Diaphragm Small</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV2.seatUpper" name="rRV2SU"
                                                            id="rRV2SU"><label class="form-check-label" for="rRV2SU">Seat
                                                         Upper</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV2.seatLower" name="rRV2SL"
                                                            id="rRV2SL"><label class="form-check-label" for="rRV2SL">Seat
                                                         Lower</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV2.spacerLower" name="rRV2SpL"
                                                            id="rRV2SpL"><label class="form-check-label"
                                                            for="rRV2SpL">Spacer Lower</label></div>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Repair Details:</strong></td>
-                                            <td>
-                                                <vp-input type="textarea" name="repairCV1Details"
+                                            <td [class.test-cell-disabled]="repairsDisabled"><strong>Repair Details:</strong></td>
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairCV1Details"
                                                           [(ngModel)]="model.repairCV1Details" [maxLength]="100" />
                                             </td>
-                                            <td>
-                                                <vp-input type="textarea" name="repairCV2Details"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairCV2Details"
                                                           [(ngModel)]="model.repairCV2Details" [maxLength]="100" />
                                             </td>
-                                            <td>
-                                                <vp-input type="textarea" name="repairRVDetails"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairRVDetails"
                                                           [(ngModel)]="model.repairRVDetails" [maxLength]="100" />
                                             </td>
 
-                                            <td>
-                                                <vp-input type="textarea" name="repairCV1Details2"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairCV1Details2"
                                                           [(ngModel)]="model.repairCV1Details2" [maxLength]="100" />
                                             </td>
-                                            <td>
-                                                <vp-input type="textarea" name="repairCV2Details2"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairCV2Details2"
                                                           [(ngModel)]="model.repairCV2Details2" [maxLength]="100" />
                                             </td>
-                                            <td>
-                                                <vp-input type="textarea" name="repairRVDetails2"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairRVDetails2"
                                                           [(ngModel)]="model.repairRVDetails2" [maxLength]="100" />
                                             </td>
                                         </tr>
@@ -2276,66 +2285,66 @@
                                         </tr>
 
                                         <tr>
-                                            <td [class.test-cell-valid]="!isFailedResult && !finalTestDateError"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && !finalTestDateError"
                                                 [class.test-cell-invalid]="!isFailedResult && !!finalTestDateError">
                                                 <div class="fw-bold mb-3 text-center">Test After Repair</div>
                                                 <strong>Date and Time:</strong><br>
-                                                <vp-input type="datetime" name="finalTestDate"
+                                                <vp-input [disabled]="repairsDisabled" type="datetime" name="finalTestDate"
                                                           [(ngModel)]="model.finalTestDate" [required]="true"
                                                           [max]="today" [form]="submitForm" />
                                             </td>
 
-                                            <td [class.test-cell-valid]="!isFailedResult && isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)">
-                                                <div class="mb-3">Held at <vp-input type="text" class="psid-input" name="finalCV1PSID" [numeric]="true"
+                                                <div class="mb-3">Held at <vp-input [disabled]="repairsDisabled" type="text" class="psid-input" name="finalCV1PSID" [numeric]="true"
                                                            [(ngModel)]="model.finalCV1HeldPSID" [min]="0" [max]="15" /> PSID </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="finalCV1CT"
+                                                    <input class="form-check-input" type="checkbox" [disabled]="repairsDisabled" id="finalCV1CT"
                                                            name="finalCV1CT" [(ngModel)]="model.finalCV1ClosedTight" />
                                                     <label class="form-check-label" for="finalCV1CT">Closed
                                                         Tight</label>
                                                 </div>
                                             </td>
-                                            <td [class.test-cell-valid]="!isFailedResult && model.finalCV2ClosedTight"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && model.finalCV2ClosedTight"
                                                 [class.test-cell-invalid]="!isFailedResult && !model.finalCV2ClosedTight">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="finalCV2CT"
+                                                    <input class="form-check-input" type="checkbox" [disabled]="repairsDisabled" id="finalCV2CT"
                                                            name="finalCV2CT" [(ngModel)]="model.finalCV2ClosedTight" />
                                                     <label class="form-check-label" for="finalCV2CT">Closed
                                                         Tight</label>
                                                 </div>
                                             </td>
-                                            <td [class.test-cell-valid]="!isFailedResult && isRVCellValid(model.finalRVOpenedPSID, undefined)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isRVCellValid(model.finalRVOpenedPSID, undefined)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isRVCellValid(model.finalRVOpenedPSID, undefined)">
-                                                <div class="mb-3">Opened at <vp-input type="text" class="psid-input" name="finalRVOpenedPSID" [numeric]="true"
+                                                <div class="mb-3">Opened at <vp-input [disabled]="repairsDisabled" type="text" class="psid-input" name="finalRVOpenedPSID" [numeric]="true"
                                                            [(ngModel)]="model.finalRVOpenedPSID" [min]="0" [max]="15" /> PSID </div>
                                             </td>
 
-                                            <td [class.test-cell-valid]="!isFailedResult && isRPCV1CellValid(model.finalCV1HeldPSID2, model.finalCV1ClosedTight2, undefined, model.finalRVOpenedPSID2)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isRPCV1CellValid(model.finalCV1HeldPSID2, model.finalCV1ClosedTight2, undefined, model.finalRVOpenedPSID2)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isRPCV1CellValid(model.finalCV1HeldPSID2, model.finalCV1ClosedTight2, undefined, model.finalRVOpenedPSID2)">
-                                                <div class="mb-3">Held at <vp-input type="text" class="psid-input" name="finalCV1PSID2" [numeric]="true"
+                                                <div class="mb-3">Held at <vp-input [disabled]="repairsDisabled" type="text" class="psid-input" name="finalCV1PSID2" [numeric]="true"
                                                            [(ngModel)]="model.finalCV1HeldPSID2" [min]="0" [max]="15" /> PSID </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="finalCV1CT2"
+                                                    <input class="form-check-input" type="checkbox" [disabled]="repairsDisabled" id="finalCV1CT2"
                                                            name="finalCV1CT2"
                                                            [(ngModel)]="model.finalCV1ClosedTight2" />
                                                     <label class="form-check-label" for="finalCV1CT2">Closed
                                                         Tight</label>
                                                 </div>
                                             </td>
-                                            <td [class.test-cell-valid]="!isFailedResult && model.finalCV2ClosedTight2"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && model.finalCV2ClosedTight2"
                                                 [class.test-cell-invalid]="!isFailedResult && !model.finalCV2ClosedTight2">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="finalCV2CT2"
+                                                    <input class="form-check-input" type="checkbox" [disabled]="repairsDisabled" id="finalCV2CT2"
                                                            name="finalCV2CT2"
                                                            [(ngModel)]="model.finalCV2ClosedTight2" />
                                                     <label class="form-check-label" for="finalCV2CT2">Closed
                                                         Tight</label>
                                                 </div>
                                             </td>
-                                            <td [class.test-cell-valid]="!isFailedResult && isRVCellValid(model.finalRVOpenedPSID2, undefined)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isRVCellValid(model.finalRVOpenedPSID2, undefined)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isRVCellValid(model.finalRVOpenedPSID2, undefined)">
-                                                <div class="mb-3">Opened at <vp-input type="text" class="psid-input" name="finalRVOpenedPSID2" [numeric]="true"
+                                                <div class="mb-3">Opened at <vp-input [disabled]="repairsDisabled" type="text" class="psid-input" name="finalRVOpenedPSID2" [numeric]="true"
                                                            [(ngModel)]="model.finalRVOpenedPSID2" [min]="0" [max]="15" /> PSID </div>
                                             </td>
                                         </tr>
@@ -2464,178 +2473,179 @@
                                             </div>
                                         </td>
                                     </tr>
-                                    <ng-container *ngIf="initialTestFailed">
+                                    <ng-container>
+                                        @let repairsDisabled = !isFailedResult && !initialTestFailed;
                                         <tr>
-                                            <td class="align-top">
+                                            <td class="align-top" [class.test-cell-disabled]="repairsDisabled">
                                                 <div class="fw-bold">Repairs and Materials Used **</div>
                                             </td>
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.cleaned" name="rCV1Cleaned"
                                                            id="rCV1Cleaned"><label class="form-check-label"
                                                            for="rCV1Cleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.disc" name="rCV1Disc"
                                                            id="rCV1Disc"><label class="form-check-label"
                                                            for="rCV1Disc">Disc</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.spring" name="rCV1Spring"
                                                            id="rCV1Spring"><label class="form-check-label"
                                                            for="rCV1Spring">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.guide" name="rCV1Guide"
                                                            id="rCV1Guide"><label class="form-check-label"
                                                            for="rCV1Guide">Guide</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.pinRetainer" name="rCV1PR"
                                                            id="rCV1PR"><label class="form-check-label" for="rCV1PR">Pin
                                                         Retainer</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.hingePin" name="rCV1HP"
                                                            id="rCV1HP"><label class="form-check-label"
                                                            for="rCV1HP">Hinge Pin</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.seat" name="rCV1Seat"
                                                            id="rCV1Seat"><label class="form-check-label"
                                                            for="rCV1Seat">Seat</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV1.diaphragm" name="rCV1Dia"
                                                            id="rCV1Dia"><label class="form-check-label"
                                                            for="rCV1Dia">Diaphragm</label></div>
                                             </td>
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.cleaned" name="rCV2Cleaned"
                                                            id="rCV2Cleaned"><label class="form-check-label"
                                                            for="rCV2Cleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.disc" name="rCV2Disc"
                                                            id="rCV2Disc"><label class="form-check-label"
                                                            for="rCV2Disc">Disc</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.spring" name="rCV2Spring"
                                                            id="rCV2Spring"><label class="form-check-label"
                                                            for="rCV2Spring">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.guide" name="rCV2Guide"
                                                            id="rCV2Guide"><label class="form-check-label"
                                                            for="rCV2Guide">Guide</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.pinRetainer" name="rCV2PR"
                                                            id="rCV2PR"><label class="form-check-label" for="rCV2PR">Pin
                                                         Retainer</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.hingePin" name="rCV2HP"
                                                            id="rCV2HP"><label class="form-check-label"
                                                            for="rCV2HP">Hinge Pin</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.seat" name="rCV2Seat"
                                                            id="rCV2Seat"><label class="form-check-label"
                                                            for="rCV2Seat">Seat</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairCV2.diaphragm" name="rCV2Dia"
                                                            id="rCV2Dia"><label class="form-check-label"
                                                            for="rCV2Dia">Diaphragm</label></div>
                                             </td>
 
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.cleaned" name="rRVCleaned"
                                                            id="rRVCleaned"><label class="form-check-label"
                                                            for="rRVCleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.discUpper" name="rRVDU"
                                                            id="rRVDU"><label class="form-check-label" for="rRVDU">Disc
                                                         Upper</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.discLower" name="rRVDL"
                                                            id="rRVDL"><label class="form-check-label" for="rRVDL">Disc
                                                         Lower</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.spring" name="rRVS" id="rRVS"><label
                                                            class="form-check-label" for="rRVS">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.diaphragmUpper" name="rRVDiaU"
                                                            id="rRVDiaU"><label class="form-check-label"
                                                            for="rRVDiaU">Diaphragm Upper</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.diaphragmLower" name="rRVDiaL"
                                                            id="rRVDiaL"><label class="form-check-label"
                                                            for="rRVDiaL">Diaphragm Lower</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.diaphragmSmall" name="rRVDiaS"
                                                            id="rRVDiaS"><label class="form-check-label"
                                                            for="rRVDiaS">Diaphragm Small</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.seatUpper" name="rRVSU"
                                                            id="rRVSU"><label class="form-check-label" for="rRVSU">Seat
                                                         Upper</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.seatLower" name="rRVSL"
                                                            id="rRVSL"><label class="form-check-label" for="rRVSL">Seat
                                                         Lower</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairRV.spacerLower" name="rRVSpL"
                                                            id="rRVSpL"><label class="form-check-label"
                                                            for="rRVSpL">Spacer Lower</label></div>
                                             </td>
 
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairBC.cleaned" name="rBCCleaned"
                                                            id="rBCCleaned"><label class="form-check-label"
                                                            for="rBCCleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairBC.disc" name="rBCDisc"
                                                            id="rBCDisc"><label class="form-check-label"
                                                            for="rBCDisc">Disc</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairBC.spring" name="rBCSpring"
                                                            id="rBCSpring"><label class="form-check-label"
                                                            for="rBCSpring">Spring</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairBC.guide" name="rBCGuide"
                                                            id="rBCGuide"><label class="form-check-label"
                                                            for="rBCGuide">Guide</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairBC.pinRetainer" name="rBCPR"
                                                            id="rBCPR"><label class="form-check-label" for="rBCPR">Pin
                                                         Retainer</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairBC.hingePin" name="rBCHP"
                                                            id="rBCHP"><label class="form-check-label" for="rBCHP">Hinge
                                                         Pin</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairBC.seat" name="rBCSeat"
                                                            id="rBCSeat"><label class="form-check-label"
                                                            for="rBCSeat">Seat</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairBC.diaphragm" name="rBCDia"
                                                            id="rBCDia"><label class="form-check-label"
                                                            for="rBCDia">Diaphragm</label></div>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Repair Details:</strong></td>
-                                            <td>
-                                                <vp-input type="textarea" name="repairCV1Details"
+                                            <td [class.test-cell-disabled]="repairsDisabled"><strong>Repair Details:</strong></td>
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairCV1Details"
                                                           [(ngModel)]="model.repairCV1Details" [maxLength]="100" />
                                             </td>
-                                            <td>
-                                                <vp-input type="textarea" name="repairCV2Details"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairCV2Details"
                                                           [(ngModel)]="model.repairCV2Details" [maxLength]="100" />
                                             </td>
-                                            <td>
-                                                <vp-input type="textarea" name="repairRVDetails"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairRVDetails"
                                                           [(ngModel)]="model.repairRVDetails" [maxLength]="100" />
                                             </td>
 
-                                            <td>
-                                                <vp-input type="textarea" name="repairBCDetails"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairBCDetails"
                                                           [(ngModel)]="model.repairBCDetails" [maxLength]="100" />
                                             </td>
                                         </tr>
@@ -2660,47 +2670,47 @@
                                         </tr>
 
                                         <tr>
-                                            <td [class.test-cell-valid]="!isFailedResult && !finalTestDateError"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && !finalTestDateError"
                                                 [class.test-cell-invalid]="!isFailedResult && !!finalTestDateError">
                                                 <div class="fw-bold mb-3 text-center">Test After Repair</div>
                                                 <strong>Date and Time:</strong><br>
-                                                <vp-input type="datetime" name="finalTestDate"
+                                                <vp-input [disabled]="repairsDisabled" type="datetime" name="finalTestDate"
                                                           [(ngModel)]="model.finalTestDate" [required]="true"
                                                           [max]="today" [form]="submitForm" />
                                             </td>
 
-                                            <td [class.test-cell-valid]="!isFailedResult && isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isRPCV1CellValid(model.finalCV1HeldPSID, model.finalCV1ClosedTight, undefined, model.finalRVOpenedPSID)">
-                                                <div class="mb-3">Held at <vp-input type="text" class="psid-input" name="finalCV1PSID" [numeric]="true"
+                                                <div class="mb-3">Held at <vp-input [disabled]="repairsDisabled" type="text" class="psid-input" name="finalCV1PSID" [numeric]="true"
                                                            [(ngModel)]="model.finalCV1HeldPSID" [min]="0" [max]="15" /> PSID </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="finalCV1CT"
+                                                    <input class="form-check-input" type="checkbox" [disabled]="repairsDisabled" id="finalCV1CT"
                                                            name="finalCV1CT" [(ngModel)]="model.finalCV1ClosedTight" />
                                                     <label class="form-check-label" for="finalCV1CT">Closed
                                                         Tight</label>
                                                 </div>
                                             </td>
-                                            <td [class.test-cell-valid]="!isFailedResult && model.finalCV2ClosedTight"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && model.finalCV2ClosedTight"
                                                 [class.test-cell-invalid]="!isFailedResult && !model.finalCV2ClosedTight">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="finalCV2CT"
+                                                    <input class="form-check-input" type="checkbox" [disabled]="repairsDisabled" id="finalCV2CT"
                                                            name="finalCV2CT" [(ngModel)]="model.finalCV2ClosedTight" />
                                                     <label class="form-check-label" for="finalCV2CT">Closed
                                                         Tight</label>
                                                 </div>
                                             </td>
-                                            <td [class.test-cell-valid]="!isFailedResult && isRVCellValid(model.finalRVOpenedPSID, undefined)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isRVCellValid(model.finalRVOpenedPSID, undefined)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isRVCellValid(model.finalRVOpenedPSID, undefined)">
-                                                <div class="mb-3">Opened at <vp-input type="text" class="psid-input" name="finalRVOpenedPSID" [numeric]="true"
+                                                <div class="mb-3">Opened at <vp-input [disabled]="repairsDisabled" type="text" class="psid-input" name="finalRVOpenedPSID" [numeric]="true"
                                                            [(ngModel)]="model.finalRVOpenedPSID" [min]="0" [max]="15" /> PSID </div>
                                             </td>
 
-                                            <td [class.test-cell-valid]="!isFailedResult && isCVCellValid(model.finalBCHeldPSID, model.finalBCClosedTight, undefined)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isCVCellValid(model.finalBCHeldPSID, model.finalBCClosedTight, undefined)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isCVCellValid(model.finalBCHeldPSID, model.finalBCClosedTight, undefined)">
-                                                <div class="mb-3">Held at <vp-input type="text" class="psid-input" name="finalBCHeldPSID" [numeric]="true"
+                                                <div class="mb-3">Held at <vp-input [disabled]="repairsDisabled" type="text" class="psid-input" name="finalBCHeldPSID" [numeric]="true"
                                                            [(ngModel)]="model.finalBCHeldPSID" [min]="0" [max]="15" /> PSID </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="finalBCT"
+                                                    <input class="form-check-input" type="checkbox" [disabled]="repairsDisabled" id="finalBCT"
                                                            name="finalBCT" [(ngModel)]="model.finalBCClosedTight" />
                                                     <label class="form-check-label" for="finalBCT">Closed Tight</label>
                                                 </div>
@@ -2787,53 +2797,54 @@
                                             </div>
                                         </td>
                                     </tr>
-                                    <ng-container *ngIf="initialTestFailed">
+                                    <ng-container>
+                                        @let repairsDisabled = !isFailedResult && !initialTestFailed;
                                         <tr>
-                                            <td class="align-top">
+                                            <td class="align-top" [class.test-cell-disabled]="repairsDisabled">
                                                 <div class="fw-bold">Repairs and Materials Used **</div>
                                             </td>
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairPvbAirInlet.cleaned"
                                                            name="rPvbAirInletCleaned" id="rPvbAirInletCleaned"><label
                                                            class="form-check-label"
                                                            for="rPvbAirInletCleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairPvbAirInlet.disc" name="rPvbAirInletDisc"
                                                            id="rPvbAirInletDisc"><label class="form-check-label"
                                                            for="rPvbAirInletDisc">Disc</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairPvbAirInlet.spring"
                                                            name="rPvbAirInletSpring" id="rPvbAirInletSpring"><label
                                                            class="form-check-label"
                                                            for="rPvbAirInletSpring">Spring</label></div>
                                             </td>
-                                            <td>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairPvbCV.cleaned" name="rPvbCVCleaned"
                                                            id="rPvbCVCleaned"><label class="form-check-label"
                                                            for="rPvbCVCleaned">Cleaned</label></div>
                                                 <div class="text-muted small mb-1">Replaced:</div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairPvbCV.disc" name="rPvbCVDisc"
                                                            id="rPvbCVDisc"><label class="form-check-label"
                                                            for="rPvbCVDisc">Disc</label></div>
-                                                <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            [(ngModel)]="repairPvbCV.spring" name="rPvbCVSpring"
                                                            id="rPvbCVSpring"><label class="form-check-label"
                                                            for="rPvbCVSpring">Spring</label></div>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Repair Details:</strong></td>
-                                            <td>
-                                                <vp-input type="textarea" name="repairPvbAirInletDetails"
+                                            <td [class.test-cell-disabled]="repairsDisabled"><strong>Repair Details:</strong></td>
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairPvbAirInletDetails"
                                                           [(ngModel)]="model.repairPvbAirInletDetails"
                                                           [maxLength]="100" />
                                             </td>
-                                            <td>
-                                                <vp-input type="textarea" name="repairPvbCVDetails"
+                                            <td [class.test-cell-disabled]="repairsDisabled">
+                                                <vp-input [disabled]="repairsDisabled" type="textarea" name="repairPvbCVDetails"
                                                           [(ngModel)]="model.repairPvbCVDetails" [maxLength]="100" />
                                             </td>
                                         </tr>
@@ -2853,20 +2864,20 @@
                                         </tr>
 
                                         <tr>
-                                            <td [class.test-cell-valid]="!isFailedResult && !finalTestDateError"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && !finalTestDateError"
                                                 [class.test-cell-invalid]="!isFailedResult && !!finalTestDateError">
                                                 <div class="fw-bold mb-3 text-center">Test After Repair</div>
                                                 <strong>Date and Time:</strong><br>
-                                                <vp-input type="datetime" name="finalTestDate"
+                                                <vp-input [disabled]="repairsDisabled" type="datetime" name="finalTestDate"
                                                           [(ngModel)]="model.finalTestDate" [required]="true"
                                                           [max]="today" [form]="submitForm" />
                                             </td>
-                                            <td [class.test-cell-valid]="!isFailedResult && isAirInletCellValid(model.finalPvbAirInletOpenedPSID, undefined, model.finalPvbAirInletFullyOpened)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isAirInletCellValid(model.finalPvbAirInletOpenedPSID, undefined, model.finalPvbAirInletFullyOpened)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isAirInletCellValid(model.finalPvbAirInletOpenedPSID, undefined, model.finalPvbAirInletFullyOpened)">
-                                                <div class="mb-3">Opened at <vp-input type="text" class="psid-input" name="finalPvbAirInletOpenedPSID" [numeric]="true"
+                                                <div class="mb-3">Opened at <vp-input [disabled]="repairsDisabled" type="text" class="psid-input" name="finalPvbAirInletOpenedPSID" [numeric]="true"
                                                            [(ngModel)]="model.finalPvbAirInletOpenedPSID" [min]="0" [max]="15" /> PSID </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox"
+                                                    <input class="form-check-input" type="checkbox" [disabled]="repairsDisabled"
                                                            id="finalPvbAirInletFullyOpened"
                                                            name="finalPvbAirInletFullyOpened"
                                                            [(ngModel)]="model.finalPvbAirInletFullyOpened" />
@@ -2874,9 +2885,9 @@
                                                            for="finalPvbAirInletFullyOpened">Fully Opened</label>
                                                 </div>
                                             </td>
-                                            <td [class.test-cell-valid]="!isFailedResult && isPvbCVCellValid(model.finalPvbCVHeldPSID, undefined)"
+                                            <td [class.test-cell-disabled]="repairsDisabled" [class.test-cell-valid]="!isFailedResult && isPvbCVCellValid(model.finalPvbCVHeldPSID, undefined)"
                                                 [class.test-cell-invalid]="!isFailedResult && !isPvbCVCellValid(model.finalPvbCVHeldPSID, undefined)">
-                                                <div class="mb-3">Held at <vp-input type="text" class="psid-input" name="finalPvbCVHeldPSID" [numeric]="true"
+                                                <div class="mb-3">Held at <vp-input [disabled]="repairsDisabled" type="text" class="psid-input" name="finalPvbCVHeldPSID" [numeric]="true"
                                                            [(ngModel)]="model.finalPvbCVHeldPSID" [min]="0" [max]="15" /> PSID </div>
                                             </td>
                                         </tr>

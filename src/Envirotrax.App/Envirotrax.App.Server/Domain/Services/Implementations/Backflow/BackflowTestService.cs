@@ -10,6 +10,7 @@ using Envirotrax.App.Server.Data.Repositories;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
 using Envirotrax.App.Server.Domain.Services.Implementations.Sites;
@@ -295,10 +296,12 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         }
     }
 
-    private async Task ApplyRenewalAsync(BackflowTestDto dto, bool hasAuxWaterSupply, CancellationToken cancellationToken)
+    private async Task ApplyRenewalAsync(BackflowTestDto dto, SiteDto? site, BackflowTest? previousTest, BackflowSettingsDto? settings, CancellationToken cancellationToken)
     {
+        var testDate = dto.TestDate ?? DateTime.UtcNow;
+
         dto.RenewalRequired = false;
-        dto.ExpirationDate = null;
+        dto.ExpirationDate = testDate;
 
         if (dto.WaterSupplier?.Id is not int waterSupplierId)
         {
@@ -317,16 +320,269 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
             DeviceType = dto.DeviceType,
             PropertyType = dto.PropertyType,
             HazardType = dto.HazardType,
-            Ossf = dto.Ossf,
+            Ossf = site != null && site.HasOnSiteSewageFacility,
             TestResult = dto.TestResult,
             TestDate = dto.TestDate,
-            Site = new Site { HasAuxWaterSupply = hasAuxWaterSupply }
+            Site = new Site { HasAuxWaterSupply = site != null && site.HasAuxWaterSupply }
         };
 
-        var (renewalRequired, expirationDate) = ComputeRenewal(test, requirements);
+        BackflowRenewalRequirementDto? matchedRequirement = null;
 
-        dto.RenewalRequired = renewalRequired;
-        dto.ExpirationDate = expirationDate;
+        foreach (var requirement in requirements)
+        {
+            if (DoesTestMatchRequirement(test, requirement))
+            {
+                matchedRequirement = requirement;
+            }
+        }
+
+        if (matchedRequirement == null)
+        {
+            return;
+        }
+
+        dto.RenewalRequired = true;
+
+        if (dto.TestResult != BackflowTestResult.Pass)
+        {
+            dto.ExpirationDate = GetFailedTestExpirationDate(testDate, previousTest, dto.ValidationUnknownSerialNumber);
+
+            return;
+        }
+
+        var gracePeriodDays = 0;
+        var adjustCreepingDates = false;
+
+        if (settings != null)
+        {
+            gracePeriodDays = settings.GracePeriodDays.GetValueOrDefault();
+            adjustCreepingDates = settings.AdjustBackflowCreepingDates;
+        }
+
+        dto.ExpirationDate = GetExpirationDate(testDate, dto.BackflowScheduleMonth, previousTest, adjustCreepingDates, gracePeriodDays, matchedRequirement.RenewalYears);
+    }
+
+    private static DateTime GetFailedTestExpirationDate(DateTime testDate, BackflowTest? previousTest, bool unknownSerialNumber)
+    {
+        if (unknownSerialNumber || previousTest == null || previousTest.ExpirationDate == null)
+        {
+            return testDate;
+        }
+
+        if (previousTest.ExpirationDate.Value < testDate)
+        {
+            return previousTest.ExpirationDate.Value;
+        }
+
+        return testDate;
+    }
+
+    private static DateTime GetExpirationDate(DateTime testDate, int scheduleMonth, BackflowTest? previousTest, bool adjustCreepingDates, int gracePeriodDays, int expirationYears)
+    {
+        DateTime previousScheduledDate;
+        DateTime nextScheduledDate;
+
+        if (scheduleMonth > 0)
+        {
+            if (testDate.Month < scheduleMonth)
+            {
+                previousScheduledDate = new DateTime(testDate.Year - 1, scheduleMonth, 1);
+                nextScheduledDate = new DateTime(testDate.Year, scheduleMonth, 1);
+            }
+            else
+            {
+                previousScheduledDate = new DateTime(testDate.Year, scheduleMonth, 1);
+                nextScheduledDate = new DateTime(testDate.Year + 1, scheduleMonth, 1);
+            }
+
+            var daysBeforeNextScheduledDate = (int)Math.Round(nextScheduledDate.Subtract(testDate).TotalDays);
+
+            if (daysBeforeNextScheduledDate >= gracePeriodDays)
+            {
+                return previousScheduledDate.AddYears(expirationYears);
+            }
+
+            return nextScheduledDate.AddYears(expirationYears);
+        }
+
+        if (previousTest == null || previousTest.ExpirationDate == null || gracePeriodDays <= 0)
+        {
+            return testDate.AddYears(expirationYears);
+        }
+
+        var previousExpirationDate = previousTest.ExpirationDate.Value;
+
+        var isBeforePreviousExpiration = testDate.Month < previousExpirationDate.Month
+            || (testDate.Month == previousExpirationDate.Month && testDate.Day < previousExpirationDate.Day);
+
+        if (isBeforePreviousExpiration)
+        {
+            previousScheduledDate = BuildDateInYear(testDate.Year - 1, previousExpirationDate);
+            nextScheduledDate = BuildDateInYear(testDate.Year, previousExpirationDate);
+        }
+        else
+        {
+            previousScheduledDate = BuildDateInYear(testDate.Year, previousExpirationDate);
+            nextScheduledDate = BuildDateInYear(testDate.Year + 1, previousExpirationDate);
+        }
+
+        var daysFromPreviousScheduledDate = Math.Abs(testDate.Subtract(previousScheduledDate).TotalDays);
+        var daysFromNextScheduledDate = Math.Abs(testDate.Subtract(nextScheduledDate).TotalDays);
+
+        if (daysFromPreviousScheduledDate <= gracePeriodDays || daysFromNextScheduledDate <= gracePeriodDays)
+        {
+            if (daysFromPreviousScheduledDate < daysFromNextScheduledDate)
+            {
+                return BuildDateInYear(previousScheduledDate.Year + expirationYears, previousExpirationDate);
+            }
+
+            return BuildDateInYear(nextScheduledDate.Year + expirationYears, previousExpirationDate);
+        }
+
+        if (adjustCreepingDates)
+        {
+            return previousScheduledDate.AddYears(expirationYears);
+        }
+
+        return testDate.AddYears(expirationYears);
+    }
+
+    private static DateTime BuildDateInYear(int year, DateTime monthAndDay)
+    {
+        var day = Math.Min(monthAndDay.Day, DateTime.DaysInMonth(year, monthAndDay.Month));
+
+        return new DateTime(year, monthAndDay.Month, day);
+    }
+
+    private static int GetScheduleMonth(int siteScheduleMonth, BackflowTest? previousTest)
+    {
+        if (previousTest != null && previousTest.BackflowScheduleMonth > 0)
+        {
+            return previousTest.BackflowScheduleMonth;
+        }
+
+        return siteScheduleMonth;
+    }
+
+    private static void ApplyApproval(BackflowTestDto dto, BackflowTest? previousTest, BackflowSettingsDto? settings)
+    {
+        var newInstallationsRequireApproval = false;
+        var replacementsRequireApproval = false;
+
+        if (settings != null)
+        {
+            newInstallationsRequireApproval = settings.NewInstallationsRequireApproval;
+            replacementsRequireApproval = settings.ReplacementsRequireApproval;
+        }
+
+        var isNewInstallation = dto.ReasonForTest == BackflowReasonForTest.NewInstallation;
+        var isUnknownExistingInstallation = dto.ReasonForTest == BackflowReasonForTest.ExistingInstallation && previousTest == null;
+        var isReplacement = dto.ReasonForTest == BackflowReasonForTest.Replacement;
+
+        dto.Disapproved = (newInstallationsRequireApproval && isNewInstallation)
+            || ((newInstallationsRequireApproval || replacementsRequireApproval) && isUnknownExistingInstallation)
+            || (replacementsRequireApproval && isReplacement)
+            || (previousTest != null && previousTest.Disapproved);
+    }
+
+    private async Task<BackflowTest?> ApplyDeviceValidationAsync(BackflowTestDto dto, int siteId, CancellationToken cancellationToken)
+    {
+        dto.SerialNumber = BackflowSerialNumber.Correct(dto.SerialNumber);
+        dto.SerialNumber2 = BackflowSerialNumber.Correct(dto.SerialNumber2);
+
+        var unknownSerialNumber = !BackflowSerialNumber.IsValid(dto.SerialNumber);
+        var deviceMoved = false;
+        var deviceInformationChanged = false;
+        var hazardTypeChanged = false;
+
+        var previousTest = await FindPreviousTestForSubmissionAsync(dto, dto.Manufacturer, dto.SerialNumber, siteId, cancellationToken);
+
+        if (!unknownSerialNumber && previousTest != null)
+        {
+            deviceMoved = previousTest.SiteId != siteId;
+            deviceInformationChanged = HasDeviceInformationChanged(previousTest, dto.Manufacturer, dto.Model, dto.Size, dto.DeviceType, dto.SerialNumber);
+            hazardTypeChanged = HasHazardTypeChanged(previousTest, dto.HazardType);
+        }
+
+        if (!string.IsNullOrEmpty(dto.DeviceType) && BypassDeviceTypes.Contains(dto.DeviceType))
+        {
+            var unknownSerialNumber2 = !BackflowSerialNumber.IsValid(dto.SerialNumber2);
+            var previousTest2 = await FindPreviousTestForSubmissionAsync(dto, dto.Manufacturer2, dto.SerialNumber2, siteId, cancellationToken);
+
+            if (unknownSerialNumber2)
+            {
+                unknownSerialNumber = true;
+            }
+            else if (previousTest2 != null)
+            {
+                if (previousTest2.SiteId != siteId)
+                {
+                    deviceMoved = true;
+                }
+
+                if (HasDeviceInformationChanged(previousTest2, dto.Manufacturer2, dto.Model2, dto.Size2, dto.DeviceType, dto.SerialNumber2))
+                {
+                    deviceInformationChanged = true;
+                }
+            }
+        }
+
+        dto.ValidationUnknownSerialNumber = unknownSerialNumber;
+        dto.ValidationDeviceInformationChanged = deviceInformationChanged;
+
+        if (unknownSerialNumber || deviceMoved || deviceInformationChanged || hazardTypeChanged)
+        {
+            dto.NeedsValidation = true;
+        }
+
+        return previousTest;
+    }
+
+    private async Task<BackflowTest?> FindPreviousTestForSubmissionAsync(BackflowTestDto dto, string? manufacturer, string serialNumber, int siteId, CancellationToken cancellationToken)
+    {
+        if (dto.WaterSupplier?.Id is not int waterSupplierId)
+        {
+            return null;
+        }
+
+        var test = new BackflowTest
+        {
+            Id = dto.Id,
+            WaterSupplierId = waterSupplierId,
+            SiteId = siteId,
+            Manufacturer = manufacturer,
+            SerialNumber = serialNumber,
+            PropertyStreetNumber = dto.PropertyStreetNumber,
+            CreatedTime = DateTime.UtcNow
+        };
+
+        return await _testRepository.FindPreviousCurrentTestAsync(test, cancellationToken);
+    }
+
+    private static bool HasDeviceInformationChanged(BackflowTest previousTest, string? manufacturer, string? model, string? size, string? deviceType, string serialNumber)
+    {
+        return !IsSameText(previousTest.Manufacturer, manufacturer)
+            || BackflowSerialNumber.Correct(previousTest.Model) != BackflowSerialNumber.Correct(model)
+            || !IsSameText(previousTest.Size, size)
+            || !IsSameText(previousTest.DeviceType, deviceType)
+            || !IsSameText(previousTest.SerialNumber, serialNumber);
+    }
+
+    private static bool HasHazardTypeChanged(BackflowTest previousTest, string? hazardType)
+    {
+        var wasOtherHazardType = IsSameText(previousTest.HazardType, OtherHazardType) && !IsSameText(hazardType, OtherHazardType);
+
+        return !wasOtherHazardType && !IsSameText(hazardType, previousTest.HazardType);
+    }
+
+    private static bool IsSameText(string? first, string? second)
+    {
+        if (string.IsNullOrEmpty(first) && string.IsNullOrEmpty(second))
+        {
+            return true;
+        }
+
+        return first == second;
     }
 
     // Fee-exempt sites, failed tests, and air-gap devices are never charged; otherwise the water supplier's fee schedule applies,
@@ -430,6 +686,16 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         return site;
     }
 
+    private async Task<BackflowSettingsDto?> GetBackflowSettingsAsync(BackflowTestDto dto, CancellationToken cancellationToken)
+    {
+        if (dto.WaterSupplier?.Id is not int waterSupplierId)
+        {
+            return null;
+        }
+
+        return await _settingsService.GetAsync(waterSupplierId, cancellationToken);
+    }
+
     public async Task<BackflowTestDto> SubmitWithImagesAsync(
         BackflowTestDto dto,
         Stream? assemblyStream, string? assemblyFileName,
@@ -439,6 +705,11 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         Stream? airGapStream, string? airGapFileName,
         CancellationToken cancellationToken = default)
     {
+        if (!string.IsNullOrEmpty(dto.SubmissionId) && await _testRepository.HasSubmissionAsync(dto.SubmissionId, cancellationToken))
+        {
+            throw new AppValidationException("Error.  Duplicate test submission.");
+        }
+
         var professionalId = _authService.ProfessionalId;
         dto.Professional = new ReferencedProfessionalDto { Id = professionalId };
 
@@ -447,20 +718,29 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         await PopulateBpatSnapshotAsync(dto);
         DeriveTestDate(dto);
 
+        var isUnlistedProperty = dto.Site == null || dto.Site.Id == null;
         var site = await ApplySiteValidationAsync(dto, cancellationToken);
 
-        var hasAuxWaterSupply = false;
+        var siteId = 0;
+        var siteScheduleMonth = 0;
         var siteIsFeeExempt = false;
         var feePropertyType = (PropertyType)dto.PropertyType;
 
         if (site != null)
         {
-            hasAuxWaterSupply = site.HasAuxWaterSupply;
+            siteId = site.Id;
+            siteScheduleMonth = site.BackflowScheduleMonth;
             siteIsFeeExempt = site.IsFeeExempt;
             feePropertyType = site.PropertyType;
         }
 
-        await ApplyRenewalAsync(dto, hasAuxWaterSupply, cancellationToken);
+        var previousTest = await ApplyDeviceValidationAsync(dto, siteId, cancellationToken);
+        dto.BackflowScheduleMonth = GetScheduleMonth(siteScheduleMonth, previousTest);
+
+        var backflowSettings = await GetBackflowSettingsAsync(dto, cancellationToken);
+
+        await ApplyRenewalAsync(dto, site, previousTest, backflowSettings, cancellationToken);
+        ApplyApproval(dto, previousTest, backflowSettings);
         await ApplyAmountAsync(dto, siteIsFeeExempt, feePropertyType, cancellationToken);
 
         // Set paths before AddAsync to avoid a second EF update (double-tracking conflict)
@@ -489,6 +769,14 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
         using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
+            if (isUnlistedProperty)
+            {
+                var createdSite = await _siteService.AddWithGeneratedAccountNumberAsync(BuildSiteForUnlistedProperty(dto));
+
+                dto.Site = new ReferencedSiteDto { Id = createdSite.Id };
+                dto.AccountNumber = createdSite.AccountNumber;
+            }
+
             saved = await base.AddAsync(dto);
 
             if (assemblyStream != null && dto.AssemblyImagePath != null)
@@ -516,6 +804,35 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         }
 
         return await _mailingInfoRedactionService.RedactAsync(saved, cancellationToken);
+    }
+
+    private static SiteDto BuildSiteForUnlistedProperty(BackflowTestDto dto)
+    {
+        return new SiteDto
+        {
+            WaterSupplier = new ReferencedWaterSupplierDto { Id = dto.WaterSupplier!.Id },
+            Active = true,
+
+            BusinessName = dto.PropertyBusinessName,
+            PropertyType = (PropertyType)dto.PropertyType,
+            StreetNumber = dto.PropertyStreetNumber,
+            StreetName = dto.PropertyStreetName,
+            PropertyNumber = dto.PropertyNumber,
+            City = dto.PropertyCity,
+            State = dto.PropertyState,
+            ZipCode = dto.PropertyZip,
+
+            MailingCompanyName = dto.MailingCompanyName,
+            MailingContactName = dto.MailingContactName,
+            MailingStreetNumber = dto.MailingStreetNumber,
+            MailingStreetName = dto.MailingStreetName,
+            MailingNumber = dto.MailingNumber,
+            MailingCity = dto.MailingCity,
+            MailingState = dto.MailingState,
+            MailingZipCode = dto.MailingZip,
+            MailingPhoneNumber = dto.MailingPhoneNumber,
+            MailingEmailAddress = dto.MailingEmailAddress
+        };
     }
 
     // Checkout "Edit" on an own, still-unpaid test: mirrors SubmitWithImagesAsync's snapshot/renewal/image
@@ -551,15 +868,23 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         DeriveTestDate(dto);
 
         var site = await ApplySiteValidationAsync(dto, cancellationToken);
+        dto.ValidationNewSite = existing.ValidationNewSite;
 
-        var hasAuxWaterSupply = false;
+        var siteId = 0;
+        var siteScheduleMonth = 0;
 
         if (site != null)
         {
-            hasAuxWaterSupply = site.HasAuxWaterSupply;
+            siteId = site.Id;
+            siteScheduleMonth = site.BackflowScheduleMonth;
         }
 
-        await ApplyRenewalAsync(dto, hasAuxWaterSupply, cancellationToken);
+        var previousTest = await ApplyDeviceValidationAsync(dto, siteId, cancellationToken);
+        dto.BackflowScheduleMonth = GetScheduleMonth(siteScheduleMonth, previousTest);
+
+        var backflowSettings = await GetBackflowSettingsAsync(dto, cancellationToken);
+
+        await ApplyRenewalAsync(dto, site, previousTest, backflowSettings, cancellationToken);
 
         string? newAssemblyPath = null;
         string? newSerialPath = null;
@@ -1005,6 +1330,13 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     {
         "Rain", "Freeze", "RainFreeze"
     };
+
+    private static readonly HashSet<string> BypassDeviceTypes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        nameof(BackflowDeviceType.DCD), nameof(BackflowDeviceType.DCD2), nameof(BackflowDeviceType.RPPD), nameof(BackflowDeviceType.RPPD2)
+    };
+
+    private const string OtherHazardType = "Other";
 
     public async Task<BackflowTestDto?> UpdateRenewalRequiredAsync(int id, bool renewalRequired, CancellationToken cancellationToken = default)
     {

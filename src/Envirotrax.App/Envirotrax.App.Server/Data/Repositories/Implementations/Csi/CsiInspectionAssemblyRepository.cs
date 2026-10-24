@@ -28,6 +28,14 @@ public class CsiInspectionAssemblyRepository : Repository<CsiInspectionVisuallyI
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<List<CsiInspectionVisuallyIdentifiedAssembly>> GetByInspectionsAsync(IReadOnlyCollection<int> inspectionIds, CancellationToken cancellationToken)
+    {
+        return await GetListQuery()
+            .Where(assembly => inspectionIds.Contains(assembly.InspectionId))
+            .OrderBy(assembly => assembly.Id)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<int> GetCountByInspectionAsync(int inspectionId, CancellationToken cancellationToken)
     {
         return await base.GetListQuery()

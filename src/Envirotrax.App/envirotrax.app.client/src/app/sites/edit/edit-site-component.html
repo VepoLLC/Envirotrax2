@@ -55,23 +55,89 @@
                                                    [(ngModel)]="site.isFeeExempt" name="isFeeExempt">
                                             <label class="form-check-label">Is Fee Exempt</label>
                                         </div>
+                                        <div class="form-check mt-4 mb-2">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [(ngModel)]="site.excludeFromBackflowMailing"
+                                                   name="excludeFromBackflowMailing">
+                                            <label class="form-check-label">Exclude From Backflow Mailing</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input"
+                                                   [(ngModel)]="site.excludeFromCsiMailing"
+                                                   name="excludeFromCsiMailing">
+                                            <label class="form-check-label">Exclude From CSI Mailing</label>
+                                        </div>
                                     </div>
 
                                     <div class="col-md-6 mb-3">
-                                        <div class="form-check mb-2">
-                                            <input type="checkbox" class="form-check-input"
-                                                   [(ngModel)]="site.needsCsiInspection" name="needsCsiInspection">
-                                            <label class="form-check-label">Needs CSI Inspection</label>
+                                        <div class="row align-items-center mb-2">
+                                            <div class="col-5">
+                                                <div class="form-check">
+                                                    <input type="checkbox" class="form-check-input"
+                                                           [(ngModel)]="site.needsCsiInspection"
+                                                           (ngModelChange)="setDefaultDateWhenEnabled($event, 'csiRenewalDate')"
+                                                           name="needsCsiInspection">
+                                                    <label class="form-check-label">Needs CSI Inspection</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-7">
+                                                @if (site.needsCsiInspection) {
+                                                    <vp-input name="csiRenewalDate"
+                                                              label="CSI Renewal Date:"
+                                                              labelStyle="horizontal"
+                                                              type="date"
+                                                              [(ngModel)]="site.csiRenewalDate"
+                                                              [required]="true"
+                                                              [form]="form">
+                                                    </vp-input>
+                                                }
+                                            </div>
                                         </div>
-                                        <div class="form-check mb-2">
-                                            <input type="checkbox" class="form-check-input"
-                                                   [(ngModel)]="site.needsFogInspection" name="needsFogInspection">
-                                            <label class="form-check-label">Needs FOG Inspection</label>
+                                        <div class="row align-items-center mb-2">
+                                            <div class="col-5">
+                                                <div class="form-check">
+                                                    <input type="checkbox" class="form-check-input"
+                                                           [(ngModel)]="site.needsFogInspection"
+                                                           (ngModelChange)="setDefaultDateWhenEnabled($event, 'fogInspectionExpirationDate')"
+                                                           name="needsFogInspection">
+                                                    <label class="form-check-label">Needs FOG Inspection</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-7">
+                                                @if (site.needsFogInspection) {
+                                                    <vp-input name="fogInspectionExpirationDate"
+                                                              label="FOG Inspection Date:"
+                                                              labelStyle="horizontal"
+                                                              type="date"
+                                                              [(ngModel)]="site.fogInspectionExpirationDate"
+                                                              [required]="true"
+                                                              [form]="form">
+                                                    </vp-input>
+                                                }
+                                            </div>
                                         </div>
-                                        <div class="form-check mb-2">
-                                            <input type="checkbox" class="form-check-input"
-                                                   [(ngModel)]="site.needsFogPermit" name="needsFogPermit">
-                                            <label class="form-check-label">Has FOG Permit</label>
+                                        <div class="row align-items-center mb-2">
+                                            <div class="col-5">
+                                                <div class="form-check">
+                                                    <input type="checkbox" class="form-check-input"
+                                                           [(ngModel)]="site.needsFogPermit"
+                                                           (ngModelChange)="setDefaultDateWhenEnabled($event, 'fogPermitExpirationDate')"
+                                                           name="needsFogPermit">
+                                                    <label class="form-check-label">Has FOG Permit</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-7">
+                                                @if (site.needsFogPermit) {
+                                                    <vp-input name="fogPermitExpirationDate"
+                                                              label="Fog Permit Expiration Date:"
+                                                              labelStyle="horizontal"
+                                                              type="date"
+                                                              [(ngModel)]="site.fogPermitExpirationDate"
+                                                              [required]="true"
+                                                              [form]="form">
+                                                    </vp-input>
+                                                }
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -135,7 +201,7 @@
 
                             <div>
                                 <vp-validation-summary [form]="form"
-                                                       [validationErrors]="validationErrors">
+                                                       [validationErrors]="sectionValidationErrors.siteSettings">
                                 </vp-validation-summary>
 
                                 <div class="d-flex justify-content-end">
@@ -252,7 +318,7 @@
 
                             <div>
                                 <vp-validation-summary [form]="form"
-                                                       [validationErrors]="validationErrors">
+                                                       [validationErrors]="sectionValidationErrors.facilityType">
                                 </vp-validation-summary>
 
                                 <div class="d-flex justify-content-end">
@@ -325,7 +391,7 @@
 
                             <div>
                                 <vp-validation-summary [form]="form"
-                                                       [validationErrors]="validationErrors">
+                                                       [validationErrors]="sectionValidationErrors.gisData">
                                 </vp-validation-summary>
 
                                 <div class="d-flex justify-content-end mt-1">
@@ -355,6 +421,7 @@
                                               name="accountNumber"
                                               label="Account Number:"
                                               labelStyle="horizontal"
+                                              [readonly]="!allowAccountNumberChanges"
                                               [required]="true"
                                               [maxLength]="50"
                                               [form]="form">
@@ -464,7 +531,7 @@
 
                             <div>
                                 <vp-validation-summary [form]="form"
-                                                       [validationErrors]="validationErrors">
+                                                       [validationErrors]="sectionValidationErrors.location">
                                 </vp-validation-summary>
 
                                 <div class="d-flex justify-content-end">
@@ -586,7 +653,7 @@
 
                             <div>
                                 <vp-validation-summary [form]="form"
-                                                       [validationErrors]="validationErrors">
+                                                       [validationErrors]="sectionValidationErrors.mailing">
                                 </vp-validation-summary>
 
                                 <div class="d-flex justify-content-end">

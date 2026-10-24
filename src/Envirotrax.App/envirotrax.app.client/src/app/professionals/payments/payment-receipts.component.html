@@ -1,0 +1,65 @@
+<h1 class="text-center h2">Payment Receipts</h1>
+
+<ng-template #dateCell let-transaction="rowData">
+    {{ transaction.transactionDate | date: 'short' }}
+</ng-template>
+
+<ng-template #receiptCell let-transaction="rowData">
+    <button type="button" class="btn btn-primary btn-sm" (click)="viewReceipt(transaction)">
+        Receipt
+    </button>
+</ng-template>
+
+<vp-section header="Transaction Details">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="isLoading" message="Loading Payments" />
+
+        <div class="mb-3">
+            <div class="row">
+                <div class="col-xl col-md-6">
+                    <vp-input name="transactionType"
+                              label="Payment Type:"
+                              labelStyle="horizontal"
+                              type="select"
+                              [options]="transactionTypeOptions"
+                              [(ngModel)]="transactionType" />
+                </div>
+
+                <div class="col-xl col-md-6">
+                    <vp-input name="fromDate"
+                              label="From:"
+                              labelStyle="horizontal"
+                              type="date"
+                              [(ngModel)]="fromDate" />
+                </div>
+
+                <div class="col-xl col-md-6">
+                    <vp-input name="toDate"
+                              label="To:"
+                              labelStyle="horizontal"
+                              type="date"
+                              [(ngModel)]="toDate" />
+                </div>
+
+                <div class="col-xl-2 mt-3 mt-xl-0">
+                    <div class="d-flex justify-content-center">
+                        <button type="button" class="btn btn-primary vp-section-button"
+                                [disabled]="!fromDate || !toDate"
+                                (click)="search()">
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getTransactions()"
+                  [(query)]="table.query"
+                  (queryChange)="getTransactions()"
+                  (queryReset)="getTransactions()" />
+    </div>
+</vp-section>

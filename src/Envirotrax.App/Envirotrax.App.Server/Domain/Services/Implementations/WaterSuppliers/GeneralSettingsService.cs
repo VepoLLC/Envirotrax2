@@ -1,4 +1,5 @@
 
+using System.Linq.Expressions;
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
@@ -16,6 +17,13 @@ public class GeneralSettingsService : Service<GeneralSettings, GeneralSettingsDt
         : base(mapper, repository)
     {
         _repository = repository;
+    }
+
+    public async Task<GeneralSettingsDto> GetAsync(int waterSupplierId, Expression<Func<GeneralSettings, GeneralSettings>> selector, CancellationToken cancellationToken)
+    {
+        var settings = await _repository.GetAsync(waterSupplierId, selector, cancellationToken);
+
+        return MapToDto(settings)!;
     }
 
     public async Task<GeneralSettingsDto> AddOrUpdateAsync(int waterSupplierId, GeneralSettingsDto settings)

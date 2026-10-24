@@ -35,6 +35,11 @@ export class ProfessionalInsuranceService {
         return lastValueFrom(this._http.get<ProfessionalInsurance>(url));
     }
 
+    public getFileUrl(id: number): Promise<string> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/insurances/${id}/file-url`);
+        return lastValueFrom(this._http.get<string>(url));
+    }
+
     public add(insurance: ProfessionalInsurance, file: File): Promise<ProfessionalInsurance> {
         const url = this._urlResolver.resolveUrl('/api/professionals/insurances');
 

@@ -80,6 +80,16 @@ export class HelperService {
         return Number.isNaN(parsed) ? undefined : parsed;
     }
 
+    public getShortMonthName(month: number | null | undefined): string {
+        if (!month || month < 1 || month > 12) {
+            return '';
+        }
+
+        const date = new Date(2000, month - 1, 1);
+
+        return date.toLocaleString('en-US', { month: 'short' });
+    }
+
     public toTextOrUndefined(value: unknown): string | undefined {
         if (value === null || value === undefined || value === '') {
             return undefined;

@@ -19,10 +19,20 @@ public class ProfessionalProfile : Profile
                         Id = model.StateId.Value
                     };
                 }
+
+                if (model.DefaultStateId.HasValue)
+                {
+                    dto.DefaultState ??= new()
+                    {
+                        Id = model.DefaultStateId.Value
+                    };
+                }
             })
             .ReverseMap()
             .ForMember(pro => pro.State, opt => opt.Ignore())
             .ForMember(pro => pro.StateId, opt => opt.MapFrom(pro => pro.State!.Id))
+            .ForMember(pro => pro.DefaultState, opt => opt.Ignore())
+            .ForMember(pro => pro.DefaultStateId, opt => opt.MapFrom(pro => pro.DefaultState != null ? pro.DefaultState.Id : null))
             .ForMember(pro => pro.CreatedTime, opt => opt.Ignore())
             .ForMember(pro => pro.AccountBalance, opt => opt.Ignore());
 

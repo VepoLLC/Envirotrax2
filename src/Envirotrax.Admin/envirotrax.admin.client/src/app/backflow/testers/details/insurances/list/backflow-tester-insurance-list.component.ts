@@ -4,6 +4,7 @@ import { ModalSize } from '@developer-partners/ngx-modal-dialog';
 import {
     CellTemplateData,
     ColumnType,
+    DownloadService,
     ModalHelperService,
     TableColumn,
     TableCustomAction,
@@ -60,7 +61,8 @@ export class BackflowTesterInsuranceListComponent implements OnInit {
     constructor(
         private readonly _insuranceService: BackflowTesterInsuranceService,
         private readonly _modalHelper: ModalHelperService,
-        private readonly _toastService: ToastService
+        private readonly _toastService: ToastService,
+        private readonly _downloadService: DownloadService
     ) {
 
     }
@@ -119,22 +121,11 @@ export class BackflowTesterInsuranceListComponent implements OnInit {
     }
 
     public async viewCertificate(insurance: ProfessionalInsurance): Promise<void> {
-        // The tab has to be opened synchronously inside the click, otherwise the await moves the
-        // window.open out of the user-gesture task and pop-up blockers suppress it.
-        const certificateWindow = window.open('', '_blank');
-
         try {
             this.table.isLoading = true;
 
             const url = await this._insuranceService.getFileUrl(this.professionalId, insurance.id!);
-
-            if (certificateWindow) {
-                certificateWindow.location.href = url;
-            }
-        } catch (error) {
-            certificateWindow?.close();
-
-            this._toastService.show({ text: 'Could not open the certificate.', type: ToastType.Error });
+            this._downloadService.downloadFileFromUrl(url);
         } finally {
             this.table.isLoading = false;
         }

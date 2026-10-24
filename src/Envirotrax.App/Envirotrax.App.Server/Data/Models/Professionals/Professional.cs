@@ -30,6 +30,9 @@ public class Professional : IAuditableModel<AppUser>
     public int? StateId { get; set; }
     public State? State { get; set; }
 
+    public int? DefaultStateId { get; set; }
+    public State? DefaultState { get; set; }
+
     [StringLength(255)]
     public string? City { get; set; }
 
@@ -51,6 +54,8 @@ public class Professional : IAuditableModel<AppUser>
     public bool HidePublicListing { get; set; }
 
     public bool HideCellPhoneNumber { get; set; }
+
+    public bool SendCheckoutEmail { get; set; }
 
     public bool HasWiseGuys { get; set; }
     public bool HasBackflowTesting { get; set; }

@@ -23,6 +23,8 @@ namespace Envirotrax.App.Server.Data.DbContexts;
 // Record logging lives in TenantDbContext.RecordLogging.cs.
 public partial class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUser>
 {
+    public const string SiteAccountNumberSequence = "SiteAccountNumberSequence";
+
     public DbSet<GeneralSettings> GeneralSettings { get; set; }
     public DbSet<CsiSettings> CsiSettings { get; set; }
     public DbSet<BackflowSettings> BackflowSettings { get; set; }
@@ -99,6 +101,9 @@ public partial class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUse
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+        modelBuilder.HasSequence<long>(SiteAccountNumberSequence)
+            .StartsAt(100000);
     }
 
     /// <summary>

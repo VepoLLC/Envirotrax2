@@ -12,7 +12,7 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" [class.active]="activeTab === 'assemblies'" (click)="onTabChange('assemblies')" role="button">
-                Assemblies at this Location
+                Assemblies at this Location ({{ assemblies.length }})
             </a>
         </li>
         <li class="nav-item">
@@ -312,15 +312,78 @@
     </div>
 
     <div *ngIf="activeTab === 'assemblies'">
-        <dp-loading-spinner *ngIf="isLoadingAssemblies"></dp-loading-spinner>
-        <vp-section *ngIf="!isLoadingAssemblies" header="Assemblies at This Location" class="d-block">
-            <vp-csi-inspection-assembly-table [assemblies]="assemblies" testViewRoute="/professionals/backflow/tests" />
+        <vp-section header="Assemblies at This Location" class="d-block">
+            <vp-csi-inspection-assembly-table [assemblies]="assemblies" viewTestBasePath="/professionals/backflow/tests" />
         </vp-section>
     </div>
 
     <div *ngIf="activeTab === 'additional'">
+        <vp-section header="Additional Information" class="d-block">
+            <div class="d-flex justify-content-center">
+                <div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input readonly-checkbox" type="checkbox" id="aiOssf" disabled [checked]="inspection.aiOssf" />
+                            <label class="form-check-label" for="aiOssf">Has On Site Sewage Facility</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input readonly-checkbox" type="checkbox" id="aiWaterWell" disabled [checked]="inspection.aiWaterWell" />
+                            <label class="form-check-label" for="aiWaterWell">Has Auxiliary Water Supply</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input readonly-checkbox" type="checkbox" id="aiReclaimedWater" disabled [checked]="inspection.aiReclaimedWater" />
+                            <label class="form-check-label" for="aiReclaimedWater">Has Reclaimed Water</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input readonly-checkbox" type="checkbox" id="aiFireSystem" disabled [checked]="inspection.aiFireSystem" />
+                            <label class="form-check-label" for="aiFireSystem">Has Fire System</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input readonly-checkbox" type="checkbox" id="aiFireSystem2" disabled [checked]="inspection.aiFireSystem2" />
+                            <label class="form-check-label" for="aiFireSystem2">Fire System on Separate Water Supply</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input readonly-checkbox" type="checkbox" id="aiGreaseTrap" disabled [checked]="inspection.aiGreaseTrap" />
+                            <label class="form-check-label" for="aiGreaseTrap">Has Grease Trap</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input readonly-checkbox" type="checkbox" id="aiSandGrit" disabled [checked]="inspection.aiSandGrit" />
+                            <label class="form-check-label" for="aiSandGrit">Has Sand &amp; Grit Trap</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input readonly-checkbox" type="checkbox" id="aiIrrigationSystem" disabled [checked]="inspection.aiIrrigationSystem" />
+                            <label class="form-check-label" for="aiIrrigationSystem">Has Irrigation System</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input readonly-checkbox" type="checkbox" id="aiIrrigationSystem2" disabled [checked]="inspection.aiIrrigationSystem2" />
+                            <label class="form-check-label" for="aiIrrigationSystem2">Irrigation on Separate Water Supply</label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="form-check">
+                            <input class="form-check-input readonly-checkbox" type="checkbox" id="aiHasIsolation" disabled [checked]="inspection.aiHasDomesticPremisesIsolation" />
+                            <label class="form-check-label" for="aiHasIsolation">Has Domestic/Premises Isolation</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input readonly-checkbox" type="checkbox" id="aiRequiresIsolation" disabled [checked]="inspection.aiRequiresDomesticPremisesIsolation" />
+                            <label class="form-check-label" for="aiRequiresIsolation">Requires Domestic/Premises Isolation</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </vp-section>
     </div>
-    
+
     <div *ngIf="activeTab === 'images'">
         <dp-loading-spinner *ngIf="isLoadingImages"></dp-loading-spinner>
         <div *ngIf="!isLoadingImages">

@@ -4,7 +4,7 @@
 
 <div *ngIf="!isLoading">
 
-    <div *ngIf="site">
+    <div *ngIf="site || isUnlistedProperty">
 
         <!-- Tabs -->
         <ul class="nav vp-tabs justify-content-center mb-1">
@@ -83,8 +83,8 @@
                         </div>
                     </div>
                     <div *ngIf="isSiteWaterSupplierMissing" class="text-danger mt-3">
-                        This site is located within {{ site.waterSupplier?.name }}, which is not currently on your list of
-                        selected water suppliers. You must add {{ site.waterSupplier?.name }} to your water suppliers to
+                        This site is located within {{ site?.waterSupplier?.name }}, which is not currently on your list of
+                        selected water suppliers. You must add {{ site?.waterSupplier?.name }} to your water suppliers to
                         continue.
                     </div>
                 </vp-section>
@@ -226,7 +226,7 @@
                     <div class="col-md-6">
                         <vp-section header="Location / Property Information">
                             <vp-section-actions>
-                                <button type="button" class="btn-primary"
+                                <button *ngIf="!isUnlistedProperty" type="button" class="btn-primary"
                                         (click)="cancelLocationModification()">Cancel</button>
                             </vp-section-actions>
 
@@ -250,7 +250,7 @@
                                 <div class="col-xl-8">
                                     <vp-input name="propertyBusinessName"
                                               [(ngModel)]="model.propertyBusinessName"
-                                              [disabled]="model.propertyType === PropertyType.Residential"
+                                              [disabled]="!isUnlistedProperty && model.propertyType === PropertyType.Residential"
                                               [maxLength]="100" />
                                 </div>
                             </div>
@@ -326,11 +326,11 @@
                     <div class="col-md-6">
                         <vp-section header="Contact / Mailing Information">
                             <vp-section-actions>
-                                <button type="button" class="btn-primary"
+                                <button *ngIf="!isUnlistedProperty" type="button" class="btn-primary"
                                         (click)="cancelLocationModification()">Cancel</button>
                             </vp-section-actions>
 
-                            <p *ngIf="model.propertyType === PropertyType.Residential" class="mb-2">Leave Company Name
+                            <p *ngIf="model.propertyType === PropertyType.Residential" class="text-danger mb-2">Leave Company Name
                                 blank if this is a residence not owned or managed by a business.</p>
                             <p class="text-danger mb-2">Do not enter your company's information for the mailing contact
                                 name or address.</p>

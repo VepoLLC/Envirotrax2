@@ -9,10 +9,13 @@ public interface ISiteService : IService<Site, SiteDto>
     Task<IPagedData<SiteDto>> SearchAsync(PageInfo pageInfo, Query query, FogCompliancyStatus? fogCompliancyStatus, CancellationToken cancellationToken);
     Task<IPagedData<ProfessionalSiteDto>> SearchForProfessionalAsync(ProfessionalSiteSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<SiteDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken);
+    Task<SiteDto> AddWithGeneratedAccountNumberAsync(SiteDto dto);
+    Task<IPagedData<BackflowSubmissionSiteDto>> SearchForBackflowSubmissionAsync(BackflowSubmissionSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<IEnumerable<SiteDto>> GetAllPendingGeocodingAsync(int batchSize);
     Task<SiteDto?> GeocodeAsync(int siteId, bool assignGisArea, CancellationToken cancellationToken);
     Task UpdateGisDataAsync(int siteId, UpdateSiteGisDataDto dto, CancellationToken cancellationToken);
     Task<bool> UpdateFromAdminAsync(int siteId, SiteDto dto, CancellationToken cancellationToken);
+    Task UpdateAdditionalInformationAsync(int siteId, SiteAdditionalInformationDto dto);
     Task<bool> UpdateWaterSupplierAsync(int siteId, UpdateSiteWaterSupplierDto dto);
     Task<IPagedData<CsiComplianceSiteDto>> GetCsiComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<IPagedData<FogComplianceSiteDto>> GetFogInspectionComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
@@ -23,4 +26,5 @@ public interface ISiteService : IService<Site, SiteDto>
     Task UpdateFogAssignmentAsync(int siteId, int? userId);
     Task<IEnumerable<SiteDto>> GetAllPendingRenewalAsync(int batchSize, CancellationToken cancellationToken);
     Task<SiteTabCountsDto?> GetTabCountsAsync(int siteId, CancellationToken cancellationToken);
+    Task<SiteAccountNumberDto> GenerateAccountNumberAsync();
 }

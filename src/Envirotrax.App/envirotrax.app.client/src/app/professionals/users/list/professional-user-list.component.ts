@@ -1,10 +1,10 @@
-import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { ProfessionalUser } from "../../../shared/models/professionals/professional-user";
 import { ProfesionalUserService } from "../../../shared/services/professionals/professional-user.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import { CreateProfessionalUserComponent } from "../create/create-professional-user.component";
-import { ToastService, CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
+import { ToastService, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 
 // A grid row: a user decorated with the abbreviated job functions shown in the Job Functions column.
 type ProfessionalUserRow = ProfessionalUser & {
@@ -16,13 +16,8 @@ type ProfessionalUserRow = ProfessionalUser & {
     templateUrl: './professional-user-list.component.html'
 })
 export class ProfessionalUserListComponent implements OnInit {
-    // Kept as a template so the column's `field` stays empty: vp-table refetches when the header of a column
-    // with a field is clicked, and jobFunctions is not a DTO field the API can sort on.
-    @ViewChild('jobFunctionsTemplate', { static: true })
-    public jobFunctionsTemplate!: TemplateRef<CellTemplateData<ProfessionalUserRow>>;
-
     public table: TableViewModel<ProfessionalUserRow> = {
-        columns: [],
+        columns: this.getColumns(),
         query: {
             sort: {},
             filter: []
@@ -63,18 +58,16 @@ export class ProfessionalUserListComponent implements OnInit {
                 type: ColumnType.text
             },
             {
-                field: '',
+                field: 'jobFunctions',
                 caption: 'Job Functions',
-                type: ColumnType.other,
+                type: ColumnType.text,
                 queryColumnExcluded: true,
-                cellTemplate: this.jobFunctionsTemplate
+                sortColumnExcluded: true
             }
         ];
     }
 
     public async ngOnInit(): Promise<void> {
-        this.table.columns = this.getColumns();
-
         await this.getUsers();
     }
 

@@ -244,8 +244,7 @@ a:hover {
 }
 
 .form-control,
-.form-control:focus,
-.ng-select.ng-select-opened>.ng-select-container {
+.form-control:focus {
     padding: 0.25rem 0.75rem;
 }
 
@@ -327,6 +326,16 @@ dp-loading-spinner.vp-spinner-overlay .dp-spinner-container {
 
 .ng-select.ng-select-single .ng-select-container {
     height: 31px;
+}
+
+/* The search box sits over the selected value: the theme's top: 5px centers it in its own 36px box, not our 31px one,
+   and an input's text defaults to black (unreadable in the dark theme) instead of the value's color. */
+.ng-select.ng-select-single .ng-select-container .ng-value-container .ng-input {
+    top: 4px;
+}
+
+.ng-select.ng-select-searchable .ng-select-container .ng-value-container .ng-input>input {
+    color: inherit;
 }
 
 .ng-select.ng-select-focused .ng-select-container {

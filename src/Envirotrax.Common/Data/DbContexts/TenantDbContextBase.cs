@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
 using Envirotrax.Common.Data.Services.Definitions;
@@ -215,25 +216,63 @@ namespace Envirotrax.Common.Data.DbContexts
             }
         }
 
+        private static readonly Regex DuplicateKeyNameRegex = new(@"(?:unique index|constraint) '([^']+)'", RegexOptions.Compiled);
+
         private void CheckDuplicateException(Exception ex)
         {
             if (ex is DbUpdateException dbUpdateEx)
             {
                 if (dbUpdateEx.InnerException is SqlException sqlEx)
                 {
+                    var propertyNames = GetDuplicatePropertyNames(sqlEx.Message);
+
                     if (sqlEx.Number == 2627)
                     {
                         // In case if we are adding the same record again.
-                        throw new DuplicateRecordException("The record with provided key already exists", ex);
+                        throw new DuplicateRecordException("The record with provided key already exists", ex, propertyNames);
                     }
 
                     if (sqlEx.Number == 2601)
                     {
                         // In case if we have a unique index error.
-                        throw new DuplicateRecordException(ex);
+                        throw new DuplicateRecordException(ex, propertyNames);
                     }
                 }
             }
+        }
+
+        // SQL Server embeds the violated index/constraint name in the error message (e.g. "with unique
+        // index 'IX_...'" or "Violation of ... constraint 'UQ_...'"). Matching that name against the EF
+        // model lets us report which entity properties collided instead of making callers parse SQL text.
+        private IReadOnlyList<string> GetDuplicatePropertyNames(string sqlErrorMessage)
+        {
+            var match = DuplicateKeyNameRegex.Match(sqlErrorMessage);
+
+            if (!match.Success)
+            {
+                return Array.Empty<string>();
+            }
+
+            var keyName = match.Groups[1].Value;
+
+            foreach (var entityType in Model.GetEntityTypes())
+            {
+                var index = entityType.GetIndexes().FirstOrDefault(i => i.GetDatabaseName() == keyName);
+
+                if (index != null)
+                {
+                    return index.Properties.Select(p => p.Name).ToArray();
+                }
+
+                var key = entityType.GetKeys().FirstOrDefault(k => k.GetName() == keyName);
+
+                if (key != null)
+                {
+                    return key.Properties.Select(p => p.Name).ToArray();
+                }
+            }
+
+            return Array.Empty<string>();
         }
 
         protected virtual int VerifySaveTenantId(int tenantId)

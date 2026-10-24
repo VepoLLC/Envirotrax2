@@ -12,6 +12,7 @@ public interface ISiteRepository : IRepository<Site>
     Task<IEnumerable<Site>> SearchAsync(PageInfo pageInfo, Query query, bool? fogCompliant, CancellationToken cancellationToken);
     Task<IEnumerable<Site>> SearchForProfessionalAsync(ProfessionalSiteSearchDto criteria, PageInfo pageInfo, Query query, int professionalId, int userId, CancellationToken cancellationToken);
     Task<IEnumerable<Site>> SearchForBackflowSubmissionAsync(BackflowSubmissionSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<IEnumerable<Site>> GetForBackflowSubmissionAsync(IReadOnlyCollection<int> siteIds, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<IEnumerable<Site>> GetAllPendingGeocodingAsync(int batchSize);
     Task UpdateGisCoordinatesAsync(Site site);
     Task UpdateManualGisDataAsync(int siteId, double? latitude, double? longitude, GisStatusType status);
@@ -27,8 +28,6 @@ public interface ISiteRepository : IRepository<Site>
     Task ClearNeedsCsiInspectionAsync(IReadOnlyCollection<int> siteIds);
     Task UpdateLastTripTicketDatesAsync(IReadOnlyDictionary<int, DateTime> lastTripTicketDates);
     Task<IEnumerable<Site>> GetAllPendingRenewalAsync(int batchSize);
-    Task<bool> IsWaterSupplierAccountNumberTakenAsync(int siteId, string waterSupplierAccountNumber, CancellationToken cancellationToken);
-    Task<bool> IsAccountNumberTakenAsync(int siteId, string accountNumber, CancellationToken cancellationToken);
     Task<string?> GetAccountNumberAsync(int siteId, CancellationToken cancellationToken);
     Task<long> GetNextAccountNumberAsync();
 }

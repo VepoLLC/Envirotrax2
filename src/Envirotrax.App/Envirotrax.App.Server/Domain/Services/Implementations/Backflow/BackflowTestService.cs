@@ -696,35 +696,6 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         return await _settingsService.GetAsync(waterSupplierId, cancellationToken);
     }
 
-    private static SiteDto BuildSiteForUnlistedProperty(BackflowTestDto dto)
-    {
-        return new SiteDto
-        {
-            WaterSupplier = dto.WaterSupplier,
-            Active = true,
-
-            BusinessName = dto.PropertyBusinessName,
-            PropertyType = (PropertyType)dto.PropertyType,
-            StreetNumber = dto.PropertyStreetNumber,
-            StreetName = dto.PropertyStreetName,
-            PropertyNumber = dto.PropertyNumber,
-            City = dto.PropertyCity,
-            State = dto.PropertyState,
-            ZipCode = dto.PropertyZip,
-
-            MailingCompanyName = dto.MailingCompanyName,
-            MailingContactName = dto.MailingContactName,
-            MailingStreetNumber = dto.MailingStreetNumber,
-            MailingStreetName = dto.MailingStreetName,
-            MailingNumber = dto.MailingNumber,
-            MailingCity = dto.MailingCity,
-            MailingState = dto.MailingState,
-            MailingZipCode = dto.MailingZip,
-            MailingPhoneNumber = dto.MailingPhoneNumber,
-            MailingEmailAddress = dto.MailingEmailAddress
-        };
-    }
-
     public async Task<BackflowTestDto> SubmitWithImagesAsync(
         BackflowTestDto dto,
         Stream? assemblyStream, string? assemblyFileName,
@@ -833,6 +804,35 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         }
 
         return await _mailingInfoRedactionService.RedactAsync(saved, cancellationToken);
+    }
+
+    private static SiteDto BuildSiteForUnlistedProperty(BackflowTestDto dto)
+    {
+        return new SiteDto
+        {
+            WaterSupplier = new ReferencedWaterSupplierDto { Id = dto.WaterSupplier!.Id },
+            Active = true,
+
+            BusinessName = dto.PropertyBusinessName,
+            PropertyType = (PropertyType)dto.PropertyType,
+            StreetNumber = dto.PropertyStreetNumber,
+            StreetName = dto.PropertyStreetName,
+            PropertyNumber = dto.PropertyNumber,
+            City = dto.PropertyCity,
+            State = dto.PropertyState,
+            ZipCode = dto.PropertyZip,
+
+            MailingCompanyName = dto.MailingCompanyName,
+            MailingContactName = dto.MailingContactName,
+            MailingStreetNumber = dto.MailingStreetNumber,
+            MailingStreetName = dto.MailingStreetName,
+            MailingNumber = dto.MailingNumber,
+            MailingCity = dto.MailingCity,
+            MailingState = dto.MailingState,
+            MailingZipCode = dto.MailingZip,
+            MailingPhoneNumber = dto.MailingPhoneNumber,
+            MailingEmailAddress = dto.MailingEmailAddress
+        };
     }
 
     // Checkout "Edit" on an own, still-unpaid test: mirrors SubmitWithImagesAsync's snapshot/renewal/image

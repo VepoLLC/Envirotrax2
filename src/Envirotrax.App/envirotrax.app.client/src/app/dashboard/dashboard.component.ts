@@ -213,8 +213,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
             subAccountStats,
             subAccountTotalInspections: subAccountStats.reduce((s, sub) => s + sub.totalInspections, 0),
             subAccountTotalPaidInspections: subAccountStats.reduce((s, sub) => s + sub.totalPaidInspections, 0),
-            rangeStartDate: dailyStats[0]?.date,
-            rangeEndDate: dailyStats[dailyStats.length - 1]?.date
+            rangeStartDate: dailyStats[dailyStats.length - 1]?.date,
+            rangeEndDate: dailyStats[0]?.date
         };
     }
 
@@ -246,8 +246,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
             subAccountStats,
             subAccountTotalTests: subAccountStats.reduce((s, sub) => s + sub.totalTests, 0),
             subAccountTotalPaidTests: subAccountStats.reduce((s, sub) => s + sub.totalPaidTests, 0),
-            rangeStartDate: dailyStats[0]?.date,
-            rangeEndDate: dailyStats[dailyStats.length - 1]?.date
+            rangeStartDate: dailyStats[dailyStats.length - 1]?.date,
+            rangeEndDate: dailyStats[0]?.date
         };
     }
 
@@ -301,8 +301,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
             subAccountStats,
             subAccountTotalInspections: subAccountStats.reduce((s, sub) => s + sub.totalInspections, 0),
             subAccountTotalPaidInspections: subAccountStats.reduce((s, sub) => s + sub.totalPaidInspections, 0),
-            rangeStartDate: dailyStats[0]?.date,
-            rangeEndDate: dailyStats[dailyStats.length - 1]?.date
+            rangeStartDate: dailyStats[dailyStats.length - 1]?.date,
+            rangeEndDate: dailyStats[0]?.date
         };
     }
 
@@ -334,8 +334,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
             subAccountStats,
             subAccountTotalTripTickets: subAccountStats.reduce((s, sub) => s + sub.totalTripTickets, 0),
             subAccountTotalPaidTripTickets: subAccountStats.reduce((s, sub) => s + sub.totalPaidTripTickets, 0),
-            rangeStartDate: dailyStats[0]?.date,
-            rangeEndDate: dailyStats[dailyStats.length - 1]?.date
+            rangeStartDate: dailyStats[dailyStats.length - 1]?.date,
+            rangeEndDate: dailyStats[0]?.date
         };
     }
 
